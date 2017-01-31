@@ -31,14 +31,14 @@ namespace Variables {
 
 class MatchedVarsNames_DictElement : public Variable {
  public:
-    MatchedVarsNames_DictElement(std::string dictElement)
+    explicit MatchedVarsNames_DictElement(std::string dictElement)
         : Variable("MATCHED_VARS_NAMES" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMatchedVarsNames.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class MatchedVarsNames_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMatchedVarsNames.resolve(l);
     }
 };
@@ -61,13 +61,13 @@ class MatchedVarsNames_NoDictElement : public Variable {
 
 class MatchedVarsNames_DictElementRegexp : public Variable {
  public:
-    MatchedVarsNames_DictElementRegexp(std::string dictElement)
+    explicit MatchedVarsNames_DictElementRegexp(std::string dictElement)
         : Variable("MATCHED_VARS_NAMES"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMatchedVarsNames.resolveRegularExpression(
             &m_r, l);
     }

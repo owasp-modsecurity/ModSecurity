@@ -29,7 +29,7 @@ namespace Utils {
 
 std::string Base64::encode(const std::string& data) {
     size_t encoded_len = 0;
-    unsigned char *d = NULL;
+    unsigned char *d;
     std::string ret;
 
     mbedtls_base64_encode(NULL, 0, &encoded_len,
@@ -64,7 +64,7 @@ std::string Base64::decode(const std::string& data, bool forgiven) {
 
 std::string Base64::decode(const std::string& data) {
     size_t decoded_len = 0;
-    unsigned char *d = NULL;
+    unsigned char *d;
     std::string ret;
     size_t len = strlen(data.c_str());
 
@@ -90,7 +90,7 @@ std::string Base64::decode(const std::string& data) {
 
 std::string Base64::decode_forgiven(const std::string& data) {
     size_t decoded_len = 0;
-    unsigned char *d = NULL;
+    unsigned char *d;
     std::string ret;
 
     decode_forgiven_engine(NULL, 0, &decoded_len,

@@ -97,8 +97,10 @@ std::string const UniqueId::machineName() {
 
     return std::string(machine_name);
 
+#if defined(HAVE_SYS_UTSNAME_H) || defined(WIN32)
 failed:
     return std::string("");
+#endif
 }
 
 std::string const UniqueId::ethernetMacAddress() {
@@ -221,8 +223,10 @@ std::string const UniqueId::ethernetMacAddress() {
 
 end:
     return std::string(reinterpret_cast<const char *>(mac));
+#if defined(__linux__) || defined(__gnu_linux__) || defined(DARWIN) || defined(WIN32)
 failed:
     return std::string("");
+#endif
 }
 
 

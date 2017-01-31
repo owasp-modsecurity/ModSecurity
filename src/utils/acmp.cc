@@ -37,7 +37,7 @@ extern "C" {
 
 char *parse_pm_content(const char *op_parm, unsigned short int op_len, const char **error_msg)  {
     char *parm = NULL;
-    char *content = NULL;
+    char *content;
     unsigned short int offset = 0;
 //    char converted = 0;
     int i, x;

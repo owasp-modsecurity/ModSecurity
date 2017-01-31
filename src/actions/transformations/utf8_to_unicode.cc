@@ -36,7 +36,7 @@ namespace transformations {
 std::string Utf8ToUnicode::evaluate(std::string value,
     Transaction *transaction) {
     std::string ret;
-    unsigned char *input = NULL;
+    unsigned char *input;
     int changed = 0;
     char *out;
 

@@ -25,6 +25,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <memory>
 #endif
 
 #include "modsecurity/collection/variable.h"
@@ -64,5 +65,5 @@ class AnchoredVariable {
 #endif
 
 
-#endif  // HEADERS_MODSECURITY_ANCHORED_SET_VARIABLE_H_
+#endif  // HEADERS_MODSECURITY_ANCHORED_VARIABLE_H_
 

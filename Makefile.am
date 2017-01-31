@@ -59,10 +59,10 @@ cppcheck:
 		--enable=all \
 		--inconclusive \
 		--template="warning: {file},{line},{severity},{id},{message}" \
-		-U YYSTYPE \
-		-U YY_USER_INIT \
 		--std=posix . 2> cppcheck.txt
 	cat cppcheck.txt
+#		-U YYSTYPE
+#		-U YY_USER_INIT
 
 check-static: cppcheck
 

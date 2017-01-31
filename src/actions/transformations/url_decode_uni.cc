@@ -38,7 +38,7 @@ namespace transformations {
 std::string UrlDecodeUni::evaluate(std::string value,
     Transaction *transaction) {
     std::string ret;
-    unsigned char *input = NULL;
+    unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>
         (malloc(sizeof(char) * value.length()+1));

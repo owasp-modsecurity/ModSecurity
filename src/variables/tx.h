@@ -48,7 +48,7 @@ class Tx_DictElement : public Variable {
 
 class Tx_NoDictElement : public Variable {
  public:
-    explicit Tx_NoDictElement()
+    Tx_NoDictElement()
         : Variable("TX") { }
 
     void evaluate(Transaction *transaction,
@@ -61,7 +61,7 @@ class Tx_NoDictElement : public Variable {
 
 class Tx_DictElementRegexp : public Variable {
  public:
-    Tx_DictElementRegexp(std::string dictElement)
+    explicit Tx_DictElementRegexp(std::string dictElement)
         : Variable("TX"),
         m_r(dictElement),
         m_dictElement("TX:" + dictElement) { }

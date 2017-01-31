@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/collection/variable.h"
 #include "src/utils/regex.h"

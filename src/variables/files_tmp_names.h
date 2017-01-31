@@ -30,14 +30,14 @@ class Transaction;
 namespace Variables {
 class FilesTmpNames_DictElement : public Variable {
  public:
-    FilesTmpNames_DictElement(std::string dictElement)
+    explicit FilesTmpNames_DictElement(std::string dictElement)
         : Variable("FILES_TMPNAMES" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableFilesTmpNames.resolve(m_dictElement, l);
     }
 
@@ -52,7 +52,7 @@ class FilesTmpNames_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableFilesTmpNames.resolve(l);
     }
 };
@@ -60,7 +60,7 @@ class FilesTmpNames_NoDictElement : public Variable {
 
 class FilesTmpNames_DictElementRegexp : public Variable {
  public:
-    FilesTmpNames_DictElementRegexp(std::string dictElement)
+    explicit FilesTmpNames_DictElementRegexp(std::string dictElement)
         : Variable("FILES_TMPNAMES"),
         m_r(dictElement) { }
 

@@ -33,7 +33,7 @@ ModSecurity *modsec = NULL;
 
 
 void process_special_request (int j) {
-    Transaction *transaction = NULL;
+    Transaction *transaction;
     transaction = msc_new_transaction(modsec, rules, NULL);
 
     msc_process_connection(transaction, "127.0.0.1", 12345, "127.0.0.1", 80);
@@ -61,7 +61,7 @@ void process_request (int j) {
         }
         struct timeval tv;
 
-        Transaction *transaction = NULL;
+        Transaction *transaction;
         transaction = msc_new_transaction(modsec, rules, NULL);
 
         msc_process_connection(transaction, "127.0.0.1", 12345, "127.0.0.1", 80);

@@ -29,14 +29,14 @@ namespace Variables {
 
 class Rule_DictElement : public Variable {
  public:
-    Rule_DictElement(std::string dictElement)
+    explicit Rule_DictElement(std::string dictElement)
         : Variable("RULE" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableRule.resolve(m_dictElement, l);
     }
 
@@ -51,7 +51,7 @@ class Rule_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableRule.resolve(l);
     }
 };
@@ -59,7 +59,7 @@ class Rule_NoDictElement : public Variable {
 
 class Rule_DictElementRegexp : public Variable {
  public:
-    Rule_DictElementRegexp(std::string dictElement)
+    explicit Rule_DictElementRegexp(std::string dictElement)
         : Variable("RULE"),
         m_r(dictElement) { }
 

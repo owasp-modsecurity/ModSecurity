@@ -25,9 +25,8 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <vector>
 #include <algorithm>
-#include <iostream>
+#include <memory>
 #endif
 
 #include "modsecurity/collection/variable.h"
@@ -40,7 +39,7 @@
 namespace modsecurity {
 class Transaction;
 namespace Utils {
-    class Regex;
+class Regex;
 }
 
 
@@ -66,8 +65,8 @@ struct MyHash{
 };
 
 
-class AnchoredSetVariable : public std::unordered_multimap<std::string, collection::Variable *,
-        MyHash, MyEqual> {
+class AnchoredSetVariable : public std::unordered_multimap<std::string,
+	collection::Variable *, MyHash, MyEqual> {
  public:
     AnchoredSetVariable(Transaction *t, std::string name);
     ~AnchoredSetVariable();
@@ -76,6 +75,7 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string, collecti
 
     void set(const std::string &key, const std::string &value,
         size_t offset);
+    void setCopy(std::string key, std::string value, size_t offset);
 
     void resolve(std::vector<const collection::Variable *> *l);
 

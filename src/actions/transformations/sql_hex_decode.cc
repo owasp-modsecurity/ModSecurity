@@ -44,7 +44,7 @@ namespace transformations {
 std::string SqlHexDecode::evaluate(std::string value,
     Transaction *transaction) {
     std::string ret;
-    unsigned char *input = NULL;
+    unsigned char *input;
     int size = 0;
 
     input = reinterpret_cast<unsigned char *>

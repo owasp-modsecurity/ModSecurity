@@ -25,6 +25,7 @@
 #include <cstdio>
 #include <string>
 #include <list>
+#include <memory>
 #endif
 
 #include "modsecurity/collection/collection.h"

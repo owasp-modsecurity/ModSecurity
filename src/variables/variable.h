@@ -17,6 +17,8 @@
 #include <string>
 #include <list>
 #include <utility>
+#include <memory>
+
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "src/utils/string.h"
@@ -96,7 +98,7 @@ class Variable {
 
 class VariableModificatorExclusion : public Variable {
  public:
-    VariableModificatorExclusion(std::unique_ptr<Variable> var)
+    explicit VariableModificatorExclusion(std::unique_ptr<Variable> var)
         : Variable(var->m_name),
         m_var(std::move(var)) {
             m_isExclusion = true;
@@ -114,7 +116,7 @@ class VariableModificatorExclusion : public Variable {
 
 class VariableModificatorCount : public Variable {
  public:
-    VariableModificatorCount(std::unique_ptr<Variable> var)
+    explicit VariableModificatorCount(std::unique_ptr<Variable> var)
         : Variable(var->m_name),
         m_var(std::move(var)) {
             m_isCount = true;

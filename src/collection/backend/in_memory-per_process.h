@@ -21,6 +21,7 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+#include <memory>
 #endif
 
 

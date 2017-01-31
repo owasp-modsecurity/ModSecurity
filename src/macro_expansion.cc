@@ -13,6 +13,9 @@
  *
  */
 
+
+#include <memory>
+
 #include "src/macro_expansion.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/collection/variable.h"

@@ -31,14 +31,14 @@ namespace Variables {
 
 class Geo_DictElement : public Variable {
  public:
-    Geo_DictElement(std::string dictElement)
+    explicit Geo_DictElement(std::string dictElement)
         : Variable("GEO" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableGeo.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class Geo_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableGeo.resolve(l);
     }
 };
@@ -61,7 +61,7 @@ class Geo_NoDictElement : public Variable {
 
 class Geo_DictElementRegexp : public Variable {
  public:
-    Geo_DictElementRegexp(std::string dictElement)
+    explicit Geo_DictElementRegexp(std::string dictElement)
         : Variable("GEO"),
         m_r(dictElement) { }
 

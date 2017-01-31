@@ -206,20 +206,24 @@ void Rule::cleanMatchedVars(Transaction *trasn) {
 
 void Rule::updateRulesVariable(Transaction *trasn) {
     if (m_ruleId != 0) {
-        trasn->m_variableRule.set("id", std::to_string(m_ruleId), 0);
+        trasn->m_variableRule.set("id",
+            std::to_string(m_ruleId), 0);
     }
     if (m_rev.empty() == false) {
-        trasn->m_variableRule.set("rev", m_rev, 0);
+        trasn->m_variableRule.set("rev",
+            m_rev, 0);
     }
     if (getActionsByName("msg").size() > 0) {
         actions::Msg *msg = dynamic_cast<actions::Msg*>(
             getActionsByName("msg")[0]);
-        trasn->m_variableRule.set("msg", msg->data(trasn), 0);
+        trasn->m_variableRule.set("msg",
+           msg->data(trasn), 0);
     }
     if (getActionsByName("logdata").size() > 0) {
         actions::LogData *data = dynamic_cast<actions::LogData*>(
             getActionsByName("logdata")[0]);
-        trasn->m_variableRule.set("logdata", data->data(trasn), 0);
+        trasn->m_variableRule.set("logdata",
+            data->data(trasn), 0);
     }
     if (getActionsByName("severity").size() > 0) {
         actions::Severity *data = dynamic_cast<actions::Severity*>(
@@ -295,34 +299,33 @@ bool Rule::executeOperatorAt(Transaction *trasn, std::string key,
     return ret;
 }
 
-// FIXME: this should be a list instead of a vector, keeping the but
-// of v2 alive.
-std::list<std::pair<std::unique_ptr<std::string>,
-    std::unique_ptr<std::string>>>
-    Rule::executeSecDefaultActionTransofrmations(
+
+std::list<std::pair<std::shared_ptr<std::string>,
+    std::shared_ptr<std::string>>>
+    Rule::executeDefaultTransformations(
 
     Transaction *trasn, const std::string &in, bool multiMatch) {
     int none = 0;
     int transformations = 0;
 
-    std::list<std::pair<std::unique_ptr<std::string>,
-        std::unique_ptr<std::string>>> ret;
+    std::list<std::pair<std::shared_ptr<std::string>,
+        std::shared_ptr<std::string>>> ret;
 
 
-    std::unique_ptr<std::string> value =
-        std::unique_ptr<std::string>(new std::string(in));
-    std::unique_ptr<std::string> newValue;
+    std::shared_ptr<std::string> value =
+        std::shared_ptr<std::string>(new std::string(in));
+    std::shared_ptr<std::string> newValue;
 
-    std::unique_ptr<std::string> trans =
-        std::unique_ptr<std::string>(new std::string());
+    std::shared_ptr<std::string> trans =
+        std::shared_ptr<std::string>(new std::string());
 
     if (multiMatch == true) {
         ret.push_back(std::make_pair(
-            std::move(value),
-            std::move(trans)));
+            std::shared_ptr<std::string>(value),
+            std::shared_ptr<std::string>(trans)));
         ret.push_back(std::make_pair(
-            std::move(value),
-            std::move(trans)));
+            std::shared_ptr<std::string>(value),
+            std::shared_ptr<std::string>(trans)));
     }
 
     for (Action *a : this->m_actionsRuntimePre) {
@@ -344,11 +347,11 @@ std::list<std::pair<std::unique_ptr<std::string>,
                 if (multiMatch == true) {
                     if (*newValue != *value) {
                         ret.push_back(std::make_pair(
-                            std::move(newValue),
-                            std::move(trans)));
+                            newValue,
+                            trans));
                     }
                 }
-                value = std::move(newValue);
+                value = std::shared_ptr<std::string>(newValue);
                 if (trans->empty()) {
                     trans->append(a->m_name);
                 } else {
@@ -364,22 +367,21 @@ std::list<std::pair<std::unique_ptr<std::string>,
         }
     }
 
-
     for (Action *a : this->m_actionsRuntimePre) {
         if (none == 0) {
-            newValue = std::unique_ptr<std::string>(
+            newValue = std::shared_ptr<std::string>(
                 new std::string(a->evaluate(*value, trasn)));
 
             if (multiMatch == true) {
                 if (*value != *newValue) {
                     ret.push_back(std::make_pair(
-                        std::move(newValue),
-                        std::move(trans)));
-                    value = std::move(newValue);
+                        newValue,
+                        trans));
+                    value = newValue;
                 }
             }
 
-            value = std::move(newValue);
+            value = newValue;
             trasn->debug(9, " T (" + \
                 std::to_string(transformations) + ") " + \
                 a->m_name + ": \"" + \
@@ -397,15 +399,15 @@ std::list<std::pair<std::unique_ptr<std::string>,
     }
     if (multiMatch == true) {
         // v2 checks the last entry twice. Don't know why.
-        ret.push_back(std::move(ret.back()));
+        ret.push_back(ret.back());
 
         trasn->debug(9, "multiMatch is enabled. " \
             + std::to_string(ret.size()) + \
             " values to be tested.");
     } else {
         ret.push_back(std::make_pair(
-            std::move(value),
-            std::move(trans)));
+            std::shared_ptr<std::string>(value),
+            std::shared_ptr<std::string>(trans)));
     }
 
     return ret;
@@ -425,7 +427,6 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             variable->evaluateInternal(trasn, this, &z);
             for (auto &y : z) {
                 exclusions.push_back(y->m_key);
-                //delete y;
             }
             exclusions.push_back(&variable->m_name);
         }
@@ -628,12 +629,12 @@ bool Rule::evaluate(Transaction *trasn) {
         const std::string value = *(v->m_value);
         const std::string key = *(v->m_key);
 
-        std::list<std::pair<std::unique_ptr<std::string>,
-            std::unique_ptr<std::string>>> values;
+        std::list<std::pair<std::shared_ptr<std::string>,
+            std::shared_ptr<std::string>>> values;
 
         bool multiMatch = getActionsByName("multimatch").size() > 0;
 
-        values = executeSecDefaultActionTransofrmations(trasn, value,
+        values = executeDefaultTransformations(trasn, value,
             multiMatch);
         for (const auto &valueTemp : values) {
             bool ret;

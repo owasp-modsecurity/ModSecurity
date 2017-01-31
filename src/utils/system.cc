@@ -59,7 +59,7 @@ double cpu_seconds(void) {
 
 std::string find_resource(const std::string& resource,
     const std::string& config) {
-    std::ifstream *iss = NULL;
+    std::ifstream *iss;
 
     // Trying absolute or relative to the current dir.
     iss = new std::ifstream(resource, std::ios::in);

@@ -31,14 +31,14 @@ namespace Variables {
 
 class RequestCookies_DictElement : public Variable {
  public:
-    RequestCookies_DictElement(std::string dictElement)
+    explicit RequestCookies_DictElement(std::string dictElement)
         : Variable("REQUEST_COOKIES" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableRequestCookies.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class RequestCookies_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableRequestCookies.resolve(l);
     }
 };
@@ -61,13 +61,13 @@ class RequestCookies_NoDictElement : public Variable {
 
 class RequestCookies_DictElementRegexp : public Variable {
  public:
-    RequestCookies_DictElementRegexp(std::string dictElement)
+    explicit RequestCookies_DictElementRegexp(std::string dictElement)
         : Variable("REQUEST_COOKIES"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableRequestCookies.resolveRegularExpression(
             &m_r, l);
     }

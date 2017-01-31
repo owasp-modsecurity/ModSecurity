@@ -36,7 +36,7 @@ namespace transformations {
 std::string HtmlEntityDecode::evaluate(std::string value,
     Transaction *transaction) {
     std::string ret;
-    unsigned char *input = NULL;
+    unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>
         (malloc(sizeof(char) * value.length()+1));
@@ -98,7 +98,7 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                     }
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
-                        char *x = NULL;
+                        char *x;
                         x = reinterpret_cast<char *>(calloc(sizeof(char),
                             ((j - k) + 1)));
                         memcpy(x, (const char *)&input[k], j - k);
@@ -124,7 +124,7 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                     }
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
-                        char *x = NULL;
+                        char *x;
                         x = reinterpret_cast<char *>(calloc(sizeof(char),
                             ((j - k) + 1)));
                         memcpy(x, (const char *)&input[k], j - k);
@@ -150,7 +150,7 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                     j++;
                 }
                 if (j > k) { /* Do we have at least one digit? */
-                    char *x = NULL;
+                    char *x;
                     x = reinterpret_cast<char *>(calloc(sizeof(char),
                         ((j - k) + 1)));
                     memcpy(x, (const char *)&input[k], j - k);

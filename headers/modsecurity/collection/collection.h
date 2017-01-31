@@ -21,6 +21,7 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+#include <memory>
 #endif
 
 
@@ -50,7 +51,8 @@ class Collection {
 
     virtual void del(const std::string& key) = 0;
 
-    virtual std::unique_ptr<std::string> resolveFirst(const std::string& var) = 0;
+    virtual std::unique_ptr<std::string> resolveFirst(
+	const std::string& var) = 0;
 
     virtual void resolveSingleMatch(const std::string& var,
         std::vector<const Variable *> *l) = 0;

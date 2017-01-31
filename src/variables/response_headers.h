@@ -31,14 +31,14 @@ namespace Variables {
 
 class ResponseHeaders_DictElement : public Variable {
  public:
-    ResponseHeaders_DictElement(std::string dictElement)
+    explicit ResponseHeaders_DictElement(std::string dictElement)
         : Variable("RESPONSE_HEADERS" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableResponseHeaders.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class ResponseHeaders_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableResponseHeaders.resolve(l);
     }
 };
@@ -61,7 +61,7 @@ class ResponseHeaders_NoDictElement : public Variable {
 
 class ResponseHeaders_DictElementRegexp : public Variable {
  public:
-    ResponseHeaders_DictElementRegexp(std::string dictElement)
+    explicit ResponseHeaders_DictElementRegexp(std::string dictElement)
         : Variable("RESPONSE_HEADERS"),
         m_r(dictElement) { }
 

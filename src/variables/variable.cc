@@ -122,7 +122,7 @@ Variable::Variable(std::string name, VariableKind kind)
 
 std::vector<const collection::Variable *> *
     Variable::evaluate(Transaction *transaction) {
-    std::vector<const collection::Variable *> *l = NULL;
+    std::vector<const collection::Variable *> *l;
     l = new std::vector<const collection::Variable *>();
     evaluate(transaction, NULL, l);
 
@@ -170,7 +170,8 @@ std::string Variable::to_s(
     std::string except("");
     for (int i = 0; i < variables->size() ; i++) {
         std::string name = variables->at(i)->m_name;
-        VariableModificatorExclusion *e =  dynamic_cast<VariableModificatorExclusion *>(variables->at(i));
+        VariableModificatorExclusion *e =
+            dynamic_cast<VariableModificatorExclusion *>(variables->at(i));
         if (e != NULL) {
             if (except.empty()) {
                 except = except + name;

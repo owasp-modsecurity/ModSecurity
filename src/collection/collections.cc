@@ -145,8 +145,8 @@ std::unique_ptr<std::string> Collections::resolveFirst(const std::string& var) {
 }
 
 
-std::unique_ptr<std::string> Collections::resolveFirst(const std::string& collectionName,
-        const std::string& var) {
+std::unique_ptr<std::string> Collections::resolveFirst(
+	const std::string& collectionName, const std::string& var) {
         if (utils::string::tolower(collectionName) == "ip"
             && !m_ip_collection_key.empty()) {
             return m_ip_collection->resolveFirst(

@@ -39,7 +39,8 @@ class Session_DictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_dictElement, "SESSION", l);
+        transaction->m_collections.resolveMultiMatches(m_dictElement,
+            "SESSION", l);
     }
 
     std::string m_dictElement;
@@ -48,7 +49,7 @@ class Session_DictElement : public Variable {
 
 class Session_NoDictElement : public Variable {
  public:
-    explicit Session_NoDictElement()
+    Session_NoDictElement()
         : Variable("SESSION") { }
 
     void evaluate(Transaction *transaction,
@@ -61,7 +62,7 @@ class Session_NoDictElement : public Variable {
 
 class Session_DictElementRegexp : public Variable {
  public:
-    Session_DictElementRegexp(std::string dictElement)
+    explicit Session_DictElementRegexp(std::string dictElement)
         : Variable("SESSION"),
         m_r(dictElement),
         m_dictElement("SESSION:" + dictElement) { }

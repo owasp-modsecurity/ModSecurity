@@ -21,6 +21,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <list>
+#include <memory>
 #endif
 
 #include "modsecurity/collection/variable.h"
@@ -155,7 +156,8 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
 }
 
 
-std::unique_ptr<std::string> InMemoryPerProcess::resolveFirst(const std::string& var) {
+std::unique_ptr<std::string> InMemoryPerProcess::resolveFirst(
+    const std::string& var) {
     auto range = equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {

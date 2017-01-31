@@ -24,7 +24,7 @@
 extern "C" {
 
 CPTTree *CPTCreateRadixTree()   {
-    CPTTree *tree = NULL;
+    CPTTree *tree;
 
     tree = reinterpret_cast<CPTTree *>(malloc(sizeof(CPTTree)));
 
@@ -60,7 +60,7 @@ void ConvertIPNetmask(unsigned char *buffer, unsigned char netmask, unsigned int
 }
 
 TreeNode *CPTCreateNode()   {
-    TreeNode *node = NULL;
+    TreeNode *node;
 
     node = reinterpret_cast<TreeNode *>(malloc(sizeof(TreeNode)));
 
@@ -247,7 +247,7 @@ TreeNode *SetParentNode(TreeNode *node, TreeNode *new_node, CPTTree *tree)  {
 int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
         CPTTree *tree, unsigned char netmask, unsigned char bitlen) {
     if (netmask != NETMASK_256-1 && netmask != NETMASK_128) {
-        if ((netmask != NETMASK_32 || (netmask == NETMASK_32 && bitlen != NETMASK_32))) {
+        if (netmask != NETMASK_32 || bitlen != NETMASK_32) {
             int i;
             node = new_node;
             parent = new_node->parent;
@@ -383,7 +383,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
     if (test_bit == bitlen && node->bit == bitlen) {
         if (node->prefix != NULL) {
             int found = 0;
-            CPTData *prefix_data = NULL;
+            CPTData *prefix_data;
 
             prefix_data = node->prefix->prefix_data;
 
@@ -966,7 +966,7 @@ int add_ip_from_param(
 {
     char *param_copy = strdup(param);
     char *saved = NULL;
-    char *str = NULL;
+    char *str;
     TreeNode *tnode = NULL;
 
     str = strtok_r(param_copy, ",", &saved);

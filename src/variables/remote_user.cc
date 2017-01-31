@@ -27,6 +27,7 @@
 #include <vector>
 #include <list>
 #include <utility>
+#include <memory>
 
 #include "modsecurity/transaction.h"
 #include "src/utils/base64.h"
@@ -41,8 +42,8 @@ void RemoteUser::evaluate(Transaction *transaction,
     size_t pos;
     std::string base64;
 
-    std::unique_ptr<std::string> header = std::move(transaction->m_variableRequestHeaders.resolveFirst(
-        "Authorization"));
+    std::unique_ptr<std::string> header = std::move(
+	transaction->m_variableRequestHeaders.resolveFirst("Authorization"));
 
     if (header == NULL) {
         return;
@@ -62,7 +63,6 @@ void RemoteUser::evaluate(Transaction *transaction,
 
     l->push_back(new collection::Variable(&m_retName,
         &transaction->m_variableRemoteUser));
-
 }
 
 

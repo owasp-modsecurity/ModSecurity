@@ -39,7 +39,8 @@ class Global_DictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_dictElement, "GLOBAL", l);
+        transaction->m_collections.resolveMultiMatches(m_dictElement,
+		"GLOBAL", l);
     }
 
     std::string m_dictElement;
@@ -48,7 +49,7 @@ class Global_DictElement : public Variable {
 
 class Global_NoDictElement : public Variable {
  public:
-    explicit Global_NoDictElement()
+    Global_NoDictElement()
         : Variable("GLOBAL") { }
 
     void evaluate(Transaction *transaction,
@@ -61,7 +62,7 @@ class Global_NoDictElement : public Variable {
 
 class Global_DictElementRegexp : public Variable {
  public:
-    Global_DictElementRegexp(std::string dictElement)
+    explicit Global_DictElementRegexp(std::string dictElement)
         : Variable("GLOBAL"),
         m_r(dictElement),
         m_dictElement("GLOBAL:" + dictElement) { }

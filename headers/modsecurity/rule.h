@@ -19,6 +19,7 @@
 #include <string>
 #include <list>
 #include <memory>
+#include <utility>
 #endif
 
 #ifndef HEADERS_MODSECURITY_RULE_H_
@@ -48,21 +49,20 @@ class Rule {
             std::vector<actions::Action *> *_actions,
             std::string fileName,
             int lineNumber);
-    Rule(std::__cxx11::string marker);
+    explicit Rule(std::__cxx11::string marker);
     ~Rule();
 
     bool evaluate(Transaction *transaction);
     bool evaluateActions(Transaction *transaction);
-    std::vector<std::unique_ptr<collection::Variable>> getFinalVars(Transaction *trasn);
+    std::vector<std::unique_ptr<collection::Variable>>
+	getFinalVars(Transaction *trasn);
     void executeActionsAfterFullMatch(Transaction *trasn,
         bool containsDisruptive, RuleMessage *ruleMessage);
-    std::list<
-        std::pair<
-            std::unique_ptr<std::string>,
-            std::unique_ptr<std::string>
-        >
-    > executeSecDefaultActionTransofrmations(
+
+    std::list<std::pair<std::shared_ptr<std::string>,
+        std::shared_ptr<std::string>>> executeDefaultTransformations(
         Transaction *trasn, const std::string &value, bool multiMatch);
+
     bool executeOperatorAt(Transaction *trasn, std::string key,
         std::string value, RuleMessage *rm);
     void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
@@ -111,6 +111,7 @@ class Rule {
     bool m_secMarker;
     std::vector<Variables::Variable *> *m_variables;
     std::string m_ver;
+
  private:
     bool m_unconditional;
     int m_referenceCount;

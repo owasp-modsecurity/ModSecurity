@@ -31,14 +31,14 @@ namespace Variables {
 
 class RequestCookiesNames_DictElement : public Variable {
  public:
-    RequestCookiesNames_DictElement(std::string dictElement)
+    explicit RequestCookiesNames_DictElement(std::string dictElement)
         : Variable("REQUEST_COOKIES_NAMES" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableRequestCookiesNames.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class RequestCookiesNames_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableRequestCookiesNames.resolve(l);
     }
 };
@@ -61,7 +61,7 @@ class RequestCookiesNames_NoDictElement : public Variable {
 
 class RequestCookiesNames_DictElementRegexp : public Variable {
  public:
-    RequestCookiesNames_DictElementRegexp(std::string dictElement)
+    explicit RequestCookiesNames_DictElementRegexp(std::string dictElement)
         : Variable("REQUEST_COOKIES_NAMES"),
         m_r(dictElement) { }
 

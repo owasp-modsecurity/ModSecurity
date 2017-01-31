@@ -31,13 +31,13 @@ namespace Variables {
 
 class ArgsPost_DictElement : public Variable {
  public:
-    ArgsPost_DictElement(std::string dictElement)
+    explicit ArgsPost_DictElement(std::string dictElement)
         : Variable("ARGS_POST" + std::string(":") + std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableArgsPost.resolve(m_dictElement, l);
     }
 
@@ -52,7 +52,7 @@ class ArgsPost_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableArgsPost.resolve(l);
     }
 };
@@ -60,7 +60,7 @@ class ArgsPost_NoDictElement : public Variable {
 
 class ArgsPost_DictElementRegexp : public Variable {
  public:
-    ArgsPost_DictElementRegexp(std::string dictElement)
+    explicit ArgsPost_DictElementRegexp(std::string dictElement)
         : Variable("ARGS_POST"),
         m_r(dictElement) { }
 

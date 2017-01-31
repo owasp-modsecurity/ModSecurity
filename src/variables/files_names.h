@@ -31,14 +31,14 @@ namespace Variables {
 
 class FilesNames_DictElement : public Variable {
  public:
-    FilesNames_DictElement(std::string dictElement)
+    explicit FilesNames_DictElement(std::string dictElement)
         : Variable("FILES_NAMES" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableFilesNames.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class FilesNames_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableFilesNames.resolve(l);
     }
 };
@@ -61,8 +61,8 @@ class FilesNames_NoDictElement : public Variable {
 
 class FilesNames_DictElementRegexp : public Variable {
  public:
-    FilesNames_DictElementRegexp(std::string dictElement)
-        : Variable("FILES_NAMES"), 
+    explicit FilesNames_DictElementRegexp(std::string dictElement)
+        : Variable("FILES_NAMES"),
         m_r(dictElement) { }
 
 

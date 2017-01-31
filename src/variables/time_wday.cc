@@ -45,8 +45,6 @@ void TimeWDay::evaluate(Transaction *transaction,
 
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%u", &timeinfo);
-    int a = atoi(tstr);
-    a--;
 
     transaction->m_variableTimeWDay.assign(tstr);
 

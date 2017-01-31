@@ -343,8 +343,6 @@ int Multipart::parse_content_disposition(const char *c_d_value) {
             validate_quotes(value.c_str());
 
             m_transaction->m_variableMultiPartName.set(value, value, 0);
-            //m_transaction->m_collections.storeOrUpdateFirst("MULTIPART_NAME",
-            //    value);
 
             if (!m_mpp->m_name.empty()) {
                 debug(4, "Multipart: Warning: Duplicate Content-Disposition " \

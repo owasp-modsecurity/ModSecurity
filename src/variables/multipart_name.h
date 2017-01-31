@@ -31,14 +31,14 @@ namespace Variables {
 
 class MultiPartName_DictElement : public Variable {
  public:
-    MultiPartName_DictElement(std::string dictElement)
+    explicit MultiPartName_DictElement(std::string dictElement)
         : Variable("MULTIPART_NAME" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMultiPartName.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class MultiPartName_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMultiPartName.resolve(l);
     }
 };
@@ -61,7 +61,7 @@ class MultiPartName_NoDictElement : public Variable {
 
 class MultiPartName_DictElementRegexp : public Variable {
  public:
-    MultiPartName_DictElementRegexp(std::string dictElement)
+    explicit MultiPartName_DictElementRegexp(std::string dictElement)
         : Variable("MULTIPART_NAME"),
         m_r(dictElement) { }
 
@@ -79,5 +79,5 @@ class MultiPartName_DictElementRegexp : public Variable {
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_MULTIPART_FILENAME_H_
+#endif  // SRC_VARIABLES_MULTIPART_NAME_H_
 

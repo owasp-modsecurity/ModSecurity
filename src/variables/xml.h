@@ -36,7 +36,7 @@ namespace Variables {
  */
 class XML_NoDictElement : public Variable {
  public:
-    explicit XML_NoDictElement()
+    XML_NoDictElement()
         : Variable("XML"),
         m_plain("[XML document tree]"),
         m_var(&m_name, &m_plain) {
@@ -46,7 +46,7 @@ class XML_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         l->push_back(&m_var);
     }
 
@@ -62,7 +62,7 @@ class XML : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l);
+        std::vector<const collection::Variable *> *l) override;
 };
 
 

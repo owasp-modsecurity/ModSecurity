@@ -31,14 +31,14 @@ namespace Variables {
 
 class MatchedVars_DictElement : public Variable {
  public:
-    MatchedVars_DictElement(std::string dictElement)
+    explicit MatchedVars_DictElement(std::string dictElement)
         : Variable("MATCHED_VARS" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMatchedVars.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class MatchedVars_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMatchedVars.resolve(l);
     }
 };
@@ -61,7 +61,7 @@ class MatchedVars_NoDictElement : public Variable {
 
 class MatchedVars_DictElementRegexp : public Variable {
  public:
-    MatchedVars_DictElementRegexp(std::string dictElement)
+    explicit MatchedVars_DictElementRegexp(std::string dictElement)
         : Variable("MATCHED_VARS"),
         m_r(dictElement) { }
 

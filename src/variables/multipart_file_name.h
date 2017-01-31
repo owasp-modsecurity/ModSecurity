@@ -19,8 +19,8 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLES_MULTIPART_FILENAME_H_
-#define SRC_VARIABLES_MULTIPART_FILENAME_H_
+#ifndef SRC_VARIABLES_MULTIPART_FILE_NAME_H_
+#define SRC_VARIABLES_MULTIPART_FILE_NAME_H_
 
 #include "src/variables/variable.h"
 
@@ -31,14 +31,14 @@ namespace Variables {
 
 class MultiPartFileName_DictElement : public Variable {
  public:
-    MultiPartFileName_DictElement(std::string dictElement)
+    explicit MultiPartFileName_DictElement(std::string dictElement)
         : Variable("MULTIPART_FILENAME" + std::string(":") +
             std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMultiPartFileName.resolve(m_dictElement, l);
     }
 
@@ -53,7 +53,7 @@ class MultiPartFileName_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) override {
         transaction->m_variableMultiPartFileName.resolve(l);
     }
 };
@@ -61,7 +61,7 @@ class MultiPartFileName_NoDictElement : public Variable {
 
 class MultiPartFileName_DictElementRegexp : public Variable {
  public:
-    MultiPartFileName_DictElementRegexp(std::string dictElement)
+    explicit MultiPartFileName_DictElementRegexp(std::string dictElement)
         : Variable("MULTIPART_FILENAME"),
         m_r(dictElement) { }
 
@@ -79,5 +79,5 @@ class MultiPartFileName_DictElementRegexp : public Variable {
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_MULTIPART_FILENAME_H_
+#endif  // SRC_VARIABLES_MULTIPART_FILE_NAME_H_
 

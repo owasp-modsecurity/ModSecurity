@@ -27,9 +27,9 @@ int main (int argc, char **argv)
 {
     int ret;
     const char *error = NULL;
-    ModSecurity *modsec = NULL;
+    ModSecurity *modsec;
     Transaction *transaction = NULL;
-    Rules *rules = NULL;
+    Rules *rules;
 
     modsec = msc_init();
 

@@ -112,7 +112,7 @@ void XML::evaluate(Transaction *t,
     }
     /* Create one variable for each node in the result. */
     for (i = 0; i < nodes->nodeNr; i++) {
-        char *content = NULL;
+        char *content;
         content = reinterpret_cast<char *>(
             xmlNodeGetContent(nodes->nodeTab[i]));
         if (content != NULL) {
