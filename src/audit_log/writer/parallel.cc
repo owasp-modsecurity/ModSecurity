@@ -21,6 +21,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #include <fstream>
 #include <mutex>
@@ -100,7 +102,6 @@ bool Parallel::init(std::string *error) {
 
 
 bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
-    FILE *fp;
     int fd;
     std::string log = transaction->toJSON(parts);
     std::string fileName = logFilePath(&transaction->m_timeStamp,
@@ -139,9 +140,13 @@ bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
             + strerror(errno));
         return false;
     }
-    fp = fdopen(fd, "w");
-    fwrite(log.c_str(), log.length(), 1, fp);
-    fclose(fp);
+    close(fd);
+
+    std::ofstream myfile;
+    std::string a(fileName.c_str());
+    myfile.open (a);
+    myfile << log;
+    myfile.close();
 
     if (m_audit->m_path1.empty() == false
         && m_audit->m_path2.empty() == false) {

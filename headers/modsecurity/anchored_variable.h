@@ -42,7 +42,7 @@ class Transaction;
 
 class AnchoredVariable {
  public:
-    AnchoredVariable(Transaction* t, std::__cxx11::string name);
+    AnchoredVariable(Transaction* t, std::string name);
     ~AnchoredVariable();
 
     void unset();

@@ -90,8 +90,9 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
     bool capture = rule && rule->getActionsByName("capture").size() > 0;
 
     if (rc > 0 && transaction) {
-        logOffset(ruleMessage, rc, input.size());
-        transaction->m_matched.push_back(std::string(match));
+        std::string match_(match);
+        logOffset(ruleMessage, rc - match_.size() + 1, match_.size());
+        transaction->m_matched.push_back(match_);
     }
 
     if (capture && transaction && rc) {

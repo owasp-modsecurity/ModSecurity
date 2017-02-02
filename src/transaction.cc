@@ -288,13 +288,14 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
     debug(4, "Adding request argument (" + orig + "): name \"" + \
                 key + "\", value \"" + value + "\"");
 
-    m_variableArgs.set(key, value, m_variableOffset);
+    offset = offset + key.size() + 1;
+    m_variableArgs.set(key, value, offset);
 
     if (orig == "GET") {
-        m_variableArgsGet.set(key, value, m_variableOffset);
+        m_variableArgsGet.set(key, value, offset);
         m_variableArgGetNames.append(key, offset, true);
     } else if (orig == "POST") {
-        m_variableArgsPost.set(key, value, m_variableOffset);
+        m_variableArgsPost.set(key, value, offset);
         m_variableArgPostNames.append(key, offset, true);
     }
     m_variableArgsNames.append(key, offset, true);
@@ -379,7 +380,7 @@ int Transaction::processURI(const char *uri, const char *method,
             path_info.length() - (offset + 1));
         m_variableRequestBasename.set(basename, m_variableOffset);
     }
-    m_variableRequestMethod.set(method, m_variableOffset);
+    m_variableRequestMethod.set(method, 0);
     m_variableRequestProtocol.set("HTTP/" + std::string(http_version),
         m_variableOffset);
 
@@ -414,6 +415,8 @@ int Transaction::processURI(const char *uri, const char *method,
         extractArguments("GET", m_variableQueryString.m_value,
             m_variableQueryString.m_offset);
     }
+
+    m_variableOffset = m_variableOffset + 1;
     return true;
 }
 
@@ -471,7 +474,9 @@ int Transaction::addRequestHeader(const std::string& key,
     const std::string& value) {
     m_variableRequestHeadersNames.append(key, 0, true);
 
+    m_variableOffset = m_variableOffset + key.size() + 2;
     m_variableRequestHeaders.set(key, value, m_variableOffset);
+    m_variableOffset = m_variableOffset + value.size() + 1;
 
 
     std::string keyl = utils::string::tolower(key);
@@ -1427,6 +1432,7 @@ std::string Transaction::toJSON(int parts) {
     const unsigned char *buf;
     size_t len;
     yajl_gen g;
+    std::string log;
     std::string ts = utils::string::ascTime(&m_timeStamp).c_str();
     std::string uniqueId = UniqueId::uniqueId();
 
@@ -1561,6 +1567,7 @@ std::string Transaction::toJSON(int parts) {
                 strlen("details"));
             yajl_gen_map_open(g);
             LOGFY_ADD("match", a.m_match.c_str());
+            LOGFY_ADD("reference", a.m_reference.c_str());
             LOGFY_ADD("ruleId", std::to_string(a.m_ruleId).c_str());
             LOGFY_ADD("file", a.m_ruleFile.c_str());
             LOGFY_ADD("lineNumber", std::to_string(a.m_ruleLine).c_str());
@@ -1597,7 +1604,7 @@ std::string Transaction::toJSON(int parts) {
 
     yajl_gen_get_buf(g, &buf, &len);
 
-    std::string log(reinterpret_cast<const char*>(buf), len);
+    log.assign(reinterpret_cast<const char*>(buf), len);
 
     yajl_gen_free(g);
 

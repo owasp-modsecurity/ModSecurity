@@ -505,6 +505,12 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 new std::string(*v->m_value)));
             var->m_dynamic_value = true;
             var->m_dynamic_key = true;
+            for (auto &i : v->m_orign) {
+                std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+                origin->m_offset = i->m_offset;
+                origin->m_length = i->m_length;
+                var->m_orign.push_back(std::move(origin));
+            }
 
             if (v->m_dynamic) {
                 delete v;

@@ -49,7 +49,7 @@ class Rule {
             std::vector<actions::Action *> *_actions,
             std::string fileName,
             int lineNumber);
-    explicit Rule(std::__cxx11::string marker);
+    explicit Rule(std::string marker);
     ~Rule();
 
     bool evaluate(Transaction *transaction);
