@@ -391,6 +391,9 @@ int main(int argc, char **argv) {
 #ifdef WITH_GEOIP
     resources.push_back("geoip");
 #endif
+#ifdef WITH_CURL
+    resources.push_back("curl");
+#endif
 
 #ifdef NO_LOGS
     std::cout << "Test utility cannot work without logging support." \

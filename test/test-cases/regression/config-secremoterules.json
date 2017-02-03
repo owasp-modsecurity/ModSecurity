@@ -2,6 +2,7 @@
   {
     "enabled":1,
     "version_min":300000,
+    "resource": "curl",
     "title":"Include remote rules",
     "client":{
       "ip":"200.249.12.31",
@@ -41,6 +42,7 @@
   },
   {
     "enabled":1,
+    "resource": "curl",
     "version_min":300000,
     "title":"Include remote rules - failed download (Abort)",
     "expected":{
@@ -54,6 +56,7 @@
   },
   {
     "enabled":1,
+    "resource": "curl",
     "version_min":300000,
     "title":"Include remote rules - failed download (Warn)",
    "client":{
