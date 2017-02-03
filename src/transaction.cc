@@ -38,7 +38,9 @@
 #include "modsecurity/modsecurity.h"
 #include "src/request_body_processor/multipart.h"
 #include "src/request_body_processor/xml.h"
+#ifdef WITH_YAJL
 #include "src/request_body_processor/json.h"
+#endif
 #include "modsecurity/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils/string.h"
@@ -122,7 +124,11 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_collections(ms->m_global_collection, ms->m_ip_collection,
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
+#ifdef WITH_YAJL
     m_json(new RequestBodyProcessor::JSON(this)),
+#else
+    m_json(NULL),
+#endif
     m_xml(new RequestBodyProcessor::XML(this)),
     TransactionAnchoredVariables(this) {
     m_id = std::to_string(this->m_timeStamp) + \
@@ -153,7 +159,9 @@ Transaction::~Transaction() {
     intervention::free(&m_it);
     intervention::clean(&m_it);
 
+#ifdef WITH_YAJL
     delete m_json;
+#endif
     delete m_xml;
 }
 
@@ -648,6 +656,7 @@ int Transaction::processRequestBody() {
             m_variableReqbodyError.set("1", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
+#if WITH_YAJL
     } else if (m_requestBodyProcessor == JSONRequestBody) {
         std::string error;
         if (m_json->init() == true) {
@@ -667,6 +676,7 @@ int Transaction::processRequestBody() {
             m_variableReqbodyError.set("0", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
+#endif
     } else if (m_requestBodyType == MultiPartRequestBody) {
         std::string error;
         if (a != NULL) {

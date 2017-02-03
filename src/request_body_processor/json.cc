@@ -13,6 +13,9 @@
  *
  */
 
+
+#ifdef WITH_YAJL
+
 #include "src/request_body_processor/json.h"
 
 #include <list>
@@ -273,3 +276,7 @@ JSON::~JSON() {
 
 }  // namespace RequestBodyProcessor
 }  // namespace modsecurity
+
+
+#endif  // WITH_YAJL
+

@@ -14,6 +14,8 @@
  */
 
 
+#ifdef WITH_YAJL
+
 #include <yajl/yajl_parse.h>
 
 #include <string>
@@ -82,3 +84,5 @@ class JSON {
 
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_JSON_H_
+
+#endif  // WITH_YAJL

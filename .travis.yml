@@ -1,25 +1,27 @@
 dist: trusty
-sudo: required
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - libyajl-dev
+    - libgeoip-dev
+    - liblmdb-dev
 
 language: cpp
 
 compiler:
-#  - clang
+  - clang
   - gcc
 
-#before_script:
-#  - wget http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
-#  - tar -xvzf bison-3.0.4.tar.gz
-#  - cd bison-3.0.4
-# - ./configure
-#  - make
-#  - make install
+env:
+  - OPTS="--enable-parser-generation"
+  - OPTS="--without-curl"
 
 
-# Build steps
 script:
   - ./build.sh
-  - ./configure --enable-parser-generation
+  - ./configure $OPTS
   - make
   - make check
 
