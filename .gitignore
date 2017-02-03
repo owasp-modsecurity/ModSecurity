@@ -24,9 +24,6 @@ depcomp
 src/config.h
 src/config.h.in
 src/location.hh
-src/parser/seclang-parser.cc
-src/parser/seclang-parser.hh
-src/parser/seclang-scanner.cc
 src/position.hh
 src/stack.hh
 src/stamp-h1
