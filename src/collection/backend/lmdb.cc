@@ -167,7 +167,7 @@ std::unique_ptr<std::string> LMDB::resolveFirst(const std::string& var) {
     MDB_val mdb_key;
     MDB_val mdb_value;
     MDB_val mdb_value_ret;
-    std::string *ret = NULL;
+    std::unique_ptr<std::string> ret = NULL;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
 
