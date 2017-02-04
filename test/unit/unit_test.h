@@ -33,12 +33,14 @@ class UnitTest {
 
     std::string param;
     std::string input;
+    std::string resource;
     std::string name;
     std::string type;
     std::string filename;
     std::string output;
     int ret;
     int obtained;
+    int skipped;
     std::string obtainedOutput;
 };
 

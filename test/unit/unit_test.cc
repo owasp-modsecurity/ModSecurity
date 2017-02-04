@@ -129,12 +129,14 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
         const char *key = node->u.object.keys[ i ];
         yajl_val val = node->u.object.values[ i ];
 
-
+        u->skipped = false;
         if (strcmp(key, "param") == 0) {
            u->param = YAJL_GET_STRING(val);
         } else if (strcmp(key, "input") == 0) {
            u->input = YAJL_GET_STRING(val);
            json2bin(&u->input);
+        } else if (strcmp(key, "resource") == 0) {
+           u->resource = YAJL_GET_STRING(val);
         } else if (strcmp(key, "name") == 0) {
            u->name = YAJL_GET_STRING(val);
         } else if (strcmp(key, "type") == 0) {

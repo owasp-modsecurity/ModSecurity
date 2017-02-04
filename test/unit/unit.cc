@@ -82,6 +82,7 @@ using modsecurity::operators::Operator;
 using namespace modsecurity::actions::transformations;
 
 std::string default_test_path = "test-cases/secrules-language-tests/operators";
+std::list<std::string> resources;
 
 void print_help() {
     std::cout << "Use ./unit /path/to/file" << std::endl;
@@ -138,9 +139,23 @@ Transformation* t_instantiate(std::string a) {
 void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
     ModSecurityTestResults<UnitTest>* res) {
     std::string error;
+    bool found = true;
 
     if (test->m_automake_output) {
         std::cout << ":test-result: ";
+    }
+
+    if (t->resource.empty() == false) {
+        found = (std::find(resources.begin(), resources.end(), t->resource)
+            != resources.end());
+    }
+
+    if (!found) {
+        t->skipped = true;
+        res->push_back(t);
+        if (test->m_automake_output) {
+            std::cout << "SKIP ";
+        }
     }
 
     if (t->type == "op") {
@@ -189,6 +204,13 @@ int main(int argc, char **argv) {
     ModSecurityTest<UnitTest> test;
     ModSecurityTestResults<UnitTest> results;
 
+#ifdef WITH_GEOIP
+    resources.push_back("geoip");
+#endif
+#ifdef WITH_CURL
+    resources.push_back("curl");
+#endif
+
     test.cmd_options(argc, argv);
     if (!test.m_automake_output) {
         std::cout << test.header();
@@ -212,12 +234,23 @@ int main(int argc, char **argv) {
             perform_unit_test(&test, t, &r);
 
             if (!test.m_automake_output) {
+                int skp = 0;
                 if (r.size() == 0) {
-                    std::cout << KGRN << r.size() << " tests failed.";
+                    std::cout << KGRN << "0 tests failed.";
                 } else {
-                    std::cout << KRED << r.size() << " tests failed.";
+                    for (auto &i : r) {
+                        if (i->skipped == true) {
+                            skp++; 
+                        }
+                    }
+                    std::cout << KRED << r.size()-skp << " tests failed.";
                 }
-                std::cout << RESET << std::endl;
+                std::cout << RESET;
+                if (skp > 0) {
+                    std::cout << " " << std::to_string(skp) << " ";
+                    std::cout << "skipped.";
+                }
+                std::cout << std::endl;
             }
 
             results.insert(results.end(), r.begin(), r.end());
@@ -239,8 +272,18 @@ int main(int argc, char **argv) {
         if (results.size() == 0) {
             std::cout << KGRN << "All tests passed" << RESET << std::endl;
         } else {
-            std::cout << KRED << results.size() << " failed.";
+            int skp = 0;
+            for (auto &i : results) {
+                if (i->skipped == true) {
+                    skp++; 
+                }
+            }
+            std::cout << KRED << results.size()-skp << " failed.";
             std::cout << RESET << std::endl;
+            if (skp > 0) {
+                std::cout << " " << std::to_string(skp) << " ";
+                std::cout << "skipped.";
+            }
         }
     }
 
