@@ -14,13 +14,16 @@ compiler:
   - clang
   - gcc
 
+os:
+  - linux
+  - osx
+
 env:
   - OPTS="--enable-parser-generation $OPTS"
   - OPTS="--without-curl $OPTS"
   - OPTS="--without-yajl $OPTS"
   - OPTS="--without-geoip $OPTS"
   - OPTS="--without-lmdb $OPTS"
-  - OPTS="--without-yajl $OPTS"
 
 
 script:
