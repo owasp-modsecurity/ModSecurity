@@ -34,6 +34,7 @@
 #endif
 
 #include "src/utils/system.h"
+#include "src/config.h"
 
 namespace modsecurity {
 namespace utils {
