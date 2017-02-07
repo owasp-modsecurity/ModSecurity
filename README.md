@@ -1,4 +1,8 @@
-# Introduction
+
+<img src="https://github.com/SpiderLabs/ModSecurity/raw/v3/master/others/modsec.png" width="50%">
+
+![Build Status](https://api.travis-ci.org/SpiderLabs/ModSecurity.svg?branch=v3/master)
+
 
 Libmodsecurity is one component of the ModSecurity v3 project. The library
 codebase serves as an interface to ModSecurity Connectors taking in web traffic
@@ -8,10 +12,6 @@ and apply them to HTTP content provided by your application via Connectors.
 
 Currently, libmodsecurity is known to be compatible with the following
 Connectors: ModSecurity Nginx Connector (ModSecurity-nginx).
-
-_Notice: This project is under development and it is NOT ready to be placed in
-production yet. It currently does not support all the operators and/or actions
-of the SecRules language, yet._
 
 
 ### What is the difference between this project and the old ModSecurity (v2.x.x)?
@@ -44,30 +44,9 @@ regression tests. These test utilities are located under the subfolder ‘tests�
 
 As a dynamic library, don’t forget that libmodsecurity must be installed to a location (folder) where you OS will be looking for dynamic libraries.
 
+
+
 ### Unix (Linux, MacOS, FreeBSD, …)
-
-Several individuals have been building the project on Fedora (22 or later) succesfully. We were able to get it to build using the following packages. These packages have no been thoroughly tested yet so compile at your own risk. You may have to manually link the generated ModSecurity library file location if it is not put into a location that is in your path (export  LD_LIBRARY_PATH=/usr/local/modsecurity/lib/).
-
-```shell
-$ sudo dnf install gcc-c++ flex bison curl-devel curl yajl yajl-devel GeoIP-devel doxygen
-$ cd /opt/
-$ git clone https://github.com/SpiderLabs/ModSecurity
-$ cd ModSecurity
-$ git checkout libmodsecurity
-$ sh build.sh
-$ ./configure
-$ make
-$ make install
-$ cd /opt/
-$ git clone https://github.com/SpiderLabs/ModSecurity-nginx
-$ cd /opt/Modsecurity-nginx
-$ git checkout experimental
-$ cd /opt/
-$ wget http://nginx.org/download/nginx-1.9.2.tar.gz
-$ tar -xvzf nginx-1.9.2.tar.gz
-$ yum install zlib-devel
-$ ./configure --add-module=/opt/ModSecurity-nginx
-```
 
 On unix the project uses autotools to help the compilation process.
 
@@ -77,6 +56,9 @@ $ ./configure
 $ make
 $ sudo make install
 ```
+
+Details on distribution specific builds can be found in our Wiki:
+[Compilation Recipes](https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes)
 
 ### Windows
 
