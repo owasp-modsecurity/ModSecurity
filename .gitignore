@@ -36,3 +36,4 @@ libtool
 ltmain.sh
 examples/simple_example_using_c/test
 test/benchmark/benchmark
+test/benchmark/owasp-v3/
