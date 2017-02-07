@@ -2,7 +2,7 @@
 <img src="https://github.com/SpiderLabs/ModSecurity/raw/v3/master/others/modsec.png" width="50%">
 
 ![Build Status](https://api.travis-ci.org/SpiderLabs/ModSecurity.svg?branch=v3/master)
-
+[![](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.com)
 
 Libmodsecurity is one component of the ModSecurity v3 project. The library
 codebase serves as an interface to ModSecurity Connectors taking in web traffic
