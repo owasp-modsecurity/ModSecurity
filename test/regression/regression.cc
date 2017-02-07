@@ -50,6 +50,13 @@ void print_help() {
     std::cout << std::endl;
 }
 
+bool contains(const std::string &s, const std::string &pattern) {
+    bool ret;
+    modsecurity::Utils::Regex re(pattern);
+    ret = modsecurity::Utils::regex_search(s, re);
+    return ret;
+}
+
 
 void actions(ModSecurityTestResults<RegressionTest> *r,
     modsecurity::Transaction *a) {
@@ -336,7 +343,7 @@ end:
                 testRes->reason << "Debug log was not matching the " \
                     << "expected results." << std::endl;
                 testRes->reason << KWHT << "Expecting: " << RESET \
-                    << t->debug_log + ".";
+                    << t->debug_log + "";
                 testRes->passed = false;
             } else if (r.status != t->http_code) {
                 if (test->m_automake_output) {
@@ -348,6 +355,18 @@ end:
                 testRes->reason << "HTTP code mismatch. expecting: " + \
                     std::to_string(t->http_code) + \
                     " got: " + std::to_string(r.status) + "\n";
+                testRes->passed = false;
+            } else if (!contains(serverLog.str(), t->error_log)) {
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: FAIL " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KRED << "failed!" << RESET << std::endl;
+                }
+                testRes->reason << "Error log was not matching the " \
+                    << "expected results." << std::endl;
+                testRes->reason << KWHT << "Expecting: " << RESET \
+                    << t->error_log + "";
                 testRes->passed = false;
             } else {
                 if (test->m_automake_output) {
@@ -364,8 +383,11 @@ end:
                 testRes->reason << std::endl;
                 testRes->reason << KWHT << "Debug log:" << RESET << std::endl;
                 testRes->reason << d->log_messages() << std::endl;
+                testRes->reason << KWHT << "Error log:" << RESET << std::endl;
+                testRes->reason << serverLog.str() << std::endl;
             }
         }
+
 
 after_debug_log:
         if (d != NULL) {

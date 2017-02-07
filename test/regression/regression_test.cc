@@ -186,7 +186,7 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
                     u->debug_log = YAJL_GET_STRING(val2);
                 }
                 if (strcmp(key2, "error_log") == 0) {
-                    u->error_log = yajl_array_to_str(val2);
+                    u->error_log = YAJL_GET_STRING(val2);
                 }
                 if (strcmp(key2, "http_code") == 0) {
                     u->http_code = YAJL_GET_INTEGER(val2);
