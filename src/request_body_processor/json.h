@@ -13,6 +13,9 @@
  *
  */
 
+#ifndef SRC_REQUEST_BODY_PROCESSOR_JSON_H_
+#define SRC_REQUEST_BODY_PROCESSOR_JSON_H_
+
 
 #ifdef WITH_YAJL
 
@@ -24,8 +27,6 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rules.h"
 
-#ifndef SRC_REQUEST_BODY_PROCESSOR_JSON_H_
-#define SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 
 
 namespace modsecurity {
@@ -82,7 +83,6 @@ class JSON {
 }  // namespace RequestBodyProcessor
 }  // namespace modsecurity
 
+#endif  // WITH_YAJL
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_JSON_H_
-
-#endif  // WITH_YAJL

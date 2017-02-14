@@ -66,15 +66,15 @@ inline std::vector<std::string> RegressionTest::yajl_array_to_vec_str(
 }
 
 
-inline std::unordered_map<std::string, std::string>
+inline std::vector<std::pair<std::string, std::string>>
     RegressionTest::yajl_array_to_map(const yajl_val &node) {
-    std::unordered_map<std::string, std::string> vec;
+    std::vector<std::pair<std::string, std::string>> vec;
     for (int z = 0; z < node->u.object.len; z++) {
         const char *key = node->u.object.keys[z];
         yajl_val val3 = node->u.object.values[z];
         const char *value = YAJL_GET_STRING(val3);
         std::pair<std::string, std::string> a(key, value);
-        vec.insert(a);
+        vec.push_back(a);
     }
     return vec;
 }

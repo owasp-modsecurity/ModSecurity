@@ -17,6 +17,7 @@
 #include <iostream>
 #include <list>
 #include <unordered_map>
+#include <utility>
 
 #ifndef SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
 #define SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
@@ -58,9 +59,14 @@ class MultipartPart {
     MultipartPart()
      : m_type(MULTIPART_FORMDATA),
      m_tmp_file_fd(0),
-     m_tmp_file_size(0),
      m_offset(0),
-     m_length(0) { }
+     m_filenameOffset(0),
+     m_nameOffset(0),
+     m_valueOffset(0),
+     m_length(0) {
+         m_tmp_file_size.first = 0;
+         m_tmp_file_size.second = 0;
+    }
 
     ~MultipartPart() {
         m_headers.clear();
@@ -72,10 +78,13 @@ class MultipartPart {
 
     /* the name */
     std::string m_name;
+    size_t m_nameOffset;
 
     /* variables only, variable value */
     std::string m_value;
-    std::list<std::string> m_value_parts;
+    size_t m_valueOffset;
+
+    std::list<std::pair<std::string, int>> m_value_parts;
 
     /* files only, the content type (where available) */
     /* std::string m_content_type; */
@@ -83,13 +92,15 @@ class MultipartPart {
     /* files only, the name of the temporary file holding data */
     std::string m_tmp_file_name;
     int m_tmp_file_fd;
-    unsigned int m_tmp_file_size;
+    std::pair<size_t, size_t> m_tmp_file_size;
 
     /* files only, filename as supplied by the browser */
     std::string m_filename;
+    size_t m_filenameOffset;
 
     std::string m_last_header_name;
-    std::unordered_map<std::string, std::string, MyHash, MyEqual> m_headers;
+    std::unordered_map<std::string, std::pair<size_t, std::string>,
+        MyHash, MyEqual> m_headers;
 
     unsigned int m_offset;
     unsigned int m_length;
@@ -108,11 +119,11 @@ class Multipart {
     int is_token_char(unsigned char c);
     int multipart_complete(std::string *err);
 
-    int parse_content_disposition(const char *c_d_value);
-    bool process(const std::string& data, std::string *err);
+    int parse_content_disposition(const char *c_d_value, int offset);
+    bool process(const std::string& data, std::string *err, int offset);
     int process_boundary(int last_part);
-    int process_part_header(std::string *error);
-    int process_part_data(std::string *error);
+    int process_part_header(std::string *error, int offset);
+    int process_part_data(std::string *error, size_t offset);
 
     int tmp_file_name(std::string *filename) const;
 

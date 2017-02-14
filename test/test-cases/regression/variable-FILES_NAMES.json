@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"T \\(0\\) t:trim: \"filedata"
+      "debug_log":"T \\(0\\) t:trim: \"small_text"
     },
     "rules":[  
       "SecRuleEngine On",

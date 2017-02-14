@@ -353,11 +353,6 @@ class Transaction : public TransactionAnchoredVariables {
     const char *m_httpVersion;
 
     /**
-     * Holds the request method: GET, POST, HEAD ...
-     */
-    const char *m_method;
-
-    /**
      * Holds the server IP Address
      */
     const char *m_serverIpAddress;

@@ -40,7 +40,7 @@ class VariableOrigin {
     std::string toText() {
         std::string offset = std::to_string(m_offset);
         std::string len = std::to_string(m_length);
-        return "rr:" + offset + "," + len;
+        return "v" + offset + "," + len;
     }
 
     int m_length;

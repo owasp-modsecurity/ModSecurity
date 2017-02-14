@@ -240,7 +240,7 @@ int main(int argc, char **argv) {
                 } else {
                     for (auto &i : r) {
                         if (i->skipped == true) {
-                            skp++; 
+                            skp++;
                         }
                     }
                     std::cout << KRED << r.size()-skp << " tests failed.";
@@ -275,7 +275,7 @@ int main(int argc, char **argv) {
             int skp = 0;
             for (auto &i : results) {
                 if (i->skipped == true) {
-                    skp++; 
+                    skp++;
                 }
             }
             std::cout << KRED << results.size()-skp << " failed.";

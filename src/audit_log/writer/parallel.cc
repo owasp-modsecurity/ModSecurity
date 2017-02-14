@@ -144,7 +144,7 @@ bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
 
     std::ofstream myfile;
     std::string a(fileName.c_str());
-    myfile.open (a);
+    myfile.open(a);
     myfile << log;
     myfile.close();
 

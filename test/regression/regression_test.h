@@ -18,8 +18,10 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <map>
 #include <vector>
 #include <string>
+#include <utility>
 
 #ifndef TEST_REGRESSION_REGRESSION_TEST_H_
 #define TEST_REGRESSION_REGRESSION_TEST_H_
@@ -44,8 +46,8 @@ class RegressionTest {
     int version_max;
     int github_issue;
 
-    std::unordered_map<std::string, std::string> request_headers;
-    std::unordered_map<std::string, std::string> response_headers;
+    std::vector<std::pair<std::string, std::string>> request_headers;
+    std::vector<std::pair<std::string, std::string>> response_headers;
     std::string request_body;
     std::string response_body;
     std::string response_protocol;
@@ -68,8 +70,8 @@ class RegressionTest {
     static inline std::string yajl_array_to_str(const yajl_val &node);
     static inline std::vector<std::string> yajl_array_to_vec_str(
         const yajl_val &node);
-    static inline std::unordered_map<std::string,
-        std::string> yajl_array_to_map(const yajl_val &node);
+    static inline std::vector<std::pair<std::string, std::string>>
+        yajl_array_to_map(const yajl_val &node);
 
     int http_code;
     std::string redirect_url;

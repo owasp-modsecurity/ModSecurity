@@ -475,7 +475,7 @@ int main(int argc, char **argv) {
         if (r->passed == true && r->skipped == false) {
             passed++;
         } else if (r->skipped == false) {
-            if (test.m_automake_output && 1 == 0) {
+            if (test.m_automake_output) {
                 // m_automake_output
             } else {
                 std::cout << KRED << "Test failed." << RESET << KWHT \

@@ -651,13 +651,9 @@ bool Rule::evaluate(Transaction *trasn) {
             if (ret == true) {
                 ruleMessage.m_match = resolveMatchMessage(key, value);
                 for (auto &i : v->m_orign) {
-                    if (ruleMessage.m_reference.empty()) {
-                        ruleMessage.m_reference.append(i->toText());
-                    } else {
-                        ruleMessage.m_reference.append(";" + i->toText());
-                    }
+                    ruleMessage.m_reference.append(i->toText());
                 }
-                ruleMessage.m_reference.append("-" + *valueTemp.second);
+                ruleMessage.m_reference.append(*valueTemp.second);
                 updateMatchedVars(trasn, key, value);
                 executeActionsIndependentOfChainedRuleResult(trasn,
                     &containsDisruptive, &ruleMessage);

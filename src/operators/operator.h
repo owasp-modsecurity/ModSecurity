@@ -78,10 +78,7 @@ class Operator {
 
     static void logOffset(RuleMessage *ruleMessage, int offset, int len) {
         if (ruleMessage) {
-            if (ruleMessage->m_reference.empty() == false) {
-                ruleMessage->m_reference.append(";");
-            }
-            ruleMessage->m_reference.append("op:"
+            ruleMessage->m_reference.append("o"
                 + std::to_string(offset) + ","
                 + std::to_string(len));
         }

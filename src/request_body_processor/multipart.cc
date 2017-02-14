@@ -25,6 +25,7 @@
 #include <list>
 #include <iostream>
 #include <string>
+#include <utility>
 
 #include "modsecurity/collection/collections.h"
 #include "modsecurity/rules.h"
@@ -212,7 +213,7 @@ void Multipart::validate_quotes(const char *data)  {
 }
 
 
-int Multipart::parse_content_disposition(const char *c_d_value) {
+int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     const char *p = NULL;
 
     /* accept only what we understand */
@@ -342,7 +343,8 @@ int Multipart::parse_content_disposition(const char *c_d_value) {
         if (name == "name") {
             validate_quotes(value.c_str());
 
-            m_transaction->m_variableMultiPartName.set(value, value, 0);
+            m_transaction->m_variableMultiPartName.set(value, value,
+                offset + ((p - c_d_value) - value.size()));
 
             if (!m_mpp->m_name.empty()) {
                 debug(4, "Multipart: Warning: Duplicate Content-Disposition " \
@@ -350,10 +352,12 @@ int Multipart::parse_content_disposition(const char *c_d_value) {
                 return -14;
             }
             m_mpp->m_name.assign(value);
+            m_mpp->m_nameOffset = offset + ((p - c_d_value) - value.size());
             debug(9, "Multipart: Content-Disposition name: " + value + ".");
         } else if (name == "filename") {
             validate_quotes(value.c_str());
-            m_transaction->m_variableMultiPartFileName.set(value, value, 0);
+            m_transaction->m_variableMultiPartFileName.set(value, value, \
+                offset + ((p - c_d_value) - value.size()));
 
             if (!m_mpp->m_filename.empty()) {
                 debug(4, "Multipart: Warning: Duplicate Content-Disposition " \
@@ -361,6 +365,7 @@ int Multipart::parse_content_disposition(const char *c_d_value) {
                 return -15;
             }
             m_mpp->m_filename.assign(value);
+            m_mpp->m_filenameOffset = offset + ((p - c_d_value) - value.size());
 
             debug(9, "Multipart: Content-Disposition filename: " \
                 + value + ".");
@@ -432,7 +437,7 @@ int Multipart::tmp_file_name(std::string *filename) const {
 }
 
 
-int Multipart::process_part_data(std::string *error) {
+int Multipart::process_part_data(std::string *error, size_t offset) {
     char *p = m_buf + (MULTIPART_BUF_SIZE - m_bufleft);
     char localreserve[2] = { '\0', '\0' }; /* initialized to quiet warning */
     int bytes_reserved = 0;
@@ -525,7 +530,11 @@ int Multipart::process_part_data(std::string *error) {
                     return -1;
                 }
 
-                m_mpp->m_tmp_file_size += m_reserve[0];
+                m_mpp->m_tmp_file_size.first += m_reserve[0];
+                if (m_mpp->m_tmp_file_size.second == 0) {
+                    m_mpp->m_tmp_file_size.second = offset \
+                        - m_mpp->m_tmp_file_size.first;
+                }
                 m_mpp->m_length += m_reserve[0];
             }
 
@@ -541,12 +550,26 @@ int Multipart::process_part_data(std::string *error) {
                 return -1;
             }
 
-            m_mpp->m_tmp_file_size += (MULTIPART_BUF_SIZE - m_bufleft);
+            m_mpp->m_value.append(std::string(m_buf,
+                    MULTIPART_BUF_SIZE - m_bufleft));
+            m_mpp->m_valueOffset = offset - (MULTIPART_BUF_SIZE - m_bufleft);
+
+            m_mpp->m_tmp_file_size.first += (MULTIPART_BUF_SIZE - m_bufleft);
+            if (m_mpp->m_tmp_file_size.second == 0) {
+                m_mpp->m_tmp_file_size.second = offset \
+                    - m_mpp->m_tmp_file_size.first;
+            }
+
             m_mpp->m_length += (MULTIPART_BUF_SIZE - m_bufleft);
         } else {
             /* just keep track of the file size */
-            m_mpp->m_tmp_file_size += (MULTIPART_BUF_SIZE - m_bufleft) \
+            m_mpp->m_tmp_file_size.first += (MULTIPART_BUF_SIZE - m_bufleft) \
                 + m_reserve[0];
+            if (m_mpp->m_tmp_file_size.second == 0) {
+                m_mpp->m_tmp_file_size.second = offset \
+                    - m_mpp->m_tmp_file_size.first;
+            }
+
             m_mpp->m_length += (MULTIPART_BUF_SIZE - m_bufleft) + m_reserve[0];
         }
     } else if (m_mpp->m_type == MULTIPART_FORMDATA) {
@@ -573,7 +596,7 @@ int Multipart::process_part_data(std::string *error) {
             m_mpp->m_length += d.size();
         }
 
-        m_mpp->m_value_parts.push_back(d);
+        m_mpp->m_value_parts.push_back(std::make_pair(d, m_buf_offset));
 
         debug(9, "Multipart: Added data to variable: " + d);
     } else {
@@ -601,7 +624,7 @@ int Multipart::process_part_data(std::string *error) {
 }
 
 
-int Multipart::process_part_header(std::string *error) {
+int Multipart::process_part_header(std::string *error, int offset) {
     int i, len;
 
     /* Check for nul bytes. */
@@ -614,6 +637,7 @@ int Multipart::process_part_header(std::string *error) {
         }
     }
 
+    i = 0;
     /* The buffer is data so increase the data length counter. */
     m_reqbody_no_files_length += (MULTIPART_BUF_SIZE - m_bufleft);
 
@@ -639,9 +663,10 @@ int Multipart::process_part_header(std::string *error) {
                 "Content-Disposition header.");
             return false;
         }
-        header_value = m_mpp->m_headers.at("Content-Disposition");
+        header_value = m_mpp->m_headers.at("Content-Disposition").second;
 
-        rc = parse_content_disposition(header_value.c_str());
+        rc = parse_content_disposition(header_value.c_str(),
+            m_mpp->m_headers.at("Content-Disposition").first);
         if (rc < 0) {
             debug(1, "Multipart: Invalid Content-Disposition header ("
                 + std::to_string(rc) + "): " + header_value);
@@ -714,15 +739,17 @@ int Multipart::process_part_header(std::string *error) {
                     m_flag_invalid_header_folding = 1;
                 }
                 data++;
+                i++;
             }
 
             new_value = std::string(data);
             utils::string::chomp(&new_value);
 
             /* update the header value in the table */
-            header_value = m_mpp->m_headers.at(m_mpp->m_last_header_name);
+            header_value = m_mpp->m_headers.at(
+                m_mpp->m_last_header_name).second;
             new_value = header_value + " " +  new_value;
-            m_mpp->m_headers.at(m_mpp->m_last_header_name) = new_value;
+            m_mpp->m_headers.at(m_mpp->m_last_header_name).second = new_value;
 
             debug(9, "Multipart: Continued folder header \"" \
                 + m_mpp->m_last_header_name + "\" with \"" \
@@ -742,6 +769,7 @@ int Multipart::process_part_header(std::string *error) {
             data = m_buf;
             while ((*data != ':') && (*data != '\0')) {
                 data++;
+                i++;
             }
             if (*data == '\0') {
                 debug(1, "Multipart: Invalid part header (colon missing): " \
@@ -763,8 +791,10 @@ int Multipart::process_part_header(std::string *error) {
 
             /* extract the value value */
             data++;
+            i++;
             while ((*data == '\t') || (*data == ' ')) {
                 data++;
+                i++;
             }
             header_value = std::string(data);
             utils::string::chomp(&header_value);
@@ -780,7 +810,8 @@ int Multipart::process_part_header(std::string *error) {
 
 
             m_mpp->m_headers.emplace(
-                std::string(header_name), std::string(header_value));
+                std::string(header_name), std::make_pair(offset - len + i,
+                    std::string(header_value)));
 
 
             debug(9, "Multipart: Added part header \"" + header_name \
@@ -805,8 +836,11 @@ int Multipart::process_boundary(int last_part) {
 
         if (m_mpp->m_type != MULTIPART_FILE) {
             /* now construct a single string out of the parts */
-            for (std::string &i : m_mpp->m_value_parts) {
-                m_mpp->m_value.append(i);
+            for (const auto &i : m_mpp->m_value_parts) {
+                if (m_mpp->m_valueOffset == 0) {
+                    m_mpp->m_valueOffset = i.second;
+                }
+                m_mpp->m_value.append(i.first);
             }
         }
 
@@ -986,6 +1020,7 @@ int Multipart::multipart_complete(std::string *error) {
         if (m->m_name.empty()) {
             continue;
         }
+        size_t offset = m_transaction->m_variableOffset + 1;
 
         if (m->m_type == MULTIPART_FILE) {
             std::string tmp_name;
@@ -996,25 +1031,36 @@ int Multipart::multipart_complete(std::string *error) {
             if (!m->m_filename.empty()) {
                 name.assign(m->m_filename);
             }
+
             m_transaction->m_variableFiles.set(m->m_filename,
-                m->m_filename, 0);
-            m_transaction->m_variableFilesNames.set(m->m_name,
-                m->m_name, 0);
+                m->m_filename, m->m_filenameOffset);
+
+            m_transaction->m_variableFilesNames.set(m->m_filename,
+                m->m_filename, m->m_filenameOffset);
+
             m_transaction->m_variableFilesSizes.set(m->m_name,
-                std::to_string(m->m_tmp_file_size), 0);
-            m_transaction->m_variableFilesTmpContent.set(m->m_name,
-               m->m_value, 0);
-            m_transaction->m_variableFilesTmpContent.set(m->m_name,
-               m->m_value, 0);
-            m_transaction->m_variableFilesTmpNames.set(m->m_name,
-               m->m_value, 0);
-            file_combined_size = file_combined_size + m->m_tmp_file_size;
+                std::to_string(m->m_tmp_file_size.first),
+                m->m_tmp_file_size.second,
+                m->m_tmp_file_size.first);
+
+            m_transaction->m_variableFilesTmpContent.set(m->m_filename,
+               m->m_value, m->m_valueOffset);
+
+            m_transaction->m_variableFilesTmpNames.set(m->m_filename,
+               m->m_filename, m->m_filenameOffset);
+
+            file_combined_size = file_combined_size + m->m_tmp_file_size.first;
+
+            m_transaction->m_variableFilesCombinedSize.set(
+               std::to_string(file_combined_size),
+               m->m_tmp_file_size.second, m->m_tmp_file_size.first);
         } else {
             debug(4, "Adding request argument (BODY): name \"" +
                 m->m_name + "\", value \"" + m->m_value + "\"");
             m_transaction->m_variableArgs.set(m->m_name, m->m_value,
-                m_transaction->m_variableOffset);
-            m_transaction->m_variableArgsPost.set(m->m_name, m->m_value, 0);
+                offset + m->m_valueOffset);
+            m_transaction->m_variableArgsPost.set(m->m_name, m->m_value,
+               offset + m->m_valueOffset);
         }
 #if 0
         if (m_transaction->m_namesArgs->empty()) {
@@ -1036,9 +1082,7 @@ int Multipart::multipart_complete(std::string *error) {
             std::to_string(m_transaction->->m_ARGScombinedSize));
 #endif
     }
-    m_transaction->m_variableFilesCombinedSize.set(
-        std::to_string(file_combined_size),
-        m_transaction->m_variableOffset);
+
 
     return true;
 }
@@ -1256,12 +1300,13 @@ bool Multipart::init(std::string *error) {
  * Assuming that all data is on data. We are not processing chunks.
  *
  */
-bool Multipart::process(const std::string& data, std::string *error) {
+bool Multipart::process(const std::string& data, std::string *error,
+    int offset) {
     const char *inptr = data.c_str();
     unsigned int inleft = data.size();
+    size_t z = 0;
 
     if (data.size() == 0) return true;
-
     m_seen_data = true;
 
     if (m_is_complete) {
@@ -1284,6 +1329,8 @@ bool Multipart::process(const std::string& data, std::string *error) {
     while (inleft > 0) {
         char c = *inptr;
         int process_buffer = 0;
+
+        z++;
 
         if ((c == '\r') && (m_bufleft == 1)) {
             /* we don't want to take \r as the last byte in the buffer */
@@ -1443,13 +1490,13 @@ bool Multipart::process(const std::string& data, std::string *error) {
                             return false;
                         }
 
-                        if (process_part_header(error) < 0) {
+                        if (process_part_header(error, offset + z) < 0) {
                             m_flag_error = 1;
                             return false;
                         }
 
                     } else {
-                        if (process_part_data(error) < 0) {
+                        if (process_part_data(error, offset + z) < 0) {
                             m_flag_error = 1;
                             return false;
                         }

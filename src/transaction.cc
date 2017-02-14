@@ -105,7 +105,6 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_serverPort(0),
     m_uri(""),
     m_uri_no_query_string_decoded(""),
-    m_method(""),
     m_httpVersion(""),
     m_rules(rules),
     m_timeStamp(std::time(NULL)),
@@ -301,17 +300,20 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
 
     if (orig == "GET") {
         m_variableArgsGet.set(key, value, offset);
-        m_variableArgGetNames.append(key, offset, true);
+        m_variableArgGetNames.append(key, offset - key.size() - 1, true);
     } else if (orig == "POST") {
         m_variableArgsPost.set(key, value, offset);
-        m_variableArgPostNames.append(key, offset, true);
+        m_variableArgPostNames.append(key, offset - key.size() - 1, true);
     }
-    m_variableArgsNames.append(key, offset, true);
+    m_variableArgsNames.append(key, offset - key.size() - 1, true);
 
     m_ARGScombinedSizeDouble = m_ARGScombinedSizeDouble + \
         key.length() + value.length();
 
-    m_variableARGScombinedSize.set(std::to_string(m_ARGScombinedSizeDouble), 0);
+    m_variableARGScombinedSize.set(std::to_string(m_ARGScombinedSizeDouble),
+        offset - key.size() - 1, key.size());
+    m_variableARGScombinedSize.set(std::to_string(m_ARGScombinedSizeDouble),
+        offset, value.length());
 
     return true;
 }
@@ -347,7 +349,6 @@ int Transaction::processURI(const char *uri, const char *method,
     debug(4, "Starting phase URI. (SecRules 0 + 1/2)");
 #endif
 
-    m_method = method;
     m_httpVersion = http_version;
     m_uri = uri;
     std::string uri_s(uri);
@@ -355,16 +356,26 @@ int Transaction::processURI(const char *uri, const char *method,
 
     size_t pos = m_uri_decoded.find("?");
     size_t pos_raw = uri_s.find("?");
+    size_t var_size = pos_raw;
 
-    m_variableRequestLine.set(std::string(method) + " " + std::string(uri)
+    m_variableRequestMethod.set(method, 0);
+
+
+    std::string requestLine(std::string(method) + " " + std::string(uri));
+    m_variableRequestLine.set(requestLine \
         + " HTTP/" + std::string(http_version), m_variableOffset);
-    m_variableOffset = m_variableRequestLine.m_value.size();
+
+    m_variableRequestProtocol.set("HTTP/" + std::string(http_version),
+        m_variableOffset + requestLine.size() + 1);
+
+
 
     if (pos != std::string::npos) {
         m_uri_no_query_string_decoded = std::string(m_uri_decoded, 0, pos);
     } else {
         m_uri_no_query_string_decoded = std::string(m_uri_decoded);
     }
+
 
     if (pos_raw != std::string::npos) {
         std::string qry = std::string(uri_s, pos_raw + 1,
@@ -379,18 +390,26 @@ int Transaction::processURI(const char *uri, const char *method,
     } else {
         path_info = std::string(m_uri_decoded, 0, pos);
     }
-    m_variablePathInfo.set(path_info, m_variableOffset);
-    m_variableRequestFilename.set(path_info, m_variableOffset);
+    if (var_size == std::string::npos) {
+        var_size = uri_s.size();
+    }
+
+    m_variablePathInfo.set(path_info, m_variableOffset + strlen(method) +
+        1, var_size);
+    m_variableRequestFilename.set(path_info,  m_variableOffset +
+        strlen(method) + 1, var_size);
+
+
 
     size_t offset = path_info.find_last_of("/\\");
     if (offset != std::string::npos && path_info.length() > offset + 1) {
         std::string basename = std::string(path_info, offset + 1,
             path_info.length() - (offset + 1));
-        m_variableRequestBasename.set(basename, m_variableOffset);
+        m_variableRequestBasename.set(basename, m_variableOffset +
+            strlen(method) + 1 + offset + 1);
     }
-    m_variableRequestMethod.set(method, 0);
-    m_variableRequestProtocol.set("HTTP/" + std::string(http_version),
-        m_variableOffset);
+
+    m_variableOffset = m_variableRequestLine.m_value.size();
 
     std::string parsedURI = m_uri_decoded;
     // The more popular case is without domain
@@ -416,8 +435,9 @@ int Transaction::processURI(const char *uri, const char *method,
         }
     }
 
-    m_variableRequestURI.set(parsedURI, m_variableOffset);
-    m_variableRequestURIRaw.set(uri, m_variableOffset);
+    m_variableRequestURI.set(parsedURI, std::string(method).size() + 1,
+        uri_s.size());
+    m_variableRequestURIRaw.set(uri, std::string(method).size() + 1);
 
     if (m_variableQueryString.m_value.empty() == false) {
         extractArguments("GET", m_variableQueryString.m_value,
@@ -480,11 +500,11 @@ int Transaction::processRequestHeaders() {
  */
 int Transaction::addRequestHeader(const std::string& key,
     const std::string& value) {
-    m_variableRequestHeadersNames.append(key, 0, true);
+    m_variableRequestHeadersNames.append(key, m_variableOffset, true,
+        key.size());
 
     m_variableOffset = m_variableOffset + key.size() + 2;
     m_variableRequestHeaders.set(key, value, m_variableOffset);
-    m_variableOffset = m_variableOffset + value.size() + 1;
 
 
     std::string keyl = utils::string::tolower(key);
@@ -494,19 +514,22 @@ int Transaction::addRequestHeader(const std::string& key,
     }
 
     if (keyl == "cookie") {
+        size_t localOffset = m_variableOffset;
         std::vector<std::string> cookies = utils::string::split(value, ';');
-        while (cookies.empty() == false) {
-            std::vector<std::string> s = utils::string::split(cookies.back(),
+        for (const std::string &c : cookies) {
+            std::vector<std::string> s = utils::string::split(c,
                '=');
             if (s.size() > 1) {
                 if (s[0].at(0) == ' ') {
                     s[0].erase(0, 1);
                 }
-                m_variableRequestCookies.set(s[0], s[1], m_variableOffset);
                 m_variableRequestCookiesNames.set(s[0],
-                    s[0], m_variableOffset);
+                    s[0], localOffset);
+
+                localOffset = localOffset + s[0].size() + 1;
+                m_variableRequestCookies.set(s[0], s[1], localOffset);
+                localOffset = localOffset + s[1].size() + 2;
             }
-            cookies.pop_back();
         }
     }
     /**
@@ -534,6 +557,8 @@ int Transaction::addRequestHeader(const std::string& key,
         std::vector<std::string> host = utils::string::split(value, ':');
         m_variableServerName.set(host[0], m_variableOffset);
     }
+    m_variableOffset = m_variableOffset + value.size() + 1;
+
     return 1;
 }
 
@@ -624,7 +649,7 @@ int Transaction::processRequestBody() {
     }
 
     if (m_variableInboundDataError.m_value.empty() == true) {
-        m_variableInboundDataError.set("0", m_variableOffset);
+        m_variableInboundDataError.set("0", 0);
     }
 
     /*
@@ -682,7 +707,7 @@ int Transaction::processRequestBody() {
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
-                m.process(m_requestBody.str(), &error);
+                m.process(m_requestBody.str(), &error, m_variableOffset);
             }
             m.multipart_complete(&error);
         }
@@ -698,7 +723,8 @@ int Transaction::processRequestBody() {
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
-        extractArguments("POST", m_requestBody.str(), 0);
+        m_variableOffset++;
+        extractArguments("POST", m_requestBody.str(), m_variableOffset);
     } else if (a != NULL) {
         std::string error;
         if (a != NULL && a->empty() == false) {
@@ -762,7 +788,7 @@ int Transaction::processRequestBody() {
         m_variableRequestBody.set(m_requestBody.str(), m_variableOffset);
         m_variableRequestBodyLength.set(std::to_string(
             m_requestBody.str().size()),
-            m_variableOffset);
+            m_variableOffset, m_requestBody.str().size());
     }
 
     this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
@@ -1310,7 +1336,8 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << tstr << " ";
 
     ss << "\"";
-    ss << this->m_method << " ";
+    ss << utils::string::dash_if_empty(m_variableRequestMethod.evaluate());
+    ss << " ";
     ss << this->m_uri << " ";
     ss << "HTTP/" << m_httpVersion;
     ss << "\" ";
@@ -1360,7 +1387,9 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     if (parts & audit_log::AuditLog::BAuditLogPart) {
         std::vector<const collection::Variable *> l;
         audit_log << "--" << trailer << "-" << "B--" << std::endl;
-        audit_log << this->m_method << " " << this->m_uri << " " << "HTTP/";
+        audit_log << utils::string::dash_if_empty(
+            m_variableRequestMethod.evaluate());
+        audit_log << " " << this->m_uri << " " << "HTTP/";
         audit_log << this->m_httpVersion << std::endl;
 
         m_variableRequestHeaders.resolve(&l);
@@ -1474,7 +1503,10 @@ std::string Transaction::toJSON(int parts) {
         strlen("request"));
     yajl_gen_map_open(g);
 
-    LOGFY_ADD("protocol", m_method);
+    LOGFY_ADD("protocol",
+        utils::string::dash_if_empty(
+            m_variableRequestMethod.evaluate()).c_str());
+
     LOGFY_ADD_INT("http_version", m_httpVersion);
     LOGFY_ADD("uri", this->m_uri);
 

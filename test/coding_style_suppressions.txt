@@ -21,4 +21,12 @@
 ./test/fuzzer
 ./test/libfuzzer
 ./src/parser/seclang-parser.tab.cc
+./src/unique_id.cc:226
+./test/unit/unit.cc:84
+./test/unit/unit.cc:82
+./headers/modsecurity/rule.h:110
+./test/regression/regression.cc:44
+./test/benchmark/owasp-v3/util/av-scanning/runAV/common.h
+./src/audit_log/writer/parallel.cc:28
+./src/macro_expansion.c
 Total errors found

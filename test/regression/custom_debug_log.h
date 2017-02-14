@@ -31,6 +31,7 @@ class CustomDebugLog : public modsecurity::debug_log::DebugLog {
     void write(int level, const std::string& message) override;
     bool contains(const std::string& pattern);
     std::string log_messages();
+    std::string error_log_messages();
 
  private:
     std::stringstream m_log;

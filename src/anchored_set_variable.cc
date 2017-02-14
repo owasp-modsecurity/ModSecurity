@@ -50,6 +50,23 @@ void AnchoredSetVariable::unset() {
 
 
 void AnchoredSetVariable::set(const std::string &key,
+    const std::string &value, size_t offset, size_t len) {
+    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+    std::string *v = new std::string(value);
+    std::string *k = new std::string(m_name + ":" + key);
+    collection::Variable *var = new collection::Variable(k, v);
+
+    origin->m_offset = offset;
+    origin->m_length = len;
+
+    var->m_dynamic_value = true;
+    var->m_dynamic = false;
+    var->m_orign.push_back(std::move(origin));
+    emplace(key, var);
+}
+
+
+void AnchoredSetVariable::set(const std::string &key,
     const std::string &value, size_t offset) {
     std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
     std::string *v = new std::string(value);

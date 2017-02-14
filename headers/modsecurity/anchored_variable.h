@@ -47,8 +47,12 @@ class AnchoredVariable {
 
     void unset();
     void set(const std::string &a, size_t offset);
+    void set(const std::string &a, size_t offset, size_t offsetLen);
     void append(const std::string &a, size_t offset,
-            bool spaceSeparator = false);
+        bool spaceSeparator = false);
+    void append(const std::string &a, size_t offset,
+        bool spaceSeparator, int size);
+
     void evaluate(std::vector<const collection::Variable *> *l);
     std::string *  evaluate();
     std::unique_ptr<std::string> resolveFirst();

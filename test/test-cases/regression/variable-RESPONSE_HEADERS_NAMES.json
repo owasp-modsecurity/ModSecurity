@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"Content-Type Last-Modified Date\" \\(Variable: RESPONSE_HEADERS_NAMES\\)"
+      "debug_log":"Target value: \"Date Last-Modified Content-Type\" \\(Variable: RESPONSE_HEADERS_NAMES\\)"
     },
     "rules":[  
       "SecRuleEngine On",
