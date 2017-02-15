@@ -38,7 +38,7 @@ std::string phase_name(int x) {
             return "Request Headers";
             break;
         case modsecurity::Phases::RequestBodyPhase:
-            return "Request Headers";
+            return "Request Body";
             break;
         case modsecurity::Phases::ResponseHeadersPhase:
             return "Response Headers";
