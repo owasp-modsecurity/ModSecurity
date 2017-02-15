@@ -221,6 +221,9 @@ class ModSecurity {
     void serverLog(void *data, const std::string& msg);
     const std::string& getConnectorInformation();
 
+    int processContentOffset(const char *content, size_t len,
+        const char *matchString, std::string *json, const char **err);
+
     collection::Collection *m_global_collection;
     collection::Collection *m_resource_collection;
     collection::Collection *m_ip_collection;

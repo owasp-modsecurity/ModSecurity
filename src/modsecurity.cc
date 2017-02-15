@@ -22,11 +22,17 @@
 #include "src/collection/backend/lmdb.h"
 #include "src/config.h"
 #include "src/unique_id.h"
+#include "src/utils/regex.h"
 #ifdef MSC_WITH_CURL
 #include <curl/curl.h>
 #endif
+#ifdef WITH_YAJL
+#include <yajl/yajl_tree.h>
+#include <yajl/yajl_gen.h>
+#endif
 
 #include "src/utils/geo_lookup.h"
+#include "src/actions/transformations/transformation.h"
 
 namespace modsecurity {
 
@@ -167,6 +173,185 @@ void ModSecurity::serverLog(void *data, const std::string& msg) {
     } else {
         m_logCb(data, msg.c_str());
     }
+}
+
+
+int ModSecurity::processContentOffset(const char *content, size_t len,
+    const char *matchString, std::string *json, const char **err) {
+#ifdef WITH_YAJL
+    Utils::Regex variables("v([0-9]+),([0-9]+)");
+    Utils::Regex operators("o([0-9]+),([0-9]+)");
+    Utils::Regex transformations("t:(?:(?!t:).)+");
+    int i;
+    yajl_gen g;
+    std::string varValue;
+    std::string opValue;
+    const unsigned char *buf;
+    size_t jsonSize;
+
+    std::list<Utils::SMatch> vars = variables.searchAll(matchString);
+    std::list<Utils::SMatch> ops = operators.searchAll(matchString);
+    std::list<Utils::SMatch> trans = transformations.searchAll(matchString);
+
+    g = yajl_gen_alloc(NULL);
+    if (g == NULL) {
+        *err = "Failed to allocate memory for the JSON creation.";
+        return -1;
+    }
+
+    yajl_gen_config(g, yajl_gen_beautify, 1);
+
+    yajl_gen_map_open(g);
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("match"),
+        strlen("match"));
+
+    yajl_gen_array_open(g);
+    yajl_gen_map_open(g);
+
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("variable"),
+            strlen("variable"));
+
+    yajl_gen_map_open(g);
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("highlight"),
+            strlen("highlight"));
+
+        yajl_gen_array_open(g);
+    while (vars.size() > 0) {
+        std::string value;
+        yajl_gen_map_open(g);
+        vars.pop_back();
+        std::string startingAt = vars.back().match;
+        vars.pop_back();
+        std::string size = vars.back().match;
+        vars.pop_back();
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>("startingAt"),
+            strlen("startingAt"));
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>(startingAt.c_str()),
+            startingAt.size());
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("size"),
+            strlen("size"));
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>(size.c_str()),
+            size.size());
+        yajl_gen_map_close(g);
+
+        if (stoi(startingAt) >= len) {
+            *err = "Offset is out of the content limits.";
+            return -1;
+        }
+
+        value = std::string(content, stoi(startingAt), stoi(size));
+        if (varValue.size() > 0) {
+            varValue.append(" " + value);
+        } else {
+            varValue.append(value);
+        }
+    }
+    yajl_gen_array_close(g);
+
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("value"),
+            strlen("value"));
+
+    yajl_gen_array_open(g);
+
+    yajl_gen_map_open(g);
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("value"),
+            strlen("value"));
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(varValue.c_str()),
+            varValue.size());
+    yajl_gen_map_close(g);
+
+    while (trans.size() > 0) {
+        modsecurity::actions::transformations::Transformation *t;
+        std::string varValueRes;
+        yajl_gen_map_open(g);
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>("transformation"),
+            strlen("transformation"));
+
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>(trans.back().match.c_str()),
+            trans.back().match.size());
+
+        t = modsecurity::actions::transformations::Transformation::instantiate(trans.back().match.c_str());
+        varValueRes = t->evaluate(varValue, NULL);
+        varValue.assign(varValueRes);
+        trans.pop_back();
+
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("value"),
+            strlen("value"));
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>(varValue.c_str()),
+            varValue.size());
+        yajl_gen_map_close(g);
+    }
+
+    yajl_gen_array_close(g);
+
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("operator"),
+            strlen("operator"));
+
+    yajl_gen_map_open(g);
+
+    while (ops.size() > 0) {
+        std::string value;
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("highlight"),
+            strlen("highlight"));
+        yajl_gen_map_open(g);
+        ops.pop_back();
+        std::string startingAt = ops.back().match;
+        ops.pop_back();
+        std::string size = ops.back().match;
+        ops.pop_back();
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>("startingAt"),
+            strlen("startingAt"));
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>(startingAt.c_str()),
+            startingAt.size());
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("size"),
+            strlen("size"));
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>(size.c_str()),
+            size.size());
+        yajl_gen_map_close(g);
+
+        if (stoi(startingAt) >= varValue.size()) {
+            *err = "Offset is out of the variable limits.";
+            return -1;
+        }
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>("value"),
+            strlen("value"));
+
+        value = std::string(varValue, stoi(startingAt), stoi(size));
+
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>(value.c_str()),
+            value.size());
+    }
+
+    yajl_gen_map_close(g);
+
+
+    yajl_gen_map_close(g);
+    yajl_gen_array_close(g);
+
+    yajl_gen_map_close(g);
+    yajl_gen_array_close(g);
+    yajl_gen_map_close(g);
+
+    yajl_gen_get_buf(g, &buf, &jsonSize);
+
+    json->assign(reinterpret_cast<const char*>(buf), jsonSize);
+
+    yajl_gen_free(g);
+#else
+    *err = "Without YAJL support, we cannot generate JSON.";
+    return -1;
+#endif
+    return 0;
 }
 
 

@@ -35,17 +35,9 @@ std::string LowerCase::evaluate(std::string value,
     Transaction *transaction) {
     std::locale loc;
 
-    if (LowerCaseInstantCache::getInstance().count(value) > 0) {
-        return LowerCaseInstantCache::getInstance().at(value);
-    }
-
-    std::string orig_value = value;
-
     for (std::string::size_type i=0; i < value.length(); ++i) {
         value[i] = std::tolower(value[i], loc);
     }
-
-    LowerCaseInstantCache::getInstance().cache(orig_value, value);
 
     return value;
 }

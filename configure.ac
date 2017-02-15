@@ -316,9 +316,12 @@ AM_COND_IF([TEST_UTILITIES],
        [AC_CONFIG_FILES([test/Makefile test/benchmark/Makefile])])
 
 AM_COND_IF([EXAMPLES],
-       [AC_CONFIG_FILES([examples/Makefile \
+       [AC_CONFIG_FILES([ \
+            examples/Makefile \
             examples/simple_example_using_c/Makefile \
-            examples/multiprocess_c/Makefile])])
+            examples/multiprocess_c/Makefile \
+            examples/reading_logs_with_offset/Makefile \
+            ])])
 
 AM_COND_IF([AFL_FUZZER],
        [AC_CONFIG_FILES([test/fuzzer/Makefile])])
