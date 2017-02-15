@@ -26,6 +26,9 @@ env:
   - OPTS="--without-geoip $OPTS"
   - OPTS="--without-lmdb $OPTS"
 
+before_script:
+  - '[ "$TRAVIS_OS_NAME" != osx ] || brew update'
+  - '[ "$TRAVIS_OS_NAME" != osx ] || brew install cppcheck'
 
 script:
   - ./build.sh
