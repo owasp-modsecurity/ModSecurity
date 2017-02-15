@@ -60,9 +60,7 @@ cppcheck:
 		--inconclusive \
 		--template="warning: {file},{line},{severity},{id},{message}" \
 		--std=posix . 2> cppcheck.txt
-	cat cppcheck.txt
-#		-U YYSTYPE
-#		-U YY_USER_INIT
+	cat cppcheck.txt | grep -v "/ lalr1.cc"
 
 check-static: cppcheck
 

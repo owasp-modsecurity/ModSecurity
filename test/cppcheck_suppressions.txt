@@ -15,6 +15,11 @@ unusedFunction:src/utils.cc
 *:src/parser/seclang-scanner.cc
 *:parser/seclang-parser.hh
 *:parser/seclang-scanner.cc
+*:seclang-parser.tab.hh
+*:seclang-scanner.ll
+*:seclang-scanner.cc
+*:src/seclang-scanner.cc
+*:src/parser/seclang-parser.cc
 *:others/libinjection/src/libinjection_html5.c
 *:others/libinjection/src/libinjection_sqli.c
 *:others/libinjection/src/libinjection_xss.c
@@ -39,10 +44,7 @@ unreadVariable:test/regression/regression.cc:380
 shiftNegative:src/utils/msc_tree.cc
 nullPointerRedundantCheck:src/utils/msc_tree.cc:654
 *:test/benchmark/owasp-v3/util/av-scanning/runAV/common.c
-*:seclang-parser.tab.hh
-*:seclang-scanner.ll
-*:seclang-scanner.cc
-*:src/seclang-scanner.cc
 passedByValue:src/variables/time.h:34
 knownConditionTrueFalse:test/regression/regression.cc:453
 unusedFunction:test/unit/unit_test.cc:33
+

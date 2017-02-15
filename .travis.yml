@@ -7,6 +7,7 @@ addons:
     - libyajl-dev
     - libgeoip-dev
     - liblmdb-dev
+    - cppcheck
 
 language: cpp
 
@@ -31,6 +32,7 @@ script:
   - ./configure $OPTS
   - make
   - make check
+  - make check-static
 
 
 
