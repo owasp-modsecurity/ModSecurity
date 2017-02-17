@@ -33,15 +33,12 @@ namespace utils {
 
 
 typedef struct msc_file_handler {
-    char *file_name;
     FILE *fp;
     int file_handler;
-    int shm_id_file_name;
     int shm_id_structure;
     int using_it;
     pthread_mutex_t lock;
-    void *next;
-    void *previous;
+    char file_name[];
 } msc_file_handler_t;
 
 
@@ -62,7 +59,7 @@ class SharedFiles {
         std::string *error);
 
  private:
-    SharedFiles() : m_first(NULL) { }
+    SharedFiles() { }
     ~SharedFiles() { }
 
     // C++ 03
@@ -73,7 +70,7 @@ class SharedFiles {
     SharedFiles(SharedFiles const&);
     void operator=(SharedFiles const&);
 
-    msc_file_handler_t *m_first;
+    std::vector<std::pair<std::string, msc_file_handler *>> m_handlers;
 };
 
 
