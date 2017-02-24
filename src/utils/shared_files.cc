@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+#include <utility>
 #include <fstream>
 #include <string>
 
@@ -35,22 +35,25 @@ namespace modsecurity {
 namespace utils {
 
 
-msc_file_handler_t *SharedFiles::find_handler(
+std::pair<msc_file_handler *, FILE *> SharedFiles::find_handler(
     const std::string &fileName) {
-    for (const auto &i: m_handlers) {
+    for (const auto &i : m_handlers) {
         if (i.first == fileName) {
             return i.second;
         }
     }
-    return NULL;
+    return std::pair<modsecurity::utils::msc_file_handler*,
+        _IO_FILE*>(NULL, NULL);
 }
 
 
-msc_file_handler_t *SharedFiles::add_new_handler(
+std::pair<msc_file_handler *, FILE *> SharedFiles::add_new_handler(
     const std::string &fileName, std::string *error) {
     int shm_id;
+    int ret;
     key_t mem_key_structure;
     msc_file_handler_t *new_debug_log;
+    struct shmid_ds shared_mem_info;
     FILE *fp;
     bool toBeCreated = true;
 
@@ -67,8 +70,8 @@ msc_file_handler_t *SharedFiles::add_new_handler(
         goto err_mem_key;
     }
 
-    shm_id = shmget(mem_key_structure, sizeof (msc_file_handler_t) + fileName.size() + 1,
-        IPC_CREAT | IPC_EXCL | 0666);
+    shm_id = shmget(mem_key_structure, sizeof (msc_file_handler_t) \
+        + fileName.size() + 1, IPC_CREAT | IPC_EXCL | 0666);
     if (shm_id < 0) {
         shm_id = shmget(mem_key_structure, sizeof (msc_file_handler_t)
             + fileName.size() + 1, IPC_CREAT | 0666);
@@ -80,6 +83,13 @@ msc_file_handler_t *SharedFiles::add_new_handler(
         }
     }
 
+    ret = shmctl(shm_id, IPC_STAT, &shared_mem_info);
+    if (ret < 0) {
+        error->assign("Failed to get information on shared memory (1): ");
+        error->append(strerror(errno));
+        goto err_shmctl1;
+    }
+
     new_debug_log = reinterpret_cast<msc_file_handler_t *>(
             shmat(shm_id, NULL, 0));
     if ((reinterpret_cast<char *>(new_debug_log)[0]) == -1) {
@@ -88,103 +98,143 @@ msc_file_handler_t *SharedFiles::add_new_handler(
         goto err_shmat1;
     }
 
+    if (toBeCreated == false && shared_mem_info.shm_nattch == 0) {
+        toBeCreated = true;
+    }
+
     if (toBeCreated) {
         memset(new_debug_log, '\0', sizeof(msc_file_handler_t));
         pthread_mutex_init(&new_debug_log->lock, NULL);
-        new_debug_log->fp = fp;
-        new_debug_log->file_handler = fileno(new_debug_log->fp);
         new_debug_log->shm_id_structure = shm_id;
         memcpy(new_debug_log->file_name, fileName.c_str(), fileName.size());
         new_debug_log->file_name[fileName.size()] = '\0';
     }
-    m_handlers.push_back(std::make_pair(fileName, new_debug_log));
+    m_handlers.push_back(std::make_pair(fileName,
+        std::make_pair(new_debug_log, fp)));
 
-    return new_debug_log;
+    return std::make_pair(new_debug_log, fp);
 err_shmget1:
+err_shmctl1:
 err_shmat1:
     shmdt(new_debug_log);
 err_mem_key:
     fclose(fp);
 err_fh:
-    return NULL;
+    return std::pair<modsecurity::utils::msc_file_handler*,
+        _IO_FILE*>(NULL, NULL);
 }
 
 
 bool SharedFiles::open(const std::string& fileName, std::string *error) {
-    msc_file_handler_t *a = find_handler(fileName);
-    if (a == NULL) {
+    std::pair<msc_file_handler *, FILE *> a;
+
+    #if MODSEC_USE_GENERAL_LOCK
+    pthread_mutex_lock(m_generalLock);
+#endif
+
+    a = find_handler(fileName);
+    if (a.first == NULL) {
         a = add_new_handler(fileName, error);
         if (error->size() > 0) {
-            return false;
+            goto out;
         }
     }
-    if (a == NULL) {
+    if (a.first == NULL) {
         error->assign("Not able to open: " + fileName);
-        return false;
+        goto out;
     }
 
-    a->using_it++;
+out:
+#if MODSEC_USE_GENERAL_LOCK
+    pthread_mutex_unlock(m_generalLock);
+#endif
 
     return true;
 }
 
 
 void SharedFiles::close(const std::string& fileName) {
-    msc_file_handler_t *a;
-    int j = 0;
+    std::pair<msc_file_handler *, FILE *> a;
+    /* int ret; */
+    /* int shm_id; */
+    /* struct shmid_ds shared_mem_info; */
+    /* int j = 0; */
+
+#if MODSEC_USE_GENERAL_LOCK
+    pthread_mutex_lock(m_generalLock);
+#endif
 
     if (fileName.empty()) {
-        return;
+        goto out;
     }
 
     a = find_handler(fileName);
-    if (a == NULL) {
-        return;
+    if (a.first == NULL || a.second == NULL) {
+        goto out;
     }
 
-    a->using_it--;
+    /* fclose(a.second); */
+    a.second = 0;
 
-    if (a->using_it == 0) {
-        int shm_id1 = a->shm_id_structure;
-        msc_file_handler_t *p , *n;
-        pthread_mutex_lock(&a->lock);
-        fclose(a->fp);
-        pthread_mutex_unlock(&a->lock);
-        pthread_mutex_destroy(&a->lock);
-        shmdt(a);
-        shmctl(shm_id1, IPC_RMID, NULL);
-    }
-
-    for (const auto &i: m_handlers) {
+    /*
+     * Delete the file structure will be welcomed, but we cannot delay
+     * while the process is being killed.
+     *
+    for (std::pair<std::string,
+        std::pair<msc_file_handler *, FILE *>> i : m_handlers) {
         if (i.first == fileName) {
             j++;
         }
     }
 
-    m_handlers.erase(m_handlers.begin() + j, m_handlers.begin() + j + 1);
+    m_handlers.erase(m_handlers.begin()+j);
+    */
+
+    /* hmdt(a.second); */
+    shmctl(a.first->shm_id_structure, IPC_RMID, NULL);
+
+    /*
+     *
+     * We could check to see how many process attached to the shared memory
+     * we have, prior to the deletion of the shared memory.
+     *
+    ret = shmctl(a.first->shm_id_structure, IPC_STAT, &shared_mem_info);
+    if (ret < 0) {
+        goto out;
+    }
+    ret = shared_mem_info.shm_nattch;
+    shm_id = a.first->shm_id_structure;
+    */
+
+out:
+#if MODSEC_USE_GENERAL_LOCK
+    pthread_mutex_unlock(m_generalLock);
+#endif
+    return;
 }
 
 
 bool SharedFiles::write(const std::string& fileName,
     const std::string &msg, std::string *error) {
+    std::pair<msc_file_handler *, FILE *> a;
     std::string lmsg = msg;
     size_t wrote;
     bool ret = true;
 
-    msc_file_handler_t *a = find_handler(fileName);
-    if (a == NULL) {
+    a = find_handler(fileName);
+    if (a.first == NULL) {
         error->assign("file is not open: " + fileName);
         return false;
     }
 
-    pthread_mutex_lock(&a->lock);
+    pthread_mutex_lock(&a.first->lock);
     wrote = fwrite(reinterpret_cast<const char *>(lmsg.c_str()), 1,
-        lmsg.size(), a->fp);
+        lmsg.size(), a.second);
     if (wrote < msg.size()) {
         error->assign("failed to write: " + fileName);
         ret = false;
     }
-    pthread_mutex_unlock(&a->lock);
+    pthread_mutex_unlock(&a.first->lock);
 
     return ret;
 }
