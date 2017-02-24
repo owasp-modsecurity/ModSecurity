@@ -541,7 +541,7 @@ int Transaction::addRequestHeader(const std::string& key,
 
     if (keyl == "content-type") {
         std::string multipart("multipart/form-data");
-        std::string urlencoded("application/x-www-form-urlencoded;");
+        std::string urlencoded("application/x-www-form-urlencoded");
         std::string l = utils::string::tolower(value);
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
