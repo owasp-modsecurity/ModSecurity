@@ -1503,7 +1503,7 @@ std::string Transaction::toJSON(int parts) {
         strlen("request"));
     yajl_gen_map_open(g);
 
-    LOGFY_ADD("protocol",
+    LOGFY_ADD("method",
         utils::string::dash_if_empty(
             m_variableRequestMethod.evaluate()).c_str());
 
