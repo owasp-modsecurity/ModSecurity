@@ -25,6 +25,8 @@ typedef yy::seclang_parser p;
 %}
 %option noyywrap nounput batch debug noinput
 
+
+
 ACTION_ACCURACY                                 (?i:accuracy)
 ACTION_ALLOW                                    ((?i:allow:(?i:REQUEST|PHASE))|(?i:phase:'(?i:REQUEST|PHASE)')|(?i:allow))
 ACTION_APPEND                                   (?i:append)
@@ -758,6 +760,8 @@ EQUALS_MINUS                            (?i:=\-)
 
 <EXPECTING_VAR_PARAMETER>{
 [\/]{DICT_ELEMENT_WITH_PIPE}[\/]              { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
+['][\/]{DICT_ELEMENT_WITH_PIPE}[\/][']              { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
+
 {DICT_ELEMENT}                                { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
 [|]                                           { }
 .                                             { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
