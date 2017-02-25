@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 
     while (*args != NULL) {
         struct stat buffer;
-        std::string argFull;
+        std::string argFull("");
         const char *arg = *args;
         std::string err;
         int r;
