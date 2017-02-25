@@ -42,8 +42,8 @@ std::pair<msc_file_handler *, FILE *> SharedFiles::find_handler(
             return i.second;
         }
     }
-    return std::pair<modsecurity::utils::msc_file_handler*,
-        _IO_FILE*>(NULL, NULL);
+    return std::pair<modsecurity::utils::msc_file_handler *,
+        FILE *>(NULL, NULL);
 }
 
 
@@ -120,8 +120,8 @@ err_shmat1:
 err_mem_key:
     fclose(fp);
 err_fh:
-    return std::pair<modsecurity::utils::msc_file_handler*,
-        _IO_FILE*>(NULL, NULL);
+    return std::pair<modsecurity::utils::msc_file_handler *,
+        FILE *>(NULL, NULL);
 }
 
 
