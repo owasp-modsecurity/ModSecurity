@@ -321,6 +321,8 @@ AM_COND_IF([EXAMPLES],
             examples/simple_example_using_c/Makefile \
             examples/multiprocess_c/Makefile \
             examples/reading_logs_with_offset/Makefile \
+            tools/Makefile \
+            tools/rules-check/Makefile \
             ])])
 
 AM_COND_IF([AFL_FUZZER],

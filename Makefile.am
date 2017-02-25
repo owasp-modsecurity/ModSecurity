@@ -12,8 +12,10 @@ SUBDIRS = \
 	others \
 	src \
 	doc \
+	tools \
 	$(MAYBE_EXAMPLES) \
 	$(MAYBE_TEST)
+
 
 
 # make clean
