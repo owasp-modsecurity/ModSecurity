@@ -206,8 +206,8 @@ RUN_TIME_VAR_TIME_SEC                     (?i:TIME_SEC)
 RUN_TIME_VAR_TIME_WDAY                    (?i:TIME_WDAY)
 RUN_TIME_VAR_TIME_YEAR                    (?i:TIME_YEAR)
 RUN_TIME_VAR_XML                          (?i:XML)
-VAR_EXCLUSION                             (!)
-VAR_COUNT                                 (&)
+VAR_EXCLUSION                             !
+VAR_COUNT                                 &
 
 
 OPERATOR_UNCONDITIONAL_MATCH            (?i:@unconditionalMatch)
@@ -311,6 +311,8 @@ CONGIG_DIR_SEC_STATUS_ENGINE            (?i:SecStatusEngine)
 CONGIG_DIR_SEC_TMP_DIR                  (?i:SecTmpDir)
 DICT_ELEMENT                            [^ \t|]+
 DICT_ELEMENT_WITH_PIPE                  [^ \t]+
+
+
 DICT_ELEMENT_TWO                        [^\"\=]+
 DICT_ELEMENT_TWO2                        [A-Za-z_ -\%\{\.\}\-\/]+
 DIRECTIVE                               (?i:SecRule)
@@ -759,11 +761,10 @@ EQUALS_MINUS                            (?i:=\-)
 
 
 <EXPECTING_VAR_PARAMETER>{
-[\/]{DICT_ELEMENT_WITH_PIPE}[\/]              { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
-['][\/]{DICT_ELEMENT_WITH_PIPE}[\/][']              { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
-
+[\/]{DICT_ELEMENT_WITH_PIPE}[\/][ ]              { BEGIN(EXPECTING_VARIABLE); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-3), *driver.loc.back()); }
+[\/]{DICT_ELEMENT_WITH_PIPE}[\/][|]              { BEGIN(EXPECTING_VARIABLE); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-3), *driver.loc.back()); }
+['][\/]{DICT_ELEMENT_WITH_PIPE}[\/][']        { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 {DICT_ELEMENT}                                { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
-[|]                                           { }
 .                                             { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 }
 
