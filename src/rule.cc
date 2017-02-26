@@ -697,7 +697,7 @@ end_clean:
 
 end_exec:
     executeActionsAfterFullMatch(trans, containsDisruptive, ruleMessage);
-    if (this->m_chained == false) {
+    if (this->m_chained == false && ruleMessage->m_saveMessage != false) {
         trans->serverLog(ruleMessage);
         trans->m_rulesMessages.push_back(*ruleMessage);
     }

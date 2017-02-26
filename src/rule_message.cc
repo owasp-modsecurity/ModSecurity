@@ -100,8 +100,7 @@ std::string RuleMessage::errorLog(const RuleMessage *rm) {
 }
 
 std::string RuleMessage::log(const RuleMessage *rm) {
-    std::string msg;
-
+    std::string msg("");
     if (rm->m_isDisruptive) {
         msg.append(disruptiveErrorLog(rm));
     } else {

@@ -52,7 +52,7 @@ class RuleMessage {
         m_ruleFile(rule->m_fileName),
         m_ruleId(rule->m_ruleId),
         m_ruleLine(rule->m_lineNumber),
-        m_saveMessage(false),
+        m_saveMessage(true),
         m_serverIpAddress(trans->m_serverIpAddress),
         m_severity(0),
         m_uriNoQueryStringDecoded(trans->m_uri_no_query_string_decoded),
