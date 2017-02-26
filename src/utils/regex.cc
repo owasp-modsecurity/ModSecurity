@@ -80,7 +80,7 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
 
     do {
         rc = pcre_exec(m_pc, m_pce, subject,
-            s.size() - offset, offset, 0, ovector, OVECCOUNT);
+            s.size(), offset, 0, ovector, OVECCOUNT);
 
         for (i = 0; i < rc; i++) {
             SMatch match;
@@ -88,12 +88,18 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
             size_t end = ovector[2*i+1];
             size_t len = end - start;
             if (end > s.size()) {
-                continue;
+                rc = 0;
+                break;
+            }
+            if (len == 0) {
+                rc = 0;
+                break;
             }
             match.match = std::string(tmpString, start, len);
             match.m_offset = start;
             match.m_length = len;
             offset = start + len;
+
             retList.push_front(match);
         }
     } while (rc > 0);
