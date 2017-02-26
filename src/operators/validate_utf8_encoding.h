@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_VALIDATE_UTF8_ENCODING_H_
 
 #include <string>
+#include <memory>
 
 #include "src/operators/operator.h"
 
@@ -40,7 +41,8 @@ class ValidateUtf8Encoding : public Operator {
         : Operator("ValidateUtf8Encoding") { }
 
     bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string &str, RuleMessage *ruleMessage) override;
+        const std::string &str,
+        std::shared_ptr<RuleMessage> ruleMessage) override;
 
     int detect_utf8_character(const unsigned char *p_read,
         unsigned int length);

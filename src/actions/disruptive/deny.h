@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -32,7 +33,7 @@ class Deny : public Action {
     explicit Deny(std::string action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
-        RuleMessage *rm) override;
+        std::shared_ptr<RuleMessage> rm) override;
     bool isDisruptive() override { return true; }
 };
 

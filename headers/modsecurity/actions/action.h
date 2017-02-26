@@ -17,6 +17,7 @@
 
 #include <string>
 #include <iostream>
+#include <memory>
 
 #endif
 
@@ -62,7 +63,7 @@ class Action {
         Transaction *transaction);
     virtual bool evaluate(Rule *rule, Transaction *transaction);
     virtual bool evaluate(Rule *rule, Transaction *transaction,
-        RuleMessage *ruleMessage) {
+        std::shared_ptr<RuleMessage> ruleMessage) {
         return evaluate(rule, transaction);
     }
     virtual bool init(std::string *error) { return true; }

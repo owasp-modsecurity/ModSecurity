@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -27,7 +28,8 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Log::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool Log::evaluate(Rule *rule, Transaction *transaction,
+    std::shared_ptr<RuleMessage> rm) {
     transaction->debug(9, "Saving transaction to logs");
     rm->m_saveMessage = true;
     return true;

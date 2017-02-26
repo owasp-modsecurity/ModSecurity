@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule_message.h"
@@ -26,7 +27,7 @@ namespace actions {
 
 
 bool AuditLog::evaluate(Rule *rule, Transaction *transaction,
-    RuleMessage *rm) {
+    std::shared_ptr<RuleMessage> rm) {
     rm->m_noAuditLog = false;
     return true;
 }

@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
@@ -36,7 +37,7 @@ class Block : public Action {
     explicit Block(std::string action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
-        RuleMessage *rm) override;
+        std::shared_ptr<RuleMessage> rm) override;
     bool isDisruptive() override { return true; }
 };
 

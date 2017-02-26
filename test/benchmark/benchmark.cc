@@ -68,6 +68,7 @@ char rules_file[] = "basic_rules.conf";
 
 #define NUM_REQUESTS 10000
 
+
 int main(int argc, char *argv[]) {
     int i = 0;
     modsecurity::ModSecurity *modsec;

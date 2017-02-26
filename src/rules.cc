@@ -209,7 +209,7 @@ int Rules::evaluate(int phase, Transaction *transaction) {
             debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "'. Removed by an SecRuleRemove directive.");
         } else {
-            rule->evaluate(transaction);
+            rule->evaluate(transaction, NULL);
             if (transaction->m_it.disruptive == true) {
                 debug(8, "Skipping this phase as this " \
                     "request was already intercepted.");

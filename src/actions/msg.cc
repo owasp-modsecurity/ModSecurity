@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -46,14 +47,14 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Msg::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool Msg::evaluate(Rule *rule, Transaction *transaction,
+    std::shared_ptr<RuleMessage> rm) {
     std::string msg = data(transaction);
     rm->m_message = msg;
     transaction->debug(9, "Saving msg: " + msg);
 
     transaction->m_collections.storeOrUpdateFirst("RULE:msg", msg);
 
-    rm->m_server_logs.push_back(rm->errorLog(transaction));
     return true;
 }
 

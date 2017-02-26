@@ -77,6 +77,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <memory>
 #endif
 
 
@@ -163,6 +164,8 @@ namespace modsecurity {
      */
      NUMBER_OF_PHASES,
     };
+
+
 }  // namespace modsecurity
 #endif
 
@@ -198,16 +201,76 @@ namespace modsecurity {
 #define MODSECURITY_VERSION_NUM MODSECURITY_MAJOR \
     MODSECURITY_MINOR MODSECURITY_PATCHLEVEL MODSECURITY_TAG_NUM
 
-typedef void (*LogCb) (void *, const char *);
+
+/*
+ * @name    ModSecLogCb
+ * @brief   Callback to be function on every log generation
+ *
+ *
+ * The callback is going to be called on every log request.
+ *
+ *
+ * void *   Internal reference to be used by the API consumer. Whatever
+ *          is set here will be passed on every call.
+ * void *   Pointer to a const char * or RuleMessage class. The returned
+ *          data is selected on the log register property.
+ *
+ * @note    Vide LogProperty enum to learn more about Log Properties.
+ *
+ */
+typedef void (*ModSecLogCb) (void *, const void *);
+
 
 #ifdef __cplusplus
 namespace modsecurity {
+
 
 /* few forwarded declarations */
 namespace actions {
 class Action;
 }
 class Rule;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    /**
+     *
+     * Properties used to configure the general log callback.
+     *
+     */
+    enum LogProperty {
+    /**
+     *
+     * Original ModSecurity text log entry. The same entry that can be found
+     * within the Apache error_log (in the 2.x family)
+     *
+     */
+     TextLogProperty = 1,
+    /**
+     *
+     * Instead of return the text log entry an instance of the class
+     * RuleMessages is returned.
+     *
+     */
+     RuleMessageLogProperty = 2,
+    /**
+     * This property only makes sense with the utilization of the
+     * RuleMessageLogProperty. Without this property set the RuleMessage
+     * structure will not be filled with the information of the hightlight.
+     *
+     * Notice that the highlight can be calculate post-analisys. Calculate it
+     * during the analisys may delay the analisys process.
+     *
+    */
+     IncludeFullHighlightLogProperty = 4,
+    };
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 /** @ingroup ModSecurity_CPP_API */
 class ModSecurity {
@@ -217,8 +280,17 @@ class ModSecurity {
 
     static const std::string whoAmI();
     void setConnectorInformation(std::string connector);
-    void setServerLogCb(LogCb cb);
-    void serverLog(void *data, const std::string& msg);
+    void setServerLogCb(ModSecLogCb cb);
+    /**
+     *
+     * properties   Properties to inform ModSecurity what kind of infornation
+     *              is expected be returned.
+     *
+     */
+    void setServerLogCb(ModSecLogCb cb, int properties);
+
+    void serverLog(void *data, std::shared_ptr<RuleMessage> rm);
+
     const std::string& getConnectorInformation();
 
     int processContentOffset(const char *content, size_t len,
@@ -232,7 +304,8 @@ class ModSecurity {
 
  private:
     std::string m_connector;
-    LogCb m_logCb;
+    ModSecLogCb m_logCb;
+    int m_logProperties;
 };
 
 
@@ -249,7 +322,7 @@ const char *msc_who_am_i(ModSecurity *msc);
 /** @ingroup ModSecurity_C_API */
 void msc_set_connector_info(ModSecurity *msc, const char *connector);
 /** @ingroup ModSecurity_C_API */
-void msc_set_log_cb(ModSecurity *msc, LogCb cb);
+void msc_set_log_cb(ModSecurity *msc, ModSecLogCb cb);
 /** @ingroup ModSecurity_C_API */
 void msc_cleanup(ModSecurity *msc);
 

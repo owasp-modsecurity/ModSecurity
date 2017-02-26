@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/transaction.h"
 
@@ -37,7 +38,8 @@ bool Status::init(std::string *error) {
 }
 
 
-bool Status::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool Status::evaluate(Rule *rule, Transaction *transaction,
+    std::shared_ptr<RuleMessage> rm) {
     transaction->m_it.status = m_status;
     return true;
 }

@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_CONTAINS_WORD_H_
 
 #include <string>
+#include <memory>
 
 #include "src/operators/operator.h"
 #include "modsecurity/rule_message.h"
@@ -32,7 +33,8 @@ class ContainsWord : public Operator {
     explicit ContainsWord(std::string param)
         : Operator("ContainsWord", param) { }
     bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string &str, RuleMessage *ruleMessage) override;
+        const std::string &str,
+        std::shared_ptr<RuleMessage> ruleMessage) override;
 
     bool acceptableChar(const std::string& a, size_t pos);
 };

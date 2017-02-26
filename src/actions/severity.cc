@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -70,7 +71,7 @@ bool Severity::init(std::string *error) {
 
 
 bool Severity::evaluate(Rule *rule, Transaction *transaction,
-    RuleMessage *rm) {
+    std::shared_ptr<RuleMessage> rm) {
 #ifndef NO_LOGS
     transaction->debug(9, "This rule severity is: " + \
         std::to_string(this->m_severity) + " current transaction is: " + \

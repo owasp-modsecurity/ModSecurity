@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
@@ -39,8 +40,8 @@ class Redirect : public Action {
         m_urlExpanded(""),
         m_url("") { }
 
-    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
-        override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm) override;
     bool init(std::string *error) override;
     bool isDisruptive() override { return true; }
 

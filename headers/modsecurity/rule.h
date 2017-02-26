@@ -52,21 +52,21 @@ class Rule {
     explicit Rule(std::string marker);
     ~Rule();
 
-    bool evaluate(Transaction *transaction);
+    bool evaluate(Transaction *transaction, std::shared_ptr<RuleMessage> rm);
     bool evaluateActions(Transaction *transaction);
     std::vector<std::unique_ptr<collection::Variable>>
 	getFinalVars(Transaction *trasn);
     void executeActionsAfterFullMatch(Transaction *trasn,
-        bool containsDisruptive, RuleMessage *ruleMessage);
+        bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage);
 
     std::list<std::pair<std::shared_ptr<std::string>,
         std::shared_ptr<std::string>>> executeDefaultTransformations(
         Transaction *trasn, const std::string &value, bool multiMatch);
 
     bool executeOperatorAt(Transaction *trasn, std::string key,
-        std::string value, RuleMessage *rm);
+        std::string value, std::shared_ptr<RuleMessage> rm);
     void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
-        bool *b, RuleMessage *ruleMessage);
+        bool *b, std::shared_ptr<RuleMessage> ruleMessage);
     std::string resolveMatchMessage(std::string key, std::string value);
     void updateMatchedVars(Transaction *trasn, std::string key,
         std::string value);

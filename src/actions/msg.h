@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
@@ -33,8 +34,8 @@ class Msg : public Action {
     explicit Msg(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
-        override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm) override;
 
     std::string data(Transaction *Transaction);
 };

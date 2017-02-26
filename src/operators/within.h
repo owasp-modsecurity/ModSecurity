@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_WITHIN_H_
 
 #include <string>
+#include <memory>
 
 #include "src/operators/operator.h"
 
@@ -32,7 +33,7 @@ class Within : public Operator {
     explicit Within(std::string param)
         : Operator("Within", param) { }
     bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string &str, RuleMessage *ruleMessage);
+        const std::string &str, std::shared_ptr<RuleMessage> ruleMessage);
 };
 
 }  // namespace operators

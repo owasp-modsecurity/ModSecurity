@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 
@@ -32,8 +33,8 @@ class NoLog : public Action {
     explicit NoLog(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
-        override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm) override;
 };
 
 }  // namespace actions

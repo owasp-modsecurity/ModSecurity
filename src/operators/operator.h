@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #ifndef SRC_OPERATORS_OPERATOR_H__
 #define SRC_OPERATORS_OPERATOR_H__
@@ -63,7 +64,7 @@ class Operator {
     bool evaluateInternal(Transaction *t, Rule *rule,
         const std::string& a);
     bool evaluateInternal(Transaction *t, Rule *rule,
-        const std::string& a, RuleMessage *ruleMessage);
+        const std::string& a, std::shared_ptr<RuleMessage> ruleMessage);
 
 
     virtual bool evaluate(Transaction *transaction, const std::string &str);
@@ -72,11 +73,12 @@ class Operator {
         return evaluate(transaction, str);
     }
     virtual bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string &str, RuleMessage *ruleMessage) {
+        const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) {
         return evaluate(transaction, str);
     }
 
-    static void logOffset(RuleMessage *ruleMessage, int offset, int len) {
+    static void logOffset(std::shared_ptr<RuleMessage> ruleMessage,
+        int offset, int len) {
         if (ruleMessage) {
             ruleMessage->m_reference.append("o"
                 + std::to_string(offset) + ","

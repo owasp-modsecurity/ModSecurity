@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -30,8 +31,8 @@ class Pass : public Action {
  public:
     explicit Pass(std::string action) : Action(action) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
-        override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm) override;
     bool isDisruptive() override { return true; }
 };
 

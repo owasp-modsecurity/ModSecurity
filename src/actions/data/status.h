@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
@@ -36,8 +37,8 @@ class Status : public Action {
     m_status(0) { }
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
-        override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm) override;
 
     int m_status;
 };

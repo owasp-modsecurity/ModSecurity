@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_BEGINS_WITH_H_
 
 #include <string>
+#include <memory>
 
 #include "src/operators/operator.h"
 
@@ -33,7 +34,7 @@ class BeginsWith : public Operator {
         : Operator("BeginsWith", param) { }
 
     bool evaluate(Transaction *transaction, Rule *rule, const std::string &str,
-        RuleMessage *ruleMessage) override;
+        std::shared_ptr<RuleMessage> ruleMessage) override;
 };
 
 }  // namespace operators

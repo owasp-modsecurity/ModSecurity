@@ -23,79 +23,90 @@
 
 namespace modsecurity {
 
-std::string RuleMessage::disruptiveErrorLog(Transaction *trans,
-    std::string msg2) {
+std::string RuleMessage::disruptiveErrorLog(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append("[client " + std::string(trans->m_clientIpAddress) + "]");
+    msg.append("[client " + std::string(rm->m_clientIpAddress) + "]");
     msg.append(" ModSecurity: ");
-    msg.append(msg2);
-    msg.append(m_match);
-    msg.append(" [file \"" + std::string(m_ruleFile) + "\"]");
-    msg.append(" [line \"" + std::to_string(m_ruleLine) + "\"]");
-    msg.append(" [id \"" + std::to_string(m_ruleId) + "\"]");
-    msg.append(" [rev \"" + m_rev + "\"]");
-    msg.append(" [msg \"" + m_message + "\"]");
-    msg.append(" [data \"" + m_data + "\"]");
+    msg.append(rm->m_disruptiveMessage);
+    msg.append(rm->m_match);
+    msg.append(" [file \"" + std::string(rm->m_ruleFile) + "\"]");
+    msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
+    msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
+    msg.append(" [rev \"" + rm->m_rev + "\"]");
+    msg.append(" [msg \"" + rm->m_message + "\"]");
+    msg.append(" [data \"" + rm->m_data + "\"]");
     msg.append(" [severity \"" +
-        std::to_string(m_severity) + "\"]");
-    msg.append(" [ver \"" + m_ver + "\"]");
-    msg.append(" [maturity \"" + std::to_string(m_maturity) + "\"]");
-    msg.append(" [accuracy \"" + std::to_string(m_accuracy) + "\"]");
-    for (auto &a : m_tags) {
+        std::to_string(rm->m_severity) + "\"]");
+    msg.append(" [ver \"" + rm->m_ver + "\"]");
+    msg.append(" [maturity \"" + std::to_string(rm->m_maturity) + "\"]");
+    msg.append(" [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]");
+    for (auto &a : rm->m_tags) {
         msg.append(" [tag \"" + a + "\"]");
     }
-    msg.append(" [hostname \"" + std::string(trans->m_serverIpAddress) \
+    msg.append(" [hostname \"" + std::string(rm->m_serverIpAddress) \
         + "\"]");
-    msg.append(" [uri \"" + trans->m_uri_no_query_string_decoded + "\"]");
-    msg.append(" [unique_id \"" + trans->m_id + "\"]");
-    msg.append(" [ref \"" + m_reference + "\"]");
+    msg.append(" [uri \"" + rm->m_uriNoQueryStringDecoded + "\"]");
+    msg.append(" [unique_id \"" + rm->m_id + "\"]");
+    msg.append(" [ref \"" + rm->m_reference + "\"]");
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }
 
 
-std::string RuleMessage::noClientErrorLog(Transaction *trans) {
+std::string RuleMessage::noClientErrorLog(const RuleMessage *rm) {
     std::string msg;
 
     msg.append("ModSecurity: Warning. ");
-    msg.append(m_match);
-    msg.append(" [file \"" + std::string(m_ruleFile) + "\"]");
-    msg.append(" [line \"" + std::to_string(m_ruleLine) + "\"]");
-    msg.append(" [id \"" + std::to_string(m_ruleId) + "\"]");
-    msg.append(" [rev \"" + m_rev + "\"]");
-    msg.append(" [msg \"" + m_message + "\"]");
-    msg.append(" [data \"" + m_data + "\"]");
+    msg.append(rm->m_match);
+    msg.append(" [file \"" + std::string(rm->m_ruleFile) + "\"]");
+    msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
+    msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
+    msg.append(" [rev \"" + rm->m_rev + "\"]");
+    msg.append(" [msg \"" + rm->m_message + "\"]");
+    msg.append(" [data \"" + rm->m_data + "\"]");
     msg.append(" [severity \"" +
-        std::to_string(m_severity) + "\"]");
-    msg.append(" [ver \"" + m_ver + "\"]");
-    msg.append(" [maturity \"" + std::to_string(m_maturity) + "\"]");
-    msg.append(" [accuracy \"" + std::to_string(m_accuracy) + "\"]");
-    for (auto &a : m_tags) {
+        std::to_string(rm->m_severity) + "\"]");
+    msg.append(" [ver \"" + rm->m_ver + "\"]");
+    msg.append(" [maturity \"" + std::to_string(rm->m_maturity) + "\"]");
+    msg.append(" [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]");
+    for (auto &a : rm->m_tags) {
         msg.append(" [tag \"" + a + "\"]");
     }
-    msg.append(" [ref \"" + m_reference + "\"]");
+    msg.append(" [ref \"" + rm->m_reference + "\"]");
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }
 
-std::string RuleMessage::errorLogTail(Transaction *trans) {
+std::string RuleMessage::errorLogTail(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append("[hostname \"" + std::string(trans->m_serverIpAddress) \
+    msg.append("[hostname \"" + std::string(rm->m_serverIpAddress) \
         + "\"]");
-    msg.append(" [uri \"" + trans->m_uri_no_query_string_decoded + "\"]");
-    msg.append(" [unique_id \"" + trans->m_id + "\"]");
+    msg.append(" [uri \"" + rm->m_uriNoQueryStringDecoded + "\"]");
+    msg.append(" [unique_id \"" + rm->m_id + "\"]");
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }
 
-std::string RuleMessage::errorLog(Transaction *trans) {
+std::string RuleMessage::errorLog(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append("[client " + std::string(trans->m_clientIpAddress) + "] ");
-    msg.append(noClientErrorLog(trans));
-    msg.append(" " + errorLogTail(trans));
+    msg.append("[client " + std::string(rm->m_clientIpAddress) + "] ");
+    msg.append(noClientErrorLog(rm));
+    msg.append(" " + errorLogTail(rm));
+
+    return msg;
+}
+
+std::string RuleMessage::log(const RuleMessage *rm) {
+    std::string msg;
+
+    if (rm->m_isDisruptive) {
+        msg.append(disruptiveErrorLog(rm));
+    } else {
+        msg.append(errorLog(rm));
+    }
 
     return msg;
 }

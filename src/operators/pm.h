@@ -18,6 +18,7 @@
 
 #include <string>
 #include <list>
+#include <memory>
 
 #include "src/operators/operator.h"
 #include "src/utils/acmp.h"
@@ -44,7 +45,8 @@ class Pm : public Operator {
     }
     ~Pm();
     bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string &str, RuleMessage *ruleMessage) override;
+        const std::string &str,
+        std::shared_ptr<RuleMessage> ruleMessage) override;
 
 
     bool init(const std::string &file, std::string *error) override;

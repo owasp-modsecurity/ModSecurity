@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_ENDS_WITH_H_
 
 #include <string>
+#include <memory>
 
 #include "src/operators/operator.h"
 
@@ -32,7 +33,8 @@ class EndsWith : public Operator {
     explicit EndsWith(std::string param)
         : Operator("EndsWith", param) { }
     bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string &str, RuleMessage *ruleMessage) override;
+        const std::string &str,
+        std::shared_ptr<RuleMessage> ruleMessage) override;
 };
 
 

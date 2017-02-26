@@ -18,6 +18,7 @@
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_message.h"
 #include "src/collection/backend/in_memory-per_process.h"
 #include "src/collection/backend/lmdb.h"
 #include "src/config.h"
@@ -166,12 +167,33 @@ const std::string& ModSecurity::getConnectorInformation() {
     return m_connector;
 }
 
-
-void ModSecurity::serverLog(void *data, const std::string& msg) {
+void ModSecurity::serverLog(void *data, std::shared_ptr<RuleMessage> rm) {
     if (m_logCb == NULL) {
-        std::cout << "Server log callback is not set -- " << msg << std::endl;
-    } else {
-        m_logCb(data, msg.c_str());
+        std::cerr << "Server log callback is not set -- " << rm->errorLog();
+        std::cerr << std::endl;
+        return;
+    }
+
+    if (rm == NULL) {
+        return;
+    }
+
+    if (m_logProperties & TextLogProperty) {
+        char *d = strdup(rm->log().c_str());
+        const void *a = static_cast<const void *>(d);
+        m_logCb(data, a);
+        free(d);
+        return;
+    }
+
+    if (m_logProperties & RuleMessageLogProperty) {
+        const void *a = static_cast<const void *>(rm.get());
+        if (m_logProperties & IncludeFullHighlightLogProperty) {
+            m_logCb(data, a);
+            return;
+        }
+        m_logCb(data, a);
+        return;
     }
 }
 
@@ -355,8 +377,14 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 }
 
 
-void ModSecurity::setServerLogCb(LogCb cb) {
-    m_logCb = (LogCb) cb;
+void ModSecurity::setServerLogCb(ModSecLogCb cb) {
+    setServerLogCb(cb, TextLogProperty);
+}
+
+
+void ModSecurity::setServerLogCb(ModSecLogCb cb, int properties) {
+    m_logCb = (ModSecLogCb) cb;
+    m_logProperties = properties;
 }
 
 /**
@@ -367,11 +395,11 @@ void ModSecurity::setServerLogCb(LogCb cb) {
  * connector should be called when logging is required.
  *
  * @oarm msc The current ModSecurity instance
- * @param LogCB The callback function to which a reference to the log msgs 
+ * @param ModSecLogCb The callback function to which a reference to the log msgs 
  * will be passed.
  *
  */
-extern "C" void msc_set_log_cb(ModSecurity *msc, LogCb cb) {
+extern "C" void msc_set_log_cb(ModSecurity *msc, ModSecLogCb cb) {
     msc->setServerLogCb(cb);
 }
 

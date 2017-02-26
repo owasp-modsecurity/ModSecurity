@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
@@ -27,7 +28,8 @@ namespace actions {
 namespace disruptive {
 
 
-bool Pass::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool Pass::evaluate(Rule *rule, Transaction *transaction,
+    std::shared_ptr<RuleMessage> rm) {
     intervention::free(&transaction->m_it);
     intervention::reset(&transaction->m_it);
 

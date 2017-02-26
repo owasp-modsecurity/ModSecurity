@@ -80,7 +80,8 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
     }
 }
 
-void logCb(void *data, const char *msg) {
+void logCb(void *data, const void *msgv) {
+    const char *msg = reinterpret_cast<const char*>(msgv);
     std::stringstream *ss = (std::stringstream *) data;
     *ss << msg << std::endl;
 }

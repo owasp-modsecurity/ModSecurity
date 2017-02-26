@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 
@@ -35,7 +36,7 @@ class Severity : public Action {
         m_severity(0) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
-        RuleMessage *rm) override;
+        std::shared_ptr<RuleMessage> rm) override;
     bool init(std::string *error) override;
 
     int m_severity;

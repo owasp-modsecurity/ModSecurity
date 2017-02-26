@@ -16,6 +16,7 @@
 #include "src/operators/validate_byte_range.h"
 
 #include <string>
+#include <memory>
 
 #include "src/operators/operator.h"
 
@@ -110,7 +111,7 @@ bool ValidateByteRange::init(const std::string &file,
 
 
 bool ValidateByteRange::evaluate(Transaction *transaction, Rule *rule,
-    const std::string &input, RuleMessage *ruleMessage) {
+    const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
     bool ret = true;
 
     size_t count = 0;

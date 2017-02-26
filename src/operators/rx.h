@@ -18,6 +18,7 @@
 
 #include <string>
 #include <list>
+#include <memory>
 
 #include "src/operators/operator.h"
 #include "src/utils/regex.h"
@@ -59,7 +60,8 @@ class Rx : public Operator {
         return evaluate(transaction, NULL, input);
     }
     bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string& input, RuleMessage *ruleMessage) override;
+        const std::string& input,
+        std::shared_ptr<RuleMessage> ruleMessage) override;
 
  private:
     Regex *m_re;

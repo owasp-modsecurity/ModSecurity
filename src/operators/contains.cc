@@ -23,7 +23,7 @@ namespace modsecurity {
 namespace operators {
 
 bool Contains::evaluate(Transaction *transaction, Rule *rule,
-        const std::string &input, RuleMessage *ruleMessage) {
+        const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
     std::string p = MacroExpansion::expand(m_param, transaction);
     size_t offset = input.find(p);
 

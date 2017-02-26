@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
@@ -29,7 +30,8 @@ namespace actions {
 namespace disruptive {
 
 
-bool Block::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool Block::evaluate(Rule *rule, Transaction *transaction,
+    std::shared_ptr<RuleMessage> rm) {
     transaction->debug(8, "Marking request as disruptive.");
 
     for (Action *a : transaction->m_rules->m_defaultActions[rule->m_phase]) {

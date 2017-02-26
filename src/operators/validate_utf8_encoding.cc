@@ -114,7 +114,7 @@ int ValidateUtf8Encoding::detect_utf8_character(
 }
 
 bool ValidateUtf8Encoding::evaluate(Transaction *transaction, Rule *rule,
-    const std::string &str, RuleMessage *ruleMessage) {
+    const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) {
     unsigned int i, bytes_left;
 
     const char *str_c = str.c_str();

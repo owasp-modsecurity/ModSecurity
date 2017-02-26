@@ -242,7 +242,7 @@ std::string Rule::resolveMatchMessage(std::string key, std::string value) {
             utils::string::limitTo(200, this->m_op->m_param) +
             "' against variable `" + key + "' (Value: `" +
             utils::string::limitTo(100, utils::string::toHexIfNeeded(value)) +
-            "' ) \" at " + key;
+            "' )";
     }
 
     return ret;
@@ -250,7 +250,7 @@ std::string Rule::resolveMatchMessage(std::string key, std::string value) {
 
 
 void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
-    bool *containsDisruptive, RuleMessage *ruleMessage) {
+    bool *containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage) {
     for (Action *a : this->m_actionsRuntimePos) {
         if (a->isDisruptive() == true) {
             if (a->m_name == "pass") {
@@ -272,7 +272,7 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
 
 
 bool Rule::executeOperatorAt(Transaction *trans, std::string key,
-    std::string value, RuleMessage *ruleMessage) {
+    std::string value, std::shared_ptr<RuleMessage> ruleMessage) {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
     clock_t end;
@@ -524,7 +524,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
 
 
 void Rule::executeActionsAfterFullMatch(Transaction *trans,
-    bool containsDisruptive, RuleMessage *ruleMessage) {
+    bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage) {
 
     for (Action *a : trans->m_rules->m_defaultActions[this->m_phase]) {
         if (a->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
@@ -581,14 +581,19 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
 }
 
 
-bool Rule::evaluate(Transaction *trans) {
+bool Rule::evaluate(Transaction *trans,
+    std::shared_ptr<RuleMessage> ruleMessage) {
     bool globalRet = false;
     std::vector<Variable *> *variables = this->m_variables;
     bool recursiveGlobalRet;
     bool containsDisruptive = false;
-    RuleMessage ruleMessage(this);
     std::vector<std::unique_ptr<collection::Variable>> finalVars;
     std::string eparam;
+
+    if (ruleMessage == NULL) {
+        ruleMessage = std::shared_ptr<RuleMessage>(
+            new RuleMessage(this, trans));
+    }
 
     trans->m_matched.clear();
 
@@ -599,7 +604,7 @@ bool Rule::evaluate(Transaction *trans) {
         trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
             + ") Executing unconditional rule...");
         executeActionsIndependentOfChainedRuleResult(trans,
-            &containsDisruptive, &ruleMessage);
+            &containsDisruptive, ruleMessage);
         goto end_exec;
     }
 
@@ -646,17 +651,17 @@ bool Rule::evaluate(Transaction *trans) {
             bool ret;
             std::string valueAfterTrans = std::move(*valueTemp.first);
 
-            ret = executeOperatorAt(trans, key, valueAfterTrans, &ruleMessage);
+            ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
 
             if (ret == true) {
-                ruleMessage.m_match = resolveMatchMessage(key, value);
+                ruleMessage->m_match = resolveMatchMessage(key, value);
                 for (auto &i : v->m_orign) {
-                    ruleMessage.m_reference.append(i->toText());
+                    ruleMessage->m_reference.append(i->toText());
                 }
-                ruleMessage.m_reference.append(*valueTemp.second);
+                ruleMessage->m_reference.append(*valueTemp.second);
                 updateMatchedVars(trans, key, value);
                 executeActionsIndependentOfChainedRuleResult(trans,
-                    &containsDisruptive, &ruleMessage);
+                    &containsDisruptive, ruleMessage);
                 globalRet = true;
             }
         }
@@ -681,7 +686,7 @@ bool Rule::evaluate(Transaction *trans) {
     }
 
     trans->debug(4, "Executing chained rule.");
-    recursiveGlobalRet = this->m_chainedRule->evaluate(trans);
+    recursiveGlobalRet = this->m_chainedRule->evaluate(trans, ruleMessage);
 
     if (recursiveGlobalRet == true) {
         goto end_exec;
@@ -691,13 +696,10 @@ end_clean:
     return false;
 
 end_exec:
-    executeActionsAfterFullMatch(trans, containsDisruptive, &ruleMessage);
-    for (const auto &u : ruleMessage.m_server_logs) {
-        trans->serverLog(u);
-    }
-
-    if (ruleMessage.m_server_logs.size() > 0) {
-        trans->m_rulesMessages.push_back(ruleMessage);
+    executeActionsAfterFullMatch(trans, containsDisruptive, ruleMessage);
+    if (this->m_chained == false) {
+        trans->serverLog(ruleMessage);
+        trans->m_rulesMessages.push_back(*ruleMessage);
     }
 
     return true;

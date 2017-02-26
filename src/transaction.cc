@@ -1441,7 +1441,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     if (parts & audit_log::AuditLog::HAuditLogPart) {
         audit_log << "--" << trailer << "-" << "H--" << std::endl;
         for (auto a : m_rulesMessages) {
-            audit_log << a.noClientErrorLog(this) << std::endl;
+            audit_log << a.noClientErrorLog() << std::endl;
         }
         audit_log << std::endl;
         /** TODO: write audit_log H part. */
@@ -1658,8 +1658,8 @@ std::string Transaction::toJSON(int parts) {
 }
 
 
-void Transaction::serverLog(const std::string& msg) {
-    m_ms->serverLog(m_logCbData, msg);
+void Transaction::serverLog(std::shared_ptr<RuleMessage> rm) {
+    m_ms->serverLog(m_logCbData, rm);
 }
 
 

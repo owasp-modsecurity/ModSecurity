@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -56,7 +57,8 @@ std::string Tag::getName(Transaction *transaction) {
 }
 
 
-bool Tag::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool Tag::evaluate(Rule *rule, Transaction *transaction,
+    std::shared_ptr<RuleMessage> rm) {
     std::string tag = getName(transaction);
 
 #ifndef NO_LOGS

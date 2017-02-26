@@ -18,7 +18,7 @@
 #include <string.h>
 #include <iostream>
 #include <string>
-
+#include <memory>
 
 #include "modsecurity/transaction.h"
 #include "src/macro_expansion.h"
@@ -36,7 +36,7 @@ bool Redirect::init(std::string *error) {
 
 
 bool Redirect::evaluate(Rule *rule, Transaction *transaction,
-    RuleMessage *rm) {
+   std::shared_ptr<RuleMessage> rm) {
     m_urlExpanded = MacroExpansion::expand(m_url, transaction);
     std::string log;
 
@@ -48,13 +48,15 @@ bool Redirect::evaluate(Rule *rule, Transaction *transaction,
     log.append(" (phase ");
     log.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
 
+    rm->m_disruptiveMessage.assign(log);
     intervention::freeUrl(&transaction->m_it);
     transaction->m_it.url = strdup(m_urlExpanded.c_str());
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
     transaction->m_it.log = strdup(
-        rm->disruptiveErrorLog(transaction, log).c_str());
+        rm->disruptiveErrorLog().c_str());
 
+    rm->m_isDisruptive = true;
     return true;
 }
 

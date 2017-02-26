@@ -17,6 +17,7 @@
 
 #include <string>
 #include <list>
+#include <memory>
 
 #include "src/operators/operator.h"
 #include "src/macro_expansion.h"
@@ -29,7 +30,7 @@ namespace operators {
 
 
 bool Rx::evaluate(Transaction *transaction, Rule *rule,
-    const std::string& input, RuleMessage *ruleMessage) {
+    const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     SMatch match;
     std::list<SMatch> matches;
 

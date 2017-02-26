@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <memory>
 
 #include "modsecurity/transaction.h"
 
@@ -27,7 +28,8 @@ namespace actions {
 namespace disruptive {
 
 
-bool Deny::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool Deny::evaluate(Rule *rule, Transaction *transaction,
+    std::shared_ptr<RuleMessage> rm) {
 #ifndef NO_LOGS
     transaction->debug(8, "Running action deny");
 #endif
@@ -41,11 +43,13 @@ bool Deny::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     log.append(" (phase ");
     log.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
 
+    rm->m_disruptiveMessage.assign(log);
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
     transaction->m_it.log = strdup(
-        rm->disruptiveErrorLog(transaction, log).c_str());
+        rm->disruptiveErrorLog().c_str());
 
+    rm->m_isDisruptive = true;
     return true;
 }
 

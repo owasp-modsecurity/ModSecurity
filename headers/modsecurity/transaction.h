@@ -323,7 +323,7 @@ class Transaction : public TransactionAnchoredVariables {
 #ifndef NO_LOGS
     void debug(int, std::string);
 #endif
-    void serverLog(const std::string& msg);
+    void serverLog(std::shared_ptr<RuleMessage> rm);
 
     std::string toJSON(int parts);
     std::string toOldAuditLogFormat(int parts, const std::string &trailer);

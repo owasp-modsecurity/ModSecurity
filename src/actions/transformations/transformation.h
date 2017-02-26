@@ -39,7 +39,6 @@ class Transformation : public Action {
         Transaction *transaction) override;
 
     static Transformation* instantiate(std::string a);
-
 };
 
 }  // namespace transformations

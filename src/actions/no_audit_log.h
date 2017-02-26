@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 
@@ -35,7 +36,7 @@ class NoAuditLog : public Action {
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
-        RuleMessage *rm) override;
+        std::shared_ptr<RuleMessage> rm) override;
 };
 
 }  // namespace actions

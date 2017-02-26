@@ -16,7 +16,7 @@
 #include "src/operators/operator.h"
 
 #include <cstring>
-
+#include <memory>
 #include <string>
 
 #include "modsecurity/transaction.h"
@@ -76,7 +76,7 @@ bool Operator::debug(Transaction *transaction, int x, std::string a) {
 }
 
 bool Operator::evaluateInternal(Transaction *transaction,
-    Rule *rule, const std::string& a, RuleMessage *rm) {
+    Rule *rule, const std::string& a, std::shared_ptr<RuleMessage> rm) {
     bool res = evaluate(transaction, rule, a, rm);
 
     if (m_negation) {

@@ -23,6 +23,7 @@
 #include <sstream>
 #include <vector>
 #include <list>
+#include <memory>
 
 #include "src/operators/operator.h"
 #include "src/utils/acmp.h"
@@ -79,7 +80,7 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
 
 
 bool Pm::evaluate(Transaction *transaction, Rule *rule,
-    const std::string &input, RuleMessage *ruleMessage) {
+    const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
     int rc = 0;
     ACMPT pt;
     pt.parser = m_p;

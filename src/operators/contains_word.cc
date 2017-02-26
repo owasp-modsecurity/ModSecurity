@@ -38,7 +38,7 @@ bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {
 }
 
 bool ContainsWord::evaluate(Transaction *transaction, Rule *rule,
-    const std::string &input, RuleMessage *ruleMessage) {
+    const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
     std::string paramTarget = MacroExpansion::expand(m_param, transaction);
 
     if (paramTarget.empty()) {

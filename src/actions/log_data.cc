@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -29,7 +30,8 @@ namespace modsecurity {
 namespace actions {
 
 
-bool LogData::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool LogData::evaluate(Rule *rule, Transaction *transaction,
+    std::shared_ptr<RuleMessage> rm) {
     rm->m_data = data(transaction);
 
     transaction->m_collections.storeOrUpdateFirst("RULE:logdata", rm->m_data);
