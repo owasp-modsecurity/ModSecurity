@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 
     std::string rules(*argv);
     ReadingLogsViaRuleMessage rlvrm(request_header, request_uri, request_body,
-        response_headers, response_body, ip, rules);
+        "", response_body, ip, rules);
     rlvrm.process();
 
 

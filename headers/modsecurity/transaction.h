@@ -329,6 +329,7 @@ class Transaction : public TransactionAnchoredVariables {
     int getRuleEngineState();
 
     std::string toJSON(int parts);
+    std::string toBuf();
     std::string toOldAuditLogFormat(int parts, const std::string &trailer);
     std::string toOldAuditLogFormatIndex(const std::string &filename,
         double size, const std::string &md5);
