@@ -358,8 +358,7 @@ std::list<std::pair<std::shared_ptr<std::string>,
                 if (multiMatch == true) {
                     if (*newValue != *value) {
                         ret.push_back(std::make_pair(
-                            newValue,
-                                          transStr));
+                            newValue, transStr));
                     }
                 }
                 value = std::shared_ptr<std::string>(newValue);
@@ -388,8 +387,7 @@ std::list<std::pair<std::shared_ptr<std::string>,
             if (multiMatch == true) {
                 if (*value != *newValue) {
                     ret.push_back(std::make_pair(
-                        newValue,
-                                      transStr));
+                        newValue, transStr));
                     value = newValue;
                 }
             }
