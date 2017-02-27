@@ -20,9 +20,11 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"
+#include "src/utils/regex.h"
+#include "modsecurity/actions/action.h"
+#include "src/actions/transformations/transformation.h"
 
 namespace modsecurity {
-
 
 std::string RuleMessage::_details(const RuleMessage *rm) {
     std::string msg;
@@ -61,7 +63,6 @@ std::string RuleMessage::_errorLogTail(const RuleMessage *rm) {
     return msg;
 }
 
-
 std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
     std::string msg("");
 
@@ -90,6 +91,82 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
     }
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
+}
+
+
+RuleMessageHighlight RuleMessage::computeHighlight(const RuleMessage *rm,
+    const std::string buf) {
+    RuleMessageHighlight ret;
+    Utils::Regex variables("v([0-9]+),([0-9]+)");
+    Utils::Regex operators("o([0-9]+),([0-9]+)");
+    Utils::Regex transformations("t:(?:(?!t:).)+");
+
+    std::string ref(rm->m_reference);
+    std::list<Utils::SMatch> vars = variables.searchAll(ref);
+    std::list<Utils::SMatch> ops = operators.searchAll(ref);
+    std::list<Utils::SMatch> trans = transformations.searchAll(ref);
+
+    std::string varValue;
+
+    while (vars.size() > 0) {
+        std::string value;
+        RuleMessageHighlightArea a;
+        vars.pop_back();
+        std::string startingAt = vars.back().match;
+        vars.pop_back();
+        std::string size = vars.back().match;
+        vars.pop_back();
+        a.m_startingAt = std::stoi(startingAt);
+        a.m_size = std::stoi(size);
+        ret.m_variable.push_back(a);
+
+        if ((stoi(startingAt) + stoi(size)) > buf.size()) {
+            return ret;
+        }
+
+        value = std::string(buf, stoi(startingAt), stoi(size));
+        if (varValue.size() > 0) {
+            varValue.append(" " + value);
+        } else {
+            varValue.append(value);
+        }
+    }
+
+    ret.m_value.push_back(std::make_pair("original value", varValue));
+    while (trans.size() > 0) {
+        modsecurity::actions::transformations::Transformation *t;
+        std::string varValueRes;
+        std::string transformation = trans.back().match.c_str();
+        t = actions::transformations::Transformation::instantiate(
+            transformation);
+
+        varValueRes = t->evaluate(varValue, NULL);
+        varValue.assign(varValueRes);
+        ret.m_value.push_back(std::make_pair(transformation, varValue));
+        trans.pop_back();
+        delete t;
+    }
+
+    while (ops.size() > 0) {
+        RuleMessageHighlightOperator o;
+        ops.pop_back();
+        std::string startingAt = ops.back().match;
+        ops.pop_back();
+        std::string size = ops.back().match;
+        ops.pop_back();
+
+        if ((stoi(startingAt) + stoi(size)) > buf.size()) {
+            return ret;
+        }
+
+        o.m_area.m_startingAt = std::stoi(startingAt);
+        o.m_area.m_size = std::stoi(size);
+        o.m_value.assign(std::string(varValue, o.m_area.m_startingAt,
+            o.m_area.m_size));
+        ret.m_op.push_back(o);
+    }
+
+    return ret;
 }
 
 
