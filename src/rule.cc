@@ -347,16 +347,11 @@ std::list<std::pair<std::shared_ptr<std::string>,
                 if (multiMatch == true) {
                     if (*newValue != *value) {
                         ret.push_back(std::make_pair(
-                            newValue,
-                                          transStr));
+                            newValue, transStr));
                     }
                 }
                 value = std::shared_ptr<std::string>(newValue);
-                if (transStr->empty()) {
-                    transStr->append(a->m_name);
-                } else {
-                    transStr->append("," + a->m_name);
-                }
+                transStr->append(a->m_name);
                 trans->debug(9, "(SecDefaultAction) T (" + \
                     std::to_string(transformations) + ") " + \
                     a->m_name + ": \"" + \
@@ -375,8 +370,7 @@ std::list<std::pair<std::shared_ptr<std::string>,
             if (multiMatch == true) {
                 if (*value != *newValue) {
                     ret.push_back(std::make_pair(
-                        newValue,
-                                      transStr));
+                        newValue, transStr));
                     value = newValue;
                 }
             }
@@ -386,11 +380,7 @@ std::list<std::pair<std::shared_ptr<std::string>,
                 std::to_string(transformations) + ") " + \
                 a->m_name + ": \"" + \
                 utils::string::limitTo(80, *value) + "\"");
-            if (transStr->empty()) {
-                transStr->append(a->m_name);
-            } else {
-                transStr->append("," + a->m_name);
-            }
+            transStr->append(a->m_name);
             transformations++;
         }
         if (a->m_isNone) {
@@ -698,6 +688,9 @@ end_clean:
 end_exec:
     executeActionsAfterFullMatch(trans, containsDisruptive, ruleMessage);
     if (this->m_chained == false && ruleMessage->m_saveMessage != false) {
+        if (trans->m_ms->m_logProperties & IncludeFullHighlightLogProperty) {
+            ruleMessage->m_buf.assign(trans->toBuf());
+        }
         trans->serverLog(ruleMessage);
         trans->m_rulesMessages.push_back(*ruleMessage);
     }

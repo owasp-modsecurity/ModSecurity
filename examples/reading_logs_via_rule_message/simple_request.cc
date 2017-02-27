@@ -37,14 +37,10 @@ char request_header[] =  "" \
     "Pragma: no-cache\n\r" \
     "Cache-Control: no-cache\n\r";
 
-char request_uri[] = "/test.pl?param1=test&para2=test2";
+char request_uri[] = "/TeSt.Pl?param1=TEsT&para2=TEST2";
 
 char request_body[] = "";
 
-char response_headers[] = "" \
-    "HTTP/1.1 200 OK\n\r" \
-    "Content-Type: text/xml; charset=utf-8\n\r" \
-    "Content-Length: length\n\r";
 
 char response_body[] = "" \
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\r" \
@@ -62,16 +58,16 @@ char ip[] = "200.249.12.31";
 
 
 int main(int argc, char **argv) {
-    (*argv)++;
+    (*argv++);
     if (*argv == NULL) {
-        (*argv)--;
+        (*argv--);
         std::cout << "Use " << *argv << " test-case-file.conf";
         std::cout << std::endl << std::endl;
         return -1;
     }
     std::string rules(*argv);
     ReadingLogsViaRuleMessage rlvrm(request_header, request_uri, request_body,
-        response_headers, response_body, ip, rules);
+        "", response_body, ip, rules);
     rlvrm.process();
     return 0;
 }

@@ -301,11 +301,11 @@ class ModSecurity {
     collection::Collection *m_ip_collection;
     collection::Collection *m_session_collection;
     collection::Collection *m_user_collection;
+    int m_logProperties;
 
  private:
     std::string m_connector;
     ModSecLogCb m_logCb;
-    int m_logProperties;
 };
 
 

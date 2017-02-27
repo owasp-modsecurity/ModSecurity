@@ -67,8 +67,9 @@ class ReadingLogsViaRuleMessage {
             "net.tutsplus.com");
         modsecTransaction->processRequestHeaders();
         modsecTransaction->processRequestBody();
-        modsecTransaction->addResponseHeader("HTTP/1.1",
-            "200 OK");
+
+        modsecTransaction->addResponseHeader("Content-Type", "text/xml; charset=utf-8");
+        modsecTransaction->addResponseHeader("Content-Length", "123");
         modsecTransaction->processResponseHeaders(200, "HTTP 1.2");
         modsecTransaction->appendResponseBody(
             (const unsigned char*)m_response_body,
@@ -82,6 +83,38 @@ class ReadingLogsViaRuleMessage {
         return 0;
 end:
         return -1;
+    }
+
+
+    static std::string highlightToText(
+        const modsecurity::RuleMessageHighlight &h) {
+        std::cout << " * ModSecurity variable to be highlighted" << std::endl;
+
+        for (const auto &i : h.m_variable) {
+            std::cout << "  - From: " << std::to_string(i.m_startingAt);
+            std::cout << " to: " << std::to_string(i.m_startingAt + i.m_size);
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+
+        std::cout << " * Variable's values ";
+        std::cout << "(may include transformations)" << std::endl;
+        for (const auto &i : h.m_value) {
+            std::cout << "  - " << i.first << ": " << i.second << std::endl;
+        }
+        std::cout << std::endl;
+
+        std::cout << " * Operators match to be highlight inside ";
+        std::cout << "the variables (after transformations)" << std::endl;
+
+        for (const auto &i : h.m_op) {
+            std::cout << "  - From: " << i.m_area.m_startingAt;
+            std::cout << " to: " << std::to_string(i.m_area.m_startingAt \
+                + i.m_area.m_size);
+            std::cout << " [Value: " << i.m_value << "]" << std::endl;
+        }
+        std::cout << std::endl;
+        return "";
     }
 
     static void logCb(void *data, const void *ruleMessagev) {
@@ -108,6 +141,17 @@ end:
             std::cout << modsecurity::RuleMessage::log(ruleMessage);
             std::cout << std::endl;
         }
+        std::cout << std::endl;
+        std::cout << "Verbose details on the match highlight" << std::endl;
+        std::cout << "  Highlight reference string: ";
+        std::cout << ruleMessage->m_reference << std::endl;
+        std::cout << std::endl;
+        std::cout << "Details:" << std::endl;
+        modsecurity::RuleMessageHighlight h =
+            modsecurity::RuleMessage::computeHighlight(ruleMessage,
+                ruleMessage->m_buf);
+        highlightToText(h);
+        std::cout << std::endl;
     }
 
  protected:
