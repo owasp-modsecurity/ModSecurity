@@ -1279,7 +1279,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
             strncmp(fn, "http://", strlen("http://")) == 0)
         {
             *error_msg = apr_psprintf(rule->ruleset->mp, "HTTPS address or " \
-		        "file path are expected for operator pmFromFile \"%s\"", fn);
+                "file path are expected for operator pmFromFile \"%s\"", fn);
             return 0;
         }
         else if (strlen(fn) > strlen("https://") &&
@@ -1316,7 +1316,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
             msc_remote_clean_chunk(&chunk);
 #else
             *error_msg = apr_psprintf(rule->ruleset->mp, "ModSecurity was not " \
-		        "compiled with Curl support, it cannot load: \"%s\"", fn);
+                "compiled with Curl support, it cannot load: \"%s\"", fn);
             return 0;
 #endif
         }
@@ -3828,15 +3828,19 @@ static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
 {
 #ifdef WITH_SSDEEP
     struct fuzzy_hash_param_data *param_data;
+    struct fuzzy_hash_chunk *chunk, *t;
     FILE *fp;
     char *file;
     int param_len,threshold;
+    char line[1024];
 
     char *data = NULL;
     char *threshold_str = NULL;
 
     param_data = apr_palloc(rule->ruleset->mp,
         sizeof(struct fuzzy_hash_param_data));
+
+    param_data->head = NULL;
 
     data = apr_pstrdup(rule->ruleset->mp, rule->op_param);
     threshold_str = data;
@@ -3885,6 +3889,28 @@ static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
             " %s.", file);
         return -1;
     }
+
+    while (read_line(line, sizeof(line), fp))
+    {
+        chunk = apr_palloc(rule->ruleset->mp,
+            sizeof(struct fuzzy_hash_chunk));
+
+        chunk->data = apr_pstrdup(rule->ruleset->mp, line);
+        chunk->next = NULL;
+
+        if (param_data->head == NULL) {
+            param_data->head = chunk;
+        } else {
+            t = param_data->head;
+
+            while (t->next) {
+                t = t->next;
+            }
+
+            t->next = chunk;
+        }
+    }
+
     fclose(fp);
 
     param_data->file = file;
@@ -3911,8 +3937,7 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
 #ifdef WITH_SSDEEP
     char result[FUZZY_MAX_RESULT];
     struct fuzzy_hash_param_data *param = rule->op_param_data;
-    FILE *fp;
-    char line[1024];
+    struct fuzzy_hash_chunk *chunk = param->head;
 #endif
 
     if (error_msg == NULL)
@@ -3931,29 +3956,19 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
         return -1;
     }
 
-    fp = fopen(param->file, "r");
-    if (!fp)
+    while (chunk != NULL)
     {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Not able to open " \
-            "fuzzy hash file: %s", param->file);
-
-        return 1;
-    }
-
-    while (read_line(line, sizeof(line), fp))
-    {
-        int i = fuzzy_compare(line, result);
+        int i = fuzzy_compare(chunk->data, result);
+        msr_log(msr, 9, "%d (%s)", i, chunk->data);
         if (i >= param->threshold)
         {
             *error_msg = apr_psprintf(msr->mp, "Fuzzy hash of %s matched " \
-                "with %s (from: %s). Score: %d.", var->name, line,
+                "with %s (from: %s). Score: %d.", var->name, chunk->data,
                 param->file, i);
-            fclose(fp);
             return 1;
         }
+        chunk = chunk->next;
     }
-
-    fclose(fp);
 #else
     *error_msg = apr_psprintf(rule->ruleset->mp, "ModSecurity was not " \
         "compiled with ssdeep support.");
