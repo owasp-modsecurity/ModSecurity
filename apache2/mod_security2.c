@@ -1461,7 +1461,7 @@ static int hook_connection_early(conn_rec *conn)
             for (j = 0; j < thread_limit; ++j) {
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-                ws_record = ap_get_scoreboard_worker(sbh);
+                ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
 #else
                 ws_record = ap_get_scoreboard_worker(i, j);
 #endif
