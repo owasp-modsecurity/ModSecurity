@@ -96,11 +96,6 @@ int (*modsecDropAction)(request_rec *r) = NULL;
 #endif
 static int server_limit, thread_limit;
 
-typedef struct {
-    int child_num;
-    int thread_num;
-} sb_handle;
-
 /* -- Miscellaneous functions -- */
 
 /**
@@ -1435,21 +1430,25 @@ static void modsec_register_operator(const char *name, void *fn_init, void *fn_e
  */
 static int hook_connection_early(conn_rec *conn)
 {
-    sb_handle *sb = conn->sbh;
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    ap_sb_handle_t *sbh = conn->sbh;
+    char *client_ip = conn->client_ip;
+#else
+    sb_handle *sbh = conn->sbh;
+    char *client_ip = conn->remote_ip;
+#endif
     int i, j;
     unsigned long int ip_count_r = 0, ip_count_w = 0;
     char *error_msg;
     worker_score *ws_record = NULL;
+
+    if (sbh != NULL && (conn_read_state_limit > 0 || conn_write_state_limit > 0)) {
+
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    ap_sb_handle_t *sbh = NULL;
-    char *client_ip = conn->client_ip;
+        ws_record = ap_get_scoreboard_worker(sbh);
 #else
-    char *client_ip = conn->remote_ip;
+        ws_record = ap_get_scoreboard_worker(sbh->child_num, sbh->thread_num);
 #endif
-
-    if (sb != NULL && (conn_read_state_limit > 0 || conn_write_state_limit > 0)) {
-
-        ws_record = &ap_scoreboard_image->servers[sb->child_num][sb->thread_num];
         if (ws_record == NULL)
             return DECLINED;
 
@@ -1462,11 +1461,6 @@ static int hook_connection_early(conn_rec *conn)
             for (j = 0; j < thread_limit; ++j) {
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-                sbh = conn->sbh;
-                if (sbh == NULL) {
-                    return DECLINED;
-                }
-
                 ws_record = ap_get_scoreboard_worker(sbh);
 #else
                 ws_record = ap_get_scoreboard_worker(i, j);
