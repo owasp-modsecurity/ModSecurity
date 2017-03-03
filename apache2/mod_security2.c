@@ -1452,7 +1452,19 @@ static int hook_connection_early(conn_rec *conn)
         if (ws_record == NULL)
             return DECLINED;
 
-        apr_cpystrn(ws_record->client, client_ip, sizeof(ws_record->client));
+        /* If ws_record does not have correct ip yet, we count it already */
+        if (strcmp(client_ip, ws_record->client) != 0) {
+            switch (ws_record->status) {
+                case SERVER_BUSY_READ:
+                    ip_count_r++;
+                    break;
+                case SERVER_BUSY_WRITE:
+                    ip_count_w++;
+                    break;
+                default:
+                    break;
+            }
+        }
 
         ap_log_cerror(APLOG_MARK, APLOG_TRACE3, 0, conn,
             "ModSecurity: going to loop through %d servers with %d threads",
