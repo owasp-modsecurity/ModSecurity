@@ -25,6 +25,10 @@
 #include "apr_optional.h"
 #include "mod_log_config.h"
 
+#ifdef APLOG_USE_MODULE
+APLOG_USE_MODULE(security2);
+#endif
+
 #include "msc_logging.h"
 #include "msc_util.h"
 
@@ -1451,6 +1455,9 @@ static int hook_connection_early(conn_rec *conn)
 
         apr_cpystrn(ws_record->client, client_ip, sizeof(ws_record->client));
 
+        ap_log_cerror(APLOG_MARK, APLOG_TRACE3, 0, conn,
+            "ModSecurity: going to loop through %d servers with %d threads",
+            server_limit, thread_limit);
         for (i = 0; i < server_limit; ++i) {
             for (j = 0; j < thread_limit; ++j) {
 
@@ -1485,6 +1492,10 @@ static int hook_connection_early(conn_rec *conn)
             }
         }
 
+        ap_log_cerror(APLOG_MARK, APLOG_TRACE3, 0, conn,
+            "ModSecurity: threads in READ: %ld of %ld, WRITE: %ld of %ld, IP: %s",
+            ip_count_r, conn_read_state_limit, ip_count_w, conn_write_state_limit, client_ip);
+
         if (conn_read_state_limit > 0 && ip_count_r > conn_read_state_limit)
         {
             if (conn_read_state_suspicious_list &&
@@ -1492,7 +1503,7 @@ static int hook_connection_early(conn_rec *conn)
                    conn_read_state_suspicious_list, client_ip, NULL, &error_msg) <= 0))
             {
                 if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                         "ModSecurity: Too many threads [%ld] of %ld allowed " \
                         "in READ state from %s - There is a suspission list " \
                         "but that IP is not part of it, access granted",
@@ -1502,7 +1513,7 @@ static int hook_connection_early(conn_rec *conn)
                 conn_read_state_whitelist, client_ip, NULL, &error_msg) > 0)
             {
                 if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                         "ModSecurity: Too many threads [%ld] of %ld allowed " \
                         "in READ state from %s - Ip is on whitelist, access " \
                         "granted", ip_count_r, conn_read_state_limit,
@@ -1510,7 +1521,7 @@ static int hook_connection_early(conn_rec *conn)
             }
             else
             {
-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                     "ModSecurity: Access denied with code 400. Too many " \
                     "threads [%ld] of %ld allowed in READ state from %s - " \
                     "Possible DoS Consumption Attack [Rejected]", ip_count_r,
@@ -1528,7 +1539,7 @@ static int hook_connection_early(conn_rec *conn)
                     conn_write_state_suspicious_list, client_ip, NULL, &error_msg) <= 0))
             {
                 if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                         "ModSecurity: Too many threads [%ld] of %ld allowed " \
                         "in WRITE state from %s - There is a suspission list " \
                         "but that IP is not part of it, access granted",
@@ -1538,7 +1549,7 @@ static int hook_connection_early(conn_rec *conn)
                 conn_write_state_whitelist, client_ip, NULL, &error_msg) > 0)
             {
                 if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                         "ModSecurity: Too many threads [%ld] of %ld allowed " \
                         "in WRITE state from %s - Ip is on whitelist, " \
                         "access granted", ip_count_w, conn_read_state_limit,
@@ -1546,7 +1557,7 @@ static int hook_connection_early(conn_rec *conn)
             }
             else
             {
-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                     "ModSecurity: Access denied with code 400. Too many " \
                     "threads [%ld] of %ld allowed in WRITE state from %s - " \
                     "Possible DoS Consumption Attack [Rejected]", ip_count_w,
