@@ -690,6 +690,11 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         change_server_signature(s);
     }
 
+    /* For connection level hook */
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &server_limit);
+
+
 #if (!(defined(WIN32) || defined(NETWARE)))
 
     /* Internal chroot functionality */
@@ -1671,10 +1676,6 @@ static void register_hooks(apr_pool_t *mp) {
     APR_REGISTER_OPTIONAL_FN(modsec_register_variable);
     APR_REGISTER_OPTIONAL_FN(modsec_register_reqbody_processor);
 #endif
-
-    /* For connection level hook */
-    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &thread_limit);
-    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &server_limit);
 
     /* Main hooks */
     ap_hook_pre_config(hook_pre_config, NULL, NULL, APR_HOOK_FIRST);
