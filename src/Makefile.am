@@ -15,7 +15,18 @@ libmodsecurity_includesub_collectiondir = $(pkgincludedir)/collection/
 libmodsecurity_includesub_actionsdir = $(pkgincludedir)/actions/
 
 
-EXTRA_DIST = $(CLEANFILES)
+# pregenerated parser + parser sources
+EXTRA_DIST = \
+	parser/Makefile.am \
+	parser/Makefile.in \
+	parser/location.hh \
+	parser/position.hh \
+	parser/seclang-parser.cc \
+	parser/seclang-parser.hh \
+	parser/seclang-parser.yy \
+	parser/seclang-scanner.cc \
+	parser/seclang-scanner.ll \
+	parser/stack.hh
 
 MAINTAINERCLEANFILES = \
 	Makefile.in \
