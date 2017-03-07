@@ -8,6 +8,9 @@ SUBDIRS = \
 	reading_logs_with_offset \
 	reading_logs_via_rule_message
 
+pkginclude_HEADERS = \
+	reading_logs_via_rule_message/reading_logs_via_rule_message.h
+
 # make clean
 CLEANFILES = 
 
