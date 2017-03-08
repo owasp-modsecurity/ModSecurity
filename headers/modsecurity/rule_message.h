@@ -119,6 +119,7 @@ class RuleMessage {
 
     std::list<std::string> m_tags;
     RuleMessageHighlight m_highlight;
+    std::string m_highlightJSON;
 };
 
 

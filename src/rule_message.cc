@@ -144,7 +144,10 @@ std::string RuleMessage::log(const RuleMessage *rm) {
     return msg;
 }
 
-
+/*
+ * Depricated. Do not use. Should be removed before merge.
+ *
+ */
 RuleMessageHighlight RuleMessage::computeHighlight(const RuleMessage *rm,
     const std::string buf) {
     RuleMessageHighlight ret;

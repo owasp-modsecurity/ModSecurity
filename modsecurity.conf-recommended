@@ -180,7 +180,7 @@ SecDataDir /tmp/
 # trigger a server error (determined by a 5xx or 4xx, excluding 404,  
 # level response status codes).
 #
-SecAuditEngine RelevantOnly
+SecAuditEngine Off
 SecAuditLogRelevantStatus "^(?:5|4(?!04))"
 
 # Log everything we know about a transaction.
