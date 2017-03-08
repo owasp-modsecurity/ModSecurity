@@ -242,8 +242,6 @@ std::string MacroExpansion::expand(const std::string& input,
             std::string col = std::string(variable, 0, collection);
             std::string var = std::string(variable, collection + 1,
                 variable.length() - (collection + 1));
-            col = utils::string::toupper(col);
-
             if (col == "ARGS") {
                 variableValue = transaction->m_variableArgs.resolveFirst(var);
             }
