@@ -21,6 +21,9 @@
 #include "examples/reading_logs_via_rule_message/reading_logs_via_rule_message.h"
 
 
+char request_uri2[] = "/index.html?d=1";
+
+std::unordered_multimap<std::string, std::string> requestHeaders;
 
 int main(int argc, char **argv) {
     *argv++;
@@ -31,8 +34,13 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    requestHeaders.emplace("Host", "SITE2");
+    requestHeaders.emplace("User-Agent", "wFetch");
+    requestHeaders.emplace("test", "21321");
+
+
     std::string rules(*argv);
-    ReadingLogsViaRuleMessage rlvrm(request_header, request_uri, request_body,
+    ReadingLogsViaRuleMessage rlvrm(requestHeaders, request_uri, request_body,
         "", response_body, ip, rules);
     rlvrm.process();
 

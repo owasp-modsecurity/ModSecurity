@@ -189,11 +189,37 @@ void ModSecurity::serverLog(void *data, std::shared_ptr<RuleMessage> rm) {
     if (m_logProperties & RuleMessageLogProperty) {
         const void *a = static_cast<const void *>(rm.get());
         if (m_logProperties & IncludeFullHighlightLogProperty) {
-            processContentOffset(rm->m_buf.c_str(), rm->m_buf.size(),
-                rm->m_reference.c_str(), &rm->m_highlightJSON, NULL);
-            m_logCb(data, a);
-            return;
+            const char *err = NULL;
+            const char *buf = NULL;
+            size_t z;
+            int ret = processContentOffset(rm->m_buf.c_str(), rm->m_buf.size(),
+                rm->m_reference.c_str(), &rm->m_highlightJSON, &err);
+            if (ret < 0) {
+#ifdef WITH_YAJL
+                yajl_gen g;
+                g = yajl_gen_alloc(NULL);
+                if (g == NULL) {
+                    rm->m_highlightJSON.append(err);
+                    goto out;
+                }
+                yajl_gen_config(g, yajl_gen_beautify, 1);
+                yajl_gen_map_open(g);
+                yajl_gen_string(g, reinterpret_cast<const unsigned char*>("error"),
+                    strlen("error"));
+                yajl_gen_string(g, reinterpret_cast<const unsigned char*>(err),
+                    strlen(err));
+                yajl_gen_map_close(g);
+                yajl_gen_get_buf(g, (const unsigned char**)&buf, &z);
+
+                &rm->m_highlightJSON.append(buf);
+
+                yajl_gen_free(g);
+#else
+                rm->m_highlightJSON.append(err);
+#endif
+            }
         }
+out:
         m_logCb(data, a);
         return;
     }
@@ -219,7 +245,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
     g = yajl_gen_alloc(NULL);
     if (g == NULL) {
-        *err = "Failed to allocate memory for the JSON creation.";
+        *err = strdup("Failed to allocate memory for the JSON creation.");
         return -1;
     }
 
@@ -262,7 +288,12 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
         yajl_gen_map_close(g);
 
         if (stoi(startingAt) >= len) {
-            *err = "Offset is out of the content limits.";
+            std::stringstream e;
+            e << "Offset for the variables are out of the content limits. " \
+                "Trying to read position " << startingAt.c_str() << " from a buffer "\
+                "with only " << len << " bytes. Buffer: " <<  content \
+                << std::endl;
+            *err = strdup(e.str().c_str());
             return -1;
         }
 
@@ -342,7 +373,12 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
         yajl_gen_map_close(g);
 
         if (stoi(startingAt) >= varValue.size()) {
-            *err = "Offset is out of the variable limits.";
+            std::stringstream e;
+            e << "Offset for the operator is out of the variable limit. " \
+                "Trying to read " << startingAt.c_str() << " from a buffer with " \
+                "only " << std::to_string(varValue.size()) << " bytes. Buffer: " \
+                "" << varValue << std::endl;
+                *err = strdup(e.str().c_str());
             return -1;
         }
         yajl_gen_string(g,
@@ -373,7 +409,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
     yajl_gen_free(g);
 #else
-    *err = "Without YAJL support, we cannot generate JSON.";
+    *err = strdup("Without YAJL support, we cannot generate JSON.");
     return -1;
 #endif
     return 0;
