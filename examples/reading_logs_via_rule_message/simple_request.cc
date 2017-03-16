@@ -21,26 +21,13 @@
 
 #include "examples/reading_logs_via_rule_message/reading_logs_via_rule_message.h"
 
-char request_header[] =  "" \
-    "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\n\r" \
-    "Host: net.tutsplus.com\n\r" \
-    "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5)" \
-    " Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\n\r" \
-    "Accept: text/html,application/xhtml+xml,application/xml; " \
-    "q=0.9,*/*;q=0.8\n\r" \
-    "Accept-Language: en-us,en;q=0.5\n\r" \
-    "Accept-Encoding: gzip,deflate\n\r" \
-    "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\n\r" \
-    "Keep-Alive: 300\n\r" \
-    "Connection: keep-alive\n\r" \
-    "Cookie: PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120\n\r" \
-    "Pragma: no-cache\n\r" \
-    "Cache-Control: no-cache\n\r";
+
 
 char request_uri[] = "/TeSt.Pl?param1=TEsT&para2=TEST2";
 
-char request_body[] = "";
+char request_uri2[] = "/index.html?d=1";
 
+char request_body[] = "";
 
 char response_body[] = "" \
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\r" \
@@ -56,6 +43,7 @@ char response_body[] = "" \
 
 char ip[] = "200.249.12.31";
 
+std::unordered_multimap<std::string, std::string> requestHeaders;
 
 int main(int argc, char **argv) {
     (*argv++);
@@ -65,8 +53,14 @@ int main(int argc, char **argv) {
         std::cout << std::endl << std::endl;
         return -1;
     }
+
+    requestHeaders.emplace("Host", "SITE2");
+    requestHeaders.emplace("User-Agent", "wFetch");
+    requestHeaders.emplace("test", "21321");
+
+
     std::string rules(*argv);
-    ReadingLogsViaRuleMessage rlvrm(request_header, request_uri, request_body,
+    ReadingLogsViaRuleMessage rlvrm(requestHeaders, request_uri, request_body,
         "", response_body, ip, rules);
     rlvrm.process();
     return 0;

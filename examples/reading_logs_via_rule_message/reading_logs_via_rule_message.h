@@ -24,14 +24,15 @@
 
 class ReadingLogsViaRuleMessage {
  public:
-    ReadingLogsViaRuleMessage(char *request_header,
+    ReadingLogsViaRuleMessage(
+        std::unordered_multimap<std::string, std::string> requestHeaders,
         char *request_uri,
         char *request_body,
         char *response_headers,
         char *response_body,
         char *ip,
         std::string rules) :
-            m_request_header(request_header),
+            m_requestHeaders(requestHeaders),
             m_request_uri(request_uri),
             m_request_body(request_body),
             m_response_headers(response_headers),
@@ -63,8 +64,11 @@ class ReadingLogsViaRuleMessage {
         modsecTransaction->processConnection(m_ip, 12345, "127.0.0.1", 80);
         modsecTransaction->processURI(m_request_uri, "GET", "1.1");
 
-        modsecTransaction->addRequestHeader("Host",
-            "net.tutsplus.com");
+        for (auto &i : m_requestHeaders) {
+            modsecTransaction->addRequestHeader(i.first,
+                i.second);
+        }
+
         modsecTransaction->processRequestHeaders();
         modsecTransaction->processRequestBody();
 
@@ -159,7 +163,7 @@ end:
     }
 
  protected:
-    char *m_request_header;
+    std::unordered_multimap<std::string, std::string> m_requestHeaders;
     char *m_request_uri;
     char *m_request_body;
     char *m_response_headers;
