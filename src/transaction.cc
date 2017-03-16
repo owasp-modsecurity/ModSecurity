@@ -1486,7 +1486,6 @@ std::string Transaction::toBuf() {
         a.append("\n");
     }
 
-    a.append("\n\n");
     if (this->m_requestBody.str().length() > 0) {
         a.append(this->m_requestBody.str().c_str());
         a.append("\n\n");
