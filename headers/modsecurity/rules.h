@@ -99,7 +99,7 @@ extern "C" {
 
 Rules *msc_create_rules_set();
 void msc_rules_dump(Rules *rules);
-int msc_rules_merge(Rules *rules_dst, Rules *rules_from);
+int msc_rules_merge(Rules *rules_dst, Rules *rules_from, const char **error);
 int msc_rules_add_remote(Rules *rules, const char *key, const char *uri,
     const char **error);
 int msc_rules_add_file(Rules *rules, const char *file, const char **error);

@@ -277,8 +277,12 @@ extern "C" void msc_rules_dump(Rules *rules) {
 
 
 extern "C" int msc_rules_merge(Rules *rules_dst,
-    Rules *rules_from) {
-    return rules_dst->merge(rules_from);
+    Rules *rules_from, const char **error) {
+    int ret = rules_dst->merge(rules_from);
+    if (ret < 0) {
+        *error = strdup(rules_dst->getParserError().c_str());
+    }
+    return ret;
 }
 
 
