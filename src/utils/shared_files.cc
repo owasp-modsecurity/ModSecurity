@@ -234,6 +234,7 @@ bool SharedFiles::write(const std::string& fileName,
         error->assign("failed to write: " + fileName);
         ret = false;
     }
+    fflush(a.second);
     pthread_mutex_unlock(&a.first->lock);
 
     return ret;
