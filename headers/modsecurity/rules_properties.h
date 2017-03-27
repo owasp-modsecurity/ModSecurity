@@ -371,8 +371,10 @@ class RulesProperties {
 
         if (from->m_debugLog && to->m_debugLog &&
             from->m_debugLog->isLogLevelSet()) {
-            to->m_debugLog->setDebugLogLevel(
-                from->m_debugLog->getDebugLogLevel());
+            if (to->m_debugLog->isLogFileSet() == false) {
+                to->m_debugLog->setDebugLogLevel(
+                    from->m_debugLog->getDebugLogLevel());
+            }
         }
 
 
