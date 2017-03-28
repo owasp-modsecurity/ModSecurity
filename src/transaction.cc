@@ -726,7 +726,11 @@ int Transaction::processRequestBody() {
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         m_variableOffset++;
         extractArguments("POST", m_requestBody.str(), m_variableOffset);
-    } else if (a != NULL) {
+    } else if (m_requestBodyType != UnknownFormat) {
+        /**
+         * FIXME: double check to see if that is a valid scenario...
+         *
+         */
         std::string error;
         if (a != NULL && a->empty() == false) {
             error.assign(*a);
