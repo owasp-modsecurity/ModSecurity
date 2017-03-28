@@ -57,7 +57,7 @@ std::string JsDecode::evaluate(std::string value,
 }
 
 
-int JsDecode::inplace(unsigned char *input, u_int64_t input_len) {
+int JsDecode::inplace(unsigned char *input, uint64_t input_len) {
     unsigned char *d = (unsigned char *)input;
     int64_t i, count;
 

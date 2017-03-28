@@ -54,8 +54,8 @@ std::string ParityEven7bit::evaluate(std::string value,
     return ret;
 }
 
-bool ParityEven7bit::inplace(unsigned char *input, u_int64_t input_len) {
-    u_int64_t i;
+bool ParityEven7bit::inplace(unsigned char *input, uint64_t input_len) {
+    uint64_t i;
 
     i = 0;
     while (i < input_len) {

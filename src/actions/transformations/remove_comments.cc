@@ -46,8 +46,8 @@ std::string RemoveComments::evaluate(std::string value,
 
     memcpy(input, value.c_str(), value.length()+1);
 
-    u_int64_t input_len = value.size();
-    u_int64_t i, j, incomment;
+    uint64_t input_len = value.size();
+    uint64_t i, j, incomment;
 
     i = j = incomment = 0;
     while (i < input_len) {

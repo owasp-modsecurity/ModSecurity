@@ -62,7 +62,7 @@ std::string UrlDecodeUni::evaluate(std::string value,
  *
  * IMP1 Assumes NUL-terminated
  */
-int UrlDecodeUni::inplace(unsigned char *input, u_int64_t input_len,
+int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
     Transaction *transaction) {
     unsigned char *d = input;
     int64_t i, count, fact, j, xv;

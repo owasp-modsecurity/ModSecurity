@@ -56,7 +56,7 @@ std::string HtmlEntityDecode::evaluate(std::string value,
 }
 
 
-int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
+int HtmlEntityDecode::inplace(unsigned char *input, uint64_t input_len) {
     unsigned char *d = input;
     int i, count;
 
