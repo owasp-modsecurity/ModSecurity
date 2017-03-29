@@ -603,7 +603,7 @@ using modsecurity::operators::Operator;
   OPERATOR_RBL                                 "OPERATOR_RBL"
   OPERATOR_RSUB                                "OPERATOR_RSUB"
   OPERATOR_RX                                  "OPERATOR_RX"
-  OPERATOR_RX_CONTENT_ONLY                     "Operator Rx"
+  OPERATOR_RX_CONTENT_ONLY                     "Operator RX (content only)"
   OPERATOR_STR_EQ                              "OPERATOR_STR_EQ"
   OPERATOR_STR_MATCH                           "OPERATOR_STR_MATCH"
   OPERATOR_UNCONDITIONAL_MATCH                 "OPERATOR_UNCONDITIONAL_MATCH"
@@ -649,6 +649,7 @@ using modsecurity::operators::Operator;
   op
 ;
 
+%type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables_may_be_quoted
 %type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables
 %type <std::unique_ptr<Variable>> var
 
@@ -1297,18 +1298,29 @@ expression:
     ;
 
 variables:
-    variables PIPE var
+    variables_may_be_quoted
+      {
+        $$ = std::move($1);
+      }
+    | QUOTATION_MARK variables_may_be_quoted QUOTATION_MARK
+      {
+        $$ = std::move($2);
+      }
+    ;
+
+variables_may_be_quoted:
+    variables_may_be_quoted PIPE var
       {
         $1->push_back(std::move($3));
         $$ = std::move($1);
       }
-    | variables PIPE VAR_EXCLUSION var
+    | variables_may_be_quoted PIPE VAR_EXCLUSION var
       {
         std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move($4)));
         $1->push_back(std::move(c));
         $$ = std::move($1);
       }
-    | variables PIPE VAR_COUNT var
+    | variables_may_be_quoted PIPE VAR_COUNT var
       {
         std::unique_ptr<Variable> c(new VariableModificatorCount(std::move($4)));
         $1->push_back(std::move(c));

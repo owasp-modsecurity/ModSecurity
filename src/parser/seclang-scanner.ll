@@ -309,8 +309,8 @@ CONGIG_DIR_SEC_COOKIE_FORMAT            (?i:SecCookieFormat)
 CONGIG_DIR_SEC_DATA_DIR                 (?i:SecDataDir)
 CONGIG_DIR_SEC_STATUS_ENGINE            (?i:SecStatusEngine)
 CONGIG_DIR_SEC_TMP_DIR                  (?i:SecTmpDir)
-DICT_ELEMENT                            [^ \t|]+
-DICT_ELEMENT_WITH_PIPE                  [^ \t]+
+DICT_ELEMENT                            ([^\"| \t]|([^\\]\\\"))+
+DICT_ELEMENT_WITH_PIPE                  [^ \t"]+
 
 
 DICT_ELEMENT_TWO                        [^\"\=]+
@@ -757,6 +757,7 @@ EQUALS_MINUS                            (?i:=\-)
 
 {VAR_EXCLUSION}                             { return p::make_VAR_EXCLUSION(*driver.loc.back()); }
 {VAR_COUNT}                                 { return p::make_VAR_COUNT(*driver.loc.back()); }
+["]                                         { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 }
 
 
@@ -766,6 +767,7 @@ EQUALS_MINUS                            (?i:=\-)
 ['][\/]{DICT_ELEMENT_WITH_PIPE}[\/][']        { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 {DICT_ELEMENT}                                { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
 .                                             { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
+["]                                         { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 }
 
 <EXPECTING_VARIABLE,TRANSACTION_FROM_VARIABLE_TO_OPERATOR>{

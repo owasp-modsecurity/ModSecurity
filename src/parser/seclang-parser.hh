@@ -770,7 +770,7 @@ namespace yy {
       // "OPERATOR_RBL"
       // "OPERATOR_RSUB"
       // "OPERATOR_RX"
-      // "Operator Rx"
+      // "Operator RX (content only)"
       // "OPERATOR_STR_EQ"
       // "OPERATOR_STR_MATCH"
       // "OPERATOR_UNCONDITIONAL_MATCH"
@@ -815,6 +815,7 @@ namespace yy {
       char dummy4[sizeof(std::unique_ptr<actions::Action>)];
 
       // variables
+      // variables_may_be_quoted
       char dummy5[sizeof(std::unique_ptr<std::vector<std::unique_ptr<Variable> > > )];
 
       // actions
@@ -2583,9 +2584,9 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 764,     ///< Last index in yytable_.
-      yynnts_ = 12,  ///< Number of nonterminal symbols.
-      yyfinal_ = 260, ///< Termination state number.
+      yylast_ = 898,     ///< Last index in yytable_.
+      yynnts_ = 13,  ///< Number of nonterminal symbols.
+      yyfinal_ = 262, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
       yyntokens_ = 286  ///< Number of tokens.
@@ -2855,7 +2856,7 @@ namespace yy {
       case 251: // "OPERATOR_RBL"
       case 252: // "OPERATOR_RSUB"
       case 253: // "OPERATOR_RX"
-      case 254: // "Operator Rx"
+      case 254: // "Operator RX (content only)"
       case 255: // "OPERATOR_STR_EQ"
       case 256: // "OPERATOR_STR_MATCH"
       case 257: // "OPERATOR_UNCONDITIONAL_MATCH"
@@ -2895,15 +2896,16 @@ namespace yy {
         value.copy< std::unique_ptr<Operator> > (other.value);
         break;
 
-      case 296: // var
+      case 297: // var
         value.copy< std::unique_ptr<Variable> > (other.value);
         break;
 
-      case 297: // act
+      case 298: // act
         value.copy< std::unique_ptr<actions::Action> > (other.value);
         break;
 
       case 295: // variables
+      case 296: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (other.value);
         break;
 
@@ -3090,7 +3092,7 @@ namespace yy {
       case 251: // "OPERATOR_RBL"
       case 252: // "OPERATOR_RSUB"
       case 253: // "OPERATOR_RX"
-      case 254: // "Operator Rx"
+      case 254: // "Operator RX (content only)"
       case 255: // "OPERATOR_STR_EQ"
       case 256: // "OPERATOR_STR_MATCH"
       case 257: // "OPERATOR_UNCONDITIONAL_MATCH"
@@ -3130,15 +3132,16 @@ namespace yy {
         value.copy< std::unique_ptr<Operator> > (v);
         break;
 
-      case 296: // var
+      case 297: // var
         value.copy< std::unique_ptr<Variable> > (v);
         break;
 
-      case 297: // act
+      case 298: // act
         value.copy< std::unique_ptr<actions::Action> > (v);
         break;
 
       case 295: // variables
+      case 296: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (v);
         break;
 
@@ -3391,7 +3394,7 @@ namespace yy {
       case 251: // "OPERATOR_RBL"
       case 252: // "OPERATOR_RSUB"
       case 253: // "OPERATOR_RX"
-      case 254: // "Operator Rx"
+      case 254: // "Operator RX (content only)"
       case 255: // "OPERATOR_STR_EQ"
       case 256: // "OPERATOR_STR_MATCH"
       case 257: // "OPERATOR_UNCONDITIONAL_MATCH"
@@ -3431,15 +3434,16 @@ namespace yy {
         value.template destroy< std::unique_ptr<Operator> > ();
         break;
 
-      case 296: // var
+      case 297: // var
         value.template destroy< std::unique_ptr<Variable> > ();
         break;
 
-      case 297: // act
+      case 298: // act
         value.template destroy< std::unique_ptr<actions::Action> > ();
         break;
 
       case 295: // variables
+      case 296: // variables_may_be_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
         break;
 
@@ -3632,7 +3636,7 @@ namespace yy {
       case 251: // "OPERATOR_RBL"
       case 252: // "OPERATOR_RSUB"
       case 253: // "OPERATOR_RX"
-      case 254: // "Operator Rx"
+      case 254: // "Operator RX (content only)"
       case 255: // "OPERATOR_STR_EQ"
       case 256: // "OPERATOR_STR_MATCH"
       case 257: // "OPERATOR_UNCONDITIONAL_MATCH"
@@ -3672,15 +3676,16 @@ namespace yy {
         value.move< std::unique_ptr<Operator> > (s.value);
         break;
 
-      case 296: // var
+      case 297: // var
         value.move< std::unique_ptr<Variable> > (s.value);
         break;
 
-      case 297: // act
+      case 298: // act
         value.move< std::unique_ptr<actions::Action> > (s.value);
         break;
 
       case 295: // variables
+      case 296: // variables_may_be_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (s.value);
         break;
 
@@ -5484,7 +5489,7 @@ namespace yy {
 
 
 } // yy
-#line 5488 "seclang-parser.hh" // lalr1.cc:377
+#line 5493 "seclang-parser.hh" // lalr1.cc:377
 
 
 
