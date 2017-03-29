@@ -33,7 +33,7 @@ namespace Variables {
 class Tx_DictElement : public Variable {
  public:
     explicit Tx_DictElement(std::string dictElement)
-        : Variable("TX"),
+        : Variable("TX:" + dictElement),
         m_dictElement("TX:" + dictElement) { }
 
     void evaluate(Transaction *transaction,
