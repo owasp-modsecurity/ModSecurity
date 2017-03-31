@@ -1638,6 +1638,7 @@ static void register_hooks(apr_pool_t *mp) {
 
     static const char *const fixups_beforeme_list[] = {
         "mod_env.c",
+        "mod_session.c",
         NULL
     };
 
