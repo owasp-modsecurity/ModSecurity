@@ -140,12 +140,13 @@ std::string tolower(std::string str) {
 
 
 std::string toupper(std::string str) {
-    std::locale loc;
     std::string value;
+    value.resize(str.length());
 
-    for (std::string::size_type i=0; i < str.length(); ++i) {
-        value.assign(value + std::toupper(str[i], loc));
-    }
+    std::transform(str.begin(),
+            str.end(),
+            value.begin(),
+            ::toupper);
 
     return value;
 }
