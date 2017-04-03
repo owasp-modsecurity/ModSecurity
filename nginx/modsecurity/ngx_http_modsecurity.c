@@ -528,9 +528,15 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
 
         hc = r->http_connection;
 
+#if defined(nginx_version) && nginx_version >= 1011011
+        if (hc->free && size == cscf->large_client_header_buffers.size) {
+
+            buf = hc->free->buf;
+#else
         if (hc->nfree && size == cscf->large_client_header_buffers.size) {
 
             buf = hc->free[--hc->nfree];
+#endif
 
             ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                            "ModSecurity: use http free large header buffer: %p %uz",
