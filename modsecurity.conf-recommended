@@ -19,7 +19,7 @@ SecRequestBodyAccess On
 # Enable XML request body parser.
 # Initiate XML Processor in case of xml content-type
 #
-SecRule REQUEST_HEADERS:Content-Type "(?:text|application)/xml" \
+SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\+|/)|text/)xml" \
      "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
 
 # Enable JSON request body parser.
