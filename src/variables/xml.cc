@@ -66,7 +66,6 @@ void XML::evaluate(Transaction *t,
     /* Is there an XML document tree at all? */
     if (t->m_xml->m_data.doc == NULL) {
         /* Sorry, we've got nothing to give! */
-        t->debug(1, "XML: No XML document found, returning.");
         return;
     }
 

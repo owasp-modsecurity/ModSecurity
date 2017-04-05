@@ -73,7 +73,7 @@
     "version_min":300000,
     "title":"Testing CtlRequestBodyProcessor=XML (2)",
     "expected":{
-      "debug_log": "XML: No XML document found, returning"
+      "debug_log": "Rule returned 0"
     },
     "client":{
       "ip":"200.249.12.31",
