@@ -3828,6 +3828,7 @@ static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
 {
 #ifdef WITH_SSDEEP
     struct fuzzy_hash_param_data *param_data;
+    FILE *fp;
     char *file;
     int param_len,threshold;
 
@@ -3876,14 +3877,15 @@ static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
     }
 
     file = resolve_relative_path(rule->ruleset->mp, rule->filename, file);
-    
-    if (!fopen(file, "r"))
+
+    fp = fopen(file, "r");
+    if (!fp)
     {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Not able to open file:" \
             " %s.", file);
         return -1;
     }
-
+    fclose(fp);
 
     param_data->file = file;
     param_data->threshold = threshold;
