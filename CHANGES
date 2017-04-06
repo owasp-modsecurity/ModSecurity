@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Changes the configuration to recognize soap+xml as XML
+   [Issue #1374 - @emphazer and Chaim Sanders]
  * Fix building with nginx >= 1.11.11
    [Issue #1373, #1359 - Andrei Belov and Thomas Deutschmann]
  * Using Czechia instea of Czech Republic
