@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Reads fuzzy hash databases on init
+   [Issue #1339 - Robert Paprocki and @Rendername]
  * Changes the configuration to recognize soap+xml as XML
    [Issue #1374 - @emphazer and Chaim Sanders]
  * Fix building with nginx >= 1.11.11
