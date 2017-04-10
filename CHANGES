@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * {dis|en}able-collection-delete-problem-logging: Option to disable logging of
+   collection delete problem in audit log when log level < 9 in audit log.
+   [Issue #576 - Marc Stern]
  * {dis|en}able-filename-logging: Option to disable logging of filename
    in audit log.
    [Issue #1065 - Marc Stern]
