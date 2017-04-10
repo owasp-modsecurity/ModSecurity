@@ -443,8 +443,8 @@ AC_ARG_ENABLE(filename-logging,
 ])
 
 # Disable logging of stopwatches
-AC_ARG_ENABLE(log-stopwatch,
-              AS_HELP_STRING([--enable-log-stopwatch],
+AC_ARG_ENABLE(stopwatch-logging,
+              AS_HELP_STRING([--enable-stopwatch-logging],
                              [Enable logging of stopwatches in audit log when log level < 9. This is the default]),
 [
   if test "$enableval" != "no"; then
