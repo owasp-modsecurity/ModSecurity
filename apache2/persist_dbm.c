@@ -217,10 +217,13 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
 
         rc = apr_sdbm_delete(dbm, key);
         if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "collection_retrieve_ex: Failed deleting collection (name \"%s\", "
+#ifdef LOG_NO_COLL_DELET_PB
+			if (msr->txcfg->debuglog_level >= 9)
+#endif
+			msr_log(msr, 1, "collection_retrieve_ex: Failed deleting collection (name \"%s\", "
                 "key \"%s\"): %s", log_escape(msr->mp, col_name),
                 log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
-            msr->msc_sdbm_delete_error = 1;
+			msr->msc_sdbm_delete_error = 1;
             goto cleanup;
         }
 
@@ -678,10 +681,13 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
                 if (expiry_time <= now) {
                     rc = apr_sdbm_delete(dbm, key);
                     if (rc != APR_SUCCESS) {
-                        msr_log(msr, 1, "collections_remove_stale: Failed deleting collection (name \"%s\", "
+#ifdef LOG_NO_COLL_DELET_PB
+						if (msr->txcfg->debuglog_level >= 9)
+#endif
+						msr_log(msr, 1, "collections_remove_stale: Failed deleting collection (name \"%s\", "
                             "key \"%s\"): %s", log_escape(msr->mp, col_name),
                             log_escape_ex(msr->mp, key.dptr, key.dsize - 1), get_apr_error(msr->mp, rc));
-                    msr->msc_sdbm_delete_error = 1;
+						msr->msc_sdbm_delete_error = 1;
                         goto error;
                     }
 
