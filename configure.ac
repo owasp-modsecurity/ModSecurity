@@ -442,6 +442,21 @@ AC_ARG_ENABLE(filename-logging,
   log_filename=''
 ])
 
+# Disable logging of log producer
+AC_ARG_ENABLE(log-producer-logging,
+              AS_HELP_STRING([--enable-log-producer-logging],
+                             [Enable logging of log producer in audit log when log level < 9. This is the default]),
+[
+  if test "$enableval" != "no"; then
+    log_producer=
+  else
+    log_producer="-DLOG_NO_PRODUCER"
+  fi
+],
+[
+  log_producer=''
+])
+
 # Ignore configure errors
 AC_ARG_ENABLE(errors,
               AS_HELP_STRING([--disable-errors],
@@ -692,7 +707,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_producer"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

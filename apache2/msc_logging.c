@@ -363,6 +363,9 @@ static void sec_auditlog_write_producer_header(modsec_rec *msr) {
     char *text = NULL;
     int i;
 
+#ifdef LOG_NO_PRODUCER
+	if (msr->txcfg->debuglog_level < 9) return;
+#endif
     /* Try to write everything in one go. */
     if (msr->txcfg->component_signatures->nelts == 0) {
         text = apr_psprintf(msr->mp, "Producer: %s.\n", MODSEC_MODULE_NAME_FULL);
