@@ -450,11 +450,11 @@ AC_ARG_ENABLE(collection-delete-problem-logging,
   if test "$enableval" != "no"; then
     log_collection-delete-problem=
   else
-    log_collection-delete-problem-logging="-DLOG_NO_COLL_DELET_PB"
+    log_collection-delete-problem="-DLOG_NO_COLL_DELET_PB"
   fi
 ],
 [
-  log_collection-delete-problem-logging=''
+  log_collection-delete-problem=''
 ])
 
 # Ignore configure errors
@@ -707,7 +707,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_collection-delete-problem-logging"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_collection-delete-problem"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
