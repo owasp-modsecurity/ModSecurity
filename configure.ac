@@ -443,8 +443,8 @@ AC_ARG_ENABLE(filename-logging,
 ])
 
 # Disable logging of dechunking
-AC_ARG_ENABLE(log-dechunking,
-              AS_HELP_STRING([--enable-log-dechunking],
+AC_ARG_ENABLE(dechunk-logging,
+              AS_HELP_STRING([--enable-dechunk-logging],
                              [Enable logging of dechunking in audit log when log level < 9. This is the default]),
 [
   if test "$enableval" != "no"; then

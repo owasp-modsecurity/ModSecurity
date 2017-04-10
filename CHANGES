@@ -1,7 +1,7 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
- * {dis|en}able-dechunking: Option to disable logging of
+ * {dis|en}able-dechunk-logging: Option to disable logging of
    dechunking in audit log when log level < 9.
    [Issue #1068 - Marc Stern]
  * {dis|en}able-filename-logging: Option to disable logging of filename
