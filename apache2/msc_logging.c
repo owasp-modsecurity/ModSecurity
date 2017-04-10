@@ -1999,7 +1999,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
 #ifdef LOG_NO_DECHUNK
 		if (msr->txcfg->debuglog_level >= 9)
 #endif
-		if (wrote_response_body) {
+        if (wrote_response_body) {
             text = apr_psprintf(msr->mp, "Response-Body-Transformed: Dechunked\n");
             sec_auditlog_write(msr, text, strlen(text));
         }
