@@ -443,7 +443,7 @@ AC_ARG_ENABLE(filename-logging,
 ])
 
 # Disable logging of Apache handler
-AC_ARG_ENABLE(filename-logging,
+AC_ARG_ENABLE(handler-logging,
               AS_HELP_STRING([--enable-handler-logging],
                              [Enable logging of Apache handler in audit log when log level < 9. This is the default]),
 [
