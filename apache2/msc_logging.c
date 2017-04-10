@@ -363,9 +363,6 @@ static void sec_auditlog_write_producer_header(modsec_rec *msr) {
     char *text = NULL;
     int i;
 
-#ifdef LOG_NO_PRODUCER
-	if (msr->txcfg->debuglog_level < 9) return;
-#endif
     /* Try to write everything in one go. */
     if (msr->txcfg->component_signatures->nelts == 0) {
         text = apr_psprintf(msr->mp, "Producer: %s.\n", MODSEC_MODULE_NAME_FULL);
@@ -1999,7 +1996,10 @@ void sec_audit_logger_native(modsec_rec *msr) {
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
-        if (wrote_response_body) {
+#ifdef LOG_NO_DECHUNK
+		if (msr->txcfg->debuglog_level >= 9)
+#endif
+		if (wrote_response_body) {
             text = apr_psprintf(msr->mp, "Response-Body-Transformed: Dechunked\n");
             sec_auditlog_write(msr, text, strlen(text));
         }
