@@ -1156,6 +1156,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
         }
 
         /* Apache-Handler */
+#ifdef LOG_NO_HANDLER
+        if (msr->txcfg->debuglog_level >= 9)
+#endif
         if (msr->r->handler != NULL) {
             yajl_kv_string(g, "handler", msr->r->handler);
         }
