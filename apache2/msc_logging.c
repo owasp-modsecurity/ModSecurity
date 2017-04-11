@@ -1174,6 +1174,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
             yajl_kv_bool(g, "response_body_dechunked", 1);
         }
 
+#ifdef LOG_NO_PRODUCER
+        if (msr->txcfg->debuglog_level < 9) return;
+#endif
         sec_auditlog_write_producer_header_json(msr, g);
 
         /* Server */
