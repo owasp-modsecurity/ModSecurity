@@ -1167,6 +1167,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
+#ifdef LOG_NO_DECHUNK
+        if (msr->txcfg->debuglog_level >= 9)
+#endif
         if (wrote_response_body) {
             yajl_kv_bool(g, "response_body_dechunked", 1);
         }
