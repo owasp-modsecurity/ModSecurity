@@ -1162,6 +1162,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
 
 
         /* Stopwatch2 */
+#ifdef DLOG_NO_STOPWATCH
+        if (msr->txcfg->debuglog_level >= 9) {
+#endif
         format_performance_variables_json(msr, g);
 
         /* Our response body does not contain chunks */
