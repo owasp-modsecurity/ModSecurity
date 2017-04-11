@@ -1889,8 +1889,11 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
         else if (rc < 0) {
-            msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", rule->actionset->id, rule->actionset->msg);
-
+	    if (rule->actionset != NULL && rule->actionset->msg != NULL) {
+                msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", rule->actionset->id, rule->actionset->msg);
+            } else {
+                msr_log(msr, 1, "Rule processing failed.");
+            }
 
             if (msr->txcfg->reqintercept_oe == 1)   {
                 apr_table_clear(msr->matched_vars);
@@ -1920,7 +1923,11 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
         else {
-            msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, rule->actionset->id, rule->actionset->msg);
+	    if (rule->actionset != NULL && rule->actionset->msg != NULL) {
+                msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, rule->actionset->id, rule->actionset->msg);
+	    } else {
+                msr_log(msr, 1, "Rule processing failed with unknown return code: %d", rc);
+	    }
             apr_table_clear(msr->matched_vars);
             return -1;
         }
