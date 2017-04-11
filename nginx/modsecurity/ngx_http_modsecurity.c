@@ -1123,6 +1123,10 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
+    if (in == NULL) {
+        return ngx_http_next_body_filter(r, NULL);
+    }
+
     if (r != r->main || !cf->enable || ctx == NULL || ctx->complete) {
         return ngx_http_next_body_filter(r, in);
     }
@@ -1134,7 +1138,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
         ngx_buf_t   *buf = cl->buf;
         apr_bucket_brigade  *bb = ctx->brigade;
         off_t size = ngx_buf_size(buf);
-        if (size) {
+        if (size != 0 && !buf->in_file) {
             char *data = apr_pmemdup(bb->p, buf->pos, size);
             if (data == NULL) {
                 return ngx_http_filter_finalize_request(r, 
@@ -1148,7 +1152,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
             APR_BRIGADE_INSERT_TAIL(bb, e);
         }
 
-        if (buf->last_buf) {
+        if (buf->last_buf || buf->in_file) {
             last_buf = 1;
             buf->last_buf = 0;
             e = apr_bucket_eos_create(bb->bucket_alloc);
