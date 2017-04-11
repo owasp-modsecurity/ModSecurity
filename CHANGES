@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Adds rule id in logs whenever a rule fail.
+   [Issue #1379, #391 - Marc Stern]
  * {dis|en}able-server-logging: Option to disable logging of
    "Server" in audit log when log level < 9.
    [Issue #1070 - Marc Stern]
