@@ -694,9 +694,9 @@ int Transaction::processRequestBody() {
         if (error.empty() == false) {
             m_variableReqbodyError.set("1", m_variableOffset);
             m_variableReqbodyProcessorError.set("1", m_variableOffset);
-            m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
+            m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
                 m_variableOffset);
-            m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
+            m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
                 + error, m_variableOffset);
         } else {
             m_variableReqbodyError.set("0", m_variableOffset);
