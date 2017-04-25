@@ -76,7 +76,7 @@ class Rule {
     std::vector<std::string> getActionNames();
     std::vector<actions::Action *> getActionsByName(const std::string& name);
     bool containsTag(const std::string& name, Transaction *t);
-
+    bool containsDisruptiveAction();
 
     int refCountDecreaseAndCheck() {
         m_referenceCount--;

@@ -35,8 +35,8 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule ARGS:key \"@contains other_value\" \"chain,id:28\"",
-      "SecRule MATCHED_VAR \"@contains asdf\" \"pass\""
+      "SecRule ARGS:key \"@contains other_value\" \"chain,id:28,pass\"",
+      "SecRule MATCHED_VAR \"@contains asdf\" \"\""
     ]
   },
   {
@@ -75,8 +75,9 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule ARGS:key \"@contains other_value\" \"chain,id:28\"",
-      "SecRule MATCHED_VAR \"@contains Aasdf\" \"pass\"",
+      "SecRule ARGS:key \"@contains other_value\" \"chain,id:28,pass\"",
+      "SecRule MATCHED_VAR \"@contains Aasdf\" \"\"",
+
       "SecRule MATCHED_VAR \"@contains other_value\" \"id:29,pass\"",
       "SecRule MATCHED_VAR \"@contains other_value\" \"id:30,pass\""
     ]

@@ -70,22 +70,33 @@ int Driver::addSecRule(Rule *rule) {
         return false;
     }
 
-    if (lastRule && lastRule->m_chained && lastRule->m_chainedRule == NULL) {
-        rule->m_phase = lastRule->m_phase;
-        lastRule->m_chainedRule = rule;
-        return true;
+    if (lastRule && lastRule->m_chained) {
+        if (lastRule->m_chainedRule == NULL) {
+            rule->m_phase = lastRule->m_phase;
+            lastRule->m_chainedRule = rule;
+            if (rule->containsDisruptiveAction()) {
+                m_parserError << "Disruptive actions can only be specified by";
+                m_parserError << " chain starter rules.";
+                return false;
+            }
+            return true;
+        } else {
+            Rule *a = lastRule->m_chainedRule;
+            while (a->m_chained && a->m_chainedRule != NULL) {
+                a = a->m_chainedRule;
+            }
+            if (a->m_chained && a->m_chainedRule == NULL) {
+                a->m_chainedRule = rule;
+                if (a->containsDisruptiveAction()) {
+                    m_parserError << "Disruptive actions can only be ";
+                    m_parserError << "specified by chain starter rules.";
+                    return false;
+                }
+                return true;
+            }
+        }
     }
 
-    if (lastRule && lastRule->m_chained && lastRule->m_chainedRule != NULL) {
-        Rule *a = lastRule->m_chainedRule;
-        while (a->m_chained && a->m_chainedRule != NULL) {
-            a = a->m_chainedRule;
-        }
-        if (a->m_chained && a->m_chainedRule == NULL) {
-            a->m_chainedRule = rule;
-            return true;
-        }
-    }
 
     /*
      * Checking if the rule has an ID and also checking if this ID is not used

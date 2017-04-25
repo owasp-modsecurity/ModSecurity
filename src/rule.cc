@@ -706,6 +706,27 @@ end_exec:
 }
 
 
+bool Rule::containsDisruptiveAction() {
+    for (Action *a : m_actionsRuntimePos) {
+        if (a->isDisruptive() == true) {
+            return true;
+        }
+    }
+    for (Action *a : m_actionsRuntimePre) {
+        if (a->isDisruptive() == true) {
+            return true;
+        }
+    }
+    for (Action *a : m_actionsConf) {
+        if (a->isDisruptive() == true) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 std::vector<actions::Action *> Rule::getActionsByName(const std::string& name) {
     std::vector<actions::Action *> ret;
     for (auto &z : m_actionsRuntimePos) {
