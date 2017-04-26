@@ -1974,7 +1974,10 @@ void sec_audit_logger_native(modsec_rec *msr) {
         }
 
         /* Apache-Handler */
-        if (msr->r->handler != NULL) {
+#ifdef LOG_NO_HANDLER
+		if (msr->txcfg->debuglog_level >= 9)
+#endif
+		if (msr->r->handler != NULL) {
             text = apr_psprintf(msr->mp, "Apache-Handler: %s\n", msr->r->handler);
             sec_auditlog_write(msr, text, strlen(text));
         }

@@ -472,6 +472,21 @@ AC_ARG_ENABLE(collection-delete-problem-logging,
   log_collection_delete_problem=''
 ])
 
+# Disable logging of Apache handler
+AC_ARG_ENABLE(handler-logging,
+              AS_HELP_STRING([--enable-handler-logging],
+                             [Enable logging of Apache handler in audit log when log level < 9. This is the default]),
+[
+  if test "$enableval" != "no"; then
+    log_handler=
+  else
+    log_handler="-DLOG_NO_HANDLER"
+  fi
+],
+[
+  log_handler=''
+])
+
 # Ignore configure errors
 AC_ARG_ENABLE(errors,
               AS_HELP_STRING([--disable-errors],

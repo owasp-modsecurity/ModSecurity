@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * {dis|en}able-handler-logging: Option to disable logging of Apache handler
+   in audit log
+   [Issue #1070, #1381 - Marc Stern]
  * {dis|en}able-collection-delete-problem-logging: Option to disable logging of
    collection delete problem in audit log when log level < 9.
    [Issue #1380 - Marc Stern]
