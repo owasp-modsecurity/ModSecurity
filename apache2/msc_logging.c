@@ -1156,6 +1156,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
         }
 
         /* Apache-Handler */
+#ifdef LOG_NO_HANDLER
+        if (msr->txcfg->debuglog_level >= 9)
+#endif
         if (msr->r->handler != NULL) {
             yajl_kv_string(g, "handler", msr->r->handler);
         }
@@ -2007,9 +2010,6 @@ void sec_audit_logger_native(modsec_rec *msr) {
         sec_auditlog_write_producer_header(msr);
 
         /* Server */
-#ifdef LOG_NO_SERVER
-		if (msr->txcfg->debuglog_level >= 9)
-#endif
         if (msr->server_software != NULL) {
             text = apr_psprintf(msr->mp, "Server: %s\n", msr->server_software);
             sec_auditlog_write(msr, text, strlen(text));
