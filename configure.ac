@@ -460,7 +460,7 @@ AC_ARG_ENABLE(server-logging,
 # Disable logging of problem when deleting collection
 AC_ARG_ENABLE(collection-delete-problem-logging,
               AS_HELP_STRING([--enable-collection-delete-problem-logging],
-                             [Enable logging of collection delete problem in audit log when log level < 9. This is the default]),
+                             [Enable logging of collection delete problem even when log level is < 9. This is the default]),
 [
   if test "$enableval" != "no"; then
     log_collection_delete_problem=
