@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * {dis|en}able-collection-delete-problem-logging: Option to disable logging of
+   collection delete problem in audit log when log level < 9.
+   [Issue #576 - Marc Stern]
  * Adds rule id in logs whenever a rule fail.
    [Issue #1379, #391 - Marc Stern]
  * {dis|en}able-server-logging: Option to disable logging of
