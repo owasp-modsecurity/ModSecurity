@@ -1174,6 +1174,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
             yajl_kv_bool(g, "response_body_dechunked", 1);
         }
 
+#ifdef LOG_NO_PRODUCER
+        if (msr->txcfg->debuglog_level >= 9) {
+#endif
         sec_auditlog_write_producer_header_json(msr, g);
 
         /* Server */
@@ -1323,6 +1326,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
         }
     }
 
+#ifdef LOG_NO_PRODUCER
+        }
+#endif
     yajl_gen_map_close(g); // audit_data top-level key is finished
 
     /* AUDITLOG_PART_UPLOADS */
