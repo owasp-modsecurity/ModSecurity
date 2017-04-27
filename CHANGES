@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * {dis|en}able-stopwatch-logging: Option to disable logging of stopwatches
+   in audit log.
+   [Issue #1067 - Marc Stern]
  * {dis|en}able-handler-logging: Option to disable logging of Apache handler
    in audit log
    [Issue #1070, #1381 - Marc Stern]
