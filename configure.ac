@@ -505,7 +505,7 @@ AC_ARG_ENABLE(dechunk-logging,
 # Disable logging of stopwatches
 AC_ARG_ENABLE(stopwatch-logging,
               AS_HELP_STRING([--enable-stopwatch-logging],
-                             [Enable logging of stopwatches in audit log when log level < 9. This is the default]),
+                             [Enable logging of stopwatches even when log level is < 9. This is the default]),
 [
   if test "$enableval" != "no"; then
     log_stopwatch=

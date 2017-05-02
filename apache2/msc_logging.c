@@ -1993,7 +1993,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
 
         /* Stopwatch; left in for compatibility reasons */
 #ifdef DLOG_NO_STOPWATCH
-		if (msr->txcfg->debuglog_level >= 9) {
+	if (msr->txcfg->debuglog_level >= 9) {
 #endif
         text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
             msr->request_time, (now - msr->request_time));
@@ -2008,7 +2008,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
             sec_auditlog_write(msr, text, strlen(text));
         }
 #ifdef DLOG_NO_STOPWATCH
-		}
+        }
 #endif
 
         /* Our response body does not contain chunks */
