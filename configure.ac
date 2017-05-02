@@ -490,7 +490,7 @@ AC_ARG_ENABLE(handler-logging,
 # Disable logging of dechunking
 AC_ARG_ENABLE(dechunk-logging,
               AS_HELP_STRING([--enable-dechunk-logging],
-                             [Enable logging of dechunking in audit log when log level < 9. This is the default]),
+                             [Enable logging of dechunking even when log level is < 9. This is the default]),
 [
   if test "$enableval" != "no"; then
     log_dechunk=
