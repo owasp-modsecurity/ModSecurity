@@ -34,7 +34,7 @@ std::string find_resource(const std::string& file, const std::string& param,
 std::string get_path(const std::string& file);
 std::list<std::string> expandEnv(const std::string& var, int flags);
 bool createDir(std::string dir, int mode, std::string *error);
-
+bool isFile(std::string f);
 
 }  // namespace utils
 }  // namespace modsecurity

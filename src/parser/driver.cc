@@ -157,7 +157,7 @@ int Driver::parseFile(const std::string &f) {
     std::ifstream t(f);
     std::string str;
 
-    if (t.is_open() == false) {
+    if (utils::isFile(f) == false) {
         m_parserError << "Failed to open the file: " << f << std::endl;
         return false;
     }

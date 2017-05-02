@@ -144,5 +144,19 @@ bool createDir(std::string dir, int mode, std::string *error) {
 }
 
 
+bool isFile(std::string f) {
+    struct stat fileInfo;
+    FILE *fp = fopen(f.c_str(), "r");
+    fstat(fileno(fp), &fileInfo);
+    if (!S_ISREG(fileInfo.st_mode)) {
+        fclose(fp);
+        return false;
+    }
+    fclose(fp);
+
+    return true;
+}
+
+
 }  // namespace utils
 }  // namespace modsecurity
