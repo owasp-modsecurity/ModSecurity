@@ -3903,7 +3903,7 @@ static const flex_int16_t yy_rule_linenum[404] =
       814,  815,  817,  818,  823,  828,  829,  830,  831,  836,
       840,  844,  845,  846,  850,  851,  852,  857,  859,  860,
 
-      885,  909,  936
+      885,  911,  939
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -6490,21 +6490,23 @@ case 401:
 YY_RULE_SETUP
 #line 885 "seclang-scanner.ll"
 {
+    std::string err;
     const char *file = strchr(yytext, ' ') + 1;
-    std::string fi = modsecurity::utils::find_resource(file, driver.ref.back());
+    std::string fi = modsecurity::utils::find_resource(file, driver.ref.back(), &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
-        driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file."));
+        driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
         throw p::syntax_error(*driver.loc.back(), "");
     }
     std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
     files.reverse();
     for (auto& s: files) {
-        std::string f = modsecurity::utils::find_resource(s, driver.ref.back());
+        std::string err;
+        std::string f = modsecurity::utils::find_resource(s, driver.ref.back(), &err);
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
-            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
+            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
             throw p::syntax_error(*driver.loc.back(), "");
         }
         driver.ref.push_back(f);
@@ -6515,25 +6517,26 @@ YY_RULE_SETUP
 	YY_BREAK
 case 402:
 YY_RULE_SETUP
-#line 909 "seclang-scanner.ll"
+#line 911 "seclang-scanner.ll"
 {
+    std::string err;
     const char *file = strchr(yytext, ' ') + 1;
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
-    std::string fi = modsecurity::utils::find_resource(f, driver.ref.back());
+    std::string fi = modsecurity::utils::find_resource(f, driver.ref.back(), &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
-        driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file."));
+        driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
         throw p::syntax_error(*driver.loc.back(), "");
     }
     std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
     files.reverse();
     for (auto& s: files) {
-        std::string f = modsecurity::utils::find_resource(s, driver.ref.back());
+        std::string f = modsecurity::utils::find_resource(s, driver.ref.back(), &err);
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
-            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
+            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
             throw p::syntax_error(*driver.loc.back(), "");
         }
         driver.ref.push_back(f.c_str());
@@ -6546,7 +6549,7 @@ YY_RULE_SETUP
 case 403:
 /* rule 403 can match eol */
 YY_RULE_SETUP
-#line 936 "seclang-scanner.ll"
+#line 939 "seclang-scanner.ll"
 {
     HttpsClient c;
     std::string key;
@@ -6580,10 +6583,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 404:
 YY_RULE_SETUP
-#line 968 "seclang-scanner.ll"
+#line 971 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 6586 "seclang-scanner.cc"
+#line 6589 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -7684,7 +7687,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 968 "seclang-scanner.ll"
+#line 971 "seclang-scanner.ll"
 
 
 namespace modsecurity {

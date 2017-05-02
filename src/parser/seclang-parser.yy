@@ -1204,8 +1204,16 @@ expression:
     | CONFIG_DIR_GEO_DB
       {
 #ifdef WITH_GEOIP
+        std::string err;
         std::string file = modsecurity::utils::find_resource($1,
-            driver.ref.back());
+            driver.ref.back(), &err);
+        if (file.empty()) {
+            std::stringstream ss;
+            ss << "Failed to load locate the GeoDB file from: " << $1 << " ";
+            ss << err;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
         if (GeoLookup::getInstance().setDataBase(file) == false) {
             std::stringstream ss;
             ss << "Failed to load the GeoDB from: ";

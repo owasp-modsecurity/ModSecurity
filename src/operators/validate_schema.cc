@@ -26,9 +26,10 @@ namespace modsecurity {
 namespace operators {
 
 bool ValidateSchema::init(const std::string &file, std::string *error) {
-    m_resource = utils::find_resource(m_param, file);
+    std::string err;
+    m_resource = utils::find_resource(m_param, file, &err);
     if (m_resource == "") {
-        error->assign("XML: File not found: " + m_param + ".");
+        error->assign("XML: File not found: " + m_param + ". " + err);
         return false;
     }
 

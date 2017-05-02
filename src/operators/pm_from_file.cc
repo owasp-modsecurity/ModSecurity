@@ -38,11 +38,12 @@ bool PmFromFile::init(const std::string &config, std::string *error) {
         }
         iss = new std::stringstream(client.content);
     } else {
-        std::string resource = utils::find_resource(m_param, config);
+        std::string err;
+        std::string resource = utils::find_resource(m_param, config, &err);
         iss = new std::ifstream(resource, std::ios::in);
 
         if (((std::ifstream *)iss)->is_open() == false) {
-            error->assign("Failed to open file: " + m_param);
+            error->assign("Failed to open file: " + m_param + ". " + err);
             delete iss;
             return false;
         }

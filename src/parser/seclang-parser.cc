@@ -2000,8 +2000,16 @@ namespace yy {
 #line 1205 "seclang-parser.yy" // lalr1.cc:859
     {
 #ifdef WITH_GEOIP
+        std::string err;
         std::string file = modsecurity::utils::find_resource(yystack_[0].value.as< std::string > (),
-            driver.ref.back());
+            driver.ref.back(), &err);
+        if (file.empty()) {
+            std::stringstream ss;
+            ss << "Failed to load locate the GeoDB file from: " << yystack_[0].value.as< std::string > () << " ";
+            ss << err;
+            driver.error(yystack_[1].location, ss.str());
+            YYERROR;
+        }
         if (GeoLookup::getInstance().setDataBase(file) == false) {
             std::stringstream ss;
             ss << "Failed to load the GeoDB from: ";
@@ -2016,95 +2024,95 @@ namespace yy {
         YYERROR;
 #endif  // WITH_GEOIP
       }
-#line 2020 "seclang-parser.cc" // lalr1.cc:859
+#line 2028 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 88:
-#line 1225 "seclang-parser.yy" // lalr1.cc:859
+#line 1233 "seclang-parser.yy" // lalr1.cc:859
     {
         driver.m_requestBodyLimit.m_set = true;
         driver.m_requestBodyLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
-#line 2029 "seclang-parser.cc" // lalr1.cc:859
+#line 2037 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 89:
-#line 1230 "seclang-parser.yy" // lalr1.cc:859
+#line 1238 "seclang-parser.yy" // lalr1.cc:859
     {
         driver.m_requestBodyNoFilesLimit.m_set = true;
         driver.m_requestBodyNoFilesLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
-#line 2038 "seclang-parser.cc" // lalr1.cc:859
+#line 2046 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 90:
-#line 1235 "seclang-parser.yy" // lalr1.cc:859
+#line 1243 "seclang-parser.yy" // lalr1.cc:859
     {
         driver.m_requestBodyInMemoryLimit.m_set = true;
         driver.m_requestBodyInMemoryLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
-#line 2047 "seclang-parser.cc" // lalr1.cc:859
+#line 2055 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 91:
-#line 1240 "seclang-parser.yy" // lalr1.cc:859
+#line 1248 "seclang-parser.yy" // lalr1.cc:859
     {
         driver.m_responseBodyLimit.m_set = true;
         driver.m_responseBodyLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
-#line 2056 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 92:
-#line 1245 "seclang-parser.yy" // lalr1.cc:859
-    {
-        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
-      }
 #line 2064 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 93:
-#line 1249 "seclang-parser.yy" // lalr1.cc:859
+  case 92:
+#line 1253 "seclang-parser.yy" // lalr1.cc:859
     {
-        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
 #line 2072 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 94:
-#line 1253 "seclang-parser.yy" // lalr1.cc:859
+  case 93:
+#line 1257 "seclang-parser.yy" // lalr1.cc:859
     {
-        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
 #line 2080 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 95:
-#line 1257 "seclang-parser.yy" // lalr1.cc:859
+  case 94:
+#line 1261 "seclang-parser.yy" // lalr1.cc:859
     {
-        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
 #line 2088 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 96:
-#line 1261 "seclang-parser.yy" // lalr1.cc:859
+  case 95:
+#line 1265 "seclang-parser.yy" // lalr1.cc:859
     {
-        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
+        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
 #line 2096 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 97:
-#line 1265 "seclang-parser.yy" // lalr1.cc:859
+  case 96:
+#line 1269 "seclang-parser.yy" // lalr1.cc:859
     {
-        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
+        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
 #line 2104 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 97:
+#line 1273 "seclang-parser.yy" // lalr1.cc:859
+    {
+        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
+      }
+#line 2112 "seclang-parser.cc" // lalr1.cc:859
+    break;
+
   case 100:
-#line 1271 "seclang-parser.yy" // lalr1.cc:859
+#line 1279 "seclang-parser.yy" // lalr1.cc:859
     {
         std::istringstream buf(yystack_[0].value.as< std::string > ());
         std::istream_iterator<std::string> beg(buf), end;
@@ -2115,2016 +2123,2016 @@ namespace yy {
             driver.m_responseBodyTypeToBeInspected.insert(*it);
         }
       }
-#line 2119 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 101:
-#line 1282 "seclang-parser.yy" // lalr1.cc:859
-    {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
-      }
 #line 2127 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 102:
-#line 1286 "seclang-parser.yy" // lalr1.cc:859
+  case 101:
+#line 1290 "seclang-parser.yy" // lalr1.cc:859
     {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
       }
 #line 2135 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 109:
-#line 1296 "seclang-parser.yy" // lalr1.cc:859
+  case 102:
+#line 1294 "seclang-parser.yy" // lalr1.cc:859
     {
+        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
       }
-#line 2142 "seclang-parser.cc" // lalr1.cc:859
+#line 2143 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 110:
-#line 1302 "seclang-parser.yy" // lalr1.cc:859
+  case 109:
+#line 1304 "seclang-parser.yy" // lalr1.cc:859
     {
-        yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
 #line 2150 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 111:
-#line 1306 "seclang-parser.yy" // lalr1.cc:859
+  case 110:
+#line 1310 "seclang-parser.yy" // lalr1.cc:859
     {
-        yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[1].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
+        yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
 #line 2158 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 111:
+#line 1314 "seclang-parser.yy" // lalr1.cc:859
+    {
+        yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[1].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
+      }
+#line 2166 "seclang-parser.cc" // lalr1.cc:859
+    break;
+
   case 112:
-#line 1313 "seclang-parser.yy" // lalr1.cc:859
+#line 1321 "seclang-parser.yy" // lalr1.cc:859
     {
         yystack_[2].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ()));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[2].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
-#line 2167 "seclang-parser.cc" // lalr1.cc:859
+#line 2175 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 113:
-#line 1318 "seclang-parser.yy" // lalr1.cc:859
+#line 1326 "seclang-parser.yy" // lalr1.cc:859
     {
         std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
         yystack_[3].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(c));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[3].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
-#line 2177 "seclang-parser.cc" // lalr1.cc:859
+#line 2185 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 114:
-#line 1324 "seclang-parser.yy" // lalr1.cc:859
+#line 1332 "seclang-parser.yy" // lalr1.cc:859
     {
         std::unique_ptr<Variable> c(new VariableModificatorCount(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
         yystack_[3].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(c));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[3].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
-#line 2187 "seclang-parser.cc" // lalr1.cc:859
+#line 2195 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 115:
-#line 1330 "seclang-parser.yy" // lalr1.cc:859
+#line 1338 "seclang-parser.yy" // lalr1.cc:859
     {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         b->push_back(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ()));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(b);
       }
-#line 2197 "seclang-parser.cc" // lalr1.cc:859
+#line 2205 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 116:
-#line 1336 "seclang-parser.yy" // lalr1.cc:859
+#line 1344 "seclang-parser.yy" // lalr1.cc:859
     {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
         b->push_back(std::move(c));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(b);
       }
-#line 2208 "seclang-parser.cc" // lalr1.cc:859
+#line 2216 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 117:
-#line 1343 "seclang-parser.yy" // lalr1.cc:859
+#line 1351 "seclang-parser.yy" // lalr1.cc:859
     {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         std::unique_ptr<Variable> c(new VariableModificatorCount(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
         b->push_back(std::move(c));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(b);
       }
-#line 2219 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 118:
-#line 1353 "seclang-parser.yy" // lalr1.cc:859
-    {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_DictElement(yystack_[0].value.as< std::string > ()));
-      }
 #line 2227 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 119:
-#line 1357 "seclang-parser.yy" // lalr1.cc:859
+  case 118:
+#line 1361 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2235 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 120:
-#line 1361 "seclang-parser.yy" // lalr1.cc:859
+  case 119:
+#line 1365 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2243 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 121:
-#line 1365 "seclang-parser.yy" // lalr1.cc:859
+  case 120:
+#line 1369 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_NoDictElement());
       }
 #line 2251 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 122:
-#line 1369 "seclang-parser.yy" // lalr1.cc:859
+  case 121:
+#line 1373 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2259 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 123:
-#line 1373 "seclang-parser.yy" // lalr1.cc:859
+  case 122:
+#line 1377 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2267 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 124:
-#line 1377 "seclang-parser.yy" // lalr1.cc:859
+  case 123:
+#line 1381 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_NoDictElement());
       }
 #line 2275 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 125:
-#line 1381 "seclang-parser.yy" // lalr1.cc:859
+  case 124:
+#line 1385 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2283 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 126:
-#line 1385 "seclang-parser.yy" // lalr1.cc:859
+  case 125:
+#line 1389 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2291 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 127:
-#line 1389 "seclang-parser.yy" // lalr1.cc:859
+  case 126:
+#line 1393 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_NoDictElement());
       }
 #line 2299 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 128:
-#line 1393 "seclang-parser.yy" // lalr1.cc:859
+  case 127:
+#line 1397 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2307 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 129:
-#line 1397 "seclang-parser.yy" // lalr1.cc:859
+  case 128:
+#line 1401 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2315 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 130:
-#line 1401 "seclang-parser.yy" // lalr1.cc:859
+  case 129:
+#line 1405 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_NoDictElement());
       }
 #line 2323 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 131:
-#line 1405 "seclang-parser.yy" // lalr1.cc:859
+  case 130:
+#line 1409 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2331 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 132:
-#line 1409 "seclang-parser.yy" // lalr1.cc:859
+  case 131:
+#line 1413 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2339 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 133:
-#line 1413 "seclang-parser.yy" // lalr1.cc:859
+  case 132:
+#line 1417 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_NoDictElement());
       }
 #line 2347 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 134:
-#line 1417 "seclang-parser.yy" // lalr1.cc:859
+  case 133:
+#line 1421 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2355 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 135:
-#line 1421 "seclang-parser.yy" // lalr1.cc:859
+  case 134:
+#line 1425 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2363 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 136:
-#line 1425 "seclang-parser.yy" // lalr1.cc:859
+  case 135:
+#line 1429 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_NoDictElement());
       }
 #line 2371 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 137:
-#line 1429 "seclang-parser.yy" // lalr1.cc:859
+  case 136:
+#line 1433 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2379 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 138:
-#line 1433 "seclang-parser.yy" // lalr1.cc:859
+  case 137:
+#line 1437 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2387 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 139:
-#line 1437 "seclang-parser.yy" // lalr1.cc:859
+  case 138:
+#line 1441 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_NoDictElement());
       }
 #line 2395 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 140:
-#line 1441 "seclang-parser.yy" // lalr1.cc:859
+  case 139:
+#line 1445 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2403 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 141:
-#line 1445 "seclang-parser.yy" // lalr1.cc:859
+  case 140:
+#line 1449 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2411 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 142:
-#line 1449 "seclang-parser.yy" // lalr1.cc:859
+  case 141:
+#line 1453 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_NoDictElement());
       }
 #line 2419 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 143:
-#line 1453 "seclang-parser.yy" // lalr1.cc:859
+  case 142:
+#line 1457 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2427 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 144:
-#line 1457 "seclang-parser.yy" // lalr1.cc:859
+  case 143:
+#line 1461 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2435 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 145:
-#line 1461 "seclang-parser.yy" // lalr1.cc:859
+  case 144:
+#line 1465 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_NoDictElement());
       }
 #line 2443 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 146:
-#line 1465 "seclang-parser.yy" // lalr1.cc:859
+  case 145:
+#line 1469 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2451 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 147:
-#line 1469 "seclang-parser.yy" // lalr1.cc:859
+  case 146:
+#line 1473 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2459 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 148:
-#line 1473 "seclang-parser.yy" // lalr1.cc:859
+  case 147:
+#line 1477 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_NoDictElement());
       }
 #line 2467 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 149:
-#line 1477 "seclang-parser.yy" // lalr1.cc:859
+  case 148:
+#line 1481 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2475 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 150:
-#line 1481 "seclang-parser.yy" // lalr1.cc:859
+  case 149:
+#line 1485 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2483 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 151:
-#line 1485 "seclang-parser.yy" // lalr1.cc:859
+  case 150:
+#line 1489 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_NoDictElement());
       }
 #line 2491 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 152:
-#line 1489 "seclang-parser.yy" // lalr1.cc:859
+  case 151:
+#line 1493 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2499 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 153:
-#line 1493 "seclang-parser.yy" // lalr1.cc:859
+  case 152:
+#line 1497 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2507 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 154:
-#line 1497 "seclang-parser.yy" // lalr1.cc:859
+  case 153:
+#line 1501 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_NoDictElement());
       }
 #line 2515 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 155:
-#line 1501 "seclang-parser.yy" // lalr1.cc:859
+  case 154:
+#line 1505 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2523 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 156:
-#line 1505 "seclang-parser.yy" // lalr1.cc:859
+  case 155:
+#line 1509 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2531 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 157:
-#line 1509 "seclang-parser.yy" // lalr1.cc:859
+  case 156:
+#line 1513 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_NoDictElement());
       }
 #line 2539 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 158:
-#line 1513 "seclang-parser.yy" // lalr1.cc:859
+  case 157:
+#line 1517 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2547 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 159:
-#line 1517 "seclang-parser.yy" // lalr1.cc:859
+  case 158:
+#line 1521 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2555 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 160:
-#line 1521 "seclang-parser.yy" // lalr1.cc:859
+  case 159:
+#line 1525 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_NoDictElement());
       }
 #line 2563 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 161:
-#line 1525 "seclang-parser.yy" // lalr1.cc:859
+  case 160:
+#line 1529 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2571 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 162:
-#line 1529 "seclang-parser.yy" // lalr1.cc:859
+  case 161:
+#line 1533 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2579 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 163:
-#line 1533 "seclang-parser.yy" // lalr1.cc:859
+  case 162:
+#line 1537 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_NoDictElement());
       }
 #line 2587 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 164:
-#line 1537 "seclang-parser.yy" // lalr1.cc:859
+  case 163:
+#line 1541 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2595 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 165:
-#line 1541 "seclang-parser.yy" // lalr1.cc:859
+  case 164:
+#line 1545 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2603 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 166:
-#line 1545 "seclang-parser.yy" // lalr1.cc:859
+  case 165:
+#line 1549 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_NoDictElement());
       }
 #line 2611 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 167:
-#line 1549 "seclang-parser.yy" // lalr1.cc:859
+  case 166:
+#line 1553 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2619 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 168:
-#line 1553 "seclang-parser.yy" // lalr1.cc:859
+  case 167:
+#line 1557 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2627 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 169:
-#line 1557 "seclang-parser.yy" // lalr1.cc:859
+  case 168:
+#line 1561 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Env("ENV:" + yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_NoDictElement());
       }
 #line 2635 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 170:
-#line 1561 "seclang-parser.yy" // lalr1.cc:859
+  case 169:
+#line 1565 "seclang-parser.yy" // lalr1.cc:859
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Env("ENV:" + yystack_[0].value.as< std::string > ()));
       }
 #line 2643 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 171:
-#line 1565 "seclang-parser.yy" // lalr1.cc:859
+  case 170:
+#line 1569 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Env("ENV"));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Env("ENV:" + yystack_[0].value.as< std::string > ()));
       }
 #line 2651 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 172:
-#line 1569 "seclang-parser.yy" // lalr1.cc:859
+  case 171:
+#line 1573 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::XML("XML:" + yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Env("ENV"));
       }
 #line 2659 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 173:
-#line 1573 "seclang-parser.yy" // lalr1.cc:859
+  case 172:
+#line 1577 "seclang-parser.yy" // lalr1.cc:859
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::XML("XML:" + yystack_[0].value.as< std::string > ()));
       }
 #line 2667 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 174:
-#line 1577 "seclang-parser.yy" // lalr1.cc:859
+  case 173:
+#line 1581 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::XML_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::XML("XML:" + yystack_[0].value.as< std::string > ()));
       }
 #line 2675 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 175:
-#line 1581 "seclang-parser.yy" // lalr1.cc:859
+  case 174:
+#line 1585 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::XML_NoDictElement());
       }
 #line 2683 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 176:
-#line 1585 "seclang-parser.yy" // lalr1.cc:859
+  case 175:
+#line 1589 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2691 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 177:
-#line 1589 "seclang-parser.yy" // lalr1.cc:859
+  case 176:
+#line 1593 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2699 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 178:
-#line 1594 "seclang-parser.yy" // lalr1.cc:859
+  case 177:
+#line 1597 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_NoDictElement());
       }
 #line 2707 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 179:
-#line 1598 "seclang-parser.yy" // lalr1.cc:859
+  case 178:
+#line 1602 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2715 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 180:
-#line 1602 "seclang-parser.yy" // lalr1.cc:859
+  case 179:
+#line 1606 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2723 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 181:
-#line 1607 "seclang-parser.yy" // lalr1.cc:859
+  case 180:
+#line 1610 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_NoDictElement());
       }
 #line 2731 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 182:
-#line 1611 "seclang-parser.yy" // lalr1.cc:859
+  case 181:
+#line 1615 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2739 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 183:
-#line 1615 "seclang-parser.yy" // lalr1.cc:859
+  case 182:
+#line 1619 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2747 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 184:
-#line 1620 "seclang-parser.yy" // lalr1.cc:859
+  case 183:
+#line 1623 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_NoDictElement());
       }
 #line 2755 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 185:
-#line 1624 "seclang-parser.yy" // lalr1.cc:859
+  case 184:
+#line 1628 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2763 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 186:
-#line 1628 "seclang-parser.yy" // lalr1.cc:859
+  case 185:
+#line 1632 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2771 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 187:
-#line 1633 "seclang-parser.yy" // lalr1.cc:859
+  case 186:
+#line 1636 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_DictElement(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_NoDictElement());
       }
 #line 2779 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 188:
-#line 1637 "seclang-parser.yy" // lalr1.cc:859
+  case 187:
+#line 1641 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_DictElementRegexp(yystack_[0].value.as< std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_DictElement(yystack_[0].value.as< std::string > ()));
       }
 #line 2787 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 189:
-#line 1641 "seclang-parser.yy" // lalr1.cc:859
+  case 188:
+#line 1645 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
 #line 2795 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 190:
-#line 1648 "seclang-parser.yy" // lalr1.cc:859
+  case 189:
+#line 1649 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsNames());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_NoDictElement());
       }
 #line 2803 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 191:
-#line 1652 "seclang-parser.yy" // lalr1.cc:859
+  case 190:
+#line 1656 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGetNames());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsNames());
       }
 #line 2811 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 192:
-#line 1656 "seclang-parser.yy" // lalr1.cc:859
+  case 191:
+#line 1660 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPostNames());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGetNames());
       }
 #line 2819 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 193:
-#line 1660 "seclang-parser.yy" // lalr1.cc:859
+  case 192:
+#line 1664 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeadersNames());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPostNames());
       }
 #line 2827 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 194:
-#line 1664 "seclang-parser.yy" // lalr1.cc:859
+  case 193:
+#line 1668 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseContentType());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeadersNames());
       }
 #line 2835 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 195:
-#line 1668 "seclang-parser.yy" // lalr1.cc:859
+  case 194:
+#line 1672 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeadersNames());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseContentType());
       }
 #line 2843 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 196:
-#line 1672 "seclang-parser.yy" // lalr1.cc:859
+  case 195:
+#line 1676 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsCombinedSize());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeadersNames());
       }
 #line 2851 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 197:
-#line 1676 "seclang-parser.yy" // lalr1.cc:859
+  case 196:
+#line 1680 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::AuthType());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsCombinedSize());
       }
 #line 2859 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 198:
-#line 1680 "seclang-parser.yy" // lalr1.cc:859
+  case 197:
+#line 1684 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesCombinedSize());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::AuthType());
       }
 #line 2867 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 199:
-#line 1684 "seclang-parser.yy" // lalr1.cc:859
+  case 198:
+#line 1688 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FullRequest());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesCombinedSize());
       }
 #line 2875 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 200:
-#line 1688 "seclang-parser.yy" // lalr1.cc:859
+  case 199:
+#line 1692 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FullRequestLength());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FullRequest());
       }
 #line 2883 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 201:
-#line 1692 "seclang-parser.yy" // lalr1.cc:859
+  case 200:
+#line 1696 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::InboundDataError());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FullRequestLength());
       }
 #line 2891 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 202:
-#line 1696 "seclang-parser.yy" // lalr1.cc:859
+  case 201:
+#line 1700 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVar());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::InboundDataError());
       }
 #line 2899 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 203:
-#line 1700 "seclang-parser.yy" // lalr1.cc:859
+  case 202:
+#line 1704 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarName());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVar());
       }
 #line 2907 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 204:
-#line 1704 "seclang-parser.yy" // lalr1.cc:859
+  case 203:
+#line 1708 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartCrlfLFLines());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarName());
       }
 #line 2915 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 205:
-#line 1708 "seclang-parser.yy" // lalr1.cc:859
+  case 204:
+#line 1712 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartDateAfter());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartCrlfLFLines());
       }
 #line 2923 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 206:
-#line 1712 "seclang-parser.yy" // lalr1.cc:859
+  case 205:
+#line 1716 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartFileLimitExceeded());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartDateAfter());
       }
 #line 2931 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 207:
-#line 1716 "seclang-parser.yy" // lalr1.cc:859
+  case 206:
+#line 1720 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartHeaderFolding());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartFileLimitExceeded());
       }
 #line 2939 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 208:
-#line 1720 "seclang-parser.yy" // lalr1.cc:859
+  case 207:
+#line 1724 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartInvalidHeaderFolding());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartHeaderFolding());
       }
 #line 2947 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 209:
-#line 1724 "seclang-parser.yy" // lalr1.cc:859
+  case 208:
+#line 1728 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartInvalidQuoting());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartInvalidHeaderFolding());
       }
 #line 2955 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 210:
-#line 1728 "seclang-parser.yy" // lalr1.cc:859
+  case 209:
+#line 1732 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartStrictError());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartInvalidQuoting());
       }
 #line 2963 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 211:
-#line 1732 "seclang-parser.yy" // lalr1.cc:859
+  case 210:
+#line 1736 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartUnmatchedBoundary());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartStrictError());
       }
 #line 2971 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 212:
-#line 1736 "seclang-parser.yy" // lalr1.cc:859
+  case 211:
+#line 1740 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::OutboundDataError());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartUnmatchedBoundary());
       }
 #line 2979 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 213:
-#line 1740 "seclang-parser.yy" // lalr1.cc:859
+  case 212:
+#line 1744 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::PathInfo());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::OutboundDataError());
       }
 #line 2987 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 214:
-#line 1744 "seclang-parser.yy" // lalr1.cc:859
+  case 213:
+#line 1748 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::QueryString());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::PathInfo());
       }
 #line 2995 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 215:
-#line 1748 "seclang-parser.yy" // lalr1.cc:859
+  case 214:
+#line 1752 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemoteAddr());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::QueryString());
       }
 #line 3003 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 216:
-#line 1752 "seclang-parser.yy" // lalr1.cc:859
+  case 215:
+#line 1756 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemoteHost());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemoteAddr());
       }
 #line 3011 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 217:
-#line 1756 "seclang-parser.yy" // lalr1.cc:859
+  case 216:
+#line 1760 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemotePort());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemoteHost());
       }
 #line 3019 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 218:
-#line 1760 "seclang-parser.yy" // lalr1.cc:859
+  case 217:
+#line 1764 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyError());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemotePort());
       }
 #line 3027 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 219:
-#line 1764 "seclang-parser.yy" // lalr1.cc:859
+  case 218:
+#line 1768 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyErrorMsg());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyError());
       }
 #line 3035 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 220:
-#line 1768 "seclang-parser.yy" // lalr1.cc:859
+  case 219:
+#line 1772 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessor());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyErrorMsg());
       }
 #line 3043 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 221:
-#line 1772 "seclang-parser.yy" // lalr1.cc:859
+  case 220:
+#line 1776 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessorError());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessor());
       }
 #line 3051 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 222:
-#line 1776 "seclang-parser.yy" // lalr1.cc:859
+  case 221:
+#line 1780 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessorErrorMsg());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessorError());
       }
 #line 3059 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 223:
-#line 1780 "seclang-parser.yy" // lalr1.cc:859
+  case 222:
+#line 1784 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBasename());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessorErrorMsg());
       }
 #line 3067 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 224:
-#line 1784 "seclang-parser.yy" // lalr1.cc:859
+  case 223:
+#line 1788 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBody());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBasename());
       }
 #line 3075 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 225:
-#line 1788 "seclang-parser.yy" // lalr1.cc:859
+  case 224:
+#line 1792 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBodyLength());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBody());
       }
 #line 3083 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 226:
-#line 1792 "seclang-parser.yy" // lalr1.cc:859
+  case 225:
+#line 1796 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestFilename());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBodyLength());
       }
 #line 3091 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 227:
-#line 1796 "seclang-parser.yy" // lalr1.cc:859
+  case 226:
+#line 1800 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestLine());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestFilename());
       }
 #line 3099 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 228:
-#line 1800 "seclang-parser.yy" // lalr1.cc:859
+  case 227:
+#line 1804 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestMethod());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestLine());
       }
 #line 3107 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 229:
-#line 1804 "seclang-parser.yy" // lalr1.cc:859
+  case 228:
+#line 1808 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestProtocol());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestMethod());
       }
 #line 3115 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 230:
-#line 1808 "seclang-parser.yy" // lalr1.cc:859
+  case 229:
+#line 1812 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestURI());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestProtocol());
       }
 #line 3123 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 231:
-#line 1812 "seclang-parser.yy" // lalr1.cc:859
+  case 230:
+#line 1816 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestURIRaw());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestURI());
       }
 #line 3131 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 232:
-#line 1816 "seclang-parser.yy" // lalr1.cc:859
+  case 231:
+#line 1820 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Resource());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestURIRaw());
       }
 #line 3139 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 233:
-#line 1820 "seclang-parser.yy" // lalr1.cc:859
+  case 232:
+#line 1824 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseBody());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Resource());
       }
 #line 3147 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 234:
-#line 1824 "seclang-parser.yy" // lalr1.cc:859
+  case 233:
+#line 1828 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseContentLength());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseBody());
       }
 #line 3155 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 235:
-#line 1828 "seclang-parser.yy" // lalr1.cc:859
+  case 234:
+#line 1832 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseProtocol());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseContentLength());
       }
 #line 3163 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 236:
-#line 1832 "seclang-parser.yy" // lalr1.cc:859
+  case 235:
+#line 1836 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseStatus());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseProtocol());
       }
 #line 3171 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 237:
-#line 1836 "seclang-parser.yy" // lalr1.cc:859
+  case 236:
+#line 1840 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerAddr());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseStatus());
       }
 #line 3179 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 238:
-#line 1840 "seclang-parser.yy" // lalr1.cc:859
+  case 237:
+#line 1844 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerName());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerAddr());
       }
 #line 3187 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 239:
-#line 1844 "seclang-parser.yy" // lalr1.cc:859
+  case 238:
+#line 1848 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerPort());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerName());
       }
 #line 3195 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 240:
-#line 1848 "seclang-parser.yy" // lalr1.cc:859
+  case 239:
+#line 1852 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::SessionID());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerPort());
       }
 #line 3203 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 241:
-#line 1852 "seclang-parser.yy" // lalr1.cc:859
+  case 240:
+#line 1856 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UniqueID());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::SessionID());
       }
 #line 3211 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 242:
-#line 1856 "seclang-parser.yy" // lalr1.cc:859
+  case 241:
+#line 1860 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UrlEncodedError());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UniqueID());
       }
 #line 3219 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 243:
-#line 1860 "seclang-parser.yy" // lalr1.cc:859
+  case 242:
+#line 1864 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UserID());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UrlEncodedError());
       }
 #line 3227 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 244:
-#line 1864 "seclang-parser.yy" // lalr1.cc:859
+  case 243:
+#line 1868 "seclang-parser.yy" // lalr1.cc:859
     {
-        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Status());
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UserID());
       }
 #line 3235 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 244:
+#line 1872 "seclang-parser.yy" // lalr1.cc:859
+    {
+        VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Status());
+      }
+#line 3243 "seclang-parser.cc" // lalr1.cc:859
+    break;
+
   case 245:
-#line 1868 "seclang-parser.yy" // lalr1.cc:859
+#line 1876 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new Duration(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3246 "seclang-parser.cc" // lalr1.cc:859
+#line 3254 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 246:
-#line 1876 "seclang-parser.yy" // lalr1.cc:859
+#line 1884 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new ModsecBuild(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3257 "seclang-parser.cc" // lalr1.cc:859
+#line 3265 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 247:
-#line 1883 "seclang-parser.yy" // lalr1.cc:859
+#line 1891 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new HighestSeverity(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3268 "seclang-parser.cc" // lalr1.cc:859
+#line 3276 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 248:
-#line 1890 "seclang-parser.yy" // lalr1.cc:859
+#line 1898 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new RemoteUser(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3279 "seclang-parser.cc" // lalr1.cc:859
+#line 3287 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 249:
-#line 1897 "seclang-parser.yy" // lalr1.cc:859
+#line 1905 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new Time(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3290 "seclang-parser.cc" // lalr1.cc:859
+#line 3298 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 250:
-#line 1904 "seclang-parser.yy" // lalr1.cc:859
+#line 1912 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeDay(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3301 "seclang-parser.cc" // lalr1.cc:859
+#line 3309 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 251:
-#line 1911 "seclang-parser.yy" // lalr1.cc:859
+#line 1919 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeEpoch(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3312 "seclang-parser.cc" // lalr1.cc:859
+#line 3320 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 252:
-#line 1918 "seclang-parser.yy" // lalr1.cc:859
+#line 1926 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeHour(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3323 "seclang-parser.cc" // lalr1.cc:859
+#line 3331 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 253:
-#line 1925 "seclang-parser.yy" // lalr1.cc:859
+#line 1933 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeMin(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3334 "seclang-parser.cc" // lalr1.cc:859
+#line 3342 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 254:
-#line 1932 "seclang-parser.yy" // lalr1.cc:859
+#line 1940 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeMon(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3345 "seclang-parser.cc" // lalr1.cc:859
+#line 3353 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 255:
-#line 1939 "seclang-parser.yy" // lalr1.cc:859
+#line 1947 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
             std::unique_ptr<Variable> c(new TimeSec(name));
             yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3356 "seclang-parser.cc" // lalr1.cc:859
+#line 3364 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 256:
-#line 1946 "seclang-parser.yy" // lalr1.cc:859
+#line 1954 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeWDay(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3367 "seclang-parser.cc" // lalr1.cc:859
+#line 3375 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 257:
-#line 1953 "seclang-parser.yy" // lalr1.cc:859
+#line 1961 "seclang-parser.yy" // lalr1.cc:859
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeYear(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 3378 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 258:
-#line 1963 "seclang-parser.yy" // lalr1.cc:859
-    {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Accuracy(yystack_[0].value.as< std::string > ()));
-      }
 #line 3386 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 259:
-#line 1967 "seclang-parser.yy" // lalr1.cc:859
+  case 258:
+#line 1971 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Allow(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Accuracy(yystack_[0].value.as< std::string > ()));
       }
 #line 3394 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 260:
-#line 1971 "seclang-parser.yy" // lalr1.cc:859
+  case 259:
+#line 1975 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("Append", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Allow(yystack_[0].value.as< std::string > ()));
       }
 #line 3402 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 261:
-#line 1975 "seclang-parser.yy" // lalr1.cc:859
+  case 260:
+#line 1979 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::AuditLog(yystack_[0].value.as< std::string > ()));
+        ACTION_NOT_SUPPORTED("Append", yystack_[1].location);
       }
 #line 3410 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 262:
-#line 1979 "seclang-parser.yy" // lalr1.cc:859
+  case 261:
+#line 1983 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Block(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::AuditLog(yystack_[0].value.as< std::string > ()));
       }
 #line 3418 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 263:
-#line 1983 "seclang-parser.yy" // lalr1.cc:859
+  case 262:
+#line 1987 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Capture(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Block(yystack_[0].value.as< std::string > ()));
       }
 #line 3426 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 264:
-#line 1987 "seclang-parser.yy" // lalr1.cc:859
+  case 263:
+#line 1991 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Chain(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Capture(yystack_[0].value.as< std::string > ()));
       }
 #line 3434 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 264:
+#line 1995 "seclang-parser.yy" // lalr1.cc:859
+    {
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Chain(yystack_[0].value.as< std::string > ()));
+      }
+#line 3442 "seclang-parser.cc" // lalr1.cc:859
+    break;
+
   case 265:
-#line 1991 "seclang-parser.yy" // lalr1.cc:859
+#line 1999 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 3443 "seclang-parser.cc" // lalr1.cc:859
+#line 3451 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 266:
-#line 1996 "seclang-parser.yy" // lalr1.cc:859
+#line 2004 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 3452 "seclang-parser.cc" // lalr1.cc:859
+#line 3460 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 267:
-#line 2001 "seclang-parser.yy" // lalr1.cc:859
+#line 2009 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
-      }
-#line 3461 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 268:
-#line 2006 "seclang-parser.yy" // lalr1.cc:859
-    {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::AuditLogParts(yystack_[0].value.as< std::string > ()));
       }
 #line 3469 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 269:
-#line 2010 "seclang-parser.yy" // lalr1.cc:859
+  case 268:
+#line 2014 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorJSON(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::AuditLogParts(yystack_[0].value.as< std::string > ()));
       }
 #line 3477 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 270:
-#line 2014 "seclang-parser.yy" // lalr1.cc:859
+  case 269:
+#line 2018 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorXML(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorJSON(yystack_[0].value.as< std::string > ()));
       }
 #line 3485 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 270:
+#line 2022 "seclang-parser.yy" // lalr1.cc:859
+    {
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorXML(yystack_[0].value.as< std::string > ()));
+      }
+#line 3493 "seclang-parser.cc" // lalr1.cc:859
+    break;
+
   case 271:
-#line 2018 "seclang-parser.yy" // lalr1.cc:859
+#line 2026 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 3494 "seclang-parser.cc" // lalr1.cc:859
+#line 3502 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 272:
-#line 2023 "seclang-parser.yy" // lalr1.cc:859
+#line 2031 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
-      }
-#line 3503 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 273:
-#line 2028 "seclang-parser.yy" // lalr1.cc:859
-    {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as< std::string > () + "true"));
       }
 #line 3511 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 274:
-#line 2032 "seclang-parser.yy" // lalr1.cc:859
+  case 273:
+#line 2036 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as< std::string > () + "false"));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as< std::string > () + "true"));
       }
 #line 3519 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 274:
+#line 2040 "seclang-parser.yy" // lalr1.cc:859
+    {
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as< std::string > () + "false"));
+      }
+#line 3527 "seclang-parser.cc" // lalr1.cc:859
+    break;
+
   case 275:
-#line 2036 "seclang-parser.yy" // lalr1.cc:859
+#line 2044 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 3528 "seclang-parser.cc" // lalr1.cc:859
+#line 3536 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 276:
-#line 2041 "seclang-parser.yy" // lalr1.cc:859
+#line 2049 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 3537 "seclang-parser.cc" // lalr1.cc:859
+#line 3545 "seclang-parser.cc" // lalr1.cc:859
     break;
 
   case 277:
-#line 2046 "seclang-parser.yy" // lalr1.cc:859
+#line 2054 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
-      }
-#line 3546 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 278:
-#line 2051 "seclang-parser.yy" // lalr1.cc:859
-    {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveById(yystack_[0].value.as< std::string > ()));
       }
 #line 3554 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 279:
-#line 2055 "seclang-parser.yy" // lalr1.cc:859
+  case 278:
+#line 2059 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetById(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveById(yystack_[0].value.as< std::string > ()));
       }
 #line 3562 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 280:
-#line 2059 "seclang-parser.yy" // lalr1.cc:859
+  case 279:
+#line 2063 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetByTag(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetById(yystack_[0].value.as< std::string > ()));
       }
 #line 3570 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 281:
-#line 2063 "seclang-parser.yy" // lalr1.cc:859
+  case 280:
+#line 2067 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Deny(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetByTag(yystack_[0].value.as< std::string > ()));
       }
 #line 3578 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 282:
-#line 2067 "seclang-parser.yy" // lalr1.cc:859
+  case 281:
+#line 2071 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("DeprecateVar", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Deny(yystack_[0].value.as< std::string > ()));
       }
 #line 3586 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 282:
+#line 2075 "seclang-parser.yy" // lalr1.cc:859
+    {
+        ACTION_NOT_SUPPORTED("DeprecateVar", yystack_[1].location);
+      }
+#line 3594 "seclang-parser.cc" // lalr1.cc:859
+    break;
+
   case 283:
-#line 2071 "seclang-parser.yy" // lalr1.cc:859
+#line 2079 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("Drop", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[0].value.as< std::string > ()));
       }
-#line 3595 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 284:
-#line 2076 "seclang-parser.yy" // lalr1.cc:859
-    {
-        ACTION_NOT_SUPPORTED("Exec", yystack_[1].location);
-      }
 #line 3603 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 284:
+#line 2084 "seclang-parser.yy" // lalr1.cc:859
+    {
+        ACTION_NOT_SUPPORTED("Exec", yystack_[1].location);
+      }
+#line 3611 "seclang-parser.cc" // lalr1.cc:859
+    break;
+
   case 285:
-#line 2080 "seclang-parser.yy" // lalr1.cc:859
+#line 2088 "seclang-parser.yy" // lalr1.cc:859
     {
         //ACTION_NOT_SUPPORTED("ExpireVar", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[0].value.as< std::string > ()));
       }
-#line 3612 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 286:
-#line 2085 "seclang-parser.yy" // lalr1.cc:859
-    {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::RuleId(yystack_[0].value.as< std::string > ()));
-      }
 #line 3620 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 287:
-#line 2089 "seclang-parser.yy" // lalr1.cc:859
+  case 286:
+#line 2093 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::InitCol(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::RuleId(yystack_[0].value.as< std::string > ()));
       }
 #line 3628 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 288:
-#line 2093 "seclang-parser.yy" // lalr1.cc:859
+  case 287:
+#line 2097 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::LogData(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::InitCol(yystack_[0].value.as< std::string > ()));
       }
 #line 3636 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 289:
-#line 2097 "seclang-parser.yy" // lalr1.cc:859
+  case 288:
+#line 2101 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Log(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::LogData(yystack_[0].value.as< std::string > ()));
       }
 #line 3644 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 290:
-#line 2101 "seclang-parser.yy" // lalr1.cc:859
+  case 289:
+#line 2105 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Maturity(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Log(yystack_[0].value.as< std::string > ()));
       }
 #line 3652 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 291:
-#line 2105 "seclang-parser.yy" // lalr1.cc:859
+  case 290:
+#line 2109 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Msg(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Maturity(yystack_[0].value.as< std::string > ()));
       }
 #line 3660 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 292:
-#line 2109 "seclang-parser.yy" // lalr1.cc:859
+  case 291:
+#line 2113 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::MultiMatch(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Msg(yystack_[0].value.as< std::string > ()));
       }
 #line 3668 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 293:
-#line 2113 "seclang-parser.yy" // lalr1.cc:859
+  case 292:
+#line 2117 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::NoAuditLog(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::MultiMatch(yystack_[0].value.as< std::string > ()));
       }
 #line 3676 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 294:
-#line 2117 "seclang-parser.yy" // lalr1.cc:859
+  case 293:
+#line 2121 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::NoLog(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::NoAuditLog(yystack_[0].value.as< std::string > ()));
       }
 #line 3684 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 295:
-#line 2121 "seclang-parser.yy" // lalr1.cc:859
+  case 294:
+#line 2125 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Pass(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::NoLog(yystack_[0].value.as< std::string > ()));
       }
 #line 3692 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 296:
-#line 2125 "seclang-parser.yy" // lalr1.cc:859
+  case 295:
+#line 2129 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("Pause", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Pass(yystack_[0].value.as< std::string > ()));
       }
 #line 3700 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 297:
-#line 2129 "seclang-parser.yy" // lalr1.cc:859
+  case 296:
+#line 2133 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Phase(yystack_[0].value.as< std::string > ()));
+        ACTION_NOT_SUPPORTED("Pause", yystack_[1].location);
       }
 #line 3708 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 298:
-#line 2133 "seclang-parser.yy" // lalr1.cc:859
+  case 297:
+#line 2137 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("Prepend", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Phase(yystack_[0].value.as< std::string > ()));
       }
 #line 3716 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 299:
-#line 2137 "seclang-parser.yy" // lalr1.cc:859
+  case 298:
+#line 2141 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("Proxy", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("Prepend", yystack_[1].location);
       }
 #line 3724 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 300:
-#line 2141 "seclang-parser.yy" // lalr1.cc:859
+  case 299:
+#line 2145 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Redirect(yystack_[0].value.as< std::string > ()));
+        ACTION_NOT_SUPPORTED("Proxy", yystack_[1].location);
       }
 #line 3732 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 301:
-#line 2145 "seclang-parser.yy" // lalr1.cc:859
+  case 300:
+#line 2149 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Rev(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Redirect(yystack_[0].value.as< std::string > ()));
       }
 #line 3740 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 302:
-#line 2149 "seclang-parser.yy" // lalr1.cc:859
+  case 301:
+#line 2153 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("SanatiseArg", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Rev(yystack_[0].value.as< std::string > ()));
       }
 #line 3748 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 303:
-#line 2153 "seclang-parser.yy" // lalr1.cc:859
+  case 302:
+#line 2157 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("SanatiseMatched", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseArg", yystack_[1].location);
       }
 #line 3756 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 304:
-#line 2157 "seclang-parser.yy" // lalr1.cc:859
+  case 303:
+#line 2161 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("SanatiseMatchedBytes", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseMatched", yystack_[1].location);
       }
 #line 3764 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 305:
-#line 2161 "seclang-parser.yy" // lalr1.cc:859
+  case 304:
+#line 2165 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("SanatiseRequestHeader", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseMatchedBytes", yystack_[1].location);
       }
 #line 3772 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 306:
-#line 2165 "seclang-parser.yy" // lalr1.cc:859
+  case 305:
+#line 2169 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("SanatiseResponseHeader", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseRequestHeader", yystack_[1].location);
       }
 #line 3780 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 307:
-#line 2169 "seclang-parser.yy" // lalr1.cc:859
+  case 306:
+#line 2173 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("SetEnv", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseResponseHeader", yystack_[1].location);
       }
 #line 3788 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 308:
-#line 2173 "seclang-parser.yy" // lalr1.cc:859
+  case 307:
+#line 2177 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("SetRSC", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SetEnv", yystack_[1].location);
       }
 #line 3796 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 309:
-#line 2177 "seclang-parser.yy" // lalr1.cc:859
+  case 308:
+#line 2181 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetSID(yystack_[0].value.as< std::string > ()));
+        ACTION_NOT_SUPPORTED("SetRSC", yystack_[1].location);
       }
 #line 3804 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 310:
-#line 2181 "seclang-parser.yy" // lalr1.cc:859
+  case 309:
+#line 2185 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetUID(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetSID(yystack_[0].value.as< std::string > ()));
       }
 #line 3812 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 311:
-#line 2185 "seclang-parser.yy" // lalr1.cc:859
+  case 310:
+#line 2189 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::unsetOperation, yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetUID(yystack_[0].value.as< std::string > ()));
       }
 #line 3820 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 312:
-#line 2189 "seclang-parser.yy" // lalr1.cc:859
+  case 311:
+#line 2193 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setToOneOperation, yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::unsetOperation, yystack_[0].value.as< std::string > ()));
       }
 #line 3828 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 313:
-#line 2193 "seclang-parser.yy" // lalr1.cc:859
+  case 312:
+#line 2197 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setOperation, yystack_[2].value.as< std::string > (), yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setToOneOperation, yystack_[0].value.as< std::string > ()));
       }
 #line 3836 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 314:
-#line 2197 "seclang-parser.yy" // lalr1.cc:859
+  case 313:
+#line 2201 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, yystack_[2].value.as< std::string > (), yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setOperation, yystack_[2].value.as< std::string > (), yystack_[0].value.as< std::string > ()));
       }
 #line 3844 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 315:
-#line 2201 "seclang-parser.yy" // lalr1.cc:859
+  case 314:
+#line 2205 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, yystack_[2].value.as< std::string > (), yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, yystack_[2].value.as< std::string > (), yystack_[0].value.as< std::string > ()));
       }
 #line 3852 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 316:
-#line 2205 "seclang-parser.yy" // lalr1.cc:859
+  case 315:
+#line 2209 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Severity(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, yystack_[2].value.as< std::string > (), yystack_[0].value.as< std::string > ()));
       }
 #line 3860 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 317:
-#line 2209 "seclang-parser.yy" // lalr1.cc:859
+  case 316:
+#line 2213 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Skip(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Severity(yystack_[0].value.as< std::string > ()));
       }
 #line 3868 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 318:
-#line 2213 "seclang-parser.yy" // lalr1.cc:859
+  case 317:
+#line 2217 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SkipAfter(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Skip(yystack_[0].value.as< std::string > ()));
       }
 #line 3876 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 319:
-#line 2217 "seclang-parser.yy" // lalr1.cc:859
+  case 318:
+#line 2221 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::data::Status(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SkipAfter(yystack_[0].value.as< std::string > ()));
       }
 #line 3884 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 320:
-#line 2221 "seclang-parser.yy" // lalr1.cc:859
+  case 319:
+#line 2225 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Tag(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::data::Status(yystack_[0].value.as< std::string > ()));
       }
 #line 3892 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 321:
-#line 2225 "seclang-parser.yy" // lalr1.cc:859
+  case 320:
+#line 2229 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Ver(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Tag(yystack_[0].value.as< std::string > ()));
       }
 #line 3900 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 322:
-#line 2229 "seclang-parser.yy" // lalr1.cc:859
+  case 321:
+#line 2233 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::XmlNS(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Ver(yystack_[0].value.as< std::string > ()));
       }
 #line 3908 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 323:
-#line 2233 "seclang-parser.yy" // lalr1.cc:859
+  case 322:
+#line 2237 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityZero7bit(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::XmlNS(yystack_[0].value.as< std::string > ()));
       }
 #line 3916 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 324:
-#line 2237 "seclang-parser.yy" // lalr1.cc:859
+  case 323:
+#line 2241 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityOdd7bit(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityZero7bit(yystack_[0].value.as< std::string > ()));
       }
 #line 3924 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 325:
-#line 2241 "seclang-parser.yy" // lalr1.cc:859
+  case 324:
+#line 2245 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityEven7bit(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityOdd7bit(yystack_[0].value.as< std::string > ()));
       }
 #line 3932 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 326:
-#line 2245 "seclang-parser.yy" // lalr1.cc:859
+  case 325:
+#line 2249 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::SqlHexDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityEven7bit(yystack_[0].value.as< std::string > ()));
       }
 #line 3940 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 327:
-#line 2249 "seclang-parser.yy" // lalr1.cc:859
+  case 326:
+#line 2253 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CmdLine(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::SqlHexDecode(yystack_[0].value.as< std::string > ()));
       }
 #line 3948 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 328:
-#line 2253 "seclang-parser.yy" // lalr1.cc:859
+  case 327:
+#line 2257 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Sha1(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CmdLine(yystack_[0].value.as< std::string > ()));
       }
 #line 3956 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 329:
-#line 2257 "seclang-parser.yy" // lalr1.cc:859
+  case 328:
+#line 2261 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Md5(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Sha1(yystack_[0].value.as< std::string > ()));
       }
 #line 3964 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 330:
-#line 2261 "seclang-parser.yy" // lalr1.cc:859
+  case 329:
+#line 2265 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HexEncode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Md5(yystack_[0].value.as< std::string > ()));
       }
 #line 3972 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 331:
-#line 2265 "seclang-parser.yy" // lalr1.cc:859
+  case 330:
+#line 2269 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::LowerCase(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HexEncode(yystack_[0].value.as< std::string > ()));
       }
 #line 3980 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 332:
-#line 2269 "seclang-parser.yy" // lalr1.cc:859
+  case 331:
+#line 2273 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecodeUni(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::LowerCase(yystack_[0].value.as< std::string > ()));
       }
 #line 3988 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 333:
-#line 2273 "seclang-parser.yy" // lalr1.cc:859
+  case 332:
+#line 2277 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecodeUni(yystack_[0].value.as< std::string > ()));
       }
 #line 3996 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 334:
-#line 2277 "seclang-parser.yy" // lalr1.cc:859
+  case 333:
+#line 2281 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::None(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecode(yystack_[0].value.as< std::string > ()));
       }
 #line 4004 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 335:
-#line 2281 "seclang-parser.yy" // lalr1.cc:859
+  case 334:
+#line 2285 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CompressWhitespace(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::None(yystack_[0].value.as< std::string > ()));
       }
 #line 4012 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 336:
-#line 2285 "seclang-parser.yy" // lalr1.cc:859
+  case 335:
+#line 2289 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveWhitespace(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CompressWhitespace(yystack_[0].value.as< std::string > ()));
       }
 #line 4020 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 337:
-#line 2289 "seclang-parser.yy" // lalr1.cc:859
+  case 336:
+#line 2293 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceNulls(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveWhitespace(yystack_[0].value.as< std::string > ()));
       }
 #line 4028 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 338:
-#line 2293 "seclang-parser.yy" // lalr1.cc:859
+  case 337:
+#line 2297 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveNulls(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceNulls(yystack_[0].value.as< std::string > ()));
       }
 #line 4036 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 339:
-#line 2297 "seclang-parser.yy" // lalr1.cc:859
+  case 338:
+#line 2301 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HtmlEntityDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveNulls(yystack_[0].value.as< std::string > ()));
       }
 #line 4044 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 340:
-#line 2301 "seclang-parser.yy" // lalr1.cc:859
+  case 339:
+#line 2305 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::JsDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HtmlEntityDecode(yystack_[0].value.as< std::string > ()));
       }
 #line 4052 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 341:
-#line 2305 "seclang-parser.yy" // lalr1.cc:859
+  case 340:
+#line 2309 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CssDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::JsDecode(yystack_[0].value.as< std::string > ()));
       }
 #line 4060 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 342:
-#line 2309 "seclang-parser.yy" // lalr1.cc:859
+  case 341:
+#line 2313 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Trim(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CssDecode(yystack_[0].value.as< std::string > ()));
       }
 #line 4068 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 343:
-#line 2313 "seclang-parser.yy" // lalr1.cc:859
+  case 342:
+#line 2317 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePathWin(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Trim(yystack_[0].value.as< std::string > ()));
       }
 #line 4076 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 344:
-#line 2317 "seclang-parser.yy" // lalr1.cc:859
+  case 343:
+#line 2321 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePath(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePathWin(yystack_[0].value.as< std::string > ()));
       }
 #line 4084 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 345:
-#line 2321 "seclang-parser.yy" // lalr1.cc:859
+  case 344:
+#line 2325 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Length(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePath(yystack_[0].value.as< std::string > ()));
       }
 #line 4092 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 346:
-#line 2325 "seclang-parser.yy" // lalr1.cc:859
+  case 345:
+#line 2329 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Utf8ToUnicode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Length(yystack_[0].value.as< std::string > ()));
       }
 #line 4100 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 347:
-#line 2329 "seclang-parser.yy" // lalr1.cc:859
+  case 346:
+#line 2333 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveCommentsChar(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Utf8ToUnicode(yystack_[0].value.as< std::string > ()));
       }
 #line 4108 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 348:
-#line 2333 "seclang-parser.yy" // lalr1.cc:859
+  case 347:
+#line 2337 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveComments(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveCommentsChar(yystack_[0].value.as< std::string > ()));
       }
 #line 4116 "seclang-parser.cc" // lalr1.cc:859
     break;
 
-  case 349:
-#line 2337 "seclang-parser.yy" // lalr1.cc:859
+  case 348:
+#line 2341 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceComments(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveComments(yystack_[0].value.as< std::string > ()));
       }
 #line 4124 "seclang-parser.cc" // lalr1.cc:859
     break;
 
+  case 349:
+#line 2345 "seclang-parser.yy" // lalr1.cc:859
+    {
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceComments(yystack_[0].value.as< std::string > ()));
+      }
+#line 4132 "seclang-parser.cc" // lalr1.cc:859
+    break;
 
-#line 4128 "seclang-parser.cc" // lalr1.cc:859
+
+#line 4136 "seclang-parser.cc" // lalr1.cc:859
             default:
               break;
             }
@@ -4959,33 +4967,33 @@ namespace yy {
      922,   926,   930,   934,   938,   942,   946,   950,   954,   958,
      962,   966,   970,   974,   978,   982,   986,   990,   994,  1008,
     1009,  1033,  1052,  1067,  1075,  1122,  1126,  1130,  1134,  1138,
-    1142,  1146,  1150,  1154,  1158,  1172,  1184,  1204,  1224,  1229,
-    1234,  1239,  1244,  1248,  1252,  1256,  1260,  1264,  1268,  1269,
-    1270,  1281,  1285,  1289,  1290,  1291,  1292,  1293,  1294,  1295,
-    1301,  1305,  1312,  1317,  1323,  1329,  1335,  1342,  1352,  1356,
-    1360,  1364,  1368,  1372,  1376,  1380,  1384,  1388,  1392,  1396,
-    1400,  1404,  1408,  1412,  1416,  1420,  1424,  1428,  1432,  1436,
-    1440,  1444,  1448,  1452,  1456,  1460,  1464,  1468,  1472,  1476,
-    1480,  1484,  1488,  1492,  1496,  1500,  1504,  1508,  1512,  1516,
-    1520,  1524,  1528,  1532,  1536,  1540,  1544,  1548,  1552,  1556,
-    1560,  1564,  1568,  1572,  1576,  1580,  1584,  1588,  1593,  1597,
-    1601,  1606,  1610,  1614,  1619,  1623,  1627,  1632,  1636,  1640,
-    1647,  1651,  1655,  1659,  1663,  1667,  1671,  1675,  1679,  1683,
-    1687,  1691,  1695,  1699,  1703,  1707,  1711,  1715,  1719,  1723,
-    1727,  1731,  1735,  1739,  1743,  1747,  1751,  1755,  1759,  1763,
-    1767,  1771,  1775,  1779,  1783,  1787,  1791,  1795,  1799,  1803,
-    1807,  1811,  1815,  1819,  1823,  1827,  1831,  1835,  1839,  1843,
-    1847,  1851,  1855,  1859,  1863,  1867,  1875,  1882,  1889,  1896,
-    1903,  1910,  1917,  1924,  1931,  1938,  1945,  1952,  1962,  1966,
-    1970,  1974,  1978,  1982,  1986,  1990,  1995,  2000,  2005,  2009,
-    2013,  2017,  2022,  2027,  2031,  2035,  2040,  2045,  2050,  2054,
-    2058,  2062,  2066,  2070,  2075,  2079,  2084,  2088,  2092,  2096,
-    2100,  2104,  2108,  2112,  2116,  2120,  2124,  2128,  2132,  2136,
-    2140,  2144,  2148,  2152,  2156,  2160,  2164,  2168,  2172,  2176,
-    2180,  2184,  2188,  2192,  2196,  2200,  2204,  2208,  2212,  2216,
-    2220,  2224,  2228,  2232,  2236,  2240,  2244,  2248,  2252,  2256,
-    2260,  2264,  2268,  2272,  2276,  2280,  2284,  2288,  2292,  2296,
-    2300,  2304,  2308,  2312,  2316,  2320,  2324,  2328,  2332,  2336
+    1142,  1146,  1150,  1154,  1158,  1172,  1184,  1204,  1232,  1237,
+    1242,  1247,  1252,  1256,  1260,  1264,  1268,  1272,  1276,  1277,
+    1278,  1289,  1293,  1297,  1298,  1299,  1300,  1301,  1302,  1303,
+    1309,  1313,  1320,  1325,  1331,  1337,  1343,  1350,  1360,  1364,
+    1368,  1372,  1376,  1380,  1384,  1388,  1392,  1396,  1400,  1404,
+    1408,  1412,  1416,  1420,  1424,  1428,  1432,  1436,  1440,  1444,
+    1448,  1452,  1456,  1460,  1464,  1468,  1472,  1476,  1480,  1484,
+    1488,  1492,  1496,  1500,  1504,  1508,  1512,  1516,  1520,  1524,
+    1528,  1532,  1536,  1540,  1544,  1548,  1552,  1556,  1560,  1564,
+    1568,  1572,  1576,  1580,  1584,  1588,  1592,  1596,  1601,  1605,
+    1609,  1614,  1618,  1622,  1627,  1631,  1635,  1640,  1644,  1648,
+    1655,  1659,  1663,  1667,  1671,  1675,  1679,  1683,  1687,  1691,
+    1695,  1699,  1703,  1707,  1711,  1715,  1719,  1723,  1727,  1731,
+    1735,  1739,  1743,  1747,  1751,  1755,  1759,  1763,  1767,  1771,
+    1775,  1779,  1783,  1787,  1791,  1795,  1799,  1803,  1807,  1811,
+    1815,  1819,  1823,  1827,  1831,  1835,  1839,  1843,  1847,  1851,
+    1855,  1859,  1863,  1867,  1871,  1875,  1883,  1890,  1897,  1904,
+    1911,  1918,  1925,  1932,  1939,  1946,  1953,  1960,  1970,  1974,
+    1978,  1982,  1986,  1990,  1994,  1998,  2003,  2008,  2013,  2017,
+    2021,  2025,  2030,  2035,  2039,  2043,  2048,  2053,  2058,  2062,
+    2066,  2070,  2074,  2078,  2083,  2087,  2092,  2096,  2100,  2104,
+    2108,  2112,  2116,  2120,  2124,  2128,  2132,  2136,  2140,  2144,
+    2148,  2152,  2156,  2160,  2164,  2168,  2172,  2176,  2180,  2184,
+    2188,  2192,  2196,  2200,  2204,  2208,  2212,  2216,  2220,  2224,
+    2228,  2232,  2236,  2240,  2244,  2248,  2252,  2256,  2260,  2264,
+    2268,  2272,  2276,  2280,  2284,  2288,  2292,  2296,  2300,  2304,
+    2308,  2312,  2316,  2320,  2324,  2328,  2332,  2336,  2340,  2344
   };
 
   // Print the state stack on the debug stream.
@@ -5020,8 +5028,8 @@ namespace yy {
 
 
 } // yy
-#line 5024 "seclang-parser.cc" // lalr1.cc:1167
-#line 2342 "seclang-parser.yy" // lalr1.cc:1168
+#line 5032 "seclang-parser.cc" // lalr1.cc:1167
+#line 2350 "seclang-parser.yy" // lalr1.cc:1168
 
 
 void yy::seclang_parser::error (const location_type& l, const std::string& m) {

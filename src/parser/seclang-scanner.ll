@@ -882,21 +882,23 @@ EQUALS_MINUS                            (?i:=\-)
 
 
 {CONFIG_INCLUDE}[ ]{CONFIG_VALUE_PATH} {
+    std::string err;
     const char *file = strchr(yytext, ' ') + 1;
-    std::string fi = modsecurity::utils::find_resource(file, driver.ref.back());
+    std::string fi = modsecurity::utils::find_resource(file, driver.ref.back(), &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
-        driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file."));
+        driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
         throw p::syntax_error(*driver.loc.back(), "");
     }
     std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
     files.reverse();
     for (auto& s: files) {
-        std::string f = modsecurity::utils::find_resource(s, driver.ref.back());
+        std::string err;
+        std::string f = modsecurity::utils::find_resource(s, driver.ref.back(), &err);
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
-            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
+            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
             throw p::syntax_error(*driver.loc.back(), "");
         }
         driver.ref.push_back(f);
@@ -906,23 +908,24 @@ EQUALS_MINUS                            (?i:=\-)
 }
 
 {CONFIG_INCLUDE}[ ]["]{CONFIG_VALUE_PATH}["] {
+    std::string err;
     const char *file = strchr(yytext, ' ') + 1;
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
-    std::string fi = modsecurity::utils::find_resource(f, driver.ref.back());
+    std::string fi = modsecurity::utils::find_resource(f, driver.ref.back(), &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
-        driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file."));
+        driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
         throw p::syntax_error(*driver.loc.back(), "");
     }
     std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
     files.reverse();
     for (auto& s: files) {
-        std::string f = modsecurity::utils::find_resource(s, driver.ref.back());
+        std::string f = modsecurity::utils::find_resource(s, driver.ref.back(), &err);
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
-            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
+            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
             throw p::syntax_error(*driver.loc.back(), "");
         }
         driver.ref.push_back(f.c_str());
