@@ -1271,6 +1271,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
         if (been_opened == 1) {
             yajl_gen_map_close(g); // sanitized args map is finished
         }
+#ifdef LOG_NO_PRODUCER
+		}
+#endif
 
         /* Web application info. */
         if ( ((msr->txcfg->webappid != NULL)&&(strcmp(msr->txcfg->webappid, "default") != 0))
@@ -1326,9 +1329,6 @@ void sec_audit_logger_json(modsec_rec *msr) {
         }
     }
 
-#ifdef LOG_NO_PRODUCER
-        }
-#endif
     yajl_gen_map_close(g); // audit_data top-level key is finished
 
     /* AUDITLOG_PART_UPLOADS */
@@ -2013,6 +2013,9 @@ void sec_audit_logger_native(modsec_rec *msr) {
             sec_auditlog_write(msr, text, strlen(text));
         }
 
+#ifdef LOG_NO_PRODUCER
+        if (msr->txcfg->debuglog_level >= 9) {
+#endif
         sec_auditlog_write_producer_header(msr);
 
         /* Server */
@@ -2082,7 +2085,10 @@ void sec_audit_logger_native(modsec_rec *msr) {
             }
         }
 
-        /* Web application info. */
+#ifdef LOG_NO_PRODUCER
+	    }
+#endif
+		/* Web application info. */
         if ( ((msr->txcfg->webappid != NULL)&&(strcmp(msr->txcfg->webappid, "default") != 0))
             || (msr->sessionid != NULL) || (msr->userid != NULL))
         {

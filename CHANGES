@@ -1,9 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
- * {dis|en}able-dechunk-logging: Option to disable logging of
-   dechunking in audit log when log level < 9.
-   [Issue #1068 - Marc Stern]
+ * {dis|en}able-log-producer-logging: Option to disable logging of
+   log producer in audit log.
+   [Issue #1069 - Marc Stern]
  * {dis|en}able-handler-logging: Option to disable logging of Apache handler
    in audit log
    [Issue #1070, #1381 - Marc Stern]
