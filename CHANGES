@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Fix SecConn(Read|Write)StateLimit on Apache 2.4
+   [Issue #1340, #1337, #786 - Sander Hoentjen]
  * {dis|en}able-stopwatch-logging: Option to disable logging of stopwatches
    in audit log.
    [Issue #1067 - Marc Stern]
