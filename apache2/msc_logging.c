@@ -1165,11 +1165,17 @@ void sec_audit_logger_json(modsec_rec *msr) {
 
 
         /* Stopwatch2 */
+#ifdef DLOG_NO_STOPWATCH
+        if (msr->txcfg->debuglog_level >= 9)
+#endif
         format_performance_variables_json(msr, g);
 
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
+#ifdef LOG_NO_DECHUNK
+        if (msr->txcfg->debuglog_level >= 9)
+#endif
         if (wrote_response_body) {
             yajl_kv_bool(g, "response_body_dechunked", 1);
         }
@@ -1992,6 +1998,9 @@ void sec_audit_logger_native(modsec_rec *msr) {
         }
 
         /* Stopwatch; left in for compatibility reasons */
+#ifdef DLOG_NO_STOPWATCH
+	if (msr->txcfg->debuglog_level >= 9) {
+#endif
         text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
             msr->request_time, (now - msr->request_time));
         sec_auditlog_write(msr, text, strlen(text));
@@ -2004,10 +2013,16 @@ void sec_audit_logger_native(modsec_rec *msr) {
                 "; %s\n", msr->request_time, (now - msr->request_time), perf_all);
             sec_auditlog_write(msr, text, strlen(text));
         }
+#ifdef DLOG_NO_STOPWATCH
+        }
+#endif
 
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
+#ifdef LOG_NO_DECHUNK
+	if (msr->txcfg->debuglog_level >= 9)
+#endif
         if (wrote_response_body) {
             text = apr_psprintf(msr->mp, "Response-Body-Transformed: Dechunked\n");
             sec_auditlog_write(msr, text, strlen(text));

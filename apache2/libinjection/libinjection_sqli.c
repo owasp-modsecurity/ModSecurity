@@ -1,5 +1,5 @@
 /**
- * Copyright 2012,2013  Nick Galbreath
+ * Copyright 2012,2016  Nick Galbreath
  * nickg@client9.com
  * BSD License -- see COPYING.txt for details
  *
@@ -112,15 +112,11 @@ memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
     }
 
     while (cur < last) {
-        if (cur[0] == c0) {
-            if (cur[1] == c1) {
-                return cur;
-            } else {
-                cur += 2; /* (c0 == c1) ? 1 : 2; */
-            }
-        } else {
-            cur += 1;
+        /* safe since cur < len - 1 always */
+        if (cur[0] == c0 && cur[1] == c1) {
+            return cur;
         }
+        cur += 1;
     }
 
     return NULL;
@@ -191,11 +187,11 @@ static int char_is_white(char ch) {
     /* ' '  space is 0x32
        '\t  0x09 \011 horizontal tab
        '\n' 0x0a \012 new line
-       '\v' 0x0b \013 verical tab
+       '\v' 0x0b \013 vertical tab
        '\f' 0x0c \014 new page
        '\r' 0x0d \015 carriage return
             0x00 \000 null (oracle)
-            0xa0 \240 is latin1
+            0xa0 \240 is Latin-1
     */
     return strchr(" \t\n\v\f\r\240\000", ch) != NULL;
 }
@@ -294,7 +290,7 @@ static void st_clear(stoken_t * st)
 static void st_assign_char(stoken_t * st, const char stype, size_t pos, size_t len,
                            const char value)
 {
-    /* done to elimiate unused warning */
+    /* done to eliminate unused warning */
     (void)len;
     st->type = (char) stype;
     st->pos = pos;
@@ -402,7 +398,7 @@ static size_t parse_eol_comment(struct libinjection_sqli_state * sf)
     }
 }
 
-/** In Ansi mode, hash is an operator
+/** In ANSI mode, hash is an operator
  *  In MYSQL mode, it's a EOL comment like '--'
  */
 static size_t parse_hash(struct libinjection_sqli_state * sf)
@@ -842,7 +838,7 @@ static size_t parse_bstring(struct libinjection_sqli_state *sf)
 
 /*
  * hex literal string
- * re: [XX]'[0123456789abcdefABCDEF]*'
+ * re: [xX]'[0123456789abcdefABCDEF]*'
  * mysql has requirement of having EVEN number of chars,
  *  but pgsql does not
  */
@@ -1072,7 +1068,7 @@ static size_t parse_money(struct libinjection_sqli_state *sf)
             /* we have $foobar$ ... find it again */
             strend = my_memmem(cs+xlen+2, slen - (pos+xlen+2), cs + pos, xlen+2);
 
-            if (strend == NULL) {
+            if (strend == NULL || ((size_t)(strend - cs) < (pos+xlen+2))) {
                 /* fell off edge */
                 st_assign(sf->current, TYPE_STRING, pos+xlen+2, slen - pos - xlen - 2, cs+pos+xlen+2);
                 sf->current->str_open = '$';
@@ -1104,7 +1100,6 @@ static size_t parse_number(struct libinjection_sqli_state * sf)
     const char *cs = sf->s;
     const size_t slen = sf->slen;
     size_t pos = sf->pos;
-    int have_dot = 0;
     int have_e = 0;
     int have_exp = 0;
 
@@ -1136,7 +1131,6 @@ static size_t parse_number(struct libinjection_sqli_state * sf)
     }
 
     if (pos < slen && cs[pos] == '.') {
-        have_dot = 1;
         pos += 1;
         while (pos < slen && ISDIGIT(cs[pos])) {
             pos += 1;
@@ -1185,7 +1179,7 @@ static size_t parse_number(struct libinjection_sqli_state * sf)
         }
     }
 
-    if (have_dot == 1 && have_e == 1 && have_exp == 0) {
+    if (have_e == 1 && have_exp == 0) {
         /* very special form of
          * "1234.e"
          * "10.10E"
@@ -1242,29 +1236,13 @@ int libinjection_sqli_tokenize(struct libinjection_sqli_state * sf)
         const unsigned char ch = (unsigned char) (s[*pos]);
 
         /*
-         * if not ascii, then continue...
-         *   actually probably need to just assuming
-         *   it's a string
+         * look up the parser, and call it
+         *
+         * Porting Note: this is mapping of char to function
+         *   charparsers[ch]()
          */
-        if (ch > 127) {
+        fnptr = char_parse_map[ch];
 
-            /* 160 or 0xA0 or octal 240 is "latin1 non-breaking space"
-             * but is treated as a space in mysql.
-             */
-            if (ch == 160) {
-                fnptr = parse_white;
-            } else {
-                fnptr = parse_word;
-            }
-        } else {
-            /*
-             * look up the parser, and call it
-             *
-             * Porting Note: this is mapping of char to function
-             *   charparsers[ch]()
-             */
-            fnptr = char_parse_map[ch];
-        }
         *pos = (*fnptr) (sf);
 
         /*
@@ -1349,16 +1327,22 @@ static int syntax_merge_words(struct libinjection_sqli_state * sf,stoken_t * a, 
          a->type == TYPE_UNION ||
          a->type == TYPE_FUNCTION ||
          a->type == TYPE_EXPRESSION ||
+         a->type == TYPE_TSQL ||
          a->type == TYPE_SQLTYPE)) {
-        return CHAR_NULL;
+        return FALSE;
     }
 
-    if (b->type != TYPE_KEYWORD  && b->type != TYPE_BAREWORD &&
-        b->type != TYPE_OPERATOR && b->type != TYPE_SQLTYPE &&
-        b->type != TYPE_LOGIC_OPERATOR &&
-        b->type != TYPE_FUNCTION &&
-        b->type != TYPE_UNION    && b->type != TYPE_EXPRESSION) {
-        return CHAR_NULL;
+    if (!
+        (b->type == TYPE_KEYWORD ||
+         b->type == TYPE_BAREWORD ||
+         b->type == TYPE_OPERATOR ||
+         b->type == TYPE_UNION ||
+         b->type == TYPE_FUNCTION ||
+         b->type == TYPE_EXPRESSION ||
+         b->type == TYPE_TSQL ||
+         b->type == TYPE_SQLTYPE ||
+         b->type == TYPE_LOGIC_OPERATOR)) {
+        return FALSE;
     }
 
     sz1 = a->len;
@@ -1374,7 +1358,6 @@ static int syntax_merge_words(struct libinjection_sqli_state * sf,stoken_t * a, 
     tmp[sz1] = ' ';
     memcpy(tmp + sz1 + 1, b->val, sz2);
     tmp[sz3] = CHAR_NULL;
-
     ch = sf->lookup(sf, LOOKUP_WORD, tmp, sz3);
 
     if (ch != CHAR_NULL) {
@@ -1450,6 +1433,13 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
                     sf->tokenvec[2].type == TYPE_COMMA &&
                     sf->tokenvec[3].type == TYPE_LEFTPARENS &&
                     sf->tokenvec[4].type == TYPE_NUMBER
+                    ) ||
+                (
+                    sf->tokenvec[0].type == TYPE_BAREWORD &&
+                    sf->tokenvec[1].type == TYPE_RIGHTPARENS &&
+                    sf->tokenvec[2].type == TYPE_OPERATOR &&
+                    sf->tokenvec[3].type == TYPE_LEFTPARENS &&
+                    sf->tokenvec[4].type == TYPE_BAREWORD
                     )
                 )
             {
@@ -1541,7 +1531,7 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
             continue;
         } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_VARIABLE) &&
                    sf->tokenvec[left+1].type == TYPE_LEFTPARENS && (
-                       /* TSQL functions but common enough to be collumn names */
+                       /* TSQL functions but common enough to be column names */
                        cstrcasecmp("USER_ID", sf->tokenvec[left].val, sf->tokenvec[left].len) == 0 ||
                        cstrcasecmp("USER_NAME", sf->tokenvec[left].val, sf->tokenvec[left].len) == 0 ||
 
@@ -1564,7 +1554,7 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
 
             /* pos is the same
              * other conversions need to go here... for instance
-             * password CAN be a function, coalese CAN be a function
+             * password CAN be a function, coalesce CAN be a function
              */
             sf->tokenvec[left].type = TYPE_FUNCTION;
             continue;
@@ -1828,7 +1818,7 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
              * 1,-sin(1) --> 1 (1)
              * Here, just do
              * 1,-sin(1) --> 1,sin(1)
-             * just remove unary opartor
+             * just remove unary operator
              */
             st_copy(&sf->tokenvec[left+1], &sf->tokenvec[left+2]);
             pos -= 1;
@@ -1852,8 +1842,20 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
             pos -= 1;
             left = 0;
             continue;
+        } else if ((sf->tokenvec[left].type == TYPE_FUNCTION) &&
+                   (sf->tokenvec[left+1].type == TYPE_LEFTPARENS) &&
+                   (sf->tokenvec[left+2].type != TYPE_RIGHTPARENS)) {
+            /*
+             * whats going on here
+             * Some SQL functions like USER() have 0 args
+             * if we get User(foo), then User is not a function
+             * This should be expanded since it eliminated a lot of false
+             * positives. 
+             */
+            if  (cstrcasecmp("USER", sf->tokenvec[left].val, sf->tokenvec[left].len) == 0) {
+                sf->tokenvec[left].type = TYPE_BAREWORD;
+            }
         }
-
 
         /* no folding -- assume left-most token is
            is good, now use the existing 2 tokens --
@@ -2019,7 +2021,7 @@ int libinjection_sqli_blacklist(struct libinjection_sqli_state* sql_state)
 }
 
 /*
- * return TRUE if sqli, false is benign
+ * return TRUE if SQLi, false is benign
  */
 int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
 {
@@ -2033,10 +2035,10 @@ int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
 
     if (tlen > 1 && sql_state->fingerprint[tlen-1] == TYPE_COMMENT) {
         /*
-         * if ending comment is contains 'sp_password' then it's sqli!
+         * if ending comment is contains 'sp_password' then it's SQLi!
          * MS Audit log apparently ignores anything with
-         * 'sp_password' in it. Unable to find primary refernece to
-         * this "feature" of SQL Server but seems to be known sqli
+         * 'sp_password' in it. Unable to find primary reference to
+         * this "feature" of SQL Server but seems to be known SQLi
          * technique
          */
         if (my_memmem(sql_state->s, sql_state->slen,
@@ -2055,7 +2057,7 @@ int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
 
         if (sql_state->fingerprint[1] == TYPE_UNION) {
             if (sql_state->stats_tokens == 2) {
-                /* not sure why but 1U comes up in Sqli attack
+                /* not sure why but 1U comes up in SQLi attack
                  * likely part of parameter splitting/etc.
                  * lots of reasons why "1 union" might be normal
                  * input, so beep only if other SQLi things are present
@@ -2080,7 +2082,7 @@ int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
 
         /*
          * for fingerprint like 'nc', only comments of /x are treated
-         * as SQL... ending comments of "--" and "#" are not sqli
+         * as SQL... ending comments of "--" and "#" are not SQLi
          */
         if (sql_state->tokenvec[0].type == TYPE_BAREWORD &&
             sql_state->tokenvec[1].type == TYPE_COMMENT &&
@@ -2090,7 +2092,7 @@ int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
         }
 
         /*
-         * if '1c' ends with '/x' then it's sqli
+         * if '1c' ends with '/x' then it's SQLi
          */
         if (sql_state->tokenvec[0].type == TYPE_NUMBER &&
             sql_state->tokenvec[1].type == TYPE_COMMENT &&
@@ -2113,13 +2115,13 @@ int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
         if (sql_state->tokenvec[0].type == TYPE_NUMBER &&
             sql_state->tokenvec[1].type == TYPE_COMMENT) {
             if (sql_state->stats_tokens > 2) {
-                /* we have some folding going on, highly likely sqli */
+                /* we have some folding going on, highly likely SQLi */
                 sql_state->reason = __LINE__;
                 return TRUE;
             }
             /*
              * we check that next character after the number is either whitespace,
-             * or '/' or a '-' ==> sqli.
+             * or '/' or a '-' ==> SQLi.
              */
             ch = sql_state->s[sql_state->tokenvec[0].len];
             if ( ch <= 32 ) {
@@ -2141,7 +2143,7 @@ int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
         }
 
         /*
-         * detect obvious sqli scans.. many people put '--' in plain text
+         * detect obvious SQLi scans.. many people put '--' in plain text
          * so only detect if input ends with '--', e.g. 1-- but not 1-- foo
          */
         if ((sql_state->tokenvec[1].len > 2)
@@ -2177,7 +2179,7 @@ int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
                 }
 
                 /*
-                 * not sqli
+                 * not SQLi
                  */
                 sql_state->reason = __LINE__;
                 return FALSE;
@@ -2186,8 +2188,8 @@ int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
                    streq(sql_state->fingerprint, "1&1") ||
                    streq(sql_state->fingerprint, "1&v") ||
                    streq(sql_state->fingerprint, "1&s")) {
-            /* 'sexy and 17' not sqli
-             * 'sexy and 17<18'  sqli
+            /* 'sexy and 17' not SQLi
+             * 'sexy and 17<18'  SQLi
              */
             if (sql_state->stats_tokens == 3) {
                 sql_state->reason = __LINE__;
@@ -2243,7 +2245,7 @@ int libinjection_is_sqli(struct libinjection_sqli_state * sql_state)
     size_t slen = sql_state->slen;
 
     /*
-     * no input? not sqli
+     * no input? not SQLi
      */
     if (slen == 0) {
         return FALSE;

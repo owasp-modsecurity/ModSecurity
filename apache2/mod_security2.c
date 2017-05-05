@@ -25,6 +25,10 @@
 #include "apr_optional.h"
 #include "mod_log_config.h"
 
+#ifdef APLOG_USE_MODULE
+APLOG_USE_MODULE(security2);
+#endif
+
 #include "msc_logging.h"
 #include "msc_util.h"
 
@@ -91,11 +95,6 @@ TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
 int (*modsecDropAction)(request_rec *r) = NULL;
 #endif
 static int server_limit, thread_limit;
-
-typedef struct {
-    int child_num;
-    int thread_num;
-} sb_handle;
 
 /* -- Miscellaneous functions -- */
 
@@ -266,9 +265,22 @@ int perform_interception(modsec_rec *msr) {
             #if !defined(WIN32) && !defined(VERSION_NGINX)
             {
                 extern module core_module;
-                apr_socket_t *csd = ap_get_module_config(msr->r->connection->conn_config,
-                    &core_module);
+                apr_socket_t *csd;
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2 && AP_SERVER_PATCHLEVEL_NUMBER > 17
+                /* For mod_http2 used by HTTP/2 there is a virtual connection so must go through
+                 * master to get the main connection or the drop request doesn't seem to do anything.
+                 * For HTTP/1.1 master will not be defined so just go through normal connection.
+                 * More details here: https://github.com/icing/mod_h2/issues/127
+                 */
+                if (msr->r->connection->master) {
+                    csd = ap_get_module_config(msr->r->connection->master->conn_config, &core_module);
+                } else {
+                    csd = ap_get_module_config(msr->r->connection->conn_config, &core_module);
+                }
+#else
+		csd = ap_get_module_config(msr->r->connection->conn_config, &core_module);
+#endif
                 if (csd) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {
                         status = HTTP_FORBIDDEN;
@@ -690,6 +702,11 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         ap_add_version_component(mp, new_server_signature);
         change_server_signature(s);
     }
+
+    /* For connection level hook */
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &server_limit);
+
 
 #if (!(defined(WIN32) || defined(NETWARE)))
 
@@ -1431,36 +1448,50 @@ static void modsec_register_operator(const char *name, void *fn_init, void *fn_e
  */
 static int hook_connection_early(conn_rec *conn)
 {
-    sb_handle *sb = conn->sbh;
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    ap_sb_handle_t *sbh = conn->sbh;
+    char *client_ip = conn->client_ip;
+#else
+    sb_handle *sbh = conn->sbh;
+    char *client_ip = conn->remote_ip;
+#endif
     int i, j;
     unsigned long int ip_count_r = 0, ip_count_w = 0;
     char *error_msg;
     worker_score *ws_record = NULL;
+
+    if (sbh != NULL && (conn_read_state_limit > 0 || conn_write_state_limit > 0)) {
+
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    ap_sb_handle_t *sbh = NULL;
-    char *client_ip = conn->client_ip;
+        ws_record = ap_get_scoreboard_worker(sbh);
 #else
-    char *client_ip = conn->remote_ip;
+        ws_record = ap_get_scoreboard_worker(sbh->child_num, sbh->thread_num);
 #endif
-
-    if (sb != NULL && (conn_read_state_limit > 0 || conn_write_state_limit > 0)) {
-
-        ws_record = &ap_scoreboard_image->servers[sb->child_num][sb->thread_num];
         if (ws_record == NULL)
             return DECLINED;
 
-        apr_cpystrn(ws_record->client, client_ip, sizeof(ws_record->client));
+        /* If ws_record does not have correct ip yet, we count it already */
+        if (strcmp(client_ip, ws_record->client) != 0) {
+            switch (ws_record->status) {
+                case SERVER_BUSY_READ:
+                    ip_count_r++;
+                    break;
+                case SERVER_BUSY_WRITE:
+                    ip_count_w++;
+                    break;
+                default:
+                    break;
+            }
+        }
 
+        ap_log_cerror(APLOG_MARK, APLOG_TRACE3, 0, conn,
+            "ModSecurity: going to loop through %d servers with %d threads",
+            server_limit, thread_limit);
         for (i = 0; i < server_limit; ++i) {
             for (j = 0; j < thread_limit; ++j) {
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-                sbh = conn->sbh;
-                if (sbh == NULL) {
-                    return DECLINED;
-                }
-
-                ws_record = ap_get_scoreboard_worker(sbh);
+                ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
 #else
                 ws_record = ap_get_scoreboard_worker(i, j);
 #endif
@@ -1485,6 +1516,10 @@ static int hook_connection_early(conn_rec *conn)
             }
         }
 
+        ap_log_cerror(APLOG_MARK, APLOG_TRACE3, 0, conn,
+            "ModSecurity: threads in READ: %ld of %ld, WRITE: %ld of %ld, IP: %s",
+            ip_count_r, conn_read_state_limit, ip_count_w, conn_write_state_limit, client_ip);
+
         if (conn_read_state_limit > 0 && ip_count_r > conn_read_state_limit)
         {
             if (conn_read_state_suspicious_list &&
@@ -1492,7 +1527,7 @@ static int hook_connection_early(conn_rec *conn)
                    conn_read_state_suspicious_list, client_ip, NULL, &error_msg) <= 0))
             {
                 if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                         "ModSecurity: Too many threads [%ld] of %ld allowed " \
                         "in READ state from %s - There is a suspission list " \
                         "but that IP is not part of it, access granted",
@@ -1502,7 +1537,7 @@ static int hook_connection_early(conn_rec *conn)
                 conn_read_state_whitelist, client_ip, NULL, &error_msg) > 0)
             {
                 if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                         "ModSecurity: Too many threads [%ld] of %ld allowed " \
                         "in READ state from %s - Ip is on whitelist, access " \
                         "granted", ip_count_r, conn_read_state_limit,
@@ -1510,7 +1545,7 @@ static int hook_connection_early(conn_rec *conn)
             }
             else
             {
-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                     "ModSecurity: Access denied with code 400. Too many " \
                     "threads [%ld] of %ld allowed in READ state from %s - " \
                     "Possible DoS Consumption Attack [Rejected]", ip_count_r,
@@ -1528,7 +1563,7 @@ static int hook_connection_early(conn_rec *conn)
                     conn_write_state_suspicious_list, client_ip, NULL, &error_msg) <= 0))
             {
                 if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                         "ModSecurity: Too many threads [%ld] of %ld allowed " \
                         "in WRITE state from %s - There is a suspission list " \
                         "but that IP is not part of it, access granted",
@@ -1538,7 +1573,7 @@ static int hook_connection_early(conn_rec *conn)
                 conn_write_state_whitelist, client_ip, NULL, &error_msg) > 0)
             {
                 if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                         "ModSecurity: Too many threads [%ld] of %ld allowed " \
                         "in WRITE state from %s - Ip is on whitelist, " \
                         "access granted", ip_count_w, conn_read_state_limit,
@@ -1546,7 +1581,7 @@ static int hook_connection_early(conn_rec *conn)
             }
             else
             {
-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
                     "ModSecurity: Access denied with code 400. Too many " \
                     "threads [%ld] of %ld allowed in WRITE state from %s - " \
                     "Possible DoS Consumption Attack [Rejected]", ip_count_w,
@@ -1654,10 +1689,6 @@ static void register_hooks(apr_pool_t *mp) {
     APR_REGISTER_OPTIONAL_FN(modsec_register_variable);
     APR_REGISTER_OPTIONAL_FN(modsec_register_reqbody_processor);
 #endif
-
-    /* For connection level hook */
-    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &thread_limit);
-    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &server_limit);
 
     /* Main hooks */
     ap_hook_pre_config(hook_pre_config, NULL, NULL, APR_HOOK_FIRST);
