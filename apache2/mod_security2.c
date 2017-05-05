@@ -25,9 +25,11 @@
 #include "apr_optional.h"
 #include "mod_log_config.h"
 
-#ifdef APLOG_USE_MODULE
-APLOG_USE_MODULE(security2);
-#endif
+/*
+ * #ifdef APLOG_USE_MODULE
+ * APLOG_USE_MODULE(security2);
+ * #endif
+ */
 
 #include "msc_logging.h"
 #include "msc_util.h"
@@ -1437,6 +1439,14 @@ static void modsec_register_operator(const char *name, void *fn_init, void *fn_e
     }
 }
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#else
+typedef struct {
+    int child_num;
+    int thread_num;
+} sb_handle;
+#endif
+
 /**
  * \brief Connetion hook to limit the number of
  * connections in BUSY state
@@ -1484,7 +1494,7 @@ static int hook_connection_early(conn_rec *conn)
             }
         }
 
-        ap_log_cerror(APLOG_MARK, APLOG_TRACE3, 0, conn,
+        ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
             "ModSecurity: going to loop through %d servers with %d threads",
             server_limit, thread_limit);
         for (i = 0; i < server_limit; ++i) {
@@ -1516,7 +1526,7 @@ static int hook_connection_early(conn_rec *conn)
             }
         }
 
-        ap_log_cerror(APLOG_MARK, APLOG_TRACE3, 0, conn,
+        ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
             "ModSecurity: threads in READ: %ld of %ld, WRITE: %ld of %ld, IP: %s",
             ip_count_r, conn_read_state_limit, ip_count_w, conn_write_state_limit, client_ip);
 
