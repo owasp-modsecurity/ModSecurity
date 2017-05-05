@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Allow drop to work with mod_http2
+   [Issue #1308, #992 - @bazzadp]
  * Fix SecConn(Read|Write)StateLimit on Apache 2.4
    [Issue #1340, #1337, #786 - Sander Hoentjen]
  * {dis|en}able-stopwatch-logging: Option to disable logging of stopwatches
