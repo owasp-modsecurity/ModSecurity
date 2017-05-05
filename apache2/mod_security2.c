@@ -267,6 +267,7 @@ int perform_interception(modsec_rec *msr) {
                 extern module core_module;
                 apr_socket_t *csd;
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2 && AP_SERVER_PATCHLEVEL_NUMBER > 17
                 /* For mod_http2 used by HTTP/2 there is a virtual connection so must go through
                  * master to get the main connection or the drop request doesn't seem to do anything.
                  * For HTTP/1.1 master will not be defined so just go through normal connection.
@@ -277,7 +278,9 @@ int perform_interception(modsec_rec *msr) {
                 } else {
                     csd = ap_get_module_config(msr->r->connection->conn_config, &core_module);
                 }
-
+#else
+		csd = ap_get_module_config(msr->r->connection->conn_config, &core_module);
+#endif
                 if (csd) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {
                         status = HTTP_FORBIDDEN;
