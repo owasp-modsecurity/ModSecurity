@@ -487,19 +487,19 @@ AC_ARG_ENABLE(handler-logging,
   log_handler=''
 ])
 
-# Disable logging of log producer
-AC_ARG_ENABLE(log-producer-logging,
-              AS_HELP_STRING([--enable-log-producer-logging],
-                             [Enable logging of log producer in audit log when log level < 9. This is the default]),
+# Disable logging of server context
+AC_ARG_ENABLE(server-context-logging,
+              AS_HELP_STRING([--enable-server-context-logging],
+                             [Enable logging of server info (log producer, sanitized objects, ...) in audit log when log level < 9. This is the default]),
 [
   if test "$enableval" != "no"; then
-    log_producer=
+    log_server_context=
   else
-    log_producer="-DLOG_NO_PRODUCER"
+    log_server_context="-DLOG_NO_SERVER_CONTEXT"
   fi
 ],
 [
-  log_producer=''
+  log_server_context=''
 ])
 
 # Ignore configure errors
@@ -752,7 +752,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_producer"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_server_context"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
