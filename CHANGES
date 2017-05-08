@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * {dis|en}able-server-context-logging: Option to disable logging of
+   server info (log producer, sanitized objects, ...) in audit log.
+   [Issue #1069 - Marc Stern]
  * Allow drop to work with mod_http2
    [Issue #1308, #992 - @bazzadp]
  * Fix SecConn(Read|Write)StateLimit on Apache 2.4

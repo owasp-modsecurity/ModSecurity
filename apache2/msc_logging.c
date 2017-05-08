@@ -1180,6 +1180,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
             yajl_kv_bool(g, "response_body_dechunked", 1);
         }
 
+#ifdef LOG_NO_SERVER_CONTEXT
+        if (msr->txcfg->debuglog_level >= 9) {
+#endif
         sec_auditlog_write_producer_header_json(msr, g);
 
         /* Server */
@@ -1274,6 +1277,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
         if (been_opened == 1) {
             yajl_gen_map_close(g); // sanitized args map is finished
         }
+#ifdef LOG_NO_SERVER_CONTEXT
+		}
+#endif
 
         /* Web application info. */
         if ( ((msr->txcfg->webappid != NULL)&&(strcmp(msr->txcfg->webappid, "default") != 0))
@@ -2022,6 +2028,9 @@ void sec_audit_logger_native(modsec_rec *msr) {
             sec_auditlog_write(msr, text, strlen(text));
         }
 
+#ifdef LOG_NO_SERVER_CONTEXT
+        if (msr->txcfg->debuglog_level >= 9) {
+#endif
         sec_auditlog_write_producer_header(msr);
 
         /* Server */
@@ -2090,8 +2099,11 @@ void sec_audit_logger_native(modsec_rec *msr) {
                 sec_auditlog_write(msr, text, strlen(text));
             }
         }
+#ifdef LOG_NO_SERVER_CONTEXT
+		}
+#endif
 
-        /* Web application info. */
+		/* Web application info. */
         if ( ((msr->txcfg->webappid != NULL)&&(strcmp(msr->txcfg->webappid, "default") != 0))
             || (msr->sessionid != NULL) || (msr->userid != NULL))
         {
