@@ -520,7 +520,7 @@ AC_ARG_ENABLE(stopwatch-logging,
 # Disable logging of server context
 AC_ARG_ENABLE(server-context-logging,
               AS_HELP_STRING([--enable-server-context-logging],
-                             [Enable logging of server info (log producer, sanitized objects, ...) in audit log when log level < 9. This is the default]),
+                             [Enable logging of server info (log producer, sanitized objects, ...) in audit log even when log level < 9. This is the default]),
 [
   if test "$enableval" != "no"; then
     log_server_context=

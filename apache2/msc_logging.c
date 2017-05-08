@@ -1278,7 +1278,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
             yajl_gen_map_close(g); // sanitized args map is finished
         }
 #ifdef LOG_NO_SERVER_CONTEXT
-		}
+	}
 #endif
 
         /* Web application info. */
@@ -2100,10 +2100,10 @@ void sec_audit_logger_native(modsec_rec *msr) {
             }
         }
 #ifdef LOG_NO_SERVER_CONTEXT
-		}
+	}
 #endif
 
-		/* Web application info. */
+	/* Web application info. */
         if ( ((msr->txcfg->webappid != NULL)&&(strcmp(msr->txcfg->webappid, "default") != 0))
             || (msr->sessionid != NULL) || (msr->userid != NULL))
         {
