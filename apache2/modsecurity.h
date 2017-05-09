@@ -610,6 +610,7 @@ struct directory_config {
 
     /* Collection timeout */
     int col_timeout;
+    float col_gc_freq;
 
     /* hash of ids */
     apr_hash_t          *rule_id_htab;
