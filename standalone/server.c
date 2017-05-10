@@ -187,6 +187,11 @@ static char *http2env(apr_pool_t *a, const char *w)
     return res;
 }
 
+AP_DECLARE(apr_uint32_t) ap_random_pick(apr_uint32_t min, apr_uint32_t max)
+{
+    return rand();
+}
+
 AP_DECLARE(char *) ap_escape_html2(apr_pool_t *p, const char *s, int toasc)
 {
     int i, j;
