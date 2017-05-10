@@ -1,6 +1,7 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Allow $1, $2 ... $9 in @rsub replacement string
  * Cosmetics: added comments on odd looking code to prevent future
    scrutiny
    [Issue #1279 - Coty Sutherland]
