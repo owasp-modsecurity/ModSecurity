@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * {dis|en}able-start-notice-logging: Option to disable logging of
+   notice info at start (versions, ...) in error log.
  * Cosmetics: added comments on odd looking code to prevent future
    scrutiny
    [Issue #1279 - Coty Sutherland]

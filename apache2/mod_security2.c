@@ -758,6 +758,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     apr_pool_cleanup_register(mp, (void *)s, module_cleanup, apr_pool_cleanup_null);
 
     /* Log our presence to the error log. */
+#ifndef LOG_NO_START_NOTICE
     if (first_time) {
         ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
                 "%s configured.", MODSEC_MODULE_NAME_FULL);
@@ -782,6 +783,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         }
 #endif
     }
+#endif
 
     /**
      * Checking if it is not the first time that we are in this very function.
