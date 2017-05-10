@@ -98,16 +98,21 @@ if test -z "${LMDB_LDADD}"; then
         LMDB_FOUND=-1
     fi
 else
-    LMDB_FOUND=1
-    AC_MSG_NOTICE([using LMDB v${LMDB_VERSION}])
-    LMDB_CFLAGS="-DWITH_LMDB ${LMDB_CFLAGS}"
-    LMDB_DISPLAY="${LMDB_LDADD}, ${LMDB_CFLAGS}"
-    AC_SUBST(LMDB_VERSION)
-    AC_SUBST(LMDB_LDADD)
-    AC_SUBST(LMDB_LIBS)
-    AC_SUBST(LMDB_LDFLAGS)
-    AC_SUBST(LMDB_CFLAGS)
-    AC_SUBST(LMDB_DISPLAY)
+    if test -z "${LMDB_MANDATORY}"; then
+        LMDB_FOUND=2
+        AC_MSG_NOTICE([LMDB is disabled by default.])
+    else
+        LMDB_FOUND=1
+        AC_MSG_NOTICE([using LMDB v${LMDB_VERSION}])
+        LMDB_CFLAGS="-DWITH_LMDB ${LMDB_CFLAGS}"
+        LMDB_DISPLAY="${LMDB_LDADD}, ${LMDB_CFLAGS}"
+        AC_SUBST(LMDB_VERSION)
+        AC_SUBST(LMDB_LDADD)
+        AC_SUBST(LMDB_LIBS)
+        AC_SUBST(LMDB_LDFLAGS)
+        AC_SUBST(LMDB_CFLAGS)
+        AC_SUBST(LMDB_DISPLAY)
+    fi
 fi
 
 
