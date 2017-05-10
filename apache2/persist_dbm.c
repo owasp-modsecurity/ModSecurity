@@ -482,10 +482,12 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
             }
         }
 
+        // Allocate blob_size for keys
         len = var->name_len + 1;
         if (len >= 65536) len = 65536;
         blob_size += len + 2;
 
+        // Allocate blob_size for values
         len = var->value_len + 1;
         if (len >= 65536) len = 65536;
         blob_size += len + 2;

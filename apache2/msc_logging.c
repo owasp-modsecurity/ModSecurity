@@ -1165,15 +1165,24 @@ void sec_audit_logger_json(modsec_rec *msr) {
 
 
         /* Stopwatch2 */
+#ifdef DLOG_NO_STOPWATCH
+        if (msr->txcfg->debuglog_level >= 9)
+#endif
         format_performance_variables_json(msr, g);
 
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
+#ifdef LOG_NO_DECHUNK
+        if (msr->txcfg->debuglog_level >= 9)
+#endif
         if (wrote_response_body) {
             yajl_kv_bool(g, "response_body_dechunked", 1);
         }
 
+#ifdef LOG_NO_SERVER_CONTEXT
+        if (msr->txcfg->debuglog_level >= 9) {
+#endif
         sec_auditlog_write_producer_header_json(msr, g);
 
         /* Server */
@@ -1268,6 +1277,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
         if (been_opened == 1) {
             yajl_gen_map_close(g); // sanitized args map is finished
         }
+#ifdef LOG_NO_SERVER_CONTEXT
+	}
+#endif
 
         /* Web application info. */
         if ( ((msr->txcfg->webappid != NULL)&&(strcmp(msr->txcfg->webappid, "default") != 0))
@@ -1986,6 +1998,9 @@ void sec_audit_logger_native(modsec_rec *msr) {
         }
 
         /* Stopwatch; left in for compatibility reasons */
+#ifdef DLOG_NO_STOPWATCH
+	if (msr->txcfg->debuglog_level >= 9) {
+#endif
         text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
             msr->request_time, (now - msr->request_time));
         sec_auditlog_write(msr, text, strlen(text));
@@ -1998,15 +2013,24 @@ void sec_audit_logger_native(modsec_rec *msr) {
                 "; %s\n", msr->request_time, (now - msr->request_time), perf_all);
             sec_auditlog_write(msr, text, strlen(text));
         }
+#ifdef DLOG_NO_STOPWATCH
+        }
+#endif
 
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
+#ifdef LOG_NO_DECHUNK
+	if (msr->txcfg->debuglog_level >= 9)
+#endif
         if (wrote_response_body) {
             text = apr_psprintf(msr->mp, "Response-Body-Transformed: Dechunked\n");
             sec_auditlog_write(msr, text, strlen(text));
         }
 
+#ifdef LOG_NO_SERVER_CONTEXT
+        if (msr->txcfg->debuglog_level >= 9) {
+#endif
         sec_auditlog_write_producer_header(msr);
 
         /* Server */
@@ -2075,8 +2099,11 @@ void sec_audit_logger_native(modsec_rec *msr) {
                 sec_auditlog_write(msr, text, strlen(text));
             }
         }
+#ifdef LOG_NO_SERVER_CONTEXT
+	}
+#endif
 
-        /* Web application info. */
+	/* Web application info. */
         if ( ((msr->txcfg->webappid != NULL)&&(strcmp(msr->txcfg->webappid, "default") != 0))
             || (msr->sessionid != NULL) || (msr->userid != NULL))
         {

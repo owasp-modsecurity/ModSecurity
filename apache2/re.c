@@ -1889,11 +1889,17 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
         else if (rc < 0) {
-	    if (rule->actionset != NULL && rule->actionset->msg != NULL) {
-                msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", rule->actionset->id, rule->actionset->msg);
-            } else {
-                msr_log(msr, 1, "Rule processing failed.");
+            const char *id = "";
+            const char *msg = "";
+            if (rule->actionset) {
+                if (rule->actionset->id) {
+                    id = rule->actionset->id;
+                }
+                if (rule->actionset->msg) {
+                    msg = rule->actionset->msg;
+                }
             }
+            msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", id, msg);
 
             if (msr->txcfg->reqintercept_oe == 1)   {
                 apr_table_clear(msr->matched_vars);
@@ -1923,11 +1929,17 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
         else {
-	    if (rule->actionset != NULL && rule->actionset->msg != NULL) {
-                msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, rule->actionset->id, rule->actionset->msg);
-	    } else {
-                msr_log(msr, 1, "Rule processing failed with unknown return code: %d", rc);
-	    }
+            const char *id = "";
+            const char *msg = "";
+            if (rule->actionset) {
+                if (rule->actionset->id) {
+                    id = rule->actionset->id;
+                }
+                if (rule->actionset->msg) {
+                    msg = rule->actionset->msg;
+                }
+            }
+            msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, id, msg);
             apr_table_clear(msr->matched_vars);
             return -1;
         }

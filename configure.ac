@@ -487,6 +487,51 @@ AC_ARG_ENABLE(handler-logging,
   log_handler=''
 ])
 
+# Disable logging of dechunking
+AC_ARG_ENABLE(dechunk-logging,
+              AS_HELP_STRING([--enable-dechunk-logging],
+                             [Enable logging of dechunking even when log level is < 9. This is the default]),
+[
+  if test "$enableval" != "no"; then
+    log_dechunk=
+  else
+    log_dechunk="-DLOG_NO_DECHUNK"
+  fi
+],
+[
+  log_dechunk=''
+])
+
+# Disable logging of stopwatches
+AC_ARG_ENABLE(stopwatch-logging,
+              AS_HELP_STRING([--enable-stopwatch-logging],
+                             [Enable logging of stopwatches even when log level is < 9. This is the default]),
+[
+  if test "$enableval" != "no"; then
+    log_stopwatch=
+  else
+    log_stopwatch="-DLOG_NO_STOPWATCH"
+  fi
+],
+[
+  log_stopwatch=''
+])
+
+# Disable logging of server context
+AC_ARG_ENABLE(server-context-logging,
+              AS_HELP_STRING([--enable-server-context-logging],
+                             [Enable logging of server info (log producer, sanitized objects, ...) in audit log even when log level < 9. This is the default]),
+[
+  if test "$enableval" != "no"; then
+    log_server_context=
+  else
+    log_server_context="-DLOG_NO_SERVER_CONTEXT"
+  fi
+],
+[
+  log_server_context=''
+])
+
 # Ignore configure errors
 AC_ARG_ENABLE(errors,
               AS_HELP_STRING([--disable-errors],
@@ -737,7 +782,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_contex"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
