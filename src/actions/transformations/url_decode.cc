@@ -43,10 +43,6 @@ std::string UrlDecode::evaluate(std::string value,
     int invalid_count;
     int changed;
 
-    if (UrlDecodeInstantCache::getInstance().count(value) > 0) {
-        return UrlDecodeInstantCache::getInstance().at(value);
-    }
-
     val = (unsigned char *) malloc(sizeof(char) * value.size() + 1);
     memcpy(val, value.c_str(), value.size() + 1);
     val[value.size()] = '\0';
@@ -58,8 +54,6 @@ std::string UrlDecode::evaluate(std::string value,
     out.append((const char *)val, size);
 
     free(val);
-
-    UrlDecodeInstantCache::getInstance().cache(value, out);
 
     return out;
 }

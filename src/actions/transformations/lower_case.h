@@ -29,24 +29,6 @@ class Transaction;
 namespace actions {
 namespace transformations {
 
-class LowerCaseInstantCache :
-    public std::unordered_map<std::string, std::string> {
- public:
-    static LowerCaseInstantCache& getInstance() {
-        static LowerCaseInstantCache instance;
-        return instance;
-    }
-
-    void cache(const std::string& value, const std::string& out) {
-        emplace(value, out);
-        if (size() > 100) {
-            erase(begin());
-        }
-    }
- private:
-    LowerCaseInstantCache() {}
-};
-
 
 class LowerCase : public Transformation {
  public:

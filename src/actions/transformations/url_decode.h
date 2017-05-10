@@ -29,24 +29,6 @@ class Transaction;
 namespace actions {
 namespace transformations {
 
-class UrlDecodeInstantCache :
-    public std::unordered_map<std::string, std::string> {
- public:
-    static UrlDecodeInstantCache& getInstance() {
-        static UrlDecodeInstantCache instance;
-        return instance;
-    }
-
-    void cache(const std::string& value, const std::string& out) {
-        emplace(value, out);
-        if (size() > 500) {
-            erase(begin());
-        }
-    }
- private:
-    UrlDecodeInstantCache() {}
-};
-
 
 class UrlDecode : public Transformation {
  public:
