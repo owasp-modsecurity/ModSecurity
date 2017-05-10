@@ -1,6 +1,7 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Allow $1, $2 ... $9 in @rsub replacement string
  * {dis|en}able-handler-logging: Option to disable logging of Apache handler
    in audit log
    [Issue #1070, #1381 - Marc Stern]
