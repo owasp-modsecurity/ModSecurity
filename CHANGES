@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Fix --enable-docs adding missing Makefile, modifying autoconf and filenames
+   [Issue #1322 - @victorhora]
  * Change from using rand() to thread-safe ap_random_pick.
    [Issue #1289 - Robert Bost]
  * Cosmetics: added comments on odd looking code to prevent future
