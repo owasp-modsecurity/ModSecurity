@@ -288,7 +288,20 @@ AC_ARG_ENABLE(docs,
 ])
 AM_CONDITIONAL([BUILD_DOCS], [test "$build_docs" -eq 1])
 if test "$build_docs" -eq 1; then
-    TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS docs"
+    TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS doc"
+    AC_CHECK_PROGS([DOXYGEN], [doxygen])
+    if test -z "$DOXYGEN"; then
+        AC_MSG_WARN([Doxygen not found - continue without Doxygen support])
+    fi
+    if test "$build_apache2_module" -eq 1; then
+       AC_CONFIG_FILES([doc/doxygen-apache])
+    fi
+    if test "$build_standalone_module" -eq 1; then
+       AC_CONFIG_FILES([doc/doxygen-nginx])
+       AC_CONFIG_FILES([doc/doxygen-iis])
+       AC_CONFIG_FILES([doc/doxygen-standalone])
+    fi
+    AC_CONFIG_FILES([doc/Makefile])
 fi
 
 
