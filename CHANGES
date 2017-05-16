@@ -1,6 +1,7 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Allow $1, $2 ... $9 in @rsub replacement string
  * Change from using rand() to thread-safe ap_random_pick.
    [Issue #1289 - Robert Bost]
  * Cosmetics: added comments on odd looking code to prevent future

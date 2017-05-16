@@ -564,7 +564,7 @@ nextround:
         //Copy of regex match with replacing data \1..\9
         for(i=0;i<str->value_len;)  {
             char *x = str->value+i;
-            if (*x == '\\' && *(x + 1) > '0' && *(x + 1) <= '9') {
+            if ( (*x == '\\' || *x == '$') && (*(x + 1) > '0') && (*(x + 1) <= '9') ) {
                 int capture=*(x + 1) - 48;
                 int capture_len=pmatch[capture].rm_eo-pmatch[capture].rm_so;
 
