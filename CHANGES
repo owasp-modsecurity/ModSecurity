@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Fix collection naming problem while merging collections.
+   [Issue #1274 - Coty Sutherland and @zimmerle]
  * Fix --enable-docs adding missing Makefile, modifying autoconf and filenames
    [Issue #1322 - @victorhora]
  * Change from using rand() to thread-safe ap_random_pick.

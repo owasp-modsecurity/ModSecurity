@@ -1519,6 +1519,7 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
     char *s = NULL;
     apr_table_t *target_col = NULL;
     int is_negated = 0;
+    char *real_col_name = NULL;
     msc_string *var = NULL;
 
     if (msr->txcfg->debuglog_level >= 9) {
@@ -1561,19 +1562,26 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
     var_name = s + 1;
     *s = '\0';
 
+    if (strcasecmp(col_name,"USER") == 0 || strcasecmp(col_name,"SESSION") == 0
+        || strcasecmp(col_name, "RESOURCE") == 0) {
+	real_col_name = apr_psprintf(mptmp, "%s_%s", msr->txcfg->webappid, col_name);
+    }
+
     /* Locate the collection. */
     if (strcasecmp(col_name, "tx") == 0) { /* Special case for TX variables. */
         target_col = msr->tx_vars;
     } else {
         target_col = (apr_table_t *)apr_table_get(msr->collections, col_name);
-        if (target_col == NULL) {
-            if (msr->txcfg->debuglog_level >= 3) {
-                msr_log(msr, 3, "Could not set variable \"%s.%s\" as the collection does not exist.",
-                    log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
-            }
+    }
 
-            return 0;
+
+    if (target_col == NULL) {
+        if (msr->txcfg->debuglog_level >= 3) {
+	    msr_log(msr, 3, "Could not set variable \"%s.%s\" as the collection does not exist.",
+	        log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
         }
+
+        return 0;
     }
 
     if (is_negated) {
@@ -1616,7 +1624,11 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
             }
 
             /* Record the original value before we change it */
-            collection_original_setvar(msr, col_name, rec);
+            if (real_col_name == NULL) {
+                collection_original_setvar(msr, col_name, rec);
+            } else {
+                collection_original_setvar(msr, real_col_name, rec);
+            }
 
             /* Expand values in value */
             val->value = var_value;
@@ -1651,6 +1663,7 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
             var->value = apr_pstrdup(msr->mp, var_value);
             var->value_len = strlen(var->value);
             expand_macros(msr, var, rule, mptmp);
+
             apr_table_setn(target_col, var->name, (void *)var);
 
             if (msr->txcfg->debuglog_level >= 9) {
@@ -2048,7 +2061,11 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     /* Record the original counter value before we change it */
     var = (msc_string *)apr_table_get(table, "UPDATE_COUNTER");
     if (var != NULL) {
-        collection_original_setvar(msr, col_name, var);
+        if (real_col_name == NULL) {
+            collection_original_setvar(msr, col_name, var);
+        } else {
+            collection_original_setvar(msr, real_col_name, var);
+        }
     }
 
     /* Add the collection to the list. */
