@@ -265,9 +265,9 @@ static void modsecurity_persist_data(modsec_rec *msr) {
 
     /* Remove stale collections. */
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
-    if (ap_random_pick(0, RAND_MAX) < RAND_MAX/100) {
+    if (ap_random_pick(0, RAND_MAX) < (RAND_MAX * msr->txcfg->col_gc_freq)) {
 #else
-    if (rand() < RAND_MAX/100) {
+    if (rand() < (RAND_MAX * msr->txcfg->col_gc_freq)) {
 #endif
         arr = apr_table_elts(msr->collections);
         te = (apr_table_entry_t *)arr->elts;

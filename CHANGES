@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Added SecCollectionGCFrequency option for configuring frequncy
+   at which garbage collection runs for persistent collections
+   [Issue #1298 - Robert Bost]
  * Uses an optional global lock while manipulating collections.
    [Issues #1224 - @mturk and @zimmerle]
  * Fix collection naming problem while merging collections.
