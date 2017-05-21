@@ -170,6 +170,7 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     }
 #endif /* SET_MUTEX_PERMS */
 
+#ifdef GLOBAL_COLLECTION_LOCK
     rc = apr_global_mutex_create(&msce->dbm_lock, NULL, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         return -1;
@@ -185,6 +186,7 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
         return -1;
     }
 #endif /* SET_MUTEX_PERMS */
+#endif
 #endif
 
     return 1;
@@ -211,12 +213,15 @@ void modsecurity_child_init(msc_engine *msce) {
         }
     }
 
+#ifdef GLOBAL_COLLECTION_LOCK
     if (msce->dbm_lock != NULL) {
         apr_status_t rc = apr_global_mutex_child_init(&msce->dbm_lock, NULL, msce->mp);
         if (rc != APR_SUCCESS) {
             // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init dbm mutex");
         }
     }
+#endif
+
 }
 
 /**
