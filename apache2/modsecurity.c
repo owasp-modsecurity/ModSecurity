@@ -169,6 +169,22 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
         return -1;
     }
 #endif /* SET_MUTEX_PERMS */
+
+    rc = apr_global_mutex_create(&msce->dbm_lock, NULL, APR_LOCK_DEFAULT, mp);
+    if (rc != APR_SUCCESS) {
+        return -1;
+    }
+
+#ifdef __SET_MUTEX_PERMS
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    rc = ap_unixd_set_global_mutex_perms(msce->dbm_lock);
+#else
+    rc = unixd_set_global_mutex_perms(msce->dbm_lock);
+#endif
+    if (rc != APR_SUCCESS) {
+        return -1;
+    }
+#endif /* SET_MUTEX_PERMS */
 #endif
 
     return 1;
@@ -195,6 +211,12 @@ void modsecurity_child_init(msc_engine *msce) {
         }
     }
 
+    if (msce->dbm_lock != NULL) {
+        apr_status_t rc = apr_global_mutex_child_init(&msce->dbm_lock, NULL, msce->mp);
+        if (rc != APR_SUCCESS) {
+            // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init dbm mutex");
+        }
+    }
 }
 
 /**
