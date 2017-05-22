@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Adds a sanity check before use ctl:ruleRemoveTargetByTag.
+   [Issue #1353 - @LukeP21 and @zimmerle]
  * Uses an optional global lock while manipulating collections.
    [Issues #1224 - @mturk and @zimmerle]
  * Fix collection naming problem while merging collections.

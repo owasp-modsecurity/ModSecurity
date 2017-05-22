@@ -1253,6 +1253,10 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: ruleRemoveTargetByTag tag=%s targets=%s", p1, p2);
         }
+	if (p2 == NULL) {
+            msr_log(msr, 1, "ModSecurity: Missing target for tag \"%s\"", p1);
+	    return -1;
+	}
 
     re = apr_pcalloc(msr->mp, sizeof(rule_exception));
     re->type = RULE_EXCEPTION_REMOVE_TAG;
