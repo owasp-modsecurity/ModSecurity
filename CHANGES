@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Make url path absolute for SecHashEngine only when it is relative
+   in the first place.
+   [Issue #752, #1071 - @hideaki]
  * Fix the hex digit size for SHA1 on msc_crypt implementation.
    [Issue #1354 - @zimmerle and @parthasarathi204]
  * Avoid to flush xml buffer while assembling the injected html.
