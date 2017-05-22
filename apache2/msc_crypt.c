@@ -189,7 +189,7 @@ char *hmac(modsec_rec *msr, const char *key, int key_len,
     unsigned char hmac_ipad[HMAC_PAD_SIZE], hmac_opad[HMAC_PAD_SIZE];
     unsigned char nkey[APR_SHA1_DIGESTSIZE];
     unsigned char *hmac_key = (unsigned char *) key;
-    char hex_digest[APR_SHA1_DIGESTSIZE * 2], *hmac_digest;
+    char hex_digest[APR_SHA1_DIGESTSIZE * 2 + 1], *hmac_digest;
     const char hex[] = "0123456789abcdef";
     int i;
 

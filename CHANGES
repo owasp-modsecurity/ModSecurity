@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Fix the hex digit size for SHA1 on msc_crypt implementation.
+   [Issue #1354 - @zimmerle and @parthasarathi204]
  * Avoid to flush xml buffer while assembling the injected html.
    [Issue #742 - @zimmerle]
  * Avoid additional operator invokation if last transform of a multimatch
