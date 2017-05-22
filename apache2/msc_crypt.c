@@ -1072,7 +1072,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
     }
 
     htmlDocContentDumpFormatOutput(output_buf, msr->crypto_html_tree, NULL, 0);
-    xmlOutputBufferFlush(output_buf);
+    // Not necessary in 2.9.4+
+    //xmlOutputBufferFlush(output_buf);
 
 #ifdef  LIBXML2_NEW_BUFFER
 
@@ -1082,6 +1083,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             xmlOutputBufferClose(output_buf);
             xmlFreeDoc(msr->crypto_html_tree);
             msr->of_stream_changed = 0;
+            msr_log(msr, 4, "inject_hashed_response_body: NEW_BUFFER Output buffer is null.");
             return -1;
         }
 
@@ -1096,6 +1098,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         if (msr->stream_output_data == NULL) {
             xmlOutputBufferClose(output_buf);
             xmlFreeDoc(msr->crypto_html_tree);
+            msr_log(msr, 4, "inject_hashed_response_body: NEW BUFFER Stream Output is null.");
             return -1;
         }
 
@@ -1111,6 +1114,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             xmlOutputBufferClose(output_buf);
             xmlFreeDoc(msr->crypto_html_tree);
             msr->of_stream_changed = 0;
+            msr_log(msr, 4, "inject_hashed_response_body: Conv is null.");
             return -1;
         }
 
@@ -1123,6 +1127,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
+            msr_log(msr, 4, "inject_hashed_response_body: Stream Output data is NULL.");
             xmlOutputBufferClose(output_buf);
             xmlFreeDoc(msr->crypto_html_tree);
             return -1;
@@ -1143,6 +1148,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         if(output_buf->buffer == NULL || output_buf->buffer->use == 0)  {
             xmlOutputBufferClose(output_buf);
             xmlFreeDoc(msr->crypto_html_tree);
+            msr_log(msr, 4, "inject_hashed_response_body: Output buffer is null.");
             msr->of_stream_changed = 0;
             return -1;
         }
@@ -1158,6 +1164,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         if (msr->stream_output_data == NULL) {
             xmlOutputBufferClose(output_buf);
             xmlFreeDoc(msr->crypto_html_tree);
+            msr_log(msr, 4, "inject_hashed_response_body: Stream Output is null.");
             return -1;
         }
 
@@ -1174,6 +1181,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             xmlOutputBufferClose(output_buf);
             xmlFreeDoc(msr->crypto_html_tree);
             msr->of_stream_changed = 0;
+            msr_log(msr, 4, "inject_hashed_response_body: Stream Output is null.");
             return -1;
         }
 
@@ -1188,6 +1196,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         if (msr->stream_output_data == NULL) {
             xmlOutputBufferClose(output_buf);
             xmlFreeDoc(msr->crypto_html_tree);
+            msr_log(msr, 4, "inject_hashed_response_body: Stream Output Data is null.");
             return -1;
         }
 

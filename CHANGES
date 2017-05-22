@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Avoid to flush xml buffer while assembling the injected html.
+   [Issue #742 - @zimmerle]
  * Avoid additional operator invokation if last transform of a multimatch
    doesn't modify the input
    [Issue #1086, #1087 - Daniel Stelter-Gliese]
