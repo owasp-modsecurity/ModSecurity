@@ -215,9 +215,11 @@ move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool
                 }
 
                 cl->buf->last_buf = 1;
+                cl->next = NULL;
                 *ll = cl;
             } else {
                 cl->buf->last_buf = 1;
+                cl->next = NULL;
             }
             apr_brigade_cleanup(bb);
             return NGX_OK;
