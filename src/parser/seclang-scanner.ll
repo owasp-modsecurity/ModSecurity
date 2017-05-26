@@ -87,6 +87,7 @@ ACTION_TRANSFORMATION_CMD_LINE                  (?i:t:cmdLine)
 ACTION_TRANSFORMATION_COMPRESS_WHITESPACE       (?i:t:compressWhitespace)
 ACTION_TRANSFORMATION_CSS_DECODE                (?i:t:cssDecode)
 ACTION_TRANSFORMATION_HEX_ENCODE                (?i:t:hexEncode)
+ACTION_TRANSFORMATION_HEX_DECODE                (?i:t:hexDecode)
 ACTION_TRANSFORMATION_HTML_ENTITY_DECODE        (?i:t:htmlEntityDecode)
 ACTION_TRANSFORMATION_JS_DECODE                 (?i:t:jsDecode)
 ACTION_TRANSFORMATION_LENGTH                    (?i:t:length)
@@ -453,6 +454,7 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_TRANSFORMATION_SHA1}                                            { return p::make_ACTION_TRANSFORMATION_SHA1(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_MD5}                                             { return p::make_ACTION_TRANSFORMATION_MD5(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_HEX_ENCODE}                                      { return p::make_ACTION_TRANSFORMATION_HEX_ENCODE(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_HEX_DECODE}                                      { return p::make_ACTION_TRANSFORMATION_HEX_DECODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_LOWERCASE}                                       { return p::make_ACTION_TRANSFORMATION_LOWERCASE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_URL_DECODE_UNI}                                  { return p::make_ACTION_TRANSFORMATION_URL_DECODE_UNI(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_URL_DECODE}                                      { return p::make_ACTION_TRANSFORMATION_URL_DECODE(yytext, *driver.loc.back()); }
