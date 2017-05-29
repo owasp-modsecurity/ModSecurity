@@ -25,7 +25,7 @@ namespace Utils {
 
 
 std::string Sha1::hexdigest(const std::string& input) {
-    unsigned char digest[20];
+    unsigned char digest[20] = { 0 };
     static const char* const lut = "0123456789abcdef";
 
     mbedtls_sha1(reinterpret_cast<const unsigned char *>(input.c_str()),
