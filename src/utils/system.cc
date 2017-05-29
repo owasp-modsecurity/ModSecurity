@@ -147,6 +147,9 @@ bool createDir(std::string dir, int mode, std::string *error) {
 bool isFile(std::string f) {
     struct stat fileInfo;
     FILE *fp = fopen(f.c_str(), "r");
+    if (fp == NULL) {
+        return false;
+    }
     fstat(fileno(fp), &fileInfo);
     if (!S_ISREG(fileInfo.st_mode)) {
         fclose(fp);
