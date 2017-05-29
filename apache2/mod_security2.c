@@ -1494,7 +1494,7 @@ static int hook_connection_early(conn_rec *conn)
             }
         }
 
-        ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
+        ap_log_cerror(APLOG_MARK, APLOG_DEBUG, 0, conn,
             "ModSecurity: going to loop through %d servers with %d threads",
             server_limit, thread_limit);
         for (i = 0; i < server_limit; ++i) {
@@ -1526,7 +1526,7 @@ static int hook_connection_early(conn_rec *conn)
             }
         }
 
-        ap_log_cerror(APLOG_MARK, APLOG_WARNING, 0, conn,
+        ap_log_cerror(APLOG_MARK, APLOG_DEBUG, 0, conn,
             "ModSecurity: threads in READ: %ld of %ld, WRITE: %ld of %ld, IP: %s",
             ip_count_r, conn_read_state_limit, ip_count_w, conn_write_state_limit, client_ip);
 
