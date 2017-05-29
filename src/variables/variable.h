@@ -131,9 +131,15 @@ class VariableModificatorCount : public Variable {
         int count = 0;
 
         m_var->evaluate(transaction, rule, &reslIn);
-        for (auto &a : reslIn) {
+        for (const collection::Variable *a : reslIn) {
             count++;
+            if (a->m_dynamic) {
+                delete a;
+                a = NULL;
+            }
         }
+        reslIn.clear();
+
         res = new std::string(std::to_string(count));
 
         val = new collection::Variable(&m_name, res);
