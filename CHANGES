@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Updates libinjection to: bf234eb2f385b969c4f803b35fda53cffdd93922
+   [Issue #1412 - @zimmerle, @bjdijk]
  * Avoid log flood while using SecConnEngine
    [Issue #1436 - @victorhora]
  * Make url path absolute for SecHashEngine only when it is relative

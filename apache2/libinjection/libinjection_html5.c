@@ -12,7 +12,6 @@
 
 
 #define CHAR_EOF -1
-#define CHAR_NULL 0
 #define CHAR_BANG 33
 #define CHAR_DOUBLE 34
 #define CHAR_PERCENT 37
@@ -24,7 +23,6 @@
 #define CHAR_GT 62
 #define CHAR_QUESTION 63
 #define CHAR_RIGHTB 93
-#define CHAR_TICK 96
 
 /* prototypes */
 
@@ -43,7 +41,6 @@ static int h5_state_before_attribute_name(h5_state_t* hs);
 static int h5_state_before_attribute_value(h5_state_t* hs);
 static int h5_state_attribute_value_double_quote(h5_state_t* hs);
 static int h5_state_attribute_value_single_quote(h5_state_t* hs);
-static int h5_state_attribute_value_back_quote(h5_state_t* hs);
 static int h5_state_attribute_value_no_quote(h5_state_t* hs);
 static int h5_state_after_attribute_value_quoted_state(h5_state_t* hs);
 static int h5_state_comment(h5_state_t* hs);
@@ -63,28 +60,16 @@ static int h5_state_doctype(h5_state_t* hs);
 /**
  * public function
  */
-void libinjection_h5_init(h5_state_t* hs, const char* s, size_t len, enum html5_flags flags)
+void libinjection_h5_init(h5_state_t* hs, const char* s, size_t len, int flags)
 {
     memset(hs, 0, sizeof(h5_state_t));
     hs->s = s;
     hs->len = len;
-
-    switch (flags) {
-    case DATA_STATE:
+    hs->state = h5_state_data;
+    if (flags == 0) {
         hs->state = h5_state_data;
-        break;
-    case VALUE_NO_QUOTE:
-        hs->state = h5_state_before_attribute_name;
-        break;
-    case VALUE_SINGLE_QUOTE:
-        hs->state = h5_state_attribute_value_single_quote;
-        break;
-    case VALUE_DOUBLE_QUOTE:
-        hs->state = h5_state_attribute_value_double_quote;
-        break;
-    case VALUE_BACK_QUOTE:
-        hs->state = h5_state_attribute_value_back_quote;
-        break;
+    } else {
+        assert(0);
     }
 }
 
@@ -100,18 +85,10 @@ int libinjection_h5_next(h5_state_t* hs)
 /**
  * Everything below here is private
  *
- */
-
+*/
 
 static int h5_is_white(char ch)
 {
-    /*
-     * \t = horizontal tab = 0x09
-     * \n = newline = 0x0A
-     * \v = vertical tab = 0x0B
-     * \f = form feed = 0x0C
-     * \r = cr  = 0x0D
-     */
     return strchr(" \t\n\v\f\r", ch) != NULL;
 }
 
@@ -120,17 +97,9 @@ static int h5_skip_white(h5_state_t* hs)
     char ch;
     while (hs->pos < hs->len) {
         ch = hs->s[hs->pos];
-        switch (ch) {
-        case 0x00: /* IE only */
-        case 0x20:
-        case 0x09:
-        case 0x0A:
-        case 0x0B: /* IE only */
-        case 0x0C:
-        case 0x0D: /* IE only */
+        if (ch == ' ') {
             hs->pos += 1;
-            break;
-        default:
+        } else {
             return ch;
         }
     }
@@ -198,9 +167,6 @@ static int h5_state_tag_open(h5_state_t* hs)
         return h5_state_bogus_comment2(hs);
     } else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
         return h5_state_tag_name(hs);
-    } else if (ch == CHAR_NULL) {
-        /* IE-ism  NULL characters are ignored */
-        return h5_state_tag_name(hs);
     } else {
         /* user input mistake in configuring state */
         if (hs->pos == 0) {
@@ -231,9 +197,7 @@ static int h5_state_end_tag_open(h5_state_t* hs)
     } else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
         return h5_state_tag_name(hs);
     }
-
-    hs->is_close = 0;
-    return h5_state_bogus_comment(hs);
+    return h5_state_data(hs);
 }
 /*
  *
@@ -267,12 +231,7 @@ static int h5_state_tag_name(h5_state_t* hs)
     pos = hs->pos;
     while (pos < hs->len) {
         ch = hs->s[pos];
-        if (ch == 0) {
-            /* special non-standard case */
-            /* allow nulls in tag name   */
-            /* some old browsers apparently allow and ignore them */
-            pos += 1;
-        } else if (h5_is_white(ch)) {
+        if (h5_is_white(ch)) {
             hs->token_start = hs->s + hs->pos;
             hs->token_len = pos - hs->pos;
             hs->token_type = TAG_NAME_OPEN;
@@ -340,7 +299,7 @@ static int h5_state_before_attribute_name(h5_state_t* hs)
     default: {
         return h5_state_attribute_name(hs);
     }
-    }
+  }
 }
 
 static int h5_state_attribute_name(h5_state_t* hs)
@@ -349,7 +308,7 @@ static int h5_state_attribute_name(h5_state_t* hs)
     size_t pos;
 
     TRACE();
-    pos = hs->pos + 1;
+    pos = hs->pos;
     while (pos < hs->len) {
         ch = hs->s[pos];
         if (h5_is_white(ch)) {
@@ -399,19 +358,21 @@ static int h5_state_attribute_name(h5_state_t* hs)
 static int h5_state_after_attribute_name(h5_state_t* hs)
 {
     int c;
+    size_t pos;
 
     TRACE();
+    pos = hs->pos;
     c = h5_skip_white(hs);
     switch (c) {
     case CHAR_EOF: {
         return 0;
     }
     case CHAR_SLASH: {
-        hs->pos += 1;
+        hs->pos = pos + 1;
         return h5_state_self_closing_start_tag(hs);
     }
     case CHAR_EQUALS: {
-        hs->pos += 1;
+        hs->pos = pos + 1;
         return h5_state_before_attribute_value(hs);
     }
     case CHAR_GT: {
@@ -442,9 +403,6 @@ static int h5_state_before_attribute_value(h5_state_t* hs)
         return h5_state_attribute_value_double_quote(hs);
     } else if (c == CHAR_SINGLE) {
         return h5_state_attribute_value_single_quote(hs);
-    } else if (c == CHAR_TICK) {
-        /* NON STANDARD IE */
-        return h5_state_attribute_value_back_quote(hs);
     } else {
         return h5_state_attribute_value_no_quote(hs);
     }
@@ -457,16 +415,8 @@ static int h5_state_attribute_value_quote(h5_state_t* hs, char qchar)
 
     TRACE();
 
-    /* skip initial quote in normal case.
-     * don't do this "if (pos == 0)" since it means we have started
-     * in a non-data state.  given an input of '><foo
-     * we want to make 0-length attribute name
-     */
-    if (hs->pos > 0) {
-        hs->pos += 1;
-    }
-
-
+    /* skip quote */
+    hs->pos += 1;
     idx = (const char*) memchr(hs->s + hs->pos, qchar, hs->len - hs->pos);
     if (idx == NULL) {
         hs->token_start = hs->s + hs->pos;
@@ -495,13 +445,6 @@ int h5_state_attribute_value_single_quote(h5_state_t* hs)
 {
     TRACE();
     return h5_state_attribute_value_quote(hs, CHAR_SINGLE);
-}
-
-static
-int h5_state_attribute_value_back_quote(h5_state_t* hs)
-{
-    TRACE();
-    return h5_state_attribute_value_quote(hs, CHAR_TICK);
 }
 
 static int h5_state_attribute_value_no_quote(h5_state_t* hs)
@@ -713,13 +656,10 @@ static int h5_state_comment(h5_state_t* hs)
     char ch;
     const char* idx;
     size_t pos;
-    size_t offset;
-    const char* end = hs->s + hs->len;
 
     TRACE();
     pos = hs->pos;
     while (1) {
-
         idx = (const char*) memchr(hs->s + pos, CHAR_DASH, hs->len - pos);
 
         /* did not find anything or has less than 3 chars left */
@@ -730,62 +670,21 @@ static int h5_state_comment(h5_state_t* hs)
             hs->token_type = TAG_COMMENT;
             return 1;
         }
-        offset = 1;
-
-        /* skip all nulls */
-        while (idx + offset < end && *(idx + offset) == 0) {
-            offset += 1;
-        }
-        if (idx + offset == end) {
-            hs->state = h5_state_eof;
-            hs->token_start = hs->s + hs->pos;
-            hs->token_len = hs->len - hs->pos;
-            hs->token_type = TAG_COMMENT;
-            return 1;
-        }
-
-        ch = *(idx + offset);
+        ch = *(idx + 1);
         if (ch != CHAR_DASH && ch != CHAR_BANG) {
             pos = (size_t)(idx - hs->s) + 1;
             continue;
         }
-
-        /* need to test */
-#if 0
-        /* skip all nulls */
-        while (idx + offset < end && *(idx + offset) == 0) {
-            offset += 1;
-        }
-        if (idx + offset == end) {
-            hs->state = h5_state_eof;
-            hs->token_start = hs->s + hs->pos;
-            hs->token_len = hs->len - hs->pos;
-            hs->token_type = TAG_COMMENT;
-            return 1;
-        }
-#endif
-
-        offset += 1;
-        if (idx + offset == end) {
-            hs->state = h5_state_eof;
-            hs->token_start = hs->s + hs->pos;
-            hs->token_len = hs->len - hs->pos;
-            hs->token_type = TAG_COMMENT;
-            return 1;
-        }
-
-
-        ch = *(idx + offset);
+        ch = *(idx + 2);
         if (ch != CHAR_GT) {
             pos = (size_t)(idx - hs->s) + 1;
             continue;
         }
-        offset += 1;
 
         /* ends in --> or -!> */
         hs->token_start = hs->s + hs->pos;
         hs->token_len = (size_t)(idx - hs->s) - hs->pos;
-        hs->pos = (size_t)(idx + offset - hs->s);
+        hs->pos = (size_t)(idx - hs->s) + 3;
         hs->state = h5_state_data;
         hs->token_type = TAG_COMMENT;
         return 1;

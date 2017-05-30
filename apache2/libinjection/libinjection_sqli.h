@@ -40,10 +40,6 @@ struct libinjection_sqli_token {
 #ifdef SWIG
 %immutable;
 #endif
-    char type;
-    char str_open;
-    char str_close;
-
     /*
      * position and length of token
      * in original string
@@ -57,6 +53,9 @@ struct libinjection_sqli_token {
      */
     int  count;
 
+    char type;
+    char str_open;
+    char str_close;
     char val[32];
 };
 
