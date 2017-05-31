@@ -878,7 +878,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
                 for(i = 0; i < tarr->nelts; i++) {
                     msc_arg *arg = (msc_arg *)telts[i].val;
                     if (arg->origin != NULL &&
-                            strcmp(arg->origin, "BODY") != 0)
+                            ( strcmp(arg->origin, "BODY") != 0 && strcmp(arg->origin, "JSON") !=0) )
                         continue;
 
                     if (last_offset == 0) { /* The first time we're here. */
