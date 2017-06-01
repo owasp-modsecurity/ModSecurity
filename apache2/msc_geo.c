@@ -134,17 +134,17 @@ static const char geo_country_continent[GEO_COUNTRY_LAST + 1][4] = {
 };
 
 typedef enum {
-GEOIP_COUNTRY_EDITION     = 1,
-GEOIP_REGION_EDITION_REV0 = 7,
-GEOIP_CITY_EDITION_REV0   = 6,
-GEOIP_ORG_EDITION         = 5,
-GEOIP_ISP_EDITION         = 4,
-GEOIP_CITY_EDITION_REV1   = 2,
-GEOIP_REGION_EDITION_REV1 = 3,
-GEOIP_PROXY_EDITION       = 8,
-GEOIP_ASNUM_EDITION       = 9,
-GEOIP_NETSPEED_EDITION    = 10,
-GEOIP_DOMAIN_EDITION      = 11
+    GEOIP_COUNTRY_EDITION     = 1,
+    GEOIP_REGION_EDITION_REV0 = 7,
+    GEOIP_CITY_EDITION_REV0   = 6,
+    GEOIP_ORG_EDITION         = 5,
+    GEOIP_ISP_EDITION         = 4,
+    GEOIP_CITY_EDITION_REV1   = 2,
+    GEOIP_REGION_EDITION_REV1 = 3,
+    GEOIP_PROXY_EDITION       = 8,
+    GEOIP_ASNUM_EDITION       = 9,
+    GEOIP_NETSPEED_EDITION    = 10,
+    GEOIP_DOMAIN_EDITION      = 11
 } GeoIPDBTypes;
 
 static void create_segments(geo_db *geo) {
@@ -502,5 +502,3 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
     return 1;
 }
-
-
