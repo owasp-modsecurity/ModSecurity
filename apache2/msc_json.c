@@ -16,6 +16,8 @@
 
 #ifdef WITH_YAJL
 
+char *base_offset=NULL;
+
 int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
 {
     msc_arg *arg = (msc_arg *) NULL;
@@ -48,6 +50,8 @@ int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
      */
     arg->value = apr_pstrmemdup(msr->mp, value, length);
     arg->value_len = length;
+    arg->value_origin_len = length;
+    arg->value_origin_offset = value-base_offset;
     arg->origin = "JSON";
 
     if (msr->txcfg->debuglog_level >= 9) {
@@ -273,6 +277,7 @@ int json_init(modsec_rec *msr, char **error_msg) {
 int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char **error_msg) {
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
+    base_offset=buf;
 
     /* Feed our parser and catch any errors */
     msr->json->status = yajl_parse(msr->json->handle, buf, size);
