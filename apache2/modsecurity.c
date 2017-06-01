@@ -250,7 +250,13 @@ static void modsecurity_persist_data(modsec_rec *msr) {
 
         /* Only store those collections that changed. */
         if (apr_table_get(msr->collections_dirty, te[i].key)) {
-            collection_store(msr, col);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msc_string *name = (msc_string *)apr_table_get(col, "__name");
+                if (name != NULL) {
+                    msr_log(msr, 9, "Storing dirty collection %s at key %s", name->value, te[i].key);
+                }
+            }
+            collection_store(msr, col, te[i].key);
         }
     }
 

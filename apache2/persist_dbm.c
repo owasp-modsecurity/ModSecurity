@@ -359,7 +359,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
 /**
  *
  */
-int collection_store(modsec_rec *msr, apr_table_t *col) {
+int collection_store(modsec_rec *msr, apr_table_t *col, const char *col_name) {
     char *dbm_filename = NULL;
     msc_string *var_name = NULL, *var_key = NULL;
     unsigned char *blob = NULL;
@@ -486,7 +486,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
     /* If there is an original value, then create a delta and
      * apply the delta to the current value */
-    orig_col = (const apr_table_t *)apr_table_get(msr->collections_original, var_name->value);
+    orig_col = (const apr_table_t *)apr_table_get(msr->collections_original, col_name);
     if (orig_col != NULL) {
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "collection_store: Re-retrieving collection prior to store: %s",

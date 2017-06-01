@@ -21,7 +21,7 @@
 apr_table_t DSOLOCAL *collection_retrieve(modsec_rec *msr, const char *col_name,
     const char *col_value, int col_value_length);
 
-int DSOLOCAL collection_store(modsec_rec *msr, apr_table_t *collection);
+int DSOLOCAL collection_store(modsec_rec *msr, apr_table_t *collection, const char *col_name);
 
 int DSOLOCAL collections_remove_stale(modsec_rec *msr, const char *col_name);
 
