@@ -167,6 +167,7 @@ ACTIONS = \
 	actions/transformations/trim.cc \
 	actions/transformations/trim_left.cc \
 	actions/transformations/trim_right.cc \
+	actions/transformations/upper_case.cc \
 	actions/transformations/url_decode.cc \
 	actions/transformations/url_decode_uni.cc \
 	actions/transformations/url_encode.cc \
