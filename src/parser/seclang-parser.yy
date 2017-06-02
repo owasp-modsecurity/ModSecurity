@@ -67,6 +67,7 @@ class Driver;
 #include "src/actions/transformations/none.h"
 #include "src/actions/transformations/url_decode.h"
 #include "src/actions/transformations/lower_case.h"
+#include "src/actions/transformations/upper_case.h"
 #include "src/actions/transformations/hex_decode.h"
 #include "src/actions/transformations/url_encode.h"
 #include "src/actions/transformations/js_decode.h"
@@ -519,6 +520,7 @@ using modsecurity::operators::Operator;
   ACTION_TRANSFORMATION_SHA1                   "ACTION_TRANSFORMATION_SHA1"
   ACTION_TRANSFORMATION_SQL_HEX_DECODE         "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
   ACTION_TRANSFORMATION_TRIM                   "ACTION_TRANSFORMATION_TRIM"
+  ACTION_TRANSFORMATION_UPPERCASE              "ACTION_TRANSFORMATION_UPPERCASE"
   ACTION_TRANSFORMATION_URL_DECODE             "ACTION_TRANSFORMATION_URL_DECODE"
   ACTION_TRANSFORMATION_URL_DECODE_UNI         "ACTION_TRANSFORMATION_URL_DECODE_UNI"
   ACTION_TRANSFORMATION_UTF8_TO_UNICODE        "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
@@ -2277,6 +2279,10 @@ act:
     | ACTION_TRANSFORMATION_LOWERCASE
       {
         ACTION_CONTAINER($$, new actions::transformations::LowerCase($1));
+      }
+    | ACTION_TRANSFORMATION_UPPERCASE
+      {
+        ACTION_CONTAINER($$, new actions::transformations::UpperCase($1));
       }
     | ACTION_TRANSFORMATION_URL_DECODE_UNI
       {

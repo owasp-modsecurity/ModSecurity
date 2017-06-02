@@ -53,6 +53,7 @@
 #include "src/actions/transformations/trim.h"
 #include "src/actions/transformations/trim_left.h"
 #include "src/actions/transformations/trim_right.h"
+#include "src/actions/transformations/upper_case.h"
 #include "src/actions/transformations/url_decode.h"
 #include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/transformations/url_encode.h"
@@ -109,6 +110,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(trimLeft) { return new TrimLeft(a); }
     IF_MATCH(trimRight) { return new TrimRight(a); }
     IF_MATCH(trim) { return new Trim(a); }
+    IF_MATCH(uppercase) { return new UpperCase(a); }
     IF_MATCH(urlDecodeUni) { return new UrlDecodeUni(a); }
     IF_MATCH(urlDecode) { return new UrlDecode(a); }
     IF_MATCH(urlEncode) { return new UrlEncode(a); }
