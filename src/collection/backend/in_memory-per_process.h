@@ -91,6 +91,9 @@ class InMemoryPerProcess :
         std::vector<const Variable *> *l) override;
     void resolveRegularExpression(const std::string& var,
         std::vector<const Variable *> *l) override;
+
+ private:
+    pthread_mutex_t m_lock;
 };
 
 }  // namespace backend
