@@ -38,10 +38,7 @@ namespace backend {
 
 InMemoryPerProcess::InMemoryPerProcess() {
     this->reserve(1000);
-    if (pthread_mutex_init(&m_lock, NULL) != 0)
-    {
-        printf("\n mutex init failed\n");
-    }
+    pthread_mutex_init(&m_lock, NULL);
 }
 
 InMemoryPerProcess::~InMemoryPerProcess() {

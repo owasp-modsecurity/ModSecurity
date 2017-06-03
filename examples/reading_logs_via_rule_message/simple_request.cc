@@ -18,50 +18,25 @@
 
 #include <modsecurity/modsecurity.h>
 #include <modsecurity/rules.h>
-
 #include "examples/reading_logs_via_rule_message/reading_logs_via_rule_message.h"
 
-
-
-char request_uri[] = "/TeSt.Pl?param1=TEsT&para2=TEST2";
-
-char request_uri2[] = "/index.html?d=1";
-
-char request_body[] = "";
-
-char response_body[] = "" \
-    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\r" \
-    "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " \
-    "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " \
-    "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n\r" \
-    "  <soap:Body>\n\r" \
-    "  <EnlightenResponse xmlns=\"http://clearforest.com/\">\n\r" \
-    "  <EnlightenResult>string</EnlightenResult>\n\r" \
-    "  </EnlightenResponse>\n\r" \
-    "  </soap:Body>\n\r" \
-    "</soap:Envelope>\n\r";
-
-char ip[] = "200.249.12.31";
 
 std::unordered_multimap<std::string, std::string> requestHeaders;
 
 int main(int argc, char **argv) {
-    (*argv++);
+    *argv++;
     if (*argv == NULL) {
-        (*argv--);
+        *argv--;
         std::cout << "Use " << *argv << " test-case-file.conf";
         std::cout << std::endl << std::endl;
         return -1;
     }
 
-    requestHeaders.emplace("Host", "SITE2");
-    requestHeaders.emplace("User-Agent", "wFetch");
-    requestHeaders.emplace("test", "21321");
-
-
     std::string rules(*argv);
     ReadingLogsViaRuleMessage rlvrm(requestHeaders, request_uri, request_body,
         "", response_body, ip, rules);
     rlvrm.process();
+
+    pthread_exit(NULL);
     return 0;
 }
