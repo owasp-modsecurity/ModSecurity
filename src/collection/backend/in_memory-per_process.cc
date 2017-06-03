@@ -24,6 +24,8 @@
 #include <memory>
 #endif
 
+#include <pthread.h>
+
 #include "modsecurity/collection/variable.h"
 #include "src/utils/regex.h"
 #include "src/utils/string.h"
@@ -36,14 +38,21 @@ namespace backend {
 
 InMemoryPerProcess::InMemoryPerProcess() {
     this->reserve(1000);
+    if (pthread_mutex_init(&m_lock, NULL) != 0)
+    {
+        printf("\n mutex init failed\n");
+    }
 }
 
 InMemoryPerProcess::~InMemoryPerProcess() {
     this->clear();
+    pthread_mutex_destroy(&m_lock);
 }
 
 void InMemoryPerProcess::store(std::string key, std::string value) {
+    pthread_mutex_lock(&m_lock);
     this->emplace(key, value);
+    pthread_mutex_unlock(&m_lock);
 }
 
 
@@ -58,18 +67,23 @@ bool InMemoryPerProcess::storeOrUpdateFirst(const std::string &key,
 
 bool InMemoryPerProcess::updateFirst(const std::string &key,
     const std::string &value) {
+    pthread_mutex_lock(&m_lock);
     auto range = this->equal_range(key);
 
     for (auto it = range.first; it != range.second; ++it) {
         it->second = value;
+        pthread_mutex_unlock(&m_lock);
         return true;
     }
+    pthread_mutex_unlock(&m_lock);
     return false;
 }
 
 
 void InMemoryPerProcess::del(const std::string& key) {
+    pthread_mutex_lock(&m_lock);
     this->erase(key);
+    pthread_mutex_unlock(&m_lock);
 }
 
 
