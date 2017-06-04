@@ -297,6 +297,10 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
     if ((pos - lb) > 1) {
         left = lb + (pos - lb) / 2;
         node->left = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+        node->left->node = NULL;
+        node->left->right = NULL;
+        node->left->left = NULL;
+        node->left->letter = 0;
         /* ENH: Check alloc succeded */
         node->left->node = nodes[left];
         node->left->letter = nodes[left]->letter;
@@ -307,6 +311,10 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
     if ((rb - pos) > 1) {
         right = pos + (rb - pos) / 2;
         node->right = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+        node->right->node = NULL;
+        node->right->right = NULL;
+        node->right->left = NULL;
+        node->right->letter = 0;
         /* ENH: Check alloc succeded */
         node->right->node = nodes[right];
         node->right->letter = nodes[right]->letter;
@@ -355,8 +363,12 @@ static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
             nodes[i] = nodes[j];
             nodes[j] = tmp;
         }
-        if (node->btree) { free (node->btree);  node->btree = NULL; }
+        if (node->btree != NULL) {
+            free(node->btree);
+            node->btree = NULL;
+        }
     node->btree = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+
     /* ENH: Check alloc succeded */
     pos = count / 2;
     node->btree->node = nodes[pos];
@@ -365,7 +377,9 @@ static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
     for (i = 0; i < count; i++) {
         if (nodes[i]->child != NULL) acmp_build_binary_tree(parser, nodes[i]);
     }
-    free(nodes);
+    if (nodes != NULL) {
+        free(nodes);
+    }
 }
 
 /**
@@ -532,9 +546,11 @@ int acmp_process_quick(ACMPT *acmpt, const char **match, const char *data, size_
     const char *end;
     int offset = 0;
 
+    /*
     if (acmpt->parser->is_failtree_done == 0) {
         acmp_prepare(acmpt->parser);
     };
+    */
 
     parser = acmpt->parser;
     if (acmpt->ptr == NULL) acmpt->ptr = parser->root_node;

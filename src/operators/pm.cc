@@ -40,6 +40,7 @@ Pm::~Pm() {
 
     free(m_p);
     m_p = NULL;
+    pthread_mutex_destroy(&m_lock);
 }
 
 
@@ -86,8 +87,9 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
     pt.parser = m_p;
     pt.ptr = NULL;
     const char *match = NULL;
-
+    pthread_mutex_lock(&m_lock);
     rc = acmp_process_quick(&pt, &match, input.c_str(), input.length());
+    pthread_mutex_unlock(&m_lock);
     bool capture = rule && rule->getActionsByName("capture").size() > 0;
 
     if (rc > 0 && transaction) {
@@ -112,6 +114,8 @@ bool Pm::init(const std::string &file, std::string *error) {
     std::istringstream *iss;
     const char *err = NULL;
 
+    pthread_mutex_init(&m_lock, NULL);
+
     char *content = parse_pm_content(m_param.c_str(), m_param.length(), &err);
     if (content == NULL) {
         iss = new std::istringstream(m_param);
@@ -127,7 +131,9 @@ bool Pm::init(const std::string &file, std::string *error) {
         acmp_add_pattern(m_p, a.c_str(), NULL, NULL, a.length());
     }
 
-    acmp_prepare(m_p);
+    while (m_p->is_failtree_done == 0) {
+        acmp_prepare(m_p);
+    }
 
     if (content) {
         free(content);

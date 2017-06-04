@@ -55,6 +55,9 @@ class Pm : public Operator {
 
  protected:
     ACMP *m_p;
+
+ private:
+    pthread_mutex_t m_lock;
 };
 
 

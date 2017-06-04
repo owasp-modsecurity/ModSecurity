@@ -18,7 +18,7 @@
 
 #include <unistd.h>
 
-#define NUM_THREADS 100
+#define NUM_THREADS 20
 
 
 char request_header[] =  "" \
@@ -78,7 +78,7 @@ static void *process_request(void *data) {
     modsecurity::Rules *rules = a->rules;
     int z = 0;
 
-    for (z = 0; z < 10000; z++) {
+    for (z = 0; z < 1000; z++) {
         modsecurity::Transaction *modsecTransaction = \
             new modsecurity::Transaction(modsec, rules, NULL);
         modsecTransaction->processConnection(ip, 12345, "127.0.0.1", 80);
@@ -153,14 +153,12 @@ class ReadingLogsViaRuleMessage {
 
         for (i = 0; i < NUM_THREADS; i++) {
             pthread_create(&threads[i], NULL, process_request, (void *)&dms);
-            //process_request((void *)&dms);
         }
 
         usleep(10000);
 
         for (i=0; i < NUM_THREADS; i++) {
             pthread_join(threads[i], &status);
-            std::cout << "Main: completed thread id :" << i << std::endl;
         }
 
         delete rules;

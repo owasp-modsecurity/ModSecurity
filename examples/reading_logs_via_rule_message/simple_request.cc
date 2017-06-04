@@ -18,12 +18,13 @@
 
 #include <modsecurity/modsecurity.h>
 #include <modsecurity/rules.h>
-#include "examples/reading_logs_via_rule_message/reading_logs_via_rule_message.h"
+#include "reading_logs_via_rule_message.h"
 
 
 std::unordered_multimap<std::string, std::string> requestHeaders;
 
 int main(int argc, char **argv) {
+    char a = '\0';
     *argv++;
     if (*argv == NULL) {
         *argv--;
@@ -34,7 +35,7 @@ int main(int argc, char **argv) {
 
     std::string rules(*argv);
     ReadingLogsViaRuleMessage rlvrm(requestHeaders, request_uri, request_body,
-        "", response_body, ip, rules);
+        &a, response_body, ip, rules);
     rlvrm.process();
 
     pthread_exit(NULL);
