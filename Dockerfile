@@ -37,7 +37,8 @@ RUN cd /usr/share/ModSecurity/modsecurity-2.9.1/ && \
   mv unicode.mapping /etc/httpd/modsecurity.d/
 
 # Setup Config
-Run printf "LoadModule security2_module modules/mod_security2.so\nInclude modsecurity.d/*.conf" > /etc/httpd/conf.modules.d/10-modsecurty.conf
+Run printf "LoadModule security2_module modules/mod_security2.so\nInclude modsecurity.d/*.conf" > /etc/httpd/conf.modules.d/10-modsecurty.conf && \
+  echo "ServerName localhost" > /etc/httpd/conf.d/ServerName.conf
 
 EXPOSE 80
 
