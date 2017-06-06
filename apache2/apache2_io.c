@@ -85,10 +85,11 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         return APR_EGENERAL;
     }
 
-    if (chunk && (!msr->txcfg->stream_inbody_inspection || (msr->txcfg->stream_inbody_inspection && msr->if_stream_changed == 0))) {
-        /* Copy the data we received in the chunk */
-        bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
-                f->r->connection->bucket_alloc);
+    if (chunk->length > 0) {
+        if (chunk && (!msr->txcfg->stream_inbody_inspection || (msr->txcfg->stream_inbody_inspection && msr->if_stream_changed == 0))) {
+            /* Copy the data we received in the chunk */
+            bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
+                    f->r->connection->bucket_alloc);
 
 #if 0
 
@@ -107,33 +108,34 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
 #endif
 
-        if (bucket == NULL) return APR_EGENERAL;
-        APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
+            if (bucket == NULL) return APR_EGENERAL;
+            APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
 
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Input filter: Forwarded %" APR_SIZE_T_FMT " bytes.", chunk->length);
-        }
-    } else if (msr->stream_input_data != NULL) {
-
-        msr->if_stream_changed = 0;
-
-        bucket = apr_bucket_heap_create(msr->stream_input_data, msr->stream_input_length, NULL,
-                f->r->connection->bucket_alloc);
-
-        if (msr->txcfg->stream_inbody_inspection)  {
-            if(msr->stream_input_data != NULL) {
-                free(msr->stream_input_data);
-                msr->stream_input_data = NULL;
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Input filter: Forwarded %" APR_SIZE_T_FMT " bytes.", chunk->length);
             }
+        } else if (msr->stream_input_data != NULL) {
+
+            msr->if_stream_changed = 0;
+
+            bucket = apr_bucket_heap_create(msr->stream_input_data, msr->stream_input_length, NULL,
+                    f->r->connection->bucket_alloc);
+
+            if (msr->txcfg->stream_inbody_inspection)  {
+                if(msr->stream_input_data != NULL) {
+                    free(msr->stream_input_data);
+                    msr->stream_input_data = NULL;
+                }
+            }
+
+            if (bucket == NULL) return APR_EGENERAL;
+            APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
+
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->stream_input_length);
+            }
+
         }
-
-        if (bucket == NULL) return APR_EGENERAL;
-        APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
-
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->stream_input_length);
-        }
-
     }
 
     if (rc == 0) {
