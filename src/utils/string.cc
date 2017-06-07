@@ -47,6 +47,24 @@ namespace utils {
 namespace string {
 
 
+std::string parserSanitizer(std::string a) {
+    a = removeWhiteSpacesIfNeeded(a);
+    a = removeBracketsIfNeeded(a);
+    return a;
+}
+
+
+std::string removeWhiteSpacesIfNeeded(std::string a) {
+    while (a.size() > 1 && a.at(0) == ' ') {
+        a.erase(0, 1);
+    }
+    while (a.size() > 1 && a.at(a.length()-1) == ' ') {
+        a.pop_back();
+    }
+    return a;
+}
+
+
 std::string ascTime(time_t *t) {
     std::string ts = std::ctime(t);
     ts.pop_back();
@@ -87,7 +105,7 @@ std::string limitTo(int amount, const std::string &str) {
 
 
 std::string removeBracketsIfNeeded(std::string a) {
-    if ((a.at(0) == '"') && (a.at(a.length()-1) == '"')) {
+    if (a.length() > 1 && a.at(0) == '"' && a.at(a.length()-1) == '"') {
         a.pop_back();
         a.erase(0, 1);
     }

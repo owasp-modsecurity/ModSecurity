@@ -68,6 +68,8 @@ std::vector<std::string> split(std::string str, char delimiter);
 void chomp(std::string *str);
 void replaceAll(std::string *str, const std::string& from,
     const std::string& to);
+std::string removeWhiteSpacesIfNeeded(std::string a);
+std::string parserSanitizer(std::string a);
 
 unsigned char x2c(unsigned char *what);
 unsigned char xsingle2c(unsigned char *what);

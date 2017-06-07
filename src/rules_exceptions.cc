@@ -24,9 +24,13 @@ namespace modsecurity {
 
 
 bool RulesExceptions::load(const std::string &a, std::string *error) {
+    bool added = false;
     std::vector<std::string> toRemove = utils::string::split(a, ' ');
     for (std::string &a : toRemove) {
-        std::string b = utils::string::removeBracketsIfNeeded(a);
+        std::string b = modsecurity::utils::string::parserSanitizer(a);
+        if (b.size() == 0) {
+            continue;
+        }
 
         size_t dash = b.find('-');
         if (dash != std::string::npos) {
@@ -36,12 +40,14 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
             int n2n = 0;
             try {
                 n1n = std::stoi(n1s);
+                added = true;
             } catch (...) {
                 error->assign("Not a number: " + n1s);
                 return false;
             }
             try {
                 n2n = std::stoi(n2s);
+                added = true;
             } catch (...) {
                 error->assign("Not a number: " + n2s);
                 return false;
@@ -52,10 +58,12 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
                 return false;
             }
             addRange(n1n, n2n);
+            added = true;
         } else {
             try {
                 int num = std::stoi(b);
                 addNumber(num);
+                added = true;
             } catch (...) {
                 error->assign("Not a number or range: " + b);
                 return false;
@@ -63,7 +71,12 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
         }
     }
 
-    return true;
+    if (added) {
+        return true;
+    }
+
+    error->assign("Not a number or range: " + a);
+    return false;
 }
 
 
