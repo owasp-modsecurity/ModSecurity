@@ -42,4 +42,4 @@ Run printf "LoadModule security2_module modules/mod_security2.so\nInclude modsec
 
 EXPOSE 80
 
-CMD ["httpd", "-k", "start"]
+CMD ["httpd", "-D", "FOREGROUND"]
