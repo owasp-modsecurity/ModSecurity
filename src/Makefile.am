@@ -128,6 +128,7 @@ ACTIONS = \
 	actions/rev.cc \
 	actions/rule_id.cc \
 	actions/severity.cc \
+	actions/set_rsc.cc \
 	actions/set_sid.cc \
 	actions/set_uid.cc \
 	actions/set_var.cc \

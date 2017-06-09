@@ -80,6 +80,7 @@ class Driver;
 #include "src/actions/phase.h"
 #include "src/actions/rev.h"
 #include "src/actions/rule_id.h"
+#include "src/actions/set_rsc.h"
 #include "src/actions/set_sid.h"
 #include "src/actions/set_uid.h"
 #include "src/actions/set_var.h"
@@ -366,7 +367,7 @@ using modsecurity::operators::Operator;
 
 
 
-#line 370 "seclang-parser.hh" // lalr1.cc:377
+#line 371 "seclang-parser.hh" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -443,7 +444,7 @@ using modsecurity::operators::Operator;
 
 
 namespace yy {
-#line 447 "seclang-parser.hh" // lalr1.cc:377
+#line 448 "seclang-parser.hh" // lalr1.cc:377
 
 
 
@@ -654,7 +655,7 @@ namespace yy {
       // "SanatiseRequestHeader"
       // "SanatiseResponseHeader"
       // "SetEnv"
-      // "SetSrc"
+      // "SetRsc"
       // "SetSid"
       // "SetUID"
       // "Severity"
@@ -2752,7 +2753,7 @@ namespace yy {
       case 134: // "SanatiseRequestHeader"
       case 135: // "SanatiseResponseHeader"
       case 136: // "SetEnv"
-      case 137: // "SetSrc"
+      case 137: // "SetRsc"
       case 138: // "SetSid"
       case 139: // "SetUID"
       case 140: // "Severity"
@@ -2990,7 +2991,7 @@ namespace yy {
       case 134: // "SanatiseRequestHeader"
       case 135: // "SanatiseResponseHeader"
       case 136: // "SetEnv"
-      case 137: // "SetSrc"
+      case 137: // "SetRsc"
       case 138: // "SetSid"
       case 139: // "SetUID"
       case 140: // "Severity"
@@ -3294,7 +3295,7 @@ namespace yy {
       case 134: // "SanatiseRequestHeader"
       case 135: // "SanatiseResponseHeader"
       case 136: // "SetEnv"
-      case 137: // "SetSrc"
+      case 137: // "SetRsc"
       case 138: // "SetSid"
       case 139: // "SetUID"
       case 140: // "Severity"
@@ -3538,7 +3539,7 @@ namespace yy {
       case 134: // "SanatiseRequestHeader"
       case 135: // "SanatiseResponseHeader"
       case 136: // "SetEnv"
-      case 137: // "SetSrc"
+      case 137: // "SetRsc"
       case 138: // "SetSid"
       case 139: // "SetUID"
       case 140: // "Severity"
@@ -5522,7 +5523,7 @@ namespace yy {
 
 
 } // yy
-#line 5526 "seclang-parser.hh" // lalr1.cc:377
+#line 5527 "seclang-parser.hh" // lalr1.cc:377
 
 
 

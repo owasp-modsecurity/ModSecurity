@@ -398,7 +398,10 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_SANATISE_MATCHED_BYTES}                                         { return p::make_ACTION_SANATISE_MATCHED_BYTES(yytext, *driver.loc.back()); }
 {ACTION_SANATISE_REQUEST_HEADER}                                        { return p::make_ACTION_SANATISE_REQUEST_HEADER(yytext, *driver.loc.back()); }
 {ACTION_SANATISE_RESPONSE_HEADER}                                       { return p::make_ACTION_SANATISE_RESPONSE_HEADER(yytext, *driver.loc.back()); }
-{ACTION_SETRSC}                                                         { return p::make_ACTION_SETRSC(yytext, *driver.loc.back()); }
+{ACTION_SETRSC}:{VAR_FREE_TEXT_SPACE_COMMA}                             { return p::make_ACTION_SETRSC(yytext, *driver.loc.back()); }
+{ACTION_SETRSC}:'{VAR_FREE_TEXT_QUOTE}'                                 { return p::make_ACTION_SETRSC(yytext, *driver.loc.back()); }
+{ACTION_SETRSC}:{VAR_FREE_TEXT_SPACE_COMMA}                             { return p::make_ACTION_SETRSC(yytext, *driver.loc.back()); }
+
 {ACTION_STATUS}                                                         { return p::make_ACTION_STATUS(yytext, *driver.loc.back()); }
 {ACTION_ACCURACY}:'{FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
 {ACTION_ACCURACY}:{FREE_TEXT_QUOTE}                                     { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
@@ -509,6 +512,10 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_SESSION}(\:{DICT_ELEMENT_TWO})?                          { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_SESSION}(\.[\']{DICT_ELEMENT_TWO}[\'])?                  { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_SESSION}(\.{DICT_ELEMENT_TWO})?                          { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
+{VARIABLE_RESOURCE}(\:[\']{DICT_ELEMENT_TWO}[\'])?                 { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
+{VARIABLE_RESOURCE}(\:{DICT_ELEMENT_TWO})?                         { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
+{VARIABLE_RESOURCE}(\.[\']{DICT_ELEMENT_TWO}[\'])?                 { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
+{VARIABLE_RESOURCE}(\.{DICT_ELEMENT_TWO})?                         { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_IP}(\:[\']{DICT_ELEMENT_TWO}[\'])?                       { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_IP}(\:{DICT_ELEMENT_TWO})?                               { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_IP}(\.[\']{DICT_ELEMENT_TWO}[\'])?                       { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }

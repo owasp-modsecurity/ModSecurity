@@ -46,6 +46,7 @@ class Driver;
 #include "src/actions/phase.h"
 #include "src/actions/rev.h"
 #include "src/actions/rule_id.h"
+#include "src/actions/set_rsc.h"
 #include "src/actions/set_sid.h"
 #include "src/actions/set_uid.h"
 #include "src/actions/set_var.h"
@@ -487,7 +488,7 @@ using modsecurity::operators::Operator;
   ACTION_SANATISE_REQUEST_HEADER               "SanatiseRequestHeader"
   ACTION_SANATISE_RESPONSE_HEADER              "SanatiseResponseHeader"
   ACTION_SETENV                                "SetEnv"
-  ACTION_SETRSC                                "SetSrc"
+  ACTION_SETRSC                                "SetRsc"
   ACTION_SETSID                                "SetSid"
   ACTION_SETUID                                "SetUID"
   ACTION_SEVERITY                              "Severity"
@@ -2182,7 +2183,7 @@ act:
       }
     | ACTION_SETRSC
       {
-        ACTION_NOT_SUPPORTED("SetRSC", @0);
+        ACTION_CONTAINER($$, new actions::SetRSC($1));
       }
     | ACTION_SETSID
       {
