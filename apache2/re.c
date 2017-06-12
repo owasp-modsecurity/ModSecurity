@@ -401,7 +401,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     param = opt;
                     is_counting = 1;
                 } else  {
-                    param = target;
+                    param = apr_pstrdup(msr->mp, target);
                 }
 
                 opt = strchr(param,':');
@@ -415,6 +415,8 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 if(apr_table_get(ruleset->engine->variables, name) == NULL)   {
                     if(target_list != NULL)
                         free(target_list);
+                    if (target != NULL)
+                        free(target);
                     if(replace != NULL)
                         free(replace);
                     if(msr) {

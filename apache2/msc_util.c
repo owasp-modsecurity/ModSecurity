@@ -22,6 +22,10 @@
 #include "msc_release.h"
 #include "msc_util.h"
 
+#include <apr.h>
+#if APR_HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
 #include <apr_lib.h>
 #include <apr_sha1.h>
 #include "modsecurity_config.h"
