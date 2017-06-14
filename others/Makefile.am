@@ -16,11 +16,16 @@ noinst_HEADERS = \
 	mbedtls/mbed-tls-config.h \
 	mbedtls/md5.h \
 	mbedtls/platform.h \
+	mbedtls/platform_util.h \
+	mbedtls/aes.h \
 	mbedtls/sha1.h
 
 libmbedtls_la_SOURCES = \
 	mbedtls/base64.c \
 	mbedtls/md5.c \
+	mbedtls/aes.c \
+	mbedtls/aesni.c \
+	mbedtls/platform_util.c \
 	mbedtls/sha1.c
 
 libmbedtls_la_CFLAGS = -D MBEDTLS_CONFIG_FILE=\"mbed-tls-config.h\" -Iothers

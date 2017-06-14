@@ -8,6 +8,7 @@
 #include "src/parser/seclang-parser.hh"
 #include "src/utils/https_client.h"
 #include "src/utils/string.h"
+#include "others/mbedtls/aes.h"
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;
@@ -376,6 +377,7 @@ CONFIG_INCLUDE                          (?i:Include)
 CONFIG_SEC_COLLECTION_TIMEOUT           (?i:SecCollectionTimeout)
 CONFIG_SEC_HTTP_BLKEY                   (?i:SecHttpBlKey)
 CONFIG_SEC_REMOTE_RULES                 (?i:SecRemoteRules)
+CONFIG_SEC_BINARY_RULES                 (?i:SecBinaryRules)
 CONFIG_SEC_REMOTE_RULES_FAIL_ACTION     (?i:SecRemoteRulesFailAction)
 CONFIG_SEC_REMOVE_RULES_BY_ID           (?i:SecRuleRemoveById)
 CONFIG_SEC_REMOVE_RULES_BY_MSG          (?i:SecRuleRemoveByMsg)
@@ -1283,6 +1285,44 @@ EQUALS_MINUS                            (?i:=\-)
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
     free(f);
+}
+
+{CONFIG_SEC_BINARY_RULES}[ ]+[^\n\r ]+ {
+// https://tls.mbed.org/kb/how-to/encrypt-with-aes-cbc
+    mbedtls_aes_context aes;
+    std::vector<std::string> conf = modsecurity::utils::string::split(yytext, ' ');
+    if (conf.size() < 2) {
+        driver.error (*driver.loc.back(), "", "SecRemoteRules demands a key and a URI");
+        throw p::syntax_error(*driver.loc.back(), "");
+    }
+
+    std::ifstream t(conf[1]);
+    std::string str;
+        std::cout << conf[1] << std::endl;
+
+
+    t.seekg(0, std::ios::end);
+    str.reserve(t.tellg());
+    t.seekg(0, std::ios::beg);
+
+    str.assign((std::istreambuf_iterator<char>(t)),
+        std::istreambuf_iterator<char>());
+
+    std::cout << str << std::endl;
+
+    driver.ref.push_back(conf[1]);
+    driver.loc.push_back(new yy::location());
+    YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
+    yypush_buffer_state(temp);
+
+    unsigned char key[32] = { 0 };
+    unsigned char iv[16] = { 0 };
+    unsigned char *output = (unsigned char *)malloc(str.size() + 1);
+    mbedtls_aes_setkey_enc( &aes, key, 256 );
+    mbedtls_aes_crypt_cbc( &aes, MBEDTLS_AES_DECRYPT, 24, iv, (unsigned char *) str.c_str(), output );
+
+    yy_scan_string(str.c_str());
+
 }
 
 {CONFIG_SEC_REMOTE_RULES}[ ][^ ]+[ ][^\n\r ]+ {
