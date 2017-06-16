@@ -52,7 +52,9 @@ bool PmFromFile::init(const std::string &config, std::string *error) {
         acmp_add_pattern(m_p, line.c_str(), NULL, NULL, line.length());
     }
 
-    // acmp_prepare(m_p);
+    while (m_p->is_failtree_done == 0) {
+        acmp_prepare(m_p);
+    }
 
     delete iss;
     return true;
