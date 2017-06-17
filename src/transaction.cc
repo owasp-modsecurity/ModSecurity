@@ -1348,7 +1348,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << "\" ";
 
     ss << this->m_httpCodeReturned << " ";
-    ss << this->m_responseBody.tellp();
+    ss << this->m_responseBody.tellp() << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
         this->m_collections.resolveFirst("REFERER").get()) << " ";
