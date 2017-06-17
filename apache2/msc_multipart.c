@@ -695,40 +695,27 @@ static int multipart_boundary_characters_valid(char *boundary) {
 
     if (p == NULL) return -1;
 
-    while((c = *p) != '\0') {
-        /* Control characters and space not allowed. */
-        if (c < 32) {
+    while ((c = *p) != '\0') {
+        // Check against allowed list defined in RFC2046 page 21
+        if (!(
+            ('0' <= c && c <= '9')
+            || ('A' <= c && c <= 'Z')
+            || ('a' <= c && c <= 'z')
+            || (c == ' ' && *(p + 1) != '\0') // space allowed, but not as last character
+            || c == '\''
+            || c == '('
+            || c == ')'
+            || c == '+'
+            || c == '_'
+            || c == ','
+            || c == '-'
+            || c == '.'
+            || c == '/'
+            || c == ':'
+            || c == '='
+            || c == '?'
+            )) {
             return 0;
-        }
-
-        /* Non-ASCII characters not allowed. */
-        if (c > 126) {
-            return 0;
-        }
-
-        switch(c) {
-            /* Special characters not allowed. */
-            case '(' :
-            case ')' :
-            case '<' :
-            case '>' :
-            case '@' :
-            case ',' :
-            case ';' :
-            case ':' :
-            case '\\' :
-            case '"' :
-            case '/' :
-            case '[' :
-            case ']' :
-            case '?' :
-            case '=' :
-                return 0;
-                break;
-
-            default :
-                /* Do nothing. */
-                break;
         }
 
         p++;
