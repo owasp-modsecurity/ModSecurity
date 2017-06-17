@@ -774,11 +774,12 @@ EQUALS_MINUS                            (?i:=\-)
 
 
 <EXPECTING_VAR_PARAMETER>{
-[\/]{DICT_ELEMENT_WITH_PIPE}[\/][ ]              { BEGIN(EXPECTING_VARIABLE); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-3), *driver.loc.back()); }
-[\/]{DICT_ELEMENT_WITH_PIPE}[\/][|]              { BEGIN(EXPECTING_VARIABLE); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-3), *driver.loc.back()); }
-['][\/]{DICT_ELEMENT_WITH_PIPE}[\/][']        { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
-{DICT_ELEMENT}                                { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
-.                                             { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
+[\/]{DICT_ELEMENT_WITH_PIPE}[\/][ ]         { BEGIN(EXPECTING_VARIABLE); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
+[\/]{DICT_ELEMENT_WITH_PIPE}[\/][|]         { BEGIN(EXPECTING_VARIABLE); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
+['][\/]{DICT_ELEMENT_WITH_PIPE}[\/][']      { BEGIN(EXPECTING_VARIABLE); yyless(yyleng - 0); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
+['][\/]{DICT_ELEMENT_WITH_PIPE}[\/]['][|]   { BEGIN(EXPECTING_VARIABLE); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
+{DICT_ELEMENT}                              { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
+.                                           { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 ["]                                         { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 }
 
