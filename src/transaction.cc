@@ -1293,7 +1293,9 @@ int Transaction::processLogging() {
  */
 bool Transaction::intervention(ModSecurityIntervention *it) {
     if (m_it.disruptive) {
-        it->url = m_it.url;
+        if (m_it.url) {
+            it->url = strdup(m_it.url);
+        }
         it->disruptive = m_it.disruptive;
         it->status = m_it.status;
 
