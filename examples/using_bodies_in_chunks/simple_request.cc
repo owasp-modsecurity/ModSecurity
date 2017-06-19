@@ -85,6 +85,42 @@ static void logCb(void *data, const void *ruleMessagev) {
     }
 }
 
+int process_intervention(modsecurity::Transaction *transaction)
+{
+    modsecurity::ModSecurityIntervention intervention;
+    intervention.status = 200;
+    intervention.url = NULL;
+    intervention.log = NULL;
+    intervention.disruptive = 0;
+
+    if (msc_intervention(transaction, &intervention) == 0) {
+        return 0;
+    }
+
+    if (intervention.log == NULL) {
+        intervention.log = strdup("(no log message was specified)");
+    }
+
+    std::cout << "Log: " << intervention.log << std::endl;
+    free(intervention.log);
+
+    if (intervention.url != NULL)
+    {
+        std::cout << "Intervention, redirect to: " << intervention.url;
+        std::cout << " with status code: " << intervention.status << std::endl;
+        free(intervention.url);
+        return intervention.status;
+    }
+
+    if (intervention.status != 200)
+    {
+        std::cout << "Intervention, returning code: " << intervention.status;
+        std::cout << std::endl;
+        return intervention.status;
+    }
+
+    return 0;
+}
 
 int main(int argc, char **argv) {
     modsecurity::ModSecurity *modsec;
@@ -129,21 +165,21 @@ int main(int argc, char **argv) {
      */
     modsecurity::Transaction *modsecTransaction = \
         new modsecurity::Transaction(modsec, rules, NULL);
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * Initial connection setup
      *
      */
     modsecTransaction->processConnection(ip, 12345, "127.0.0.1", 80);
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * Finally we've got the URI
      *
      */
     modsecTransaction->processURI(request_uri, "GET", "1.1");
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * Lets add our request headers.
@@ -151,14 +187,14 @@ int main(int argc, char **argv) {
      */
     modsecTransaction->addRequestHeader("Host",
         "net.tutsplus.com");
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * No other reuqest header to add, let process it.
      *
      */
     modsecTransaction->processRequestHeaders();
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * There is a request body to be informed...
@@ -167,38 +203,38 @@ int main(int argc, char **argv) {
     modsecTransaction->appendRequestBody(
         (const unsigned char*)request_body_first,
         strlen((const char*)request_body_first));
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     modsecTransaction->appendRequestBody(
         (const unsigned char*)request_body_second,
         strlen((const char*)request_body_second));
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     modsecTransaction->appendRequestBody(
         (const unsigned char*)request_body_third,
         strlen((const char*)request_body_third));
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * Request body is there ;) lets process it.
      *
      */
     modsecTransaction->processRequestBody();
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * The webserver is giving back the response headers.
      */
     modsecTransaction->addResponseHeader("HTTP/1.1",
         "200 OK");
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * The response headers are filled in, lets process.
      *
      */
     modsecTransaction->processResponseHeaders(200, "HTTP 1.2");
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * It is time to let modsec aware of the response body
@@ -207,31 +243,31 @@ int main(int argc, char **argv) {
     modsecTransaction->appendResponseBody(
         (const unsigned char*)response_body_first,
         strlen((const char*)response_body_first));
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     modsecTransaction->appendResponseBody(
         (const unsigned char*)response_body_second,
         strlen((const char*)response_body_second));
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     modsecTransaction->appendResponseBody(
         (const unsigned char*)response_body_third,
         strlen((const char*)response_body_third));
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * Finally, lets have the response body processed.
      *
      */
     modsecTransaction->processResponseBody();
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
     /**
      * Keeping track of everything: saving the logs.
      *
      */
     modsecTransaction->processLogging();
-    // TODO: verify if there is any disruptive action.
+    process_intervention(modsecTransaction);
 
 
     /**
