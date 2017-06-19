@@ -2158,6 +2158,11 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
 
             msre_var *rvar = apr_palloc(mptmp, sizeof(msre_var));
 
+            rvar->param = NULL;
+            rvar->param_data = NULL;
+            rvar->metadata = NULL;
+            rvar->param_regex = NULL;
+
             rvar->value = apr_pstrndup(mptmp, str->name, strlen(str->name));
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "%s",
@@ -2217,6 +2222,11 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
         if (match && (strncmp(str->name,"MATCHED_VARS:",13) != 0) && (strncmp(str->name,"MATCHED_VARS_NAMES:",19))) {
 
             msre_var *rvar = apr_palloc(mptmp, sizeof(msre_var));
+
+            rvar->param = NULL;
+            rvar->param_data = NULL;
+            rvar->metadata = NULL;
+            rvar->param_regex = NULL;
 
             rvar->value = apr_pstrndup(mptmp, str->value, str->value_len);
             rvar->value_len = str->value_len;
