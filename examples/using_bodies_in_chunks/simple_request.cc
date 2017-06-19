@@ -103,12 +103,14 @@ int process_intervention(modsecurity::Transaction *transaction)
 
     std::cout << "Log: " << intervention.log << std::endl;
     free(intervention.log);
+    intervention.log = NULL;
 
     if (intervention.url != NULL)
     {
         std::cout << "Intervention, redirect to: " << intervention.url;
         std::cout << " with status code: " << intervention.status << std::endl;
         free(intervention.url);
+        intervention.url = NULL;
         return intervention.status;
     }
 
