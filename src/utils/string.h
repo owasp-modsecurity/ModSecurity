@@ -64,6 +64,7 @@ std::string string_to_hex(const std::string& input);
 std::string toHexIfNeeded(const std::string &str);
 std::string tolower(std::string str);
 std::string toupper(std::string str);
+std::vector<std::string> ssplit(std::string str, char delimiter);
 std::vector<std::string> split(std::string str, char delimiter);
 void chomp(std::string *str);
 void replaceAll(std::string *str, const std::string& from,

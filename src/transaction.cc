@@ -235,7 +235,7 @@ int Transaction::processConnection(const char *client, int cPort,
 bool Transaction::extractArguments(const std::string &orig,
     const std::string& buf, size_t offset) {
     char sep1 = '&';
-    std::vector<std::string> key_value_sets = utils::string::split(buf, sep1);
+    std::vector<std::string> key_value_sets = utils::string::ssplit(buf, sep1);
 
     for (std::string t : key_value_sets) {
         char sep2 = '=';
@@ -247,7 +247,7 @@ bool Transaction::extractArguments(const std::string &orig,
 
         std::string key;
         std::string value;
-        std::vector<std::string> key_value = utils::string::split(t, sep2);
+        std::vector<std::string> key_value = utils::string::ssplit(t, sep2);
         for (auto& a : key_value) {
             if (i == 0) {
                 key = a;
@@ -515,7 +515,7 @@ int Transaction::addRequestHeader(const std::string& key,
 
     if (keyl == "cookie") {
         size_t localOffset = m_variableOffset;
-        std::vector<std::string> cookies = utils::string::split(value, ';');
+        std::vector<std::string> cookies = utils::string::ssplit(value, ';');
         for (const std::string &c : cookies) {
             std::vector<std::string> s = utils::string::split(c,
                '=');
