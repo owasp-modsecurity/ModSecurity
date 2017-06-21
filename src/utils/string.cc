@@ -151,13 +151,24 @@ std::string toupper(std::string str) {
 }
 
 
-std::vector<std::string> split(std::string str, char delimiter) {
+std::vector<std::string> ssplit(std::string str, char delimiter) {
     std::vector<std::string> internal;
     std::stringstream ss(str);  // Turn the string into a stream.
     std::string tok;
 
     while (getline(ss, tok, delimiter)) {
         internal.push_back(tok);
+    }
+
+    return internal;
+}
+
+
+std::vector<std::string> split(std::string str, char delimiter) {
+    std::vector<std::string> internal = ssplit(str, delimiter);
+
+    if (internal.size() == 0) {
+        internal.push_back(str);
     }
 
     return internal;
