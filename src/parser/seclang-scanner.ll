@@ -936,6 +936,10 @@ EQUALS_MINUS                            (?i:=\-)
     std::string url;
 
     std::vector<std::string> conf = modsecurity::utils::string::split(yytext, ' ');
+    if (conf.size() < 2) {
+        driver.error (*driver.loc.back(), "", "SecRemoteRules demands a key and a URI");
+        throw p::syntax_error(*driver.loc.back(), "");
+    }
     key = conf[1];
     url = conf[2];
     c.setKey(key);
