@@ -25,7 +25,7 @@ namespace modsecurity {
 
 bool RulesExceptions::load(const std::string &a, std::string *error) {
     bool added = false;
-    std::vector<std::string> toRemove = utils::string::split(a, ' ');
+    std::vector<std::string> toRemove = utils::string::ssplit(a, ' ');
     for (std::string &a : toRemove) {
         std::string b = modsecurity::utils::string::parserSanitizer(a);
         if (b.size() == 0) {
