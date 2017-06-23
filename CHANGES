@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
  
+ * Best practice: Initialize msre_var pointers
+   [Commit fbd57 - Allan Boll]
  * nginx: Obtain port from r->connection->local_sockaddr.
    [Commit 51314 - @defanator]
  * Updates libinjection to v3.10.0
