@@ -1486,7 +1486,7 @@ std::string Transaction::toJSON(int parts) {
     if (g == NULL) {
       return "";
     }
-    yajl_gen_config(g, yajl_gen_beautify, 1);
+    yajl_gen_config(g, yajl_gen_beautify, 0);
 
     /* main */
     yajl_gen_map_open(g);
@@ -1657,7 +1657,7 @@ std::string Transaction::toJSON(int parts) {
 
     yajl_gen_free(g);
 
-    return log;
+    return log + "\n";
 #else
     return std::string("");
 #endif
