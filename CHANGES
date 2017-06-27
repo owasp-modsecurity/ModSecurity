@@ -1,6 +1,8 @@
-DD MMM YYYY - 2.9.2 - To be released
-------------------------------------
- 
+18 Jul 2017 - 2.9.2
+-------------------
+
+ * IIS build refactoring and dependencies update
+   [Issue #1487 - @victorhora]
  * Best practice: Initialize msre_var pointers
    [Commit fbd57 - Allan Boll]
  * nginx: Obtain port from r->connection->local_sockaddr.
@@ -44,6 +46,7 @@ DD MMM YYYY - 2.9.2 - To be released
    [Issue #1067 - Marc Stern]
  * {dis|en}able-dechunk-logging: Option to disable logging of
    dechunking in audit log when log level < 9.
+   [Issue #1068 - Marc Stern]
  * Updates libinjection to: da027ab52f9cf14401dd92e34e6683d183bdb3b4
    [ModSecurity team]
  * {dis|en}able-handler-logging: Option to disable logging of Apache handler
@@ -91,6 +94,15 @@ DD MMM YYYY - 2.9.2 - To be released
    [Issue #1158 - Thomas Deutschmann (@Whissi)]
  * Treat APR_INCOMPLETE as APR_EOF while receiving the request body.
    [Issue #1060, #334 - Alexey Sintsov]
+
+
+Security issues
+
+ * Allan Boll reported an uninitialized variable that may lead to a crash on
+   Windows platform.
+ * Brian Adeloye reported an infinite loop on the version of libinjection used
+   on ModSecurity 2.9.1.
+
 
 09 Mar 2016 - 2.9.1
 -------------------
