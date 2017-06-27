@@ -221,7 +221,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
         return -1;
     }
 
-    yajl_gen_config(g, yajl_gen_beautify, 1);
+    yajl_gen_config(g, yajl_gen_beautify, 0);
 
     yajl_gen_map_open(g);
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("match"),
@@ -367,6 +367,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     yajl_gen_get_buf(g, &buf, &jsonSize);
 
     json->assign(reinterpret_cast<const char*>(buf), jsonSize);
+    json->append("\n");
 
     yajl_gen_free(g);
 #else
