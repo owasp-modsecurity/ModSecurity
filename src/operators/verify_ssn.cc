@@ -22,13 +22,114 @@
 namespace modsecurity {
 namespace operators {
 
+int VerifySSN::convert_to_int(const char c)
+{
+    int n;
+    if ((c>='0') && (c<='9'))
+        n = c - '0';
+    else if ((c>='A') && (c<='F'))
+        n = c - 'A' + 10;
+    else if ((c>='a') && (c<='f'))
+        n = c - 'a' + 10;
+    else
+        n = 0;
+    return n;
+}
 
-bool VerifySSN::evaluate(Transaction *transaction, const std::string &str) {
-    /**
-     * @todo Implement the operator VerifySSN.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#verifySSN
-     */
+bool VerifySSN::verify(const char *ssnumber, int len) {
+    int i;
+    int num[9];
+    int digits = 0;
+    int area, serial, grp;
+    int sequencial = 0;
+    int repetitions = 0;
+    std::string str_area;
+    std::string str_grp;
+    std::string str_serial;
+
+    for (i = 0; i < len; i++) {
+        if (isdigit(ssnumber[i])) {
+            if (digits < 9)
+                num[digits] = convert_to_int(ssnumber[i]);
+            digits++;
+        }
+    }
+
+    /* Not a valid number */
+    if (digits != 9)
+        goto invalid;
+
+    for (i=0; i < 8; i++)   {
+        if (num[i] == (num[i+1]-1))
+            sequencial++;
+
+        if (num[i] == num[i+1])
+            repetitions++;
+    }
+
+    /* We are blocking when all numbers were sequencial or repeated */
+    if (sequencial == 8)
+        goto invalid;
+
+    if (repetitions == 8)
+        goto invalid;
+
+    str_area.append(std::to_string(num[0]) + std::to_string(num[1]) +
+        std::to_string(num[2]));
+
+    str_grp.append(std::to_string(num[3]) + std::to_string(num[4]));
+
+    str_serial.append(std::to_string(num[5]) + std::to_string(num[6])
+        + std::to_string(num[7]) + std::to_string(num[8]));
+
+    if (str_area.size() == 0 || str_grp.size() == 0
+        || str_serial.size() == 0) {
+        goto invalid;
+    }
+
+    area = atoi(str_area.c_str());
+    grp = atoi(str_grp.c_str());
+    serial = atoi(str_serial.c_str());
+
+    /* Cannot has seroed fields */
+    if (area == 0 || serial == 0 || grp == 0)
+        goto invalid;
+
+    /* More tests */
+    if (area >= 740 || area == 666)
+        goto invalid;
+
     return true;
+
+invalid:
+    return false;
+}
+
+
+bool VerifySSN::evaluate(Transaction *transaction, Rule *rule,
+    const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
+    std::list<SMatch> matches;
+    bool is_ssn = false;
+    int i;
+
+    if (m_param.empty()) {
+        return false;
+    }
+
+    for (i = 0; i < input.size() - 1 && is_ssn == false; i++) {
+        matches = m_re->searchAll(input.substr(i, input.size()));
+
+        for (const auto & i : matches) {
+            is_ssn = verify(i.match.c_str(), i.match.size());
+            logOffset(ruleMessage, i.m_offset, i.m_length);
+            if (is_ssn) {
+                goto out;
+            }
+        }
+    }
+
+out:
+    return is_ssn;
 }
 
 

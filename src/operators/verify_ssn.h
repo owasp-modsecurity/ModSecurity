@@ -19,19 +19,52 @@
 #include <string>
 
 #include "src/operators/operator.h"
+#include "src/utils/regex.h"
 
 
 namespace modsecurity {
+using Utils::SMatch;
+using Utils::regex_search;
+using Utils::Regex;
+
 namespace operators {
 
 class VerifySSN : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     VerifySSN(std::string o, std::string p, bool n)
-        : Operator(o, p, n) { }
+        : Operator(o, p, n) {
+        m_re = new Regex(p);
+    }
+    VerifySSN(std::string name, std::string param)
+        : Operator(name, param) {
+        m_re = new Regex(param);
+    }
     explicit VerifySSN(std::string param)
-        : Operator("VerifySSN", param) { }
-    bool evaluate(Transaction *transaction, const std::string  &str) override;
+        : Operator("VerifySSN", param) {
+        m_re = new Regex(param);
+    }
+
+    ~VerifySSN() {
+        delete m_re;
+    }
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string &input) override {
+        return evaluate(transaction, NULL, input, NULL);
+    }
+    bool evaluate(Transaction *transaction,
+        const std::string &input) override {
+        return evaluate(transaction, NULL, input);
+    }
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string& input,
+        std::shared_ptr<RuleMessage> ruleMessage) override;
+
+    int convert_to_int(const char c);
+    bool verify(const char *ssnumber, int len);
+
+ private:
+    Regex *m_re;
 };
 
 }  // namespace operators
