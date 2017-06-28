@@ -19,25 +19,56 @@
 #include <string>
 
 #include "src/operators/operator.h"
+#include "src/utils/regex.h"
+
 
 namespace modsecurity {
-namespace operators {
+using Utils::SMatch;
+using Utils::regex_search;
+using Utils::Regex;
 
+namespace operators {
 
 class VerifyCPF : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     VerifyCPF(std::string o, std::string p, bool n)
-        : Operator(o, p, n) { }
+        : Operator(o, p, n) {
+        m_re = new Regex(p);
+    }
+    VerifyCPF(std::string name, std::string param)
+        : Operator(name, param) {
+        m_re = new Regex(param);
+    }
     explicit VerifyCPF(std::string param)
-        : Operator("VerifyCPF", param) { }
-    bool evaluate(Transaction *transaction, const std::string  &str) override;
-};
+        : Operator("VerifyCPF", param) {
+        m_re = new Regex(param);
+    }
 
+    ~VerifyCPF() {
+        delete m_re;
+    }
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string &input) override {
+        return evaluate(transaction, NULL, input, NULL);
+    }
+    bool evaluate(Transaction *transaction,
+        const std::string &input) override {
+        return evaluate(transaction, NULL, input);
+    }
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string& input,
+        std::shared_ptr<RuleMessage> ruleMessage) override;
+
+    int convert_to_int(const char c);
+    bool verify(const char *ssnumber, int len);
+
+ private:
+    Regex *m_re;
+};
 
 }  // namespace operators
 }  // namespace modsecurity
-
 
 
 #endif  // SRC_OPERATORS_VERIFY_CPF_H_
