@@ -742,12 +742,12 @@ AP_DECLARE(char *) ap_make_full_path(apr_pool_t *a, const char *src1,
     return path;
 }
 
-static int fname_alphasort(const void *fn1, const void *fn2)
+static int fname_reversealphasort(const void *fn1, const void *fn2)
 {
     const fnames *f1 = fn1;
     const fnames *f2 = fn2;
 
-    return strcmp(f1->fname,f2->fname);
+    return strcmp(f2->fname,f1->fname);
 }
 
 int fnmatch_test(const char *pattern)
@@ -840,7 +840,7 @@ static const char *process_resource_config_nofnmatch(const char *fname,
         apr_dir_close(dirp);
         if (candidates->nelts != 0) {
             qsort((void *) candidates->elts, candidates->nelts,
-                  sizeof(fnames), fname_alphasort);
+                  sizeof(fnames), fname_reversealphasort);
 
             /*
              * Now recurse these... we handle errors and subdirectories
@@ -941,7 +941,7 @@ static const char *process_resource_config_fnmatch(const char *path,
         const char *error;
 
         qsort((void *) candidates->elts, candidates->nelts,
-              sizeof(fnames), fname_alphasort);
+              sizeof(fnames), fname_reversealphasort);
 
         /*
          * Now recurse these... we handle errors and subdirectories
@@ -1201,3 +1201,4 @@ Exit:
 
 	return errmsg;
 }
+
