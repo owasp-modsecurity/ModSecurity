@@ -18,10 +18,29 @@
 #include <string>
 
 #include "src/utils/string.h"
-
+#include "src/variables/variable.h"
 
 namespace modsecurity {
 
+
+RulesExceptions::RulesExceptions() {
+}
+
+
+RulesExceptions::~RulesExceptions() {
+}
+
+
+bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
+    std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
+    std::string *error) {
+
+    for (auto &i : *var) {
+        m_variable_update_target_by_tag.emplace(std::pair<std::string, std::unique_ptr<Variables::Variable>>(tag, std::move(i)));
+    }
+
+    return true;
+}
 
 bool RulesExceptions::load(const std::string &a, std::string *error) {
     bool added = false;
@@ -109,7 +128,7 @@ bool RulesExceptions::contains(int a) {
 }
 
 
-bool RulesExceptions::merge(const RulesExceptions& from) {
+bool RulesExceptions::merge(RulesExceptions& from) {
     for (int a : from.m_numbers) {
         bool ret = addNumber(a);
         if (ret == false) {
@@ -123,9 +142,13 @@ bool RulesExceptions::merge(const RulesExceptions& from) {
         }
     }
 
+    for (auto &p : from.m_variable_update_target_by_tag) {
+        m_variable_update_target_by_tag.emplace(std::pair<std::string, std::unique_ptr<Variables::Variable>>(p.first, std::move(p.second)));
+    }
+
+
     return true;
 }
-
 
 }  // namespace modsecurity
 

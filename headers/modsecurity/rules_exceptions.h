@@ -25,6 +25,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <memory>
 #endif
 
 #ifndef HEADERS_MODSECURITY_RULES_EXCEPTIONS_H_
@@ -34,15 +35,26 @@
 
 
 namespace modsecurity {
+namespace Variables {
+class Variable;
+}
 
 class RulesExceptions {
  public:
-    RulesExceptions() { }
+    RulesExceptions();
+    ~RulesExceptions();
+
     bool load(const std::string &data, std::string *error);
     bool addRange(int a, int b);
     bool addNumber(int a);
     bool contains(int a);
-    bool merge(const RulesExceptions& from);
+    bool merge(RulesExceptions& from);
+
+    bool loadUpdateTargetByTag(const std::string &tag,
+        std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
+        std::string *error);
+
+    std::unordered_multimap<std::string, std::unique_ptr<Variables::Variable>> m_variable_update_target_by_tag;
 
  private:
     std::list<std::pair<int, int> > m_ranges;

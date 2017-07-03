@@ -558,6 +558,7 @@ using modsecurity::operators::Operator;
   CONFIG_SEC_COLLECTION_TIMEOUT                "CONFIG_SEC_COLLECTION_TIMEOUT"
   CONFIG_SEC_REMOTE_RULES_FAIL_ACTION          "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
   CONFIG_SEC_RULE_REMOVE_BY_ID                 "CONFIG_SEC_RULE_REMOVE_BY_ID"
+  CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG         "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
   CONFIG_UPDLOAD_KEEP_FILES                    "CONFIG_UPDLOAD_KEEP_FILES"
   CONFIG_UPDLOAD_SAVE_TMP_FILES                "CONFIG_UPDLOAD_SAVE_TMP_FILES"
   CONFIG_UPLOAD_DIR                            "CONFIG_UPLOAD_DIR"
@@ -1165,6 +1166,19 @@ expression:
         if (driver.m_exceptions.load($1, &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveById: failed to load:";
+            ss << $1;
+            ss << ". ";
+            ss << error;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+      }
+    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG variables
+      {
+        std::string error;
+        if (driver.m_exceptions.loadUpdateTargetByTag($1, std::move($2), &error) == false) {
+            std::stringstream ss;
+            ss << "SecRuleUpdateTargetByTag: failed to load:";
             ss << $1;
             ss << ". ";
             ss << error;
