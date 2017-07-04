@@ -2158,12 +2158,14 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
  */
 static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg) {
-
+    int capture;
     int is_xss;
 
     is_xss = libinjection_xss(var->value, var->value_len);
+    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (is_xss) {
+        set_match_to_tx(msr, capture, var->value, 0);
         *error_msg = apr_psprintf(msr->mp, "detected XSS using libinjection.");
 
         if (msr->txcfg->debuglog_level >= 9) {
