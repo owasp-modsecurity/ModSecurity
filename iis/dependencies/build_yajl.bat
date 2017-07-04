@@ -20,10 +20,10 @@ nmake
 
 cd "%WORK%"
 
-copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.dll" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.pdb" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.lib" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl_s.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl.pdb" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl_s.lib" "%OUTPUT_DIR%"
 
 @exit /B 0
 
