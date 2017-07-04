@@ -42,6 +42,17 @@ bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
     return true;
 }
 
+bool RulesExceptions::loadUpdateTargetById(double id,
+    std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
+    std::string *error) {
+
+    for (auto &i : *var) {
+        m_variable_update_target_by_id.emplace(std::pair<double, std::unique_ptr<Variables::Variable>>(id , std::move(i)));
+    }
+
+    return true;
+}
+
 bool RulesExceptions::load(const std::string &a, std::string *error) {
     bool added = false;
     std::vector<std::string> toRemove = utils::string::ssplit(a, ' ');
@@ -146,6 +157,9 @@ bool RulesExceptions::merge(RulesExceptions& from) {
         m_variable_update_target_by_tag.emplace(std::pair<std::string, std::unique_ptr<Variables::Variable>>(p.first, std::move(p.second)));
     }
 
+    for (auto &p : from.m_variable_update_target_by_id) {
+        m_variable_update_target_by_id.emplace(std::pair<double, std::unique_ptr<Variables::Variable>>(p.first, std::move(p.second)));
+    }
 
     return true;
 }

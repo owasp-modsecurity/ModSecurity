@@ -277,4 +277,5 @@ TESTS+=test/test-cases/secrules-language-tests/operators/detectXSS.json
 TESTS+=test/test-cases/secrules-language-tests/operators/eq.json
 TESTS+=test/test-cases/regression/offset-variable.json
 TESTS+=test/test-cases/regression/config-update-target-by-tag.json
+TESTS+=test/test-cases/regression/config-update-target-by-id.json
 

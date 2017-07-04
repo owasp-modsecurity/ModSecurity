@@ -418,6 +418,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
     Transaction *trans) {
     std::list<const std::string*> exclusions;
     std::list<const std::string*> exclusions_update_by_tag_remove;
+    std::list<const std::string*> exclusions_update_by_id_remove;
     std::vector<Variables::Variable *> variables;
     std::vector<std::unique_ptr<collection::Variable>> finalVars;
 
@@ -441,6 +442,23 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
         }
     }
 
+    for (auto &a : trans->m_rules->m_exceptions.m_variable_update_target_by_id) {
+        if (m_ruleId != a.first) {
+            continue;
+        }
+        if (a.second->m_isExclusion) {
+            std::vector<const collection::Variable *> z;
+            a.second->evaluateInternal(trans, this, &z);
+            for (auto &y : z) {
+                exclusions_update_by_id_remove.push_back(y->m_key);
+            }
+            exclusions_update_by_id_remove.push_back(&a.second->m_name);
+        } else {
+            Variable *b = a.second.get();
+            variables.push_back(b);
+        }
+    }
+
     for (int i = 0; i < variables.size(); i++) {
         Variable *variable = variables.at(i);
         if (variable->m_isExclusion) {
@@ -452,6 +470,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             exclusions.push_back(&variable->m_name);
         }
     }
+
     for (int i = 0; i < variables.size(); i++) {
         Variable *variable = variables.at(i);
         std::vector<const collection::Variable *> e;
@@ -491,6 +510,22 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 }
                 continue;
             }
+
+            if (std::find_if(exclusions_update_by_id_remove.begin(),
+                exclusions_update_by_id_remove.end(),
+                [key](const std::string *m) -> bool { return *key == *m; })
+                != exclusions_update_by_id_remove.end()) {
+#ifndef NO_LOGS
+                trans->debug(9, "Variable: " + *key +
+                    " is part of the exclusion list (from update by ID), skipping...");
+#endif
+                if (v->m_dynamic) {
+                    delete v;
+                    v = NULL;
+                }
+                continue;
+            }
+
             for (auto &i : trans->m_ruleRemoveTargetByTag) {
                 std::string tag = i.first;
                 std::string args = i.second;

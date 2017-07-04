@@ -559,6 +559,7 @@ using modsecurity::operators::Operator;
   CONFIG_SEC_REMOTE_RULES_FAIL_ACTION          "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
   CONFIG_SEC_RULE_REMOVE_BY_ID                 "CONFIG_SEC_RULE_REMOVE_BY_ID"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG         "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+  CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID          "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
   CONFIG_UPDLOAD_KEEP_FILES                    "CONFIG_UPDLOAD_KEEP_FILES"
   CONFIG_UPDLOAD_SAVE_TMP_FILES                "CONFIG_UPDLOAD_SAVE_TMP_FILES"
   CONFIG_UPLOAD_DIR                            "CONFIG_UPLOAD_DIR"
@@ -1179,6 +1180,32 @@ expression:
         if (driver.m_exceptions.loadUpdateTargetByTag($1, std::move($2), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetByTag: failed to load:";
+            ss << $1;
+            ss << ". ";
+            ss << error;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+      }
+    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID variables
+      {
+        std::string error;
+        double ruleId;
+        try {
+            ruleId = std::stod($1);
+        } catch (...) {
+            std::stringstream ss;
+            ss << "SecRuleUpdateTargetById: failed to load:";
+            ss << "The input \"" + $1 + "\" does not ";
+            ss << "seems to be a valid rule id.";
+            ss << ". ";
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+
+        if (driver.m_exceptions.loadUpdateTargetById(ruleId, std::move($2), &error) == false) {
+            std::stringstream ss;
+            ss << "SecRuleUpdateTargetById: failed to load:";
             ss << $1;
             ss << ". ";
             ss << error;
