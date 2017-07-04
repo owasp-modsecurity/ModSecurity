@@ -1,3 +1,5 @@
+::@if NOT (%ERRORLEVEL%) == (1) Echo "Patch successfull... For more info on patch see: https://vcs.pcre.org/pcre/code/trunk/CMakeLists.txt?r1=1659&r2=1677&view=patch"
+
 cd "%WORK_DIR%"
 
 @if NOT EXIST "%SOURCE_DIR%\%APACHE_BIN%" goto file_not_found_bin
@@ -6,6 +8,11 @@ cd "%WORK_DIR%"
 set PCRE_DIR=%PCRE:~0,-4%
 
 move "%PCRE_DIR%" "pcre"
+
+@if "%PCRE_DIR%" == "pcre-8.40" (
+	Echo. && Echo "PCRE 8.40 found... patching with patch-pcre-8.40.vbs..." 
+	cscript /B /Nologo ../patch-pcre-8.40.vbs
+)
 
 cd "pcre"
 CMAKE -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True
