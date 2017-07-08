@@ -62,6 +62,7 @@ std::string MacroExpansion::expand(const std::string& input,
     while (pos != std::string::npos) {
         size_t start = pos;
         size_t end = res.find("}");
+        size_t new_pos = start;
         if (end == std::string::npos) {
             return res;
         }
@@ -313,9 +314,13 @@ std::string MacroExpansion::expand(const std::string& input,
 
         if (variableValue != NULL) {
             res.insert(start, *variableValue);
+            new_pos = new_pos + (*variableValue).length();
+        }
+        if (new_pos + 3 >= res.length()) {
+            break;
         }
 
-        pos = res.find("%{");
+        pos = res.find("%{", new_pos);
     }
 
     return res;
