@@ -32,12 +32,15 @@ src/stamp-h1
 /test/unit_tests
 /test-driver
 /test/massif.out.*
+/test/benchmark/benchmark
+/test/benchmark/owasp-v3/
+/test/test-cases/regression/*.trs
+/test/test-cases/regression/*.log
+/test-suite.log
 ylwrap
 missing
 install-sh
 libtool
 ltmain.sh
 examples/simple_example_using_c/test
-test/benchmark/benchmark
-test/benchmark/owasp-v3/
 /tools/rules-check/modsec-rules-check
