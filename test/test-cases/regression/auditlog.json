@@ -5,11 +5,11 @@
     "version_max": 0,
     "title": "auditlog : basic parser test - Parallel",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -62,11 +62,11 @@
     "version_max": 0,
     "title": "auditlog : basic parser test - Serial",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -120,11 +120,11 @@
     "version_max": 0,
     "title": "auditlog : basic parser test - Parallel",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {

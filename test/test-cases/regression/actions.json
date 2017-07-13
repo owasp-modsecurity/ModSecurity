@@ -5,11 +5,11 @@
     "version_max": 0,
     "title": "actions :: trim,deny",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -64,11 +64,11 @@
     "version_max": 0,
     "title": "actions :: trim,redirect:'http://www.google.com'",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -124,11 +124,11 @@
     "version_max": 0,
     "title": "actions :: trim,status:500,redirect:http://www.google.com",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -184,11 +184,11 @@
     "version_max": 0,
     "title": "actions :: trim,status:500",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -243,11 +243,11 @@
     "version_max": 0,
     "title": "actions :: phase:2,trim,status:500,deny",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -302,11 +302,11 @@
     "version_max": 0,
     "title": "actions :: phase:4,trim,status:500,deny",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {

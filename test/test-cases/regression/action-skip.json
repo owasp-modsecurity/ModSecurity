@@ -7,7 +7,7 @@
       "debug_log": "\\[9\\] Skipped rule id \\'2\\' due to a \\`skip\\' action."
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -22,7 +22,7 @@
       "method":"GET"
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[
@@ -41,7 +41,7 @@
       "parser_error": "Rules error. File: action-skip.json. Line: 2. Column: 71. Invalid action:  skip:abc"
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -56,7 +56,7 @@
       "method":"GET"
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[
@@ -75,7 +75,7 @@
       "debug_log": "\\[9\\] Skipped rule id \\'3\\' due to a \\`skip\\' action."
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -90,7 +90,7 @@
       "method":"GET"
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[

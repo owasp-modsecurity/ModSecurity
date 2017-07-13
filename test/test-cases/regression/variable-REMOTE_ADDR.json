@@ -4,11 +4,11 @@
     "version_min":300000,
     "title":"Testing Variables :: REMOTE_ADDR",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -33,7 +33,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"200.249.12.31\" \\(Variable: REMOTE_ADDR\\)"
+      "debug_log":"Target value: \"192.0.2.31\" \\(Variable: REMOTE_ADDR\\)"
     },
     "rules":[
       "SecRuleEngine On",
@@ -49,7 +49,7 @@
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{

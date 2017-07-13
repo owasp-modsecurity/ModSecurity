@@ -4,11 +4,11 @@
     "version_min":300000,
     "title":"Testing Variables :: RULE (1/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -48,11 +48,11 @@
     "version_min":300000,
     "title":"Testing Variables :: RULE (2/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -92,11 +92,11 @@
     "version_min":300000,
     "title":"Testing Variables :: RULE (3/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -136,11 +136,11 @@
     "version_min":300000,
     "title":"Testing Variables :: RULE (4/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -180,11 +180,11 @@
     "version_min":300000,
     "title":"Testing Variables :: RULE (5/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -224,11 +224,11 @@
     "version_min":300000,
     "title":"Testing Variables :: RULE (6/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -268,11 +268,11 @@
     "version_min":300000,
     "title":"Testing Variables :: RULE (7/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{

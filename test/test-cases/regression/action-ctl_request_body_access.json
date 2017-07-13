@@ -4,11 +4,11 @@
     "version_min":300000,
     "title":"Testing CtlRequestBodyAccess (1)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -65,11 +65,11 @@
     "version_min":300000,
     "title":"Testing CtlRequestBodyAccess (2)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -126,11 +126,11 @@
     "version_min":300000,
     "title":"Testing CtlRequestBodyAccess (3)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{

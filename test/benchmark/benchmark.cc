@@ -61,7 +61,7 @@ unsigned char response_body[] = "" \
     "  </soap:Body>\n\r" \
     "</soap:Envelope>\n\r";
 
-char ip[] = "200.249.12.31";
+char ip[] = "192.0.2.31";
 
 char rules_file[] = "basic_rules.conf";
 

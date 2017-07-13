@@ -4,11 +4,11 @@
     "version_min":300000,
     "title":"Testing Variables :: HIGHEST_SEVERITY (1/2)",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -35,7 +35,7 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecRule REMOTE_ADDR \"@contains 200.249\" \"id:1,pass,t:trim,severity:0\"",
+      "SecRule REMOTE_ADDR \"@contains 192.0.2.31\" \"id:1,pass,t:trim,severity:0\"",
       "SecRule HIGHEST_SEVERITY \"@lt 10\" \"id:2,pass,t:trim\""
     ]
   },
@@ -44,11 +44,11 @@
     "version_min":300000,
     "title":"Testing Variables :: HIGHEST_SEVERITY (2/2)",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -75,9 +75,8 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecRule REMOTE_ADDR \"@contains 200.249\" \"id:1,pass,t:trim,severity:EMERGENCY\"",
+      "SecRule REMOTE_ADDR \"@contains 192.0.2.31\" \"id:1,pass,t:trim,severity:EMERGENCY\"",
       "SecRule HIGHEST_SEVERITY \"@lt 10\" \"id:2,pass,t:trim\""
     ]
   }
 ]
-

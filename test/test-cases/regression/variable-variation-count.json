@@ -5,11 +5,11 @@
     "version_max": 0,
     "title": "Testing variable variations :: count (1/3)",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -62,11 +62,11 @@
     "version_max": 0,
     "title": "Testing variable variations :: count (2/3)",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {
@@ -119,11 +119,11 @@
     "version_max": 0,
     "title": "Testing variable variations :: count (3/3)",
     "client": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 2313
     },
     "server": {
-      "ip": "200.249.12.31",
+      "ip": "192.0.2.31",
       "port": 80
     },
     "request": {

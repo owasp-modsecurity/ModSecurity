@@ -7,7 +7,7 @@
       "debug_log": "XML: Successfully validated payload against DTD: test-cases/data/SoapEnvelope.dtd"
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -33,7 +33,7 @@
       ]
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[
@@ -53,7 +53,7 @@
       "http_code": 403
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -79,7 +79,7 @@
       ]
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[
@@ -99,7 +99,7 @@
       "http_code": 403
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -125,7 +125,7 @@
       ]
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[
@@ -145,7 +145,7 @@
       "http_code": 403
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -171,7 +171,7 @@
       ]
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[

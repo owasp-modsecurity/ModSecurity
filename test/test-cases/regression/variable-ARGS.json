@@ -4,11 +4,11 @@
     "version_min":300000,
     "title":"Testing Variables :: ARGS - GET (1/7)",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -43,11 +43,11 @@
     "version_min":300000,
     "title":"Testing Variables :: ARGS - GET (2/7)",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -82,11 +82,11 @@
     "version_min":300000,
     "title":"Testing Variables :: ARGS - POST (3/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -126,11 +126,11 @@
     "version_min":300000,
     "title":"Testing Variables :: ARGS - POST (4/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -170,11 +170,11 @@
     "version_min":300000,
     "title":"Testing Variables :: ARGS - POST (5/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -214,11 +214,11 @@
     "version_min":300000,
     "title":"Testing Variables :: ARGS - POST (6/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
@@ -258,11 +258,11 @@
     "version_min":300000,
     "title":"Testing Variables :: ARGS - POST (7/7)",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{
