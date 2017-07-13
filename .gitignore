@@ -27,8 +27,11 @@ src/location.hh
 src/position.hh
 src/stack.hh
 src/stamp-h1
-test/regression-tests
-test/unit-tests
+/test/rules_optimization
+/test/regression_tests
+/test/unit_tests
+/test-driver
+/test/massif.out.*
 ylwrap
 missing
 install-sh
@@ -37,3 +40,4 @@ ltmain.sh
 examples/simple_example_using_c/test
 test/benchmark/benchmark
 test/benchmark/owasp-v3/
+/tools/rules-check/modsec-rules-check
