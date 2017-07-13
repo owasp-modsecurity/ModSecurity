@@ -47,7 +47,7 @@ enum AllowType : int {
   /**
    *
    */
-  FromNowOneAllowType,
+  FromNowOnAllowType,
 };
 
 
@@ -71,8 +71,8 @@ class Allow : public Action {
             return "Request";
         } else if (a == PhaseAllowType) {
             return "Phase";
-        } else if (a == FromNowOneAllowType) {
-            return "FromNowOne";
+        } else if (a == FromNowOnAllowType) {
+            return "FromNowOn";
         } else {
             return "Unknown";
         }
