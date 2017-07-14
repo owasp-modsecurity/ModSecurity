@@ -884,14 +884,14 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
 
         if (msr->msc_reqbody_filename != NULL) {
             if (keep_body) {
+                /* Move request body (which is a file) to the storage area. */
+                const char *put_filename = NULL;
+                const char *put_basename = NULL;
+
                 if (strcmp(msr->txcfg->upload_dir, msr->txcfg->tmp_dir) == 0) {
                     msr_log(msr, 4, "Not moving file to identical location.");
                     goto nullify;
                 }
-
-                /* Move request body (which is a file) to the storage area. */
-                const char *put_filename = NULL;
-                const char *put_basename = NULL;
 
                 /* Construct the new filename. */
                 put_basename = file_basename(msr->msc_reqbody_mp, msr->msc_reqbody_filename);
