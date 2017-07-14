@@ -65,7 +65,7 @@
 		SecRule REMOTE_ADDR "\@ipMatchFromFile https://status.modsecurity.org/modsecurity-regression-test-huge-ip-list.txt" "id:10500,pass"
 	),
 	match_log => {
-		error => [ qr/ModSecurity: Problems loading external resources: Failed to download: \"https:\/\/status.modsecurity.org\/modsecurity-regression-test-huge-ip-list.txt\" error: SSL peer certificate or SSH remote key was not OK./, 1],
+		error => [ qr/ModSecurity: Problems loading external resources: Failed to download: \"https:\/\/status.modsecurity.org\/modsecurity-regression-test-huge-ip-list.txt\" error: [SSL peer certificate or SSH remote key was not OK.|Couldn't connect to server.]/, 1],
 	},
 },
 

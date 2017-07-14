@@ -67,7 +67,7 @@
 
 	),
 	match_log => {
-		error => [ qr/ModSecurity: Problems loading external resources: Failed to download: \"https:\/\/status.modsecurity.org\/modsecurity-regression-test.txt\" error: SSL peer certificate or SSH remote key was not OK./, 1],
+		error => [ qr/ModSecurity: Problems loading external resources: Failed to download: \"https:\/\/status.modsecurity.org\/modsecurity-regression-test.txt\" error: [SSL peer certificate or SSH remote key was not OK.|Couldn't connect to server.]/, 1],
 	},
 	match_response => {
 		status => qr/^404$/,
