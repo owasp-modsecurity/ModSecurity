@@ -502,7 +502,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 != exclusions_update_by_tag_remove.end()) {
 #ifndef NO_LOGS
                 trans->debug(9, "Variable: " + *key +
-                    " is part of the exclusion list (from update by tag " +
+                    " is part of the exclusion list (from update by tag" +
                     "), skipping...");
 #endif
                 if (v->m_dynamic) {
@@ -530,14 +530,26 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             for (auto &i : trans->m_ruleRemoveTargetByTag) {
                 std::string tag = i.first;
                 std::string args = i.second;
+                size_t posa = key->find(":");
+
                 if (containsTag(tag, trans) == false) {
                     continue;
                 }
+
                 if (args == *key) {
                     trans->debug(9, "Variable: " + *key +
                         " was excluded by ruleRemoteTargetByTag...");
                     ignoreVariable = true;
                     break;
+                }
+                if (posa != std::string::npos) {
+                    std::string var = std::string(*key, posa);
+                    if (var == args) {
+                        trans->debug(9, "Variable: " + *key +
+                            " was excluded by ruleRemoteTargetByTag...");
+                        ignoreVariable = true;
+                        break;
+                    }
                 }
             }
             if (ignoreVariable) {
@@ -551,14 +563,28 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             for (auto &i : trans->m_ruleRemoveTargetById) {
                 int id = i.first;
                 std::string args = i.second;
+                size_t posa = key->find(":");
+
                 if (m_ruleId != id) {
                     continue;
                 }
+
                 if (args == *key) {
                     trans->debug(9, "Variable: " + *key +
                         " was excluded by ruleRemoveTargetById...");
                     ignoreVariable = true;
                     break;
+                }
+                if (posa != std::string::npos) {
+                    if (key->size() > posa) {
+                        std::string var = std::string(*key, 0, posa);
+                        if (var == args) {
+                            trans->debug(9, "Variable: " + var +
+                                " was excluded by ruleRemoveTargetById...");
+                            ignoreVariable = true;
+                            break;
+                        }
+                    }
                 }
             }
             if (ignoreVariable) {
