@@ -502,7 +502,8 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 != exclusions_update_by_tag_remove.end()) {
 #ifndef NO_LOGS
                 trans->debug(9, "Variable: " + *key +
-                    " is part of the exclusion list (from update by tag), skipping...");
+                    " is part of the exclusion list (from update by tag " +
+                    "), skipping...");
 #endif
                 if (v->m_dynamic) {
                     delete v;
@@ -555,7 +556,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 }
                 if (args == *key) {
                     trans->debug(9, "Variable: " + *key +
-                        " was excluded by ruleRemoteTargetById...");
+                        " was excluded by ruleRemoveTargetById...");
                     ignoreVariable = true;
                     break;
                 }
