@@ -1407,10 +1407,14 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         }
         audit_log << std::endl;
     }
-    if (parts & audit_log::AuditLog::CAuditLogPart) {
+    if (parts & audit_log::AuditLog::CAuditLogPart
+        &&  m_requestBody.tellp() > 0) {
+        std::string body =  m_requestBody.str();
         audit_log << "--" << trailer << "-" << "C--" << std::endl;
+        if (body.size() > 0) {
+            audit_log << body << std::endl;
+        }
         audit_log << std::endl;
-        /** TODO: write audit_log C part. */
     }
     if (parts & audit_log::AuditLog::DAuditLogPart) {
         audit_log << "--" << trailer << "-" << "D--" << std::endl;
