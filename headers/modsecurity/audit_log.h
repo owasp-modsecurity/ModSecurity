@@ -193,10 +193,10 @@ class AuditLog {
         | FAuditLogPart | HAuditLogPart | ZAuditLogPart;
 
     int m_filePermission;
-    int m_defaultFilePermission = 1600;
+    int m_defaultFilePermission = 0640;
 
     int m_directoryPermission;
-    int m_defaultDirectoryPermission = 1872;
+    int m_defaultDirectoryPermission = 0750;
 
  private:
     AuditLogStatus m_status;
