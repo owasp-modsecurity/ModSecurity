@@ -1434,6 +1434,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         std::vector<const collection::Variable *> l;
 
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
+        audit_log << "HTTP/" << m_httpVersion  << " " << this->m_httpCodeReturned << std::endl;
         m_variableResponseHeaders.resolve(&l);
         for (auto h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
