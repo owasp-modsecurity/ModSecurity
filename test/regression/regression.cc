@@ -93,8 +93,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
     std::vector<RegressionTest *> *tests,
     ModSecurityTestResults<RegressionTestResult> *res, int *count) {
 
-
     for (RegressionTest *t : *tests) {
+        if (t->enabled == 0) {
+            continue;
+        }
+
         CustomDebugLog *debug_log = new CustomDebugLog();
         modsecurity::ModSecurity *modsec = NULL;
         modsecurity::Rules *modsec_rules = NULL;
