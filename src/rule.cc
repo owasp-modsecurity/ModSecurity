@@ -186,7 +186,7 @@ bool Rule::evaluateActions(Transaction *trans) {
 
 void Rule::updateMatchedVars(Transaction *trans, std::string key,
     std::string value) {
-    trans->debug(4, "Matched vars updated.");
+    trans->debug(9, "Matched vars updated.");
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
     trans->m_variableMatchedVarName.set(key, trans->m_variableOffset);
 
@@ -196,7 +196,7 @@ void Rule::updateMatchedVars(Transaction *trans, std::string key,
 
 
 void Rule::cleanMatchedVars(Transaction *trans) {
-    trans->debug(4, "Matched vars cleaned.");
+    trans->debug(9, "Matched vars cleaned.");
     trans->m_variableMatchedVar.unset();
     trans->m_variableMatchedVars.unset();
     trans->m_variableMatchedVarName.unset();
@@ -254,17 +254,14 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     for (Action *a : this->m_actionsRuntimePos) {
         if (a->isDisruptive() == true) {
             if (a->m_name == "pass") {
-                trans->debug(4, "Rule contains a `pass' action");
+                trans->debug(9, "Rule contains a `pass' action");
             } else {
                 *containsDisruptive = true;
             }
         } else {
-            if (a->m_name == "setvar"
-                || a->m_name == "msg"
-                || a->m_name == "log") {
-                trans->debug(4, "Running [I] (_non_ disruptive) " \
-                    "action: " + a->m_name);
-                    a->evaluate(this, trans, ruleMessage);
+            if (a->m_name == "setvar" || a->m_name == "msg" || a->m_name == "log") {
+                trans->debug(4, "Running [independent] (non-disruptive) action: " + a->m_name);
+				a->evaluate(this, trans, ruleMessage);
             }
         }
     }
@@ -293,7 +290,7 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
     end = clock();
     elapsed_s = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-    trans->debug(4, "Operator completed in " + \
+    trans->debug(5, "Operator completed in " + \
         std::to_string(elapsed_s) + " seconds");
 #endif
     return ret;
@@ -628,14 +625,14 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         }
 
         if (a->isDisruptive() == false) {
-            trans->debug(4, "(SecDefaultAction) Running " \
+            trans->debug(9, "(SecDefaultAction) Running " \
                 "action: " + a->m_name);
-                a->evaluate(this, trans, ruleMessage);
+            a->evaluate(this, trans, ruleMessage);
             continue;
         }
 
         if (containsDisruptive) {
-            trans->debug(4, "(SecDefaultAction) _ignoring_ " \
+            trans->debug(4, "(SecDefaultAction) ignoring " \
                 "action: " + a->m_name + \
                 " (rule contains a disruptive action)");
             continue;
@@ -644,14 +641,13 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         if (trans->m_rules->m_secRuleEngine == Rules::EnabledRuleEngine) {
             trans->debug(4, "(SecDefaultAction) " \
                 "Running action: " + a->m_name + \
-                " (rule _does not_ contains a " \
-                "disruptive action)");
+                " (rule does not contain a disruptive action)");
             a->evaluate(this, trans, ruleMessage);
             continue;
         }
 
-        trans->debug(4, "(SecDefaultAction) _Not_ running action: " \
-                + a->m_name + ". Rule _does not_contains a disruptive action,"\
+        trans->debug(4, "(SecDefaultAction) Not running action: " \
+                + a->m_name + ". Rule does not contain a disruptive action,"\
                 + " but SecRuleEngine is not On.");
     }
 
@@ -659,14 +655,13 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         if (a->isDisruptive() == false) {
             if (a->m_name != "setvar" && a->m_name != "log"
                 && a->m_name != "msg") {
-                trans->debug(4, "Running [I] (_non_ disruptive) " \
-                    "action: " + a->m_name);
-                    a->evaluate(this, trans, ruleMessage);
+                trans->debug(4, "Running (non-disruptive) action: " + a->m_name);
+                a->evaluate(this, trans, ruleMessage);
             }
             continue;
         }
         if (trans->m_rules->m_secRuleEngine == Rules::EnabledRuleEngine) {
-            trans->debug(4, "Running (disruptive) action: " + a->m_name);
+            trans->debug(4, "Running (disruptive)     action: " + a->m_name);
             a->evaluate(this, trans, ruleMessage);
             continue;
         }

@@ -276,7 +276,7 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
     if ((m_status == RelevantOnlyAuditLogStatus
         && this->isRelevant(transaction->m_httpCodeReturned) == false)
         && saveAnyway == false) {
-        transaction->debug(5, "Return code `" +
+        transaction->debug(9, "Return code `" +
             std::to_string(transaction->m_httpCodeReturned) + "'" \
             " is not interesting to audit logs, relevant code(s): `" +
             m_relevant + "'.");
