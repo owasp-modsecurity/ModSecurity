@@ -186,7 +186,7 @@ bool Rule::evaluateActions(Transaction *trans) {
 
 void Rule::updateMatchedVars(Transaction *trans, std::string key,
     std::string value) {
-    trans->debug(4, "Matched vars updated.");
+    trans->debug(9, "Matched vars updated.");
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
     trans->m_variableMatchedVarName.set(key, trans->m_variableOffset);
 
@@ -196,7 +196,7 @@ void Rule::updateMatchedVars(Transaction *trans, std::string key,
 
 
 void Rule::cleanMatchedVars(Transaction *trans) {
-    trans->debug(4, "Matched vars cleaned.");
+    trans->debug(9, "Matched vars cleaned.");
     trans->m_variableMatchedVar.unset();
     trans->m_variableMatchedVars.unset();
     trans->m_variableMatchedVarName.unset();
@@ -254,7 +254,7 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     for (Action *a : this->m_actionsRuntimePos) {
         if (a->isDisruptive() == true) {
             if (a->m_name == "pass") {
-                trans->debug(4, "Rule contains a `pass' action");
+                trans->debug(9, "Rule contains a `pass' action");
             } else {
                 *containsDisruptive = true;
             }
@@ -290,7 +290,7 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
     end = clock();
     elapsed_s = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-    trans->debug(4, "Operator completed in " + \
+    trans->debug(5, "Operator completed in " + \
         std::to_string(elapsed_s) + " seconds");
 #endif
     return ret;
@@ -625,9 +625,9 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         }
 
         if (a->isDisruptive() == false) {
-            trans->debug(4, "(SecDefaultAction) Running " \
+            trans->debug(9, "(SecDefaultAction) Running " \
                 "action: " + a->m_name);
-                a->evaluate(this, trans, ruleMessage);
+            a->evaluate(this, trans, ruleMessage);
             continue;
         }
 

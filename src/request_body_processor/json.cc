@@ -245,7 +245,7 @@ JSON::JSON(Transaction *transaction) : m_transaction(transaction) {
     };
 
 
-    debug(4, "JSON parser initialization");
+    debug(9, "JSON parser initialization");
 
     /**
      * Prefix and current key are initially empty
@@ -269,7 +269,7 @@ JSON::JSON(Transaction *transaction) : m_transaction(transaction) {
 
 
 JSON::~JSON() {
-    debug(4, "JSON: Cleaning up JSON results");
+    debug(9, "JSON: Cleaning up JSON results");
     yajl_free(m_data.handle);
 }
 
