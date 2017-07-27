@@ -259,12 +259,9 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
                 *containsDisruptive = true;
             }
         } else {
-            if (a->m_name == "setvar"
-                || a->m_name == "msg"
-                || a->m_name == "log") {
-                trans->debug(4, "Running [I] (_non_ disruptive) " \
-                    "action: " + a->m_name);
-                    a->evaluate(this, trans, ruleMessage);
+            if (a->m_name == "setvar" || a->m_name == "msg" || a->m_name == "log") {
+                trans->debug(4, "Running [independent] (non-disruptive) action: " + a->m_name);
+				a->evaluate(this, trans, ruleMessage);
             }
         }
     }
@@ -635,7 +632,7 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         }
 
         if (containsDisruptive) {
-            trans->debug(4, "(SecDefaultAction) _ignoring_ " \
+            trans->debug(4, "(SecDefaultAction) ignoring " \
                 "action: " + a->m_name + \
                 " (rule contains a disruptive action)");
             continue;
@@ -644,14 +641,13 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
             trans->debug(4, "(SecDefaultAction) " \
                 "Running action: " + a->m_name + \
-                " (rule _does not_ contains a " \
-                "disruptive action)");
+                " (rule does not contain a disruptive action)");
             a->evaluate(this, trans, ruleMessage);
             continue;
         }
 
-        trans->debug(4, "(SecDefaultAction) _Not_ running action: " \
-                + a->m_name + ". Rule _does not_contains a disruptive action,"\
+        trans->debug(4, "(SecDefaultAction) Not running action: " \
+                + a->m_name + ". Rule does not contain a disruptive action,"\
                 + " but SecRuleEngine is not On.");
     }
 
@@ -659,14 +655,13 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         if (a->isDisruptive() == false) {
             if (a->m_name != "setvar" && a->m_name != "log"
                 && a->m_name != "msg") {
-                trans->debug(4, "Running [I] (_non_ disruptive) " \
-                    "action: " + a->m_name);
-                    a->evaluate(this, trans, ruleMessage);
+                trans->debug(4, "Running (non-disruptive) action: " + a->m_name);
+                a->evaluate(this, trans, ruleMessage);
             }
             continue;
         }
         if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
-            trans->debug(4, "Running (disruptive) action: " + a->m_name);
+            trans->debug(4, "Running (disruptive)     action: " + a->m_name);
             a->evaluate(this, trans, ruleMessage);
             continue;
         }
