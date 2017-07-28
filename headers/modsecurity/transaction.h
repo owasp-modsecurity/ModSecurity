@@ -325,6 +325,8 @@ class Transaction : public TransactionAnchoredVariables {
 #endif
     void serverLog(std::shared_ptr<RuleMessage> rm);
 
+    int getRuleEngineState();
+
     std::string toJSON(int parts);
     std::string toOldAuditLogFormat(int parts, const std::string &trailer);
     std::string toOldAuditLogFormatIndex(const std::string &filename,
@@ -520,6 +522,8 @@ class Transaction : public TransactionAnchoredVariables {
 
     RequestBodyProcessor::XML *m_xml;
     RequestBodyProcessor::JSON *m_json;
+
+    int m_secRuleEngine;
 
     std::string m_variableDuration;
     std::map<std::string, std::string> m_variableEnvs;

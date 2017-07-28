@@ -120,6 +120,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_creationTimeStamp(utils::cpu_seconds()),
     m_logCbData(logCbData),
     m_ms(ms),
+    m_secRuleEngine(RulesProperties::PropertyNotSetRuleEngine),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
@@ -468,7 +469,7 @@ int Transaction::processRequestHeaders() {
     debug(4, "Starting phase REQUEST_HEADERS.  (SecRules 1)");
 #endif
 
-    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
+    if (getRuleEngineState() == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -642,7 +643,7 @@ int Transaction::processRequestBody() {
     debug(4, "Starting phase REQUEST_BODY. (SecRules 2)");
 #endif
 
-    if (m_rules->m_secRuleEngine == RulesProperties::DisabledRuleEngine) {
+    if (getRuleEngineState() == RulesProperties::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -928,7 +929,7 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
     m_variableResponseStatus.set(std::to_string(code), m_variableOffset);
     m_variableResponseProtocol.set(proto, m_variableOffset);
 
-    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
+    if (getRuleEngineState() == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -1053,7 +1054,7 @@ int Transaction::processResponseBody() {
     debug(4, "Starting phase RESPONSE_BODY. (SecRules 4)");
 #endif
 
-    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
+    if (getRuleEngineState() == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -1233,7 +1234,7 @@ int Transaction::processLogging() {
     debug(4, "Starting phase LOGGING. (SecRules 5)");
 #endif
 
-    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
+    if (getRuleEngineState() == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -1590,7 +1591,8 @@ std::string Transaction::toJSON(int parts) {
 
         /* producer > engine state */
         LOGFY_ADD("secrules_engine",
-            Rules::ruleEngineStateString(m_rules->m_secRuleEngine));
+            Rules::ruleEngineStateString(
+            (RulesProperties::RuleEngine) getRuleEngineState()));
 
         /* producer > components */
         yajl_gen_string(g,
@@ -1672,6 +1674,15 @@ std::string Transaction::toJSON(int parts) {
 
 void Transaction::serverLog(std::shared_ptr<RuleMessage> rm) {
     m_ms->serverLog(m_logCbData, rm);
+}
+
+
+int Transaction::getRuleEngineState() {
+    if (m_secRuleEngine == RulesProperties::PropertyNotSetRuleEngine) {
+        return m_rules->m_secRuleEngine;
+    }
+
+    return m_secRuleEngine;
 }
 
 

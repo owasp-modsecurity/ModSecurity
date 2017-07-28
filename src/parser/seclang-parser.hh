@@ -58,6 +58,7 @@ class Driver;
 #include "src/actions/chain.h"
 #include "src/actions/ctl/audit_log_parts.h"
 #include "src/actions/ctl/request_body_access.h"
+#include "src/actions/ctl/rule_engine.h"
 #include "src/actions/ctl/request_body_processor_json.h"
 #include "src/actions/ctl/request_body_processor_xml.h"
 #include "src/actions/ctl/rule_remove_by_id.h"
@@ -367,7 +368,7 @@ using modsecurity::operators::Operator;
 
 
 
-#line 371 "seclang-parser.hh" // lalr1.cc:377
+#line 372 "seclang-parser.hh" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -444,7 +445,7 @@ using modsecurity::operators::Operator;
 
 
 namespace yy {
-#line 448 "seclang-parser.hh" // lalr1.cc:377
+#line 449 "seclang-parser.hh" // lalr1.cc:377
 
 
 
@@ -624,7 +625,6 @@ namespace yy {
       // "ACTION_CTL_BDY_XML"
       // "ACTION_CTL_FORCE_REQ_BODY_VAR"
       // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      // "ACTION_CTL_RULE_ENGINE"
       // "ACTION_CTL_RULE_REMOVE_BY_ID"
       // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
       // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
@@ -940,20 +940,20 @@ namespace yy {
         TOK_SETVAR_OPERATION_EQUALS_PLUS = 345,
         TOK_SETVAR_OPERATION_EQUALS_MINUS = 346,
         TOK_NOT = 347,
-        TOK_ACTION_ACCURACY = 348,
-        TOK_ACTION_ALLOW = 349,
-        TOK_ACTION_APPEND = 350,
-        TOK_ACTION_AUDIT_LOG = 351,
-        TOK_ACTION_BLOCK = 352,
-        TOK_ACTION_CAPTURE = 353,
-        TOK_ACTION_CHAIN = 354,
-        TOK_ACTION_CTL_AUDIT_ENGINE = 355,
-        TOK_ACTION_CTL_AUDIT_LOG_PARTS = 356,
-        TOK_ACTION_CTL_BDY_JSON = 357,
-        TOK_ACTION_CTL_BDY_XML = 358,
-        TOK_ACTION_CTL_FORCE_REQ_BODY_VAR = 359,
-        TOK_ACTION_CTL_REQUEST_BODY_ACCESS = 360,
-        TOK_ACTION_CTL_RULE_ENGINE = 361,
+        TOK_ACTION_CTL_RULE_ENGINE = 348,
+        TOK_ACTION_ACCURACY = 349,
+        TOK_ACTION_ALLOW = 350,
+        TOK_ACTION_APPEND = 351,
+        TOK_ACTION_AUDIT_LOG = 352,
+        TOK_ACTION_BLOCK = 353,
+        TOK_ACTION_CAPTURE = 354,
+        TOK_ACTION_CHAIN = 355,
+        TOK_ACTION_CTL_AUDIT_ENGINE = 356,
+        TOK_ACTION_CTL_AUDIT_LOG_PARTS = 357,
+        TOK_ACTION_CTL_BDY_JSON = 358,
+        TOK_ACTION_CTL_BDY_XML = 359,
+        TOK_ACTION_CTL_FORCE_REQ_BODY_VAR = 360,
+        TOK_ACTION_CTL_REQUEST_BODY_ACCESS = 361,
         TOK_ACTION_CTL_RULE_REMOVE_BY_ID = 362,
         TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID = 363,
         TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG = 364,
@@ -1619,6 +1619,10 @@ namespace yy {
 
     static inline
     symbol_type
+    make_ACTION_CTL_RULE_ENGINE (const location_type& l);
+
+    static inline
+    symbol_type
     make_ACTION_ACCURACY (const std::string& v, const location_type& l);
 
     static inline
@@ -1668,10 +1672,6 @@ namespace yy {
     static inline
     symbol_type
     make_ACTION_CTL_REQUEST_BODY_ACCESS (const std::string& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_ACTION_CTL_RULE_ENGINE (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
@@ -2721,20 +2721,19 @@ namespace yy {
   {
       switch (other.type_get ())
     {
-      case 93: // "Accuracy"
-      case 94: // "Allow"
-      case 95: // "Append"
-      case 96: // "AuditLog"
-      case 97: // "Block"
-      case 98: // "Capture"
-      case 99: // "Chain"
-      case 100: // "ACTION_CTL_AUDIT_ENGINE"
-      case 101: // "ACTION_CTL_AUDIT_LOG_PARTS"
-      case 102: // "ACTION_CTL_BDY_JSON"
-      case 103: // "ACTION_CTL_BDY_XML"
-      case 104: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
-      case 105: // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      case 106: // "ACTION_CTL_RULE_ENGINE"
+      case 94: // "Accuracy"
+      case 95: // "Allow"
+      case 96: // "Append"
+      case 97: // "AuditLog"
+      case 98: // "Block"
+      case 99: // "Capture"
+      case 100: // "Chain"
+      case 101: // "ACTION_CTL_AUDIT_ENGINE"
+      case 102: // "ACTION_CTL_AUDIT_LOG_PARTS"
+      case 103: // "ACTION_CTL_BDY_JSON"
+      case 104: // "ACTION_CTL_BDY_XML"
+      case 105: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
+      case 106: // "ACTION_CTL_REQUEST_BODY_ACCESS"
       case 107: // "ACTION_CTL_RULE_REMOVE_BY_ID"
       case 108: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
       case 109: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
@@ -2961,20 +2960,19 @@ namespace yy {
     (void) v;
       switch (this->type_get ())
     {
-      case 93: // "Accuracy"
-      case 94: // "Allow"
-      case 95: // "Append"
-      case 96: // "AuditLog"
-      case 97: // "Block"
-      case 98: // "Capture"
-      case 99: // "Chain"
-      case 100: // "ACTION_CTL_AUDIT_ENGINE"
-      case 101: // "ACTION_CTL_AUDIT_LOG_PARTS"
-      case 102: // "ACTION_CTL_BDY_JSON"
-      case 103: // "ACTION_CTL_BDY_XML"
-      case 104: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
-      case 105: // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      case 106: // "ACTION_CTL_RULE_ENGINE"
+      case 94: // "Accuracy"
+      case 95: // "Allow"
+      case 96: // "Append"
+      case 97: // "AuditLog"
+      case 98: // "Block"
+      case 99: // "Capture"
+      case 100: // "Chain"
+      case 101: // "ACTION_CTL_AUDIT_ENGINE"
+      case 102: // "ACTION_CTL_AUDIT_LOG_PARTS"
+      case 103: // "ACTION_CTL_BDY_JSON"
+      case 104: // "ACTION_CTL_BDY_XML"
+      case 105: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
+      case 106: // "ACTION_CTL_REQUEST_BODY_ACCESS"
       case 107: // "ACTION_CTL_RULE_REMOVE_BY_ID"
       case 108: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
       case 109: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
@@ -3267,20 +3265,19 @@ namespace yy {
     // Type destructor.
     switch (yytype)
     {
-      case 93: // "Accuracy"
-      case 94: // "Allow"
-      case 95: // "Append"
-      case 96: // "AuditLog"
-      case 97: // "Block"
-      case 98: // "Capture"
-      case 99: // "Chain"
-      case 100: // "ACTION_CTL_AUDIT_ENGINE"
-      case 101: // "ACTION_CTL_AUDIT_LOG_PARTS"
-      case 102: // "ACTION_CTL_BDY_JSON"
-      case 103: // "ACTION_CTL_BDY_XML"
-      case 104: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
-      case 105: // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      case 106: // "ACTION_CTL_RULE_ENGINE"
+      case 94: // "Accuracy"
+      case 95: // "Allow"
+      case 96: // "Append"
+      case 97: // "AuditLog"
+      case 98: // "Block"
+      case 99: // "Capture"
+      case 100: // "Chain"
+      case 101: // "ACTION_CTL_AUDIT_ENGINE"
+      case 102: // "ACTION_CTL_AUDIT_LOG_PARTS"
+      case 103: // "ACTION_CTL_BDY_JSON"
+      case 104: // "ACTION_CTL_BDY_XML"
+      case 105: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
+      case 106: // "ACTION_CTL_REQUEST_BODY_ACCESS"
       case 107: // "ACTION_CTL_RULE_REMOVE_BY_ID"
       case 108: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
       case 109: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
@@ -3513,20 +3510,19 @@ namespace yy {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 93: // "Accuracy"
-      case 94: // "Allow"
-      case 95: // "Append"
-      case 96: // "AuditLog"
-      case 97: // "Block"
-      case 98: // "Capture"
-      case 99: // "Chain"
-      case 100: // "ACTION_CTL_AUDIT_ENGINE"
-      case 101: // "ACTION_CTL_AUDIT_LOG_PARTS"
-      case 102: // "ACTION_CTL_BDY_JSON"
-      case 103: // "ACTION_CTL_BDY_XML"
-      case 104: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
-      case 105: // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      case 106: // "ACTION_CTL_RULE_ENGINE"
+      case 94: // "Accuracy"
+      case 95: // "Allow"
+      case 96: // "Append"
+      case 97: // "AuditLog"
+      case 98: // "Block"
+      case 99: // "Capture"
+      case 100: // "Chain"
+      case 101: // "ACTION_CTL_AUDIT_ENGINE"
+      case 102: // "ACTION_CTL_AUDIT_LOG_PARTS"
+      case 103: // "ACTION_CTL_BDY_JSON"
+      case 104: // "ACTION_CTL_BDY_XML"
+      case 105: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
+      case 106: // "ACTION_CTL_REQUEST_BODY_ACCESS"
       case 107: // "ACTION_CTL_RULE_REMOVE_BY_ID"
       case 108: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
       case 109: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
@@ -4371,6 +4367,12 @@ namespace yy {
   }
 
   seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_RULE_ENGINE (const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_RULE_ENGINE, l);
+  }
+
+  seclang_parser::symbol_type
   seclang_parser::make_ACTION_ACCURACY (const std::string& v, const location_type& l)
   {
     return symbol_type (token::TOK_ACTION_ACCURACY, v, l);
@@ -4446,12 +4448,6 @@ namespace yy {
   seclang_parser::make_ACTION_CTL_REQUEST_BODY_ACCESS (const std::string& v, const location_type& l)
   {
     return symbol_type (token::TOK_ACTION_CTL_REQUEST_BODY_ACCESS, v, l);
-  }
-
-  seclang_parser::symbol_type
-  seclang_parser::make_ACTION_CTL_RULE_ENGINE (const std::string& v, const location_type& l)
-  {
-    return symbol_type (token::TOK_ACTION_CTL_RULE_ENGINE, v, l);
   }
 
   seclang_parser::symbol_type
@@ -5555,7 +5551,7 @@ namespace yy {
 
 
 } // yy
-#line 5559 "seclang-parser.hh" // lalr1.cc:377
+#line 5555 "seclang-parser.hh" // lalr1.cc:377
 
 
 

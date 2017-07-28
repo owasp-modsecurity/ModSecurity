@@ -641,7 +641,7 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
             continue;
         }
 
-        if (trans->m_rules->m_secRuleEngine == Rules::EnabledRuleEngine) {
+        if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
             trans->debug(4, "(SecDefaultAction) " \
                 "Running action: " + a->m_name + \
                 " (rule _does not_ contains a " \
@@ -665,7 +665,7 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
             }
             continue;
         }
-        if (trans->m_rules->m_secRuleEngine == Rules::EnabledRuleEngine) {
+        if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
             trans->debug(4, "Running (disruptive) action: " + a->m_name);
             a->evaluate(this, trans, ruleMessage);
             continue;

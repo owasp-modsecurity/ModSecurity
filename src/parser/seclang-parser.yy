@@ -24,6 +24,7 @@ class Driver;
 #include "src/actions/chain.h"
 #include "src/actions/ctl/audit_log_parts.h"
 #include "src/actions/ctl/request_body_access.h"
+#include "src/actions/ctl/rule_engine.h"
 #include "src/actions/ctl/request_body_processor_json.h"
 #include "src/actions/ctl/request_body_processor_xml.h"
 #include "src/actions/ctl/rule_remove_by_id.h"
@@ -441,7 +442,9 @@ using modsecurity::operators::Operator;
   SETVAR_OPERATION_EQUALS_PLUS
   SETVAR_OPERATION_EQUALS_MINUS
   NOT                                          "NOT"
-  ;
+
+  ACTION_CTL_RULE_ENGINE                       "ACTION_CTL_RULE_ENGINE"
+;
 
 %token <std::string>
   ACTION_ACCURACY                              "Accuracy"
@@ -457,7 +460,6 @@ using modsecurity::operators::Operator;
   ACTION_CTL_BDY_XML                           "ACTION_CTL_BDY_XML"
   ACTION_CTL_FORCE_REQ_BODY_VAR                "ACTION_CTL_FORCE_REQ_BODY_VAR"
   ACTION_CTL_REQUEST_BODY_ACCESS               "ACTION_CTL_REQUEST_BODY_ACCESS"
-  ACTION_CTL_RULE_ENGINE                       "ACTION_CTL_RULE_ENGINE"
   ACTION_CTL_RULE_REMOVE_BY_ID                 "ACTION_CTL_RULE_REMOVE_BY_ID"
   ACTION_CTL_RULE_REMOVE_TARGET_BY_ID          "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
   ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG         "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
@@ -2087,18 +2089,15 @@ act:
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_ON
       {
-        //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::RuleEngine("ctl:RuleEngine=on"));
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_OFF
       {
-        //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::RuleEngine("ctl:RuleEngine=off"));
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_DETC
       {
-        //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::RuleEngine("ctl:RuleEngine=detectiononly"));
       }
     | ACTION_CTL_RULE_REMOVE_BY_ID
       {
