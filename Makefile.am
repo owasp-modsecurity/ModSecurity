@@ -135,6 +135,7 @@ TESTS+=test/test-cases/regression/variable-RESPONSE_CONTENT_TYPE.json
 TESTS+=test/test-cases/regression/action-disruptive.json
 TESTS+=test/test-cases/regression/variable-REQUEST_BASENAME.json
 TESTS+=test/test-cases/regression/sec_component_signature.json
+TESTS+=test/test-cases/regression/action-ctl_rule_engine.json
 TESTS+=test/test-cases/regression/action-ctl_rule_remove_target_by_tag.json
 TESTS+=test/test-cases/regression/variable-REQUEST_METHOD.json
 TESTS+=test/test-cases/regression/action-initcol.json
