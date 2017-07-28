@@ -318,7 +318,7 @@ class Transaction : public TransactionAnchoredVariables {
         size_t offset);
 
     const char *getResponseBody();
-    int getResponseBodyLenth();
+    int getResponseBodyLength();
 
 #ifndef NO_LOGS
     void debug(int, std::string);

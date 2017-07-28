@@ -1189,7 +1189,7 @@ const char *Transaction::getResponseBody() {
 
 
 /**
- * @name    getResponseBodyLenth
+ * @name    getResponseBodyLength
  * @brief   Retrieve the length of the updated response body.
  *
  * This method returns the size of the update response body buffer, notice
@@ -1202,7 +1202,7 @@ const char *Transaction::getResponseBody() {
  * @retval >0  the size of the updated buffer.
  *
  */
-int Transaction::getResponseBodyLenth() {
+int Transaction::getResponseBodyLength() {
     int size = 0;
 #if 0
     int there_is_update = this->rules->loadResponseBodyFromJS(this);
@@ -2097,7 +2097,7 @@ extern "C" const char *msc_get_response_body(Transaction *transaction) {
  *
  */
 extern "C" int msc_get_response_body_length(Transaction *transaction) {
-    return transaction->getResponseBodyLenth();
+    return transaction->getResponseBodyLength();
 }
 
 /**
