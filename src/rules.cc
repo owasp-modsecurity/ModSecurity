@@ -167,7 +167,7 @@ int Rules::evaluate(int phase, Transaction *transaction) {
     debug(9, "This phase consists of " + std::to_string(rules.size()) + \
         " rule(s).");
 
-    if (transaction->m_allowType == actions::disruptive::FromNowOneAllowType
+    if (transaction->m_allowType == actions::disruptive::FromNowOnAllowType
         && phase != modsecurity::Phases::LoggingPhase) {
         debug(9, "Skipping all rules evaluation on this phase as request " \
             "through the utilization of an `allow' action.");

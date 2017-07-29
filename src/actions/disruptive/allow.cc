@@ -37,7 +37,7 @@ bool Allow::init(std::string *error) {
     } else if (a == "request") {
         m_allowType = RequestAllowType;
     } else if (a == "") {
-        m_allowType = FromNowOneAllowType;
+        m_allowType = FromNowOnAllowType;
     } else {
         error->assign("Allow: if specified, the parameter " \
             "most be: phase, request");
