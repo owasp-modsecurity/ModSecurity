@@ -33,7 +33,10 @@ namespace operators {
 std::string Rbl::mapIpToAddress(std::string ipStr, Transaction *trans) {
     std::string addr;
     int h0, h1, h2, h3;
-    std::string key = trans->m_rules->m_httpblKey.m_value;
+    std::string key;
+    if (trans->m_rules->m_httpblKey.m_set == true) {
+        key = trans->m_rules->m_httpblKey.m_value;
+    }
 
     if (sscanf(ipStr.c_str(), "%d.%d.%d.%d", &h0, &h1, &h2, &h3) != 4) {
         debug(trans, 0, std::string("Failed to understand `" + ipStr +

@@ -321,6 +321,7 @@ class RulesProperties {
 
         if (from->m_httpblKey.m_set == true) {
             to->m_httpblKey.m_value = from->m_httpblKey.m_value;
+            to->m_httpblKey.m_set = from->m_httpblKey.m_set;
         }
 
         to->m_exceptions.merge(from->m_exceptions);

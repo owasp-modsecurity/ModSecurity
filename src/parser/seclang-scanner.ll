@@ -285,6 +285,7 @@ CONFIG_DIR_SEC_MARKER                   (?i:SecMarker)
 CONFIG_DIR_UNICODE_MAP_FILE             (?i:SecUnicodeMapFile)
 CONFIG_INCLUDE                          (?i:Include)
 CONFIG_SEC_COLLECTION_TIMEOUT           (?i:SecCollectionTimeout)
+CONFIG_SEC_HTTP_BLKEY                   (?i:SecHttpBlKey)
 CONFIG_SEC_REMOTE_RULES                 (?i:SecRemoteRules)
 CONFIG_SEC_REMOTE_RULES_FAIL_ACTION     (?i:SecRemoteRulesFailAction)
 CONFIG_SEC_REMOVE_RULES_BY_ID           (?i:SecRuleRemoveById)
@@ -625,6 +626,7 @@ EQUALS_MINUS                            (?i:=\-)
 
 {CONFIG_SEC_REMOTE_RULES_FAIL_ACTION}                                   { return p::make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION(yytext, *driver.loc.back()); }
 {CONFIG_SEC_COLLECTION_TIMEOUT}[ ]{CONFIG_VALUE_NUMBER}                 { return p::make_CONFIG_SEC_COLLECTION_TIMEOUT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_SEC_HTTP_BLKEY}[ ]{FREE_TEXT_NEW_LINE}                          { return p::make_CONFIG_SEC_HTTP_BLKEY(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 [ \t]*[\n]                                                              { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 #[ \t]*SecRule[^\\].*\\[ \t]*[\r\n]*                                    { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
 #[ \t]*SecAction[^\\].*\\[ \t]*[^\\n]                                   { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }

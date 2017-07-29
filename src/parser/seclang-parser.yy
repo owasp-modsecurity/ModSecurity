@@ -558,6 +558,7 @@ using modsecurity::operators::Operator;
   CONFIG_DIR_SEC_MARKER                        "CONFIG_DIR_SEC_MARKER"
   CONFIG_DIR_UNICODE_MAP_FILE                  "CONFIG_DIR_UNICODE_MAP_FILE"
   CONFIG_SEC_COLLECTION_TIMEOUT                "CONFIG_SEC_COLLECTION_TIMEOUT"
+  CONFIG_SEC_HTTP_BLKEY                        "CONFIG_SEC_HTTP_BLKEY"
   CONFIG_SEC_REMOTE_RULES_FAIL_ACTION          "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
   CONFIG_SEC_RULE_REMOVE_BY_ID                 "CONFIG_SEC_RULE_REMOVE_BY_ID"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG         "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
@@ -1349,6 +1350,11 @@ expression:
     | CONFIG_DIR_UNICODE_MAP_FILE
     | CONFIG_SEC_COLLECTION_TIMEOUT
       {
+      }
+    | CONFIG_SEC_HTTP_BLKEY
+      {
+        driver.m_httpblKey.m_set = true;
+        driver.m_httpblKey.m_value = $1;
       }
     ;
 
