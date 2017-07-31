@@ -680,7 +680,7 @@ int Transaction::processRequestBody() {
                 + error, m_variableOffset);
             m_variableReqbodyProcessorError.set("1", m_variableOffset);
         } else {
-            m_variableReqbodyError.set("1", m_variableOffset);
+            m_variableReqbodyError.set("0", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
 #if WITH_YAJL
