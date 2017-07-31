@@ -5,11 +5,11 @@
     "version_max":0,
     "title":"Testing collection :: TX (1/4)",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":2313
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -63,11 +63,11 @@
     "version_max":0,
     "title":"Testing collection :: TX (2/4)",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":2313
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -121,11 +121,11 @@
     "version_max":0,
     "title":"Testing collection :: TX (3/4)",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":2313
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -180,11 +180,11 @@
     "version_max":0,
     "title":"Testing collection :: TX (4/4)",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":2313
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  

@@ -7,7 +7,7 @@
       "debug_log": "Variable: ARGS:pwd was excluded by ruleRemoteTargetByTag..."
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -23,7 +23,7 @@
       "body": [ ]
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[
@@ -39,7 +39,7 @@
       "debug_log": "Target value: .*Variable: ARGS:pwd"
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -55,7 +55,7 @@
       "body": [ ]
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[

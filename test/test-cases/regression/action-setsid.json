@@ -7,7 +7,7 @@
       "debug_log": "Saving variable: SESSION:score with value: "
     },
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "request":{
@@ -22,7 +22,7 @@
       "method":"GET"
     },
     "server":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "rules":[

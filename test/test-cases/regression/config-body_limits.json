@@ -4,11 +4,11 @@
     "version_min":300000,
     "title":"SecResponseBodyLimitAction Reject",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -44,11 +44,11 @@
     "version_min":300000,
     "title":"SecResponseBodyLimitAction ProcessPartial",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -84,11 +84,11 @@
     "version_min":300000,
     "title":"SecRequestBodyLimitAction Reject",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  
@@ -141,11 +141,11 @@
     "version_min":300000,
     "title":"SecRequestBodyLimitAction ProcessPartial",
     "client":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{  
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":80
     },
     "request":{  

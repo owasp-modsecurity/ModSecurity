@@ -4,7 +4,7 @@
     "version_min":300000,
     "title":"Testing Variables :: TIME_EPOCH",
     "client":{
-      "ip":"200.249.12.31",
+      "ip":"192.0.2.31",
       "port":123
     },
     "server":{

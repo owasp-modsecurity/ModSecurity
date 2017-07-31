@@ -7,11 +7,11 @@
   "url": "https:\/\/github.com\/SpiderLabs\/ModSecurity\/issues\/394",
   "gihub_issue": 394,
   "client": {
-    "ip": "200.249.12.31",
+    "ip": "192.0.2.31",
     "port": 2313
   },
   "server": {
-    "ip": "200.249.12.31",
+    "ip": "192.0.2.31",
     "port": 80
   },
   "request": {
