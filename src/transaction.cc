@@ -838,7 +838,12 @@ int Transaction::requestBodyFromFile(const char *path) {
     }
 
     request_body.seekg(0, std::ios::end);
-    str.reserve(request_body.tellg());
+    try {
+        str.reserve(request_body.tellg());
+    } catch (...) {
+        debug(3, "Failed to allocate memory to load request body.");
+        return false;
+    }
     request_body.seekg(0, std::ios::beg);
     str.assign((std::istreambuf_iterator<char>(request_body)),
             std::istreambuf_iterator<char>());
