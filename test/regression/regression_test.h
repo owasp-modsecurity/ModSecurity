@@ -83,10 +83,12 @@ class RegressionTestResult {
     RegressionTestResult() :
       passed(false),
       skipped(false),
+      disabled(false),
       test(NULL) { }
 
     bool passed;
     bool skipped;
+    bool disabled;
     RegressionTest *test;
     std::stringstream reason;
 };
