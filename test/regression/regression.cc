@@ -93,7 +93,6 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
     std::vector<RegressionTest *> *tests,
     ModSecurityTestResults<RegressionTestResult> *res, int *count) {
 
-
     for (RegressionTest *t : *tests) {
         CustomDebugLog *debug_log = new CustomDebugLog();
         modsecurity::ModSecurity *modsec = NULL;
@@ -102,6 +101,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         ModSecurityTestResults<RegressionTest> r;
         std::stringstream serverLog;
         RegressionTestResult *testRes = new RegressionTestResult();
+
         testRes->test = t;
         r.status = 200;
         (*count)++;
@@ -120,6 +120,19 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 std::to_string(*count) << " ";
             std::cout << std::setw(50) << std::left << filename;
             std::cout << std::setw(70) << std::left << t->name;
+        }
+
+        if (t->enabled == 0) {
+            if (test->m_automake_output) {
+                std::cout << ":test-result: disabled" << filename \
+                    << ":" << t->name << std::endl;
+            } else {
+                std::cout << KCYN << "disabled" << RESET << std::endl;
+            }
+            res->push_back(testRes);
+            testRes->disabled = true;
+            testRes->reason << "JSON disabled";
+            continue;
         }
 
         modsec = new modsecurity::ModSecurity();
@@ -470,17 +483,22 @@ int main(int argc, char **argv) {
 
     int passed = 0;
     int failed = 0;
+    int disabled = 0;
     int skipped = 0;
+
     for (RegressionTestResult *r : res) {
         if (r->skipped == true) {
             skipped++;
         }
-        if (r->passed == true && r->skipped == false) {
+        if (r->disabled == true) {
+            disabled++;
+        }
+        if (r->passed == true) {
             passed++;
-        } else if (r->skipped == false) {
-            if (test.m_automake_output) {
-                // m_automake_output
-            } else {
+        }
+
+        if (!r->passed && !r->skipped && !r->disabled) {
+            if (!test.m_automake_output) {
                 std::cout << KRED << "Test failed." << RESET << KWHT \
                     << " From: " \
                     << RESET << r->test->filename << "." << std::endl;
@@ -499,18 +517,16 @@ int main(int argc, char **argv) {
         std::cout << "Ran a total of: " << std::to_string(failed + passed) \
             << " regression tests - ";
         if (failed == 0) {
-            std::cout << KGRN << "All tests passed." << RESET;
+            std::cout << KGRN << "All tests passed. " << RESET;
         } else {
-            std::cout << KRED << failed << " failed." << RESET;
+            std::cout << KRED << failed << " failed. " << RESET;
         }
 
-        if (skipped > 0) {
-            std::cout << KCYN << " " << std::to_string(skipped) << " ";
-            std::cout << "skipped tests." << RESET << std::endl;
-        } else {
-            std::cout << std::endl;
-        }
+        std::cout << KCYN << std::to_string(skipped) << " ";
+		std::cout << "skipped test(s). " << std::to_string(disabled) << " ";
+        std::cout << "disabled test(s)." << RESET << std::endl;
     }
+
     for (std::pair<std::string, std::vector<RegressionTest *> *> a : test) {
         std::vector<RegressionTest *> *vec = a.second;
         for (int i = 0; i < vec->size(); i++) {
