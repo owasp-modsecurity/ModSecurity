@@ -116,7 +116,7 @@ bool ValidateByteRange::evaluate(Transaction *transaction, Rule *rule,
 
     size_t count = 0;
     for (int i = 0; i < input.length(); i++) {
-        int x = input.at(i);
+        int x = (unsigned char) input.at(i);
         if (!(table[x >> 3] & (1 << (x & 0x7)))) {
             // debug(9, "Value " + std::to_string(x) + " in " +
             //     input + " ouside range: " + param);
