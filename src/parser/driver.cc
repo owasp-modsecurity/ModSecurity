@@ -134,6 +134,10 @@ int Driver::parse(const std::string &f, const std::string &ref) {
         this->ref.push_back(ref);
     }
 
+    if (f.empty()) {
+        return 1;
+    }
+
     buffer = f;
     scan_begin();
     yy::seclang_parser parser(*this);
