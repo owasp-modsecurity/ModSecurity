@@ -2,7 +2,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing allow action 1/3",
+    "title":"Testing allow action (1/3)",
     "expected":{
       "debug_log": "Skipped rule id '500066' as request trough the utilization of an `allow' action",
       "http_code": 200
@@ -35,7 +35,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing allow action 1/3",
+    "title":"Testing allow action (2/3)",
     "expected":{
       "debug_log": "",
       "http_code": 500
@@ -68,7 +68,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing allow action 1/3",
+    "title":"Testing allow action (3/3)",
     "expected":{
       "debug_log": "",
       "http_code": 500
