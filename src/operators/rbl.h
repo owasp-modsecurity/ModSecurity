@@ -64,12 +64,12 @@ class Rbl : public Operator {
         m_service(param),
         m_demandsPassword(false) {
             m_provider = RblProvider::UnknownProvider;
-            if (m_service == "httpbl.org") {
+            if (m_service.find("httpbl.org") != std::string::npos) {
                 m_demandsPassword = true;
                 m_provider = RblProvider::httpbl;
-            } else if (m_service == "uribl.com") {
+            } else if (m_service.find("uribl.com") != std::string::npos) {
                 m_provider = RblProvider::httpbl;
-            } else if (m_service == "spamhaus.org") {
+            } else if (m_service.find("spamhaus.org") != std::string::npos) {
                 m_provider = RblProvider::httpbl;
             }
         }
@@ -78,12 +78,12 @@ class Rbl : public Operator {
         m_service(param),
         m_demandsPassword(false) {
             m_provider = RblProvider::UnknownProvider;
-            if (m_service == "httpbl.org") {
+            if (m_service.find("httpbl.org") != std::string::npos) {
                 m_demandsPassword = true;
                 m_provider = RblProvider::httpbl;
-            } else if (m_service == "uribl.com") {
+            } else if (m_service.find("uribl.com") != std::string::npos) {
                 m_provider = RblProvider::httpbl;
-            } else if (m_service == "spamhaus.org") {
+            } else if (m_service.find("spamhaus.org") != std::string::npos) {
                 m_provider = RblProvider::httpbl;
             }
         }
