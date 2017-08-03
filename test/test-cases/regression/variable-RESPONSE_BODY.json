@@ -1,43 +1,34 @@
-[  
-  {  
+[
+  {
     "enabled":1,
     "version_min":300000,
     "title":"Testing Variables :: RESPONSE_BODY",
-    "client":{  
-      "ip":"200.249.12.31",
-      "port":123
+    "client": {
+      "ip":"200.249.12.31"
     },
-    "server":{  
-      "ip":"200.249.12.31",
-      "port":80
-    },
-    "request":{  
-      "headers":{  
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*"
+    "request": {
+      "headers": {
+        "Host":"localhost"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"GET",
+      "uri":"/foo",
       "http_version":1.1
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+        "Content-Type":"text/plain"
       },
-      "body":[  
-        "no need."
+      "body":[
+        "denystring"
       ]
     },
-    "expected":{  
-      "debug_log":"Target value: \"no need.\" \\(Variable: RESPONSE_BODY\\)"
+    "expected":{
+      "http_code": 403
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
-      "SecRule RESPONSE_BODY \"@contains test \" \"id:1,phase:4,pass,t:trim\""
+      "SecRule RESPONSE_BODY \"@contains denystring\" \"id:1,phase:4,deny\""
     ]
   }
 ]
-
