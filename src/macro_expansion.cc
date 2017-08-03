@@ -301,12 +301,14 @@ std::string MacroExpansion::expand(const std::string& input,
             }
         }
 
+#ifndef NO_LOGS
         if (variableValue) {
             transaction->debug(6, "Resolving: " + variable + " to: " +
                 *variableValue);
         } else {
             transaction->debug(6, "Resolving: " + variable + " to: NULL");
         }
+#endif
         res.erase(start, end - start + 1);
         if (res[start] == '%') {
             res.erase(start, 1);

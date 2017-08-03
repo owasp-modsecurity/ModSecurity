@@ -282,10 +282,12 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
     if ((m_status == RelevantOnlyAuditLogStatus
         && this->isRelevant(transaction->m_httpCodeReturned) == false)
         && saveAnyway == false) {
+#ifndef NO_LOGS
         transaction->debug(9, "Return code `" +
             std::to_string(transaction->m_httpCodeReturned) + "'" \
             " is not interesting to audit logs, relevant code(s): `" +
             m_relevant + "'.");
+#endif
 
         return false;
     }
@@ -293,15 +295,21 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
     if (parts == -1) {
         parts = m_parts;
     }
+#ifndef NO_LOGS
     transaction->debug(5, "Saving this request as part " \
             "of the audit logs.");
+#endif
     if (m_writer == NULL) {
+#ifndef NO_LOGS
         transaction->debug(1, "Internal error, audit log writer is null");
+#endif
     } else {
         std::string error;
         bool a = m_writer->write(transaction, parts, &error);
         if (a == false) {
+#ifndef NO_LOGS
             transaction->debug(1, "Cannot save the audit log: " + error);
+#endif
             return false;
         }
     }

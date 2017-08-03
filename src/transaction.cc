@@ -296,8 +296,10 @@ bool Transaction::extractArguments(const std::string &orig,
 
 bool Transaction::addArgument(const std::string& orig, const std::string& key,
     const std::string& value, size_t offset) {
+#ifndef NO_LOGS
     debug(4, "Adding request argument (" + orig + "): name \"" + \
                 key + "\", value \"" + value + "\"");
+#endif
 
     offset = offset + key.size() + 1;
     m_variableArgs.set(key, value, offset);
@@ -754,20 +756,26 @@ int Transaction::processRequestBody() {
 #if 1
     if (m_rules->m_secRequestBodyAccess != RulesProperties::TrueConfigBoolean) {
         if (m_requestBodyAccess != RulesProperties::TrueConfigBoolean) {
+#ifndef NO_LOGS
             debug(4, "Request body processing is disabled");
+#endif
 
             this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
             return true;
         } else {
+#ifndef NO_LOGS
             debug(4, "Request body processing is disabled, but " \
                 "enabled to this transaction due to ctl:requestBodyAccess " \
                 "action");
+#endif
         }
     } else {
         if (m_requestBodyAccess == RulesProperties::FalseConfigBoolean) {
+#ifndef NO_LOGS
             debug(4, "Request body processing is enabled, but " \
                 "disable to this transaction due to ctl:requestBodyAccess " \
                 "action");
+#endif
             this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
             return true;
         }
@@ -844,7 +852,9 @@ int Transaction::requestBodyFromFile(const char *path) {
     try {
         str.reserve(request_body.tellg());
     } catch (...) {
+#ifndef NO_LOGS
         debug(3, "Failed to allocate memory to load request body.");
+#endif
         return false;
     }
     request_body.seekg(0, std::ios::beg);
@@ -1264,8 +1274,10 @@ int Transaction::processLogging() {
             debug(4, "There was an audit log modifier for this transaction.");
 #endif
             std::list<std::pair<int, std::string>>::iterator it;
+#ifndef NO_LOGS
             debug(7, "AuditLog parts before modification(s): " +
                 std::to_string(parts) + ".");
+#endif
             for (it = m_auditLogModifier.begin();
                 it != m_auditLogModifier.end(); ++it) {
                 std::pair <int, std::string> p = *it;
@@ -1278,8 +1290,10 @@ int Transaction::processLogging() {
                 }
             }
         }
+#ifndef NO_LOGS
         debug(8, "Checking if this request is relevant to be " \
             "part of the audit logs.");
+#endif
         bool saved = this->m_rules->m_auditLog->saveIfRelevant(this, parts);
         if (saved) {
 #ifndef NO_LOGS

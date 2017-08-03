@@ -73,32 +73,42 @@ void XML::evaluate(Transaction *t,
     xpathExpr = (const xmlChar*)param.c_str();
     xpathCtx = xmlXPathNewContext(t->m_xml->m_data.doc);
     if (xpathCtx == NULL) {
+#ifndef NO_LOGS
         t->debug(1, "XML: Unable to create new XPath context. : ");
+#endif
         return;
     }
 
     if (rule == NULL) {
+#ifndef NO_LOGS
         t->debug(2, "XML: Can't look for xmlns, internal error.");
+#endif
     } else {
         std::vector<actions::Action *> acts = rule->getActionsByName("xmlns");
         for (auto &x : acts) {
             actions::XmlNS *z = (actions::XmlNS *)x;
             if (xmlXPathRegisterNs(xpathCtx, (const xmlChar*)z->m_scope.c_str(),
                     (const xmlChar*)z->m_href.c_str()) != 0) {
+#ifndef NO_LOGS
                 t->debug(1, "Failed to register XML namespace href \"" + \
                     z->m_href + "\" prefix \"" + z->m_scope + "\".");
+#endif
                 return;
             }
 
+#ifndef NO_LOGS
             t->debug(4, "Registered XML namespace href \"" + z->m_href + \
                 "\" prefix \"" + z->m_scope + "\"");
+#endif
         }
     }
 
     /* Initialise XPath expression. */
     xpathObj = xmlXPathEvalExpression(xpathExpr, xpathCtx);
     if (xpathObj == NULL) {
+#ifndef NO_LOGS
         t->debug(1, "XML: Unable to evaluate xpath expression.");
+#endif
         xmlXPathFreeContext(xpathCtx);
         return;
     }

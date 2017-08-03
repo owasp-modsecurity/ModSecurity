@@ -47,7 +47,9 @@ bool Https::init(std::string *error) {
 
 bool Https::write(Transaction *transaction, int parts, std::string *error) {
     Utils::HttpsClient m_http_client;
+#ifndef NO_LOGS
     transaction->debug(7, "Sending logs to: " + m_audit->m_path1);
+#endif
 
     std::string log = transaction->toJSON(parts);
     m_http_client.setRequestType("application/json");

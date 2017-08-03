@@ -33,7 +33,9 @@ bool Pass::evaluate(Rule *rule, Transaction *transaction,
     intervention::free(&transaction->m_it);
     intervention::reset(&transaction->m_it);
 
+#ifndef NO_LOGS
     transaction->debug(8, "Running action pass");
+#endif
 
     return true;
 }

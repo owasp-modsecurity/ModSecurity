@@ -49,9 +49,11 @@ bool Allow::init(std::string *error) {
 
 
 bool Allow::evaluate(Rule *rule, Transaction *transaction) {
+#ifndef NO_LOGS
     transaction->debug(4, "Dropping the evaluation of upcoming rules " \
         "in favor of an `allow' action of type: " \
         + allowTypeToName(m_allowType));
+#endif
 
     transaction->m_allowType = m_allowType;
 

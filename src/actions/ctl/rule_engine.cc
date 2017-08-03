@@ -50,7 +50,9 @@ bool RuleEngine::evaluate(Rule *rule, Transaction *transaction) {
     a << modsecurity::RulesProperties::ruleEngineStateString(m_ruleEngine);
     a << " as requested by a ctl:ruleEngine action";
 
+#ifndef NO_LOGS
     transaction->debug(8, a.str());
+#endif
 
     transaction->m_secRuleEngine = m_ruleEngine;
     return true;

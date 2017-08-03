@@ -48,7 +48,9 @@ int JSON::yajl_map_key(void *ctx, const unsigned char *key, size_t length) {
      */
     safe_key.assign((const char *)key, length);
 
+#ifndef NO_LOGS
     tthis->debug(9, "New JSON hash key '" + safe_key + "'");
+#endif
 
     /**
      * TODO: How do we free the previously string value stored here?
@@ -128,8 +130,10 @@ int JSON::yajl_start_map(void *ctx) {
         tthis->m_data.prefix.assign(tthis->m_data.current_key);
     }
 
+#ifndef NO_LOGS
     tthis->debug(9, "New JSON hash context (prefix '" + \
         tthis->m_data.prefix + "')");
+#endif
 
     return 1;
 }
@@ -176,7 +180,9 @@ int JSON::addArgument(const std::string& value) {
      * to reference this argument; for now we simply ignore these
      */
     if (m_data.current_key.empty()) {
+#ifndef NO_LOGS
         debug(3, "Cannot add scalar value without an associated key");
+#endif
         return 1;
     }
 
@@ -245,7 +251,9 @@ JSON::JSON(Transaction *transaction) : m_transaction(transaction) {
     };
 
 
+#ifndef NO_LOGS
     debug(9, "JSON parser initialization");
+#endif
 
     /**
      * Prefix and current key are initially empty
@@ -261,7 +269,9 @@ JSON::JSON(Transaction *transaction) : m_transaction(transaction) {
      *
      * TODO: make UTF8 validation optional, as it depends on Content-Encoding
      */
+#ifndef NO_LOGS
     debug(9, "yajl JSON parsing callback initialization");
+#endif
     m_data.handle = yajl_alloc(&callbacks, NULL, this);
 
     yajl_config(m_data.handle, yajl_allow_partial_values, 0);
@@ -269,7 +279,9 @@ JSON::JSON(Transaction *transaction) : m_transaction(transaction) {
 
 
 JSON::~JSON() {
+#ifndef NO_LOGS
     debug(9, "JSON: Cleaning up JSON results");
+#endif
     yajl_free(m_data.handle);
 }
 

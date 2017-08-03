@@ -71,8 +71,10 @@ bool InitCol::evaluate(Rule *rule, Transaction *t) {
         return false;
     }
 
+#ifndef NO_LOGS
     t->debug(5, "Collection `" + m_collection_key + "' initialized with " \
         "value: " + collectionName);
+#endif
 
     return true;
 }
