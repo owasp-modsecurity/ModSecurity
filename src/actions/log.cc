@@ -30,7 +30,9 @@ namespace actions {
 
 bool Log::evaluate(Rule *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
+#ifndef NO_LOGS
     transaction->debug(9, "Saving transaction to logs");
+#endif
     rm->m_saveMessage = true;
     return true;
 }

@@ -62,7 +62,9 @@ class ValidateDTD : public Operator {
         if (len > 0) {
             s = "XML Error: " + std::string(buf);
         }
+#ifndef NO_LOGS
         t->debug(4, s);
+#endif
     }
 
 
@@ -79,7 +81,9 @@ class ValidateDTD : public Operator {
         if (len > 0) {
             s = "XML Warning: " + std::string(buf);
         }
+#ifndef NO_LOGS
         t->debug(4, s);
+#endif
     }
 
 

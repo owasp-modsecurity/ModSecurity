@@ -50,7 +50,9 @@ bool ValidateSchema::evaluate(Transaction *t,
         if (m_err.empty() == false) {
             err << m_err;
         }
+#ifndef NO_LOGS
         t->debug(4, err.str());
+#endif
         return true;
     }
 
@@ -73,7 +75,9 @@ bool ValidateSchema::evaluate(Transaction *t,
         if (m_err.empty() == false) {
             err << " " << m_err;
         }
+#ifndef NO_LOGS
         t->debug(4, err.str());
+#endif
         xmlSchemaFreeParserCtxt(m_parserCtx);
         return true;
     }
@@ -84,7 +88,9 @@ bool ValidateSchema::evaluate(Transaction *t,
         if (m_err.empty() == false) {
             err << " " << m_err;
         }
+#ifndef NO_LOGS
         t->debug(4, err.str());
+#endif
         return true;
     }
 
@@ -94,36 +100,46 @@ bool ValidateSchema::evaluate(Transaction *t,
         (xmlSchemaValidityWarningFunc)warn_runtime, t);
 
     if (t->m_xml->m_data.doc == NULL) {
+#ifndef NO_LOGS
         t->debug(4, "XML document tree could not be found for " \
             "schema validation.");
+#endif
         return true;
     }
 
     if (t->m_xml->m_data.well_formed != 1) {
+#ifndef NO_LOGS
         t->debug(4, "XML: Schema validation failed because " \
             "content is not well formed.");
+#endif
         return true;
     }
 
     /* Make sure there were no other generic processing errors */
     /*
     if (msr->msc_reqbody_error) {
+#ifndef NO_LOGS
         t->debug(4, "XML: Schema validation could not proceed due to previous"
                 " processing errors.");
+#endif
         return true;
     }
     */
 
     rc = xmlSchemaValidateDoc(m_validCtx, t->m_xml->m_data.doc);
     if (rc != 0) {
-       t->debug(4, "XML: Schema validation failed.");
+#ifndef NO_LOGS
+        t->debug(4, "XML: Schema validation failed.");
+#endif
         xmlSchemaFree(m_schema);
         xmlSchemaFreeParserCtxt(m_parserCtx);
         return true; /* No match. */
     }
 
+#ifndef NO_LOGS
     t->debug(4, "XML: Successfully validated payload against " \
         "Schema: " + m_resource);
+#endif
 
     return false;
 }

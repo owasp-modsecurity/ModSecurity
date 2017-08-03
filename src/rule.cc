@@ -186,7 +186,9 @@ bool Rule::evaluateActions(Transaction *trans) {
 
 void Rule::updateMatchedVars(Transaction *trans, std::string key,
     std::string value) {
+#ifndef NO_LOGS
     trans->debug(9, "Matched vars updated.");
+#endif
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
     trans->m_variableMatchedVarName.set(key, trans->m_variableOffset);
 
@@ -196,7 +198,9 @@ void Rule::updateMatchedVars(Transaction *trans, std::string key,
 
 
 void Rule::cleanMatchedVars(Transaction *trans) {
+#ifndef NO_LOGS
     trans->debug(9, "Matched vars cleaned.");
+#endif
     trans->m_variableMatchedVar.unset();
     trans->m_variableMatchedVars.unset();
     trans->m_variableMatchedVarName.unset();
@@ -254,13 +258,17 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     for (Action *a : this->m_actionsRuntimePos) {
         if (a->isDisruptive() == true) {
             if (a->m_name == "pass") {
+#ifndef NO_LOGS
                 trans->debug(9, "Rule contains a `pass' action");
+#endif
             } else {
                 *containsDisruptive = true;
             }
         } else {
             if (a->m_name == "setvar" || a->m_name == "msg" || a->m_name == "log") {
+#ifndef NO_LOGS
                 trans->debug(4, "Running [independent] (non-disruptive) action: " + a->m_name);
+#endif
 				a->evaluate(this, trans, ruleMessage);
             }
         }
@@ -277,9 +285,11 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
 #endif
     bool ret;
 
+#ifndef NO_LOGS
     trans->debug(9, "Target value: \"" + utils::string::limitTo(80,
             utils::string::toHexIfNeeded(value)) \
             + "\" (Variable: " + key + ")");
+#endif
 
     ret = this->m_op->evaluateInternal(trans, this, value, ruleMessage);
     if (ret == false) {
@@ -290,8 +300,10 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
     end = clock();
     elapsed_s = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
+#ifndef NO_LOGS
     trans->debug(5, "Operator completed in " + \
         std::to_string(elapsed_s) + " seconds");
+#endif
 #endif
     return ret;
 }
@@ -354,10 +366,12 @@ std::list<std::pair<std::shared_ptr<std::string>,
                 } else {
                     transStr->append("," + a->m_name);
                 }
+#ifndef NO_LOGS
                 trans->debug(9, "(SecDefaultAction) T (" + \
                     std::to_string(transformations) + ") " + \
                     a->m_name + ": \"" + \
                     utils::string::limitTo(80, *value) +"\"");
+#endif
 
                 transformations++;
             }
@@ -379,10 +393,12 @@ std::list<std::pair<std::shared_ptr<std::string>,
             }
 
             value = newValue;
+#ifndef NO_LOGS
             trans->debug(9, " T (" + \
                 std::to_string(transformations) + ") " + \
                 a->m_name + ": \"" + \
                 utils::string::limitTo(80, *value) + "\"");
+#endif
             if (transStr->empty()) {
                 transStr->append(a->m_name);
             } else {
@@ -398,9 +414,11 @@ std::list<std::pair<std::shared_ptr<std::string>,
         // v2 checks the last entry twice. Don't know why.
         ret.push_back(ret.back());
 
+#ifndef NO_LOGS
         trans->debug(9, "multiMatch is enabled. " \
             + std::to_string(ret.size()) + \
             " values to be tested.");
+#endif
     } else {
         ret.push_back(std::make_pair(
             std::shared_ptr<std::string>(value),
@@ -534,16 +552,20 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 }
 
                 if (args == *key) {
+#ifndef NO_LOGS
                     trans->debug(9, "Variable: " + *key +
                         " was excluded by ruleRemoteTargetByTag...");
+#endif
                     ignoreVariable = true;
                     break;
                 }
                 if (posa != std::string::npos) {
                     std::string var = std::string(*key, posa);
                     if (var == args) {
+#ifndef NO_LOGS
                         trans->debug(9, "Variable: " + *key +
                             " was excluded by ruleRemoteTargetByTag...");
+#endif
                         ignoreVariable = true;
                         break;
                     }
@@ -567,8 +589,10 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 }
 
                 if (args == *key) {
+#ifndef NO_LOGS
                     trans->debug(9, "Variable: " + *key +
                         " was excluded by ruleRemoveTargetById...");
+#endif
                     ignoreVariable = true;
                     break;
                 }
@@ -576,8 +600,10 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                     if (key->size() > posa) {
                         std::string var = std::string(*key, 0, posa);
                         if (var == args) {
+#ifndef NO_LOGS
                             trans->debug(9, "Variable: " + var +
                                 " was excluded by ruleRemoveTargetById...");
+#endif
                             ignoreVariable = true;
                             break;
                         }
@@ -625,49 +651,63 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         }
 
         if (a->isDisruptive() == false) {
+#ifndef NO_LOGS
             trans->debug(9, "(SecDefaultAction) Running " \
                 "action: " + a->m_name);
+#endif
             a->evaluate(this, trans, ruleMessage);
             continue;
         }
 
         if (containsDisruptive) {
+#ifndef NO_LOGS
             trans->debug(4, "(SecDefaultAction) ignoring " \
                 "action: " + a->m_name + \
                 " (rule contains a disruptive action)");
+#endif
             continue;
         }
 
         if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
+#ifndef NO_LOGS
             trans->debug(4, "(SecDefaultAction) " \
                 "Running action: " + a->m_name + \
                 " (rule does not contain a disruptive action)");
+#endif
             a->evaluate(this, trans, ruleMessage);
             continue;
         }
 
+#ifndef NO_LOGS
         trans->debug(4, "(SecDefaultAction) Not running action: " \
                 + a->m_name + ". Rule does not contain a disruptive action,"\
                 + " but SecRuleEngine is not On.");
+#endif
     }
 
     for (Action *a : this->m_actionsRuntimePos) {
         if (a->isDisruptive() == false) {
             if (a->m_name != "setvar" && a->m_name != "log"
                 && a->m_name != "msg") {
+#ifndef NO_LOGS
                 trans->debug(4, "Running (non-disruptive) action: " + a->m_name);
+#endif
                 a->evaluate(this, trans, ruleMessage);
             }
             continue;
         }
         if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
+#ifndef NO_LOGS
             trans->debug(4, "Running (disruptive)     action: " + a->m_name);
+#endif
             a->evaluate(this, trans, ruleMessage);
             continue;
         }
 
+#ifndef NO_LOGS
         trans->debug(4, "Not running disruptive action: " + \
                 a->m_name + ". SecRuleEngine is not On");
+#endif
     }
 }
 
@@ -692,8 +732,10 @@ bool Rule::evaluate(Transaction *trans,
         return true;
     }
     if (m_unconditional == true) {
+#ifndef NO_LOGS
         trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
             + ") Executing unconditional rule...");
+#endif
         executeActionsIndependentOfChainedRuleResult(trans,
             &containsDisruptive, ruleMessage);
         goto end_exec;
@@ -703,8 +745,10 @@ bool Rule::evaluate(Transaction *trans,
         if (m_ruleId != i) {
             continue;
         }
+#ifndef NO_LOGS
         trans->debug(9, "Rule id: " + std::to_string(m_ruleId) +
             " was skipped due to an ruleRemoveById action...");
+#endif
         return true;
     }
 
@@ -716,12 +760,14 @@ bool Rule::evaluate(Transaction *trans,
         eparam = "\"" + eparam + "\"";
     }
 
+#ifndef NO_LOGS
     trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
         + ") Executing operator \"" + this->m_op->m_op \
         + "\" with param " \
         + eparam \
         + " against " \
         + Variable::to_s(variables) + ".");
+#endif
 
     updateRulesVariable(trans);
 
@@ -759,24 +805,32 @@ bool Rule::evaluate(Transaction *trans,
     }
 
     if (globalRet == false) {
+#ifndef NO_LOGS
         trans->debug(4, "Rule returned 0.");
+#endif
         cleanMatchedVars(trans);
         goto end_clean;
     }
 
+#ifndef NO_LOGS
     trans->debug(4, "Rule returned 1.");
+#endif
 
     if (this->m_chained == false) {
         goto end_exec;
     }
 
     if (this->m_chainedRule == NULL) {
+#ifndef NO_LOGS
         trans->debug(4, "Rule is marked as chained but there " \
             "isn't a subsequent rule.");
+#endif
         goto end_clean;
     }
 
+#ifndef NO_LOGS
     trans->debug(4, "Executing chained rule.");
+#endif
     recursiveGlobalRet = this->m_chainedRule->evaluate(trans, ruleMessage);
 
     if (recursiveGlobalRet == true) {
