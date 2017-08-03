@@ -853,7 +853,7 @@ op:
       }
     | NOT OPERATOR_RX_CONTENT_ONLY
       {
-        OPERATOR_CONTAINER($$, new operators::Rx("!" + utils::string::removeBracketsIfNeeded($2)));
+        OPERATOR_CONTAINER($$, new operators::Rx("Rx", utils::string::removeBracketsIfNeeded($2), true));
         std::string error;
         if ($$->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
