@@ -52,7 +52,7 @@ std::pair<msc_file_handler *, FILE *> SharedFiles::add_new_handler(
     int shm_id;
     int ret;
     key_t mem_key_structure;
-    msc_file_handler_t *new_debug_log;
+    msc_file_handler_t *new_debug_log = NULL;
     struct shmid_ds shared_mem_info;
     FILE *fp;
     bool toBeCreated = true;
@@ -113,10 +113,10 @@ std::pair<msc_file_handler *, FILE *> SharedFiles::add_new_handler(
         std::make_pair(new_debug_log, fp)));
 
     return std::make_pair(new_debug_log, fp);
-err_shmget1:
-err_shmctl1:
 err_shmat1:
     shmdt(new_debug_log);
+err_shmctl1:
+err_shmget1:
 err_mem_key:
     fclose(fp);
 err_fh:
