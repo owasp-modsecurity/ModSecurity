@@ -572,7 +572,8 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_DIR_AUDIT_LOG2}[ ]{CONFIG_VALUE_PATH}                           { return p::make_CONFIG_DIR_AUDIT_LOG2(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_LOG_P}[ ]{AUDIT_PARTS}                                { return p::make_CONFIG_DIR_AUDIT_LOG_P(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_LOG}[ ]{CONFIG_VALUE_PATH}                            { return p::make_CONFIG_DIR_AUDIT_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{CONFIG_DIR_AUDIT_STS}[ ]["]{FREE_TEXT}["]                              { return p::make_CONFIG_DIR_AUDIT_STS(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_AUDIT_STS}[ ]{FREE_TEXT_NEW_LINE}                           { return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_DIR_AUDIT_STS}[ \t]+["]{NEW_LINE_FREE_TEXT}["]                     { return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_TPE}                                                  { return p::make_CONFIG_DIR_AUDIT_TPE(yytext, *driver.loc.back()); }
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}                            { return p::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_DEBUG_LOG}[ ]["]{CONFIG_VALUE_PATH}["]                      { return p::make_CONFIG_DIR_DEBUG_LOG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }

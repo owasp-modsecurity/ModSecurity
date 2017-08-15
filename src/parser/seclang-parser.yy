@@ -736,8 +736,6 @@ audit_log:
     | CONFIG_DIR_AUDIT_STS
       {
         std::string relevant_status($1);
-        relevant_status.pop_back();
-        relevant_status.erase(0, 1);
         driver.m_auditLog->setRelevantStatus(relevant_status);
       }
 
