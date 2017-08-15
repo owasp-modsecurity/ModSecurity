@@ -574,6 +574,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_DIR_AUDIT_STS}[ ]["]{FREE_TEXT}["]                              { return p::make_CONFIG_DIR_AUDIT_STS(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_TPE}                                                  { return p::make_CONFIG_DIR_AUDIT_TPE(yytext, *driver.loc.back()); }
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}                            { return p::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_DEBUG_LOG}[ ]["]{CONFIG_VALUE_PATH}["]                      { return p::make_CONFIG_DIR_DEBUG_LOG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_DEBUG_LVL}[ ]{CONFIG_VALUE_NUMBER}                          { return p::make_CONFIG_DIR_DEBUG_LVL(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_GEO_DB}[ ]{FREE_TEXT_NEW_LINE}                              { return p::make_CONFIG_DIR_GEO_DB(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION}[ ]{CONFIG_VALUE_NUMBER}         { return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION(strchr(yytext, ' ') + 1, *driver.loc.back()); }
