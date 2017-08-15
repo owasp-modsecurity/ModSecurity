@@ -22,6 +22,7 @@
 
 #include "modsecurity/transaction.h"
 #include "src/macro_expansion.h"
+#include "src/utils/string.h"
 
 namespace modsecurity {
 namespace actions {
@@ -30,6 +31,7 @@ namespace disruptive {
 
 bool Redirect::init(std::string *error) {
     m_url = m_parser_payload;
+    m_url = utils::string::parserSanitizer(m_url);
     m_status = 302;
     return true;
 }

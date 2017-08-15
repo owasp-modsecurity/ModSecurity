@@ -109,6 +109,10 @@ std::string removeBracketsIfNeeded(std::string a) {
         a.pop_back();
         a.erase(0, 1);
     }
+    if (a.length() > 1 && a.at(0) == '\'' && a.at(a.length()-1) == '\'') {
+        a.pop_back();
+        a.erase(0, 1);
+    }
     return a;
 }
 
