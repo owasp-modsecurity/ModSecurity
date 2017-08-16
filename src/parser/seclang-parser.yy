@@ -353,6 +353,7 @@ using modsecurity::operators::Operator;
   END  0  "end of file"
   COMMA    ","
   CONFIG_CONTENT_INJECTION                     "CONFIG_CONTENT_INJECTION"
+  CONGIG_DIR_RESPONSE_BODY_MP_CLEAR            "CONGIG_DIR_RESPONSE_BODY_MP_CLEAR"
   PIPE
   NEW_LINE
   VAR_COUNT
@@ -1362,11 +1363,18 @@ expression:
         std::istringstream buf($1);
         std::istream_iterator<std::string> beg(buf), end;
         std::set<std::string> tokens(beg, end);
+        driver.m_responseBodyTypeToBeInspected.m_set = true;
         for (std::set<std::string>::iterator it=tokens.begin();
             it!=tokens.end(); ++it)
         {
-            driver.m_responseBodyTypeToBeInspected.insert(*it);
+            driver.m_responseBodyTypeToBeInspected.m_value.insert(*it);
         }
+      }
+    | CONGIG_DIR_RESPONSE_BODY_MP_CLEAR
+      {
+        driver.m_responseBodyTypeToBeInspected.m_set = true;
+        driver.m_responseBodyTypeToBeInspected.m_clear = true;
+        driver.m_responseBodyTypeToBeInspected.m_value.clear();
       }
     | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_OFF
       {

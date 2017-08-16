@@ -71,6 +71,14 @@ class ConfigString {
 };
 
 
+class ConfigSet {
+ public:
+    ConfigSet() : m_set(false), m_clear(false) { }
+    bool m_set;
+    bool m_clear;
+    std::set<std::string> m_value;
+};
+
 class RulesProperties {
  public:
     RulesProperties() :
@@ -334,10 +342,18 @@ class RulesProperties {
         to->m_components.insert(to->m_components.end(),
             from->m_components.begin(), from->m_components.end());
 
-        for (std::set<std::string>::iterator
-                it = from->m_responseBodyTypeToBeInspected.begin();
-                it != from->m_responseBodyTypeToBeInspected.end(); ++it) {
-            to->m_responseBodyTypeToBeInspected.insert(*it);
+        if (from->m_responseBodyTypeToBeInspected.m_set == true) {
+            if (from->m_responseBodyTypeToBeInspected.m_clear == true) {
+                to->m_responseBodyTypeToBeInspected.m_value.clear();
+                from->m_responseBodyTypeToBeInspected.m_value.clear();
+            } else {
+                for (std::set<std::string>::iterator
+                        it = from->m_responseBodyTypeToBeInspected.m_value.begin();
+                        it != from->m_responseBodyTypeToBeInspected.m_value.end(); ++it) {
+                    to->m_responseBodyTypeToBeInspected.m_value.insert(*it);
+                }
+            }
+            to->m_responseBodyTypeToBeInspected.m_set = true;
         }
 
         for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
@@ -447,7 +463,7 @@ class RulesProperties {
     RulesExceptions m_exceptions;
     std::list<std::string> m_components;
     std::ostringstream m_parserError;
-    std::set<std::string> m_responseBodyTypeToBeInspected;
+    ConfigSet m_responseBodyTypeToBeInspected;
     ConfigString m_httpblKey;
     ConfigString m_uploadDirectory;
     ConfigString m_uploadTmpDirectory;

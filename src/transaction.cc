@@ -1069,9 +1069,9 @@ int Transaction::processResponseBody() {
         return true;
     }
 
-    std::set<std::string> &bi = this->m_rules->m_responseBodyTypeToBeInspected;
+    std::set<std::string> &bi = m_rules->m_responseBodyTypeToBeInspected.m_value;
     auto t = bi.find(m_variableResponseContentType.m_value);
-    if (t == bi.end() && bi.empty() == false) {
+    if (t == bi.end() && m_rules->m_responseBodyTypeToBeInspected.m_set == true) {
 #ifndef NO_LOGS
         debug(5, "Response Content-Type is " \
             + m_variableResponseContentType.m_value \
@@ -1094,7 +1094,7 @@ int Transaction::processResponseBody() {
     m_variableResponseContentLength.set(std::to_string(
         m_responseBody.str().size()), m_variableOffset);
 
-    this->m_rules->evaluate(modsecurity::ResponseBodyPhase, this);
+    m_rules->evaluate(modsecurity::ResponseBodyPhase, this);
     return true;
 }
 
@@ -1120,7 +1120,7 @@ int Transaction::processResponseBody() {
 int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_responseBody.tellp();
 
-    std::set<std::string> &bi = this->m_rules->m_responseBodyTypeToBeInspected;
+    std::set<std::string> &bi = this->m_rules->m_responseBodyTypeToBeInspected.m_value;
     auto t = bi.find(m_variableResponseContentType.m_value);
     if (t == bi.end() && bi.empty() == false) {
 #ifndef NO_LOGS

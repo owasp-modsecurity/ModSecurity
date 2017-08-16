@@ -316,6 +316,7 @@ CONFIG_VALUE_SERIAL                     (?i:Serial)
 CONFIG_VALUE_WARN                       (?i:Warn)
 CONFIG_XML_EXTERNAL_ENTITY              (?i:SecXmlExternalEntity)
 CONGIG_DIR_RESPONSE_BODY_MP             (?i:SecResponseBodyMimeType)
+CONGIG_DIR_RESPONSE_BODY_MP_CLEAR       (?i:SecResponseBodyMimeTypesClear)
 CONGIG_DIR_SEC_ARG_SEP                  (?i:SecArgumentSeparator)
 CONGIG_DIR_SEC_COOKIE_FORMAT            (?i:SecCookieFormat)
 CONGIG_DIR_SEC_DATA_DIR                 (?i:SecDataDir)
@@ -632,6 +633,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_VALUE_WARN}                                                     { return p::make_CONFIG_VALUE_WARN(yytext, *driver.loc.back()); }
 {CONFIG_XML_EXTERNAL_ENTITY}                                            { return p::make_CONFIG_XML_EXTERNAL_ENTITY(yytext, *driver.loc.back()); }
 {CONGIG_DIR_RESPONSE_BODY_MP}[ ]{FREE_TEXT_NEW_LINE}                    { return p::make_CONGIG_DIR_RESPONSE_BODY_MP(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONGIG_DIR_RESPONSE_BODY_MP_CLEAR}                                     { return p::make_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR(*driver.loc.back()); }
 {CONGIG_DIR_SEC_ARG_SEP}[ ]{FREE_TEXT_NEW_LINE}                         { return p::make_CONGIG_DIR_SEC_ARG_SEP(yytext, *driver.loc.back()); }
 {CONGIG_DIR_SEC_COOKIE_FORMAT}[ ]{CONFIG_VALUE_NUMBER}                  { return p::make_CONGIG_DIR_SEC_COOKIE_FORMAT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONGIG_DIR_SEC_DATA_DIR}[ \t]+{CONFIG_VALUE_PATH}                      { return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
