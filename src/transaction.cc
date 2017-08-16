@@ -236,6 +236,9 @@ int Transaction::processConnection(const char *client, int cPort,
 bool Transaction::extractArguments(const std::string &orig,
     const std::string& buf, size_t offset) {
     char sep1 = '&';
+    if (m_rules->m_secArgumentSeparator.m_set) {
+        sep1 = m_rules->m_secArgumentSeparator.m_value.at(0);
+    }
     std::vector<std::string> key_value_sets = utils::string::ssplit(buf, sep1);
 
     for (std::string t : key_value_sets) {

@@ -258,7 +258,9 @@ COL_NAME                                [A-Za-z]+
 CONFIG_COMPONENT_SIG                    (?i:SecComponentSignature)
 CONFIG_SEC_SERVER_SIG                   (?i:SecServerSignature)
 CONFIG_SEC_WEB_APP_ID                   (?i:SecWebAppId)
+CONFIG_SEC_CACHE_TRANSFORMATIONS        (?i:SecCacheTransformations)
 CONFIG_CONTENT_INJECTION                (?i:SecContentInjection)
+CONFIG_SEC_ARGUMENT_SEPARATOR           (?i:SecArgumentSeparator)
 CONFIG_DIR_AUDIT_DIR                    (?i:SecAuditLogStorageDir)
 CONFIG_DIR_AUDIT_DIR_MOD                (?i:SecAuditLogDirMode)
 CONFIG_DIR_AUDIT_ENG                    (?i:SecAuditEngine)
@@ -576,6 +578,8 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_DIR_AUDIT_DIR_MOD}[ \t]+["]{CONFIG_VALUE_NUMBER}["]             { return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR}[ \t]+{CONFIG_VALUE_PATH}                         { return p::make_CONFIG_DIR_AUDIT_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                   { return p::make_CONFIG_DIR_AUDIT_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_ARGUMENT_SEPARATOR}[ \t]+["]{NEW_LINE_FREE_TEXT}["]         { return p::make_CONFIG_SEC_ARGUMENT_SEPARATOR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_ARGUMENT_SEPARATOR}[ \t]+{NEW_LINE_FREE_TEXT}               { return p::make_CONFIG_SEC_ARGUMENT_SEPARATOR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_ENG}                                                  { return p::make_CONFIG_DIR_AUDIT_ENG(yytext, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_FLE_MOD}[ ]{CONFIG_VALUE_NUMBER}                      { return p::make_CONFIG_DIR_AUDIT_FLE_MOD(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_LOG2}[ ]{CONFIG_VALUE_PATH}                           { return p::make_CONFIG_DIR_AUDIT_LOG2(strchr(yytext, ' ') + 1, *driver.loc.back()); }
@@ -637,6 +641,8 @@ EQUALS_MINUS                            (?i:=\-)
 {CONGIG_DIR_SEC_TMP_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                 { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {DIRECTIVE_SECRULESCRIPT}[ \t]+{CONFIG_VALUE_PATH}                      { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {DIRECTIVE_SECRULESCRIPT}[ \t]+["]{FREE_TEXT_SPACE_COMMA_QUOTE}["]      { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_CACHE_TRANSFORMATIONS}{FREE_TEXT_NEW_LINE}                  { return p::make_CONFIG_SEC_CACHE_TRANSFORMATIONS(yytext, *driver.loc.back()); }
+
 
 {DIRECTIVE}                                                             { BEGIN(TRANSACTION_TO_VARIABLE); return p::make_DIRECTIVE(yytext, *driver.loc.back()); }
 {CONFIG_DIR_SEC_DEFAULT_ACTION}                                         { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_CONFIG_DIR_SEC_DEFAULT_ACTION(yytext, *driver.loc.back()); }

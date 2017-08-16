@@ -319,6 +319,11 @@ class RulesProperties {
                 from->m_uploadTmpDirectory.m_value;
         }
 
+        if (from->m_secArgumentSeparator.m_set == true) {
+            to->m_secArgumentSeparator.m_value = \
+                from->m_secArgumentSeparator.m_value;
+        }
+
         if (from->m_httpblKey.m_set == true) {
             to->m_httpblKey.m_value = from->m_httpblKey.m_value;
             to->m_httpblKey.m_set = from->m_httpblKey.m_set;
@@ -446,6 +451,7 @@ class RulesProperties {
     ConfigString m_httpblKey;
     ConfigString m_uploadDirectory;
     ConfigString m_uploadTmpDirectory;
+    ConfigString m_secArgumentSeparator;
     std::vector<actions::Action *> m_defaultActions[8];
     std::vector<modsecurity::Rule *> m_rules[8];
 };

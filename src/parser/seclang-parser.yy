@@ -531,6 +531,7 @@ using modsecurity::operators::Operator;
   ACTION_VER                                   "Ver"
   ACTION_XMLNS                                 "xmlns"
   CONFIG_COMPONENT_SIG                         "CONFIG_COMPONENT_SIG"
+  CONFIG_SEC_ARGUMENT_SEPARATOR                "CONFIG_SEC_ARGUMENT_SEPARATOR"
   CONFIG_SEC_WEB_APP_ID                        "CONFIG_SEC_WEB_APP_ID"
   CONFIG_SEC_SERVER_SIG                        "CONFIG_SEC_SERVER_SIG"
   CONFIG_DIR_AUDIT_DIR                         "CONFIG_DIR_AUDIT_DIR"
@@ -544,6 +545,7 @@ using modsecurity::operators::Operator;
   CONFIG_DIR_AUDIT_TPE                         "CONFIG_DIR_AUDIT_TPE"
   CONFIG_DIR_DEBUG_LOG                         "CONFIG_DIR_DEBUG_LOG"
   CONFIG_DIR_DEBUG_LVL                         "CONFIG_DIR_DEBUG_LVL"
+  CONFIG_SEC_CACHE_TRANSFORMATIONS             "CONFIG_SEC_CACHE_TRANSFORMATIONS"
   CONFIG_DIR_GEO_DB                            "CONFIG_DIR_GEO_DB"
   CONFIG_DIR_PCRE_MATCH_LIMIT                  "CONFIG_DIR_PCRE_MATCH_LIMIT"
   CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION        "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
@@ -1158,6 +1160,15 @@ expression:
       {
         driver.m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
+    | CONFIG_SEC_ARGUMENT_SEPARATOR
+      {
+        if ($1.length() != 1) {
+          driver.error(@0, "Argument separator should be set to a single character.");
+          YYERROR;
+        }
+        driver.m_secArgumentSeparator.m_value = $1;
+        driver.m_secArgumentSeparator.m_set = true;
+      }
     | CONFIG_COMPONENT_SIG
       {
         driver.m_components.push_back($1);
@@ -1175,6 +1186,11 @@ expression:
     | CONFIG_CONTENT_INJECTION CONFIG_VALUE_ON
       {
         driver.error(@0, "ContentInjection is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_CACHE_TRANSFORMATIONS
+      {
+        driver.error(@0, "SecCacheTransformations is not supported.");
         YYERROR;
       }
     | CONFIG_CONTENT_INJECTION CONFIG_VALUE_OFF
