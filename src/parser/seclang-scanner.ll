@@ -256,6 +256,7 @@ AUDIT_PARTS                             [ABCDEFHJKIZ]+
 COL_FREE_TEXT_SPACE_COMMA               ([^,"])+
 COL_NAME                                [A-Za-z]+
 CONFIG_COMPONENT_SIG                    (?i:SecComponentSignature)
+CONFIG_CONTENT_INJECTION                (?i:SecContentInjection)
 CONFIG_DIR_AUDIT_DIR                    (?i:SecAuditLogStorageDir)
 CONFIG_DIR_AUDIT_DIR_MOD                (?i:SecAuditLogDirMode)
 CONFIG_DIR_AUDIT_ENG                    (?i:SecAuditEngine)
@@ -565,6 +566,7 @@ EQUALS_MINUS                            (?i:=\-)
 }
 
 {CONFIG_COMPONENT_SIG}[ \t]+["]{FREE_TEXT}["]                           { return p::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
+{CONFIG_CONTENT_INJECTION}                                              { return p::make_CONFIG_CONTENT_INJECTION(*driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR_MOD}[ ]{CONFIG_VALUE_NUMBER}                      { return p::make_CONFIG_DIR_AUDIT_DIR_MOD(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR}[ ]{CONFIG_VALUE_PATH}                            { return p::make_CONFIG_DIR_AUDIT_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_ENG}                                                  { return p::make_CONFIG_DIR_AUDIT_ENG(yytext, *driver.loc.back()); }

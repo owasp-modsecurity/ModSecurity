@@ -352,6 +352,7 @@ using modsecurity::operators::Operator;
 %token
   END  0  "end of file"
   COMMA    ","
+  CONFIG_CONTENT_INJECTION                     "CONFIG_CONTENT_INJECTION"
   PIPE
   NEW_LINE
   VAR_COUNT
@@ -1161,6 +1162,16 @@ expression:
     | CONFIG_COMPONENT_SIG
       {
         driver.m_components.push_back($1);
+      }
+    | CONFIG_CONTENT_INJECTION CONFIG_VALUE_ON
+      {
+        driver.error(@0, "ContentInjection is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_CONTENT_INJECTION CONFIG_VALUE_OFF
+      {
+        driver.error(@0, "ContentInjection is not yet supported.");
+        YYERROR;
       }
     | CONFIG_SEC_RULE_REMOVE_BY_ID
       {
