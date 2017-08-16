@@ -531,6 +531,7 @@ using modsecurity::operators::Operator;
   ACTION_VER                                   "Ver"
   ACTION_XMLNS                                 "xmlns"
   CONFIG_COMPONENT_SIG                         "CONFIG_COMPONENT_SIG"
+  CONFIG_SEC_WEB_APP_ID                        "CONFIG_SEC_WEB_APP_ID"
   CONFIG_SEC_SERVER_SIG                        "CONFIG_SEC_SERVER_SIG"
   CONFIG_DIR_AUDIT_DIR                         "CONFIG_DIR_AUDIT_DIR"
   CONFIG_DIR_AUDIT_DIR_MOD                     "CONFIG_DIR_AUDIT_DIR_MOD"
@@ -1160,6 +1161,11 @@ expression:
     | CONFIG_COMPONENT_SIG
       {
         driver.m_components.push_back($1);
+      }
+    | CONFIG_SEC_WEB_APP_ID
+      {
+        driver.error(@0, "SecWebAppId is not supported.");
+        YYERROR;
       }
     | CONFIG_SEC_SERVER_SIG
       {
