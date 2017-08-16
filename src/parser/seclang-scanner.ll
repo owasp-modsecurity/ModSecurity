@@ -252,7 +252,7 @@ OPERATOR_GEOLOOKUP                      (?i:@geoLookup)
 OPERATOR_RX_CONTENT_ONLY                ([^\"]|([^\\]\\\"))+
 
 
-AUDIT_PARTS                             [ABCDEFHJKIZ]+
+AUDIT_PARTS                             [ABCDEFGHJKIZ]+
 COL_FREE_TEXT_SPACE_COMMA               ([^,"])+
 COL_NAME                                [A-Za-z]+
 CONFIG_COMPONENT_SIG                    (?i:SecComponentSignature)
@@ -626,7 +626,8 @@ EQUALS_MINUS                            (?i:=\-)
 {CONGIG_DIR_SEC_COOKIE_FORMAT}[ ]{CONFIG_VALUE_NUMBER}                  { return p::make_CONGIG_DIR_SEC_COOKIE_FORMAT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONGIG_DIR_SEC_DATA_DIR}[ ]{CONFIG_VALUE_PATH}                         { return p::make_CONGIG_DIR_SEC_DATA_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONGIG_DIR_SEC_STATUS_ENGINE}[ ]{FREE_TEXT_NEW_LINE}                   { return p::make_CONGIG_DIR_SEC_STATUS_ENGINE(yytext, *driver.loc.back()); }
-{CONGIG_DIR_SEC_TMP_DIR}[ ]{CONFIG_VALUE_PATH}                          { return p::make_CONGIG_DIR_SEC_TMP_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONGIG_DIR_SEC_TMP_DIR}[ \t]+{CONFIG_VALUE_PATH}                       { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONGIG_DIR_SEC_TMP_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                 { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {DIRECTIVE_SECRULESCRIPT}[ ]{CONFIG_VALUE_PATH}                         { return p::make_DIRECTIVE_SECRULESCRIPT(yytext, *driver.loc.back()); }
 
 {DIRECTIVE}                                                             { BEGIN(TRANSACTION_TO_VARIABLE); return p::make_DIRECTIVE(yytext, *driver.loc.back()); }
