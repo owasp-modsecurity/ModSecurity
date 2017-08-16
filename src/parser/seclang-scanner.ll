@@ -627,7 +627,8 @@ EQUALS_MINUS                            (?i:=\-)
 {CONGIG_DIR_RESPONSE_BODY_MP}[ ]{FREE_TEXT_NEW_LINE}                    { return p::make_CONGIG_DIR_RESPONSE_BODY_MP(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONGIG_DIR_SEC_ARG_SEP}[ ]{FREE_TEXT_NEW_LINE}                         { return p::make_CONGIG_DIR_SEC_ARG_SEP(yytext, *driver.loc.back()); }
 {CONGIG_DIR_SEC_COOKIE_FORMAT}[ ]{CONFIG_VALUE_NUMBER}                  { return p::make_CONGIG_DIR_SEC_COOKIE_FORMAT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{CONGIG_DIR_SEC_DATA_DIR}[ ]{CONFIG_VALUE_PATH}                         { return p::make_CONGIG_DIR_SEC_DATA_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONGIG_DIR_SEC_DATA_DIR}[ \t]+{CONFIG_VALUE_PATH}                      { return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONGIG_DIR_SEC_DATA_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                { return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONGIG_DIR_SEC_STATUS_ENGINE}[ ]{FREE_TEXT_NEW_LINE}                   { return p::make_CONGIG_DIR_SEC_STATUS_ENGINE(yytext, *driver.loc.back()); }
 {CONGIG_DIR_SEC_TMP_DIR}[ \t]+{CONFIG_VALUE_PATH}                       { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONGIG_DIR_SEC_TMP_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                 { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
