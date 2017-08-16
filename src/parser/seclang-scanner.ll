@@ -629,7 +629,8 @@ EQUALS_MINUS                            (?i:=\-)
 {CONGIG_DIR_SEC_STATUS_ENGINE}[ ]{FREE_TEXT_NEW_LINE}                   { return p::make_CONGIG_DIR_SEC_STATUS_ENGINE(yytext, *driver.loc.back()); }
 {CONGIG_DIR_SEC_TMP_DIR}[ \t]+{CONFIG_VALUE_PATH}                       { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONGIG_DIR_SEC_TMP_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                 { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
-{DIRECTIVE_SECRULESCRIPT}[ ]{CONFIG_VALUE_PATH}                         { return p::make_DIRECTIVE_SECRULESCRIPT(yytext, *driver.loc.back()); }
+{DIRECTIVE_SECRULESCRIPT}[ \t]+{CONFIG_VALUE_PATH}                      { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{DIRECTIVE_SECRULESCRIPT}[ \t]+["]{FREE_TEXT_SPACE_COMMA_QUOTE}["]      { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 
 {DIRECTIVE}                                                             { BEGIN(TRANSACTION_TO_VARIABLE); return p::make_DIRECTIVE(yytext, *driver.loc.back()); }
 {CONFIG_DIR_SEC_DEFAULT_ACTION}                                         { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_CONFIG_DIR_SEC_DEFAULT_ACTION(yytext, *driver.loc.back()); }

@@ -1074,11 +1074,8 @@ expression:
       }
     | DIRECTIVE_SECRULESCRIPT actions
       {
-        /*
-
-        TODO: implement the SecRuleScript directive
-
-        */
+        driver.error(@0, "SecRuleScript is not yet supported.");
+        YYERROR;
       }
     | CONFIG_DIR_SEC_DEFAULT_ACTION actions
       {
