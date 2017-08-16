@@ -606,7 +606,8 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_SEC_UPDATE_TARGET_BY_ID}[ ]+{FREE_TEXT_SPACE_COMMA_QUOTE}       { state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_UPDLOAD_KEEP_FILES}                                             { return p::make_CONFIG_UPDLOAD_KEEP_FILES(yytext, *driver.loc.back()); }
 {CONFIG_UPDLOAD_SAVE_TMP_FILES}                                         { return p::make_CONFIG_UPDLOAD_SAVE_TMP_FILES(yytext, *driver.loc.back()); }
-{CONFIG_UPLOAD_DIR}[ ]{CONFIG_VALUE_PATH}                               { return p::make_CONFIG_UPLOAD_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_UPLOAD_DIR}[ \t]+{CONFIG_VALUE_PATH}                            { return p::make_CONFIG_UPLOAD_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_UPLOAD_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                      { return p::make_CONFIG_UPLOAD_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_UPLOAD_FILE_LIMIT}[ ]{CONFIG_VALUE_NUMBER}                      { return p::make_CONFIG_UPLOAD_FILE_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_UPLOAD_FILE_MODE}[ ]{CONFIG_VALUE_NUMBER}                       { return p::make_CONFIG_UPLOAD_FILE_MODE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_VALUE_ABORT}                                                    { return p::make_CONFIG_VALUE_ABORT(yytext, *driver.loc.back()); }
