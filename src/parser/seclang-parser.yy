@@ -1703,31 +1703,75 @@ var:
         VARIABLE_CONTAINER($$, new Variables::Session_NoDictElement());
       }
 
-
-
+    | VARIABLE_ARGS_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsNames_DictElement($2));
+      }
+    | VARIABLE_ARGS_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsNames_DictElementRegexp($2));
+      }
     | VARIABLE_ARGS_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsNames());
+        VARIABLE_CONTAINER($$, new Variables::ArgsNames_NoDictElement());
+      }
+
+
+    | VARIABLE_ARGS_GET_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsGetNames_DictElement($2));
+      }
+    | VARIABLE_ARGS_GET_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsGetNames_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_GET_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsGetNames());
+        VARIABLE_CONTAINER($$, new Variables::ArgsGetNames_NoDictElement());
+      }
+
+    | VARIABLE_ARGS_POST_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsPostNames_DictElement($2));
+      }
+    | VARIABLE_ARGS_POST_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsPostNames_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_POST_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsPostNames());
+        VARIABLE_CONTAINER($$, new Variables::ArgsPostNames_NoDictElement());
+      }
+
+    | VARIABLE_REQUEST_HEADERS_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestHeadersNames_DictElement($2));
+      }
+    | VARIABLE_REQUEST_HEADERS_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestHeadersNames_DictElementRegexp($2));
       }
     | VARIABLE_REQUEST_HEADERS_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestHeadersNames());
+        VARIABLE_CONTAINER($$, new Variables::RequestHeadersNames_NoDictElement());
       }
+
     | VARIABLE_RESPONSE_CONTENT_TYPE
       {
         VARIABLE_CONTAINER($$, new Variables::ResponseContentType());
       }
+
+    | VARIABLE_RESPONSE_HEADERS_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseHeadersNames_DictElement($2));
+      }
+    | VARIABLE_RESPONSE_HEADERS_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseHeadersNames_DictElementRegexp($2));
+      }
     | VARIABLE_RESPONSE_HEADERS_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseHeadersNames());
+        VARIABLE_CONTAINER($$, new Variables::ResponseHeadersNames_NoDictElement());
       }
     | VARIABLE_ARGS_COMBINED_SIZE
       {

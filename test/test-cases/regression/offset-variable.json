@@ -149,7 +149,7 @@
       ]
     },
     "expected":{
-      "error_log":"o0,6v17,6v31,6t:trim"
+      "error_log":"o0,6v17,6t:trim"
     },
     "rules":[
       "SecRequestBodyAccess On",
@@ -182,7 +182,7 @@
       ]
     },
     "expected":{
-      "error_log":"o7,6v17,6v31,6t:trim"
+      "error_log":"o0,6v31,6t:trim"
     },
     "rules":[
       "SecRequestBodyAccess On",
@@ -215,7 +215,7 @@
       ]
     },
     "expected":{
-      "error_log":"o3,7v17,6v31,6t:trim"
+      // should not match
     },
     "rules":[
       "SecRequestBodyAccess On",
@@ -248,7 +248,7 @@
       ]
     },
     "expected":{
-      "error_log":"o3,14v17,6v31,6v45,6t:trim"
+      // should not match
     },
     "rules":[
       "SecRequestBodyAccess On",
@@ -281,11 +281,11 @@
       ]
     },
     "expected":{
-      "error_log":"o3,14v149,6v163,6v177,6t:trim"
+      "error_log": "0,6v149,6t:trim"
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_POST_NAMES \"@rx am1 param2 par\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRule ARGS_POST_NAMES \"@rx param1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
     ]
   },
   {
@@ -314,11 +314,11 @@
       ]
     },
     "expected":{
-      "error_log":"o0,17v17,6v31,6v45,6v149,6v163,6v177,6t:trim"
+      "error_log":"o0,6v17,6t:trimo0,6v149,6t:trim"
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_NAMES \"@rx param1 param2 par\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRule ARGS_NAMES \"@rx param1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
     ]
   },
     {
@@ -786,7 +786,7 @@
       ]
     },
     "expected":{
-      "error_log":"o0,4v64,13v114,4v130,14v149,12t:lowercase"
+      "error_log":"o0,4v64,13t:lowercase"
     },
     "rules":[
       "SecRequestBodyAccess On",

@@ -29,16 +29,48 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class ArgsGetNames : public Variable {
+class ArgsGetNames_DictElement : public Variable {
  public:
-    ArgsGetNames()
+    explicit ArgsGetNames_DictElement(std::string dictElement)
+        : Variable("ARGS_GET_NAMES" + std::string(":") +
+            std::string(dictElement)),
+        m_dictElement(dictElement) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) override {
+        transaction->m_variableArgsGetNames.resolve(m_dictElement, l);
+    }
+
+    std::string m_dictElement;
+};
+
+class ArgsGetNames_NoDictElement : public Variable {
+ public:
+    ArgsGetNames_NoDictElement()
         : Variable("ARGS_GET_NAMES") { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
-        transaction->m_variableArgGetNames.evaluate(l);
+        std::vector<const collection::Variable *> *l) override {
+        transaction->m_variableArgsGetNames.resolve(l);
     }
+};
+
+class ArgsGetNames_DictElementRegexp : public Variable {
+ public:
+    explicit ArgsGetNames_DictElementRegexp(std::string dictElement)
+        : Variable("ARGS_GET_NAMES"),
+        m_r(dictElement) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) override {
+        transaction->m_variableArgsGetNames.resolveRegularExpression(
+            &m_r, l);
+    }
+
+    Utils::Regex m_r;
 };
 
 }  // namespace Variables

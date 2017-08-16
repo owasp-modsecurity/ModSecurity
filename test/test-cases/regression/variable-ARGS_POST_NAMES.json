@@ -36,7 +36,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"param1 param2\""
+      "debug_log":"Target value: \"param1\""
     },
     "rules":[
       "SecRuleEngine On",
@@ -80,7 +80,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"param1 param2\""
+      "debug_log":"Target value: \"param2\""
     },
     "rules":[
       "SecRuleEngine On",

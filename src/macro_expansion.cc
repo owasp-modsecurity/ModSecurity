@@ -73,23 +73,8 @@ std::string MacroExpansion::expand(const std::string& input,
             collection = variable.find(":");
         }
         if (collection == std::string::npos) {
-            if (compareStrNoCase(variable, "ARGS_NAMES")) {
-                variableValue = transaction->m_variableArgsNames.resolveFirst();
-            }
-            else if (compareStrNoCase(variable, "ARGS_GET_NAMES")) {
-                variableValue = transaction->m_variableArgGetNames.resolveFirst();
-            }
-            else if (compareStrNoCase(variable, "ARGS_POST_NAMES")) {
-                variableValue = transaction->m_variableArgPostNames.resolveFirst();
-            }
-            else if (compareStrNoCase(variable, "REQUEST_HEADERS_NAMES")) {
-                variableValue = transaction->m_variableRequestHeadersNames.resolveFirst();
-            }
-            else if (compareStrNoCase(variable, "RESPONSE_CONTENT_TYPE")) {
+            if (compareStrNoCase(variable, "RESPONSE_CONTENT_TYPE")) {
                 variableValue = transaction->m_variableResponseContentType.resolveFirst();
-            }
-            else if (compareStrNoCase(variable, "RESPONSE_HEADERS_NAMES")) {
-                variableValue = transaction->m_variableResponseHeadersNames.resolveFirst();
             }
             else if (compareStrNoCase(variable, "ARGS_COMBINED_SIZE")) {
                 variableValue = transaction->m_variableARGScombinedSize.resolveFirst();
@@ -245,6 +230,15 @@ std::string MacroExpansion::expand(const std::string& input,
             if (compareStrNoCase(col, "ARGS")) {
                 variableValue = transaction->m_variableArgs.resolveFirst(var);
             }
+            else if (compareStrNoCase(variable, "ARGS_NAMES")) {
+                variableValue = transaction->m_variableArgsNames.resolveFirst(var);
+            }
+            else if (compareStrNoCase(variable, "ARGS_GET_NAMES")) {
+                variableValue = transaction->m_variableArgsGetNames.resolveFirst(var);
+            }
+            else if (compareStrNoCase(variable, "ARGS_POST_NAMES")) {
+                variableValue = transaction->m_variableArgsPostNames.resolveFirst(var);
+            }
             else if (compareStrNoCase(col, "RULE")) {
                 variableValue = transaction->m_variableRule.resolveFirst(var);
             }
@@ -284,8 +278,14 @@ std::string MacroExpansion::expand(const std::string& input,
             else if (compareStrNoCase(col, "REQUEST_HEADERS")) {
                 variableValue = transaction->m_variableRequestHeaders.resolveFirst(var);
             }
+            else if (compareStrNoCase(variable, "REQUEST_HEADERS_NAMES")) {
+                variableValue = transaction->m_variableRequestHeadersNames.resolveFirst(var);
+            }
             else if (compareStrNoCase(col, "RESPONSE_HEADERS")) {
                 variableValue = transaction->m_variableResponseHeaders.resolveFirst(var);
+            }
+            else if (compareStrNoCase(variable, "RESPONSE_HEADERS_NAMES")) {
+                variableValue = transaction->m_variableResponseHeadersNames.resolveFirst(var);
             }
             else if (compareStrNoCase(col, "GEO")) {
                 variableValue = transaction->m_variableGeo.resolveFirst(var);

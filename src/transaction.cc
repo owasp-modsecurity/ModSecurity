@@ -296,17 +296,18 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
     debug(4, "Adding request argument (" + orig + "): name \"" + \
                 key + "\", value \"" + value + "\"");
 
+    size_t k_offset = offset;
     offset = offset + key.size() + 1;
     m_variableArgs.set(key, value, offset);
+    m_variableArgsNames.set(key, key, k_offset);
 
     if (orig == "GET") {
         m_variableArgsGet.set(key, value, offset);
-        m_variableArgGetNames.append(key, offset - key.size() - 1, true);
+        m_variableArgsGetNames.set(key, key, k_offset);
     } else if (orig == "POST") {
         m_variableArgsPost.set(key, value, offset);
-        m_variableArgPostNames.append(key, offset - key.size() - 1, true);
+        m_variableArgsPostNames.set(key, key, k_offset);
     }
-    m_variableArgsNames.append(key, offset - key.size() - 1, true);
 
     m_ARGScombinedSizeDouble = m_ARGScombinedSizeDouble + \
         key.length() + value.length();
@@ -501,8 +502,7 @@ int Transaction::processRequestHeaders() {
  */
 int Transaction::addRequestHeader(const std::string& key,
     const std::string& value) {
-    m_variableRequestHeadersNames.append(key, m_variableOffset, true,
-        key.size());
+    m_variableRequestHeadersNames.set(key, key, m_variableOffset);
 
     m_variableOffset = m_variableOffset + key.size() + 2;
     m_variableRequestHeaders.set(key, value, m_variableOffset);
@@ -966,7 +966,7 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
  */
 int Transaction::addResponseHeader(const std::string& key,
     const std::string& value) {
-    m_variableResponseHeadersNames.append(key, 0, true);
+    m_variableResponseHeadersNames.set(key, key, m_variableOffset);
     m_variableResponseHeaders.set(key, value, m_variableOffset);
 
     if (utils::string::tolower(key) == "content-type") {
