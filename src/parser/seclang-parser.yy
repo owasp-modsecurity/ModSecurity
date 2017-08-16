@@ -1807,8 +1807,6 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::ArgsNames_NoDictElement());
       }
-
-
     | VARIABLE_ARGS_GET_NAMES DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new Variables::ArgsGetNames_DictElement($2));
