@@ -649,12 +649,18 @@ using modsecurity::operators::Operator;
   RUN_TIME_VAR_TIME_SEC                        "RUN_TIME_VAR_TIME_SEC"
   RUN_TIME_VAR_TIME_WDAY                       "RUN_TIME_VAR_TIME_WDAY"
   RUN_TIME_VAR_TIME_YEAR                       "RUN_TIME_VAR_TIME_YEAR"
+  SETVAR_VARIABLE_PART                         "SETVAR_VARIABLE_PART"
+  SETVAR_CONTENT_PART                          "SETVAR_CONTENT_PART"
   VARIABLE                                     "VARIABLE"
   DICT_ELEMENT                                 "Dictionary element"
   DICT_ELEMENT_REGEXP                          "Dictionary element, selected by regexp"
 ;
 
 %type <std::unique_ptr<actions::Action>> act
+
+%type <std::unique_ptr<actions::Action>> setvar_action
+%type <std::string>                      setvar_variable
+%type <std::string>                      setvar_content
 
 %type <std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > >
   actions_may_quoted
@@ -2321,25 +2327,9 @@ act:
       {
         ACTION_CONTAINER($$, new actions::SetUID($1));
       }
-    | ACTION_SETVAR NOT VARIABLE
+    | ACTION_SETVAR setvar_action
       {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::unsetOperation, $3));
-      }
-    | ACTION_SETVAR VARIABLE
-      {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setToOneOperation, $2));
-      }
-    | ACTION_SETVAR VARIABLE SETVAR_OPERATION_EQUALS FREE_TEXT
-      {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setOperation, $2, $4));
-      }
-    | ACTION_SETVAR VARIABLE SETVAR_OPERATION_EQUALS_PLUS FREE_TEXT
-      {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, $2, $4));
-      }
-    | ACTION_SETVAR VARIABLE SETVAR_OPERATION_EQUALS_MINUS FREE_TEXT
-      {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, $2, $4));
+        $$ = std::move($2);
       }
     | ACTION_SEVERITY
       {
@@ -2486,6 +2476,53 @@ act:
         ACTION_CONTAINER($$, new actions::transformations::ReplaceComments($1));
       }
     ;
+
+setvar_action:
+    NOT setvar_variable
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::unsetOperation, $2));
+      }
+    | setvar_variable
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setToOneOperation, $1));
+      }
+    | setvar_variable SETVAR_OPERATION_EQUALS setvar_content
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setOperation, $1, $3));
+      }
+    | setvar_variable SETVAR_OPERATION_EQUALS_PLUS setvar_content
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, $1, $3));
+      }
+    | setvar_variable SETVAR_OPERATION_EQUALS_MINUS setvar_content
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, $1, $3));
+      }
+    ;
+
+setvar_variable:
+    SETVAR_VARIABLE_PART
+      {
+        $$ = $1;
+      }
+    |
+    SETVAR_VARIABLE_PART setvar_variable
+      {
+        $$ = $1 + $2;
+      }
+    ;
+
+setvar_content:
+    SETVAR_CONTENT_PART
+      {
+        $$ = $1;
+      }
+    |
+    SETVAR_CONTENT_PART setvar_content
+      {
+        $$ = $1 + $2;
+      }
+;
 
 %%
 
