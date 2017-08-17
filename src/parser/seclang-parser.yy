@@ -570,6 +570,7 @@ using modsecurity::operators::Operator;
   CONFIG_SEC_RULE_REMOVE_BY_MSG                "CONFIG_SEC_RULE_REMOVE_BY_MSG"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG         "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID          "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+  CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID          "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
   CONFIG_UPDLOAD_KEEP_FILES                    "CONFIG_UPDLOAD_KEEP_FILES"
   CONFIG_UPDLOAD_SAVE_TMP_FILES                "CONFIG_UPDLOAD_SAVE_TMP_FILES"
   CONFIG_UPLOAD_DIR                            "CONFIG_UPLOAD_DIR"
@@ -1264,6 +1265,31 @@ expression:
             driver.error(@0, ss.str());
             YYERROR;
         }
+      }
+    | CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID actions
+      {
+        std::string error;
+        double ruleId;
+        try {
+            ruleId = std::stod($1);
+        } catch (...) {
+            std::stringstream ss;
+            ss << "SecRuleUpdateActionById: failed to load:";
+            ss << "The input \"" + $1 + "\" does not ";
+            ss << "seems to be a valid rule id.";
+            ss << ". ";
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+
+
+        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        for (auto &i : *$2.get()) {
+            a->push_back(i.release());
+        }
+
+        driver.error(@0, "SecRuleUpdateActionById is not yet supported");
+        YYERROR;
       }
     /* Debug log: start */
     | CONFIG_DIR_DEBUG_LVL
