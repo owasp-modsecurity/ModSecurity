@@ -33,12 +33,19 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     SMatch match;
     std::list<SMatch> matches;
+    Regex * re = m_re;
 
     if (m_param.empty()) {
         return true;
     }
 
-    matches = m_re->searchAll(input);
+    std::string eparam = MacroExpansion::expand(m_param, transaction);
+
+    if (eparam != m_param) {
+        re = new Regex(eparam);
+    }
+
+    matches = re->searchAll(input);
     if (rule && rule->getActionsByName("capture").size() > 0 && transaction) {
         int i = 0;
         matches.reverse();
@@ -56,6 +63,10 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
 
     for (const auto & i : matches) {
         logOffset(ruleMessage, i.m_offset, i.m_length);
+    }
+
+    if (re != m_re) {
+        delete re;
     }
 
     if (matches.size() > 0) {
