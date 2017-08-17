@@ -567,6 +567,7 @@ using modsecurity::operators::Operator;
   CONFIG_SEC_HTTP_BLKEY                        "CONFIG_SEC_HTTP_BLKEY"
   CONFIG_SEC_REMOTE_RULES_FAIL_ACTION          "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
   CONFIG_SEC_RULE_REMOVE_BY_ID                 "CONFIG_SEC_RULE_REMOVE_BY_ID"
+  CONFIG_SEC_RULE_REMOVE_BY_MSG                "CONFIG_SEC_RULE_REMOVE_BY_MSG"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG         "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID          "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
   CONFIG_UPDLOAD_KEEP_FILES                    "CONFIG_UPDLOAD_KEEP_FILES"
@@ -1205,6 +1206,19 @@ expression:
         if (driver.m_exceptions.load($1, &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveById: failed to load:";
+            ss << $1;
+            ss << ". ";
+            ss << error;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+      }
+    | CONFIG_SEC_RULE_REMOVE_BY_MSG
+      {
+        std::string error;
+        if (driver.m_exceptions.loadRemoveRuleByMsg($1, &error) == false) {
+            std::stringstream ss;
+            ss << "SecRuleRemoveByMsg: failed to load:";
             ss << $1;
             ss << ". ";
             ss << error;

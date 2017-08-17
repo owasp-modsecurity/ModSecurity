@@ -31,6 +31,14 @@ RulesExceptions::~RulesExceptions() {
 }
 
 
+bool RulesExceptions::loadRemoveRuleByMsg(const std::string &msg,
+    std::string *error) {
+    m_remove_rule_by_msg.push_back(msg);
+
+    return true;
+}
+
+
 bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
     std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
     std::string *error) {
@@ -42,6 +50,7 @@ bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
     return true;
 }
 
+
 bool RulesExceptions::loadUpdateTargetById(double id,
     std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
     std::string *error) {
@@ -52,6 +61,7 @@ bool RulesExceptions::loadUpdateTargetById(double id,
 
     return true;
 }
+
 
 bool RulesExceptions::load(const std::string &a, std::string *error) {
     bool added = false;
@@ -159,6 +169,10 @@ bool RulesExceptions::merge(RulesExceptions& from) {
 
     for (auto &p : from.m_variable_update_target_by_id) {
         m_variable_update_target_by_id.emplace(std::pair<double, std::unique_ptr<Variables::Variable>>(p.first, std::move(p.second)));
+    }
+
+    for (auto &p : from.m_remove_rule_by_msg) {
+        m_remove_rule_by_msg.push_back(p);
     }
 
     return true;

@@ -730,6 +730,7 @@ namespace yy {
       // "CONFIG_SEC_HTTP_BLKEY"
       // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
       // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
       // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
       // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
       // "CONFIG_UPDLOAD_KEEP_FILES"
@@ -1066,89 +1067,90 @@ namespace yy {
         TOK_CONFIG_SEC_HTTP_BLKEY = 466,
         TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION = 467,
         TOK_CONFIG_SEC_RULE_REMOVE_BY_ID = 468,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG = 469,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID = 470,
-        TOK_CONFIG_UPDLOAD_KEEP_FILES = 471,
-        TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES = 472,
-        TOK_CONFIG_UPLOAD_DIR = 473,
-        TOK_CONFIG_UPLOAD_FILE_LIMIT = 474,
-        TOK_CONFIG_UPLOAD_FILE_MODE = 475,
-        TOK_CONFIG_VALUE_ABORT = 476,
-        TOK_CONFIG_VALUE_DETC = 477,
-        TOK_CONFIG_VALUE_HTTPS = 478,
-        TOK_CONFIG_VALUE_OFF = 479,
-        TOK_CONFIG_VALUE_ON = 480,
-        TOK_CONFIG_VALUE_PARALLEL = 481,
-        TOK_CONFIG_VALUE_PROCESS_PARTIAL = 482,
-        TOK_CONFIG_VALUE_REJECT = 483,
-        TOK_CONFIG_VALUE_RELEVANT_ONLY = 484,
-        TOK_CONFIG_VALUE_SERIAL = 485,
-        TOK_CONFIG_VALUE_WARN = 486,
-        TOK_CONFIG_XML_EXTERNAL_ENTITY = 487,
-        TOK_CONGIG_DIR_RESPONSE_BODY_MP = 488,
-        TOK_CONGIG_DIR_SEC_ARG_SEP = 489,
-        TOK_CONGIG_DIR_SEC_COOKIE_FORMAT = 490,
-        TOK_CONGIG_DIR_SEC_DATA_DIR = 491,
-        TOK_CONGIG_DIR_SEC_STATUS_ENGINE = 492,
-        TOK_CONGIG_DIR_SEC_TMP_DIR = 493,
-        TOK_DIRECTIVE = 494,
-        TOK_DIRECTIVE_SECRULESCRIPT = 495,
-        TOK_FREE_TEXT = 496,
-        TOK_OPERATOR = 497,
-        TOK_OPERATOR_BEGINS_WITH = 498,
-        TOK_OPERATOR_CONTAINS = 499,
-        TOK_OPERATOR_CONTAINS_WORD = 500,
-        TOK_OPERATOR_DETECT_SQLI = 501,
-        TOK_OPERATOR_DETECT_XSS = 502,
-        TOK_OPERATOR_ENDS_WITH = 503,
-        TOK_OPERATOR_EQ = 504,
-        TOK_OPERATOR_FUZZY_HASH = 505,
-        TOK_OPERATOR_GE = 506,
-        TOK_OPERATOR_GEOLOOKUP = 507,
-        TOK_OPERATOR_GSB_LOOKUP = 508,
-        TOK_OPERATOR_GT = 509,
-        TOK_OPERATOR_INSPECT_FILE = 510,
-        TOK_OPERATOR_IP_MATCH = 511,
-        TOK_OPERATOR_IP_MATCH_FROM_FILE = 512,
-        TOK_OPERATOR_LE = 513,
-        TOK_OPERATOR_LT = 514,
-        TOK_OPERATOR_PM = 515,
-        TOK_OPERATOR_PM_FROM_FILE = 516,
-        TOK_OPERATOR_RBL = 517,
-        TOK_OPERATOR_RSUB = 518,
-        TOK_OPERATOR_RX = 519,
-        TOK_OPERATOR_RX_CONTENT_ONLY = 520,
-        TOK_OPERATOR_STR_EQ = 521,
-        TOK_OPERATOR_STR_MATCH = 522,
-        TOK_OPERATOR_UNCONDITIONAL_MATCH = 523,
-        TOK_OPERATOR_VALIDATE_BYTE_RANGE = 524,
-        TOK_OPERATOR_VALIDATE_DTD = 525,
-        TOK_OPERATOR_VALIDATE_HASH = 526,
-        TOK_OPERATOR_VALIDATE_SCHEMA = 527,
-        TOK_OPERATOR_VALIDATE_URL_ENCODING = 528,
-        TOK_OPERATOR_VALIDATE_UTF8_ENCODING = 529,
-        TOK_OPERATOR_VERIFY_CC = 530,
-        TOK_OPERATOR_VERIFY_CPF = 531,
-        TOK_OPERATOR_VERIFY_SSN = 532,
-        TOK_OPERATOR_WITHIN = 533,
-        TOK_OP_QUOTE = 534,
-        TOK_QUOTATION_MARK = 535,
-        TOK_RUN_TIME_VAR_BLD = 536,
-        TOK_RUN_TIME_VAR_DUR = 537,
-        TOK_RUN_TIME_VAR_HSV = 538,
-        TOK_RUN_TIME_VAR_REMOTE_USER = 539,
-        TOK_RUN_TIME_VAR_TIME = 540,
-        TOK_RUN_TIME_VAR_TIME_DAY = 541,
-        TOK_RUN_TIME_VAR_TIME_EPOCH = 542,
-        TOK_RUN_TIME_VAR_TIME_HOUR = 543,
-        TOK_RUN_TIME_VAR_TIME_MIN = 544,
-        TOK_RUN_TIME_VAR_TIME_MON = 545,
-        TOK_RUN_TIME_VAR_TIME_SEC = 546,
-        TOK_RUN_TIME_VAR_TIME_WDAY = 547,
-        TOK_RUN_TIME_VAR_TIME_YEAR = 548,
-        TOK_VARIABLE = 549,
-        TOK_DICT_ELEMENT = 550,
-        TOK_DICT_ELEMENT_REGEXP = 551
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG = 469,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG = 470,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID = 471,
+        TOK_CONFIG_UPDLOAD_KEEP_FILES = 472,
+        TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES = 473,
+        TOK_CONFIG_UPLOAD_DIR = 474,
+        TOK_CONFIG_UPLOAD_FILE_LIMIT = 475,
+        TOK_CONFIG_UPLOAD_FILE_MODE = 476,
+        TOK_CONFIG_VALUE_ABORT = 477,
+        TOK_CONFIG_VALUE_DETC = 478,
+        TOK_CONFIG_VALUE_HTTPS = 479,
+        TOK_CONFIG_VALUE_OFF = 480,
+        TOK_CONFIG_VALUE_ON = 481,
+        TOK_CONFIG_VALUE_PARALLEL = 482,
+        TOK_CONFIG_VALUE_PROCESS_PARTIAL = 483,
+        TOK_CONFIG_VALUE_REJECT = 484,
+        TOK_CONFIG_VALUE_RELEVANT_ONLY = 485,
+        TOK_CONFIG_VALUE_SERIAL = 486,
+        TOK_CONFIG_VALUE_WARN = 487,
+        TOK_CONFIG_XML_EXTERNAL_ENTITY = 488,
+        TOK_CONGIG_DIR_RESPONSE_BODY_MP = 489,
+        TOK_CONGIG_DIR_SEC_ARG_SEP = 490,
+        TOK_CONGIG_DIR_SEC_COOKIE_FORMAT = 491,
+        TOK_CONGIG_DIR_SEC_DATA_DIR = 492,
+        TOK_CONGIG_DIR_SEC_STATUS_ENGINE = 493,
+        TOK_CONGIG_DIR_SEC_TMP_DIR = 494,
+        TOK_DIRECTIVE = 495,
+        TOK_DIRECTIVE_SECRULESCRIPT = 496,
+        TOK_FREE_TEXT = 497,
+        TOK_OPERATOR = 498,
+        TOK_OPERATOR_BEGINS_WITH = 499,
+        TOK_OPERATOR_CONTAINS = 500,
+        TOK_OPERATOR_CONTAINS_WORD = 501,
+        TOK_OPERATOR_DETECT_SQLI = 502,
+        TOK_OPERATOR_DETECT_XSS = 503,
+        TOK_OPERATOR_ENDS_WITH = 504,
+        TOK_OPERATOR_EQ = 505,
+        TOK_OPERATOR_FUZZY_HASH = 506,
+        TOK_OPERATOR_GE = 507,
+        TOK_OPERATOR_GEOLOOKUP = 508,
+        TOK_OPERATOR_GSB_LOOKUP = 509,
+        TOK_OPERATOR_GT = 510,
+        TOK_OPERATOR_INSPECT_FILE = 511,
+        TOK_OPERATOR_IP_MATCH = 512,
+        TOK_OPERATOR_IP_MATCH_FROM_FILE = 513,
+        TOK_OPERATOR_LE = 514,
+        TOK_OPERATOR_LT = 515,
+        TOK_OPERATOR_PM = 516,
+        TOK_OPERATOR_PM_FROM_FILE = 517,
+        TOK_OPERATOR_RBL = 518,
+        TOK_OPERATOR_RSUB = 519,
+        TOK_OPERATOR_RX = 520,
+        TOK_OPERATOR_RX_CONTENT_ONLY = 521,
+        TOK_OPERATOR_STR_EQ = 522,
+        TOK_OPERATOR_STR_MATCH = 523,
+        TOK_OPERATOR_UNCONDITIONAL_MATCH = 524,
+        TOK_OPERATOR_VALIDATE_BYTE_RANGE = 525,
+        TOK_OPERATOR_VALIDATE_DTD = 526,
+        TOK_OPERATOR_VALIDATE_HASH = 527,
+        TOK_OPERATOR_VALIDATE_SCHEMA = 528,
+        TOK_OPERATOR_VALIDATE_URL_ENCODING = 529,
+        TOK_OPERATOR_VALIDATE_UTF8_ENCODING = 530,
+        TOK_OPERATOR_VERIFY_CC = 531,
+        TOK_OPERATOR_VERIFY_CPF = 532,
+        TOK_OPERATOR_VERIFY_SSN = 533,
+        TOK_OPERATOR_WITHIN = 534,
+        TOK_OP_QUOTE = 535,
+        TOK_QUOTATION_MARK = 536,
+        TOK_RUN_TIME_VAR_BLD = 537,
+        TOK_RUN_TIME_VAR_DUR = 538,
+        TOK_RUN_TIME_VAR_HSV = 539,
+        TOK_RUN_TIME_VAR_REMOTE_USER = 540,
+        TOK_RUN_TIME_VAR_TIME = 541,
+        TOK_RUN_TIME_VAR_TIME_DAY = 542,
+        TOK_RUN_TIME_VAR_TIME_EPOCH = 543,
+        TOK_RUN_TIME_VAR_TIME_HOUR = 544,
+        TOK_RUN_TIME_VAR_TIME_MIN = 545,
+        TOK_RUN_TIME_VAR_TIME_MON = 546,
+        TOK_RUN_TIME_VAR_TIME_SEC = 547,
+        TOK_RUN_TIME_VAR_TIME_WDAY = 548,
+        TOK_RUN_TIME_VAR_TIME_YEAR = 549,
+        TOK_VARIABLE = 550,
+        TOK_DICT_ELEMENT = 551,
+        TOK_DICT_ELEMENT_REGEXP = 552
       };
     };
 
@@ -2115,6 +2117,10 @@ namespace yy {
 
     static inline
     symbol_type
+    make_CONFIG_SEC_RULE_REMOVE_BY_MSG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
     make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG (const std::string& v, const location_type& l);
 
     static inline
@@ -2650,12 +2656,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 947,     ///< Last index in yytable_.
+      yylast_ = 944,     ///< Last index in yytable_.
       yynnts_ = 13,  ///< Number of nonterminal symbols.
-      yyfinal_ = 277, ///< Termination state number.
+      yyfinal_ = 278, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 297  ///< Number of tokens.
+      yyntokens_ = 298  ///< Number of tokens.
     };
 
 
@@ -2727,9 +2733,9 @@ namespace yy {
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296
+     295,   296,   297
     };
-    const unsigned int user_token_number_max_ = 551;
+    const unsigned int user_token_number_max_ = 552;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -2880,112 +2886,113 @@ namespace yy {
       case 211: // "CONFIG_SEC_HTTP_BLKEY"
       case 212: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
       case 213: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 214: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 215: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 216: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 217: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 218: // "CONFIG_UPLOAD_DIR"
-      case 219: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 220: // "CONFIG_UPLOAD_FILE_MODE"
-      case 221: // "CONFIG_VALUE_ABORT"
-      case 222: // "CONFIG_VALUE_DETC"
-      case 223: // "CONFIG_VALUE_HTTPS"
-      case 224: // "CONFIG_VALUE_OFF"
-      case 225: // "CONFIG_VALUE_ON"
-      case 226: // "CONFIG_VALUE_PARALLEL"
-      case 227: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 228: // "CONFIG_VALUE_REJECT"
-      case 229: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 230: // "CONFIG_VALUE_SERIAL"
-      case 231: // "CONFIG_VALUE_WARN"
-      case 232: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 233: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 234: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 235: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 236: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 237: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 238: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 239: // "DIRECTIVE"
-      case 240: // "DIRECTIVE_SECRULESCRIPT"
-      case 241: // "FREE_TEXT"
-      case 242: // "OPERATOR"
-      case 243: // "OPERATOR_BEGINS_WITH"
-      case 244: // "OPERATOR_CONTAINS"
-      case 245: // "OPERATOR_CONTAINS_WORD"
-      case 246: // "OPERATOR_DETECT_SQLI"
-      case 247: // "OPERATOR_DETECT_XSS"
-      case 248: // "OPERATOR_ENDS_WITH"
-      case 249: // "OPERATOR_EQ"
-      case 250: // "OPERATOR_FUZZY_HASH"
-      case 251: // "OPERATOR_GE"
-      case 252: // "OPERATOR_GEOLOOKUP"
-      case 253: // "OPERATOR_GSB_LOOKUP"
-      case 254: // "OPERATOR_GT"
-      case 255: // "OPERATOR_INSPECT_FILE"
-      case 256: // "OPERATOR_IP_MATCH"
-      case 257: // "OPERATOR_IP_MATCH_FROM_FILE"
-      case 258: // "OPERATOR_LE"
-      case 259: // "OPERATOR_LT"
-      case 260: // "OPERATOR_PM"
-      case 261: // "OPERATOR_PM_FROM_FILE"
-      case 262: // "OPERATOR_RBL"
-      case 263: // "OPERATOR_RSUB"
-      case 264: // "OPERATOR_RX"
-      case 265: // "Operator RX (content only)"
-      case 266: // "OPERATOR_STR_EQ"
-      case 267: // "OPERATOR_STR_MATCH"
-      case 268: // "OPERATOR_UNCONDITIONAL_MATCH"
-      case 269: // "OPERATOR_VALIDATE_BYTE_RANGE"
-      case 270: // "OPERATOR_VALIDATE_DTD"
-      case 271: // "OPERATOR_VALIDATE_HASH"
-      case 272: // "OPERATOR_VALIDATE_SCHEMA"
-      case 273: // "OPERATOR_VALIDATE_URL_ENCODING"
-      case 274: // "OPERATOR_VALIDATE_UTF8_ENCODING"
-      case 275: // "OPERATOR_VERIFY_CC"
-      case 276: // "OPERATOR_VERIFY_CPF"
-      case 277: // "OPERATOR_VERIFY_SSN"
-      case 278: // "OPERATOR_WITHIN"
-      case 279: // "OP_QUOTE"
-      case 280: // "QUOTATION_MARK"
-      case 281: // "RUN_TIME_VAR_BLD"
-      case 282: // "RUN_TIME_VAR_DUR"
-      case 283: // "RUN_TIME_VAR_HSV"
-      case 284: // "RUN_TIME_VAR_REMOTE_USER"
-      case 285: // "RUN_TIME_VAR_TIME"
-      case 286: // "RUN_TIME_VAR_TIME_DAY"
-      case 287: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 288: // "RUN_TIME_VAR_TIME_HOUR"
-      case 289: // "RUN_TIME_VAR_TIME_MIN"
-      case 290: // "RUN_TIME_VAR_TIME_MON"
-      case 291: // "RUN_TIME_VAR_TIME_SEC"
-      case 292: // "RUN_TIME_VAR_TIME_WDAY"
-      case 293: // "RUN_TIME_VAR_TIME_YEAR"
-      case 294: // "VARIABLE"
-      case 295: // "Dictionary element"
-      case 296: // "Dictionary element, selected by regexp"
+      case 214: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 215: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 216: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 217: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 218: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 219: // "CONFIG_UPLOAD_DIR"
+      case 220: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 221: // "CONFIG_UPLOAD_FILE_MODE"
+      case 222: // "CONFIG_VALUE_ABORT"
+      case 223: // "CONFIG_VALUE_DETC"
+      case 224: // "CONFIG_VALUE_HTTPS"
+      case 225: // "CONFIG_VALUE_OFF"
+      case 226: // "CONFIG_VALUE_ON"
+      case 227: // "CONFIG_VALUE_PARALLEL"
+      case 228: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 229: // "CONFIG_VALUE_REJECT"
+      case 230: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 231: // "CONFIG_VALUE_SERIAL"
+      case 232: // "CONFIG_VALUE_WARN"
+      case 233: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 234: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 235: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 236: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 237: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 238: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 239: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 240: // "DIRECTIVE"
+      case 241: // "DIRECTIVE_SECRULESCRIPT"
+      case 242: // "FREE_TEXT"
+      case 243: // "OPERATOR"
+      case 244: // "OPERATOR_BEGINS_WITH"
+      case 245: // "OPERATOR_CONTAINS"
+      case 246: // "OPERATOR_CONTAINS_WORD"
+      case 247: // "OPERATOR_DETECT_SQLI"
+      case 248: // "OPERATOR_DETECT_XSS"
+      case 249: // "OPERATOR_ENDS_WITH"
+      case 250: // "OPERATOR_EQ"
+      case 251: // "OPERATOR_FUZZY_HASH"
+      case 252: // "OPERATOR_GE"
+      case 253: // "OPERATOR_GEOLOOKUP"
+      case 254: // "OPERATOR_GSB_LOOKUP"
+      case 255: // "OPERATOR_GT"
+      case 256: // "OPERATOR_INSPECT_FILE"
+      case 257: // "OPERATOR_IP_MATCH"
+      case 258: // "OPERATOR_IP_MATCH_FROM_FILE"
+      case 259: // "OPERATOR_LE"
+      case 260: // "OPERATOR_LT"
+      case 261: // "OPERATOR_PM"
+      case 262: // "OPERATOR_PM_FROM_FILE"
+      case 263: // "OPERATOR_RBL"
+      case 264: // "OPERATOR_RSUB"
+      case 265: // "OPERATOR_RX"
+      case 266: // "Operator RX (content only)"
+      case 267: // "OPERATOR_STR_EQ"
+      case 268: // "OPERATOR_STR_MATCH"
+      case 269: // "OPERATOR_UNCONDITIONAL_MATCH"
+      case 270: // "OPERATOR_VALIDATE_BYTE_RANGE"
+      case 271: // "OPERATOR_VALIDATE_DTD"
+      case 272: // "OPERATOR_VALIDATE_HASH"
+      case 273: // "OPERATOR_VALIDATE_SCHEMA"
+      case 274: // "OPERATOR_VALIDATE_URL_ENCODING"
+      case 275: // "OPERATOR_VALIDATE_UTF8_ENCODING"
+      case 276: // "OPERATOR_VERIFY_CC"
+      case 277: // "OPERATOR_VERIFY_CPF"
+      case 278: // "OPERATOR_VERIFY_SSN"
+      case 279: // "OPERATOR_WITHIN"
+      case 280: // "OP_QUOTE"
+      case 281: // "QUOTATION_MARK"
+      case 282: // "RUN_TIME_VAR_BLD"
+      case 283: // "RUN_TIME_VAR_DUR"
+      case 284: // "RUN_TIME_VAR_HSV"
+      case 285: // "RUN_TIME_VAR_REMOTE_USER"
+      case 286: // "RUN_TIME_VAR_TIME"
+      case 287: // "RUN_TIME_VAR_TIME_DAY"
+      case 288: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 289: // "RUN_TIME_VAR_TIME_HOUR"
+      case 290: // "RUN_TIME_VAR_TIME_MIN"
+      case 291: // "RUN_TIME_VAR_TIME_MON"
+      case 292: // "RUN_TIME_VAR_TIME_SEC"
+      case 293: // "RUN_TIME_VAR_TIME_WDAY"
+      case 294: // "RUN_TIME_VAR_TIME_YEAR"
+      case 295: // "VARIABLE"
+      case 296: // "Dictionary element"
+      case 297: // "Dictionary element, selected by regexp"
         value.copy< std::string > (other.value);
         break;
 
-      case 303: // op
-      case 304: // op_before_init
+      case 304: // op
+      case 305: // op_before_init
         value.copy< std::unique_ptr<Operator> > (other.value);
         break;
 
-      case 308: // var
+      case 309: // var
         value.copy< std::unique_ptr<Variable> > (other.value);
         break;
 
-      case 309: // act
+      case 310: // act
         value.copy< std::unique_ptr<actions::Action> > (other.value);
         break;
 
-      case 306: // variables
-      case 307: // variables_may_be_quoted
+      case 307: // variables
+      case 308: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (other.value);
         break;
 
-      case 301: // actions
-      case 302: // actions_may_quoted
+      case 302: // actions
+      case 303: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (other.value);
         break;
 
@@ -3124,112 +3131,113 @@ namespace yy {
       case 211: // "CONFIG_SEC_HTTP_BLKEY"
       case 212: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
       case 213: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 214: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 215: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 216: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 217: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 218: // "CONFIG_UPLOAD_DIR"
-      case 219: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 220: // "CONFIG_UPLOAD_FILE_MODE"
-      case 221: // "CONFIG_VALUE_ABORT"
-      case 222: // "CONFIG_VALUE_DETC"
-      case 223: // "CONFIG_VALUE_HTTPS"
-      case 224: // "CONFIG_VALUE_OFF"
-      case 225: // "CONFIG_VALUE_ON"
-      case 226: // "CONFIG_VALUE_PARALLEL"
-      case 227: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 228: // "CONFIG_VALUE_REJECT"
-      case 229: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 230: // "CONFIG_VALUE_SERIAL"
-      case 231: // "CONFIG_VALUE_WARN"
-      case 232: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 233: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 234: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 235: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 236: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 237: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 238: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 239: // "DIRECTIVE"
-      case 240: // "DIRECTIVE_SECRULESCRIPT"
-      case 241: // "FREE_TEXT"
-      case 242: // "OPERATOR"
-      case 243: // "OPERATOR_BEGINS_WITH"
-      case 244: // "OPERATOR_CONTAINS"
-      case 245: // "OPERATOR_CONTAINS_WORD"
-      case 246: // "OPERATOR_DETECT_SQLI"
-      case 247: // "OPERATOR_DETECT_XSS"
-      case 248: // "OPERATOR_ENDS_WITH"
-      case 249: // "OPERATOR_EQ"
-      case 250: // "OPERATOR_FUZZY_HASH"
-      case 251: // "OPERATOR_GE"
-      case 252: // "OPERATOR_GEOLOOKUP"
-      case 253: // "OPERATOR_GSB_LOOKUP"
-      case 254: // "OPERATOR_GT"
-      case 255: // "OPERATOR_INSPECT_FILE"
-      case 256: // "OPERATOR_IP_MATCH"
-      case 257: // "OPERATOR_IP_MATCH_FROM_FILE"
-      case 258: // "OPERATOR_LE"
-      case 259: // "OPERATOR_LT"
-      case 260: // "OPERATOR_PM"
-      case 261: // "OPERATOR_PM_FROM_FILE"
-      case 262: // "OPERATOR_RBL"
-      case 263: // "OPERATOR_RSUB"
-      case 264: // "OPERATOR_RX"
-      case 265: // "Operator RX (content only)"
-      case 266: // "OPERATOR_STR_EQ"
-      case 267: // "OPERATOR_STR_MATCH"
-      case 268: // "OPERATOR_UNCONDITIONAL_MATCH"
-      case 269: // "OPERATOR_VALIDATE_BYTE_RANGE"
-      case 270: // "OPERATOR_VALIDATE_DTD"
-      case 271: // "OPERATOR_VALIDATE_HASH"
-      case 272: // "OPERATOR_VALIDATE_SCHEMA"
-      case 273: // "OPERATOR_VALIDATE_URL_ENCODING"
-      case 274: // "OPERATOR_VALIDATE_UTF8_ENCODING"
-      case 275: // "OPERATOR_VERIFY_CC"
-      case 276: // "OPERATOR_VERIFY_CPF"
-      case 277: // "OPERATOR_VERIFY_SSN"
-      case 278: // "OPERATOR_WITHIN"
-      case 279: // "OP_QUOTE"
-      case 280: // "QUOTATION_MARK"
-      case 281: // "RUN_TIME_VAR_BLD"
-      case 282: // "RUN_TIME_VAR_DUR"
-      case 283: // "RUN_TIME_VAR_HSV"
-      case 284: // "RUN_TIME_VAR_REMOTE_USER"
-      case 285: // "RUN_TIME_VAR_TIME"
-      case 286: // "RUN_TIME_VAR_TIME_DAY"
-      case 287: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 288: // "RUN_TIME_VAR_TIME_HOUR"
-      case 289: // "RUN_TIME_VAR_TIME_MIN"
-      case 290: // "RUN_TIME_VAR_TIME_MON"
-      case 291: // "RUN_TIME_VAR_TIME_SEC"
-      case 292: // "RUN_TIME_VAR_TIME_WDAY"
-      case 293: // "RUN_TIME_VAR_TIME_YEAR"
-      case 294: // "VARIABLE"
-      case 295: // "Dictionary element"
-      case 296: // "Dictionary element, selected by regexp"
+      case 214: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 215: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 216: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 217: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 218: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 219: // "CONFIG_UPLOAD_DIR"
+      case 220: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 221: // "CONFIG_UPLOAD_FILE_MODE"
+      case 222: // "CONFIG_VALUE_ABORT"
+      case 223: // "CONFIG_VALUE_DETC"
+      case 224: // "CONFIG_VALUE_HTTPS"
+      case 225: // "CONFIG_VALUE_OFF"
+      case 226: // "CONFIG_VALUE_ON"
+      case 227: // "CONFIG_VALUE_PARALLEL"
+      case 228: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 229: // "CONFIG_VALUE_REJECT"
+      case 230: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 231: // "CONFIG_VALUE_SERIAL"
+      case 232: // "CONFIG_VALUE_WARN"
+      case 233: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 234: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 235: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 236: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 237: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 238: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 239: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 240: // "DIRECTIVE"
+      case 241: // "DIRECTIVE_SECRULESCRIPT"
+      case 242: // "FREE_TEXT"
+      case 243: // "OPERATOR"
+      case 244: // "OPERATOR_BEGINS_WITH"
+      case 245: // "OPERATOR_CONTAINS"
+      case 246: // "OPERATOR_CONTAINS_WORD"
+      case 247: // "OPERATOR_DETECT_SQLI"
+      case 248: // "OPERATOR_DETECT_XSS"
+      case 249: // "OPERATOR_ENDS_WITH"
+      case 250: // "OPERATOR_EQ"
+      case 251: // "OPERATOR_FUZZY_HASH"
+      case 252: // "OPERATOR_GE"
+      case 253: // "OPERATOR_GEOLOOKUP"
+      case 254: // "OPERATOR_GSB_LOOKUP"
+      case 255: // "OPERATOR_GT"
+      case 256: // "OPERATOR_INSPECT_FILE"
+      case 257: // "OPERATOR_IP_MATCH"
+      case 258: // "OPERATOR_IP_MATCH_FROM_FILE"
+      case 259: // "OPERATOR_LE"
+      case 260: // "OPERATOR_LT"
+      case 261: // "OPERATOR_PM"
+      case 262: // "OPERATOR_PM_FROM_FILE"
+      case 263: // "OPERATOR_RBL"
+      case 264: // "OPERATOR_RSUB"
+      case 265: // "OPERATOR_RX"
+      case 266: // "Operator RX (content only)"
+      case 267: // "OPERATOR_STR_EQ"
+      case 268: // "OPERATOR_STR_MATCH"
+      case 269: // "OPERATOR_UNCONDITIONAL_MATCH"
+      case 270: // "OPERATOR_VALIDATE_BYTE_RANGE"
+      case 271: // "OPERATOR_VALIDATE_DTD"
+      case 272: // "OPERATOR_VALIDATE_HASH"
+      case 273: // "OPERATOR_VALIDATE_SCHEMA"
+      case 274: // "OPERATOR_VALIDATE_URL_ENCODING"
+      case 275: // "OPERATOR_VALIDATE_UTF8_ENCODING"
+      case 276: // "OPERATOR_VERIFY_CC"
+      case 277: // "OPERATOR_VERIFY_CPF"
+      case 278: // "OPERATOR_VERIFY_SSN"
+      case 279: // "OPERATOR_WITHIN"
+      case 280: // "OP_QUOTE"
+      case 281: // "QUOTATION_MARK"
+      case 282: // "RUN_TIME_VAR_BLD"
+      case 283: // "RUN_TIME_VAR_DUR"
+      case 284: // "RUN_TIME_VAR_HSV"
+      case 285: // "RUN_TIME_VAR_REMOTE_USER"
+      case 286: // "RUN_TIME_VAR_TIME"
+      case 287: // "RUN_TIME_VAR_TIME_DAY"
+      case 288: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 289: // "RUN_TIME_VAR_TIME_HOUR"
+      case 290: // "RUN_TIME_VAR_TIME_MIN"
+      case 291: // "RUN_TIME_VAR_TIME_MON"
+      case 292: // "RUN_TIME_VAR_TIME_SEC"
+      case 293: // "RUN_TIME_VAR_TIME_WDAY"
+      case 294: // "RUN_TIME_VAR_TIME_YEAR"
+      case 295: // "VARIABLE"
+      case 296: // "Dictionary element"
+      case 297: // "Dictionary element, selected by regexp"
         value.copy< std::string > (v);
         break;
 
-      case 303: // op
-      case 304: // op_before_init
+      case 304: // op
+      case 305: // op_before_init
         value.copy< std::unique_ptr<Operator> > (v);
         break;
 
-      case 308: // var
+      case 309: // var
         value.copy< std::unique_ptr<Variable> > (v);
         break;
 
-      case 309: // act
+      case 310: // act
         value.copy< std::unique_ptr<actions::Action> > (v);
         break;
 
-      case 306: // variables
-      case 307: // variables_may_be_quoted
+      case 307: // variables
+      case 308: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (v);
         break;
 
-      case 301: // actions
-      case 302: // actions_may_quoted
+      case 302: // actions
+      case 303: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (v);
         break;
 
@@ -3434,112 +3442,113 @@ namespace yy {
       case 211: // "CONFIG_SEC_HTTP_BLKEY"
       case 212: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
       case 213: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 214: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 215: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 216: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 217: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 218: // "CONFIG_UPLOAD_DIR"
-      case 219: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 220: // "CONFIG_UPLOAD_FILE_MODE"
-      case 221: // "CONFIG_VALUE_ABORT"
-      case 222: // "CONFIG_VALUE_DETC"
-      case 223: // "CONFIG_VALUE_HTTPS"
-      case 224: // "CONFIG_VALUE_OFF"
-      case 225: // "CONFIG_VALUE_ON"
-      case 226: // "CONFIG_VALUE_PARALLEL"
-      case 227: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 228: // "CONFIG_VALUE_REJECT"
-      case 229: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 230: // "CONFIG_VALUE_SERIAL"
-      case 231: // "CONFIG_VALUE_WARN"
-      case 232: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 233: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 234: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 235: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 236: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 237: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 238: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 239: // "DIRECTIVE"
-      case 240: // "DIRECTIVE_SECRULESCRIPT"
-      case 241: // "FREE_TEXT"
-      case 242: // "OPERATOR"
-      case 243: // "OPERATOR_BEGINS_WITH"
-      case 244: // "OPERATOR_CONTAINS"
-      case 245: // "OPERATOR_CONTAINS_WORD"
-      case 246: // "OPERATOR_DETECT_SQLI"
-      case 247: // "OPERATOR_DETECT_XSS"
-      case 248: // "OPERATOR_ENDS_WITH"
-      case 249: // "OPERATOR_EQ"
-      case 250: // "OPERATOR_FUZZY_HASH"
-      case 251: // "OPERATOR_GE"
-      case 252: // "OPERATOR_GEOLOOKUP"
-      case 253: // "OPERATOR_GSB_LOOKUP"
-      case 254: // "OPERATOR_GT"
-      case 255: // "OPERATOR_INSPECT_FILE"
-      case 256: // "OPERATOR_IP_MATCH"
-      case 257: // "OPERATOR_IP_MATCH_FROM_FILE"
-      case 258: // "OPERATOR_LE"
-      case 259: // "OPERATOR_LT"
-      case 260: // "OPERATOR_PM"
-      case 261: // "OPERATOR_PM_FROM_FILE"
-      case 262: // "OPERATOR_RBL"
-      case 263: // "OPERATOR_RSUB"
-      case 264: // "OPERATOR_RX"
-      case 265: // "Operator RX (content only)"
-      case 266: // "OPERATOR_STR_EQ"
-      case 267: // "OPERATOR_STR_MATCH"
-      case 268: // "OPERATOR_UNCONDITIONAL_MATCH"
-      case 269: // "OPERATOR_VALIDATE_BYTE_RANGE"
-      case 270: // "OPERATOR_VALIDATE_DTD"
-      case 271: // "OPERATOR_VALIDATE_HASH"
-      case 272: // "OPERATOR_VALIDATE_SCHEMA"
-      case 273: // "OPERATOR_VALIDATE_URL_ENCODING"
-      case 274: // "OPERATOR_VALIDATE_UTF8_ENCODING"
-      case 275: // "OPERATOR_VERIFY_CC"
-      case 276: // "OPERATOR_VERIFY_CPF"
-      case 277: // "OPERATOR_VERIFY_SSN"
-      case 278: // "OPERATOR_WITHIN"
-      case 279: // "OP_QUOTE"
-      case 280: // "QUOTATION_MARK"
-      case 281: // "RUN_TIME_VAR_BLD"
-      case 282: // "RUN_TIME_VAR_DUR"
-      case 283: // "RUN_TIME_VAR_HSV"
-      case 284: // "RUN_TIME_VAR_REMOTE_USER"
-      case 285: // "RUN_TIME_VAR_TIME"
-      case 286: // "RUN_TIME_VAR_TIME_DAY"
-      case 287: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 288: // "RUN_TIME_VAR_TIME_HOUR"
-      case 289: // "RUN_TIME_VAR_TIME_MIN"
-      case 290: // "RUN_TIME_VAR_TIME_MON"
-      case 291: // "RUN_TIME_VAR_TIME_SEC"
-      case 292: // "RUN_TIME_VAR_TIME_WDAY"
-      case 293: // "RUN_TIME_VAR_TIME_YEAR"
-      case 294: // "VARIABLE"
-      case 295: // "Dictionary element"
-      case 296: // "Dictionary element, selected by regexp"
+      case 214: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 215: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 216: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 217: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 218: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 219: // "CONFIG_UPLOAD_DIR"
+      case 220: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 221: // "CONFIG_UPLOAD_FILE_MODE"
+      case 222: // "CONFIG_VALUE_ABORT"
+      case 223: // "CONFIG_VALUE_DETC"
+      case 224: // "CONFIG_VALUE_HTTPS"
+      case 225: // "CONFIG_VALUE_OFF"
+      case 226: // "CONFIG_VALUE_ON"
+      case 227: // "CONFIG_VALUE_PARALLEL"
+      case 228: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 229: // "CONFIG_VALUE_REJECT"
+      case 230: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 231: // "CONFIG_VALUE_SERIAL"
+      case 232: // "CONFIG_VALUE_WARN"
+      case 233: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 234: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 235: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 236: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 237: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 238: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 239: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 240: // "DIRECTIVE"
+      case 241: // "DIRECTIVE_SECRULESCRIPT"
+      case 242: // "FREE_TEXT"
+      case 243: // "OPERATOR"
+      case 244: // "OPERATOR_BEGINS_WITH"
+      case 245: // "OPERATOR_CONTAINS"
+      case 246: // "OPERATOR_CONTAINS_WORD"
+      case 247: // "OPERATOR_DETECT_SQLI"
+      case 248: // "OPERATOR_DETECT_XSS"
+      case 249: // "OPERATOR_ENDS_WITH"
+      case 250: // "OPERATOR_EQ"
+      case 251: // "OPERATOR_FUZZY_HASH"
+      case 252: // "OPERATOR_GE"
+      case 253: // "OPERATOR_GEOLOOKUP"
+      case 254: // "OPERATOR_GSB_LOOKUP"
+      case 255: // "OPERATOR_GT"
+      case 256: // "OPERATOR_INSPECT_FILE"
+      case 257: // "OPERATOR_IP_MATCH"
+      case 258: // "OPERATOR_IP_MATCH_FROM_FILE"
+      case 259: // "OPERATOR_LE"
+      case 260: // "OPERATOR_LT"
+      case 261: // "OPERATOR_PM"
+      case 262: // "OPERATOR_PM_FROM_FILE"
+      case 263: // "OPERATOR_RBL"
+      case 264: // "OPERATOR_RSUB"
+      case 265: // "OPERATOR_RX"
+      case 266: // "Operator RX (content only)"
+      case 267: // "OPERATOR_STR_EQ"
+      case 268: // "OPERATOR_STR_MATCH"
+      case 269: // "OPERATOR_UNCONDITIONAL_MATCH"
+      case 270: // "OPERATOR_VALIDATE_BYTE_RANGE"
+      case 271: // "OPERATOR_VALIDATE_DTD"
+      case 272: // "OPERATOR_VALIDATE_HASH"
+      case 273: // "OPERATOR_VALIDATE_SCHEMA"
+      case 274: // "OPERATOR_VALIDATE_URL_ENCODING"
+      case 275: // "OPERATOR_VALIDATE_UTF8_ENCODING"
+      case 276: // "OPERATOR_VERIFY_CC"
+      case 277: // "OPERATOR_VERIFY_CPF"
+      case 278: // "OPERATOR_VERIFY_SSN"
+      case 279: // "OPERATOR_WITHIN"
+      case 280: // "OP_QUOTE"
+      case 281: // "QUOTATION_MARK"
+      case 282: // "RUN_TIME_VAR_BLD"
+      case 283: // "RUN_TIME_VAR_DUR"
+      case 284: // "RUN_TIME_VAR_HSV"
+      case 285: // "RUN_TIME_VAR_REMOTE_USER"
+      case 286: // "RUN_TIME_VAR_TIME"
+      case 287: // "RUN_TIME_VAR_TIME_DAY"
+      case 288: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 289: // "RUN_TIME_VAR_TIME_HOUR"
+      case 290: // "RUN_TIME_VAR_TIME_MIN"
+      case 291: // "RUN_TIME_VAR_TIME_MON"
+      case 292: // "RUN_TIME_VAR_TIME_SEC"
+      case 293: // "RUN_TIME_VAR_TIME_WDAY"
+      case 294: // "RUN_TIME_VAR_TIME_YEAR"
+      case 295: // "VARIABLE"
+      case 296: // "Dictionary element"
+      case 297: // "Dictionary element, selected by regexp"
         value.template destroy< std::string > ();
         break;
 
-      case 303: // op
-      case 304: // op_before_init
+      case 304: // op
+      case 305: // op_before_init
         value.template destroy< std::unique_ptr<Operator> > ();
         break;
 
-      case 308: // var
+      case 309: // var
         value.template destroy< std::unique_ptr<Variable> > ();
         break;
 
-      case 309: // act
+      case 310: // act
         value.template destroy< std::unique_ptr<actions::Action> > ();
         break;
 
-      case 306: // variables
-      case 307: // variables_may_be_quoted
+      case 307: // variables
+      case 308: // variables_may_be_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
         break;
 
-      case 301: // actions
-      case 302: // actions_may_quoted
+      case 302: // actions
+      case 303: // actions_may_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ();
         break;
 
@@ -3684,112 +3693,113 @@ namespace yy {
       case 211: // "CONFIG_SEC_HTTP_BLKEY"
       case 212: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
       case 213: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 214: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 215: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 216: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 217: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 218: // "CONFIG_UPLOAD_DIR"
-      case 219: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 220: // "CONFIG_UPLOAD_FILE_MODE"
-      case 221: // "CONFIG_VALUE_ABORT"
-      case 222: // "CONFIG_VALUE_DETC"
-      case 223: // "CONFIG_VALUE_HTTPS"
-      case 224: // "CONFIG_VALUE_OFF"
-      case 225: // "CONFIG_VALUE_ON"
-      case 226: // "CONFIG_VALUE_PARALLEL"
-      case 227: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 228: // "CONFIG_VALUE_REJECT"
-      case 229: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 230: // "CONFIG_VALUE_SERIAL"
-      case 231: // "CONFIG_VALUE_WARN"
-      case 232: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 233: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 234: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 235: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 236: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 237: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 238: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 239: // "DIRECTIVE"
-      case 240: // "DIRECTIVE_SECRULESCRIPT"
-      case 241: // "FREE_TEXT"
-      case 242: // "OPERATOR"
-      case 243: // "OPERATOR_BEGINS_WITH"
-      case 244: // "OPERATOR_CONTAINS"
-      case 245: // "OPERATOR_CONTAINS_WORD"
-      case 246: // "OPERATOR_DETECT_SQLI"
-      case 247: // "OPERATOR_DETECT_XSS"
-      case 248: // "OPERATOR_ENDS_WITH"
-      case 249: // "OPERATOR_EQ"
-      case 250: // "OPERATOR_FUZZY_HASH"
-      case 251: // "OPERATOR_GE"
-      case 252: // "OPERATOR_GEOLOOKUP"
-      case 253: // "OPERATOR_GSB_LOOKUP"
-      case 254: // "OPERATOR_GT"
-      case 255: // "OPERATOR_INSPECT_FILE"
-      case 256: // "OPERATOR_IP_MATCH"
-      case 257: // "OPERATOR_IP_MATCH_FROM_FILE"
-      case 258: // "OPERATOR_LE"
-      case 259: // "OPERATOR_LT"
-      case 260: // "OPERATOR_PM"
-      case 261: // "OPERATOR_PM_FROM_FILE"
-      case 262: // "OPERATOR_RBL"
-      case 263: // "OPERATOR_RSUB"
-      case 264: // "OPERATOR_RX"
-      case 265: // "Operator RX (content only)"
-      case 266: // "OPERATOR_STR_EQ"
-      case 267: // "OPERATOR_STR_MATCH"
-      case 268: // "OPERATOR_UNCONDITIONAL_MATCH"
-      case 269: // "OPERATOR_VALIDATE_BYTE_RANGE"
-      case 270: // "OPERATOR_VALIDATE_DTD"
-      case 271: // "OPERATOR_VALIDATE_HASH"
-      case 272: // "OPERATOR_VALIDATE_SCHEMA"
-      case 273: // "OPERATOR_VALIDATE_URL_ENCODING"
-      case 274: // "OPERATOR_VALIDATE_UTF8_ENCODING"
-      case 275: // "OPERATOR_VERIFY_CC"
-      case 276: // "OPERATOR_VERIFY_CPF"
-      case 277: // "OPERATOR_VERIFY_SSN"
-      case 278: // "OPERATOR_WITHIN"
-      case 279: // "OP_QUOTE"
-      case 280: // "QUOTATION_MARK"
-      case 281: // "RUN_TIME_VAR_BLD"
-      case 282: // "RUN_TIME_VAR_DUR"
-      case 283: // "RUN_TIME_VAR_HSV"
-      case 284: // "RUN_TIME_VAR_REMOTE_USER"
-      case 285: // "RUN_TIME_VAR_TIME"
-      case 286: // "RUN_TIME_VAR_TIME_DAY"
-      case 287: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 288: // "RUN_TIME_VAR_TIME_HOUR"
-      case 289: // "RUN_TIME_VAR_TIME_MIN"
-      case 290: // "RUN_TIME_VAR_TIME_MON"
-      case 291: // "RUN_TIME_VAR_TIME_SEC"
-      case 292: // "RUN_TIME_VAR_TIME_WDAY"
-      case 293: // "RUN_TIME_VAR_TIME_YEAR"
-      case 294: // "VARIABLE"
-      case 295: // "Dictionary element"
-      case 296: // "Dictionary element, selected by regexp"
+      case 214: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 215: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 216: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 217: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 218: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 219: // "CONFIG_UPLOAD_DIR"
+      case 220: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 221: // "CONFIG_UPLOAD_FILE_MODE"
+      case 222: // "CONFIG_VALUE_ABORT"
+      case 223: // "CONFIG_VALUE_DETC"
+      case 224: // "CONFIG_VALUE_HTTPS"
+      case 225: // "CONFIG_VALUE_OFF"
+      case 226: // "CONFIG_VALUE_ON"
+      case 227: // "CONFIG_VALUE_PARALLEL"
+      case 228: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 229: // "CONFIG_VALUE_REJECT"
+      case 230: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 231: // "CONFIG_VALUE_SERIAL"
+      case 232: // "CONFIG_VALUE_WARN"
+      case 233: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 234: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 235: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 236: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 237: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 238: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 239: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 240: // "DIRECTIVE"
+      case 241: // "DIRECTIVE_SECRULESCRIPT"
+      case 242: // "FREE_TEXT"
+      case 243: // "OPERATOR"
+      case 244: // "OPERATOR_BEGINS_WITH"
+      case 245: // "OPERATOR_CONTAINS"
+      case 246: // "OPERATOR_CONTAINS_WORD"
+      case 247: // "OPERATOR_DETECT_SQLI"
+      case 248: // "OPERATOR_DETECT_XSS"
+      case 249: // "OPERATOR_ENDS_WITH"
+      case 250: // "OPERATOR_EQ"
+      case 251: // "OPERATOR_FUZZY_HASH"
+      case 252: // "OPERATOR_GE"
+      case 253: // "OPERATOR_GEOLOOKUP"
+      case 254: // "OPERATOR_GSB_LOOKUP"
+      case 255: // "OPERATOR_GT"
+      case 256: // "OPERATOR_INSPECT_FILE"
+      case 257: // "OPERATOR_IP_MATCH"
+      case 258: // "OPERATOR_IP_MATCH_FROM_FILE"
+      case 259: // "OPERATOR_LE"
+      case 260: // "OPERATOR_LT"
+      case 261: // "OPERATOR_PM"
+      case 262: // "OPERATOR_PM_FROM_FILE"
+      case 263: // "OPERATOR_RBL"
+      case 264: // "OPERATOR_RSUB"
+      case 265: // "OPERATOR_RX"
+      case 266: // "Operator RX (content only)"
+      case 267: // "OPERATOR_STR_EQ"
+      case 268: // "OPERATOR_STR_MATCH"
+      case 269: // "OPERATOR_UNCONDITIONAL_MATCH"
+      case 270: // "OPERATOR_VALIDATE_BYTE_RANGE"
+      case 271: // "OPERATOR_VALIDATE_DTD"
+      case 272: // "OPERATOR_VALIDATE_HASH"
+      case 273: // "OPERATOR_VALIDATE_SCHEMA"
+      case 274: // "OPERATOR_VALIDATE_URL_ENCODING"
+      case 275: // "OPERATOR_VALIDATE_UTF8_ENCODING"
+      case 276: // "OPERATOR_VERIFY_CC"
+      case 277: // "OPERATOR_VERIFY_CPF"
+      case 278: // "OPERATOR_VERIFY_SSN"
+      case 279: // "OPERATOR_WITHIN"
+      case 280: // "OP_QUOTE"
+      case 281: // "QUOTATION_MARK"
+      case 282: // "RUN_TIME_VAR_BLD"
+      case 283: // "RUN_TIME_VAR_DUR"
+      case 284: // "RUN_TIME_VAR_HSV"
+      case 285: // "RUN_TIME_VAR_REMOTE_USER"
+      case 286: // "RUN_TIME_VAR_TIME"
+      case 287: // "RUN_TIME_VAR_TIME_DAY"
+      case 288: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 289: // "RUN_TIME_VAR_TIME_HOUR"
+      case 290: // "RUN_TIME_VAR_TIME_MIN"
+      case 291: // "RUN_TIME_VAR_TIME_MON"
+      case 292: // "RUN_TIME_VAR_TIME_SEC"
+      case 293: // "RUN_TIME_VAR_TIME_WDAY"
+      case 294: // "RUN_TIME_VAR_TIME_YEAR"
+      case 295: // "VARIABLE"
+      case 296: // "Dictionary element"
+      case 297: // "Dictionary element, selected by regexp"
         value.move< std::string > (s.value);
         break;
 
-      case 303: // op
-      case 304: // op_before_init
+      case 304: // op
+      case 305: // op_before_init
         value.move< std::unique_ptr<Operator> > (s.value);
         break;
 
-      case 308: // var
+      case 309: // var
         value.move< std::unique_ptr<Variable> > (s.value);
         break;
 
-      case 309: // act
+      case 310: // act
         value.move< std::unique_ptr<actions::Action> > (s.value);
         break;
 
-      case 306: // variables
-      case 307: // variables_may_be_quoted
+      case 307: // variables
+      case 308: // variables_may_be_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (s.value);
         break;
 
-      case 301: // actions
-      case 302: // actions_may_quoted
+      case 302: // actions
+      case 303: // actions_may_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (s.value);
         break;
 
@@ -3877,7 +3887,7 @@ namespace yy {
      515,   516,   517,   518,   519,   520,   521,   522,   523,   524,
      525,   526,   527,   528,   529,   530,   531,   532,   533,   534,
      535,   536,   537,   538,   539,   540,   541,   542,   543,   544,
-     545,   546,   547,   548,   549,   550,   551
+     545,   546,   547,   548,   549,   550,   551,   552
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -5155,6 +5165,12 @@ namespace yy {
   }
 
   seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_REMOVE_BY_MSG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG, v, l);
+  }
+
+  seclang_parser::symbol_type
   seclang_parser::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG (const std::string& v, const location_type& l)
   {
     return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG, v, l);
@@ -5655,7 +5671,7 @@ namespace yy {
 
 
 } // yy
-#line 5659 "seclang-parser.hh" // lalr1.cc:377
+#line 5675 "seclang-parser.hh" // lalr1.cc:377
 
 
 

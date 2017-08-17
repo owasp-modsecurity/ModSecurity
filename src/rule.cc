@@ -850,4 +850,15 @@ bool Rule::containsTag(const std::string& name, Transaction *t) {
 }
 
 
+bool Rule::containsMsg(const std::string& name, Transaction *t) {
+    for (auto &z : this->m_actionsRuntimePos) {
+        actions::Msg *msg = dynamic_cast<actions::Msg *> (z);
+        if (msg != NULL && msg->data(t) == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 }  // namespace modsecurity
