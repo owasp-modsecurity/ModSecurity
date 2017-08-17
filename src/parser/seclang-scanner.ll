@@ -458,6 +458,7 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_SKIP_AFTER}:{FREE_TEXT_SPACE_COMMA_QUOTE}                       { return p::make_ACTION_SKIP_AFTER(yytext, *driver.loc.back()); }
 {ACTION_SKIP}:{CONFIG_VALUE_NUMBER}                                     { return p::make_ACTION_SKIP(yytext, *driver.loc.back()); }
 {ACTION_TAG}:'{FREE_TEXT_QUOTE}'                                        { return p::make_ACTION_TAG(yytext, *driver.loc.back()); }
+{ACTION_TAG}:{FREE_TEXT_SPACE_COMMA_QUOTE}                              { return p::make_ACTION_TAG(yytext, *driver.loc.back()); }
 {ACTION_VER}:'{FREE_TEXT_QUOTE}'                                        { return p::make_ACTION_VER(yytext, *driver.loc.back()); }
 {ACTION_XMLNS}:{FREE_TEXT_SPACE_COMMA_QUOTE}                            { return p::make_ACTION_XMLNS(yytext, *driver.loc.back()); }
 
