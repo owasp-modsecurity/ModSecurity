@@ -217,6 +217,7 @@ TESTS+=test/test-cases/regression/variable-TX.json
 TESTS+=test/test-cases/regression/variable-ENV.json
 TESTS+=test/test-cases/regression/variable-STATUS.json
 TESTS+=test/test-cases/regression/action-tag.json
+TESTS+=test/test-cases/regression/operator-validate-byte-range.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/base64Encode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/trimRight.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/parityEven7bit.json
