@@ -39,10 +39,12 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
         return true;
     }
 
-    std::string eparam = MacroExpansion::expand(m_param, transaction);
+    if (m_macro_expansion_possible) {
+        std::string eparam = MacroExpansion::expand(m_param, transaction);
 
-    if (eparam != m_param) {
-        re = new Regex(eparam);
+        if (eparam != m_param) {
+            re = new Regex(eparam);
+        }
     }
 
     matches = re->searchAll(input);
@@ -72,6 +74,18 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
     }
 
     return false;
+}
+
+
+void Rx::checkIfMacroExpansionPossible() {
+    size_t pos = m_param.find("%{");
+
+    if (pos == std::string::npos) {
+        m_macro_expansion_possible = false;
+        return;
+    }
+
+    m_macro_expansion_possible = (m_param.find('}', pos) != std::string::npos);
 }
 
 
