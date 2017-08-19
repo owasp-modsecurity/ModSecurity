@@ -283,7 +283,6 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             }
 
             if (msr->txcfg->stream_inbody_inspection == 1)   {
-                msr->stream_input_length+=buflen;
                 modsecurity_request_body_to_stream(msr, buf, buflen, error_msg);
             }
 
