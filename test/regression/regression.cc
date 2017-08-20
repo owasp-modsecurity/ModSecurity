@@ -124,7 +124,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
 
         if (t->enabled == 0) {
             if (test->m_automake_output) {
-                std::cout << ":test-result: disabled" << filename \
+                std::cout << ":test-result: SKIP" << filename \
                     << ":" << t->name << std::endl;
             } else {
                 std::cout << KCYN << "disabled" << RESET << std::endl;
