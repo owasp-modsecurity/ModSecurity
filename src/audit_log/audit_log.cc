@@ -204,17 +204,17 @@ bool AuditLog::setType(AuditLogType audit_type) {
 
 
 bool AuditLog::init(std::string *error) {
-    if (m_type == SerialAuditLogType) {
-        m_writer = new audit_log::writer::Serial(this);
+    if (m_type == ParallelAuditLogType) {
+        m_writer = new audit_log::writer::Parallel(this);
     } else if (m_type == HttpsAuditLogType) {
         m_writer = new audit_log::writer::Https(this);
     } else {
         /*
-         * if (m_type == ParallelAuditLogType
+         * if (m_type == SerialAuditLogType
          * || m_type == NotSetAuditLogType)
          *
          */
-        m_writer = new audit_log::writer::Parallel(this);
+        m_writer = new audit_log::writer::Serial(this);
     }
 
     if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
