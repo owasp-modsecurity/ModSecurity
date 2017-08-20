@@ -1695,6 +1695,29 @@ int Transaction::getRuleEngineState() {
 
 
 /**
+ * @name    updateStatusCode
+ * @brief   Updates response status code.
+ *
+ * Called after processResponseHeaders to inform a new response code.
+ * Not mandatory.
+ *
+ *
+ * @param status The returned http code.
+ *
+ * @returns If the operation was successful or not.
+ * @retval true Operation was successful.
+ * @retval false Operation failed.
+ *
+ */
+int Transaction::updateStatusCode(int code) {
+    this->m_httpCodeReturned = code;
+    m_variableResponseStatus.set(std::to_string(code), m_variableOffset);
+
+    return true;
+}
+
+
+/**
  * @name    msc_new_transaction
  * @brief   Create a new transaction for a given configuration and ModSecurity core.
  *
@@ -2125,6 +2148,26 @@ extern "C" int msc_get_response_body_length(Transaction *transaction) {
 extern "C" int msc_process_logging(Transaction *transaction) {
     return transaction->processLogging();
 }
+
+
+/**
+ * @name    msc_update_status_code
+ * @brief   Updates response status code.
+ *
+ * Called after msc_process_response_headers to inform a new response code.
+ * Not mandatory.
+ *
+ * @param transaction ModSecurity transaction.
+ *
+ * @returns If the operation was successful or not.
+ * @retval 1 Operation was successful.
+ * @retval 0 Operation failed.
+ *
+ */
+extern "C" int msc_update_status_code(Transaction *transaction, int status) {
+    return transaction->updateStatusCode(status);
+}
+
 
 }  // namespace modsecurity
 

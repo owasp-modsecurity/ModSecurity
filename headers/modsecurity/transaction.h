@@ -309,6 +309,7 @@ class Transaction : public TransactionAnchoredVariables {
     int appendResponseBody(const unsigned char *body, size_t size);
 
     int processLogging();
+    int updateStatusCode(int status);
 
     bool intervention(ModSecurityIntervention *it);
 
@@ -621,6 +622,9 @@ int msc_intervention(Transaction *transaction, ModSecurityIntervention *it);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_logging(Transaction *transaction);
+
+/** @ingroup ModSecurity_C_API */
+int msc_update_status_code(Transaction *transaction, int status);
 
 #ifdef __cplusplus
 }
