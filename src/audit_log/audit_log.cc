@@ -228,9 +228,15 @@ bool AuditLog::init(std::string *error) {
     /* Sanity check */
     if (m_status == RelevantOnlyAuditLogStatus) {
         if (m_relevant.empty()) {
+            /*
             error->assign("m_relevant cannot be null while status is set to " \
                 "RelevantOnly");
             return false;
+            */
+            // FIXME: this should be a warning. There is not point to
+            // have the logs on relevant only if nothing is relevant.
+            //
+            // Not returning an error to keep the compatibility with v2.
         }
     }
 
