@@ -428,29 +428,29 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 }
 
 apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buffer, int buflen, char **error_msg) {
-    apr_size_t allocate;
-    char* allocated;
+    apr_size_t allocate_length = 0;
+    char* allocated = NULL;
 
     if (msr->stream_input_data == NULL)  {
         // Is the request body length is known beforehand? (requests that are not Transfer-Encoding: chunked)
         if (msr->request_content_length > 0) {
-            allocate = msr->request_content_length;
+            allocate_length = msr->request_content_length;
         }
         else {
             // We don't know how this request is going to be, so hope for just buflen to begin with (requests that are Transfer-Encoding: chunked)
-            allocate = buflen;
+            allocate_length = buflen;
         }
 
-        allocated = (char*) calloc(allocate, sizeof(char));
+        allocated = (char*) calloc(allocate_length, sizeof(char));
         if (allocated) {
             msr->stream_input_data = allocated;
-            msr->stream_input_allocated_length = allocate;
+            msr->stream_input_allocated_length = allocate_length;
         }
         else {
             *error_msg = apr_psprintf(
                 msr->mp,
                 "Unable to allocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
-                allocate);
+                allocate_length);
             return -1;
         }
     }
@@ -459,18 +459,18 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
         if ((msr->stream_input_length + buflen) > msr->stream_input_allocated_length) {
 
             // If this becomes a hotspot again, consider increasing by some percent extra each time, for fewer reallocs
-            allocate = msr->stream_input_length + buflen;
+            allocate_length = msr->stream_input_length + buflen;
 
-            allocated = (char*) realloc(msr->stream_input_data, allocate);
+            allocated = (char*) realloc(msr->stream_input_data, allocate_length);
             if (allocated) {
                 msr->stream_input_data = allocated;
-                msr->stream_input_allocated_length = allocate;
+                msr->stream_input_allocated_length = allocate_length;
             }
             else {
                 *error_msg = apr_psprintf(
                     msr->mp,
                     "Unable to reallocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
-                    allocate);
+                    allocate_length);
                 free(msr->stream_input_data);
                 return -1;
             }
@@ -891,14 +891,14 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
 
         if (msr->msc_reqbody_filename != NULL) {
             if (keep_body) {
+                /* Move request body (which is a file) to the storage area. */
+                const char *put_filename = NULL;
+                const char *put_basename = NULL;
+
                 if (strcmp(msr->txcfg->upload_dir, msr->txcfg->tmp_dir) == 0) {
                     msr_log(msr, 4, "Not moving file to identical location.");
                     goto nullify;
                 }
-
-                /* Move request body (which is a file) to the storage area. */
-                const char *put_filename = NULL;
-                const char *put_basename = NULL;
 
                 /* Construct the new filename. */
                 put_basename = file_basename(msr->msc_reqbody_mp, msr->msc_reqbody_filename);
