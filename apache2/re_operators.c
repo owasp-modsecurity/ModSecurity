@@ -636,15 +636,15 @@ nextround:
         msr->stream_input_length = 0;
         msr->stream_input_allocated_length  = 0;
 
-        msr->stream_input_data = (char *)malloc(size+1);
+        msr->stream_input_data = (char *)malloc(size);
 
         if(msr->stream_input_data == NULL)  {
             return -1;
         }
 
         msr->stream_input_length = size;
-        msr->stream_input_allocated_length = size + 1;
-        memset(msr->stream_input_data, 0x0, size + 1);
+        msr->stream_input_allocated_length = size;
+        memset(msr->stream_input_data, 0x0, size);
 
         msr->if_stream_changed = 1;
 
