@@ -343,7 +343,7 @@ NEW_LINE_FREE_TEXT                      [^, \t\"\n\r]+
 NOT !
 OP_QUOTE \"
 FREE_TEXT                               ([^\"]|([^\\]\\\"))+
-REMOVE_RULE_BY                          [0-9A-Za-z_\/\.\-\*\:\;\]\[]+
+REMOVE_RULE_BY                          [0-9A-Za-z_\/\.\-\*\:\;\]\[\$]+
 
 VAR_FREE_TEXT_QUOTE                     ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE                     [^ \t\"]+
