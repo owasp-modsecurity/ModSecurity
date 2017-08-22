@@ -172,7 +172,6 @@ class TransactionAnchoredVariables {
         m_variableOffset(0)
         { }
 
-    AnchoredVariable m_variableArgsNames;
     AnchoredVariable m_variableArgGetNames;
     AnchoredVariable m_variableArgPostNames;
     AnchoredVariable m_variableRequestHeadersNames;
@@ -227,6 +226,7 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableUrlEncodedError;
     AnchoredVariable m_variableUserID;
 
+    AnchoredSetVariable m_variableArgsNames;
     AnchoredSetVariable m_variableArgs;
     AnchoredSetVariable m_variableArgsGet;
     AnchoredSetVariable m_variableArgsPost;

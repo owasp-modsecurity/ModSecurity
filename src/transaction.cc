@@ -309,7 +309,7 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
         m_variableArgsPost.set(key, value, offset);
         m_variableArgPostNames.append(key, offset - key.size() - 1, true);
     }
-    m_variableArgsNames.append(key, offset - key.size() - 1, true);
+    m_variableArgsNames.set(key, key, offset - key.size() - 1);
 
     m_ARGScombinedSizeDouble = m_ARGScombinedSizeDouble + \
         key.length() + value.length();

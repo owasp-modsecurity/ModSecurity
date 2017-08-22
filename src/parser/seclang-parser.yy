@@ -1514,6 +1514,18 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::Args_NoDictElement());
       }
+    | VARIABLE_ARGS_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsNames_DictElement($2));
+      }
+    | VARIABLE_ARGS_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsNames_DictElementRegexp($2));
+      }
+    | VARIABLE_ARGS_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsNames_NoDictElement());
+      }
     | VARIABLE_ARGS_POST DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new Variables::ArgsPost_DictElement($2));
@@ -1793,13 +1805,6 @@ var:
     | VARIABLE_SESSION
       {
         VARIABLE_CONTAINER($$, new Variables::Session_NoDictElement());
-      }
-
-
-
-    | VARIABLE_ARGS_NAMES
-      {
-        VARIABLE_CONTAINER($$, new Variables::ArgsNames());
       }
     | VARIABLE_ARGS_GET_NAMES
       {

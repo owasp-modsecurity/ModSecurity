@@ -31,7 +31,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"key key\""
+      "debug_log":"Target value: \"key\""
     },
     "rules":[  
       "SecRuleEngine On",
@@ -70,7 +70,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"key key\""
+      "debug_log":"Target value: \"key\""
     },
     "rules":[  
       "SecRuleEngine On",
@@ -114,7 +114,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"param1 param2\""
+      "debug_log":"Target value: \"param1\""
     },
     "rules":[
       "SecRuleEngine On",
@@ -158,7 +158,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"param1 param2\""
+      "debug_log":"Target value: \"param1\" "
     },
     "rules":[
       "SecRuleEngine On",

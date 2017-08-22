@@ -73,10 +73,7 @@ std::string MacroExpansion::expand(const std::string& input,
             collection = variable.find(":");
         }
         if (collection == std::string::npos) {
-            if (compareStrNoCase(variable, "ARGS_NAMES")) {
-                variableValue = transaction->m_variableArgsNames.resolveFirst();
-            }
-            else if (compareStrNoCase(variable, "ARGS_GET_NAMES")) {
+            if (compareStrNoCase(variable, "ARGS_GET_NAMES")) {
                 variableValue = transaction->m_variableArgGetNames.resolveFirst();
             }
             else if (compareStrNoCase(variable, "ARGS_POST_NAMES")) {
@@ -244,6 +241,9 @@ std::string MacroExpansion::expand(const std::string& input,
                 variable.length() - (collection + 1));
             if (compareStrNoCase(col, "ARGS")) {
                 variableValue = transaction->m_variableArgs.resolveFirst(var);
+            }
+            if (compareStrNoCase(variable, "ARGS_NAMES")) {
+                variableValue = transaction->m_variableArgsNames.resolveFirst(var);
             }
             else if (compareStrNoCase(col, "RULE")) {
                 variableValue = transaction->m_variableRule.resolveFirst(var);

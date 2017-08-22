@@ -755,6 +755,8 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_USER_ID}                          { return p::make_VARIABLE_USER_ID(*driver.loc.back()); }
 {VARIABLE_ARGS}                             { return p::make_VARIABLE_ARGS(*driver.loc.back()); }
 {VARIABLE_ARGS}[:]                          { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS(*driver.loc.back()); }
+{VARIABLE_ARGS_NAMES}                       { return p::make_VARIABLE_ARGS(*driver.loc.back()); }
+{VARIABLE_ARGS_NAMES}[:]                    { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS(*driver.loc.back()); }
 {VARIABLE_ARGS_GET}                         { return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
 {VARIABLE_ARGS_GET}[:]                      { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
 {VARIABLE_ARGS_POST}                        { return p::make_VARIABLE_ARGS_POST(*driver.loc.back()); }
