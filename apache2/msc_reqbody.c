@@ -434,7 +434,8 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
     if (msr->stream_input_data == NULL)  {
         // Is the request body length is known beforehand? (requests that are not Transfer-Encoding: chunked)
         if (msr->request_content_length > 0) {
-            allocate_length = msr->request_content_length;
+            // Use min of Content-Length and SecRequestBodyLimit
+            allocate_length = min(msr->request_content_length, msr->txcfg->reqbody_limit);
         }
         else {
             // We don't know how this request is going to be, so hope for just buflen to begin with (requests that are Transfer-Encoding: chunked)
@@ -472,6 +473,9 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
                     "Unable to reallocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
                     allocate_length);
                 free(msr->stream_input_data);
+                msr->stream_input_data = NULL;
+                msr->stream_input_length = 0;
+                msr->stream_input_allocated_length = 0;
                 return -1;
             }
         }
