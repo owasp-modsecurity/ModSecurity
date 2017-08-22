@@ -1370,8 +1370,12 @@ expression:
       }
     | CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
       {
-        driver.m_requestBodyInMemoryLimit.m_set = true;
-        driver.m_requestBodyInMemoryLimit.m_value = atoi($1.c_str());
+        std::stringstream ss;
+        ss << "As of ModSecurity version 3.0, SecRequestBodyInMemoryLimit is no longer ";
+        ss << "supported. Instead, you can use your web server configurations to control ";
+        ss << "those values. ModSecurity will follow the web server decision.";
+        driver.error(@0, ss.str());
+        YYERROR;
       }
     | CONFIG_DIR_RES_BODY_LIMIT
       {

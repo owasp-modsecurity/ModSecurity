@@ -451,7 +451,6 @@ class RulesProperties {
     ConfigBoolean m_secXMLExternalEntity;
     ConfigBoolean m_tmpSaveUploadedFiles;
     ConfigBoolean m_uploadKeepFiles;
-    ConfigDouble m_requestBodyInMemoryLimit;
     ConfigDouble m_requestBodyLimit;
     ConfigDouble m_requestBodyNoFilesLimit;
     ConfigDouble m_responseBodyLimit;
