@@ -287,6 +287,7 @@ struct modsec_rec {
     unsigned int         resbody_contains_html;
 
     apr_size_t           stream_input_length;
+    apr_size_t           stream_input_allocated_length;
     char                *stream_input_data;
     apr_size_t           stream_output_length;
     char                *stream_output_data;

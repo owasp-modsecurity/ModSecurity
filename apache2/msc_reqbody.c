@@ -428,55 +428,66 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 }
 
 apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buffer, int buflen, char **error_msg) {
-    char *stream_input_body = NULL;
-    char *data = NULL;
-    int first_pkt = 0;
+    apr_size_t allocate_length = 0;
+    char* allocated = NULL;
 
-    if(msr->stream_input_data == NULL)  {
-        msr->stream_input_data = (char *)calloc(sizeof(char), msr->stream_input_length + 1);
-        first_pkt = 1;
-    }
-    else    {
-
-        data = (char *)malloc(msr->stream_input_length + 1 - buflen);
-
-        if(data == NULL)
-            return -1;
-
-        memset(data, 0, msr->stream_input_length + 1 - buflen);
-        memcpy(data, msr->stream_input_data, msr->stream_input_length - buflen);
-
-        stream_input_body = (char *)realloc(msr->stream_input_data, msr->stream_input_length + 1);
-
-        msr->stream_input_data = (char *)stream_input_body;
-    }
-
-    if (msr->stream_input_data == NULL) {
-        if(data)    {
-            free(data);
-            data = NULL;
+    if (msr->stream_input_data == NULL)  {
+        // Is the request body length known beforehand? (requests that are not Transfer-Encoding: chunked)
+        if (msr->request_content_length > 0) {
+            // Use min of Content-Length and SecRequestBodyLimit
+            allocate_length = min(msr->request_content_length, msr->txcfg->reqbody_limit);
         }
-        *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
-                msr->stream_input_length + 1);
-        return -1;
+        else {
+            // We don't know how this request is going to be, so hope for just buflen to begin with (requests that are Transfer-Encoding: chunked)
+            allocate_length = buflen;
+        }
+
+        allocated = (char*) calloc(allocate_length, sizeof(char));
+        if (allocated) {
+            msr->stream_input_data = allocated;
+            msr->stream_input_allocated_length = allocate_length;
+        }
+        else {
+            *error_msg = apr_psprintf(
+                msr->mp,
+                "Unable to allocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
+                allocate_length);
+            return -1;
+        }
+    }
+    else {
+        // Do we need to expand the space we have previously allocated?
+        if ((msr->stream_input_length + buflen) > msr->stream_input_allocated_length) {
+
+            // If this becomes a hotspot again, consider increasing by some percent extra each time, for fewer reallocs
+            allocate_length = msr->stream_input_length + buflen;
+
+            allocated = (char*) realloc(msr->stream_input_data, allocate_length);
+            if (allocated) {
+                msr->stream_input_data = allocated;
+                msr->stream_input_allocated_length = allocate_length;
+            }
+            else {
+                *error_msg = apr_psprintf(
+                    msr->mp,
+                    "Unable to reallocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
+                    allocate_length);
+                free(msr->stream_input_data);
+                msr->stream_input_data = NULL;
+                msr->stream_input_length = 0;
+                msr->stream_input_allocated_length = 0;
+                return -1;
+            }
+        }
     }
 
-    memset(msr->stream_input_data, 0, msr->stream_input_length+1);
-
-    if(first_pkt)   {
-        memcpy(msr->stream_input_data, buffer, msr->stream_input_length);
-    } else {
-        memcpy(msr->stream_input_data, data, msr->stream_input_length - buflen);
-        memcpy(msr->stream_input_data+(msr->stream_input_length - buflen), buffer, buflen);
-    }
-
-    if(data)    {
-        free(data);
-        data = NULL;
-    }
+    // Append buffer to msr->stream_input_data
+    memcpy(msr->stream_input_data + msr->stream_input_length, buffer, buflen);
+    msr->stream_input_length += buflen;
 
     return 1;
 }
+
 /**
  * Replace a bunch of chunks holding a request body with a single large chunk.
  */
