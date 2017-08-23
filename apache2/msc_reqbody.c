@@ -432,7 +432,7 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
     char* allocated = NULL;
 
     if (msr->stream_input_data == NULL)  {
-        // Is the request body length is known beforehand? (requests that are not Transfer-Encoding: chunked)
+        // Is the request body length known beforehand? (requests that are not Transfer-Encoding: chunked)
         if (msr->request_content_length > 0) {
             // Use min of Content-Length and SecRequestBodyLimit
             allocate_length = min(msr->request_content_length, msr->txcfg->reqbody_limit);
