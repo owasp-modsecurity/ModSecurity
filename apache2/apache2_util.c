@@ -254,6 +254,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
     if (level <= 3) {
         char *unique_id = (char *)get_env_var(r, "UNIQUE_ID");
         char *hostname = (char *)msr->hostname;
+        char *requestheaderhostname = (char *)r->hostname;
 
         if (unique_id != NULL) {
             unique_id = apr_psprintf(msr->mp, " [unique_id \"%s\"]",
@@ -267,14 +268,20 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
         }
         else hostname = "";
 
+        if (requestheaderhostname != NULL) {
+            requestheaderhostname = apr_psprintf(msr->mp, " [requestheaderhostname \"%s\"]",
+                log_escape(msr->mp, requestheaderhostname));
+        }
+        else requestheaderhostname = "";
+
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
 	ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
-            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->useragent_ip ? r->useragent_ip : r->connection->client_ip, str1,
-            hostname, log_escape(msr->mp, r->uri), unique_id);
+            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s%s", r->useragent_ip ? r->useragent_ip : r->connection->client_ip, str1,
+            hostname, log_escape(msr->mp, r->uri), unique_id, requestheaderhostname);
 #else
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-                "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", msr->remote_addr ? msr->remote_addr : r->connection->remote_ip, str1,
-                hostname, log_escape(msr->mp, r->uri), unique_id);
+                "[client %s] ModSecurity: %s%s [uri \"%s\"]%s%s", msr->remote_addr ? msr->remote_addr : r->connection->remote_ip, str1,
+                hostname, log_escape(msr->mp, r->uri), unique_id, requestheaderhostname);
 #endif
 
         /* Add this message to the list. */
