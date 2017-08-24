@@ -95,8 +95,8 @@ class TransactionAnchoredVariables {
  public:
     explicit TransactionAnchoredVariables(Transaction *t)
         : m_variableArgsNames(t, "ARGS_NAMES"),
-        m_variableArgGetNames(t, "ARGS_GET_NAMES"),
-        m_variableArgPostNames(t, "ARGS_POST_NAMES"),
+        m_variableArgsGetNames(t, "ARGS_GET_NAMES"),
+        m_variableArgsPostNames(t, "ARGS_POST_NAMES"),
         m_variableRequestHeadersNames(t, "REQUEST_HEADERS_NAMES"),
         m_variableResponseContentType(t, "RESPONSE_CONTENT_TYPE"),
         m_variableResponseHeadersNames(t, "RESPONSE_HEADERS_NAMES"),
@@ -172,11 +172,12 @@ class TransactionAnchoredVariables {
         m_variableOffset(0)
         { }
 
-    AnchoredVariable m_variableArgGetNames;
-    AnchoredVariable m_variableArgPostNames;
-    AnchoredVariable m_variableRequestHeadersNames;
+    AnchoredSetVariable m_variableArgsNames;
+    AnchoredSetVariable m_variableArgsGetNames;
+    AnchoredSetVariable m_variableArgsPostNames;
+    AnchoredSetVariable m_variableRequestHeadersNames;
     AnchoredVariable m_variableResponseContentType;
-    AnchoredVariable m_variableResponseHeadersNames;
+    AnchoredSetVariable m_variableResponseHeadersNames;
     AnchoredVariable m_variableARGScombinedSize;
     AnchoredVariable m_variableAuthType;
     AnchoredVariable m_variableFilesCombinedSize;
@@ -226,7 +227,6 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableUrlEncodedError;
     AnchoredVariable m_variableUserID;
 
-    AnchoredSetVariable m_variableArgsNames;
     AnchoredSetVariable m_variableArgs;
     AnchoredSetVariable m_variableArgsGet;
     AnchoredSetVariable m_variableArgsPost;

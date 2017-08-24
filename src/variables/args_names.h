@@ -32,7 +32,8 @@ namespace Variables {
 class ArgsNames_DictElement : public Variable {
  public:
     explicit ArgsNames_DictElement(std::string dictElement)
-        : Variable("ARGS_NAMES" + std::string(":") + std::string(dictElement)),
+        : Variable("ARGS_NAMES" + std::string(":") +
+            std::string(dictElement)),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *transaction,
@@ -43,7 +44,6 @@ class ArgsNames_DictElement : public Variable {
 
     std::string m_dictElement;
 };
-
 
 class ArgsNames_NoDictElement : public Variable {
  public:
@@ -57,18 +57,17 @@ class ArgsNames_NoDictElement : public Variable {
     }
 };
 
-
 class ArgsNames_DictElementRegexp : public Variable {
  public:
     explicit ArgsNames_DictElementRegexp(std::string dictElement)
-        : Variable("ARGS_NAMES:regex(" + dictElement + ")"),
-        m_r(dictElement) {
-    }
+        : Variable("ARGS_NAMES"),
+        m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_variableArgsNames.resolveRegularExpression(&m_r, l);
+        transaction->m_variableArgsNames.resolveRegularExpression(
+            &m_r, l);
     }
 
     Utils::Regex m_r;
