@@ -43,8 +43,6 @@ AnchoredSetVariable::~AnchoredSetVariable() {
 void AnchoredSetVariable::unset() {
     for (const auto& x : *this) {
         collection::Variable *var = x.second;
-        delete var->m_key;
-        var->m_key = NULL;
         delete var;
     }
     clear();
@@ -61,7 +59,6 @@ void AnchoredSetVariable::set(const std::string &key,
     origin->m_offset = offset;
     origin->m_length = len;
 
-    var->m_dynamic_value = true;
     var->m_dynamic = false;
     var->m_orign.push_back(std::move(origin));
     emplace(key, var);
@@ -78,7 +75,6 @@ void AnchoredSetVariable::set(const std::string &key,
     origin->m_offset = offset;
     origin->m_length = value.size();
 
-    var->m_dynamic_value = true;
     var->m_dynamic = false;
     var->m_orign.push_back(std::move(origin));
     emplace(key, var);

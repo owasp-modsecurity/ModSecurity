@@ -127,7 +127,6 @@ void XML::evaluate(Transaction *t,
         if (content != NULL) {
             collection::Variable *var = new collection::Variable(&m_name,
                 new std::string(content));
-            var->m_dynamic_value = true;
             l->push_back(var);
             xmlFree(content);
          }

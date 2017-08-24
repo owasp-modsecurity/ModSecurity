@@ -143,7 +143,6 @@ class VariableModificatorCount : public Variable {
         res = new std::string(std::to_string(count));
 
         val = new collection::Variable(&m_name, res);
-        val->m_dynamic_value = true;
         val->m_dynamic = true;
 
         l->push_back(val);

@@ -431,16 +431,16 @@ std::list<std::pair<std::shared_ptr<std::string>,
 
 std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
     Transaction *trans) {
-    std::list<const std::string*> exclusions;
-    std::list<const std::string*> exclusions_update_by_tag_remove;
-    std::list<const std::string*> exclusions_update_by_id_remove;
+    std::list<std::shared_ptr<std::string>> exclusions;
+    std::list<std::shared_ptr<std::string>> exclusions_update_by_tag_remove;
+    std::list<std::shared_ptr<std::string>> exclusions_update_by_id_remove;
     std::vector<Variables::Variable *> variables;
     std::vector<std::unique_ptr<collection::Variable>> finalVars;
 
     std::copy (m_variables->begin(), m_variables->end(), std::back_inserter(variables));
 
     for (auto &a : trans->m_rules->m_exceptions.m_variable_update_target_by_tag) {
-        if (containsTag(a.first, trans) == false) {
+        if (containsTag(*a.first.get(), trans) == false) {
             continue;
         }
         if (a.second->m_isExclusion) {
@@ -449,7 +449,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             for (auto &y : z) {
                 exclusions_update_by_tag_remove.push_back(y->m_key);
             }
-            exclusions_update_by_tag_remove.push_back(&a.second->m_name);
+            exclusions_update_by_tag_remove.push_back(std::make_shared<std::string>(a.second->m_name));
 
         } else {
             Variable *b = a.second.get();
@@ -467,7 +467,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             for (auto &y : z) {
                 exclusions_update_by_id_remove.push_back(y->m_key);
             }
-            exclusions_update_by_id_remove.push_back(&a.second->m_name);
+            exclusions_update_by_id_remove.push_back(std::make_shared<std::string>(a.second->m_name));
         } else {
             Variable *b = a.second.get();
             variables.push_back(b);
@@ -482,7 +482,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             for (auto &y : z) {
                 exclusions.push_back(y->m_key);
             }
-            exclusions.push_back(&variable->m_name);
+//            exclusions.push_back(std::make_shared<std::string>(&variable->m_name));
         }
     }
 
@@ -497,9 +497,9 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
 
         variable->evaluateInternal(trans, this, &e);
         for (const collection::Variable *v : e) {
-            const std::string *key = v->m_key;
+            const std::shared_ptr<std::string> key = v->m_key;
             if (std::find_if(exclusions.begin(), exclusions.end(),
-                [key](const std::string *m) -> bool { return *key == *m; })
+                [key](std::shared_ptr<std::string> m) -> bool { return *key == *m.get(); })
                 != exclusions.end()) {
 #ifndef NO_LOGS
                 trans->debug(9, "Variable: " + *key +
@@ -513,7 +513,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             }
             if (std::find_if(exclusions_update_by_tag_remove.begin(),
                 exclusions_update_by_tag_remove.end(),
-                [key](const std::string *m) -> bool { return *key == *m; })
+                [key](std::shared_ptr<std::string> m) -> bool { return *key == *m.get(); })
                 != exclusions_update_by_tag_remove.end()) {
 #ifndef NO_LOGS
                 trans->debug(9, "Variable: " + *key +
@@ -529,7 +529,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
 
             if (std::find_if(exclusions_update_by_id_remove.begin(),
                 exclusions_update_by_id_remove.end(),
-                [key](const std::string *m) -> bool { return *key == *m; })
+                [key](std::shared_ptr<std::string> m) -> bool { return *key == *m.get(); })
                 != exclusions_update_by_id_remove.end()) {
 #ifndef NO_LOGS
                 trans->debug(9, "Variable: " + *key +
@@ -621,8 +621,6 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             std::unique_ptr<collection::Variable> var(new collection::Variable(
                 new std::string(*v->m_key),
                 new std::string(*v->m_value)));
-            var->m_dynamic_value = true;
-            var->m_dynamic_key = true;
             for (auto &i : v->m_orign) {
                 std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
                 origin->m_offset = i->m_offset;

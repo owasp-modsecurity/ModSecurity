@@ -41,7 +41,6 @@ class XML_NoDictElement : public Variable {
         m_plain("[XML document tree]"),
         m_var(&m_name, &m_plain) {
             m_var.m_dynamic = false;
-            m_var.m_dynamic_value = false;
         }
 
     void evaluate(Transaction *transaction,

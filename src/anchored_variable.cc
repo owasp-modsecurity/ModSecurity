@@ -38,15 +38,17 @@ AnchoredVariable::AnchoredVariable(Transaction *t,
         m_name.append(name);
         m_var = new collection::Variable(&m_name);
         m_var->m_dynamic = false;
-        m_var->m_value = &m_value;
+        m_var->m_value.reset(&m_value);
 }
 
 
 AnchoredVariable::~AnchoredVariable() {
+    /*
     if (m_var) {
         delete (m_var);
         m_var = NULL;
     }
+    */
 }
 
 
