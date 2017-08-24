@@ -4,26 +4,30 @@
 # Get the hash of the last commit, to be used if it is not an
 # official release.
 AC_DEFUN([MSC_GIT_HASH], m4_esyscmd_s(git log -1 --format="%h" --abbrev-commit))
+AC_DEFUN([MSC_MAJOR], m4_esyscmd_s(cat headers/modsecurity/modsecurity.h | grep "define MODSECURITY_MAJOR " | awk {'print $3'} | sed 's/\"//g'))
+AC_DEFUN([MSC_MINOR], m4_esyscmd_s(cat headers/modsecurity/modsecurity.h | grep "define MODSECURITY_MINOR " | awk {'print $3'} | sed 's/\"//g'))
+AC_DEFUN([MSC_PATCHLEVEL], m4_esyscmd_s(cat headers/modsecurity/modsecurity.h | grep "define MODSECURITY_PATCHLEVEL " | awk {'print $3'} | sed 's/\"//g'))
+AC_DEFUN([MSC_TAG], m4_esyscmd_s(cat headers/modsecurity/modsecurity.h | grep "define MODSECURITY_TAG " | awk {'print $3'} | sed 's/\"//g'))
 
 
 # Version definition to be further used by AC_INIT and 
 # .so file naming.
-m4_define([msc_version_major], [3])
-m4_define([msc_version_minor], [0])
-m4_define([msc_version_patchlevel], [0])
+m4_define([msc_version_major], [MSC_MAJOR])
+m4_define([msc_version_minor], [MSC_MINOR])
+m4_define([msc_version_patchlevel], [MSC_PATCHLEVEL])
 
 m4_define([msc_version],
     [msc_version_major.msc_version_minor])
 
 m4_define([msc_version_git],
-    [msc_version_major.msc_version_minor.msc_version_patchlevel+MSC_GIT_HASH])
+    [m4_esyscmd_s(git describe)])
 
 m4_define([msc_version_info],
     [msc_version_major:msc_version_minor:msc_version_patchlevel])
 
 
 # Project Information
-AC_INIT([modsecurity], [msc_version], [security@modsecurity.org])
+AC_INIT([modsecurity], [3.0], [security@modsecurity.org])
 
 
 # General definitions
@@ -360,7 +364,7 @@ AC_OUTPUT
 # Print a fancy summary
 echo " "
 echo " "
-echo "ModSecurity - v${MSC_GIT_VERSION} for $PLATFORM"
+echo "ModSecurity - ${MSC_GIT_VERSION} for $PLATFORM"
 echo " "
 echo " Mandatory dependencies"
 echo -n "   + libInjection                                  ...."
