@@ -40,13 +40,12 @@ class XML_NoDictElement : public Variable {
         : Variable("XML"),
         m_plain("[XML document tree]"),
         m_var(&m_name, &m_plain) {
-            m_var.m_dynamic = false;
         }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        l->push_back(&m_var);
+        l->push_back(new collection::Variable(&m_var));
     }
 
     std::string m_plain;

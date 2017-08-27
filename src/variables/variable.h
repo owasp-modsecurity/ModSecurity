@@ -126,24 +126,22 @@ class VariableModificatorCount : public Variable {
         Rule *rule,
         std::vector<const collection::Variable *> *l) {
         std::vector<const collection::Variable *> reslIn;
-        std::string *res = NULL;
         collection::Variable *val = NULL;
         int count = 0;
 
         m_var->evaluate(transaction, rule, &reslIn);
         for (const collection::Variable *a : reslIn) {
             count++;
-            if (a->m_dynamic) {
-                delete a;
-                a = NULL;
-            }
+	    delete a;
+            a = NULL;
         }
         reslIn.clear();
 
-        res = new std::string(std::to_string(count));
-
-        val = new collection::Variable(&m_name, res);
-        val->m_dynamic = true;
+        std::string *res = new std::string(std::to_string(count));
+        std::string *name = new std::string(m_name);
+        val = new collection::Variable(name, res);
+        delete name;
+        delete res;
 
         l->push_back(val);
         return;

@@ -37,32 +37,36 @@ namespace collection {
 class Variable {
  public:
     explicit Variable(const std::string *key) :
-        m_dynamic(true) {
-            m_key.reset(new std::string(*key));
+        m_key(""),
+        m_value("") {
+            m_key.assign(*key);
         }
     Variable(const std::string *key, const std::string *value) :
-        m_dynamic(true) {
-            m_key.reset(new std::string(*key));
-            m_value.reset(new std::string(*value));
+        m_key(""),
+        m_value("") {
+            m_key.assign(*key);
+            m_value.assign(*value);
+        }
+    Variable() :
+        m_key(""),
+        m_value("") { }
 
+    Variable(const Variable *o) :
+        m_key(""),
+        m_value("") {
+        m_key.assign(o->m_key);
+        m_value.assign(o->m_value);
+        for (auto &i : o->m_orign) {
+            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+            origin->m_offset = i->m_offset;
+            origin->m_length = i->m_length;
+            m_orign.push_back(std::move(origin));
         }
-    explicit Variable(const std::shared_ptr<std::string> key) :
-        m_dynamic(true) {
-            m_key = key;
-        }
-    Variable(std::shared_ptr<std::string> key, std::shared_ptr<std::string> value) :
-        m_dynamic(true) {
-            m_key = key;
-            m_value = value;
-
-        }
-    ~Variable() {
     }
 
-    std::shared_ptr<std::string> m_key;
-    std::shared_ptr<std::string> m_value;
+    std::string m_key;
+    std::string m_value;
     std::list<std::unique_ptr<VariableOrigin>> m_orign;
-    bool m_dynamic;
 };
 
 }  // namespace collection

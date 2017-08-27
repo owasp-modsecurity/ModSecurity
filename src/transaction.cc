@@ -790,9 +790,10 @@ int Transaction::processRequestBody() {
     std::vector<const collection::Variable *> l;
     m_variableRequestHeaders.resolve(&l);
     for (auto &a : l) {
-        std::string z(*a->m_key, 16, a->m_key->length() - 16);
-        z = z + ": " + *a->m_value;
+        std::string z(a->m_key, 16, a->m_key.length() - 16);
+        z = z + ": " + a->m_value;
         fullRequest = fullRequest + z + "\n";
+        delete a;
     }
 
     fullRequest = fullRequest + "\n\n";
@@ -1423,10 +1424,11 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << this->m_httpVersion << std::endl;
 
         m_variableRequestHeaders.resolve(&l);
-        for (auto h : l) {
+        for (auto &h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
-            audit_log << h->m_key->c_str() + pos << ": ";
-            audit_log << h->m_value->c_str() << std::endl;
+            audit_log << h->m_key.c_str() + pos << ": ";
+            audit_log << h->m_value.c_str() << std::endl;
+            delete h;
         }
         audit_log << std::endl;
     }
@@ -1459,10 +1461,11 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
         audit_log << "HTTP/" << m_httpVersion  << " " << this->m_httpCodeReturned << std::endl;
         m_variableResponseHeaders.resolve(&l);
-        for (auto h : l) {
+        for (auto &h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
-            audit_log << h->m_key->c_str() + pos << ": ";
-            audit_log << h->m_value->c_str() << std::endl;
+            audit_log << h->m_key.c_str() + pos << ": ";
+            audit_log << h->m_value.c_str() << std::endl;
+            delete h;
         }
     }
     audit_log << std::endl;
@@ -1558,9 +1561,10 @@ std::string Transaction::toJSON(int parts) {
         yajl_gen_map_open(g);
 
         m_variableRequestHeaders.resolve(&l);
-        for (auto h : l) {
+        for (auto &h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
-            LOGFY_ADD(h->m_key->c_str() + pos, h->m_value->c_str());
+            LOGFY_ADD(h->m_key.c_str() + pos, h->m_value.c_str());
+            delete h;
         }
 
         /* end: request headers */
@@ -1588,9 +1592,10 @@ std::string Transaction::toJSON(int parts) {
         yajl_gen_map_open(g);
 
         m_variableResponseHeaders.resolve(&l);
-        for (auto h : l) {
+        for (auto &h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
-            LOGFY_ADD(h->m_key->c_str() + pos, h->m_value->c_str());
+            LOGFY_ADD(h->m_key.c_str() + pos, h->m_value.c_str());
+            delete h;
         }
 
         /* end: response headers */

@@ -58,10 +58,12 @@ class AnchoredVariable {
     std::unique_ptr<std::string> resolveFirst();
 
     Transaction *m_transaction;
-    collection::Variable *m_var;
     int m_offset;
     std::string m_name;
     std::string m_value;
+
+ private:
+    collection::Variable *m_var;
 };
 
 }  // namespace modsecurity

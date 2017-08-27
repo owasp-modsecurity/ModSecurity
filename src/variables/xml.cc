@@ -125,8 +125,10 @@ void XML::evaluate(Transaction *t,
         content = reinterpret_cast<char *>(
             xmlNodeGetContent(nodes->nodeTab[i]));
         if (content != NULL) {
+            std::string *a = new std::string(content);
             collection::Variable *var = new collection::Variable(&m_name,
-                new std::string(content));
+                a);
+            delete a;
             l->push_back(var);
             xmlFree(content);
          }

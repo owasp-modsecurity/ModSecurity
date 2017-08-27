@@ -37,24 +37,19 @@ AnchoredVariable::AnchoredVariable(Transaction *t,
     m_value("") {
         m_name.append(name);
         m_var = new collection::Variable(&m_name);
-        m_var->m_dynamic = false;
-        m_var->m_value.reset(&m_value);
 }
 
 
 AnchoredVariable::~AnchoredVariable() {
-    /*
     if (m_var) {
         delete (m_var);
         m_var = NULL;
     }
-    */
 }
 
 
 void AnchoredVariable::unset() {
     m_value.clear();
-    m_var->m_orign.clear();
 }
 
 
@@ -116,11 +111,13 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
 
 
 void AnchoredVariable::evaluate(std::vector<const collection::Variable *> *l) {
-    if (m_name.empty() || m_var == NULL || m_var->m_key == NULL
-            || m_var->m_value == NULL || m_var->m_key->empty()) {
+    if (m_name.empty() or m_value.empty()) {
         return;
     }
-    l->push_back(m_var);
+
+    m_var->m_value.assign(m_value);
+    collection::Variable *m_var2 = new collection::Variable(m_var);
+    l->push_back(m_var2);
 }
 
 

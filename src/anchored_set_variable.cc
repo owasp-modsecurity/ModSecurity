@@ -55,11 +55,12 @@ void AnchoredSetVariable::set(const std::string &key,
     std::string *v = new std::string(value);
     std::string *k = new std::string(m_name + ":" + key);
     collection::Variable *var = new collection::Variable(k, v);
+    delete v;
+    delete k;
 
     origin->m_offset = offset;
     origin->m_length = len;
 
-    var->m_dynamic = false;
     var->m_orign.push_back(std::move(origin));
     emplace(key, var);
 }
@@ -71,11 +72,12 @@ void AnchoredSetVariable::set(const std::string &key,
     std::string *v = new std::string(value);
     std::string *k = new std::string(m_name + ":" + key);
     collection::Variable *var = new collection::Variable(k, v);
+    delete v;
+    delete k;
 
     origin->m_offset = offset;
     origin->m_length = value.size();
 
-    var->m_dynamic = false;
     var->m_orign.push_back(std::move(origin));
     emplace(key, var);
 }
@@ -84,7 +86,7 @@ void AnchoredSetVariable::set(const std::string &key,
 void AnchoredSetVariable::resolve(
     std::vector<const collection::Variable *> *l) {
     for (const auto& x : *this) {
-        l->insert(l->begin(), x.second);
+        l->insert(l->begin(), new collection::Variable(x.second));
     }
 }
 
@@ -93,7 +95,7 @@ void AnchoredSetVariable::resolve(const std::string &key,
     std::vector<const collection::Variable *> *l) {
     auto range = this->equal_range(key);
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(it->second);
+        l->push_back(new collection::Variable(it->second));
     }
 }
 
@@ -103,7 +105,7 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
     auto range = equal_range(key);
     for (auto it = range.first; it != range.second; ++it) {
         std::unique_ptr<std::string> b(new std::string());
-        b->assign(*it->second->m_value);
+        b->assign(it->second->m_value);
         return b;
     }
     return nullptr;
@@ -117,7 +119,7 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
         if (ret <= 0) {
             continue;
         }
-        l->insert(l->begin(), x.second);
+        l->insert(l->begin(), new collection::Variable(x.second));
     }
 }
 
