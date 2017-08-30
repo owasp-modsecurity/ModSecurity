@@ -435,7 +435,7 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
         // Is the request body length known beforehand? (requests that are not Transfer-Encoding: chunked)
         if (msr->request_content_length > 0) {
             // Use min of Content-Length and SecRequestBodyLimit
-            allocate_length = min(msr->request_content_length, msr->txcfg->reqbody_limit);
+            allocate_length = msr->request_content_length < msr->txcfg->reqbody_limit ? msr->request_content_length : msr->txcfg->reqbody_limit;
         }
         else {
             // We don't know how this request is going to be, so hope for just buflen to begin with (requests that are Transfer-Encoding: chunked)
