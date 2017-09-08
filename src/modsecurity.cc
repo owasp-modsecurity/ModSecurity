@@ -189,6 +189,8 @@ void ModSecurity::serverLog(void *data, std::shared_ptr<RuleMessage> rm) {
     if (m_logProperties & RuleMessageLogProperty) {
         const void *a = static_cast<const void *>(rm.get());
         if (m_logProperties & IncludeFullHighlightLogProperty) {
+            processContentOffset(rm->m_buf.c_str(), rm->m_buf.size(),
+                rm->m_reference.c_str(), &rm->m_highlightJSON, NULL);
             m_logCb(data, a);
             return;
         }
