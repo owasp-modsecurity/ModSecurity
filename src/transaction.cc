@@ -1585,8 +1585,8 @@ std::string Transaction::toJSON(int parts) {
         utils::string::dash_if_empty(
             m_variableRequestMethod.evaluate()).c_str());
 
-    LOGFY_ADD_INT("http_version", m_httpVersion);
-    LOGFY_ADD("uri", this->m_uri);
+    LOGFY_ADD_INT("http_version", m_httpVersion.c_str());
+    LOGFY_ADD("uri", this->m_uri.c_str());
 
     if (parts & audit_log::AuditLog::CAuditLogPart) {
         // FIXME: check for the binary content size.
