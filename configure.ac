@@ -248,6 +248,23 @@ AC_ARG_ENABLE(parser-generation,
     [buildParser=false]
     )
 
+# Mutex
+AC_ARG_ENABLE(mutex-on-pm,
+    [AC_HELP_STRING([--enable-mutex-on-pm],[Treats pm operations as a critical section])],
+
+    [case "${enableval}" in
+        yes) mutexPm=true ;;
+        no)  mutexPm=false ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-mutex-on-pm) ;;
+    esac],
+
+    [mutexPm=false]
+    )
+if test "$mutexPm" == "true"; then
+    MODSEC_MUTEX_ON_PM="-DMUTEX_ON_PM=1"
+    AC_SUBST(MODSEC_MUTEX_ON_PM)
+fi
+
 
 if test $buildParser = true; then
     AC_PROG_YACC
@@ -287,6 +304,7 @@ fi
 
 AM_CONDITIONAL([EXAMPLES], [test $buildExamples = true])
 AM_CONDITIONAL([BUILD_PARSER], [test $buildParser = true])
+AM_CONDITIONAL([USE_MUTEX_ON_PM], [test $mutexPm = true])
 
 
 # General link options
@@ -494,11 +512,19 @@ if test "$buildExamples" = "true"; then
 else
     echo "   + library examples                              ....disabled"
 fi
+
 if test "$buildParser" = "true"; then
     echo "   + Building parser                               ....enabled"
 else
     echo "   + Building parser                               ....disabled"
 fi
+
+if test "$mutexPm" = "true"; then
+    echo "   + Treating pm operations as critical section    ....enabled"
+else
+    echo "   + Treating pm operations as critical section    ....disabled"
+fi
+
 
 echo " "
 
