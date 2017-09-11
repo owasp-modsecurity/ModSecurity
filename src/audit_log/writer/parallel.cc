@@ -133,7 +133,7 @@ bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
         return false;
     }
 
-    fd = open(fileName.c_str(), O_CREAT | O_WRONLY,
+    fd = open(fileName.c_str(), O_CREAT | O_WRONLY | O_APPEND,
         m_audit->getFilePermission());
     if (fd < 0) {
         error->assign("Not able to open: " + fileName + ". " \
@@ -144,7 +144,7 @@ bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
 
     std::ofstream myfile;
     std::string a(fileName.c_str());
-    myfile.open(a);
+    myfile.open(a, std::ofstream::out | std::ofstream::app);
     myfile << log;
     myfile.close();
 
