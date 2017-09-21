@@ -82,31 +82,31 @@ class ConfigSet {
 class RulesProperties {
  public:
     RulesProperties() :
-        m_debugLog(new DebugLog()),
         m_auditLog(new AuditLog()),
-        m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
+        m_requestBodyLimitAction(PropertyNotSetBodyLimitAction),
+        m_responseBodyLimitAction(PropertyNotSetBodyLimitAction),
         m_secRequestBodyAccess(PropertyNotSetConfigBoolean),
         m_secResponseBodyAccess(PropertyNotSetConfigBoolean),
         m_secXMLExternalEntity(PropertyNotSetConfigBoolean),
-        m_requestBodyLimitAction(PropertyNotSetBodyLimitAction),
-        m_responseBodyLimitAction(PropertyNotSetBodyLimitAction),
-        m_secRuleEngine(PropertyNotSetRuleEngine),
+        m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean),
         m_uploadKeepFiles(PropertyNotSetConfigBoolean),
-        m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean) { }
+        m_debugLog(new DebugLog()),
+        m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
+        m_secRuleEngine(PropertyNotSetRuleEngine) { }
 
 
     explicit RulesProperties(DebugLog *debugLog) :
-        m_debugLog(debugLog),
         m_auditLog(new AuditLog()),
-        m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
+        m_requestBodyLimitAction(PropertyNotSetBodyLimitAction),
+        m_responseBodyLimitAction(PropertyNotSetBodyLimitAction),
         m_secRequestBodyAccess(PropertyNotSetConfigBoolean),
         m_secResponseBodyAccess(PropertyNotSetConfigBoolean),
         m_secXMLExternalEntity(PropertyNotSetConfigBoolean),
-        m_requestBodyLimitAction(PropertyNotSetBodyLimitAction),
-        m_responseBodyLimitAction(PropertyNotSetBodyLimitAction),
-        m_secRuleEngine(PropertyNotSetRuleEngine),
+        m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean),
         m_uploadKeepFiles(PropertyNotSetConfigBoolean),
-        m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean) { }
+        m_debugLog(debugLog),
+        m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
+        m_secRuleEngine(PropertyNotSetRuleEngine) { }
 
 
     ~RulesProperties() {
@@ -360,7 +360,7 @@ class RulesProperties {
             std::vector<actions::Action *> *actions_from = \
                 from->m_defaultActions+i;
             std::vector<actions::Action *> *actions_to = to->m_defaultActions+i;
-            for (int j = 0; j < actions_from->size(); j++) {
+            for (size_t j = 0; j < actions_from->size(); j++) {
                 actions::Action *action = actions_from->at(j);
                 action->refCountIncrease();
                 actions_to->push_back(action);
@@ -411,9 +411,9 @@ class RulesProperties {
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
             std::vector<modsecurity::Rule *> *rules_to = to+i;
             std::vector<modsecurity::Rule *> *rules_from = from+i;
-            for (int j = 0; j < rules_from->size(); j++) {
+            for (size_t j = 0; j < rules_from->size(); j++) {
                 Rule *rule = rules_from->at(j);
-                for (int z = 0; z < rules_to->size(); z++) {
+                for (size_t z = 0; z < rules_to->size(); z++) {
                     Rule *rule_ckc = rules_to->at(z);
                     if (rule_ckc->m_ruleId == rule->m_ruleId &&
                         rule_ckc->m_secMarker == false &&

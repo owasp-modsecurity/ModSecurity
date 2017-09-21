@@ -39,21 +39,21 @@ namespace actions {
 class Action {
  public:
     explicit Action(const std::string& _action)
-        : action_kind(2),
-        m_isNone(false),
+        : m_isNone(false),
+        temporaryAction(false),
+        action_kind(2),
         m_name(""),
-        m_referenceCount(1),
         m_parser_payload(""),
-        temporaryAction(false) {
+        m_referenceCount(1) {
             set_name_and_payload(_action);
         }
     explicit Action(const std::string& _action, int kind)
-        : action_kind(kind),
-        m_isNone(false),
+        : m_isNone(false),
+        temporaryAction(false),
+        action_kind(kind),
         m_name(""),
-        m_referenceCount(1),
         m_parser_payload(""),
-        temporaryAction(false) {
+        m_referenceCount(1) {
             set_name_and_payload(_action);
         }
 

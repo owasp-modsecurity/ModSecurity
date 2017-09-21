@@ -45,19 +45,19 @@ class Rules : public RulesProperties {
  public:
     Rules()
         : RulesProperties(new DebugLog()),
+        unicode_codepage(0),
         m_referenceCount(0),
-        m_secmarker_skipped(0),
-        unicode_codepage(0) {
+        m_secmarker_skipped(0) {
             unicode_map_table = reinterpret_cast<int *>(
                 malloc(sizeof(int)*65536));
             memset(unicode_map_table, -1, (sizeof(int)*65536));
         }
 
     explicit Rules(DebugLog *customLog)
-        : m_referenceCount(0),
-        m_secmarker_skipped(0),
+        : RulesProperties(customLog),
         unicode_codepage(0),
-        RulesProperties(customLog) {
+        m_referenceCount(0),
+        m_secmarker_skipped(0) {
             unicode_map_table = reinterpret_cast<int *>(
                 malloc(sizeof(int)*65536));
             memset(unicode_map_table, -1, (sizeof(int)*65536));
