@@ -99,13 +99,9 @@ namespace modsecurity {
  *
  */
 Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
-    : m_clientIpAddress(""),
-    m_serverIpAddress(""),
-    m_clientPort(0),
+    : m_clientPort(0),
     m_serverPort(0),
-    m_uri(""),
     m_uri_no_query_string_decoded(""),
-    m_httpVersion(""),
     m_rules(rules),
     m_timeStamp(std::time(NULL)),
     m_httpCodeReturned(200),
@@ -1355,7 +1351,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << utils::string::dash_if_empty(
        m_variableRequestHeaders.resolveFirst("Host").get())
         << " ";
-    ss << utils::string::dash_if_empty(this->m_clientIpAddress) << " ";
+    ss << utils::string::dash_if_empty(this->m_clientIpAddress.c_str()) << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
         m_collections.resolveFirst("REMOTE_USER").get());
@@ -1369,8 +1365,8 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << "\"";
     ss << utils::string::dash_if_empty(m_variableRequestMethod.evaluate());
     ss << " ";
-    ss << this->m_uri << " ";
-    ss << "HTTP/" << m_httpVersion;
+    ss << this->m_uri.c_str() << " ";
+    ss << "HTTP/" << m_httpVersion.c_str();
     ss << "\" ";
 
     ss << this->m_httpCodeReturned << " ";
@@ -1420,8 +1416,8 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << "--" << trailer << "-" << "B--" << std::endl;
         audit_log << utils::string::dash_if_empty(
             m_variableRequestMethod.evaluate());
-        audit_log << " " << this->m_uri << " " << "HTTP/";
-        audit_log << this->m_httpVersion << std::endl;
+        audit_log << " " << this->m_uri.c_str() << " " << "HTTP/";
+        audit_log << this->m_httpVersion.c_str() << std::endl;
 
         m_variableRequestHeaders.resolve(&l);
         for (auto &h : l) {
@@ -1459,7 +1455,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         std::vector<const collection::Variable *> l;
 
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
-        audit_log << "HTTP/" << m_httpVersion  << " " << this->m_httpCodeReturned << std::endl;
+        audit_log << "HTTP/" << m_httpVersion.c_str()  << " " << this->m_httpCodeReturned << std::endl;
         m_variableResponseHeaders.resolve(&l);
         for (auto &h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
@@ -1528,11 +1524,11 @@ std::string Transaction::toJSON(int parts) {
 
     yajl_gen_map_open(g);
     /* Part: A (header mandatory) */
-    LOGFY_ADD("client_ip", this->m_clientIpAddress);
+    LOGFY_ADD("client_ip", this->m_clientIpAddress.c_str());
     LOGFY_ADD("time_stamp", ts.c_str());
     LOGFY_ADD("server_id", uniqueId.c_str());
     LOGFY_ADD_NUM("client_port", m_clientPort);
-    LOGFY_ADD("host_ip", m_serverIpAddress);
+    LOGFY_ADD("host_ip", m_serverIpAddress.c_str());
     LOGFY_ADD_NUM("host_port", m_serverPort);
     LOGFY_ADD("id", this->m_id.c_str());
 
@@ -1545,8 +1541,8 @@ std::string Transaction::toJSON(int parts) {
         utils::string::dash_if_empty(
             m_variableRequestMethod.evaluate()).c_str());
 
-    LOGFY_ADD_INT("http_version", m_httpVersion);
-    LOGFY_ADD("uri", this->m_uri);
+    LOGFY_ADD_INT("http_version", m_httpVersion.c_str());
+    LOGFY_ADD("uri", this->m_uri.c_str());
 
     if (parts & audit_log::AuditLog::CAuditLogPart) {
         // FIXME: check for the binary content size.
