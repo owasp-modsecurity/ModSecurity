@@ -1,0 +1,15 @@
+
+v3.0.????? - ?
+---------------------------
+
+ - Adds possibility to run the pm operator inside a mutex to avoid concurrent
+   access while working on a thread environment. This option is a compilation
+   flag.
+   [Felipe Zimmerle/@zimmerle]
+
+
+v3.0.0-rc1 - 2017-Aug-28
+------------------------
+
+ Very first public version.
+
