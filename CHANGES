@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Limits [request|response] body size while saving audit logs
+   [Issue: #1519 - Lasse Karstensen/@lkarsten and Felipe Zimmerle/@zimmerle]
  - Makes parallel logging to work when SELinux is enabled.
    [Issue: #1562 - David Buckle/@met3or]
  - Adds possibility to run the pm operator inside a mutex to avoid concurrent

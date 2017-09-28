@@ -1549,8 +1549,7 @@ std::string Transaction::toJSON(int parts) {
     LOGFY_ADD("uri", this->m_uri);
 
     if (parts & audit_log::AuditLog::CAuditLogPart) {
-        // FIXME: check for the binary content size.
-        LOGFY_ADD("body", this->m_requestBody.str().c_str());
+        LOGFY_ADD_N("body", this->m_requestBody.str().c_str(), this->m_requestBody.size());
     }
 
     /* request headers */
@@ -1580,7 +1579,7 @@ std::string Transaction::toJSON(int parts) {
     yajl_gen_map_open(g);
 
     if (parts & audit_log::AuditLog::GAuditLogPart) {
-        LOGFY_ADD("body", this->m_responseBody.str().c_str());
+        LOGFY_ADD_N("body", this->m_responseBody.str().c_str(), this->m_responseBody.size());
     }
     LOGFY_ADD_NUM("http_code", m_httpCodeReturned);
 

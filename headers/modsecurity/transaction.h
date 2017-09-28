@@ -48,6 +48,16 @@ typedef struct Rules_t Rules;
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
 
+#define LOGFY_ADD_N(a, b, c) \
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
+    if (b == NULL) { \
+      yajl_gen_string(g, reinterpret_cast<const unsigned char*>(""), \
+          strlen("")); \
+    } else { \
+      yajl_gen_string(g, reinterpret_cast<const unsigned char*>(b), \
+          c); \
+    }
+
 
 #define LOGFY_ADD(a, b) \
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
