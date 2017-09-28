@@ -25,8 +25,7 @@ int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
      * to reference this argument; for now we simply ignore these
      */
     if (!msr->json->current_key) {
-        msr_log(msr, 3, "Cannot add scalar value without an associated key");
-        return 1;
+        msr->json->current_key = "";
     }
 
     arg = (msc_arg *) apr_pcalloc(msr->mp, sizeof(msc_arg));

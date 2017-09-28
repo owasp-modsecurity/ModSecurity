@@ -1,6 +1,8 @@
 18 Jul 2017 - 2.9.2
 -------------------
 
+ * Include unanmed JSON values in unnamed ARGS
+   [Issue #1576 - Marc Stern]
  * IIS build refactoring and dependencies update
    [Issue #1487 - @victorhora]
  * Best practice: Initialize msre_var pointers
