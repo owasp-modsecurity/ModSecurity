@@ -358,22 +358,22 @@ class Transaction : public TransactionAnchoredVariables {
     /**
      * Holds the client IP address.
      */
-    const char *m_clientIpAddress;
+    std::string m_clientIpAddress;
 
     /**
      * Holds the HTTP version: 1.2, 2.0, 3.0 and so on....
      */
-    const char *m_httpVersion;
+    std::string m_httpVersion;
 
     /**
      * Holds the server IP Address
      */
-    const char *m_serverIpAddress;
+    std::string m_serverIpAddress;
 
     /**
      * Holds the raw URI that was requested.
      */
-    const char *m_uri;
+    std::string m_uri;
 
     /**
      * Holds the URI that was requests (without the query string).
