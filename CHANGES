@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Store the connection and url parameters in std::string
+   [Issue: #1571 - @majordaw]
  - Eliminate some reorder and sign warnings
    [Issue: #1572 - Dávid Major/@majordaw]
  - Makes parallel logging to work when SELinux is enabled.
