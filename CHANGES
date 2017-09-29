@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Eliminate some reorder and sign warnings
+   [Issue: #1572 - Dávid Major/@majordaw]
  - Makes parallel logging to work when SELinux is enabled.
    [Issue: #1562 - David Buckle/@met3or]
  - Adds possibility to run the pm operator inside a mutex to avoid concurrent
