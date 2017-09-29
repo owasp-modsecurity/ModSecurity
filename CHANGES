@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Uses LOG_NO_STOPWATCH instead of DLOG_NO_STOPWATCH
+   [Issue #1510 - @marcstern]
  * Adds missing headers
    [Issue #1454 - @devnexen]
 
