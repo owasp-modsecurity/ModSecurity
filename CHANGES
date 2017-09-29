@@ -1,7 +1,8 @@
-
 v3.0.????? - ?
 ---------------------------
 
+ - Eliminate some reorder and sign warnings
+   [Issue: #1572 - @majordaw]
  - Limits [request|response] body size while saving audit logs
    [Issue: #1519 - Lasse Karstensen/@lkarsten and Felipe Zimmerle/@zimmerle]
  - Makes parallel logging to work when SELinux is enabled.
