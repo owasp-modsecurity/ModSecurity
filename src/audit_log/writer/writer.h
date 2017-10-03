@@ -31,11 +31,11 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/audit_log.h"
 
+#define SERIAL_AUDIT_LOG_BOUNDARY_LENGTH 8
 
 namespace modsecurity {
 namespace audit_log {
 namespace writer {
-
 
 
 /** @ingroup ModSecurity_CPP_API */
@@ -51,6 +51,7 @@ class Writer {
     virtual bool write(Transaction *transaction, int parts,
         std::string *error) = 0;
 
+    void generateBoundary(std::string *boundary);
 
     void refCountIncrease() {
         m_refereceCount++;

@@ -1205,28 +1205,39 @@ const char *Transaction::getResponseBody() {
 
 /**
  * @name    getResponseBodyLength
- * @brief   Retrieve the length of the updated response body.
+ * @brief   Retrieve the length of the response body.
  *
- * This method returns the size of the update response body buffer, notice
+ * This method returns the size of the response body buffer.
+ *
+ *
+ * @return Size of the update response body.
+ *
+ */
+size_t Transaction::getResponseBodyLength() {
+    size_t size = 0;
+    m_responseBody.seekp(0, std::ios::end);
+    size = m_responseBody.tellp();
+
+    return size;
+}
+
+/**
+ * @name    getRequestBodyLength
+ * @brief   Retrieve the length of the request body.
+ *
+ * This method returns the size of the request body buffer, notice
  * however, that most likely there isn't an update. Thus, this method will
  * return 0.
  *
  *
- * @return Size of the update response body.
- * @retval ==0 there is no update.
- * @retval >0  the size of the updated buffer.
+ * @return Size of the request body.
  *
  */
-int Transaction::getResponseBodyLength() {
-    int size = 0;
-#if 0
-    int there_is_update = this->rules->loadResponseBodyFromJS(this);
-    if (there_is_update == -1) {
-        return -1;
-    }
-#endif
-    this->m_responseBody.seekp(0, std::ios::end);
-    size = this->m_responseBody.tellp();
+size_t Transaction::getRequestBodyLength() {
+    size_t size = 0;
+
+    m_requestBody.seekp(0, std::ios::end);
+    size = m_requestBody.tellp();
 
     return size;
 }
@@ -1444,7 +1455,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     }
     if (parts & audit_log::AuditLog::EAuditLogPart
         && m_responseBody.tellp() > 0) {
-        std::string body = m_responseBody.str();
+        std::string body = utils::string::toHexIfNeeded(m_responseBody.str());
         audit_log << "--" << trailer << "-" << "E--" << std::endl;
         if (body.size() > 0) {
             audit_log << body << std::endl;
@@ -2129,21 +2140,32 @@ extern "C" const char *msc_get_response_body(Transaction *transaction) {
 
 /**
  * @name    msc_get_response_body_length
- * @brief   Retrieve the length of the updated response body.
+ * @brief   Retrieve the length of the response body.
  *
- * This function returns the size of the update response body buffer, notice
- * however, that most likely there isn't an update. Thus, this function will
- * return 0.
+ * This function returns the size of the response body buffer.
  *
  * @param transaction ModSecurity transaction.
  *
- * @return Size of the update response body.
- * @retval ==0 there is no update.
- * @retval >0  the size of the updated buffer.
+ * @return Size of the response body.
  *
  */
-extern "C" int msc_get_response_body_length(Transaction *transaction) {
+extern "C" size_t msc_get_response_body_length(Transaction *transaction) {
     return transaction->getResponseBodyLength();
+}
+
+/**
+ * @name    msc_get_request_body_length
+ * @brief   Retrieve the length of the request body.
+ *
+ * This function returns the size of the request body buffer.
+ *
+ * @param transaction ModSecurity transaction.
+ *
+ * @return Size of the request body.
+ *
+ */
+extern "C" size_t msc_get_request_body_length(Transaction *transaction) {
+    return transaction->getRequestBodyLength();
 }
 
 /**

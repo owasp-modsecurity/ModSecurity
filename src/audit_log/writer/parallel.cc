@@ -103,11 +103,20 @@ bool Parallel::init(std::string *error) {
 
 bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
     int fd;
-    std::string log = transaction->toJSON(parts);
+    std::string log;
     std::string fileName = logFilePath(&transaction->m_timeStamp,
         YearMonthDayDirectory | YearMonthDayAndTimeDirectory
         | YearMonthDayAndTimeFileName);
     bool ret;
+
+    if (transaction->m_rules->m_auditLog->m_format ==
+            audit_log::AuditLog::JSONAuditLogFormat) {
+        log = transaction->toJSON(parts);
+    } else {
+        std::string boundary;
+        generateBoundary(&boundary);
+        log = transaction->toOldAuditLogFormat(parts, "-" + boundary + "--");
+    }
 
     std::string logPath = m_audit->m_storage_dir;
     fileName = logPath + fileName + "-" + transaction->m_id;

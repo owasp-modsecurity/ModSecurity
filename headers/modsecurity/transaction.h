@@ -319,7 +319,8 @@ class Transaction : public TransactionAnchoredVariables {
         size_t offset);
 
     const char *getResponseBody();
-    int getResponseBodyLength();
+    size_t getResponseBodyLength();
+    size_t getRequestBodyLength();
 
 #ifndef NO_LOGS
     void debug(int, std::string);
@@ -612,7 +613,10 @@ int msc_process_uri(Transaction *transaction, const char *uri,
 const char *msc_get_response_body(Transaction *transaction);
 
 /** @ingroup ModSecurity_C_API */
-int msc_get_response_body_length(Transaction *transaction);
+size_t msc_get_response_body_length(Transaction *transaction);
+
+/** @ingroup ModSecurity_C_API */
+size_t msc_get_request_body_length(Transaction *transaction);
 
 /** @ingroup ModSecurity_C_API */
 void msc_transaction_cleanup(Transaction *transaction);

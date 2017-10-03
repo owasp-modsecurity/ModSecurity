@@ -267,6 +267,7 @@ CONFIG_DIR_AUDIT_ENG                    (?i:SecAuditEngine)
 CONFIG_DIR_AUDIT_FLE_MOD                (?i:SecAuditLogFileMode)
 CONFIG_DIR_AUDIT_LOG2                   (?i:SecAuditLog2)
 CONFIG_DIR_AUDIT_LOG                    (?i:SecAuditLog)
+CONFIG_DIR_AUDIT_LOG_FMT                (?i:SecAuditLogFormat)
 CONFIG_DIR_AUDIT_LOG_P                  (?i:SecAuditLogParts)
 CONFIG_DIR_AUDIT_STS                    (?i:SecAuditLogRelevantStatus)
 CONFIG_DIR_AUDIT_TPE                    (?i:SecAuditLogType)
@@ -349,6 +350,9 @@ REMOVE_RULE_BY                          [0-9A-Za-z_\/\.\-\*\:\;\]\[\$]+
 VAR_FREE_TEXT_QUOTE                     ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE                     [^ \t\"]+
 VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
+
+JSON                                    (?i:JSON)
+NATIVE                                  (?i:NATIVE)
 
 NEW_LINE                                [\n\r]+
 
@@ -597,6 +601,9 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_DIR_AUDIT_LOG_P}[ \t]+{AUDIT_PARTS}                             { return p::make_CONFIG_DIR_AUDIT_LOG_P(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_LOG_P}[ \t]+["]{AUDIT_PARTS}["]                       { return p::make_CONFIG_DIR_AUDIT_LOG_P(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_LOG}[ ]{CONFIG_VALUE_PATH}                            { return p::make_CONFIG_DIR_AUDIT_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_AUDIT_LOG_FMT}                                              { return p::make_CONFIG_DIR_AUDIT_LOG_FMT(*driver.loc.back()); }
+{JSON}                                                                  { return p::make_JSON(*driver.loc.back()); }
+{NATIVE}                                                                { return p::make_NATIVE(*driver.loc.back()); }
 {CONFIG_DIR_AUDIT_LOG}[ ]["]{CONFIG_VALUE_PATH}["]                      { return p::make_CONFIG_DIR_AUDIT_LOG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_STS}[ ]{FREE_TEXT_NEW_LINE}                           { return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_STS}[ \t]+["]{NEW_LINE_FREE_TEXT}["]                  { return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }

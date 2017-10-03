@@ -26,14 +26,13 @@
 #include "src/utils/shared_files.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/audit_log.h"
+#include "modsecurity/rules.h"
 
 #ifdef __cplusplus
 
 namespace modsecurity {
 namespace audit_log {
 namespace writer {
-
-#define SERIAL_AUDIT_LOG_BOUNDARY_LENGTH 8
 
 
 /** @ingroup ModSecurity_CPP_API */
@@ -49,7 +48,6 @@ class Serial : public Writer {
     bool write(Transaction *transaction, int parts,
         std::string *error) override;
 
-    void generateBoundary(std::string *boundary);
 };
 
 }  // namespace writer
