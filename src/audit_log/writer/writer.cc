@@ -23,7 +23,16 @@ namespace modsecurity {
 namespace audit_log {
 namespace writer {
 
+void Writer::generateBoundary(std::string *boundary) {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
 
+    for (int i = 0; i < SERIAL_AUDIT_LOG_BOUNDARY_LENGTH; ++i) {
+        boundary->append(1, alphanum[rand() % (sizeof(alphanum) - 1)]);
+    }
+}
 
 }  // namespace writer
 }  // namespace audit_log

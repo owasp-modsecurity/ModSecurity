@@ -129,6 +129,10 @@ bool AuditLog::setFilePath2(const std::basic_string<char>& path) {
     return true;
 }
 
+bool AuditLog::setFormat(AuditLogFormat fmt) {
+    this->m_format = fmt;
+    return true;
+}
 
 int AuditLog::addParts(int parts, const std::string& new_parts) {
     PARTS_CONSTAINS('A', AAuditLogPart)
@@ -347,6 +351,10 @@ bool AuditLog::merge(AuditLog *from, std::string *error) {
 
     if (from->m_parts != -1) {
         m_parts = from->m_parts;
+    }
+
+    if (from->m_format != NotSetAuditLogFormat) {
+        m_format = from->m_format;
     }
 
     return init(error);

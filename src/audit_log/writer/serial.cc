@@ -28,29 +28,22 @@ Serial::~Serial() {
 }
 
 
-void Serial::generateBoundary(std::string *boundary) {
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-
-    for (int i = 0; i < SERIAL_AUDIT_LOG_BOUNDARY_LENGTH; ++i) {
-        boundary->append(1, alphanum[rand() % (sizeof(alphanum) - 1)]);
-    }
-}
-
-
 bool Serial::init(std::string *error) {
     return utils::SharedFiles::getInstance().open(m_audit->m_path1, error);
 }
 
 
 bool Serial::write(Transaction *transaction, int parts, std::string *error) {
-    std::string boundary;
     std::string msg;
 
-    generateBoundary(&boundary);
-    msg = transaction->toOldAuditLogFormat(parts, "-" + boundary + "--");
+    if (transaction->m_rules->m_auditLog->m_format ==
+            audit_log::AuditLog::JSONAuditLogFormat) {
+        msg = transaction->toJSON(parts);
+    } else {
+        std::string boundary;
+        generateBoundary(&boundary);
+        msg = transaction->toOldAuditLogFormat(parts, "-" + boundary + "--");
+    }
 
     return utils::SharedFiles::getInstance().write(m_audit->m_path1, msg,
         error);

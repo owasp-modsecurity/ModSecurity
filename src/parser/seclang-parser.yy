@@ -445,6 +445,10 @@ using modsecurity::operators::Operator;
   SETVAR_OPERATION_EQUALS_MINUS
   NOT                                          "NOT"
 
+  CONFIG_DIR_AUDIT_LOG_FMT
+  JSON
+  NATIVE
+
   ACTION_CTL_RULE_ENGINE                       "ACTION_CTL_RULE_ENGINE"
 ;
 
@@ -744,6 +748,16 @@ audit_log:
     | CONFIG_DIR_AUDIT_LOG
       {
         driver.m_auditLog->setFilePath1($1);
+      }
+
+    | CONFIG_DIR_AUDIT_LOG_FMT JSON
+      {
+        driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::JSONAuditLogFormat);
+      }
+
+    | CONFIG_DIR_AUDIT_LOG_FMT NATIVE
+      {
+        driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::NativeAuditLogFormat);
       }
 
     /* SecAuditLogRelevantStatus */

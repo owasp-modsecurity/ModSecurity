@@ -53,6 +53,12 @@ class AuditLog {
      RelevantOnlyAuditLogStatus
     };
 
+    enum AuditLogFormat {
+     NotSetAuditLogFormat,
+     JSONAuditLogFormat,
+     NativeAuditLogFormat
+    };
+
     enum AuditLogParts {
      /**
       * Audit log header (mandatory).
@@ -150,6 +156,7 @@ class AuditLog {
     bool setFilePath1(const std::basic_string<char>& path);
     bool setFilePath2(const std::basic_string<char>& path);
     bool setStorageDir(const std::basic_string<char>& path);
+    bool setFormat(AuditLogFormat format);
 
     int getDirectoryPermission();
     int getFilePermission();
@@ -186,6 +193,7 @@ class AuditLog {
         }
         return false;
     }
+    AuditLogFormat m_format;
 
  protected:
     int m_parts;
@@ -198,7 +206,7 @@ class AuditLog {
     int m_directoryPermission;
     int m_defaultDirectoryPermission = 0750;
 
- private:
+private:
     AuditLogStatus m_status;
 
     AuditLogType m_type;
