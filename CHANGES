@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Fixes SecConnWriteStateLimit
+   [Issue #1545 - @nicjansma]
  * Added "empy chunk" check
    [Issue #1347, #1446 - @gravagli, @bostrt, @zimmerle]
  * Add capture action to @detectXSS operator
