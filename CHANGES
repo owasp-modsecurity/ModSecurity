@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Optionally preallocates memory when SecStreamInBodyInspection is on
+   [Issue #1366 - @allanbomsft, @zimmerle]
  * Fixed typo in build_yajl.bat
    [Issue #1366 - @allanbomsft]
  * Fixes SecConnWriteStateLimit
