@@ -85,7 +85,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         return APR_EGENERAL;
     }
 
-    if (chunk->length > 0) {
+    if (chunk && chunk->length > 0) {
         if (chunk && (!msr->txcfg->stream_inbody_inspection || (msr->txcfg->stream_inbody_inspection && msr->if_stream_changed == 0))) {
             /* Copy the data we received in the chunk */
             bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
