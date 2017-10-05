@@ -690,6 +690,22 @@ AC_ARG_ENABLE(modsec-api,
   modsec_api=
 ])
 
+# MSC_LARGE_STREAM_INPUT
+AC_ARG_ENABLE(large-stream-input,
+              AS_HELP_STRING([--enable-large-stream-input],
+                             [Enable optimization for large stream input]),
+[
+  if test "$enableval" == "yes"; then
+    large_stream_input="-DMSC_LARGE_STREAM_INPUT"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $large_stream_input"
+  else
+    large_stream_input=
+  fi
+],
+[
+  large_stream_input=
+])
+
 # Find apxs
 AC_MSG_NOTICE(looking for Apache module support via DSO through APXS)
 AC_ARG_WITH(apxs,
@@ -812,7 +828,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

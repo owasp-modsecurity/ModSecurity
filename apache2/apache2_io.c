@@ -192,7 +192,6 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Input filter: Reading request body.");
     }
-
     if (modsecurity_request_body_start(msr, error_msg) < 0) {
         return -1;
     }
@@ -283,9 +282,14 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             }
 
             if (msr->txcfg->stream_inbody_inspection == 1)   {
+#ifndef MSC_LARGE_STREAM_INPUT
+                msr->stream_input_length+=buflen;
+                modsecurity_request_body_to_stream(msr, buf, buflen, error_msg);
+#else
                 if (modsecurity_request_body_to_stream(msr, buf, buflen, error_msg) < 0) {
                     return -1;
                 }
+#endif
             }
 
             msr->reqbody_length += buflen;
