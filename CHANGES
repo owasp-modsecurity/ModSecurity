@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Add capture action to @detectXSS operator
+   [Issue #1488, #1482 - @victorhora]
  * Fix for wildcard operator when loading conf files on Nginx / IIS
    [Issue #1486, #1285 - @victorhora and @thierry-f-78]
  * Set of fixies to make windows build workable with the buildbots
