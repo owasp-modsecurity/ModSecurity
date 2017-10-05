@@ -35,7 +35,7 @@ copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl_s.lib" "%WORK_DIR%\yajl\build
 @exit /B 0
 
 :file_not_found_bin
-@echo File not found: "%SOURCE_DIR%\%PCRE%"
+@echo File not found: "%SOURCE_DIR%\%YAJL%"
 @goto failed
 
 :build_failed
