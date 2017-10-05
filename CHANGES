@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Added "empy chunk" check
+   [Issue #1347, #1446 - @gravagli, @bostrt, @zimmerle]
  * Add capture action to @detectXSS operator
    [Issue #1488, #1482 - @victorhora]
  * Fix for wildcard operator when loading conf files on Nginx / IIS
