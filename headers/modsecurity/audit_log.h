@@ -156,7 +156,7 @@ class AuditLog {
     bool setFilePath1(const std::basic_string<char>& path);
     bool setFilePath2(const std::basic_string<char>& path);
     bool setStorageDir(const std::basic_string<char>& path);
-    bool setFormat(AuditLogFormat format);
+    bool setFormat(AuditLogFormat fmt);
 
     int getDirectoryPermission();
     int getFilePermission();
