@@ -38,14 +38,20 @@ class Rx : public Operator {
     Rx(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) {
         m_re = new Regex(param);
+
+        checkIfMacroExpansionPossible();
         }
     Rx(std::string name, std::string param)
         : Operator(name, param) {
         m_re = new Regex(param);
+
+        checkIfMacroExpansionPossible();
     }
     explicit Rx(std::string param)
         : Operator("Rx", param) {
         m_re = new Regex(param);
+
+        checkIfMacroExpansionPossible();
     }
 
     ~Rx() {
@@ -65,6 +71,9 @@ class Rx : public Operator {
 
  private:
     Regex *m_re;
+    bool m_macro_expansion_possible;
+
+    void checkIfMacroExpansionPossible();
 };
 
 
