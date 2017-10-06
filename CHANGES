@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Adds macro expansion for @rx operator
+   [Issue: #1528, #1536 - @asterite3, @zimmerle]
  - Consideres under quoted variable while loading the rules.
    [Felipe Zimmerle/@zimmerle, Victor Hora/@victorhora]
  - Store the connection and url parameters in std::string
