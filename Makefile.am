@@ -280,4 +280,5 @@ TESTS+=test/test-cases/secrules-language-tests/operators/eq.json
 TESTS+=test/test-cases/regression/offset-variable.json
 TESTS+=test/test-cases/regression/config-update-target-by-tag.json
 TESTS+=test/test-cases/regression/config-update-target-by-id.json
+TESTS+=test/test-cases/regression/misc-variable-under-quotes.json
 

@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Consideres under quoted variable while loading the rules.
+   [Felipe Zimmerle/@zimmerle, Victor Hora/@victorhora]
  - Store the connection and url parameters in std::string
    [Issue: #1571 - @majordaw]
  - Eliminate some reorder and sign warnings

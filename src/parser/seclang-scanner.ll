@@ -677,7 +677,6 @@ EQUALS_MINUS                            (?i:=\-)
 
 <TRANSACTION_TO_VARIABLE>{
 [ \t]*                        { BEGIN(EXPECTING_VARIABLE); }
-[ \t]*\"[ \t]*                { BEGIN(EXPECTING_VARIABLE); }
 }
 
 <TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS>{
@@ -691,6 +690,7 @@ EQUALS_MINUS                            (?i:=\-)
 <EXPECTING_VARIABLE>{
 [|]                                        { return p::make_PIPE(*driver.loc.back()); }
 [,]                                        { return p::make_PIPE(*driver.loc.back()); }
+["]                                        { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 
 [ \t]+                                      { if (state_variable_from == 0) { BEGIN(EXPECTING_OPERATOR); } else { state_variable_from = 0; BEGIN(INITIAL);} }
 [ \t]*\"                                    { if (state_variable_from == 0) { BEGIN(EXPECTING_OPERATOR); } else { state_variable_from = 0; BEGIN(INITIAL);} }
@@ -833,7 +833,6 @@ EQUALS_MINUS                            (?i:=\-)
 
 {VAR_EXCLUSION}                             { return p::make_VAR_EXCLUSION(*driver.loc.back()); }
 {VAR_COUNT}                                 { return p::make_VAR_COUNT(*driver.loc.back()); }
-["]                                         { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 }
 
 
