@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Enable support for AuditLogFormat
+   [Issue: #1583, #1493 and #1453 - @victorhora]
  - Adds macro expansion for @rx operator
    [Issue: #1528, #1536 - @asterite3, @zimmerle]
  - Consideres under quoted variable while loading the rules.
