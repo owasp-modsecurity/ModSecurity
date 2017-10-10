@@ -140,6 +140,8 @@ bool ValidateSchema::evaluate(Transaction *t,
     t->debug(4, "XML: Successfully validated payload against " \
         "Schema: " + m_resource);
 #endif
+    xmlSchemaFree(m_schema);
+    xmlSchemaFreeParserCtxt(m_parserCtx);
 
     return false;
 }

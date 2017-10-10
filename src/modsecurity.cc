@@ -16,6 +16,9 @@
 #include <ctime>
 #include <iostream>
 
+#include <libxml/xmlschemas.h>
+#include <libxml/xpath.h>
+
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
@@ -72,6 +75,7 @@ ModSecurity::ModSecurity()
     srand(time(NULL));
 #ifdef MSC_WITH_CURL
     curl_global_init(CURL_GLOBAL_ALL);
+    xmlInitParser();
 #endif
 }
 
@@ -83,6 +87,8 @@ ModSecurity::~ModSecurity() {
 #ifdef WITH_GEOIP
     Utils::GeoLookup::getInstance().cleanUp();
 #endif
+    xmlCleanupParser();
+
     delete m_global_collection;
     delete m_resource_collection;
     delete m_ip_collection;

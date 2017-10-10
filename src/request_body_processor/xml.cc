@@ -33,6 +33,10 @@ XML::XML(Transaction *transaction)
 
 
 XML::~XML() {
+    if (m_data.parsing_ctx != NULL) {
+        xmlFreeParserCtxt(m_data.parsing_ctx);
+        m_data.parsing_ctx = NULL;
+    }
     if (m_data.doc != NULL) {
         xmlFreeDoc(m_data.doc);
         m_data.doc = NULL;
