@@ -75,8 +75,8 @@ ModSecurity::ModSecurity()
     srand(time(NULL));
 #ifdef MSC_WITH_CURL
     curl_global_init(CURL_GLOBAL_ALL);
-    xmlInitParser();
 #endif
+    xmlInitParser();
 }
 
 
