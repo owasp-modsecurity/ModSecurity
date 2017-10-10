@@ -2,6 +2,11 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Makes clear to the user whenever the audit log is empty due to missing
+   JSON support.
+   [Issue #1585 - @zimmerle]
+ - Makes auditlog more verbose on debug logs
+   [Issue: #1559 - @zimmerle]
  - Enable support for AuditLogFormat
    [Issue: #1583, #1493 and #1453 - @victorhora]
  - Adds macro expansion for @rx operator

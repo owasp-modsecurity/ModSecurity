@@ -1701,7 +1701,7 @@ std::string Transaction::toJSON(int parts) {
 
     return log;
 #else
-    return std::string("");
+    return std::string("{\"error\":\"ModSecurity was not compiled with JSON support.\"}");
 #endif
 }
 
