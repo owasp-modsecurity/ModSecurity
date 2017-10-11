@@ -40,6 +40,7 @@ namespace Parser {
 class Driver;
 }
 
+
 /** @ingroup ModSecurity_CPP_API */
 class Rules : public RulesProperties {
  public:
@@ -47,23 +48,15 @@ class Rules : public RulesProperties {
         : RulesProperties(new DebugLog()),
         unicode_codepage(0),
         m_referenceCount(0),
-        m_secmarker_skipped(0) {
-            unicode_map_table = reinterpret_cast<int *>(
-                malloc(sizeof(int)*65536));
-            memset(unicode_map_table, -1, (sizeof(int)*65536));
-        }
+        m_secmarker_skipped(0) { }
 
     explicit Rules(DebugLog *customLog)
         : RulesProperties(customLog),
         unicode_codepage(0),
         m_referenceCount(0),
-        m_secmarker_skipped(0) {
-            unicode_map_table = reinterpret_cast<int *>(
-                malloc(sizeof(int)*65536));
-            memset(unicode_map_table, -1, (sizeof(int)*65536));
-        }
+        m_secmarker_skipped(0) { }
 
-    ~Rules();
+    ~Rules() { }
 
     void incrementReferenceCount(void);
     void decrementReferenceCount(void);
@@ -83,7 +76,6 @@ class Rules : public RulesProperties {
 
     void debug(int level, std::string message);
 
-    int *unicode_map_table;
     int64_t unicode_codepage;
 
  private:

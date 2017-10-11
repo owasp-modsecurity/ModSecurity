@@ -2,6 +2,9 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Avoids unicode initialization on every rules object
+   [Issue #1563 - @zimmerle, @Tiki-God, @sethinsd, @Cloaked9000, @AnoopAlias,
+                  @intelbg]
  - Makes clear to the user whenever the audit log is empty due to missing
    JSON support.
    [Issue #1585 - @zimmerle]

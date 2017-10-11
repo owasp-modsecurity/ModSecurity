@@ -87,7 +87,8 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
                         fact = 1;
 
                         if (transaction
-                            && transaction->m_rules->unicode_map_table != NULL
+                            && transaction->m_rules->m_unicodeMapTable.m_set == true
+                            && transaction->m_rules->m_unicodeMapTable.m_unicode_map_table != NULL
                             && transaction->m_rules->unicode_codepage > 0)  {
                             for (j = 5; j >= 2; j--) {
                                 if (isxdigit((input[i+j]))) {
@@ -105,7 +106,7 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
 
                             if (Code >= 0 && Code <= 65535)  {
                                 Rules *r = transaction->m_rules;
-                                hmap = r->unicode_map_table[Code];
+                                hmap = r->m_unicodeMapTable.m_unicode_map_table[Code];
                             }
                         }
 

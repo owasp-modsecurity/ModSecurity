@@ -79,6 +79,14 @@ class ConfigSet {
     std::set<std::string> m_value;
 };
 
+
+class ConfigUnicodeMap {
+ public:
+    ConfigUnicodeMap() : m_set(false), m_unicode_map_table(NULL) { }
+    bool m_set;
+    int *m_unicode_map_table;
+};
+
 class RulesProperties {
  public:
     RulesProperties() :
@@ -332,6 +340,11 @@ class RulesProperties {
                 from->m_secArgumentSeparator.m_value;
         }
 
+        if (from->m_unicodeMapTable.m_set == true) {
+            to->m_unicodeMapTable.m_unicode_map_table = \
+                from->m_unicodeMapTable.m_unicode_map_table;
+        }
+
         if (from->m_httpblKey.m_set == true) {
             to->m_httpblKey.m_value = from->m_httpblKey.m_value;
             to->m_httpblKey.m_set = from->m_httpblKey.m_set;
@@ -469,6 +482,7 @@ class RulesProperties {
     ConfigString m_secArgumentSeparator;
     std::vector<actions::Action *> m_defaultActions[8];
     std::vector<modsecurity::Rule *> m_rules[8];
+    ConfigUnicodeMap m_unicodeMapTable;
 };
 
 #endif

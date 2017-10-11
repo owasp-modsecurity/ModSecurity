@@ -77,12 +77,6 @@ void Rules::decrementReferenceCount(void) {
 }
 
 
-Rules::~Rules() {
-    free(unicode_map_table);
-    unicode_map_table = NULL;
-}
-
-
 /**
  * @name    loadFromUri
  * @brief   load rules from a give uri
