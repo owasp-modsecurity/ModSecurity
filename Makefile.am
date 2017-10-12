@@ -103,6 +103,7 @@ TESTS+=test/test-cases/regression/variable-RESPONSE_HEADERS.json
 TESTS+=test/test-cases/regression/operator-rx.json
 TESTS+=test/test-cases/regression/variable-ARGS.json
 TESTS+=test/test-cases/regression/issue-394.json
+TESTS+=test/test-cases/regression/issue-1565.json
 TESTS+=test/test-cases/regression/variable-TIME_MON.json
 TESTS+=test/test-cases/regression/misc.json
 TESTS+=test/test-cases/regression/collection-regular_expression_selection.json
