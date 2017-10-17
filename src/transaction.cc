@@ -1485,7 +1485,11 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     if (parts & audit_log::AuditLog::HAuditLogPart) {
         audit_log << "--" << trailer << "-" << "H--" << std::endl;
         for (auto a : m_rulesMessages) {
-            audit_log << a.noClientErrorLog() << std::endl;
+            if (a.m_isDisruptive == true) {
+                audit_log << a.noClientErrorLog(true) << std::endl;
+            } else {
+                audit_log << a.noClientErrorLog() << std::endl;
+            }
         }
         audit_log << std::endl;
         /** TODO: write audit_log H part. */

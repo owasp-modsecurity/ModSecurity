@@ -53,6 +53,33 @@ std::string RuleMessage::disruptiveErrorLog(const RuleMessage *rm) {
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }
 
+std::string RuleMessage::noClientErrorLog(const RuleMessage *rm, bool disruptive) {
+    std::string msg;
+    if (disruptive == false) {
+        return RuleMessage::noClientErrorLog(rm);
+    }
+
+    msg.append("Message: ");
+    msg.append(rm->m_disruptiveMessage);
+    msg.append(rm->m_match);
+    msg.append(" [file \"" + std::string(rm->m_ruleFile) + "\"]");
+    msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
+    msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
+    msg.append(" [rev \"" + rm->m_rev + "\"]");
+    msg.append(" [msg \"" + rm->m_message + "\"]");
+    msg.append(" [data \"" + rm->m_data + "\"]");
+    msg.append(" [severity \"" +
+        std::to_string(rm->m_severity) + "\"]");
+    msg.append(" [ver \"" + rm->m_ver + "\"]");
+    msg.append(" [maturity \"" + std::to_string(rm->m_maturity) + "\"]");
+    msg.append(" [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]");
+    for (auto &a : rm->m_tags) {
+        msg.append(" [tag \"" + a + "\"]");
+    }
+    msg.append(" [ref \"" + rm->m_reference + "\"]");
+
+    return modsecurity::utils::string::toHexIfNeeded(msg);
+}
 
 std::string RuleMessage::noClientErrorLog(const RuleMessage *rm) {
     std::string msg;

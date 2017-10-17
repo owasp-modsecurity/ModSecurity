@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Having disruptive msgs as disruptive [instead of warnings] on audit log
+   [Issue #1592 - @zimmerle, @nobodysz]
  - Parser: Pipes are no longer welcomed inside regex dict element selection.
    [Issue #1591 - @zimmerle, @slabber]
  - Avoids unicode initialization on every rules object

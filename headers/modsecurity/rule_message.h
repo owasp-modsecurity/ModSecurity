@@ -68,6 +68,9 @@ class RuleMessage {
     std::string noClientErrorLog() {
         return RuleMessage::noClientErrorLog(this);
     }
+    std::string noClientErrorLog(bool disrupt) {
+        return RuleMessage::noClientErrorLog(this, disrupt);
+    }
     std::string errorLogTail() {
         return RuleMessage::errorLogTail(this);
     }
@@ -76,6 +79,7 @@ class RuleMessage {
     }
     static std::string disruptiveErrorLog(const RuleMessage *rm);
     static std::string noClientErrorLog(const RuleMessage *rm);
+    static std::string noClientErrorLog(const RuleMessage *rm, bool disrupt);
     static std::string errorLogTail(const RuleMessage *rm);
     static std::string errorLog(const RuleMessage *rm);
     static std::string log(const RuleMessage *rm);
