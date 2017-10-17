@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Parser: Pipes are no longer welcomed inside regex dict element selection.
+   [Issue #1591 - @zimmerle, @slabber]
  - Avoids unicode initialization on every rules object
    [Issue #1563 - @zimmerle, @Tiki-God, @sethinsd, @Cloaked9000, @AnoopAlias,
                   @intelbg]
