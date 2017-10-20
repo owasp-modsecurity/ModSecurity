@@ -72,6 +72,9 @@ class RuleMessage {
     std::string log(int props) {
         return RuleMessage::log(this, props);
     }
+    std::string log(int props, int responseCode) {
+        return RuleMessage::log(this, props, responseCode);
+    }
     std::string errorLog() {
         return RuleMessage::log(this, ClientLogMessageInfo | ErrorLogTailLogMessageInfo);
     }
