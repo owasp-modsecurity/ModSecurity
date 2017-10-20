@@ -33,21 +33,15 @@ bool Deny::evaluate(Rule *rule, Transaction *transaction,
 #ifndef NO_LOGS
     transaction->debug(8, "Running action deny");
 #endif
-    std::string log;
 
     if (transaction->m_it.status == 200) {
         transaction->m_it.status = 403;
     }
 
-    log.append("Access denied with code %d");
-    log.append(" (phase ");
-    log.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
-
-    rm->m_disruptiveMessage.assign(log);
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
     transaction->m_it.log = strdup(
-        rm->disruptiveErrorLog().c_str());
+        rm->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
 
     rm->m_isDisruptive = true;
     return true;

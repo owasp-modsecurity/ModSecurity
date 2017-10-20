@@ -40,23 +40,18 @@ bool Redirect::init(std::string *error) {
 bool Redirect::evaluate(Rule *rule, Transaction *transaction,
    std::shared_ptr<RuleMessage> rm) {
     m_urlExpanded = MacroExpansion::expand(m_url, transaction);
-    std::string log;
 
     /* if it was changed before, lets keep it. */
     if (transaction->m_it.status == 200) {
         transaction->m_it.status = m_status;
     }
-    log.append("Access denied with code %d");
-    log.append(" (phase ");
-    log.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
 
-    rm->m_disruptiveMessage.assign(log);
     intervention::freeUrl(&transaction->m_it);
     transaction->m_it.url = strdup(m_urlExpanded.c_str());
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
     transaction->m_it.log = strdup(
-        rm->disruptiveErrorLog().c_str());
+        rm->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
 
     rm->m_isDisruptive = true;
     return true;

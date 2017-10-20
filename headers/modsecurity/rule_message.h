@@ -32,13 +32,19 @@
 
 namespace modsecurity {
 
+
+
 class RuleMessage {
  public:
+    enum LogMessageInfo {
+        ErrorLogTailLogMessageInfo = 2,
+        ClientLogMessageInfo = 4
+    };
+
     explicit RuleMessage(Rule *rule, Transaction *trans) :
         m_accuracy(rule->m_accuracy),
         m_clientIpAddress(trans->m_clientIpAddress),
         m_data(""),
-        m_disruptiveMessage(""),
         m_id(trans->m_id),
         m_isDisruptive(false),
         m_match(""),
@@ -59,35 +65,31 @@ class RuleMessage {
         m_ver(rule->m_ver)
     { }
 
-    std::string errorLog() {
-        return RuleMessage::errorLog(this);
-    }
-    std::string disruptiveErrorLog() {
-        return RuleMessage::disruptiveErrorLog(this);
-    }
-    std::string noClientErrorLog() {
-        return RuleMessage::noClientErrorLog(this);
-    }
-    std::string noClientErrorLog(bool disrupt) {
-        return RuleMessage::noClientErrorLog(this, disrupt);
-    }
-    std::string errorLogTail() {
-        return RuleMessage::errorLogTail(this);
-    }
+
     std::string log() {
-        return RuleMessage::log(this);
+        return RuleMessage::log(this, 0);
     }
-    static std::string disruptiveErrorLog(const RuleMessage *rm);
-    static std::string noClientErrorLog(const RuleMessage *rm);
-    static std::string noClientErrorLog(const RuleMessage *rm, bool disrupt);
-    static std::string errorLogTail(const RuleMessage *rm);
-    static std::string errorLog(const RuleMessage *rm);
-    static std::string log(const RuleMessage *rm);
+    std::string log(int props) {
+        return RuleMessage::log(this, props);
+    }
+    std::string errorLog() {
+        return RuleMessage::log(this, ClientLogMessageInfo | ErrorLogTailLogMessageInfo);
+    }
+
+    static std::string log(const RuleMessage *rm, int props, int code);
+    static std::string log(const RuleMessage *rm, int props) {
+        return RuleMessage::log(rm, props, -1);
+    }
+    static std::string log(const RuleMessage *rm) {
+        return RuleMessage::log(rm, 0);
+    }
+
+    static std::string _details(const RuleMessage *rm);
+    static std::string _errorLogTail(const RuleMessage *rm);
 
     int m_accuracy;
     std::string m_clientIpAddress;
     std::string m_data;
-    std::string m_disruptiveMessage;
     std::string m_id;
     bool m_isDisruptive;
     std::string m_match;

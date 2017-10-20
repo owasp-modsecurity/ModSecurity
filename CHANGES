@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Refactoring on RuleMessage class, now accepting http code as parameter.
+   [@zimmerle]
  - Having disruptive msgs as disruptive [instead of warnings] on audit log
    [Issue #1592 - @zimmerle, @nobodysz]
  - Parser: Pipes are no longer welcomed inside regex dict element selection.

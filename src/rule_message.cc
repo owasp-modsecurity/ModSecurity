@@ -23,13 +23,10 @@
 
 namespace modsecurity {
 
-std::string RuleMessage::disruptiveErrorLog(const RuleMessage *rm) {
+
+std::string RuleMessage::_details(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append("[client " + std::string(rm->m_clientIpAddress) + "]");
-    msg.append(" ModSecurity: ");
-    msg.append(rm->m_disruptiveMessage);
-    msg.append(rm->m_match);
     msg.append(" [file \"" + std::string(rm->m_ruleFile) + "\"]");
     msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
     msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
@@ -50,91 +47,55 @@ std::string RuleMessage::disruptiveErrorLog(const RuleMessage *rm) {
     msg.append(" [unique_id \"" + rm->m_id + "\"]");
     msg.append(" [ref \"" + rm->m_reference + "\"]");
 
-    return modsecurity::utils::string::toHexIfNeeded(msg);
+    return msg;
 }
 
-std::string RuleMessage::noClientErrorLog(const RuleMessage *rm, bool disruptive) {
-    std::string msg;
-    if (disruptive == false) {
-        return RuleMessage::noClientErrorLog(rm);
-    }
 
-    msg.append("Message: ");
-    msg.append(rm->m_disruptiveMessage);
-    msg.append(rm->m_match);
-    msg.append(" [file \"" + std::string(rm->m_ruleFile) + "\"]");
-    msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
-    msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
-    msg.append(" [rev \"" + rm->m_rev + "\"]");
-    msg.append(" [msg \"" + rm->m_message + "\"]");
-    msg.append(" [data \"" + rm->m_data + "\"]");
-    msg.append(" [severity \"" +
-        std::to_string(rm->m_severity) + "\"]");
-    msg.append(" [ver \"" + rm->m_ver + "\"]");
-    msg.append(" [maturity \"" + std::to_string(rm->m_maturity) + "\"]");
-    msg.append(" [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]");
-    for (auto &a : rm->m_tags) {
-        msg.append(" [tag \"" + a + "\"]");
-    }
-    msg.append(" [ref \"" + rm->m_reference + "\"]");
-
-    return modsecurity::utils::string::toHexIfNeeded(msg);
-}
-
-std::string RuleMessage::noClientErrorLog(const RuleMessage *rm) {
+std::string RuleMessage::_errorLogTail(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append("ModSecurity: Warning. ");
-    msg.append(rm->m_match);
-    msg.append(" [file \"" + std::string(rm->m_ruleFile) + "\"]");
-    msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
-    msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
-    msg.append(" [rev \"" + rm->m_rev + "\"]");
-    msg.append(" [msg \"" + rm->m_message + "\"]");
-    msg.append(" [data \"" + rm->m_data + "\"]");
-    msg.append(" [severity \"" +
-        std::to_string(rm->m_severity) + "\"]");
-    msg.append(" [ver \"" + rm->m_ver + "\"]");
-    msg.append(" [maturity \"" + std::to_string(rm->m_maturity) + "\"]");
-    msg.append(" [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]");
-    for (auto &a : rm->m_tags) {
-        msg.append(" [tag \"" + a + "\"]");
-    }
-    msg.append(" [ref \"" + rm->m_reference + "\"]");
-
-    return modsecurity::utils::string::toHexIfNeeded(msg);
-}
-
-std::string RuleMessage::errorLogTail(const RuleMessage *rm) {
-    std::string msg;
-
-    msg.append("[hostname \"" + std::string(rm->m_serverIpAddress) \
-        + "\"]");
+    msg.append("[hostname \"" + std::string(rm->m_serverIpAddress) + "\"]");
     msg.append(" [uri \"" + rm->m_uriNoQueryStringDecoded + "\"]");
     msg.append(" [unique_id \"" + rm->m_id + "\"]");
 
+    return msg;
+}
+
+
+std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
+    std::string msg("");
+
+    if (props & ClientLogMessageInfo) {
+        msg.append("[client " + std::string(rm->m_clientIpAddress) + "] ");
+    }
+
+    if (rm->m_isDisruptive)
+    {
+        msg.append("ModSecurity: Access denied with code ");
+        if (code == -1) {
+            msg.append("%d");
+        }
+        else
+        {
+            msg.append(std::to_string(code));
+        }
+        msg.append(" (phase ");
+        msg.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
+    }
+    else
+    {
+        msg.append("ModSecurity: Warning. ");
+    }
+
+    msg.append(rm->m_match);
+    msg.append(_details(rm));
+
+    if (props & ErrorLogTailLogMessageInfo) {
+        msg.append(" " + _errorLogTail(rm));
+    }
+
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }
 
-std::string RuleMessage::errorLog(const RuleMessage *rm) {
-    std::string msg;
-
-    msg.append("[client " + std::string(rm->m_clientIpAddress) + "] ");
-    msg.append(noClientErrorLog(rm));
-    msg.append(" " + errorLogTail(rm));
-
-    return msg;
-}
-
-std::string RuleMessage::log(const RuleMessage *rm) {
-    std::string msg("");
-    if (rm->m_isDisruptive) {
-        msg.append(disruptiveErrorLog(rm));
-    } else {
-        msg.append(errorLog(rm));
-    }
-
-    return msg;
-}
 
 }  // namespace modsecurity
