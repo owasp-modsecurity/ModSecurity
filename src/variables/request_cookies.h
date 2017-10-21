@@ -62,7 +62,7 @@ class RequestCookies_NoDictElement : public Variable {
 class RequestCookies_DictElementRegexp : public Variable {
  public:
     explicit RequestCookies_DictElementRegexp(std::string dictElement)
-        : Variable("REQUEST_COOKIES"),
+        : Variable("REQUEST_COOKIES:regex(" + dictElement + ")"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,

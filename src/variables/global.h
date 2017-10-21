@@ -63,7 +63,7 @@ class Global_NoDictElement : public Variable {
 class Global_DictElementRegexp : public Variable {
  public:
     explicit Global_DictElementRegexp(std::string dictElement)
-        : Variable("GLOBAL"),
+        : Variable("GLOBAL:regex(" + dictElement + ")"),
         m_r(dictElement),
         m_dictElement("GLOBAL:" + dictElement) { }
 

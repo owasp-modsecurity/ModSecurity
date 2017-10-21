@@ -62,7 +62,7 @@ class Ip_NoDictElement : public Variable {
 class Ip_DictElementRegexp : public Variable {
  public:
     explicit Ip_DictElementRegexp(std::string dictElement)
-        : Variable("IP"),
+        : Variable("IP:regex(" + dictElement + ")"),
         m_r(dictElement),
         m_dictElement("IP:" + dictElement) { }
 

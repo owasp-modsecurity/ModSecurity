@@ -62,7 +62,7 @@ class MatchedVarsNames_NoDictElement : public Variable {
 class MatchedVarsNames_DictElementRegexp : public Variable {
  public:
     explicit MatchedVarsNames_DictElementRegexp(std::string dictElement)
-        : Variable("MATCHED_VARS_NAMES"),
+        : Variable("MATCHED_VARS_NAMES:regex(" + dictElement + ")"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,

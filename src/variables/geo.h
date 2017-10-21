@@ -62,7 +62,7 @@ class Geo_NoDictElement : public Variable {
 class Geo_DictElementRegexp : public Variable {
  public:
     explicit Geo_DictElementRegexp(std::string dictElement)
-        : Variable("GEO"),
+        : Variable("GEO:regex(" + dictElement + ")"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,

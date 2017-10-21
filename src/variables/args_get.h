@@ -61,7 +61,7 @@ class ArgsGet_NoDictElement : public Variable {
 class ArgsGet_DictElementRegexp : public Variable {
  public:
     explicit ArgsGet_DictElementRegexp(std::string dictElement)
-        : Variable("ARGS_GET"),
+        : Variable("ARGS_GET:regex(" + dictElement + ")"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,

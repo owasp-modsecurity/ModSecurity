@@ -62,7 +62,7 @@ class MultiPartName_NoDictElement : public Variable {
 class MultiPartName_DictElementRegexp : public Variable {
  public:
     explicit MultiPartName_DictElementRegexp(std::string dictElement)
-        : Variable("MULTIPART_NAME"),
+        : Variable("MULTIPART_NAME:regex(" + dictElement + ")"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,

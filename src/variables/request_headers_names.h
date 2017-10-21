@@ -60,7 +60,7 @@ class RequestHeadersNames_NoDictElement : public Variable {
 class RequestHeadersNames_DictElementRegexp : public Variable {
  public:
     explicit RequestHeadersNames_DictElementRegexp(std::string dictElement)
-        : Variable("REQUEST_HEADERS_NAMES"),
+        : Variable("REQUEST_HEADERS_NAMES:regex(" + dictElement + ")"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,

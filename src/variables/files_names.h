@@ -62,7 +62,7 @@ class FilesNames_NoDictElement : public Variable {
 class FilesNames_DictElementRegexp : public Variable {
  public:
     explicit FilesNames_DictElementRegexp(std::string dictElement)
-        : Variable("FILES_NAMES"),
+        : Variable("FILES_NAMES:regex(" + dictElement + ")"),
         m_r(dictElement) { }
 
 

@@ -61,7 +61,7 @@ class FilesTmpNames_NoDictElement : public Variable {
 class FilesTmpNames_DictElementRegexp : public Variable {
  public:
     explicit FilesTmpNames_DictElementRegexp(std::string dictElement)
-        : Variable("FILES_TMPNAMES"),
+        : Variable("FILES_TMPNAMES:regex(" + dictElement + ")"),
         m_r(dictElement) { }
 
     void evaluate(Transaction *transaction,
