@@ -33,25 +33,25 @@ namespace string {
 
 const char HEX2DEC[256] = {
     /*       0  1  2  3   4  5  6  7   8  9  A  B   C  D  E  F */
-    /* 0 */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* 1 */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* 2 */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* 3 */  0,  1,  2,  3,   4,  5,  6,  7,   8,  9, -1, -1,  -1, -1, -1, -1,
+    /* 0 */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* 1 */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* 2 */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* 3 */  0,  1,  2,  3,   4,  5,  6,  7,   8,  9, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
 
-    /* 4 */ -1, 10, 11, 12,  13, 14, 15, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* 5 */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* 6 */ -1, 10, 11, 12,  13, 14, 15, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* 7 */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
+    /* 4 */ (char)-1, 10, 11, 12,  13, 14, 15, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* 5 */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* 6 */ (char)-1, 10, 11, 12,  13, 14, 15, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* 7 */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
 
-    /* 8 */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* 9 */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* A */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* B */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
+    /* 8 */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* 9 */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* A */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* B */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
 
-    /* C */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* D */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* E */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,
-    /* F */ -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1
+    /* C */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* D */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* E */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,
+    /* F */ (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1,  (char)-1, (char)-1, (char)-1, (char)-1
 };
 
 
