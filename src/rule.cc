@@ -447,10 +447,10 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             std::vector<const collection::Variable *> z;
             a.second->evaluateInternal(trans, this, &z);
             for (auto &y : z) {
-                exclusions_update_by_tag_remove.push_back(y->m_key);
+                exclusions_update_by_tag_remove.push_back(std::string(y->m_key));
                 delete y;
             }
-            exclusions_update_by_tag_remove.push_back(a.second->m_name);
+            exclusions_update_by_tag_remove.push_back(std::string(a.second->m_name));
 
         } else {
             Variable *b = a.second.get();
@@ -466,10 +466,10 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             std::vector<const collection::Variable *> z;
             a.second->evaluateInternal(trans, this, &z);
             for (auto &y : z) {
-                exclusions_update_by_id_remove.push_back(y->m_key);
+                exclusions_update_by_id_remove.push_back(std::string(y->m_key));
                 delete y;
             }
-            exclusions_update_by_id_remove.push_back(a.second->m_name);
+            exclusions_update_by_id_remove.push_back(std::string(a.second->m_name));
         } else {
             Variable *b = a.second.get();
             variables.push_back(b);
@@ -482,10 +482,10 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             std::vector<const collection::Variable *> z;
             variable->evaluateInternal(trans, this, &z);
             for (auto &y : z) {
-                exclusions.push_back(y->m_key);
+                exclusions.push_back(std::string(y->m_key));
                 delete y;
             }
-            exclusions.push_back(variable->m_name);
+            exclusions.push_back(std::string(variable->m_name));
         }
     }
 
