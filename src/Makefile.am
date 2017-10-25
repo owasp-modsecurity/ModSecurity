@@ -297,6 +297,7 @@ libmodsecurity_la_CPPFLAGS = \
 	$(YAJL_CFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
+	$(SSDEEP_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
 libmodsecurity_la_LIBADD = \
@@ -306,6 +307,7 @@ libmodsecurity_la_LIBADD = \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
+	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
 	$(LIBXML2_LDADD) \
 	../others/libinjection.la \
 	../others/libmbedtls.la

@@ -86,6 +86,10 @@ AM_CONDITIONAL([GEOIP_CFLAGS], [test "GEOIP_CFLAGS" != ""])
 PROG_LMDB
 AM_CONDITIONAL([LMDB_CFLAGS], [test "LMDB_CFLAGS" != ""])
 
+# Check for SSDEEP
+CHECK_SSDEEP
+AM_CONDITIONAL([SSDEEP_CFLAGS], [test "SSDEEP_CFLAGS" != ""])
+
 #
 # Check for curl
 #
@@ -480,6 +484,24 @@ if test "x$LIBXML2_FOUND" = "x1"; then
 fi
 if test "x$LIBXML2_FOUND" = "x2"; then
     echo "   + LibXML2                                       ....disabled"
+fi
+
+
+## SSDEEP
+if test "x$SSDEEP_FOUND" = "x0"; then
+    echo "   + SSDEEP                                        ....not found"
+fi
+if test "x$SSDEEP_FOUND" = "x1"; then
+    echo -n "   + SSDEEP                                        ....found "
+    if ! test "x$SSDEEP_VERSION" = "x"; then
+        echo "v${SSDEEP_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${SSDEEP_DISPLAY}"
+fi
+if test "x$SSDEEP_FOUND" = "x2"; then
+    echo "   + SSDEEP                                        ....disabled"
 fi
 
 

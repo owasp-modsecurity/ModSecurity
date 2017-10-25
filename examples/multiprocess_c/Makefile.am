@@ -11,6 +11,7 @@ multi_LDADD = \
 	-lpthread \
 	$(YAJL_LDFLAGS) \
 	$(GEOIP_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
 	$(GLOBAL_LDADD)
 
 multi_CFLAGS = \

@@ -910,8 +910,12 @@ op_before_init:
       }
     | OPERATOR_FUZZY_HASH FREE_TEXT
       {
-        /* $$ = new operators::FuzzyHash(); */
-        OPERATOR_NOT_SUPPORTED("FuzzyHash", @0);
+        OPERATOR_CONTAINER($$, new operators::FuzzyHash(utils::string::removeBracketsIfNeeded($2)));
+        std::string error;
+        if ($$->init(driver.ref.back(), &error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | OPERATOR_VALIDATE_BYTE_RANGE FREE_TEXT
       {

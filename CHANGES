@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Adds support for @fuzzyHash operator.
+   [Issue #997 - @zimmerle]
  - Fix build on non x86 arch build
    [Issue #1598 - @athmane]
  - Fix memory issue while changing rule target dynamic

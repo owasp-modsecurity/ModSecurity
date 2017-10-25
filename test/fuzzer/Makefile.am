@@ -20,6 +20,7 @@ afl_fuzzer_LDADD = \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
+	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(top_builddir)/others/libinjection.la \

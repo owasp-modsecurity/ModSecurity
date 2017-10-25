@@ -10,6 +10,7 @@ test_LDADD = \
 	-lmodsecurity \
 	$(YAJL_LDFLAGS) \
 	$(GEOIP_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
 	$(GLOBAL_LDADD)
 
 test_CFLAGS = \

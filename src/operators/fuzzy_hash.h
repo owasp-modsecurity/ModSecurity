@@ -18,20 +18,38 @@
 
 #include <string>
 
-#include "src/operators/operator.h"
+#ifdef WITH_SSDEEP
+#include "fuzzy.h"
+#endif
 
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {
+
+
+struct fuzzy_hash_chunk {
+    const char *data;
+    struct fuzzy_hash_chunk *next;
+};
 
 class FuzzyHash : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     FuzzyHash(std::string o, std::string p, bool n)
-        : Operator(o, p, n) { }
+        : Operator(o, p, n),
+        m_head(NULL),
+        m_threshold(0) { }
     explicit FuzzyHash(std::string param)
-        : Operator("FuzzyHash", param) { }
+        : Operator("FuzzyHash", param),
+        m_head(NULL),
+        m_threshold(0) { }
     bool evaluate(Transaction *transaction, const std::string &std) override;
+
+    bool init(const std::string &param, std::string *error) override;
+ private:
+    int m_threshold;
+    struct fuzzy_hash_chunk *m_head;
 };
 
 }  // namespace operators
