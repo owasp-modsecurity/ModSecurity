@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Fix build on non x86 arch build
+   [Issue #1598 - @athmane]
  - Fix memory issue while changing rule target dynamic
    [Issue #1590 - @zimmerle, @slabber]
  - Fix log while displaying the name of a dict selection by regex.
