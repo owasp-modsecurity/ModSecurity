@@ -3,6 +3,8 @@ pkglibdir = $(prefix)/lib
 pkglib_LTLIBRARIES = standalone.la
 
 standalone_la_SOURCES = ../apache2/acmp.c \
+    ../apache2/ag_mdb/murmur3.c \
+    ../apache2/ag_mdb/ag_mdb.cpp \
     ../apache2/apache2_config.c \
     ../apache2/apache2_io.c \
     ../apache2/apache2_util.c \
@@ -53,7 +55,8 @@ standalone_la_CFLAGS = -DVERSION_NGINX \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
     @YAJL_CFLAGS@ \
-    @SSDEEP_CFLAGS@
+    @SSDEEP_CFLAGS@ \
+    -I../apache2/ag_mdb 
 
 standalone_la_CPPFLAGS = @APR_CPPFLAGS@ \
     @LIBXML2_CPPFLAGS@ \

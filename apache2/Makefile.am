@@ -2,6 +2,8 @@ pkglibdir = $(prefix)/lib
 pkglib_LTLIBRARIES = mod_security2.la
 
 mod_security2_la_SOURCES = acmp.c \
+    ag_mdb/murmur3.c \
+    ag_mdb/ag_mdb.cpp \
     apache2_config.c \
     apache2_io.c \
     apache2_util.c \
@@ -43,8 +45,8 @@ mod_security2_la_CFLAGS = @APR_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
     @YAJL_CFLAGS@ \
-    @SSDEEP_CFLAGS@
-
+    @SSDEEP_CFLAGS@ \
+    -I./ag_mdb 
 
 mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ \
     @CURL_CPPFLAGS@ \
@@ -128,7 +130,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version -R @PCRE_LD_PATH
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
-    @SSDEEP_LDFLAGS@
+    @SSDEEP_LDFLAGS@ 
 endif
 
 if FREEBSD

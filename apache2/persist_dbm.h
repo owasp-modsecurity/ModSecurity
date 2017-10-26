@@ -18,6 +18,15 @@
 #include "apr_general.h"
 #include "modsecurity.h"
 
+#define DB_OPT_AGMDB    2
+#define DB_OPT_REDIS    1
+#define DB_OPT_ORIGIN   0
+struct agmdb_handle_entry{
+    const char* col_name;
+    void* handle;
+    struct agmdb_handle_entry *next;
+};
+
 apr_table_t DSOLOCAL *collection_retrieve(modsec_rec *msr, const char *col_name,
     const char *col_value, int col_value_length);
 

@@ -1960,6 +1960,28 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
 {
     apr_table_t *table = NULL;
     msc_string *var = NULL;
+    static int  counter_test_col = 0;   // The suffix of collection key
+    char* real_col_key = NULL;          // The col_key include the suffix
+    int real_col_key_len;
+
+    // only increase the ip_suffix_cnt when init ip collection
+    if(msr->dcfg1->test_ip_range > 1) {
+        if(strcmp(col_name,"ip") == 0)
+            counter_test_col ++;
+        counter_test_col %= msr->dcfg1->test_ip_range;
+        
+        real_col_key = (char*)apr_pcalloc(msr->mp, strlen(col_key)+20);
+        if(real_col_key == NULL) {
+            msr_log_error(msr,"[Init_collection]:Cannot alloc space for real_col_key");
+            return 0;
+        }
+
+        sprintf(real_col_key, "%s_%d", col_key, counter_test_col);
+        real_col_key_len = strlen(real_col_key);
+    } else {
+        real_col_key = (char*)col_key;
+        real_col_key_len = col_key_len;
+    }
 
     /* IMP1 Cannot initialise the built-in collections this way. */
 
@@ -1970,18 +1992,20 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     }
 
     /* Init collection from storage. */
-    table = collection_retrieve(msr, real_col_name, col_key, col_key_len);
+    table = collection_retrieve(msr, real_col_name, real_col_key, real_col_key_len);
 
     if (table == NULL) {
         /* Does not exist yet - create new. */
 
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
-               real_col_name, col_key);
+               real_col_name, real_col_key);
         }
 
         table = apr_table_make(msr->mp, 24);
-        if (table == NULL) return -1;
+        if (table == NULL) {
+            return -1;
+        }
 
         /* IMP1 Is the timeout hard-coded to 3600? */
 
@@ -2001,8 +2025,8 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "KEY";
         var->name_len = strlen(var->name);
-        var->value = apr_pstrmemdup(msr->mp, col_key, col_key_len);
-        var->value_len = col_key_len;
+        var->value = apr_pstrmemdup(msr->mp, real_col_key, real_col_key_len);
+        var->value_len = real_col_key_len;
         apr_table_setn(table, var->name, (void *)var);
 
         /* The timeout. */
@@ -2025,8 +2049,8 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "__key";
         var->name_len = strlen(var->name);
-        var->value = apr_pstrmemdup(msr->mp, col_key, col_key_len);
-        var->value_len = col_key_len;
+        var->value = apr_pstrmemdup(msr->mp, real_col_key, real_col_key_len);
+        var->value_len = real_col_key_len;
         apr_table_setn(table, var->name, (void *)var);
 
         /* Peristence code will need to know the name of the collection. */

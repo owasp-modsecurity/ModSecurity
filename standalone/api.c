@@ -293,6 +293,8 @@ const char *modsecProcessConfig(directory_config *config, const char *file, cons
 
     err = process_command_config(server, config, config->mp, ptemp, file);
 
+	config->root_config = config;
+
     apr_pool_destroy(ptemp);
 
     return err;

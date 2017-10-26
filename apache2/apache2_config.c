@@ -26,6 +26,7 @@
 #include "msc_lua.h"
 #endif
 
+#define MAX_LEN_OF_REDIS_IP_ADDR 15 
 
 /* -- Directory context creation and initialisation -- */
 
@@ -43,7 +44,12 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     dcfg->mp = mp;
     dcfg->is_enabled = NOT_SET;
-
+    
+    dcfg->root_config = NOT_SET_P;
+    dcfg->db_option = 0;
+    dcfg->test_ip_range = NOT_SET;
+    dcfg->agmdb_handles = NOT_SET_P;
+    
     dcfg->reqbody_access = NOT_SET;
     dcfg->reqintercept_oe = NOT_SET;
     dcfg->reqbody_buffering = NOT_SET;
@@ -317,6 +323,14 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     /* Use values from the child configuration where possible,
      * otherwise use the parent's.
      */
+    merged->root_config = (child->root_config == NOT_SET_P
+        ? parent->root_config : child->root_config);
+    merged->db_option = (child->db_option == NOT_SET
+        ? parent->db_option : child->db_option);
+    merged->test_ip_range = (child->test_ip_range == NOT_SET
+        ? parent->test_ip_range : child->test_ip_range);
+    merged->agmdb_handles = (child->agmdb_handles == NOT_SET_P
+        ? parent->agmdb_handles : child->agmdb_handles);
 
     merged->is_enabled = (child->is_enabled == NOT_SET
         ? parent->is_enabled : child->is_enabled);
@@ -639,6 +653,11 @@ void init_directory_config(directory_config *dcfg)
 {
     if (dcfg == NULL) return;
 
+    if (dcfg->root_config == NOT_SET_P) dcfg->root_config = NULL;
+    if (dcfg->db_option == NOT_SET) dcfg->db_option = 0;
+    if (dcfg->test_ip_range == NOT_SET) dcfg->test_ip_range = 1;
+    if (dcfg->agmdb_handles == NOT_SET_P) dcfg->agmdb_handles = NULL;
+    
     if (dcfg->is_enabled == NOT_SET) dcfg->is_enabled = 0;
 
     if (dcfg->reqbody_access == NOT_SET) dcfg->reqbody_access = 0;
@@ -1127,6 +1146,26 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
 }
 
 /* -- Configuration directives -- */
+static const char *cmd_test_rand_ip_range(cmd_parms *cmd, void *_dcfg, const char *p1){
+    int tmpi;
+    directory_config *dcfg = (directory_config *)_dcfg;
+    tmpi = atoi(p1);
+    dcfg->test_ip_range = tmpi > 0 ? tmpi : 0;
+    return NULL;
+}
+
+static const char *cmd_db_option(cmd_parms *cmd, void *_dcfg, const char *p1){
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if((strcmp(p1,"origin")==0))
+        dcfg->db_option = 0;
+    else if((strcmp(p1,"agmdb")==0)) {
+        dcfg->db_option = 2;
+        dcfg->agmdb_handles = NULL;
+    }
+    else
+        dcfg->db_option = 0;
+    return NULL;
+}
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
@@ -3196,6 +3235,22 @@ const command_rec module_directives[] = {
         "an action list"
     ),
 #endif
+
+    AP_INIT_TAKE1 (
+        "SecTestRandIpRange",
+        cmd_test_rand_ip_range,
+        NULL,
+        CMD_SCOPE_ANY,
+        "IP address range. For test only"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecDBOption",
+        cmd_db_option,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Choose database. (origin/redis/agdb)"
+    ),
 
     AP_INIT_TAKE1 (
         "SecArgumentSeparator",
