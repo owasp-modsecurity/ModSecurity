@@ -4,6 +4,7 @@ sudo: false
 addons:
   apt:
     packages:
+    - libfuzzy-dev
     - libyajl-dev
     - libgeoip-dev
     - liblmdb-dev
@@ -25,6 +26,7 @@ env:
   - OPTS="--without-yajl $OPTS"
   - OPTS="--without-geoip $OPTS"
   - OPTS="--without-lmdb $OPTS"
+  - OPTS="--without-ssdeep $OPTS"
 
 before_script:
   - '[ "$TRAVIS_OS_NAME" != osx ] || brew update'
