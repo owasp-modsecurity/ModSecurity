@@ -130,6 +130,10 @@ int main(int argc, char **argv) {
 #ifdef WITH_CURL
     resources.push_back("curl");
 #endif
+#ifdef WITH_SSDEEP
+    resources.push_back("ssdeep");
+#endif
+
 
     test.cmd_options(argc, argv);
     if (!test.m_automake_output) {
