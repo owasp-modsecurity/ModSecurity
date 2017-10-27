@@ -50,7 +50,7 @@ fi
 
 
 if test -z "${SSDEEP_CFLAGS}"; then
-    if test -z "${SSDEEP_MANDATORY}"; then
+    if test -z "${SSDEEP_MANDATORY}" || test "x${SSDEEP_MANDATORY}" == "xno"; then
         if test -z "${SSDEEP_DISABLED}"; then
             AC_MSG_NOTICE([SSDEEP library was not found])
             SSDEEP_FOUND=0
@@ -62,8 +62,7 @@ if test -z "${SSDEEP_CFLAGS}"; then
         SSDEEP_FOUND=-1
     fi
 else
-
-    if test -z "${SSDEEP_MANDATORY}"; then
+    if test -z "${SSDEEP_MANDATORY}" || test "x${SSDEEP_MANDATORY}" == "xno"; then
         SSDEEP_FOUND=2
         AC_MSG_NOTICE([SSDEEP is disabled by default.])
     else
