@@ -817,6 +817,8 @@ int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_len
         return AGMDB_FAIL;
     if(db_name == NULL)
         return AGMDB_FAIL;
+    if(db_name_length <= 0)
+        return AGMDB_FAIL;
 
   
     // Check the format of db_name
@@ -920,6 +922,10 @@ int AGMDB_get(struct agmdb_handler *dbm, const char* key, int key_len, char* buf
             return AGMDB_FAIL;
     if(buffer == NULL)
             return AGMDB_FAIL;
+    if(key_len <= 0)
+            return AGMDB_FAIL;
+    if(buffer_len <= 0)
+            return AGMDB_FAIL;
     shm_base = (CPTR_VOID)(dbm->shm_base);
     
     // Check the format of key
@@ -965,6 +971,10 @@ int AGMDB_set(struct agmdb_handler *dbm, const char* key, int key_len, const cha
         return AGMDB_FAIL;
     if(value == NULL)
         return AGMDB_FAIL;
+    if(key_len <= 0)
+        return AGMDB_FAIL;
+    if(value_len <= 0)
+        return AGMDB_FAIL;
     shm_base = (CPTR_VOID)(dbm->shm_base);
     if(shm_base == NULL)
         return AGMDB_FAIL;
@@ -999,6 +1009,8 @@ int AGMDB_delete(struct agmdb_handler *dbm, const char* key, int key_len) {
         return AGMDB_FAIL;
     if(key == NULL)
             return AGMDB_FAIL;    
+    if(key_len <= 0)
+            return AGMDB_FAIL;
     shm_base = (CPTR_VOID)(dbm->shm_base);
     if(shm_base == NULL)
         return AGMDB_FAIL;
