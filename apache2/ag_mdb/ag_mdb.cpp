@@ -1032,6 +1032,7 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
     CPTR_VOID shm_base;
     PTR_VOID entry_addr;
     PTR_OFFSET  entry_id;
+    PTR_OFFSET  entry_id_next;
     PTR_OFFSET* time_list_head;
     unsigned int expire_modify_time; 
 
@@ -1048,8 +1049,9 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
         entry_addr = ENTRY_ADDR(shm_base, entry_id);
         if(*ENTRY_MODIFYTIME(entry_addr) > expire_modify_time)
             break;
+        entry_id_next = *ENTRY_TIME_NEXT(entry_addr);
         AGMDB_deleteEntry(shm_base, entry_id);        
-        entry_id = *ENTRY_TIME_NEXT(entry_addr);
+	entry_id = entry_id_next;
     }
     
     return AGMDB_SUCCESS;
