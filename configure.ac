@@ -90,6 +90,11 @@ AM_CONDITIONAL([LMDB_CFLAGS], [test "LMDB_CFLAGS" != ""])
 CHECK_SSDEEP
 AM_CONDITIONAL([SSDEEP_CFLAGS], [test "SSDEEP_CFLAGS" != ""])
 
+# Check for LUA
+CHECK_LUA
+AM_CONDITIONAL([LUA_CFLAGS], [test "LUA_CFLAGS" != ""])
+
+
 #
 # Check for curl
 #
@@ -502,6 +507,23 @@ if test "x$SSDEEP_FOUND" = "x1"; then
 fi
 if test "x$SSDEEP_FOUND" = "x2"; then
     echo "   + SSDEEP                                        ....disabled"
+fi
+
+## LUA
+if test "x$LUA_FOUND" = "x0"; then
+    echo "   + LUA                                           ....not found"
+fi
+if test "x$LUA_FOUND" = "x1"; then
+    echo -n "   + LUA                                           ....found "
+    if ! test "x$LUA_VERSION" = "x"; then
+        echo "v${LUA_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${LUA_DISPLAY}"
+fi
+if test "x$LUA_FOUND" = "x2"; then
+    echo "   + LUA                                           ....disabled"
 fi
 
 

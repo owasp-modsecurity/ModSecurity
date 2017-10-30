@@ -78,6 +78,10 @@ noinst_HEADERS = \
 	*.h
 
 
+ENGINES = \
+	engines/lua.cc
+
+
 VARIABLES = \
 	variables/duration.cc \
 	variables/env.cc \
@@ -273,6 +277,7 @@ libmodsecurity_la_SOURCES = \
 	rules_exceptions.cc \
 	${BODY_PROCESSORS} \
 	${ACTIONS} \
+	${ENGINES} \
 	${COLLECTION} \
 	${OPERATORS} \
 	${UTILS} \
@@ -298,6 +303,7 @@ libmodsecurity_la_CPPFLAGS = \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(SSDEEP_CFLAGS) \
+	$(LUA_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
 libmodsecurity_la_LIBADD = \
@@ -308,6 +314,7 @@ libmodsecurity_la_LIBADD = \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
 	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
+	$(LUA_LDFLAGS) $(LUA_LDADD) \
 	$(LIBXML2_LDADD) \
 	../others/libinjection.la \
 	../others/libmbedtls.la
