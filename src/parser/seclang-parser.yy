@@ -1760,6 +1760,18 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::FilesTmpNames_NoDictElement());
       }
+    | VARIABLE_RESOURCE DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::Resource_DictElement($2));
+      }
+    | VARIABLE_RESOURCE DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::Resource_DictElementRegexp($2));
+      }
+    | VARIABLE_RESOURCE
+      {
+        VARIABLE_CONTAINER($$, new Variables::Resource_NoDictElement());
+      }
 
     | VARIABLE_IP DICT_ELEMENT
       {
@@ -2024,10 +2036,6 @@ var:
     | VARIABLE_REQUEST_URI_RAW
       {
         VARIABLE_CONTAINER($$, new Variables::RequestURIRaw());
-      }
-    | VARIABLE_RESOURCE
-      {
-        VARIABLE_CONTAINER($$, new Variables::Resource());
       }
     | VARIABLE_RESPONSE_BODY
       {

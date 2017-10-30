@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Adds support for RESOURCE variable collection.
+   [Issue #1014 - @zimmerle, @victorhora]
  - Adds support for @fuzzyHash operator.
    [Issue #997 - @zimmerle]
  - Fix build on non x86 arch build

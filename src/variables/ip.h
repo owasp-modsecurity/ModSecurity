@@ -33,7 +33,7 @@ namespace Variables {
 class Ip_DictElement : public Variable {
  public:
     explicit Ip_DictElement(std::string dictElement)
-        : Variable("IP"),
+        : Variable("IP:" + dictElement),
         m_dictElement("IP:" + dictElement) { }
 
     void evaluate(Transaction *transaction,

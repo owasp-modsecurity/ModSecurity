@@ -809,6 +809,8 @@ EQUALS_MINUS                            (?i:=\-)
 
 {VARIABLE_IP}                               { return p::make_VARIABLE_IP(*driver.loc.back()); }
 {VARIABLE_IP}[:]                            { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_IP(*driver.loc.back()); }
+{VARIABLE_RESOURCE}                         { return p::make_VARIABLE_RESOURCE(*driver.loc.back()); }
+{VARIABLE_RESOURCE}[:]                      { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RESOURCE(*driver.loc.back()); }
 {VARIABLE_GLOBAL}                           { return p::make_VARIABLE_GLOBAL(*driver.loc.back()); }
 {VARIABLE_GLOBAL}[:]                        { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_GLOBAL(*driver.loc.back()); }
 {VARIABLE_SESSION}                          { return p::make_VARIABLE_SESSION(*driver.loc.back()); }

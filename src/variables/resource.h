@@ -29,17 +29,54 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class Resource : public Variable {
+
+class Resource_DictElement : public Variable {
  public:
-    Resource()
+    explicit Resource_DictElement(std::string dictElement)
+        : Variable("RESOURCE:" + dictElement),
+        m_dictElement("RESOURCE:" + dictElement) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) override {
+        transaction->m_collections.resolveMultiMatches(m_dictElement, "RESOURCE", l);
+    }
+
+    std::string m_dictElement;
+};
+
+
+class Resource_NoDictElement : public Variable {
+ public:
+    Resource_NoDictElement()
         : Variable("RESOURCE") { }
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
-        transaction->m_variableResource.evaluate(l);
+        std::vector<const collection::Variable *> *l) override {
+        transaction->m_collections.resolveMultiMatches(m_name, "RESOURCE", l);
     }
 };
+
+
+class Resource_DictElementRegexp : public Variable {
+ public:
+    explicit Resource_DictElementRegexp(std::string dictElement)
+        : Variable("RESOURCE:regex(" + dictElement + ")"),
+        m_r(dictElement),
+        m_dictElement("RESOURCE:" + dictElement) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) override {
+        transaction->m_collections.resolveRegularExpression(m_dictElement,
+            "RESOURCE", l);
+    }
+
+    Utils::Regex m_r;
+    std::string m_dictElement;
+};
+
 
 }  // namespace Variables
 }  // namespace modsecurity
