@@ -28,11 +28,16 @@ class InspectFile : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     InspectFile(std::string o, std::string p, bool n)
-        : Operator(o, p, n) { }
+        : Operator(o, p, n),
+        m_file("") { }
     explicit InspectFile(std::string param)
-        : Operator("InspectFile", param) { }
+        : Operator("InspectFile", param),
+        m_file("") { }
 
+    bool init(const std::string &param, std::string *error) override;
     bool evaluate(Transaction *transaction, const std::string &str) override;
+ private:
+    std::string m_file;
 };
 
 }  // namespace operators

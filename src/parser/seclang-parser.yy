@@ -905,8 +905,12 @@ op_before_init:
       }
     | OPERATOR_INSPECT_FILE FREE_TEXT
       {
-        /* $$ = new operators::InspectFile($1); */
-        OPERATOR_NOT_SUPPORTED("InspectFile", @0);
+        OPERATOR_CONTAINER($$, new operators::InspectFile($2));
+        std::string error;
+        if ($$->init(driver.ref.back(), &error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | OPERATOR_FUZZY_HASH FREE_TEXT
       {

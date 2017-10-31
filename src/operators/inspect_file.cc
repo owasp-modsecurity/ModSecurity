@@ -16,18 +16,59 @@
 #include "src/operators/inspect_file.h"
 
 #include <string>
+#include <iostream>
+#include <stdio.h>
 
 #include "src/operators/operator.h"
+#include "src/utils/system.h"
 
 namespace modsecurity {
 namespace operators {
 
-bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
-    /**
-     * @todo Implement the operator InspectFile.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#inspectfile
-     */
+bool InspectFile::init(const std::string &param2, std::string *error) {
+    std::istream *iss;
+    std::string err;
+
+    m_file = utils::find_resource(m_param, param2, &err);
+    iss = new std::ifstream(m_file, std::ios::in);
+
+    if (((std::ifstream *)iss)->is_open() == false) {
+        error->assign("Failed to open file: " + m_param + ". " + err);
+        delete iss;
+        return false;
+    }
+
+    delete iss;
     return true;
+}
+
+bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
+    FILE *in;
+    char buff[512];
+    std::stringstream s;
+    std::string res;
+    std::string openstr;
+
+    openstr.append(m_param);
+    openstr.append(" ");
+    openstr.append(str);
+
+    if (!(in = popen(openstr.c_str(), "r"))){
+        return false;
+    }
+
+    while (fgets(buff, sizeof(buff), in) != NULL) {
+        s << buff;
+    }
+
+    pclose(in);
+
+    res.append(s.str());
+    if (res.size() > 1 && res.at(0) == '1') {
+        return true;
+    }
+
+    return false;
 }
 
 

@@ -286,4 +286,5 @@ TESTS+=test/test-cases/regression/config-update-target-by-id.json
 TESTS+=test/test-cases/regression/misc-variable-under-quotes.json
 TESTS+=test/test-cases/regression/operator-fuzzyhash.json
 TESTS+=test/test-cases/regression/collection-resource.json
+TESTS+=test/test-cases/regression/operator-inpectFile.json
 
