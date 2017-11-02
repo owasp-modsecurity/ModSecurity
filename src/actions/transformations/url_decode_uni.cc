@@ -75,7 +75,7 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
         if (input[i] == '%') {
             if ((i + 1 < input_len) &&
                 ((input[i + 1] == 'u') || (input[i + 1] == 'U'))) {
-            /* Character is a percent sign. */
+                /* Character is a percent sign. */
                 /* IIS-specific %u encoding. */
                 if (i + 5 < input_len) {
                     /* We have at least 4 data bytes. */
@@ -113,19 +113,9 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
                         if (hmap != -1)  {
                             *d = hmap;
                         } else {
-                            /* We first make use of the lower byte here,
-                             * ignoring the higher byte. */
-                            *d = utils::string::x2c(&input[i + 4]);
-
-                            /* Full width ASCII (ff01 - ff5e)
-                             * needs 0x20 added */
-                            if ((*d > 0x00) && (*d < 0x5f)
-                                    && ((input[i + 2] == 'f')
-                                    || (input[i + 2] == 'F'))
-                                    && ((input[i + 3] == 'f')
-                                    || (input[i + 3] == 'F'))) {
-                                (*d) += 0x20;
-                            }
+                            /* There was no ASCII character to map this unicode character to. */
+                            /* Put a placeholder that is hopefully as innocent as the unicode character. */
+                            *d = 'x';
                         }
                         d++;
                         count++;
