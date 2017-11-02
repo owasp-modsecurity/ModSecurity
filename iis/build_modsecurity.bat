@@ -15,21 +15,21 @@ set CURRENT_DIR=%cd%
 cd ..\apache2
 del *.obj *.dll *.lib
 del libinjection\*.obj libinjection\*.dll libinjection\*.lib
-NMAKE -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre LIBXML2=..\iis\%DEPENDENCIES_DIR%\libxml2 LUA=..\iis\%DEPENDENCIES_DIR%\lua\src VERSION=VERSION_IIS YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\%YAJL_DIR% SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep CURL=..\iis\%DEPENDENCIES_DIR%\curl IIS_BUILD=yes
+NMAKE -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre LIBXML2=..\iis\%DEPENDENCIES_DIR%\libxml2 LUA=..\iis\%DEPENDENCIES_DIR%\lua\src VERSION=VERSION_IIS YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\%YAJL_DIR%\yajl-2.1.0 SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep CURL=..\iis\%DEPENDENCIES_DIR%\curl IIS_BUILD=yes
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
 @echo mlogc...
 cd ..\mlogc
 del *.obj *.dll *.lib
 nmake -f Makefile.win clean
-nmake -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre CURL=..\iis\%DEPENDENCIES_DIR%\curl YAJL=..\iis\%DEPENDENCIES_DIR%\yajl SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep VERSION=VERSION_IIS
+nmake -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre CURL=..\iis\%DEPENDENCIES_DIR%\curl YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\%YAJL_DIR%\yajl-2.1.0 SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep VERSION=VERSION_IIS
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
 @echo iis...
 cd ..\iis
 del *.obj *.dll *.lib
 nmake -f Makefile.win clean
-NMAKE -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre LIBXML2=..\iis\%DEPENDENCIES_DIR%\libxml2 LUA=..\iis\%DEPENDENCIES_DIR%\lua\src VERSION=VERSION_IIS YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\%YAJL_DIR% SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep CURL=..\iis\%DEPENDENCIES_DIR%\curl
+NMAKE -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre LIBXML2=..\iis\%DEPENDENCIES_DIR%\libxml2 LUA=..\iis\%DEPENDENCIES_DIR%\lua\src VERSION=VERSION_IIS YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\%YAJL_DIR%\yajl-2.1.0 SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep CURL=..\iis\%DEPENDENCIES_DIR%\curl
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
 cd %CURRENT_DIR%

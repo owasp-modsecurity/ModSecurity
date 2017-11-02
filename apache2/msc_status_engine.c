@@ -19,6 +19,9 @@
 #ifdef WIN32
 #include <winsock2.h>
 #include <iphlpapi.h>
+#else
+#include <sys/ioctl.h>
+#include <netdb.h>
 #endif
 
 #ifdef DARWIN

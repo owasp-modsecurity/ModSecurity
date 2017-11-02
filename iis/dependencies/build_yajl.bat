@@ -4,11 +4,13 @@ cd "%WORK_DIR%"
 
 7z.exe x "%SOURCE_DIR%\%YAJL%"
 set YAJL_DIR=%YAJL:~0,-4%
-
-move "%YAJL_DIR%" "yajl"
-
+echo "%SOURCE_DIR%\%YAJL%"
+echo "%YAJL_DIR%"
+pwd
+move "%YAJL_DIR%" "%WORK_DIR%\yajl"
+pwd
 cd "yajl"
-
+pwd
 mkdir build
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 cd build
@@ -24,6 +26,11 @@ copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl.dll" "%OUTPUT_DIR%"
 :: copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl.pdb" "%OUTPUT_DIR%"
 copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl.lib" "%OUTPUT_DIR%"
 copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl_s.lib" "%OUTPUT_DIR%"
+
+copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl.dll" "%WORK_DIR%\yajl\build\%YAJL_DIR%\include\yajl.dll"
+copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl.lib" "%WORK_DIR%\yajl\build\%YAJL_DIR%\include\yajl.lib"
+copy /y "%WORK_DIR%\yajl\build\%YAJL_DIR%\lib\yajl_s.lib" "%WORK_DIR%\yajl\build\%YAJL_DIR%\include\yajl_s.lib"
+
 
 @exit /B 0
 
