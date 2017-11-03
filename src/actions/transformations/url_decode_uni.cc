@@ -113,9 +113,22 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
                         if (hmap != -1)  {
                             *d = hmap;
                         } else {
-                            /* There was no ASCII character to map this unicode character to. */
-                            /* Put a placeholder that is hopefully as innocent as the unicode character. */
-                            *d = 'x';
+                             unsigned char lowestByte = utils::string::x2c(&input[i + 4]);
+
+                            if ((lowestByte > 0x00) && (lowestByte < 0x5f)
+                                && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                                && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                            {
+                                /* Full width ASCII (ff01 - ff5e) needs 0x20 added. */
+                                /* This is because the first printable char in ASCII is 0x20, and corresponds to 0xFF00. */
+                                *d = lowestByte + 0x20;
+                            }
+                            else
+                            {
+                                /* There was no good ASCII character to map this unicode character to. */
+                                /* Put a placeholder that is hopefully as innocent as the unicode character. */
+                                *d = 'x';
+                            }
                         }
                         d++;
                         count++;

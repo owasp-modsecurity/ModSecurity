@@ -71,14 +71,21 @@ int JsDecode::inplace(unsigned char *input, uint64_t input_len) {
                 && (VALID_HEX(input[i + 4])) && (VALID_HEX(input[i + 5]))) {
                 /* \uHHHH */
 
-                /* Use only the lower byte. */
-                *d = utils::string::x2c(&input[i + 4]);
+                unsigned char lowestByte = utils::string::x2c(&input[i + 4]);
 
-                /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
-                if ((*d > 0x00) && (*d < 0x5f)
+                if ((lowestByte > 0x00) && (lowestByte < 0x5f)
                     && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
-                    && ((input[i + 3] == 'f') || (input[i + 3] == 'F'))) {
-                    (*d) += 0x20;
+                    && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                {
+                    /* Full width ASCII (ff01 - ff5e) needs 0x20 added. */
+                    /* This is because the first printable char in ASCII is 0x20, and corresponds to 0xFF00. */
+                    *d = lowestByte + 0x20;
+                }
+                else
+                {
+                    /* There was no good ASCII character to map this unicode character to. */
+                    /* Put a placeholder that is hopefully as innocent as the unicode character. */
+                    *d = 'x';
                 }
 
                 d++;
