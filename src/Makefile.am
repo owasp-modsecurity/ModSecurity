@@ -79,7 +79,7 @@ noinst_HEADERS = \
 
 
 ENGINES = \
-	engines/lua.cc
+	engine/lua.cc
 
 
 VARIABLES = \

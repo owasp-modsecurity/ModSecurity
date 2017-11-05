@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Adds initial support for Lua engine.
+   [Issue #994 - @zimmerle]
  - Adds support for @inspectFile operator.
    [Issue #999 - @zimmerle, @victorhora]
  - Adds support for RESOURCE variable collection.

@@ -2296,7 +2296,7 @@ act:
       }
     | ACTION_EXEC
       {
-        ACTION_NOT_SUPPORTED("Exec", @0);
+        //ACTION_CONTAINER($$, new actions::Exec($1));
       }
     | ACTION_EXPIRE_VAR
       {

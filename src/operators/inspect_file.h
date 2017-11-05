@@ -19,6 +19,7 @@
 #include <string>
 
 #include "src/operators/operator.h"
+#include "src/engine/lua.h"
 
 
 namespace modsecurity {
@@ -29,15 +30,19 @@ class InspectFile : public Operator {
     /** @ingroup ModSecurity_Operator */
     InspectFile(std::string o, std::string p, bool n)
         : Operator(o, p, n),
-        m_file("") { }
+        m_file(""),
+        m_isScript(false) { }
     explicit InspectFile(std::string param)
         : Operator("InspectFile", param),
-        m_file("") { }
+        m_file(""),
+        m_isScript(false) { }
 
     bool init(const std::string &param, std::string *error) override;
     bool evaluate(Transaction *transaction, const std::string &str) override;
  private:
     std::string m_file;
+    bool m_isScript;
+    engine::Lua m_lua;
 };
 
 }  // namespace operators

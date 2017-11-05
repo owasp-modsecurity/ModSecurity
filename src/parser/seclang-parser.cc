@@ -3937,7 +3937,7 @@ namespace yy {
   case 310:
 #line 2298 "seclang-parser.yy" // lalr1.cc:859
     {
-        ACTION_NOT_SUPPORTED("Exec", yystack_[1].location);
+        //ACTION_CONTAINER($$, new actions::Exec($1));
       }
 #line 3943 "seclang-parser.cc" // lalr1.cc:859
     break;

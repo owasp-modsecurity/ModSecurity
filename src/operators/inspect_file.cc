@@ -28,6 +28,7 @@ namespace operators {
 bool InspectFile::init(const std::string &param2, std::string *error) {
     std::istream *iss;
     std::string err;
+    std::string err_lua;
 
     m_file = utils::find_resource(m_param, param2, &err);
     iss = new std::ifstream(m_file, std::ios::in);
@@ -38,37 +39,45 @@ bool InspectFile::init(const std::string &param2, std::string *error) {
         return false;
     }
 
+    if (engine::Lua::isCompatible(m_file, &m_lua, &err_lua) == true) {
+        m_isScript = true;
+    }
+
     delete iss;
     return true;
 }
 
+
 bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
-    FILE *in;
-    char buff[512];
-    std::stringstream s;
-    std::string res;
-    std::string openstr;
+    if (m_isScript) {
+        return m_lua.run(transaction);
+    } else {
+        FILE *in;
+        char buff[512];
+        std::stringstream s;
+        std::string res;
+        std::string openstr;
 
-    openstr.append(m_param);
-    openstr.append(" ");
-    openstr.append(str);
+        openstr.append(m_param);
+        openstr.append(" ");
+        openstr.append(str);
+        if (!(in = popen(openstr.c_str(), "r"))){
+            return false;
+        }
 
-    if (!(in = popen(openstr.c_str(), "r"))){
+        while (fgets(buff, sizeof(buff), in) != NULL) {
+            s << buff;
+        }
+
+        pclose(in);
+
+        res.append(s.str());
+        if (res.size() > 1 && res.at(0) == '1') {
+            return true;
+        }
+
         return false;
     }
-
-    while (fgets(buff, sizeof(buff), in) != NULL) {
-        s << buff;
-    }
-
-    pclose(in);
-
-    res.append(s.str());
-    if (res.size() > 1 && res.at(0) == '1') {
-        return true;
-    }
-
-    return false;
 }
 
 
