@@ -1,0 +1,34 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing 'block' action as default action is rejected by the parser",
+    "expected":{
+      "parser_error": "The 'block' action cannot be used as a default action"
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":12300
+    },
+    "request":{
+      "headers":{
+        "Host":"a.b.com",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "User-Agent":"My sweet little browser",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/path1",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:1,log,block\"",
+      "SecRule REQUEST_URI \"@contains path1\" \"phase:1,block,msg:'block',id:500065\""
+    ]
+  }
+]
