@@ -52,7 +52,7 @@ class Rule {
     explicit Rule(std::string marker);
     ~Rule();
 
-    bool evaluate(Transaction *transaction, std::shared_ptr<RuleMessage> rm);
+    virtual bool evaluate(Transaction *transaction, std::shared_ptr<RuleMessage> rm);
     bool evaluateActions(Transaction *transaction);
     std::vector<std::unique_ptr<collection::Variable>>
 	getFinalVars(Transaction *trasn);

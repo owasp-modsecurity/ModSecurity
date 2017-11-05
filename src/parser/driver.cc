@@ -63,6 +63,13 @@ int Driver::addSecAction(Rule *rule) {
     return true;
 }
 
+
+int Driver::addSecRuleScript(RuleScript *rule) {
+    m_rules[rule->m_phase].push_back(rule);
+    return true;
+}
+
+
 int Driver::addSecRule(Rule *rule) {
     if (rule->m_phase > modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(rule->m_phase);

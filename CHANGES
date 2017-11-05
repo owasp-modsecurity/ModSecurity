@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Adds support to SecRuleScript directive.
+   [Issue #994 - @zimmerle]
  - Adds support for the exec action.
    [Issue #1050 - @zimmerle]
  - Adds support for transformations inside Lua engine

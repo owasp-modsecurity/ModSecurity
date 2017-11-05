@@ -28,7 +28,7 @@
 #include "modsecurity/rules.h"
 #include "modsecurity/rules_properties.h"
 #include "modsecurity/audit_log.h"
-
+#include "src/rule_script.h"
 #include "src/parser/seclang-parser.hh"
 
 using modsecurity::Rule;
@@ -58,6 +58,7 @@ class Driver : public RulesProperties {
     int addSecRule(Rule *rule);
     int addSecAction(Rule *rule);
     int addSecMarker(std::string marker);
+    int addSecRuleScript(RuleScript *rule);
 
     bool scan_begin();
     void scan_end();
