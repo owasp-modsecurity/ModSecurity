@@ -298,12 +298,90 @@
       ]
     },
     "expected":{
-      "debug_log":"Z: \\{ \\[1\\] = \\{ \\[\"value\"\\] = res=whee&z=z&d=e,\\[\"name\"\\] = QUERY_STRING,\\} ,\\}"
+      "debug_log":"Z: \\{ \\[1\\] = \\{ \\[\""
     },
     "rules":[
       "SecRuleEngine On",
       "SecRule QUERY_STRING \".\" \"id:2,phase:2,setvar:tx.test=2\"",
       "SecRule ARGS:res \"@inspectFile test-cases/data/match-getvars.lua\" \"id:1,phase:2,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Operator :: @inspectFile - lua (6/?)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "27",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/whee?res=whee&z=z&d=e",
+      "method":"GET",
+      "body": [ ]
+    },
+    "response":{
+      "headers":{},
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"Just fine."
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule QUERY_STRING \".\" \"id:2,phase:2,setvar:tx.test=FELIPE\"",
+      "SecRule QUERY_STRING \"@inspectFile test-cases/data/match-getvar-transformation.lua\" \"id:1,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Operator :: @inspectFile - lua (7/?)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "27",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/whee?res=whee&z=z&d=e",
+      "method":"GET",
+      "body": [ ]
+    },
+    "response":{
+      "headers":{},
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"Whee. Working like a charm. That is what we have: FELIPE"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule QUERY_STRING \".\" \"id:2,phase:2,setvar:tx.test=FeLiPe\"",
+      "SecRule QUERY_STRING \"@inspectFile test-cases/data/match-getvar-multi-transformations.lua\" \"id:1,phase:2,pass\""
     ]
   }
 ]
