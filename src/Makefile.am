@@ -121,6 +121,7 @@ ACTIONS = \
 	actions/disruptive/deny.cc \
 	actions/disruptive/redirect.cc \
 	actions/disruptive/pass.cc \
+	actions/exec.cc \
 	actions/init_col.cc \
 	actions/log.cc \
 	actions/log_data.cc \
@@ -273,6 +274,7 @@ libmodsecurity_la_SOURCES = \
 	macro_expansion.cc \
 	rule.cc \
 	rule_message.cc \
+	rule_script.cc \
 	unique_id.cc \
 	rules_exceptions.cc \
 	${BODY_PROCESSORS} \

@@ -17,6 +17,7 @@ class Driver;
 }
 }
 
+#include "src/rule_script.h"
 
 #include "src/actions/accuracy.h"
 #include "src/actions/audit_log.h"
@@ -37,6 +38,7 @@ class Driver;
 #include "src/actions/disruptive/pass.h"
 #include "src/actions/disruptive/redirect.h"
 #include "src/actions/init_col.h"
+#include "src/actions/exec.h"
 #include "src/actions/log_data.h"
 #include "src/actions/log.h"
 #include "src/actions/maturity.h"
@@ -1109,8 +1111,27 @@ expression:
       }
     | DIRECTIVE_SECRULESCRIPT actions
       {
-        driver.error(@0, "SecRuleScript is not yet supported.");
-        YYERROR;
+        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        for (auto &i : *$2.get()) {
+            a->push_back(i.release());
+        }
+
+        RuleScript *r = new RuleScript(
+            /* path to script */ $1,
+            /* actions */ a,
+            /* file name */ driver.ref.back(),
+            /* line number */ @0.end.line
+            );
+        std::string err;
+        if (r->init(&err) == false) {
+            driver.error(@0, "Failed to load script: " + err);
+            delete r;
+            YYERROR;
+        }
+        if (driver.addSecRuleScript(r) == false) {
+            delete r;
+            YYERROR;
+        }
       }
     | CONFIG_DIR_SEC_DEFAULT_ACTION actions
       {
@@ -2296,7 +2317,7 @@ act:
       }
     | ACTION_EXEC
       {
-        //ACTION_CONTAINER($$, new actions::Exec($1));
+        ACTION_CONTAINER($$, new actions::Exec($1));
       }
     | ACTION_EXPIRE_VAR
       {
