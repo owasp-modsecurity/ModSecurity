@@ -63,8 +63,14 @@ if test -z "${LUA_CFLAGS}"; then
     fi
 else
     if test -z "${LUA_MANDATORY}" || test "x${LUA_MANDATORY}" == "xno"; then
-        LUA_FOUND=2
-        AC_MSG_NOTICE([LUA is disabled by default.])
+        LUA_FOUND=1
+        AC_MSG_NOTICE([using LUA v${LUA_VERSION}])
+        LUA_CFLAGS="-DWITH_LUA ${LUA_CFLAGS}"
+        LUA_DISPLAY="${LUA_LDADD} ${LUA_LDFLAGS}, ${LUA_CFLAGS}"
+        AC_SUBST(LUA_LDFLAGS)
+        AC_SUBST(LUA_LDADD)
+        AC_SUBST(LUA_CFLAGS)
+        AC_SUBST(LUA_DISPLAY)
     else
         LUA_FOUND=1
         AC_MSG_NOTICE([using LUA v${LUA_VERSION}])

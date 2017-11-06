@@ -3,6 +3,7 @@
     "enabled":1,
     "version_min":300000,
     "version_max":0,
+    "resource":"lua",
     "title":"Testing action :: exec (1/3)",
     "client":{
       "ip":"200.249.12.31",
@@ -51,6 +52,7 @@
     "enabled":1,
     "version_min":300000,
     "version_max":0,
+    "resource":"lua",
     "title":"Testing action :: exec (2/2)",
     "client":{
       "ip":"200.249.12.31",
@@ -98,6 +100,7 @@
     "enabled":1,
     "version_min":300000,
     "version_max":0,
+    "resource":"lua",
     "title":"Testing action :: exec (3/3)",
     "client":{
       "ip":"200.249.12.31",

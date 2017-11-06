@@ -41,6 +41,7 @@ namespace engine {
 
 
 bool Lua::isCompatible(std::string script, Lua *l, std::string *error) {
+#ifdef WITH_LUA
     std::string lua(".lua");
     std::string err;
 
@@ -57,10 +58,15 @@ bool Lua::isCompatible(std::string script, Lua *l, std::string *error) {
     }
 
     return true;
+#else
+    error->assign("Lua support was not enabled.");
+    return false;
+#endif
 }
 
 
 bool Lua::load(std::string script, std::string *err) {
+#ifdef WITH_LUA
     lua_State *L = NULL;
     L = luaL_newstate();
     luaL_openlibs(L);
@@ -93,9 +99,13 @@ bool Lua::load(std::string script, std::string *err) {
 
     lua_close(L);
     return true;
+#else
+    err->assign("Lua support was not enabled.");
+    return false;
+#endif
 }
 
-
+#ifdef WITH_LUA
 int Lua::blob_keeper(lua_State *L, const void *p, size_t sz, void *ud) {
     LuaScriptBlob *lsb = static_cast<LuaScriptBlob *>(ud);
     lsb->write(p, sz);
@@ -108,9 +118,10 @@ const char *Lua::blob_reader(lua_State *L, void *ud, size_t *size) {
     const char *data = lsb->read(size);
     return data;
 }
-
+#endif
 
 int Lua::run(Transaction *t) {
+#ifdef WITH_LUA
     std::string luaRet;
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
@@ -188,9 +199,14 @@ int Lua::run(Transaction *t) {
     }
 
     return true;
+#else
+    t->debug(9, "Lua support was not enabled.");
+    return false;
+#endif
 }
 
 
+#ifdef WITH_LUA
 int Lua::log(lua_State *L) {
     Transaction *t = NULL;
     const char *text;
@@ -371,7 +387,7 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t, int idx, std
 
     return newVar;
 }
-
+#endif
 
 }  // namespace engines
 }  // namespace modsecurity

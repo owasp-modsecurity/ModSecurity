@@ -78,7 +78,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @inspectFile (2/3)",
+    "title":"Testing Operator :: @inspectFile (3/3)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -116,7 +116,8 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @inspectFile - lua (1/1)",
+    "resource":"lua",
+    "title":"Testing Operator :: @inspectFile - lua (1/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -154,7 +155,8 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @inspectFile - lua (2/2)",
+    "resource":"lua",
+    "title":"Testing Operator :: @inspectFile - lua (2/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -192,7 +194,8 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @inspectFile - lua (3/3)",
+    "resource":"lua",
+    "title":"Testing Operator :: @inspectFile - lua (3/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -231,7 +234,8 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @inspectFile - lua (4/4)",
+    "resource":"lua",
+    "title":"Testing Operator :: @inspectFile - lua (4/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -270,7 +274,8 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @inspectFile - lua (5/5)",
+    "resource":"lua",
+    "title":"Testing Operator :: @inspectFile - lua (5/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -309,7 +314,8 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @inspectFile - lua (6/?)",
+    "resource":"lua",
+    "title":"Testing Operator :: @inspectFile - lua (6/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -348,7 +354,8 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @inspectFile - lua (7/?)",
+    "resource":"lua",
+    "title":"Testing Operator :: @inspectFile - lua (7/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123

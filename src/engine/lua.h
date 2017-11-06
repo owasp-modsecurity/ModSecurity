@@ -14,8 +14,8 @@
  */
 
 #ifdef WITH_LUA
-#endif
 #include <lua.hpp>
+#endif
 
 #include <iostream>
 #include <cstdint>
@@ -29,6 +29,7 @@ namespace modsecurity {
 class Transaction;
 namespace engine {
 
+#ifdef WITH_LUA
 class LuaScriptBlob {
  public:
     LuaScriptBlob() :
@@ -61,7 +62,7 @@ class LuaScriptBlob {
     unsigned char *m_data;
     size_t m_len;
 };
-
+#endif
 
 class Lua {
  public:
@@ -71,6 +72,7 @@ class Lua {
     int run(Transaction *t);
     static bool isCompatible(std::string script, Lua *l, std::string *error);
 
+#ifdef WITH_LUA
     static int blob_keeper(lua_State *L, const void *p, size_t sz, void *ud);
     static const char *blob_reader(lua_State *L, void *us, size_t *size);
 
@@ -82,10 +84,11 @@ class Lua {
         std::string var);
 
     LuaScriptBlob m_blob;
+#endif
     std::string m_scriptName;
 };
 
-
+#ifdef WITH_LUA
 static const struct luaL_Reg mscLuaLib[] = {
     { "log", Lua::log },
     { "getvar", Lua::getvar },
@@ -93,7 +96,7 @@ static const struct luaL_Reg mscLuaLib[] = {
     { "setvar", Lua::setvar },
     { NULL, NULL }
 };
-
+#endif
 
 }  // namespace engines
 }  // namespace modsecurity

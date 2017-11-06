@@ -435,6 +435,9 @@ int main(int argc, char **argv) {
 #ifdef WITH_SSDEEP
     resources.push_back("ssdeep");
 #endif
+#ifdef WITH_LUA
+    resources.push_back("lua");
+#endif
 
 #ifdef NO_LOGS
     std::cout << "Test utility cannot work without logging support." \
