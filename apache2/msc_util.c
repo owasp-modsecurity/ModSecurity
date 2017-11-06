@@ -1482,15 +1482,21 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
             {
                 /* \uHHHH */
 
-                /* Use only the lower byte. */
-                *d = x2c(&input[i + 4]);
+                unsigned char lowestByte = x2c(&input[i + 4]);
 
-                /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
-                if (   (*d > 0x00) && (*d < 0x5f)
+                if ((lowestByte > 0x00) && (lowestByte < 0x5f)
                         && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
                         && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
                 {
-                    (*d) += 0x20;
+                    /* Full width ASCII (ff01 - ff5e) needs 0x20 added. */
+                    /* This is because the first printable char in ASCII is 0x20, and corresponds to 0xFF00. */
+                    *d = lowestByte + 0x20;
+                }
+                else
+                {
+                    /* There was no good ASCII character to map this unicode character to. */
+                    /* Put a placeholder that is hopefully as innocent as the unicode character. */
+                    *d = 'x';
                 }
 
                 d++;
@@ -1633,15 +1639,21 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len,
                         if(hmap != -1)  {
                             *d = hmap;
                         } else {
-                            /* We first make use of the lower byte here, ignoring the higher byte. */
-                            *d = x2c(&input[i + 4]);
+                            unsigned char lowestByte = x2c(&input[i + 4]);
 
-                            /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
-                            if (   (*d > 0x00) && (*d < 0x5f)
-                                    && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
-                                    && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                            if ((lowestByte > 0x00) && (lowestByte < 0x5f)
+                                && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                                && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
                             {
-                                (*d) += 0x20;
+                                /* Full width ASCII (ff01 - ff5e) needs 0x20 added. */
+                                /* This is because the first printable char in ASCII is 0x20, and corresponds to 0xFF00. */
+                                *d = lowestByte + 0x20;
+                            }
+                            else
+                            {
+                                /* There was no good ASCII character to map this unicode character to. */
+                                /* Put a placeholder that is hopefully as innocent as the unicode character. */
+                                *d = 'x';
                             }
                         }
                         d++;
