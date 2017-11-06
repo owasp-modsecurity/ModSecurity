@@ -7,6 +7,7 @@ addons:
     - libfuzzy-dev
     - libyajl-dev
     - libgeoip-dev
+    - liblua5.2-dev
     - liblmdb-dev
     - cppcheck
 
@@ -27,6 +28,7 @@ env:
   - OPTS="--without-geoip $OPTS"
   - OPTS="--without-lmdb $OPTS"
   - OPTS="--without-ssdeep $OPTS"
+  - OPTS="--without-lua $OPTS"
 
 before_script:
   - '[ "$TRAVIS_OS_NAME" != osx ] || brew update'
