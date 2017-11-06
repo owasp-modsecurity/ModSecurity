@@ -335,8 +335,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
         apr_brigade_cleanup(bb_in);
     } while(!finished_reading);
 
-    // TODO: Why ignore the return code here?
-    modsecurity_request_body_end(msr, error_msg);
+    apr_status_t rcbe = modsecurity_request_body_end(msr, error_msg);
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Input filter: Completed receiving request body (length %" APR_SIZE_T_FMT ").",
@@ -345,7 +344,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
     msr->if_status = IF_STATUS_WANTS_TO_RUN;
 
-    return 1;
+    return rcbe;
 }
 
 
