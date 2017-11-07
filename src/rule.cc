@@ -433,6 +433,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
     Transaction *trans) {
     std::list<std::string> exclusions;
     std::list<std::string> exclusions_update_by_tag_remove;
+    std::list<std::string> exclusions_update_by_msg_remove;
     std::list<std::string> exclusions_update_by_id_remove;
     std::vector<Variables::Variable *> variables;
     std::vector<std::unique_ptr<collection::Variable>> finalVars;
@@ -451,6 +452,25 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 delete y;
             }
             exclusions_update_by_tag_remove.push_back(std::string(a.second->m_name));
+
+        } else {
+            Variable *b = a.second.get();
+            variables.push_back(b);
+        }
+    }
+
+    for (auto &a : trans->m_rules->m_exceptions.m_variable_update_target_by_msg) {
+        if (containsMsg(*a.first.get(), trans) == false) {
+            continue;
+        }
+        if (a.second->m_isExclusion) {
+            std::vector<const collection::Variable *> z;
+            a.second->evaluateInternal(trans, this, &z);
+            for (auto &y : z) {
+                exclusions_update_by_msg_remove.push_back(std::string(y->m_key));
+                delete y;
+            }
+            exclusions_update_by_msg_remove.push_back(std::string(a.second->m_name));
 
         } else {
             Variable *b = a.second.get();
@@ -520,6 +540,20 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
 #ifndef NO_LOGS
                 trans->debug(9, "Variable: " + key +
                     " is part of the exclusion list (from update by tag" +
+                    "), skipping...");
+#endif
+                    delete v;
+                    v = NULL;
+                continue;
+            }
+
+            if (std::find_if(exclusions_update_by_msg_remove.begin(),
+                exclusions_update_by_msg_remove.end(),
+                [key](std::string m) -> bool { return key == m; })
+                != exclusions_update_by_msg_remove.end()) {
+#ifndef NO_LOGS
+                trans->debug(9, "Variable: " + key +
+                    " is part of the exclusion list (from update by msg" +
                     "), skipping...");
 #endif
                     delete v;

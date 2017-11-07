@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Adds support for update target by message.
+   [Issue #1474 - @zimmerle, @victorhora]
  - Adds support to SecRuleScript directive.
    [Issue #994 - @zimmerle]
  - Adds support for the exec action.

@@ -39,6 +39,17 @@ bool RulesExceptions::loadRemoveRuleByMsg(const std::string &msg,
 }
 
 
+bool RulesExceptions::loadUpdateTargetByMsg(const std::string &msg,
+    std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
+    std::string *error) {
+    for (auto &i : *var) {
+        m_variable_update_target_by_msg.emplace(std::pair<std::shared_ptr<std::string>, std::unique_ptr<Variables::Variable>>(std::make_shared<std::string>(msg), std::move(i)));
+    }
+
+    return true;
+}
+
+
 bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
     std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
     std::string *error) {
@@ -165,6 +176,10 @@ bool RulesExceptions::merge(RulesExceptions& from) {
 
     for (auto &p : from.m_variable_update_target_by_tag) {
         m_variable_update_target_by_tag.emplace(std::pair<std::shared_ptr<std::string>, std::unique_ptr<Variables::Variable>>(p.first, std::move(p.second)));
+    }
+
+    for (auto &p : from.m_variable_update_target_by_msg) {
+        m_variable_update_target_by_msg.emplace(std::pair<std::shared_ptr<std::string>, std::unique_ptr<Variables::Variable>>(p.first, std::move(p.second)));
     }
 
     for (auto &p : from.m_variable_update_target_by_id) {
