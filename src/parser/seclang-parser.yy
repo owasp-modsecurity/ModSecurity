@@ -1156,6 +1156,11 @@ expression:
                     driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");
                     YYERROR;
                 }
+                actions::disruptive::Block *block = dynamic_cast<actions::disruptive::Block *>(a);
+                if (block != NULL) {
+                    driver.error(@0, "The 'block' action cannot be used as a default action");
+                    YYERROR;
+                }
                 checkedActions.push_back(a);
             } else {
                 driver.error(@0, "The action '" + a->m_name + "' is not suitable to be part of the SecDefaultActions");
