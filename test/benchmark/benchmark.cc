@@ -65,16 +65,38 @@ char ip[] = "200.249.12.31";
 
 char rules_file[] = "basic_rules.conf";
 
-
-#define NUM_REQUESTS 10000
-
+const char* const help_message = "Usage: benchmark [num_iterations|-h|-?|--help]";
 
 int main(int argc, char *argv[]) {
-    int i = 0;
+
+    unsigned long long NUM_REQUESTS(10000);
+
+    if (argc > 1) {
+        if (0 == strcmp(argv[1], "-h") ||
+            0 == strcmp(argv[1], "-?") ||
+            0 == strcmp(argv[1], "--help")) {
+            std::cout << help_message << std::endl;
+            return 0;
+        }
+        errno = 0;
+        unsigned long long upper = strtoull(argv[1], 0, 10);
+        if (!errno && upper) {
+            NUM_REQUESTS = upper;
+        } else {
+            if (errno) {
+                perror("Invalid number of iterations");
+            } else {
+                std::cerr << "Failed to convert '" << argv[1] << "' to integer value" << std::endl
+                          << help_message << std::endl;
+                return -1;
+            }
+        }
+    }
+    std::cout << "Doing " << NUM_REQUESTS << " transactions...\n";
     modsecurity::ModSecurity *modsec;
     modsecurity::Rules *rules;
     modsecurity::ModSecurityIntervention it;
-
+    modsecurity::intervention::reset(&it);
     modsec = new modsecurity::ModSecurity();
     modsec->setConnectorInformation("ModSecurity-benchmark v0.0.1-alpha" \
             " (ModSecurity benchmark utility)");
@@ -86,8 +108,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    for (i = 0; i < NUM_REQUESTS; i++) {
-        std::cout << "Proceeding with request " << i << std::endl;
+    for (unsigned long long i = 0; i < NUM_REQUESTS; i++) {
+        //std::cout << "Proceeding with request " << i << std::endl;
 
         Transaction *modsecTransaction = new Transaction(modsec, rules, NULL);
         modsecTransaction->processConnection(ip, 12345, "127.0.0.1", 80);
