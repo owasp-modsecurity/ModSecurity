@@ -296,6 +296,7 @@ CONFIG_SEC_REMOTE_RULES                 (?i:SecRemoteRules)
 CONFIG_SEC_REMOTE_RULES_FAIL_ACTION     (?i:SecRemoteRulesFailAction)
 CONFIG_SEC_REMOVE_RULES_BY_ID           (?i:SecRuleRemoveById)
 CONFIG_SEC_REMOVE_RULES_BY_MSG          (?i:SecRuleRemoveByMsg)
+CONFIG_SEC_REMOVE_RULES_BY_TAG          (?i:SecRuleRemoveByTag)
 CONFIG_SEC_UPDATE_TARGET_BY_TAG         (?i:SecRuleUpdateTargetByTag)
 CONFIG_SEC_UPDATE_TARGET_BY_MSG         (?i:SecRuleUpdateTargetByMsg)
 CONFIG_SEC_UPDATE_TARGET_BY_ID          (?i:SecRuleUpdateTargetById)
@@ -630,6 +631,9 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_SEC_REMOVE_RULES_BY_ID}[ ]+{FREE_TEXT_NEW_LINE}                 { return p::make_CONFIG_SEC_RULE_REMOVE_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_MSG}[ \t]+{FREE_TEXT_NEW_LINE}              { return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_MSG}[ \t]+["]{FREE_TEXT_NEW_LINE}["]        { return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_REMOVE_RULES_BY_TAG}[ \t]+{FREE_TEXT_NEW_LINE}              { return p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_REMOVE_RULES_BY_TAG}[ \t]+["]{FREE_TEXT_NEW_LINE}["]        { return 
+p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_UPDATE_TARGET_BY_TAG}[ ]+["]{FREE_TEXT_NEW_LINE}["]         { state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_UPDATE_TARGET_BY_TAG}[ ]+{FREE_TEXT_SPACE_COMMA_QUOTE}      { state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_UPDATE_TARGET_BY_MSG}[ ]+["]{FREE_TEXT_NEW_LINE}["]         { state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }

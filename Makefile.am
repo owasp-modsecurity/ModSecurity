@@ -290,4 +290,5 @@ TESTS+=test/test-cases/regression/operator-inpectFile.json
 TESTS+=test/test-cases/regression/action-exec.json
 TESTS+=test/test-cases/regression/directive-sec_rule_script.json
 TESTS+=test/test-cases/regression/config-update-target-by-msg.json
+TESTS+=test/test-cases/regression/config-remove_by_msg.json
 

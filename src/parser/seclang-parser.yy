@@ -574,6 +574,7 @@ using modsecurity::operators::Operator;
   CONFIG_SEC_REMOTE_RULES_FAIL_ACTION          "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
   CONFIG_SEC_RULE_REMOVE_BY_ID                 "CONFIG_SEC_RULE_REMOVE_BY_ID"
   CONFIG_SEC_RULE_REMOVE_BY_MSG                "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+  CONFIG_SEC_RULE_REMOVE_BY_TAG                "CONFIG_SEC_RULE_REMOVE_BY_TAG"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG         "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG         "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
   CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID          "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
@@ -1257,6 +1258,19 @@ expression:
         if (driver.m_exceptions.load($1, &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveById: failed to load:";
+            ss << $1;
+            ss << ". ";
+            ss << error;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+      }
+    | CONFIG_SEC_RULE_REMOVE_BY_TAG
+      {
+        std::string error;
+        if (driver.m_exceptions.loadRemoveRuleByTag($1, &error) == false) {
+            std::stringstream ss;
+            ss << "SecRuleRemoveByTag: failed to load:";
             ss << $1;
             ss << ". ";
             ss << error;

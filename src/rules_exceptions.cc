@@ -39,6 +39,14 @@ bool RulesExceptions::loadRemoveRuleByMsg(const std::string &msg,
 }
 
 
+bool RulesExceptions::loadRemoveRuleByTag(const std::string &msg,
+    std::string *error) {
+    m_remove_rule_by_tag.push_back(msg);
+
+    return true;
+}
+
+
 bool RulesExceptions::loadUpdateTargetByMsg(const std::string &msg,
     std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
     std::string *error) {
@@ -188,6 +196,10 @@ bool RulesExceptions::merge(RulesExceptions& from) {
 
     for (auto &p : from.m_remove_rule_by_msg) {
         m_remove_rule_by_msg.push_back(p);
+    }
+
+    for (auto &p : from.m_remove_rule_by_tag) {
+        m_remove_rule_by_tag.push_back(p);
     }
 
     return true;

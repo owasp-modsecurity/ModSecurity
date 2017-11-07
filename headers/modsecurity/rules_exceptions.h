@@ -51,6 +51,7 @@ class RulesExceptions {
     bool merge(RulesExceptions& from);
 
     bool loadRemoveRuleByMsg(const std::string &msg, std::string *error);
+    bool loadRemoveRuleByTag(const std::string &msg, std::string *error);
 
     bool loadUpdateTargetByMsg(const std::string &msg,
         std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
@@ -68,6 +69,7 @@ class RulesExceptions {
     std::unordered_multimap<std::shared_ptr<std::string>, std::unique_ptr<Variables::Variable>> m_variable_update_target_by_msg;
     std::unordered_multimap<double, std::unique_ptr<Variables::Variable>> m_variable_update_target_by_id;
     std::list<std::string> m_remove_rule_by_msg;
+    std::list<std::string> m_remove_rule_by_tag;
 
  private:
     std::list<std::pair<int, int> > m_ranges;
