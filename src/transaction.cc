@@ -1707,7 +1707,9 @@ std::string Transaction::toJSON(int parts) {
 
 
 void Transaction::serverLog(std::shared_ptr<RuleMessage> rm) {
-    m_ms->serverLog(m_logCbData, rm);
+    if (m_logCbData) {
+        m_ms->serverLog(m_logCbData, rm);
+    }
 }
 
 
