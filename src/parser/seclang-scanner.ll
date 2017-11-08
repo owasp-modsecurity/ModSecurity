@@ -363,7 +363,6 @@ EQUALS_PLUS                             (?i:=\+)
 EQUALS_MINUS                            (?i:=\-)
 
 
-
 %x TRANSACTION_TO_VARIABLE
 %x EXPECTING_VARIABLE
 %x EXPECTING_OPERATOR
@@ -589,7 +588,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_COMPONENT_SIG}[ \t]+["]{FREE_TEXT}["]                           { return p::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 {CONFIG_SEC_SERVER_SIG}[ \t]+["]{FREE_TEXT}["]                          { return p::make_CONFIG_SEC_SERVER_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 {CONFIG_SEC_WEB_APP_ID}[ \t]+["]{FREE_TEXT}["]                          { return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 2), *driver.loc.back()); }
-{CONFIG_SEC_WEB_APP_ID}[ \t]+{FREE_TEXT}                                { return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 2), *driver.loc.back()); }
+{CONFIG_SEC_WEB_APP_ID}[ \t]+{FREE_TEXT_NEW_LINE}                                { return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_CONTENT_INJECTION}                                              { return p::make_CONFIG_CONTENT_INJECTION(*driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR_MOD}[ \t]+{CONFIG_VALUE_NUMBER}                   { return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR_MOD}[ \t]+["]{CONFIG_VALUE_NUMBER}["]             { return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }

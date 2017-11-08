@@ -1,7 +1,9 @@
 
 v3.0.????? - ?
 ---------------------------
- 
+
+ - Adds support for SecWebAppId
+   [Issue #1442 - @zimmerle, @victorhora] 
  - Adds support for SecRuleRemoveByTag.
    [Issue #1476 - @zimmerle, @victorhora]
  - Adds support for update target by message.

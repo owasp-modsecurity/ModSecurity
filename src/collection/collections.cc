@@ -61,6 +61,12 @@ Collections::~Collections() {
 void Collections::storeOrUpdateFirst(const std::string& collectionName,
     const std::string& variableName,
     const std::string& targetValue) {
+    storeOrUpdateFirst(collectionName, variableName, "", targetValue);
+}
+
+void Collections::storeOrUpdateFirst(const std::string& collectionName,
+    const std::string& variableName, const std::string& appid,
+    const std::string& targetValue) {
     if (utils::string::tolower(collectionName) == "ip"
         && !m_ip_collection_key.empty()) {
         m_ip_collection->storeOrUpdateFirst(collectionName + ":"
@@ -78,14 +84,14 @@ void Collections::storeOrUpdateFirst(const std::string& collectionName,
     if (utils::string::tolower(collectionName) == "resource"
         && !m_resource_collection_key.empty()) {
         m_resource_collection->storeOrUpdateFirst(collectionName + ":"
-            + variableName, m_resource_collection_key, targetValue);
+            + variableName, m_resource_collection_key, appid, targetValue);
         return;
     }
 
     if (utils::string::tolower(collectionName) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->storeOrUpdateFirst(collectionName + ":"
-            + variableName, m_session_collection_key, targetValue);
+            + variableName, m_session_collection_key, appid, targetValue);
         return;
     }
 
@@ -144,9 +150,14 @@ std::unique_ptr<std::string> Collections::resolveFirst(const std::string& var) {
     return nullptr;
 }
 
+std::unique_ptr<std::string> Collections::resolveFirst(
+    const std::string& collectionName, const std::string& var) {
+    return resolveFirst(collectionName, "", var);
+}
 
 std::unique_ptr<std::string> Collections::resolveFirst(
-	const std::string& collectionName, const std::string& var) {
+    const std::string& collectionName, const std::string &appid,
+    const std::string& var) {
         if (utils::string::tolower(collectionName) == "ip"
             && !m_ip_collection_key.empty()) {
             return m_ip_collection->resolveFirst(
@@ -165,14 +176,14 @@ std::unique_ptr<std::string> Collections::resolveFirst(
             && !m_resource_collection_key.empty()) {
             return m_resource_collection->resolveFirst(
                 utils::string::toupper(collectionName)
-                + ":" + var, m_resource_collection_key);
+                + ":" + var, m_resource_collection_key, appid);
         }
 
         if (utils::string::tolower(collectionName) == "session"
             && !m_session_collection_key.empty()) {
             return m_session_collection->resolveFirst(
                 utils::string::toupper(collectionName)
-                + ":" + var, m_session_collection_key);
+                + ":" + var, m_session_collection_key, appid);
         }
 
         for (auto &a : *this) {
@@ -197,9 +208,14 @@ void Collections::resolveSingleMatch(const std::string& var,
     m_transient->resolveSingleMatch(var, l);
 }
 
-
 void Collections::resolveSingleMatch(const std::string& var,
     const std::string& collection,
+    std::vector<const Variable *> *l) {
+    resolveSingleMatch(var, collection, "", l);
+}
+
+void Collections::resolveSingleMatch(const std::string& var,
+    const std::string& collection, const std::string& appid,
     std::vector<const Variable *> *l) {
 
     if (utils::string::tolower(collection) == "ip"
@@ -218,14 +234,14 @@ void Collections::resolveSingleMatch(const std::string& var,
     if (utils::string::tolower(collection) == "resource"
         && !m_resource_collection_key.empty()) {
         m_resource_collection->resolveSingleMatch(var,
-            m_resource_collection_key, l);
+            m_resource_collection_key, appid, l);
         return;
     }
 
     if (utils::string::tolower(collection) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->resolveSingleMatch(var,
-            m_session_collection_key, l);
+            m_session_collection_key, appid, l);
         return;
     }
 
@@ -240,9 +256,14 @@ void Collections::resolveMultiMatches(const std::string& var,
     m_transient->resolveMultiMatches(var, l);
 }
 
-
 void Collections::resolveMultiMatches(const std::string& var,
     const std::string& collection,
+    std::vector<const Variable *> *l) {
+    return resolveMultiMatches(var, collection, "", l);
+}
+
+void Collections::resolveMultiMatches(const std::string& var,
+    const std::string& collection, const std::string &appid,
     std::vector<const Variable *> *l) {
     if (utils::string::tolower(collection) == "ip"
         && !m_ip_collection_key.empty()) {
@@ -260,14 +281,14 @@ void Collections::resolveMultiMatches(const std::string& var,
     if (utils::string::tolower(collection) == "resource"
         && !m_resource_collection_key.empty()) {
         m_resource_collection->resolveMultiMatches(var,
-            m_resource_collection_key, l);
+            m_resource_collection_key, appid, l);
         return;
     }
 
     if (utils::string::tolower(collection) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->resolveMultiMatches(var,
-            m_session_collection_key, l);
+            m_session_collection_key, appid, l);
         return;
     }
 
@@ -281,9 +302,14 @@ void Collections::resolveRegularExpression(const std::string& var,
     m_transient->resolveRegularExpression(var, l);
 }
 
-
 void Collections::resolveRegularExpression(const std::string& var,
     const std::string& collection,
+    std::vector<const Variable *> *l) {
+    return resolveRegularExpression(var, collection, "", l);
+}
+
+void Collections::resolveRegularExpression(const std::string& var,
+    const std::string& collection, const std::string &appid,
     std::vector<const Variable *> *l) {
     if (utils::string::tolower(collection) == "ip"
         && !m_ip_collection_key.empty()) {
@@ -305,7 +331,7 @@ void Collections::resolveRegularExpression(const std::string& var,
         && !m_resource_collection_key.empty()) {
         m_resource_collection->resolveRegularExpression(
             utils::string::toupper(collection)
-            + ":" + var, m_resource_collection_key, l);
+            + ":" + var, m_resource_collection_key, appid, l);
         return;
     }
 
@@ -313,7 +339,7 @@ void Collections::resolveRegularExpression(const std::string& var,
         && !m_session_collection_key.empty()) {
         m_session_collection->resolveRegularExpression(
             utils::string::toupper(collection)
-            + ":" + var, m_session_collection_key, l);
+            + ":" + var, m_session_collection_key, appid, l);
         return;
     }
 

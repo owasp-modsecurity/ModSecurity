@@ -39,7 +39,8 @@ class Resource_DictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_dictElement, "RESOURCE", l);
+        transaction->m_collections.resolveMultiMatches(m_dictElement,
+            "RESOURCE", transaction->m_rules->m_secWebAppId.m_value, l);
     }
 
     std::string m_dictElement;
@@ -54,7 +55,8 @@ class Resource_NoDictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_name, "RESOURCE", l);
+        transaction->m_collections.resolveMultiMatches(m_name, "RESOURCE",
+            transaction->m_rules->m_secWebAppId.m_value, l);
     }
 };
 
@@ -70,7 +72,7 @@ class Resource_DictElementRegexp : public Variable {
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
         transaction->m_collections.resolveRegularExpression(m_dictElement,
-            "RESOURCE", l);
+            "RESOURCE", transaction->m_rules->m_secWebAppId.m_value, l);
     }
 
     Utils::Regex m_r;

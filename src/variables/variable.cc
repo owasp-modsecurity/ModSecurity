@@ -120,50 +120,6 @@ Variable::Variable(std::string name, VariableKind kind)
 }
 
 
-std::vector<const collection::Variable *> *
-    Variable::evaluate(Transaction *transaction) {
-    std::vector<const collection::Variable *> *l;
-    l = new std::vector<const collection::Variable *>();
-    evaluate(transaction, NULL, l);
-
-    return l;
-}
-
-
-void Variable::evaluate(Transaction *transaction,
-    Rule *rule,
-    std::vector<const collection::Variable *> *l) {
-    if (m_collectionName.empty() == false) {
-        if (m_kind == CollectionVarible && m_type == MultipleMatches) {
-            transaction->m_collections.resolveMultiMatches(m_name,
-                m_collectionName, l);
-        } else if (m_type == RegularExpression) {
-            transaction->m_collections.resolveRegularExpression(m_name,
-                m_collectionName, l);
-        } else {
-            transaction->m_collections.resolveSingleMatch(m_name,
-                m_collectionName, l);
-        }
-    } else {
-        if (m_kind == CollectionVarible && m_type == MultipleMatches) {
-            transaction->m_collections.resolveMultiMatches(m_name, l);
-        } else if (m_type == RegularExpression) {
-            transaction->m_collections.resolveRegularExpression(m_name, l);
-        } else {
-            transaction->m_collections.resolveSingleMatch(m_name, l);
-        }
-    }
-}
-
-
-void Variable::evaluateInternal(Transaction *transaction,
-    Rule *rule,
-    std::vector<const collection::Variable *> *l) {
-
-    evaluate(transaction, rule, l);
-}
-
-
 std::string Variable::to_s(
     std::vector<Variable *> *variables) {
     std::string ret;

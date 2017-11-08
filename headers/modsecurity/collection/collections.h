@@ -54,27 +54,47 @@ class Collections :
     void storeOrUpdateFirst(const std::string& collectionName,
         const std::string& variableName,
         const std::string& targetValue);
+    void storeOrUpdateFirst(const std::string& collectionName,
+        const std::string& variableName,
+        const std::string& appid,
+        const std::string& targetValue);
     bool storeOrUpdateFirst(const std::string &key, const std::string &value);
     bool updateFirst(const std::string &key, const std::string &value);
     void del(const std::string& key);
     std::unique_ptr<std::string> resolveFirst(const std::string& var);
     std::unique_ptr<std::string> resolveFirst(const std::string& collectionName,
         const std::string& var);
+    std::unique_ptr<std::string> resolveFirst(const std::string& collectionName,
+        const std::string &appid, const std::string& var);
 
     void resolveSingleMatch(const std::string& var,
         std::vector<const Variable *> *l);
     void resolveSingleMatch(const std::string& var,
         const std::string& collection,
         std::vector<const Variable *> *l);
+    void resolveSingleMatch(const std::string& var,
+        const std::string& collection,
+        const std::string& appid,
+        std::vector<const Variable *> *l);
+
     void resolveMultiMatches(const std::string& var,
         std::vector<const Variable *> *l);
     void resolveMultiMatches(const std::string& var,
         const std::string& collection,
         std::vector<const Variable *> *l);
+    void resolveMultiMatches(const std::string& var,
+        const std::string& collection,
+        const std::string& appid,
+        std::vector<const Variable *> *l);
+
     void resolveRegularExpression(const std::string& var,
         std::vector<const Variable *> *l);
     void resolveRegularExpression(const std::string& var,
         const std::string& collection,
+        std::vector<const Variable *> *l);
+    void resolveRegularExpression(const std::string& var,
+        const std::string& collection,
+        const std::string& appid,
         std::vector<const Variable *> *l);
 
     /**

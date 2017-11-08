@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/rules.h"
 #include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
 #include "src/utils/string.h"
@@ -154,7 +155,7 @@ bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
         + ":" + m_variableNameExpanded + " with value: " + targetValue);
 #endif
     transm_parser_payload->m_collections.storeOrUpdateFirst(m_collectionName,
-        m_variableNameExpanded, targetValue);
+        m_variableNameExpanded, transm_parser_payload->m_rules->m_secWebAppId.m_value, targetValue);
 
 end:
     return true;

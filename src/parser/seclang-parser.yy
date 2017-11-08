@@ -1229,8 +1229,8 @@ expression:
       }
     | CONFIG_SEC_WEB_APP_ID
       {
-        driver.error(@0, "SecWebAppId is not supported.");
-        YYERROR;
+        driver.m_secWebAppId.m_value = $1;
+        driver.m_secWebAppId.m_set = true;
       }
     | CONFIG_SEC_SERVER_SIG
       {

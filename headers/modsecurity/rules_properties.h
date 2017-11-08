@@ -340,6 +340,11 @@ class RulesProperties {
                 from->m_secArgumentSeparator.m_value;
         }
 
+        if (from->m_secWebAppId.m_set == true) {
+            to->m_secWebAppId.m_value = \
+                from->m_secWebAppId.m_value;
+        }
+
         if (from->m_unicodeMapTable.m_set == true) {
             to->m_unicodeMapTable.m_unicode_map_table = \
                 from->m_unicodeMapTable.m_unicode_map_table;
@@ -379,7 +384,6 @@ class RulesProperties {
                 actions_to->push_back(action);
             }
         }
-
 
         if (to->m_auditLog) {
             std::string error;
@@ -480,6 +484,7 @@ class RulesProperties {
     ConfigString m_uploadDirectory;
     ConfigString m_uploadTmpDirectory;
     ConfigString m_secArgumentSeparator;
+    ConfigString m_secWebAppId;
     std::vector<actions::Action *> m_defaultActions[8];
     std::vector<modsecurity::Rule *> m_rules[8];
     ConfigUnicodeMap m_unicodeMapTable;

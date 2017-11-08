@@ -2045,8 +2045,8 @@ namespace yy {
   case 87:
 #line 1231 "seclang-parser.yy" // lalr1.cc:859
     {
-        driver.error(yystack_[1].location, "SecWebAppId is not supported.");
-        YYERROR;
+        driver.m_secWebAppId.m_value = yystack_[0].value.as< std::string > ();
+        driver.m_secWebAppId.m_set = true;
       }
 #line 2052 "seclang-parser.cc" // lalr1.cc:859
     break;

@@ -40,7 +40,7 @@ class Session_DictElement : public Variable {
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
         transaction->m_collections.resolveMultiMatches(m_dictElement,
-            "SESSION", l);
+            "SESSION", transaction->m_rules->m_secWebAppId.m_value, l);
     }
 
     std::string m_dictElement;
@@ -55,7 +55,8 @@ class Session_NoDictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_name, "SESSION", l);
+        transaction->m_collections.resolveMultiMatches(m_name, "SESSION",
+            transaction->m_rules->m_secWebAppId.m_value, l);
     }
 };
 
@@ -71,7 +72,7 @@ class Session_DictElementRegexp : public Variable {
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
         transaction->m_collections.resolveRegularExpression(m_dictElement,
-            "SESSION", l);
+            "SESSION", transaction->m_rules->m_secWebAppId.m_value, l);
     }
 
     Utils::Regex m_r;

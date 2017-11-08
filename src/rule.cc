@@ -446,7 +446,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
         }
         if (a.second->m_isExclusion) {
             std::vector<const collection::Variable *> z;
-            a.second->evaluateInternal(trans, this, &z);
+            a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
                 exclusions_update_by_tag_remove.push_back(std::string(y->m_key));
                 delete y;
@@ -465,7 +465,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
         }
         if (a.second->m_isExclusion) {
             std::vector<const collection::Variable *> z;
-            a.second->evaluateInternal(trans, this, &z);
+            a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
                 exclusions_update_by_msg_remove.push_back(std::string(y->m_key));
                 delete y;
@@ -484,7 +484,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
         }
         if (a.second->m_isExclusion) {
             std::vector<const collection::Variable *> z;
-            a.second->evaluateInternal(trans, this, &z);
+            a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
                 exclusions_update_by_id_remove.push_back(std::string(y->m_key));
                 delete y;
@@ -500,7 +500,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
         Variable *variable = variables.at(i);
         if (variable->m_isExclusion) {
             std::vector<const collection::Variable *> z;
-            variable->evaluateInternal(trans, this, &z);
+            variable->evaluate(trans, this, &z);
             for (auto &y : z) {
                 exclusions.push_back(std::string(y->m_key));
                 delete y;
@@ -518,7 +518,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             continue;
         }
 
-        variable->evaluateInternal(trans, this, &e);
+        variable->evaluate(trans, this, &e);
         for (const collection::Variable *v : e) {
             std::string key = v->m_key;
 

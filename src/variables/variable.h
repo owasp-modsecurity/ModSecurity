@@ -70,19 +70,9 @@ class Variable {
     Variable(std::string name, VariableKind kind);
     virtual ~Variable() { }
 
-
-    virtual std::vector<const collection::Variable *>
-        *evaluate(Transaction *transaction);
-
-
     virtual void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l);
-
-
-    virtual void evaluateInternal(Transaction *transaction,
-        Rule *rule,
-        std::vector<const collection::Variable *> *l);
+        std::vector<const collection::Variable *> *l) = 0;
 
     static std::string to_s(std::vector<Variable *> *variables);
 
