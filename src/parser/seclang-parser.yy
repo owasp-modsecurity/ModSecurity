@@ -223,6 +223,7 @@ class Driver;
 #include "src/variables/server_name.h"
 #include "src/variables/server_port.h"
 #include "src/variables/session_id.h"
+#include "src/variables/web_app_id.h"
 #include "src/variables/time_day.h"
 #include "src/variables/time_epoch.h"
 #include "src/variables/time.h"
@@ -432,6 +433,7 @@ using modsecurity::operators::Operator;
   VARIABLE_UNIQUE_ID            "UNIQUE_ID"
   VARIABLE_URL_ENCODED_ERROR    "URLENCODED_ERROR"
   VARIABLE_USER_ID               "USERID"
+  VARIABLE_WEB_APP_ID           "WEBAPPID"
   VARIABLE_STATUS                              "VARIABLE_STATUS"
   VARIABLE_IP                                  "VARIABLE_IP"
   VARIABLE_GLOBAL                              "VARIABLE_GLOBAL"
@@ -2137,6 +2139,10 @@ var:
     | VARIABLE_STATUS
       {
         VARIABLE_CONTAINER($$, new Variables::Status());
+      }
+    | VARIABLE_WEB_APP_ID
+      {
+        VARIABLE_CONTAINER($$, new Variables::WebAppId());
       }
     | RUN_TIME_VAR_DUR
       {

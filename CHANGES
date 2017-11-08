@@ -2,7 +2,9 @@
 v3.0.????? - ?
 ---------------------------
 
- - Adds support for SecWebAppId
+ - Adds support to WEBAPPID variable.
+   [Issue #1027 - @zimmerle, @victorhora]
+ - Adds support for SecWebAppId.
    [Issue #1442 - @zimmerle, @victorhora] 
  - Adds support for SecRuleRemoveByTag.
    [Issue #1476 - @zimmerle, @victorhora]

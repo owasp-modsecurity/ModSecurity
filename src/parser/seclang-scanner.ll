@@ -195,6 +195,7 @@ VARIABLE_IP                               (?i:(IP))
 VARIABLE_USER                             (?i:(USER))
 VARIABLE_STATUS                           (?i:(STATUS[^:]))
 VARIABLE_TX                               (?i:TX)
+VARIABLE_WEB_APP_ID                       (?i:WEBAPPID)
 RUN_TIME_VAR_BLD                          (?i:MODSEC_BUILD)
 RUN_TIME_VAR_DUR                          (?i:DURATION)
 RUN_TIME_VAR_ENV                          (?i:ENV)
@@ -771,6 +772,7 @@ p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), 
 {VARIABLE_UNIQUE_ID}                        { return p::make_VARIABLE_UNIQUE_ID(*driver.loc.back()); }
 {VARIABLE_URL_ENCODED_ERROR}                { return p::make_VARIABLE_URL_ENCODED_ERROR(*driver.loc.back()); }
 {VARIABLE_USER_ID}                          { return p::make_VARIABLE_USER_ID(*driver.loc.back()); }
+{VARIABLE_WEB_APP_ID}                       { return p::make_VARIABLE_WEB_APP_ID(*driver.loc.back()); }
 {VARIABLE_ARGS}                             { return p::make_VARIABLE_ARGS(*driver.loc.back()); }
 {VARIABLE_ARGS}[:]                          { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS(*driver.loc.back()); }
 {VARIABLE_ARGS_GET}                         { return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
