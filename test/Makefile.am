@@ -64,6 +64,8 @@ unit_tests_CPPFLAGS = \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS) \
+	$(LUA_CFLAGS) \
+	$(SSDEEP_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
 
@@ -100,6 +102,8 @@ regression_tests_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(LMDB_CFLAGS) \
+	$(LUA_CFLAGS) \
+	$(SSDEEP_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS) \
 	$(LIBXML2_CFLAGS)
@@ -137,6 +141,8 @@ rules_optimization_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(LMDB_CFLAGS) \
+	$(LUA_CFLAGS) \
+	$(SSDEEP_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS) \
 	$(LIBXML2_CFLAGS)
