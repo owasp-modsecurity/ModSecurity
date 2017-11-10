@@ -26,11 +26,118 @@
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
-/**
- * yajl callback functions
- * For more information on the function signatures and order, check
- * http://lloyd.github.com/yajl/yajl-1.0.12/structyajl__callbacks.html
- */
+JSON::JSON(Transaction *transaction) : m_transaction(transaction),
+    m_handle(NULL),
+    m_current_key("") {
+    /**
+     * yajl callback functions
+     * For more information on the function signatures and order, check
+     * http://lloyd.github.com/yajl/yajl-1.0.12/structyajl__callbacks.html
+     */
+
+    /**
+     * yajl configuration and callbacks
+     */
+    static yajl_callbacks callbacks = {
+        yajl_null,
+        yajl_boolean,
+        NULL /* yajl_integer  */,
+        NULL /* yajl_double */,
+        yajl_number,
+        yajl_string,
+        yajl_start_map,
+        yajl_map_key,
+        yajl_end_map,
+        yajl_start_array,
+        yajl_end_array
+    };
+
+
+    /**
+     * yajl initialization
+     *
+     * yajl_parser_config definition:
+     * http://lloyd.github.io/yajl/yajl-2.0.1/yajl__parse_8h.html#aec816c5518264d2ac41c05469a0f986c
+     *
+     * TODO: make UTF8 validation optional, as it depends on Content-Encoding
+     */
+    m_handle = yajl_alloc(&callbacks, NULL, this);
+
+    yajl_config(m_handle, yajl_allow_partial_values, 0);
+}
+
+
+JSON::~JSON() {
+    while (m_containers.size() > 0) {
+        JSONContainer *a = m_containers.back();
+        m_containers.pop_back();
+        delete a;
+    }
+    yajl_free(m_handle);
+}
+
+
+bool JSON::init() {
+    return true;
+}
+
+
+bool JSON::processChunk(const char *buf, unsigned int size, std::string *err) {
+    /* Feed our parser and catch any errors */
+    m_status = yajl_parse(m_handle,
+        (const unsigned char *)buf, size);
+    if (m_status != yajl_status_ok) {
+        const unsigned char *e = yajl_get_error(m_handle, 0,
+            (const unsigned char *)buf, size);
+        /* We need to free the yajl error message later, how to do this? */
+        err->assign((const char *)e);
+        return false;
+    }
+
+    return true;
+}
+
+
+bool JSON::complete(std::string *err) {
+    /* Wrap up the parsing process */
+    m_status = yajl_complete_parse(m_handle);
+    if (m_status  != yajl_status_ok) {
+        const unsigned char *e = yajl_get_error(m_handle, 0, NULL, 0);
+        /* We need to free the yajl error message later, how to do this? */
+        err->assign((const char *)e);
+        return false;
+    }
+
+    return true;
+}
+
+
+int JSON::addArgument(const std::string& value) {
+    std::string data("");
+    std::string path;
+
+    for (size_t i =  0; i < m_containers.size(); i++) {
+        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(m_containers[i]);
+        path = path + m_containers[i]->m_name;
+        if (a != NULL) {
+            path = path + ".array_" + std::to_string(a->m_elementCounter);
+        } else {
+            path = path + ".";
+        }
+    }
+
+    JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(m_containers.back());
+    if (a) {
+        a->m_elementCounter++;
+    } else {
+        data = getCurrentKey();
+    }
+
+    m_transaction->addArgument("JSON", path + data, value, 0);
+
+    return 1;
+}
+
 
 /**
  * Callback for hash key values; we use those to define the variable names
@@ -48,17 +155,11 @@ int JSON::yajl_map_key(void *ctx, const unsigned char *key, size_t length) {
      */
     safe_key.assign((const char *)key, length);
 
-#ifndef NO_LOGS
-    tthis->debug(9, "New JSON hash key '" + safe_key + "'");
-#endif
-
-    /**
-     * TODO: How do we free the previously string value stored here?
-     */
-    tthis->m_data.current_key = safe_key;
+    tthis->m_current_key = safe_key;
 
     return 1;
 }
+
 
 /**
  * Callback for null values
@@ -66,22 +167,21 @@ int JSON::yajl_map_key(void *ctx, const unsigned char *key, size_t length) {
  */
 int JSON::yajl_null(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
-
     return tthis->addArgument("");
 }
+
 
 /**
  * Callback for boolean values
  */
 int JSON::yajl_boolean(void *ctx, int value) {
     JSON *tthis =  reinterpret_cast<JSON *>(ctx);
-
     if (value) {
         return tthis->addArgument("true");
     }
-
     return tthis->addArgument("false");
 }
+
 
 /**
  * Callback for string values
@@ -89,9 +189,9 @@ int JSON::yajl_boolean(void *ctx, int value) {
 int JSON::yajl_string(void *ctx, const unsigned char *value, size_t length) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
     std::string v = std::string((const char*)value, length);
-
     return tthis->addArgument(v);
 }
+
 
 /**
  * Callback for numbers; YAJL can use separate callbacks for integers/longs and
@@ -101,42 +201,45 @@ int JSON::yajl_string(void *ctx, const unsigned char *value, size_t length) {
 int JSON::yajl_number(void *ctx, const char *value, size_t length) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
     std::string v = std::string((const char*)value, length);
-
     return tthis->addArgument(v);
 }
+
 
 /**
  * Callback for a new hash, which indicates a new subtree, labeled as the
  * current argument name, is being created
  */
-int JSON::yajl_start_map(void *ctx) {
+int JSON::yajl_start_array(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
+    std::string name = tthis->getCurrentKey();
+    tthis->m_containers.push_back((JSONContainer *)new JSONContainerArray(name));
+    return 1;
+}
 
-    /**
-     * If we do not have a current_key, this is a top-level hash, so we do not
-     * need to do anything
-     */
-    if (tthis->m_data.current_key.empty() == true) {
-        return true;
+
+int JSON::yajl_end_array(void *ctx) {
+    JSON *tthis = reinterpret_cast<JSON *>(ctx);
+    JSONContainer *a = tthis->m_containers.back();
+    tthis->m_containers.pop_back();
+    delete a;
+    if (tthis->m_containers.size() > 0) {
+        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(tthis->m_containers.back());
+        if (a) {
+            a->m_elementCounter++;
+        }
     }
-
-    /**
-     * Check if we are already inside a hash context, and append or create the
-     * current key name accordingly
-     */
-    if (tthis->m_data.prefix.empty() == false) {
-        tthis->m_data.prefix.append("." + tthis->m_data.current_key);
-    } else {
-        tthis->m_data.prefix.assign(tthis->m_data.current_key);
-    }
-
-#ifndef NO_LOGS
-    tthis->debug(9, "New JSON hash context (prefix '" + \
-        tthis->m_data.prefix + "')");
-#endif
 
     return 1;
 }
+
+
+int JSON::yajl_start_map(void *ctx) {
+    JSON *tthis = reinterpret_cast<JSON *>(ctx);
+    std::string name(tthis->getCurrentKey());
+    tthis->m_containers.push_back((JSONContainer *)new JSONContainerMap(name));
+    return 1;
+}
+
 
 /**
  * Callback for end hash, meaning the current subtree is being closed, and that
@@ -144,145 +247,18 @@ int JSON::yajl_start_map(void *ctx) {
  */
 int JSON::yajl_end_map(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    size_t sep_pos = std::string::npos;
+    JSONContainer *a = tthis->m_containers.back();
+    tthis->m_containers.pop_back();
+    delete a;
 
-    /**
-     * If we have no prefix, then this is the end of a top-level hash and
-     * we don't do anything
-     */
-    if (tthis->m_data.prefix.empty() == true) {
-        return true;
-    }
-
-    /**
-     * Current prefix might or not include a separator character; top-level
-     * hash keys do not have separators in the variable name
-     */
-    sep_pos = tthis->m_data.prefix.find(".");
-
-    if (sep_pos != std::string::npos) {
-        std::string tmp = tthis->m_data.prefix;
-        tthis->m_data.prefix.assign(tmp, 0, sep_pos);
-        tthis->m_data.current_key.assign(tmp, sep_pos + 1,
-            tmp.length() - sep_pos - 1);
-    } else {
-        tthis->m_data.current_key.assign(tthis->m_data.prefix);
-        tthis->m_data.prefix = "";
+    if (tthis->m_containers.size() > 0) {
+        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(tthis->m_containers.back());
+        if (a) {
+            a->m_elementCounter++;
+        }
     }
 
     return 1;
-}
-
-
-int JSON::addArgument(const std::string& value) {
-    /**
-     * If we do not have a prefix, we cannot create a variable name
-     * to reference this argument; for now we simply ignore these
-     */
-    if (m_data.current_key.empty()) {
-#ifndef NO_LOGS
-        debug(3, "Cannot add scalar value without an associated key");
-#endif
-        return 1;
-    }
-
-    if (m_data.prefix.empty()) {
-        m_transaction->addArgument("JSON", m_data.current_key, value, 0);
-    } else {
-        m_transaction->addArgument("JSON", m_data.prefix + "." + \
-            m_data.current_key, value, 0);
-    }
-
-    return 1;
-}
-
-
-bool JSON::init() {
-    return true;
-}
-
-
-bool JSON::processChunk(const char *buf, unsigned int size, std::string *err) {
-    /* Feed our parser and catch any errors */
-    m_data.status = yajl_parse(m_data.handle,
-        (const unsigned char *)buf, size);
-    if (m_data.status != yajl_status_ok) {
-        const unsigned char *e = yajl_get_error(m_data.handle, 0,
-            (const unsigned char *)buf, size);
-        /* We need to free the yajl error message later, how to do this? */
-        err->assign((const char *)e);
-        return false;
-    }
-
-    return true;
-}
-
-
-bool JSON::complete(std::string *err) {
-    /* Wrap up the parsing process */
-    m_data.status = yajl_complete_parse(m_data.handle);
-    if (m_data.status  != yajl_status_ok) {
-        const unsigned char *e = yajl_get_error(m_data.handle, 0, NULL, 0);
-        /* We need to free the yajl error message later, how to do this? */
-        err->assign((const char *)e);
-        return false;
-    }
-
-    return true;
-}
-
-
-JSON::JSON(Transaction *transaction) : m_transaction(transaction) {
-    /**
-     * yajl configuration and callbacks
-     */
-    static yajl_callbacks callbacks = {
-        yajl_null,
-        yajl_boolean,
-        NULL /* yajl_integer  */,
-        NULL /* yajl_double */,
-        yajl_number,
-        yajl_string,
-        yajl_start_map,
-        yajl_map_key,
-        yajl_end_map,
-        NULL /* yajl_start_array */,
-        NULL /* yajl_end_array  */
-    };
-
-
-#ifndef NO_LOGS
-    debug(9, "JSON parser initialization");
-#endif
-
-    /**
-     * Prefix and current key are initially empty
-     */
-    m_data.prefix = "";
-    m_data.current_key = "";
-
-    /**
-     * yajl initialization
-     *
-     * yajl_parser_config definition:
-     * http://lloyd.github.io/yajl/yajl-2.0.1/yajl__parse_8h.html#aec816c5518264d2ac41c05469a0f986c
-     *
-     * TODO: make UTF8 validation optional, as it depends on Content-Encoding
-     */
-#ifndef NO_LOGS
-    debug(9, "yajl JSON parsing callback initialization");
-#endif
-    m_data.handle = yajl_alloc(&callbacks, NULL, this);
-
-    yajl_config(m_data.handle, yajl_allow_partial_values, 0);
-}
-
-
-JSON::~JSON() {
-#ifndef NO_LOGS
-    debug(9, "JSON: Cleaning up JSON results");
-#endif
-    yajl_free(m_data.handle);
 }
 
 

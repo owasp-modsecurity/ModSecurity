@@ -33,17 +33,26 @@ namespace modsecurity {
 namespace RequestBodyProcessor {
 
 
-struct json_data {
-    /* yajl configuration and parser state */
-    yajl_handle handle;
-    yajl_status status;
-
-    /* prefix is used to create data hierarchy (i.e., 'parent.child.value') */
-    std::string prefix;
-    std::string current_key;
+class JSONContainer {
+ public:
+    JSONContainer(std::string name) : m_name(name) { };
+    virtual ~JSONContainer() { };
+    std::string m_name;
 };
 
-typedef struct json_data json_data;
+
+class JSONContainerArray : public JSONContainer {
+ public:
+    JSONContainerArray(std::string name) : JSONContainer(name),
+        m_elementCounter(0) { }
+    size_t m_elementCounter;
+};
+
+
+class JSONContainerMap : public JSONContainer {
+ public:
+     JSONContainerMap(std::string name) : JSONContainer(name) { }
+};
 
 
 class JSON {
@@ -57,8 +66,6 @@ class JSON {
 
     int addArgument(const std::string& value);
 
-    static int yajl_end_map(void *ctx);
-    static int yajl_start_map(void *ctx);
     static int yajl_number(void *ctx, const char *value, size_t length);
     static int yajl_string(void *ctx, const unsigned char *value,
         size_t length);
@@ -66,17 +73,47 @@ class JSON {
     static int yajl_null(void *ctx);
     static int yajl_map_key(void *ctx, const unsigned char *key,
         size_t length);
+    static int yajl_end_map(void *ctx);
+    static int yajl_start_map(void *ctx);
+    static int yajl_start_array(void *ctx);
+    static int yajl_end_array(void *ctx);
 
 #ifndef NO_LOGS
     void debug(int a, std::string str) {
         m_transaction->debug(a, str);
     }
 #endif
-    json_data m_data;
+
+    bool isPreviousArray() {
+        JSONContainerArray *prev = NULL;
+        if (m_containers.size() < 1) {
+            return false;
+        }
+        prev = dynamic_cast<JSONContainerArray *>(m_containers[m_containers.size() - 1]);
+        return prev != NULL;
+    }
+
+    std::string getCurrentKey(bool emptyIsNull = false) {
+        std::string ret(m_current_key);
+        if (m_containers.size() == 0) {
+            return "json";
+        }
+        if (m_current_key.empty() == true) {
+            if (isPreviousArray() || emptyIsNull == true) {
+                return "";
+            }
+            return "empty-key";
+        }
+        m_current_key = "";
+        return ret;
+    }
 
  private:
+    std::deque<JSONContainer *> m_containers;
     Transaction *m_transaction;
-    std::string m_header;
+    yajl_handle m_handle;
+    yajl_status m_status;
+    std::string m_current_key;
 };
 
 
@@ -86,3 +123,4 @@ class JSON {
 #endif  // WITH_YAJL
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_JSON_H_
+

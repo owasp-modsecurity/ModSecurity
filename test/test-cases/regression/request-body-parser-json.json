@@ -4,7 +4,7 @@
     "version_min":300000,
     "title":"Testing JSON request body parser 1/1",
     "expected":{
-      "debug_log": "Target value: \"bar\" \\(Variable: ARGS:foo\\)"
+      "debug_log": "Target value: \"bar\" \\(Variable: ARGS:json.foo\\)"
     },
     "client":{
       "ip":"200.249.12.31",
@@ -35,7 +35,7 @@
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
         "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
-        "SecRule ARGS:foo \"bar\" \"id:'200441',phase:3,log\""
+        "SecRule ARGS:json.foo \"bar\" \"id:'200441',phase:3,log\""
     ]
   },
   {
@@ -43,7 +43,7 @@
     "version_min":300000,
     "title":"Testing JSON request body parser 1/1",
     "expected":{
-      "debug_log": "Target value: \"bar\" \\(Variable: ARGS:first_level.first_key\\)"
+      "debug_log": "Target value: \"bar\" \\(Variable: ARGS:json.first_level.first_key\\)"
     },
     "client":{
       "ip":"200.249.12.31",

@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Refactoring on the JSON parser.
+   [Issue #1576, #1577 - Tobias Gutknecht, @zimmerle, @victorhora, @marcstern]
  - Adds support to WEBAPPID variable.
    [Issue #1027 - @zimmerle, @victorhora]
  - Adds support for SecWebAppId.
@@ -47,7 +49,7 @@ v3.0.????? - ?
  - Makes auditlog more verbose on debug logs
    [Issue: #1559 - @zimmerle]
  - Enable support for AuditLogFormat
-   [Issue: #1583, #1493 and #1453 - @victorhora]
+   Issue: #1583, #1493 and #1453 - @victorhora]
  - Adds macro expansion for @rx operator
    [Issue: #1528, #1536 - @asterite3, @zimmerle]
  - Consideres under quoted variable while loading the rules.
