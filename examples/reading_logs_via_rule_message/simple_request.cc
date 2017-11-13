@@ -23,14 +23,13 @@
 
 
 int main(int argc, char **argv) {
-    *argv++;
-    if (*argv == NULL) {
-        *argv--;
+    if (argc < 2) {
         std::cout << "Use " << *argv << " test-case-file.conf";
         std::cout << std::endl << std::endl;
         return -1;
     }
 
+    *(argv++);
     std::string rules(*argv);
     ReadingLogsViaRuleMessage rlvrm(request_header, request_uri, request_body,
         response_headers, response_body, ip, rules);

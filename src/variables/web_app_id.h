@@ -32,7 +32,7 @@ namespace Variables {
 
 class WebAppId : public Variable {
  public:
-    explicit WebAppId()
+    WebAppId()
         : Variable("WEBAPPID") { }
 
     void evaluate(Transaction *transaction,

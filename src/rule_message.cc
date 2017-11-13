@@ -69,21 +69,16 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
         msg.append("[client " + std::string(rm->m_clientIpAddress) + "] ");
     }
 
-    if (rm->m_isDisruptive)
-    {
+    if (rm->m_isDisruptive) {
         msg.append("ModSecurity: Access denied with code ");
         if (code == -1) {
             msg.append("%d");
-        }
-        else
-        {
+        } else {
             msg.append(std::to_string(code));
         }
         msg.append(" (phase ");
         msg.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
-    }
-    else
-    {
+    } else {
         msg.append("ModSecurity: Warning. ");
     }
 

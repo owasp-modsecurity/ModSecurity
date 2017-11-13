@@ -16,23 +16,25 @@
 #include "src/operators/verify_ssn.h"
 
 #include <string>
+#include <memory>
+#include <list>
 
 #include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {
 
-int VerifySSN::convert_to_int(const char c)
-{
+int VerifySSN::convert_to_int(const char c) {
     int n;
-    if ((c>='0') && (c<='9'))
+    if ((c >= '0') && (c <= '9')) {
         n = c - '0';
-    else if ((c>='A') && (c<='F'))
+    } else if ((c >= 'A') && (c <= 'F')) {
         n = c - 'A' + 10;
-    else if ((c>='a') && (c<='f'))
+    } else if ((c >= 'a') && (c <= 'f')) {
         n = c - 'a' + 10;
-    else
+    } else {
         n = 0;
+    }
     return n;
 }
 

@@ -265,9 +265,11 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
                 *containsDisruptive = true;
             }
         } else {
-            if (a->m_name == "setvar" || a->m_name == "msg" || a->m_name == "log") {
+            if (a->m_name == "setvar" || a->m_name == "msg"
+                || a->m_name == "log") {
 #ifndef NO_LOGS
-                trans->debug(4, "Running [independent] (non-disruptive) action: " + a->m_name);
+                trans->debug(4, "Running [independent] (non-disruptive) " \
+                    "action: " + a->m_name);
 #endif
 				a->evaluate(this, trans, ruleMessage);
             }
@@ -438,9 +440,11 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
     std::vector<Variables::Variable *> variables;
     std::vector<std::unique_ptr<collection::Variable>> finalVars;
 
-    std::copy (m_variables->begin(), m_variables->end(), std::back_inserter(variables));
+    std::copy(m_variables->begin(), m_variables->end(),
+        std::back_inserter(variables));
 
-    for (auto &a : trans->m_rules->m_exceptions.m_variable_update_target_by_tag) {
+    for (auto &a :
+        trans->m_rules->m_exceptions.m_variable_update_target_by_tag) {
         if (containsTag(*a.first.get(), trans) == false) {
             continue;
         }
@@ -448,10 +452,12 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             std::vector<const collection::Variable *> z;
             a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
-                exclusions_update_by_tag_remove.push_back(std::string(y->m_key));
+                exclusions_update_by_tag_remove.push_back(
+                    std::string(y->m_key));
                 delete y;
             }
-            exclusions_update_by_tag_remove.push_back(std::string(a.second->m_name));
+            exclusions_update_by_tag_remove.push_back(
+                std::string(a.second->m_name));
 
         } else {
             Variable *b = a.second.get();
@@ -459,7 +465,8 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
         }
     }
 
-    for (auto &a : trans->m_rules->m_exceptions.m_variable_update_target_by_msg) {
+    for (auto &a :
+        trans->m_rules->m_exceptions.m_variable_update_target_by_msg) {
         if (containsMsg(*a.first.get(), trans) == false) {
             continue;
         }
@@ -467,10 +474,12 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             std::vector<const collection::Variable *> z;
             a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
-                exclusions_update_by_msg_remove.push_back(std::string(y->m_key));
+                exclusions_update_by_msg_remove.push_back(
+                    std::string(y->m_key));
                 delete y;
             }
-            exclusions_update_by_msg_remove.push_back(std::string(a.second->m_name));
+            exclusions_update_by_msg_remove.push_back(
+                std::string(a.second->m_name));
 
         } else {
             Variable *b = a.second.get();
@@ -478,7 +487,8 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
         }
     }
 
-    for (auto &a : trans->m_rules->m_exceptions.m_variable_update_target_by_id) {
+    for (auto &a :
+        trans->m_rules->m_exceptions.m_variable_update_target_by_id) {
         if (m_ruleId != a.first) {
             continue;
         }
@@ -489,7 +499,8 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 exclusions_update_by_id_remove.push_back(std::string(y->m_key));
                 delete y;
             }
-            exclusions_update_by_id_remove.push_back(std::string(a.second->m_name));
+            exclusions_update_by_id_remove.push_back(
+                std::string(a.second->m_name));
         } else {
             Variable *b = a.second.get();
             variables.push_back(b);
@@ -567,7 +578,8 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 != exclusions_update_by_id_remove.end()) {
 #ifndef NO_LOGS
                 trans->debug(9, "Variable: " + key +
-                    " is part of the exclusion list (from update by ID), skipping...");
+                    " is part of the exclusion list (from " \
+                    "update by ID), skipping...");
 #endif
                     delete v;
                     v = NULL;
@@ -646,7 +658,8 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 continue;
             }
 
-            std::unique_ptr<collection::Variable> var(new collection::Variable(v));
+            std::unique_ptr<collection::Variable> var(
+                new collection::Variable(v));
             delete v;
             v = NULL;
             finalVars.push_back(std::move(var));
@@ -705,7 +718,8 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
             if (a->m_name != "setvar" && a->m_name != "log"
                 && a->m_name != "msg") {
 #ifndef NO_LOGS
-                trans->debug(4, "Running (non-disruptive) action: " + a->m_name);
+                trans->debug(4, "Running (non-disruptive) action: " \
+		    + a->m_name);
 #endif
                 a->evaluate(this, trans, ruleMessage);
             }

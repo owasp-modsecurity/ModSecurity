@@ -323,7 +323,7 @@ class Transaction : public TransactionAnchoredVariables {
     size_t getRequestBodyLength();
 
 #ifndef NO_LOGS
-    void debug(int, std::string);
+    void debug(int, std::string) const;
 #endif
     void serverLog(std::shared_ptr<RuleMessage> rm);
 

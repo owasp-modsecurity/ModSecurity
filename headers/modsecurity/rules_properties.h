@@ -355,7 +355,7 @@ class RulesProperties {
             to->m_httpblKey.m_set = from->m_httpblKey.m_set;
         }
 
-        to->m_exceptions.merge(from->m_exceptions);
+        to->m_exceptions.merge(&from->m_exceptions);
 
         to->m_components.insert(to->m_components.end(),
             from->m_components.begin(), from->m_components.end());

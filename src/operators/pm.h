@@ -57,6 +57,7 @@ class Pm : public Operator {
     ACMP *m_p;
 
 #ifdef MODSEC_MUTEX_ON_PM
+
  private:
     pthread_mutex_t m_lock;
 #endif

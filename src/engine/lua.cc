@@ -14,16 +14,10 @@
  */
 
 
-#include "modsecurity/modsecurity.h"
 #include "src/engine/lua.h"
-#include "src/utils/string.h"
-#include "src/macro_expansion.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/collection/variable.h"
-#include "src/variables/variable.h"
-#include "src/variables/highest_severity.h"
-#include "src/utils/string.h"
-#include "src/actions/transformations/transformation.h"
+
+#include <stdio.h>
+#include <string.h>
 
 #include <vector>
 #include <string>
@@ -32,8 +26,14 @@
 #include <iterator>
 #include <iostream>
 
-#include <stdio.h>
-#include <string.h>
+#include "modsecurity/modsecurity.h"
+#include "src/utils/string.h"
+#include "src/macro_expansion.h"
+#include "modsecurity/transaction.h"
+#include "modsecurity/collection/variable.h"
+#include "src/variables/variable.h"
+#include "src/variables/highest_severity.h"
+#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {
@@ -46,8 +46,7 @@ bool Lua::isCompatible(std::string script, Lua *l, std::string *error) {
     std::string err;
 
     if (!(script.size() >= lua.size() &&
-        script.compare(script.size() - lua.size(), lua.size(), lua) == 0))
-    {
+        script.compare(script.size() - lua.size(), lua.size(), lua) == 0)) {
         error->assign("Expecting a Lua script: " + script);
         return false;
     }
@@ -84,7 +83,7 @@ bool Lua::load(std::string script, std::string *err) {
         return false;
     }
 
-    if (lua_dump(L, Lua::blob_keeper, (void *)&m_blob, 0)) {
+    if (lua_dump(L, Lua::blob_keeper, reinterpret_cast<void *>(&m_blob), 0)) {
         const char *luaerr = lua_tostring(L, -1);
         err->assign("Failed to compile script '" + script + "");
         if (luaerr) {
@@ -129,7 +128,7 @@ int Lua::run(Transaction *t) {
     luaL_newmetatable(L, "luaL_msc");
     lua_newtable(L);
 
-    lua_pushlightuserdata(L, (void *)t);
+    lua_pushlightuserdata(L, reinterpret_cast<void *>(t));
     lua_setglobal(L, "__transaction");
 
     luaL_setfuncs(L, mscLuaLib, 0);
@@ -184,7 +183,7 @@ int Lua::run(Transaction *t) {
         return false;
     }
 
-    char *a = (char *)lua_tostring(L, -1);
+    const char *a = reinterpret_cast<const char *>(lua_tostring(L, -1));
     if (a != NULL) {
         luaRet.assign(a);
     }
@@ -208,7 +207,7 @@ int Lua::run(Transaction *t) {
 
 #ifdef WITH_LUA
 int Lua::log(lua_State *L) {
-    Transaction *t = NULL;
+    const Transaction *t = NULL;
     const char *text;
     int level;
 
@@ -218,7 +217,7 @@ int Lua::log(lua_State *L) {
 
     /* Retrieve msr. */
     lua_getglobal(L, "__transaction");
-    t = (Transaction *)lua_topointer(L, -1);
+    t = reinterpret_cast<const Transaction *>(lua_topointer(L, -1));
 
     /* Log message. */
     if (t != NULL) {
@@ -230,14 +229,16 @@ int Lua::log(lua_State *L) {
 
 
 int Lua::getvar(lua_State *L) {
-    char *varname = NULL;
+    const char *varname = NULL;
     Transaction *t = NULL;
+    void *z = NULL;
 
     /* Retrieve parameters. */
-    varname = (char *)luaL_checkstring(L, 1);
+    varname = reinterpret_cast<const char *>(luaL_checkstring(L, 1));
 
     lua_getglobal(L, "__transaction");
-    t = (Transaction *)lua_topointer(L, -1);
+    z = const_cast<void *>(lua_topointer(L, -1));
+    t = reinterpret_cast<Transaction *>(z);
 
     std::string var = Variables::Variable::stringMatchResolve(t, varname);
     var = applyTransformations(L, t, 2, var);
@@ -254,16 +255,18 @@ int Lua::getvar(lua_State *L) {
 
 
 int Lua::getvars(lua_State *L) {
-    char *varname = NULL;
+    const char *varname = NULL;
     Transaction *t = NULL;
+    void *z = NULL;
     std::vector<const collection::Variable *> l;
     int idx = 1;
 
     /* Retrieve parameters. */
-    varname = (char *)luaL_checkstring(L, 1);
+    varname = reinterpret_cast<const char *>(luaL_checkstring(L, 1));
 
     lua_getglobal(L, "__transaction");
-    t = (Transaction *)lua_topointer(L, -1);
+    z = const_cast<void *>(lua_topointer(L, -1));
+    t = reinterpret_cast<Transaction *>(z);
 
     Variables::Variable::stringMatchResolveMulti(t, varname, &l);
 
@@ -298,9 +301,12 @@ int Lua::setvar(lua_State *L) {
     int nargs = lua_gettop(L);
     char *chr = NULL;
     size_t pos;
+    void *z = NULL;
 
     lua_getglobal(L, "__transaction");
-    t = (Transaction *)lua_topointer(L, -1);
+    z = const_cast<void *>(lua_topointer(L, -1));
+    t = reinterpret_cast<Transaction *>(z);
+
 
     if (nargs != 2) {
         t->debug(8, "m.setvar: Failed m.setvar funtion must has 2 arguments");
@@ -334,7 +340,8 @@ int Lua::setvar(lua_State *L) {
 }
 
 
-std::string Lua::applyTransformations(lua_State *L, Transaction *t, int idx, std::string var) {
+std::string Lua::applyTransformations(lua_State *L, Transaction *t,
+    int idx, std::string var) {
     std::string newVar = var;
 
     if (lua_isuserdata(L, idx) || lua_isnoneornil(L, idx)) {
@@ -342,12 +349,12 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t, int idx, std
     }
 
     if (lua_istable(L, idx)) {
-        char *name = NULL;
+        const char *name = NULL;
         int i, n = lua_rawlen(L, idx);
 
         for (i = 1; i <= n; i++) {
             lua_rawgeti(L, idx, i);
-            name = (char *)luaL_checkstring(L, -1);
+            name = reinterpret_cast<const char *>(luaL_checkstring(L, -1));
 
             /* A "none" means start over */
             if (strcmp("none", name) == 0) {
@@ -355,12 +362,15 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t, int idx, std
                 continue;
             }
 
-            actions::transformations::Transformation *tfn = actions::transformations::Transformation::instantiate("t:" + std::string(name));
-            // FIXME: transformation is not yet returning null. 
+            actions::transformations::Transformation *tfn = \
+                actions::transformations::Transformation::instantiate(
+                    "t:" + std::string(name));
+            // FIXME: transformation is not yet returning null.
             if (tfn) {
                 newVar = tfn->evaluate(newVar, t);
             } else {
-                t->debug(1, "SecRuleScript: Invalid transformation function: " + std::string(name));
+                t->debug(1, "SecRuleScript: Invalid transformation function: " \
+                    + std::string(name));
             }
         }
 
@@ -368,14 +378,19 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t, int idx, std
     }
 
     if (lua_isstring(L, idx)) {
-        char *name = (char *)luaL_checkstring(L, idx);
+        const char *name = NULL;
+        name = reinterpret_cast<const char *>(luaL_checkstring(L, idx));
 
-        actions::transformations::Transformation *tfn = actions::transformations::Transformation::instantiate("t:" + std::string(name));
-        // FIXME: transformation is not yet returning null. 
+        actions::transformations::Transformation *tfn = \
+            actions::transformations::Transformation::instantiate(
+                "t:" + std::string(name));
+
+        // FIXME: transformation is not yet returning null.
         if (tfn) {
             newVar = tfn->evaluate(newVar, t);
         } else {
-            t->debug(1, "SecRuleScript: Invalid transformation function: " + std::string(name));
+            t->debug(1, "SecRuleScript: Invalid transformation function: " \
+                + std::string(name));
         }
         return newVar;
     }
@@ -389,5 +404,6 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t, int idx, std
 }
 #endif
 
-}  // namespace engines
-}  // namespace modsecurity
+}  //  namespace engine
+}  //  namespace modsecurity
+

@@ -206,7 +206,7 @@ class AuditLog {
     int m_directoryPermission;
     int m_defaultDirectoryPermission = 0750;
 
-private:
+ private:
     AuditLogStatus m_status;
 
     AuditLogType m_type;

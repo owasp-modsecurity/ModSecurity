@@ -13,28 +13,30 @@
  *
  */
 
-#include <ctime>
-#include <iostream>
-
-#include <libxml/xmlschemas.h>
-#include <libxml/xpath.h>
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rule.h"
-#include "modsecurity/rule_message.h"
-#include "src/collection/backend/in_memory-per_process.h"
-#include "src/collection/backend/lmdb.h"
 #include "src/config.h"
-#include "src/unique_id.h"
-#include "src/utils/regex.h"
-#ifdef MSC_WITH_CURL
-#include <curl/curl.h>
-#endif
+
 #ifdef WITH_YAJL
 #include <yajl/yajl_tree.h>
 #include <yajl/yajl_gen.h>
 #endif
+#include <libxml/xmlschemas.h>
+#include <libxml/xpath.h>
+#ifdef MSC_WITH_CURL
+#include <curl/curl.h>
+#endif
 
+
+#include <ctime>
+#include <iostream>
+
+#include "modsecurity/rule.h"
+#include "modsecurity/rule_message.h"
+#include "src/collection/backend/in_memory-per_process.h"
+#include "src/collection/backend/lmdb.h"
+#include "src/unique_id.h"
+#include "src/utils/regex.h"
 #include "src/utils/geo_lookup.h"
 #include "src/actions/transformations/transformation.h"
 
@@ -303,14 +305,16 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             reinterpret_cast<const unsigned char*>(trans.back().match.c_str()),
             trans.back().match.size());
 
-        t = modsecurity::actions::transformations::Transformation::instantiate(trans.back().match.c_str());
+        t = modsecurity::actions::transformations::Transformation::instantiate(
+            trans.back().match.c_str());
         varValueRes = t->evaluate(varValue, NULL);
         varValue.assign(varValueRes);
         trans.pop_back();
 
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("value"),
             strlen("value"));
-        yajl_gen_string(g, reinterpret_cast<const unsigned char*>(varValue.c_str()),
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>(
+            varValue.c_str()),
             varValue.size());
         yajl_gen_map_close(g);
     }

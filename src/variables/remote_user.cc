@@ -44,7 +44,8 @@ void RemoteUser::evaluate(Transaction *transaction,
     collection::Variable *var;
     std::string header;
 
-    std::vector<const collection::Variable *> *l2 = new std::vector<const collection::Variable *>();
+    std::vector<const collection::Variable *> *l2 = \
+	new std::vector<const collection::Variable *>();
     transaction->m_variableRequestHeaders.resolve("authorization", l2);
 
     if (l2->size() < 1) {

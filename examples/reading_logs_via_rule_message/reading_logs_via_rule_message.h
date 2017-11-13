@@ -13,10 +13,11 @@
  *
  */
 
+#include <unistd.h>
+
 #include <string>
 #include <memory>
 
-#include <unistd.h>
 
 #define NUM_THREADS 100
 
@@ -151,8 +152,9 @@ class ReadingLogsViaRuleMessage {
         dms.rules = rules;
 
         for (i = 0; i < NUM_THREADS; i++) {
-            pthread_create(&threads[i], NULL, process_request, (void *)&dms);
-            //process_request((void *)&dms);
+            pthread_create(&threads[i], NULL, process_request,
+		reinterpret_cast<void *>(&dms));
+            //  process_request((void *)&dms);
         }
 
         usleep(10000);

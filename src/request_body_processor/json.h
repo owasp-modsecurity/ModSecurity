@@ -23,6 +23,7 @@
 
 #include <string>
 #include <iostream>
+#include <deque>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rules.h"
@@ -35,15 +36,15 @@ namespace RequestBodyProcessor {
 
 class JSONContainer {
  public:
-    JSONContainer(std::string name) : m_name(name) { };
-    virtual ~JSONContainer() { };
+    explicit JSONContainer(std::string name) : m_name(name) { }
+    virtual ~JSONContainer() { }
     std::string m_name;
 };
 
 
 class JSONContainerArray : public JSONContainer {
  public:
-    JSONContainerArray(std::string name) : JSONContainer(name),
+    explicit JSONContainerArray(std::string name) : JSONContainer(name),
         m_elementCounter(0) { }
     size_t m_elementCounter;
 };
@@ -51,7 +52,7 @@ class JSONContainerArray : public JSONContainer {
 
 class JSONContainerMap : public JSONContainer {
  public:
-     JSONContainerMap(std::string name) : JSONContainer(name) { }
+     explicit JSONContainerMap(std::string name) : JSONContainer(name) { }
 };
 
 
@@ -89,7 +90,8 @@ class JSON {
         if (m_containers.size() < 1) {
             return false;
         }
-        prev = dynamic_cast<JSONContainerArray *>(m_containers[m_containers.size() - 1]);
+        prev = dynamic_cast<JSONContainerArray *>(
+            m_containers[m_containers.size() - 1]);
         return prev != NULL;
     }
 

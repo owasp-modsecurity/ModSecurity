@@ -19,7 +19,7 @@
 #include <string>
 
 #ifdef WITH_SSDEEP
-#include "fuzzy.h"
+#include <fuzzy.h>
 #endif
 
 #include "src/operators/operator.h"

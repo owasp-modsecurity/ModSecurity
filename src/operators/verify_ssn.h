@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_VERIFY_SSN_H_
 
 #include <string>
+#include <memory>
 
 #include "src/operators/operator.h"
 #include "src/utils/regex.h"

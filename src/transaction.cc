@@ -174,7 +174,7 @@ Transaction::~Transaction() {
  *
  */
 #ifndef NO_LOGS
-void Transaction::debug(int level, std::string message) {
+void Transaction::debug(int level, std::string message) const {
     if (m_rules == NULL) {
         return;
     }
@@ -1076,9 +1076,11 @@ int Transaction::processResponseBody() {
         return true;
     }
 
-    std::set<std::string> &bi = m_rules->m_responseBodyTypeToBeInspected.m_value;
+    std::set<std::string> &bi = \
+        m_rules->m_responseBodyTypeToBeInspected.m_value;
     auto t = bi.find(m_variableResponseContentType.m_value);
-    if (t == bi.end() && m_rules->m_responseBodyTypeToBeInspected.m_set == true) {
+    if (t == bi.end()
+        && m_rules->m_responseBodyTypeToBeInspected.m_set == true) {
 #ifndef NO_LOGS
         debug(5, "Response Content-Type is " \
             + m_variableResponseContentType.m_value \
@@ -1127,7 +1129,8 @@ int Transaction::processResponseBody() {
 int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_responseBody.tellp();
 
-    std::set<std::string> &bi = this->m_rules->m_responseBodyTypeToBeInspected.m_value;
+    std::set<std::string> &bi = \
+        this->m_rules->m_responseBodyTypeToBeInspected.m_value;
     auto t = bi.find(m_variableResponseContentType.m_value);
     if (t == bi.end() && bi.empty() == false) {
 #ifndef NO_LOGS
@@ -1466,7 +1469,8 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         std::vector<const collection::Variable *> l;
 
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
-        audit_log << "HTTP/" << m_httpVersion.c_str()  << " " << this->m_httpCodeReturned << std::endl;
+        audit_log << "HTTP/" << m_httpVersion.c_str()  << " ";
+        audit_log << this->m_httpCodeReturned << std::endl;
         m_variableResponseHeaders.resolve(&l);
         for (auto &h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
@@ -1701,7 +1705,8 @@ std::string Transaction::toJSON(int parts) {
 
     return log;
 #else
-    return std::string("{\"error\":\"ModSecurity was not compiled with JSON support.\"}");
+    return std::string("{\"error\":\"ModSecurity was " \
+        "not compiled with JSON support.\"}");
 #endif
 }
 

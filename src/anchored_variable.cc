@@ -111,7 +111,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
 
 
 void AnchoredVariable::evaluate(std::vector<const collection::Variable *> *l) {
-    if (m_name.empty() or m_value.empty()) {
+    if (m_name.empty() || m_value.empty()) {
         return;
     }
 

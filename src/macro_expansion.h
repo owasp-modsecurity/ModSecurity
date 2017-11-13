@@ -39,13 +39,14 @@ class MacroExpansion {
     static std::string expandKeepOriginal(const std::string& input,
         Transaction *transaction);
 
-    static inline bool compareStrNoCase(const std::string &a, const std::string &b) {
+    static inline bool compareStrNoCase(const std::string &a,
+        const std::string &b) {
         return a.size() == b.size()
              && std::equal(a.begin(), a.end(), b.begin(),
             [](char aa, char bb) {
             return toupper(aa) == bb;
         });
-    };
+    }
 };
 
 

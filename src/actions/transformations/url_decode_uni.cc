@@ -36,7 +36,7 @@ namespace transformations {
 
 
 std::string UrlDecodeUni::evaluate(std::string value,
-    Transaction *transaction) {
+    Transaction *t) {
     std::string ret;
     unsigned char *input;
 
@@ -49,7 +49,7 @@ std::string UrlDecodeUni::evaluate(std::string value,
 
     memcpy(input, value.c_str(), value.length()+1);
 
-    size_t i = inplace(input, value.length(), transaction);
+    size_t i = inplace(input, value.length(), t);
 
     ret.assign(reinterpret_cast<char *>(input), i);
     free(input);
@@ -63,7 +63,7 @@ std::string UrlDecodeUni::evaluate(std::string value,
  * IMP1 Assumes NUL-terminated
  */
 int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
-    Transaction *transaction) {
+    Transaction *t) {
     unsigned char *d = input;
     int64_t i, count, fact, j, xv;
     int Code, hmap = -1;
@@ -86,10 +86,10 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
                         Code = 0;
                         fact = 1;
 
-                        if (transaction
-                            && transaction->m_rules->m_unicodeMapTable.m_set == true
-                            && transaction->m_rules->m_unicodeMapTable.m_unicode_map_table != NULL
-                            && transaction->m_rules->unicode_codepage > 0)  {
+                        if (t
+                            && t->m_rules->m_unicodeMapTable.m_set == true
+                            && t->m_rules->m_unicodeMapTable.m_unicode_map_table != NULL
+                            && t->m_rules->unicode_codepage > 0)  {
                             for (j = 5; j >= 2; j--) {
                                 if (isxdigit((input[i+j]))) {
                                     if (input[i+j] >= 97) {
@@ -105,7 +105,7 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
                             }
 
                             if (Code >= 0 && Code <= 65535)  {
-                                Rules *r = transaction->m_rules;
+                                Rules *r = t->m_rules;
                                 hmap = r->m_unicodeMapTable.m_unicode_map_table[Code];
                             }
                         }

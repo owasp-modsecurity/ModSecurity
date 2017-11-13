@@ -52,7 +52,8 @@ class Rule {
     explicit Rule(std::string marker);
     ~Rule();
 
-    virtual bool evaluate(Transaction *transaction, std::shared_ptr<RuleMessage> rm);
+    virtual bool evaluate(Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm);
     bool evaluateActions(Transaction *transaction);
     std::vector<std::unique_ptr<collection::Variable>>
 	getFinalVars(Transaction *trasn);
@@ -108,7 +109,7 @@ class Rule {
     operators::Operator *m_op;
     int m_phase;
     std::string m_rev;
-    long m_ruleId;
+    int64_t m_ruleId;
     bool m_secMarker;
     std::vector<Variables::Variable *> *m_variables;
     std::string m_ver;

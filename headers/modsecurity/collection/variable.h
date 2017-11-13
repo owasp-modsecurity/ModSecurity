@@ -19,6 +19,7 @@
 #include <iostream>
 #include <memory>
 #include <list>
+#include <utility>
 #endif
 
 #include "modsecurity/variable_origin.h"
@@ -51,7 +52,7 @@ class Variable {
         m_key(""),
         m_value("") { }
 
-    Variable(const Variable *o) :
+    explicit Variable(const Variable *o) :
         m_key(""),
         m_value("") {
         m_key.assign(o->m_key);

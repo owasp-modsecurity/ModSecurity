@@ -15,9 +15,10 @@
 
 #include "src/operators/inspect_file.h"
 
+#include <stdio.h>
+
 #include <string>
 #include <iostream>
-#include <stdio.h>
 
 #include "src/operators/operator.h"
 #include "src/utils/system.h"
@@ -61,7 +62,7 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
         openstr.append(m_param);
         openstr.append(" ");
         openstr.append(str);
-        if (!(in = popen(openstr.c_str(), "r"))){
+        if (!(in = popen(openstr.c_str(), "r"))) {
             return false;
         }
 

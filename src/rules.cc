@@ -206,7 +206,8 @@ int Rules::evaluate(int phase, Transaction *transaction) {
             if (m_exceptions.m_remove_rule_by_msg.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_msg) {
                     if (rule->containsMsg(z, transaction) == true) {
-                        debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
+                        debug(9, "Skipped rule id '" \
+                            + std::to_string(rule->m_ruleId) \
                             + "'. Removed by a SecRuleRemoveByMsg directive.");
                         return 1;
                     }
@@ -216,7 +217,8 @@ int Rules::evaluate(int phase, Transaction *transaction) {
             if (m_exceptions.m_remove_rule_by_tag.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_tag) {
                     if (rule->containsTag(z, transaction) == true) {
-                        debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
+                        debug(9, "Skipped rule id '" \
+                            + std::to_string(rule->m_ruleId) \
                             + "'. Removed by a SecRuleRemoveByTag directive.");
                         return 1;
                     }

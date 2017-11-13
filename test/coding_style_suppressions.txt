@@ -29,4 +29,9 @@
 ./test/benchmark/owasp-v3/util/av-scanning/runAV/common.h
 ./src/audit_log/writer/parallel.cc:28
 ./src/macro_expansion.c
+./src/utils/string.h
+./headers/modsecurity/rules_properties.h:369
+./headers/modsecurity/rules_properties.h:370
+./src/actions/transformations/url_decode_uni.cc
+./test/unit/unit.cc:47
 Total errors found

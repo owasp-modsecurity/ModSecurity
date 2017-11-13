@@ -20,10 +20,10 @@
 #include <iostream>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
-
-#ifndef SRC_ENGINES_LUA_H_
-#define SRC_ENGINES_LUA_H_
+#ifndef SRC_ENGINE_LUA_H_
+#define SRC_ENGINE_LUA_H_
 
 namespace modsecurity {
 class Transaction;
@@ -34,7 +34,7 @@ class LuaScriptBlob {
  public:
     LuaScriptBlob() :
         m_data(NULL),
-        m_len(0) { };
+        m_len(0) { }
 
     ~LuaScriptBlob() {
         if (m_data) {
@@ -66,7 +66,7 @@ class LuaScriptBlob {
 
 class Lua {
  public:
-    Lua() { };
+    Lua() { }
 
     bool load(std::string script, std::string *err);
     int run(Transaction *t);
@@ -80,8 +80,8 @@ class Lua {
     static int getvar(lua_State *L);
     static int getvars(lua_State *L);
     static int setvar(lua_State *L);
-    static std::string applyTransformations(lua_State *L, Transaction *t, int idx,
-        std::string var);
+    static std::string applyTransformations(lua_State *L, Transaction *t,
+        int idx, std::string var);
 
     LuaScriptBlob m_blob;
 #endif
@@ -98,7 +98,7 @@ static const struct luaL_Reg mscLuaLib[] = {
 };
 #endif
 
-}  // namespace engines
+}  // namespace engine
 }  // namespace modsecurity
 
-#endif  // SRC_ENGINES_LUA_H_
+#endif  // SRC_ENGINE_LUA_H_

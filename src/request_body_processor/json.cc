@@ -117,7 +117,8 @@ int JSON::addArgument(const std::string& value) {
     std::string path;
 
     for (size_t i =  0; i < m_containers.size(); i++) {
-        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(m_containers[i]);
+        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+            m_containers[i]);
         path = path + m_containers[i]->m_name;
         if (a != NULL) {
             path = path + ".array_" + std::to_string(a->m_elementCounter);
@@ -126,7 +127,8 @@ int JSON::addArgument(const std::string& value) {
         }
     }
 
-    JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(m_containers.back());
+    JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+        m_containers.back());
     if (a) {
         a->m_elementCounter++;
     } else {
@@ -212,7 +214,8 @@ int JSON::yajl_number(void *ctx, const char *value, size_t length) {
 int JSON::yajl_start_array(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
     std::string name = tthis->getCurrentKey();
-    tthis->m_containers.push_back((JSONContainer *)new JSONContainerArray(name));
+    tthis->m_containers.push_back(
+        reinterpret_cast<JSONContainer *>(new JSONContainerArray(name)));
     return 1;
 }
 
@@ -223,7 +226,8 @@ int JSON::yajl_end_array(void *ctx) {
     tthis->m_containers.pop_back();
     delete a;
     if (tthis->m_containers.size() > 0) {
-        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(tthis->m_containers.back());
+        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+            tthis->m_containers.back());
         if (a) {
             a->m_elementCounter++;
         }
@@ -236,7 +240,8 @@ int JSON::yajl_end_array(void *ctx) {
 int JSON::yajl_start_map(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
     std::string name(tthis->getCurrentKey());
-    tthis->m_containers.push_back((JSONContainer *)new JSONContainerMap(name));
+    tthis->m_containers.push_back(
+        reinterpret_cast<JSONContainer *>(new JSONContainerMap(name)));
     return 1;
 }
 
@@ -252,7 +257,8 @@ int JSON::yajl_end_map(void *ctx) {
     delete a;
 
     if (tthis->m_containers.size() > 0) {
-        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(tthis->m_containers.back());
+        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+            tthis->m_containers.back());
         if (a) {
             a->m_elementCounter++;
         }

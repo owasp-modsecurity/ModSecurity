@@ -15,6 +15,9 @@
  */
 
 #include <string>
+#include <memory>
+#include <vector>
+
 #include "modsecurity/rule.h"
 #include "src/engine/lua.h"
 #include "src/operators/operator.h"
@@ -45,9 +48,9 @@ class RuleScript : public Rule {
     RuleScript(std::string name,
         std::vector<Action *> *actions,
         std::string fileName,
-        int lineNumber
-    ) : Rule (NULL, NULL, actions, fileName, lineNumber),
-        m_name(name) { };
+        int lineNumber)
+            : Rule(NULL, NULL, actions, fileName, lineNumber),
+        m_name(name) { }
 
     bool init(std::string *err);
     bool evaluate(Transaction *trans,

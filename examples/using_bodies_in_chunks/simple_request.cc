@@ -13,16 +13,18 @@
  *
  */
 
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-#include <string>
-#include <memory>
 
-#include <unistd.h>
 
 #include <modsecurity/modsecurity.h>
 #include <modsecurity/rules.h>
 #include <modsecurity/rule_message.h>
+
+
+#include <string>
+#include <memory>
 
 
 
@@ -85,8 +87,7 @@ static void logCb(void *data, const void *ruleMessagev) {
     }
 }
 
-int process_intervention(modsecurity::Transaction *transaction)
-{
+int process_intervention(modsecurity::Transaction *transaction) {
     modsecurity::ModSecurityIntervention intervention;
     intervention.status = 200;
     intervention.url = NULL;
@@ -105,8 +106,7 @@ int process_intervention(modsecurity::Transaction *transaction)
     free(intervention.log);
     intervention.log = NULL;
 
-    if (intervention.url != NULL)
-    {
+    if (intervention.url != NULL) {
         std::cout << "Intervention, redirect to: " << intervention.url;
         std::cout << " with status code: " << intervention.status << std::endl;
         free(intervention.url);
@@ -114,8 +114,7 @@ int process_intervention(modsecurity::Transaction *transaction)
         return intervention.status;
     }
 
-    if (intervention.status != 200)
-    {
+    if (intervention.status != 200) {
         std::cout << "Intervention, returning code: " << intervention.status;
         std::cout << std::endl;
         return intervention.status;
@@ -129,13 +128,12 @@ int main(int argc, char **argv) {
     modsecurity::Rules *rules;
     modsecurity::ModSecurityIntervention it;
 
-    *argv++;
-    if (*argv == NULL) {
-        *argv--;
+    if (argc < 2) {
         std::cout << "Use " << *argv << " test-case-file.conf";
         std::cout << std::endl << std::endl;
         return -1;
     }
+    *(argv++);
 
     std::string rules_arg(*argv);
 
