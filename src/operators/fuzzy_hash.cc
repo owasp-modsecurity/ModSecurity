@@ -91,7 +91,7 @@ FuzzyHash::~FuzzyHash() {
         free(c->data);
         c->data = NULL;
         c = c->next;
-        free (t);
+        free(t);
     }
     m_head = NULL;
 }

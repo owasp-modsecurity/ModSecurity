@@ -3771,4 +3771,55 @@
    fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
    fun:main
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:realloc
+   fun:write
+   fun:_ZN11modsecurity6engine3Lua11blob_keeperEP9lua_StatePKvmPv
+   obj:/usr/lib/liblua.so.5.3.4
+   obj:/usr/lib/liblua.so.5.3.4
+   obj:/usr/lib/liblua.so.5.3.4
+   obj:/usr/lib/liblua.so.5.3.4
+   fun:_ZN11modsecurity6engine3Lua4loadENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPS7_
+   fun:_ZN11modsecurity10RuleScript4initEPNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_assignERKS4_
+   fun:assign
+   fun:operator=
+   fun:_ZN11modsecurity6engine3Lua4loadENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPS7_
+   fun:_ZN11modsecurity10RuleScript4initEPNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPcEEvT_S7_St20forward_iterator_tag.isra.137
+   fun:_M_construct_aux<char*>
+   fun:_M_construct<char*>
+   fun:basic_string
+   fun:RuleScript
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
 

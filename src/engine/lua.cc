@@ -122,6 +122,8 @@ const char *Lua::blob_reader(lua_State *L, void *ud, size_t *size) {
 int Lua::run(Transaction *t) {
 #ifdef WITH_LUA
     std::string luaRet;
+    const char *a = NULL;
+    int ret = true;
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
 
@@ -152,7 +154,8 @@ int Lua::run(Transaction *t) {
         }
         e.append(lua_tostring(L, -1));
         t->debug(2, e);
-        return false;
+        ret = false;
+        goto err;
     }
 
     if (lua_pcall(L, 0, 0, 0)) {
@@ -165,7 +168,8 @@ int Lua::run(Transaction *t) {
             e.append(luaerr);
         }
         t->debug(2, e);
-        return false;
+        ret = false;
+        goto err;
     }
 
     lua_setglobal(L, "modsec");
@@ -180,24 +184,27 @@ int Lua::run(Transaction *t) {
             e.append(luaerr);
         }
         t->debug(2, e);
-        return false;
+        ret = false;
+        goto err;
     }
 
-    const char *a = reinterpret_cast<const char *>(lua_tostring(L, -1));
+    a = reinterpret_cast<const char *>(lua_tostring(L, -1));
     if (a != NULL) {
         luaRet.assign(a);
     }
 
     t->debug(9, "Returning from lua script: " + luaRet);
 
+    if (luaRet.size() == 0) {
+        ret = false;
+    }
+
+
+err:
     lua_pop(L, 1);
     lua_close(L);
 
-    if (luaRet.size() == 0) {
-        return false;
-    }
-
-    return true;
+    return ret;
 #else
     t->debug(9, "Lua support was not enabled.");
     return false;
@@ -287,6 +294,10 @@ int Lua::getvars(lua_State *L) {
         idx++;
     }
 
+    for (const collection::Variable * i : l) {
+        delete i;
+    }
+
     return 1;
 }
 
@@ -372,6 +383,7 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
                 t->debug(1, "SecRuleScript: Invalid transformation function: " \
                     + std::string(name));
             }
+            delete tfn;
         }
 
         return newVar;
@@ -388,6 +400,7 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
         // FIXME: transformation is not yet returning null.
         if (tfn) {
             newVar = tfn->evaluate(newVar, t);
+            delete tfn;
         } else {
             t->debug(1, "SecRuleScript: Invalid transformation function: " \
                 + std::string(name));
