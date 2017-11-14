@@ -29,7 +29,7 @@ namespace operators {
 
 
 struct fuzzy_hash_chunk {
-    const char *data;
+    char *data;
     struct fuzzy_hash_chunk *next;
 };
 
@@ -44,6 +44,8 @@ class FuzzyHash : public Operator {
         : Operator("FuzzyHash", param),
         m_head(NULL),
         m_threshold(0) { }
+    ~FuzzyHash();
+
     bool evaluate(Transaction *transaction, const std::string &std) override;
 
     bool init(const std::string &param, std::string *error) override;

@@ -84,6 +84,17 @@ bool FuzzyHash::init(const std::string &param2, std::string *error) {
 #endif
 }
 
+FuzzyHash::~FuzzyHash() {
+    struct fuzzy_hash_chunk *c = m_head;
+    while (c) {
+        struct fuzzy_hash_chunk *t = c;
+        free(c->data);
+        c->data = NULL;
+        c = c->next;
+        free (t);
+    }
+    m_head = NULL;
+}
 
 
 bool FuzzyHash::evaluate(Transaction *t, const std::string &str) {
