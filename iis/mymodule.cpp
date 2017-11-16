@@ -1155,6 +1155,23 @@ apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
 		// not possible
     }
 
+	// Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
+	// This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
+
+	USHORT ctcch = 0;
+	char *ct = (char *)pHttpRequest->GetHeader(HttpHeaderTransferEncoding, &ctcch);
+	if (ct)
+	{
+		char *ctz = ZeroTerminate(ct, ctcch, r->pool);
+		if (ctcch != 0)
+		{
+			if (0 == stricmp(ctz, "chunked"))
+			{
+				pHttpRequest->DeleteHeader(HttpHeaderTransferEncoding);
+			}
+		}
+	}
+	
     hr = pHttpRequest->SetHeader(
             HttpHeaderContentLength, 
             szLength, 
