@@ -129,11 +129,11 @@ AC_DEFUN([CHECK_FOR_LUA_AT], [
            break
        fi
     done
-    if test -e "${path}/include/fuzzy.h"; then
+    if test -e "${path}/include/lua.h"; then
         lua_inc_path="${path}/include"
-    elif test -e "${path}/fuzzy.h"; then
+    elif test -e "${path}/lua.h"; then
         lua_inc_path="${path}"
-    elif test -e "${path}/include/fuzzy/fuzzy.h"; then
+    elif test -e "${path}/include/lua/lua.h"; then
         lua_inc_path="${path}/include"
     fi
 
