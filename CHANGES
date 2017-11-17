@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Fix lua headers on the build scripts
+   [Issue #1621 - @Minasu]
  - Refactoring on the JSON parser.
    [Issue #1576, #1577 - Tobias Gutknecht, @zimmerle, @victorhora, @marcstern]
  - Adds support to WEBAPPID variable.
