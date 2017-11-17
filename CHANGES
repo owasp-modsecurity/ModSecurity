@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Improvements on the benchmark tool.
+   [Issue #1615 - @zimmerle]
  - Fix lua headers on the build scripts
    [Issue #1621 - @Minasu]
  - Refactoring on the JSON parser.
