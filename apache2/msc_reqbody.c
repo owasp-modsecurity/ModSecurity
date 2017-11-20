@@ -710,7 +710,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
         }
         else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
 #ifdef WITH_YAJL
-            if (json_complete(msr, &my_error_msg) < 0) {
+            if (json_complete(msr, &my_error_msg) < 0 && msr->msc_reqbody_length > 0) {
                 *error_msg = apr_psprintf(msr->mp, "JSON parser error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
