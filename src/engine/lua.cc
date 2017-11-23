@@ -83,6 +83,19 @@ bool Lua::load(std::string script, std::string *err) {
         return false;
     }
 
+#ifdef WITH_LUA_5_2
+    if (lua_dump(L, Lua::blob_keeper, reinterpret_cast<void *>(&m_blob))) {
+        const char *luaerr = lua_tostring(L, -1);
+        err->assign("Failed to compile script '" + script + "");
+        if (luaerr) {
+            err->append(": " + *luaerr);
+        }
+        err->append(".");
+        lua_close(L);
+
+        return false;
+    }
+#else
     if (lua_dump(L, Lua::blob_keeper, reinterpret_cast<void *>(&m_blob), 0)) {
         const char *luaerr = lua_tostring(L, -1);
         err->assign("Failed to compile script '" + script + "");
@@ -94,7 +107,7 @@ bool Lua::load(std::string script, std::string *err) {
 
         return false;
     }
-
+#endif
 
     lua_close(L);
     return true;

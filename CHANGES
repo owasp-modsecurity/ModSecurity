@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Improvements on LUA build scripts and support for LUA 5.2.
+   [Issue #1617 and #1622 - @victorhora, @zimmerle]
  - Improvements on the benchmark tool.
    [Issue #1615 - @zimmerle]
  - Fix lua headers on the build scripts
