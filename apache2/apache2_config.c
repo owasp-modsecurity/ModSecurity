@@ -2471,7 +2471,8 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_rule_update_action_by_id(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
-    int offset = 0, rule_id = atoi(p1);
+    int offset = 0;
+    long rule_id = strtol(p1, 0, 10);
     char *opt = strchr(p1,':');
     char *savedptr = NULL;
     char *param = apr_pstrdup(cmd->pool, p1);

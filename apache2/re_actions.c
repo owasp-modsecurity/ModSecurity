@@ -388,14 +388,14 @@ static apr_status_t msre_action_id_init(msre_engine *engine, apr_pool_t *mp, msr
 }
 
 static char *msre_action_id_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
-    int id;
+    long id;
 
     if(action != NULL && action->param != NULL) {
         for(id=0;id<strlen(action->param);id++) {
             if(!apr_isdigit(action->param[id]))
                 return apr_psprintf(mp, "ModSecurity: Invalid value for action ID: %s", action->param);
         }
-        id = atoi(action->param);
+        id = strtol(action->param, 0, 10);
         if ((id == LONG_MAX)||(id == LONG_MIN)||(id <= 0)) {
             return apr_psprintf(mp, "ModSecurity: Invalid value for action ID: %s", action->param);
         }
