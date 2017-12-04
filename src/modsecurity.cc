@@ -406,9 +406,8 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
 
     yajl_gen_map_close(g);
-    yajl_gen_array_close(g);
-
     yajl_gen_map_close(g);
+
     yajl_gen_array_close(g);
     yajl_gen_map_close(g);
 
@@ -417,6 +416,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     json->assign(reinterpret_cast<const char*>(buf), jsonSize);
     json->append("\n");
 
+    yajl_gen_clear(g);
     yajl_gen_free(g);
 #else
     *err = strdup("Without YAJL support, we cannot generate JSON.");
