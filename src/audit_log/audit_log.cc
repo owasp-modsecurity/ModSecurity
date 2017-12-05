@@ -274,7 +274,9 @@ bool AuditLog::saveIfRelevant(Transaction *transaction) {
 bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
     bool saveAnyway = false;
     if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
+#ifndef NO_LOGS
         transaction->debug(5, "Audit log engine was not set.");
+#endif
         return true;
     }
 

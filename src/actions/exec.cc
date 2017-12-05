@@ -50,8 +50,9 @@ bool Exec::init(std::string *error) {
 
 
 bool Exec::evaluate(Rule *rule, Transaction *t) {
+#ifndef NO_LOGS
     t->debug(8, "Running script... " + m_script);
-
+#endif
     m_lua.run(t);
     return true;
 }

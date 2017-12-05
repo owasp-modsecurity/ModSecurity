@@ -24,7 +24,9 @@ bool RuleScript::init(std::string *err) {
 
 bool RuleScript::evaluate(Transaction *trans,
     std::shared_ptr<RuleMessage> ruleMessage) {
+#ifndef NO_LOGS
     trans->debug(4, " Executing script: " + m_name + ".");
+#endif
     bool containsDisruptive = false;
 
     if (ruleMessage == NULL) {
