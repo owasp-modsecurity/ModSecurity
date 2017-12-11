@@ -1252,6 +1252,17 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
 
     if(msr == NULL) return NULL;
 
+    /* crypto_key optimization */
+    if (msr->txcfg->crypto_key == NOT_SET_P)
+    {
+        msr->txcfg->crypto_key = getkey(msr->txcfg->mp);
+    }
+
+    if(msr->txcfg->crypto_key_len == NOT_SET)
+    {
+        msr->txcfg->crypto_key_len = strlen(msr->txcfg->crypto_key);
+    }
+
     if(strlen(link) > 7 && strncmp("http:",(char*)link,5)==0){
         path_chunk = strchr(link+7,'/');
         if(path_chunk != NULL)  {
