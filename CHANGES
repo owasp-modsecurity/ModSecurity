@@ -2,6 +2,8 @@
 v3.0.????? - ?
 ---------------------------
 
+ - Fix compilation error with disable_debug_log flag
+   [0xfd84e - Izik Abramov]
  - Improvements on the benchmark tool.
    [Issue #1615 - @zimmerle]
  - Fix lua headers on the build scripts
