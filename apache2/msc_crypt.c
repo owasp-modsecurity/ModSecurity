@@ -1252,7 +1252,6 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
 
     if(msr == NULL) return NULL;
 
-    /* crypto_key optimization */
     if (msr->txcfg->crypto_key == NOT_SET_P)
     {
         msr->txcfg->crypto_key = getkey(msr->txcfg->mp);

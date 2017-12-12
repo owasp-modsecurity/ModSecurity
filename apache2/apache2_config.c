@@ -733,9 +733,6 @@ void init_directory_config(directory_config *dcfg)
 
     /* Hash */
 
-    /* crypto_key optimization: we only init crypto_key and crypto_key_len here. We init key when calling do_hash_link() at first time */
-    // if (dcfg->crypto_key == NOT_SET_P) dcfg->crypto_key = getkey(dcfg->mp);
-    // if (dcfg->crypto_key_len == NOT_SET) dcfg->crypto_key_len = strlen(dcfg->crypto_key);
     if (dcfg->crypto_key_add == NOT_SET) dcfg->crypto_key_add = HASH_KEYONLY;
     if (dcfg->crypto_param_name == NOT_SET_P) dcfg->crypto_param_name = "crypt";
     if (dcfg->hash_is_enabled == NOT_SET) dcfg->hash_is_enabled = HASH_DISABLED;
