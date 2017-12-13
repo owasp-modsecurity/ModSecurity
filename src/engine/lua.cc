@@ -75,7 +75,7 @@ bool Lua::load(std::string script, std::string *err) {
         const char *luaerr = lua_tostring(L, -1);
         err->assign("Failed to compile script '" + script + "");
         if (luaerr) {
-            err->append(": " + *luaerr);
+            err->append(": " + std::string(luaerr));
         }
         err->append(".");
         lua_close(L);
@@ -91,7 +91,7 @@ bool Lua::load(std::string script, std::string *err) {
         const char *luaerr = lua_tostring(L, -1);
         err->assign("Failed to compile script '" + script + "");
         if (luaerr) {
-            err->append(": " + *luaerr);
+            err->append(": " + std::string(luaerr));
         }
         err->append(".");
         lua_close(L);
@@ -366,6 +366,8 @@ int Lua::setvar(lua_State *L) {
 
     t->m_collections.storeOrUpdateFirst(collection,
         variableName, var_value);
+
+    return 0;
 }
 
 

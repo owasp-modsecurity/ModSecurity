@@ -1115,18 +1115,18 @@ expression:
       }
     | DIRECTIVE_SECRULESCRIPT actions
       {
+        std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         for (auto &i : *$2.get()) {
             a->push_back(i.release());
         }
-
         RuleScript *r = new RuleScript(
             /* path to script */ $1,
             /* actions */ a,
             /* file name */ driver.ref.back(),
             /* line number */ @0.end.line
             );
-        std::string err;
+
         if (r->init(&err) == false) {
             driver.error(@0, "Failed to load script: " + err);
             delete r;

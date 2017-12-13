@@ -1881,18 +1881,18 @@ namespace yy {
   case 75:
 #line 1117 "seclang-parser.yy" // lalr1.cc:859
     {
+        std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         for (auto &i : *yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ().get()) {
             a->push_back(i.release());
         }
-
         RuleScript *r = new RuleScript(
             /* path to script */ yystack_[1].value.as< std::string > (),
             /* actions */ a,
             /* file name */ driver.ref.back(),
             /* line number */ yystack_[2].location.end.line
             );
-        std::string err;
+
         if (r->init(&err) == false) {
             driver.error(yystack_[2].location, "Failed to load script: " + err);
             delete r;
