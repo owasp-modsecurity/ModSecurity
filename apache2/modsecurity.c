@@ -59,7 +59,28 @@ const char * msc_alert_message(modsec_rec *msr, msre_actionset *actionset, const
 void msc_alert(modsec_rec *msr, int level, msre_actionset *actionset, const char *action_message,
     const char *rule_message)
 {
-    const char *message = msc_alert_message(msr, actionset, action_message, rule_message);
+    directory_config *dcfg = msr->txcfg;
+    apr_file_t *debuglog_fd = NULL;
+    int filter_debug_level = 0;
+    char *message;
+
+    if (dcfg != NULL) {
+        if ((dcfg->debuglog_fd != NULL)&&(dcfg->debuglog_fd != NOT_SET_P)) {
+            debuglog_fd = dcfg->debuglog_fd;
+        }
+
+        if (dcfg->debuglog_level != NOT_SET) {
+            filter_debug_level = dcfg->debuglog_level;
+        }
+    }
+
+    /* Return immediately if we don't have where to write
+     * or if the log level of the message is higher than
+     * wanted in the log.
+     */
+    if ((level > 3)&&( (debuglog_fd == NULL) || (level > filter_debug_level) )) return;
+
+    message = msc_alert_message(msr, actionset, action_message, rule_message);
 
     msr_log(msr, level, "%s", message);
 }
