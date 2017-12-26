@@ -59,6 +59,7 @@ namespace modsecurity {
  */
 ModSecurity::ModSecurity()
     : m_connector(""),
+    m_whoami(""),
 #ifdef WITH_LMDB
     m_global_collection(new collection::backend::LMDB()),
     m_resource_collection(new collection::backend::LMDB()),
@@ -111,7 +112,7 @@ ModSecurity::~ModSecurity() {
  *       update it, make it in a fashion that won't break the existent parsers.
  *       (e.g. adding extra information _only_ to the end of the string)
  */
-const std::string ModSecurity::whoAmI() {
+const std::string& ModSecurity::whoAmI() {
     std::string platform("Unknown platform");
 
 #if AIX
@@ -134,8 +135,11 @@ const std::string ModSecurity::whoAmI() {
     platform = "Windows";
 #endif
 
-    return std::string("ModSecurity v" MODSECURITY_VERSION \
-        " (" + platform + ")");
+    if (m_whoami.empty()) {
+        m_whoami = "ModSecurity v" MODSECURITY_VERSION " (" + platform + ")";
+    }
+
+    return m_whoami;
 }
 
 

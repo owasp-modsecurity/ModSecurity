@@ -278,7 +278,7 @@ class ModSecurity {
     ModSecurity();
     ~ModSecurity();
 
-    static const std::string whoAmI();
+    const std::string& whoAmI();
     void setConnectorInformation(std::string connector);
     void setServerLogCb(ModSecLogCb cb);
     /**
@@ -304,6 +304,7 @@ class ModSecurity {
 
  private:
     std::string m_connector;
+    std::string m_whoami;
     ModSecLogCb m_logCb;
     int m_logProperties;
 };
