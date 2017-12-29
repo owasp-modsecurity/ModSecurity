@@ -130,7 +130,6 @@ TESTS+=test/test-cases/regression/variable-TIME_MIN.json
 TESTS+=test/test-cases/regression/action-setuid.json
 TESTS+=test/test-cases/regression/action-setrsc.json
 TESTS+=test/test-cases/regression/issue-1152.json
-TESTS+=test/test-cases/regression/issue-1528.json
 TESTS+=test/test-cases/regression/config-calling_phases_by_name.json
 TESTS+=test/test-cases/regression/variable-USERID.json
 TESTS+=test/test-cases/regression/request-body-parser-multipart.json
