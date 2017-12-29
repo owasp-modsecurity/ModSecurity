@@ -33,14 +33,17 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     SMatch match;
     std::list<SMatch> matches;
-    Regex *re;
+    Regex * re = m_re;
 
     if (m_param.empty()) {
         return true;
     }
 
     std::string eparam = MacroExpansion::expand(m_param, transaction);
-    re = new Regex(eparam);
+
+    if (eparam != m_param) {
+        re = new Regex(eparam);
+    }
 
     matches = re->searchAll(input);
     if (rule && rule->getActionsByName("capture").size() > 0 && transaction) {
@@ -62,7 +65,9 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
         logOffset(ruleMessage, i.m_offset, i.m_length);
     }
 
-    delete re;
+    if (re != m_re) {
+        delete re;
+    }
 
     if (matches.size() > 0) {
         return true;
