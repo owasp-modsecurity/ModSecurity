@@ -24,30 +24,7 @@
 
 using modsecurity::Transaction;
 
-char request_header[] =  "" \
-    "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\n\r" \
-    "Host: net.tutsplus.com\n\r" \
-    "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5)" \
-    " Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\n\r" \
-    "Accept: text/html,application/xhtml+xml,application/xml; " \
-    "q=0.9,*/*;q=0.8\n\r" \
-    "Accept-Language: en-us,en;q=0.5\n\r" \
-    "Accept-Encoding: gzip,deflate\n\r" \
-    "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\n\r" \
-    "Keep-Alive: 300\n\r" \
-    "Connection: keep-alive\n\r" \
-    "Cookie: PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120\n\r" \
-    "Pragma: no-cache\n\r" \
-    "Cache-Control: no-cache\n\r";
-
 char request_uri[] = "/test.pl?param1=test&para2=test2";
-
-char request_body[] = "";
-
-char response_headers[] = "" \
-    "HTTP/1.1 200 OK\n\r" \
-    "Content-Type: text/xml; charset=utf-8\n\r" \
-    "Content-Length: length\n\r";
 
 unsigned char response_body[] = "" \
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\r" \
@@ -69,7 +46,7 @@ const char* const help_message = "Usage: benchmark [num_iterations|-h|-?|--help]
 
 int main(int argc, char *argv[]) {
 
-    unsigned long long NUM_REQUESTS(10000);
+    unsigned long long NUM_REQUESTS(1000000);
 
     if (argc > 1) {
         if (0 == strcmp(argv[1], "-h") ||
