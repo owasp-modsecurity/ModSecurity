@@ -28,6 +28,15 @@ namespace modsecurity {
 namespace operators {
 
 
+bool Rx::init(const std::string &arg, std::string *error) {
+    m_containsMacro = MacroExpansion::containsMacro(m_param);
+    if (m_containsMacro == false) {
+        m_re = new Regex(m_param);
+    }
+
+    return true;
+}
+
 
 bool Rx::evaluate(Transaction *transaction, Rule *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
@@ -39,8 +48,12 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
         return true;
     }
 
-    std::string eparam = MacroExpansion::expand(m_param, transaction);
-    re = new Regex(eparam);
+    if (m_containsMacro) {
+        std::string eparam = MacroExpansion::expand(m_param, transaction);
+        re = new Regex(eparam);
+    } else {
+        re = m_re;
+    }
 
     matches = re->searchAll(input);
     if (rule && rule->getActionsByName("capture").size() > 0 && transaction) {
@@ -62,7 +75,9 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
         logOffset(ruleMessage, i.m_offset, i.m_length);
     }
 
-    delete re;
+    if (m_containsMacro) {
+        delete re;
+    }
 
     if (matches.size() > 0) {
         return true;
