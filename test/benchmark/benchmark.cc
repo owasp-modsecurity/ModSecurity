@@ -40,7 +40,7 @@ char request_header[] =  "" \
     "Pragma: no-cache\n\r" \
     "Cache-Control: no-cache\n\r";
 
-char request_uri[] = "GET /test.pl?param1=test&para2=test2";
+char request_uri[] = "/test.pl?param1=test&para2=test2";
 
 char request_body[] = "";
 
