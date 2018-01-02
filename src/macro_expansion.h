@@ -47,6 +47,8 @@ class MacroExpansion {
             return toupper(aa) == bb;
         });
     }
+
+    static bool containsMacro(std::string& input);
 };
 
 

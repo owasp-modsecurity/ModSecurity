@@ -36,17 +36,25 @@ class Rx : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     Rx(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) {
+        : Operator(op, param, negation),
+        m_containsMacro(false) {
         }
     Rx(std::string name, std::string param)
-        : Operator(name, param) {
+        : Operator(name, param),
+        m_containsMacro(false) {
     }
     explicit Rx(std::string param)
-        : Operator("Rx", param) {
+        : Operator("Rx", param),
+        m_containsMacro(false) {
     }
 
     ~Rx() {
+        if (m_containsMacro == false && m_re != NULL) {
+            delete m_re;
+            m_re = NULL;
+        }
     }
+
     bool evaluate(Transaction *transaction, Rule *rule,
         const std::string &input) override {
         return evaluate(transaction, NULL, input, NULL);
@@ -58,6 +66,11 @@ class Rx : public Operator {
     bool evaluate(Transaction *transaction, Rule *rule,
         const std::string& input,
         std::shared_ptr<RuleMessage> ruleMessage) override;
+
+    bool init(const std::string &arg, std::string *error);
+ private:
+    bool m_containsMacro;
+    Regex *m_re;
 };
 
 

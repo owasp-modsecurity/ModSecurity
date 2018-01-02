@@ -1027,6 +1027,11 @@ op_before_init:
     | OPERATOR_RX FREE_TEXT
       {
         OPERATOR_CONTAINER($$, new operators::Rx($2));
+        std::string error;
+        if ($$->init(driver.ref.back(), &error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | OPERATOR_STR_EQ FREE_TEXT
       {

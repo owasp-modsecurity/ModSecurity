@@ -48,8 +48,20 @@ std::string MacroExpansion::expand(const std::string& input,
 }
 
 
+bool MacroExpansion::containsMacro(std::string& input) {
+   size_t pos = input.find("%{");
+    size_t end = input.find("}");
+
+    if (pos == std::string::npos || end == std::string::npos) {
+        return false;
+    }
+
+    return true;
+}
+
+
 std::string MacroExpansion::expand(const std::string& input,
-     modsecurity::Rule *rule, Transaction *transaction) {
+    modsecurity::Rule *rule, Transaction *transaction) {
     std::string res;
     size_t pos = input.find("%{");
 
