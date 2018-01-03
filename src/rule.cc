@@ -288,9 +288,12 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
     bool ret;
 
 #ifndef NO_LOGS
-    trans->debug(9, "Target value: \"" + utils::string::limitTo(80,
+    if (trans && trans->m_rules && trans->m_rules->m_debugLog
+        && trans->m_rules->m_debugLog->getDebugLogLevel() >= 9) {
+        trans->debug(9, "Target value: \"" + utils::string::limitTo(80,
             utils::string::toHexIfNeeded(value)) \
             + "\" (Variable: " + key + ")");
+    }
 #endif
 
     ret = this->m_op->evaluateInternal(trans, this, value, ruleMessage);
