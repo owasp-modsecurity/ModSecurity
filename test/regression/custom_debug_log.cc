@@ -41,4 +41,9 @@ std::string CustomDebugLog::log_messages() {
 }
 
 
+int CustomDebugLog::getDebugLogLevel() {
+    return 9;
+}
+
+
 }  // namespace modsecurity_test

@@ -32,6 +32,7 @@ class CustomDebugLog : public modsecurity::debug_log::DebugLog {
     bool contains(const std::string& pattern);
     std::string log_messages();
     std::string error_log_messages();
+    int getDebugLogLevel() override;
 
  private:
     std::stringstream m_log;
