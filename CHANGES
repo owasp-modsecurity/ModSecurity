@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - perf improvement: Checks debuglog level before format debug msg
+   [0x068f7 - @zimmerle]
  - perf. improvement/rx: Only compute dynamic regex in case of macro
    [0xab78d - @zimmerle]
  - Fix uri on the benchmark utility
