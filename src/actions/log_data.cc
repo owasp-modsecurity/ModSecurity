@@ -39,7 +39,8 @@ bool LogData::evaluate(Rule *rule, Transaction *transaction,
 }
 
 std::string LogData::data(Transaction *transaction) {
-    return MacroExpansion::expand(m_parser_payload, transaction);
+    std::string a(m_string->evaluate(transaction));
+    return a;
 }
 
 

@@ -31,7 +31,7 @@ namespace actions {
 bool InitCol::init(std::string *error) {
     int posEquals = m_parser_payload.find("=");
 
-    if (m_parser_payload.size() < 8) {
+    if (m_parser_payload.size() < 2) {
         error->assign("Something wrong with initcol format: too small");
         return false;
     }
@@ -42,7 +42,6 @@ bool InitCol::init(std::string *error) {
     }
 
     m_collection_key = std::string(m_parser_payload, 0,  posEquals);
-    m_collection_value = std::string(m_parser_payload, posEquals + 1);
 
     if (m_collection_key != "ip" &&
         m_collection_key != "global" &&
@@ -57,9 +56,7 @@ bool InitCol::init(std::string *error) {
 
 
 bool InitCol::evaluate(Rule *rule, Transaction *t) {
-    std::string collectionName;
-    collectionName = MacroExpansion::expand(m_collection_value, t);
-
+    std::string collectionName(m_string->evaluate(t));
 
     if (m_collection_key == "ip") {
         t->m_collections.m_ip_collection_key = collectionName;

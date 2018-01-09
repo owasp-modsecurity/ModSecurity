@@ -607,6 +607,7 @@ using modsecurity::operators::Operator;
   DIRECTIVE                                    "DIRECTIVE"
   DIRECTIVE_SECRULESCRIPT                      "DIRECTIVE_SECRULESCRIPT"
   FREE_TEXT                                    "FREE_TEXT"
+  FREE_TEXT_QUOTE_MACRO_EXPANSION              "FREE_TEXT_QUOTE_MACRO_EXPANSION"
   OPERATOR                                     "OPERATOR"
   OPERATOR_BEGINS_WITH                         "OPERATOR_BEGINS_WITH"
   OPERATOR_CONTAINS                            "OPERATOR_CONTAINS"
@@ -671,6 +672,7 @@ using modsecurity::operators::Operator;
 %type <std::unique_ptr<actions::Action>> setvar_action
 %type <std::string>                      setvar_variable
 %type <std::string>                      setvar_content
+%type <std::unique_ptr<RunTimeString>>   run_time_string
 
 %type <std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > >
   actions_may_quoted
@@ -681,6 +683,7 @@ using modsecurity::operators::Operator;
   op_before_init
   op
 ;
+
 
 %type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables_may_be_quoted
 %type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables
@@ -2367,13 +2370,13 @@ act:
       {
         ACTION_CONTAINER($$, new actions::RuleId($1));
       }
-    | ACTION_INITCOL
+    | ACTION_INITCOL run_time_string
       {
-        ACTION_CONTAINER($$, new actions::InitCol($1));
+        ACTION_CONTAINER($$, new actions::InitCol($1, std::move($2)));
       }
-    | ACTION_LOG_DATA
+    | ACTION_LOG_DATA run_time_string
       {
-        ACTION_CONTAINER($$, new actions::LogData($1));
+        ACTION_CONTAINER($$, new actions::LogData(std::move($2)));
       }
     | ACTION_LOG
       {
@@ -2383,9 +2386,9 @@ act:
       {
         ACTION_CONTAINER($$, new actions::Maturity($1));
       }
-    | ACTION_MSG
+    | ACTION_MSG run_time_string
       {
-        ACTION_CONTAINER($$, new actions::Msg($1));
+        ACTION_CONTAINER($$, new actions::Msg(std::move($2)));
       }
     | ACTION_MULTI_MATCH
       {
@@ -2419,9 +2422,9 @@ act:
       {
         ACTION_NOT_SUPPORTED("Proxy", @0);
       }
-    | ACTION_REDIRECT
+    | ACTION_REDIRECT run_time_string
       {
-        ACTION_CONTAINER($$, new actions::disruptive::Redirect($1));
+        ACTION_CONTAINER($$, new actions::disruptive::Redirect(std::move($2)));
       }
     | ACTION_REV
       {
@@ -2451,17 +2454,17 @@ act:
       {
         ACTION_NOT_SUPPORTED("SetEnv", @0);
       }
-    | ACTION_SETRSC
+    | ACTION_SETRSC run_time_string
       {
-        ACTION_CONTAINER($$, new actions::SetRSC($1));
+        ACTION_CONTAINER($$, new actions::SetRSC(std::move($2)));
       }
-    | ACTION_SETSID
+    | ACTION_SETSID run_time_string
       {
-        ACTION_CONTAINER($$, new actions::SetSID($1));
+        ACTION_CONTAINER($$, new actions::SetSID(std::move($2)));
       }
-    | ACTION_SETUID
+    | ACTION_SETUID run_time_string
       {
-        ACTION_CONTAINER($$, new actions::SetUID($1));
+        ACTION_CONTAINER($$, new actions::SetUID(std::move($2)));
       }
     | ACTION_SETVAR setvar_action
       {
@@ -2483,9 +2486,9 @@ act:
       {
         ACTION_CONTAINER($$, new actions::data::Status($1));
       }
-    | ACTION_TAG
+    | ACTION_TAG run_time_string
       {
-        ACTION_CONTAINER($$, new actions::Tag($1));
+        ACTION_CONTAINER($$, new actions::Tag(std::move($2)));
       }
     | ACTION_VER
       {
@@ -2660,6 +2663,30 @@ setvar_content:
       }
 ;
 
+run_time_string:
+    run_time_string FREE_TEXT_QUOTE_MACRO_EXPANSION
+      {
+        $1->appendText($2);
+        $$ = std::move($1);
+      }
+    | run_time_string var
+      {
+        $1->appendVar(std::move($2));
+        $$ = std::move($1);
+      }
+    | FREE_TEXT_QUOTE_MACRO_EXPANSION
+      {
+        std::unique_ptr<RunTimeString> r(new RunTimeString());
+        r->appendText($1);
+        $$ = std::move(r);
+      }
+    | var
+      {
+        std::unique_ptr<RunTimeString> r(new RunTimeString());
+        r->appendVar(std::move($1));
+        $$ = std::move(r);
+      }
+    ;
 %%
 
 void yy::seclang_parser::error (const location_type& l, const std::string& m) {
