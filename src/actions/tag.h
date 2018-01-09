@@ -17,6 +17,7 @@
 #include <memory>
 
 #include "modsecurity/actions/action.h"
+#include "src/run_time_string.h"
 
 #ifndef SRC_ACTIONS_TAG_H_
 #define SRC_ACTIONS_TAG_H_
@@ -33,10 +34,16 @@ class Tag : public Action {
     explicit Tag(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
+    explicit Tag(std::unique_ptr<RunTimeString> z)
+        : Action("tag", RunTimeOnlyIfMatchKind),
+        m_string(std::move(z)) { }
+
     std::string getName(Transaction *transaction);
 
     bool evaluate(Rule *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;
+
+    std::unique_ptr<RunTimeString> m_string;
 };
 
 

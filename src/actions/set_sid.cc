@@ -28,20 +28,12 @@ namespace actions {
 
 
 bool SetSID::init(std::string *error) {
-    m_collection_key = std::string(m_parser_payload, 0,
-        m_parser_payload.length());
-
-    if (m_collection_key.empty()) {
-        error->assign("Missing collection key");
-        return false;
-    }
-
     return true;
 }
 
 
 bool SetSID::evaluate(Rule *rule, Transaction *t) {
-    std::string colNameExpanded = MacroExpansion::expand(m_collection_key, t);
+    std::string colNameExpanded(m_string->evaluate(t));
 
 #ifndef NO_LOGS
     t->debug(8, "Session ID initiated with value: \'"
