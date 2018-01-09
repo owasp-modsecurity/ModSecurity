@@ -18,6 +18,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
+#include "src/run_time_string.h"
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
 #define SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
@@ -36,9 +37,11 @@ class Redirect : public Action {
  public:
     explicit Redirect(const std::string &action)
         : Action(action, RunTimeOnlyIfMatchKind),
-        m_status(0),
-        m_urlExpanded(""),
-        m_url("") { }
+        m_status(0) { }
+
+    explicit Redirect(std::unique_ptr<RunTimeString> z)
+        : Action("redirert", RunTimeOnlyIfMatchKind),
+            m_string(std::move(z)) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;
@@ -47,8 +50,7 @@ class Redirect : public Action {
 
  private:
     int m_status;
-    std::string m_urlExpanded;
-    std::string m_url;
+    std::unique_ptr<RunTimeString> m_string;
 };
 
 

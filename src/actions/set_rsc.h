@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/run_time_string.h"
 
 #ifndef SRC_ACTIONS_SET_RSC_H_
 #define SRC_ACTIONS_SET_RSC_H_
@@ -32,11 +33,15 @@ class SetRSC : public Action {
     explicit SetRSC(std::string _action)
         : Action(_action) { }
 
+    explicit SetRSC(std::unique_ptr<RunTimeString> z)
+        : Action("setsrc", RunTimeOnlyIfMatchKind),
+            m_string(std::move(z)) { }
+
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
  private:
-    std::string m_collection_key;
+    std::unique_ptr<RunTimeString> m_string;
 };
 
 

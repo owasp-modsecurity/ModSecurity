@@ -765,6 +765,7 @@ namespace yy {
       // "DIRECTIVE"
       // "DIRECTIVE_SECRULESCRIPT"
       // "FREE_TEXT"
+      // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
       // "OPERATOR"
       // "OPERATOR_BEGINS_WITH"
       // "OPERATOR_CONTAINS"
@@ -830,20 +831,23 @@ namespace yy {
       // op_before_init
       char dummy2[sizeof(std::unique_ptr<Operator>)];
 
+      // run_time_string
+      char dummy3[sizeof(std::unique_ptr<RunTimeString>)];
+
       // var
-      char dummy3[sizeof(std::unique_ptr<Variable>)];
+      char dummy4[sizeof(std::unique_ptr<Variable>)];
 
       // act
       // setvar_action
-      char dummy4[sizeof(std::unique_ptr<actions::Action>)];
+      char dummy5[sizeof(std::unique_ptr<actions::Action>)];
 
       // variables
       // variables_may_be_quoted
-      char dummy5[sizeof(std::unique_ptr<std::vector<std::unique_ptr<Variable> > > )];
+      char dummy6[sizeof(std::unique_ptr<std::vector<std::unique_ptr<Variable> > > )];
 
       // actions
       // actions_may_quoted
-      char dummy6[sizeof(std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > )];
+      char dummy7[sizeof(std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > )];
 };
 
     /// Symbol semantic values.
@@ -1114,63 +1118,64 @@ namespace yy {
         TOK_DIRECTIVE = 502,
         TOK_DIRECTIVE_SECRULESCRIPT = 503,
         TOK_FREE_TEXT = 504,
-        TOK_OPERATOR = 505,
-        TOK_OPERATOR_BEGINS_WITH = 506,
-        TOK_OPERATOR_CONTAINS = 507,
-        TOK_OPERATOR_CONTAINS_WORD = 508,
-        TOK_OPERATOR_DETECT_SQLI = 509,
-        TOK_OPERATOR_DETECT_XSS = 510,
-        TOK_OPERATOR_ENDS_WITH = 511,
-        TOK_OPERATOR_EQ = 512,
-        TOK_OPERATOR_FUZZY_HASH = 513,
-        TOK_OPERATOR_GE = 514,
-        TOK_OPERATOR_GEOLOOKUP = 515,
-        TOK_OPERATOR_GSB_LOOKUP = 516,
-        TOK_OPERATOR_GT = 517,
-        TOK_OPERATOR_INSPECT_FILE = 518,
-        TOK_OPERATOR_IP_MATCH = 519,
-        TOK_OPERATOR_IP_MATCH_FROM_FILE = 520,
-        TOK_OPERATOR_LE = 521,
-        TOK_OPERATOR_LT = 522,
-        TOK_OPERATOR_PM = 523,
-        TOK_OPERATOR_PM_FROM_FILE = 524,
-        TOK_OPERATOR_RBL = 525,
-        TOK_OPERATOR_RSUB = 526,
-        TOK_OPERATOR_RX = 527,
-        TOK_OPERATOR_RX_CONTENT_ONLY = 528,
-        TOK_OPERATOR_STR_EQ = 529,
-        TOK_OPERATOR_STR_MATCH = 530,
-        TOK_OPERATOR_UNCONDITIONAL_MATCH = 531,
-        TOK_OPERATOR_VALIDATE_BYTE_RANGE = 532,
-        TOK_OPERATOR_VALIDATE_DTD = 533,
-        TOK_OPERATOR_VALIDATE_HASH = 534,
-        TOK_OPERATOR_VALIDATE_SCHEMA = 535,
-        TOK_OPERATOR_VALIDATE_URL_ENCODING = 536,
-        TOK_OPERATOR_VALIDATE_UTF8_ENCODING = 537,
-        TOK_OPERATOR_VERIFY_CC = 538,
-        TOK_OPERATOR_VERIFY_CPF = 539,
-        TOK_OPERATOR_VERIFY_SSN = 540,
-        TOK_OPERATOR_WITHIN = 541,
-        TOK_OP_QUOTE = 542,
-        TOK_QUOTATION_MARK = 543,
-        TOK_RUN_TIME_VAR_BLD = 544,
-        TOK_RUN_TIME_VAR_DUR = 545,
-        TOK_RUN_TIME_VAR_HSV = 546,
-        TOK_RUN_TIME_VAR_REMOTE_USER = 547,
-        TOK_RUN_TIME_VAR_TIME = 548,
-        TOK_RUN_TIME_VAR_TIME_DAY = 549,
-        TOK_RUN_TIME_VAR_TIME_EPOCH = 550,
-        TOK_RUN_TIME_VAR_TIME_HOUR = 551,
-        TOK_RUN_TIME_VAR_TIME_MIN = 552,
-        TOK_RUN_TIME_VAR_TIME_MON = 553,
-        TOK_RUN_TIME_VAR_TIME_SEC = 554,
-        TOK_RUN_TIME_VAR_TIME_WDAY = 555,
-        TOK_RUN_TIME_VAR_TIME_YEAR = 556,
-        TOK_SETVAR_VARIABLE_PART = 557,
-        TOK_SETVAR_CONTENT_PART = 558,
-        TOK_VARIABLE = 559,
-        TOK_DICT_ELEMENT = 560,
-        TOK_DICT_ELEMENT_REGEXP = 561
+        TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION = 505,
+        TOK_OPERATOR = 506,
+        TOK_OPERATOR_BEGINS_WITH = 507,
+        TOK_OPERATOR_CONTAINS = 508,
+        TOK_OPERATOR_CONTAINS_WORD = 509,
+        TOK_OPERATOR_DETECT_SQLI = 510,
+        TOK_OPERATOR_DETECT_XSS = 511,
+        TOK_OPERATOR_ENDS_WITH = 512,
+        TOK_OPERATOR_EQ = 513,
+        TOK_OPERATOR_FUZZY_HASH = 514,
+        TOK_OPERATOR_GE = 515,
+        TOK_OPERATOR_GEOLOOKUP = 516,
+        TOK_OPERATOR_GSB_LOOKUP = 517,
+        TOK_OPERATOR_GT = 518,
+        TOK_OPERATOR_INSPECT_FILE = 519,
+        TOK_OPERATOR_IP_MATCH = 520,
+        TOK_OPERATOR_IP_MATCH_FROM_FILE = 521,
+        TOK_OPERATOR_LE = 522,
+        TOK_OPERATOR_LT = 523,
+        TOK_OPERATOR_PM = 524,
+        TOK_OPERATOR_PM_FROM_FILE = 525,
+        TOK_OPERATOR_RBL = 526,
+        TOK_OPERATOR_RSUB = 527,
+        TOK_OPERATOR_RX = 528,
+        TOK_OPERATOR_RX_CONTENT_ONLY = 529,
+        TOK_OPERATOR_STR_EQ = 530,
+        TOK_OPERATOR_STR_MATCH = 531,
+        TOK_OPERATOR_UNCONDITIONAL_MATCH = 532,
+        TOK_OPERATOR_VALIDATE_BYTE_RANGE = 533,
+        TOK_OPERATOR_VALIDATE_DTD = 534,
+        TOK_OPERATOR_VALIDATE_HASH = 535,
+        TOK_OPERATOR_VALIDATE_SCHEMA = 536,
+        TOK_OPERATOR_VALIDATE_URL_ENCODING = 537,
+        TOK_OPERATOR_VALIDATE_UTF8_ENCODING = 538,
+        TOK_OPERATOR_VERIFY_CC = 539,
+        TOK_OPERATOR_VERIFY_CPF = 540,
+        TOK_OPERATOR_VERIFY_SSN = 541,
+        TOK_OPERATOR_WITHIN = 542,
+        TOK_OP_QUOTE = 543,
+        TOK_QUOTATION_MARK = 544,
+        TOK_RUN_TIME_VAR_BLD = 545,
+        TOK_RUN_TIME_VAR_DUR = 546,
+        TOK_RUN_TIME_VAR_HSV = 547,
+        TOK_RUN_TIME_VAR_REMOTE_USER = 548,
+        TOK_RUN_TIME_VAR_TIME = 549,
+        TOK_RUN_TIME_VAR_TIME_DAY = 550,
+        TOK_RUN_TIME_VAR_TIME_EPOCH = 551,
+        TOK_RUN_TIME_VAR_TIME_HOUR = 552,
+        TOK_RUN_TIME_VAR_TIME_MIN = 553,
+        TOK_RUN_TIME_VAR_TIME_MON = 554,
+        TOK_RUN_TIME_VAR_TIME_SEC = 555,
+        TOK_RUN_TIME_VAR_TIME_WDAY = 556,
+        TOK_RUN_TIME_VAR_TIME_YEAR = 557,
+        TOK_SETVAR_VARIABLE_PART = 558,
+        TOK_SETVAR_CONTENT_PART = 559,
+        TOK_VARIABLE = 560,
+        TOK_DICT_ELEMENT = 561,
+        TOK_DICT_ELEMENT_REGEXP = 562
       };
     };
 
@@ -1211,6 +1216,8 @@ namespace yy {
   basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator> v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString> v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const std::unique_ptr<Variable> v, const location_type& l);
 
@@ -2281,6 +2288,10 @@ namespace yy {
 
     static inline
     symbol_type
+    make_FREE_TEXT_QUOTE_MACRO_EXPANSION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
     make_OPERATOR (const std::string& v, const location_type& l);
 
     static inline
@@ -2712,12 +2723,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1110,     ///< Last index in yytable_.
-      yynnts_ = 16,  ///< Number of nonterminal symbols.
+      yylast_ = 1513,     ///< Last index in yytable_.
+      yynnts_ = 17,  ///< Number of nonterminal symbols.
       yyfinal_ = 287, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 307  ///< Number of tokens.
+      yyntokens_ = 308  ///< Number of tokens.
     };
 
 
@@ -2790,9 +2801,9 @@ namespace yy {
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-     305,   306
+     305,   306,   307
     };
-    const unsigned int user_token_number_max_ = 561;
+    const unsigned int user_token_number_max_ = 562;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -2975,89 +2986,94 @@ namespace yy {
       case 247: // "DIRECTIVE"
       case 248: // "DIRECTIVE_SECRULESCRIPT"
       case 249: // "FREE_TEXT"
-      case 250: // "OPERATOR"
-      case 251: // "OPERATOR_BEGINS_WITH"
-      case 252: // "OPERATOR_CONTAINS"
-      case 253: // "OPERATOR_CONTAINS_WORD"
-      case 254: // "OPERATOR_DETECT_SQLI"
-      case 255: // "OPERATOR_DETECT_XSS"
-      case 256: // "OPERATOR_ENDS_WITH"
-      case 257: // "OPERATOR_EQ"
-      case 258: // "OPERATOR_FUZZY_HASH"
-      case 259: // "OPERATOR_GE"
-      case 260: // "OPERATOR_GEOLOOKUP"
-      case 261: // "OPERATOR_GSB_LOOKUP"
-      case 262: // "OPERATOR_GT"
-      case 263: // "OPERATOR_INSPECT_FILE"
-      case 264: // "OPERATOR_IP_MATCH"
-      case 265: // "OPERATOR_IP_MATCH_FROM_FILE"
-      case 266: // "OPERATOR_LE"
-      case 267: // "OPERATOR_LT"
-      case 268: // "OPERATOR_PM"
-      case 269: // "OPERATOR_PM_FROM_FILE"
-      case 270: // "OPERATOR_RBL"
-      case 271: // "OPERATOR_RSUB"
-      case 272: // "OPERATOR_RX"
-      case 273: // "Operator RX (content only)"
-      case 274: // "OPERATOR_STR_EQ"
-      case 275: // "OPERATOR_STR_MATCH"
-      case 276: // "OPERATOR_UNCONDITIONAL_MATCH"
-      case 277: // "OPERATOR_VALIDATE_BYTE_RANGE"
-      case 278: // "OPERATOR_VALIDATE_DTD"
-      case 279: // "OPERATOR_VALIDATE_HASH"
-      case 280: // "OPERATOR_VALIDATE_SCHEMA"
-      case 281: // "OPERATOR_VALIDATE_URL_ENCODING"
-      case 282: // "OPERATOR_VALIDATE_UTF8_ENCODING"
-      case 283: // "OPERATOR_VERIFY_CC"
-      case 284: // "OPERATOR_VERIFY_CPF"
-      case 285: // "OPERATOR_VERIFY_SSN"
-      case 286: // "OPERATOR_WITHIN"
-      case 287: // "OP_QUOTE"
-      case 288: // "QUOTATION_MARK"
-      case 289: // "RUN_TIME_VAR_BLD"
-      case 290: // "RUN_TIME_VAR_DUR"
-      case 291: // "RUN_TIME_VAR_HSV"
-      case 292: // "RUN_TIME_VAR_REMOTE_USER"
-      case 293: // "RUN_TIME_VAR_TIME"
-      case 294: // "RUN_TIME_VAR_TIME_DAY"
-      case 295: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 296: // "RUN_TIME_VAR_TIME_HOUR"
-      case 297: // "RUN_TIME_VAR_TIME_MIN"
-      case 298: // "RUN_TIME_VAR_TIME_MON"
-      case 299: // "RUN_TIME_VAR_TIME_SEC"
-      case 300: // "RUN_TIME_VAR_TIME_WDAY"
-      case 301: // "RUN_TIME_VAR_TIME_YEAR"
-      case 302: // "SETVAR_VARIABLE_PART"
-      case 303: // "SETVAR_CONTENT_PART"
-      case 304: // "VARIABLE"
-      case 305: // "Dictionary element"
-      case 306: // "Dictionary element, selected by regexp"
-      case 321: // setvar_variable
-      case 322: // setvar_content
+      case 250: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 251: // "OPERATOR"
+      case 252: // "OPERATOR_BEGINS_WITH"
+      case 253: // "OPERATOR_CONTAINS"
+      case 254: // "OPERATOR_CONTAINS_WORD"
+      case 255: // "OPERATOR_DETECT_SQLI"
+      case 256: // "OPERATOR_DETECT_XSS"
+      case 257: // "OPERATOR_ENDS_WITH"
+      case 258: // "OPERATOR_EQ"
+      case 259: // "OPERATOR_FUZZY_HASH"
+      case 260: // "OPERATOR_GE"
+      case 261: // "OPERATOR_GEOLOOKUP"
+      case 262: // "OPERATOR_GSB_LOOKUP"
+      case 263: // "OPERATOR_GT"
+      case 264: // "OPERATOR_INSPECT_FILE"
+      case 265: // "OPERATOR_IP_MATCH"
+      case 266: // "OPERATOR_IP_MATCH_FROM_FILE"
+      case 267: // "OPERATOR_LE"
+      case 268: // "OPERATOR_LT"
+      case 269: // "OPERATOR_PM"
+      case 270: // "OPERATOR_PM_FROM_FILE"
+      case 271: // "OPERATOR_RBL"
+      case 272: // "OPERATOR_RSUB"
+      case 273: // "OPERATOR_RX"
+      case 274: // "Operator RX (content only)"
+      case 275: // "OPERATOR_STR_EQ"
+      case 276: // "OPERATOR_STR_MATCH"
+      case 277: // "OPERATOR_UNCONDITIONAL_MATCH"
+      case 278: // "OPERATOR_VALIDATE_BYTE_RANGE"
+      case 279: // "OPERATOR_VALIDATE_DTD"
+      case 280: // "OPERATOR_VALIDATE_HASH"
+      case 281: // "OPERATOR_VALIDATE_SCHEMA"
+      case 282: // "OPERATOR_VALIDATE_URL_ENCODING"
+      case 283: // "OPERATOR_VALIDATE_UTF8_ENCODING"
+      case 284: // "OPERATOR_VERIFY_CC"
+      case 285: // "OPERATOR_VERIFY_CPF"
+      case 286: // "OPERATOR_VERIFY_SSN"
+      case 287: // "OPERATOR_WITHIN"
+      case 288: // "OP_QUOTE"
+      case 289: // "QUOTATION_MARK"
+      case 290: // "RUN_TIME_VAR_BLD"
+      case 291: // "RUN_TIME_VAR_DUR"
+      case 292: // "RUN_TIME_VAR_HSV"
+      case 293: // "RUN_TIME_VAR_REMOTE_USER"
+      case 294: // "RUN_TIME_VAR_TIME"
+      case 295: // "RUN_TIME_VAR_TIME_DAY"
+      case 296: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 297: // "RUN_TIME_VAR_TIME_HOUR"
+      case 298: // "RUN_TIME_VAR_TIME_MIN"
+      case 299: // "RUN_TIME_VAR_TIME_MON"
+      case 300: // "RUN_TIME_VAR_TIME_SEC"
+      case 301: // "RUN_TIME_VAR_TIME_WDAY"
+      case 302: // "RUN_TIME_VAR_TIME_YEAR"
+      case 303: // "SETVAR_VARIABLE_PART"
+      case 304: // "SETVAR_CONTENT_PART"
+      case 305: // "VARIABLE"
+      case 306: // "Dictionary element"
+      case 307: // "Dictionary element, selected by regexp"
+      case 322: // setvar_variable
+      case 323: // setvar_content
         value.copy< std::string > (other.value);
         break;
 
-      case 313: // op
-      case 314: // op_before_init
+      case 314: // op
+      case 315: // op_before_init
         value.copy< std::unique_ptr<Operator> > (other.value);
         break;
 
-      case 318: // var
+      case 324: // run_time_string
+        value.copy< std::unique_ptr<RunTimeString> > (other.value);
+        break;
+
+      case 319: // var
         value.copy< std::unique_ptr<Variable> > (other.value);
         break;
 
-      case 319: // act
-      case 320: // setvar_action
+      case 320: // act
+      case 321: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (other.value);
         break;
 
-      case 316: // variables
-      case 317: // variables_may_be_quoted
+      case 317: // variables
+      case 318: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (other.value);
         break;
 
-      case 311: // actions
-      case 312: // actions_may_quoted
+      case 312: // actions
+      case 313: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (other.value);
         break;
 
@@ -3228,89 +3244,94 @@ namespace yy {
       case 247: // "DIRECTIVE"
       case 248: // "DIRECTIVE_SECRULESCRIPT"
       case 249: // "FREE_TEXT"
-      case 250: // "OPERATOR"
-      case 251: // "OPERATOR_BEGINS_WITH"
-      case 252: // "OPERATOR_CONTAINS"
-      case 253: // "OPERATOR_CONTAINS_WORD"
-      case 254: // "OPERATOR_DETECT_SQLI"
-      case 255: // "OPERATOR_DETECT_XSS"
-      case 256: // "OPERATOR_ENDS_WITH"
-      case 257: // "OPERATOR_EQ"
-      case 258: // "OPERATOR_FUZZY_HASH"
-      case 259: // "OPERATOR_GE"
-      case 260: // "OPERATOR_GEOLOOKUP"
-      case 261: // "OPERATOR_GSB_LOOKUP"
-      case 262: // "OPERATOR_GT"
-      case 263: // "OPERATOR_INSPECT_FILE"
-      case 264: // "OPERATOR_IP_MATCH"
-      case 265: // "OPERATOR_IP_MATCH_FROM_FILE"
-      case 266: // "OPERATOR_LE"
-      case 267: // "OPERATOR_LT"
-      case 268: // "OPERATOR_PM"
-      case 269: // "OPERATOR_PM_FROM_FILE"
-      case 270: // "OPERATOR_RBL"
-      case 271: // "OPERATOR_RSUB"
-      case 272: // "OPERATOR_RX"
-      case 273: // "Operator RX (content only)"
-      case 274: // "OPERATOR_STR_EQ"
-      case 275: // "OPERATOR_STR_MATCH"
-      case 276: // "OPERATOR_UNCONDITIONAL_MATCH"
-      case 277: // "OPERATOR_VALIDATE_BYTE_RANGE"
-      case 278: // "OPERATOR_VALIDATE_DTD"
-      case 279: // "OPERATOR_VALIDATE_HASH"
-      case 280: // "OPERATOR_VALIDATE_SCHEMA"
-      case 281: // "OPERATOR_VALIDATE_URL_ENCODING"
-      case 282: // "OPERATOR_VALIDATE_UTF8_ENCODING"
-      case 283: // "OPERATOR_VERIFY_CC"
-      case 284: // "OPERATOR_VERIFY_CPF"
-      case 285: // "OPERATOR_VERIFY_SSN"
-      case 286: // "OPERATOR_WITHIN"
-      case 287: // "OP_QUOTE"
-      case 288: // "QUOTATION_MARK"
-      case 289: // "RUN_TIME_VAR_BLD"
-      case 290: // "RUN_TIME_VAR_DUR"
-      case 291: // "RUN_TIME_VAR_HSV"
-      case 292: // "RUN_TIME_VAR_REMOTE_USER"
-      case 293: // "RUN_TIME_VAR_TIME"
-      case 294: // "RUN_TIME_VAR_TIME_DAY"
-      case 295: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 296: // "RUN_TIME_VAR_TIME_HOUR"
-      case 297: // "RUN_TIME_VAR_TIME_MIN"
-      case 298: // "RUN_TIME_VAR_TIME_MON"
-      case 299: // "RUN_TIME_VAR_TIME_SEC"
-      case 300: // "RUN_TIME_VAR_TIME_WDAY"
-      case 301: // "RUN_TIME_VAR_TIME_YEAR"
-      case 302: // "SETVAR_VARIABLE_PART"
-      case 303: // "SETVAR_CONTENT_PART"
-      case 304: // "VARIABLE"
-      case 305: // "Dictionary element"
-      case 306: // "Dictionary element, selected by regexp"
-      case 321: // setvar_variable
-      case 322: // setvar_content
+      case 250: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 251: // "OPERATOR"
+      case 252: // "OPERATOR_BEGINS_WITH"
+      case 253: // "OPERATOR_CONTAINS"
+      case 254: // "OPERATOR_CONTAINS_WORD"
+      case 255: // "OPERATOR_DETECT_SQLI"
+      case 256: // "OPERATOR_DETECT_XSS"
+      case 257: // "OPERATOR_ENDS_WITH"
+      case 258: // "OPERATOR_EQ"
+      case 259: // "OPERATOR_FUZZY_HASH"
+      case 260: // "OPERATOR_GE"
+      case 261: // "OPERATOR_GEOLOOKUP"
+      case 262: // "OPERATOR_GSB_LOOKUP"
+      case 263: // "OPERATOR_GT"
+      case 264: // "OPERATOR_INSPECT_FILE"
+      case 265: // "OPERATOR_IP_MATCH"
+      case 266: // "OPERATOR_IP_MATCH_FROM_FILE"
+      case 267: // "OPERATOR_LE"
+      case 268: // "OPERATOR_LT"
+      case 269: // "OPERATOR_PM"
+      case 270: // "OPERATOR_PM_FROM_FILE"
+      case 271: // "OPERATOR_RBL"
+      case 272: // "OPERATOR_RSUB"
+      case 273: // "OPERATOR_RX"
+      case 274: // "Operator RX (content only)"
+      case 275: // "OPERATOR_STR_EQ"
+      case 276: // "OPERATOR_STR_MATCH"
+      case 277: // "OPERATOR_UNCONDITIONAL_MATCH"
+      case 278: // "OPERATOR_VALIDATE_BYTE_RANGE"
+      case 279: // "OPERATOR_VALIDATE_DTD"
+      case 280: // "OPERATOR_VALIDATE_HASH"
+      case 281: // "OPERATOR_VALIDATE_SCHEMA"
+      case 282: // "OPERATOR_VALIDATE_URL_ENCODING"
+      case 283: // "OPERATOR_VALIDATE_UTF8_ENCODING"
+      case 284: // "OPERATOR_VERIFY_CC"
+      case 285: // "OPERATOR_VERIFY_CPF"
+      case 286: // "OPERATOR_VERIFY_SSN"
+      case 287: // "OPERATOR_WITHIN"
+      case 288: // "OP_QUOTE"
+      case 289: // "QUOTATION_MARK"
+      case 290: // "RUN_TIME_VAR_BLD"
+      case 291: // "RUN_TIME_VAR_DUR"
+      case 292: // "RUN_TIME_VAR_HSV"
+      case 293: // "RUN_TIME_VAR_REMOTE_USER"
+      case 294: // "RUN_TIME_VAR_TIME"
+      case 295: // "RUN_TIME_VAR_TIME_DAY"
+      case 296: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 297: // "RUN_TIME_VAR_TIME_HOUR"
+      case 298: // "RUN_TIME_VAR_TIME_MIN"
+      case 299: // "RUN_TIME_VAR_TIME_MON"
+      case 300: // "RUN_TIME_VAR_TIME_SEC"
+      case 301: // "RUN_TIME_VAR_TIME_WDAY"
+      case 302: // "RUN_TIME_VAR_TIME_YEAR"
+      case 303: // "SETVAR_VARIABLE_PART"
+      case 304: // "SETVAR_CONTENT_PART"
+      case 305: // "VARIABLE"
+      case 306: // "Dictionary element"
+      case 307: // "Dictionary element, selected by regexp"
+      case 322: // setvar_variable
+      case 323: // setvar_content
         value.copy< std::string > (v);
         break;
 
-      case 313: // op
-      case 314: // op_before_init
+      case 314: // op
+      case 315: // op_before_init
         value.copy< std::unique_ptr<Operator> > (v);
         break;
 
-      case 318: // var
+      case 324: // run_time_string
+        value.copy< std::unique_ptr<RunTimeString> > (v);
+        break;
+
+      case 319: // var
         value.copy< std::unique_ptr<Variable> > (v);
         break;
 
-      case 319: // act
-      case 320: // setvar_action
+      case 320: // act
+      case 321: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (v);
         break;
 
-      case 316: // variables
-      case 317: // variables_may_be_quoted
+      case 317: // variables
+      case 318: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (v);
         break;
 
-      case 311: // actions
-      case 312: // actions_may_quoted
+      case 312: // actions
+      case 313: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (v);
         break;
 
@@ -3338,6 +3359,13 @@ namespace yy {
 
   template <typename Base>
   seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator> v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -3547,89 +3575,94 @@ namespace yy {
       case 247: // "DIRECTIVE"
       case 248: // "DIRECTIVE_SECRULESCRIPT"
       case 249: // "FREE_TEXT"
-      case 250: // "OPERATOR"
-      case 251: // "OPERATOR_BEGINS_WITH"
-      case 252: // "OPERATOR_CONTAINS"
-      case 253: // "OPERATOR_CONTAINS_WORD"
-      case 254: // "OPERATOR_DETECT_SQLI"
-      case 255: // "OPERATOR_DETECT_XSS"
-      case 256: // "OPERATOR_ENDS_WITH"
-      case 257: // "OPERATOR_EQ"
-      case 258: // "OPERATOR_FUZZY_HASH"
-      case 259: // "OPERATOR_GE"
-      case 260: // "OPERATOR_GEOLOOKUP"
-      case 261: // "OPERATOR_GSB_LOOKUP"
-      case 262: // "OPERATOR_GT"
-      case 263: // "OPERATOR_INSPECT_FILE"
-      case 264: // "OPERATOR_IP_MATCH"
-      case 265: // "OPERATOR_IP_MATCH_FROM_FILE"
-      case 266: // "OPERATOR_LE"
-      case 267: // "OPERATOR_LT"
-      case 268: // "OPERATOR_PM"
-      case 269: // "OPERATOR_PM_FROM_FILE"
-      case 270: // "OPERATOR_RBL"
-      case 271: // "OPERATOR_RSUB"
-      case 272: // "OPERATOR_RX"
-      case 273: // "Operator RX (content only)"
-      case 274: // "OPERATOR_STR_EQ"
-      case 275: // "OPERATOR_STR_MATCH"
-      case 276: // "OPERATOR_UNCONDITIONAL_MATCH"
-      case 277: // "OPERATOR_VALIDATE_BYTE_RANGE"
-      case 278: // "OPERATOR_VALIDATE_DTD"
-      case 279: // "OPERATOR_VALIDATE_HASH"
-      case 280: // "OPERATOR_VALIDATE_SCHEMA"
-      case 281: // "OPERATOR_VALIDATE_URL_ENCODING"
-      case 282: // "OPERATOR_VALIDATE_UTF8_ENCODING"
-      case 283: // "OPERATOR_VERIFY_CC"
-      case 284: // "OPERATOR_VERIFY_CPF"
-      case 285: // "OPERATOR_VERIFY_SSN"
-      case 286: // "OPERATOR_WITHIN"
-      case 287: // "OP_QUOTE"
-      case 288: // "QUOTATION_MARK"
-      case 289: // "RUN_TIME_VAR_BLD"
-      case 290: // "RUN_TIME_VAR_DUR"
-      case 291: // "RUN_TIME_VAR_HSV"
-      case 292: // "RUN_TIME_VAR_REMOTE_USER"
-      case 293: // "RUN_TIME_VAR_TIME"
-      case 294: // "RUN_TIME_VAR_TIME_DAY"
-      case 295: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 296: // "RUN_TIME_VAR_TIME_HOUR"
-      case 297: // "RUN_TIME_VAR_TIME_MIN"
-      case 298: // "RUN_TIME_VAR_TIME_MON"
-      case 299: // "RUN_TIME_VAR_TIME_SEC"
-      case 300: // "RUN_TIME_VAR_TIME_WDAY"
-      case 301: // "RUN_TIME_VAR_TIME_YEAR"
-      case 302: // "SETVAR_VARIABLE_PART"
-      case 303: // "SETVAR_CONTENT_PART"
-      case 304: // "VARIABLE"
-      case 305: // "Dictionary element"
-      case 306: // "Dictionary element, selected by regexp"
-      case 321: // setvar_variable
-      case 322: // setvar_content
+      case 250: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 251: // "OPERATOR"
+      case 252: // "OPERATOR_BEGINS_WITH"
+      case 253: // "OPERATOR_CONTAINS"
+      case 254: // "OPERATOR_CONTAINS_WORD"
+      case 255: // "OPERATOR_DETECT_SQLI"
+      case 256: // "OPERATOR_DETECT_XSS"
+      case 257: // "OPERATOR_ENDS_WITH"
+      case 258: // "OPERATOR_EQ"
+      case 259: // "OPERATOR_FUZZY_HASH"
+      case 260: // "OPERATOR_GE"
+      case 261: // "OPERATOR_GEOLOOKUP"
+      case 262: // "OPERATOR_GSB_LOOKUP"
+      case 263: // "OPERATOR_GT"
+      case 264: // "OPERATOR_INSPECT_FILE"
+      case 265: // "OPERATOR_IP_MATCH"
+      case 266: // "OPERATOR_IP_MATCH_FROM_FILE"
+      case 267: // "OPERATOR_LE"
+      case 268: // "OPERATOR_LT"
+      case 269: // "OPERATOR_PM"
+      case 270: // "OPERATOR_PM_FROM_FILE"
+      case 271: // "OPERATOR_RBL"
+      case 272: // "OPERATOR_RSUB"
+      case 273: // "OPERATOR_RX"
+      case 274: // "Operator RX (content only)"
+      case 275: // "OPERATOR_STR_EQ"
+      case 276: // "OPERATOR_STR_MATCH"
+      case 277: // "OPERATOR_UNCONDITIONAL_MATCH"
+      case 278: // "OPERATOR_VALIDATE_BYTE_RANGE"
+      case 279: // "OPERATOR_VALIDATE_DTD"
+      case 280: // "OPERATOR_VALIDATE_HASH"
+      case 281: // "OPERATOR_VALIDATE_SCHEMA"
+      case 282: // "OPERATOR_VALIDATE_URL_ENCODING"
+      case 283: // "OPERATOR_VALIDATE_UTF8_ENCODING"
+      case 284: // "OPERATOR_VERIFY_CC"
+      case 285: // "OPERATOR_VERIFY_CPF"
+      case 286: // "OPERATOR_VERIFY_SSN"
+      case 287: // "OPERATOR_WITHIN"
+      case 288: // "OP_QUOTE"
+      case 289: // "QUOTATION_MARK"
+      case 290: // "RUN_TIME_VAR_BLD"
+      case 291: // "RUN_TIME_VAR_DUR"
+      case 292: // "RUN_TIME_VAR_HSV"
+      case 293: // "RUN_TIME_VAR_REMOTE_USER"
+      case 294: // "RUN_TIME_VAR_TIME"
+      case 295: // "RUN_TIME_VAR_TIME_DAY"
+      case 296: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 297: // "RUN_TIME_VAR_TIME_HOUR"
+      case 298: // "RUN_TIME_VAR_TIME_MIN"
+      case 299: // "RUN_TIME_VAR_TIME_MON"
+      case 300: // "RUN_TIME_VAR_TIME_SEC"
+      case 301: // "RUN_TIME_VAR_TIME_WDAY"
+      case 302: // "RUN_TIME_VAR_TIME_YEAR"
+      case 303: // "SETVAR_VARIABLE_PART"
+      case 304: // "SETVAR_CONTENT_PART"
+      case 305: // "VARIABLE"
+      case 306: // "Dictionary element"
+      case 307: // "Dictionary element, selected by regexp"
+      case 322: // setvar_variable
+      case 323: // setvar_content
         value.template destroy< std::string > ();
         break;
 
-      case 313: // op
-      case 314: // op_before_init
+      case 314: // op
+      case 315: // op_before_init
         value.template destroy< std::unique_ptr<Operator> > ();
         break;
 
-      case 318: // var
+      case 324: // run_time_string
+        value.template destroy< std::unique_ptr<RunTimeString> > ();
+        break;
+
+      case 319: // var
         value.template destroy< std::unique_ptr<Variable> > ();
         break;
 
-      case 319: // act
-      case 320: // setvar_action
+      case 320: // act
+      case 321: // setvar_action
         value.template destroy< std::unique_ptr<actions::Action> > ();
         break;
 
-      case 316: // variables
-      case 317: // variables_may_be_quoted
+      case 317: // variables
+      case 318: // variables_may_be_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
         break;
 
-      case 311: // actions
-      case 312: // actions_may_quoted
+      case 312: // actions
+      case 313: // actions_may_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ();
         break;
 
@@ -3806,89 +3839,94 @@ namespace yy {
       case 247: // "DIRECTIVE"
       case 248: // "DIRECTIVE_SECRULESCRIPT"
       case 249: // "FREE_TEXT"
-      case 250: // "OPERATOR"
-      case 251: // "OPERATOR_BEGINS_WITH"
-      case 252: // "OPERATOR_CONTAINS"
-      case 253: // "OPERATOR_CONTAINS_WORD"
-      case 254: // "OPERATOR_DETECT_SQLI"
-      case 255: // "OPERATOR_DETECT_XSS"
-      case 256: // "OPERATOR_ENDS_WITH"
-      case 257: // "OPERATOR_EQ"
-      case 258: // "OPERATOR_FUZZY_HASH"
-      case 259: // "OPERATOR_GE"
-      case 260: // "OPERATOR_GEOLOOKUP"
-      case 261: // "OPERATOR_GSB_LOOKUP"
-      case 262: // "OPERATOR_GT"
-      case 263: // "OPERATOR_INSPECT_FILE"
-      case 264: // "OPERATOR_IP_MATCH"
-      case 265: // "OPERATOR_IP_MATCH_FROM_FILE"
-      case 266: // "OPERATOR_LE"
-      case 267: // "OPERATOR_LT"
-      case 268: // "OPERATOR_PM"
-      case 269: // "OPERATOR_PM_FROM_FILE"
-      case 270: // "OPERATOR_RBL"
-      case 271: // "OPERATOR_RSUB"
-      case 272: // "OPERATOR_RX"
-      case 273: // "Operator RX (content only)"
-      case 274: // "OPERATOR_STR_EQ"
-      case 275: // "OPERATOR_STR_MATCH"
-      case 276: // "OPERATOR_UNCONDITIONAL_MATCH"
-      case 277: // "OPERATOR_VALIDATE_BYTE_RANGE"
-      case 278: // "OPERATOR_VALIDATE_DTD"
-      case 279: // "OPERATOR_VALIDATE_HASH"
-      case 280: // "OPERATOR_VALIDATE_SCHEMA"
-      case 281: // "OPERATOR_VALIDATE_URL_ENCODING"
-      case 282: // "OPERATOR_VALIDATE_UTF8_ENCODING"
-      case 283: // "OPERATOR_VERIFY_CC"
-      case 284: // "OPERATOR_VERIFY_CPF"
-      case 285: // "OPERATOR_VERIFY_SSN"
-      case 286: // "OPERATOR_WITHIN"
-      case 287: // "OP_QUOTE"
-      case 288: // "QUOTATION_MARK"
-      case 289: // "RUN_TIME_VAR_BLD"
-      case 290: // "RUN_TIME_VAR_DUR"
-      case 291: // "RUN_TIME_VAR_HSV"
-      case 292: // "RUN_TIME_VAR_REMOTE_USER"
-      case 293: // "RUN_TIME_VAR_TIME"
-      case 294: // "RUN_TIME_VAR_TIME_DAY"
-      case 295: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 296: // "RUN_TIME_VAR_TIME_HOUR"
-      case 297: // "RUN_TIME_VAR_TIME_MIN"
-      case 298: // "RUN_TIME_VAR_TIME_MON"
-      case 299: // "RUN_TIME_VAR_TIME_SEC"
-      case 300: // "RUN_TIME_VAR_TIME_WDAY"
-      case 301: // "RUN_TIME_VAR_TIME_YEAR"
-      case 302: // "SETVAR_VARIABLE_PART"
-      case 303: // "SETVAR_CONTENT_PART"
-      case 304: // "VARIABLE"
-      case 305: // "Dictionary element"
-      case 306: // "Dictionary element, selected by regexp"
-      case 321: // setvar_variable
-      case 322: // setvar_content
+      case 250: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 251: // "OPERATOR"
+      case 252: // "OPERATOR_BEGINS_WITH"
+      case 253: // "OPERATOR_CONTAINS"
+      case 254: // "OPERATOR_CONTAINS_WORD"
+      case 255: // "OPERATOR_DETECT_SQLI"
+      case 256: // "OPERATOR_DETECT_XSS"
+      case 257: // "OPERATOR_ENDS_WITH"
+      case 258: // "OPERATOR_EQ"
+      case 259: // "OPERATOR_FUZZY_HASH"
+      case 260: // "OPERATOR_GE"
+      case 261: // "OPERATOR_GEOLOOKUP"
+      case 262: // "OPERATOR_GSB_LOOKUP"
+      case 263: // "OPERATOR_GT"
+      case 264: // "OPERATOR_INSPECT_FILE"
+      case 265: // "OPERATOR_IP_MATCH"
+      case 266: // "OPERATOR_IP_MATCH_FROM_FILE"
+      case 267: // "OPERATOR_LE"
+      case 268: // "OPERATOR_LT"
+      case 269: // "OPERATOR_PM"
+      case 270: // "OPERATOR_PM_FROM_FILE"
+      case 271: // "OPERATOR_RBL"
+      case 272: // "OPERATOR_RSUB"
+      case 273: // "OPERATOR_RX"
+      case 274: // "Operator RX (content only)"
+      case 275: // "OPERATOR_STR_EQ"
+      case 276: // "OPERATOR_STR_MATCH"
+      case 277: // "OPERATOR_UNCONDITIONAL_MATCH"
+      case 278: // "OPERATOR_VALIDATE_BYTE_RANGE"
+      case 279: // "OPERATOR_VALIDATE_DTD"
+      case 280: // "OPERATOR_VALIDATE_HASH"
+      case 281: // "OPERATOR_VALIDATE_SCHEMA"
+      case 282: // "OPERATOR_VALIDATE_URL_ENCODING"
+      case 283: // "OPERATOR_VALIDATE_UTF8_ENCODING"
+      case 284: // "OPERATOR_VERIFY_CC"
+      case 285: // "OPERATOR_VERIFY_CPF"
+      case 286: // "OPERATOR_VERIFY_SSN"
+      case 287: // "OPERATOR_WITHIN"
+      case 288: // "OP_QUOTE"
+      case 289: // "QUOTATION_MARK"
+      case 290: // "RUN_TIME_VAR_BLD"
+      case 291: // "RUN_TIME_VAR_DUR"
+      case 292: // "RUN_TIME_VAR_HSV"
+      case 293: // "RUN_TIME_VAR_REMOTE_USER"
+      case 294: // "RUN_TIME_VAR_TIME"
+      case 295: // "RUN_TIME_VAR_TIME_DAY"
+      case 296: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 297: // "RUN_TIME_VAR_TIME_HOUR"
+      case 298: // "RUN_TIME_VAR_TIME_MIN"
+      case 299: // "RUN_TIME_VAR_TIME_MON"
+      case 300: // "RUN_TIME_VAR_TIME_SEC"
+      case 301: // "RUN_TIME_VAR_TIME_WDAY"
+      case 302: // "RUN_TIME_VAR_TIME_YEAR"
+      case 303: // "SETVAR_VARIABLE_PART"
+      case 304: // "SETVAR_CONTENT_PART"
+      case 305: // "VARIABLE"
+      case 306: // "Dictionary element"
+      case 307: // "Dictionary element, selected by regexp"
+      case 322: // setvar_variable
+      case 323: // setvar_content
         value.move< std::string > (s.value);
         break;
 
-      case 313: // op
-      case 314: // op_before_init
+      case 314: // op
+      case 315: // op_before_init
         value.move< std::unique_ptr<Operator> > (s.value);
         break;
 
-      case 318: // var
+      case 324: // run_time_string
+        value.move< std::unique_ptr<RunTimeString> > (s.value);
+        break;
+
+      case 319: // var
         value.move< std::unique_ptr<Variable> > (s.value);
         break;
 
-      case 319: // act
-      case 320: // setvar_action
+      case 320: // act
+      case 321: // setvar_action
         value.move< std::unique_ptr<actions::Action> > (s.value);
         break;
 
-      case 316: // variables
-      case 317: // variables_may_be_quoted
+      case 317: // variables
+      case 318: // variables_may_be_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (s.value);
         break;
 
-      case 311: // actions
-      case 312: // actions_may_quoted
+      case 312: // actions
+      case 313: // actions_may_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (s.value);
         break;
 
@@ -3977,7 +4015,7 @@ namespace yy {
      525,   526,   527,   528,   529,   530,   531,   532,   533,   534,
      535,   536,   537,   538,   539,   540,   541,   542,   543,   544,
      545,   546,   547,   548,   549,   550,   551,   552,   553,   554,
-     555,   556,   557,   558,   559,   560,   561
+     555,   556,   557,   558,   559,   560,   561,   562
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -5471,6 +5509,12 @@ namespace yy {
   }
 
   seclang_parser::symbol_type
+  seclang_parser::make_FREE_TEXT_QUOTE_MACRO_EXPANSION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION, v, l);
+  }
+
+  seclang_parser::symbol_type
   seclang_parser::make_OPERATOR (const std::string& v, const location_type& l)
   {
     return symbol_type (token::TOK_OPERATOR, v, l);
@@ -5815,7 +5859,7 @@ namespace yy {
 
 
 } // yy
-#line 5819 "seclang-parser.hh" // lalr1.cc:377
+#line 5863 "seclang-parser.hh" // lalr1.cc:377
 
 
 

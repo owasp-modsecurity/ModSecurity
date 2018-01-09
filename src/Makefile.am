@@ -272,6 +272,7 @@ libmodsecurity_la_SOURCES = \
 	debug_log/debug_log.cc \
 	debug_log/debug_log_writer.cc \
 	macro_expansion.cc \
+	run_time_string.cc \
 	rule.cc \
 	rule_message.cc \
 	rule_script.cc \

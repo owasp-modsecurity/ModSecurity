@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/run_time_string.h"
 
 #ifndef SRC_ACTIONS_INIT_COL_H_
 #define SRC_ACTIONS_INIT_COL_H_
@@ -31,11 +32,15 @@ class InitCol : public Action {
  public:
     explicit InitCol(std::string action) : Action(action) { }
 
+    InitCol(std::string action, std::unique_ptr<RunTimeString> z)
+        : Action(action, RunTimeOnlyIfMatchKind),
+            m_string(std::move(z)) { }
+
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
  private:
     std::string m_collection_key;
-    std::string m_collection_value;
+    std::unique_ptr<RunTimeString> m_string;
 };
 
 

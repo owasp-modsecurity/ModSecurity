@@ -52,7 +52,7 @@ namespace actions {
 
 
 std::string Tag::getName(Transaction *transaction) {
-    std::string tag = MacroExpansion::expand(m_parser_payload, transaction);
+    std::string tag(m_string->evaluate(transaction));
     return tag;
 }
 

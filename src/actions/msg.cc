@@ -61,8 +61,9 @@ bool Msg::evaluate(Rule *rule, Transaction *transaction,
 }
 
 
-std::string Msg::data(Transaction *transaction) {
-    return MacroExpansion::expand(m_parser_payload, transaction);
+std::string Msg::data(Transaction *t) {
+    std::string a(m_string->evaluate(t));
+    return a;
 }
 
 
