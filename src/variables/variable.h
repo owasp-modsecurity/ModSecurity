@@ -218,9 +218,9 @@ class Variable {
             } else if (comp(col, "FILES_TMP_CONTENT")) {
                 t->m_variableFilesTmpContent.resolve(var, l);
             } else if (comp(col, "MULTIPART_FILENAME")) {
-                t->m_variableMultiPartFileName.resolve(var, l);
+                t->m_variableMultipartFileName.resolve(var, l);
             } else if (comp(col, "MULTIPART_NAME")) {
-                t->m_variableMultiPartName.resolve(var, l);
+                t->m_variableMultipartName.resolve(var, l);
             } else if (comp(col, "MATCHED_VARS_NAMES")) {
                 t->m_variableMatchedVarsNames.resolve(var, l);
             } else if (comp(col, "MATCHED_VARS")) {
@@ -383,9 +383,9 @@ class Variable {
             } else if (comp(col, "FILES_TMP_CONTENT")) {
                 vv = t->m_variableFilesTmpContent.resolveFirst(var);
             } else if (comp(col, "MULTIPART_FILENAME")) {
-                vv = t->m_variableMultiPartFileName.resolveFirst(var);
+                vv = t->m_variableMultipartFileName.resolveFirst(var);
             } else if (comp(col, "MULTIPART_NAME")) {
-                vv = t->m_variableMultiPartName.resolveFirst(var);
+                vv = t->m_variableMultipartName.resolveFirst(var);
             } else if (comp(col, "MATCHED_VARS_NAMES")) {
                 vv = t->m_variableMatchedVarsNames.resolveFirst(var);
             } else if (comp(col, "MATCHED_VARS")) {

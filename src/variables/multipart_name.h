@@ -39,7 +39,7 @@ class MultiPartName_DictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_variableMultiPartName.resolve(m_dictElement, l);
+        transaction->m_variableMultipartName.resolve(m_dictElement, l);
     }
 
     std::string m_dictElement;
@@ -54,7 +54,7 @@ class MultiPartName_NoDictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_variableMultiPartName.resolve(l);
+        transaction->m_variableMultipartName.resolve(l);
     }
 };
 
@@ -68,7 +68,7 @@ class MultiPartName_DictElementRegexp : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_variableMultiPartName.resolveRegularExpression(
+        transaction->m_variableMultipartName.resolveRegularExpression(
             &m_r, l);
     }
 

@@ -136,12 +136,20 @@ VARIABLE_GLOBAL                           (?i:GLOBAL)
 VARIABLE_INBOUND_DATA_ERROR               (?i:INBOUND_DATA_ERROR)
 VARIABLE_MATCHED_VAR                      (?i:MATCHED_VAR)
 VARIABLE_MATCHED_VAR_NAME                 (?i:MATCHED_VAR_NAME)
+VARIABLE_MULTIPART_BOUNDARY_QUOTED        (?i:MULTIPART_BOUNDARY_QUOTED)
+VARIABLE_MULTIPART_BOUNDARY_WHITESPACE    (?i:MULTIPART_BOUNDARY_WHITESPACE)
 VARIABLE_MULTIPART_CRLF_LF_LINES          (?i:MULTIPART_CRLF_LF_LINES)
 VARIABLE_MULTIPART_DATA_AFTER             (?i:MULTIPART_DATA_AFTER)
+VARIABLE_MULTIPART_DATA_BEFORE            (?i:MULTIPART_DATA_BEFORE)
 VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED    (?i:MULTIPART_FILE_LIMIT_EXCEEDED)
+VARIABLE_MULTIPART_FILENAME               (?i:MULTIPART_FILENAME)
 VARIABLE_MULTIPART_HEADER_FOLDING         (?i:MULTIPART_HEADER_FOLDING)
 VARIABLE_MULTIPART_INVALID_HEADER_FOLDING (?i:MULTIPART_INVALID_HEADER_FOLDING)
+VARIABLE_MULTIPART_INVALID_PART           (?i:MULTIPART_INVALID_PART)
 VARIABLE_MULTIPART_INVALID_QUOTING        (?i:MULTIPART_INVALID_QUOTING)
+VARIABLE_MULTIPART_LF_LINE                (?i:MULTIPART_LF_LINE)
+VARIABLE_MULTIPART_MISSING_SEMICOLON      (?i:MULTIPART_MISSING_SEMICOLON)
+VARIABLE_MULTIPART_NAME                   (?i:MULTIPART_NAME)
 VARIABLE_MULTIPART_STRICT_ERROR           (?i:MULTIPART_STRICT_ERROR)
 VARIABLE_MULTIPART_UNMATCHED_BOUNDARY     (?i:MULTIPART_UNMATCHED_BOUNDARY)
 VARIABLE_OUTBOUND_DATA_ERROR              (?i:OUTBOUND_DATA_ERROR)
@@ -186,8 +194,6 @@ VARIABLE_ARGS_GET                         (?i:ARGS_GET)
 VARIABLE_FILES_SIZES                      (?i:FILES_SIZES)
 VARIABLE_FILES_NAMES                      (?i:FILES_NAMES)
 VARIABLE_FILES_TMP_CONTENT                (?i:FILES_TMP_CONTENT)
-VARIABLE_MULTIPART_FILENAME               (?i:MULTIPART_FILENAME)
-VARIABLE_MULTIPART_NAME                   (?i:MULTIPART_NAME)
 VARIABLE_MATCHED_VARS_NAMES               (?i:MATCHED_VARS_NAMES)
 VARIABLE_MATCHED_VARS                     (?i:MATCHED_VARS)
 VARIABLE_FILES                            (?i:FILES)
@@ -779,12 +785,27 @@ p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), 
 {VARIABLE_INBOUND_DATA_ERROR}               { return p::make_VARIABLE_INBOUND_DATA_ERROR(*driver.loc.back()); }
 {VARIABLE_MATCHED_VAR_NAME}                 { return p::make_VARIABLE_MATCHED_VAR_NAME(*driver.loc.back()); }
 {VARIABLE_MATCHED_VAR}                      { return p::make_VARIABLE_MATCHED_VAR(*driver.loc.back()); }
+{VARIABLE_MULTIPART_BOUNDARY_QUOTED}        { return p::make_VARIABLE_MULTIPART_BOUNDARY_QUOTED(*driver.loc.back()); }
+{VARIABLE_MULTIPART_BOUNDARY_WHITESPACE}    { return p::make_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE(*driver.loc.back()); }
 {VARIABLE_MULTIPART_CRLF_LF_LINES}          { return p::make_VARIABLE_MULTIPART_CRLF_LF_LINES(*driver.loc.back()); }
 {VARIABLE_MULTIPART_DATA_AFTER}             { return p::make_VARIABLE_MULTIPART_DATA_AFTER(*driver.loc.back()); }
+{VARIABLE_MULTIPART_DATA_AFTER}             { return p::make_VARIABLE_MULTIPART_DATA_AFTER(*driver.loc.back()); }
+{VARIABLE_MULTIPART_DATA_BEFORE}            { return p::make_VARIABLE_MULTIPART_DATA_BEFORE(*driver.loc.back()); }
 {VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED}    { return p::make_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED(*driver.loc.back()); }
+{VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED}    { return p::make_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED(*driver.loc.back()); }
+{VARIABLE_MULTIPART_FILENAME}[:.]           { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
+{VARIABLE_MULTIPART_FILENAME}               { return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
+{VARIABLE_MULTIPART_HEADER_FOLDING}         { return p::make_VARIABLE_MULTIPART_HEADER_FOLDING(*driver.loc.back()); }
 {VARIABLE_MULTIPART_HEADER_FOLDING}         { return p::make_VARIABLE_MULTIPART_HEADER_FOLDING(*driver.loc.back()); }
 {VARIABLE_MULTIPART_INVALID_HEADER_FOLDING} { return p::make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING(*driver.loc.back()); }
+{VARIABLE_MULTIPART_INVALID_HEADER_FOLDING} { return p::make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING(*driver.loc.back()); }
+{VARIABLE_MULTIPART_INVALID_PART}           { return p::make_VARIABLE_MULTIPART_INVALID_PART(*driver.loc.back()); }
 {VARIABLE_MULTIPART_INVALID_QUOTING}        { return p::make_VARIABLE_MULTIPART_INVALID_QUOTING(*driver.loc.back()); }
+{VARIABLE_MULTIPART_INVALID_QUOTING}        { return p::make_VARIABLE_MULTIPART_INVALID_QUOTING(*driver.loc.back()); }
+{VARIABLE_MULTIPART_LF_LINE}                { return p::make_VARIABLE_MULTIPART_LF_LINE(*driver.loc.back()); }
+{VARIABLE_MULTIPART_MISSING_SEMICOLON}      { return p::make_VARIABLE_MULTIPART_MISSING_SEMICOLON(*driver.loc.back()); }
+{VARIABLE_MULTIPART_NAME}[:.]               { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_NAME(*driver.loc.back()); }
+{VARIABLE_MULTIPART_NAME}                   { return p::make_VARIABLE_MULTIPART_NAME(*driver.loc.back()); }
 {VARIABLE_MULTIPART_STRICT_ERROR}           { return p::make_VARIABLE_MULTIPART_STRICT_ERROR(*driver.loc.back()); }
 {VARIABLE_MULTIPART_UNMATCHED_BOUNDARY}     { return p::make_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY(*driver.loc.back()); }
 {VARIABLE_OUTBOUND_DATA_ERROR}              { return p::make_VARIABLE_OUTBOUND_DATA_ERROR(*driver.loc.back()); }
@@ -837,10 +858,6 @@ p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), 
 {VARIABLE_FILES_NAMES}[:.]                  { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_NAMES(*driver.loc.back()); }
 {VARIABLE_FILES_TMP_CONTENT}                { return p::make_VARIABLE_FILES_TMP_CONTENT(*driver.loc.back()); }
 {VARIABLE_FILES_TMP_CONTENT}[:.]            { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_TMP_CONTENT(*driver.loc.back()); }
-{VARIABLE_MULTIPART_FILENAME}               { return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
-{VARIABLE_MULTIPART_FILENAME}[:.]           { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
-{VARIABLE_MULTIPART_NAME}                   { return p::make_VARIABLE_MULTIPART_NAME(*driver.loc.back()); }
-{VARIABLE_MULTIPART_NAME}[:.]               { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_NAME(*driver.loc.back()); }
 {VARIABLE_MATCHED_VARS_NAMES}               { return p::make_VARIABLE_MATCHED_VARS_NAMES(*driver.loc.back()); }
 {VARIABLE_MATCHED_VARS_NAMES}[:.]           { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MATCHED_VARS_NAMES(*driver.loc.back()); }
 {VARIABLE_MATCHED_VARS}                     { return p::make_VARIABLE_MATCHED_VARS(*driver.loc.back()); }
@@ -879,7 +896,6 @@ p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), 
 {VARIABLE_USER}[:.]                         { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_USER(*driver.loc.back()); }
 {VARIABLE_TX}                               { return p::make_VARIABLE_TX(*driver.loc.back()); }
 {VARIABLE_TX}[:.]                           { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_TX(*driver.loc.back()); }
-
 
 {RUN_TIME_VAR_BLD}                          { return p::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
 {RUN_TIME_VAR_DUR}                          { return p::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
