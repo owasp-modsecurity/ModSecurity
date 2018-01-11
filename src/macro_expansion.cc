@@ -270,10 +270,10 @@ std::string MacroExpansion::expand(const std::string& input,
                 variableValue = transaction->m_variableFilesTmpContent.resolveFirst(var);
             }
             else if (compareStrNoCase(col, "MULTIPART_FILENAME")) {
-                variableValue = transaction->m_variableMultiPartFileName.resolveFirst(var);
+                variableValue = transaction->m_variableMultipartFileName.resolveFirst(var);
             }
             else if (compareStrNoCase(col, "MULTIPART_NAME")) {
-                variableValue = transaction->m_variableMultiPartName.resolveFirst(var);
+                variableValue = transaction->m_variableMultipartName.resolveFirst(var);
             }
             else if (compareStrNoCase(col, "MATCHED_VARS_NAMES")) {
                 variableValue = transaction->m_variableMatchedVarsNames.resolveFirst(var);
