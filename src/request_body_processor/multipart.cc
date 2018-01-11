@@ -352,7 +352,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         if (name == "name") {
             validate_quotes(value.c_str());
 
-            m_transaction->m_variableMultiPartName.set(value, value,
+            m_transaction->m_variableMultipartName.set(value, value,
                 offset + ((p - c_d_value) - value.size()));
 
             if (!m_mpp->m_name.empty()) {
@@ -369,7 +369,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
 #endif
         } else if (name == "filename") {
             validate_quotes(value.c_str());
-            m_transaction->m_variableMultiPartFileName.set(value, value, \
+            m_transaction->m_variableMultipartFileName.set(value, value, \
                 offset + ((p - c_d_value) - value.size()));
 
             if (!m_mpp->m_filename.empty()) {
@@ -956,8 +956,9 @@ int Multipart::multipart_complete(std::string *error) {
         std::to_string(m_flag_unmatched_boundary),
         m_transaction->m_variableOffset);
 
-    m_transaction->m_collections.store("MULTIPART_DATA_BEFORE",
-        std::to_string(m_flag_data_before));
+    m_transaction->m_variableMultipartDataBefore.set(
+        std::to_string(m_flag_data_before),
+        m_transaction->m_variableOffset);
     if (m_flag_data_before) {
 #ifndef NO_LOGS
         debug(4, "Multipart: Warning: seen data before first boundary.");
@@ -973,16 +974,18 @@ int Multipart::multipart_complete(std::string *error) {
 #endif
     }
 
-    m_transaction->m_collections.store("MULTIPART_BOUNDARY_QUOTED",
-        std::to_string(m_flag_boundary_quoted));
+    m_transaction->m_variableMultipartBoundaryQuoted.set(
+        std::to_string(m_flag_boundary_quoted),
+        m_transaction->m_variableOffset);
     if (m_flag_boundary_quoted) {
 #ifndef NO_LOGS
         debug(4, "Multipart: Warning: boundary was quoted.");
 #endif
     }
 
-    m_transaction->m_collections.store("MULTIPART_BOUNDARY_WHITESPACE",
-        std::to_string(m_flag_boundary_whitespace));
+    m_transaction->m_variableMultipartBoundaryWhiteSpace.set(
+        std::to_string(m_flag_boundary_whitespace),
+        m_transaction->m_variableOffset);
     if (m_flag_boundary_whitespace) {
 #ifndef NO_LOGS
         debug(4, "Multipart: Warning: boundary whitespace in C-T header.");
@@ -997,11 +1000,9 @@ int Multipart::multipart_complete(std::string *error) {
         debug(4, "Multipart: Warning: header folding used.");
 #endif
     }
-
-    m_transaction->m_collections.store("MULTIPART_CRLF_LINE",
-        std::to_string(m_flag_crlf_line));
-    m_transaction->m_collections.store("MULTIPART_LF_LINE",
-        std::to_string(m_flag_lf_line));
+    m_transaction->m_variableMultipartLFLine.set(
+        std::to_string(m_flag_lf_line),
+        m_transaction->m_variableOffset);
     m_transaction->m_variableMultipartCrlfLFLines.set(
         std::to_string(m_flag_crlf_line && m_flag_lf_line),
         m_transaction->m_variableOffset);
@@ -1014,9 +1015,9 @@ int Multipart::multipart_complete(std::string *error) {
         debug(4, "Multipart: Warning: incorrect line endings used (LF).");
 #endif
     }
-
-    m_transaction->m_collections.store("MULTIPART_MISSING_SEMICOLON",
-        std::to_string(m_flag_missing_semicolon));
+    m_transaction->m_variableMultipartMissingSemicolon.set(
+        std::to_string(m_flag_missing_semicolon),
+        m_transaction->m_variableOffset);
     if (m_flag_missing_semicolon) {
 #ifndef NO_LOGS
         debug(4, "Multipart: Warning: missing semicolon in C-T header.");
@@ -1031,9 +1032,9 @@ int Multipart::multipart_complete(std::string *error) {
         debug(4, "Multipart: Warning: invalid quoting used.");
 #endif
     }
-
-    m_transaction->m_collections.store("MULTIPART_INVALID_PART",
-        std::to_string(m_flag_invalid_part));
+    m_transaction->m_variableMultipartInvalidPart.set(
+        std::to_string(m_flag_invalid_part),
+        m_transaction->m_variableOffset);
     if (m_flag_invalid_part) {
 #ifndef NO_LOGS
         debug(4, "Multipart: Warning: invalid part parsing.");

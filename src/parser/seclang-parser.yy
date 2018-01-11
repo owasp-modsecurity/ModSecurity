@@ -175,13 +175,19 @@ class Driver;
 #include "src/variables/matched_vars.h"
 #include "src/variables/matched_vars_names.h"
 #include "src/variables/modsec_build.h"
+#include "src/variables/multipart_boundary_quoted.h"
+#include "src/variables/multipart_boundary_whitespace.h"
 #include "src/variables/multipart_crlf_lf_lines.h"
 #include "src/variables/multipart_data_after.h"
+#include "src/variables/multipart_data_before.h"
 #include "src/variables/multipart_file_limit_exceeded.h"
 #include "src/variables/multipart_file_name.h"
 #include "src/variables/multipart_header_folding.h"
 #include "src/variables/multipart_invalid_header_folding.h"
+#include "src/variables/multipart_invalid_part.h"
 #include "src/variables/multipart_invalid_quoting.h"
+#include "src/variables/multipart_lf_line.h"
+#include "src/variables/multipart_missing_semicolon.h"
 #include "src/variables/multipart_name.h"
 #include "src/variables/multipart_strict_error.h"
 #include "src/variables/multipart_unmatched_boundary.h"
@@ -390,12 +396,18 @@ using modsecurity::operators::Operator;
   VARIABLE_INBOUND_DATA_ERROR   "INBOUND_DATA_ERROR"
   VARIABLE_MATCHED_VAR          "MATCHED_VAR"
   VARIABLE_MATCHED_VAR_NAME     "MATCHED_VAR_NAME"
+  VARIABLE_MULTIPART_BOUNDARY_QUOTED
+  VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
   VARIABLE_MULTIPART_CRLF_LF_LINES    "MULTIPART_CRLF_LF_LINES"
   VARIABLE_MULTIPART_DATA_AFTER "MULTIPART_DATA_AFTER"
+  VARIABLE_MULTIPART_DATA_BEFORE
   VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED       "MULTIPART_FILE_LIMIT_EXCEEDED"
   VARIABLE_MULTIPART_HEADER_FOLDING            "MULTIPART_HEADER_FOLDING"
   VARIABLE_MULTIPART_INVALID_HEADER_FOLDING    "MULTIPART_INVALID_HEADER_FOLDING"
+  VARIABLE_MULTIPART_INVALID_PART
   VARIABLE_MULTIPART_INVALID_QUOTING           "MULTIPART_INVALID_QUOTING"
+  VARIABLE_MULTIPART_LF_LINE
+  VARIABLE_MULTIPART_MISSING_SEMICOLON
   VARIABLE_MULTIPART_STRICT_ERROR              "MULTIPART_STRICT_ERROR"
   VARIABLE_MULTIPART_UNMATCHED_BOUNDARY        "MULTIPART_UNMATCHED_BOUNDARY"
   VARIABLE_OUTBOUND_DATA_ERROR  "OUTBOUND_DATA_ERROR"
@@ -434,12 +446,14 @@ using modsecurity::operators::Operator;
   VARIABLE_URL_ENCODED_ERROR    "URLENCODED_ERROR"
   VARIABLE_USER_ID               "USERID"
   VARIABLE_WEB_APP_ID           "WEBAPPID"
+
+
   VARIABLE_STATUS                              "VARIABLE_STATUS"
   VARIABLE_IP                                  "VARIABLE_IP"
   VARIABLE_GLOBAL                              "VARIABLE_GLOBAL"
   VARIABLE_TX                                  "VARIABLE_TX"
   VARIABLE_SESSION                             "VARIABLE_SESSION"
-  VARIABLE_USER                                 "VARIABLE_USER"
+  VARIABLE_USER                                "VARIABLE_USER"
   RUN_TIME_VAR_ENV                             "RUN_TIME_VAR_ENV"
   RUN_TIME_VAR_XML                             "RUN_TIME_VAR_XML"
 
@@ -1988,6 +2002,14 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::MatchedVarName());
       }
+    | VARIABLE_MULTIPART_BOUNDARY_QUOTED
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartBoundaryQuoted());
+      }
+    | VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartBoundaryWhiteSpace());
+      }
     | VARIABLE_MULTIPART_CRLF_LF_LINES
       {
         VARIABLE_CONTAINER($$, new Variables::MultipartCrlfLFLines());
@@ -1995,6 +2017,10 @@ var:
     | VARIABLE_MULTIPART_DATA_AFTER
       {
         VARIABLE_CONTAINER($$, new Variables::MultipartDateAfter());
+      }
+    | VARIABLE_MULTIPART_DATA_BEFORE
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartDateBefore());
       }
     | VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED
       {
@@ -2008,9 +2034,21 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::MultipartInvalidHeaderFolding());
       }
+    | VARIABLE_MULTIPART_INVALID_PART
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartInvalidPart());
+      }
     | VARIABLE_MULTIPART_INVALID_QUOTING
       {
         VARIABLE_CONTAINER($$, new Variables::MultipartInvalidQuoting());
+      }
+    | VARIABLE_MULTIPART_LF_LINE
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartLFLine());
+      }
+    | VARIABLE_MULTIPART_MISSING_SEMICOLON
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartMissingSemicolon());
       }
     | VARIABLE_MULTIPART_STRICT_ERROR
       {
