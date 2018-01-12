@@ -899,9 +899,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
     char **keys;
     apr_time_t now = apr_time_sec(msr->request_time);
     int i;
-
-    if(db_option == DB_OPT_REDIS)
-        return 1;
+    
     //---------------------------------
     //AGMDB
     //---------------------------------

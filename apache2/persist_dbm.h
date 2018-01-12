@@ -18,8 +18,7 @@
 #include "apr_general.h"
 #include "modsecurity.h"
 
-#define DB_OPT_AGMDB    2
-#define DB_OPT_REDIS    1
+#define DB_OPT_AGMDB    1
 #define DB_OPT_ORIGIN   0
 struct agmdb_handle_entry{
     const char* col_name;
