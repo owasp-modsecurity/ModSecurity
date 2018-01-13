@@ -54,11 +54,11 @@ if test -n "${curl_path}"; then
     fi
     AC_MSG_RESULT([${CURL_CONFIG}])
     CURL_VERSION=`${CURL_CONFIG} --version | sed 's/^[[^0-9]][[^[:space:]]][[^[:space:]]]*[[[:space:]]]*//'`
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl VERSION: $CURL_VERSION); fi
+    if test ! -z "${CURL_VERSION}"; then AC_MSG_NOTICE(curl VERSION: $CURL_VERSION); fi
     CURL_CFLAGS="`${CURL_CONFIG} --cflags`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl CFLAGS: $CURL_CFLAGS); fi
+    if test ! -z "${CURL_CFLAGS}"; then AC_MSG_NOTICE(curl CFLAGS: $CURL_CFLAGS); fi
     CURL_LDADD="`${CURL_CONFIG} --libs`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl LDADD: $CURL_LIBS); fi
+    if test ! -z "${CURL_CONFIG}"; then AC_MSG_NOTICE(curl LDADD: $CURL_LIBS); fi
 
     dnl # Check version is ok
     AC_MSG_CHECKING([if libcurl is at least v${CURL_MIN_VERSION}])

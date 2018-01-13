@@ -54,13 +54,13 @@ if test -n "${pcre_path}"; then
     fi
     AC_MSG_RESULT([${PCRE_CONFIG}])
     PCRE_VERSION="`${PCRE_CONFIG} --version`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre VERSION: $PCRE_VERSION); fi
+    if test ! -z "${PCRE_VERSION}"; then AC_MSG_NOTICE(pcre VERSION: $PCRE_VERSION); fi
     PCRE_CFLAGS="`${PCRE_CONFIG} --cflags`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre CFLAGS: $PCRE_CFLAGS); fi
+    if test ! -z "${PCRE_CFLAGS}"; then AC_MSG_NOTICE(pcre CFLAGS: $PCRE_CFLAGS); fi
     PCRE_LDADD="`${PCRE_CONFIG} --libs`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre LDADD: $PCRE_LDADD); fi
+    if test ! -z "${PCRE_LDADD}"; then AC_MSG_NOTICE(pcre LDADD: $PCRE_LDADD); fi
     PCRE_LD_PATH="/`${PCRE_CONFIG} --libs | cut -d'/' -f2,3,4,5,6 | cut -d ' ' -f1`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre PCRE_LD_PATH: $PCRE_LD_PATH); fi
+    if test ! -z "${PCRE_LD_PATH}"; then AC_MSG_NOTICE(pcre PCRE_LD_PATH: $PCRE_LD_PATH); fi
 else
     AC_MSG_RESULT([no])
 fi

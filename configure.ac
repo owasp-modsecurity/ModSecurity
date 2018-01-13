@@ -307,7 +307,9 @@ fi
 AM_CONDITIONAL([TEST_UTILITIES], [test $buildTestUtilities = true])
 if test $buildTestUtilities = true; then
     if test $debugLogs = true; then
-        TEST_CASES=`./test/test-list.sh`
+        if test -f ./test/test-list.sh; then
+            TEST_CASES=`./test/test-list.sh`
+        fi
     fi
 fi
 
