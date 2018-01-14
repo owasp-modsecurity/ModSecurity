@@ -169,10 +169,11 @@ int AGMDB_removeStale(struct agmdb_handler *dbm);
  ** Get the number of keys in a database.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
  ** @param dbm: the database you want to read.
- ** return: number of keys in the database
+ ** @param keynum: the value to store the number of keys in the database 
+ ** return: AGMDB_SUCCESS if no error
  **      or AGMDB_FAIL if failed.
  */
-unsigned int AGMDB_getKeyNum(struct agmdb_handler *dbm);
+int AGMDB_getKeyNum(struct agmdb_handler *dbm, int* keynum);
 
 /**
  ** Use AGMDB's hash function to hash a string into an integer.
@@ -183,6 +184,20 @@ unsigned int AGMDB_getKeyNum(struct agmdb_handler *dbm);
  **      or AGMDB_FAIL if failed.
  */
 int AGMDB_getHashValue(const char* key, int key_len, int hash_nums);
+
+/**
+ ** Get the const pointers of all keys and values in a database.
+ ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
+ ** You should call AGMDB_getKeyNum() before to get the number of keys, then assign proper space for keys and values. Although, you can just assign a large enough space for these two arrays.
+ ** @param dbm:         the database you want to read.
+ ** @param array_size:  the maximum size of key array and value array 
+ ** @param keys:        the array to store pointers of keys.
+ ** @param values:      the array to store pointers of values.
+ ** @param vals_len:    the array to store length of values.
+ ** return: AGMDB_SUCCESS if no error
+ **      or AGMDB_FAIL if failed.
+ */
+int AGMDB_getAllKeysValues(struct agmdb_handler *dbm, int array_size, const char* keys[], const char * values[], unsigned int vals_len[]);
 
 #ifdef __cplusplus
 }

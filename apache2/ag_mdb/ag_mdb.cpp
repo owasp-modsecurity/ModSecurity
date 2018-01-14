@@ -1079,10 +1079,11 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
  ** Get the number of keys in a database.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
  ** @param dbm: the database you want to read.
- ** return: number of keys in the database
+ ** @param keynum: the value to store the number of keys in the database 
+ ** return: AGMDB_SUCCESS if no error
  **      or AGMDB_FAIL if failed.
  */
-unsigned int AGMDB_getKeyNum(struct agmdb_handler *dbm) {
+int AGMDB_getKeyNum(struct agmdb_handler *dbm, int* keynum) {
     CPTR_VOID shm_base;
     unsigned int timelist_cnt = 0;
     PTR_VOID entry_addr;
@@ -1098,10 +1099,10 @@ unsigned int AGMDB_getKeyNum(struct agmdb_handler *dbm) {
         timelist_cnt ++;
         entry_id = *ENTRY_TIME_NEXT(entry_addr);
     }
-    
+    *keynum = timelist_cnt;
     // Check the length of expirartion time linklist and the busy entry counter;
     if(timelist_cnt == *SHM_BUSY_ENTRY_CNT(shm_base))
-        return timelist_cnt;
+        return AGMDB_SUCCESS;
     else
         return AGMDB_FAIL;
 }
@@ -1120,6 +1121,45 @@ int AGMDB_getHashValue(const char* key, int key_len, int output_val_range) {
     if(AGMDB_isstring(key, key_len) != AGMDB_SUCCESS)
         return AGMDB_FAIL;
     return AGMDB_hash(key, key_len, output_val_range);
+}
+
+/**
+ ** Get the const pointers of all keys and values in a database.
+ ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
+ ** You should call AGMDB_getKeyNum() before to get the number of keys, then assign proper space for keys and values. Although, you can just assign a large enough space for these two arrays.
+ ** @param dbm:         the database you want to read.
+ ** @param array_size:  the maximum size of key array and value array 
+ ** @param keys:        the array to store pointers of keys.
+ ** @param values:      the array to store pointers of values.
+ ** @param vals_len:    the array to store length of values.
+ ** return: AGMDB_SUCCESS if no error
+ **      or AGMDB_FAIL if failed.
+ */
+int AGMDB_getAllKeysValues(struct agmdb_handler *dbm, int array_size, const char* keys[], const char * values[], unsigned int vals_len[]) {
+    CPTR_VOID shm_base;
+    PTR_VOID entry_addr;
+    PTR_OFFSET  entry_id;
+    PTR_OFFSET* time_list_head;
+    int keys_counter = 0;
+
+    if(dbm == NULL)
+        return AGMDB_FAIL;
+    shm_base = (CPTR_VOID)(dbm->shm_base);
+    time_list_head = SHM_EXPIRE_TIME_LIST_HEAD(shm_base);
+    
+    entry_id = *time_list_head;
+    while(entry_id != AGMDB_INVALID_INDEX){
+        if (keys_counter >= array_size)
+            return AGMDB_FAIL;
+        entry_addr = ENTRY_ADDR(shm_base, entry_id);
+        keys[keys_counter] = ENTRY_KEY(entry_addr);
+        values[keys_counter] = ENTRY_DATA(entry_addr);
+        vals_len[keys_counter] = *ENTRY_LENG(entry_addr);
+        entry_id = *ENTRY_TIME_NEXT(entry_addr);
+        keys_counter++;
+    }
+    
+    return AGMDB_SUCCESS;
 }
 
 
