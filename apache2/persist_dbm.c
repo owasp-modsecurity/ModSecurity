@@ -604,9 +604,9 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
                 msr_log_error(msr, "[ERROR]collection_retrieve_ex_agmdb: Cannot find root_config in msr->dcfg1.");
                 goto error;
             }
-            new_handle = (struct agmdb_handle_entry *)malloc(sizeof(struct agmdb_handle_entry));
-            new_handle->col_name = (char*)malloc(var_name->value_len);
-            new_handle->handle = malloc(sizeof(struct agmdb_handler));
+            new_handle = (struct agmdb_handle_entry *)apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handle_entry));
+            new_handle->col_name = (char*)apr_pcalloc(root_dcfg->mp, var_name->value_len);
+            new_handle->handle = apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handler));
             strcpy((char*)(new_handle->col_name), var_name->value);
             
             rc = AGMDB_openDB(new_handle->handle, new_db_name, strlen(new_db_name), DEFAULT_AGMDB_ENTRY_NUM);
