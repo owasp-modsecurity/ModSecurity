@@ -137,7 +137,7 @@ typedef unsigned long long PTR_OFFSET;
 #define SHM_ENTRIES(base)               ((PTR_VOID )     (base + SHM_ENTRIES_OFFSET))
 
 /* SHM Default Setting */
-#define DEFAULT_ENTRY_SIZE      1024        // default size of each entry (1024B)
+#define DEFAULT_ENTRY_SIZE      AGMDB_MAX_ENTRY_SIZE        // default size of each entry (1024B)
 #define MAX_KEY_SIZE            128         // maximum key length (128B)
 
 #define DEFAULT_SHM_SIZE        0x40000000  // the default size of database (256MB)

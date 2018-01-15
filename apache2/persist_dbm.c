@@ -20,9 +20,6 @@
 #include "modsecurity.h"
 #include "string.h"
 #include "stdio.h"
-//buffer temp define here, should use malloc latter
-#define MAX_BUF_LEN 1024
-#define DEFAULT_AGMDB_ENTRY_NUM 200000
 
 //debug code
 #include <stdio.h>
@@ -135,7 +132,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
 
     //variables used for ag_dbm 
     struct agmdb_handler *ag_dbm = NULL;
-    char buffer[MAX_BUF_LEN];
+    char buffer[AGMDB_MAX_ENTRY_SIZE];
     
     //variables used for apr_sdbm
     struct apr_sdbm_t *apr_dbm = NULL;
@@ -225,7 +222,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
                 goto cleanup;
             }
         }
-        rc2 = AGMDB_get(ag_dbm, col_key, col_key_len, buffer, MAX_BUF_LEN);
+        rc2 = AGMDB_get(ag_dbm, col_key, col_key_len, buffer, AGMDB_MAX_ENTRY_SIZE);
         if (rc2 == AGMDB_FAIL) {
             msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to read from database \"%s\": %s", log_escape(msr->mp,
                 col_name), col_key);
@@ -608,7 +605,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             new_handle->handle = apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handler));
             strcpy((char*)(new_handle->col_name), var_name->value);
             
-            rc = AGMDB_openDB(new_handle->handle, dbm_filename, strlen(dbm_filename), DEFAULT_AGMDB_ENTRY_NUM);
+            rc = AGMDB_openDB(new_handle->handle, dbm_filename, strlen(dbm_filename), MAXIMUM_AGMDB_ENTRY_NUM);
             if(rc == AGMDB_FAIL){
                 msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to create DBM name: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
                 goto error;

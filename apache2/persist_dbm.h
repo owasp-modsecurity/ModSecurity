@@ -18,8 +18,17 @@
 #include "apr_general.h"
 #include "modsecurity.h"
 
+/* The DB Option Definition */
 #define DB_OPT_AGMDB    1
 #define DB_OPT_ORIGIN   0
+
+/*
+* The maximum number of entries that database can support.
+* The database will refuse the new entry injection if the total entry number is larger than MAXIMUM_AGMDB_ENTRY_NUM
+* TODO: add as a configuration parameter 
+*/  
+#define MAXIMUM_AGMDB_ENTRY_NUM 200000
+
 struct agmdb_handle_entry{
     const char* col_name;
     void* handle;
