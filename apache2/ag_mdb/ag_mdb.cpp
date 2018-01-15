@@ -9,7 +9,7 @@
  */ 
 
 /**
- ** Create and initialize a AGMDB_lock, if the lock with given key exists, just link to the lock.
+ ** Create and initialize a agmdb_lock, if the lock with given key exists, just link to the lock.
  ** The new_lock should have been created before calling this function.
  ** @param new_lock:        The pointer to save the information of the lock.
  ** @param lock_name:       The name of lock.
@@ -18,7 +18,7 @@
  **         AGMDB_LOCK_SUCCESS_OPEN if successfully link to an existed lock,
  **         AGMDB_FAIL if failed.
  */
-int Lock_create(struct AGMDB_Lock *new_lock, const char* lock_name, int lock_name_length) {
+int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_name_length) {
 #ifndef _WIN32
     union semun sem_union;
     int lock_id = AGMDB_hash(lock_name, lock_name_length, DEFAULT_AGMDB_ID_RANGE);
@@ -89,13 +89,13 @@ int Lock_create(struct AGMDB_Lock *new_lock, const char* lock_name, int lock_nam
 
 /**
  ** Decrease a lock's value by a given number.
- ** @param db_lock: The AGMDB_lock sturcture  
+ ** @param db_lock: The agmdb_lock sturcture  
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to decrease from the lock.
  ** return: AGMDB_SUCCESS if success;
  **         or AGMDB_FAIL if failed
  */
-int Lock_P(const struct AGMDB_Lock *db_lock, int index, int val) {
+int Lock_P(const struct agmdb_lock *db_lock, int index, int val) {
 #ifndef _WIN32
     struct sembuf sem_op;
     if (val < 0)
@@ -126,13 +126,13 @@ int Lock_P(const struct AGMDB_Lock *db_lock, int index, int val) {
 
 /**
  ** Increase a lock's value by a given number.
- ** @param db_lock: The AGMDB_lock sturcture  
+ ** @param db_lock: The agmdb_lock sturcture  
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to add to the lock.
  ** return: AGMDB_SUCCESS if success;
  **         or AGMDB_FAIL if failed
  */
-int Lock_V(const struct AGMDB_Lock *db_lock, int index, int val) {
+int Lock_V(const struct agmdb_lock *db_lock, int index, int val) {
 #ifndef _WIN32
     struct sembuf sem_op;
     if (val < 0)
@@ -614,10 +614,10 @@ unsigned int AGMDB_hash(const char* key, int key_len, unsigned int output_val_ra
  ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
  */
 int AGMDB_getSharedLock(struct agmdb_handler *dbm) {
-    struct AGMDB_Lock *db_lock;
+    struct agmdb_lock *db_lock;
     if(dbm == NULL)
         return AGMDB_FAIL;
-    db_lock = (struct AGMDB_Lock *)(dbm->db_lock);
+    db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
     if(Lock_P(db_lock, SEM_ID_WRITE, 1) == AGMDB_FAIL)
         return AGMDB_FAIL;
@@ -641,10 +641,10 @@ int AGMDB_getSharedLock(struct agmdb_handler *dbm) {
  ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
  */
 int AGMDB_getExclusiveLock(struct agmdb_handler *dbm) {
-    struct AGMDB_Lock *db_lock;
+    struct agmdb_lock *db_lock;
     if(dbm == NULL)
         return AGMDB_FAIL;
-    db_lock = (struct AGMDB_Lock *)(dbm->db_lock);
+    db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
     if(Lock_P(db_lock, SEM_ID_WRITE, 1) == AGMDB_FAIL)
         return AGMDB_FAIL;
@@ -663,10 +663,10 @@ int AGMDB_getExclusiveLock(struct agmdb_handler *dbm) {
  ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
  */
 int AGMDB_freeSharedLock(struct agmdb_handler *dbm){    
-    struct AGMDB_Lock *db_lock;
+    struct agmdb_lock *db_lock;
     if(dbm == NULL)
         return AGMDB_FAIL;
-    db_lock = (struct AGMDB_Lock *)(dbm->db_lock);
+    db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
     if(Lock_V(db_lock, SEM_ID_READ, 1) == AGMDB_FAIL)
         return AGMDB_FAIL;
@@ -680,10 +680,10 @@ int AGMDB_freeSharedLock(struct agmdb_handler *dbm){
  ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
  */
 int AGMDB_freeExclusiveLock(struct agmdb_handler *dbm){
-    struct AGMDB_Lock *db_lock;
+    struct agmdb_lock *db_lock;
     if(dbm == NULL)
         return AGMDB_FAIL;
-    db_lock = (struct AGMDB_Lock *)(dbm->db_lock);
+    db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
     if(Lock_V(db_lock, SEM_ID_READ, SEM_READ_INITVAL) == AGMDB_FAIL)
             return AGMDB_FAIL;
@@ -810,7 +810,6 @@ inline int AGMDB_deleteEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id){
  */
 int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num) {
     int     rc;
-    struct AGMDB_Lock *db_lock;
     PTR_VOID   shm_base;
 
     if(dbm == NULL)
@@ -830,12 +829,10 @@ int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_len
     if((rc != AGMDB_SHM_SUCCESS_CREATE) && (rc != AGMDB_SHM_SUCCESS_OPEN))
         return rc;
 
-    db_lock = (struct AGMDB_Lock *)malloc(sizeof(struct AGMDB_Lock));
-    rc = Lock_create(db_lock, db_name, db_name_length);
+    rc = Lock_create(&(dbm->db_lock), db_name, db_name_length);
     if((rc != AGMDB_LOCK_SUCCESS_CREATE) && (rc != AGMDB_LOCK_SUCCESS_OPEN))
         return rc;
 
-    dbm->db_lock = (void*) db_lock;
     dbm->shm_base = shm_base;
 
     return AGMDB_SUCCESS;

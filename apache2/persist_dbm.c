@@ -511,7 +511,6 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     //variable used for AGMDB
     struct agmdb_handler *ag_dbm = NULL;
     struct agmdb_handle_entry *new_handle;
-    char new_db_name[MAX_BUF_LEN];
 
     //variable used for apr_sdbm
     char *dbm_filename = NULL;
@@ -599,7 +598,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         if(ag_dbm == NULL) {
             //Create the DB
             root_dcfg = msr->dcfg1->root_config;
-            sprintf(new_db_name, "%s/%s", root_dcfg->data_dir, var_name->value);
+            dbm_filename = apr_pstrcat(root_dcfg->mp, root_dcfg->data_dir, "/", var_name->value, NULL);
             if(root_dcfg == NULL){
                 msr_log_error(msr, "[ERROR]collection_retrieve_ex_agmdb: Cannot find root_config in msr->dcfg1.");
                 goto error;
@@ -609,7 +608,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             new_handle->handle = apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handler));
             strcpy((char*)(new_handle->col_name), var_name->value);
             
-            rc = AGMDB_openDB(new_handle->handle, new_db_name, strlen(new_db_name), DEFAULT_AGMDB_ENTRY_NUM);
+            rc = AGMDB_openDB(new_handle->handle, dbm_filename, strlen(dbm_filename), DEFAULT_AGMDB_ENTRY_NUM);
             if(rc == AGMDB_FAIL){
                 msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to create DBM name: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
                 goto error;

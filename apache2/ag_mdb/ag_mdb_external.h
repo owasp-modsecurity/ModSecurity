@@ -22,13 +22,30 @@ extern "C" {
  */
 
 /**
- ** Handler of AG-MDB, which contains a block of shared momory and a set of semaphores.
+ ** The structure stores the Read/Write locks information. 
+ ** In Linux, a set of semaphores is used to implement the Read/Write locks.
+ ** In Windows, The Windows Mutex is used to implement the Read/Write locks.
+ ** @param sem_id: The identifier of semaphore set in Linux.
+ ** @param read_lock_handle: The handler of the read locks in Windows.
+ ** @param write_lock_handle: The handler of the write lock in Windows.
+ */ 
+struct agmdb_lock{
+#ifndef _WIN32
+    int sem_id;
+#else
+    HANDLE read_lock_handle;
+    HANDLE write_lock_handle;
+#endif
+};
+
+/**
+ ** Handler of AG-MDB, which contains a block of shared momory and the lock structure.
  ** @param shm_base: The base address of the shared memory.
- ** @param sem_id: The identifier of semaphore set.
+ ** @param db_lock: The structure that stores the lock information.
  */ 
 struct agmdb_handler{
     const void* shm_base;
-    void* db_lock;
+    struct agmdb_lock db_lock;
 };
 
 /**
