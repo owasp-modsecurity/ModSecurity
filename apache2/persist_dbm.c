@@ -757,11 +757,11 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         if (blob == NULL) {
             if (apr_dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
-                apr_sdbm_close(dbm);
+                apr_sdbm_close(apr_dbm);
                 apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #else
-                apr_sdbm_unlock(dbm);
-                apr_sdbm_close(dbm);
+                apr_sdbm_unlock(apr_dbm);
+                apr_sdbm_close(apr_dbm);
 #endif
             }
             return -1;
@@ -836,22 +836,22 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
                     get_apr_error(msr->mp, rc));
             if (apr_dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
-                apr_sdbm_close(dbm);
+                apr_sdbm_close(apr_dbm);
                 apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #else
-                apr_sdbm_unlock(dbm);
-                apr_sdbm_close(dbm);
+                apr_sdbm_unlock(apr_dbm);
+                apr_sdbm_close(apr_dbm);
 #endif
             }
 
             return -1;
         }
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_sdbm_close(dbm);
+        apr_sdbm_close(apr_dbm);
         apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #else
-        apr_sdbm_unlock(dbm);
-        apr_sdbm_close(dbm);
+        apr_sdbm_unlock(apr_dbm);
+        apr_sdbm_close(apr_dbm);
 #endif
     }
 
@@ -955,7 +955,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
     keys_arr = apr_array_make(msr->mp, 256, sizeof(char *));
 
 #ifndef GLOBAL_COLLECTION_LOCK
-    rc = apr_sdbm_lock(dbm, APR_FLOCK_SHARED);
+    rc = apr_sdbm_lock(apr_dbm, APR_FLOCK_SHARED);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "collections_remove_stale: Failed to lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
             get_apr_error(msr->mp, rc));
@@ -975,7 +975,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
         rc = apr_sdbm_nextkey(apr_dbm, &key);
     }
 #ifndef GLOBAL_COLLECTION_LOCK
-    apr_sdbm_unlock(dbm);
+    apr_sdbm_unlock(apr_dbm);
 #endif
 
     if (msr->txcfg->debuglog_level >= 9) {
