@@ -7,6 +7,15 @@ extern "C" {
 
 /**
  **========================================================
+ ** AG Memory Database Limitation Definition
+ **========================================================
+ */
+#define AGMDB_MAX_ENTRY_SIZE 1024
+
+
+
+/**
+ **========================================================
  ** AG Memory Database Status Definition
  **========================================================
  */
@@ -22,13 +31,30 @@ extern "C" {
  */
 
 /**
- ** Handler of AG-MDB, which contains a block of shared momory and a set of semaphores.
+ ** The structure stores the Read/Write locks information. 
+ ** In Linux, a set of semaphores is used to implement the Read/Write locks.
+ ** In Windows, The Windows Mutex is used to implement the Read/Write locks.
+ ** @param sem_id: The identifier of semaphore set in Linux.
+ ** @param read_lock_handle: The handler of the read locks in Windows.
+ ** @param write_lock_handle: The handler of the write lock in Windows.
+ */ 
+struct agmdb_lock{
+#ifndef _WIN32
+    int sem_id;
+#else
+    HANDLE read_lock_handle;
+    HANDLE write_lock_handle;
+#endif
+};
+
+/**
+ ** Handler of AG-MDB, which contains a block of shared momory and the lock structure.
  ** @param shm_base: The base address of the shared memory.
- ** @param sem_id: The identifier of semaphore set.
+ ** @param db_lock: The structure that stores the lock information.
  */ 
 struct agmdb_handler{
     const void* shm_base;
-    void* db_lock;
+    struct agmdb_lock db_lock;
 };
 
 /**
@@ -169,10 +195,11 @@ int AGMDB_removeStale(struct agmdb_handler *dbm);
  ** Get the number of keys in a database.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
  ** @param dbm: the database you want to read.
- ** return: number of keys in the database
+ ** @param keynum: the value to store the number of keys in the database 
+ ** return: AGMDB_SUCCESS if no error
  **      or AGMDB_FAIL if failed.
  */
-unsigned int AGMDB_getKeyNum(struct agmdb_handler *dbm);
+int AGMDB_getKeyNum(struct agmdb_handler *dbm, int* keynum);
 
 /**
  ** Use AGMDB's hash function to hash a string into an integer.
@@ -183,6 +210,20 @@ unsigned int AGMDB_getKeyNum(struct agmdb_handler *dbm);
  **      or AGMDB_FAIL if failed.
  */
 int AGMDB_getHashValue(const char* key, int key_len, int hash_nums);
+
+/**
+ ** Get the const pointers of all keys and values in a database.
+ ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
+ ** You should call AGMDB_getKeyNum() before to get the number of keys, then assign proper space for keys and values. Although, you can just assign a large enough space for these two arrays.
+ ** @param dbm:         the database you want to read.
+ ** @param array_size:  the maximum size of key array and value array 
+ ** @param keys:        the array to store pointers of keys.
+ ** @param values:      the array to store pointers of values.
+ ** @param vals_len:    the array to store length of values.
+ ** return: AGMDB_SUCCESS if no error
+ **      or AGMDB_FAIL if failed.
+ */
+int AGMDB_getAllKeysValues(struct agmdb_handler *dbm, int array_size, const char* keys[], const char * values[], unsigned int vals_len[]);
 
 #ifdef __cplusplus
 }

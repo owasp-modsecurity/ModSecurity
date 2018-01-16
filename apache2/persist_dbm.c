@@ -20,9 +20,6 @@
 #include "modsecurity.h"
 #include "string.h"
 #include "stdio.h"
-//buffer temp define here, should use malloc latter
-#define MAX_BUF_LEN 1024
-#define DEFAULT_AGMDB_ENTRY_NUM 200000
 
 //debug code
 #include <stdio.h>
@@ -135,7 +132,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
 
     //variables used for ag_dbm 
     struct agmdb_handler *ag_dbm = NULL;
-    char buffer[MAX_BUF_LEN];
+    char buffer[AGMDB_MAX_ENTRY_SIZE];
     
     //variables used for apr_sdbm
     struct apr_sdbm_t *apr_dbm = NULL;
@@ -225,7 +222,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
                 goto cleanup;
             }
         }
-        rc2 = AGMDB_get(ag_dbm, col_key, col_key_len, buffer, MAX_BUF_LEN);
+        rc2 = AGMDB_get(ag_dbm, col_key, col_key_len, buffer, AGMDB_MAX_ENTRY_SIZE);
         if (rc2 == AGMDB_FAIL) {
             msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to read from database \"%s\": %s", log_escape(msr->mp,
                 col_name), col_key);
@@ -511,7 +508,6 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     //variable used for AGMDB
     struct agmdb_handler *ag_dbm = NULL;
     struct agmdb_handle_entry *new_handle;
-    char new_db_name[MAX_BUF_LEN];
 
     //variable used for apr_sdbm
     char *dbm_filename = NULL;
@@ -599,17 +595,17 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         if(ag_dbm == NULL) {
             //Create the DB
             root_dcfg = msr->dcfg1->root_config;
-            sprintf(new_db_name, "%s/%s", root_dcfg->data_dir, var_name->value);
+            dbm_filename = apr_pstrcat(root_dcfg->mp, root_dcfg->data_dir, "/", var_name->value, NULL);
             if(root_dcfg == NULL){
                 msr_log_error(msr, "[ERROR]collection_retrieve_ex_agmdb: Cannot find root_config in msr->dcfg1.");
                 goto error;
             }
-            new_handle = (struct agmdb_handle_entry *)malloc(sizeof(struct agmdb_handle_entry));
-            new_handle->col_name = (char*)malloc(var_name->value_len);
-            new_handle->handle = malloc(sizeof(struct agmdb_handler));
+            new_handle = (struct agmdb_handle_entry *)apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handle_entry));
+            new_handle->col_name = (char*)apr_pcalloc(root_dcfg->mp, var_name->value_len);
+            new_handle->handle = apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handler));
             strcpy((char*)(new_handle->col_name), var_name->value);
             
-            rc = AGMDB_openDB(new_handle->handle, new_db_name, strlen(new_db_name), DEFAULT_AGMDB_ENTRY_NUM);
+            rc = AGMDB_openDB(new_handle->handle, dbm_filename, strlen(dbm_filename), MAXIMUM_AGMDB_ENTRY_NUM);
             if(rc == AGMDB_FAIL){
                 msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to create DBM name: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
                 goto error;
@@ -758,11 +754,11 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         if (blob == NULL) {
             if (apr_dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
-                apr_sdbm_close(dbm);
+                apr_sdbm_close(apr_dbm);
                 apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #else
-                apr_sdbm_unlock(dbm);
-                apr_sdbm_close(dbm);
+                apr_sdbm_unlock(apr_dbm);
+                apr_sdbm_close(apr_dbm);
 #endif
             }
             return -1;
@@ -837,22 +833,22 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
                     get_apr_error(msr->mp, rc));
             if (apr_dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
-                apr_sdbm_close(dbm);
+                apr_sdbm_close(apr_dbm);
                 apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #else
-                apr_sdbm_unlock(dbm);
-                apr_sdbm_close(dbm);
+                apr_sdbm_unlock(apr_dbm);
+                apr_sdbm_close(apr_dbm);
 #endif
             }
 
             return -1;
         }
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_sdbm_close(dbm);
+        apr_sdbm_close(apr_dbm);
         apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #else
-        apr_sdbm_unlock(dbm);
-        apr_sdbm_close(dbm);
+        apr_sdbm_unlock(apr_dbm);
+        apr_sdbm_close(apr_dbm);
 #endif
     }
 
@@ -899,9 +895,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
     char **keys;
     apr_time_t now = apr_time_sec(msr->request_time);
     int i;
-
-    if(db_option == DB_OPT_REDIS)
-        return 1;
+    
     //---------------------------------
     //AGMDB
     //---------------------------------
@@ -958,7 +952,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
     keys_arr = apr_array_make(msr->mp, 256, sizeof(char *));
 
 #ifndef GLOBAL_COLLECTION_LOCK
-    rc = apr_sdbm_lock(dbm, APR_FLOCK_SHARED);
+    rc = apr_sdbm_lock(apr_dbm, APR_FLOCK_SHARED);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "collections_remove_stale: Failed to lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
             get_apr_error(msr->mp, rc));
@@ -978,7 +972,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
         rc = apr_sdbm_nextkey(apr_dbm, &key);
     }
 #ifndef GLOBAL_COLLECTION_LOCK
-    apr_sdbm_unlock(dbm);
+    apr_sdbm_unlock(apr_dbm);
 #endif
 
     if (msr->txcfg->debuglog_level >= 9) {

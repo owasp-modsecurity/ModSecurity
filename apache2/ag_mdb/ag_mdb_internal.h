@@ -12,10 +12,11 @@
 #include<sys/ipc.h>
 #endif
 #include<cstring>
-#include"murmur3.h"
 #include<stdlib.h>
 #include<time.h>
 #include<stdio.h>
+#include"murmur3.h"
+#include"ag_mdb_external.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,7 +137,7 @@ typedef unsigned long long PTR_OFFSET;
 #define SHM_ENTRIES(base)               ((PTR_VOID )     (base + SHM_ENTRIES_OFFSET))
 
 /* SHM Default Setting */
-#define DEFAULT_ENTRY_SIZE      1024        // default size of each entry (1024B)
+#define DEFAULT_ENTRY_SIZE      AGMDB_MAX_ENTRY_SIZE        // default size of each entry (1024B)
 #define MAX_KEY_SIZE            128         // maximum key length (128B)
 
 #define DEFAULT_SHM_SIZE        0x40000000  // the default size of database (256MB)
@@ -324,14 +325,6 @@ int Entry_setKeyValue(PTR_OFFSET entry_id, const char* key, int key_len, const c
 
 #define AGMDB_LOCK_SUCCESS_CREATE 0
 #define AGMDB_LOCK_SUCCESS_OPEN   1
-struct AGMDB_Lock{
-#ifndef _WIN32
-    int sem_id;
-#else
-    HANDLE read_lock_handle;
-    HANDLE write_lock_handle;
-#endif
-};
 
 /**
  ** Required by Linux.
@@ -346,36 +339,36 @@ union semun{
 };
 
 /**
- ** Create and initialize a AGMDB_lock, if the lock with given key exists, just link to the lock.
+ ** Create and initialize a agmdb_lock, if the lock with given key exists, just link to the lock.
  ** The new_lock should have been created before calling this function.
  ** @param new_lock:    The pointer to save the information of the lock.
  ** @param lock_key:    The identifier of the lock.
- ** @param lock_num:    The number of atom lock in the AGMDB_lock sturcture. Default is 2 (read lock and write lock).
+ ** @param lock_num:    The number of atom lock in the agmdb_lock sturcture. Default is 2 (read lock and write lock).
  ** return: AGMDB_LOCK_SUCCESS_CREATE if successfully created a new lock, 
  **         AGMDB_LOCK_SUCCESS_OPEN if successfully link to an existed lock,
  **         AGMDB_FAIL if failed.
  */
-int Lock_create(struct AGMDB_Lock *new_lock, int lock_id, int lock_num);
+int Lock_create(struct agmdb_lock *new_lock, int lock_id, int lock_num);
 
 /**
  ** Decrease a lock's value by a given number.
- ** @param db_lock: The AGMDB_lock sturcture  
+ ** @param db_lock: The agmdb_lock sturcture  
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to decrease from the lock.
  ** return: AGMDB_SUCCESS if success;
  **         or AGMDB_FAIL if failed
  */
-int Lock_P(const struct AGMDB_Lock *db_lock, int index, int val);
+int Lock_P(const struct agmdb_lock *db_lock, int index, int val);
 
 /**
  ** Increase a lock's value by a given number.
- ** @param db_lock: The AGMDB_lock sturcture  
+ ** @param db_lock: The agmdb_lock sturcture  
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to add to the lock.
  ** return: AGMDB_SUCCESS if success;
  **         or AGMDB_FAIL if failed
  */
-int Lock_V(const struct AGMDB_Lock *db_lock, int index, int val);
+int Lock_V(const struct agmdb_lock *db_lock, int index, int val);
 
 /**
  **========================================================

@@ -9,7 +9,7 @@
  */ 
 
 /**
- ** Create and initialize a AGMDB_lock, if the lock with given key exists, just link to the lock.
+ ** Create and initialize a agmdb_lock, if the lock with given key exists, just link to the lock.
  ** The new_lock should have been created before calling this function.
  ** @param new_lock:        The pointer to save the information of the lock.
  ** @param lock_name:       The name of lock.
@@ -18,7 +18,7 @@
  **         AGMDB_LOCK_SUCCESS_OPEN if successfully link to an existed lock,
  **         AGMDB_FAIL if failed.
  */
-int Lock_create(struct AGMDB_Lock *new_lock, const char* lock_name, int lock_name_length) {
+int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_name_length) {
 #ifndef _WIN32
     union semun sem_union;
     int lock_id = AGMDB_hash(lock_name, lock_name_length, DEFAULT_AGMDB_ID_RANGE);
@@ -89,13 +89,13 @@ int Lock_create(struct AGMDB_Lock *new_lock, const char* lock_name, int lock_nam
 
 /**
  ** Decrease a lock's value by a given number.
- ** @param db_lock: The AGMDB_lock sturcture  
+ ** @param db_lock: The agmdb_lock sturcture  
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to decrease from the lock.
  ** return: AGMDB_SUCCESS if success;
  **         or AGMDB_FAIL if failed
  */
-int Lock_P(const struct AGMDB_Lock *db_lock, int index, int val) {
+int Lock_P(const struct agmdb_lock *db_lock, int index, int val) {
 #ifndef _WIN32
     struct sembuf sem_op;
     if (val < 0)
@@ -126,13 +126,13 @@ int Lock_P(const struct AGMDB_Lock *db_lock, int index, int val) {
 
 /**
  ** Increase a lock's value by a given number.
- ** @param db_lock: The AGMDB_lock sturcture  
+ ** @param db_lock: The agmdb_lock sturcture  
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to add to the lock.
  ** return: AGMDB_SUCCESS if success;
  **         or AGMDB_FAIL if failed
  */
-int Lock_V(const struct AGMDB_Lock *db_lock, int index, int val) {
+int Lock_V(const struct agmdb_lock *db_lock, int index, int val) {
 #ifndef _WIN32
     struct sembuf sem_op;
     if (val < 0)
@@ -614,10 +614,10 @@ unsigned int AGMDB_hash(const char* key, int key_len, unsigned int output_val_ra
  ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
  */
 int AGMDB_getSharedLock(struct agmdb_handler *dbm) {
-    struct AGMDB_Lock *db_lock;
+    struct agmdb_lock *db_lock;
     if(dbm == NULL)
         return AGMDB_FAIL;
-    db_lock = (struct AGMDB_Lock *)(dbm->db_lock);
+    db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
     if(Lock_P(db_lock, SEM_ID_WRITE, 1) == AGMDB_FAIL)
         return AGMDB_FAIL;
@@ -641,10 +641,10 @@ int AGMDB_getSharedLock(struct agmdb_handler *dbm) {
  ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
  */
 int AGMDB_getExclusiveLock(struct agmdb_handler *dbm) {
-    struct AGMDB_Lock *db_lock;
+    struct agmdb_lock *db_lock;
     if(dbm == NULL)
         return AGMDB_FAIL;
-    db_lock = (struct AGMDB_Lock *)(dbm->db_lock);
+    db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
     if(Lock_P(db_lock, SEM_ID_WRITE, 1) == AGMDB_FAIL)
         return AGMDB_FAIL;
@@ -663,10 +663,10 @@ int AGMDB_getExclusiveLock(struct agmdb_handler *dbm) {
  ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
  */
 int AGMDB_freeSharedLock(struct agmdb_handler *dbm){    
-    struct AGMDB_Lock *db_lock;
+    struct agmdb_lock *db_lock;
     if(dbm == NULL)
         return AGMDB_FAIL;
-    db_lock = (struct AGMDB_Lock *)(dbm->db_lock);
+    db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
     if(Lock_V(db_lock, SEM_ID_READ, 1) == AGMDB_FAIL)
         return AGMDB_FAIL;
@@ -680,10 +680,10 @@ int AGMDB_freeSharedLock(struct agmdb_handler *dbm){
  ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
  */
 int AGMDB_freeExclusiveLock(struct agmdb_handler *dbm){
-    struct AGMDB_Lock *db_lock;
+    struct agmdb_lock *db_lock;
     if(dbm == NULL)
         return AGMDB_FAIL;
-    db_lock = (struct AGMDB_Lock *)(dbm->db_lock);
+    db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
     if(Lock_V(db_lock, SEM_ID_READ, SEM_READ_INITVAL) == AGMDB_FAIL)
             return AGMDB_FAIL;
@@ -810,7 +810,6 @@ inline int AGMDB_deleteEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id){
  */
 int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num) {
     int     rc;
-    struct AGMDB_Lock *db_lock;
     PTR_VOID   shm_base;
 
     if(dbm == NULL)
@@ -830,12 +829,10 @@ int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_len
     if((rc != AGMDB_SHM_SUCCESS_CREATE) && (rc != AGMDB_SHM_SUCCESS_OPEN))
         return rc;
 
-    db_lock = (struct AGMDB_Lock *)malloc(sizeof(struct AGMDB_Lock));
-    rc = Lock_create(db_lock, db_name, db_name_length);
+    rc = Lock_create(&(dbm->db_lock), db_name, db_name_length);
     if((rc != AGMDB_LOCK_SUCCESS_CREATE) && (rc != AGMDB_LOCK_SUCCESS_OPEN))
         return rc;
 
-    dbm->db_lock = (void*) db_lock;
     dbm->shm_base = shm_base;
 
     return AGMDB_SUCCESS;
@@ -1079,10 +1076,11 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
  ** Get the number of keys in a database.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
  ** @param dbm: the database you want to read.
- ** return: number of keys in the database
+ ** @param keynum: the value to store the number of keys in the database 
+ ** return: AGMDB_SUCCESS if no error
  **      or AGMDB_FAIL if failed.
  */
-unsigned int AGMDB_getKeyNum(struct agmdb_handler *dbm) {
+int AGMDB_getKeyNum(struct agmdb_handler *dbm, int* keynum) {
     CPTR_VOID shm_base;
     unsigned int timelist_cnt = 0;
     PTR_VOID entry_addr;
@@ -1098,10 +1096,10 @@ unsigned int AGMDB_getKeyNum(struct agmdb_handler *dbm) {
         timelist_cnt ++;
         entry_id = *ENTRY_TIME_NEXT(entry_addr);
     }
-    
+    *keynum = timelist_cnt;
     // Check the length of expirartion time linklist and the busy entry counter;
     if(timelist_cnt == *SHM_BUSY_ENTRY_CNT(shm_base))
-        return timelist_cnt;
+        return AGMDB_SUCCESS;
     else
         return AGMDB_FAIL;
 }
@@ -1120,6 +1118,45 @@ int AGMDB_getHashValue(const char* key, int key_len, int output_val_range) {
     if(AGMDB_isstring(key, key_len) != AGMDB_SUCCESS)
         return AGMDB_FAIL;
     return AGMDB_hash(key, key_len, output_val_range);
+}
+
+/**
+ ** Get the const pointers of all keys and values in a database.
+ ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
+ ** You should call AGMDB_getKeyNum() before to get the number of keys, then assign proper space for keys and values. Although, you can just assign a large enough space for these two arrays.
+ ** @param dbm:         the database you want to read.
+ ** @param array_size:  the maximum size of key array and value array 
+ ** @param keys:        the array to store pointers of keys.
+ ** @param values:      the array to store pointers of values.
+ ** @param vals_len:    the array to store length of values.
+ ** return: AGMDB_SUCCESS if no error
+ **      or AGMDB_FAIL if failed.
+ */
+int AGMDB_getAllKeysValues(struct agmdb_handler *dbm, int array_size, const char* keys[], const char * values[], unsigned int vals_len[]) {
+    CPTR_VOID shm_base;
+    PTR_VOID entry_addr;
+    PTR_OFFSET  entry_id;
+    PTR_OFFSET* time_list_head;
+    int keys_counter = 0;
+
+    if(dbm == NULL)
+        return AGMDB_FAIL;
+    shm_base = (CPTR_VOID)(dbm->shm_base);
+    time_list_head = SHM_EXPIRE_TIME_LIST_HEAD(shm_base);
+    
+    entry_id = *time_list_head;
+    while(entry_id != AGMDB_INVALID_INDEX){
+        if (keys_counter >= array_size)
+            return AGMDB_FAIL;
+        entry_addr = ENTRY_ADDR(shm_base, entry_id);
+        keys[keys_counter] = ENTRY_KEY(entry_addr);
+        values[keys_counter] = ENTRY_DATA(entry_addr);
+        vals_len[keys_counter] = *ENTRY_LENG(entry_addr);
+        entry_id = *ENTRY_TIME_NEXT(entry_addr);
+        keys_counter++;
+    }
+    
+    return AGMDB_SUCCESS;
 }
 
 

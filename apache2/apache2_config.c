@@ -21,6 +21,7 @@
 #include "apr_lib.h"
 #include "acmp.h"
 #include "msc_crypt.h"
+#include "persist_dbm.h"
 
 #if defined(WITH_LUA)
 #include "msc_lua.h"
@@ -1156,14 +1157,14 @@ static const char *cmd_test_rand_ip_range(cmd_parms *cmd, void *_dcfg, const cha
 
 static const char *cmd_db_option(cmd_parms *cmd, void *_dcfg, const char *p1){
     directory_config *dcfg = (directory_config *)_dcfg;
-    if((strcmp(p1,"origin")==0))
-        dcfg->db_option = 0;
-    else if((strcmp(p1,"agmdb")==0)) {
-        dcfg->db_option = 2;
+    if((strcmp(p1,"origin") == 0))
+        dcfg->db_option = DB_OPT_ORIGIN;
+    else if((strcmp(p1,"agmdb") == 0)) {
+        dcfg->db_option = DB_OPT_AGMDB;
         dcfg->agmdb_handles = NULL;
     }
     else
-        dcfg->db_option = 0;
+        dcfg->db_option = DB_OPT_ORIGIN;
     return NULL;
 }
 
@@ -3237,22 +3238,6 @@ const command_rec module_directives[] = {
 #endif
 
     AP_INIT_TAKE1 (
-        "SecTestRandIpRange",
-        cmd_test_rand_ip_range,
-        NULL,
-        CMD_SCOPE_ANY,
-        "IP address range. For test only"
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecDBOption",
-        cmd_db_option,
-        NULL,
-        CMD_SCOPE_ANY,
-        "Choose database. (origin/redis/agdb)"
-    ),
-
-    AP_INIT_TAKE1 (
         "SecArgumentSeparator",
         cmd_argument_separator,
         NULL,
@@ -3972,6 +3957,22 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "Set Hash parameter"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecTestRandIpRange",
+        cmd_test_rand_ip_range,
+        NULL,
+        CMD_SCOPE_ANY,
+        "IP address range. For test only"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecDBOption",
+        cmd_db_option,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Choose database. (origin/redis/agdb)"
     ),
 
     { NULL }
