@@ -146,8 +146,8 @@ typedef unsigned long long PTR_OFFSET;
 #define DEFAULT_EXPIRE_TIME     3600        // the default expire time (seconds) 
 
 /* Return value of shm_create */
-#define AGMDB_SHM_SUCCESS_CREATE 0
-#define AGMDB_SHM_SUCCESS_OPEN   0
+#define AGMDB_SUCCESS_SHM_CREATE 0
+#define AGMDB_SUCCESS_SHM_OPEN   0
 
 /* Shared Memory Functions */
 /**
@@ -166,8 +166,8 @@ int SHM_init(PTR_VOID shm_base, unsigned int shm_size, int entry_num);
 ** @param db_name:         The name of the database.
 ** @param db_name_length:  The length of db_name.
 ** @param entry_num:       The number of entries in the shared memory.
-** return: AGMDB_SHM_SUCCESS_CREATE if successfully created a new shared memory,
-**         AGMDB_SHM_SUCCESS_OPEN if successfully link to an existed shared memory,
+** return: AGMDB_SUCCESS_SHM_CREATE if successfully created a new shared memory,
+**         AGMDB_SUCCESS_SHM_OPEN if successfully link to an existed shared memory,
 **         AGMDB_FAIL if failed.
 */
 int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, int entry_num);
@@ -222,7 +222,7 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
 
 
 /**
- ** Insert an entry into spare linklist .
+ ** Insert an entry into spare linklist.
  ** @param shm_base:        The base address of shared memory.
  ** @param spare_list_head: The head of spare linklist.
  ** @param entry_id:        The index of the entry you want to insert.
@@ -323,8 +323,8 @@ int Entry_setKeyValue(PTR_OFFSET entry_id, const char* key, int key_len, const c
  **========================================================
  */
 
-#define AGMDB_LOCK_SUCCESS_CREATE 0
-#define AGMDB_LOCK_SUCCESS_OPEN   1
+#define AGMDB_SUCCESS_LOCK_CREATE 0
+#define AGMDB_SUCCESS_LOCK_OPEN   1
 
 /**
  ** Required by Linux.
@@ -344,8 +344,8 @@ union semun{
  ** @param new_lock:    The pointer to save the information of the lock.
  ** @param lock_key:    The identifier of the lock.
  ** @param lock_num:    The number of atom lock in the agmdb_lock sturcture. Default is 2 (read lock and write lock).
- ** return: AGMDB_LOCK_SUCCESS_CREATE if successfully created a new lock, 
- **         AGMDB_LOCK_SUCCESS_OPEN if successfully link to an existed lock,
+ ** return: AGMDB_SUCCESS_LOCK_CREATE if successfully created a new lock, 
+ **         AGMDB_SUCCESS_LOCK_OPEN if successfully link to an existed lock,
  **         AGMDB_FAIL if failed.
  */
 int Lock_create(struct agmdb_lock *new_lock, int lock_id, int lock_num);

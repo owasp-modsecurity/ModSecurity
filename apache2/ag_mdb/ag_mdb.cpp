@@ -14,9 +14,9 @@
  ** @param new_lock:        The pointer to save the information of the lock.
  ** @param lock_name:       The name of lock.
  ** @param lock_name_length:The length of the lock_name.
- ** return: AGMDB_LOCK_SUCCESS_CREATE if successfully created a new lock, 
- **         AGMDB_LOCK_SUCCESS_OPEN if successfully link to an existed lock,
- **         AGMDB_FAIL if failed.
+ ** return: AGMDB_SUCCESS_LOCK_CREATE if successfully created a new lock, 
+ **         AGMDB_SUCCESS_LOCK_OPEN if successfully link to an existed lock,
+ **         AGMDB_ERROR if failed.
  */
 int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_name_length) {
 #ifndef _WIN32
@@ -27,7 +27,7 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
         // A new semaphore set is created, need to initialize the semaphore set
         sem_union.val = SEM_READ_INITVAL;
         if(semctl(new_lock->sem_id, SEM_ID_READ, SETVAL, sem_union) == -1){
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_LOCK_LINUX_SEM_CREATE_FAIL;
         }
         
         sem_union.val = SEM_WRITE_INITVAL;
@@ -35,16 +35,16 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
             // If failed, reset the read lock
             sem_union.val = 0;
             semctl(new_lock->sem_id, SEM_ID_READ, SETVAL, sem_union);
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_LOCK_LINUX_SEM_INIT_FAIL;
         }
-        return AGMDB_LOCK_SUCCESS_CREATE;
+        return AGMDB_SUCCESS_LOCK_CREATE;
     }
     else{
         new_lock->sem_id = semget(lock_id, SEM_NUMBERS, IPC_CREAT);
         if(new_lock->sem_id == -1){
-               return AGMDB_FAIL;
+               return AGMDB_ERROR_LOCK_LINUX_SEM_OPEN_FAIL;
         }
-        return AGMDB_LOCK_SUCCESS_OPEN;
+        return AGMDB_SUCCESS_LOCK_OPEN;
     }
     
 #else
@@ -54,7 +54,7 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
     bool lock_exists = false;
 
     if (AGMDB_isstring(lock_name, lock_name_length) != AGMDB_SUCCESS)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING;
     sprintf_s(read_lock_name, AGMDB_MAX_NAME_LEN, "DB_%s_LOCK_READ", lock_name);
     sprintf_s(write_lock_name, AGMDB_MAX_NAME_LEN, "DB_%s_LOCK_WRITE", lock_name);
     new_mutex = CreateMutex(
@@ -62,7 +62,7 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
                     FALSE,              // Do not take the lock after created.
                     read_lock_name);    // The name of read lock.
     if(new_mutex == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
     if(GetLastError() == ERROR_ALREADY_EXISTS)
         lock_exists = true;
     new_lock->read_lock_handle = OpenMutex(
@@ -75,16 +75,16 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
                     FALSE,              // Do not take the lock after created.
                     write_lock_name);   // The name of write lock.
     if(new_mutex == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
     if((GetLastError() == ERROR_ALREADY_EXISTS) != lock_exists) // One lock exists, another not.
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LCOK_EXISTS;
     new_lock->write_lock_handle = OpenMutex(
                                     MUTEX_ALL_ACCESS,   //
                                     false,              //
                                     write_lock_name);
 #endif
     // Should never get here
-    return AGMDB_LOCK_SUCCESS_CREATE;
+    return AGMDB_SUCCESS_LOCK_CREATE;
 }
 
 /**
@@ -93,25 +93,25 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to decrease from the lock.
  ** return: AGMDB_SUCCESS if success;
- **         or AGMDB_FAIL if failed
+ **         or AGMDB_ERROR if failed
  */
 int Lock_P(const struct agmdb_lock *db_lock, int index, int val) {
 #ifndef _WIN32
     struct sembuf sem_op;
     if (val < 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL;
 
     sem_op.sem_num = index;
     sem_op.sem_op = -val;
     sem_op.sem_flg = SEM_UNDO;
     if(semop(db_lock->sem_id, &sem_op, 1) == -1)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_LINUX_SEM_MODIFY_FAIL;
     return AGMDB_SUCCESS;
 #else
     int rc;
     HANDLE lock_handle;
     if (val < 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL;
 
     if(index == SEM_ID_READ)
         lock_handle = db_lock->read_lock_handle;
@@ -119,7 +119,7 @@ int Lock_P(const struct agmdb_lock *db_lock, int index, int val) {
         lock_handle = db_lock->write_lock_handle;
     rc = WaitForSingleObject(lock_handle, INFINITE);
     if (rc != WAIT_OBJECT_0) 
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL;
     return AGMDB_SUCCESS;
 #endif
 }
@@ -130,25 +130,25 @@ int Lock_P(const struct agmdb_lock *db_lock, int index, int val) {
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to add to the lock.
  ** return: AGMDB_SUCCESS if success;
- **         or AGMDB_FAIL if failed
+ **         or AGMDB_ERROR if failed
  */
 int Lock_V(const struct agmdb_lock *db_lock, int index, int val) {
 #ifndef _WIN32
     struct sembuf sem_op;
     if (val < 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL;
 
     sem_op.sem_num = index;
     sem_op.sem_op = val;
     sem_op.sem_flg = SEM_UNDO;
     if(semop(db_lock->sem_id, &sem_op, 1) == -1)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_LINUX_SEM_MODIFY_FAIL;
     return AGMDB_SUCCESS;
 #else
     int rc;
     HANDLE lock_handle;
     if (val < 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL;
 
     if(index == SEM_ID_READ)
         lock_handle = db_lock->read_lock_handle;
@@ -156,7 +156,7 @@ int Lock_V(const struct agmdb_lock *db_lock, int index, int val) {
         lock_handle = db_lock->write_lock_handle;
     rc = ReleaseMutex(lock_handle);
     if (rc == 0) 
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL;
     return AGMDB_SUCCESS;
 #endif
 }
@@ -167,7 +167,7 @@ int Lock_V(const struct agmdb_lock *db_lock, int index, int val) {
  ** @param shm_size: The size of the shared memory.
  ** @param entry_num:The number of entries in the shared memory.
  ** return: AGMDB_SUCCESS if success,
- **         AGMDB_FAIL if failed. 
+ **         AGMDB_ERROR if failed. 
  */
 int SHM_init(PTR_VOID shm_base, unsigned int shm_size, unsigned int entry_num) {
     PTR_OFFSET* spare_head;
@@ -180,9 +180,10 @@ int SHM_init(PTR_VOID shm_base, unsigned int shm_size, unsigned int entry_num) {
     PTR_OFFSET previous_entry_id;
     unsigned int entry_size;
     
-    if(shm_base == NULL || shm_size < SHM_ENTRIES_OFFSET)
-        return AGMDB_FAIL;
-    
+    if(shm_base == NULL) 
+        return AGMDB_ERROR_SHM_BASE_NULL;
+    if(shm_size < SHM_ENTRIES_OFFSET)
+        return AGMDB_ERROR_SHM_SIZE_TOO_SMALL;
     memset(shm_base, 0, shm_size);
     
     // Initialize SHM information
@@ -240,9 +241,9 @@ int SHM_init(PTR_VOID shm_base, unsigned int shm_size, unsigned int entry_num) {
  ** @param db_name:         The name of the database.
  ** @param db_name_length:  The length of db_name.
  ** @param entry_num:       The number of entries in the shared memory.
- ** return: AGMDB_SHM_SUCCESS_CREATE if successfully created a new shared memory, 
- **         AGMDB_SHM_SUCCESS_OPEN if successfully link to an existed shared memory,
- **         AGMDB_FAIL if failed. 
+ ** return: AGMDB_SUCCESS_SHM_CREATE if successfully created a new shared memory, 
+ **         AGMDB_SUCCESS_SHM_OPEN if successfully link to an existed shared memory,
+ **         AGMDB_ERROR if failed. 
  */
 int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, unsigned int entry_num){
     unsigned int shm_size = SHM_ENTRIES_OFFSET + entry_num * DEFAULT_ENTRY_SIZE;
@@ -251,30 +252,30 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
     int shm_id;
     int shm_key;
     if (AGMDB_isstring(db_name, db_name_length) != AGMDB_SUCCESS)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_SHM_NAME_INVALID_STRING;
 
     shm_key = AGMDB_hash(db_name, db_name_length, DEFAULT_AGMDB_ID_RANGE);
     if(entry_num < 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_SHM_ENTRY_NUM_NEGATIVE;
                                                                    
     shm_id = shmget(shm_key, shm_size, IPC_CREAT | IPC_EXCL);
     
-    if(shm_id == -1){ // Map the new SHM into the address space of this process
+    if(shm_id == -1){ // create a new SHM
         shm_id = shmget(shm_key, shm_size, IPC_CREAT);
         if(shm_id == -1)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_SHM_LINUX_CREATE_FAIL;
     }
     *new_shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
     if(*new_shm_base == (PTR_VOID)-1)
-           return AGMDB_FAIL;
+           return AGMDB_ERROR_SHM_LINUX_MAP_FAIL;
     rc = SHM_init(*new_shm_base, shm_size, entry_num);
-    if(rc == AGMDB_FAIL)
-        return AGMDB_FAIL;
-    return AGMDB_SHM_SUCCESS_OPEN;
+    if(rc != AGMDB_SUCCESS)
+        return rc;
+    return AGMDB_SUCCESS_SHM_OPEN;
 #else
     HANDLE shm_handle;
     if (AGMDB_isstring(db_name, db_name_length) != AGMDB_SUCCESS)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_SHM_NAME_INVALID_STRING;
 
     shm_handle = CreateFileMapping(
                     INVALID_HANDLE_VALUE,   // A memory, not a real file. 
@@ -284,7 +285,7 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
                     shm_size,               // Low 32-bit of shm size.
                     db_name);               // Name of shared memory.
     if(shm_handle == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_SHM_WIN_CREATE_FAIL;
     *new_shm_base = (PTR_VOID) MapViewOfFile(
                     shm_handle,             // Handle of file.
                     FILE_MAP_ALL_ACCESS,    // All permissioon.
@@ -292,21 +293,21 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
                     0,                      // Map from the beginning of the shared memory.
                     0);                     // Map entire shared memory into address space.
     if(new_shm_base == NULL)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_SHM_WIN_MAP_FAIL;
     if(GetLastError() != ERROR_ALREADY_EXISTS) { // A new shared memory.
         rc = SHM_init(*new_shm_base, shm_size, entry_num);        
-        if(rc == AGMDB_FAIL)
-            return AGMDB_FAIL;
-        return AGMDB_SHM_SUCCESS_CREATE;        
+        if(rc != AGMDB_SUCCESS)
+            return rc;
+        return AGMDB_SUCCESS_SHM_CREATE;        
     }
     else{ // There has been a SHM with the given name
-        return AGMDB_SHM_SUCCESS_OPEN;
+        return AGMDB_SUCCESS_SHM_OPEN;
     }
 #endif
 }
 
 /**
- ** Insert an entry into spare linklist .
+ ** Insert an entry into spare linklist.
  ** @param shm_base:        The base address of shared memory.
  ** @param spare_list_head: The head of spare linklist.
  ** @param entry_id:        The offset of the entry you want to insert.
@@ -315,10 +316,10 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
 int Entry_insertSpareList(CPTR_VOID shm_base, PTR_OFFSET* spare_list_head, PTR_OFFSET entry_id) {
     PTR_VOID entry_addr = ENTRY_ADDR(shm_base, entry_id);
     if(entry_id == AGMDB_INVALID_INDEX)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_SPARELIST;
     if(*ENTRY_PREV(entry_addr) != AGMDB_INVALID_INDEX|| 
             *ENTRY_NEXT(entry_addr) != AGMDB_INVALID_INDEX)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_SPARELIST;
     *ENTRY_PREV(entry_addr) = AGMDB_INVALID_INDEX;
     *ENTRY_NEXT(entry_addr) = *spare_list_head;
     if(*spare_list_head != AGMDB_INVALID_INDEX)
@@ -333,7 +334,7 @@ int Entry_insertSpareList(CPTR_VOID shm_base, PTR_OFFSET* spare_list_head, PTR_O
  ** @param spare_list_head: The head of spare linklist.
  ** @param entry_id:        The offset of gotten entry.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_FAIL if failed.
+            AGMDB_ERROR if failed.
  */
 int Entry_removeSpareList(CPTR_VOID shm_base, PTR_OFFSET* spare_list_head, PTR_OFFSET* entry_id) {
     PTR_VOID entry_addr;
@@ -356,14 +357,14 @@ int Entry_removeSpareList(CPTR_VOID shm_base, PTR_OFFSET* spare_list_head, PTR_O
  ** @param hash_list_head:  The head of spare linklist.
  ** @param entry_id:        The offset of entry you want to insert.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_FAIL if failed. 
+            AGMDB_ERROR if failed. 
  */
 int Entry_insertHashList(CPTR_VOID shm_base, PTR_OFFSET* hash_list_head, PTR_OFFSET entry_id) {
     PTR_VOID entry_addr = ENTRY_ADDR(shm_base, entry_id);
     if(entry_id == AGMDB_INVALID_INDEX)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_HASHLIST;
     if(*ENTRY_NEXT(entry_addr) != AGMDB_INVALID_INDEX || *ENTRY_PREV(entry_addr) != AGMDB_INVALID_INDEX)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_HASHLIST;
     
     *ENTRY_NEXT(entry_addr) = *hash_list_head;
     if(*hash_list_head == AGMDB_INVALID_INDEX)
@@ -380,7 +381,7 @@ int Entry_insertHashList(CPTR_VOID shm_base, PTR_OFFSET* hash_list_head, PTR_OFF
  ** @param shm_base:    The base address of shared memory.
  ** @param entry_id:    The offset of entry you want to remove.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_FAIL if failed.  
+            AGMDB_ERROR if failed.  
  */
 int Entry_removeHashList(CPTR_VOID shm_base, PTR_OFFSET entry_id) {
     PTR_OFFSET* hash_list_head;
@@ -390,7 +391,7 @@ int Entry_removeHashList(CPTR_VOID shm_base, PTR_OFFSET entry_id) {
     PTR_VOID prev_addr;
     PTR_VOID next_addr;
     if(entry_id == AGMDB_INVALID_INDEX)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_REMOVE_INVALID_ENTRY_FROM_HASHLIST;
     prev_id = *ENTRY_PREV(entry_addr);
     next_id = *ENTRY_NEXT(entry_addr);
     prev_addr = ENTRY_ADDR(shm_base, prev_id);
@@ -400,7 +401,7 @@ int Entry_removeHashList(CPTR_VOID shm_base, PTR_OFFSET entry_id) {
     if(prev_id == AGMDB_INVALID_INDEX) { // the first entry in hash link list
         hash_list_head = SHM_HASH_LISTS_HEADS(shm_base) + AGMDB_hash(ENTRY_KEY(entry_addr), (int)strlen(ENTRY_KEY(entry_addr)), DEFAULT_HASH_LISTS_NUM);
         if(*hash_list_head != entry_id)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_NONHEAD_ENTRY_IN_HASHLIST_WITHOUT_PREV;
         *hash_list_head = next_id;
         if(*hash_list_head != AGMDB_INVALID_INDEX)
             *ENTRY_PREV(next_addr) = AGMDB_INVALID_INDEX;
@@ -425,7 +426,7 @@ int Entry_removeHashList(CPTR_VOID shm_base, PTR_OFFSET entry_id) {
  ** @param time_list_head:  The head of expiration time linklist.
  ** @param time_list_tail:  The tail of expiration time linklist.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_FAIL if failed.   
+            AGMDB_ERROR if failed.   
  */
 int Entry_insertTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_OFFSET* time_list_head, PTR_OFFSET* time_list_tail) {
     PTR_VOID entry_addr = ENTRY_ADDR(shm_base, entry_id);
@@ -434,7 +435,7 @@ int Entry_insertTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_OFFSET* ti
     PTR_VOID time_prev_addr;
     PTR_VOID time_next_addr;
     if(entry_id == AGMDB_INVALID_INDEX) {
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_TIMELIST;
     }
     time_prev_id = *ENTRY_TIME_PREV(entry_addr);
     time_next_id = *ENTRY_TIME_NEXT(entry_addr);
@@ -473,7 +474,7 @@ int Entry_insertTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_OFFSET* ti
  ** @param time_list_head:  The head of expiration time linklist.
  ** @param time_list_tail:  The tail of expiration time linklist.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_FAIL if failed.    
+            AGMDB_ERROR if failed.    
  */
 int Entry_removeTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_OFFSET* time_list_head, PTR_OFFSET* time_list_tail) {
     PTR_VOID entry_addr = ENTRY_ADDR(shm_base, entry_id);
@@ -482,7 +483,7 @@ int Entry_removeTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_OFFSET* ti
     PTR_VOID time_prev_addr;
     PTR_VOID time_next_addr;
     if(entry_id == AGMDB_INVALID_INDEX) {
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_REMOVE_INVALID_ENTRY_FROM_TIMELIST;
     }
     time_prev_id = *ENTRY_TIME_PREV(entry_addr);
     time_next_id = *ENTRY_TIME_NEXT(entry_addr);
@@ -546,16 +547,18 @@ PTR_OFFSET Entry_searchHashlist(CPTR_VOID shm_base, const char* key, unsigned in
  ** @param value:   The value string.
  ** @param value:   The length of value string.
  ** return: AGMDB_SUCCESS if success
-            or AGMDB_FAIL if fail
+            or AGMDB_ERROR if fail
  */
 int Entry_setKeyValue(CPTR_VOID shm_base, PTR_OFFSET entry_id, const char* key, int key_len, const char* value, int value_len) {
     PTR_VOID entry_addr = ENTRY_ADDR(shm_base, entry_id);
     if(entry_id == AGMDB_INVALID_INDEX)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_SET_KEYVAL_OF_INVALID_ENTRY;
     if((AGMDB_isstring(key, key_len) != AGMDB_SUCCESS))
-        return AGMDB_FAIL;
-    if((key_len + 1 > MAX_KEY_SIZE) || (value_len + 1 > ENTRY_MAX_DATA_SIZE))
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_KEY_INVALID_STRING;
+    if(key_len + 1 > MAX_KEY_SIZE)
+        return AGMDB_ERROR_KEY_TOO_LONG;
+    if(value_len + 1 > ENTRY_MAX_DATA_SIZE)
+        return AGMDB_ERROR_VALUE_TOO_LONG;
 
     // Copy the key and value into the entry
     *ENTRY_LENG(entry_addr) = value_len;
@@ -572,15 +575,15 @@ int Entry_setKeyValue(CPTR_VOID shm_base, PTR_OFFSET entry_id, const char* key, 
  ** @param str: the string you want to check.
  ** @param str_len: given string length (not include '\0').
  ** return: AGMDB_SUCCESS if the string length equals str_len;
- **             AGMDB_FAIL if not
+ **             AGMDB_ERROR if not
  */
 int AGMDB_isstring(const char* str, int str_len){
     int i;
     for(i = 0;i < str_len;i++)
         if(str[i] == '\0')
-            return AGMDB_FAIL;
+            return AGMDB_ERROR;
     if(str[i] != '\0')
-        return AGMDB_FAIL;
+        return AGMDB_ERROR;
     return AGMDB_SUCCESS;
 }
 
@@ -590,7 +593,7 @@ int AGMDB_isstring(const char* str, int str_len){
  ** @param key_len: the length of the key string.
  ** @param output_val_range: the range of output value.
  ** return: hash result if success
- **      or AGMDB_FAIL if failed.
+ **      or AGMDB_ERROR if failed.
  */
 unsigned int AGMDB_hash(const char* key, int key_len, unsigned int output_val_range) {
     unsigned char buf[DEFAULT_HASH_VALUE_STR_LENGTH] = {0};
@@ -611,25 +614,29 @@ unsigned int AGMDB_hash(const char* key, int key_len, unsigned int output_val_ra
 /**
  ** Get a shared lock for read only.
  ** @param dbm: the database you want to lock.
- ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
+ ** return: AGMDB_SUCCESS if successfully created or AGMDB_ERROR if failed.
  */
 int AGMDB_getSharedLock(struct agmdb_handler *dbm) {
     struct agmdb_lock *db_lock;
+    int rc;
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
-    if(Lock_P(db_lock, SEM_ID_WRITE, 1) == AGMDB_FAIL)
-        return AGMDB_FAIL;
+    rc = Lock_P(db_lock, SEM_ID_WRITE, 1);
+    if (rc != AGMDB_SUCCESS)
+        return rc;
     
-    if(Lock_P(db_lock, SEM_ID_READ, 1) == AGMDB_FAIL) {
+    rc = Lock_P(db_lock, SEM_ID_READ, 1);
+    if (rc != AGMDB_SUCCESS){
         Lock_V(db_lock, SEM_ID_WRITE, 1);
-        return AGMDB_FAIL;
+        return rc;
     }
 
-    if(Lock_V(db_lock, SEM_ID_WRITE, 1) == AGMDB_FAIL) {
+    rc = Lock_V(db_lock, SEM_ID_WRITE, 1);
+    if (rc != AGMDB_SUCCESS){
         Lock_V(db_lock, SEM_ID_READ, 1);
-        return AGMDB_FAIL;
+        return rc;
     }
  
     return AGMDB_SUCCESS;
@@ -638,20 +645,23 @@ int AGMDB_getSharedLock(struct agmdb_handler *dbm) {
 /**
  ** Get a exclusive lock for read and write.
  ** @param dbm: the database you want to lock.
- ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
+ ** return: AGMDB_SUCCESS if successfully created or AGMDB_ERROR if failed.
  */
 int AGMDB_getExclusiveLock(struct agmdb_handler *dbm) {
+    int rc;
     struct agmdb_lock *db_lock;
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
-    if(Lock_P(db_lock, SEM_ID_WRITE, 1) == AGMDB_FAIL)
-        return AGMDB_FAIL;
+    rc = Lock_P(db_lock, SEM_ID_WRITE, 1);
+    if (rc != AGMDB_SUCCESS)
+        return rc;
     
-    if(Lock_P(db_lock, SEM_ID_READ, SEM_READ_INITVAL) == AGMDB_FAIL) {
+    rc = Lock_P(db_lock, SEM_ID_READ, SEM_READ_INITVAL);
+    if (rc != AGMDB_SUCCESS){
         Lock_V(db_lock, SEM_ID_WRITE, 1);
-        return AGMDB_FAIL;
+        return rc;
     }
                 
     return AGMDB_SUCCESS;
@@ -660,16 +670,18 @@ int AGMDB_getExclusiveLock(struct agmdb_handler *dbm) {
 /**
  ** Free a shared lock that you have got before.
  ** @param dbm: the database you want to return the lock.
- ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
+ ** return: AGMDB_SUCCESS if successfully created or AGMDB_ERROR if failed.
  */
-int AGMDB_freeSharedLock(struct agmdb_handler *dbm){    
+int AGMDB_freeSharedLock(struct agmdb_handler *dbm){
+    int rc;
     struct agmdb_lock *db_lock;
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
-    if(Lock_V(db_lock, SEM_ID_READ, 1) == AGMDB_FAIL)
-        return AGMDB_FAIL;
+    rc = Lock_V(db_lock, SEM_ID_READ, 1);
+    if (rc != AGMDB_SUCCESS)
+        return rc;
 
     return AGMDB_SUCCESS;
 }
@@ -677,19 +689,21 @@ int AGMDB_freeSharedLock(struct agmdb_handler *dbm){
 /**
  ** Free a exclusive lock that you have got before.
  ** @param dbm: the database you want to return the lock.
- ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
+ ** return: AGMDB_SUCCESS if successfully created or AGMDB_ERROR if failed.
  */
 int AGMDB_freeExclusiveLock(struct agmdb_handler *dbm){
+    int rc;
     struct agmdb_lock *db_lock;
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     db_lock = (struct agmdb_lock *)&(dbm->db_lock);
     
-    if(Lock_V(db_lock, SEM_ID_READ, SEM_READ_INITVAL) == AGMDB_FAIL)
-            return AGMDB_FAIL;
-        
-    if(Lock_V(db_lock, SEM_ID_WRITE, 1) == AGMDB_FAIL)
-        return AGMDB_FAIL;
+    rc = Lock_V(db_lock, SEM_ID_READ, SEM_READ_INITVAL);
+    if (rc != AGMDB_SUCCESS)
+        return AGMDB_ERROR;
+    rc = Lock_V(db_lock, SEM_ID_WRITE, 1);
+    if (rc != AGMDB_SUCCESS)
+        return AGMDB_ERROR;
     
     return AGMDB_SUCCESS;
 }
@@ -715,7 +729,7 @@ inline PTR_OFFSET AGMDB_getEntry(CPTR_VOID shm_base, const char * key, int key_l
  ** @param value:   The value string.
  ** @param value:   Tthe length of value string.
  ** return: AGMDB_SUCCESS if success
-            or AGMDB_FAIL if fail
+            or AGMDB_ERROR if fail
  */
 inline int AGMDB_setEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id,
     const char* key, int key_len, const char* value, int value_len) {
@@ -738,16 +752,18 @@ inline int AGMDB_setEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id,
  ** @param value:       The value string.
  ** @param value:       Tthe length of value string.
  ** return: AGMDB_SUCCESS if success
-            or AGMDB_FAIL if fail
+            or AGMDB_ERROR if fail
  */
 inline int AGMDB_setSpareEntry(CPTR_VOID shm_base, const char* key, int key_len, const char* value, int value_len) {
     PTR_OFFSET entry_id;
     int rc;
     PTR_OFFSET* hash_list_head;
     if((AGMDB_isstring(key, key_len) != AGMDB_SUCCESS))
-        return AGMDB_FAIL;
-    if((key_len + 1 > MAX_KEY_SIZE) || (value_len + 1 > ENTRY_MAX_DATA_SIZE))
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_KEY_INVALID_STRING;
+    if(key_len + 1 > MAX_KEY_SIZE) 
+        return AGMDB_ERROR_KEY_TOO_LONG;
+    if(value_len + 1 > ENTRY_MAX_DATA_SIZE)
+        return AGMDB_ERROR_VALUE_TOO_LONG;
     hash_list_head = SHM_HASH_LISTS_HEADS(shm_base) + AGMDB_hash(key, key_len, DEFAULT_HASH_LISTS_NUM);
     
     rc = Entry_removeSpareList(shm_base, SHM_SPARE_LIST_HEAD(shm_base), &entry_id);
@@ -756,8 +772,7 @@ inline int AGMDB_setSpareEntry(CPTR_VOID shm_base, const char* key, int key_len,
     rc = Entry_insertHashList(shm_base, hash_list_head, entry_id);
     if(rc != AGMDB_SUCCESS) {
         Entry_insertSpareList(shm_base, SHM_SPARE_LIST_HEAD(shm_base), entry_id);
-        return rc;
-        
+        return rc;    
     } 
 
     rc = AGMDB_setEntry(shm_base, entry_id, key, key_len, value, value_len);
@@ -765,7 +780,6 @@ inline int AGMDB_setSpareEntry(CPTR_VOID shm_base, const char* key, int key_len,
         Entry_removeHashList(shm_base, entry_id);
         Entry_insertSpareList(shm_base, SHM_SPARE_LIST_HEAD(shm_base), entry_id);
         return rc;
-        
     }    
     return AGMDB_SUCCESS;
 }
@@ -775,12 +789,14 @@ inline int AGMDB_setSpareEntry(CPTR_VOID shm_base, const char* key, int key_len,
  ** @param shm_base:The base address of shared memory.
  ** @param entry_id:The offset of the entry you want to delete.
  ** return: AGMDB_SUCCESS if success,
-            or AGMDB_FAIL if fail to delete.
+            or AGMDB_ERROR if fail to delete.
  */
 inline int AGMDB_deleteEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id){
     int rc;
-    if((shm_base == NULL)||(entry_id == AGMDB_INVALID_INDEX))
-        return AGMDB_FAIL;
+    if(shm_base == NULL)
+        return AGMDB_ERROR_SHM_BASE_NULL;
+    if(entry_id == AGMDB_INVALID_INDEX)
+        return AGMDB_ERROR_DELETE_INVALID_ENTRY;
     
     // Maintain the expiration time linklist
     rc = Entry_removeTimeList(shm_base, entry_id, SHM_EXPIRE_TIME_LIST_HEAD(shm_base), SHM_EXPIRE_TIME_LIST_TAIL(shm_base));
@@ -792,11 +808,7 @@ inline int AGMDB_deleteEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id){
     if(rc != AGMDB_SUCCESS)
         return rc;
     // Maintain the spare linklist
-    rc = Entry_insertSpareList(shm_base, SHM_SPARE_LIST_HEAD(shm_base), entry_id);
-    if(rc != AGMDB_SUCCESS)
-        return rc;
-    return AGMDB_SUCCESS;
-    
+    return Entry_insertSpareList(shm_base, SHM_SPARE_LIST_HEAD(shm_base), entry_id);    
 }
 
 /**
@@ -806,47 +818,46 @@ inline int AGMDB_deleteEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id){
  ** @param db_name: the unique identifier of a database.
  ** @param db_name_length: the length of the unique_name.
  ** @param entry_num: The maximum number of entries in the database.
- ** return: AGMDB_SUCCESS if successfully created or AGMDB_FAIL if failed.
+ ** return: AGMDB_SUCCESS if successfully created or AGMDB_ERROR if failed.
  */
 int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num) {
     int     rc;
     PTR_VOID   shm_base;
 
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     if(db_name == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_NAME_NULL;
     if(db_name_length <= 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_NAME_INVALID_STRING;
 
   
     // Check the format of db_name
-    if(AGMDB_isstring(db_name ,db_name_length) == AGMDB_FAIL) {
-        return AGMDB_FAIL;
+    if(AGMDB_isstring(db_name ,db_name_length) == AGMDB_ERROR) {
+        return AGMDB_ERROR_NAME_INVALID_STRING;
     }
 
     rc = SHM_create(&shm_base, db_name, db_name_length , entry_num);
-    if((rc != AGMDB_SHM_SUCCESS_CREATE) && (rc != AGMDB_SHM_SUCCESS_OPEN))
+    if((rc != AGMDB_SUCCESS_SHM_CREATE) && (rc != AGMDB_SUCCESS_SHM_OPEN))
         return rc;
 
     rc = Lock_create(&(dbm->db_lock), db_name, db_name_length);
-    if((rc != AGMDB_LOCK_SUCCESS_CREATE) && (rc != AGMDB_LOCK_SUCCESS_OPEN))
+    if((rc != AGMDB_SUCCESS_LOCK_CREATE) && (rc != AGMDB_SUCCESS_LOCK_OPEN))
         return rc;
 
     dbm->shm_base = shm_base;
 
     return AGMDB_SUCCESS;
-
 }
 
 /**
  ** Close and destroy a database. 
  ** @param dbm: the database you want to destroy.
- ** return: AGMDB_SUCCESS if successfully destroyed or AGMDB_FAIL if failed.
+ ** return: AGMDB_SUCCESS if successfully destroyed or AGMDB_ERROR if failed.
  */
 int AGMDB_destroyDB(struct agmdb_handler *dbm) {
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     
     return AGMDB_SUCCESS;
 }
@@ -854,11 +865,11 @@ int AGMDB_destroyDB(struct agmdb_handler *dbm) {
 /**
  ** Close a database, but does not destroy it. 
  ** @param dbm: the database you want to close.
- ** return: AGMDB_SUCCESS if successfully closed or AGMDB_FAIL if failed.
+ ** return: AGMDB_SUCCESS if successfully closed or AGMDB_ERROR if failed.
  */
 int AGMDB_closeDB(struct agmdb_handler *dbm) {
     if(dbm == NULL)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_HANDLE_NULL;
 
     return AGMDB_SUCCESS;
 }
@@ -868,12 +879,12 @@ int AGMDB_closeDB(struct agmdb_handler *dbm) {
  ** You have to get EXCLUSIVE LOCK of the database before calling this function.
  ** @param dbm: the database you want to modify.
  ** return: AGMDB_SUCCESS if success
- **      or AGMDB_FAIL if failed.
+ **      or AGMDB_ERROR if failed.
  */
 int AGMDB_cleanDB(struct agmdb_handler *dbm) {
     PTR_VOID shm_base;
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     shm_base = (PTR_VOID)(dbm->shm_base);
 
     return SHM_init(shm_base, *SHM_SIZE(shm_base), *SHM_ENTRIES_NUM(shm_base));
@@ -887,10 +898,10 @@ int AGMDB_cleanDB(struct agmdb_handler *dbm) {
  */
 int AGMDB_setExpireTime(struct agmdb_handler *dbm, unsigned int expire_time){
     if(dbm == NULL)
-                return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
 
     if(expire_time < 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_SET_NAGATIVE_EXIPRE_TIME;
     *SHM_EXPIRE_TIME((const PTR_VOID)(dbm->shm_base)) = expire_time;
     return AGMDB_SUCCESS;
 }
@@ -903,31 +914,33 @@ int AGMDB_setExpireTime(struct agmdb_handler *dbm, unsigned int expire_time){
  ** @param key_len: the length of key string.
  ** @param buffer: An created buffer to save the value.
  ** @param buffer_len: the length of buffer array.
- ** return: Length of value if the key is fetched or not in the database (buffer will be NULL and return value will be 0 if key does not exist)
- **      or AGMDB_FAIL if failed (cannot get access to database, or the buffer is not long enough).
+ ** @param val_len: the length of value if the key is fetched or not in the database (buffer will be NULL and return value will be 0 if key does not exist)
+ ** return: AGMDB_SUCCESS if success
+ **      or AGMDB_ERROR if failed (cannot get access to database, or the buffer is not long enough).
  */
 
-int AGMDB_get(struct agmdb_handler *dbm, const char* key, int key_len, char* buffer, int buffer_len) {
+int AGMDB_get(struct agmdb_handler *dbm, const char* key, int key_len, char* buffer, int buffer_len, int* val_len) {
     CPTR_VOID shm_base;
     int data_len;
     PTR_OFFSET entry_id;
     PTR_VOID entry_addr;
+    *val_len = 0;
 
     if(dbm == NULL)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_HANDLE_NULL;
     if(key == NULL)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_KEY_INVALID_STRING;
     if(buffer == NULL)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_GET_BUFFER_NULL;
     if(key_len <= 0)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_KEY_INVALID_STRING;
     if(buffer_len <= 0)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_GET_INVALID_BUFFER_LEN;
     shm_base = (CPTR_VOID)(dbm->shm_base);
     
     // Check the format of key
-    if(AGMDB_isstring(key ,key_len) == AGMDB_FAIL){
-        return AGMDB_FAIL;
+    if(AGMDB_isstring(key ,key_len) == AGMDB_ERROR){
+        return AGMDB_ERROR_KEY_INVALID_STRING;
     }
 
     // Hash the key, and search the key in the corresponding hash linlist
@@ -941,10 +954,11 @@ int AGMDB_get(struct agmdb_handler *dbm, const char* key, int key_len, char* buf
     // Check the capacity of buffer and copy the data
     data_len = *ENTRY_LENG(entry_addr);
     if(data_len + 1 > buffer_len)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_GET_BUFFER_TOO_SMALL;
     memcpy(buffer, ENTRY_DATA(entry_addr), data_len);
     buffer[data_len] = '\0';
-    return data_len;
+    *val_len = data_len;
+    return AGMDB_SUCCESS;
 }
 
 /**
@@ -956,36 +970,33 @@ int AGMDB_get(struct agmdb_handler *dbm, const char* key, int key_len, char* buf
  ** @param value: the value string.
  ** @param value: the length of value string.
  ** return: AGMDB_SUCCESS if successfully set
- **      or AGMDB_FAIL if failed.
+ **      or AGMDB_ERROR if failed.
  */
 int AGMDB_set(struct agmdb_handler *dbm, const char* key, int key_len, const char* value, int value_len) {
     CPTR_VOID shm_base;
     PTR_OFFSET entry_id;
-    int rc;
+
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     if(key == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_KEY_INVALID_STRING;
     if(value == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_VALUE_INVALID_STRING;
     if(key_len <= 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_KEY_INVALID_STRING;
     if(value_len <= 0)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_VALUE_INVALID_STRING;
     shm_base = (CPTR_VOID)(dbm->shm_base);
     if(shm_base == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_SHM_BASE_NULL;
   
     // Check the format of key & value in setEntry and setSpareEntry
     // Hash the key, and search the key in the corresponding hash linklist
     entry_id = AGMDB_getEntry(shm_base, key, key_len);
     if(entry_id == AGMDB_INVALID_INDEX) // Cannot find this key, need a new entry
-        rc = AGMDB_setSpareEntry(shm_base, key, key_len, value, value_len);
+        return AGMDB_setSpareEntry(shm_base, key, key_len, value, value_len);
     else 
-        rc = AGMDB_setEntry(shm_base, entry_id, key, key_len, value, value_len);
-    if(rc != AGMDB_SUCCESS)
-        return rc;
-    return AGMDB_SUCCESS;
+        return AGMDB_setEntry(shm_base, entry_id, key, key_len, value, value_len);
 }
 
 /**
@@ -995,7 +1006,7 @@ int AGMDB_set(struct agmdb_handler *dbm, const char* key, int key_len, const cha
  ** @param key: the key string.
  ** @param key_len: the length of key string.
  ** return: AGMDB_SUCCESS if the key is deleted or not in the database
- **      or AGMDB_FAIL if failed.
+ **      or AGMDB_ERROR if failed.
  */
 int AGMDB_delete(struct agmdb_handler *dbm, const char* key, int key_len) {
     CPTR_VOID shm_base;
@@ -1003,19 +1014,19 @@ int AGMDB_delete(struct agmdb_handler *dbm, const char* key, int key_len) {
     PTR_OFFSET entry_id;
 
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     if(key == NULL)
-            return AGMDB_FAIL;    
+        return AGMDB_ERROR_KEY_INVALID_STRING;
     if(key_len <= 0)
-            return AGMDB_FAIL;
+        return AGMDB_ERROR_KEY_INVALID_STRING;
     shm_base = (CPTR_VOID)(dbm->shm_base);
     if(shm_base == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_SHM_BASE_NULL;
     
     // Check the format of key
-    if(AGMDB_isstring(key, key_len) == AGMDB_FAIL){
+    if(AGMDB_isstring(key, key_len) == AGMDB_ERROR){
         //msr_log_error(msr, "[ERROR]In AGMDB_delete: Invalid key.");
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_KEY_INVALID_STRING;
     }
     
     // Hash the key, and search the key in the corresponding hash linklist
@@ -1035,7 +1046,7 @@ int AGMDB_delete(struct agmdb_handler *dbm, const char* key, int key_len) {
  ** You have to get EXCLUSIVE LOCK of the database before calling this function.
  ** @param dbm: the database you want to remove the stale entry_array.
  ** return: AGMDB_SUCCESS if success
- **      or AGMDB_FAIL if failed.
+ **      or AGMDB_ERROR if failed.
  */
 int AGMDB_removeStale(struct agmdb_handler *dbm) {
     CPTR_VOID shm_base;
@@ -1046,7 +1057,7 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
     unsigned int expire_modify_time; 
 
     if(dbm == NULL)
-            return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     shm_base = (CPTR_VOID)(dbm->shm_base);
     time_list_head = SHM_EXPIRE_TIME_LIST_HEAD(shm_base);
     
@@ -1066,6 +1077,9 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
     return AGMDB_SUCCESS;
 }
 
+const char* AGMDB_getErrorInfo(int error_code){
+    return NULL;
+}
 /**
  **========================================================
  ** AG Memory Database Debug API
@@ -1078,7 +1092,7 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
  ** @param dbm: the database you want to read.
  ** @param keynum: the value to store the number of keys in the database 
  ** return: AGMDB_SUCCESS if no error
- **      or AGMDB_FAIL if failed.
+ **      or AGMDB_ERROR if failed.
  */
 int AGMDB_getKeyNum(struct agmdb_handler *dbm, int* keynum) {
     CPTR_VOID shm_base;
@@ -1087,7 +1101,7 @@ int AGMDB_getKeyNum(struct agmdb_handler *dbm, int* keynum) {
     PTR_OFFSET entry_id;
     
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     
     shm_base = (CPTR_VOID)(dbm->shm_base);
     entry_id = *SHM_EXPIRE_TIME_LIST_HEAD(shm_base);
@@ -1101,7 +1115,7 @@ int AGMDB_getKeyNum(struct agmdb_handler *dbm, int* keynum) {
     if(timelist_cnt == *SHM_BUSY_ENTRY_CNT(shm_base))
         return AGMDB_SUCCESS;
     else
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_TIMELIST_LONG_NOTEQUEAL_SHM_CNT;
 }
 
 /**
@@ -1110,13 +1124,13 @@ int AGMDB_getKeyNum(struct agmdb_handler *dbm, int* keynum) {
  ** @param key_len: the length of the key string.
  ** @param output_val_range: the range of output value.
  ** return: hash result if success
- **      or AGMDB_FAIL if failed.
+ **      or AGMDB_ERROR if failed.
  */
 int AGMDB_getHashValue(const char* key, int key_len, int output_val_range) {
     if(key == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_KEY_INVALID_STRING;
     if(AGMDB_isstring(key, key_len) != AGMDB_SUCCESS)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_KEY_INVALID_STRING;
     return AGMDB_hash(key, key_len, output_val_range);
 }
 
@@ -1130,7 +1144,7 @@ int AGMDB_getHashValue(const char* key, int key_len, int output_val_range) {
  ** @param values:      the array to store pointers of values.
  ** @param vals_len:    the array to store length of values.
  ** return: AGMDB_SUCCESS if no error
- **      or AGMDB_FAIL if failed.
+ **      or AGMDB_ERROR if failed.
  */
 int AGMDB_getAllKeysValues(struct agmdb_handler *dbm, int array_size, const char* keys[], const char * values[], unsigned int vals_len[]) {
     CPTR_VOID shm_base;
@@ -1140,14 +1154,14 @@ int AGMDB_getAllKeysValues(struct agmdb_handler *dbm, int array_size, const char
     int keys_counter = 0;
 
     if(dbm == NULL)
-        return AGMDB_FAIL;
+        return AGMDB_ERROR_HANDLE_NULL;
     shm_base = (CPTR_VOID)(dbm->shm_base);
     time_list_head = SHM_EXPIRE_TIME_LIST_HEAD(shm_base);
     
     entry_id = *time_list_head;
     while(entry_id != AGMDB_INVALID_INDEX){
         if (keys_counter >= array_size)
-            return AGMDB_FAIL;
+            return AGMDB_ERROR_GETALL_ARRAY_TOO_SMALL;
         entry_addr = ENTRY_ADDR(shm_base, entry_id);
         keys[keys_counter] = ENTRY_KEY(entry_addr);
         values[keys_counter] = ENTRY_DATA(entry_addr);
@@ -1158,9 +1172,3 @@ int AGMDB_getAllKeysValues(struct agmdb_handler *dbm, int array_size, const char
     
     return AGMDB_SUCCESS;
 }
-
-
-
-
-
-

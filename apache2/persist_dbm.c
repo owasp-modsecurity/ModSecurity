@@ -119,7 +119,6 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
  */
 static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, modsec_rec *msr, const char *col_name, const char *col_key, int col_key_len)
 {
-    int rc,rc2;
     apr_table_t *col = NULL;
     apr_sdbm_datum_t key;
     apr_sdbm_datum_t *value = NULL;
@@ -127,6 +126,8 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
     apr_table_entry_t *te;
     int expired = 0;
     int i;
+    int rc;
+    int tmp_val_len = 0;
 
     directory_config * root_dcfg;
 
@@ -222,8 +223,8 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
                 goto cleanup;
             }
         }
-        rc2 = AGMDB_get(ag_dbm, col_key, col_key_len, buffer, AGMDB_MAX_ENTRY_SIZE);
-        if (rc2 == AGMDB_FAIL) {
+        rc = AGMDB_get(ag_dbm, col_key, col_key_len, buffer, AGMDB_MAX_ENTRY_SIZE, &tmp_val_len);
+        if(rc != AGMDB_SUCCESS) {
             msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to read from database \"%s\": %s", log_escape(msr->mp,
                 col_name), col_key);
             goto cleanup;
@@ -231,16 +232,16 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
         
         if(existing_dbm == NULL ){
             rc = AGMDB_freeSharedLock(ag_dbm);
-            if(rc != AGMDB_SUCCESS){
+            if(rc != AGMDB_SUCCESS) {
                 msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to free shared lock");
                 goto cleanup;
             }
         }
-        if (rc2 == 0) { /* Key not found in DBM file. */
+        if (tmp_val_len == 0) { /* Key not found in DBM file. */
              goto cleanup;
         }
         value->dptr = buffer;
-        value->dsize = rc2;
+        value->dsize = tmp_val_len;
     }
     else{
         rc = apr_sdbm_fetch(apr_dbm, value, key);
@@ -320,7 +321,9 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
                     goto cleanup;
                 }
             }
-            rc2 = AGMDB_delete(ag_dbm, col_key, col_key_len);
+            rc = AGMDB_delete(ag_dbm, col_key, col_key_len);
+            if(rc != AGMDB_SUCCESS)
+                fail_flag = 1;
 
             if(existing_dbm == NULL){
                 rc = AGMDB_freeExclusiveLock(ag_dbm);
@@ -329,8 +332,6 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
                     goto cleanup;
                 }
             }
-            if(rc2 != AGMDB_SUCCESS)
-                fail_flag = 1;
         }
         else{
             if (existing_dbm == NULL) {
@@ -606,7 +607,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             strcpy((char*)(new_handle->col_name), var_name->value);
             
             rc = AGMDB_openDB(new_handle->handle, dbm_filename, strlen(dbm_filename), MAXIMUM_AGMDB_ENTRY_NUM);
-            if(rc == AGMDB_FAIL){
+            if(rc != AGMDB_SUCCESS){
                 msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to create DBM name: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
                 goto error;
             }
