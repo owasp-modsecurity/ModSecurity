@@ -15,8 +15,7 @@ using modsecurity::utils::string::parserSanitizer;
 
 typedef yy::seclang_parser p;
 static int state_variable_from = 0;
-static int YY_PREVIOUS_STATE = 0;
-static int YY_PREVIOUS_STATE2 = 0;
+static std::stack<int> YY_PREVIOUS_STATE = 0;
 
 // Work around an incompatibility in flex (at least versions
 // 2.5.31 through 2.5.33): it generates code that does
@@ -25,10 +24,8 @@ static int YY_PREVIOUS_STATE2 = 0;
 # undef yywrap
 # define yywrap() 1
 
-#define BEGINX(z) { YY_PREVIOUS_STATE = YY_START; BEGIN(z); }
-#define BEGINX2(z) { YY_PREVIOUS_STATE2 = YY_START; BEGIN(z); }
-#define BEGIN_PREVIOUS() { BEGIN(YY_PREVIOUS_STATE); YY_PREVIOUS_STATE = 0; }
-#define BEGIN_PREVIOUS2() { BEGIN(YY_PREVIOUS_STATE2); YY_PREVIOUS_STATE2 = 0; }
+#define BEGINX(z) { YY_PREVIOUS_STATE.push(YY_START); BEGIN(z); }
+#define BEGIN_PREVIOUS() { BEGIN(YY_PREVIOUS_STATE.top()); YY_PREVIOUS_STATE.pop(); }
 
 // The location of the current token.
 %}
@@ -554,8 +551,8 @@ EQUALS_MINUS                            (?i:=\-)
 }
 
 <EXPECTING_ACTION_PREDICATE_VARIABLE>{
-[}] { BEGIN_PREVIOUS2(); }
-[}][%] { BEGIN_PREVIOUS2(); }
+[}] { BEGIN_PREVIOUS(); }
+[}][%] { BEGIN_PREVIOUS(); }
 }
 
 <ACTION_PREDICATE_ENDS_WITH_QUOTE>{
@@ -574,7 +571,7 @@ EQUALS_MINUS                            (?i:=\-)
 }
 
 <ACTION_PREDICATE_ENDS_WITH_QUOTE,ACTION_PREDICATE_ENDS_WITH_DOUBLE_QUOTE,ACTION_PREDICATE_ENDS_WITH_COMMA>{
-{START_MACRO_VARIABLE}                               { BEGINX2(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+{START_MACRO_VARIABLE}                               { BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
 .                                                    { BEGIN(LEXING_ERROR_VARIABLE); yyless(0); }
 }
 
