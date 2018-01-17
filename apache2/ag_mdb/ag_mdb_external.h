@@ -19,6 +19,14 @@ extern "C" {
  ** AG Memory Database Status Definition
  **========================================================
  */
+/**
+ ** First Digit: equals 1 if it is an error code.
+ ** Second Digit: the module where the error happens. 
+ **               0 means lock, 1 means shared momory, 2 means the database.
+ ** Third Digit: the platform where the error happens. 
+ **              0 means general, 1 means LINUX, 2 means WINDOWS.
+ ** 4th & 5th Digit: the detailed error number.
+ */
 #define AGMDB_SUCCESS                                           0        
 #define AGMDB_ERROR                                             10000
 
@@ -31,7 +39,7 @@ extern "C" {
 
 #define AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING                10200
 #define AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL                  10201
-#define AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LCOK_EXISTS               10202
+#define AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS               10202
 #define AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL                     10203
 #define AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL                 10204
 
@@ -70,7 +78,7 @@ extern "C" {
 #define AGMDB_ERROR_NAME_NULL                                   12015
 #define AGMDB_ERROR_NAME_INVALID_STRING                         12016
 
-#define AGMDB_ERROR_SET_NAGATIVE_EXIPRE_TIME                    12017
+#define AGMDB_ERROR_SET_NEGATIVE_EXIPRE_TIME                    12017
 
 #define AGMDB_ERROR_GET_BUFFER_NULL                             12018
 #define AGMDB_ERROR_GET_INVALID_BUFFER_LEN                      12019
@@ -247,7 +255,12 @@ int AGMDB_removeStale(struct agmdb_handler *dbm);
  ** AG Memory Database Debug API
  **========================================================
  */
-
+/**
+ ** Get the detail information of an error.
+ ** @param error_no: the error code returned by a function.
+ ** return: The error information.
+ */
+const char* AGMDB_getErrorInfo(int error_no);
 /**
  ** Get the number of keys in a database.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.

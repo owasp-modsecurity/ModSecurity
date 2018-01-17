@@ -77,7 +77,7 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
     if(new_mutex == NULL)
         return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
     if((GetLastError() == ERROR_ALREADY_EXISTS) != lock_exists) // One lock exists, another not.
-        return AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LCOK_EXISTS;
+        return AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS;
     new_lock->write_lock_handle = OpenMutex(
                                     MUTEX_ALL_ACCESS,   //
                                     false,              //
@@ -901,7 +901,7 @@ int AGMDB_setExpireTime(struct agmdb_handler *dbm, unsigned int expire_time){
         return AGMDB_ERROR_HANDLE_NULL;
 
     if(expire_time < 0)
-        return AGMDB_ERROR_SET_NAGATIVE_EXIPRE_TIME;
+        return AGMDB_ERROR_SET_NEGATIVE_EXIPRE_TIME;
     *SHM_EXPIRE_TIME((const PTR_VOID)(dbm->shm_base)) = expire_time;
     return AGMDB_SUCCESS;
 }
@@ -1077,14 +1077,120 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
     return AGMDB_SUCCESS;
 }
 
-const char* AGMDB_getErrorInfo(int error_code){
-    return NULL;
-}
 /**
  **========================================================
  ** AG Memory Database Debug API
  **========================================================
  */
+
+/**
+ ** Get the detail information of an error.
+ ** @param error_no: the error code returned by a function.
+ ** return: The error information.
+ */
+const char* AGMDB_getErrorInfo(int error_no){
+    switch(error_no){
+        case AGMDB_SUCCESS:
+            return "Success!";
+        case AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL:
+            return "When operating the lock, the operation value is negative!";
+            
+        case AGMDB_ERROR_LOCK_LINUX_SEM_CREATE_FAIL:
+            return "In Linux system, failed when creating the semaphore. Please check the semaphore limit of the system.";
+        case AGMDB_ERROR_LOCK_LINUX_SEM_OPEN_FAIL:
+            return "In Linux system, failed when opening an existed semaphore. Please check the semaphore limit and permission settings.";
+        case AGMDB_ERROR_LOCK_LINUX_SEM_INIT_FAIL:
+            return "In Linux system, failed when initializing the semaphore value. Please check the existence and permission of the semaphore.";
+        case AGMDB_ERROR_LOCK_LINUX_SEM_MODIFY_FAIL:
+            return "In Linux system, failed when modifying the semaphore value. Please check the existence and permission of the semaphore.";
+            
+        case AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING:
+            return "In Windows system, the name of lock is not a valid string. Please check the data_dir setting in configuration file.";
+        case AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL:
+            return "In Windows system, failed when creating the mutex object.";
+        case AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS:
+            return "In Windows system, one and only one lock has existed.";
+        case AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL:
+            return "In Windows system, failed when getting the mutex object. Possible reason is deadlock or permission issue.";
+        case AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL:
+            return "In Windows system, failed when releasing the mutex object.";
+        
+        case AGMDB_ERROR_SHM_BASE_NULL:
+            return "The shared memory base address is NULL. Please check the agmdb_handler object.";
+        case AGMDB_ERROR_SHM_SIZE_TOO_SMALL:
+            return "The size setting of shared memory is too small to save the DB control information.";
+        case AGMDB_ERROR_SHM_NAME_INVALID_STRING:
+            return "The name of database is not a valid string. Please check the data_dir setting in configuration file.";
+        case AGMDB_ERROR_SHM_ENTRY_NUM_NEGATIVE:
+            return "The setting of DB's entry number is negative!";
+            
+        case AGMDB_ERROR_SHM_LINUX_CREATE_FAIL:
+            return "In Linux system, failed when creating the shared memory.";
+        case AGMDB_ERROR_SHM_LINUX_MAP_FAIL:
+            return "In Linux system, failed when mapping the shared memory into the process's address space.";
+        
+        case AGMDB_ERROR_SHM_WIN_CREATE_FAIL:
+            return "In Windows system, failed when creating the shared memory.";
+        case AGMDB_ERROR_SHM_WIN_MAP_FAIL:
+            return "In Windows system, failed when mapping the shared memory into the process's address space.";
+        
+        case AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_SPARELIST:
+            return "The AGMDB is inserting an invalid entry into the spare list.";
+        case AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_SPARELIST:
+            return "The AGMDB is inserting a busy entry into the spare list. Should remove the entry from hashlist first.";
+        
+        case AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_HASHLIST:
+            return "The AGMDB is inserting an invalid entry into the hashlist.";
+        case AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_HASHLIST:
+            return "The AGMDB is inserting a busy entry into the hashlist.";
+        
+        case AGMDB_ERROR_REMOVE_INVALID_ENTRY_FROM_HASHLIST:
+            return "The AGMDB is removing an invalid entry from hashlist";
+        case AGMDB_ERROR_NONHEAD_ENTRY_IN_HASHLIST_WITHOUT_PREV:
+            return "An entry in hashlist without previous entry is not the head of the hashlist.";
+            
+        case AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_TIMELIST:
+            return "The AGMDB is inserting an invalid entry into the expire time list.";
+        case AGMDB_ERROR_REMOVE_INVALID_ENTRY_FROM_TIMELIST:
+            return "The AGMDB is removing an invalid entry into the expire time list.";
+        
+        case AGMDB_ERROR_SET_KEYVAL_OF_INVALID_ENTRY:
+            return "The AGMDB is setting key-value to an invalid entry.";
+        
+        case AGMDB_ERROR_KEY_INVALID_STRING:
+            return "The key is not a valid string.";
+        case AGMDB_ERROR_KEY_TOO_LONG:
+            return "The key string is too long.";
+        case AGMDB_ERROR_VALUE_INVALID_STRING:
+            return "The value is not a valid string.";
+        case AGMDB_ERROR_VALUE_TOO_LONG:
+            return "The value string is too long.";
+            
+        case AGMDB_ERROR_HANDLE_NULL:
+            return "The agmdb_handler is NULL.";
+        case AGMDB_ERROR_DELETE_INVALID_ENTRY:
+            return "The AGMDB is deleting an invalid entry.";
+        case AGMDB_ERROR_NAME_NULL:
+            return "The name of AGMDB is NULL";
+        case AGMDB_ERROR_NAME_INVALID_STRING:
+            return "The name of AGMDB is not a valid string.";
+            
+        case AGMDB_ERROR_SET_NEGATIVE_EXIPRE_TIME:
+            return "Set the expire time to a negative value.";
+        
+        case AGMDB_ERROR_GET_BUFFER_NULL:
+            return "In get function, the buffer is NULL.";
+        case AGMDB_ERROR_GET_INVALID_BUFFER_LEN:
+            return "In get function, the length of buffer is an invalid number.";
+        case AGMDB_ERROR_GET_BUFFER_TOO_SMALL:
+            return "In get function, the buffer is too small to save the data.";
+        
+        case AGMDB_ERROR_TIMELIST_LONG_NOTEQUEAL_SHM_CNT:
+            return "The size of expire time list does not equal to the entry counter in DB control block.";
+        case AGMDB_ERROR_GETALL_ARRAY_TOO_SMALL:
+            return "In getAll function, the array is too samll to save the data.";
+    }
+}
 
 /**
  ** Get the number of keys in a database.
