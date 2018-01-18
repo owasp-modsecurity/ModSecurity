@@ -166,7 +166,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
     }
     else{
         if (msr->txcfg->data_dir == NULL) {
-            msr_log(msr, 1, "[ERROR]collection_retrieve_ex_origin: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
+            msr_log(msr, 1, "collection_retrieve_ex_origin: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
                 "SecDataDir to define data directory first.", log_escape(msr->mp, col_name),
                 log_escape_ex(msr->mp, col_key, col_key_len));
             goto cleanup;
@@ -218,22 +218,22 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
         //if not called by collection_store(), need to get lock
         if(existing_dbm == NULL ){
             rc = AGMDB_getSharedLock(ag_dbm);
-            if(rc != AGMDB_SUCCESS){
-                msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to get shared lock");
+            if(AGMDB_isError(rc)){
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to get shared lock. Error info: %s.", AGMDB_getErrorInfo(rc));
                 goto cleanup;
             }
         }
         rc = AGMDB_get(ag_dbm, col_key, col_key_len, buffer, AGMDB_MAX_ENTRY_SIZE, &tmp_val_len);
-        if(rc != AGMDB_SUCCESS) {
-            msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to read from database \"%s\": %s", log_escape(msr->mp,
-                col_name), col_key);
+        if(AGMDB_isError(rc)) {
+            msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to read from database \"%s\": %s. Error info: %s.", log_escape(msr->mp,
+                col_name), col_key, AGMDB_getErrorInfo(rc));
             goto cleanup;
         }
         
         if(existing_dbm == NULL ){
             rc = AGMDB_freeSharedLock(ag_dbm);
-            if(rc != AGMDB_SUCCESS) {
-                msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to free shared lock");
+            if(AGMDB_isError(rc)) {
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to free shared lock. Error info: %s.", AGMDB_getErrorInfo(rc));
                 goto cleanup;
             }
         }
@@ -316,19 +316,19 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
         if(db_option == DB_OPT_AGMDB){
             if(existing_dbm == NULL){
                 rc = AGMDB_getExclusiveLock(ag_dbm);
-                if(rc != AGMDB_SUCCESS){
-                    msr_log(msr, 1, "collection_retrieve_ex: Failed to get exclusive lock");
+                if(AGMDB_isError(rc)){
+                    msr_log(msr, 1, "collection_retrieve_ex: Failed to get exclusive lock. Error info: %s.", AGMDB_getErrorInfo(rc));
                     goto cleanup;
                 }
             }
             rc = AGMDB_delete(ag_dbm, col_key, col_key_len);
-            if(rc != AGMDB_SUCCESS)
+            if(AGMDB_isError(rc))
                 fail_flag = 1;
 
             if(existing_dbm == NULL){
                 rc = AGMDB_freeExclusiveLock(ag_dbm);
-                if(rc != AGMDB_SUCCESS){
-                    msr_log(msr, 1, "collection_retrieve_ex: Failed to free exclusive lock");
+                if(AGMDB_isError(rc)){
+                    msr_log(msr, 1, "collection_retrieve_ex: Failed to free exclusive lock. Error info: %s.", AGMDB_getErrorInfo(rc));
                     goto cleanup;
                 }
             }
@@ -494,7 +494,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     msc_string *var_name = NULL, *var_key = NULL;
     unsigned char *blob = NULL;
     unsigned int blob_size = 0, blob_offset = 0;
-    int rc,rc2;
+    int rc;
     apr_sdbm_datum_t key;
     apr_sdbm_datum_t value;
     const apr_array_header_t *arr;
@@ -598,7 +598,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             root_dcfg = msr->dcfg1->root_config;
             dbm_filename = apr_pstrcat(root_dcfg->mp, root_dcfg->data_dir, "/", var_name->value, NULL);
             if(root_dcfg == NULL){
-                msr_log_error(msr, "[ERROR]collection_retrieve_ex_agmdb: Cannot find root_config in msr->dcfg1.");
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Cannot find root_config in msr->dcfg1.");
                 goto error;
             }
             new_handle = (struct agmdb_handle_entry *)apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handle_entry));
@@ -607,8 +607,8 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             strcpy((char*)(new_handle->col_name), var_name->value);
             
             rc = AGMDB_openDB(new_handle->handle, dbm_filename, strlen(dbm_filename), MAXIMUM_AGMDB_ENTRY_NUM);
-            if(rc != AGMDB_SUCCESS){
-                msr_log(msr, 1, "[ERROR]collection_retrieve_ex_agmdb: Failed to create DBM name: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
+            if(AGMDB_isError(rc)){
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to create DBM name: %s. Error info: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value), AGMDB_getErrorInfo(rc));
                 goto error;
             }
             ag_dbm = new_handle->handle;
@@ -619,7 +619,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         // ENH: lowercase the var name in the filename
         dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "[ERRNO]collection_store_ex_origin: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, var_name->value),
+            msr_log(msr, 9, "collection_store_ex_origin: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, var_name->value),
                     log_escape(msr->mp, dbm_filename));
         }
         
@@ -639,7 +639,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
 #ifdef GLOBAL_COLLECTION_LOCK
             apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #endif
-            msr_log(msr, 1, "[ERRNO]collection_store_ex_origin: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
+            msr_log(msr, 1, "collection_store_ex_origin: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
                 get_apr_error(msr->mp, rc));
             apr_dbm = NULL;
             goto error;
@@ -653,12 +653,12 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     //---------------------------------
     if(db_option == DB_OPT_AGMDB){
         rc = AGMDB_getExclusiveLock(ag_dbm);
-        if (rc != AGMDB_SUCCESS) {
+        if (AGMDB_isError(rc)) {
 #ifdef _WIN32
             int lasterr = (int)GetLastError();
-            msr_log(msr, 1, "collection_store: Failed to getExclusiveLock, lasterr = %d", lasterr);
+            msr_log(msr, 1, "collection_store: Failed to getExclusiveLock, lasterr = %d. Error info: %s", lasterr, AGMDB_getErrorInfo(rc));
 #else
-            msr_log(msr, 1, "collection_store: Failed to getExclusiveLock, errno = %d", errno);
+            msr_log(msr, 1, "collection_store: Failed to getExclusiveLock, errno = %d. Error info: %s", errno, AGMDB_getErrorInfo(rc));
 #endif
             goto error;
         }
@@ -668,7 +668,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         /* Need to lock to pull in the stored data again and apply deltas. */
         rc = apr_sdbm_lock(apr_dbm, APR_FLOCK_EXCLUSIVE);
         if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "[ERRNO]collection_store_ex_origin: Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
+            msr_log(msr, 1, "collection_store_ex_origin: Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
                 get_apr_error(msr->mp, rc));
             goto error;
         }
@@ -745,8 +745,10 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         if (blob == NULL) {
             if (ag_dbm != NULL) {
                 rc = AGMDB_freeExclusiveLock(ag_dbm);
+                if(AGMDB_isError(rc))
+                    msr_log(msr, 1, "collection_stror_ex: Fail to free exclusive lock. Error info: %s", AGMDB_getErrorInfo(rc));
             }
-            msr_log_error(msr, "[ERROR]collection_store_ex_agdb: fail to create blob");            
+            msr_log(msr, 1, "collection_store_ex_agdb: fail to create blob");            
             return -1;
         }
     }
@@ -815,15 +817,14 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     value.dsize = blob_size;
 
     if(db_option == DB_OPT_AGMDB) {
-        rc2 = AGMDB_set(ag_dbm, var_key->value, var_key->value_len, (char*)blob, blob_size);
-        rc = AGMDB_freeExclusiveLock(ag_dbm);
-
-        if(rc2 != AGMDB_SUCCESS) {
-            msr_log(msr, 1, "[ERROR]collection_store_ex_agmdb: Failed to write to database key: %s", var_key->value);
-            return -1;
+        rc = AGMDB_set(ag_dbm, var_key->value, var_key->value_len, (char*)blob, blob_size);
+        if(AGMDB_isError(rc)) {
+            msr_log(msr, 1, "collection_store_ex_agmdb: Failed to write to database key: %s. Error info: %s.", var_key->value, AGMDB_getErrorInfo(rc));
         }
-        if(rc != AGMDB_SUCCESS){
-            msr_log(msr, 1, "[ERROR]collection_store_ex_agmdb: Failed to free exclusive lock");
+
+        rc = AGMDB_freeExclusiveLock(ag_dbm);
+        if(AGMDB_isError(rc)){
+            msr_log(msr, 1, "collection_store_ex_agmdb: Failed to free exclusive lock. Error info: %s.", AGMDB_getErrorInfo(rc));
             return -1;
         }
     }
@@ -895,7 +896,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
     apr_array_header_t *keys_arr;
     char **keys;
     apr_time_t now = apr_time_sec(msr->request_time);
-    int i;
+    int i,rc2;
     
     //---------------------------------
     //AGMDB
@@ -906,7 +907,9 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
         ag_dbm = dcfg_searchAGMDBhandler(col_name, (struct agmdb_handle_entry*)(root_dcfg->agmdb_handles));
         if(ag_dbm == NULL)
             return 1;
-        return AGMDB_removeStale(ag_dbm);
+        rc2 = AGMDB_removeStale(ag_dbm);
+        if(AGMDB_isError(rc2))
+        msr_log(msr, 1, "collections_remove_stale_ex_agmdb: error in remove stale. Error info: %s", AGMDB_getErrorInfo(rc2));
     }
     //---------------------------------
     //apr_sdbm

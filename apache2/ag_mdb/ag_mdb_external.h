@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "stdbool.h"
+
 /**
  **========================================================
  ** AG Memory Database Limitation Definition
@@ -256,11 +258,19 @@ int AGMDB_removeStale(struct agmdb_handler *dbm);
  **========================================================
  */
 /**
- ** Get the detail information of an error.
- ** @param error_no: the error code returned by a function.
- ** return: The error information.
+ ** Get the detail information of an return code.
+ ** @param return_code: the code returned by a function.
+ ** return: The string including the detailed information.
  */
-const char* AGMDB_getErrorInfo(int error_no);
+const char* AGMDB_getErrorInfo(int return_code);
+
+/**
+ ** Check whether a return_code is an error.
+ ** @param return_code: the code returned by a AGMDB function.
+ ** return: True if there is an error;
+            False if not.
+ */
+bool AGMDB_isError(int return_code);
 /**
  ** Get the number of keys in a database.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.

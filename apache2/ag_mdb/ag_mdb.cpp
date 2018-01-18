@@ -1084,9 +1084,9 @@ int AGMDB_removeStale(struct agmdb_handler *dbm) {
  */
 
 /**
- ** Get the detail information of an error.
- ** @param error_no: the error code returned by a function.
- ** return: The error information.
+ ** Get the detail information of an return code.
+ ** @param return_code: the code returned by a function.
+ ** return: The string including the detailed information.
  */
 const char* AGMDB_getErrorInfo(int error_no){
     switch(error_no){
@@ -1190,6 +1190,19 @@ const char* AGMDB_getErrorInfo(int error_no){
         case AGMDB_ERROR_GETALL_ARRAY_TOO_SMALL:
             return "In getAll function, the array is too samll to save the data.";
     }
+}
+
+/**
+ ** Check whether a return_code is an error.
+ ** @param return_code: the code returned by a AGMDB function.
+ ** return: True if there is an error;
+            False if not.
+ */
+bool AGMDB_isError(int return_code){
+    if (return_code < AGMDB_ERROR)
+        return true;
+    else
+        return false;
 }
 
 /**
