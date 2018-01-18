@@ -259,19 +259,34 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
         return AGMDB_ERROR_SHM_ENTRY_NUM_NEGATIVE;
                                                                    
     shm_id = shmget(shm_key, shm_size, IPC_CREAT | IPC_EXCL);
-    
-    if(shm_id == -1){ // create a new SHM
-        shm_id = shmget(shm_key, shm_size, IPC_CREAT);
-        if(shm_id == -1)
-            return AGMDB_ERROR_SHM_LINUX_CREATE_FAIL;
+    if(shm_id == -1) { 
+        if(errno == EEXIST) { // There has been a SHM with the given name 
+            shm_id = shmget(shm_key, shm_size, IPC_CREAT);
+            if(shm_id == -1)
+                return AGMDB_ERROR_SHM_LINUX_CREATE_FAIL;
+            
+            //  Map the SHM into the address space of this process 
+            *new_shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
+            if(*new_shm_base == (PTR_VOID)-1)
+                return AGMDB_ERROR_SHM_LINUX_MAP_FAIL;
+            return AGMDB_SUCCESS_SHM_OPEN;
+        } 
+        else if(errno == EACCES) {
+            return AGMDB_ERROR_SHM_LINUX_OPEN_ACCESS_FAIL;
+        }
+        else {
+            return AGMDB_ERROR_SHM_LINUX_OPEN_FAIL;
+        }
     }
-    *new_shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
-    if(*new_shm_base == (PTR_VOID)-1)
-           return AGMDB_ERROR_SHM_LINUX_MAP_FAIL;
-    rc = SHM_init(*new_shm_base, shm_size, entry_num);
-    if(rc != AGMDB_SUCCESS)
-        return rc;
-    return AGMDB_SUCCESS_SHM_OPEN;
+    else { // Map the new SHM into the address space of this process 
+        *new_shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
+        if(*new_shm_base == (PTR_VOID)-1)
+            return AGMDB_ERROR_SHM_LINUX_MAP_FAIL;
+        rc = SHM_init(*new_shm_base, shm_size, entry_num);
+        if(rc != AGMDB_SUCCESS)
+            return rc;
+        return AGMDB_SUCCESS_SHM_CREATE;
+    }
 #else
     HANDLE shm_handle;
     if (AGMDB_isstring(db_name, db_name_length) != AGMDB_SUCCESS)
@@ -300,7 +315,7 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
             return rc;
         return AGMDB_SUCCESS_SHM_CREATE;        
     }
-    else{ // There has been a SHM with the given name
+    else { // There has been a SHM with the given name
         return AGMDB_SUCCESS_SHM_OPEN;
     }
 #endif
@@ -1126,6 +1141,10 @@ const char* AGMDB_getErrorInfo(int error_no){
             
         case AGMDB_ERROR_SHM_LINUX_CREATE_FAIL:
             return "In Linux system, failed when creating the shared memory.";
+        case AGMDB_ERROR_SHM_LINUX_OPEN_ACCESS_FAIL:
+            return "In Linux system, no access permission when opening the shared memory.";
+        case AGMDB_ERROR_SHM_LINUX_OPEN_FAIL:
+            return "In Linux system, failed when opening the shared memory.";            
         case AGMDB_ERROR_SHM_LINUX_MAP_FAIL:
             return "In Linux system, failed when mapping the shared memory into the process's address space.";
         

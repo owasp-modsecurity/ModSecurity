@@ -51,7 +51,9 @@ extern "C" {
 #define AGMDB_ERROR_SHM_ENTRY_NUM_NEGATIVE                      11003
 
 #define AGMDB_ERROR_SHM_LINUX_CREATE_FAIL                       11100
-#define AGMDB_ERROR_SHM_LINUX_MAP_FAIL                          11101
+#define AGMDB_ERROR_SHM_LINUX_OPEN_FAIL                         11101
+#define AGMDB_ERROR_SHM_LINUX_OPEN_ACCESS_FAIL                  11102
+#define AGMDB_ERROR_SHM_LINUX_MAP_FAIL                          11103
 
 #define AGMDB_ERROR_SHM_WIN_CREATE_FAIL                         11200
 #define AGMDB_ERROR_SHM_WIN_MAP_FAIL                            11201

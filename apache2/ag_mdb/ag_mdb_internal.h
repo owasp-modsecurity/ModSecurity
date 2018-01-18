@@ -10,6 +10,7 @@
 #include<sys/shm.h>
 #include<sys/sem.h>
 #include<sys/ipc.h>
+#include <errno.h>
 #endif
 #include<cstring>
 #include<stdlib.h>
