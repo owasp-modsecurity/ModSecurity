@@ -48,7 +48,6 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     
     dcfg->root_config = NOT_SET_P;
     dcfg->db_option = 0;
-    dcfg->test_ip_range = NOT_SET;
     dcfg->agmdb_handles = NOT_SET_P;
     
     dcfg->reqbody_access = NOT_SET;
@@ -328,8 +327,6 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->root_config : child->root_config);
     merged->db_option = (child->db_option == NOT_SET
         ? parent->db_option : child->db_option);
-    merged->test_ip_range = (child->test_ip_range == NOT_SET
-        ? parent->test_ip_range : child->test_ip_range);
     merged->agmdb_handles = (child->agmdb_handles == NOT_SET_P
         ? parent->agmdb_handles : child->agmdb_handles);
 
@@ -656,7 +653,6 @@ void init_directory_config(directory_config *dcfg)
 
     if (dcfg->root_config == NOT_SET_P) dcfg->root_config = NULL;
     if (dcfg->db_option == NOT_SET) dcfg->db_option = 0;
-    if (dcfg->test_ip_range == NOT_SET) dcfg->test_ip_range = 1;
     if (dcfg->agmdb_handles == NOT_SET_P) dcfg->agmdb_handles = NULL;
     
     if (dcfg->is_enabled == NOT_SET) dcfg->is_enabled = 0;
@@ -1143,15 +1139,6 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     }
     #endif
 
-    return NULL;
-}
-
-/* -- Configuration directives -- */
-static const char *cmd_test_rand_ip_range(cmd_parms *cmd, void *_dcfg, const char *p1){
-    int tmpi;
-    directory_config *dcfg = (directory_config *)_dcfg;
-    tmpi = atoi(p1);
-    dcfg->test_ip_range = tmpi > 0 ? tmpi : 0;
     return NULL;
 }
 
@@ -3957,14 +3944,6 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "Set Hash parameter"
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecTestRandIpRange",
-        cmd_test_rand_ip_range,
-        NULL,
-        CMD_SCOPE_ANY,
-        "IP address range. For test only"
     ),
 
     AP_INIT_TAKE1 (

@@ -642,7 +642,6 @@ struct directory_config {
      */
     directory_config	*root_config;
     int                 db_option;
-    int                 test_ip_range;
     void                *agmdb_handles;    
     
 #if 0
