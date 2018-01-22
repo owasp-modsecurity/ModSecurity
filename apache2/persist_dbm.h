@@ -19,8 +19,9 @@
 #include "modsecurity.h"
 
 /* The DB Option Definition */
-#define DB_OPT_AGMDB    1
 #define DB_OPT_ORIGIN   0
+#ifdef MEMORY_DATABASE_ENABLE
+#define DB_OPT_AGMDB    1
 
 /*
 * The maximum number of entries that database can support.
@@ -34,7 +35,7 @@ struct agmdb_handle_entry{
     void* handle;
     struct agmdb_handle_entry *next;
 };
-
+#endif
 apr_table_t DSOLOCAL *collection_retrieve(modsec_rec *msr, const char *col_name,
     const char *col_value, int col_value_length);
 

@@ -14,17 +14,11 @@
 
 #include "persist_dbm.h"
 #include "apr_sdbm.h"
+#ifdef MEMORY_DATABASE_ENABLE
 #include "ag_mdb_external.h"
-#include "errno.h"
-#include "time.h"
-#include "modsecurity.h"
-#include "string.h"
-#include "stdio.h"
+#endif
 
-//debug code
-#include <stdio.h>
-#define INVALID_DBM_ID -1
-
+#ifdef MEMORY_DATABASE_ENABLE
 void* dcfg_searchAGMDBhandler(const char* col_name, struct agmdb_handle_entry *handles){
     struct agmdb_handle_entry *handle_entry = handles;
     while(handle_entry != NULL){
@@ -42,7 +36,7 @@ void dcfg_insertAGMDBhandler(directory_config *root_dcfg, struct agmdb_handle_en
     new_handle->next = (struct agmdb_handle_entry *)root_dcfg->agmdb_handles;
     root_dcfg->agmdb_handles = (void*)new_handle;
 }
-
+#endif
 /**
  *
  */
@@ -128,13 +122,13 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
     int i;
     int rc;
     int tmp_val_len = 0;
-
+#ifdef MEMORY_DATABASE_ENABLE
     directory_config * root_dcfg;
 
     //variables used for ag_dbm 
     struct agmdb_handler *ag_dbm = NULL;
     char buffer[AGMDB_MAX_ENTRY_SIZE];
-    
+#endif
     //variables used for apr_sdbm
     struct apr_sdbm_t *apr_dbm = NULL;
     char *dbm_filename = NULL;
@@ -153,6 +147,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
     //---------------------------------
     //open database
     //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
     root_dcfg = msr->dcfg1->root_config;
     if(db_option == DB_OPT_AGMDB){
         if (existing_dbm == NULL) {
@@ -165,6 +160,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
         }
     }
     else{
+#endif
         if (msr->txcfg->data_dir == NULL) {
             msr_log(msr, 1, "collection_retrieve_ex_origin: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
                 "SecDataDir to define data directory first.", log_escape(msr->mp, col_name),
@@ -196,7 +192,9 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
         else {
             apr_dbm = existing_dbm;
         }
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
     
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "collection_retrieve_ex: collection_retrieve_ex: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
@@ -214,6 +212,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
     //---------------------------------
     //get the key
     //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
     if(db_option == DB_OPT_AGMDB){
         //if not called by collection_store(), need to get lock
         if(existing_dbm == NULL ){
@@ -244,6 +243,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
         value->dsize = tmp_val_len;
     }
     else{
+#endif
         rc = apr_sdbm_fetch(apr_dbm, value, key);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "collection_retrieve_ex: Failed to read from DBM file \"%s\": %s", log_escape(msr->mp,
@@ -261,7 +261,9 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
 #endif
             apr_dbm = NULL;
         }
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
 
     //---------------------------------
     //unpack the collection
@@ -313,6 +315,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
     //---------------------------------
     if (apr_table_get(col, "KEY") == NULL) {
         int fail_flag = 0;
+#ifdef MEMORY_DATABASE_ENABLE        
         if(db_option == DB_OPT_AGMDB){
             if(existing_dbm == NULL){
                 rc = AGMDB_getExclusiveLock(ag_dbm);
@@ -334,6 +337,7 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
             }
         }
         else{
+#endif
             if (existing_dbm == NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
                 rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
@@ -369,7 +373,9 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
 #endif
                 apr_dbm = NULL;
             }
+#ifdef MEMORY_DATABASE_ENABLE             
         }
+#endif        
 
         
         if (fail_flag == 1) {
@@ -452,17 +458,21 @@ static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, mo
 
     return col;
 cleanup:
+#ifdef MEMORY_DATABASE_ENABLE
     if(db_option == DB_OPT_AGMDB){
         return NULL;
     }
     else{
+#endif
         if ((existing_dbm == NULL) && apr_dbm) {
             apr_sdbm_close(apr_dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
             apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #endif
         }
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
     return NULL;    
 }
 
@@ -475,13 +485,16 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
 
     apr_time_t time_before = apr_time_now();
     apr_table_t *rtable = NULL;
-
+#ifdef MEMORY_DATABASE_ENABLE
     if(msr->dcfg1->db_option == DB_OPT_AGMDB){
         rtable = collection_retrieve_ex(DB_OPT_AGMDB , NULL, msr, col_name, col_key, col_key_len);
     }
     if(msr->dcfg1->db_option == DB_OPT_ORIGIN){
+#endif
         rtable = collection_retrieve_ex(DB_OPT_ORIGIN, NULL, msr, col_name, col_key, col_key_len);
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
     msr->time_storage_read += apr_time_now() - time_before;
     
     return rtable;
@@ -504,12 +517,13 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     const apr_table_t *orig_col = NULL;
 
     directory_config *dcfg = msr->dcfg1;
+#ifdef MEMORY_DATABASE_ENABLE
     directory_config *root_dcfg = dcfg->root_config;
 
     //variable used for AGMDB
     struct agmdb_handler *ag_dbm = NULL;
     struct agmdb_handle_entry *new_handle;
-
+#endif
     //variable used for apr_sdbm
     char *dbm_filename = NULL;
     apr_sdbm_t *apr_dbm = NULL;
@@ -591,6 +605,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     //---------------------------------
     //open database
     //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
     if(db_option == DB_OPT_AGMDB){
         ag_dbm = dcfg_searchAGMDBhandler(var_name->value, (struct agmdb_handle_entry*)(msr->dcfg1->agmdb_handles));
         if(ag_dbm == NULL) {
@@ -616,6 +631,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         }
     }
     else{
+#endif
         // ENH: lowercase the var name in the filename
         dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
         if (msr->txcfg->debuglog_level >= 9) {
@@ -644,13 +660,14 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             apr_dbm = NULL;
             goto error;
         }
-
+#ifdef MEMORY_DATABASE_ENABLE
     }
-
+#endif
 
     //---------------------------------
     //Lock and prepare to get the original collection
     //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
     if(db_option == DB_OPT_AGMDB){
         rc = AGMDB_getExclusiveLock(ag_dbm);
         if (AGMDB_isError(rc)) {
@@ -664,6 +681,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         }
     }
     else{
+#endif 
 #ifndef GLOBAL_COLLECTION_LOCK
         /* Need to lock to pull in the stored data again and apply deltas. */
         rc = apr_sdbm_lock(apr_dbm, APR_FLOCK_EXCLUSIVE);
@@ -673,7 +691,9 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             goto error;
         }
 #endif
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
 
     //---------------------------------
     //get the origin record
@@ -684,10 +704,11 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             msr_log(msr, 9, "collection_store: Re-retrieving collection prior to store: %s",
                 apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
         }
-        //msr_log(msr, 1,"[Debug]Collection_store_ex_origin: Call retrieve.");
+#ifdef MEMORY_DATABASE_ENABLE
         if(db_option == DB_OPT_AGMDB)
             stored_col = (const apr_table_t *)collection_retrieve_ex(db_option, ag_dbm, msr, var_name->value, var_key->value, var_key->value_len);
         else
+#endif
             stored_col = (const apr_table_t *)collection_retrieve_ex(db_option, apr_dbm, msr, var_name->value, var_key->value, var_key->value_len);
     }
 
@@ -740,6 +761,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     }
 
     /* Now generate the binary object. */
+#ifdef MEMORY_DATABASE_ENABLE
     if(db_option == DB_OPT_AGMDB){
         blob = apr_pcalloc(msr->mp, blob_size);
         if (blob == NULL) {
@@ -753,6 +775,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         }
     }
     else{
+#endif
         blob = apr_pcalloc(msr->mp, blob_size);
         if (blob == NULL) {
             if (apr_dbm != NULL) {
@@ -766,7 +789,9 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             }
             return -1;
         }
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
 
     blob[0] = 0x49;
     blob[1] = 0x52;
@@ -816,6 +841,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
     value.dptr = (char *)blob;
     value.dsize = blob_size;
 
+#ifdef MEMORY_DATABASE_ENABLE
     if(db_option == DB_OPT_AGMDB) {
         rc = AGMDB_set(ag_dbm, var_key->value, var_key->value_len, (char*)blob, blob_size);
         if(AGMDB_isError(rc)) {
@@ -829,6 +855,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         }
     }
     else {
+#endif
         rc = apr_sdbm_store(apr_dbm, key, value, APR_SDBM_REPLACE);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s", dbm_filename,
@@ -852,7 +879,9 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         apr_sdbm_unlock(apr_dbm);
         apr_sdbm_close(apr_dbm);
 #endif
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "collection_store: Persisted collection (name \"%s\", key \"%s\").",
@@ -871,12 +900,16 @@ error:
  */
 int collection_store(modsec_rec *msr, apr_table_t *col){
     int rc;
+#ifdef MEMORY_DATABASE_ENABLE
     if(msr->dcfg1->db_option == DB_OPT_AGMDB){
         rc = collection_store_ex(DB_OPT_AGMDB , msr, col);
     }
     if(msr->dcfg1->db_option == DB_OPT_ORIGIN){
+#endif
         rc = collection_store_ex(DB_OPT_ORIGIN, msr, col);
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
     return rc;
 }
 
@@ -884,10 +917,11 @@ int collection_store(modsec_rec *msr, apr_table_t *col){
  *
  */
 static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const char *col_name, int time_sec){
+#ifdef MEMORY_DATABASE_ENABLE
     //variables for AGMDB
     struct agmdb_handler *ag_dbm = NULL;
     directory_config * root_dcfg = msr->dcfg1->root_config;
-    
+#endif
     //variables for apr_sdbm
     char *dbm_filename = NULL;
     apr_sdbm_datum_t key, value;
@@ -901,6 +935,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
     //---------------------------------
     //AGMDB
     //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
     if(db_option == DB_OPT_AGMDB){
         if(root_dcfg == NULL)
             return -1;
@@ -911,6 +946,7 @@ static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const cha
         if(AGMDB_isError(rc2))
         msr_log(msr, 1, "collections_remove_stale_ex_agmdb: error in remove stale. Error info: %s", AGMDB_getErrorInfo(rc2));
     }
+#endif
     //---------------------------------
     //apr_sdbm
     //---------------------------------
@@ -1068,11 +1104,15 @@ error:
 int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     int rc;
     int time_sec = (int)time(NULL);
+#ifdef MEMORY_DATABASE_ENABLE
     if(msr->dcfg1->db_option == DB_OPT_AGMDB){
         return collections_remove_stale_ex(DB_OPT_AGMDB , msr, col_name, time_sec);       
     }
     if(msr->dcfg1->db_option == DB_OPT_ORIGIN){
+#endif
         return collections_remove_stale_ex(DB_OPT_ORIGIN, msr, col_name, time_sec);
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
     
 }

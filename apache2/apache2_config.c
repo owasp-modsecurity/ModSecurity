@@ -45,11 +45,11 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     dcfg->mp = mp;
     dcfg->is_enabled = NOT_SET;
-    
+#ifdef MEMORY_DATABASE_ENABLE
     dcfg->root_config = NOT_SET_P;
     dcfg->db_option = 0;
     dcfg->agmdb_handles = NOT_SET_P;
-    
+#endif
     dcfg->reqbody_access = NOT_SET;
     dcfg->reqintercept_oe = NOT_SET;
     dcfg->reqbody_buffering = NOT_SET;
@@ -323,13 +323,14 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     /* Use values from the child configuration where possible,
      * otherwise use the parent's.
      */
+#ifdef MEMORY_DATABASE_ENABLE
     merged->root_config = (child->root_config == NOT_SET_P
         ? parent->root_config : child->root_config);
     merged->db_option = (child->db_option == NOT_SET
         ? parent->db_option : child->db_option);
     merged->agmdb_handles = (child->agmdb_handles == NOT_SET_P
         ? parent->agmdb_handles : child->agmdb_handles);
-
+#endif
     merged->is_enabled = (child->is_enabled == NOT_SET
         ? parent->is_enabled : child->is_enabled);
 
@@ -650,11 +651,11 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 void init_directory_config(directory_config *dcfg)
 {
     if (dcfg == NULL) return;
-
+#ifdef MEMORY_DATABASE_ENABLE
     if (dcfg->root_config == NOT_SET_P) dcfg->root_config = NULL;
     if (dcfg->db_option == NOT_SET) dcfg->db_option = 0;
     if (dcfg->agmdb_handles == NOT_SET_P) dcfg->agmdb_handles = NULL;
-    
+#endif
     if (dcfg->is_enabled == NOT_SET) dcfg->is_enabled = 0;
 
     if (dcfg->reqbody_access == NOT_SET) dcfg->reqbody_access = 0;
@@ -1142,6 +1143,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     return NULL;
 }
 
+#ifdef MEMORY_DATABASE_ENABLE
 static const char *cmd_db_option(cmd_parms *cmd, void *_dcfg, const char *p1){
     directory_config *dcfg = (directory_config *)_dcfg;
     if((strcmp(p1,"origin") == 0))
@@ -1154,7 +1156,7 @@ static const char *cmd_db_option(cmd_parms *cmd, void *_dcfg, const char *p1){
         dcfg->db_option = DB_OPT_ORIGIN;
     return NULL;
 }
-
+#endif
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_ACTION, SECACTION_TARGETS, SECACTION_ARGS, p1);
@@ -3945,7 +3947,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "Set Hash parameter"
     ),
-
+#ifdef MEMORY_DATABASE_ENABLE
     AP_INIT_TAKE1 (
         "SecDBOption",
         cmd_db_option,
@@ -3953,6 +3955,6 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "Choose database. (origin/redis/agdb)"
     ),
-
+#endif
     { NULL }
 };
