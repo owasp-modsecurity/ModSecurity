@@ -55,8 +55,7 @@ standalone_la_CFLAGS = -DVERSION_NGINX \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
     @YAJL_CFLAGS@ \
-    @SSDEEP_CFLAGS@ \
-    -I../apache2/ag_mdb 
+    @SSDEEP_CFLAGS@
 
 standalone_la_CPPFLAGS = @APR_CPPFLAGS@ \
     @LIBXML2_CPPFLAGS@ \

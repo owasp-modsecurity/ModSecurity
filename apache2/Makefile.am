@@ -45,8 +45,7 @@ mod_security2_la_CFLAGS = @APR_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
     @YAJL_CFLAGS@ \
-    @SSDEEP_CFLAGS@ \
-    -I./ag_mdb 
+    @SSDEEP_CFLAGS@ 
 
 mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ \
     @CURL_CPPFLAGS@ \
@@ -130,7 +129,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version -R @PCRE_LD_PATH
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
-    @SSDEEP_LDFLAGS@ 
+    @SSDEEP_LDFLAGS@
 endif
 
 if FREEBSD
