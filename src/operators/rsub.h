@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_RSUB_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -28,10 +30,8 @@ namespace operators {
 class Rsub : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Rsub(std::string o, std::string p, bool n)
-        : Operator(o, p, n) { }
-    explicit Rsub(std::string param)
-        : Operator("Rsub", param) { }
+    explicit Rsub(std::unique_ptr<RunTimeString> param)
+        : Operator("Rsub", std::move(param)) { }
     bool evaluate(Transaction *transaction, const std::string  &str) override;
 };
 

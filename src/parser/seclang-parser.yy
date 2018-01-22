@@ -885,18 +885,19 @@ op:
             YYERROR;
         }
       }
-    | OPERATOR_RX_CONTENT_ONLY
+    | run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Rx(utils::string::removeBracketsIfNeeded($1)));
+        OPERATOR_CONTAINER($$, new operators::Rx(std::move($1)));
         std::string error;
         if ($$->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
       }
-    | NOT OPERATOR_RX_CONTENT_ONLY
+    | NOT run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Rx("Rx", utils::string::removeBracketsIfNeeded($2), true));
+        OPERATOR_CONTAINER($$, new operators::Rx(std::move($2)));
+        $$->m_negation = true;
         std::string error;
         if ($$->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
@@ -926,141 +927,126 @@ op_before_init:
       {
         OPERATOR_CONTAINER($$, new operators::ValidateUtf8Encoding());
       }
-    | OPERATOR_INSPECT_FILE FREE_TEXT
+    | OPERATOR_INSPECT_FILE run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::InspectFile($2));
-        std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        OPERATOR_CONTAINER($$, new operators::InspectFile(std::move($2)));
       }
-    | OPERATOR_FUZZY_HASH FREE_TEXT
+    | OPERATOR_FUZZY_HASH run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::FuzzyHash(utils::string::removeBracketsIfNeeded($2)));
-        std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        OPERATOR_CONTAINER($$, new operators::FuzzyHash(std::move($2)));
       }
-    | OPERATOR_VALIDATE_BYTE_RANGE FREE_TEXT
+    | OPERATOR_VALIDATE_BYTE_RANGE run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::ValidateByteRange($2));
+        OPERATOR_CONTAINER($$, new operators::ValidateByteRange(std::move($2)));
       }
-    | OPERATOR_VALIDATE_DTD FREE_TEXT
+    | OPERATOR_VALIDATE_DTD run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::ValidateDTD($2));
+        OPERATOR_CONTAINER($$, new operators::ValidateDTD(std::move($2)));
       }
-    | OPERATOR_VALIDATE_HASH FREE_TEXT
+    | OPERATOR_VALIDATE_HASH run_time_string
       {
         /* $$ = new operators::ValidateHash($1); */
         OPERATOR_NOT_SUPPORTED("ValidateHash", @0);
       }
-    | OPERATOR_VALIDATE_SCHEMA FREE_TEXT
+    | OPERATOR_VALIDATE_SCHEMA run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::ValidateSchema($2));
+        OPERATOR_CONTAINER($$, new operators::ValidateSchema(std::move($2)));
       }
-    | OPERATOR_VERIFY_CC FREE_TEXT
+    | OPERATOR_VERIFY_CC run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::VerifyCC($2));
+        OPERATOR_CONTAINER($$, new operators::VerifyCC(std::move($2)));
       }
-    | OPERATOR_VERIFY_CPF FREE_TEXT
+    | OPERATOR_VERIFY_CPF run_time_string
       {
         /* $$ = new operators::VerifyCPF($1); */
         OPERATOR_NOT_SUPPORTED("VerifyCPF", @0);
       }
-    | OPERATOR_VERIFY_SSN FREE_TEXT
+    | OPERATOR_VERIFY_SSN run_time_string
       {
         /* $$ = new operators::VerifySSN($1); */
         OPERATOR_NOT_SUPPORTED("VerifySSN", @0);
       }
-    | OPERATOR_GSB_LOOKUP FREE_TEXT
+    | OPERATOR_GSB_LOOKUP run_time_string
       {
         /* $$ = new operators::GsbLookup($1); */
         OPERATOR_NOT_SUPPORTED("GsbLookup", @0);
       }
-    | OPERATOR_RSUB FREE_TEXT
+    | OPERATOR_RSUB run_time_string
       {
         /* $$ = new operators::Rsub($1); */
         OPERATOR_NOT_SUPPORTED("Rsub", @0);
       }
-    | OPERATOR_WITHIN FREE_TEXT
+    | OPERATOR_WITHIN run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Within($2));
+        OPERATOR_CONTAINER($$, new operators::Within(std::move($2)));
       }
-    | OPERATOR_CONTAINS_WORD FREE_TEXT
+    | OPERATOR_CONTAINS_WORD run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::ContainsWord($2));
+        OPERATOR_CONTAINER($$, new operators::ContainsWord(std::move($2)));
       }
-    | OPERATOR_CONTAINS FREE_TEXT
+    | OPERATOR_CONTAINS run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Contains($2));
+        OPERATOR_CONTAINER($$, new operators::Contains(std::move($2)));
       }
-    | OPERATOR_ENDS_WITH FREE_TEXT
+    | OPERATOR_ENDS_WITH run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::EndsWith($2));
+        OPERATOR_CONTAINER($$, new operators::EndsWith(std::move($2)));
       }
-    | OPERATOR_EQ FREE_TEXT
+    | OPERATOR_EQ run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Eq($2));
+        OPERATOR_CONTAINER($$, new operators::Eq(std::move($2)));
       }
-    | OPERATOR_GE FREE_TEXT
+    | OPERATOR_GE run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Ge($2));
+        OPERATOR_CONTAINER($$, new operators::Ge(std::move($2)));
       }
-    | OPERATOR_GT FREE_TEXT
+    | OPERATOR_GT run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Gt($2));
+        OPERATOR_CONTAINER($$, new operators::Gt(std::move($2)));
       }
-    | OPERATOR_IP_MATCH_FROM_FILE FREE_TEXT
+    | OPERATOR_IP_MATCH_FROM_FILE run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::IpMatchF($2));
+        OPERATOR_CONTAINER($$, new operators::IpMatchF(std::move($2)));
       }
-    | OPERATOR_IP_MATCH FREE_TEXT
+    | OPERATOR_IP_MATCH run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::IpMatch($2));
+        OPERATOR_CONTAINER($$, new operators::IpMatch(std::move($2)));
       }
-    | OPERATOR_LE FREE_TEXT
+    | OPERATOR_LE run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Le($2));
+        OPERATOR_CONTAINER($$, new operators::Le(std::move($2)));
       }
-    | OPERATOR_LT FREE_TEXT
+    | OPERATOR_LT run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Lt($2));
+        OPERATOR_CONTAINER($$, new operators::Lt(std::move($2)));
       }
-    | OPERATOR_PM_FROM_FILE FREE_TEXT
+    | OPERATOR_PM_FROM_FILE run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::PmFromFile($2));
+        OPERATOR_CONTAINER($$, new operators::PmFromFile(std::move($2)));
       }
-    | OPERATOR_PM FREE_TEXT
+    | OPERATOR_PM run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Pm($2));
+        OPERATOR_CONTAINER($$, new operators::Pm(std::move($2)));
       }
-    | OPERATOR_RBL FREE_TEXT
+    | OPERATOR_RBL run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Rbl($2));
+        OPERATOR_CONTAINER($$, new operators::Rbl(std::move($2)));
       }
-    | OPERATOR_RX FREE_TEXT
+    | OPERATOR_RX run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::Rx($2));
-        std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        OPERATOR_CONTAINER($$, new operators::Rx(std::move($2)));
       }
-    | OPERATOR_STR_EQ FREE_TEXT
+    | OPERATOR_STR_EQ run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::StrEq($2));
+        OPERATOR_CONTAINER($$, new operators::StrEq(std::move($2)));
       }
-    | OPERATOR_STR_MATCH FREE_TEXT
+    | OPERATOR_STR_MATCH run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::StrMatch($2));
+        OPERATOR_CONTAINER($$, new operators::StrMatch(std::move($2)));
       }
-    | OPERATOR_BEGINS_WITH FREE_TEXT
+    | OPERATOR_BEGINS_WITH run_time_string
       {
-        OPERATOR_CONTAINER($$, new operators::BeginsWith($2));
+        OPERATOR_CONTAINER($$, new operators::BeginsWith(std::move($2)));
       }
     | OPERATOR_GEOLOOKUP
       {

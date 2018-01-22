@@ -4,7 +4,7 @@
     "version_min":300000,
     "title":"Include - bad rule",
     "expected":{
-      "parser_error": "Rules error. File: test-cases/data/config_example3.txt. Line: 2. Column: 66. Invalid action:  ops \"id:1000,pass,t:trim\""
+      "parser_error": "Rules error. File: test-cases/data/config_example3.txt. Line: 2. Column: 66. Expecting an action, got:  ops \"id:1000,pass,t:trim\""
     },
     "rules":[
       "SecRuleEngine On",

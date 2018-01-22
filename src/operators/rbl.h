@@ -23,6 +23,8 @@
 #include <arpa/inet.h>
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -59,24 +61,10 @@ class Rbl : public Operator {
     };
 
     /** @ingroup ModSecurity_Operator */
-    Rbl(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation),
-        m_service(param),
+    explicit Rbl(std::unique_ptr<RunTimeString> param)
+        : Operator("Rbl", std::move(param)),
         m_demandsPassword(false) {
-            m_provider = RblProvider::UnknownProvider;
-            if (m_service.find("httpbl.org") != std::string::npos) {
-                m_demandsPassword = true;
-                m_provider = RblProvider::httpbl;
-            } else if (m_service.find("uribl.com") != std::string::npos) {
-                m_provider = RblProvider::httpbl;
-            } else if (m_service.find("spamhaus.org") != std::string::npos) {
-                m_provider = RblProvider::httpbl;
-            }
-        }
-    explicit Rbl(std::string param)
-        : Operator("Rbl", param),
-        m_service(param),
-        m_demandsPassword(false) {
+            m_service = m_string->evaluate();
             m_provider = RblProvider::UnknownProvider;
             if (m_service.find("httpbl.org") != std::string::npos) {
                 m_demandsPassword = true;

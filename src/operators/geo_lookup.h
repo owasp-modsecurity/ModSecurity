@@ -27,10 +27,6 @@ namespace operators {
 class GeoLookup : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    GeoLookup(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit GeoLookup(std::string param)
-        : Operator("GeoLookup", param) { }
     GeoLookup()
         : Operator("GeoLookup") { }
     bool evaluate(Transaction *transaction, const std::string &exp) override;

@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 #include "src/utils/regex.h"
@@ -33,17 +34,9 @@ namespace operators {
 class VerifySSN : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    VerifySSN(std::string o, std::string p, bool n)
-        : Operator(o, p, n) {
-        m_re = new Regex(p);
-    }
-    VerifySSN(std::string name, std::string param)
-        : Operator(name, param) {
-        m_re = new Regex(param);
-    }
-    explicit VerifySSN(std::string param)
-        : Operator("VerifySSN", param) {
-        m_re = new Regex(param);
+    explicit VerifySSN(std::unique_ptr<RunTimeString> param)
+        : Operator("VerifySSN", std::move(param)) {
+        m_re = new Regex(m_param);
     }
 
     ~VerifySSN() {

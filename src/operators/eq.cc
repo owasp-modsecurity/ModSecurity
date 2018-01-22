@@ -27,8 +27,7 @@ namespace operators {
 bool Eq::evaluate(Transaction *transaction, const std::string &input) {
     int p = 0;
     int i = 0;
-    bool eq = false;
-    std::string pt = MacroExpansion::expand(m_param, transaction);
+    std::string pt(m_string->evaluate(transaction));
 
     try {
         p = std::stoi(pt);
@@ -41,9 +40,7 @@ bool Eq::evaluate(Transaction *transaction, const std::string &input) {
         i = 0;
     }
 
-    eq = p == i;
-
-    return eq;
+    return p == i;
 }
 
 

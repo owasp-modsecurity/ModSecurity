@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_IP_MATCH_F_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/ip_match_from_file.h"
 
@@ -26,10 +28,8 @@ namespace operators {
 
 class IpMatchF : public IpMatchFromFile {
  public:
-    IpMatchF(std::string op, std::string param, bool negation)
-        : IpMatchFromFile(op, param, negation) { }
-    explicit IpMatchF(std::string param)
-        : IpMatchFromFile("IpMatchFromF", param) { }
+    explicit IpMatchF(std::unique_ptr<RunTimeString> param)
+        : IpMatchFromFile(std::move(param)) { }
 };
 
 }  // namespace operators

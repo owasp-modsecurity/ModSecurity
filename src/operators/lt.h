@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_LT_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -27,10 +29,10 @@ namespace operators {
 class Lt : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Lt(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit Lt(std::string param)
-        : Operator("Lt", param) { }
+    explicit Lt(std::unique_ptr<RunTimeString> param)
+        : Operator("Lt", std::move(param)) {
+             m_couldContainsMacro = true;
+        }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
 };

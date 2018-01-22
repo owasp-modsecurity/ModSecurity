@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -28,10 +29,10 @@ namespace operators {
 class EndsWith : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    EndsWith(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit EndsWith(std::string param)
-        : Operator("EndsWith", param) { }
+    explicit EndsWith(std::unique_ptr<RunTimeString> param)
+        : Operator("EndsWith", std::move(param)) {
+            m_couldContainsMacro = true;
+        }
     bool evaluate(Transaction *transaction, Rule *rule,
         const std::string &str,
         std::shared_ptr<RuleMessage> ruleMessage) override;

@@ -238,19 +238,7 @@ void Rule::updateRulesVariable(Transaction *trans) {
 }
 
 
-std::string Rule::resolveMatchMessage(std::string key, std::string value) {
-    std::string ret = this->m_op->m_match_message;
 
-    if (ret.empty() == true) {
-        ret = "Matched \"Operator `" + this->m_op->m_op + "' with parameter `" +
-            utils::string::limitTo(200, this->m_op->m_param) +
-            "' against variable `" + key + "' (Value: `" +
-            utils::string::limitTo(100, utils::string::toHexIfNeeded(value)) +
-            "' )";
-    }
-
-    return ret;
-}
 
 
 void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
@@ -784,14 +772,15 @@ bool Rule::evaluate(Transaction *trans,
         return true;
     }
 
-    eparam = MacroExpansion::expand(this->m_op->m_param, trans);
+    if (m_op->m_string) {
+        eparam = m_op->m_string->evaluate(trans);
 
-    if (this->m_op->m_param != eparam) {
-        eparam = "\"" + eparam + "\" Was: \"" + this->m_op->m_param + "\"";
-    } else {
-        eparam = "\"" + eparam + "\"";
-    }
-
+        if (m_op->m_string->containsMacro()) {
+            eparam = "\"" + eparam + "\" Was: \"" \
+                + m_op->m_string->evaluate(NULL) + "\"";
+        } else {
+            eparam = "\"" + eparam + "\"";
+        }
 #ifndef NO_LOGS
     trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
         + ") Executing operator \"" + this->m_op->m_op \
@@ -800,6 +789,14 @@ bool Rule::evaluate(Transaction *trans,
         + " against " \
         + Variable::to_s(variables) + ".");
 #endif
+    } else {
+#ifndef NO_LOGS
+    trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
+        + ") Executing operator \"" + this->m_op->m_op \
+        + " against " \
+        + Variable::to_s(variables) + ".");
+#endif
+    }
 
     updateRulesVariable(trans);
 
@@ -823,7 +820,8 @@ bool Rule::evaluate(Transaction *trans,
             ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
 
             if (ret == true) {
-                ruleMessage->m_match = resolveMatchMessage(key, value);
+                ruleMessage->m_match = m_op->resolveMatchMessage(trans,
+                    key, value);
                 for (auto &i : v->m_orign) {
                     ruleMessage->m_reference.append(i->toText());
                 }

@@ -24,7 +24,7 @@ namespace operators {
 
 bool Contains::evaluate(Transaction *transaction, Rule *rule,
         const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
-    std::string p = MacroExpansion::expand(m_param, transaction);
+    std::string p(m_string->evaluate(transaction));
     size_t offset = input.find(p);
 
     bool contains = offset != std::string::npos;

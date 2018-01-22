@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -28,10 +29,10 @@ namespace operators {
 class Within : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Within(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit Within(std::string param)
-        : Operator("Within", param) { }
+    explicit Within(std::unique_ptr<RunTimeString> param)
+        : Operator("Within", std::move(param)) {
+            m_couldContainsMacro = true;
+        }
     bool evaluate(Transaction *transaction, Rule *rule,
         const std::string &str, std::shared_ptr<RuleMessage> ruleMessage);
 };

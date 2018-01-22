@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_GSBLOOKUP_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -26,10 +28,8 @@ namespace operators {
 class GsbLookup : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    GsbLookup(std::string o, std::string p, bool n)
-        : Operator(o, p, n) { }
-    explicit GsbLookup(std::string param)
-        : Operator("GsbLookup", param) { }
+    explicit GsbLookup(std::unique_ptr<RunTimeString> param)
+        : Operator("GsbLookup", std::move(param)) { }
 
     bool evaluate(Transaction *transaction, const std::string &str);
 };

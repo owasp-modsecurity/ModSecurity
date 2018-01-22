@@ -27,7 +27,7 @@
   },
   "expected": {
     "debug_log": "Rule returned 1",
-    "error_log": "Matched \"Operator `Rx' with parameter `\\^%{tx\\.bad_value}\\$' against variable `ARGS:param' \\(Value: `attack' "
+    "error_log": "Matched \"Operator `Rx' with parameter `\\^attack\\$'"
   },
   "rules": [
     "SecRuleEngine On",

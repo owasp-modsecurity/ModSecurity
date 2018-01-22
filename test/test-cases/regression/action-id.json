@@ -80,7 +80,7 @@
       ]
     },
     "expected":{
-      "parser_error": "File: action-id.json. Line: 2. Column: 56. Invalid action:  id:-1,phase:2,pass,t:trim\""
+      "parser_error": "File: action-id.json. Line: 2. Column: 56. Expecting an action, got:  id:-1,phase:2,pass,t:trim\""
     },
     "rules":[
       "SecRuleEngine On",
@@ -212,7 +212,7 @@
       ]
     },
     "expected":{
-      "parser_error": "action-id.json. Line: 2. Column: 56. Invalid action:  id:'1,phase:2,pass,t:trim\""
+      "parser_error": "action-id.json. Line: 2. Column: 56. Expecting an action, got:  id:'1,phase:2,pass,t:trim\""
     },
     "rules":[
       "SecRuleEngine On",
@@ -256,7 +256,7 @@
       ]
     },
     "expected":{
-      "parser_error": "action-id.json. Line: 2. Column: 56. Invalid action:  ',phase:2,pass,t:trim\""
+      "parser_error": "action-id.json. Line: 2. Column: 56. Expecting an action, got:  ',phase:2,pass,t:trim\""
     },
     "rules":[
       "SecRuleEngine On",

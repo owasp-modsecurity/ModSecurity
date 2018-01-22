@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_LE_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -27,10 +29,10 @@ namespace operators {
 class Le : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Le(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit Le(std::string param)
-        : Operator("Le", param) { }
+    explicit Le(std::unique_ptr<RunTimeString> param)
+        : Operator("Le", std::move(param)) {
+            m_couldContainsMacro = true;
+        }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
 };

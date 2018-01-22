@@ -29,8 +29,6 @@ namespace operators {
 class NoMatch : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    NoMatch(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
     NoMatch()
         : Operator("NoMatch") { }
 

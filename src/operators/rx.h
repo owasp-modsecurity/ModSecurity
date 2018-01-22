@@ -19,6 +19,7 @@
 #include <string>
 #include <list>
 #include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 #include "src/utils/regex.h"
@@ -35,21 +36,13 @@ namespace operators {
 class Rx : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Rx(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation),
-        m_containsMacro(false) {
+    explicit Rx(std::unique_ptr<RunTimeString> param)
+        : Operator("Rx", std::move(param)) {
+            m_couldContainsMacro = true;
         }
-    Rx(std::string name, std::string param)
-        : Operator(name, param),
-        m_containsMacro(false) {
-    }
-    explicit Rx(std::string param)
-        : Operator("Rx", param),
-        m_containsMacro(false) {
-    }
 
     ~Rx() {
-        if (m_containsMacro == false && m_re != NULL) {
+        if (m_string->m_containsMacro == false && m_re != NULL) {
             delete m_re;
             m_re = NULL;
         }
@@ -68,8 +61,8 @@ class Rx : public Operator {
         std::shared_ptr<RuleMessage> ruleMessage) override;
 
     bool init(const std::string &arg, std::string *error);
+
  private:
-    bool m_containsMacro;
     Regex *m_re;
 };
 

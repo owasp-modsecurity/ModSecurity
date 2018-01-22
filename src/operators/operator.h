@@ -15,6 +15,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 
 #ifndef SRC_OPERATORS_OPERATOR_H__
 #define SRC_OPERATORS_OPERATOR_H__
@@ -22,6 +23,7 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
+#include "src/run_time_string.h"
 
 namespace modsecurity {
 namespace operators {
@@ -33,25 +35,70 @@ class Operator {
         : m_match_message(""),
         m_negation(false),
         m_op(""),
-        m_param("") { }
+        m_param(""),
+        m_couldContainsMacro(false) {
+            if (m_couldContainsMacro == false && m_string) {
+                m_param = m_string->evaluate();
+            }
+        }
 
     Operator(std::string opName, std::string param, bool negation)
         : m_match_message(""),
         m_negation(negation),
         m_op(opName),
-        m_param(param) { }
+        m_param(param),
+        m_couldContainsMacro(false) {
+            if (m_couldContainsMacro == false && m_string) {
+                m_param = m_string->evaluate();
+            }
+        }
+
+    Operator(std::string opName, std::unique_ptr<RunTimeString> param,
+        bool negation)
+        : m_match_message(""),
+        m_negation(negation),
+        m_op(opName),
+        m_param(""),
+        m_string(std::move(param)),
+        m_couldContainsMacro(false) {
+            if (m_couldContainsMacro == false && m_string) {
+                m_param = m_string->evaluate();
+            }
+        }
 
     Operator(std::string opName, std::string param)
         : m_match_message(""),
         m_negation(false),
         m_op(opName),
-        m_param(param) { }
+        m_param(param),
+        m_couldContainsMacro(false) {
+            if (m_couldContainsMacro == false && m_string) {
+                m_param = m_string->evaluate();
+            }
+        }
+
+    Operator(std::string opName, std::unique_ptr<RunTimeString> param)
+        : m_match_message(""),
+        m_negation(false),
+        m_op(opName),
+        m_param(""),
+        m_string(std::move(param)),
+        m_couldContainsMacro(false) {
+            if (m_couldContainsMacro == false && m_string) {
+                m_param = m_string->evaluate();
+            }
+        }
 
     explicit Operator(std::string opName)
         : m_match_message(""),
         m_negation(false),
         m_op(opName),
-        m_param() { }
+        m_param(),
+        m_couldContainsMacro(false) {
+            if (m_couldContainsMacro == false && m_string) {
+                m_param = m_string->evaluate();
+            }
+        }
 
     virtual ~Operator() { }
     static Operator *instantiate(std::string opName, std::string param);
@@ -59,6 +106,9 @@ class Operator {
     virtual bool init(const std::string &arg, std::string *error) {
         return true;
     }
+
+    virtual std::string resolveMatchMessage(Transaction *t,
+        std::string key, std::string value);
 
     bool evaluateInternal(Transaction *t, const std::string& a);
     bool evaluateInternal(Transaction *t, Rule *rule,
@@ -90,6 +140,8 @@ class Operator {
     bool m_negation;
     std::string m_op;
     std::string m_param;
+    std::unique_ptr<RunTimeString> m_string;
+    bool m_couldContainsMacro;
 
  protected:
     bool debug(Transaction *transaction, int x, std::string a);

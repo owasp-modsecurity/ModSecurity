@@ -28,8 +28,6 @@ namespace operators {
 class ValidateUrlEncoding : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ValidateUrlEncoding(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
     ValidateUrlEncoding()
         : Operator("ValidateUrlEncoding") { }
 

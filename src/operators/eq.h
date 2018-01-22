@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_EQ_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -27,10 +29,8 @@ namespace operators {
 class Eq : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Eq(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit Eq(std::string param)
-        : Operator("Eq", param) { }
+    explicit Eq(std::unique_ptr<RunTimeString> param)
+        : Operator("Eq", std::move(param)) { }
     bool evaluate(Transaction *transaction, const std::string &input) override;
 };
 

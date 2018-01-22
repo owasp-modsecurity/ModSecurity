@@ -27,8 +27,8 @@ namespace operators {
 bool Within::evaluate(Transaction *transaction, Rule *rule,
     const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) {
     bool res = false;
-    std::string paramTarget = MacroExpansion::expand(m_param, transaction);
     size_t pos = 0;
+    std::string paramTarget(m_string->evaluate(transaction));
 
     if (str.empty()) {
         return true;

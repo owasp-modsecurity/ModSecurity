@@ -15,6 +15,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 
 #include "modsecurity/actions/action.h"
 #include "src/run_time_string.h"
@@ -31,9 +32,6 @@ namespace actions {
 
 class Tag : public Action {
  public:
-    explicit Tag(std::string action)
-        : Action(action, RunTimeOnlyIfMatchKind) { }
-
     explicit Tag(std::unique_ptr<RunTimeString> z)
         : Action("tag", RunTimeOnlyIfMatchKind),
         m_string(std::move(z)) { }
@@ -43,6 +41,7 @@ class Tag : public Action {
     bool evaluate(Rule *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;
 
+ protected:
     std::unique_ptr<RunTimeString> m_string;
 };
 

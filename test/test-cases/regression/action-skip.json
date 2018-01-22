@@ -38,7 +38,7 @@
     "version_min":300000,
     "title":"Testing skip action 2/3",
     "expected":{
-      "parser_error": "Rules error. File: action-skip.json. Line: 2. Column: 71. Invalid action:  skip:abc"
+      "parser_error": "Rules error. File: action-skip.json. Line: 2. Column: 71. Expecting an action, got:  skip:abc"
     },
     "client":{
       "ip":"200.249.12.31",

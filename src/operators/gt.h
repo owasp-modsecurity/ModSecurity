@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_GT_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -27,10 +29,10 @@ namespace operators {
 class Gt : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Gt(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit Gt(std::string param)
-        : Operator("Gt", param) { }
+    explicit Gt(std::unique_ptr<RunTimeString> param)
+        : Operator("Gt", std::move(param)) {
+            m_couldContainsMacro = true;
+        }
     bool evaluate(Transaction *transaction, const std::string &input) override;
 };
 

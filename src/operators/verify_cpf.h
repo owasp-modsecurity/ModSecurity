@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 #include "src/utils/regex.h"
@@ -33,17 +34,9 @@ namespace operators {
 class VerifyCPF : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    VerifyCPF(std::string o, std::string p, bool n)
-        : Operator(o, p, n) {
-        m_re = new Regex(p);
-    }
-    VerifyCPF(std::string name, std::string param)
-        : Operator(name, param) {
-        m_re = new Regex(param);
-    }
-    explicit VerifyCPF(std::string param)
-        : Operator("VerifyCPF", param) {
-        m_re = new Regex(param);
+    explicit VerifyCPF(std::unique_ptr<RunTimeString> param)
+        : Operator("VerifyCPF", std::move(param)) {
+        m_re = new Regex(m_param);
     }
 
     ~VerifyCPF() {

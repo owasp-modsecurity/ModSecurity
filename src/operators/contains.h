@@ -19,6 +19,7 @@
 #include <string>
 #include <list>
 #include <memory>
+#include <utility>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule_message.h"
@@ -31,10 +32,8 @@ namespace operators {
 class Contains : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Contains(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit Contains(std::string param)
-        : Operator("Contains", param) { }
+    explicit Contains(std::unique_ptr<RunTimeString> param)
+        : Operator("Contains", std::move(param)) { }
     bool evaluate(Transaction *transaction, Rule *rule,
         const std::string &str,
         std::shared_ptr<RuleMessage> ruleMessage) override;

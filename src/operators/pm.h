@@ -19,6 +19,7 @@
 #include <string>
 #include <list>
 #include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 #include "src/utils/acmp.h"
@@ -31,16 +32,12 @@ namespace operators {
 class Pm : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Pm(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) {
+    explicit Pm(std::unique_ptr<RunTimeString> param)
+        : Operator("Pm", std::move(param)) {
         m_p = acmp_create(0);
     }
-    Pm(std::string op, std::string param)
-        : Operator(op, param) {
-        m_p = acmp_create(0);
-    }
-    explicit Pm(std::string param)
-        : Operator("Pm", param) {
+    explicit Pm(std::string n, std::unique_ptr<RunTimeString> param)
+        : Operator(n, std::move(param)) {
         m_p = acmp_create(0);
     }
     ~Pm();
