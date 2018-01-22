@@ -21,13 +21,14 @@
 #include "apr_lib.h"
 #include "acmp.h"
 #include "msc_crypt.h"
+#ifdef MEMORY_DATABASE_ENABLE
 #include "persist_dbm.h"
+#endif
 
 #if defined(WITH_LUA)
 #include "msc_lua.h"
 #endif
 
-#define MAX_LEN_OF_REDIS_IP_ADDR 15 
 
 /* -- Directory context creation and initialisation -- */
 
@@ -1143,6 +1144,8 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     return NULL;
 }
 
+/* -- Configuration directives -- */
+
 #ifdef MEMORY_DATABASE_ENABLE
 static const char *cmd_db_option(cmd_parms *cmd, void *_dcfg, const char *p1){
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1157,6 +1160,7 @@ static const char *cmd_db_option(cmd_parms *cmd, void *_dcfg, const char *p1){
     return NULL;
 }
 #endif
+
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_ACTION, SECACTION_TARGETS, SECACTION_ARGS, p1);

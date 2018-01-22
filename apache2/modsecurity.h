@@ -645,7 +645,7 @@ struct directory_config {
 
     /* This will be used whenever ModSecurity will be ready
      * to ask the server for newer rules.
-     */    
+     */
 #if 0
     msc_remote_rules_server *remote_rules;
     int remote_timeout;

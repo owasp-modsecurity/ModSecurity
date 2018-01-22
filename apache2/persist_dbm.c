@@ -47,9 +47,7 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
     unsigned int blob_offset;
 
     col = apr_table_make(msr->mp, 32);
-    if (col == NULL) {
-        return NULL;
-    }
+    if (col == NULL) return NULL;
 
     /* ENH verify the first 3 bytes (header) */
 

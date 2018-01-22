@@ -45,7 +45,8 @@ mod_security2_la_CFLAGS = @APR_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
     @YAJL_CFLAGS@ \
-    @SSDEEP_CFLAGS@ 
+    @SSDEEP_CFLAGS@
+
 
 mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ \
     @CURL_CPPFLAGS@ \

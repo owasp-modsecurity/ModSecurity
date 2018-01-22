@@ -1981,9 +1981,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         }
 
         table = apr_table_make(msr->mp, 24);
-        if (table == NULL) {
-            return -1;
-        }
+        if (table == NULL) return -1;
 
         /* IMP1 Is the timeout hard-coded to 3600? */
 
