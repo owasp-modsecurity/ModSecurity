@@ -23,34 +23,34 @@
 #include "src/variables/tx.h"
 #include "src/variables/highest_severity.h"
 #include "src/utils/string.h"
-
+#include "src/variables/variable.h"
 
 
 namespace modsecurity {
 
 
-void RunTimeString::appendText(std::string &text) {
+void RunTimeString::appendText(std::string text) {
     std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
     r->m_string = text;
     m_elements.push_back(std::move(r));
 }
 
 
-void RunTimeString::appendVar(std::unique_ptr<modsecurity::Variables::Variable> var) {
+void RunTimeString::appendVar(
+    std::unique_ptr<modsecurity::Variables::Variable> var) {
     std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
     r->m_var = std::move(var);
     m_elements.push_back(std::move(r));
+    m_containsMacro = true;
 }
 
 
 std::string RunTimeString::evaluate(Transaction *t) {
     std::string s;
-    //int i = 0;
     for (auto &z : m_elements) {
-        //s.append("Element: " + std::to_string(i) + " value: ");
         if (z->m_string.size() > 0) {
             s.append(z->m_string);
-        } else if (z->m_var != NULL) {
+        } else if (z->m_var != NULL && t != NULL) {
             std::vector<const collection::Variable *> l;
             z->m_var->evaluate(t, NULL, &l);
             if (l.size() > 0) {
@@ -60,9 +60,9 @@ std::string RunTimeString::evaluate(Transaction *t) {
                 delete i;
             }
         }
-        //s.append(" -- ");
     }
     return s;
 }
+
 
 }  // namespace modsecurity

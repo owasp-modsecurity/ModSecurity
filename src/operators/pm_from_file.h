@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_PM_FROM_FILE_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/pm.h"
 
@@ -28,12 +30,11 @@ namespace operators {
 class PmFromFile : public Pm {
  public:
     /** @ingroup ModSecurity_Operator */
-    PmFromFile(std::string op, std::string param, bool negation)
-        : Pm(op, param, negation) { }
-    PmFromFile(std::string op, std::string param)
-        : Pm(op, param) { }
-    explicit PmFromFile(std::string param)
-        : Pm("PmFromFile", param) { }
+    explicit PmFromFile(std::unique_ptr<RunTimeString> param)
+        : Pm("PmFromFile", std::move(param)) { }
+    explicit PmFromFile(std::string n, std::unique_ptr<RunTimeString> param)
+        : Pm(n, std::move(param)) { }
+
     bool init(const std::string &file, std::string *error) override;
 };
 

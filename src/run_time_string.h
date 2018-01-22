@@ -18,10 +18,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
+#include <list>
+#include <utility>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/variables/variable.h"
+
 
 #ifndef SRC_RUN_TIME_STRING_H_
 #define SRC_RUN_TIME_STRING_H_
@@ -33,18 +37,23 @@ class RunTimeElementHolder {
     RunTimeElementHolder() :
         m_string("") {
             m_var.reset(NULL);
-        };
+        }
     std::unique_ptr<modsecurity::Variables::Variable> m_var;
     std::string m_string;
 };
 
 class RunTimeString {
  public:
-    RunTimeString() {
-    };
-    void appendText(std::string &text);
+    RunTimeString() :
+        m_containsMacro(false) { }
+    void appendText(std::string text);
     void appendVar(std::unique_ptr<modsecurity::Variables::Variable> var);
     std::string evaluate(Transaction *t);
+    std::string evaluate() {
+        return evaluate(NULL);
+    }
+    inline bool containsMacro() { return m_containsMacro; }
+    bool m_containsMacro;
 
  protected:
     std::list<std::unique_ptr<RunTimeElementHolder>> m_elements;

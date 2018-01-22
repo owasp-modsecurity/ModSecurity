@@ -23,6 +23,8 @@
 #include <libxml/xpath.h>
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -33,11 +35,8 @@ namespace operators {
 class ValidateDTD : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ValidateDTD(std::string o, std::string p, bool i)
-        : Operator(o, p, i),
-        m_dtd(NULL) { }
-    explicit ValidateDTD(std::string param)
-        : Operator("ValidateDTD", param) { }
+    explicit ValidateDTD(std::unique_ptr<RunTimeString> param)
+        : Operator("ValidateDTD", std::move(param)) { }
     ~ValidateDTD() {
         if (m_dtd != NULL) {
             xmlFreeDtd(m_dtd);

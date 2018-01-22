@@ -20,7 +20,7 @@
 #include <string>
 
 #include "modsecurity/transaction.h"
-
+#include "src/run_time_string.h"
 #include "src/utils/string.h"
 #include "src/operators/begins_with.h"
 #include "src/operators/contains.h"
@@ -109,6 +109,34 @@ bool Operator::evaluateInternal(Transaction *transaction,
 }
 
 
+std::string Operator::resolveMatchMessage(Transaction *t,
+    std::string key, std::string value) {
+    std::string ret = m_match_message;
+
+    if (ret.empty() == true) {
+        if (m_couldContainsMacro == false) {
+            ret = "Matched \"Operator `" + m_op + "' with parameter `" +
+                utils::string::limitTo(200, m_param) +
+                "' against variable `" + key + "' (Value: `" +
+                utils::string::limitTo(100,
+                    utils::string::toHexIfNeeded(value)) + \
+                "' )";
+        } else {
+            std::string p(m_string->evaluate(t));
+            ret = "Matched \"Operator `" + m_op + "' with parameter `" +
+                utils::string::limitTo(200, p) +
+                "' against variable `" + key + "' (Value: `" +
+                utils::string::limitTo(100,
+                    utils::string::toHexIfNeeded(value)) +
+                "' )";
+        }
+    }
+
+
+    return ret;
+}
+
+
 bool Operator::evaluate(Transaction *transaction, const std::string& a) {
 #ifndef NO_LOGS
     if (transaction) {
@@ -120,61 +148,62 @@ bool Operator::evaluate(Transaction *transaction, const std::string& a) {
     return true;
 }
 
-Operator *Operator::instantiate(std::string op, std::string param) {
+Operator *Operator::instantiate(std::string op, std::string param_str) {
     std::string op_ = utils::string::tolower(op);
+    std::unique_ptr<RunTimeString> param(new RunTimeString());
+    param->appendText(param_str);
 
-    IF_MATCH(beginswith) { return new BeginsWith(param); }
-    IF_MATCH(contains) { return new Contains(param); }
-    IF_MATCH(containsword) { return new ContainsWord(param); }
+    IF_MATCH(beginswith) { return new BeginsWith(std::move(param)); }
+    IF_MATCH(contains) { return new Contains(std::move(param)); }
+    IF_MATCH(containsword) { return new ContainsWord(std::move(param)); }
     IF_MATCH(detectsqli) { return new DetectSQLi(); }
     IF_MATCH(detectxss) { return new DetectXSS(); }
-    IF_MATCH(endswith) { return new EndsWith(param); }
-    IF_MATCH(eq) { return new Eq(param); }
-    IF_MATCH(fuzzyhash) { return new FuzzyHash(param); }
-    IF_MATCH(geolookup) { return new GeoLookup(param); }
-    IF_MATCH(ge) { return new Ge(param); }
-    IF_MATCH(gsblookup) { return new GsbLookup(param); }
-    IF_MATCH(gt) { return new Gt(param); }
-    IF_MATCH(inspectfile) { return new InspectFile(param); }
-    IF_MATCH(ipmatchf) { return new IpMatchF(param); }
+    IF_MATCH(endswith) { return new EndsWith(std::move(param)); }
+    IF_MATCH(eq) { return new Eq(std::move(param)); }
+    IF_MATCH(fuzzyhash) { return new FuzzyHash(std::move(param)); }
+    IF_MATCH(geolookup) { return new GeoLookup(); }
+    IF_MATCH(ge) { return new Ge(std::move(param)); }
+    IF_MATCH(gsblookup) { return new GsbLookup(std::move(param)); }
+    IF_MATCH(gt) { return new Gt(std::move(param)); }
+    IF_MATCH(inspectfile) { return new InspectFile(std::move(param)); }
+    IF_MATCH(ipmatchf) { return new IpMatchF(std::move(param)); }
     IF_MATCH(ipmatchfromfile) {
-        return new IpMatchFromFile(param);
+        return new IpMatchFromFile(std::move(param));
     }
-    IF_MATCH(ipmatch) { return new IpMatch(param); }
-    IF_MATCH(le) { return new Le(param); }
-    IF_MATCH(lt) { return new Lt(param); }
+    IF_MATCH(ipmatch) { return new IpMatch(std::move(param)); }
+    IF_MATCH(le) { return new Le(std::move(param)); }
+    IF_MATCH(lt) { return new Lt(std::move(param)); }
     IF_MATCH(nomatch) { return new NoMatch(); }
-    IF_MATCH(pmfromfile) { return new PmFromFile(param); }
-    IF_MATCH(pmf) { return new PmF(param); }
-    IF_MATCH(pm) { return new Pm(param); }
-    IF_MATCH(rbl) { return new Rbl(param); }
-    IF_MATCH(rsub) { return new Rsub(param); }
-    IF_MATCH(rx) { return new Rx(param); }
-    IF_MATCH(streq) { return new StrEq(param); }
-    IF_MATCH(strmatch) { return new StrMatch(param); }
+    IF_MATCH(pmfromfile) { return new PmFromFile(std::move(param)); }
+    IF_MATCH(pmf) { return new PmF(std::move(param)); }
+    IF_MATCH(pm) { return new Pm(std::move(param)); }
+    IF_MATCH(rbl) { return new Rbl(std::move(param)); }
+    IF_MATCH(rsub) { return new Rsub(std::move(param)); }
+    IF_MATCH(rx) { return new Rx(std::move(param)); }
+    IF_MATCH(streq) { return new StrEq(std::move(param)); }
+    IF_MATCH(strmatch) { return new StrMatch(std::move(param)); }
     IF_MATCH(validatebyterange) {
-        return new ValidateByteRange(param);
+        return new ValidateByteRange(std::move(param));
     }
-    IF_MATCH(validatedtd) { return new ValidateDTD(param); }
-    IF_MATCH(validatehash) { return new ValidateHash(param); }
-    IF_MATCH(validateschema) { return new ValidateSchema(param); }
+    IF_MATCH(validatedtd) { return new ValidateDTD(std::move(param)); }
+    IF_MATCH(validatehash) { return new ValidateHash(std::move(param)); }
+    IF_MATCH(validateschema) { return new ValidateSchema(std::move(param)); }
     IF_MATCH(validateurlencoding) {
         return new ValidateUrlEncoding();
     }
     IF_MATCH(validateutf8encoding) {
         return new ValidateUtf8Encoding();
     }
-    IF_MATCH(verifycc) { return new VerifyCC(param); }
-    IF_MATCH(verifycpf) { return new VerifyCPF(param); }
-    IF_MATCH(verifyssn) { return new VerifySSN(param); }
-    IF_MATCH(within) { return new Within(param); }
+    IF_MATCH(verifycc) { return new VerifyCC(std::move(param)); }
+    IF_MATCH(verifycpf) { return new VerifyCPF(std::move(param)); }
+    IF_MATCH(verifyssn) { return new VerifySSN(std::move(param)); }
+    IF_MATCH(within) { return new Within(std::move(param)); }
 
     IF_MATCH(unconditionalmatch) {
         return new UnconditionalMatch();
     }
 
-
-    return new Operator(param);
+    std::invalid_argument("Operator not found.");
 }
 
 }  // namespace operators

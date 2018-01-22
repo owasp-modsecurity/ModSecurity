@@ -35,8 +35,6 @@ namespace operators {
 class ValidateUtf8Encoding : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ValidateUtf8Encoding(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
     ValidateUtf8Encoding()
         : Operator("ValidateUtf8Encoding") { }
 

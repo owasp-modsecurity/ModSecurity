@@ -26,18 +26,16 @@ namespace operators {
 
 bool BeginsWith::evaluate(Transaction *transaction, Rule *rule,
     const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) {
-    bool ret = false;
-
-    std::string p = MacroExpansion::expand(m_param, transaction);
+    std::string p(m_string->evaluate(transaction));
 
     if (str.size() < p.size()) {
-        ret = false;
+        return false;
     } else if (!str.compare(0, p.size(), p)) {
         logOffset(ruleMessage, 0, p.size());
-        ret = true;
+        return true;
     }
 
-    return ret;
+    return false;
 }
 
 

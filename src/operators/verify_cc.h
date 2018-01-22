@@ -18,6 +18,8 @@
 
 #include <pcre.h>
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -27,12 +29,8 @@ namespace operators {
 class VerifyCC : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    VerifyCC(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation),
-        m_pc(NULL),
-        m_pce(NULL) { }
-    explicit VerifyCC(std::string param)
-        : Operator("VerifyCC", param),
+    explicit VerifyCC(std::unique_ptr<RunTimeString> param)
+        : Operator("VerifyCC", std::move(param)),
         m_pc(NULL),
         m_pce(NULL) { }
     ~VerifyCC();

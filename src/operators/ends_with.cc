@@ -27,7 +27,7 @@ namespace operators {
 bool EndsWith::evaluate(Transaction *transaction, Rule *rule,
     const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
     bool ret = false;
-    std::string p = MacroExpansion::expand(m_param, transaction);
+    std::string p(m_string->evaluate(transaction));
 
     if (input.length() >= p.length()) {
         ret = (0 == input.compare(input.length() - p.length(),

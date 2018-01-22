@@ -28,8 +28,6 @@ namespace operators {
 class UnconditionalMatch : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    UnconditionalMatch(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
     UnconditionalMatch()
         : Operator("UnconditionalMatch") { }
 

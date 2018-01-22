@@ -17,6 +17,8 @@
 #define SRC_OPERATORS_VALIDATE_HASH_H_
 
 #include <string>
+#include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -27,10 +29,8 @@ namespace operators {
 class ValidateHash : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ValidateHash(std::string o, std::string p, bool n)
-        : Operator(o, p, n) { }
-    explicit ValidateHash(std::string param)
-        : Operator("ValidateHash", param) { }
+    explicit ValidateHash(std::unique_ptr<RunTimeString> param)
+        : Operator("ValidateHash", std::move(param)) { }
     bool evaluate(Transaction *transaction, const std::string  &str) override;
 };
 

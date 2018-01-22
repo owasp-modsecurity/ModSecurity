@@ -68,7 +68,6 @@ class Rule {
         std::string value, std::shared_ptr<RuleMessage> rm);
     void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
         bool *b, std::shared_ptr<RuleMessage> ruleMessage);
-    std::string resolveMatchMessage(std::string key, std::string value);
     void updateMatchedVars(Transaction *trasn, std::string key,
         std::string value);
     void cleanMatchedVars(Transaction *trasn);

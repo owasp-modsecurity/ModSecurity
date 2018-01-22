@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 
 #include "src/operators/operator.h"
 #include "modsecurity/rule_message.h"
@@ -28,10 +29,9 @@ namespace operators {
 class ContainsWord : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ContainsWord(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
-    explicit ContainsWord(std::string param)
-        : Operator("ContainsWord", param) { }
+    explicit ContainsWord(std::unique_ptr<RunTimeString> param)
+        : Operator("ContainsWord", std::move(param)) { }
+
     bool evaluate(Transaction *transaction, Rule *rule,
         const std::string &str,
         std::shared_ptr<RuleMessage> ruleMessage) override;
