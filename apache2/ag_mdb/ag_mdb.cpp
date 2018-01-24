@@ -1219,9 +1219,9 @@ const char* AGMDB_getErrorInfo(int error_no){
  */
 bool AGMDB_isError(int return_code){
     if (return_code < AGMDB_ERROR)
-        return true;
-    else
         return false;
+    else
+        return true;
 }
 
 /**
