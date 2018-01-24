@@ -46,7 +46,6 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
         }
         return AGMDB_SUCCESS_LOCK_OPEN;
     }
-    
 #else
     char read_lock_name[AGMDB_MAX_NAME_LEN];
     char write_lock_name[AGMDB_MAX_NAME_LEN];
@@ -57,34 +56,89 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
         return AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING;
     sprintf_s(read_lock_name, AGMDB_MAX_NAME_LEN, "DB_%s_LOCK_READ", lock_name);
     sprintf_s(write_lock_name, AGMDB_MAX_NAME_LEN, "DB_%s_LOCK_WRITE", lock_name);
-    new_mutex = CreateMutex(
-                    NULL,               // Default security settings.
-                    FALSE,              // Do not take the lock after created.
-                    read_lock_name);    // The name of read lock.
-    if(new_mutex == NULL)
+    new_lock->read_lock_handle = CreateMutex(
+                                    NULL,               // Default security settings.
+                                    FALSE,              // Do not take the lock after created.
+                                    read_lock_name);    // The name of read lock.
+    if(new_lock->read_lock_handle == NULL)
         return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
     if(GetLastError() == ERROR_ALREADY_EXISTS)
         lock_exists = true;
-    new_lock->read_lock_handle = OpenMutex(
-                                    MUTEX_ALL_ACCESS,   //
-                                    false,              //
-                                    read_lock_name);
     
-    new_mutex = CreateMutex(
-                    NULL,               // Default security settings.
-                    FALSE,              // Do not take the lock after created.
-                    write_lock_name);   // The name of write lock.
-    if(new_mutex == NULL)
+    new_lock->write_lock_handle = CreateMutex(
+                                    NULL,               // Default security settings.
+                                    FALSE,              // Do not take the lock after created.
+                                    write_lock_name);   // The name of write lock.
+    if(new_lock->write_lock_handle == NULL) {
+        CloseHandle(new_lock->read_lock_handle);
+        new_lock->read_lock_handle = NULL;
         return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
-    if((GetLastError() == ERROR_ALREADY_EXISTS) != lock_exists) // One lock exists, another not.
+    }
+        
+    if((GetLastError() == ERROR_ALREADY_EXISTS) != lock_exists) {
+        // One lock exists, another not.
+        CloseHandle(new_lock->read_lock_handle);
+        new_lock->read_lock_handle = NULL;
+        CloseHandle(new_lock->write_lock_handle);
+        new_lock->write_lock_handle = NULL;
         return AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS;
-    new_lock->write_lock_handle = OpenMutex(
-                                    MUTEX_ALL_ACCESS,   //
-                                    false,              //
-                                    write_lock_name);
+    }
+
+    if(lock_exists == true)
+        return AGMDB_SUCCESS_LOCK_OPEN;
+    else
+        return AGMDB_SUCCESS_LOCK_CREATE;
 #endif
     // Should never get here
     return AGMDB_SUCCESS_LOCK_CREATE;
+}
+
+/**
+ ** Destroy the lock of AG Memory Database 
+ ** @param db_lock: The agmdb_lock sturcture  
+ ** return: AGMDB_SUCCESS if successfully destroy the lock, 
+ **         AGMDB_ERROR if failed.
+ */
+int Lock_destroy(struct agmdb_lock *db_lock) {
+    /* Windows doesn't do anything */
+#ifndef _WIN32
+    int rc;
+    rc = semctl(db_lock->sem_id, 0, IPC_RMID);
+    if(rc == -1)
+        return AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL;
+#endif
+    return AGMDB_SUCCESS;
+}
+
+/**
+ ** Close the lock of AG Memory Database 
+ ** @param db_lock: The agmdb_lock sturcture  
+ ** return: AGMDB_SUCCESS if successfully close the lock,
+ **         AGMDB_ERROR if failed. 
+ */
+int Lock_close(struct agmdb_lock *db_lock) {
+    /* Linux doesn't do anything */
+#ifdef _WIN32
+    BOOL rc_read = 1;
+    BOOL rc_write = 1;
+    if(db_lock->read_lock_handle != NULL)
+    {
+        rc_read = CloseHandle(db_lock->read_lock_handle);
+        if(rc_read != 0)
+            db_lock->read_lock_handle = NULL;
+    }
+
+    if(db_lock->write_lock_handle != NULL)
+    {
+        rc_write = CloseHandle(db_lock->write_lock_handle);
+        if(rc_write != 0)
+            db_lock->write_lock_handle = NULL;
+    }
+
+    if (rc_read == 0 || rc_write == 0)
+        return AGMDB_ERROR_LOCK_WIN_CLOSE_MUTEX_FAIL;
+#endif
+    return AGMDB_SUCCESS;
 }
 
 /**
@@ -236,8 +290,9 @@ int SHM_init(PTR_VOID shm_base, unsigned int shm_size, unsigned int entry_num) {
 }
 
 /**
- ** Initialize the shared memory of AG Memory Database
- ** @param shm_base:        The address of the shared memory.
+ ** Create the shared memory of AG Memory Database if it doesn't exist 
+ ** Open the shared memory of AG Memory Database if it exists
+ ** @param dbm:        The hanlder of the database.
  ** @param db_name:         The name of the database.
  ** @param db_name_length:  The length of db_name.
  ** @param entry_num:       The number of entries in the shared memory.
@@ -245,12 +300,16 @@ int SHM_init(PTR_VOID shm_base, unsigned int shm_size, unsigned int entry_num) {
  **         AGMDB_SUCCESS_SHM_OPEN if successfully link to an existed shared memory,
  **         AGMDB_ERROR if failed. 
  */
-int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, unsigned int entry_num){
+int SHM_create(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num){
     unsigned int shm_size = SHM_ENTRIES_OFFSET + entry_num * DEFAULT_ENTRY_SIZE;
     int rc;
-#ifndef _WIN32
+#ifndef _WIN32    
     int shm_id;
     int shm_key;
+#endif
+    if(dbm == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
+#ifndef _WIN32
     if (AGMDB_isstring(db_name, db_name_length) != AGMDB_SUCCESS)
         return AGMDB_ERROR_SHM_NAME_INVALID_STRING;
 
@@ -266,8 +325,9 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
                 return AGMDB_ERROR_SHM_LINUX_CREATE_FAIL;
             
             //  Map the SHM into the address space of this process 
-            *new_shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
-            if(*new_shm_base == (PTR_VOID)-1)
+            dbm->linux_shm_id = shm_id;
+            dbm->shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
+            if(dbm->shm_base == (PTR_VOID)-1)
                 return AGMDB_ERROR_SHM_LINUX_MAP_FAIL;
             return AGMDB_SUCCESS_SHM_OPEN;
         } 
@@ -279,10 +339,11 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
         }
     }
     else { // Map the new SHM into the address space of this process 
-        *new_shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
-        if(*new_shm_base == (PTR_VOID)-1)
+        dbm->linux_shm_id = shm_id;
+        dbm->shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
+        if(dbm->shm_base == (PTR_VOID)-1)
             return AGMDB_ERROR_SHM_LINUX_MAP_FAIL;
-        rc = SHM_init(*new_shm_base, shm_size, entry_num);
+        rc = SHM_init((PTR_VOID)dbm->shm_base, shm_size, entry_num);
         if(rc != AGMDB_SUCCESS)
             return rc;
         return AGMDB_SUCCESS_SHM_CREATE;
@@ -301,16 +362,17 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
                     db_name);               // Name of shared memory.
     if(shm_handle == NULL)
         return AGMDB_ERROR_SHM_WIN_CREATE_FAIL;
-    *new_shm_base = (PTR_VOID) MapViewOfFile(
+    dbm->win_shm_handle = shm_handle;
+    dbm->shm_base = (PTR_VOID) MapViewOfFile(
                     shm_handle,             // Handle of file.
                     FILE_MAP_ALL_ACCESS,    // All permissioon.
                     0,                      // Map from the beginning of the shared memory.
                     0,                      // Map from the beginning of the shared memory.
                     0);                     // Map entire shared memory into address space.
-    if(new_shm_base == NULL)
+    if(dbm->shm_base == NULL)
             return AGMDB_ERROR_SHM_WIN_MAP_FAIL;
     if(GetLastError() != ERROR_ALREADY_EXISTS) { // A new shared memory.
-        rc = SHM_init(*new_shm_base, shm_size, entry_num);        
+        rc = SHM_init(dbm->shm_base, shm_size, entry_num);        
         if(rc != AGMDB_SUCCESS)
             return rc;
         return AGMDB_SUCCESS_SHM_CREATE;        
@@ -319,6 +381,54 @@ int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, 
         return AGMDB_SUCCESS_SHM_OPEN;
     }
 #endif
+}
+
+/**
+ ** Destroy the shared memory of AG Memory Database 
+ ** @param dbm: The handler of the database.
+ ** return: AGMDB_SUCCESS if successfully destroy shared memory, 
+ **         AGMDB_ERROR if failed.
+ */
+int SHM_destroy(struct agmdb_handler *dbm) {
+    int rc;
+    if(dbm == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
+    /* Windows doesn't do anything */
+#ifndef _WIN32
+    rc = shmctl(dbm->linux_shm_id, IPC_RMID, 0);
+    if(rc == -1)
+        return AGMDB_ERROR_SHM_LINUX_DESTROY_FAIL;
+#endif
+    return AGMDB_SUCCESS;
+}
+
+/**
+ ** Close the shared memory of AG Memory Database
+ ** @param dbm: The handler of the database.
+ ** return: AGMDB_SUCCESS if successfully close shared memory,
+ **         AGMDB_ERROR if failed. 
+ */
+int SHM_close(struct agmdb_handler* dbm) {
+#ifndef _WIN32
+    int rc;
+#else
+    BOOL rc;
+#endif        
+    if(dbm == NULL)
+            return AGMDB_ERROR_HANDLE_NULL;
+#ifndef _WIN32
+    rc = shmdt(dbm->shm_base);
+    if (rc == -1)
+        return AGMDB_ERROR_SHM_LINUX_DETACH_FAIL;
+#else
+    rc = UnmapViewOfFile(dbm->shm_base);
+    if (rc == -1)
+        return AGMDB_ERROR_SHM_WIN_UNMAP_FAIL;
+    rc = CloseHandle(dbm->win_shm_handle);
+    if (rc == 0)
+        return AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL;
+#endif
+    return AGMDB_SUCCESS;
 }
 
 /**
@@ -852,15 +962,13 @@ int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_len
         return AGMDB_ERROR_NAME_INVALID_STRING;
     }
 
-    rc = SHM_create(&shm_base, db_name, db_name_length , entry_num);
+    rc = SHM_create(dbm, db_name, db_name_length , entry_num);
     if((rc != AGMDB_SUCCESS_SHM_CREATE) && (rc != AGMDB_SUCCESS_SHM_OPEN))
         return rc;
 
     rc = Lock_create(&(dbm->db_lock), db_name, db_name_length);
     if((rc != AGMDB_SUCCESS_LOCK_CREATE) && (rc != AGMDB_SUCCESS_LOCK_OPEN))
         return rc;
-
-    dbm->shm_base = shm_base;
 
     return AGMDB_SUCCESS;
 }
@@ -871,10 +979,14 @@ int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_len
  ** return: AGMDB_SUCCESS if successfully destroyed or AGMDB_ERROR if failed.
  */
 int AGMDB_destroyDB(struct agmdb_handler *dbm) {
+    int rc;
     if(dbm == NULL)
         return AGMDB_ERROR_HANDLE_NULL;
-    
-    return AGMDB_SUCCESS;
+    rc = SHM_destroy(dbm);
+    if(rc != AGMDB_SUCCESS)
+        return rc;
+
+    return Lock_destroy(&(dbm->db_lock));
 }
 
 /**
@@ -883,10 +995,14 @@ int AGMDB_destroyDB(struct agmdb_handler *dbm) {
  ** return: AGMDB_SUCCESS if successfully closed or AGMDB_ERROR if failed.
  */
 int AGMDB_closeDB(struct agmdb_handler *dbm) {
+    int rc;
     if(dbm == NULL)
             return AGMDB_ERROR_HANDLE_NULL;
+    rc = SHM_close(dbm);
+    if(rc != AGMDB_SUCCESS)
+        return rc;
 
-    return AGMDB_SUCCESS;
+    return Lock_close(&(dbm->db_lock));
 }
 
 /**
@@ -1118,7 +1234,9 @@ const char* AGMDB_getErrorInfo(int error_no){
             return "In Linux system, failed when initializing the semaphore value. Please check the existence and permission of the semaphore.";
         case AGMDB_ERROR_LOCK_LINUX_SEM_MODIFY_FAIL:
             return "In Linux system, failed when modifying the semaphore value. Please check the existence and permission of the semaphore.";
-            
+        case AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL:
+            return "In Linux system, failed when deleting the semaphore.";
+
         case AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING:
             return "In Windows system, the name of lock is not a valid string. Please check the data_dir setting in configuration file.";
         case AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL:
@@ -1129,6 +1247,8 @@ const char* AGMDB_getErrorInfo(int error_no){
             return "In Windows system, failed when getting the mutex object. Possible reason is deadlock or permission issue.";
         case AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL:
             return "In Windows system, failed when releasing the mutex object.";
+        case AGMDB_ERROR_LOCK_WIN_CLOSE_MUTEX_FAIL:
+            return "In Windows system, failed when close the mutex object.";
         
         case AGMDB_ERROR_SHM_BASE_NULL:
             return "The shared memory base address is NULL. Please check the agmdb_handler object.";
@@ -1147,12 +1267,20 @@ const char* AGMDB_getErrorInfo(int error_no){
             return "In Linux system, failed when opening the shared memory.";            
         case AGMDB_ERROR_SHM_LINUX_MAP_FAIL:
             return "In Linux system, failed when mapping the shared memory into the process's address space.";
+        case AGMDB_ERROR_SHM_LINUX_DETACH_FAIL:
+            return "In Linux system, faild when detaching the shared memory.";
+        case AGMDB_ERROR_SHM_LINUX_DESTROY_FAIL:
+            return "In Linux system, faild when deleting the shared memory.";
         
         case AGMDB_ERROR_SHM_WIN_CREATE_FAIL:
             return "In Windows system, failed when creating the shared memory.";
         case AGMDB_ERROR_SHM_WIN_MAP_FAIL:
             return "In Windows system, failed when mapping the shared memory into the process's address space.";
-        
+        case AGMDB_ERROR_SHM_WIN_UNMAP_FAIL:
+            return "In Windows system, faild when unmap the shared memory. Call GetLastError() for more information.";
+        case AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL:
+            return "In Windows system, faild when close the shared memory handle. Call GetLastError() for more information.";
+            
         case AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_SPARELIST:
             return "The AGMDB is inserting an invalid entry into the spare list.";
         case AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_SPARELIST:

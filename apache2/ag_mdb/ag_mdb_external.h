@@ -38,12 +38,14 @@ extern "C" {
 #define AGMDB_ERROR_LOCK_LINUX_SEM_OPEN_FAIL                    10101
 #define AGMDB_ERROR_LOCK_LINUX_SEM_INIT_FAIL                    10102
 #define AGMDB_ERROR_LOCK_LINUX_SEM_MODIFY_FAIL                  10103
+#define AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL                 10104
 
 #define AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING                10200
 #define AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL                  10201
 #define AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS               10202
 #define AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL                     10203
 #define AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL                 10204
+#define AGMDB_ERROR_LOCK_WIN_CLOSE_MUTEX_FAIL                   10205
 
 #define AGMDB_ERROR_SHM_BASE_NULL                               11000
 #define AGMDB_ERROR_SHM_SIZE_TOO_SMALL                          11001
@@ -54,9 +56,13 @@ extern "C" {
 #define AGMDB_ERROR_SHM_LINUX_OPEN_FAIL                         11101
 #define AGMDB_ERROR_SHM_LINUX_OPEN_ACCESS_FAIL                  11102
 #define AGMDB_ERROR_SHM_LINUX_MAP_FAIL                          11103
+#define AGMDB_ERROR_SHM_LINUX_DETACH_FAIL                       11104
+#define AGMDB_ERROR_SHM_LINUX_DESTROY_FAIL                      11105
 
 #define AGMDB_ERROR_SHM_WIN_CREATE_FAIL                         11200
 #define AGMDB_ERROR_SHM_WIN_MAP_FAIL                            11201
+#define AGMDB_ERROR_SHM_WIN_UNMAP_FAIL                         11202
+#define AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL                        11203
 
 #define AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_SPARELIST         12000
 #define AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_SPARELIST            12001
@@ -123,6 +129,11 @@ struct agmdb_lock{
 struct agmdb_handler{
     const void* shm_base;
     struct agmdb_lock db_lock;
+#ifndef _WIN32
+    int linux_shm_id;
+#else
+    HANDLE win_shm_handle;
+#endif
 };
 
 /**

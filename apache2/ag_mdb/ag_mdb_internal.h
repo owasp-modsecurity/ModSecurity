@@ -162,16 +162,33 @@ typedef unsigned long long PTR_OFFSET;
 int SHM_init(PTR_VOID shm_base, unsigned int shm_size, int entry_num);
 
 /**
-** Initialize the shared memory of AG Memory Database
-** @param shm_base:        The address of the shared memory.
-** @param db_name:         The name of the database.
-** @param db_name_length:  The length of db_name.
-** @param entry_num:       The number of entries in the shared memory.
-** return: AGMDB_SUCCESS_SHM_CREATE if successfully created a new shared memory,
-**         AGMDB_SUCCESS_SHM_OPEN if successfully link to an existed shared memory,
-**         AGMDB_FAIL if failed.
-*/
-int SHM_create(PTR_VOID* new_shm_base, const char* db_name, int db_name_length, int entry_num);
+ ** Create the shared memory of AG Memory Database if it doesn't exist 
+ ** Open the shared memory of AG Memory Database if it exists
+ ** @param dbm:        The hanlder of the database.
+ ** @param db_name:         The name of the database.
+ ** @param db_name_length:  The length of db_name.
+ ** @param entry_num:       The number of entries in the shared memory.
+ ** return: AGMDB_SUCCESS_SHM_CREATE if successfully created a new shared memory, 
+ **         AGMDB_SUCCESS_SHM_OPEN if successfully link to an existed shared memory,
+ **         AGMDB_ERROR if failed. 
+ */
+int SHM_create(struct agmdb_handler* dbm, const char* db_name, int db_name_length, int entry_num);
+
+/**
+ ** Destroy the shared memory of AG Memory Database 
+ ** @param dbm: The handler of the database.
+ ** return: AGMDB_SUCCESS if successfully destroy shared memory, 
+ **         AGMDB_ERROR if failed.
+ */
+int SHM_destroy(struct agmdb_handler *dbm);
+
+/**
+ ** Close the shared memory of AG Memory Database
+ ** @param dbm: The handler of the database.
+ ** return: AGMDB_SUCCESS if successfully close shared memory,
+ **         AGMDB_ERROR if failed. 
+ */
+int SHM_close(struct agmdb_handler* dbm);
 
 /* Entry Structure and Addressing Macros */
 /*
@@ -350,6 +367,22 @@ union semun{
  **         AGMDB_FAIL if failed.
  */
 int Lock_create(struct agmdb_lock *new_lock, int lock_id, int lock_num);
+
+/**
+ ** Destroy the lock of AG Memory Database 
+ ** @param db_lock: The agmdb_lock sturcture  
+ ** return: AGMDB_SUCCESS if successfully destroy the lock, 
+ **         AGMDB_ERROR if failed.
+ */
+int Lock_destroy(struct agmdb_lock *db_lock);
+
+/**
+ ** Close the lock of AG Memory Database 
+ ** @param db_lock: The agmdb_lock sturcture  
+ ** return: AGMDB_SUCCESS if successfully close the lock,
+ **         AGMDB_ERROR if failed. 
+ */
+int Lock_close(struct agmdb_lock *db_lock);
 
 /**
  ** Decrease a lock's value by a given number.
