@@ -636,15 +636,16 @@ struct directory_config {
 
     /* xml */
     int                 xml_external_entity;
+#ifdef MEMORY_DATABASE_ENABLE
+    /* AGMDB */
+    directory_config	*root_config;
+    int                 db_option;
+    void                *agmdb_handles;    
+#endif
 
     /* This will be used whenever ModSecurity will be ready
      * to ask the server for newer rules.
      */
-    directory_config	*root_config;
-    int                 db_option;
-    int                 test_ip_range;
-    void                *agmdb_handles;    
-    
 #if 0
     msc_remote_rules_server *remote_rules;
     int remote_timeout;
