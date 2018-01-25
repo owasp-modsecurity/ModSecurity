@@ -228,29 +228,19 @@ VAR_EXCLUSION                             !
 VAR_COUNT                                 &
 
 
-OPERATOR_UNCONDITIONAL_MATCH            (?i:@unconditionalMatch)
+OPERATOR_BEGINS_WITH                    (?i:@beginsWith)
+OPERATOR_CONTAINS                       (?i:@contains)
+OPERATOR_CONTAINS_WORD                  (?i:@containsWord)
 OPERATOR_DETECT_SQLI                    (?i:@detectSQLi)
 OPERATOR_DETECT_XSS                     (?i:@detectXSS)
-OPERATOR_VALIDATE_URL_ENCODING          (?i:@validateUrlEncoding)
-OPERATOR_VALIDATE_UTF8_ENCODING         (?i:@validateUtf8Encoding)
-OPERATOR_INSPECT_FILE                   (?i:@inspectFile)
-OPERATOR_FUZZY_HASH                     (?i:@fuzzyHash)
-OPERATOR_VALIDATE_BYTE_RANGE            (?i:@validateByteRange)
-OPERATOR_VALIDATE_DTD                   (?i:@validateDTD)
-OPERATOR_VALIDATE_HASH                  (?i:@validateHash)
-OPERATOR_VALIDATE_SCHEMA                (?i:@validateSchema)
-OPERATOR_VERIFY_CC                      (?i:@verifyCC)
-OPERATOR_VERIFY_CPF                     (?i:@verifyCPF)
-OPERATOR_VERIFY_SSN                     (?i:@verifySSN)
-OPERATOR_GSB_LOOKUP                     (?i:@gsbLookup)
-OPERATOR_RSUB                           (?i:@rsub)
-OPERATOR_WITHIN                         (?i:@within)
-OPERATOR_CONTAINS_WORD                  (?i:@containsWord)
-OPERATOR_CONTAINS                       (?i:@contains)
 OPERATOR_ENDS_WITH                      (?i:@endsWith)
 OPERATOR_EQ                             (?i:@eq)
+OPERATOR_FUZZY_HASH                     (?i:@fuzzyHash)
 OPERATOR_GE                             (?i:@ge)
+OPERATOR_GEOLOOKUP                      (?i:@geoLookup)
+OPERATOR_GSB_LOOKUP                     (?i:@gsbLookup)
 OPERATOR_GT                             (?i:@gt)
+OPERATOR_INSPECT_FILE                   (?i:@inspectFile)
 OPERATOR_IP_MATCH_FROM_FILE             (?i:(@ipMatchF|@ipMatchFromFile))
 OPERATOR_IP_MATCH                       (?i:@ipMatch)
 OPERATOR_LE                             (?i:@le)
@@ -258,12 +248,21 @@ OPERATOR_LT                             (?i:@lt)
 OPERATOR_PM_FROM_FILE                   (?i:(@pmf|@pmFromFile))
 OPERATOR_PM                             (?i:@pm)
 OPERATOR_RBL                            (?i:@rbl)
+OPERATOR_RSUB                           (?i:@rsub)
 OPERATOR_RX                             (?i:@rx)
 OPERATOR_STR_EQ                         (?i:@streq)
 OPERATOR_STR_MATCH                      (?i:@strmatch)
-OPERATOR_BEGINS_WITH                    (?i:@beginsWith)
-OPERATOR_GEOLOOKUP                      (?i:@geoLookup)
-OPERATOR_RX_CONTENT_ONLY                ([^\"]|([^\\]\\\"))+
+OPERATOR_UNCONDITIONAL_MATCH            (?i:@unconditionalMatch)
+OPERATOR_VALIDATE_BYTE_RANGE            (?i:@validateByteRange)
+OPERATOR_VALIDATE_DTD                   (?i:@validateDTD)
+OPERATOR_VALIDATE_HASH                  (?i:@validateHash)
+OPERATOR_VALIDATE_SCHEMA                (?i:@validateSchema)
+OPERATOR_VALIDATE_URL_ENCODING          (?i:@validateUrlEncoding)
+OPERATOR_VALIDATE_UTF8_ENCODING         (?i:@validateUtf8Encoding)
+OPERATOR_VERIFY_CC                      (?i:@verifyCC)
+OPERATOR_VERIFY_CPF                     (?i:@verifyCPF)
+OPERATOR_VERIFY_SSN                     (?i:@verifySSN)
+OPERATOR_WITHIN                         (?i:@within)
 
 
 AUDIT_PARTS                             [ABCDEFGHJKIZ]+
@@ -369,7 +368,6 @@ FREE_TEXT_SPACE_COMMA_QUOTE             [^, \t\"\n\r]+
 FREE_TEXT_COMMA_QUOTE                   [^,\"\\n\\r]+
 NEW_LINE_FREE_TEXT                      [^, \t\"\n\r]+
 NOT !
-OP_QUOTE \"
 FREE_TEXT                               ([^\"]|([^\\]\\\"))+
 REMOVE_RULE_BY                          [0-9A-Za-z_\/\.\-\*\:\;\]\[\$]+
 
@@ -554,11 +552,12 @@ EQUALS_MINUS                            (?i:=\-)
 
 
 <EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE>{
-["][ \t]*                                                                { BEGIN(INITIAL); yyless(yyleng); }
+["][ \t]*                                                                { BEGIN(INITIAL); yyless(yyleng); p::make_NEW_LINE(*driver.loc.back()); }
 ["][ \t]*\n                                                              { BEGIN(INITIAL); yyless(1); }
 ["][ \t]*\r\n                                                            { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
-["]                                                                      { BEGIN(INITIAL); p::make_NEW_LINE(*driver.loc.back()); }
 }
+
+
 <EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE,EXPECTING_ACTIONS_ONLY_ONE>{
 .                                                                       { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 }
@@ -569,6 +568,7 @@ EQUALS_MINUS                            (?i:=\-)
 ["]                                                 { BEGIN(ACTION_PREDICATE_ENDS_WITH_DOUBLE_QUOTE); }
 .                                                   { BEGIN(ACTION_PREDICATE_ENDS_WITH_COMMA_OR_DOUBLE_QUOTE); yyless(0); }
 }
+
 
 <EXPECTING_ACTION_PREDICATE_VARIABLE,ACTION_PREDICATE_ENDS_WITH_QUOTE,ACTION_PREDICATE_ENDS_WITH_DOUBLE_QUOTE,ACTION_PREDICATE_ENDS_WITH_COMMA_OR_DOUBLE_QUOTE,EXPECTING_PARAMETER_ENDS_WITH_QUOTE,EXPECTING_PARAMETER_ENDS_WITH_SPACE>{
 [ \t]*\\\n[ \t]*                                                        { driver.loc.back()->lines(1); driver.loc.back()->step(); }
@@ -952,52 +952,52 @@ p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), 
 }
 
 <EXPECTING_OPERATOR_ENDS_WITH_SPACE>{
-{OPERATOR_GEOLOOKUP}[ ]                    { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(yytext, *driver.loc.back()); }
-{OPERATOR_UNCONDITIONAL_MATCH}[ ]          { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(yytext, *driver.loc.back()); }
-{OPERATOR_DETECT_SQLI}[ ]                  { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(yytext, *driver.loc.back()); }
-{OPERATOR_DETECT_XSS}[ ]                   { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(yytext, *driver.loc.back()); }
-{OPERATOR_VALIDATE_URL_ENCODING}[ ]        { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(yytext, *driver.loc.back()); }
-{OPERATOR_VALIDATE_UTF8_ENCODING}[ ]       { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(yytext, *driver.loc.back()); }
+{OPERATOR_GEOLOOKUP}[ ]                    { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(*driver.loc.back()); }
+{OPERATOR_UNCONDITIONAL_MATCH}[ ]          { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(*driver.loc.back()); }
+{OPERATOR_DETECT_SQLI}[ ]                  { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(*driver.loc.back()); }
+{OPERATOR_DETECT_XSS}[ ]                   { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(*driver.loc.back()); }
+{OPERATOR_VALIDATE_URL_ENCODING}[ ]        { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(*driver.loc.back()); }
+{OPERATOR_VALIDATE_UTF8_ENCODING}[ ]       { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(*driver.loc.back()); }
 }
 <EXPECTING_OPERATOR_ENDS_WITH_QUOTE>{
-{OPERATOR_GEOLOOKUP}[ ]*["]                    { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(yytext, *driver.loc.back()); }
-{OPERATOR_UNCONDITIONAL_MATCH}[ ]*["]          { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(yytext, *driver.loc.back()); }
-{OPERATOR_DETECT_SQLI}[ ]*["]                  { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(yytext, *driver.loc.back()); }
-{OPERATOR_DETECT_XSS}[ ]*["]                   { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(yytext, *driver.loc.back()); }
-{OPERATOR_VALIDATE_URL_ENCODING}[ ]*["]        { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(yytext, *driver.loc.back()); }
-{OPERATOR_VALIDATE_UTF8_ENCODING}[ ]*["]       { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(yytext, *driver.loc.back()); }
+{OPERATOR_GEOLOOKUP}[ ]*["]                    { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(*driver.loc.back()); }
+{OPERATOR_UNCONDITIONAL_MATCH}[ ]*["]          { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(*driver.loc.back()); }
+{OPERATOR_DETECT_SQLI}[ ]*["]                  { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(*driver.loc.back()); }
+{OPERATOR_DETECT_XSS}[ ]*["]                   { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(*driver.loc.back()); }
+{OPERATOR_VALIDATE_URL_ENCODING}[ ]*["]        { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(*driver.loc.back()); }
+{OPERATOR_VALIDATE_UTF8_ENCODING}[ ]*["]       { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(*driver.loc.back()); }
 }
 
 <EXPECTING_OPERATOR_ENDS_WITH_SPACE,EXPECTING_OPERATOR_ENDS_WITH_QUOTE>{
-{OPERATOR_WITHIN}                       { BEGIN_PARAMETER(); return p::make_OPERATOR_WITHIN(yytext, *driver.loc.back()); }
-{OPERATOR_CONTAINS_WORD}                { BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS_WORD(yytext, *driver.loc.back()); }
-{OPERATOR_CONTAINS}                     { BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS(yytext, *driver.loc.back()); }
-{OPERATOR_ENDS_WITH}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_ENDS_WITH(yytext, *driver.loc.back()); }
-{OPERATOR_EQ}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_EQ(yytext, *driver.loc.back()); }
-{OPERATOR_GE}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_GE(yytext, *driver.loc.back()); }
-{OPERATOR_GT}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_GT(yytext, *driver.loc.back()); }
-{OPERATOR_IP_MATCH_FROM_FILE}           { BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH_FROM_FILE(yytext, *driver.loc.back()); }
-{OPERATOR_IP_MATCH}                     { BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH(yytext, *driver.loc.back()); }
-{OPERATOR_LE}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_LE(yytext, *driver.loc.back()); }
-{OPERATOR_LT}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_LT(yytext, *driver.loc.back()); }
-{OPERATOR_PM_FROM_FILE}                 { BEGIN_PARAMETER(); return p::make_OPERATOR_PM_FROM_FILE(yytext, *driver.loc.back()); }
-{OPERATOR_PM}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_PM(yytext, *driver.loc.back()); }
-{OPERATOR_RBL}                          { BEGIN_PARAMETER(); return p::make_OPERATOR_RBL(yytext, *driver.loc.back()); }
-{OPERATOR_RX}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_RX(yytext, *driver.loc.back()); }
-{OPERATOR_STR_EQ}                       { BEGIN_PARAMETER(); return p::make_OPERATOR_STR_EQ(yytext, *driver.loc.back()); }
-{OPERATOR_STR_MATCH}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_STR_MATCH(yytext, *driver.loc.back()); }
-{OPERATOR_BEGINS_WITH}                  { BEGIN_PARAMETER(); return p::make_OPERATOR_BEGINS_WITH(yytext, *driver.loc.back()); }
-{OPERATOR_INSPECT_FILE}                 { BEGIN_PARAMETER(); return p::make_OPERATOR_INSPECT_FILE(yytext, *driver.loc.back()); }
-{OPERATOR_FUZZY_HASH}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_FUZZY_HASH(yytext, *driver.loc.back()); }
-{OPERATOR_VALIDATE_BYTE_RANGE}          { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_BYTE_RANGE(yytext, *driver.loc.back()); }
-{OPERATOR_VALIDATE_DTD}                 { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_DTD(yytext, *driver.loc.back()); }
-{OPERATOR_VALIDATE_HASH}                { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_HASH(yytext, *driver.loc.back()); }
-{OPERATOR_VALIDATE_SCHEMA}              { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_SCHEMA(yytext, *driver.loc.back()); }
-{OPERATOR_VERIFY_CC}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CC(yytext, *driver.loc.back()); }
-{OPERATOR_VERIFY_CPF}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CPF(yytext, *driver.loc.back()); }
-{OPERATOR_VERIFY_SSN}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SSN(yytext, *driver.loc.back()); }
-{OPERATOR_GSB_LOOKUP}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_GSB_LOOKUP(yytext, *driver.loc.back()); }
-{OPERATOR_RSUB}                         { BEGIN_PARAMETER(); return p::make_OPERATOR_RSUB(yytext, *driver.loc.back()); }
+{OPERATOR_WITHIN}                       { BEGIN_PARAMETER(); return p::make_OPERATOR_WITHIN(*driver.loc.back()); }
+{OPERATOR_CONTAINS_WORD}                { BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS_WORD(*driver.loc.back()); }
+{OPERATOR_CONTAINS}                     { BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS(*driver.loc.back()); }
+{OPERATOR_ENDS_WITH}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_ENDS_WITH(*driver.loc.back()); }
+{OPERATOR_EQ}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_EQ(*driver.loc.back()); }
+{OPERATOR_GE}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_GE(*driver.loc.back()); }
+{OPERATOR_GT}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_GT(*driver.loc.back()); }
+{OPERATOR_IP_MATCH_FROM_FILE}           { BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH_FROM_FILE(*driver.loc.back()); }
+{OPERATOR_IP_MATCH}                     { BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH(*driver.loc.back()); }
+{OPERATOR_LE}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_LE(*driver.loc.back()); }
+{OPERATOR_LT}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_LT(*driver.loc.back()); }
+{OPERATOR_PM_FROM_FILE}                 { BEGIN_PARAMETER(); return p::make_OPERATOR_PM_FROM_FILE(*driver.loc.back()); }
+{OPERATOR_PM}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_PM(*driver.loc.back()); }
+{OPERATOR_RBL}                          { BEGIN_PARAMETER(); return p::make_OPERATOR_RBL( *driver.loc.back()); }
+{OPERATOR_RX}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_RX(*driver.loc.back()); }
+{OPERATOR_STR_EQ}                       { BEGIN_PARAMETER(); return p::make_OPERATOR_STR_EQ(*driver.loc.back()); }
+{OPERATOR_STR_MATCH}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_STR_MATCH(*driver.loc.back()); }
+{OPERATOR_BEGINS_WITH}                  { BEGIN_PARAMETER(); return p::make_OPERATOR_BEGINS_WITH(*driver.loc.back()); }
+{OPERATOR_INSPECT_FILE}                 { BEGIN_PARAMETER(); return p::make_OPERATOR_INSPECT_FILE(*driver.loc.back()); }
+{OPERATOR_FUZZY_HASH}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_FUZZY_HASH(*driver.loc.back()); }
+{OPERATOR_VALIDATE_BYTE_RANGE}          { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_BYTE_RANGE(*driver.loc.back()); }
+{OPERATOR_VALIDATE_DTD}                 { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_DTD(*driver.loc.back()); }
+{OPERATOR_VALIDATE_HASH}                { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_HASH(*driver.loc.back()); }
+{OPERATOR_VALIDATE_SCHEMA}              { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_SCHEMA(*driver.loc.back()); }
+{OPERATOR_VERIFY_CC}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CC(*driver.loc.back()); }
+{OPERATOR_VERIFY_CPF}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CPF(*driver.loc.back()); }
+{OPERATOR_VERIFY_SSN}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SSN(*driver.loc.back()); }
+{OPERATOR_GSB_LOOKUP}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_GSB_LOOKUP(*driver.loc.back()); }
+{OPERATOR_RSUB}                         { BEGIN_PARAMETER(); return p::make_OPERATOR_RSUB(*driver.loc.back()); }
 
 {NOT}                                   { return p::make_NOT(*driver.loc.back()); }
 .                                       { BEGIN_NO_OP_INFORMED(); yyless(0); }
