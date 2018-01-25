@@ -23,13 +23,13 @@ extern "C" {
  */
 /**
  ** First Digit: equals 1 if it is an error code.
- ** Second Digit: the module where the error happens. 
+ ** Second Digit: the module where the error happens.
  **               0 means lock, 1 means shared momory, 2 means the database.
- ** Third Digit: the platform where the error happens. 
+ ** Third Digit: the platform where the error happens.
  **              0 means general, 1 means LINUX, 2 means WINDOWS.
  ** 4th & 5th Digit: the detailed error number.
  */
-#define AGMDB_SUCCESS                                           0        
+#define AGMDB_SUCCESS                                           00000
 #define AGMDB_ERROR                                             10000
 
 #define AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL                        10001
@@ -61,8 +61,8 @@ extern "C" {
 
 #define AGMDB_ERROR_SHM_WIN_CREATE_FAIL                         11200
 #define AGMDB_ERROR_SHM_WIN_MAP_FAIL                            11201
-#define AGMDB_ERROR_SHM_WIN_UNMAP_FAIL                         11202
-#define AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL                        11203
+#define AGMDB_ERROR_SHM_WIN_UNMAP_FAIL                          11202
+#define AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL                   11203
 
 #define AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_SPARELIST         12000
 #define AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_SPARELIST            12001
@@ -105,14 +105,14 @@ extern "C" {
  */
 
 /**
- ** The structure stores the Read/Write locks information. 
+ ** The structure stores the Read/Write locks information.
  ** In Linux, a set of semaphores is used to implement the Read/Write locks.
  ** In Windows, The Windows Mutex is used to implement the Read/Write locks.
  ** @param sem_id: The identifier of semaphore set in Linux.
  ** @param read_lock_handle: The handler of the read locks in Windows.
  ** @param write_lock_handle: The handler of the write lock in Windows.
- */ 
-struct agmdb_lock{
+ */
+struct agmdb_lock {
 #ifndef _WIN32
     int sem_id;
 #else
@@ -125,8 +125,8 @@ struct agmdb_lock{
  ** Handler of AG-MDB, which contains a block of shared momory and the lock structure.
  ** @param shm_base: The base address of the shared memory.
  ** @param db_lock: The structure that stores the lock information.
- */ 
-struct agmdb_handler{
+ */
+struct agmdb_handler {
     const void* shm_base;
     struct agmdb_lock db_lock;
 #ifndef _WIN32
@@ -188,14 +188,14 @@ int AGMDB_freeExclusiveLock(struct agmdb_handler *dbm);
 int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num);
 
 /**
- ** Close and destroy a database. 
+ ** Close and destroy a database.
  ** @param dbm: the database you want to destroy.
  ** return: AGMDB_SUCCESS if successfully destroyed or AGMDB_ERROR if failed.
  */
 int AGMDB_destroyDB(struct agmdb_handler *dbm);
 
 /**
- ** Close a database, but does not destroy it. 
+ ** Close a database, but does not destroy it.
  ** @param dbm: the database you want to close.
  ** return: AGMDB_SUCCESS if successfully closed or AGMDB_ERROR if failed.
  */
@@ -214,10 +214,10 @@ int AGMDB_cleanDB(struct agmdb_handler *dbm);
  ** Reset the expiration time of the database.
  ** You have to get EXCLUSIVE LOCK of the database before calling this function.
  ** Default expiration time is 3600 seconds.
- ** @param expire_time: how many seconds all entries in database will be kept. 
+ ** @param expire_time: how many seconds all entries in database will be kept.
  */
-int AGMDB_setExpireTime(struct agmdb_handler *dbm, unsigned int expire_time); 
- 
+int AGMDB_setExpireTime(struct agmdb_handler *dbm, unsigned int expire_time);
+
 /**
  ** Get the value from a database with the given key.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
@@ -288,7 +288,7 @@ bool AGMDB_isError(int return_code);
  ** Get the number of keys in a database.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.
  ** @param dbm: the database you want to read.
- ** @param keynum: the value to store the number of keys in the database 
+ ** @param keynum: the value to store the number of keys in the database
  ** return: AGMDB_SUCCESS if no error
  **      or AGMDB_ERROR if failed.
  */
