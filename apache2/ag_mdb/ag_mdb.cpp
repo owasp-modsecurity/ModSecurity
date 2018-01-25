@@ -779,6 +779,26 @@ unsigned int AGMDB_hash(const char* key, int key_len, unsigned int output_val_ra
     return hash;
 }
 
+/**
+** Initialize the handle of AG Memory Database.
+** @param dbm: the handle of AG Memory Database.
+** return:  if AGMDB_SUCCESS if success
+**          or AGMDB_ERROR if the handle is NULL.
+*/
+int Handle_init(struct agmdb_handler* dbm) {
+    if (dbm == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
+    dbm->shm_base = NULL;
+#ifndef _WIN32
+    dbm->linux_shm_id = -1;
+    dbm->db_lock.sem_id = -1;
+#else
+    dbm->win_shm_handle = INVALID_HANDLE_VALUE;
+    dbm->db_lock.read_lock_handle = INVALID_HANDLE_VALUE;
+    dbm->db_lock.write_lock_handle = INVALID_HANDLE_VALUE;
+#endif
+    return AGMDB_SUCCESS;
+}
 
 /**
 **========================================================
@@ -996,63 +1016,112 @@ inline int AGMDB_deleteEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id) {
 ** return: AGMDB_SUCCESS if successfully created or AGMDB_ERROR if failed.
 */
 int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num) {
-    int     rc;
-    PTR_VOID   shm_base;
+    int rc = AGMDB_SUCCESS;
+    int rc_shm = AGMDB_SUCCESS;
 
-    if (dbm == NULL)
-        return AGMDB_ERROR_HANDLE_NULL;
-    if (db_name == NULL)
+    rc = Handle_init(dbm);
+    if (rc != AGMDB_SUCCESS) {
+        return rc;
+    }
+
+    /* Check the format of db_name */
+    if (db_name == NULL) {
         return AGMDB_ERROR_NAME_NULL;
-    if (db_name_length <= 0)
+    }
+    else if (db_name_length <= 0) {
         return AGMDB_ERROR_NAME_INVALID_STRING;
-
-
-    // Check the format of db_name
-    if (AGMDB_isstring(db_name, db_name_length) == AGMDB_ERROR) {
+    }
+    else if (AGMDB_isstring(db_name, db_name_length) == AGMDB_ERROR) {
         return AGMDB_ERROR_NAME_INVALID_STRING;
     }
 
+    /* Create or open the shared memory */
     rc = SHM_create(dbm, db_name, db_name_length, entry_num);
-    if ((rc != AGMDB_SUCCESS_SHM_CREATE) && (rc != AGMDB_SUCCESS_SHM_OPEN))
+    if (AGMDB_isError(rc)) {
         return rc;
+    }
+    else if (rc != AGMDB_SUCCESS_SHM_CREATE && rc != AGMDB_SUCCESS_SHM_OPEN) {
+        return AGMDB_ERROR_UNEXPECTED;
+    }
+    rc_shm = rc;
 
+    /* Create or open the lock */
     rc = Lock_create(&(dbm->db_lock), db_name, db_name_length);
-    if ((rc != AGMDB_SUCCESS_LOCK_CREATE) && (rc != AGMDB_SUCCESS_LOCK_OPEN))
+    if (AGMDB_isError(rc))
+    {
+        if (rc_shm == AGMDB_SUCCESS_SHM_CREATE) {
+            SHM_destroy(dbm);
+        }
+        else if (rc_shm == AGMDB_SUCCESS_SHM_OPEN) {
+            SHM_close(dbm);
+        }
         return rc;
+    }
+    else if (rc != AGMDB_SUCCESS_LOCK_CREATE && rc != AGMDB_SUCCESS_LOCK_OPEN) {
+        if (rc_shm == AGMDB_SUCCESS_SHM_CREATE) {
+            SHM_destroy(dbm);
+        }
+        else if (rc_shm == AGMDB_SUCCESS_SHM_OPEN) {
+            SHM_close(dbm);
+        }
+        return AGMDB_ERROR_UNEXPECTED;
+    }
 
-    return AGMDB_SUCCESS;
+    if (rc_shm == AGMDB_SUCCESS_SHM_CREATE) {
+        return AGMDB_SUCCESS_DB_CREATE;
+    }
+    else {
+        return AGMDB_SUCCESS_DB_OPEN;
+    }
 }
 
 /**
- ** Close and destroy a database.
- ** @param dbm: the database you want to destroy.
- ** return: AGMDB_SUCCESS if successfully destroyed or AGMDB_ERROR if failed.
- */
+** Close and destroy a database.
+** @param dbm: the database you want to destroy.
+** return: AGMDB_SUCCESS if successfully destroyed or AGMDB_ERROR if failed.
+*/
 int AGMDB_destroyDB(struct agmdb_handler *dbm) {
-    int rc;
+    int rc = AGMDB_SUCCESS;
+    int rc_shm = AGMDB_SUCCESS;
+    int rc_lock = AGMDB_SUCCESS;
+
     if (dbm == NULL)
         return AGMDB_ERROR_HANDLE_NULL;
-    rc = SHM_destroy(dbm);
-    if (rc != AGMDB_SUCCESS)
+
+    rc = AGMDB_closeDB(dbm);
+    if (AGMDB_isError(rc))
         return rc;
 
-    return Lock_destroy(&(dbm->db_lock));
+    rc_shm = SHM_destroy(dbm);
+    rc_lock = Lock_destroy(&(dbm->db_lock));
+    if (AGMDB_isError(rc_shm))
+        return rc_shm;
+    else if (AGMDB_isError(rc_lock))
+        return rc_lock;
+    else
+        return AGMDB_SUCCESS;
 }
 
 /**
- ** Close a database, but does not destroy it.
- ** @param dbm: the database you want to close.
- ** return: AGMDB_SUCCESS if successfully closed or AGMDB_ERROR if failed.
- */
+** Close a database, but does not destroy it.
+** @param dbm: the database you want to close.
+** return: AGMDB_SUCCESS if successfully closed or AGMDB_ERROR if failed.
+*/
 int AGMDB_closeDB(struct agmdb_handler *dbm) {
-    int rc;
+    int rc_shm = AGMDB_SUCCESS;
+    int rc_lock = AGMDB_SUCCESS;
+
     if (dbm == NULL)
         return AGMDB_ERROR_HANDLE_NULL;
-    rc = SHM_close(dbm);
-    if (rc != AGMDB_SUCCESS)
-        return rc;
-
-    return Lock_close(&(dbm->db_lock));
+        
+    rc_shm = SHM_close(dbm);
+    rc_lock = Lock_close(&(dbm->db_lock));
+    if (AGMDB_isError(rc_shm))
+        return rc_shm;
+    else if (AGMDB_isError(rc_lock))
+        return rc_lock;
+    else
+        return AGMDB_SUCCESS;
 }
 
 /**

@@ -422,6 +422,14 @@ int AGMDB_isstring(const char* str, int str_len);
  */
 unsigned int AGMDB_hash(const char* key, int key_len, unsigned int output_val_range);
 
+/**
+** Initialize the handle of AG Memory Database.
+** @param dbm: the handle of AG Memory Database.
+** return:  if AGMDB_SUCCESS if success
+**          or AGMDB_ERROR if the handle is NULL.
+*/
+int Handle_init(struct agmdb_handler* dbm);
+
 #ifdef __cplusplus
 }
 #endif
