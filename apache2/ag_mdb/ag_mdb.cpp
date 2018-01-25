@@ -290,22 +290,24 @@ int SHM_init(PTR_VOID shm_base, unsigned int shm_size, unsigned int entry_num) {
 }
 
 /**
- ** Create the shared memory of AG Memory Database if it doesn't exist
- ** Open the shared memory of AG Memory Database if it exists
- ** @param dbm:        The hanlder of the database.
- ** @param db_name:         The name of the database.
- ** @param db_name_length:  The length of db_name.
- ** @param entry_num:       The number of entries in the shared memory.
- ** return: AGMDB_SUCCESS_SHM_CREATE if successfully created a new shared memory,
- **         AGMDB_SUCCESS_SHM_OPEN if successfully link to an existed shared memory,
- **         AGMDB_ERROR if failed.
- */
+** Create the shared memory of AG Memory Database if it doesn't exist
+** Open the shared memory of AG Memory Database if it exists
+** @param dbm:        The hanlder of the database.
+** @param db_name:         The name of the database.
+** @param db_name_length:  The length of db_name.
+** @param entry_num:       The number of entries in the shared memory.
+** return: AGMDB_SUCCESS_SHM_CREATE if successfully created a new shared memory,
+**         AGMDB_SUCCESS_SHM_OPEN if successfully link to an existed shared memory,
+**         AGMDB_ERROR if failed.
+*/
 int SHM_create(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num) {
     unsigned int shm_size = SHM_ENTRIES_OFFSET + entry_num * DEFAULT_ENTRY_SIZE;
     int rc;
 #ifndef _WIN32    
     int shm_id;
     int shm_key;
+#else
+    bool shm_is_create = true;
 #endif
     if (dbm == NULL)
         return AGMDB_ERROR_HANDLE_NULL;
@@ -327,8 +329,11 @@ int SHM_create(struct agmdb_handler* dbm, const char* db_name, int db_name_lengt
             //  Map the SHM into the address space of this process 
             dbm->linux_shm_id = shm_id;
             dbm->shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
-            if (dbm->shm_base == (PTR_VOID)-1)
+            if (dbm->shm_base == (PTR_VOID)-1) {
+                dbm->shm_base = NULL;
+                SHM_close(dbm);
                 return AGMDB_ERROR_SHM_LINUX_MAP_FAIL;
+            }
             return AGMDB_SUCCESS_SHM_OPEN;
         }
         else if (errno == EACCES) {
@@ -341,40 +346,61 @@ int SHM_create(struct agmdb_handler* dbm, const char* db_name, int db_name_lengt
     else { // Map the new SHM into the address space of this process 
         dbm->linux_shm_id = shm_id;
         dbm->shm_base = (PTR_VOID)shmat(shm_id, NULL, 0);
-        if (dbm->shm_base == (PTR_VOID)-1)
+        if (dbm->shm_base == (PTR_VOID)-1) {
+            dbm->shm_base = NULL;
+            SHM_destroy(dbm);
             return AGMDB_ERROR_SHM_LINUX_MAP_FAIL;
+        }
         rc = SHM_init((PTR_VOID)dbm->shm_base, shm_size, entry_num);
-        if (rc != AGMDB_SUCCESS)
+        if (rc != AGMDB_SUCCESS) {
+            SHM_destroy(dbm);
             return rc;
+        }
         return AGMDB_SUCCESS_SHM_CREATE;
     }
 #else
-    HANDLE shm_handle;
     if (AGMDB_isstring(db_name, db_name_length) != AGMDB_SUCCESS)
         return AGMDB_ERROR_SHM_NAME_INVALID_STRING;
 
-    shm_handle = CreateFileMapping(
+    dbm->win_shm_handle = CreateFileMapping(
         INVALID_HANDLE_VALUE,   // A memory, not a real file. 
         NULL,                   // Defaut security setting.
         PAGE_READWRITE,         // Read and Write permission.
         0,                      // High 32-bit of shm size.
         shm_size,               // Low 32-bit of shm size.
         db_name);               // Name of shared memory.
-    if (shm_handle == NULL)
+    if (dbm->win_shm_handle == NULL) {
+        dbm->win_shm_handle = INVALID_HANDLE_VALUE;
         return AGMDB_ERROR_SHM_WIN_CREATE_FAIL;
-    dbm->win_shm_handle = shm_handle;
+    }
+    else if (GetLastError() == ERROR_ALREADY_EXISTS) {
+        // Existing Shared Memory
+        shm_is_create = false;
+    }
+
     dbm->shm_base = (PTR_VOID)MapViewOfFile(
-        shm_handle,             // Handle of file.
+        dbm->win_shm_handle,    // Handle of file.
         FILE_MAP_ALL_ACCESS,    // All permissioon.
         0,                      // Map from the beginning of the shared memory.
         0,                      // Map from the beginning of the shared memory.
         0);                     // Map entire shared memory into address space.
-    if (dbm->shm_base == NULL)
+    if (dbm->shm_base == NULL) {
+        if (shm_is_create)
+            SHM_destroy(dbm);
+        else
+            SHM_close(dbm);
         return AGMDB_ERROR_SHM_WIN_MAP_FAIL;
-    if (GetLastError() != ERROR_ALREADY_EXISTS) { // A new shared memory.
-        rc = SHM_init(dbm->shm_base, shm_size, entry_num);
-        if (rc != AGMDB_SUCCESS)
+    }
+
+    if (shm_is_create) { // A New Shared Memory
+        rc = SHM_init((PTR_VOID)dbm->shm_base, shm_size, entry_num);
+        if (rc != AGMDB_SUCCESS) {
+            if (shm_is_create)
+                SHM_destroy(dbm);
+            else
+                SHM_close(dbm);
             return rc;
+        }
         return AGMDB_SUCCESS_SHM_CREATE;
     }
     else { // There has been a SHM with the given name
@@ -384,51 +410,76 @@ int SHM_create(struct agmdb_handler* dbm, const char* db_name, int db_name_lengt
 }
 
 /**
- ** Destroy the shared memory of AG Memory Database
- ** @param dbm: The handler of the database.
- ** return: AGMDB_SUCCESS if successfully destroy shared memory,
- **         AGMDB_ERROR if failed.
- */
+** Destroy the shared memory of AG Memory Database
+** @param dbm: The handler of the database.
+** return: AGMDB_SUCCESS if successfully destroy shared memory,
+**         AGMDB_ERROR if failed.
+*/
 int SHM_destroy(struct agmdb_handler *dbm) {
     int rc;
     if (dbm == NULL)
         return AGMDB_ERROR_HANDLE_NULL;
+    rc = SHM_close(dbm);
+    if (AGMDB_isError(rc))
+        return rc;
     /* Windows doesn't do anything */
 #ifndef _WIN32
-    rc = shmctl(dbm->linux_shm_id, IPC_RMID, 0);
-    if (rc == -1)
-        return AGMDB_ERROR_SHM_LINUX_DESTROY_FAIL;
+    if (dbm->linux_shm_id != -1) {
+        rc = shmctl(dbm->linux_shm_id, IPC_RMID, 0);
+        if (rc == -1)
+            return AGMDB_ERROR_SHM_LINUX_DESTROY_FAIL;
+        dbm->linux_shm_id = -1;
+    }
 #endif
     return AGMDB_SUCCESS;
 }
 
 /**
- ** Close the shared memory of AG Memory Database
- ** @param dbm: The handler of the database.
- ** return: AGMDB_SUCCESS if successfully close shared memory,
- **         AGMDB_ERROR if failed.
- */
+** Close the shared memory of AG Memory Database
+** @param dbm: The handler of the database.
+** return: AGMDB_SUCCESS if successfully close shared memory,
+**         AGMDB_ERROR if failed.
+*/
 int SHM_close(struct agmdb_handler* dbm) {
 #ifndef _WIN32
-    int rc;
+    int rc = 0;
 #else
-    BOOL rc;
+    BOOL rc = 0;
+    int ret_win = AGMDB_SUCCESS;
 #endif        
     if (dbm == NULL)
         return AGMDB_ERROR_HANDLE_NULL;
 #ifndef _WIN32
-    rc = shmdt(dbm->shm_base);
-    if (rc == -1)
-        return AGMDB_ERROR_SHM_LINUX_DETACH_FAIL;
-#else
-    rc = UnmapViewOfFile(dbm->shm_base);
-    if (rc == -1)
-        return AGMDB_ERROR_SHM_WIN_UNMAP_FAIL;
-    rc = CloseHandle(dbm->win_shm_handle);
-    if (rc == 0)
-        return AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL;
-#endif
+    if (dbm->shm_base != NULL) {
+        rc = shmdt(dbm->shm_base);
+        if (rc == -1)
+            return AGMDB_ERROR_SHM_LINUX_DETACH_FAIL;
+        dbm->shm_base = NULL;
+    }
     return AGMDB_SUCCESS;
+#else
+    if (dbm->shm_base != NULL) {
+        rc = UnmapViewOfFile(dbm->shm_base);
+        if (rc == 0)
+            ret_win = AGMDB_ERROR_SHM_WIN_UNMAP_FAIL;
+        else
+            dbm->shm_base = NULL;
+    }
+
+    if (dbm->win_shm_handle != INVALID_HANDLE_VALUE) {
+        rc = CloseHandle(dbm->win_shm_handle);
+        if (rc == 0) {
+            if (ret_win == AGMDB_ERROR_SHM_WIN_UNMAP_FAIL)
+                ret_win = AGMDB_ERROR_SHM_WIN_UNMAP_AND_CLOSE_HANDLE_FAIL;
+            else
+                ret_win = AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL;
+        }
+        else {
+            dbm->win_shm_handle = INVALID_HANDLE_VALUE;
+        }
+    }
+    return ret_win;
+#endif
 }
 
 /**
@@ -937,14 +988,14 @@ inline int AGMDB_deleteEntry(CPTR_VOID shm_base, PTR_OFFSET entry_id) {
 }
 
 /**
- ** Open a database with given name, and intialize the agmdb handler for further operation.
- ** If the database doesn't exist, a new database will be created.
- ** @param dbm: a created sturcture to save the database information.
- ** @param db_name: the unique identifier of a database.
- ** @param db_name_length: the length of the unique_name.
- ** @param entry_num: The maximum number of entries in the database.
- ** return: AGMDB_SUCCESS if successfully created or AGMDB_ERROR if failed.
- */
+** Open a database with given name, and intialize the agmdb handler for further operation.
+** If the database doesn't exist, a new database will be created.
+** @param dbm: a created sturcture to save the database information.
+** @param db_name: the unique identifier of a database.
+** @param db_name_length: the length of the unique_name.
+** @param entry_num: The maximum number of entries in the database.
+** return: AGMDB_SUCCESS if successfully created or AGMDB_ERROR if failed.
+*/
 int AGMDB_openDB(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num) {
     int     rc;
     PTR_VOID   shm_base;
