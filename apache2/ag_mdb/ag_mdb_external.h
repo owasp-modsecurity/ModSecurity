@@ -5,7 +5,11 @@
 extern "C" {
 #endif
 
+#ifndef _WIN32
 #include "stdbool.h"
+#else
+#include <windows.h>
+#endif
 
 /**
  **========================================================

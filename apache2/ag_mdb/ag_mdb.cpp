@@ -49,7 +49,6 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
 #else
     char read_lock_name[AGMDB_MAX_NAME_LEN];
     char write_lock_name[AGMDB_MAX_NAME_LEN];
-    HANDLE new_mutex;
     bool lock_exists = false;
 
     if (AGMDB_isstring(lock_name, lock_name_length) != AGMDB_SUCCESS)
