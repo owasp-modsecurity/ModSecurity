@@ -146,10 +146,6 @@ typedef unsigned long long PTR_OFFSET;
 #define DEFAULT_ENTRY_NUM       ((DEFAULT_SHM_SIZE - SHM_ENTRIES_OFFSET) / DEFAULT_ENTRY_SIZE) // the total number of entries
 #define DEFAULT_EXPIRE_TIME     3600        // the default expire time (seconds) 
 
-/* Return value of shm_create */
-#define AGMDB_SUCCESS_SHM_CREATE 0
-#define AGMDB_SUCCESS_SHM_OPEN   0
-
 /* Shared Memory Functions */
 /**
  ** Initialize the shared memory of AG Memory Database
@@ -340,9 +336,6 @@ int Entry_setKeyValue(CPTR_VOID shm_base, PTR_OFFSET entry_id, const char* key, 
  ** Semaphore Operator Structure and Function
  **========================================================
  */
-
-#define AGMDB_SUCCESS_LOCK_CREATE   0
-#define AGMDB_SUCCESS_LOCK_OPEN     1
 
 /**
  ** Required by Linux.

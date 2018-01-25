@@ -24,28 +24,59 @@ extern "C" {
 /**
  ** First Digit: equals 1 if it is an error code.
  ** Second Digit: the module where the error happens.
- **               0 means lock, 1 means shared momory, 2 means the database.
+ **               0 means the database, 1 means shared momory, 2 means lock.
  ** Third Digit: the platform where the error happens.
  **              0 means general, 1 means LINUX, 2 means WINDOWS.
  ** 4th & 5th Digit: the detailed error number.
  */
 #define AGMDB_SUCCESS                                           00000
+
+#define AGMDB_SUCCESS_DB_CREATE                                 00001
+#define AGMDB_SUCCESS_DB_OPEN                                   00002
+
+#define AGMDB_SUCCESS_SHM_CREATE                                01000
+#define AGMDB_SUCCESS_SHM_OPEN                                  01001
+
+#define AGMDB_SUCCESS_LOCK_CREATE                               02001
+#define AGMDB_SUCCESS_LOCK_OPEN                                 02002
+
 #define AGMDB_ERROR                                             10000
 
-#define AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL                        10001
+#define AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_SPARELIST         10001
+#define AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_SPARELIST            10002
 
-#define AGMDB_ERROR_LOCK_LINUX_SEM_CREATE_FAIL                  10100
-#define AGMDB_ERROR_LOCK_LINUX_SEM_OPEN_FAIL                    10101
-#define AGMDB_ERROR_LOCK_LINUX_SEM_INIT_FAIL                    10102
-#define AGMDB_ERROR_LOCK_LINUX_SEM_MODIFY_FAIL                  10103
-#define AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL                 10104
+#define AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_HASHLIST          10003
+#define AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_HASHLIST             10004
 
-#define AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING                10200
-#define AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL                  10201
-#define AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS               10202
-#define AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL                     10203
-#define AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL                 10204
-#define AGMDB_ERROR_LOCK_WIN_CLOSE_MUTEX_FAIL                   10205
+#define AGMDB_ERROR_REMOVE_INVALID_ENTRY_FROM_HASHLIST          10005
+#define AGMDB_ERROR_NONHEAD_ENTRY_IN_HASHLIST_WITHOUT_PREV      10006
+
+#define AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_TIMELIST          10007
+#define AGMDB_ERROR_REMOVE_INVALID_ENTRY_FROM_TIMELIST          10008
+
+#define AGMDB_ERROR_SET_KEYVAL_OF_INVALID_ENTRY                 10009
+
+#define AGMDB_ERROR_KEY_INVALID_STRING                          10010
+#define AGMDB_ERROR_KEY_TOO_LONG                                10011
+#define AGMDB_ERROR_VALUE_INVALID_STRING                        10012
+#define AGMDB_ERROR_VALUE_TOO_LONG                              10013
+
+#define AGMDB_ERROR_HANDLE_NULL                                 10014
+#define AGMDB_ERROR_DELETE_INVALID_ENTRY                        10015
+#define AGMDB_ERROR_NAME_NULL                                   10016
+#define AGMDB_ERROR_NAME_INVALID_STRING                         10017
+
+#define AGMDB_ERROR_SET_NEGATIVE_EXIPRE_TIME                    10018
+
+#define AGMDB_ERROR_GET_BUFFER_NULL                             10019
+#define AGMDB_ERROR_GET_INVALID_BUFFER_LEN                      10020
+#define AGMDB_ERROR_GET_BUFFER_TOO_SMALL                        10021
+
+#define AGMDB_ERROR_TIMELIST_LONG_NOTEQUEAL_SHM_CNT             10022
+
+#define AGMDB_ERROR_GETALL_ARRAY_TOO_SMALL                      10023
+
+#define AGMDB_ERROR_UNEXPECTED                                  10099
 
 #define AGMDB_ERROR_SHM_BASE_NULL                               11000
 #define AGMDB_ERROR_SHM_SIZE_TOO_SMALL                          11001
@@ -63,40 +94,22 @@ extern "C" {
 #define AGMDB_ERROR_SHM_WIN_MAP_FAIL                            11201
 #define AGMDB_ERROR_SHM_WIN_UNMAP_FAIL                          11202
 #define AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL                   11203
+#define AGMDB_ERROR_SHM_WIN_UNMAP_AND_CLOSE_HANDLE_FAIL         11204
 
-#define AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_SPARELIST         12000
-#define AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_SPARELIST            12001
+#define AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL                        12000
 
-#define AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_HASHLIST          12002
-#define AGMDB_ERROR_INSERT_BUSY_ENTRY_INTO_HASHLIST             12003
+#define AGMDB_ERROR_LOCK_LINUX_SEM_CREATE_FAIL                  12100
+#define AGMDB_ERROR_LOCK_LINUX_SEM_OPEN_FAIL                    12101
+#define AGMDB_ERROR_LOCK_LINUX_SEM_INIT_FAIL                    12102
+#define AGMDB_ERROR_LOCK_LINUX_SEM_MODIFY_FAIL                  12103
+#define AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL                 12104
 
-#define AGMDB_ERROR_REMOVE_INVALID_ENTRY_FROM_HASHLIST          12004
-#define AGMDB_ERROR_NONHEAD_ENTRY_IN_HASHLIST_WITHOUT_PREV      12005
-
-#define AGMDB_ERROR_INSERT_INVALID_ENTRY_INTO_TIMELIST          12006
-#define AGMDB_ERROR_REMOVE_INVALID_ENTRY_FROM_TIMELIST          12007
-
-#define AGMDB_ERROR_SET_KEYVAL_OF_INVALID_ENTRY                 12008
-
-#define AGMDB_ERROR_KEY_INVALID_STRING                          12009
-#define AGMDB_ERROR_KEY_TOO_LONG                                12010
-#define AGMDB_ERROR_VALUE_INVALID_STRING                        12011
-#define AGMDB_ERROR_VALUE_TOO_LONG                              12012
-
-#define AGMDB_ERROR_HANDLE_NULL                                 12013
-#define AGMDB_ERROR_DELETE_INVALID_ENTRY                        12014
-#define AGMDB_ERROR_NAME_NULL                                   12015
-#define AGMDB_ERROR_NAME_INVALID_STRING                         12016
-
-#define AGMDB_ERROR_SET_NEGATIVE_EXIPRE_TIME                    12017
-
-#define AGMDB_ERROR_GET_BUFFER_NULL                             12018
-#define AGMDB_ERROR_GET_INVALID_BUFFER_LEN                      12019
-#define AGMDB_ERROR_GET_BUFFER_TOO_SMALL                        12020
-
-#define AGMDB_ERROR_TIMELIST_LONG_NOTEQUEAL_SHM_CNT             12021
-
-#define AGMDB_ERROR_GETALL_ARRAY_TOO_SMALL                      12022
+#define AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING                12200
+#define AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL                  12201
+#define AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS               12202
+#define AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL                     12203
+#define AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL                 12204
+#define AGMDB_ERROR_LOCK_WIN_CLOSE_MUTEX_FAIL                   12205
 
 /**
  **========================================================
