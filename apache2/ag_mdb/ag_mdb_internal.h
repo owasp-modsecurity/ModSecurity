@@ -53,7 +53,6 @@ extern "C" {
   */
 
 #define DEFAULT_AGMDB_ID_RANGE  0x8fffffff  // the default range of database ID mapped by database's name
-#define AGMDB_MAX_NAME_LEN 256              // The name limit of lock and shm's name.
 
   /* Hash Function Default Setting */
 #define DEFAULT_HASH_MAGIC_SEED 0           // the seed of hash function in AGMDB_hash()
@@ -336,6 +335,14 @@ int Entry_setKeyValue(CPTR_VOID shm_base, PTR_OFFSET entry_id, const char* key, 
  ** Semaphore Operator Structure and Function
  **========================================================
  */
+
+/**
+ ** Define the name prefix of Read/Write lock on Windows
+ */
+#ifdef _WIN32
+#define READ_LOCK_PREFIX "DB_LOCK_READ_"
+#define WRITE_LOCK_PREFIX "DB_LOCK_WRITE_"
+#endif
 
 /**
  ** Required by Linux.

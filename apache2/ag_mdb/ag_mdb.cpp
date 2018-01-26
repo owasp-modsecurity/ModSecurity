@@ -21,20 +21,31 @@
 int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_name_length) {
 #ifndef _WIN32
     union semun sem_union;
-    int lock_id = AGMDB_hash(lock_name, lock_name_length, DEFAULT_AGMDB_ID_RANGE);
+    int lock_id = -1;
+#else
+    int read_lock_name_len = 0;
+    int write_lock_name_len = 0;
+    char* read_lock_name = NULL;
+    char* write_lock_name = NULL;
+    bool lock_exists = false;
+#endif
+    if (new_lock == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
+#ifndef _WIN32
+    lock_id = AGMDB_hash(lock_name, lock_name_length, DEFAULT_AGMDB_ID_RANGE);
     new_lock->sem_id = semget(lock_id, SEM_NUMBERS, IPC_CREAT | IPC_EXCL);
     if (new_lock->sem_id != -1) {
         // A new semaphore set is created, need to initialize the semaphore set
         sem_union.val = SEM_READ_INITVAL;
         if (semctl(new_lock->sem_id, SEM_ID_READ, SETVAL, sem_union) == -1) {
+            Lock_destroy(new_lock);
             return AGMDB_ERROR_LOCK_LINUX_SEM_CREATE_FAIL;
         }
 
         sem_union.val = SEM_WRITE_INITVAL;
         if (semctl(new_lock->sem_id, SEM_ID_WRITE, SETVAL, sem_union) == -1) {
-            // If failed, reset the read lock
-            sem_union.val = 0;
-            semctl(new_lock->sem_id, SEM_ID_READ, SETVAL, sem_union);
+            // If failed, destroy the lock
+            Lock_destroy(new_lock);
             return AGMDB_ERROR_LOCK_LINUX_SEM_INIT_FAIL;
         }
         return AGMDB_SUCCESS_LOCK_CREATE;
@@ -47,39 +58,49 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
         return AGMDB_SUCCESS_LOCK_OPEN;
     }
 #else
-    char read_lock_name[AGMDB_MAX_NAME_LEN];
-    char write_lock_name[AGMDB_MAX_NAME_LEN];
-    bool lock_exists = false;
+    read_lock_name_len = (strlen(READ_LOCK_PREFIX) + strlen(lock_name) + 1) * sizeof(char);
+    write_lock_name_len = (strlen(WRITE_LOCK_PREFIX) + strlen(lock_name) + 1) * sizeof(char);
 
     if (AGMDB_isstring(lock_name, lock_name_length) != AGMDB_SUCCESS)
         return AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING;
-    sprintf_s(read_lock_name, AGMDB_MAX_NAME_LEN, "DB_%s_LOCK_READ", lock_name);
-    sprintf_s(write_lock_name, AGMDB_MAX_NAME_LEN, "DB_%s_LOCK_WRITE", lock_name);
+
+    read_lock_name = (char *)malloc(read_lock_name_len * sizeof(char));
+    sprintf_s(read_lock_name, read_lock_name_len, "%s%s", READ_LOCK_PREFIX, lock_name);
     new_lock->read_lock_handle = CreateMutex(
         NULL,               // Default security settings.
         FALSE,              // Do not take the lock after created.
         read_lock_name);    // The name of read lock.
-    if (new_lock->read_lock_handle == NULL)
+    free(read_lock_name);
+
+    if (new_lock->read_lock_handle == NULL) {
+        new_lock->read_lock_handle = INVALID_HANDLE_VALUE;
         return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
+    }
+
     if (GetLastError() == ERROR_ALREADY_EXISTS)
         lock_exists = true;
 
+    write_lock_name = (char *)malloc(write_lock_name_len * sizeof(char));
+    sprintf_s(write_lock_name, write_lock_name_len, "%s%s", WRITE_LOCK_PREFIX, lock_name);
     new_lock->write_lock_handle = CreateMutex(
         NULL,               // Default security settings.
         FALSE,              // Do not take the lock after created.
         write_lock_name);   // The name of write lock.
+    free(write_lock_name);
+
     if (new_lock->write_lock_handle == NULL) {
         CloseHandle(new_lock->read_lock_handle);
-        new_lock->read_lock_handle = NULL;
+        new_lock->read_lock_handle = INVALID_HANDLE_VALUE;
+        new_lock->write_lock_handle = INVALID_HANDLE_VALUE;
         return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
     }
 
     if ((GetLastError() == ERROR_ALREADY_EXISTS) != lock_exists) {
         // One lock exists, another not.
         CloseHandle(new_lock->read_lock_handle);
-        new_lock->read_lock_handle = NULL;
+        new_lock->read_lock_handle = INVALID_HANDLE_VALUE;
         CloseHandle(new_lock->write_lock_handle);
-        new_lock->write_lock_handle = NULL;
+        new_lock->write_lock_handle = INVALID_HANDLE_VALUE;
         return AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS;
     }
 
@@ -99,12 +120,19 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
 **         AGMDB_ERROR if failed.
 */
 int Lock_destroy(struct agmdb_lock *db_lock) {
+    int rc = AGMDB_SUCCESS;
+    if (db_lock == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
+    rc = Lock_close(db_lock);
+    if (AGMDB_isError(rc))
+        return rc;
     /* Windows doesn't do anything */
 #ifndef _WIN32
-    int rc;
     rc = semctl(db_lock->sem_id, 0, IPC_RMID);
     if (rc == -1)
         return AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL;
+    else
+        db_lock->sem_id = -1;
 #endif
     return AGMDB_SUCCESS;
 }
@@ -116,22 +144,24 @@ int Lock_destroy(struct agmdb_lock *db_lock) {
 **         AGMDB_ERROR if failed.
 */
 int Lock_close(struct agmdb_lock *db_lock) {
+    if (db_lock == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
     /* Linux doesn't do anything */
 #ifdef _WIN32
     BOOL rc_read = 1;
     BOOL rc_write = 1;
-    if (db_lock->read_lock_handle != NULL)
+    if (db_lock->read_lock_handle != INVALID_HANDLE_VALUE)
     {
         rc_read = CloseHandle(db_lock->read_lock_handle);
         if (rc_read != 0)
-            db_lock->read_lock_handle = NULL;
+            db_lock->read_lock_handle = INVALID_HANDLE_VALUE;
     }
 
-    if (db_lock->write_lock_handle != NULL)
+    if (db_lock->write_lock_handle != INVALID_HANDLE_VALUE)
     {
         rc_write = CloseHandle(db_lock->write_lock_handle);
         if (rc_write != 0)
-            db_lock->write_lock_handle = NULL;
+            db_lock->write_lock_handle = INVALID_HANDLE_VALUE;
     }
 
     if (rc_read == 0 || rc_write == 0)
