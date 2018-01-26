@@ -930,10 +930,10 @@ int AGMDB_freeExclusiveLock(struct agmdb_handler *dbm) {
 
     rc = Lock_V(db_lock, SEM_ID_READ, SEM_READ_INITVAL);
     if (rc != AGMDB_SUCCESS)
-        return AGMDB_ERROR;
+        return rc;
     rc = Lock_V(db_lock, SEM_ID_WRITE, 1);
     if (rc != AGMDB_SUCCESS)
-        return AGMDB_ERROR;
+        return rc;
 
     return AGMDB_SUCCESS;
 }
