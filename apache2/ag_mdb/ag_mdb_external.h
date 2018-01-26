@@ -80,6 +80,8 @@ extern "C" {
 
 #define AGMDB_ERROR_GETALL_ARRAY_TOO_SMALL                      10023
 
+#define AGMDB_ERROR_DB_WIN_DESTROY_NOT_SUPPORT                  10024
+
 #define AGMDB_ERROR_UNEXPECTED                                  10099
 
 #define AGMDB_ERROR_SHM_BASE_NULL                               11000
@@ -99,6 +101,7 @@ extern "C" {
 #define AGMDB_ERROR_SHM_WIN_UNMAP_FAIL                          11202
 #define AGMDB_ERROR_SHM_WIN_CLOSE_HANDLE_FAIL                   11203
 #define AGMDB_ERROR_SHM_WIN_UNMAP_AND_CLOSE_HANDLE_FAIL         11204
+#define AGMDB_ERROR_SHM_WIN_DESTROY_NOT_SUPPORT                 11205
 
 #define AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL                        12000
 
@@ -114,6 +117,7 @@ extern "C" {
 #define AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL                     12203
 #define AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL                 12204
 #define AGMDB_ERROR_LOCK_WIN_CLOSE_MUTEX_FAIL                   12205
+#define AGMDB_ERROR_LOCK_WIN_DESTROY_NOT_SUPPORT                12206
 
 /**
  **========================================================

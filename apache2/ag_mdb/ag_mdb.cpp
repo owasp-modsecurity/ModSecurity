@@ -21,20 +21,31 @@
 int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_name_length) {
 #ifndef _WIN32
     union semun sem_union;
-    int lock_id = AGMDB_hash(lock_name, lock_name_length, DEFAULT_AGMDB_ID_RANGE);
+    int lock_id = -1;
+#else
+    int read_lock_name_len = 0;
+    int write_lock_name_len = 0;
+    char* read_lock_name = NULL;
+    char* write_lock_name = NULL;
+    bool lock_exists = false;
+#endif
+    if (new_lock == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
+#ifndef _WIN32
+    lock_id = AGMDB_hash(lock_name, lock_name_length, DEFAULT_AGMDB_ID_RANGE);
     new_lock->sem_id = semget(lock_id, SEM_NUMBERS, IPC_CREAT | IPC_EXCL);
     if (new_lock->sem_id != -1) {
         // A new semaphore set is created, need to initialize the semaphore set
         sem_union.val = SEM_READ_INITVAL;
         if (semctl(new_lock->sem_id, SEM_ID_READ, SETVAL, sem_union) == -1) {
+            Lock_destroy(new_lock);
             return AGMDB_ERROR_LOCK_LINUX_SEM_CREATE_FAIL;
         }
 
         sem_union.val = SEM_WRITE_INITVAL;
         if (semctl(new_lock->sem_id, SEM_ID_WRITE, SETVAL, sem_union) == -1) {
-            // If failed, reset the read lock
-            sem_union.val = 0;
-            semctl(new_lock->sem_id, SEM_ID_READ, SETVAL, sem_union);
+            // If failed, destroy the lock
+            Lock_destroy(new_lock);
             return AGMDB_ERROR_LOCK_LINUX_SEM_INIT_FAIL;
         }
         return AGMDB_SUCCESS_LOCK_CREATE;
@@ -47,39 +58,49 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
         return AGMDB_SUCCESS_LOCK_OPEN;
     }
 #else
-    char read_lock_name[AGMDB_MAX_NAME_LEN];
-    char write_lock_name[AGMDB_MAX_NAME_LEN];
-    bool lock_exists = false;
+    read_lock_name_len = (strlen(READ_LOCK_PREFIX) + strlen(lock_name) + 1) * sizeof(char);
+    write_lock_name_len = (strlen(WRITE_LOCK_PREFIX) + strlen(lock_name) + 1) * sizeof(char);
 
     if (AGMDB_isstring(lock_name, lock_name_length) != AGMDB_SUCCESS)
         return AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING;
-    sprintf_s(read_lock_name, AGMDB_MAX_NAME_LEN, "DB_%s_LOCK_READ", lock_name);
-    sprintf_s(write_lock_name, AGMDB_MAX_NAME_LEN, "DB_%s_LOCK_WRITE", lock_name);
+
+    read_lock_name = (char *)malloc(read_lock_name_len * sizeof(char));
+    sprintf_s(read_lock_name, read_lock_name_len, "%s%s", READ_LOCK_PREFIX, lock_name);
     new_lock->read_lock_handle = CreateMutex(
         NULL,               // Default security settings.
         FALSE,              // Do not take the lock after created.
         read_lock_name);    // The name of read lock.
-    if (new_lock->read_lock_handle == NULL)
+    free(read_lock_name);
+
+    if (new_lock->read_lock_handle == NULL) {
+        new_lock->read_lock_handle = INVALID_HANDLE_VALUE;
         return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
+    }
+
     if (GetLastError() == ERROR_ALREADY_EXISTS)
         lock_exists = true;
 
+    write_lock_name = (char *)malloc(write_lock_name_len * sizeof(char));
+    sprintf_s(write_lock_name, write_lock_name_len, "%s%s", WRITE_LOCK_PREFIX, lock_name);
     new_lock->write_lock_handle = CreateMutex(
         NULL,               // Default security settings.
         FALSE,              // Do not take the lock after created.
         write_lock_name);   // The name of write lock.
+    free(write_lock_name);
+
     if (new_lock->write_lock_handle == NULL) {
         CloseHandle(new_lock->read_lock_handle);
-        new_lock->read_lock_handle = NULL;
+        new_lock->read_lock_handle = INVALID_HANDLE_VALUE;
+        new_lock->write_lock_handle = INVALID_HANDLE_VALUE;
         return AGMDB_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL;
     }
 
     if ((GetLastError() == ERROR_ALREADY_EXISTS) != lock_exists) {
         // One lock exists, another not.
         CloseHandle(new_lock->read_lock_handle);
-        new_lock->read_lock_handle = NULL;
+        new_lock->read_lock_handle = INVALID_HANDLE_VALUE;
         CloseHandle(new_lock->write_lock_handle);
-        new_lock->write_lock_handle = NULL;
+        new_lock->write_lock_handle = INVALID_HANDLE_VALUE;
         return AGMDB_ERROR_LOCK_WIN_ONLY_ONE_LOCK_EXISTS;
     }
 
@@ -99,14 +120,23 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
 **         AGMDB_ERROR if failed.
 */
 int Lock_destroy(struct agmdb_lock *db_lock) {
-    /* Windows doesn't do anything */
+    int rc = AGMDB_SUCCESS;
+    if (db_lock == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
+    rc = Lock_close(db_lock);
+    if (AGMDB_isError(rc))
+        return rc;
 #ifndef _WIN32
-    int rc;
     rc = semctl(db_lock->sem_id, 0, IPC_RMID);
     if (rc == -1)
         return AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL;
-#endif
+    else
+        db_lock->sem_id = -1;
     return AGMDB_SUCCESS;
+#else
+    /* Locks destroy doesn't support on Windows */
+    return AGMDB_ERROR_LOCK_WIN_DESTROY_NOT_SUPPORT;
+#endif
 }
 
 /**
@@ -116,22 +146,24 @@ int Lock_destroy(struct agmdb_lock *db_lock) {
 **         AGMDB_ERROR if failed.
 */
 int Lock_close(struct agmdb_lock *db_lock) {
+    if (db_lock == NULL)
+        return AGMDB_ERROR_HANDLE_NULL;
     /* Linux doesn't do anything */
 #ifdef _WIN32
     BOOL rc_read = 1;
     BOOL rc_write = 1;
-    if (db_lock->read_lock_handle != NULL)
+    if (db_lock->read_lock_handle != INVALID_HANDLE_VALUE)
     {
         rc_read = CloseHandle(db_lock->read_lock_handle);
         if (rc_read != 0)
-            db_lock->read_lock_handle = NULL;
+            db_lock->read_lock_handle = INVALID_HANDLE_VALUE;
     }
 
-    if (db_lock->write_lock_handle != NULL)
+    if (db_lock->write_lock_handle != INVALID_HANDLE_VALUE)
     {
         rc_write = CloseHandle(db_lock->write_lock_handle);
         if (rc_write != 0)
-            db_lock->write_lock_handle = NULL;
+            db_lock->write_lock_handle = INVALID_HANDLE_VALUE;
     }
 
     if (rc_read == 0 || rc_write == 0)
@@ -421,7 +453,7 @@ int SHM_destroy(struct agmdb_handler *dbm) {
     rc = SHM_close(dbm);
     if (AGMDB_isError(rc))
         return rc;
-    /* Windows doesn't do anything */
+    
 #ifndef _WIN32
     if (dbm->linux_shm_id != -1) {
         rc = shmctl(dbm->linux_shm_id, IPC_RMID, 0);
@@ -429,8 +461,11 @@ int SHM_destroy(struct agmdb_handler *dbm) {
             return AGMDB_ERROR_SHM_LINUX_DESTROY_FAIL;
         dbm->linux_shm_id = -1;
     }
-#endif
     return AGMDB_SUCCESS;
+#else
+    /* Shared memory destroy doesn't support on Windows */
+    return AGMDB_ERROR_SHM_WIN_DESTROY_NOT_SUPPORT;
+#endif
 }
 
 /**
@@ -895,10 +930,10 @@ int AGMDB_freeExclusiveLock(struct agmdb_handler *dbm) {
 
     rc = Lock_V(db_lock, SEM_ID_READ, SEM_READ_INITVAL);
     if (rc != AGMDB_SUCCESS)
-        return AGMDB_ERROR;
+        return rc;
     rc = Lock_V(db_lock, SEM_ID_WRITE, 1);
     if (rc != AGMDB_SUCCESS)
-        return AGMDB_ERROR;
+        return rc;
 
     return AGMDB_SUCCESS;
 }
@@ -1094,6 +1129,11 @@ int AGMDB_destroyDB(struct agmdb_handler *dbm) {
 
     rc_shm = SHM_destroy(dbm);
     rc_lock = Lock_destroy(&(dbm->db_lock));
+
+    /* Database destroy doesn't support on Windows */
+    if(rc_shm == AGMDB_ERROR_SHM_WIN_DESTROY_NOT_SUPPORT && rc_lock == AGMDB_ERROR_LOCK_WIN_DESTROY_NOT_SUPPORT)
+        return AGMDB_ERROR_DB_WIN_DESTROY_NOT_SUPPORT;
+
     if (AGMDB_isError(rc_shm))
         return rc_shm;
     else if (AGMDB_isError(rc_lock))
@@ -1412,6 +1452,9 @@ const char* AGMDB_getErrorInfo(int error_no) {
     case AGMDB_ERROR_GETALL_ARRAY_TOO_SMALL:
         return "In getAll function, the array is too samll to save the data.";
 
+    case AGMDB_ERROR_DB_WIN_DESTROY_NOT_SUPPORT:
+        return "In Windows system, the destroy operation doesn't supported. Just close the database.";
+
     case AGMDB_ERROR_UNEXPECTED:
         return "Unexpected error happens.";
 
@@ -1447,6 +1490,8 @@ const char* AGMDB_getErrorInfo(int error_no) {
         return "In Windows system, faild when close the shared memory handle. Call GetLastError() for more information.";
     case AGMDB_ERROR_SHM_WIN_UNMAP_AND_CLOSE_HANDLE_FAIL:
         return "In Windows system, faild when unmap the shared memory and close the shared memory handle. Call GetLastError() for more information.";
+    case AGMDB_ERROR_SHM_WIN_DESTROY_NOT_SUPPORT:
+        return "In Windows system, the shared memory destroy operation doesn't supported. Just close the shared memory.";
 
     case AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL:
         return "When operating the lock, the operation value is negative!";
@@ -1474,6 +1519,8 @@ const char* AGMDB_getErrorInfo(int error_no) {
         return "In Windows system, failed when releasing the mutex object.";
     case AGMDB_ERROR_LOCK_WIN_CLOSE_MUTEX_FAIL:
         return "In Windows system, failed when close the mutex object.";
+    case AGMDB_ERROR_LOCK_WIN_DESTROY_NOT_SUPPORT:
+        return "In Windows system, the lock destroy operation doesn't supported. Just close the locks.";
 
     default:
         return "Error code is not found.";
