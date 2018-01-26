@@ -126,15 +126,17 @@ int Lock_destroy(struct agmdb_lock *db_lock) {
     rc = Lock_close(db_lock);
     if (AGMDB_isError(rc))
         return rc;
-    /* Windows doesn't do anything */
 #ifndef _WIN32
     rc = semctl(db_lock->sem_id, 0, IPC_RMID);
     if (rc == -1)
         return AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL;
     else
         db_lock->sem_id = -1;
-#endif
     return AGMDB_SUCCESS;
+#else
+    /* Locks destroy doesn't support on Windows */
+    return AGMDB_ERROR_LOCK_WIN_DESTROY_NOT_SUPPORT;
+#endif
 }
 
 /**
@@ -451,7 +453,7 @@ int SHM_destroy(struct agmdb_handler *dbm) {
     rc = SHM_close(dbm);
     if (AGMDB_isError(rc))
         return rc;
-    /* Windows doesn't do anything */
+    
 #ifndef _WIN32
     if (dbm->linux_shm_id != -1) {
         rc = shmctl(dbm->linux_shm_id, IPC_RMID, 0);
@@ -459,8 +461,11 @@ int SHM_destroy(struct agmdb_handler *dbm) {
             return AGMDB_ERROR_SHM_LINUX_DESTROY_FAIL;
         dbm->linux_shm_id = -1;
     }
-#endif
     return AGMDB_SUCCESS;
+#else
+    /* Shared memory destroy doesn't support on Windows */
+    return AGMDB_ERROR_SHM_WIN_DESTROY_NOT_SUPPORT;
+#endif
 }
 
 /**
@@ -1124,6 +1129,11 @@ int AGMDB_destroyDB(struct agmdb_handler *dbm) {
 
     rc_shm = SHM_destroy(dbm);
     rc_lock = Lock_destroy(&(dbm->db_lock));
+
+    /* Database destroy doesn't support on Windows */
+    if(rc_shm == AGMDB_ERROR_SHM_WIN_DESTROY_NOT_SUPPORT && rc_lock == AGMDB_ERROR_LOCK_WIN_DESTROY_NOT_SUPPORT)
+        return AGMDB_ERROR_DB_WIN_DESTROY_NOT_SUPPORT;
+
     if (AGMDB_isError(rc_shm))
         return rc_shm;
     else if (AGMDB_isError(rc_lock))
@@ -1442,6 +1452,9 @@ const char* AGMDB_getErrorInfo(int error_no) {
     case AGMDB_ERROR_GETALL_ARRAY_TOO_SMALL:
         return "In getAll function, the array is too samll to save the data.";
 
+    case AGMDB_ERROR_DB_WIN_DESTROY_NOT_SUPPORT:
+        return "In Windows system, the destroy operation doesn't supported. Just close the database.";
+
     case AGMDB_ERROR_UNEXPECTED:
         return "Unexpected error happens.";
 
@@ -1477,6 +1490,8 @@ const char* AGMDB_getErrorInfo(int error_no) {
         return "In Windows system, faild when close the shared memory handle. Call GetLastError() for more information.";
     case AGMDB_ERROR_SHM_WIN_UNMAP_AND_CLOSE_HANDLE_FAIL:
         return "In Windows system, faild when unmap the shared memory and close the shared memory handle. Call GetLastError() for more information.";
+    case AGMDB_ERROR_SHM_WIN_DESTROY_NOT_SUPPORT:
+        return "In Windows system, the shared memory destroy operation doesn't supported. Just close the shared memory.";
 
     case AGMDB_ERROR_LOCK_OP_NEGATIVE_VAL:
         return "When operating the lock, the operation value is negative!";
@@ -1504,6 +1519,8 @@ const char* AGMDB_getErrorInfo(int error_no) {
         return "In Windows system, failed when releasing the mutex object.";
     case AGMDB_ERROR_LOCK_WIN_CLOSE_MUTEX_FAIL:
         return "In Windows system, failed when close the mutex object.";
+    case AGMDB_ERROR_LOCK_WIN_DESTROY_NOT_SUPPORT:
+        return "In Windows system, the lock destroy operation doesn't supported. Just close the locks.";
 
     default:
         return "Error code is not found.";
