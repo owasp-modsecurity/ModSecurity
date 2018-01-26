@@ -25,7 +25,7 @@ extern "C" {
 
 /**
  **========================================================
- ** AG Memory Database Introduction 
+ ** AG Memory Database Introduction
  **========================================================
  ** AG memory database includes two parts:
  ** 1. A block of shared memory (SHM): maintain the basic information of agdbm and the entries
@@ -33,7 +33,7 @@ extern "C" {
  **
  ** Data organization of AG Memory Database:
  ** Three kinds of linklist: spare linklist, hash linklist and expire-time linklist
- ** 
+ **
  ** The spare linklist contains entries that have not been used.
  ** Use two macros ENTRY_PREV() and ENTRY_NEXT() to save the pointer of the spare linklist.
  **
@@ -44,18 +44,18 @@ extern "C" {
  ** The expire-time linklist, contains all busy entries, is used to maintain the expire-time and remove the staled entries.
  ** The head of expire-time linklist is the oldest entry, and the next one is the second oldest entry. The tail of expire-time linklist is the newest entry.
  ** Use two macros ENTRY_TIME_PREV() and ETNRY_NEXT_PREV() to save the pointer of the expire-time linklist.
- */ 
- 
-/**
- **========================================================
- ** AG Memory Database Default Setting
- **========================================================
- */      
+ */
+
+ /**
+  **========================================================
+  ** AG Memory Database Default Setting
+  **========================================================
+  */
 
 #define DEFAULT_AGMDB_ID_RANGE  0x8fffffff  // the default range of database ID mapped by database's name
 #define AGMDB_MAX_NAME_LEN 256              // The name limit of lock and shm's name.
 
-/* Hash Function Default Setting */ 
+  /* Hash Function Default Setting */
 #define DEFAULT_HASH_MAGIC_SEED 0           // the seed of hash function in AGMDB_hash()
 #define DEFAULT_HASH_VALUE_STR_LENGTH 4     // the length of the result value from hash function 
 
@@ -76,39 +76,39 @@ typedef unsigned long long PTR_OFFSET;
  **========================================================
  */
 
-/* SHM Structure and Operation */ 
-/*
-+----------+------------------------+
-|0x00000000|SHM_SIZE                |
-+----------+------------------------+
-|0x00000004|HASH_LISTS_NUM          |
-+----------+------------------------+
-|0x00000008|ENTRIES_NUM             |
-+----------+------------------------+
-|0x0000000c|ENTRY_SIZE              |  
-+----------+------------------------+
-|0x00000010|BUSY_ENTRY_CNT          |
-+----------+------------------------+
-|0x00000014|BUSY_HASH_CNT           |
-+----------+------------------------+
-|0x00000018|EXPIRE_TIME             |
-+----------+------------------------+
-|0x0000001c|EXPIRE_TIME_LIST_HEAD   |
-+----------+------------------------+
-|0x00000024|EXPIRE_TIME_LIST_TAIL   |
-+----------+------------------------+
-|0x0000002c|SPARE_LIST_HEAD         |
-+----------+------------------------+
-|0x00000034|Reserved                |
-|0x000000ff|                        |
-+----------+------------------------+
-|0x00000100|HASH_LISTS_HEADS        |
-|0x002000ff|                        |
-+----------+------------------------+
-|0x00200100|ENTRIES                 |
-|END       |                        |
-+----------+------------------------+
-*/
+ /* SHM Structure and Operation */
+ /*
+ +----------+------------------------+
+ |0x00000000|SHM_SIZE                |
+ +----------+------------------------+
+ |0x00000004|HASH_LISTS_NUM          |
+ +----------+------------------------+
+ |0x00000008|ENTRIES_NUM             |
+ +----------+------------------------+
+ |0x0000000c|ENTRY_SIZE              |
+ +----------+------------------------+
+ |0x00000010|BUSY_ENTRY_CNT          |
+ +----------+------------------------+
+ |0x00000014|BUSY_HASH_CNT           |
+ +----------+------------------------+
+ |0x00000018|EXPIRE_TIME             |
+ +----------+------------------------+
+ |0x0000001c|EXPIRE_TIME_LIST_HEAD   |
+ +----------+------------------------+
+ |0x00000024|EXPIRE_TIME_LIST_TAIL   |
+ +----------+------------------------+
+ |0x0000002c|SPARE_LIST_HEAD         |
+ +----------+------------------------+
+ |0x00000034|Reserved                |
+ |0x000000ff|                        |
+ +----------+------------------------+
+ |0x00000100|HASH_LISTS_HEADS        |
+ |0x002000ff|                        |
+ +----------+------------------------+
+ |0x00200100|ENTRIES                 |
+ |END       |                        |
+ +----------+------------------------+
+ */
 
 #define SHM_SIZE_OFFSET                     0x000000000 // the offset of AG Memory Database size
 #define SHM_HASH_LISTS_NUM_OFFSET           0x000000004 // the offset of number of hashes 
@@ -123,7 +123,7 @@ typedef unsigned long long PTR_OFFSET;
 #define SHM_HASH_LISTS_HEADS_OFFSET         0x000000100 // the offset of heads of hash linklists
 #define SHM_ENTRIES_OFFSET                  0x000200100 // the offset of entries
 
-/* SHM Operation */
+ /* SHM Operation */
 #define SHM_SIZE(base)                  ((unsigned int *)(base + SHM_SIZE_OFFSET))
 #define SHM_HASH_LISTS_NUM(base)        ((unsigned int *)(base + SHM_HASH_LISTS_NUM_OFFSET))
 #define SHM_ENTRIES_NUM(base)           ((unsigned int *)(base + SHM_ENTRIES_NUM_OFFSET))
@@ -146,10 +146,6 @@ typedef unsigned long long PTR_OFFSET;
 #define DEFAULT_ENTRY_NUM       ((DEFAULT_SHM_SIZE - SHM_ENTRIES_OFFSET) / DEFAULT_ENTRY_SIZE) // the total number of entries
 #define DEFAULT_EXPIRE_TIME     3600        // the default expire time (seconds) 
 
-/* Return value of shm_create */
-#define AGMDB_SUCCESS_SHM_CREATE 0
-#define AGMDB_SUCCESS_SHM_OPEN   0
-
 /* Shared Memory Functions */
 /**
  ** Initialize the shared memory of AG Memory Database
@@ -157,27 +153,27 @@ typedef unsigned long long PTR_OFFSET;
  ** @param shm_size: The size of the shared memory.
  ** @param entry_num:The number of entries in the shared memory.
  ** return: AGMDB_SUCCESS if success,
- **         AGMDB_ERROR if failed. 
+ **         AGMDB_ERROR if failed.
  */
-int SHM_init(PTR_VOID shm_base, unsigned int shm_size, int entry_num);
+int SHM_init(PTR_VOID shm_base, unsigned int shm_size, unsigned int entry_num);
 
 /**
- ** Create the shared memory of AG Memory Database if it doesn't exist 
+ ** Create the shared memory of AG Memory Database if it doesn't exist
  ** Open the shared memory of AG Memory Database if it exists
  ** @param dbm:        The hanlder of the database.
  ** @param db_name:         The name of the database.
  ** @param db_name_length:  The length of db_name.
  ** @param entry_num:       The number of entries in the shared memory.
- ** return: AGMDB_SUCCESS_SHM_CREATE if successfully created a new shared memory, 
+ ** return: AGMDB_SUCCESS_SHM_CREATE if successfully created a new shared memory,
  **         AGMDB_SUCCESS_SHM_OPEN if successfully link to an existed shared memory,
- **         AGMDB_ERROR if failed. 
+ **         AGMDB_ERROR if failed.
  */
-int SHM_create(struct agmdb_handler* dbm, const char* db_name, int db_name_length, int entry_num);
+int SHM_create(struct agmdb_handler* dbm, const char* db_name, int db_name_length, unsigned int entry_num);
 
 /**
- ** Destroy the shared memory of AG Memory Database 
+ ** Destroy the shared memory of AG Memory Database
  ** @param dbm: The handler of the database.
- ** return: AGMDB_SUCCESS if successfully destroy shared memory, 
+ ** return: AGMDB_SUCCESS if successfully destroy shared memory,
  **         AGMDB_ERROR if failed.
  */
 int SHM_destroy(struct agmdb_handler *dbm);
@@ -186,7 +182,7 @@ int SHM_destroy(struct agmdb_handler *dbm);
  ** Close the shared memory of AG Memory Database
  ** @param dbm: The handler of the database.
  ** return: AGMDB_SUCCESS if successfully close shared memory,
- **         AGMDB_ERROR if failed. 
+ **         AGMDB_ERROR if failed.
  */
 int SHM_close(struct agmdb_handler* dbm);
 
@@ -199,13 +195,13 @@ int SHM_close(struct agmdb_handler* dbm);
 +----------+------------------------+
 |0x00000008|ENTRY_PREV              |
 +----------+------------------------+
-|0x00000010|ENTRY_NEXT              | 
+|0x00000010|ENTRY_NEXT              |
 +----------+------------------------+
 |0x00000018|ENTRY_TIME_NEXT         |
 +----------+------------------------+
 |0x00000020|ENTRY_TIME_PREV         |
 +----------+------------------------+
-|0x00000028|ENTRY_LENG              | 
+|0x00000028|ENTRY_LENG              |
 +----------+------------------------+
 |0x0000002c|ENTRY_KEY               |
 +----------+------------------------+
@@ -246,7 +242,7 @@ int SHM_close(struct agmdb_handler* dbm);
  ** @param entry_id:        The index of the entry you want to insert.
  ** return: AGMDB_SUCCESS if success.
  */
-int Entry_insertSpareList(CPTR_VOID shm_base, PTR_VOID* spare_list_head, PTR_OFFSET entry_id);
+int Entry_insertSpareList(CPTR_VOID shm_base, PTR_OFFSET* spare_list_head, PTR_OFFSET entry_id);
 
 /**
  ** Remove an entry from spare linklist.
@@ -256,7 +252,7 @@ int Entry_insertSpareList(CPTR_VOID shm_base, PTR_VOID* spare_list_head, PTR_OFF
  ** return: AGMDB_SUCCESS if success,
             AGMDB_ERROR if failed.
  */
-int Entry_removeSpareList(CPTR_VOID shm_base, PTR_VOID* spare_list_head, PTR_OFFSET entry_id);
+int Entry_removeSpareList(CPTR_VOID shm_base, PTR_OFFSET* spare_list_head, PTR_OFFSET* entry_id);
 
 /**
  ** Insert an entry into hash linklist and increase the busy_entry_cnt by 1.
@@ -264,16 +260,16 @@ int Entry_removeSpareList(CPTR_VOID shm_base, PTR_VOID* spare_list_head, PTR_OFF
  ** @param hash_list_head:  The head of spare linklist.
  ** @param entry_id:         The index of entry you want to insert.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_ERROR if failed. 
+            AGMDB_ERROR if failed.
  */
-int Entry_insertHashList(CPTR_VOID shm_base, PTR_VOID* hash_list_head, PTR_OFFSET entry_id);
+int Entry_insertHashList(CPTR_VOID shm_base, PTR_OFFSET* hash_list_head, PTR_OFFSET entry_id);
 
 /**
  ** Remove an entry from hash linklist and decrease the busy_entry_cnt by 1.
  ** @param shm_base:        The base address of shared memory.
  ** @param entry_id:         The index of entry you want to remove.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_ERROR if failed.  
+            AGMDB_ERROR if failed.
  */
 int Entry_removeHashList(CPTR_VOID shm_base, PTR_OFFSET entry_id);
 
@@ -284,9 +280,9 @@ int Entry_removeHashList(CPTR_VOID shm_base, PTR_OFFSET entry_id);
  ** @param time_list_head:  The head of expiration time linklist.
  ** @param time_list_tail:  The tail of expiration time linklist.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_ERROR if failed.   
+            AGMDB_ERROR if failed.
  */
-int Entry_insertTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_VOID* time_list_head, PTR_VOID* time_list_tail);
+int Entry_insertTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_OFFSET* time_list_head, PTR_OFFSET* time_list_tail);
 
 /**
  ** Insert an entry into the tail of expiration time linklist.
@@ -295,9 +291,9 @@ int Entry_insertTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_VOID* time
  ** @param time_list_head:  The head of expiration time linklist.
  ** @param time_list_tail:  The tail of expiration time linklist.
  ** return: AGMDB_SUCCESS if success,
-            AGMDB_ERROR if failed.    
+            AGMDB_ERROR if failed.
  */
-int Entry_removeTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_VOID* time_list_head, PTR_VOID* time_list_tail);
+int Entry_removeTimeList(CPTR_VOID shm_base, PTR_OFFSET entry_id, PTR_OFFSET* time_list_head, PTR_OFFSET* time_list_tail);
 
 /**
  ** Search the entry with given key in a linklist.
@@ -312,15 +308,15 @@ PTR_OFFSET Entry_searchHashlist(CPTR_VOID shm_base, const char* key, unsigned in
 /**
  ** Set the key and value into given entry.
  ** @param shm_base:    The base address of shared memory.
- ** @param entry_id:The index of the entry you want to search.
- ** @param key:     The key string.
- ** @param key_len: The length of key string.
- ** @param value:   The value string.
- ** @param value:   The length of value string.
+ ** @param entry_id:    The index of the entry you want to search.
+ ** @param key:         The key string.
+ ** @param key_len:     The length of key string.
+ ** @param value:       The value string.
+ ** @param value_len:   The length of value string.
  ** return: AGMDB_SUCCESS if success
             or AGMDB_ERROR if fail
  */
-int Entry_setKeyValue(PTR_OFFSET entry_id, const char* key, int key_len, const char* value, int value_len);
+int Entry_setKeyValue(CPTR_VOID shm_base, PTR_OFFSET entry_id, const char* key, int key_len, const char* value, int value_len);
 
 /**
  **========================================================
@@ -341,16 +337,13 @@ int Entry_setKeyValue(PTR_OFFSET entry_id, const char* key, int key_len, const c
  **========================================================
  */
 
-#define AGMDB_SUCCESS_LOCK_CREATE 0
-#define AGMDB_SUCCESS_LOCK_OPEN   1
-
 /**
  ** Required by Linux.
- ** @param val: 
- ** @param buf: 
- ** @param array: 
+ ** @param val:
+ ** @param buf:
+ ** @param array:
  */
-union semun{
+union semun {
     int val;
     struct semid_ds *buf;
     unsigned short *array;
@@ -359,34 +352,34 @@ union semun{
 /**
  ** Create and initialize a agmdb_lock, if the lock with given key exists, just link to the lock.
  ** The new_lock should have been created before calling this function.
- ** @param new_lock:    The pointer to save the information of the lock.
- ** @param lock_key:    The identifier of the lock.
- ** @param lock_num:    The number of atom lock in the agmdb_lock sturcture. Default is 2 (read lock and write lock).
- ** return: AGMDB_SUCCESS_LOCK_CREATE if successfully created a new lock, 
+ ** @param new_lock:        The pointer to save the information of the lock.
+ ** @param lock_name:       The name of lock.
+ ** @param lock_name_length:The length of the lock_name.
+ ** return: AGMDB_SUCCESS_LOCK_CREATE if successfully created a new lock,
  **         AGMDB_SUCCESS_LOCK_OPEN if successfully link to an existed lock,
  **         AGMDB_ERROR if failed.
  */
-int Lock_create(struct agmdb_lock *new_lock, int lock_id, int lock_num);
+int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_name_length);
 
 /**
- ** Destroy the lock of AG Memory Database 
- ** @param db_lock: The agmdb_lock sturcture  
- ** return: AGMDB_SUCCESS if successfully destroy the lock, 
+ ** Destroy the lock of AG Memory Database
+ ** @param db_lock: The agmdb_lock sturcture
+ ** return: AGMDB_SUCCESS if successfully destroy the lock,
  **         AGMDB_ERROR if failed.
  */
 int Lock_destroy(struct agmdb_lock *db_lock);
 
 /**
- ** Close the lock of AG Memory Database 
- ** @param db_lock: The agmdb_lock sturcture  
+ ** Close the lock of AG Memory Database
+ ** @param db_lock: The agmdb_lock sturcture
  ** return: AGMDB_SUCCESS if successfully close the lock,
- **         AGMDB_ERROR if failed. 
+ **         AGMDB_ERROR if failed.
  */
 int Lock_close(struct agmdb_lock *db_lock);
 
 /**
  ** Decrease a lock's value by a given number.
- ** @param db_lock: The agmdb_lock sturcture  
+ ** @param db_lock: The agmdb_lock sturcture
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to decrease from the lock.
  ** return: AGMDB_SUCCESS if success;
@@ -396,7 +389,7 @@ int Lock_P(const struct agmdb_lock *db_lock, int index, int val);
 
 /**
  ** Increase a lock's value by a given number.
- ** @param db_lock: The agmdb_lock sturcture  
+ ** @param db_lock: The agmdb_lock sturcture
  ** @param index:   The index of atom lock (read or write) .
  ** @param val:     The value you want to add to the lock.
  ** return: AGMDB_SUCCESS if success;
@@ -428,6 +421,14 @@ int AGMDB_isstring(const char* str, int str_len);
  **      or AGMDB_ERROR if failed.
  */
 unsigned int AGMDB_hash(const char* key, int key_len, unsigned int output_val_range);
+
+/**
+** Initialize the handle of AG Memory Database.
+** @param dbm: the handle of AG Memory Database.
+** return:  if AGMDB_SUCCESS if success
+**          or AGMDB_ERROR if the handle is NULL.
+*/
+int Handle_init(struct agmdb_handler* dbm);
 
 #ifdef __cplusplus
 }
