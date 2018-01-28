@@ -39,7 +39,7 @@ Variable::Variable(std::string name)
         std::string name = std::string(m_name, m_name.find(":") + 1,
             m_name.size());
         if (col == "TX" || col == "IP" || col == "GLOBAL"
-            || col == "RESOURCE" || col == "SESSION") {
+            || col == "RESOURCE" || col == "SESSION" || col == "USER") {
             m_collectionName = col;
         }
         if ((name.at(0) == '\\') || (name.at(0) == '/')) {
@@ -65,6 +65,9 @@ Variable::Variable(std::string name)
         m_type = MultipleMatches;
     } else if (utils::string::tolower(m_name) == "session") {
         m_collectionName = "SESSION";
+        m_type = MultipleMatches;
+    } else if (utils::string::tolower(m_name) == "user") {
+        m_collectionName = "USER";
         m_type = MultipleMatches;
     } else if (m_name.find(".") != std::string::npos) {
         m_kind = CollectionVarible;

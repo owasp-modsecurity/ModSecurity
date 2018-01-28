@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/run_time_string.h"
 
 #ifndef SRC_ACTIONS_SET_VAR_H_
 #define SRC_ACTIONS_SET_VAR_H_
@@ -41,35 +42,27 @@ enum SetVarOperation {
 
 class SetVar : public Action {
  public:
-    explicit SetVar(std::string action) : Action(action),
-        m_operation(SetVarOperation::setOperation),
-        m_collectionName(""),
-        m_variableName(""),
-        m_predicate("") { }
+    SetVar(SetVarOperation operation,
+        std::unique_ptr<modsecurity::Variables::Variable> variable,
+        std::unique_ptr<RunTimeString> predicate)
+        : Action("setvar"),
+        m_operation(operation),
+        m_variable(std::move(variable)),
+        m_string(std::move(predicate)) { }
 
     SetVar(SetVarOperation operation,
-        std::string variableName,
-        std::string predicate) : Action("setvar"),
+        std::unique_ptr<modsecurity::Variables::Variable> variable)
+        : Action("setvar"),
         m_operation(operation),
-        m_collectionName(""),
-        m_variableName(variableName),
-        m_predicate(predicate) { }
-
-    SetVar(SetVarOperation operation,
-        std::string variableName) : Action("setvar"),
-        m_operation(operation),
-        m_collectionName(""),
-        m_variableName(variableName),
-        m_predicate("") { }
+        m_variable(std::move(variable)) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
  private:
     SetVarOperation m_operation;
-    std::string m_collectionName;
-    std::string m_variableName;
-    std::string m_predicate;
+    std::unique_ptr<modsecurity::Variables::Variable> m_variable;
+    std::unique_ptr<RunTimeString> m_string;
 };
 
 }  // namespace actions

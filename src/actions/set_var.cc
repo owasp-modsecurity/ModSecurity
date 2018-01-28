@@ -24,99 +24,64 @@
 #include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
 #include "src/utils/string.h"
-
+#include "src/variables/global.h"
+#include "src/variables/ip.h"
+#include "src/variables/resource.h"
+#include "src/variables/session.h"
+#include "src/variables/tx.h"
+#include "src/variables/user.h"
+#include "src/variables/variable.h"
 
 namespace modsecurity {
 namespace actions {
 
 
 bool SetVar::init(std::string *error) {
-    size_t pos;
-
-    if (m_variableName.empty() == false) {
-        pos = m_variableName.find(".");
-        if (pos != std::string::npos) {
-            m_collectionName = std::string(m_variableName, 0, pos);
-            m_collectionName = utils::string::toupper(m_collectionName);
-            m_variableName = std::string(m_variableName, pos + 1,
-                m_variableName.size() - (pos + 1));
-        } else {
-            error->assign("Missing the collection and/or variable name");
-            return false;
-        }
-        return true;
-    }
-
-    // Resolv operation
-    m_operation = setToOneOperation;
-    pos = m_parser_payload.find("=");
-    if (pos != std::string::npos) {
-        m_operation = setOperation;
-    }
-    pos = m_parser_payload.find("=+");
-    if (pos != std::string::npos) {
-        m_operation = sumAndSetOperation;
-    }
-    pos = m_parser_payload.find("=-");
-    if (pos != std::string::npos) {
-        m_operation = substractAndSetOperation;
-    }
-
-    // Collection name
-    pos = m_parser_payload.find(".");
-    if (pos != std::string::npos) {
-        m_collectionName = std::string(m_parser_payload, 0, pos);
-        m_collectionName = utils::string::toupper(m_collectionName);
-    } else {
-        error->assign("Missing the collection and/or variable name");
-        return false;
-    }
-
-    // Variable name
-    if (m_operation == setToOneOperation) {
-        m_variableName = std::string(m_parser_payload, pos + 1,
-            m_parser_payload.length()
-            - (pos + 1));
-    } else {
-        size_t pos2 = m_parser_payload.find("=");
-        m_variableName = std::string(m_parser_payload, pos + 1,
-            pos2 - (pos + 1));
-        if (pos2 + 2 > m_parser_payload.length()) {
-            m_predicate = "";
-        } else {
-            if (m_operation == setOperation) {
-                m_predicate = std::string(m_parser_payload, pos2 + 1,
-                    m_parser_payload.length() - (pos2));
-            } else {
-                m_predicate = std::string(m_parser_payload, pos2 + 2,
-                    m_parser_payload.length()
-                    - (pos2 + 1));
-            }
-        }
-    }
-
-    if (m_collectionName.empty() || m_variableName.empty()) {
-        error->assign("Something wrong with the input format");
-        return false;
-    }
-
     return true;
 }
 
 
-bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
+bool SetVar::evaluate(Rule *rule, Transaction *t) {
     std::string targetValue;
-    std::string m_variableNameExpanded = MacroExpansion::expand(m_variableName,
-        rule, transm_parser_payload);
-    std::string resolvedPre = MacroExpansion::expand(m_predicate,
-        rule, transm_parser_payload);
+    std::string resolvedPre;
+
+    if (m_string) {
+        resolvedPre = m_string->evaluate(t);
+    }
+
+    std::string m_variableNameExpanded;
+    std::vector<const collection::Variable *> l;
+
+    auto *v = m_variable.get();
+    Variables::Tx_DynamicElement *tx = dynamic_cast<Variables::Tx_DynamicElement *> (v);
+    Variables::Session_DynamicElement *session = dynamic_cast<Variables::Session_DynamicElement *> (v);
+    Variables::Ip_DynamicElement *ip = dynamic_cast<Variables::Ip_DynamicElement *> (v);
+    Variables::Resource_DynamicElement *resource = dynamic_cast<Variables::Resource_DynamicElement *> (v);
+    Variables::Global_DynamicElement *global = dynamic_cast<Variables::Global_DynamicElement *> (v);
+    Variables::User_DynamicElement *user = dynamic_cast<Variables::User_DynamicElement *> (v);
+    if (tx) {
+        m_variableNameExpanded = tx->m_string->evaluate(t);
+    } else if (session) {
+        m_variableNameExpanded = session->m_string->evaluate(t);
+    } else if (ip) {
+        m_variableNameExpanded = ip->m_string->evaluate(t);
+    } else if (resource) {
+        m_variableNameExpanded = resource->m_string->evaluate(t);
+    } else if (global) {
+        m_variableNameExpanded = global->m_string->evaluate(t);
+    } else if (user) {
+        m_variableNameExpanded = user->m_string->evaluate(t);
+    } else {
+        m_variableNameExpanded = m_variable->m_name;
+    }
 
     if (m_operation == setOperation) {
         targetValue = resolvedPre;
     } else if (m_operation == setToOneOperation) {
         targetValue = std::string("1");
     } else if (m_operation == unsetOperation) {
-        transm_parser_payload->m_collections.del(m_collectionName + ":" +
+        //m_variable
+        t->m_collections.del(m_variable->m_collectionName + ":" +
             m_variableNameExpanded);
         goto end;
     } else {
@@ -130,14 +95,15 @@ bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
         }
 
         try {
-            std::unique_ptr<std::string> resolvedValue =
-                transm_parser_payload->m_collections.resolveFirst(
-                    m_collectionName,
-                    m_variableNameExpanded);
-            if (resolvedValue == NULL || resolvedValue->empty()) {
+            std::vector<const collection::Variable *> l;
+            m_variable->evaluate(t, rule, &l);
+            if (l.size() == 0) {
                 value = 0;
             } else {
-                value = stoi(*resolvedValue);
+                value = stoi(l[0]->m_value);
+                for (auto &i : l) {
+                    delete i;
+                }
             }
         } catch (...) {
             value = 0;
@@ -151,13 +117,12 @@ bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
     }
 
 #ifndef NO_LOGS
-    transm_parser_payload->debug(8, "Saving variable: " + m_collectionName \
+    t->debug(8, "Saving variable: " + m_variable->m_collectionName \
         + ":" + m_variableNameExpanded + " with value: " + targetValue);
 #endif
-    transm_parser_payload->m_collections.storeOrUpdateFirst(m_collectionName,
-        m_variableNameExpanded,
-        transm_parser_payload->m_rules->m_secWebAppId.m_value, targetValue);
-
+        t->m_collections.storeOrUpdateFirst(m_variable->m_collectionName,
+            m_variableNameExpanded,
+            t->m_rules->m_secWebAppId.m_value, targetValue);
 end:
     return true;
 }

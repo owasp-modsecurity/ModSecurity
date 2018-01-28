@@ -23,6 +23,7 @@
 #define SRC_VARIABLES_IP_H_
 
 #include "src/variables/variable.h"
+#include "src/run_time_string.h"
 
 namespace modsecurity {
 
@@ -75,6 +76,23 @@ class Ip_DictElementRegexp : public Variable {
 
     Utils::Regex m_r;
     std::string m_dictElement;
+};
+
+
+class Ip_DynamicElement : public Variable {
+ public:
+    explicit Ip_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
+        : Variable("IP:dynamic"),
+        m_string(std::move(dictElement)) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) override {
+        std::string string = m_string->evaluate(transaction);
+        transaction->m_collections.resolveMultiMatches("IP:" + string, "IP", l);
+    }
+
+    std::unique_ptr<RunTimeString> m_string;
 };
 
 

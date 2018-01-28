@@ -23,6 +23,7 @@
 #define SRC_VARIABLES_TX_H_
 
 #include "src/variables/variable.h"
+#include "src/run_time_string.h"
 
 namespace modsecurity {
 
@@ -75,6 +76,23 @@ class Tx_DictElementRegexp : public Variable {
 
     Utils::Regex m_r;
     std::string m_dictElement;
+};
+
+
+class Tx_DynamicElement : public Variable {
+ public:
+    explicit Tx_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
+        : Variable("TX:dynamic"),
+        m_string(std::move(dictElement)) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) override {
+        std::string string = m_string->evaluate(transaction);
+        transaction->m_collections.resolveMultiMatches("TX:" + string, "TX", l);
+    }
+
+    std::unique_ptr<RunTimeString> m_string;
 };
 
 
