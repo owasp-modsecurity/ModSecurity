@@ -786,7 +786,6 @@ namespace yy {
       // "RUN_TIME_VAR_TIME_SEC"
       // "RUN_TIME_VAR_TIME_WDAY"
       // "RUN_TIME_VAR_TIME_YEAR"
-      // "SETVAR_CONTENT_PART"
       // "VARIABLE"
       // "Dictionary element"
       // "Dictionary element, selected by regexp"
@@ -1139,10 +1138,9 @@ namespace yy {
         TOK_RUN_TIME_VAR_TIME_SEC = 558,
         TOK_RUN_TIME_VAR_TIME_WDAY = 559,
         TOK_RUN_TIME_VAR_TIME_YEAR = 560,
-        TOK_SETVAR_CONTENT_PART = 561,
-        TOK_VARIABLE = 562,
-        TOK_DICT_ELEMENT = 563,
-        TOK_DICT_ELEMENT_REGEXP = 564
+        TOK_VARIABLE = 561,
+        TOK_DICT_ELEMENT = 562,
+        TOK_DICT_ELEMENT_REGEXP = 563
       };
     };
 
@@ -2479,10 +2477,6 @@ namespace yy {
 
     static inline
     symbol_type
-    make_SETVAR_CONTENT_PART (const std::string& v, const location_type& l);
-
-    static inline
-    symbol_type
     make_VARIABLE (const std::string& v, const location_type& l);
 
     static inline
@@ -2698,12 +2692,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 3071,     ///< Last index in yytable_.
+      yylast_ = 3069,     ///< Last index in yytable_.
       yynnts_ = 15,  ///< Number of nonterminal symbols.
       yyfinal_ = 294, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 310  ///< Number of tokens.
+      yyntokens_ = 309  ///< Number of tokens.
     };
 
 
@@ -2776,9 +2770,9 @@ namespace yy {
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-     305,   306,   307,   308,   309
+     305,   306,   307,   308
     };
-    const unsigned int user_token_number_max_ = 564;
+    const unsigned int user_token_number_max_ = 563;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -2975,38 +2969,37 @@ namespace yy {
       case 303: // "RUN_TIME_VAR_TIME_SEC"
       case 304: // "RUN_TIME_VAR_TIME_WDAY"
       case 305: // "RUN_TIME_VAR_TIME_YEAR"
-      case 306: // "SETVAR_CONTENT_PART"
-      case 307: // "VARIABLE"
-      case 308: // "Dictionary element"
-      case 309: // "Dictionary element, selected by regexp"
+      case 306: // "VARIABLE"
+      case 307: // "Dictionary element"
+      case 308: // "Dictionary element, selected by regexp"
         value.copy< std::string > (other.value);
         break;
 
-      case 316: // op
-      case 317: // op_before_init
+      case 315: // op
+      case 316: // op_before_init
         value.copy< std::unique_ptr<Operator> > (other.value);
         break;
 
-      case 324: // run_time_string
+      case 323: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (other.value);
         break;
 
-      case 321: // var
+      case 320: // var
         value.copy< std::unique_ptr<Variable> > (other.value);
         break;
 
-      case 322: // act
-      case 323: // setvar_action
+      case 321: // act
+      case 322: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (other.value);
         break;
 
-      case 319: // variables
-      case 320: // variables_may_be_quoted
+      case 318: // variables
+      case 319: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (other.value);
         break;
 
-      case 314: // actions
-      case 315: // actions_may_quoted
+      case 313: // actions
+      case 314: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (other.value);
         break;
 
@@ -3191,38 +3184,37 @@ namespace yy {
       case 303: // "RUN_TIME_VAR_TIME_SEC"
       case 304: // "RUN_TIME_VAR_TIME_WDAY"
       case 305: // "RUN_TIME_VAR_TIME_YEAR"
-      case 306: // "SETVAR_CONTENT_PART"
-      case 307: // "VARIABLE"
-      case 308: // "Dictionary element"
-      case 309: // "Dictionary element, selected by regexp"
+      case 306: // "VARIABLE"
+      case 307: // "Dictionary element"
+      case 308: // "Dictionary element, selected by regexp"
         value.copy< std::string > (v);
         break;
 
-      case 316: // op
-      case 317: // op_before_init
+      case 315: // op
+      case 316: // op_before_init
         value.copy< std::unique_ptr<Operator> > (v);
         break;
 
-      case 324: // run_time_string
+      case 323: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (v);
         break;
 
-      case 321: // var
+      case 320: // var
         value.copy< std::unique_ptr<Variable> > (v);
         break;
 
-      case 322: // act
-      case 323: // setvar_action
+      case 321: // act
+      case 322: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (v);
         break;
 
-      case 319: // variables
-      case 320: // variables_may_be_quoted
+      case 318: // variables
+      case 319: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (v);
         break;
 
-      case 314: // actions
-      case 315: // actions_may_quoted
+      case 313: // actions
+      case 314: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (v);
         break;
 
@@ -3480,38 +3472,37 @@ namespace yy {
       case 303: // "RUN_TIME_VAR_TIME_SEC"
       case 304: // "RUN_TIME_VAR_TIME_WDAY"
       case 305: // "RUN_TIME_VAR_TIME_YEAR"
-      case 306: // "SETVAR_CONTENT_PART"
-      case 307: // "VARIABLE"
-      case 308: // "Dictionary element"
-      case 309: // "Dictionary element, selected by regexp"
+      case 306: // "VARIABLE"
+      case 307: // "Dictionary element"
+      case 308: // "Dictionary element, selected by regexp"
         value.template destroy< std::string > ();
         break;
 
-      case 316: // op
-      case 317: // op_before_init
+      case 315: // op
+      case 316: // op_before_init
         value.template destroy< std::unique_ptr<Operator> > ();
         break;
 
-      case 324: // run_time_string
+      case 323: // run_time_string
         value.template destroy< std::unique_ptr<RunTimeString> > ();
         break;
 
-      case 321: // var
+      case 320: // var
         value.template destroy< std::unique_ptr<Variable> > ();
         break;
 
-      case 322: // act
-      case 323: // setvar_action
+      case 321: // act
+      case 322: // setvar_action
         value.template destroy< std::unique_ptr<actions::Action> > ();
         break;
 
-      case 319: // variables
-      case 320: // variables_may_be_quoted
+      case 318: // variables
+      case 319: // variables_may_be_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
         break;
 
-      case 314: // actions
-      case 315: // actions_may_quoted
+      case 313: // actions
+      case 314: // actions_may_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ();
         break;
 
@@ -3702,38 +3693,37 @@ namespace yy {
       case 303: // "RUN_TIME_VAR_TIME_SEC"
       case 304: // "RUN_TIME_VAR_TIME_WDAY"
       case 305: // "RUN_TIME_VAR_TIME_YEAR"
-      case 306: // "SETVAR_CONTENT_PART"
-      case 307: // "VARIABLE"
-      case 308: // "Dictionary element"
-      case 309: // "Dictionary element, selected by regexp"
+      case 306: // "VARIABLE"
+      case 307: // "Dictionary element"
+      case 308: // "Dictionary element, selected by regexp"
         value.move< std::string > (s.value);
         break;
 
-      case 316: // op
-      case 317: // op_before_init
+      case 315: // op
+      case 316: // op_before_init
         value.move< std::unique_ptr<Operator> > (s.value);
         break;
 
-      case 324: // run_time_string
+      case 323: // run_time_string
         value.move< std::unique_ptr<RunTimeString> > (s.value);
         break;
 
-      case 321: // var
+      case 320: // var
         value.move< std::unique_ptr<Variable> > (s.value);
         break;
 
-      case 322: // act
-      case 323: // setvar_action
+      case 321: // act
+      case 322: // setvar_action
         value.move< std::unique_ptr<actions::Action> > (s.value);
         break;
 
-      case 319: // variables
-      case 320: // variables_may_be_quoted
+      case 318: // variables
+      case 319: // variables_may_be_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (s.value);
         break;
 
-      case 314: // actions
-      case 315: // actions_may_quoted
+      case 313: // actions
+      case 314: // actions_may_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (s.value);
         break;
 
@@ -3822,7 +3812,7 @@ namespace yy {
      525,   526,   527,   528,   529,   530,   531,   532,   533,   534,
      535,   536,   537,   538,   539,   540,   541,   542,   543,   544,
      545,   546,   547,   548,   549,   550,   551,   552,   553,   554,
-     555,   556,   557,   558,   559,   560,   561,   562,   563,   564
+     555,   556,   557,   558,   559,   560,   561,   562,   563
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -5652,12 +5642,6 @@ namespace yy {
   }
 
   seclang_parser::symbol_type
-  seclang_parser::make_SETVAR_CONTENT_PART (const std::string& v, const location_type& l)
-  {
-    return symbol_type (token::TOK_SETVAR_CONTENT_PART, v, l);
-  }
-
-  seclang_parser::symbol_type
   seclang_parser::make_VARIABLE (const std::string& v, const location_type& l)
   {
     return symbol_type (token::TOK_VARIABLE, v, l);
@@ -5678,7 +5662,7 @@ namespace yy {
 
 
 } // yy
-#line 5682 "seclang-parser.hh" // lalr1.cc:377
+#line 5666 "seclang-parser.hh" // lalr1.cc:377
 
 
 

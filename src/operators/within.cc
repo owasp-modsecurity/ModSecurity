@@ -18,7 +18,7 @@
 #include <string>
 
 #include "src/operators/operator.h"
-#include "src/macro_expansion.h"
+
 
 namespace modsecurity {
 namespace operators {

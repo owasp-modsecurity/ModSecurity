@@ -28,7 +28,6 @@
 #include "src/utils/string.h"
 #include "modsecurity/rules.h"
 #include "modsecurity/rule_message.h"
-#include "src/macro_expansion.h"
 #include "src/actions/msg.h"
 #include "src/actions/log_data.h"
 #include "src/actions/severity.h"

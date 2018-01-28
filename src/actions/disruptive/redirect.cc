@@ -21,7 +21,6 @@
 #include <memory>
 
 #include "modsecurity/transaction.h"
-#include "src/macro_expansion.h"
 #include "src/utils/string.h"
 
 namespace modsecurity {

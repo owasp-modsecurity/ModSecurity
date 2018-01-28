@@ -19,7 +19,7 @@
 
 #include "src/operators/operator.h"
 #include "others/libinjection/src/libinjection.h"
-#include "src/macro_expansion.h"
+
 
 namespace modsecurity {
 namespace operators {

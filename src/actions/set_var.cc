@@ -22,7 +22,6 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rules.h"
 #include "modsecurity/rule.h"
-#include "src/macro_expansion.h"
 #include "src/utils/string.h"
 #include "src/variables/global.h"
 #include "src/variables/ip.h"
@@ -80,7 +79,6 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
     } else if (m_operation == setToOneOperation) {
         targetValue = std::string("1");
     } else if (m_operation == unsetOperation) {
-        //m_variable
         t->m_collections.del(m_variable->m_collectionName + ":" +
             m_variableNameExpanded);
         goto end;
