@@ -37,11 +37,12 @@ class User_DictElement : public Variable {
         : Variable("USER"),
         m_dictElement("USER:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_dictElement,
-            "USER", transaction->m_rules->m_secWebAppId.m_value, l);
+        t->m_collections.m_user_collection->resolveMultiMatches(
+            m_dictElement, t->m_collections.m_user_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     std::string m_dictElement;
@@ -53,11 +54,12 @@ class User_NoDictElement : public Variable {
     User_NoDictElement()
         : Variable("USER") { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_name, "USER",
-            transaction->m_rules->m_secWebAppId.m_value, l);
+        t->m_collections.m_user_collection->resolveMultiMatches(m_name,
+            t->m_collections.m_user_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 };
 
@@ -69,11 +71,12 @@ class User_DictElementRegexp : public Variable {
         m_r(dictElement),
         m_dictElement("USER:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveRegularExpression(m_dictElement,
-            "USER", transaction->m_rules->m_secWebAppId.m_value, l);
+        t->m_collections.m_user_collection->resolveRegularExpression(
+            m_dictElement, t->m_collections.m_user_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     Utils::Regex m_r;
@@ -87,11 +90,24 @@ class User_DynamicElement : public Variable {
         : Variable("USER:dynamic"),
         m_string(std::move(dictElement)) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        std::string string = m_string->evaluate(transaction);
-        transaction->m_collections.resolveMultiMatches("USER:" + string, "USER", l);
+        std::string string = m_string->evaluate(t);
+        t->m_collections.m_user_collection->resolveMultiMatches(
+            "USER:" + string, t->m_collections.m_user_collection_key, l);
+    }
+
+    void del(Transaction *t, std::string k) {
+        t->m_collections.m_user_collection->del(k,
+            t->m_collections.m_user_collection_key);
+    }
+
+    void storeOrUpdateFirst(Transaction *t, std::string var,
+        std::string value) {
+        t->m_collections.m_user_collection->storeOrUpdateFirst(
+            "USER:" + var, t->m_collections.m_user_collection_key,
+            value);
     }
 
     std::unique_ptr<RunTimeString> m_string;

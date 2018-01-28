@@ -363,8 +363,30 @@ int Lua::setvar(lua_State *L) {
         return -1;
     }
 
-    t->m_collections.storeOrUpdateFirst(collection,
-        variableName, var_value);
+    if (collection == "TX") {
+        t->m_collections.m_tx_collection->storeOrUpdateFirst(
+            "TX:" + variableName, "", var_value);
+    }
+    else if (collection == "IP") {
+        t->m_collections.m_ip_collection->storeOrUpdateFirst(
+            "IP:" + variableName, t->m_collections.m_ip_collection_key,
+            var_value);
+    }
+    else if (collection == "GLOBAL") {
+        t->m_collections.m_global_collection->storeOrUpdateFirst(
+            "GLOBAL:" + variableName, t->m_collections.m_global_collection_key,
+            var_value);
+    }
+    else if (collection == "RESOURCE") {
+        t->m_collections.m_resource_collection->storeOrUpdateFirst(
+            "RESOURCE:" + variableName,
+            t->m_collections.m_resource_collection_key, var_value);
+    }
+    else if (collection == "SESSION") {
+         t->m_collections.m_session_collection->storeOrUpdateFirst(
+            "SESSION:" + variableName, t->m_collections.m_session_collection_key,
+            var_value);
+    }
 
     return 0;
 }

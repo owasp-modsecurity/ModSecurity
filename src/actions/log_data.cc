@@ -33,7 +33,8 @@ bool LogData::evaluate(Rule *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
     rm->m_data = data(transaction);
 
-    transaction->m_collections.storeOrUpdateFirst("RULE:logdata", rm->m_data);
+    transaction->m_variableRule.set("logdata", rm->m_data, 0);
+
     return true;
 }
 

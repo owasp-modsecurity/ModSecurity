@@ -43,68 +43,11 @@ typedef struct Collections_t Collections;
 namespace modsecurity {
 namespace collection {
 
-class Collections :
-    public std::unordered_map<std::string, Collection *> {
+class Collections {
  public:
     Collections(Collection *global, Collection *ip, Collection *session,
         Collection *user, Collection *resource);
     ~Collections();
-
-    void store(std::string key, std::string value);
-    void storeOrUpdateFirst(const std::string& collectionName,
-        const std::string& variableName,
-        const std::string& targetValue);
-    void storeOrUpdateFirst(const std::string& collectionName,
-        const std::string& variableName,
-        const std::string& appid,
-        const std::string& targetValue);
-    bool storeOrUpdateFirst(const std::string &key, const std::string &value);
-    bool updateFirst(const std::string &key, const std::string &value);
-    void del(const std::string& key);
-    std::unique_ptr<std::string> resolveFirst(const std::string& var);
-    std::unique_ptr<std::string> resolveFirst(const std::string& collectionName,
-        const std::string& var);
-    std::unique_ptr<std::string> resolveFirst(const std::string& collectionName,
-        const std::string &appid, const std::string& var);
-
-    void resolveSingleMatch(const std::string& var,
-        std::vector<const Variable *> *l);
-    void resolveSingleMatch(const std::string& var,
-        const std::string& collection,
-        std::vector<const Variable *> *l);
-    void resolveSingleMatch(const std::string& var,
-        const std::string& collection,
-        const std::string& appid,
-        std::vector<const Variable *> *l);
-
-    void resolveMultiMatches(const std::string& var,
-        std::vector<const Variable *> *l);
-    void resolveMultiMatches(const std::string& var,
-        const std::string& collection,
-        std::vector<const Variable *> *l);
-    void resolveMultiMatches(const std::string& var,
-        const std::string& collection,
-        const std::string& appid,
-        std::vector<const Variable *> *l);
-
-    void resolveRegularExpression(const std::string& var,
-        std::vector<const Variable *> *l);
-    void resolveRegularExpression(const std::string& var,
-        const std::string& collection,
-        std::vector<const Variable *> *l);
-    void resolveRegularExpression(const std::string& var,
-        const std::string& collection,
-        const std::string& appid,
-        std::vector<const Variable *> *l);
-
-    /**
-     * This is a special collection to host the transaction variables.
-     *
-     * It exists independent of initialization and it is only valid during a transaction.
-     *
-     * Notice that it is not the TX collection.
-     */
-    Collection *m_transient;
 
     std::string m_global_collection_key;
     std::string m_ip_collection_key;
@@ -117,6 +60,7 @@ class Collections :
     Collection *m_session_collection;
     Collection *m_user_collection;
     Collection *m_resource_collection;
+    Collection *m_tx_collection;
 };
 
 }  // namespace collection

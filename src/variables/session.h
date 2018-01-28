@@ -37,11 +37,12 @@ class Session_DictElement : public Variable {
         : Variable("SESSION"),
         m_dictElement("SESSION:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_dictElement,
-            "SESSION", transaction->m_rules->m_secWebAppId.m_value, l);
+        t->m_collections.m_session_collection->resolveMultiMatches(
+            m_dictElement, t->m_collections.m_session_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     std::string m_dictElement;
@@ -53,11 +54,12 @@ class Session_NoDictElement : public Variable {
     Session_NoDictElement()
         : Variable("SESSION") { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_name, "SESSION",
-            transaction->m_rules->m_secWebAppId.m_value, l);
+        t->m_collections.m_session_collection->resolveMultiMatches(m_name,
+            t->m_collections.m_session_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 };
 
@@ -69,11 +71,12 @@ class Session_DictElementRegexp : public Variable {
         m_r(dictElement),
         m_dictElement("SESSION:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveRegularExpression(m_dictElement,
-            "SESSION", transaction->m_rules->m_secWebAppId.m_value, l);
+        t->m_collections.m_session_collection->resolveRegularExpression(m_dictElement,
+            t->m_collections.m_session_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     Utils::Regex m_r;
@@ -87,11 +90,25 @@ class Session_DynamicElement : public Variable {
         : Variable("SESSION:dynamic"),
         m_string(std::move(dictElement)) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        std::string string = m_string->evaluate(transaction);
-        transaction->m_collections.resolveMultiMatches("SESSION:" + string, "SESSION", l);
+        std::string string = m_string->evaluate(t);
+        t->m_collections.m_session_collection->resolveMultiMatches(
+            "SESSION:" + string,
+            t->m_collections.m_session_collection_key, l);
+    }
+
+    void del(Transaction *t, std::string k) {
+        t->m_collections.m_session_collection->del(k,
+            t->m_collections.m_session_collection_key);
+    }
+
+    void storeOrUpdateFirst(Transaction *t, std::string var,
+        std::string value) {
+        t->m_collections.m_session_collection->storeOrUpdateFirst(
+            "SESSION:" + var, t->m_collections.m_session_collection_key,
+            value);
     }
 
     std::unique_ptr<RunTimeString> m_string;

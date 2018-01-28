@@ -37,10 +37,12 @@ class Ip_DictElement : public Variable {
         : Variable("IP:" + dictElement),
         m_dictElement("IP:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_dictElement, "IP", l);
+        t->m_collections.m_ip_collection->resolveMultiMatches(m_dictElement,
+            t->m_collections.m_ip_collection_key, l);
+
     }
 
     std::string m_dictElement;
@@ -52,10 +54,11 @@ class Ip_NoDictElement : public Variable {
     Ip_NoDictElement()
         : Variable("IP") { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_name, "IP", l);
+        t->m_collections.m_ip_collection->resolveMultiMatches(m_name,
+            t->m_collections.m_ip_collection_key, l);
     }
 };
 
@@ -67,11 +70,11 @@ class Ip_DictElementRegexp : public Variable {
         m_r(dictElement),
         m_dictElement("IP:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveRegularExpression(m_dictElement,
-            "IP", l);
+        t->m_collections.m_ip_collection->resolveRegularExpression(m_dictElement,
+            t->m_collections.m_ip_collection_key, l);
     }
 
     Utils::Regex m_r;
@@ -85,11 +88,23 @@ class Ip_DynamicElement : public Variable {
         : Variable("IP:dynamic"),
         m_string(std::move(dictElement)) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        std::string string = m_string->evaluate(transaction);
-        transaction->m_collections.resolveMultiMatches("IP:" + string, "IP", l);
+        std::string string = m_string->evaluate(t);
+        t->m_collections.m_ip_collection->resolveMultiMatches("IP:" + string,
+            t->m_collections.m_ip_collection_key, l);
+    }
+
+    void del(Transaction *t, std::string k) {
+        t->m_collections.m_ip_collection->del(k,
+            t->m_collections.m_ip_collection_key);
+    }
+
+    void storeOrUpdateFirst(Transaction *t, std::string var,
+        std::string value) {
+        t->m_collections.m_ip_collection->storeOrUpdateFirst(
+            "IP:" + var, t->m_collections.m_ip_collection_key, value);
     }
 
     std::unique_ptr<RunTimeString> m_string;
