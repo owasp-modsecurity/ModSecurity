@@ -37,11 +37,11 @@ class Global_DictElement : public Variable {
         : Variable("GLOBAL"),
         m_dictElement("GLOBAL:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_dictElement,
-		"GLOBAL", l);
+        t->m_collections.m_global_collection->resolveMultiMatches(
+            m_dictElement, t->m_collections.m_global_collection_key, l);
     }
 
     std::string m_dictElement;
@@ -53,10 +53,11 @@ class Global_NoDictElement : public Variable {
     Global_NoDictElement()
         : Variable("GLOBAL") { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_name, "GLOBAL", l);
+        t->m_collections.m_global_collection->resolveMultiMatches(m_name,
+            t->m_collections.m_global_collection_key, l);
     }
 };
 
@@ -68,11 +69,11 @@ class Global_DictElementRegexp : public Variable {
         m_r(dictElement),
         m_dictElement("GLOBAL:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveRegularExpression(m_dictElement,
-            "GLOBAL", l);
+        t->m_collections.m_global_collection->resolveRegularExpression(
+            m_dictElement, t->m_collections.m_global_collection_key, l);
     }
 
     Utils::Regex m_r;
@@ -86,11 +87,24 @@ class Global_DynamicElement : public Variable {
         : Variable("GLOBAL:dynamic"),
         m_string(std::move(dictElement)) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        std::string string = m_string->evaluate(transaction);
-        transaction->m_collections.resolveMultiMatches("GLOBAL:" + string, "GLOBAL", l);
+        std::string string = m_string->evaluate(t);
+        t->m_collections.m_global_collection->resolveMultiMatches(
+            "GLOBAL:" + string, t->m_collections.m_global_collection_key, l);
+
+    }
+
+    void del(Transaction *t, std::string k) {
+        t->m_collections.m_global_collection->del(k,
+            t->m_collections.m_global_collection_key);
+    }
+
+    void storeOrUpdateFirst(Transaction *t, std::string var,
+        std::string value) {
+        t->m_collections.m_global_collection->storeOrUpdateFirst(
+            "GLOBAL:" + var, t->m_collections.m_global_collection_key, value);
     }
 
     std::unique_ptr<RunTimeString> m_string;

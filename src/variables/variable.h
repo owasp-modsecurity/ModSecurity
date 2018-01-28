@@ -18,6 +18,7 @@
 #include <list>
 #include <utility>
 #include <memory>
+#include <exception>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
@@ -31,6 +32,7 @@ namespace modsecurity {
 
 class Transaction;
 namespace Variables {
+
 
 class Variable {
  public:
@@ -191,7 +193,7 @@ class Variable {
             } else if (comp(variable, "USERID")) {
                 t->m_variableUserID.evaluate(l);
             } else {
-                t->m_collections.resolveMultiMatches(variable, l);
+                throw std::invalid_argument("Variable not found.");
             }
         } else {
             std::string col = std::string(variable, 0, collection);
@@ -244,7 +246,7 @@ class Variable {
             } else if (comp(col, "FILES_TMPNAMES")) {
                 t->m_variableFilesTmpNames.resolve(var, l);
             } else {
-                t->m_collections.resolveMultiMatches(col, var, l);
+                throw std::invalid_argument("Variable not found.");
             }
         }
     }
@@ -356,7 +358,7 @@ class Variable {
             } else if (comp(variable, "USERID")) {
                 vv = t->m_variableUserID.resolveFirst();
             } else {
-                vv = t->m_collections.resolveFirst(variable);
+                throw std::invalid_argument("Variable not found.");
             }
         } else {
             std::string col = std::string(variable, 0, collection);
@@ -409,7 +411,7 @@ class Variable {
             } else if (comp(col, "FILES_TMPNAMES")) {
                 vv = t->m_variableFilesTmpNames.resolveFirst(var);
             } else {
-                vv = t->m_collections.resolveFirst(col, var);
+                throw std::invalid_argument("Variable not found.");
             }
         }
         return std::string(*vv.get());

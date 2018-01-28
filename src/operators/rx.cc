@@ -58,8 +58,8 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
         int i = 0;
         matches.reverse();
         for (const SMatch& a : matches) {
-            transaction->m_collections.storeOrUpdateFirst("TX",
-                std::to_string(i), a.match);
+            transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
+                "TX:" + std::to_string(i), a.match);
 #ifndef NO_LOGS
             transaction->debug(7, "Added regex subexpression TX." +
                 std::to_string(i) + ": " + a.match);

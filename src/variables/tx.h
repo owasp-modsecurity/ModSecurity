@@ -37,10 +37,11 @@ class Tx_DictElement : public Variable {
         : Variable("TX:" + dictElement),
         m_dictElement("TX:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_dictElement, "TX", l);
+        t->m_collections.m_tx_collection->resolveMultiMatches(
+            m_dictElement, l);
     }
 
     std::string m_dictElement;
@@ -52,10 +53,10 @@ class Tx_NoDictElement : public Variable {
     Tx_NoDictElement()
         : Variable("TX") { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveMultiMatches(m_name, "TX", l);
+        t->m_collections.m_tx_collection->resolveMultiMatches(m_name, l);
     }
 };
 
@@ -67,11 +68,11 @@ class Tx_DictElementRegexp : public Variable {
         m_r(dictElement),
         m_dictElement("TX:" + dictElement) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        transaction->m_collections.resolveRegularExpression(m_dictElement,
-            "TX", l);
+        t->m_collections.m_tx_collection->resolveRegularExpression(
+            m_dictElement, l);
     }
 
     Utils::Regex m_r;
@@ -85,11 +86,22 @@ class Tx_DynamicElement : public Variable {
         : Variable("TX:dynamic"),
         m_string(std::move(dictElement)) { }
 
-    void evaluate(Transaction *transaction,
+    void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        std::string string = m_string->evaluate(transaction);
-        transaction->m_collections.resolveMultiMatches("TX:" + string, "TX", l);
+        std::string string = m_string->evaluate(t);
+        t->m_collections.m_tx_collection->resolveMultiMatches(
+            "TX:" + string, l);
+    }
+
+    void del(Transaction *t, std::string k) {
+        t->m_collections.m_tx_collection->del(k);
+    }
+
+    void storeOrUpdateFirst(Transaction *t, std::string var,
+        std::string value) {
+        t->m_collections.m_tx_collection->storeOrUpdateFirst(
+            "TX:" + var, value);
     }
 
     std::unique_ptr<RunTimeString> m_string;

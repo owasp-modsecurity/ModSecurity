@@ -79,8 +79,21 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
     } else if (m_operation == setToOneOperation) {
         targetValue = std::string("1");
     } else if (m_operation == unsetOperation) {
-        t->m_collections.del(m_variable->m_collectionName + ":" +
-            m_variableNameExpanded);
+        if (tx) {
+            tx->del(t, m_variableNameExpanded);
+        } else if (session) {
+            session->del(t, m_variableNameExpanded);
+        } else if (ip) {
+            ip->del(t, m_variableNameExpanded);
+        } else if (resource) {
+            resource->del(t, m_variableNameExpanded);
+        } else if (global) {
+            global->del(t, m_variableNameExpanded);
+        } else if (user) {
+            user->del(t, m_variableNameExpanded);
+        } else {
+            // ?
+        }
         goto end;
     } else {
         int pre = 0;
@@ -118,9 +131,26 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
     t->debug(8, "Saving variable: " + m_variable->m_collectionName \
         + ":" + m_variableNameExpanded + " with value: " + targetValue);
 #endif
+        if (tx) {
+            tx->storeOrUpdateFirst(t, m_variableNameExpanded, targetValue);
+        } else if (session) {
+            session->storeOrUpdateFirst(t, m_variableNameExpanded, targetValue);
+        } else if (ip) {
+            ip->storeOrUpdateFirst(t, m_variableNameExpanded, targetValue);
+        } else if (resource) {
+            resource->storeOrUpdateFirst(t, m_variableNameExpanded, targetValue);
+        } else if (global) {
+            global->storeOrUpdateFirst(t, m_variableNameExpanded, targetValue);
+        } else if (user) {
+            user->storeOrUpdateFirst(t, m_variableNameExpanded, targetValue);
+        } else {
+            // ?
+        }
+/*
         t->m_collections.storeOrUpdateFirst(m_variable->m_collectionName,
             m_variableNameExpanded,
             t->m_rules->m_secWebAppId.m_value, targetValue);
+            */
 end:
     return true;
 }

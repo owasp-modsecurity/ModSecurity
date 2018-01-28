@@ -51,6 +51,7 @@
 #include "modsecurity/rule_message.h"
 #include "modsecurity/rules_properties.h"
 #include "src/actions/disruptive/allow.h"
+#include "src/variables/remote_user.h"
 
 
 
@@ -1367,14 +1368,19 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
         << " ";
     ss << utils::string::dash_if_empty(this->m_clientIpAddress.c_str()) << " ";
     /** TODO: Check variable */
+    Variables::RemoteUser *r = new Variables::RemoteUser("REMOTE_USER");
+    std::vector<const collection::Variable *> l;
+    r->evaluate(this, NULL, &l);
+    delete r;
+
     ss << utils::string::dash_if_empty(
-        m_collections.resolveFirst("REMOTE_USER").get());
+        m_variableRemoteUser.c_str());
     ss << " ";
     /** TODO: Check variable */
-    ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("LOCAL_USER").get());
-    ss << " ";
-    ss << tstr << " ";
+    //ss << utils::string::dash_if_empty(
+    //    this->m_collections.resolveFirst("LOCAL_USER").get());
+    //ss << " ";
+    //ss << tstr << " ";
 
     ss << "\"";
     ss << utils::string::dash_if_empty(m_variableRequestMethod.evaluate());
@@ -1387,7 +1393,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << this->m_responseBody.tellp() << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("REFERER").get()) << " ";
+        m_variableRequestHeaders.resolveFirst("REFERER").get()) << " ";
     ss << "\"";
     ss << utils::string::dash_if_empty(
         m_variableRequestHeaders.resolveFirst("User-Agent").get());
@@ -1395,7 +1401,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << this->m_id << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("REFERER").get()) << " ";
+        m_variableRequestHeaders.resolveFirst("REFERER").get()) << " ";
 
     ss << filename << " ";
     ss << "0" << " ";

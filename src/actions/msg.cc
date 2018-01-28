@@ -54,7 +54,7 @@ bool Msg::evaluate(Rule *rule, Transaction *transaction,
     transaction->debug(9, "Saving msg: " + msg);
 #endif
 
-    transaction->m_collections.storeOrUpdateFirst("RULE:msg", msg);
+    transaction->m_variableRule.set("msg", msg, 0);
 
     return true;
 }
