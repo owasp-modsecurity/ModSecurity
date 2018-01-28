@@ -20,7 +20,6 @@
 #include <memory>
 
 #include "src/operators/operator.h"
-#include "src/macro_expansion.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
 

@@ -20,7 +20,6 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-#include "src/macro_expansion.h"
 
 
 namespace modsecurity {

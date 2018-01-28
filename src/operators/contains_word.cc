@@ -18,7 +18,6 @@
 #include <string>
 
 #include "src/operators/operator.h"
-#include "src/macro_expansion.h"
 #include "modsecurity/rule_message.h"
 
 namespace modsecurity {

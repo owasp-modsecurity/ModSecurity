@@ -28,7 +28,6 @@
 
 #include "modsecurity/modsecurity.h"
 #include "src/utils/string.h"
-#include "src/macro_expansion.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/collection/variable.h"
 #include "src/variables/variable.h"
