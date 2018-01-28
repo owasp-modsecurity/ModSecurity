@@ -242,6 +242,7 @@ class Driver;
 #include "src/variables/tx.h"
 #include "src/variables/unique_id.h"
 #include "src/variables/url_encoded_error.h"
+#include "src/variables/user.h"
 #include "src/variables/user_id.h"
 #include "src/variables/variable.h"
 #include "src/variables/xml.h"
@@ -672,8 +673,6 @@ using modsecurity::operators::Operator;
   RUN_TIME_VAR_TIME_SEC                        "RUN_TIME_VAR_TIME_SEC"
   RUN_TIME_VAR_TIME_WDAY                       "RUN_TIME_VAR_TIME_WDAY"
   RUN_TIME_VAR_TIME_YEAR                       "RUN_TIME_VAR_TIME_YEAR"
-  SETVAR_VARIABLE_PART                         "SETVAR_VARIABLE_PART"
-  SETVAR_CONTENT_PART                          "SETVAR_CONTENT_PART"
   VARIABLE                                     "VARIABLE"
   DICT_ELEMENT                                 "Dictionary element"
   DICT_ELEMENT_REGEXP                          "Dictionary element, selected by regexp"
@@ -682,8 +681,6 @@ using modsecurity::operators::Operator;
 %type <std::unique_ptr<actions::Action>> act
 
 %type <std::unique_ptr<actions::Action>> setvar_action
-%type <std::string>                      setvar_variable
-%type <std::string>                      setvar_content
 %type <std::unique_ptr<RunTimeString>>   run_time_string
 
 %type <std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > >
@@ -1821,6 +1818,10 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::FilesTmpNames_NoDictElement());
       }
+    | VARIABLE_RESOURCE run_time_string
+      {
+        VARIABLE_CONTAINER($$, new Variables::Resource_DynamicElement(std::move($2)));
+      }
     | VARIABLE_RESOURCE DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new Variables::Resource_DictElement($2));
@@ -1833,7 +1834,10 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::Resource_NoDictElement());
       }
-
+    | VARIABLE_IP run_time_string
+      {
+        VARIABLE_CONTAINER($$, new Variables::Ip_DynamicElement(std::move($2)));
+      }
     | VARIABLE_IP DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new Variables::Ip_DictElement($2));
@@ -1846,7 +1850,10 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::Ip_NoDictElement());
       }
-
+    | VARIABLE_GLOBAL run_time_string
+      {
+        VARIABLE_CONTAINER($$, new Variables::Global_DynamicElement(std::move($2)));
+      }
     | VARIABLE_GLOBAL DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new Variables::Global_DictElement($2));
@@ -1859,7 +1866,26 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::Global_NoDictElement());
       }
-
+    | VARIABLE_USER run_time_string
+      {
+        VARIABLE_CONTAINER($$, new Variables::User_DynamicElement(std::move($2)));
+      }
+    | VARIABLE_USER DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::User_DictElement($2));
+      }
+    | VARIABLE_USER DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::User_DictElementRegexp($2));
+      }
+    | VARIABLE_USER
+      {
+        VARIABLE_CONTAINER($$, new Variables::User_NoDictElement());
+      }
+    | VARIABLE_TX run_time_string
+      {
+        VARIABLE_CONTAINER($$, new Variables::Tx_DynamicElement(std::move($2)));
+      }
     | VARIABLE_TX DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new Variables::Tx_DictElement($2));
@@ -1872,7 +1898,10 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::Tx_NoDictElement());
       }
-
+    | VARIABLE_SESSION run_time_string
+      {
+        VARIABLE_CONTAINER($$, new Variables::Session_DynamicElement(std::move($2)));
+      }
     | VARIABLE_SESSION DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new Variables::Session_DictElement($2));
@@ -1885,7 +1914,6 @@ var:
       {
         VARIABLE_CONTAINER($$, new Variables::Session_NoDictElement());
       }
-
     | VARIABLE_ARGS_NAMES DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new Variables::ArgsNames_DictElement($2));
@@ -2639,51 +2667,27 @@ act:
     ;
 
 setvar_action:
-    NOT setvar_variable
+    NOT var
       {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::unsetOperation, $2));
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::unsetOperation, std::move($2)));
       }
-    | setvar_variable
+    | var
       {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setToOneOperation, $1));
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setToOneOperation, std::move($1)));
       }
-    | setvar_variable SETVAR_OPERATION_EQUALS setvar_content
+    | var SETVAR_OPERATION_EQUALS run_time_string
       {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setOperation, $1, $3));
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setOperation, std::move($1), std::move($3)));
       }
-    | setvar_variable SETVAR_OPERATION_EQUALS_PLUS setvar_content
+    | var SETVAR_OPERATION_EQUALS_PLUS run_time_string
       {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, $1, $3));
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, std::move($1), std::move($3)));
       }
-    | setvar_variable SETVAR_OPERATION_EQUALS_MINUS setvar_content
+    | var SETVAR_OPERATION_EQUALS_MINUS run_time_string
       {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, $1, $3));
-      }
-    ;
-
-setvar_variable:
-    SETVAR_VARIABLE_PART
-      {
-        $$ = $1;
-      }
-    |
-    SETVAR_VARIABLE_PART setvar_variable
-      {
-        $$ = $1 + $2;
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, std::move($1), std::move($3)));
       }
     ;
-
-setvar_content:
-    SETVAR_CONTENT_PART
-      {
-        $$ = $1;
-      }
-    |
-    SETVAR_CONTENT_PART setvar_content
-      {
-        $$ = $1 + $2;
-      }
-;
 
 run_time_string:
     run_time_string FREE_TEXT_QUOTE_MACRO_EXPANSION
