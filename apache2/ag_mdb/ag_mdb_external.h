@@ -1,14 +1,18 @@
 #ifndef _AG_MDB_EXTERNAL_HEADER
 #define _AG_MDB_EXTERNAL_HEADER
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef _WIN32
 #include "stdbool.h"
 #else
+#ifdef inline
+#undef inline
+#endif
 #include <windows.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /**

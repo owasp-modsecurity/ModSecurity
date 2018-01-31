@@ -1,10 +1,11 @@
 #ifndef _AG_MDB_INTERNAL_HEADER
 #define _AG_MDB_INTERNAL_HEADER
+
+#ifdef _WIN32
 #ifdef inline
 #undef inline
 #endif
-#ifdef _WIN32
-#include<windows.h>
+#include <windows.h>
 #include<Synchapi.h>
 #else
 #include<sys/shm.h>
