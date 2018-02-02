@@ -33,47 +33,18 @@ Variable::Variable(std::string name)
     m_collectionName(""),
     m_isExclusion(false),
     m_isCount(false) {
-    if (m_name.find(":") != std::string::npos) {
-        std::string col = utils::string::toupper(
-            std::string(m_name, 0, m_name.find(":")));
-        std::string name = std::string(m_name, m_name.find(":") + 1,
-            m_name.size());
-        if (col == "TX" || col == "IP" || col == "GLOBAL"
-            || col == "RESOURCE" || col == "SESSION" || col == "USER") {
-            m_collectionName = col;
-        }
-        if ((name.at(0) == '\\') || (name.at(0) == '/')) {
-            m_type = RegularExpression;
-        } else {
-            m_type = SingleMatch;
-        }
-    } else {
-        m_type = MultipleMatches;
+    size_t a = m_name.find(":");
+    if (a == std::string::npos) {
+        a = m_name.find(".");
     }
-
-    if (utils::string::tolower(m_name) == "tx") {
-        m_collectionName = "TX";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "ip") {
-        m_collectionName = "IP";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "global") {
-        m_collectionName = "GLOBAL";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "resource") {
-        m_collectionName = "RESOURCE";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "session") {
-        m_collectionName = "SESSION";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "user") {
-        m_collectionName = "USER";
-        m_type = MultipleMatches;
-    } else if (m_name.find(".") != std::string::npos) {
-        m_kind = CollectionVarible;
-        m_collectionName = std::string(m_name, 0, m_name.find("."));
+    if (a != std::string::npos) {
+        m_collectionName = utils::string::toupper(std::string(m_name, 0, a));
+        m_name = std::string(m_name, a + 1, m_name.size());
+        m_fullName = std::make_shared<std::string>(m_collectionName + ":" + m_name);
     } else {
-        m_kind = DirectVariable;
+        m_fullName = std::make_shared<std::string>(m_name);
+        m_collectionName = m_name;
+        m_name = "";
     }
 }
 
@@ -84,42 +55,18 @@ Variable::Variable(std::string name, VariableKind kind)
     m_kind(kind),
     m_isExclusion(false),
     m_isCount(false) {
-    if (m_name.find(":") != std::string::npos) {
-        std::string col = utils::string::toupper(
-            std::string(m_name, 0, m_name.find(":")));
-        std::string name = std::string(m_name, m_name.find(":") + 1,
-            m_name.size());
-        if (col == "TX" || col == "IP" || col == "GLOBAL"
-            || col == "RESOURCE" || col == "SESSION") {
-            m_collectionName = col;
-        }
-        if ((name.at(0) == '\\') || (name.at(0) == '/')) {
-            m_type = RegularExpression;
-        } else {
-            m_type = SingleMatch;
-        }
+    size_t a = m_name.find(":");
+    if (a == std::string::npos) {
+        a = m_name.find(".");
+    }
+    if (a != std::string::npos) {
+        m_collectionName = utils::string::toupper(std::string(m_name, 0, a));
+        m_name = std::string(m_name, a + 1, m_name.size());
+        m_fullName = std::make_shared<std::string>(m_collectionName + ":" + m_name);
     } else {
-        m_type = MultipleMatches;
+        m_fullName = std::make_shared<std::string>(m_name);
     }
 
-    if (utils::string::tolower(m_name) == "tx") {
-        m_collectionName = "TX";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "ip") {
-        m_collectionName = "IP";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "global") {
-        m_collectionName = "GLOBAL";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "resource") {
-        m_collectionName = "RESOURCE";
-        m_type = MultipleMatches;
-    } else if (utils::string::tolower(m_name) == "session") {
-        m_collectionName = "SESSION";
-        m_type = MultipleMatches;
-    } else if (m_name.find(".") != std::string::npos) {
-        m_collectionName = std::string(m_name, 0, m_name.find("."));
-    }
 }
 
 
@@ -128,22 +75,21 @@ std::string Variable::to_s(
     std::string ret;
     std::string except("");
     for (int i = 0; i < variables->size() ; i++) {
-        std::string name = variables->at(i)->m_name;
         VariableModificatorExclusion *e =
             dynamic_cast<VariableModificatorExclusion *>(variables->at(i));
         if (e != NULL) {
             if (except.empty()) {
-                except = except + name;
+                except = except + *variables->at(i)->m_fullName.get();
             } else {
-                except = except + "|" + name;
+                except = except + "|" + *variables->at(i)->m_fullName.get();
             }
             continue;
         }
 
         if (i == 0) {
-            ret = ret + name;
+            ret = ret + *variables->at(i)->m_fullName.get();
         } else {
-            ret = ret + "|" + name;
+            ret = ret + "|" + *variables->at(i)->m_fullName.get();
         }
     }
 

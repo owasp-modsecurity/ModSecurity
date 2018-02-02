@@ -36,7 +36,8 @@ namespace collection {
 namespace backend {
 
 
-InMemoryPerProcess::InMemoryPerProcess() {
+InMemoryPerProcess::InMemoryPerProcess(std::string name) :
+    Collection(name) {
     this->reserve(1000);
     pthread_mutex_init(&m_lock, NULL);
 }
@@ -89,7 +90,7 @@ void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new Variable(&it->first, &it->second));
+        l->push_back(new Variable(&m_name, &it->first, &it->second));
     }
 }
 
@@ -99,33 +100,15 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
     size_t keySize = var.size();
     l->reserve(15);
 
-    auto range = this->equal_range(var);
-
-    for (auto it = range.first; it != range.second; ++it) {
-        l->insert(l->begin(), new Variable(&var, &it->second));
-    }
-
-    for (const auto& x : *this) {
-        bool diff = false;
-
-        if (x.first.size() <= keySize + 1) {
-            continue;
+    if (keySize == 0) {
+        for (auto &i : *this) {
+            l->insert(l->begin(), new Variable(&m_name, &i.first, &i.second));
         }
-        if (x.first.at(keySize) != ':') {
-            continue;
+    } else {
+        auto range = this->equal_range(var);
+        for (auto it = range.first; it != range.second; ++it) {
+            l->insert(l->begin(), new Variable(&m_name, &var, &it->second));
         }
-
-        for (int i = 0; i < keySize && diff == false; i++) {
-            if (std::tolower(x.first.at(i)) != std::tolower(var.at(i))) {
-                diff = true;
-            }
-        }
-
-        if (diff == true) {
-            continue;
-        }
-
-        l->insert(l->begin(), new Variable(&x.first, &x.second));
     }
 }
 
@@ -133,36 +116,37 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
     std::vector<const Variable *> *l) {
 
-    if (var.find(":") == std::string::npos) {
-        return;
-    }
-    if (var.size() < var.find(":") + 3) {
-        return;
-    }
-    std::string col = std::string(var, 0, var.find(":"));
-    std::string name = std::string(var, var.find(":") + 2,
-        var.size() - var.find(":") - 3);
-    size_t keySize = col.size();
-    Utils::Regex r = Utils::Regex(name);
+    
+    //if (var.find(":") == std::string::npos) {
+    //    return;
+    //}
+    //if (var.size() < var.find(":") + 3) {
+    //    return;
+    //}
+    //std::string col = std::string(var, 0, var.find(":"));
+    //std::string name = std::string(var, var.find(":") + 2,
+    //    var.size() - var.find(":") - 3);
+    //size_t keySize = col.size();
+    Utils::Regex r = Utils::Regex(var);
 
     for (const auto& x : *this) {
-        if (x.first.size() <= keySize + 1) {
-            continue;
-        }
-        if (x.first.at(keySize) != ':') {
-            continue;
-        }
-        if (std::string(x.first, 0, keySize) != col) {
-            continue;
-        }
-        std::string content = std::string(x.first, keySize + 1,
-                                          x.first.size() - keySize - 1);
-        int ret = Utils::regex_search(content, r);
+        //if (x.first.size() <= keySize + 1) {
+        //    continue;
+        //}
+        //if (x.first.at(keySize) != ':') {
+        //    continue;
+        //}
+        //if (std::string(x.first, 0, keySize) != col) {
+        //    continue;
+        //}
+        //std::string content = std::string(x.first, keySize + 1,
+         //                                 x.first.size() - keySize - 1);
+        int ret = Utils::regex_search(x.first, r);
         if (ret <= 0) {
             continue;
         }
 
-        l->insert(l->begin(), new Variable(&x.first, &x.second));
+        l->insert(l->begin(), new Variable(&m_name, &x.first, &x.second));
     }
 }
 
@@ -170,7 +154,6 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
 std::unique_ptr<std::string> InMemoryPerProcess::resolveFirst(
     const std::string& var) {
     auto range = equal_range(var);
-
     for (auto it = range.first; it != range.second; ++it) {
         return std::unique_ptr<std::string>(new std::string(it->second));
     }

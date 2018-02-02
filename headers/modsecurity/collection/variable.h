@@ -35,28 +35,60 @@ typedef struct Variable_t Variable;
 namespace modsecurity {
 namespace collection {
 
+class Collection;
 class Variable {
  public:
     explicit Variable(const std::string *key) :
         m_key(""),
         m_value("") {
             m_key.assign(*key);
+            m_keyWithCollection = std::make_shared<std::string>(*key);
         }
+
     Variable(const std::string *key, const std::string *value) :
         m_key(""),
         m_value("") {
             m_key.assign(*key);
             m_value.assign(*value);
+            m_keyWithCollection = std::make_shared<std::string>(*key);
         }
+
     Variable() :
         m_key(""),
-        m_value("") { }
+        m_value("") {
+            m_keyWithCollection = std::make_shared<std::string>(m_key);
+        }
+
+    Variable(const std::string *a, const std::string *b, const std::string *c) :
+        m_key(*a + ":" + *b),
+        m_value(*c) {
+            m_keyWithCollection = std::make_shared<std::string>(*a + ":" + *b);
+        }
+
+    Variable(std::shared_ptr<std::string> fullName) :
+        m_key(""),
+        m_value("") {
+            m_keyWithCollection = fullName;
+            m_key.assign(*fullName.get());
+        }
+
+    Variable(std::shared_ptr<std::string> fullName, const std::string *value) :
+        m_key(""),
+        m_value("") {
+            m_value.assign(*value);
+            m_keyWithCollection = fullName;
+            m_key.assign(*fullName.get());
+        }
+
 
     explicit Variable(const Variable *o) :
         m_key(""),
         m_value("") {
         m_key.assign(o->m_key);
         m_value.assign(o->m_value);
+        m_col.assign(o->m_col);
+        m_keyWithCollection = o->m_keyWithCollection;
+
         for (auto &i : o->m_orign) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             origin->m_offset = i->m_offset;
@@ -67,6 +99,8 @@ class Variable {
 
     std::string m_key;
     std::string m_value;
+    std::string m_col;
+    std::shared_ptr<std::string> m_keyWithCollection;
     std::list<std::unique_ptr<VariableOrigin>> m_orign;
 };
 

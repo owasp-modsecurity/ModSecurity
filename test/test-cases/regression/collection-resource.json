@@ -40,7 +40,7 @@
     },
     "expected":{  
       "audit_log":"",
-      "debug_log":"Target value: \"123\" \\(Variable: whee::::RESOURCE:test\\)",
+      "debug_log":"Target value: \"123\" \\(Variable: RESOURCE:whee::::test\\)",
       "error_log":""
     },
     "rules":[  
@@ -92,7 +92,7 @@
     },
     "expected":{  
       "audit_log":"",
-      "debug_log":"whee::webappid::RESOURCE:test",
+      "debug_log":"RESOURCE:whee::webappid::test",
       "error_log":""
     },
     "rules":[  

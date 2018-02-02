@@ -35,7 +35,7 @@ class User_DictElement : public Variable {
  public:
     explicit User_DictElement(std::string dictElement)
         : Variable("USER"),
-        m_dictElement("USER:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -67,9 +67,9 @@ class User_NoDictElement : public Variable {
 class User_DictElementRegexp : public Variable {
  public:
     explicit User_DictElementRegexp(std::string dictElement)
-        : Variable("USER"),
+        : Variable("USER:regex(" + dictElement + ")"),
         m_r(dictElement),
-        m_dictElement("USER:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -95,7 +95,7 @@ class User_DynamicElement : public Variable {
         std::vector<const collection::Variable *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_user_collection->resolveMultiMatches(
-            "USER:" + string, t->m_collections.m_user_collection_key, l);
+            string, t->m_collections.m_user_collection_key, l);
     }
 
     void del(Transaction *t, std::string k) {
@@ -106,7 +106,7 @@ class User_DynamicElement : public Variable {
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_user_collection->storeOrUpdateFirst(
-            "USER:" + var, t->m_collections.m_user_collection_key,
+            var, t->m_collections.m_user_collection_key,
             value);
     }
 

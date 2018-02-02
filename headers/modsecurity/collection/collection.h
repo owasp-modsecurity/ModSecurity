@@ -40,6 +40,7 @@ namespace collection {
 
 class Collection {
  public:
+    Collection(std::string a) : m_name(a) { }
     virtual ~Collection() { }
     virtual void store(std::string key, std::string value) = 0;
 

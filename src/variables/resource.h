@@ -35,7 +35,7 @@ class Resource_DictElement : public Variable {
  public:
     explicit Resource_DictElement(std::string dictElement)
         : Variable("RESOURCE:" + dictElement),
-        m_dictElement("RESOURCE:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -69,7 +69,7 @@ class Resource_DictElementRegexp : public Variable {
     explicit Resource_DictElementRegexp(std::string dictElement)
         : Variable("RESOURCE:regex(" + dictElement + ")"),
         m_r(dictElement),
-        m_dictElement("RESOURCE:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -95,7 +95,7 @@ class Resource_DynamicElement : public Variable {
         std::vector<const collection::Variable *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_resource_collection->resolveMultiMatches(
-            "RESOURCE:" + string,
+            string,
             t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, l);
     }
@@ -108,7 +108,7 @@ class Resource_DynamicElement : public Variable {
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_resource_collection->storeOrUpdateFirst(
-            "RESOURCE:" + var,
+            var,
             t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, value);
     }

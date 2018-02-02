@@ -104,7 +104,7 @@ class Ip_DynamicElement : public Variable {
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_ip_collection->storeOrUpdateFirst(
-            "IP:" + var, t->m_collections.m_ip_collection_key, value);
+            var, t->m_collections.m_ip_collection_key, value);
     }
 
     std::unique_ptr<RunTimeString> m_string;

@@ -44,7 +44,8 @@ Collections::Collections(Collection *global,
     m_ip_collection(ip),
     m_session_collection(session),
     m_user_collection(user),
-    m_tx_collection(new backend::InMemoryPerProcess()) { }
+    m_tx_collection(new backend::InMemoryPerProcess("TX")) {
+    }
 
 
 Collections::~Collections() { }
