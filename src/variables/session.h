@@ -35,7 +35,7 @@ class Session_DictElement : public Variable {
  public:
     explicit Session_DictElement(std::string dictElement)
         : Variable("SESSION"),
-        m_dictElement("SESSION:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -67,9 +67,9 @@ class Session_NoDictElement : public Variable {
 class Session_DictElementRegexp : public Variable {
  public:
     explicit Session_DictElementRegexp(std::string dictElement)
-        : Variable("SESSION"),
+        : Variable("SESSION:regex(" + dictElement + ")"),
         m_r(dictElement),
-        m_dictElement("SESSION:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -95,7 +95,7 @@ class Session_DynamicElement : public Variable {
         std::vector<const collection::Variable *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_session_collection->resolveMultiMatches(
-            "SESSION:" + string,
+            string,
             t->m_collections.m_session_collection_key, l);
     }
 
@@ -107,7 +107,7 @@ class Session_DynamicElement : public Variable {
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_session_collection->storeOrUpdateFirst(
-            "SESSION:" + var, t->m_collections.m_session_collection_key,
+            var, t->m_collections.m_session_collection_key,
             value);
     }
 

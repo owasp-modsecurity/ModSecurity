@@ -56,13 +56,14 @@ void XML::evaluate(Transaction *t,
     size_t pos;
 
     param = m_name;
+    /*
     pos = m_name.find_first_of(":");
     if (pos == std::string::npos) {
         param = "";
     } else {
         param = std::string(m_name, pos+1, m_name.length() - (pos + 1));
     }
-
+    */
     /* Is there an XML document tree at all? */
     if (t->m_xml->m_data.doc == NULL) {
         /* Sorry, we've got nothing to give! */
@@ -126,7 +127,7 @@ void XML::evaluate(Transaction *t,
             xmlNodeGetContent(nodes->nodeTab[i]));
         if (content != NULL) {
             std::string *a = new std::string(content);
-            collection::Variable *var = new collection::Variable(&m_name,
+            collection::Variable *var = new collection::Variable(m_fullName,
                 a);
             delete a;
             l->push_back(var);

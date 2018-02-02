@@ -22,6 +22,7 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rules.h"
 #include "src/utils/string.h"
 #include "src/utils/regex.h"
 
@@ -357,6 +358,23 @@ class Variable {
                 vv = t->m_variableUrlEncodedError.resolveFirst();
             } else if (comp(variable, "USERID")) {
                 vv = t->m_variableUserID.resolveFirst();
+            } else if (comp(variable, "TX")) {
+                vv = t->m_collections.m_tx_collection->resolveFirst("");
+            } else if (comp(variable, "RESOURCE")) {
+                vv = t->m_collections.m_resource_collection->resolveFirst("",
+                    t->m_collections.m_resource_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(variable, "USER")) {
+                vv = t->m_collections.m_user_collection->resolveFirst("",
+                    t->m_collections.m_user_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(variable, "SESSION")) {
+                vv = t->m_collections.m_session_collection->resolveFirst("",
+                    t->m_collections.m_session_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(variable, "IP")) {
+                vv = t->m_collections.m_ip_collection->resolveFirst("",
+                    t->m_collections.m_ip_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(variable, "GLOBAL")) {
+                vv = t->m_collections.m_global_collection->resolveFirst("",
+                    t->m_collections.m_global_collection_key, t->m_rules->m_secWebAppId.m_value);
             } else {
                 throw std::invalid_argument("Variable not found.");
             }
@@ -410,15 +428,36 @@ class Variable {
                 vv = t->m_variableRequestCookiesNames.resolveFirst(var);
             } else if (comp(col, "FILES_TMPNAMES")) {
                 vv = t->m_variableFilesTmpNames.resolveFirst(var);
+            } else if (comp(col, "TX")) {
+                vv = t->m_collections.m_tx_collection->resolveFirst(var);
+            } else if (comp(col, "RESOURCE")) {
+                vv = t->m_collections.m_resource_collection->resolveFirst(var,
+                    t->m_collections.m_resource_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(col, "USER")) {
+                vv = t->m_collections.m_user_collection->resolveFirst(var,
+                    t->m_collections.m_user_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(col, "SESSION")) {
+                vv = t->m_collections.m_session_collection->resolveFirst(var,
+                    t->m_collections.m_session_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(col, "IP")) {
+                vv = t->m_collections.m_ip_collection->resolveFirst(var,
+                    t->m_collections.m_ip_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(col, "GLOBAL")) {
+                vv = t->m_collections.m_global_collection->resolveFirst(var,
+                    t->m_collections.m_global_collection_key, t->m_rules->m_secWebAppId.m_value);
             } else {
                 throw std::invalid_argument("Variable not found.");
             }
+        }
+        if (vv == nullptr) {
+            return std::string("");
         }
         return std::string(*vv.get());
     }
 
     std::string m_name;
     std::string m_collectionName;
+    std::shared_ptr<std::string> m_fullName;
 
     VariableType m_type;
     VariableKind m_kind;
@@ -430,7 +469,7 @@ class Variable {
 class VariableModificatorExclusion : public Variable {
  public:
     explicit VariableModificatorExclusion(std::unique_ptr<Variable> var)
-        : Variable(var->m_name),
+        : Variable(*var->m_fullName.get()),
         m_var(std::move(var)) {
             m_isExclusion = true;
         }
@@ -448,7 +487,7 @@ class VariableModificatorExclusion : public Variable {
 class VariableModificatorCount : public Variable {
  public:
     explicit VariableModificatorCount(std::unique_ptr<Variable> var)
-        : Variable(var->m_name),
+        : Variable(*var->m_fullName.get()),
         m_var(std::move(var)) {
             m_isCount = true;
         }
@@ -463,15 +502,13 @@ class VariableModificatorCount : public Variable {
         m_var->evaluate(t, rule, &reslIn);
         for (const collection::Variable *a : reslIn) {
             count++;
-	    delete a;
+            delete a;
             a = NULL;
         }
         reslIn.clear();
 
         std::string *res = new std::string(std::to_string(count));
-        std::string *name = new std::string(m_name);
-        val = new collection::Variable(name, res);
-        delete name;
+        val = new collection::Variable(m_var->m_fullName, res);
         delete res;
 
         l->push_back(val);

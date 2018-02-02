@@ -43,16 +43,15 @@ void Env::evaluate(Transaction *transaction,
         }
         std::string key = std::string(env, 0, pos);
         std::string value = std::string(env, pos+1, env.length() - (pos + 1));
-        std::pair<std::string, std::string> a("ENV:" + key, value);
+        std::pair<std::string, std::string> a(key, value);
         transaction->m_variableEnvs.insert(a);
     }
 
     for (auto& x : transaction->m_variableEnvs) {
-        if ((x.first.substr(0, m_name.size() + 1).compare(m_name + ":") != 0)
-            && (x.first != m_name)) {
+        if (x.first != m_name && m_name.length() > 0) {
             continue;
         }
-        l->push_back(new collection::Variable(&x.first, &x.second));
+        l->push_back(new collection::Variable(&m_collectionName, &x.first, &x.second));
     }
 }
 

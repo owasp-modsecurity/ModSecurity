@@ -35,7 +35,7 @@ class Tx_DictElement : public Variable {
  public:
     explicit Tx_DictElement(std::string dictElement)
         : Variable("TX:" + dictElement),
-        m_dictElement("TX:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -56,7 +56,7 @@ class Tx_NoDictElement : public Variable {
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
-        t->m_collections.m_tx_collection->resolveMultiMatches(m_name, l);
+        t->m_collections.m_tx_collection->resolveMultiMatches("", l);
     }
 };
 
@@ -64,9 +64,9 @@ class Tx_NoDictElement : public Variable {
 class Tx_DictElementRegexp : public Variable {
  public:
     explicit Tx_DictElementRegexp(std::string dictElement)
-        : Variable("TX"),
+        : Variable("TX:regex(" + dictElement + ")"),
         m_r(dictElement),
-        m_dictElement("TX:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -90,8 +90,7 @@ class Tx_DynamicElement : public Variable {
         Rule *rule,
         std::vector<const collection::Variable *> *l) override {
         std::string string = m_string->evaluate(t);
-        t->m_collections.m_tx_collection->resolveMultiMatches(
-            "TX:" + string, l);
+        t->m_collections.m_tx_collection->resolveMultiMatches(string, l);
     }
 
     void del(Transaction *t, std::string k) {
@@ -100,8 +99,7 @@ class Tx_DynamicElement : public Variable {
 
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
-        t->m_collections.m_tx_collection->storeOrUpdateFirst(
-            "TX:" + var, value);
+        t->m_collections.m_tx_collection->storeOrUpdateFirst(var, value);
     }
 
     std::unique_ptr<RunTimeString> m_string;

@@ -71,7 +71,7 @@ class InMemoryPerProcess :
         /*std::hash<std::string>*/MyHash, MyEqual>,
     public Collection {
  public:
-    InMemoryPerProcess();
+    InMemoryPerProcess(std::string name);
     ~InMemoryPerProcess();
     void store(std::string key, std::string value) override;
 

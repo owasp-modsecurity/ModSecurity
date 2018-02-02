@@ -35,7 +35,7 @@ class Global_DictElement : public Variable {
  public:
     explicit Global_DictElement(std::string dictElement)
         : Variable("GLOBAL"),
-        m_dictElement("GLOBAL:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -67,7 +67,7 @@ class Global_DictElementRegexp : public Variable {
     explicit Global_DictElementRegexp(std::string dictElement)
         : Variable("GLOBAL:regex(" + dictElement + ")"),
         m_r(dictElement),
-        m_dictElement("GLOBAL:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
@@ -92,7 +92,7 @@ class Global_DynamicElement : public Variable {
         std::vector<const collection::Variable *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_global_collection->resolveMultiMatches(
-            "GLOBAL:" + string, t->m_collections.m_global_collection_key, l);
+            string, t->m_collections.m_global_collection_key, l);
 
     }
 
@@ -104,7 +104,7 @@ class Global_DynamicElement : public Variable {
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_global_collection->storeOrUpdateFirst(
-            "GLOBAL:" + var, t->m_collections.m_global_collection_key, value);
+            var, t->m_collections.m_global_collection_key, value);
     }
 
     std::unique_ptr<RunTimeString> m_string;
