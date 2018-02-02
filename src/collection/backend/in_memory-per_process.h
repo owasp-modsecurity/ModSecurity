@@ -25,7 +25,7 @@
 #endif
 
 
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 
 #ifndef SRC_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_
@@ -86,11 +86,11 @@ class InMemoryPerProcess :
     std::unique_ptr<std::string> resolveFirst(const std::string& var) override;
 
     void resolveSingleMatch(const std::string& var,
-        std::vector<const Variable *> *l) override;
+        std::vector<const VariableValue *> *l) override;
     void resolveMultiMatches(const std::string& var,
-        std::vector<const Variable *> *l) override;
+        std::vector<const VariableValue *> *l) override;
     void resolveRegularExpression(const std::string& var,
-        std::vector<const Variable *> *l) override;
+        std::vector<const VariableValue *> *l) override;
 
  private:
     pthread_mutex_t m_lock;

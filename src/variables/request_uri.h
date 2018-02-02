@@ -35,7 +35,7 @@ class RequestURI : public Variable {
         : Variable("REQUEST_URI") { }
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         transaction->m_variableRequestURI.evaluate(l);
     }
 };

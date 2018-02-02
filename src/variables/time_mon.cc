@@ -35,7 +35,7 @@ namespace Variables {
 
 void TimeMon::evaluate(Transaction *transaction,
     Rule *rule,
-    std::vector<const collection::Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -50,7 +50,7 @@ void TimeMon::evaluate(Transaction *transaction,
 
     transaction->m_variableTimeMin.assign(std::to_string(a));
 
-    l->push_back(new collection::Variable(&m_retName,
+    l->push_back(new VariableValue(&m_retName,
         &transaction->m_variableTimeMin));
 }
 

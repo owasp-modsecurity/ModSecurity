@@ -46,7 +46,7 @@ namespace Variables {
 
 void XML::evaluate(Transaction *t,
     Rule *rule,
-    std::vector<const collection::Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
     xmlNodeSetPtr nodes;
@@ -127,7 +127,7 @@ void XML::evaluate(Transaction *t,
             xmlNodeGetContent(nodes->nodeTab[i]));
         if (content != NULL) {
             std::string *a = new std::string(content);
-            collection::Variable *var = new collection::Variable(m_fullName,
+            VariableValue *var = new VariableValue(m_fullName,
                 a);
             delete a;
             l->push_back(var);

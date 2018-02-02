@@ -35,7 +35,7 @@ class ResponseContentType : public Variable {
         : Variable("RESPONSE_CONTENT_TYPE") { }
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         transaction->m_variableResponseContentType.evaluate(l);
     }
 };

@@ -38,7 +38,7 @@ class ArgsPostNames_DictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         transaction->m_variableArgsPostNames.resolve(m_dictElement, l);
     }
 
@@ -52,7 +52,7 @@ class ArgsPostNames_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         transaction->m_variableArgsPostNames.resolve(l);
     }
 };
@@ -65,7 +65,7 @@ class ArgsPostNames_DictElementRegexp : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         transaction->m_variableArgsPostNames.resolveRegularExpression(
             &m_r, l);
     }

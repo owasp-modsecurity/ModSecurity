@@ -24,7 +24,7 @@
 #include <vector>
 #endif
 
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 #include "src/collection/backend/in_memory-per_process.h"
 #include "src/utils/string.h"

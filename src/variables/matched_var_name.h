@@ -36,7 +36,7 @@ class MatchedVarName : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         transaction->m_variableMatchedVarName.evaluate(l);
     }
 };

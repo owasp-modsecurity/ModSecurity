@@ -39,7 +39,7 @@ class Global_DictElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_global_collection->resolveMultiMatches(
             m_dictElement, t->m_collections.m_global_collection_key, l);
     }
@@ -55,7 +55,7 @@ class Global_NoDictElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_global_collection->resolveMultiMatches(m_name,
             t->m_collections.m_global_collection_key, l);
     }
@@ -71,7 +71,7 @@ class Global_DictElementRegexp : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_global_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_global_collection_key, l);
     }
@@ -89,7 +89,7 @@ class Global_DynamicElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_global_collection->resolveMultiMatches(
             string, t->m_collections.m_global_collection_key, l);

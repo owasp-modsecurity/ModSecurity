@@ -38,14 +38,14 @@ namespace Variables {
 
 void RemoteUser::evaluate(Transaction *transaction,
     Rule *rule,
-    std::vector<const collection::Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     size_t pos;
     std::string base64;
-    collection::Variable *var;
+    VariableValue *var;
     std::string header;
 
-    std::vector<const collection::Variable *> *l2 = \
-	new std::vector<const collection::Variable *>();
+    std::vector<const VariableValue *> *l2 = \
+	new std::vector<const VariableValue *>();
     transaction->m_variableRequestHeaders.resolve("authorization", l2);
 
     if (l2->size() < 1) {
@@ -66,7 +66,7 @@ void RemoteUser::evaluate(Transaction *transaction,
     }
     transaction->m_variableRemoteUser.assign(std::string(base64, 0, pos));
 
-    var = new collection::Variable(&l2->at(0)->m_key,
+    var = new VariableValue(&l2->at(0)->m_key,
         &transaction->m_variableRemoteUser);
 
     for (auto &i : l2->at(0)->m_orign) {

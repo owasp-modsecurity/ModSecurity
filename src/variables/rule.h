@@ -36,7 +36,7 @@ class Rule_DictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         transaction->m_variableRule.resolve(m_dictElement, l);
     }
 
@@ -51,7 +51,7 @@ class Rule_NoDictElement : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         transaction->m_variableRule.resolve(l);
     }
 };
@@ -65,7 +65,7 @@ class Rule_DictElementRegexp : public Variable {
 
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         transaction->m_variableRule.resolveRegularExpression(
             &m_r, l);
     }

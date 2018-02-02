@@ -37,45 +37,12 @@ namespace Variables {
 
 class Variable {
  public:
-    /**
-     *
-     */
-    enum VariableType {
-      /**
-       *
-       */
-      SingleMatch,
-      /**
-       *
-       */
-      MultipleMatches,
-      /**
-       *
-       */
-      RegularExpression
-    };
-
-    /**
-     *
-     */
-    enum VariableKind {
-      /**
-       *
-       */
-      DirectVariable,
-      /**
-       *
-       */
-      CollectionVarible,
-    };
-
     explicit Variable(std::string _name);
-    Variable(std::string name, VariableKind kind);
     virtual ~Variable() { }
 
     virtual void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) = 0;
+        std::vector<const VariableValue *> *l) = 0;
 
     static std::string to_s(std::vector<Variable *> *variables);
 
@@ -89,7 +56,7 @@ class Variable {
 
     static void stringMatchResolveMulti(Transaction *t,
         const std::string &variable,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
             collection = variable.find(":");
@@ -459,8 +426,6 @@ class Variable {
     std::string m_collectionName;
     std::shared_ptr<std::string> m_fullName;
 
-    VariableType m_type;
-    VariableKind m_kind;
     bool m_isExclusion;
     bool m_isCount;
 };
@@ -476,7 +441,7 @@ class VariableModificatorExclusion : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         m_var->evaluate(t, rule, l);
     }
 
@@ -494,13 +459,13 @@ class VariableModificatorCount : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
-        std::vector<const collection::Variable *> reslIn;
-        collection::Variable *val = NULL;
+        std::vector<const VariableValue *> *l) {
+        std::vector<const VariableValue *> reslIn;
+        VariableValue *val = NULL;
         int count = 0;
 
         m_var->evaluate(t, rule, &reslIn);
-        for (const collection::Variable *a : reslIn) {
+        for (const VariableValue *a : reslIn) {
             count++;
             delete a;
             a = NULL;
@@ -508,7 +473,7 @@ class VariableModificatorCount : public Variable {
         reslIn.clear();
 
         std::string *res = new std::string(std::to_string(count));
-        val = new collection::Variable(m_var->m_fullName, res);
+        val = new VariableValue(m_var->m_fullName, res);
         delete res;
 
         l->push_back(val);

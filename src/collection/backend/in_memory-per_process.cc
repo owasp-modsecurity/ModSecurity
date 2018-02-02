@@ -26,7 +26,7 @@
 
 #include <pthread.h>
 
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 #include "src/utils/regex.h"
 #include "src/utils/string.h"
 
@@ -86,35 +86,35 @@ void InMemoryPerProcess::del(const std::string& key) {
 
 
 void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
-    std::vector<const Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new Variable(&m_name, &it->first, &it->second));
+        l->push_back(new VariableValue(&m_name, &it->first, &it->second));
     }
 }
 
 
 void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
-    std::vector<const Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     size_t keySize = var.size();
     l->reserve(15);
 
     if (keySize == 0) {
         for (auto &i : *this) {
-            l->insert(l->begin(), new Variable(&m_name, &i.first, &i.second));
+            l->insert(l->begin(), new VariableValue(&m_name, &i.first, &i.second));
         }
     } else {
         auto range = this->equal_range(var);
         for (auto it = range.first; it != range.second; ++it) {
-            l->insert(l->begin(), new Variable(&m_name, &var, &it->second));
+            l->insert(l->begin(), new VariableValue(&m_name, &var, &it->second));
         }
     }
 }
 
 
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
-    std::vector<const Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
 
     
     //if (var.find(":") == std::string::npos) {
@@ -146,7 +146,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
             continue;
         }
 
-        l->insert(l->begin(), new Variable(&m_name, &x.first, &x.second));
+        l->insert(l->begin(), new VariableValue(&m_name, &x.first, &x.second));
     }
 }
 

@@ -47,14 +47,15 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/rules_exceptions.h \
 	../headers/modsecurity/rules_properties.h \
 	../headers/modsecurity/transaction.h \
-	../headers/modsecurity/variable_origin.h
+	../headers/modsecurity/variable_origin.h \
+	../headers/modsecurity/variable_value.h
 
 
 
 libmodsecurity_includesub_collection_HEADERS = \
 	../headers/modsecurity/collection/collection.h \
-	../headers/modsecurity/collection/collections.h \
-	../headers/modsecurity/collection/variable.h
+	../headers/modsecurity/collection/collections.h
+
 
 
 libmodsecurity_includesub_actions_HEADERS = \

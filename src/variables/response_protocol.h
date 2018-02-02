@@ -35,7 +35,7 @@ class ResponseProtocol : public Variable {
         : Variable("RESPONSE_PROTOCOL") { }
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         transaction->m_variableResponseProtocol.evaluate(l);
     }
 };

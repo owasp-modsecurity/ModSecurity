@@ -28,7 +28,7 @@
 #include <memory>
 #endif
 
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 
 #ifndef HEADERS_MODSECURITY_ANCHORED_VARIABLE_H_
 #define HEADERS_MODSECURITY_ANCHORED_VARIABLE_H_
@@ -53,7 +53,7 @@ class AnchoredVariable {
     void append(const std::string &a, size_t offset,
         bool spaceSeparator, int size);
 
-    void evaluate(std::vector<const collection::Variable *> *l);
+    void evaluate(std::vector<const VariableValue *> *l);
     std::string *  evaluate();
     std::unique_ptr<std::string> resolveFirst();
 
@@ -63,7 +63,7 @@ class AnchoredVariable {
     std::string m_value;
 
  private:
-    collection::Variable *m_var;
+    VariableValue *m_var;
 };
 
 }  // namespace modsecurity

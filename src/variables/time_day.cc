@@ -35,7 +35,7 @@ namespace Variables {
 
 void TimeDay::evaluate(Transaction *transaction,
     Rule *rule,
-    std::vector<const collection::Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -48,7 +48,7 @@ void TimeDay::evaluate(Transaction *transaction,
 
     transaction->m_variableTimeDay.assign(tstr);
 
-    l->push_back(new collection::Variable(&m_retName,
+    l->push_back(new VariableValue(&m_retName,
         &transaction->m_variableTimeDay));
 }
 

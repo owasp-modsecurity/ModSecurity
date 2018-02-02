@@ -26,10 +26,10 @@
 #include <iterator>
 #include <iostream>
 
+#include "modsecurity/variable_value.h"
 #include "modsecurity/modsecurity.h"
 #include "src/utils/string.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/collection/variable.h"
 #include "src/variables/variable.h"
 #include "src/variables/highest_severity.h"
 #include "src/actions/transformations/transformation.h"
@@ -278,7 +278,7 @@ int Lua::getvars(lua_State *L) {
     const char *varname = NULL;
     Transaction *t = NULL;
     void *z = NULL;
-    std::vector<const collection::Variable *> l;
+    std::vector<const VariableValue *> l;
     int idx = 1;
 
     /* Retrieve parameters. */
@@ -307,7 +307,7 @@ int Lua::getvars(lua_State *L) {
         idx++;
     }
 
-    for (const collection::Variable * i : l) {
+    for (const VariableValue * i : l) {
         delete i;
     }
 

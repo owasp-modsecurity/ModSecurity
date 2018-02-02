@@ -29,7 +29,7 @@
 #endif
 
 #include "modsecurity/collection/collection.h"
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 
 #ifndef HEADERS_MODSECURITY_COLLECTION_COLLECTIONS_H_
 #define HEADERS_MODSECURITY_COLLECTION_COLLECTIONS_H_

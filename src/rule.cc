@@ -421,14 +421,14 @@ std::list<std::pair<std::shared_ptr<std::string>,
 }
 
 
-std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
+std::vector<std::unique_ptr<VariableValue>> Rule::getFinalVars(
     Transaction *trans) {
     std::list<std::string> exclusions;
     std::list<std::string> exclusions_update_by_tag_remove;
     std::list<std::string> exclusions_update_by_msg_remove;
     std::list<std::string> exclusions_update_by_id_remove;
     std::vector<Variables::Variable *> variables;
-    std::vector<std::unique_ptr<collection::Variable>> finalVars;
+    std::vector<std::unique_ptr<VariableValue>> finalVars;
 
     std::copy(m_variables->begin(), m_variables->end(),
         std::back_inserter(variables));
@@ -439,7 +439,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             continue;
         }
         if (a.second->m_isExclusion) {
-            std::vector<const collection::Variable *> z;
+            std::vector<const VariableValue *> z;
             a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
                 exclusions_update_by_tag_remove.push_back(
@@ -461,7 +461,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             continue;
         }
         if (a.second->m_isExclusion) {
-            std::vector<const collection::Variable *> z;
+            std::vector<const VariableValue *> z;
             a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
                 exclusions_update_by_msg_remove.push_back(
@@ -483,7 +483,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
             continue;
         }
         if (a.second->m_isExclusion) {
-            std::vector<const collection::Variable *> z;
+            std::vector<const VariableValue *> z;
             a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
                 exclusions_update_by_id_remove.push_back(std::string(y->m_key));
@@ -500,7 +500,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
     for (int i = 0; i < variables.size(); i++) {
         Variable *variable = variables.at(i);
         if (variable->m_isExclusion) {
-            std::vector<const collection::Variable *> z;
+            std::vector<const VariableValue *> z;
             variable->evaluate(trans, this, &z);
             for (auto &y : z) {
                 exclusions.push_back(std::string(y->m_key));
@@ -512,7 +512,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
 
     for (int i = 0; i < variables.size(); i++) {
         Variable *variable = variables.at(i);
-        std::vector<const collection::Variable *> e;
+        std::vector<const VariableValue *> e;
         bool ignoreVariable = false;
 
         if (variable->m_isExclusion) {
@@ -520,7 +520,7 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
         }
 
         variable->evaluate(trans, this, &e);
-        for (const collection::Variable *v : e) {
+        for (const VariableValue *v : e) {
             std::string key = v->m_key;
 
             if (std::find_if(exclusions.begin(), exclusions.end(),
@@ -648,8 +648,8 @@ std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
                 continue;
             }
 
-            std::unique_ptr<collection::Variable> var(
-                new collection::Variable(v));
+            std::unique_ptr<VariableValue> var(
+                new VariableValue(v));
             delete v;
             v = NULL;
             finalVars.push_back(std::move(var));
@@ -737,7 +737,7 @@ bool Rule::evaluate(Transaction *trans,
     std::vector<Variable *> *variables = this->m_variables;
     bool recursiveGlobalRet;
     bool containsDisruptive = false;
-    std::vector<std::unique_ptr<collection::Variable>> finalVars;
+    std::vector<std::unique_ptr<VariableValue>> finalVars;
     std::string eparam;
 
     if (ruleMessage == NULL) {
