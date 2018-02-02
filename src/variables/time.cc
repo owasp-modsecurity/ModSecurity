@@ -35,7 +35,7 @@ namespace Variables {
 
 void Time::evaluate(Transaction *transaction,
     Rule *rule,
-    std::vector<const collection::Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
 
     char tstr[200];
     struct tm timeinfo;
@@ -48,7 +48,7 @@ void Time::evaluate(Transaction *transaction,
     strftime(tstr, 200, "%H:%M:%S", &timeinfo);
 
     transaction->m_variableTime.assign(tstr);
-    l->push_back(new collection::Variable(&m_retName,
+    l->push_back(new VariableValue(&m_retName,
         &transaction->m_variableTime));
 }
 

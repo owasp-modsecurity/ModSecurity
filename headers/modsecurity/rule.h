@@ -26,7 +26,7 @@
 #define HEADERS_MODSECURITY_RULE_H_
 
 #include "modsecurity/transaction.h"
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 
 
 #ifdef __cplusplus
@@ -55,7 +55,7 @@ class Rule {
     virtual bool evaluate(Transaction *transaction,
         std::shared_ptr<RuleMessage> rm);
     bool evaluateActions(Transaction *transaction);
-    std::vector<std::unique_ptr<collection::Variable>>
+    std::vector<std::unique_ptr<VariableValue>>
 	getFinalVars(Transaction *trasn);
     void executeActionsAfterFullMatch(Transaction *trasn,
         bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage);

@@ -49,7 +49,7 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
     }
 
     std::string m_variableNameExpanded;
-    std::vector<const collection::Variable *> l;
+    std::vector<const VariableValue *> l;
 
     auto *v = m_variable.get();
     Variables::Tx_DynamicElement *tx = dynamic_cast<Variables::Tx_DynamicElement *> (v);
@@ -106,7 +106,7 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
         }
 
         try {
-            std::vector<const collection::Variable *> l;
+            std::vector<const VariableValue *> l;
             m_variable->evaluate(t, rule, &l);
             if (l.size() == 0) {
                 value = 0;

@@ -22,7 +22,7 @@
 #include <string>
 #include <memory>
 
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 #include "src/utils/regex.h"
 
 #undef LMDB_STDOUT_COUT

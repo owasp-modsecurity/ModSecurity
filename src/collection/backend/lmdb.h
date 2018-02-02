@@ -34,7 +34,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 
 #ifndef SRC_COLLECTION_BACKEND_LMDB_H_

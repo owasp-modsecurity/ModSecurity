@@ -53,8 +53,8 @@ pkginclude_HEADERS = \
 
 libmodsecurity_includesub_collection_HEADERS = \
 	../headers/modsecurity/collection/collection.h \
-	../headers/modsecurity/collection/collections.h \
-	../headers/modsecurity/collection/variable.h
+	../headers/modsecurity/collection/collections.h
+
 
 
 libmodsecurity_includesub_actions_HEADERS = \

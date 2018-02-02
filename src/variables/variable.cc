@@ -49,27 +49,6 @@ Variable::Variable(std::string name)
 }
 
 
-Variable::Variable(std::string name, VariableKind kind)
-    : m_name(name),
-    m_collectionName(""),
-    m_kind(kind),
-    m_isExclusion(false),
-    m_isCount(false) {
-    size_t a = m_name.find(":");
-    if (a == std::string::npos) {
-        a = m_name.find(".");
-    }
-    if (a != std::string::npos) {
-        m_collectionName = utils::string::toupper(std::string(m_name, 0, a));
-        m_name = std::string(m_name, a + 1, m_name.size());
-        m_fullName = std::make_shared<std::string>(m_collectionName + ":" + m_name);
-    } else {
-        m_fullName = std::make_shared<std::string>(m_name);
-    }
-
-}
-
-
 std::string Variable::to_s(
     std::vector<Variable *> *variables) {
     std::string ret;

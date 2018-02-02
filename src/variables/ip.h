@@ -39,7 +39,7 @@ class Ip_DictElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_ip_collection->resolveMultiMatches(m_dictElement,
             t->m_collections.m_ip_collection_key, l);
 
@@ -56,7 +56,7 @@ class Ip_NoDictElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_ip_collection->resolveMultiMatches(m_name,
             t->m_collections.m_ip_collection_key, l);
     }
@@ -72,7 +72,7 @@ class Ip_DictElementRegexp : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_ip_collection->resolveRegularExpression(m_dictElement,
             t->m_collections.m_ip_collection_key, l);
     }
@@ -90,7 +90,7 @@ class Ip_DynamicElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_ip_collection->resolveMultiMatches("IP:" + string,
             t->m_collections.m_ip_collection_key, l);

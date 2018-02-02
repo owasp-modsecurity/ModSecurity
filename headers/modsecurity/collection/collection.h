@@ -25,7 +25,8 @@
 #endif
 
 
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
+
 
 #ifndef HEADERS_MODSECURITY_COLLECTION_COLLECTION_H_
 #define HEADERS_MODSECURITY_COLLECTION_COLLECTION_H_
@@ -56,11 +57,11 @@ class Collection {
         const std::string& var) = 0;
 
     virtual void resolveSingleMatch(const std::string& var,
-        std::vector<const Variable *> *l) = 0;
+        std::vector<const VariableValue *> *l) = 0;
     virtual void resolveMultiMatches(const std::string& var,
-        std::vector<const Variable *> *l) = 0;
+        std::vector<const VariableValue *> *l) = 0;
     virtual void resolveRegularExpression(const std::string& var,
-        std::vector<const Variable *> *l) = 0;
+        std::vector<const VariableValue *> *l) = 0;
 
 
     /* store */
@@ -140,7 +141,7 @@ class Collection {
 
     /* resolveSingleMatch */
     virtual void resolveSingleMatch(const std::string& var,
-        std::string compartment, std::vector<const Variable *> *l) {
+        std::string compartment, std::vector<const VariableValue *> *l) {
         std::string nkey = compartment + "::" + var;
         resolveSingleMatch(nkey, l);
     }
@@ -148,7 +149,7 @@ class Collection {
 
     virtual void resolveSingleMatch(const std::string& var,
         std::string compartment, std::string compartment2,
-        std::vector<const Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveSingleMatch(nkey, l);
     }
@@ -156,7 +157,7 @@ class Collection {
 
     /* resolveMultiMatches */
     virtual void resolveMultiMatches(const std::string& var,
-        std::string compartment, std::vector<const Variable *> *l) {
+        std::string compartment, std::vector<const VariableValue *> *l) {
         std::string nkey = compartment + "::" + var;
         resolveMultiMatches(nkey, l);
     }
@@ -164,7 +165,7 @@ class Collection {
 
     virtual void resolveMultiMatches(const std::string& var,
         std::string compartment, std::string compartment2,
-        std::vector<const Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveMultiMatches(nkey, l);
     }
@@ -172,7 +173,7 @@ class Collection {
 
     /* resolveRegularExpression */
     virtual void resolveRegularExpression(const std::string& var,
-        std::string compartment, std::vector<const Variable *> *l) {
+        std::string compartment, std::vector<const VariableValue *> *l) {
         std::string nkey = compartment + "::" + var;
         resolveRegularExpression(nkey, l);
     }
@@ -180,7 +181,7 @@ class Collection {
 
     virtual void resolveRegularExpression(const std::string& var,
         std::string compartment, std::string compartment2,
-        std::vector<const Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveRegularExpression(nkey, l);
     }

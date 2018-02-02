@@ -29,7 +29,7 @@
 #include <memory>
 #endif
 
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 
 #ifndef HEADERS_MODSECURITY_ANCHORED_SET_VARIABLE_H_
 #define HEADERS_MODSECURITY_ANCHORED_SET_VARIABLE_H_
@@ -66,7 +66,7 @@ struct MyHash{
 
 
 class AnchoredSetVariable : public std::unordered_multimap<std::string,
-	collection::Variable *, MyHash, MyEqual> {
+	VariableValue *, MyHash, MyEqual> {
  public:
     AnchoredSetVariable(Transaction *t, std::string name);
     ~AnchoredSetVariable();
@@ -81,13 +81,13 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
 
     void setCopy(std::string key, std::string value, size_t offset);
 
-    void resolve(std::vector<const collection::Variable *> *l);
+    void resolve(std::vector<const VariableValue *> *l);
 
     void resolve(const std::string &key,
-        std::vector<const collection::Variable *> *l);
+        std::vector<const VariableValue *> *l);
 
     void resolveRegularExpression(Utils::Regex *r,
-        std::vector<const collection::Variable *> *l);
+        std::vector<const VariableValue *> *l);
 
     std::unique_ptr<std::string> resolveFirst(const std::string &key);
 

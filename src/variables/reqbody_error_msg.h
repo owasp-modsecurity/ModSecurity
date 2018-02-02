@@ -35,7 +35,7 @@ class ReqbodyErrorMsg : public Variable {
         : Variable("REQBODY_ERROR_MSG") { }
     void evaluate(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) {
+        std::vector<const VariableValue *> *l) {
         transaction->m_variableReqbodyErrorMsg.evaluate(l);
     }
 };

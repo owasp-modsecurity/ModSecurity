@@ -34,7 +34,7 @@ namespace Variables {
 
 void Env::evaluate(Transaction *transaction,
     Rule *rule,
-    std::vector<const collection::Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);
         size_t pos = env.find_first_of("=");
@@ -51,7 +51,7 @@ void Env::evaluate(Transaction *transaction,
         if (x.first != m_name && m_name.length() > 0) {
             continue;
         }
-        l->push_back(new collection::Variable(&m_collectionName, &x.first, &x.second));
+        l->push_back(new VariableValue(&m_collectionName, &x.first, &x.second));
     }
 }
 

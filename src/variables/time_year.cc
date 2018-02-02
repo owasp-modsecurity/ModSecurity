@@ -35,7 +35,7 @@ namespace Variables {
 
 void TimeYear::evaluate(Transaction *transaction,
     Rule *rule,
-    std::vector<const collection::Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -48,7 +48,7 @@ void TimeYear::evaluate(Transaction *transaction,
 
     transaction->m_variableTimeYear.assign(tstr);
 
-    l->push_back(new collection::Variable(&m_retName,
+    l->push_back(new VariableValue(&m_retName,
         &transaction->m_variableTimeYear));
 }
 

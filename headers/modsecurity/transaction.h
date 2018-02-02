@@ -40,11 +40,11 @@ typedef struct Transaction_t Transaction;
 typedef struct Rules_t Rules;
 #endif
 
-#include "modsecurity/anchored_set_variable.h"
-#include "modsecurity/anchored_variable.h"
+#include "anchored_set_variable.h"
+#include "anchored_variable.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/collection/collections.h"
-#include "modsecurity/collection/variable.h"
+#include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
 

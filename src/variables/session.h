@@ -39,7 +39,7 @@ class Session_DictElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_session_collection->resolveMultiMatches(
             m_dictElement, t->m_collections.m_session_collection_key,
             t->m_rules->m_secWebAppId.m_value, l);
@@ -56,7 +56,7 @@ class Session_NoDictElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_session_collection->resolveMultiMatches(m_name,
             t->m_collections.m_session_collection_key,
             t->m_rules->m_secWebAppId.m_value, l);
@@ -73,7 +73,7 @@ class Session_DictElementRegexp : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         t->m_collections.m_session_collection->resolveRegularExpression(m_dictElement,
             t->m_collections.m_session_collection_key,
             t->m_rules->m_secWebAppId.m_value, l);
@@ -92,7 +92,7 @@ class Session_DynamicElement : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override {
+        std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_session_collection->resolveMultiMatches(
             string,

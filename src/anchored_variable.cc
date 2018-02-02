@@ -13,14 +13,13 @@
  *
  */
 
-#include "modsecurity/anchored_variable.h"
-
 #include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
+#include "../headers/modsecurity/anchored_variable.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/regex.h"
@@ -36,7 +35,7 @@ AnchoredVariable::AnchoredVariable(Transaction *t,
     m_name(""),
     m_value("") {
         m_name.append(name);
-        m_var = new collection::Variable(&m_name);
+        m_var = new VariableValue(&m_name);
 }
 
 
@@ -110,13 +109,13 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
 }
 
 
-void AnchoredVariable::evaluate(std::vector<const collection::Variable *> *l) {
+void AnchoredVariable::evaluate(std::vector<const VariableValue *> *l) {
     if (m_name.empty() || m_value.empty()) {
         return;
     }
 
     m_var->m_value.assign(m_value);
-    collection::Variable *m_var2 = new collection::Variable(m_var);
+    VariableValue *m_var2 = new VariableValue(m_var);
     l->push_back(m_var2);
 }
 

@@ -24,28 +24,27 @@
 
 #include "modsecurity/variable_origin.h"
 
-#ifndef HEADERS_MODSECURITY_COLLECTION_VARIABLE_H_
-#define HEADERS_MODSECURITY_COLLECTION_VARIABLE_H_
+#ifndef HEADERS_MODSECURITY_VARIABLE_H_
+#define HEADERS_MODSECURITY_VARIABLE_H_
 
 #ifndef __cplusplus
-typedef struct Variable_t Variable;
+typedef struct Variable_t VariableValue;
 #endif
 
 #ifdef __cplusplus
 namespace modsecurity {
-namespace collection {
 
 class Collection;
-class Variable {
+class VariableValue {
  public:
-    explicit Variable(const std::string *key) :
+    explicit VariableValue(const std::string *key) :
         m_key(""),
         m_value("") {
             m_key.assign(*key);
             m_keyWithCollection = std::make_shared<std::string>(*key);
         }
 
-    Variable(const std::string *key, const std::string *value) :
+    VariableValue(const std::string *key, const std::string *value) :
         m_key(""),
         m_value("") {
             m_key.assign(*key);
@@ -53,26 +52,26 @@ class Variable {
             m_keyWithCollection = std::make_shared<std::string>(*key);
         }
 
-    Variable() :
+    VariableValue() :
         m_key(""),
         m_value("") {
             m_keyWithCollection = std::make_shared<std::string>(m_key);
         }
 
-    Variable(const std::string *a, const std::string *b, const std::string *c) :
+    VariableValue(const std::string *a, const std::string *b, const std::string *c) :
         m_key(*a + ":" + *b),
         m_value(*c) {
             m_keyWithCollection = std::make_shared<std::string>(*a + ":" + *b);
         }
 
-    Variable(std::shared_ptr<std::string> fullName) :
+    VariableValue(std::shared_ptr<std::string> fullName) :
         m_key(""),
         m_value("") {
             m_keyWithCollection = fullName;
             m_key.assign(*fullName.get());
         }
 
-    Variable(std::shared_ptr<std::string> fullName, const std::string *value) :
+    VariableValue(std::shared_ptr<std::string> fullName, const std::string *value) :
         m_key(""),
         m_value("") {
             m_value.assign(*value);
@@ -81,7 +80,7 @@ class Variable {
         }
 
 
-    explicit Variable(const Variable *o) :
+    explicit VariableValue(const VariableValue *o) :
         m_key(""),
         m_value("") {
         m_key.assign(o->m_key);
@@ -104,8 +103,7 @@ class Variable {
     std::list<std::unique_ptr<VariableOrigin>> m_orign;
 };
 
-}  // namespace collection
 }  // namespace modsecurity
 #endif
 
-#endif  // HEADERS_MODSECURITY_COLLECTION_VARIABLE_H_
+#endif  // HEADERS_MODSECURITY_VARIABLE_H_
