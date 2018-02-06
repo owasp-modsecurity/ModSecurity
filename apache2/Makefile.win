@@ -56,6 +56,9 @@ DEFS=$(DEFS) -DWITH_YAJL
 INCLUDES = $(INCLUDES) -I$(YAJL)\include -I$(YAJL) \
 !ENDIF
 
+# Enable support for collection's memory database
+DEFS=$(DEFS) -DMEMORY_DATABASE_ENABLE
+
 CFLAGS= -MD $(INCLUDES) $(DEFS)
 
 LDFLAGS =
