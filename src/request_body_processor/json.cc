@@ -127,13 +127,18 @@ int JSON::addArgument(const std::string& value) {
         }
     }
 
-    JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
-        m_containers.back());
-    if (a) {
-        a->m_elementCounter++;
+    if (m_containers.size() > 0) {
+        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+            m_containers.back());
+        if (a) {
+            a->m_elementCounter++;
+        } else {
+            data = getCurrentKey();
+        }
     } else {
         data = getCurrentKey();
     }
+
 
     m_transaction->addArgument("JSON", path + data, value, 0);
 
@@ -222,6 +227,10 @@ int JSON::yajl_start_array(void *ctx) {
 
 int JSON::yajl_end_array(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
+    if (tthis->m_containers.size() <= 0) {
+        return 1;
+    }
+
     JSONContainer *a = tthis->m_containers.back();
     tthis->m_containers.pop_back();
     delete a;
@@ -252,6 +261,10 @@ int JSON::yajl_start_map(void *ctx) {
  */
 int JSON::yajl_end_map(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
+    if (tthis->m_containers.size() <= 0) {
+        return 1;
+    }
+
     JSONContainer *a = tthis->m_containers.back();
     tthis->m_containers.pop_back();
     delete a;
