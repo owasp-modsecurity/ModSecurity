@@ -127,6 +127,8 @@ int Lock_destroy(struct agmdb_lock *db_lock) {
     if (AGMDB_isError(rc))
         return rc;
 #ifndef _WIN32
+    if (db_lock->sem_id = -1)
+        return AGMDB_SUCCESS;
     rc = semctl(db_lock->sem_id, 0, IPC_RMID);
     if (rc == -1)
         return AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL;
