@@ -673,6 +673,9 @@ namespace yy {
       // "SkipAfter"
       // "Status"
       // "Tag"
+      // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
       // "ACTION_TRANSFORMATION_CMD_LINE"
       // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
       // "ACTION_TRANSFORMATION_CSS_DECODE"
@@ -1025,122 +1028,125 @@ namespace yy {
         TOK_ACTION_SKIP_AFTER = 445,
         TOK_ACTION_STATUS = 446,
         TOK_ACTION_TAG = 447,
-        TOK_ACTION_TRANSFORMATION_CMD_LINE = 448,
-        TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE = 449,
-        TOK_ACTION_TRANSFORMATION_CSS_DECODE = 450,
-        TOK_ACTION_TRANSFORMATION_HEX_ENCODE = 451,
-        TOK_ACTION_TRANSFORMATION_HEX_DECODE = 452,
-        TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE = 453,
-        TOK_ACTION_TRANSFORMATION_JS_DECODE = 454,
-        TOK_ACTION_TRANSFORMATION_LENGTH = 455,
-        TOK_ACTION_TRANSFORMATION_LOWERCASE = 456,
-        TOK_ACTION_TRANSFORMATION_MD5 = 457,
-        TOK_ACTION_TRANSFORMATION_NONE = 458,
-        TOK_ACTION_TRANSFORMATION_NORMALISE_PATH = 459,
-        TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN = 460,
-        TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT = 461,
-        TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT = 462,
-        TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT = 463,
-        TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS = 464,
-        TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR = 465,
-        TOK_ACTION_TRANSFORMATION_REMOVE_NULLS = 466,
-        TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE = 467,
-        TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS = 468,
-        TOK_ACTION_TRANSFORMATION_REPLACE_NULLS = 469,
-        TOK_ACTION_TRANSFORMATION_SHA1 = 470,
-        TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE = 471,
-        TOK_ACTION_TRANSFORMATION_TRIM = 472,
-        TOK_ACTION_TRANSFORMATION_UPPERCASE = 473,
-        TOK_ACTION_TRANSFORMATION_URL_DECODE = 474,
-        TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI = 475,
-        TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE = 476,
-        TOK_ACTION_VER = 477,
-        TOK_ACTION_XMLNS = 478,
-        TOK_CONFIG_COMPONENT_SIG = 479,
-        TOK_CONFIG_SEC_ARGUMENT_SEPARATOR = 480,
-        TOK_CONFIG_SEC_WEB_APP_ID = 481,
-        TOK_CONFIG_SEC_SERVER_SIG = 482,
-        TOK_CONFIG_DIR_AUDIT_DIR = 483,
-        TOK_CONFIG_DIR_AUDIT_DIR_MOD = 484,
-        TOK_CONFIG_DIR_AUDIT_ENG = 485,
-        TOK_CONFIG_DIR_AUDIT_FLE_MOD = 486,
-        TOK_CONFIG_DIR_AUDIT_LOG = 487,
-        TOK_CONFIG_DIR_AUDIT_LOG2 = 488,
-        TOK_CONFIG_DIR_AUDIT_LOG_P = 489,
-        TOK_CONFIG_DIR_AUDIT_STS = 490,
-        TOK_CONFIG_DIR_AUDIT_TPE = 491,
-        TOK_CONFIG_DIR_DEBUG_LOG = 492,
-        TOK_CONFIG_DIR_DEBUG_LVL = 493,
-        TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS = 494,
-        TOK_CONFIG_DIR_GEO_DB = 495,
-        TOK_CONFIG_DIR_PCRE_MATCH_LIMIT = 496,
-        TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION = 497,
-        TOK_CONFIG_DIR_REQ_BODY = 498,
-        TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT = 499,
-        TOK_CONFIG_DIR_REQ_BODY_LIMIT = 500,
-        TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION = 501,
-        TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT = 502,
-        TOK_CONFIG_DIR_RES_BODY = 503,
-        TOK_CONFIG_DIR_RES_BODY_LIMIT = 504,
-        TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION = 505,
-        TOK_CONFIG_DIR_RULE_ENG = 506,
-        TOK_CONFIG_DIR_SEC_ACTION = 507,
-        TOK_CONFIG_DIR_SEC_DEFAULT_ACTION = 508,
-        TOK_CONFIG_DIR_SEC_MARKER = 509,
-        TOK_CONFIG_DIR_UNICODE_MAP_FILE = 510,
-        TOK_CONFIG_SEC_COLLECTION_TIMEOUT = 511,
-        TOK_CONFIG_SEC_HTTP_BLKEY = 512,
-        TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION = 513,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_ID = 514,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG = 515,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG = 516,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG = 517,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG = 518,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID = 519,
-        TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID = 520,
-        TOK_CONFIG_UPDLOAD_KEEP_FILES = 521,
-        TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES = 522,
-        TOK_CONFIG_UPLOAD_DIR = 523,
-        TOK_CONFIG_UPLOAD_FILE_LIMIT = 524,
-        TOK_CONFIG_UPLOAD_FILE_MODE = 525,
-        TOK_CONFIG_VALUE_ABORT = 526,
-        TOK_CONFIG_VALUE_DETC = 527,
-        TOK_CONFIG_VALUE_HTTPS = 528,
-        TOK_CONFIG_VALUE_OFF = 529,
-        TOK_CONFIG_VALUE_ON = 530,
-        TOK_CONFIG_VALUE_PARALLEL = 531,
-        TOK_CONFIG_VALUE_PROCESS_PARTIAL = 532,
-        TOK_CONFIG_VALUE_REJECT = 533,
-        TOK_CONFIG_VALUE_RELEVANT_ONLY = 534,
-        TOK_CONFIG_VALUE_SERIAL = 535,
-        TOK_CONFIG_VALUE_WARN = 536,
-        TOK_CONFIG_XML_EXTERNAL_ENTITY = 537,
-        TOK_CONGIG_DIR_RESPONSE_BODY_MP = 538,
-        TOK_CONGIG_DIR_SEC_ARG_SEP = 539,
-        TOK_CONGIG_DIR_SEC_COOKIE_FORMAT = 540,
-        TOK_CONGIG_DIR_SEC_DATA_DIR = 541,
-        TOK_CONGIG_DIR_SEC_STATUS_ENGINE = 542,
-        TOK_CONGIG_DIR_SEC_TMP_DIR = 543,
-        TOK_DIRECTIVE = 544,
-        TOK_DIRECTIVE_SECRULESCRIPT = 545,
-        TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION = 546,
-        TOK_QUOTATION_MARK = 547,
-        TOK_RUN_TIME_VAR_BLD = 548,
-        TOK_RUN_TIME_VAR_DUR = 549,
-        TOK_RUN_TIME_VAR_HSV = 550,
-        TOK_RUN_TIME_VAR_REMOTE_USER = 551,
-        TOK_RUN_TIME_VAR_TIME = 552,
-        TOK_RUN_TIME_VAR_TIME_DAY = 553,
-        TOK_RUN_TIME_VAR_TIME_EPOCH = 554,
-        TOK_RUN_TIME_VAR_TIME_HOUR = 555,
-        TOK_RUN_TIME_VAR_TIME_MIN = 556,
-        TOK_RUN_TIME_VAR_TIME_MON = 557,
-        TOK_RUN_TIME_VAR_TIME_SEC = 558,
-        TOK_RUN_TIME_VAR_TIME_WDAY = 559,
-        TOK_RUN_TIME_VAR_TIME_YEAR = 560,
-        TOK_VARIABLE = 561,
-        TOK_DICT_ELEMENT = 562,
-        TOK_DICT_ELEMENT_REGEXP = 563
+        TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE = 448,
+        TOK_ACTION_TRANSFORMATION_BASE_64_DECODE = 449,
+        TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT = 450,
+        TOK_ACTION_TRANSFORMATION_CMD_LINE = 451,
+        TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE = 452,
+        TOK_ACTION_TRANSFORMATION_CSS_DECODE = 453,
+        TOK_ACTION_TRANSFORMATION_HEX_ENCODE = 454,
+        TOK_ACTION_TRANSFORMATION_HEX_DECODE = 455,
+        TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE = 456,
+        TOK_ACTION_TRANSFORMATION_JS_DECODE = 457,
+        TOK_ACTION_TRANSFORMATION_LENGTH = 458,
+        TOK_ACTION_TRANSFORMATION_LOWERCASE = 459,
+        TOK_ACTION_TRANSFORMATION_MD5 = 460,
+        TOK_ACTION_TRANSFORMATION_NONE = 461,
+        TOK_ACTION_TRANSFORMATION_NORMALISE_PATH = 462,
+        TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN = 463,
+        TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT = 464,
+        TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT = 465,
+        TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT = 466,
+        TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS = 467,
+        TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR = 468,
+        TOK_ACTION_TRANSFORMATION_REMOVE_NULLS = 469,
+        TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE = 470,
+        TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS = 471,
+        TOK_ACTION_TRANSFORMATION_REPLACE_NULLS = 472,
+        TOK_ACTION_TRANSFORMATION_SHA1 = 473,
+        TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE = 474,
+        TOK_ACTION_TRANSFORMATION_TRIM = 475,
+        TOK_ACTION_TRANSFORMATION_UPPERCASE = 476,
+        TOK_ACTION_TRANSFORMATION_URL_DECODE = 477,
+        TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI = 478,
+        TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE = 479,
+        TOK_ACTION_VER = 480,
+        TOK_ACTION_XMLNS = 481,
+        TOK_CONFIG_COMPONENT_SIG = 482,
+        TOK_CONFIG_SEC_ARGUMENT_SEPARATOR = 483,
+        TOK_CONFIG_SEC_WEB_APP_ID = 484,
+        TOK_CONFIG_SEC_SERVER_SIG = 485,
+        TOK_CONFIG_DIR_AUDIT_DIR = 486,
+        TOK_CONFIG_DIR_AUDIT_DIR_MOD = 487,
+        TOK_CONFIG_DIR_AUDIT_ENG = 488,
+        TOK_CONFIG_DIR_AUDIT_FLE_MOD = 489,
+        TOK_CONFIG_DIR_AUDIT_LOG = 490,
+        TOK_CONFIG_DIR_AUDIT_LOG2 = 491,
+        TOK_CONFIG_DIR_AUDIT_LOG_P = 492,
+        TOK_CONFIG_DIR_AUDIT_STS = 493,
+        TOK_CONFIG_DIR_AUDIT_TPE = 494,
+        TOK_CONFIG_DIR_DEBUG_LOG = 495,
+        TOK_CONFIG_DIR_DEBUG_LVL = 496,
+        TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS = 497,
+        TOK_CONFIG_DIR_GEO_DB = 498,
+        TOK_CONFIG_DIR_PCRE_MATCH_LIMIT = 499,
+        TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION = 500,
+        TOK_CONFIG_DIR_REQ_BODY = 501,
+        TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT = 502,
+        TOK_CONFIG_DIR_REQ_BODY_LIMIT = 503,
+        TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION = 504,
+        TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT = 505,
+        TOK_CONFIG_DIR_RES_BODY = 506,
+        TOK_CONFIG_DIR_RES_BODY_LIMIT = 507,
+        TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION = 508,
+        TOK_CONFIG_DIR_RULE_ENG = 509,
+        TOK_CONFIG_DIR_SEC_ACTION = 510,
+        TOK_CONFIG_DIR_SEC_DEFAULT_ACTION = 511,
+        TOK_CONFIG_DIR_SEC_MARKER = 512,
+        TOK_CONFIG_DIR_UNICODE_MAP_FILE = 513,
+        TOK_CONFIG_SEC_COLLECTION_TIMEOUT = 514,
+        TOK_CONFIG_SEC_HTTP_BLKEY = 515,
+        TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION = 516,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_ID = 517,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG = 518,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG = 519,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG = 520,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG = 521,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID = 522,
+        TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID = 523,
+        TOK_CONFIG_UPDLOAD_KEEP_FILES = 524,
+        TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES = 525,
+        TOK_CONFIG_UPLOAD_DIR = 526,
+        TOK_CONFIG_UPLOAD_FILE_LIMIT = 527,
+        TOK_CONFIG_UPLOAD_FILE_MODE = 528,
+        TOK_CONFIG_VALUE_ABORT = 529,
+        TOK_CONFIG_VALUE_DETC = 530,
+        TOK_CONFIG_VALUE_HTTPS = 531,
+        TOK_CONFIG_VALUE_OFF = 532,
+        TOK_CONFIG_VALUE_ON = 533,
+        TOK_CONFIG_VALUE_PARALLEL = 534,
+        TOK_CONFIG_VALUE_PROCESS_PARTIAL = 535,
+        TOK_CONFIG_VALUE_REJECT = 536,
+        TOK_CONFIG_VALUE_RELEVANT_ONLY = 537,
+        TOK_CONFIG_VALUE_SERIAL = 538,
+        TOK_CONFIG_VALUE_WARN = 539,
+        TOK_CONFIG_XML_EXTERNAL_ENTITY = 540,
+        TOK_CONGIG_DIR_RESPONSE_BODY_MP = 541,
+        TOK_CONGIG_DIR_SEC_ARG_SEP = 542,
+        TOK_CONGIG_DIR_SEC_COOKIE_FORMAT = 543,
+        TOK_CONGIG_DIR_SEC_DATA_DIR = 544,
+        TOK_CONGIG_DIR_SEC_STATUS_ENGINE = 545,
+        TOK_CONGIG_DIR_SEC_TMP_DIR = 546,
+        TOK_DIRECTIVE = 547,
+        TOK_DIRECTIVE_SECRULESCRIPT = 548,
+        TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION = 549,
+        TOK_QUOTATION_MARK = 550,
+        TOK_RUN_TIME_VAR_BLD = 551,
+        TOK_RUN_TIME_VAR_DUR = 552,
+        TOK_RUN_TIME_VAR_HSV = 553,
+        TOK_RUN_TIME_VAR_REMOTE_USER = 554,
+        TOK_RUN_TIME_VAR_TIME = 555,
+        TOK_RUN_TIME_VAR_TIME_DAY = 556,
+        TOK_RUN_TIME_VAR_TIME_EPOCH = 557,
+        TOK_RUN_TIME_VAR_TIME_HOUR = 558,
+        TOK_RUN_TIME_VAR_TIME_MIN = 559,
+        TOK_RUN_TIME_VAR_TIME_MON = 560,
+        TOK_RUN_TIME_VAR_TIME_SEC = 561,
+        TOK_RUN_TIME_VAR_TIME_WDAY = 562,
+        TOK_RUN_TIME_VAR_TIME_YEAR = 563,
+        TOK_VARIABLE = 564,
+        TOK_DICT_ELEMENT = 565,
+        TOK_DICT_ELEMENT_REGEXP = 566
       };
     };
 
@@ -2025,6 +2031,18 @@ namespace yy {
 
     static inline
     symbol_type
+    make_ACTION_TRANSFORMATION_BASE_64_ENCODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_BASE_64_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
     make_ACTION_TRANSFORMATION_CMD_LINE (const std::string& v, const location_type& l);
 
     static inline
@@ -2692,12 +2710,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 3069,     ///< Last index in yytable_.
+      yylast_ = 3094,     ///< Last index in yytable_.
       yynnts_ = 15,  ///< Number of nonterminal symbols.
-      yyfinal_ = 294, ///< Termination state number.
+      yyfinal_ = 297, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 309  ///< Number of tokens.
+      yyntokens_ = 312  ///< Number of tokens.
     };
 
 
@@ -2770,9 +2788,9 @@ namespace yy {
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-     305,   306,   307,   308
+     305,   306,   307,   308,   309,   310,   311
     };
-    const unsigned int user_token_number_max_ = 563;
+    const unsigned int user_token_number_max_ = 566;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -2856,150 +2874,153 @@ namespace yy {
       case 190: // "SkipAfter"
       case 191: // "Status"
       case 192: // "Tag"
-      case 193: // "ACTION_TRANSFORMATION_CMD_LINE"
-      case 194: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-      case 195: // "ACTION_TRANSFORMATION_CSS_DECODE"
-      case 196: // "ACTION_TRANSFORMATION_HEX_ENCODE"
-      case 197: // "ACTION_TRANSFORMATION_HEX_DECODE"
-      case 198: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-      case 199: // "ACTION_TRANSFORMATION_JS_DECODE"
-      case 200: // "ACTION_TRANSFORMATION_LENGTH"
-      case 201: // "ACTION_TRANSFORMATION_LOWERCASE"
-      case 202: // "ACTION_TRANSFORMATION_MD5"
-      case 203: // "ACTION_TRANSFORMATION_NONE"
-      case 204: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
-      case 205: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-      case 206: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-      case 207: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-      case 208: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-      case 209: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-      case 210: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-      case 211: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
-      case 212: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-      case 213: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-      case 214: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
-      case 215: // "ACTION_TRANSFORMATION_SHA1"
-      case 216: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-      case 217: // "ACTION_TRANSFORMATION_TRIM"
-      case 218: // "ACTION_TRANSFORMATION_UPPERCASE"
-      case 219: // "ACTION_TRANSFORMATION_URL_DECODE"
-      case 220: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-      case 221: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 222: // "Ver"
-      case 223: // "xmlns"
-      case 224: // "CONFIG_COMPONENT_SIG"
-      case 225: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 226: // "CONFIG_SEC_WEB_APP_ID"
-      case 227: // "CONFIG_SEC_SERVER_SIG"
-      case 228: // "CONFIG_DIR_AUDIT_DIR"
-      case 229: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 230: // "CONFIG_DIR_AUDIT_ENG"
-      case 231: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 232: // "CONFIG_DIR_AUDIT_LOG"
-      case 233: // "CONFIG_DIR_AUDIT_LOG2"
-      case 234: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 235: // "CONFIG_DIR_AUDIT_STS"
-      case 236: // "CONFIG_DIR_AUDIT_TPE"
-      case 237: // "CONFIG_DIR_DEBUG_LOG"
-      case 238: // "CONFIG_DIR_DEBUG_LVL"
-      case 239: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 240: // "CONFIG_DIR_GEO_DB"
-      case 241: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 242: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 243: // "CONFIG_DIR_REQ_BODY"
-      case 244: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 245: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 246: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 247: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 248: // "CONFIG_DIR_RES_BODY"
-      case 249: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 250: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 251: // "CONFIG_DIR_RULE_ENG"
-      case 252: // "CONFIG_DIR_SEC_ACTION"
-      case 253: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 254: // "CONFIG_DIR_SEC_MARKER"
-      case 255: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 256: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 257: // "CONFIG_SEC_HTTP_BLKEY"
-      case 258: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 259: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 260: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 261: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 262: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 263: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 264: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 265: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 266: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 267: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 268: // "CONFIG_UPLOAD_DIR"
-      case 269: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 270: // "CONFIG_UPLOAD_FILE_MODE"
-      case 271: // "CONFIG_VALUE_ABORT"
-      case 272: // "CONFIG_VALUE_DETC"
-      case 273: // "CONFIG_VALUE_HTTPS"
-      case 274: // "CONFIG_VALUE_OFF"
-      case 275: // "CONFIG_VALUE_ON"
-      case 276: // "CONFIG_VALUE_PARALLEL"
-      case 277: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 278: // "CONFIG_VALUE_REJECT"
-      case 279: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 280: // "CONFIG_VALUE_SERIAL"
-      case 281: // "CONFIG_VALUE_WARN"
-      case 282: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 283: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 284: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 285: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 286: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 287: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 288: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 289: // "DIRECTIVE"
-      case 290: // "DIRECTIVE_SECRULESCRIPT"
-      case 291: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 292: // "QUOTATION_MARK"
-      case 293: // "RUN_TIME_VAR_BLD"
-      case 294: // "RUN_TIME_VAR_DUR"
-      case 295: // "RUN_TIME_VAR_HSV"
-      case 296: // "RUN_TIME_VAR_REMOTE_USER"
-      case 297: // "RUN_TIME_VAR_TIME"
-      case 298: // "RUN_TIME_VAR_TIME_DAY"
-      case 299: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 300: // "RUN_TIME_VAR_TIME_HOUR"
-      case 301: // "RUN_TIME_VAR_TIME_MIN"
-      case 302: // "RUN_TIME_VAR_TIME_MON"
-      case 303: // "RUN_TIME_VAR_TIME_SEC"
-      case 304: // "RUN_TIME_VAR_TIME_WDAY"
-      case 305: // "RUN_TIME_VAR_TIME_YEAR"
-      case 306: // "VARIABLE"
-      case 307: // "Dictionary element"
-      case 308: // "Dictionary element, selected by regexp"
+      case 193: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      case 194: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      case 195: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
+      case 196: // "ACTION_TRANSFORMATION_CMD_LINE"
+      case 197: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+      case 198: // "ACTION_TRANSFORMATION_CSS_DECODE"
+      case 199: // "ACTION_TRANSFORMATION_HEX_ENCODE"
+      case 200: // "ACTION_TRANSFORMATION_HEX_DECODE"
+      case 201: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+      case 202: // "ACTION_TRANSFORMATION_JS_DECODE"
+      case 203: // "ACTION_TRANSFORMATION_LENGTH"
+      case 204: // "ACTION_TRANSFORMATION_LOWERCASE"
+      case 205: // "ACTION_TRANSFORMATION_MD5"
+      case 206: // "ACTION_TRANSFORMATION_NONE"
+      case 207: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
+      case 208: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+      case 209: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
+      case 210: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
+      case 211: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
+      case 212: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+      case 213: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+      case 214: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
+      case 215: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+      case 216: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+      case 217: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
+      case 218: // "ACTION_TRANSFORMATION_SHA1"
+      case 219: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
+      case 220: // "ACTION_TRANSFORMATION_TRIM"
+      case 221: // "ACTION_TRANSFORMATION_UPPERCASE"
+      case 222: // "ACTION_TRANSFORMATION_URL_DECODE"
+      case 223: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+      case 224: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      case 225: // "Ver"
+      case 226: // "xmlns"
+      case 227: // "CONFIG_COMPONENT_SIG"
+      case 228: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 229: // "CONFIG_SEC_WEB_APP_ID"
+      case 230: // "CONFIG_SEC_SERVER_SIG"
+      case 231: // "CONFIG_DIR_AUDIT_DIR"
+      case 232: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 233: // "CONFIG_DIR_AUDIT_ENG"
+      case 234: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 235: // "CONFIG_DIR_AUDIT_LOG"
+      case 236: // "CONFIG_DIR_AUDIT_LOG2"
+      case 237: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 238: // "CONFIG_DIR_AUDIT_STS"
+      case 239: // "CONFIG_DIR_AUDIT_TPE"
+      case 240: // "CONFIG_DIR_DEBUG_LOG"
+      case 241: // "CONFIG_DIR_DEBUG_LVL"
+      case 242: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 243: // "CONFIG_DIR_GEO_DB"
+      case 244: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 245: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 246: // "CONFIG_DIR_REQ_BODY"
+      case 247: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 248: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 249: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 250: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 251: // "CONFIG_DIR_RES_BODY"
+      case 252: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 253: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 254: // "CONFIG_DIR_RULE_ENG"
+      case 255: // "CONFIG_DIR_SEC_ACTION"
+      case 256: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 257: // "CONFIG_DIR_SEC_MARKER"
+      case 258: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 259: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 260: // "CONFIG_SEC_HTTP_BLKEY"
+      case 261: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 262: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 263: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 264: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 265: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 266: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 267: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 268: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 269: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 270: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 271: // "CONFIG_UPLOAD_DIR"
+      case 272: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 273: // "CONFIG_UPLOAD_FILE_MODE"
+      case 274: // "CONFIG_VALUE_ABORT"
+      case 275: // "CONFIG_VALUE_DETC"
+      case 276: // "CONFIG_VALUE_HTTPS"
+      case 277: // "CONFIG_VALUE_OFF"
+      case 278: // "CONFIG_VALUE_ON"
+      case 279: // "CONFIG_VALUE_PARALLEL"
+      case 280: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 281: // "CONFIG_VALUE_REJECT"
+      case 282: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 283: // "CONFIG_VALUE_SERIAL"
+      case 284: // "CONFIG_VALUE_WARN"
+      case 285: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 286: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 287: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 288: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 289: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 290: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 291: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 292: // "DIRECTIVE"
+      case 293: // "DIRECTIVE_SECRULESCRIPT"
+      case 294: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 295: // "QUOTATION_MARK"
+      case 296: // "RUN_TIME_VAR_BLD"
+      case 297: // "RUN_TIME_VAR_DUR"
+      case 298: // "RUN_TIME_VAR_HSV"
+      case 299: // "RUN_TIME_VAR_REMOTE_USER"
+      case 300: // "RUN_TIME_VAR_TIME"
+      case 301: // "RUN_TIME_VAR_TIME_DAY"
+      case 302: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 303: // "RUN_TIME_VAR_TIME_HOUR"
+      case 304: // "RUN_TIME_VAR_TIME_MIN"
+      case 305: // "RUN_TIME_VAR_TIME_MON"
+      case 306: // "RUN_TIME_VAR_TIME_SEC"
+      case 307: // "RUN_TIME_VAR_TIME_WDAY"
+      case 308: // "RUN_TIME_VAR_TIME_YEAR"
+      case 309: // "VARIABLE"
+      case 310: // "Dictionary element"
+      case 311: // "Dictionary element, selected by regexp"
         value.copy< std::string > (other.value);
         break;
 
-      case 315: // op
-      case 316: // op_before_init
+      case 318: // op
+      case 319: // op_before_init
         value.copy< std::unique_ptr<Operator> > (other.value);
         break;
 
-      case 323: // run_time_string
+      case 326: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (other.value);
         break;
 
-      case 320: // var
+      case 323: // var
         value.copy< std::unique_ptr<Variable> > (other.value);
         break;
 
-      case 321: // act
-      case 322: // setvar_action
+      case 324: // act
+      case 325: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (other.value);
         break;
 
-      case 318: // variables
-      case 319: // variables_may_be_quoted
+      case 321: // variables
+      case 322: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (other.value);
         break;
 
-      case 313: // actions
-      case 314: // actions_may_quoted
+      case 316: // actions
+      case 317: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (other.value);
         break;
 
@@ -3071,150 +3092,153 @@ namespace yy {
       case 190: // "SkipAfter"
       case 191: // "Status"
       case 192: // "Tag"
-      case 193: // "ACTION_TRANSFORMATION_CMD_LINE"
-      case 194: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-      case 195: // "ACTION_TRANSFORMATION_CSS_DECODE"
-      case 196: // "ACTION_TRANSFORMATION_HEX_ENCODE"
-      case 197: // "ACTION_TRANSFORMATION_HEX_DECODE"
-      case 198: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-      case 199: // "ACTION_TRANSFORMATION_JS_DECODE"
-      case 200: // "ACTION_TRANSFORMATION_LENGTH"
-      case 201: // "ACTION_TRANSFORMATION_LOWERCASE"
-      case 202: // "ACTION_TRANSFORMATION_MD5"
-      case 203: // "ACTION_TRANSFORMATION_NONE"
-      case 204: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
-      case 205: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-      case 206: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-      case 207: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-      case 208: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-      case 209: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-      case 210: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-      case 211: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
-      case 212: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-      case 213: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-      case 214: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
-      case 215: // "ACTION_TRANSFORMATION_SHA1"
-      case 216: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-      case 217: // "ACTION_TRANSFORMATION_TRIM"
-      case 218: // "ACTION_TRANSFORMATION_UPPERCASE"
-      case 219: // "ACTION_TRANSFORMATION_URL_DECODE"
-      case 220: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-      case 221: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 222: // "Ver"
-      case 223: // "xmlns"
-      case 224: // "CONFIG_COMPONENT_SIG"
-      case 225: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 226: // "CONFIG_SEC_WEB_APP_ID"
-      case 227: // "CONFIG_SEC_SERVER_SIG"
-      case 228: // "CONFIG_DIR_AUDIT_DIR"
-      case 229: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 230: // "CONFIG_DIR_AUDIT_ENG"
-      case 231: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 232: // "CONFIG_DIR_AUDIT_LOG"
-      case 233: // "CONFIG_DIR_AUDIT_LOG2"
-      case 234: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 235: // "CONFIG_DIR_AUDIT_STS"
-      case 236: // "CONFIG_DIR_AUDIT_TPE"
-      case 237: // "CONFIG_DIR_DEBUG_LOG"
-      case 238: // "CONFIG_DIR_DEBUG_LVL"
-      case 239: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 240: // "CONFIG_DIR_GEO_DB"
-      case 241: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 242: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 243: // "CONFIG_DIR_REQ_BODY"
-      case 244: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 245: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 246: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 247: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 248: // "CONFIG_DIR_RES_BODY"
-      case 249: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 250: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 251: // "CONFIG_DIR_RULE_ENG"
-      case 252: // "CONFIG_DIR_SEC_ACTION"
-      case 253: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 254: // "CONFIG_DIR_SEC_MARKER"
-      case 255: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 256: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 257: // "CONFIG_SEC_HTTP_BLKEY"
-      case 258: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 259: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 260: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 261: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 262: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 263: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 264: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 265: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 266: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 267: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 268: // "CONFIG_UPLOAD_DIR"
-      case 269: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 270: // "CONFIG_UPLOAD_FILE_MODE"
-      case 271: // "CONFIG_VALUE_ABORT"
-      case 272: // "CONFIG_VALUE_DETC"
-      case 273: // "CONFIG_VALUE_HTTPS"
-      case 274: // "CONFIG_VALUE_OFF"
-      case 275: // "CONFIG_VALUE_ON"
-      case 276: // "CONFIG_VALUE_PARALLEL"
-      case 277: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 278: // "CONFIG_VALUE_REJECT"
-      case 279: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 280: // "CONFIG_VALUE_SERIAL"
-      case 281: // "CONFIG_VALUE_WARN"
-      case 282: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 283: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 284: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 285: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 286: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 287: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 288: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 289: // "DIRECTIVE"
-      case 290: // "DIRECTIVE_SECRULESCRIPT"
-      case 291: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 292: // "QUOTATION_MARK"
-      case 293: // "RUN_TIME_VAR_BLD"
-      case 294: // "RUN_TIME_VAR_DUR"
-      case 295: // "RUN_TIME_VAR_HSV"
-      case 296: // "RUN_TIME_VAR_REMOTE_USER"
-      case 297: // "RUN_TIME_VAR_TIME"
-      case 298: // "RUN_TIME_VAR_TIME_DAY"
-      case 299: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 300: // "RUN_TIME_VAR_TIME_HOUR"
-      case 301: // "RUN_TIME_VAR_TIME_MIN"
-      case 302: // "RUN_TIME_VAR_TIME_MON"
-      case 303: // "RUN_TIME_VAR_TIME_SEC"
-      case 304: // "RUN_TIME_VAR_TIME_WDAY"
-      case 305: // "RUN_TIME_VAR_TIME_YEAR"
-      case 306: // "VARIABLE"
-      case 307: // "Dictionary element"
-      case 308: // "Dictionary element, selected by regexp"
+      case 193: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      case 194: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      case 195: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
+      case 196: // "ACTION_TRANSFORMATION_CMD_LINE"
+      case 197: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+      case 198: // "ACTION_TRANSFORMATION_CSS_DECODE"
+      case 199: // "ACTION_TRANSFORMATION_HEX_ENCODE"
+      case 200: // "ACTION_TRANSFORMATION_HEX_DECODE"
+      case 201: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+      case 202: // "ACTION_TRANSFORMATION_JS_DECODE"
+      case 203: // "ACTION_TRANSFORMATION_LENGTH"
+      case 204: // "ACTION_TRANSFORMATION_LOWERCASE"
+      case 205: // "ACTION_TRANSFORMATION_MD5"
+      case 206: // "ACTION_TRANSFORMATION_NONE"
+      case 207: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
+      case 208: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+      case 209: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
+      case 210: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
+      case 211: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
+      case 212: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+      case 213: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+      case 214: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
+      case 215: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+      case 216: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+      case 217: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
+      case 218: // "ACTION_TRANSFORMATION_SHA1"
+      case 219: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
+      case 220: // "ACTION_TRANSFORMATION_TRIM"
+      case 221: // "ACTION_TRANSFORMATION_UPPERCASE"
+      case 222: // "ACTION_TRANSFORMATION_URL_DECODE"
+      case 223: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+      case 224: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      case 225: // "Ver"
+      case 226: // "xmlns"
+      case 227: // "CONFIG_COMPONENT_SIG"
+      case 228: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 229: // "CONFIG_SEC_WEB_APP_ID"
+      case 230: // "CONFIG_SEC_SERVER_SIG"
+      case 231: // "CONFIG_DIR_AUDIT_DIR"
+      case 232: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 233: // "CONFIG_DIR_AUDIT_ENG"
+      case 234: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 235: // "CONFIG_DIR_AUDIT_LOG"
+      case 236: // "CONFIG_DIR_AUDIT_LOG2"
+      case 237: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 238: // "CONFIG_DIR_AUDIT_STS"
+      case 239: // "CONFIG_DIR_AUDIT_TPE"
+      case 240: // "CONFIG_DIR_DEBUG_LOG"
+      case 241: // "CONFIG_DIR_DEBUG_LVL"
+      case 242: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 243: // "CONFIG_DIR_GEO_DB"
+      case 244: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 245: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 246: // "CONFIG_DIR_REQ_BODY"
+      case 247: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 248: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 249: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 250: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 251: // "CONFIG_DIR_RES_BODY"
+      case 252: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 253: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 254: // "CONFIG_DIR_RULE_ENG"
+      case 255: // "CONFIG_DIR_SEC_ACTION"
+      case 256: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 257: // "CONFIG_DIR_SEC_MARKER"
+      case 258: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 259: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 260: // "CONFIG_SEC_HTTP_BLKEY"
+      case 261: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 262: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 263: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 264: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 265: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 266: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 267: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 268: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 269: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 270: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 271: // "CONFIG_UPLOAD_DIR"
+      case 272: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 273: // "CONFIG_UPLOAD_FILE_MODE"
+      case 274: // "CONFIG_VALUE_ABORT"
+      case 275: // "CONFIG_VALUE_DETC"
+      case 276: // "CONFIG_VALUE_HTTPS"
+      case 277: // "CONFIG_VALUE_OFF"
+      case 278: // "CONFIG_VALUE_ON"
+      case 279: // "CONFIG_VALUE_PARALLEL"
+      case 280: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 281: // "CONFIG_VALUE_REJECT"
+      case 282: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 283: // "CONFIG_VALUE_SERIAL"
+      case 284: // "CONFIG_VALUE_WARN"
+      case 285: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 286: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 287: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 288: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 289: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 290: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 291: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 292: // "DIRECTIVE"
+      case 293: // "DIRECTIVE_SECRULESCRIPT"
+      case 294: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 295: // "QUOTATION_MARK"
+      case 296: // "RUN_TIME_VAR_BLD"
+      case 297: // "RUN_TIME_VAR_DUR"
+      case 298: // "RUN_TIME_VAR_HSV"
+      case 299: // "RUN_TIME_VAR_REMOTE_USER"
+      case 300: // "RUN_TIME_VAR_TIME"
+      case 301: // "RUN_TIME_VAR_TIME_DAY"
+      case 302: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 303: // "RUN_TIME_VAR_TIME_HOUR"
+      case 304: // "RUN_TIME_VAR_TIME_MIN"
+      case 305: // "RUN_TIME_VAR_TIME_MON"
+      case 306: // "RUN_TIME_VAR_TIME_SEC"
+      case 307: // "RUN_TIME_VAR_TIME_WDAY"
+      case 308: // "RUN_TIME_VAR_TIME_YEAR"
+      case 309: // "VARIABLE"
+      case 310: // "Dictionary element"
+      case 311: // "Dictionary element, selected by regexp"
         value.copy< std::string > (v);
         break;
 
-      case 315: // op
-      case 316: // op_before_init
+      case 318: // op
+      case 319: // op_before_init
         value.copy< std::unique_ptr<Operator> > (v);
         break;
 
-      case 323: // run_time_string
+      case 326: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (v);
         break;
 
-      case 320: // var
+      case 323: // var
         value.copy< std::unique_ptr<Variable> > (v);
         break;
 
-      case 321: // act
-      case 322: // setvar_action
+      case 324: // act
+      case 325: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (v);
         break;
 
-      case 318: // variables
-      case 319: // variables_may_be_quoted
+      case 321: // variables
+      case 322: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (v);
         break;
 
-      case 313: // actions
-      case 314: // actions_may_quoted
+      case 316: // actions
+      case 317: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (v);
         break;
 
@@ -3359,150 +3383,153 @@ namespace yy {
       case 190: // "SkipAfter"
       case 191: // "Status"
       case 192: // "Tag"
-      case 193: // "ACTION_TRANSFORMATION_CMD_LINE"
-      case 194: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-      case 195: // "ACTION_TRANSFORMATION_CSS_DECODE"
-      case 196: // "ACTION_TRANSFORMATION_HEX_ENCODE"
-      case 197: // "ACTION_TRANSFORMATION_HEX_DECODE"
-      case 198: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-      case 199: // "ACTION_TRANSFORMATION_JS_DECODE"
-      case 200: // "ACTION_TRANSFORMATION_LENGTH"
-      case 201: // "ACTION_TRANSFORMATION_LOWERCASE"
-      case 202: // "ACTION_TRANSFORMATION_MD5"
-      case 203: // "ACTION_TRANSFORMATION_NONE"
-      case 204: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
-      case 205: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-      case 206: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-      case 207: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-      case 208: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-      case 209: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-      case 210: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-      case 211: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
-      case 212: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-      case 213: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-      case 214: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
-      case 215: // "ACTION_TRANSFORMATION_SHA1"
-      case 216: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-      case 217: // "ACTION_TRANSFORMATION_TRIM"
-      case 218: // "ACTION_TRANSFORMATION_UPPERCASE"
-      case 219: // "ACTION_TRANSFORMATION_URL_DECODE"
-      case 220: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-      case 221: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 222: // "Ver"
-      case 223: // "xmlns"
-      case 224: // "CONFIG_COMPONENT_SIG"
-      case 225: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 226: // "CONFIG_SEC_WEB_APP_ID"
-      case 227: // "CONFIG_SEC_SERVER_SIG"
-      case 228: // "CONFIG_DIR_AUDIT_DIR"
-      case 229: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 230: // "CONFIG_DIR_AUDIT_ENG"
-      case 231: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 232: // "CONFIG_DIR_AUDIT_LOG"
-      case 233: // "CONFIG_DIR_AUDIT_LOG2"
-      case 234: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 235: // "CONFIG_DIR_AUDIT_STS"
-      case 236: // "CONFIG_DIR_AUDIT_TPE"
-      case 237: // "CONFIG_DIR_DEBUG_LOG"
-      case 238: // "CONFIG_DIR_DEBUG_LVL"
-      case 239: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 240: // "CONFIG_DIR_GEO_DB"
-      case 241: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 242: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 243: // "CONFIG_DIR_REQ_BODY"
-      case 244: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 245: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 246: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 247: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 248: // "CONFIG_DIR_RES_BODY"
-      case 249: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 250: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 251: // "CONFIG_DIR_RULE_ENG"
-      case 252: // "CONFIG_DIR_SEC_ACTION"
-      case 253: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 254: // "CONFIG_DIR_SEC_MARKER"
-      case 255: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 256: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 257: // "CONFIG_SEC_HTTP_BLKEY"
-      case 258: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 259: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 260: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 261: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 262: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 263: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 264: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 265: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 266: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 267: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 268: // "CONFIG_UPLOAD_DIR"
-      case 269: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 270: // "CONFIG_UPLOAD_FILE_MODE"
-      case 271: // "CONFIG_VALUE_ABORT"
-      case 272: // "CONFIG_VALUE_DETC"
-      case 273: // "CONFIG_VALUE_HTTPS"
-      case 274: // "CONFIG_VALUE_OFF"
-      case 275: // "CONFIG_VALUE_ON"
-      case 276: // "CONFIG_VALUE_PARALLEL"
-      case 277: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 278: // "CONFIG_VALUE_REJECT"
-      case 279: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 280: // "CONFIG_VALUE_SERIAL"
-      case 281: // "CONFIG_VALUE_WARN"
-      case 282: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 283: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 284: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 285: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 286: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 287: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 288: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 289: // "DIRECTIVE"
-      case 290: // "DIRECTIVE_SECRULESCRIPT"
-      case 291: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 292: // "QUOTATION_MARK"
-      case 293: // "RUN_TIME_VAR_BLD"
-      case 294: // "RUN_TIME_VAR_DUR"
-      case 295: // "RUN_TIME_VAR_HSV"
-      case 296: // "RUN_TIME_VAR_REMOTE_USER"
-      case 297: // "RUN_TIME_VAR_TIME"
-      case 298: // "RUN_TIME_VAR_TIME_DAY"
-      case 299: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 300: // "RUN_TIME_VAR_TIME_HOUR"
-      case 301: // "RUN_TIME_VAR_TIME_MIN"
-      case 302: // "RUN_TIME_VAR_TIME_MON"
-      case 303: // "RUN_TIME_VAR_TIME_SEC"
-      case 304: // "RUN_TIME_VAR_TIME_WDAY"
-      case 305: // "RUN_TIME_VAR_TIME_YEAR"
-      case 306: // "VARIABLE"
-      case 307: // "Dictionary element"
-      case 308: // "Dictionary element, selected by regexp"
+      case 193: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      case 194: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      case 195: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
+      case 196: // "ACTION_TRANSFORMATION_CMD_LINE"
+      case 197: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+      case 198: // "ACTION_TRANSFORMATION_CSS_DECODE"
+      case 199: // "ACTION_TRANSFORMATION_HEX_ENCODE"
+      case 200: // "ACTION_TRANSFORMATION_HEX_DECODE"
+      case 201: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+      case 202: // "ACTION_TRANSFORMATION_JS_DECODE"
+      case 203: // "ACTION_TRANSFORMATION_LENGTH"
+      case 204: // "ACTION_TRANSFORMATION_LOWERCASE"
+      case 205: // "ACTION_TRANSFORMATION_MD5"
+      case 206: // "ACTION_TRANSFORMATION_NONE"
+      case 207: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
+      case 208: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+      case 209: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
+      case 210: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
+      case 211: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
+      case 212: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+      case 213: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+      case 214: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
+      case 215: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+      case 216: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+      case 217: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
+      case 218: // "ACTION_TRANSFORMATION_SHA1"
+      case 219: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
+      case 220: // "ACTION_TRANSFORMATION_TRIM"
+      case 221: // "ACTION_TRANSFORMATION_UPPERCASE"
+      case 222: // "ACTION_TRANSFORMATION_URL_DECODE"
+      case 223: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+      case 224: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      case 225: // "Ver"
+      case 226: // "xmlns"
+      case 227: // "CONFIG_COMPONENT_SIG"
+      case 228: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 229: // "CONFIG_SEC_WEB_APP_ID"
+      case 230: // "CONFIG_SEC_SERVER_SIG"
+      case 231: // "CONFIG_DIR_AUDIT_DIR"
+      case 232: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 233: // "CONFIG_DIR_AUDIT_ENG"
+      case 234: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 235: // "CONFIG_DIR_AUDIT_LOG"
+      case 236: // "CONFIG_DIR_AUDIT_LOG2"
+      case 237: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 238: // "CONFIG_DIR_AUDIT_STS"
+      case 239: // "CONFIG_DIR_AUDIT_TPE"
+      case 240: // "CONFIG_DIR_DEBUG_LOG"
+      case 241: // "CONFIG_DIR_DEBUG_LVL"
+      case 242: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 243: // "CONFIG_DIR_GEO_DB"
+      case 244: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 245: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 246: // "CONFIG_DIR_REQ_BODY"
+      case 247: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 248: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 249: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 250: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 251: // "CONFIG_DIR_RES_BODY"
+      case 252: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 253: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 254: // "CONFIG_DIR_RULE_ENG"
+      case 255: // "CONFIG_DIR_SEC_ACTION"
+      case 256: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 257: // "CONFIG_DIR_SEC_MARKER"
+      case 258: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 259: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 260: // "CONFIG_SEC_HTTP_BLKEY"
+      case 261: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 262: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 263: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 264: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 265: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 266: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 267: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 268: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 269: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 270: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 271: // "CONFIG_UPLOAD_DIR"
+      case 272: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 273: // "CONFIG_UPLOAD_FILE_MODE"
+      case 274: // "CONFIG_VALUE_ABORT"
+      case 275: // "CONFIG_VALUE_DETC"
+      case 276: // "CONFIG_VALUE_HTTPS"
+      case 277: // "CONFIG_VALUE_OFF"
+      case 278: // "CONFIG_VALUE_ON"
+      case 279: // "CONFIG_VALUE_PARALLEL"
+      case 280: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 281: // "CONFIG_VALUE_REJECT"
+      case 282: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 283: // "CONFIG_VALUE_SERIAL"
+      case 284: // "CONFIG_VALUE_WARN"
+      case 285: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 286: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 287: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 288: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 289: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 290: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 291: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 292: // "DIRECTIVE"
+      case 293: // "DIRECTIVE_SECRULESCRIPT"
+      case 294: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 295: // "QUOTATION_MARK"
+      case 296: // "RUN_TIME_VAR_BLD"
+      case 297: // "RUN_TIME_VAR_DUR"
+      case 298: // "RUN_TIME_VAR_HSV"
+      case 299: // "RUN_TIME_VAR_REMOTE_USER"
+      case 300: // "RUN_TIME_VAR_TIME"
+      case 301: // "RUN_TIME_VAR_TIME_DAY"
+      case 302: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 303: // "RUN_TIME_VAR_TIME_HOUR"
+      case 304: // "RUN_TIME_VAR_TIME_MIN"
+      case 305: // "RUN_TIME_VAR_TIME_MON"
+      case 306: // "RUN_TIME_VAR_TIME_SEC"
+      case 307: // "RUN_TIME_VAR_TIME_WDAY"
+      case 308: // "RUN_TIME_VAR_TIME_YEAR"
+      case 309: // "VARIABLE"
+      case 310: // "Dictionary element"
+      case 311: // "Dictionary element, selected by regexp"
         value.template destroy< std::string > ();
         break;
 
-      case 315: // op
-      case 316: // op_before_init
+      case 318: // op
+      case 319: // op_before_init
         value.template destroy< std::unique_ptr<Operator> > ();
         break;
 
-      case 323: // run_time_string
+      case 326: // run_time_string
         value.template destroy< std::unique_ptr<RunTimeString> > ();
         break;
 
-      case 320: // var
+      case 323: // var
         value.template destroy< std::unique_ptr<Variable> > ();
         break;
 
-      case 321: // act
-      case 322: // setvar_action
+      case 324: // act
+      case 325: // setvar_action
         value.template destroy< std::unique_ptr<actions::Action> > ();
         break;
 
-      case 318: // variables
-      case 319: // variables_may_be_quoted
+      case 321: // variables
+      case 322: // variables_may_be_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
         break;
 
-      case 313: // actions
-      case 314: // actions_may_quoted
+      case 316: // actions
+      case 317: // actions_may_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ();
         break;
 
@@ -3580,150 +3607,153 @@ namespace yy {
       case 190: // "SkipAfter"
       case 191: // "Status"
       case 192: // "Tag"
-      case 193: // "ACTION_TRANSFORMATION_CMD_LINE"
-      case 194: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-      case 195: // "ACTION_TRANSFORMATION_CSS_DECODE"
-      case 196: // "ACTION_TRANSFORMATION_HEX_ENCODE"
-      case 197: // "ACTION_TRANSFORMATION_HEX_DECODE"
-      case 198: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-      case 199: // "ACTION_TRANSFORMATION_JS_DECODE"
-      case 200: // "ACTION_TRANSFORMATION_LENGTH"
-      case 201: // "ACTION_TRANSFORMATION_LOWERCASE"
-      case 202: // "ACTION_TRANSFORMATION_MD5"
-      case 203: // "ACTION_TRANSFORMATION_NONE"
-      case 204: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
-      case 205: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-      case 206: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-      case 207: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-      case 208: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-      case 209: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-      case 210: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-      case 211: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
-      case 212: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-      case 213: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-      case 214: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
-      case 215: // "ACTION_TRANSFORMATION_SHA1"
-      case 216: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-      case 217: // "ACTION_TRANSFORMATION_TRIM"
-      case 218: // "ACTION_TRANSFORMATION_UPPERCASE"
-      case 219: // "ACTION_TRANSFORMATION_URL_DECODE"
-      case 220: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-      case 221: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 222: // "Ver"
-      case 223: // "xmlns"
-      case 224: // "CONFIG_COMPONENT_SIG"
-      case 225: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 226: // "CONFIG_SEC_WEB_APP_ID"
-      case 227: // "CONFIG_SEC_SERVER_SIG"
-      case 228: // "CONFIG_DIR_AUDIT_DIR"
-      case 229: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 230: // "CONFIG_DIR_AUDIT_ENG"
-      case 231: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 232: // "CONFIG_DIR_AUDIT_LOG"
-      case 233: // "CONFIG_DIR_AUDIT_LOG2"
-      case 234: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 235: // "CONFIG_DIR_AUDIT_STS"
-      case 236: // "CONFIG_DIR_AUDIT_TPE"
-      case 237: // "CONFIG_DIR_DEBUG_LOG"
-      case 238: // "CONFIG_DIR_DEBUG_LVL"
-      case 239: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 240: // "CONFIG_DIR_GEO_DB"
-      case 241: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 242: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 243: // "CONFIG_DIR_REQ_BODY"
-      case 244: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 245: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 246: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 247: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 248: // "CONFIG_DIR_RES_BODY"
-      case 249: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 250: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 251: // "CONFIG_DIR_RULE_ENG"
-      case 252: // "CONFIG_DIR_SEC_ACTION"
-      case 253: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 254: // "CONFIG_DIR_SEC_MARKER"
-      case 255: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 256: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 257: // "CONFIG_SEC_HTTP_BLKEY"
-      case 258: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 259: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 260: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 261: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 262: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 263: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 264: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 265: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 266: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 267: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 268: // "CONFIG_UPLOAD_DIR"
-      case 269: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 270: // "CONFIG_UPLOAD_FILE_MODE"
-      case 271: // "CONFIG_VALUE_ABORT"
-      case 272: // "CONFIG_VALUE_DETC"
-      case 273: // "CONFIG_VALUE_HTTPS"
-      case 274: // "CONFIG_VALUE_OFF"
-      case 275: // "CONFIG_VALUE_ON"
-      case 276: // "CONFIG_VALUE_PARALLEL"
-      case 277: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 278: // "CONFIG_VALUE_REJECT"
-      case 279: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 280: // "CONFIG_VALUE_SERIAL"
-      case 281: // "CONFIG_VALUE_WARN"
-      case 282: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 283: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 284: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 285: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 286: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 287: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 288: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 289: // "DIRECTIVE"
-      case 290: // "DIRECTIVE_SECRULESCRIPT"
-      case 291: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 292: // "QUOTATION_MARK"
-      case 293: // "RUN_TIME_VAR_BLD"
-      case 294: // "RUN_TIME_VAR_DUR"
-      case 295: // "RUN_TIME_VAR_HSV"
-      case 296: // "RUN_TIME_VAR_REMOTE_USER"
-      case 297: // "RUN_TIME_VAR_TIME"
-      case 298: // "RUN_TIME_VAR_TIME_DAY"
-      case 299: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 300: // "RUN_TIME_VAR_TIME_HOUR"
-      case 301: // "RUN_TIME_VAR_TIME_MIN"
-      case 302: // "RUN_TIME_VAR_TIME_MON"
-      case 303: // "RUN_TIME_VAR_TIME_SEC"
-      case 304: // "RUN_TIME_VAR_TIME_WDAY"
-      case 305: // "RUN_TIME_VAR_TIME_YEAR"
-      case 306: // "VARIABLE"
-      case 307: // "Dictionary element"
-      case 308: // "Dictionary element, selected by regexp"
+      case 193: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      case 194: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      case 195: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
+      case 196: // "ACTION_TRANSFORMATION_CMD_LINE"
+      case 197: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+      case 198: // "ACTION_TRANSFORMATION_CSS_DECODE"
+      case 199: // "ACTION_TRANSFORMATION_HEX_ENCODE"
+      case 200: // "ACTION_TRANSFORMATION_HEX_DECODE"
+      case 201: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+      case 202: // "ACTION_TRANSFORMATION_JS_DECODE"
+      case 203: // "ACTION_TRANSFORMATION_LENGTH"
+      case 204: // "ACTION_TRANSFORMATION_LOWERCASE"
+      case 205: // "ACTION_TRANSFORMATION_MD5"
+      case 206: // "ACTION_TRANSFORMATION_NONE"
+      case 207: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
+      case 208: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+      case 209: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
+      case 210: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
+      case 211: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
+      case 212: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+      case 213: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+      case 214: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
+      case 215: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+      case 216: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+      case 217: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
+      case 218: // "ACTION_TRANSFORMATION_SHA1"
+      case 219: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
+      case 220: // "ACTION_TRANSFORMATION_TRIM"
+      case 221: // "ACTION_TRANSFORMATION_UPPERCASE"
+      case 222: // "ACTION_TRANSFORMATION_URL_DECODE"
+      case 223: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+      case 224: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      case 225: // "Ver"
+      case 226: // "xmlns"
+      case 227: // "CONFIG_COMPONENT_SIG"
+      case 228: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 229: // "CONFIG_SEC_WEB_APP_ID"
+      case 230: // "CONFIG_SEC_SERVER_SIG"
+      case 231: // "CONFIG_DIR_AUDIT_DIR"
+      case 232: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 233: // "CONFIG_DIR_AUDIT_ENG"
+      case 234: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 235: // "CONFIG_DIR_AUDIT_LOG"
+      case 236: // "CONFIG_DIR_AUDIT_LOG2"
+      case 237: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 238: // "CONFIG_DIR_AUDIT_STS"
+      case 239: // "CONFIG_DIR_AUDIT_TPE"
+      case 240: // "CONFIG_DIR_DEBUG_LOG"
+      case 241: // "CONFIG_DIR_DEBUG_LVL"
+      case 242: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 243: // "CONFIG_DIR_GEO_DB"
+      case 244: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 245: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 246: // "CONFIG_DIR_REQ_BODY"
+      case 247: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 248: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 249: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 250: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 251: // "CONFIG_DIR_RES_BODY"
+      case 252: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 253: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 254: // "CONFIG_DIR_RULE_ENG"
+      case 255: // "CONFIG_DIR_SEC_ACTION"
+      case 256: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 257: // "CONFIG_DIR_SEC_MARKER"
+      case 258: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 259: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 260: // "CONFIG_SEC_HTTP_BLKEY"
+      case 261: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 262: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 263: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 264: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 265: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 266: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 267: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 268: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 269: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 270: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 271: // "CONFIG_UPLOAD_DIR"
+      case 272: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 273: // "CONFIG_UPLOAD_FILE_MODE"
+      case 274: // "CONFIG_VALUE_ABORT"
+      case 275: // "CONFIG_VALUE_DETC"
+      case 276: // "CONFIG_VALUE_HTTPS"
+      case 277: // "CONFIG_VALUE_OFF"
+      case 278: // "CONFIG_VALUE_ON"
+      case 279: // "CONFIG_VALUE_PARALLEL"
+      case 280: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 281: // "CONFIG_VALUE_REJECT"
+      case 282: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 283: // "CONFIG_VALUE_SERIAL"
+      case 284: // "CONFIG_VALUE_WARN"
+      case 285: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 286: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 287: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 288: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 289: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 290: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 291: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 292: // "DIRECTIVE"
+      case 293: // "DIRECTIVE_SECRULESCRIPT"
+      case 294: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 295: // "QUOTATION_MARK"
+      case 296: // "RUN_TIME_VAR_BLD"
+      case 297: // "RUN_TIME_VAR_DUR"
+      case 298: // "RUN_TIME_VAR_HSV"
+      case 299: // "RUN_TIME_VAR_REMOTE_USER"
+      case 300: // "RUN_TIME_VAR_TIME"
+      case 301: // "RUN_TIME_VAR_TIME_DAY"
+      case 302: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 303: // "RUN_TIME_VAR_TIME_HOUR"
+      case 304: // "RUN_TIME_VAR_TIME_MIN"
+      case 305: // "RUN_TIME_VAR_TIME_MON"
+      case 306: // "RUN_TIME_VAR_TIME_SEC"
+      case 307: // "RUN_TIME_VAR_TIME_WDAY"
+      case 308: // "RUN_TIME_VAR_TIME_YEAR"
+      case 309: // "VARIABLE"
+      case 310: // "Dictionary element"
+      case 311: // "Dictionary element, selected by regexp"
         value.move< std::string > (s.value);
         break;
 
-      case 315: // op
-      case 316: // op_before_init
+      case 318: // op
+      case 319: // op_before_init
         value.move< std::unique_ptr<Operator> > (s.value);
         break;
 
-      case 323: // run_time_string
+      case 326: // run_time_string
         value.move< std::unique_ptr<RunTimeString> > (s.value);
         break;
 
-      case 320: // var
+      case 323: // var
         value.move< std::unique_ptr<Variable> > (s.value);
         break;
 
-      case 321: // act
-      case 322: // setvar_action
+      case 324: // act
+      case 325: // setvar_action
         value.move< std::unique_ptr<actions::Action> > (s.value);
         break;
 
-      case 318: // variables
-      case 319: // variables_may_be_quoted
+      case 321: // variables
+      case 322: // variables_may_be_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (s.value);
         break;
 
-      case 313: // actions
-      case 314: // actions_may_quoted
+      case 316: // actions
+      case 317: // actions_may_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (s.value);
         break;
 
@@ -3812,7 +3842,8 @@ namespace yy {
      525,   526,   527,   528,   529,   530,   531,   532,   533,   534,
      535,   536,   537,   538,   539,   540,   541,   542,   543,   544,
      545,   546,   547,   548,   549,   550,   551,   552,   553,   554,
-     555,   556,   557,   558,   559,   560,   561,   562,   563
+     555,   556,   557,   558,   559,   560,   561,   562,   563,   564,
+     565,   566
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -4964,6 +4995,24 @@ namespace yy {
   }
 
   seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_BASE_64_ENCODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_BASE_64_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT, v, l);
+  }
+
+  seclang_parser::symbol_type
   seclang_parser::make_ACTION_TRANSFORMATION_CMD_LINE (const std::string& v, const location_type& l)
   {
     return symbol_type (token::TOK_ACTION_TRANSFORMATION_CMD_LINE, v, l);
@@ -5662,7 +5711,7 @@ namespace yy {
 
 
 } // yy
-#line 5666 "seclang-parser.hh" // lalr1.cc:377
+#line 5715 "seclang-parser.hh" // lalr1.cc:377
 
 
 

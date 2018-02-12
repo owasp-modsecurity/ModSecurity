@@ -132,7 +132,10 @@ ACTION_SKIP                                     (?i:skip)
 ACTION_STATUS                                   (?i:status:[0-9]+)
 ACTION_TAG                                      (?i:tag)
 ACTION_VER                                      (?i:ver)
-ACTION_XMLNS                                    (?i:xmlns)
+ACTION_XMLNS                                    (?i:xmlns)            
+ACTION_TRANSFORMATION_BASE_64_ENCODE            (?i:t:base64Encode)
+ACTION_TRANSFORMATION_BASE_64_DECODE            (?i:t:base64Decode)
+ACTION_TRANSFORMATION_BASE_64_DECODE_EXT        (?i:t:base64DecodeExt)
 ACTION_TRANSFORMATION_CMD_LINE                  (?i:t:cmdLine)
 ACTION_TRANSFORMATION_COMPRESS_WHITESPACE       (?i:t:compressWhitespace)
 ACTION_TRANSFORMATION_CSS_DECODE                (?i:t:cssDecode)
@@ -542,6 +545,9 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_TRANSFORMATION_PARITY_ODD_7_BIT}                                { return p::make_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT}                               { return p::make_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_SQL_HEX_DECODE}                                  { return p::make_ACTION_TRANSFORMATION_SQL_HEX_DECODE(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_BASE_64_ENCODE}                                  { return p::make_ACTION_TRANSFORMATION_BASE_64_ENCODE(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_BASE_64_DECODE}                                  { return p::make_ACTION_TRANSFORMATION_BASE_64_DECODE(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_BASE_64_DECODE_EXT}                              { return p::make_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_CMD_LINE}                                        { return p::make_ACTION_TRANSFORMATION_CMD_LINE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_SHA1}                                            { return p::make_ACTION_TRANSFORMATION_SHA1(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_MD5}                                             { return p::make_ACTION_TRANSFORMATION_MD5(yytext, *driver.loc.back()); }

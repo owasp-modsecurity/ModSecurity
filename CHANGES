@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Add missing Base64 transformation statements to parser
+   [Issue #1632 - @victorhora, @zimmerle]
  - Fixed resource load on ip match from file
    [#1674 - @zimmerle, @StefaanSeys]
  - Fixed examples compilation while using disable-shared
