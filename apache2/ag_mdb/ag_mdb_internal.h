@@ -338,7 +338,7 @@ int Entry_setKeyValue(CPTR_VOID shm_base, PTR_OFFSET entry_id, const char* key, 
  */
 
 /**
- ** Define the name prefix of Read/Write lock on Windows
+ ** Define the name suffix of Read/Write lock on Windows
  */
 #ifdef _WIN32
 #define READ_LOCK_SUFFIX "_DB_LOCK_READ"
