@@ -508,6 +508,9 @@ using modsecurity::operators::Operator;
   ACTION_SKIP_AFTER                            "SkipAfter"
   ACTION_STATUS                                "Status"
   ACTION_TAG                                   "Tag"
+  ACTION_TRANSFORMATION_BASE_64_ENCODE         "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+  ACTION_TRANSFORMATION_BASE_64_DECODE         "ACTION_TRANSFORMATION_BASE_64_DECODE"
+  ACTION_TRANSFORMATION_BASE_64_DECODE_EXT     "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
   ACTION_TRANSFORMATION_CMD_LINE               "ACTION_TRANSFORMATION_CMD_LINE"
   ACTION_TRANSFORMATION_COMPRESS_WHITESPACE    "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
   ACTION_TRANSFORMATION_CSS_DECODE             "ACTION_TRANSFORMATION_CSS_DECODE"
@@ -2505,6 +2508,18 @@ act:
     | ACTION_TRANSFORMATION_SQL_HEX_DECODE
       {
         ACTION_CONTAINER($$, new actions::transformations::SqlHexDecode($1));
+      }
+      | ACTION_TRANSFORMATION_BASE_64_ENCODE
+      {
+        ACTION_CONTAINER($$, new actions::transformations::Base64Encode($1));
+      }
+    | ACTION_TRANSFORMATION_BASE_64_DECODE
+      {
+        ACTION_CONTAINER($$, new actions::transformations::Base64Decode($1));
+      }
+   | ACTION_TRANSFORMATION_BASE_64_DECODE_EXT
+      {
+        ACTION_CONTAINER($$, new actions::transformations::Base64DecodeExt($1));
       }
     | ACTION_TRANSFORMATION_CMD_LINE
       {

@@ -1,3 +1,8 @@
+v3.0.1 - 2018-??-??
+--------------------
+ - Add missing Base64 transformation statements to parser
+   [Issue #1632 - @victorhora, @zimmerle]
+
 
 v3.0.0 - 2017-Dec-13
 --------------------
