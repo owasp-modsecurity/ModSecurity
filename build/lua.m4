@@ -116,6 +116,10 @@ fi
 if test "${lua_5_1}" = 1 ; then
    AC_MSG_NOTICE([LUA 5.1 was found and it is not currently supported on libModSecurity. LUA_VERSION: ${LUA_VERSION}. LUA build disabled.])
    LUA_FOUND=2
+   LUA_CFLAGS=
+   LUA_DISPLAY=
+   LUA_LDADD=
+   LUA_LDFLAGS=
 fi
 
 AC_SUBST(LUA_FOUND)
