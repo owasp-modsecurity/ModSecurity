@@ -75,7 +75,7 @@ std::string find_resource(const std::string& resource,
     delete iss;
 
     // What about `*' ?
-    if (utils::expandEnv(resource, 0).size() > 1) {
+    if (utils::expandEnv(resource, 0).size() > 0) {
         return resource;
     } else {
         err->append("'" + resource + "', ");
@@ -94,7 +94,7 @@ std::string find_resource(const std::string& resource,
     delete iss;
 
     // What about `*' ?
-    if (utils::expandEnv(f, 0).size() > 1) {
+    if (utils::expandEnv(f, 0).size() > 0) {
         return f;
     } else {
         err->append("'" + f + "'.");
