@@ -19,9 +19,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#ifdef WITH_LIBXML2
 #include <libxml/xmlschemas.h>
 #include <libxml/xpath.h>
-
+#endif
 #include <string>
 #include <memory>
 #include <utility>
@@ -37,6 +38,7 @@ class ValidateDTD : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit ValidateDTD(std::unique_ptr<RunTimeString> param)
         : Operator("ValidateDTD", std::move(param)) { }
+#ifdef WITH_LIBXML2
     ~ValidateDTD() {
         if (m_dtd != NULL) {
             xmlFreeDtd(m_dtd);
@@ -92,6 +94,7 @@ class ValidateDTD : public Operator {
  private:
     std::string m_resource;
     xmlDtdPtr m_dtd;
+#endif
 };
 
 }  // namespace operators

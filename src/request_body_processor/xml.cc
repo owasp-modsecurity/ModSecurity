@@ -23,6 +23,7 @@
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
+#ifdef WITH_LIBXML2
 
 XML::XML(Transaction *transaction)
     : m_transaction(transaction) {
@@ -148,6 +149,7 @@ bool XML::complete(std::string *error) {
     return true;
 }
 
+#endif
 
 }  // namespace RequestBodyProcessor
 }  // namespace modsecurity

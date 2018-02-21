@@ -25,6 +25,8 @@
 namespace modsecurity {
 namespace operators {
 
+#ifdef WITH_LIBXML2
+
 bool ValidateSchema::init(const std::string &file, std::string *error) {
     std::string err;
     m_resource = utils::find_resource(m_param, file, &err);
@@ -146,6 +148,7 @@ bool ValidateSchema::evaluate(Transaction *t,
     return false;
 }
 
+#endif
 
 }  // namespace operators
 }  // namespace modsecurity

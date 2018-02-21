@@ -126,7 +126,11 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
 #else
     m_json(NULL),
 #endif
+#ifdef WITH_LIBXML2
     m_xml(new RequestBodyProcessor::XML(this)),
+#else
+    m_xml(NULL),
+#endif
     TransactionAnchoredVariables(this) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(modsecurity::utils::generate_transaction_unique_id());
@@ -159,7 +163,9 @@ Transaction::~Transaction() {
 #ifdef WITH_YAJL
     delete m_json;
 #endif
+#ifdef WITH_LIBXML2
     delete m_xml;
+#endif
 }
 
 
@@ -666,6 +672,7 @@ int Transaction::processRequestBody() {
      */
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
+#ifdef WITH_LIBXML2
     if (m_requestBodyProcessor == XMLRequestBody) {
         std::string error;
         if (m_xml->init() == true) {
@@ -685,8 +692,13 @@ int Transaction::processRequestBody() {
             m_variableReqbodyError.set("0", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
+#endif
 #if WITH_YAJL
+#ifdef WITH_LIBXML2
     } else if (m_requestBodyProcessor == JSONRequestBody) {
+#else
+    if (m_requestBodyProcessor == JSONRequestBody) {
+#endif
         std::string error;
         if (m_json->init() == true) {
             m_json->processChunk(m_requestBody.str().c_str(),
@@ -706,7 +718,11 @@ int Transaction::processRequestBody() {
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
 #endif
+#if defined(WITH_LIBXML2) or defined(WITH_YAJL)
     } else if (m_requestBodyType == MultiPartRequestBody) {
+#else
+    if (m_requestBodyType == MultiPartRequestBody) {
+#endif
         std::string error;
         if (a != NULL) {
             Multipart m(*a, this);

@@ -19,9 +19,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#ifdef WITH_LIBXML2
 #include <libxml/xmlschemas.h>
 #include <libxml/xpath.h>
-
+#endif
 #include <string>
 #include <memory>
 #include <utility>
@@ -35,6 +36,10 @@ namespace operators {
 class ValidateSchema : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
+#ifndef WITH_LIBXML2
+    explicit ValidateSchema(std::unique_ptr<RunTimeString> param)
+        : Operator("ValidateSchema", std::move(param)) { }
+#else
     explicit ValidateSchema(std::unique_ptr<RunTimeString> param)
         : Operator("ValidateSchema", std::move(param)),
         m_parserCtx(NULL),
@@ -133,6 +138,7 @@ class ValidateSchema : public Operator {
     xmlSchemaPtr m_schema;
     std::string m_resource;
     std::string m_err;
+#endif
 };
 
 }  // namespace operators

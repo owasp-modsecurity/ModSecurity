@@ -24,7 +24,7 @@
 namespace modsecurity {
 namespace operators {
 
-
+#ifdef WITH_LIBXML2
 bool ValidateDTD::init(const std::string &file, std::string *error) {
     std::string err;
     m_resource = utils::find_resource(m_param, file, &err);
@@ -112,7 +112,7 @@ bool ValidateDTD::evaluate(Transaction *t, const std::string &str) {
 
     return false;
 }
-
+#endif
 
 }  // namespace operators
 }  // namespace modsecurity
