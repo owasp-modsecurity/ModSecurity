@@ -63,8 +63,8 @@ INCLUDES = $(INCLUDES) -I$(YAJL)\include -I$(YAJL) \
 # INCLUDES = $(INCLUDES) -I$(SSDEEP)\include -I$(SSDEEP) \
 # !ENDIF
 
-
-
+# Enable support for collection's memory database
+DEFS=$(DEFS) -DMEMORY_DATABASE_ENABLE
 
 CFLAGS= -MD /Zi $(INCLUDES) $(DEFS)
 

@@ -58,14 +58,14 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
         return AGMDB_SUCCESS_LOCK_OPEN;
     }
 #else
-    read_lock_name_len = (strlen(READ_LOCK_PREFIX) + strlen(lock_name) + 1) * sizeof(char);
-    write_lock_name_len = (strlen(WRITE_LOCK_PREFIX) + strlen(lock_name) + 1) * sizeof(char);
+    read_lock_name_len = (strlen(READ_LOCK_SUFFIX) + strlen(lock_name) + 1) * sizeof(char);
+    write_lock_name_len = (strlen(WRITE_LOCK_SUFFIX) + strlen(lock_name) + 1) * sizeof(char);
 
     if (AGMDB_isstring(lock_name, lock_name_length) != AGMDB_SUCCESS)
         return AGMDB_ERROR_LOCK_WIN_NAME_INVALID_STRING;
 
     read_lock_name = (char *)malloc(read_lock_name_len * sizeof(char));
-    sprintf_s(read_lock_name, read_lock_name_len, "%s%s", READ_LOCK_PREFIX, lock_name);
+    sprintf_s(read_lock_name, read_lock_name_len, "%s%s", lock_name, READ_LOCK_SUFFIX);
     new_lock->read_lock_handle = CreateMutex(
         NULL,               // Default security settings.
         FALSE,              // Do not take the lock after created.
@@ -81,7 +81,7 @@ int Lock_create(struct agmdb_lock *new_lock, const char* lock_name, int lock_nam
         lock_exists = true;
 
     write_lock_name = (char *)malloc(write_lock_name_len * sizeof(char));
-    sprintf_s(write_lock_name, write_lock_name_len, "%s%s", WRITE_LOCK_PREFIX, lock_name);
+    sprintf_s(write_lock_name, write_lock_name_len, "%s%s", lock_name, WRITE_LOCK_SUFFIX);
     new_lock->write_lock_handle = CreateMutex(
         NULL,               // Default security settings.
         FALSE,              // Do not take the lock after created.
@@ -127,6 +127,8 @@ int Lock_destroy(struct agmdb_lock *db_lock) {
     if (AGMDB_isError(rc))
         return rc;
 #ifndef _WIN32
+    if (db_lock->sem_id = -1)
+        return AGMDB_SUCCESS;
     rc = semctl(db_lock->sem_id, 0, IPC_RMID);
     if (rc == -1)
         return AGMDB_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL;

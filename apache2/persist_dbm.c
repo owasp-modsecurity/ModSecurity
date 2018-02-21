@@ -609,7 +609,11 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
         if(ag_dbm == NULL) {
             //Create the DB
             root_dcfg = msr->dcfg1->root_config;
+#ifdef _WIN32           
+            dbm_filename = apr_pstrcat(root_dcfg->mp, "Global\\", root_dcfg->data_dir, "/", var_name->value, NULL);
+#else
             dbm_filename = apr_pstrcat(root_dcfg->mp, root_dcfg->data_dir, "/", var_name->value, NULL);
+#endif
             if(root_dcfg == NULL){
                 msr_log(msr, 1, "collection_retrieve_ex_agmdb: Cannot find root_config in msr->dcfg1.");
                 goto error;
@@ -621,7 +625,7 @@ static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col)
             
             rc = AGMDB_openDB(new_handle->handle, dbm_filename, strlen(dbm_filename), MAXIMUM_AGMDB_ENTRY_NUM);
             if(AGMDB_isError(rc)){
-                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to create DBM name: %s. Error info: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value), AGMDB_getErrorInfo(rc));
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to create DBM name: %s. Error info: %s", dbm_filename, AGMDB_getErrorInfo(rc));
                 goto error;
             }
             ag_dbm = new_handle->handle;

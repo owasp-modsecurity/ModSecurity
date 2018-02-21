@@ -1,14 +1,16 @@
 #ifndef _AG_MDB_EXTERNAL_HEADER
 #define _AG_MDB_EXTERNAL_HEADER
 
-#ifdef __cplusplus
-extern "C" {
+#include "stdbool.h"
+#ifdef _WIN32
+#ifdef inline
+#undef inline
+#endif
+#include <windows.h>
 #endif
 
-#ifndef _WIN32
-#include "stdbool.h"
-#else
-#include <windows.h>
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /**
@@ -305,6 +307,7 @@ const char* AGMDB_getErrorInfo(int return_code);
             False if not.
  */
 bool AGMDB_isError(int return_code);
+
 /**
  ** Get the number of keys in a database.
  ** You have to get SHARED or EXCLUSIVE LOCK of the database before calling this function.

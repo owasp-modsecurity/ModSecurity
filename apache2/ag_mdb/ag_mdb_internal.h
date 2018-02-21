@@ -1,10 +1,11 @@
 #ifndef _AG_MDB_INTERNAL_HEADER
 #define _AG_MDB_INTERNAL_HEADER
+
+#ifdef _WIN32
 #ifdef inline
 #undef inline
 #endif
-#ifdef _WIN32
-#include<windows.h>
+#include <windows.h>
 #include<Synchapi.h>
 #else
 #include<sys/shm.h>
@@ -337,11 +338,11 @@ int Entry_setKeyValue(CPTR_VOID shm_base, PTR_OFFSET entry_id, const char* key, 
  */
 
 /**
- ** Define the name prefix of Read/Write lock on Windows
+ ** Define the name suffix of Read/Write lock on Windows
  */
 #ifdef _WIN32
-#define READ_LOCK_PREFIX "DB_LOCK_READ_"
-#define WRITE_LOCK_PREFIX "DB_LOCK_WRITE_"
+#define READ_LOCK_SUFFIX "_DB_LOCK_READ"
+#define WRITE_LOCK_SUFFIX "_DB_LOCK_WRITE"
 #endif
 
 /**
