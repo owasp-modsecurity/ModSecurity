@@ -76,6 +76,7 @@ noinst_HEADERS = \
 	request_body_processor/*.h \
 	utils/*.h \
 	variables/*.h \
+	engine/*.h \
 	*.h
 
 
