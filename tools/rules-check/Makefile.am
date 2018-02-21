@@ -6,16 +6,24 @@ modsec_rules_check_SOURCES = \
         rules-check.cc
 
 modsec_rules_check_LDADD = \
-	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
-	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
-	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
-	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
-	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
-	$(LUA_LDFLAGS) $(LUA_LDADD) \
+	$(GEOIP_LDADD) \
+	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
-	$(GLOBAL_LDADD)
+	$(LMDB_LDADD) \
+	$(LUA_LDADD) \
+	$(PCRE_LDADD) \
+	$(SSDEEP_LDADD) \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
+	$(YAJL_LDADD)
+
+modsec_rules_check_LDFLAGS = \
+	$(GEOIP_LDFLAGS) \
+	$(LDFLAGS) \
+	$(LMDB_LDFLAGS) \
+	$(LUA_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) \
+	$(YAJL_LDFLAGS)
 
 modsec_rules_check_CPPFLAGS = \
 	-std=c++11 \

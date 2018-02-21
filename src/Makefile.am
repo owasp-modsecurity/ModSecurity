@@ -8,7 +8,6 @@ SUBDIRS = \
 	$(MAYBE_PARSER)
 
 
-
 lib_LTLIBRARIES = libmodsecurity.la
 libmodsecurity_ladir = $(prefix)/include
 libmodsecurity_includesub_collectiondir = $(pkgincludedir)/collection/
@@ -27,6 +26,7 @@ EXTRA_DIST = \
 	parser/seclang-scanner.cc \
 	parser/seclang-scanner.ll \
 	parser/stack.hh
+
 
 MAINTAINERCLEANFILES = \
 	Makefile.in \
@@ -51,11 +51,9 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/variable_value.h
 
 
-
 libmodsecurity_includesub_collection_HEADERS = \
 	../headers/modsecurity/collection/collection.h \
 	../headers/modsecurity/collection/collections.h
-
 
 
 libmodsecurity_includesub_actions_HEADERS = \
@@ -243,7 +241,6 @@ UTILS = \
 	utils/shared_files.cc
 
 
-
 COLLECTION = \
 	collection/collections.cc \
 	collection/backend/in_memory-per_process.cc \
@@ -309,21 +306,31 @@ libmodsecurity_la_CPPFLAGS = \
 	$(LUA_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
-libmodsecurity_la_LIBADD = \
-	$(GLOBAL_LDADD) \
-	$(CURL_LDADD) \
-	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
-	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
-	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
-	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
-	$(LUA_LDFLAGS) $(LUA_LDADD) \
-	$(LIBXML2_LDADD) \
-	../others/libinjection.la \
-	../others/libmbedtls.la
-
 
 libmodsecurity_la_LDFLAGS = \
+	$(CURL_LDFLAGS) \
+	$(GEOIP_LDFLAGS) \
+	$(GLOBAL_LDFLAGS) \
+	$(LDFLAGS) \
+	$(LIBXML2_LDFLAGS) \
+	$(LMDB_LDFLAGS) \
+	$(LUA_LDFLAGS) \
+	$(PCRE_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) \
+	$(YAJL_LDFLAGS) \
 	-version-info @MSC_VERSION_INFO@
 
+
+libmodsecurity_la_LIBADD = \
+	$(CURL_LDADD) \
+	$(GEOIP_LDADD) \
+	$(GLOBAL_LDADD) \
+	$(LIBXML2_LDADD) \
+	$(LMDB_LDADD) \
+	$(LUA_LDADD) \
+	../others/libinjection.la \
+	../others/libmbedtls.la \
+	$(PCRE_LDADD) \
+	$(SSDEEP_LDADD) \
+	$(YAJL_LDADD)
 

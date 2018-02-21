@@ -6,14 +6,18 @@ multi_SOURCES = \
 	multi.c
 
 multi_LDADD = \
+	$(SSDEEP_LDADD) \
+	$(LUA_LDADD) \
+	$(GLOBAL_LDADD)
+
+multi_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
+	$(GEOIP_LDFLAGS) \
 	-lmodsecurity \
 	-lpthread \
-	$(YAJL_LDFLAGS) \
-	$(GEOIP_LDFLAGS) \
-	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
-	$(LUA_LDFLAGS) $(LUA_LDADD) \
-	$(GLOBAL_LDADD)
+	$(LUA_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) \
+	$(YAJL_LDFLAGS)
 
 multi_CFLAGS = \
 	-I$(top_builddir)/headers \

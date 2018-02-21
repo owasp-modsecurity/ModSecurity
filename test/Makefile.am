@@ -31,23 +31,33 @@ unit_tests_SOURCES = \
         unit/unit.cc \
         unit/unit_test.cc
 
+
 noinst_HEADERS = \
        common/modsecurity_test.cc \
        common/*.h \
        unit/*.h \
        regression/*.h
 
+
 unit_tests_LDADD = \
-	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
-	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
-	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
-	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
-	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
-	$(LUA_LDFLAGS) $(LUA_LDADD) \
+	$(GEOIP_LDADD) \
+	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
-	$(GLOBAL_LDADD)
+	$(LMDB_LDADD) \
+	$(LUA_LDADD) \
+	$(PCRE_LDADD) \
+	$(SSDEEP_LDADD) \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
+	$(YAJL_LDADD)
+
+
+unit_tests_LDFLAG = \
+	$(GEOIP_LDFLAGS) \
+	$(LMDB_LDFLAGS) \
+	$(LUA_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) \
+	$(YAJL_LDFLAGS)
 
 
 unit_tests_CPPFLAGS = \
@@ -80,14 +90,22 @@ regression_tests_SOURCES = \
 regression_tests_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
-	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
-	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
-	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
-	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
-	$(LUA_LDFLAGS) $(LUA_LDADD) \
+	$(GEOIP_LDADD) \
+	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
-	$(GLOBAL_LDADD)
+	$(LMDB_LDADD) \
+	$(LUA_LDADD) \
+	$(PCRE_LDADD) \
+	$(SSDEEP_LDADD) \
+	$(YAJL_LDADD)
+
+
+regression_tests_LDFLAGS = \
+	$(GEOIP_LDFLAGS) \
+	$(YAJL_LDFLAGS) \
+	$(LMDB_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) \
+	$(LUA_LDFLAGS)
 
 
 regression_tests_CPPFLAGS = \
@@ -117,17 +135,23 @@ rules_optimization_SOURCES = \
         optimization/optimization.cc
 
 rules_optimization_LDADD = \
-	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
-	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
-	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
-	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
-	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
-	$(LUA_LDFLAGS) $(LUA_LDADD) \
+	$(GEOIP_LDADD) \
+	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
-	$(GLOBAL_LDADD)
+	$(LMDB_LDADD) \
+	$(LUA_LDADD) \
+	$(PCRE_LDADD) \
+	$(SSDEEP_LDADD) \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
+	$(YAJL_LDADD)
 
+rules_optimization_LDFLAGS = \
+	$(GEOIP_LDFLAGS) \
+	$(LMDB_LDFLAGS) \
+	$(LUA_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) \
+	$(YAJL_LDFLAGS)
 
 rules_optimization_CPPFLAGS = \
 	-std=c++11 \
