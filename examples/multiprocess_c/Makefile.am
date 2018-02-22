@@ -15,6 +15,8 @@ multi_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
 	-lmodsecurity \
 	-lpthread \
+	-lm \
+	-lstdc++ \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(YAJL_LDFLAGS)
