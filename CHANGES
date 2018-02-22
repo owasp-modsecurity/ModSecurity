@@ -1,13 +1,26 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Fixed examples compilation while using disable-shared
+   [#1670 - @zimmerle, @ivanbaldo]
+ - Fixed compilation issue while xml is disabled
+   [0x243028 - @zimmerle]
+ - Having LDADD and LDFLAGS organized on Makefile.am
+   [0xd0e85e - @zimmerle]
+ - Checking std::deque size before use it
+   [0x217cbf - @zimmerle, Yaron Dayagi]
+ - perf improvement: Added the concept of RunTimeString and removed
+   all run time parser.
+   [0x3eae51 0x0320e0 0xb5688f 0xfe47a9 0xfa9842 0x1affc3 0x079de4
+    0xc7c04f 0x5262ea 0x01974a 0xd5ee1e - @zimmerle]
  - perf improvement: Checks debuglog level before format debug msg
-   [0x068f7 - @zimmerle]
+   [0x42ee9 - @zimmerle]
  - perf. improvement/rx: Only compute dynamic regex in case of macro
-   [0xab78d - @zimmerle]
+   [0x91ff3 - @zimmerle]
  - Fix uri on the benchmark utility
-   [0xc1cd6 - @zimmerle]
-
+   [0x63bec - @zimmerle]
+ - disable Lua on systems with liblua5.1
+   [Issue #1639 - @victorhora, @defanator]
 
 v3.0.0 - 2017-Dec-13
 --------------------
