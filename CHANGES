@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
- 
+
+ - Fix "make dist" target to include necessary headers for Lua
+   [Issue #1678 - @defanator]
  - Fix "include /foo/*.conf" for single matched object in directory
    [Issue #1677 - @defanator]
  - Add missing Base64 transformation statements to parser
