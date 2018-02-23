@@ -58,6 +58,9 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
     char *c = NULL, *name = NULL, *value = NULL;
     char *variable = NULL, *myvar = NULL;
     char *myvalue = NULL, *myname = NULL;
+    msc_regex_t *regex;
+    char *errptr;
+    int erroffset;
     int match = 0;
 
     if(msr == NULL)
@@ -110,22 +113,39 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
                 if((strlen(myname) == strlen(name)) &&
                         (strncasecmp(myname, name,strlen(myname)) == 0))   {
 
-                    if(value != NULL && myvalue != NULL)  {
-                        if((strlen(myvalue) == strlen(value)) &&
+                    if(value != NULL && myvalue != NULL) {
+                        if(strlen(value) > 2 && value[0] == '/' && value[strlen(value) - 1] == '/') {
+                            value[strlen(value) - 1] = '\0';
+                            regex = msc_pregcomp(msr->mp, value + 1,
+                                        PCRE_DOTALL | PCRE_CASELESS | PCRE_DOLLAR_ENDONLY, (const char **)&errptr, &erroffset);
+                            if (regex == NULL) {
+                                if (msr->txcfg->debuglog_level >= 9) {
+                                    msr_log(msr, 9, "fetch_target_exception: Regexp /%s/ failed to compile at pos %d: %s.",
+                                            value + 1, erroffset, errptr);
+                                }
+                            } else {
+                                if (!(msc_regexec(regex, myvalue, strlen(myvalue), &errptr) == PCRE_ERROR_NOMATCH)) {
+                                    if (msr->txcfg->debuglog_level >= 9) {
+                                        msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", var->name);
+                                    }
+                                    match = 1;
+                                }
+                            }
+                        } else if((strlen(myvalue) == strlen(value)) &&
                                 strncasecmp(myvalue,value,strlen(myvalue)) == 0) {
                             if (msr->txcfg->debuglog_level >= 9) {
-                                msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                                msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", var->name);
                             }
                             match = 1;
                         }
                     } else if (value == NULL && myvalue == NULL)    {
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", var->name);
                         }
                         match = 1;
                     } else if (value == NULL && myvalue != NULL)   {
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", var->name);
                         }
                         match = 1;
                     }
