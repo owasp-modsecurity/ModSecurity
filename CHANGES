@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Fixed resource load on ip match from file
+   [#1674 - @zimmerle, @StefaanSeys]
  - Fixed examples compilation while using disable-shared
    [#1670 - @zimmerle, @ivanbaldo]
  - Fixed compilation issue while xml is disabled

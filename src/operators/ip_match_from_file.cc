@@ -14,6 +14,7 @@
  */
 
 #include "src/operators/ip_match_from_file.h"
+#include "src/utils/system.h"
 
 #include <string.h>
 
@@ -33,7 +34,11 @@ bool IpMatchFromFile::init(const std::string &file,
     if (m_param.compare(0, 8, "https://") == 0) {
         res = m_tree.addFromUrl(m_param, &e);
     } else {
-        res = m_tree.addFromFile(m_param, &e);
+        std::string resf = utils::find_resource(m_param, file, error);\
+        if (resf == "") {
+            return false;
+        }
+        res = m_tree.addFromFile(resf, &e);
     }
 
     if (res == false) {
