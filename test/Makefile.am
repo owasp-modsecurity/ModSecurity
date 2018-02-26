@@ -40,6 +40,7 @@ noinst_HEADERS = \
 
 
 unit_tests_LDADD = \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
 	$(GLOBAL_LDADD) \
@@ -48,7 +49,6 @@ unit_tests_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(YAJL_LDADD)
 
 
@@ -135,6 +135,7 @@ rules_optimization_SOURCES = \
         optimization/optimization.cc
 
 rules_optimization_LDADD = \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
 	$(GLOBAL_LDADD) \
@@ -143,7 +144,6 @@ rules_optimization_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(YAJL_LDADD)
 
 rules_optimization_LDFLAGS = \

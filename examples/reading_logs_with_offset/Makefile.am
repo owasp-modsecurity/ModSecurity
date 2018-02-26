@@ -6,6 +6,7 @@ read_SOURCES = \
 	read.cc
 
 read_LDADD = \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
 	$(GLOBAL_LDADD) \
@@ -14,7 +15,6 @@ read_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(YAJL_LDADD)
 
 read_LDFLAGS = \

@@ -6,6 +6,7 @@ simple_request_SOURCES = \
 	simple_request.cc
 
 simple_request_LDADD = \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
 	$(GLOBAL_LDADD) \
@@ -14,7 +15,6 @@ simple_request_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(YAJL_LDADD)
 
 simple_request_LDFLAGS = \
