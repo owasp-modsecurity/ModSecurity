@@ -123,7 +123,12 @@ std::list<std::string> expandEnv(const std::string& var, int flags) {
     if (wordexp(var.c_str(), &p, flags) == false) {
         if (p.we_wordc) {
             for (char** exp = p.we_wordv; *exp; ++exp) {
-                vars.push_back(exp[0]);
+                std::ifstream *iss = new std::ifstream(exp[0], std::ios::in);
+                if (iss->is_open()) {
+                    iss->close();
+                    delete iss;
+                    vars.push_back(exp[0]);
+                }
             }
         }
         wordfree(&p);
