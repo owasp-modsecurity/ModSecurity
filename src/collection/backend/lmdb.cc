@@ -36,7 +36,7 @@ namespace backend {
 #ifdef WITH_LMDB
 
 
-LMDB::LMDB() : m_env(NULL) {
+LMDB::LMDB() : Collection(""), m_env(NULL) {
     mdb_env_create(&m_env);
     mdb_env_open(m_env, "./modsec-shared-collections",
         MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
@@ -262,7 +262,7 @@ end_txn:
 
 
 void LMDB::resolveSingleMatch(const std::string& var,
-    std::vector<const Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     int rc;
     MDB_txn *txn;
     MDB_dbi dbi;
@@ -290,8 +290,7 @@ void LMDB::resolveSingleMatch(const std::string& var,
         std::string *a = new std::string(
             reinterpret_cast<char *>(mdb_value_ret.mv_data),
             mdb_value_ret.mv_size);
-        Variable *v = new Variable(&var, a);
-        v->m_dynamic_value = true;
+        VariableValue *v = new VariableValue(&var, a);
         l->push_back(v);
     }
 
@@ -467,7 +466,7 @@ end_txn:
 
 
 void LMDB::resolveMultiMatches(const std::string& var,
-    std::vector<const Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     MDB_val key, data;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
@@ -505,12 +504,11 @@ void LMDB::resolveMultiMatches(const std::string& var,
         if (strncmp(var.c_str(), a, keySize) != 0) {
             continue;
         }
-        Variable *v = new Variable(
+        VariableValue *v = new VariableValue(
             new std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
             new std::string(reinterpret_cast<char *>(data.mv_data),
                 data.mv_size));
-        v->m_dynamic_value = true;
         l->insert(l->begin(), v);
     }
 
@@ -525,7 +523,7 @@ end_txn:
 
 
 void LMDB::resolveRegularExpression(const std::string& var,
-    std::vector<const Variable *> *l) {
+    std::vector<const VariableValue *> *l) {
     MDB_val key, data;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
@@ -599,12 +597,11 @@ void LMDB::resolveRegularExpression(const std::string& var,
             continue;
         }
 
-        Variable *v = new Variable(
+        VariableValue *v = new VariableValue(
             new std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
             new std::string(reinterpret_cast<char *>(data.mv_data),
                 data.mv_size));
-        v->m_dynamic_value = true;
         l->insert(l->begin(), v);
     }
 
