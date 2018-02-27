@@ -65,11 +65,11 @@ class LMDB :
     std::unique_ptr<std::string> resolveFirst(const std::string& var) override;
 
     void resolveSingleMatch(const std::string& var,
-        std::vector<const Variable *> *l) override;
+        std::vector<const VariableValue *> *l) override;
     void resolveMultiMatches(const std::string& var,
-        std::vector<const Variable *> *l) override;
+        std::vector<const VariableValue *> *l) override;
     void resolveRegularExpression(const std::string& var,
-        std::vector<const Variable *> *l) override;
+        std::vector<const VariableValue *> *l) override;
 
  private:
     void string2val(const std::string& str, MDB_val *val);
