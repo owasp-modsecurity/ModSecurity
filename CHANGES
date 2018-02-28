@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Fix LMDB compile error
+   [Isseu #1691 - @airween]
  - Fix msc_who_am_i() to return pointer to a valid C string
    [Issue #1640 - @defanator]
  - Added some cosmetics to autoconf related code
