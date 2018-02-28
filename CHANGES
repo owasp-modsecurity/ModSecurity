@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Fix arabic charset in unicode_mapping file
+   [Issue #1619 - @alaa-ahmed-a]
  * Optionally preallocates memory when SecStreamInBodyInspection is on
    [Issue #1366 - @allanbomsft, @zimmerle]
  * Fixed typo in build_yajl.bat
