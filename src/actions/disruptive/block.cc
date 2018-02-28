@@ -37,7 +37,8 @@ bool Block::evaluate(Rule *rule, Transaction *transaction,
 #endif
 
     for (Action *a : transaction->m_rules->m_defaultActions[rule->m_phase]) {
-        if (a->isDisruptive() == false) {
+        if (a->isDisruptive() == false
+            || dynamic_cast<actions::disruptive::Block *>(a) != NULL) {
             continue;
         }
         a->evaluate(rule, transaction, rm);

@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Fix block-block infinite loop.
+   [Issue #1614 - @zimmerle, @michaelgranzow-avi]
  - Correction remove_by_tag and remove_by_msg logic.
    [Issue #1636 - @Minasu]
  - Fix LMDB compile error
