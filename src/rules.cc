@@ -152,8 +152,6 @@ std::string Rules::getParserError() {
 
 
 int Rules::evaluate(int phase, Transaction *transaction) {
-    bool remove_rule;
-    
     if (phase > modsecurity::Phases::NUMBER_OF_PHASES) {
        return 0;
     }
@@ -180,7 +178,6 @@ int Rules::evaluate(int phase, Transaction *transaction) {
     }
 
     for (int i = 0; i < rules.size(); i++) {
-        remove_rule = false;
         Rule *rule = rules[i];
         if (transaction->m_marker.empty() == false) {
             debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
@@ -206,6 +203,7 @@ int Rules::evaluate(int phase, Transaction *transaction) {
             debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "'. Removed by an SecRuleRemove directive.");
         } else {
+            bool remove_rule = false;
             if (m_exceptions.m_remove_rule_by_msg.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_msg) {
                     if (rule->containsMsg(z, transaction) == true) {
@@ -216,7 +214,7 @@ int Rules::evaluate(int phase, Transaction *transaction) {
                         break;
                     }
                 }
-                if(remove_rule) {
+                if (remove_rule) {
                     continue;
                 }
             }
@@ -231,7 +229,7 @@ int Rules::evaluate(int phase, Transaction *transaction) {
                         break;
                     }
                 }
-                if(remove_rule) {
+                if (remove_rule) {
                     continue;
                 }
             }
