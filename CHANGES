@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Only generate SecHashKey when SecHashEngine is On
+   [Issue #1671 - @dmuey, @monkburger, @zimmerle]
  * Docs: Reformat README to Markdown and update dependencies
    [Issue #1857 - @hsluoyz, @victorhora]
  * IIS: no lock on ProcessRequest. No reload of config. 
