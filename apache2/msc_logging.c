@@ -878,7 +878,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
                 for(i = 0; i < tarr->nelts; i++) {
                     msc_arg *arg = (msc_arg *)telts[i].val;
                     if (arg->origin != NULL &&
-                            strcmp(arg->origin, "BODY") != 0)
+                            ( strcmp(arg->origin, "BODY") != 0 && strcmp(arg->origin, "JSON") !=0) )
                         continue;
 
                     if (last_offset == 0) { /* The first time we're here. */
@@ -1165,7 +1165,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
 
 
         /* Stopwatch2 */
-#ifdef DLOG_NO_STOPWATCH
+#ifdef LOG_NO_STOPWATCH
         if (msr->txcfg->debuglog_level >= 9)
 #endif
         format_performance_variables_json(msr, g);
@@ -1998,7 +1998,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
         }
 
         /* Stopwatch; left in for compatibility reasons */
-#ifdef DLOG_NO_STOPWATCH
+#ifdef LOG_NO_STOPWATCH
 	if (msr->txcfg->debuglog_level >= 9) {
 #endif
         text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
@@ -2013,7 +2013,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
                 "; %s\n", msr->request_time, (now - msr->request_time), perf_all);
             sec_auditlog_write(msr, text, strlen(text));
         }
-#ifdef DLOG_NO_STOPWATCH
+#ifdef LOG_NO_STOPWATCH
         }
 #endif
 

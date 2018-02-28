@@ -1597,7 +1597,7 @@ static int hook_connection_early(conn_rec *conn)
                     "Possible DoS Consumption Attack [Rejected]", ip_count_w,
                     conn_write_state_limit, client_ip);
 
-                if (!conn_limits_filter_state == MODSEC_ENABLED)
+                if (conn_limits_filter_state == MODSEC_ENABLED)
                     return OK;
             }
         }

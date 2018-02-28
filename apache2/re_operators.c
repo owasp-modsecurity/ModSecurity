@@ -634,16 +634,25 @@ nextround:
         free(msr->stream_input_data);
         msr->stream_input_data = NULL;
         msr->stream_input_length = 0;
+#ifdef MSC_LARGE_STREAM_INPUT
+        msr->stream_input_allocated_length  = 0;
 
+        msr->stream_input_data = (char *)malloc(size);
+#else
         msr->stream_input_data = (char *)malloc(size+1);
+#endif
 
         if(msr->stream_input_data == NULL)  {
             return -1;
         }
 
         msr->stream_input_length = size;
+#ifdef MSC_LARGE_STREAM_INPUT
+        msr->stream_input_allocated_length = size;
+        memset(msr->stream_input_data, 0x0, size);
+#else
         memset(msr->stream_input_data, 0x0, size+1);
-
+#endif
         msr->if_stream_changed = 1;
 
         memcpy(msr->stream_input_data, data, size);
@@ -2158,12 +2167,14 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
  */
 static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg) {
-
+    int capture;
     int is_xss;
 
     is_xss = libinjection_xss(var->value, var->value_len);
+    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (is_xss) {
+        set_match_to_tx(msr, capture, var->value, 0);
         *error_msg = apr_psprintf(msr->mp, "detected XSS using libinjection.");
 
         if (msr->txcfg->debuglog_level >= 9) {

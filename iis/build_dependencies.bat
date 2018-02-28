@@ -1,4 +1,4 @@
-:: Those variable should be edited as needed.
+:: Those variables should be edited as needed.
 :: Use full paths.
 
 :: General paths
@@ -6,20 +6,25 @@
 @set OUTPUT_DIR=%cd%\dependencies\release_files
 @set SOURCE_DIR=%USERPROFILE%\Downloads
 
-:: Aditional paths.
-@set PATH=%PATH%;c:\work\cmake-2.8.7-win32-x86\bin;"c:\program files\7-zip"
+:: Dependencies
+@set CMAKE=cmake-3.8.2-win32-x86.zip
+@set PCRE=pcre-8.40.zip
+@set ZLIB=zlib-1.2.11.tar.gz
+@set LIBXML2=libxml2-2.9.4.tar.gz
+@set LUA=lua-5.3.4.tar.gz
+@set CURL=curl-7.54.1.zip
+@set APACHE_SRC=httpd-2.4.27.tar.gz
+@set APACHE_BIN32=httpd-2.4.27-win32-VC11.zip
+@set APACHE_BIN64=httpd-2.4.27-win64-VC11.zip
+@set YAJL=yajl-2.1.0.zip
+@set SSDEEP=ssdeep-2.13.tar.gz
+@set SSDEEP_BIN=ssdeep-2.13.zip
 
-@set PCRE=pcre-8.33.zip
-@set ZLIB=zlib-1.2.8.tar.gz
-@set LIBXML2=libxml2-2.9.1.tar.gz
-@set LUA=lua-5.1.5.tar.gz
-@set CURL=curl-7.39.0.zip
-@set APACHE_SRC=httpd-2.4.6.tar.gz
-@set APACHE_BIN32=httpd-2.4.6-win32-VC11.zip
-@set APACHE_BIN64=httpd-2.4.6-win64-VC11.zip
-@set YAJL=lloyd-yajl-f4b2b1a.zip
-@set SSDEEP=ssdeep-2.10.tar.gz
-@set SSDEEP_BIN=ssdeep-2.10.zip
+@set CMAKE_DIR=%WORK_DIR%\%CMAKE:~0,-4%\bin
+
+:: Aditional paths.
+@set PATH=%PATH%;%CMAKE_DIR%;"c:\program files\7-zip"
+
 
 :: @set VCARGS32="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
 :: @set VCARGS64="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
@@ -45,6 +50,12 @@ call cl 2>&1 | findstr /C:"x64"
 @if (%ERRORLEVEL%) == (0) set APACHE_BIN=%APACHE_BIN64%
 
 @echo Starting with the depdendencies...
+@echo # CMake. - %CMAKE%
+@call dependencies/build_cmake.bat
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed_cmake
+@cd "%CURRENT_DIR%"
+
+
 @echo # Apache - %HTTPD%/%APACHE24_ZIP%
 @call dependencies/build_apache.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_apache
@@ -127,6 +138,10 @@ call cl 2>&1 | findstr /C:"x64"
 
 :build_failed_ssdeep
 @echo Failed to setup %SSDEEP%...
+@goto failed
+
+:build_failed_cmake
+@echo Failed to setup %CMAKE%...
 @goto failed
 
 :failed
