@@ -53,7 +53,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDefaultAction \"phase:2,t:lowercase\"",
+      "SecDefaultAction \"phase:2,t:lowercase,pass\"",
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1,msg:'This is a test, %{REQUEST_HEADERS:Accept}%'\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]
@@ -112,7 +112,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDefaultAction \"phase:2,t:lowercase\"",
+      "SecDefaultAction \"phase:2,t:lowercase,pass\"",
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:none,phase:2,id:1,msg:'This is a test, %{REQUEST_HEADERS:Accept}%'\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]
@@ -277,8 +277,8 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDefaultAction \"phase:2,log,auditlog,status:302\"",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1,redirect:'http://www.google.com'\"",
+      "SecDefaultAction \"phase:2,log,auditlog,status:302,redirect:'http://www.google.com'\"",
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]
   }

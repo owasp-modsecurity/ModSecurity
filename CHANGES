@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Check for disruptive action on SecDefaultAction.
+   [Issue #1614 - @zimmerle, @michaelgranzow-avi]
  - Fix block-block infinite loop.
    [Issue #1614 - @zimmerle, @michaelgranzow-avi]
  - Correction remove_by_tag and remove_by_msg logic.

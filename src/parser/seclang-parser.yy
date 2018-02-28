@@ -1145,6 +1145,7 @@ expression:
       }
     | CONFIG_DIR_SEC_DEFAULT_ACTION actions
       {
+        bool hasDisruptive = false;
         std::vector<actions::Action *> *actions = new std::vector<actions::Action *>();
         for (auto &i : *$2.get()) {
             actions->push_back(i.release());
@@ -1154,6 +1155,9 @@ expression:
         int secRuleDefinedPhase = -1;
         for (actions::Action *a : *actions) {
             actions::Phase *phase = dynamic_cast<actions::Phase *>(a);
+            if (a->isDisruptive() == true && dynamic_cast<actions::disruptive::Block *>(a) == NULL) {
+                hasDisruptive = true;
+            }
             if (phase != NULL) {
                 definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
@@ -1175,6 +1179,11 @@ expression:
             definedPhase = modsecurity::Phases::RequestHeadersPhase;
         }
 
+        if (hasDisruptive == false) {
+            driver.error(@0, "SecDefaultAction must specify a disruptive action.");
+            YYERROR;
+        }
+
         if (!driver.m_defaultActions[definedPhase].empty()) {
             std::stringstream ss;
             ss << "SecDefaultActions can only be placed once per phase and configuration context. Phase ";
@@ -1182,6 +1191,10 @@ expression:
             ss << " was informed already.";
             driver.error(@0, ss.str());
             YYERROR;
+        }
+
+        for (actions::Action *a : checkedActions) {
+            
         }
 
         for (actions::Action *a : checkedActions) {
