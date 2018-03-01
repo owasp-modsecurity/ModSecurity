@@ -60,7 +60,7 @@ class Rx : public Operator {
         const std::string& input,
         std::shared_ptr<RuleMessage> ruleMessage) override;
 
-    bool init(const std::string &arg, std::string *error);
+    bool init(const std::string &arg, std::string *error) override;
 
  private:
     Regex *m_re;

@@ -50,7 +50,7 @@ class Rule {
             std::string fileName,
             int lineNumber);
     explicit Rule(std::string marker);
-    ~Rule();
+    virtual ~Rule();
 
     virtual bool evaluate(Transaction *transaction,
         std::shared_ptr<RuleMessage> rm);

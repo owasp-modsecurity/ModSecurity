@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Fix a set of compilation warnings
+   [Issue #1650 - @zimmerle, @JayCase]
  - Check for disruptive action on SecDefaultAction.
    [Issue #1614 - @zimmerle, @michaelgranzow-avi]
  - Fix block-block infinite loop.
