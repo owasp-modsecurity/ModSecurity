@@ -1194,10 +1194,6 @@ expression:
         }
 
         for (actions::Action *a : checkedActions) {
-            
-        }
-
-        for (actions::Action *a : checkedActions) {
             driver.m_defaultActions[definedPhase].push_back(a);
         }
 
