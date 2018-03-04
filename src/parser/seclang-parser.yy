@@ -956,13 +956,11 @@ op_before_init:
       }
     | OPERATOR_VERIFY_CPF run_time_string
       {
-        /* $$ = new operators::VerifyCPF($1); */
-        OPERATOR_NOT_SUPPORTED("VerifyCPF", @0);
+        OPERATOR_CONTAINER($$, new operators::VerifyCPF(std::move($2)));
       }
     | OPERATOR_VERIFY_SSN run_time_string
       {
-        /* $$ = new operators::VerifySSN($1); */
-        OPERATOR_NOT_SUPPORTED("VerifySSN", @0);
+        OPERATOR_CONTAINER($$, new operators::VerifySSN(std::move($2)));
       }
     | OPERATOR_GSB_LOOKUP run_time_string
       {
