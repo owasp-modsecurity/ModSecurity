@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Add missing verify*** transformation statements to parser
+  [Issue #1006 and #1007 - @victorhora, @zimmerle]
  - Fix a set of compilation warnings
    [Issue #1650 - @zimmerle, @JayCase]
  - Check for disruptive action on SecDefaultAction.
