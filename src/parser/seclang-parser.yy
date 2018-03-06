@@ -595,6 +595,7 @@ using modsecurity::operators::Operator;
   ACTION_VER                                   "Ver"
   ACTION_XMLNS                                 "xmlns"
   CONFIG_COMPONENT_SIG                         "CONFIG_COMPONENT_SIG"
+  CONFIG_CONN_ENGINE                           "CONFIG_CONN_ENGINE"
   CONFIG_SEC_ARGUMENT_SEPARATOR                "CONFIG_SEC_ARGUMENT_SEPARATOR"
   CONFIG_SEC_WEB_APP_ID                        "CONFIG_SEC_WEB_APP_ID"
   CONFIG_SEC_SERVER_SIG                        "CONFIG_SEC_SERVER_SIG"
@@ -610,9 +611,21 @@ using modsecurity::operators::Operator;
   CONFIG_DIR_DEBUG_LOG                         "CONFIG_DIR_DEBUG_LOG"
   CONFIG_DIR_DEBUG_LVL                         "CONFIG_DIR_DEBUG_LVL"
   CONFIG_SEC_CACHE_TRANSFORMATIONS             "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+  CONFIG_SEC_DISABLE_BACKEND_COMPRESS          "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
+  CONFIG_SEC_HASH_ENGINE                       "CONFIG_SEC_HASH_ENGINE"
+  CONFIG_SEC_HASH_KEY                          "CONFIG_SEC_HASH_KEY"
+  CONFIG_SEC_HASH_PARAM                        "CONFIG_SEC_HASH_PARAM"
+  CONFIG_SEC_HASH_METHOD_RX                    "CONFIG_SEC_HASH_METHOD_RX"
+  CONFIG_SEC_HASH_METHOD_PM                    "CONFIG_SEC_HASH_METHOD_PM"
+  CONFIG_SEC_CHROOT_DIR                        "CONFIG_SEC_CHROOT_DIR"
   CONFIG_DIR_GEO_DB                            "CONFIG_DIR_GEO_DB"
+  CONFIG_DIR_GSB_DB                            "CONFIG_DIR_GSB_DB"
+  CONFIG_SEC_GUARDIAN_LOG                      "CONFIG_SEC_GUARDIAN_LOG"
   CONFIG_DIR_PCRE_MATCH_LIMIT                  "CONFIG_DIR_PCRE_MATCH_LIMIT"
   CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION        "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+  CONFIG_SEC_CONN_R_STATE_LIMIT                "CONFIG_SEC_CONN_R_STATE_LIMIT"
+  CONFIG_SEC_CONN_W_STATE_LIMIT                "CONFIG_SEC_CONN_W_STATE_LIMIT"
+  CONFIG_SEC_SENSOR_ID                         "CONFIG_SEC_SENSOR_ID"
   CONFIG_DIR_REQ_BODY                          "CONFIG_DIR_REQ_BODY"
   CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT          "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
   CONFIG_DIR_REQ_BODY_LIMIT                    "CONFIG_DIR_REQ_BODY_LIMIT"
@@ -621,6 +634,8 @@ using modsecurity::operators::Operator;
   CONFIG_DIR_RES_BODY                          "CONFIG_DIR_RES_BODY"
   CONFIG_DIR_RES_BODY_LIMIT                    "CONFIG_DIR_RES_BODY_LIMIT"
   CONFIG_DIR_RES_BODY_LIMIT_ACTION             "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+  CONFIG_SEC_RULE_INHERITANCE                  "CONFIG_SEC_RULE_INHERITANCE"
+  CONFIG_SEC_RULE_PERF_TIME                    "CONFIG_SEC_RULE_PERF_TIME"
   CONFIG_DIR_RULE_ENG                          "CONFIG_DIR_RULE_ENG"
   CONFIG_DIR_SEC_ACTION                        "CONFIG_DIR_SEC_ACTION"
   CONFIG_DIR_SEC_DEFAULT_ACTION                "CONFIG_DIR_SEC_DEFAULT_ACTION"
@@ -628,6 +643,7 @@ using modsecurity::operators::Operator;
   CONFIG_DIR_UNICODE_MAP_FILE                  "CONFIG_DIR_UNICODE_MAP_FILE"
   CONFIG_SEC_COLLECTION_TIMEOUT                "CONFIG_SEC_COLLECTION_TIMEOUT"
   CONFIG_SEC_HTTP_BLKEY                        "CONFIG_SEC_HTTP_BLKEY"
+  CONFIG_SEC_INTERCEPT_ON_ERROR                "CONFIG_SEC_INTERCEPT_ON_ERROR"
   CONFIG_SEC_REMOTE_RULES_FAIL_ACTION          "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
   CONFIG_SEC_RULE_REMOVE_BY_ID                 "CONFIG_SEC_RULE_REMOVE_BY_ID"
   CONFIG_SEC_RULE_REMOVE_BY_MSG                "CONFIG_SEC_RULE_REMOVE_BY_MSG"
@@ -656,8 +672,11 @@ using modsecurity::operators::Operator;
   CONGIG_DIR_RESPONSE_BODY_MP                  "CONGIG_DIR_RESPONSE_BODY_MP"
   CONGIG_DIR_SEC_ARG_SEP                       "CONGIG_DIR_SEC_ARG_SEP"
   CONGIG_DIR_SEC_COOKIE_FORMAT                 "CONGIG_DIR_SEC_COOKIE_FORMAT"
+  CONFIG_SEC_COOKIEV0_SEPARATOR                "CONFIG_SEC_COOKIEV0_SEPARATOR"
   CONGIG_DIR_SEC_DATA_DIR                      "CONGIG_DIR_SEC_DATA_DIR"
   CONGIG_DIR_SEC_STATUS_ENGINE                 "CONGIG_DIR_SEC_STATUS_ENGINE"
+  CONFIG_SEC_STREAM_IN_BODY_INSPECTION         "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+  CONFIG_SEC_STREAM_OUT_BODY_INSPECTION        "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
   CONGIG_DIR_SEC_TMP_DIR                       "CONGIG_DIR_SEC_TMP_DIR"
   DIRECTIVE                                    "DIRECTIVE"
   DIRECTIVE_SECRULESCRIPT                      "DIRECTIVE_SECRULESCRIPT"
@@ -810,6 +829,11 @@ audit_log:
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_OFF
       {
         driver.m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+      }
+    | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_RELEVANT_ONLY
+      {
+        driver.error(@0, "SecUploadKeepFiles RelevantOnly is not currently supported. Accepted values are On or Off");
+        YYERROR;
       }
     | CONFIG_UPLOAD_FILE_LIMIT
       {
@@ -1242,6 +1266,14 @@ expression:
       {
         driver.m_components.push_back($1);
       }
+    | CONFIG_CONN_ENGINE CONFIG_VALUE_ON
+      {
+        driver.error(@0, "SecConnEngine is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_CONN_ENGINE CONFIG_VALUE_OFF
+      {
+      }
     | CONFIG_SEC_WEB_APP_ID
       {
         driver.m_secWebAppId.m_value = $1;
@@ -1252,19 +1284,114 @@ expression:
         driver.error(@0, "SecServerSignature is not supported.");
         YYERROR;
       }
-    | CONFIG_CONTENT_INJECTION CONFIG_VALUE_ON
-      {
-        driver.error(@0, "ContentInjection is not yet supported.");
-        YYERROR;
-      }
     | CONFIG_SEC_CACHE_TRANSFORMATIONS
       {
         driver.error(@0, "SecCacheTransformations is not supported.");
         YYERROR;
       }
+    | CONFIG_SEC_DISABLE_BACKEND_COMPRESS CONFIG_VALUE_ON
+      {
+        driver.error(@0, "SecDisableBackendCompression is not supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_DISABLE_BACKEND_COMPRESS CONFIG_VALUE_OFF
+      {
+      }
+    | CONFIG_CONTENT_INJECTION CONFIG_VALUE_ON
+      {
+        driver.error(@0, "SecContentInjection is not yet supported.");
+        YYERROR;
+      }
     | CONFIG_CONTENT_INJECTION CONFIG_VALUE_OFF
       {
-        driver.error(@0, "ContentInjection is not yet supported.");
+      }
+    | CONFIG_SEC_CHROOT_DIR
+      {
+        driver.error(@0, "SecChrootDir is not supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_HASH_ENGINE CONFIG_VALUE_ON
+      {
+        driver.error(@0, "SecHashEngine is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_HASH_ENGINE CONFIG_VALUE_OFF
+      {
+      }
+    | CONFIG_SEC_HASH_KEY
+      {
+        driver.error(@0, "SecHashKey is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_HASH_PARAM
+      {
+        driver.error(@0, "SecHashParam is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_HASH_METHOD_RX
+      {
+        driver.error(@0, "SecHashMethodRx is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_HASH_METHOD_PM
+      {
+        driver.error(@0, "SecHashMethodPm is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_DIR_GSB_DB
+      {
+        driver.error(@0, "SecGsbLookupDb is not supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_GUARDIAN_LOG
+      {
+        driver.error(@0, "SecGuardianLog is not supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_INTERCEPT_ON_ERROR CONFIG_VALUE_ON
+      {
+        driver.error(@0, "SecInterceptOnError is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_INTERCEPT_ON_ERROR CONFIG_VALUE_OFF
+      {
+      }
+    | CONFIG_SEC_CONN_R_STATE_LIMIT
+      {
+        driver.error(@0, "SecConnReadStateLimit is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_CONN_W_STATE_LIMIT
+      {
+        driver.error(@0, "SecConnWriteStateLimit is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_SENSOR_ID
+      {
+        driver.error(@0, "SecSensorId is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_RULE_INHERITANCE CONFIG_VALUE_ON
+      {
+        driver.error(@0, "SecRuleInheritance is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_RULE_INHERITANCE CONFIG_VALUE_OFF
+      {
+      }
+    | CONFIG_SEC_RULE_PERF_TIME
+      {
+        driver.error(@0, "SecRulePerfTime is not yet supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_STREAM_IN_BODY_INSPECTION
+      {
+        driver.error(@0, "SecStreamInBodyInspection is not supported.");
+        YYERROR;
+      }
+    | CONFIG_SEC_STREAM_OUT_BODY_INSPECTION
+      {
+        driver.error(@0, "SecStreamOutBodyInspection is not supported.");
         YYERROR;
       }
     | CONFIG_SEC_RULE_REMOVE_BY_ID
@@ -1493,7 +1620,15 @@ expression:
         driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
     | CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
+/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
+        driver.error(@0, "SecPcreMatchLimitRecursion is not currently supported. Default PCRE values are being used for now");
+        YYERROR;
+*/
     | CONFIG_DIR_PCRE_MATCH_LIMIT
+/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
+        driver.error(@0, "SecPcreMatchLimit is not currently supported. Default PCRE values are being used for now");
+        YYERROR;
+*/
     | CONGIG_DIR_RESPONSE_BODY_MP
       {
         std::istringstream buf($1);
@@ -1521,13 +1656,52 @@ expression:
         driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONGIG_DIR_SEC_TMP_DIR
+      {
+/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
+        std::stringstream ss;
+        ss << "As of ModSecurity version 3.0, SecTmpDir is no longer supported.";
+        ss << " Instead, you can use your web server configurations to control when";
+        ss << "and where to swap. ModSecurity will follow the web server decision.";
+        driver.error(@0, ss.str());
+        YYERROR;
+*/
+      }
     | CONGIG_DIR_SEC_DATA_DIR
+/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
+        std::stringstream ss;
+        ss << "SecDataDir is not currently supported.";
+        ss << " Collections are kept in memory (in_memory-per_process) for now.";
+        ss << " When using a backend such as LMDB, temp data path is currently defined by the backend.";
+        driver.error(@0, ss.str());
+        YYERROR;
+*/
     | CONGIG_DIR_SEC_ARG_SEP
     | CONGIG_DIR_SEC_COOKIE_FORMAT
+      {
+        if (atoi($1.c_str()) == 1) {
+          driver.error(@0, "SecCookieFormat 1 is not yet supported.");
+          YYERROR;
+        }
+      }
+    | CONFIG_SEC_COOKIEV0_SEPARATOR
+      {
+        driver.error(@0, "SecCookieV0Separator is not yet supported.");
+        YYERROR;
+      }
     | CONGIG_DIR_SEC_STATUS_ENGINE
+/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
+        driver.error(@0, "SecStatusEngine is not yet supported.");
+        YYERROR;
+*/
     | CONFIG_DIR_UNICODE_MAP_FILE
+/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
+        driver.error(@0, "SecUnicodeMapFile is not yet supported. utils::string::x2c");
+        YYERROR;
+*/
     | CONFIG_SEC_COLLECTION_TIMEOUT
       {
+        driver.error(@0, "SecCollectionTimeout is not yet supported.");
+        YYERROR;
       }
     | CONFIG_SEC_HTTP_BLKEY
       {

@@ -316,6 +316,13 @@ CONFIG_COMPONENT_SIG                    (?i:SecComponentSignature)
 CONFIG_SEC_SERVER_SIG                   (?i:SecServerSignature)
 CONFIG_SEC_WEB_APP_ID                   (?i:SecWebAppId)
 CONFIG_SEC_CACHE_TRANSFORMATIONS        (?i:SecCacheTransformations)
+CONFIG_SEC_CHROOT_DIR                   (?i:SecChrootDir)
+CONFIG_CONN_ENGINE                      (?i:SecConnEngine)
+CONFIG_SEC_HASH_ENGINE                  (?i:SecHashEngine)
+CONFIG_SEC_HASH_KEY                     (?i:SecHashKey)
+CONFIG_SEC_HASH_PARAM                   (?i:SecHashParam)
+CONFIG_SEC_HASH_METHOD_RX               (?i:SecHashMethodRx)
+CONFIG_SEC_HASH_METHOD_PM               (?i:SecHashMethodPm)
 CONFIG_CONTENT_INJECTION                (?i:SecContentInjection)
 CONFIG_SEC_ARGUMENT_SEPARATOR           (?i:SecArgumentSeparator)
 CONFIG_DIR_AUDIT_DIR                    (?i:SecAuditLogStorageDir)
@@ -331,6 +338,16 @@ CONFIG_DIR_AUDIT_TPE                    (?i:SecAuditLogType)
 CONFIG_DIR_DEBUG_LOG                    (?i:SecDebugLog)
 CONFIG_DIR_DEBUG_LVL                    (?i:SecDebugLogLevel)
 CONFIG_DIR_GEO_DB                       (?i:SecGeoLookupDb)
+CONFIG_DIR_GSB_DB                       (?i:SecGsbLookupDb)
+CONFIG_SEC_GUARDIAN_LOG                 (?i:SecGuardianLog)
+CONFIG_SEC_INTERCEPT_ON_ERROR           (?i:SecInterceptOnError)
+CONFIG_SEC_CONN_R_STATE_LIMIT           (?i:SecConnReadStateLimit)
+CONFIG_SEC_CONN_W_STATE_LIMIT           (?i:SecConnWriteStateLimit)
+CONFIG_SEC_SENSOR_ID                    (?i:SecSensorId)
+CONFIG_SEC_RULE_INHERITANCE             (?i:SecRuleInheritance)
+CONFIG_SEC_RULE_PERF_TIME               (?i:SecRulePerfTime)
+CONFIG_SEC_STREAM_IN_BODY_INSPECTION    (?i:SecStreamInBodyInspection)
+CONFIG_SEC_STREAM_OUT_BODY_INSPECTION   (?i:SecStreamOutBodyInspection)
 CONFIG_DIR_PCRE_MATCH_LIMIT             (?i:SecPcreMatchLimit)
 CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION   (?i:SecPcreMatchLimitRecursion)
 CONFIG_DIR_REQ_BODY                     (?i:SecRequestBodyAccess)
@@ -344,6 +361,7 @@ CONFIG_DIR_RES_BODY_LIMIT_ACTION        (?i:SecResponseBodyLimitAction)
 CONFIG_DIR_RULE_ENG                     (?i:SecRuleEngine)
 CONFIG_DIR_SEC_ACTION                   (?i:SecAction)
 CONFIG_DIR_SEC_DEFAULT_ACTION           (?i:SecDefaultAction)
+CONFIG_SEC_DISABLE_BACKEND_COMPRESS     (?i:SecDisableBackendCompression)
 CONFIG_DIR_SEC_MARKER                   (?i:SecMarker)
 CONFIG_DIR_UNICODE_MAP_FILE             (?i:SecUnicodeMapFile)
 CONFIG_INCLUDE                          (?i:Include)
@@ -381,6 +399,7 @@ CONGIG_DIR_RESPONSE_BODY_MP             (?i:SecResponseBodyMimeType)
 CONGIG_DIR_RESPONSE_BODY_MP_CLEAR       (?i:SecResponseBodyMimeTypesClear)
 CONGIG_DIR_SEC_ARG_SEP                  (?i:SecArgumentSeparator)
 CONGIG_DIR_SEC_COOKIE_FORMAT            (?i:SecCookieFormat)
+CONFIG_SEC_COOKIEV0_SEPARATOR           (?i:SecCookieV0Separator)
 CONGIG_DIR_SEC_DATA_DIR                 (?i:SecDataDir)
 CONGIG_DIR_SEC_STATUS_ENGINE            (?i:SecStatusEngine)
 CONGIG_DIR_SEC_TMP_DIR                  (?i:SecTmpDir)
@@ -704,7 +723,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_COMPONENT_SIG}[ \t]+["]{FREE_TEXT}["]                           { return p::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 {CONFIG_SEC_SERVER_SIG}[ \t]+["]{FREE_TEXT}["]                          { return p::make_CONFIG_SEC_SERVER_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 {CONFIG_SEC_WEB_APP_ID}[ \t]+["]{FREE_TEXT}["]                          { return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 2), *driver.loc.back()); }
-{CONFIG_SEC_WEB_APP_ID}[ \t]+{FREE_TEXT_NEW_LINE}                                { return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_WEB_APP_ID}[ \t]+{FREE_TEXT_NEW_LINE}                       { return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_CONTENT_INJECTION}                                              { return p::make_CONFIG_CONTENT_INJECTION(*driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR_MOD}[ \t]+{CONFIG_VALUE_NUMBER}                   { return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR_MOD}[ \t]+["]{CONFIG_VALUE_NUMBER}["]             { return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
@@ -747,8 +766,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_SEC_REMOVE_RULES_BY_MSG}[ \t]+{FREE_TEXT_NEW_LINE}              { return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_MSG}[ \t]+["]{FREE_TEXT_NEW_LINE}["]        { return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_TAG}[ \t]+{FREE_TEXT_NEW_LINE}              { return p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
-{CONFIG_SEC_REMOVE_RULES_BY_TAG}[ \t]+["]{FREE_TEXT_NEW_LINE}["]        { return 
-p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_REMOVE_RULES_BY_TAG}[ \t]+["]{FREE_TEXT_NEW_LINE}["]        { return p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_UPDATE_TARGET_BY_TAG}[ ]+["]{FREE_TEXT_NEW_LINE}["]         { state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_UPDATE_TARGET_BY_TAG}[ ]+{FREE_TEXT_SPACE_COMMA_QUOTE}      { state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_UPDATE_TARGET_BY_MSG}[ ]+["]{FREE_TEXT_NEW_LINE}["]         { state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
@@ -779,6 +797,8 @@ p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), 
 {CONGIG_DIR_RESPONSE_BODY_MP_CLEAR}                                     { return p::make_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR(*driver.loc.back()); }
 {CONGIG_DIR_SEC_ARG_SEP}[ ]{FREE_TEXT_NEW_LINE}                         { return p::make_CONGIG_DIR_SEC_ARG_SEP(yytext, *driver.loc.back()); }
 {CONGIG_DIR_SEC_COOKIE_FORMAT}[ ]{CONFIG_VALUE_NUMBER}                  { return p::make_CONGIG_DIR_SEC_COOKIE_FORMAT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_SEC_COOKIEV0_SEPARATOR}[ \t]+["]{NEW_LINE_FREE_TEXT}["]         { return p::make_CONFIG_SEC_COOKIEV0_SEPARATOR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_COOKIEV0_SEPARATOR}[ \t]+{NEW_LINE_FREE_TEXT}               { return p::make_CONFIG_SEC_COOKIEV0_SEPARATOR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONGIG_DIR_SEC_DATA_DIR}[ \t]+{CONFIG_VALUE_PATH}                      { return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONGIG_DIR_SEC_DATA_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                { return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONGIG_DIR_SEC_STATUS_ENGINE}[ ]{FREE_TEXT_NEW_LINE}                   { return p::make_CONGIG_DIR_SEC_STATUS_ENGINE(yytext, *driver.loc.back()); }
@@ -787,7 +807,26 @@ p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), 
 {DIRECTIVE_SECRULESCRIPT}[ \t]+{CONFIG_VALUE_PATH}                      { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {DIRECTIVE_SECRULESCRIPT}[ \t]+["]{FREE_TEXT_SPACE_COMMA_QUOTE}["]      { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_CACHE_TRANSFORMATIONS}{FREE_TEXT_NEW_LINE}                  { return p::make_CONFIG_SEC_CACHE_TRANSFORMATIONS(yytext, *driver.loc.back()); }
-
+{CONFIG_SEC_CHROOT_DIR}[ \t]+{CONFIG_VALUE_PATH}                        { return p::make_CONFIG_SEC_CHROOT_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_CHROOT_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                  { return p::make_CONFIG_SEC_CHROOT_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_CONN_ENGINE}                                                    { return p::make_CONFIG_CONN_ENGINE(yytext, *driver.loc.back()); }
+{CONFIG_SEC_HASH_ENGINE}                                                { return p::make_CONFIG_SEC_HASH_ENGINE(yytext, *driver.loc.back()); }
+{CONFIG_SEC_HASH_KEY}                                                   { return p::make_CONFIG_SEC_HASH_KEY(yytext, *driver.loc.back()); }
+{CONFIG_SEC_HASH_PARAM}                                                 { return p::make_CONFIG_SEC_HASH_PARAM(yytext, *driver.loc.back()); }
+{CONFIG_SEC_HASH_METHOD_RX}                                             { return p::make_CONFIG_SEC_HASH_METHOD_RX(yytext, *driver.loc.back()); }
+{CONFIG_SEC_HASH_METHOD_PM}                                             { return p::make_CONFIG_SEC_HASH_METHOD_PM(yytext, *driver.loc.back()); }
+{CONFIG_DIR_GSB_DB}[ \t]+{CONFIG_VALUE_PATH}                            { return p::make_CONFIG_DIR_GSB_DB(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_DIR_GSB_DB}[ \t]+["]{CONFIG_VALUE_PATH}["]                      { return p::make_CONFIG_DIR_GSB_DB(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+{CONFIG_SEC_GUARDIAN_LOG}                                               { return p::make_CONFIG_SEC_GUARDIAN_LOG(yytext, *driver.loc.back()); }
+{CONFIG_SEC_INTERCEPT_ON_ERROR}                                         { return p::make_CONFIG_SEC_INTERCEPT_ON_ERROR(yytext, *driver.loc.back()); }
+{CONFIG_SEC_CONN_R_STATE_LIMIT}{FREE_TEXT_NEW_LINE}                     { return p::make_CONFIG_SEC_CONN_R_STATE_LIMIT(yytext, *driver.loc.back()); }
+{CONFIG_SEC_CONN_W_STATE_LIMIT}{FREE_TEXT_NEW_LINE}                     { return p::make_CONFIG_SEC_CONN_W_STATE_LIMIT(yytext, *driver.loc.back()); }
+{CONFIG_SEC_SENSOR_ID}{FREE_TEXT_NEW_LINE}                              { return p::make_CONFIG_SEC_SENSOR_ID(yytext, *driver.loc.back()); }
+{CONFIG_SEC_RULE_INHERITANCE}                                           { return p::make_CONFIG_SEC_RULE_INHERITANCE(yytext, *driver.loc.back()); }
+{CONFIG_SEC_RULE_PERF_TIME}[ ]{CONFIG_VALUE_NUMBER}                     { return p::make_CONFIG_SEC_RULE_PERF_TIME(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_SEC_STREAM_IN_BODY_INSPECTION}                                  { return p::make_CONFIG_SEC_STREAM_IN_BODY_INSPECTION(yytext, *driver.loc.back()); }
+{CONFIG_SEC_STREAM_OUT_BODY_INSPECTION}                                 { return p::make_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION(yytext, *driver.loc.back()); }
+{CONFIG_SEC_DISABLE_BACKEND_COMPRESS}                                   { return p::make_CONFIG_SEC_DISABLE_BACKEND_COMPRESS(yytext, *driver.loc.back()); }
 
 {DIRECTIVE}                                                             { BEGIN(TRANSACTION_TO_VARIABLE); return p::make_DIRECTIVE(yytext, *driver.loc.back()); }
 {CONFIG_DIR_SEC_DEFAULT_ACTION}                                         { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_CONFIG_DIR_SEC_DEFAULT_ACTION(yytext, *driver.loc.back()); }
