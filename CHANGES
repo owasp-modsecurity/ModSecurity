@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Adds capture action to verifyCPF
+   [Issue #1698 - @zimmerle]
  - Prettier error messages for unsupported configurations (UX)
    [@victorhora]
  - Add missing verify*** transformation statements to parser
