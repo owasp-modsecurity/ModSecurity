@@ -117,7 +117,8 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
 }
 
 
-bool VerifyCC::evaluate(Transaction *transaction, const std::string &i) {
+bool VerifyCC::evaluate(Transaction *t, Rule *rule,
+    const std::string& i, std::shared_ptr<RuleMessage> ruleMessage) {
     int offset = 0;
     bool is_cc = false;
     int target_length = i.length();
@@ -136,14 +137,22 @@ bool VerifyCC::evaluate(Transaction *transaction, const std::string &i) {
         if (ret < 0) {
             return false;
         }
-
         if (ret > 0) {
             match = std::string(i, ovector[0], ovector[1] - ovector[0]);
             is_cc = luhnVerify(match.c_str(), match.size());
             if (is_cc) {
-                if (transaction) {
+                if (t) {
+                    if (rule && t
+                        && rule->getActionsByName("capture").size() > 0) {
+                        t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                            "0", std::string(match));
 #ifndef NO_LOGS
-                    transaction->debug(9, "CC# match \"" + m_param +
+                        t->debug(7, "Added VerifyCC match TX.0: " + \
+                            std::string(match));
+#endif
+                    }
+#ifndef NO_LOGS
+                    t->debug(9, "CC# match \"" + m_param +
                         "\" at " + i + ". [offset " +
                         std::to_string(offset) + "]");
 #endif

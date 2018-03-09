@@ -36,7 +36,9 @@ class VerifyCC : public Operator {
     ~VerifyCC();
 
     int luhnVerify(const char *ccnumber, int len);
-    bool evaluate(Transaction *transaction, const std::string &input) override;
+    bool evaluate(Transaction *t, Rule *rule,
+        const std::string& input,
+        std::shared_ptr<RuleMessage> ruleMessage)  override;
     bool init(const std::string &param, std::string *error) override;
  private:
     pcre *m_pc;

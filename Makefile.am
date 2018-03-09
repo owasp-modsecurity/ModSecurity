@@ -144,6 +144,7 @@ TESTS+=test/test-cases/regression/operator-ipMatchFromFile.json
 TESTS+=test/test-cases/regression/operator-rx.json
 TESTS+=test/test-cases/regression/operator-UnconditionalMatch.json
 TESTS+=test/test-cases/regression/operator-validate-byte-range.json
+TESTS+=test/test-cases/regression/operator-verifycc.json
 TESTS+=test/test-cases/regression/operator-verifycpf.json
 TESTS+=test/test-cases/regression/operator-verifyssn.json
 TESTS+=test/test-cases/regression/request-body-parser-json.json
