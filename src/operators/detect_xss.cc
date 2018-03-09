@@ -25,22 +25,33 @@ namespace modsecurity {
 namespace operators {
 
 
-bool DetectXSS::evaluate(Transaction *transaction, const std::string &input) {
+bool DetectXSS::evaluate(Transaction *t, Rule *rule,
+    const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     int is_xss;
 
     is_xss = libinjection_xss(input.c_str(), input.length());
 
-    if (transaction) {
-#ifndef NO_LOGS
+    if (t) {
         if (is_xss) {
-            transaction->debug(5, "detected XSS using libinjection.");
-        } else {
-            transaction->debug(9, "libinjection was not able to " \
-                "find any XSS in: " + input);
-        }
+#ifndef NO_LOGS
+            t->debug(5, "detected XSS using libinjection.");
 #endif
+            if (rule && t
+                && rule->getActionsByName("capture").size() > 0) {
+                t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                    "0", std::string(input));
+#ifndef NO_LOGS
+                t->debug(7, "Added DetectXSS match TX.0: " + \
+                    std::string(input));
+#endif
+            } 
+        } else {
+#ifndef NO_LOGS
+            t->debug(9, "libinjection was not able to " \
+            "find any XSS in: " + input);
+#endif
+            }
     }
-
     return is_xss != 0;
 }
 
