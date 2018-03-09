@@ -75,7 +75,9 @@ class Rbl : public Operator {
                 m_provider = RblProvider::httpbl;
             }
         }
-    bool evaluate(Transaction *transaction, const std::string  &str) override;
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string& input,
+        std::shared_ptr<RuleMessage> ruleMessage) override;
 
     std::string mapIpToAddress(std::string ipStr, Transaction *trans);
 

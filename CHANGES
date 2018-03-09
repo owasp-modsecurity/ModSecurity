@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Adds capture action to rbl
+   [Issue #1698 - @zimmerle]
  - Adds capture action to verifyCC
    [Issue #1698 - @michaelgranzow-avi, @zimmerle]
  - Adds capture action to verifySSN

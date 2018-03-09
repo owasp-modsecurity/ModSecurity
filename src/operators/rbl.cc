@@ -196,9 +196,11 @@ void Rbl::furtherInfo(struct sockaddr_in *sin, std::string ipStr,
 }
 
 
-bool Rbl::evaluate(Transaction *transaction, const std::string &ipStr) {
+bool Rbl::evaluate(Transaction *t, Rule *rule,
+        const std::string& ipStr,
+        std::shared_ptr<RuleMessage> ruleMessage) {
     struct addrinfo *info = NULL;
-    std::string host = mapIpToAddress(ipStr, transaction);
+    std::string host = mapIpToAddress(ipStr, t);
     int rc = 0;
 
     if (host.empty()) {
@@ -211,15 +213,24 @@ bool Rbl::evaluate(Transaction *transaction, const std::string &ipStr) {
         if (info != NULL) {
             freeaddrinfo(info);
         }
-        debug(transaction, 5, "RBL lookup of " + ipStr + " failed.");
+        debug(t, 5, "RBL lookup of " + ipStr + " failed.");
         return false;
     }
 
     struct sockaddr *addr = info->ai_addr;
     struct sockaddr_in *sin = (struct sockaddr_in *) addr;
-    furtherInfo(sin, ipStr, transaction);
+    furtherInfo(sin, ipStr, t);
 
     freeaddrinfo(info);
+    if (rule && t
+        && rule->getActionsByName("capture").size() > 0) {
+        t->m_collections.m_tx_collection->storeOrUpdateFirst(
+        "0", std::string(ipStr));
+#ifndef NO_LOGS
+        t->debug(7, "Added RXL match TX.0: " + \
+            std::string(ipStr));
+#endif
+    }
 
     return true;
 }
