@@ -25,25 +25,35 @@ namespace modsecurity {
 namespace operators {
 
 
-bool DetectSQLi::evaluate(Transaction *transaction, const std::string &input) {
+bool DetectSQLi::evaluate(Transaction *t, Rule *rule,
+    const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     char fingerprint[8];
     int issqli;
 
     issqli = libinjection_sqli(input.c_str(), input.length(), fingerprint);
 
     if (issqli) {
-        if (transaction) {
-            transaction->m_matched.push_back(fingerprint);
+        if (t) {
+            t->m_matched.push_back(fingerprint);
 #ifndef NO_LOGS
-            transaction->debug(4, "detected SQLi using libinjection with " \
+            t->debug(4, "detected SQLi using libinjection with " \
                 "fingerprint '" + std::string(fingerprint) + "' at: '" +
                 input + "'");
 #endif
+            if (rule && t
+                && rule->getActionsByName("capture").size() > 0) {
+                t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                    "0", std::string(fingerprint));
+#ifndef NO_LOGS
+                t->debug(7, "Added DetectSQLi match TX.0: " + \
+                    std::string(fingerprint));
+#endif
+                }
         }
     } else {
-        if (transaction) {
+        if (t) {
 #ifndef NO_LOGS
-            transaction->debug(9, "detected SQLi: not able to find an " \
+            t->debug(9, "detected SQLi: not able to find an " \
                 "inject on '" + input + "'");
 #endif
         }
