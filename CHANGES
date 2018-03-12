@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Adds capture action to detectXSS
+   [Issue #1698 - @victorhora]
  - Adds capture action to detectSQLi
    [Issue #1698 - @zimmerle]
  - Adds capture action to rbl
