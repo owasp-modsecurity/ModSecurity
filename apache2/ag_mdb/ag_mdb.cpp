@@ -127,7 +127,7 @@ int Lock_destroy(struct agmdb_lock *db_lock) {
     if (AGMDB_isError(rc))
         return rc;
 #ifndef _WIN32
-    if (db_lock->sem_id = -1)
+    if (db_lock->sem_id == -1)
         return AGMDB_SUCCESS;
     rc = semctl(db_lock->sem_id, 0, IPC_RMID);
     if (rc == -1)
@@ -1175,7 +1175,7 @@ int AGMDB_closeDB(struct agmdb_handler *dbm) {
 */
 int AGMDB_cleanDB(struct agmdb_handler *dbm) {
     PTR_VOID shm_base;
-    if (dbm == NULL)
+    if (dbm == NULL || dbm->shm_base == NULL)
         return AGMDB_ERROR_HANDLE_NULL;
     shm_base = (PTR_VOID)(dbm->shm_base);
 
