@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 #include"ag_mdb_external.h"
 #include"ag_mdb_internal.h"
 

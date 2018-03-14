@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 #ifndef _AG_MDB_INTERNAL_HEADER
 #define _AG_MDB_INTERNAL_HEADER
 
