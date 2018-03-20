@@ -16,7 +16,7 @@
 
 #ifdef WITH_YAJL
 
-char *base_offset=NULL;
+const char *base_offset=NULL;
 
 int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
 {
