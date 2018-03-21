@@ -19,7 +19,7 @@
         "Content-Length": "27",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/whee?res=0",
+      "uri":"/whee?res=1",
       "method":"GET",
       "body": [ ]
     },
@@ -57,7 +57,7 @@
         "Content-Length": "27",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/whee?res=1",
+      "uri":"/whee?res=0",
       "method":"GET",
       "body": [ ]
     },
@@ -106,7 +106,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Rule returned 0."
+      "debug_log":"Rule returned 1."
     },
     "rules":[
       "SecRuleEngine On",
