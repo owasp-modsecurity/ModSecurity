@@ -73,10 +73,11 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
         pclose(in);
 
         res.append(s.str());
-        if (res.size() > 1 && res.at(0) == '1') {
-            return true;
+        if (res.size() > 1 && res.at(0) != '1') {
+            return true; /* match */
         }
 
+        /* no match */
         return false;
     }
 }
