@@ -12,6 +12,7 @@ simple_request_LDADD = \
 	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(LMDB_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
@@ -22,6 +23,7 @@ simple_request_LDFLAGS = \
 	$(LMDB_LDFLAGS) \
 	-lpthread \
 	$(LUA_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 

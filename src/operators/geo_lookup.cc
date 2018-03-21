@@ -15,7 +15,11 @@
 
 #include "src/operators/geo_lookup.h"
 
-#ifdef WITH_GEOIP
+#if WITH_MAXMIND
+#include <maxminddb.h>
+#endif
+
+#if WITH_GEOIP
 #include <GeoIPCity.h>
 #endif
 
@@ -35,65 +39,13 @@ bool GeoLookup::evaluate(Transaction *trans, const std::string &exp) {
     using std::placeholders::_2;
     bool ret = true;
 
-#ifdef WITH_GEOIP
-    GeoIPRecord *gir;
-
     if (trans) {
-        ret = Utils::GeoLookup::getInstance().lookup(exp, &gir,
+        ret = Utils::GeoLookup::getInstance().lookup(exp, trans,
             std::bind(&GeoLookup::debug, this, trans, _1, _2));
     } else {
-        ret = Utils::GeoLookup::getInstance().lookup(exp, &gir,
+        ret = Utils::GeoLookup::getInstance().lookup(exp, NULL,
             nullptr);
     }
-    if (ret && gir) {
-        if (gir->country_code) {
-            trans->m_variableGeo.set("COUNTRY_CODE",
-                std::string(gir->country_code), 0);
-        }
-        if (gir->country_code3) {
-            trans->m_variableGeo.set("COUNTRY_CODE3",
-                std::string(gir->country_code3), 0);
-        }
-        if (gir->country_name) {
-            trans->m_variableGeo.set("COUNTRY_NAME",
-                std::string(gir->country_name), 0);
-        }
-        if (gir->continent_code) {
-            trans->m_variableGeo.set("COUNTRY_CONTINENT",
-                std::string(gir->continent_code), 0);
-        }
-        if (gir->country_code && gir->region) {
-            trans->m_variableGeo.set("REGION",
-                std::string(GeoIP_region_name_by_code(gir->country_code,
-                    gir->region)), 0);
-        }
-        if (gir->city) {
-            trans->m_variableGeo.set("CITY", std::string(gir->city), 0);
-        }
-        if (gir->postal_code) {
-            trans->m_variableGeo.set("POSTAL_CODE",
-                std::string(gir->postal_code), 0);
-        }
-        if (gir->latitude) {
-            trans->m_variableGeo.set("LATITUDE",
-                std::to_string(gir->latitude), 0);
-        }
-        if (gir->longitude) {
-            trans->m_variableGeo.set("LONGITUDE",
-                std::to_string(gir->longitude), 0);
-        }
-        if (gir->metro_code) {
-            trans->m_variableGeo.set("DMA_CODE",
-                std::to_string(gir->metro_code), 0);
-        }
-        if (gir->area_code) {
-            trans->m_variableGeo.set("AREA_CODE",
-                std::to_string(gir->area_code), 0);
-        }
-
-        GeoIPRecord_delete(gir);
-    }
-#endif  // WITH_GEOIP
 
     return ret;
 }

@@ -426,9 +426,18 @@ int main(int argc, char **argv) {
     int test_number = 0;
 #endif
 
-#ifdef WITH_GEOIP
+#if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
+    resources.push_back("geoip-or-maxmind");
+#endif
+
+#if defined(WITH_MAXMIND)
+    resources.push_back("maxmind");
+#endif
+
+#if defined(WITH_GEOIP)
     resources.push_back("geoip");
 #endif
+
 #ifdef WITH_CURL
     resources.push_back("curl");
 #endif

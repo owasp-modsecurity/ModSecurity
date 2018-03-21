@@ -20,6 +20,7 @@ afl_fuzzer_LDADD = \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
+	$(MAXMIND_LDFLAGS) $(MAXMIND_LDADD) \
 	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
 	$(LUA_LDFLAGS) $(LUA_LDADD) \
 	$(LIBXML2_LDADD) \
@@ -37,6 +38,7 @@ afl_fuzzer_CPPFLAGS = \
 	-g \
 	-I$(top_builddir)/headers \
 	$(GEOIP_CFLAGS) \
+	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(YAJL_CFLAGS) \

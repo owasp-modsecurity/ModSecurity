@@ -304,6 +304,7 @@ libmodsecurity_la_CPPFLAGS = \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(SSDEEP_CFLAGS) \
+	$(MAXMIND_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
@@ -318,6 +319,7 @@ libmodsecurity_la_LDFLAGS = \
 	$(LUA_LDFLAGS) \
 	$(PCRE_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(YAJL_LDFLAGS) \
 	-version-info @MSC_VERSION_INFO@
 
@@ -332,6 +334,7 @@ libmodsecurity_la_LIBADD = \
 	../others/libinjection.la \
 	../others/libmbedtls.la \
 	$(PCRE_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(SSDEEP_LDADD) \
 	$(YAJL_LDADD)
 

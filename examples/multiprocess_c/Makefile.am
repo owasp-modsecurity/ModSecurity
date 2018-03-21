@@ -8,6 +8,7 @@ multi_SOURCES = \
 multi_LDADD = \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD)
 
 multi_LDFLAGS = \
@@ -19,6 +20,7 @@ multi_LDFLAGS = \
 	-lstdc++ \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 
 multi_CFLAGS = \

@@ -9,6 +9,7 @@ simple_request_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(LMDB_LDADD) \
@@ -19,6 +20,7 @@ simple_request_LDADD = \
 
 simple_request_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	-lpthread \
 	$(LUA_LDFLAGS) \
@@ -35,6 +37,7 @@ simple_request_CPPFLAGS = \
 	-fPIC \
 	-O3 \
 	$(GEOIP_CFLAGS) \
+	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(YAJL_CFLAGS) \

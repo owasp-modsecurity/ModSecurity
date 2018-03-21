@@ -9,6 +9,7 @@ modsec_rules_check_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(LMDB_LDADD) \
@@ -19,6 +20,7 @@ modsec_rules_check_LDADD = \
 
 modsec_rules_check_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
@@ -31,6 +33,7 @@ modsec_rules_check_CPPFLAGS = \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(LMDB_CFLAGS) \
+	$(MAXMIND_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
 MAINTAINERCLEANFILES = \

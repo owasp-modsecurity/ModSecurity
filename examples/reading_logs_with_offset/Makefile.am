@@ -9,6 +9,7 @@ read_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(LMDB_LDADD) \
@@ -22,6 +23,7 @@ read_LDFLAGS = \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 
 read_CPPFLAGS = \
@@ -34,6 +36,7 @@ read_CPPFLAGS = \
 	-fPIC \
 	-O3 \
 	$(GEOIP_CFLAGS) \
+	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(YAJL_CFLAGS) \

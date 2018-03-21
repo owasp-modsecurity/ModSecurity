@@ -1557,10 +1557,10 @@ expression:
             driver.error(@0, ss.str());
             YYERROR;
         }
-        if (GeoLookup::getInstance().setDataBase(file) == false) {
+        if (GeoLookup::getInstance().setDataBase(file, &err) == false) {
             std::stringstream ss;
             ss << "Failed to load the GeoDB from: ";
-            ss << file;
+            ss << file << ". " << err;
             driver.error(@0, ss.str());
             YYERROR;
         }

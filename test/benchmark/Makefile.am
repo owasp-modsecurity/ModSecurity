@@ -9,6 +9,7 @@ benchmark_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(PCRE_LDADD) \
 	$(YAJL_LDADD) \
 	$(LMDB_LDADD) \
@@ -20,6 +21,7 @@ benchmark_LDADD = \
 benchmark_LDFLAGS = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(GEOIP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(YAJL_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \

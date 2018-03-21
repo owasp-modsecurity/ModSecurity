@@ -81,6 +81,10 @@ AM_CONDITIONAL([YAJL_VERSION], [test "$YAJL_VERSION" != ""])
 PROG_GEOIP
 AM_CONDITIONAL([GEOIP_CFLAGS], [test "GEOIP_CFLAGS" != ""])
 
+# Check for MaxMind
+PROG_MAXMIND
+AM_CONDITIONAL([MAXMIND_CFLAGS], [test "MAXMIND_CFLAGS" != ""])
+
 
 # Check for LMDB
 PROG_LMDB
@@ -404,21 +408,26 @@ echo SECLANG_TEST_VERSION
 echo " "
 echo " Optional dependencies"
 
-## GeoIP
-if test "x$GEOIP_FOUND" = "x0"; then
-    echo "   + GeoIP                                         ....not found"
+
+
+## GeoIP - MaxMind
+if test "x$GEOIP_FOUND" = "x0" && test "x$MAXMIND_FOUND" = "x0"; then
+    echo "   + GeoIP/MaxMind                                 ....not found"
 fi
-if test "x$GEOIP_FOUND" = "x1"; then
-    echo -n "   + GeoIP                                         ....found "
-    if ! test "x$GEOIP_VERSION" = "x"; then
-        echo "v${GEOIP_VERSION}"
-    else
-        echo ""
+if test "x$GEOIP_FOUND" = "x1" || test "x$MAXMIND_FOUND" = "x1"; then
+    echo -n "   + GeoIP/MaxMind                                 ....found "
+    echo ""
+    if test "x$MAXMIND_FOUND" = "x1"; then
+        echo "      * (MaxMind) v${MAXMIND_VERSION}"
+        echo "         ${MAXMIND_DISPLAY}"
     fi
-    echo "      ${GEOIP_DISPLAY}"
+    if test "x$GEOIP_FOUND" = "x1"; then
+        echo "      * (GeoIP) v${GEOIP_VERSION}"
+        echo "         ${GEOIP_DISPLAY}"
+    fi
 fi
-if test "x$GEOIP_FOUND" = "x2"; then
-    echo "   + GeoIP                                         ....disabled"
+if test "x$GEOIP_FOUND" = "x2" && test "x$MAXMIND_FOUND" = "x2"; then
+    echo "   + GeoIP/MaxMind                                 ....disabled"
 fi
 
 

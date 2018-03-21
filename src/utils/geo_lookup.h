@@ -18,7 +18,10 @@
 #include <string>
 #include <functional>
 
-#ifdef WITH_GEOIP  // WITH_GEOIP
+#if WITH_MAXMIND
+#include <maxminddb.h>
+#endif
+#if WITH_GEOIP
 #include <GeoIPCity.h>
 #endif
 
@@ -30,6 +33,11 @@
 namespace modsecurity {
 namespace Utils {
 
+enum GeoLookupVersion {
+    NOT_LOADED,
+    VERSION_MAXMIND,
+    VERSION_GEOIP,
+};
 
 class GeoLookup {
  public:
@@ -37,24 +45,31 @@ class GeoLookup {
         static GeoLookup instance;
         return instance;
     }
-#ifdef WITH_GEOIP
-    bool setDataBase(const std::string& filePath);
-    bool lookup(const std::string& target, GeoIPRecord **georec,
-        std::function<bool(int, std::string)> callback);
+
+    bool setDataBase(const std::string& filePath, std::string *err);
     void cleanUp();
-#endif  // WITH_GEOIP
+
+    bool lookup(const std::string& target, Transaction *t,
+        std::function<bool(int, std::string)> callback);
 
  private:
-    GeoLookup()
-        : m_gi(NULL) { }
+    GeoLookup() :
+#if WITH_GEOIP
+        m_gi(NULL),
+#endif
+        m_version(NOT_LOADED) { }
     ~GeoLookup();
     GeoLookup(GeoLookup const&);
     void operator=(GeoLookup const&);
-#ifdef WITH_GEOIP
+
+    GeoLookupVersion m_version;
+#if WITH_MAXMIND
+    MMDB_s mmdb;
+#endif
+#if WITH_GEOIP
     GeoIP *m_gi;
-#else  // WITH_GEOIP
-    void *m_gi;
-#endif  // WITH_GEOIP
+#endif
+
 };
 
 

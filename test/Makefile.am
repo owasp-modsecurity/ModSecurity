@@ -43,6 +43,7 @@ unit_tests_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(LMDB_LDADD) \
@@ -54,6 +55,7 @@ unit_tests_LDADD = \
 
 unit_tests_LDFLAG = \
 	$(GEOIP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
@@ -70,6 +72,7 @@ unit_tests_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
+	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
@@ -91,6 +94,7 @@ regression_tests_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(LMDB_LDADD) \
@@ -102,6 +106,7 @@ regression_tests_LDADD = \
 
 regression_tests_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(YAJL_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
@@ -118,6 +123,7 @@ regression_tests_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
+	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(LUA_CFLAGS) \
@@ -138,6 +144,7 @@ rules_optimization_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(LMDB_LDADD) \
@@ -148,6 +155,7 @@ rules_optimization_LDADD = \
 
 rules_optimization_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
+	$(MAXMIND_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
@@ -163,6 +171,7 @@ rules_optimization_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
+	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(LUA_CFLAGS) \
