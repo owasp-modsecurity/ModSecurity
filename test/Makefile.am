@@ -21,7 +21,9 @@ bin_PROGRAMS =
 noinst_PROGRAMS =
 
 EXTRA_DIST = \
-	test-cases/*
+	test-cases/* \
+	custom-test-driver \
+	test-suite.sh
 
 
 # unit_tests
