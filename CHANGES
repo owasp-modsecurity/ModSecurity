@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Fix: Reverse logic of checking output in @inspectFile
+   [Issue #1715 - @defanator]
  - Adds support to libMaxMind
    [Issue #1307 - @zimmerle]
  - Adds capture action to detectXSS
