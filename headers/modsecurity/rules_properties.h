@@ -328,26 +328,31 @@ class RulesProperties {
 
         if (from->m_uploadDirectory.m_set == true) {
             to->m_uploadDirectory.m_value = from->m_uploadDirectory.m_value;
+            to->m_uploadDirectory.m_set = true;
         }
 
         if (from->m_uploadTmpDirectory.m_set == true) {
             to->m_uploadTmpDirectory.m_value = \
                 from->m_uploadTmpDirectory.m_value;
+            to->m_uploadTmpDirectory.m_set = true;
         }
 
         if (from->m_secArgumentSeparator.m_set == true) {
             to->m_secArgumentSeparator.m_value = \
                 from->m_secArgumentSeparator.m_value;
+            to->m_secArgumentSeparator.m_set = true;
         }
 
         if (from->m_secWebAppId.m_set == true) {
             to->m_secWebAppId.m_value = \
                 from->m_secWebAppId.m_value;
+            to->m_secWebAppId.m_set = true;
         }
 
         if (from->m_unicodeMapTable.m_set == true) {
             to->m_unicodeMapTable.m_unicode_map_table = \
                 from->m_unicodeMapTable.m_unicode_map_table;
+            to->m_unicodeMapTable.m_set = true;
         }
 
         if (from->m_httpblKey.m_set == true) {
