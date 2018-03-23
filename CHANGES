@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Adds support to libMaxMind
+   [Issue #1307 - @zimmerle]
  - Adds capture action to detectXSS
    [Issue #1698 - @victorhora]
  - Temporarily accept invalid MULTIPART_SEMICOLON_MISSING operator
