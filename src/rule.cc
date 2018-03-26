@@ -766,7 +766,7 @@ bool Rule::evaluate(Transaction *trans,
         }
 #ifndef NO_LOGS
         trans->debug(9, "Rule id: " + std::to_string(m_ruleId) +
-            " was skipped due to an ruleRemoveById action...");
+            " was skipped due to a ruleRemoveById action...");
 #endif
         return true;
     }

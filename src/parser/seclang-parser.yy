@@ -29,6 +29,7 @@ class Driver;
 #include "src/actions/ctl/request_body_processor_json.h"
 #include "src/actions/ctl/request_body_processor_xml.h"
 #include "src/actions/ctl/rule_remove_by_id.h"
+#include "src/actions/ctl/rule_remove_by_tag.h"
 #include "src/actions/ctl/rule_remove_target_by_id.h"
 #include "src/actions/ctl/rule_remove_target_by_tag.h"
 #include "src/actions/data/status.h"
@@ -524,6 +525,7 @@ using modsecurity::operators::Operator;
   ACTION_CTL_FORCE_REQ_BODY_VAR                "ACTION_CTL_FORCE_REQ_BODY_VAR"
   ACTION_CTL_REQUEST_BODY_ACCESS               "ACTION_CTL_REQUEST_BODY_ACCESS"
   ACTION_CTL_RULE_REMOVE_BY_ID                 "ACTION_CTL_RULE_REMOVE_BY_ID"
+  ACTION_CTL_RULE_REMOVE_BY_TAG                "ACTION_CTL_RULE_REMOVE_BY_TAG"
   ACTION_CTL_RULE_REMOVE_TARGET_BY_ID          "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
   ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG         "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
   ACTION_DENY                                  "Deny"
@@ -2576,6 +2578,10 @@ act:
     | ACTION_CTL_RULE_REMOVE_BY_ID
       {
         ACTION_CONTAINER($$, new actions::ctl::RuleRemoveById($1));
+      }
+    | ACTION_CTL_RULE_REMOVE_BY_TAG
+      {
+        ACTION_CONTAINER($$, new actions::ctl::RuleRemoveByTag($1));
       }
     | ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
       {

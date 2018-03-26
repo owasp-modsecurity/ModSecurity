@@ -441,6 +441,11 @@ class Transaction : public TransactionAnchoredVariables {
     /**
      *
      */
+    std::list<std::string> m_ruleRemoveByTag;
+
+    /**
+     *
+     */
     std::list< std::pair<std::string, std::string> > m_ruleRemoveTargetByTag;
 
     /**

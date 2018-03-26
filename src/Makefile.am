@@ -115,6 +115,7 @@ ACTIONS = \
 	actions/ctl/rule_remove_target_by_tag.cc \
 	actions/ctl/rule_remove_target_by_id.cc \
 	actions/ctl/rule_remove_by_id.cc \
+	actions/ctl/rule_remove_by_tag.cc \
 	actions/ctl/request_body_access.cc\
 	actions/disruptive/allow.cc \
 	actions/disruptive/block.cc \

@@ -91,6 +91,7 @@ ACTION_CTL_BDY_XML                              (?i:ctl:requestBodyProcessor=XML
 ACTION_CTL_FORCE_REQ_BODY_VAR                   (?i:ctl:forceRequestBodyVariable)
 ACTION_CTL_REQUEST_BODY_ACCESS                  (?i:ctl:requestBodyAccess)
 ACTION_CTL_RULE_ENGINE                          (?i:ctl:ruleEngine)
+ACTION_CTL_RULE_REMOVE_BY_TAG                   (?i:ctl:ruleRemoveByTag)
 ACTION_CTL_RULE_REMOVE_BY_ID                    (?i:ctl:ruleRemoveById)
 ACTION_CTL_RULE_REMOVE_TARGET_BY_ID             (?i:ctl:ruleRemoveTargetById)
 ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG            (?i:ctl:ruleRemoveTargetByTag)
@@ -526,6 +527,7 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_CTL_REQUEST_BODY_ACCESS}=                                       { return p::make_ACTION_CTL_REQUEST_BODY_ACCESS(yytext, *driver.loc.back()); }
 {ACTION_CTL_RULE_ENGINE}=                                               { return p::make_ACTION_CTL_RULE_ENGINE(*driver.loc.back()); }
 {ACTION_CTL_RULE_REMOVE_BY_ID}[=]{REMOVE_RULE_BY}                       { return p::make_ACTION_CTL_RULE_REMOVE_BY_ID(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_BY_TAG}[=]{REMOVE_RULE_BY}                       { return p::make_ACTION_CTL_RULE_REMOVE_BY_TAG(yytext, *driver.loc.back()); }
 {ACTION_CTL_RULE_REMOVE_TARGET_BY_ID}[=]{REMOVE_RULE_BY}                { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID(yytext, *driver.loc.back()); }
 {ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{REMOVE_RULE_BY}               { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
 {ACTION_EXEC}:'{VAR_FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_EXEC(yytext, *driver.loc.back()); }

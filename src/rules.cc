@@ -234,6 +234,16 @@ int Rules::evaluate(int phase, Transaction *transaction) {
                 }
             }
 
+            for (auto &z : transaction->m_ruleRemoveByTag) {
+                if (rule->containsTag(z, transaction) == true) {
+                    debug(9, "Skipped rule id '" \
+                        + std::to_string(rule->m_ruleId) \
+                        + "'. Skipped due to a ruleRemoveByTag action.");
+                    remove_rule = true;
+                    break;
+                }
+            }
+
             rule->evaluate(transaction, NULL);
             if (transaction->m_it.disruptive == true) {
                 debug(8, "Skipping this phase as this " \

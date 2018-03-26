@@ -1,6 +1,8 @@
 v3.0.x - YYYY-MMM-DD (To be released)
 -------------------------------------
 
+ - Adds support for ctl:ruleRemoveById
+   [@zimmerle]
  - Fix SecUploadDir configuration merge
    [Issue #1720 - @zimmerle, @gjvanetten]
  - Include all prerequisites for "make check" into dist archive
