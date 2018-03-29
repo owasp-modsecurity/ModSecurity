@@ -10,7 +10,7 @@ v3.0.x - YYYY-MMM-DD (To be released)
  - Fix: Reverse logic of checking output in @inspectFile
    [Issue #1715 - @defanator]
  - Adds support to libMaxMind
-   [Issue #1307 - @zimmerle]
+   [Issue #1307 - @zimmerle, @defanator]
  - Adds capture action to detectXSS
    [Issue #1698 - @victorhora]
  - Temporarily accept invalid MULTIPART_SEMICOLON_MISSING operator

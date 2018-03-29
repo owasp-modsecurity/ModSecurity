@@ -47,7 +47,7 @@
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:COUNTRY_NAME [maxmind]",
     "client":{  
-      "ip":"64.17.254.216",
+      "ip":"200.249.12.31",
       "port":123
     },
     "server":{  
@@ -74,11 +74,11 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"United States\" \\(Variable: GEO:COUNTRY_NAME\\)"
+      "debug_log":"Target value: \"Brazil\" \\(Variable: GEO:COUNTRY_NAME\\)"
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecGeoLookupDb test-cases\/data\/geo\/GeoLite2-City.mmdb",
+      "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
@@ -509,7 +509,7 @@
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:COUNTRY_NAME [maxmind]",
     "client":{  
-      "ip":"64.17.254.216",
+      "ip":"200.249.12.31",
       "port":123
     },
     "server":{  
@@ -536,11 +536,11 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"United States\" \\(Variable: GEO:COUNTRY_NAME\\)"
+      "debug_log":"Target value: \"Brazil\" \\(Variable: GEO:COUNTRY_NAME\\)"
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecGeoLookupDb test-cases\/data\/geo\/GeoLite2-City.mmdb",
+      "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
@@ -551,7 +551,7 @@
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:LATITUDE [maxmind]",
     "client":{  
-      "ip":"64.17.254.216",
+      "ip":"200.249.12.31",
       "port":123
     },
     "server":{  
@@ -578,11 +578,11 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"41.517100\" \\(Variable: GEO:LATITUDE\\)"
+      "debug_log":"Target value: \"-8.051502\" \\(Variable: GEO:LATITUDE\\)"
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecGeoLookupDb test-cases\/data\/geo\/GeoLite2-City.mmdb",
+      "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
@@ -593,7 +593,7 @@
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:COUNTRY_CODE [maxmind]",
     "client":{  
-      "ip":"64.17.254.216",
+      "ip":"200.249.12.31",
       "port":123
     },
     "server":{  
@@ -620,11 +620,11 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"US\" \\(Variable: GEO:COUNTRY_CODE\\)"
+      "debug_log":"Target value: \"BR\" \\(Variable: GEO:COUNTRY_CODE\\)"
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecGeoLookupDb test-cases\/data\/geo\/GeoLite2-City.mmdb",
+      "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
@@ -635,7 +635,7 @@
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:COUNTRY_CONTINENT [maxmind]",
     "client":{  
-      "ip":"64.17.254.216",
+      "ip":"200.249.12.31",
       "port":123
     },
     "server":{ 
@@ -662,11 +662,11 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"North America\" \\(Variable: GEO:COUNTRY_CONTINENT\\)"
+      "debug_log":"Target value: \"South America\" \\(Variable: GEO:COUNTRY_CONTINENT\\)"
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecGeoLookupDb test-cases\/data\/geo\/GeoLite2-City.mmdb",
+      "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
@@ -677,7 +677,7 @@
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:POSTAL_CODE [maxmind]",
     "client":{  
-      "ip":"64.17.254.216",
+      "ip":"200.249.12.31",
       "port":123
     },
     "server":{ 
@@ -704,11 +704,11 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"02842\" \\(Variable: GEO:POSTAL_CODE\\)"
+      "debug_log":"Target value: \"50040090\" \\(Variable: GEO:POSTAL_CODE\\)"
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecGeoLookupDb test-cases\/data\/geo\/GeoLite2-City.mmdb",
+      "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
@@ -719,7 +719,7 @@
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:CITY [maxmind]",
     "client":{  
-      "ip":"64.17.254.216",
+      "ip":"200.249.12.31",
       "port":123
     },
     "server":{ 
@@ -746,11 +746,11 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"Middletown\" \\(Variable: GEO:CITY\\)"
+      "debug_log":"Target value: \"Recife\" \\(Variable: GEO:CITY\\)"
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecGeoLookupDb test-cases\/data\/geo\/GeoLite2-City.mmdb",
+      "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
