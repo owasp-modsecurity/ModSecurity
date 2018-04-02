@@ -1,5 +1,5 @@
-v3.0.x - YYYY-MMM-DD (To be released)
--------------------------------------
+v3.0.1 - 2018-Apr-02
+--------------------
 
  - Adds support for ctl:ruleRemoveByTag
    [@zimmerle, @weliu]

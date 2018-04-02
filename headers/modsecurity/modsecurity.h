@@ -190,7 +190,7 @@ namespace modsecurity {
 
 #define MODSECURITY_MAJOR "3"
 #define MODSECURITY_MINOR "0"
-#define MODSECURITY_PATCHLEVEL "0"
+#define MODSECURITY_PATCHLEVEL "1"
 #define MODSECURITY_TAG ""
 #define MODSECURITY_TAG_NUM "100"
 
