@@ -2,7 +2,7 @@ v3.0.2 - YYYY-MMM-DD
 --------------------
 
  - Fix lib version information while generating the .so file
-   [ ? ]
+   [@gl1f1v21, @zimmerle]
 
 v3.0.1 - 2018-Apr-02
 --------------------
