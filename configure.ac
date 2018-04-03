@@ -16,6 +16,9 @@ m4_define([msc_version_major], [MSC_MAJOR])
 m4_define([msc_version_minor], [MSC_MINOR])
 m4_define([msc_version_patchlevel], [MSC_PATCHLEVEL])
 
+m4_define([msc_version_c_plus_a], [m4_eval(msc_version_major + msc_version_minor)])
+
+
 m4_define([msc_version],
     [msc_version_major.msc_version_minor])
 
@@ -23,7 +26,7 @@ m4_define([msc_version_git],
     [m4_esyscmd_s(git describe)])
 
 m4_define([msc_version_info],
-    [msc_version_major:msc_version_minor:msc_version_patchlevel])
+    [msc_version_c_plus_a:msc_version_patchlevel:msc_version_minor])
 
 
 # Project Information
