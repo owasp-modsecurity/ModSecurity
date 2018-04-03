@@ -1,4 +1,4 @@
-v3.0.2 - YYYY-MMM-DD
+v3.0.2 - 2018-Apr-03
 --------------------
 
  - Fix lib version information while generating the .so file
