@@ -48,7 +48,9 @@ Collections::Collections(Collection *global,
     }
 
 
-Collections::~Collections() { }
+Collections::~Collections() {
+    delete m_tx_collection;
+}
 
 
 }  // namespace collection
