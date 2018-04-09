@@ -1,5 +1,8 @@
 cd "%WORK_DIR%"
 
+echo "%SOURCE_DIR%\%SSDEEP%"
+echo "%SOURCE_DIR%\%SSDEEP_BIN%"
+
 @if NOT EXIST "%SOURCE_DIR%\%SSDEEP%" goto build_failed
 
 @7z.exe x "%SOURCE_DIR%\%SSDEEP_BIN%"

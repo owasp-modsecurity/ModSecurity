@@ -1,3 +1,26 @@
+DD MMM YYYY - 2.9.3 - To be released
+------------------------------------
+
+ * Optionally preallocates memory when SecStreamInBodyInspection is on
+   [Issue #1366 - @allanbomsft, @zimmerle]
+ * Fixed typo in build_yajl.bat
+   [Issue #1366 - @allanbomsft]
+ * Fixes SecConnWriteStateLimit
+   [Issue #1545 - @nicjansma]
+ * Added "empy chunk" check
+   [Issue #1347, #1446 - @gravagli, @bostrt, @zimmerle]
+ * Add capture action to @detectXSS operator
+   [Issue #1488, #1482 - @victorhora]
+ * Fix for wildcard operator when loading conf files on Nginx / IIS
+   [Issue #1486, #1285 - @victorhora and @thierry-f-78]
+ * Set of fixies to make windows build workable with the buildbots
+   [Commit 94fe3 - @zimmerle]
+ * Uses LOG_NO_STOPWATCH instead of DLOG_NO_STOPWATCH
+   [Issue #1510 - @marcstern]
+ * Adds missing headers
+   [Issue #1454 - @devnexen]
+
+
 18 Jul 2017 - 2.9.2
 -------------------
 

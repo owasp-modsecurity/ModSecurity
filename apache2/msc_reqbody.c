@@ -396,12 +396,13 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 
     /* Check that we are not over the request body no files limit. */
     if (msr->msc_reqbody_no_files_length >= (unsigned long) msr->txcfg->reqbody_no_files_limit) {
-
         *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                 "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
         if (msr->txcfg->debuglog_level >= 1) {
             msr_log(msr, 1, "%s", *error_msg);
         }
+
+        msr->msc_reqbody_error = 1;
 
         if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))   {
             return -5;
@@ -410,7 +411,6 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 return -5;
         }
     }
-
 
     /* Store data. */
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
@@ -428,9 +428,59 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 }
 
 apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buffer, int buflen, char **error_msg) {
+#ifndef MSC_LARGE_STREAM_INPUT
+    char *stream_input_body = NULL;
+    char *data = NULL;
+    int first_pkt = 0;
+#else
     apr_size_t allocate_length = 0;
     char* allocated = NULL;
+#endif
 
+#ifndef MSC_LARGE_STREAM_INPUT
+    if(msr->stream_input_data == NULL)  {
+        msr->stream_input_data = (char *)calloc(sizeof(char), msr->stream_input_length + 1);
+        first_pkt = 1;
+    }
+    else    {
+
+        data = (char *)malloc(msr->stream_input_length + 1 - buflen);
+
+        if(data == NULL)
+            return -1;
+
+        memset(data, 0, msr->stream_input_length + 1 - buflen);
+        memcpy(data, msr->stream_input_data, msr->stream_input_length - buflen);
+
+        stream_input_body = (char *)realloc(msr->stream_input_data, msr->stream_input_length + 1);
+
+        msr->stream_input_data = (char *)stream_input_body;
+    }
+
+    if (msr->stream_input_data == NULL) {
+        if(data)    {
+            free(data);
+            data = NULL;
+        }
+        *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
+                msr->stream_input_length + 1);
+        return -1;
+    }
+
+    memset(msr->stream_input_data, 0, msr->stream_input_length+1);
+
+    if(first_pkt)   {
+        memcpy(msr->stream_input_data, buffer, msr->stream_input_length);
+    } else {
+        memcpy(msr->stream_input_data, data, msr->stream_input_length - buflen);
+        memcpy(msr->stream_input_data+(msr->stream_input_length - buflen), buffer, buflen);
+    }
+
+    if(data)    {
+        free(data);
+        data = NULL;
+    }
+#else
     if (msr->stream_input_data == NULL)  {
         // Is the request body length known beforehand? (requests that are not Transfer-Encoding: chunked)
         if (msr->request_content_length > 0) {
@@ -458,7 +508,6 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
     else {
         // Do we need to expand the space we have previously allocated?
         if ((msr->stream_input_length + buflen) > msr->stream_input_allocated_length) {
-
             // If this becomes a hotspot again, consider increasing by some percent extra each time, for fewer reallocs
             allocate_length = msr->stream_input_length + buflen;
 
@@ -480,10 +529,10 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
             }
         }
     }
-
     // Append buffer to msr->stream_input_data
     memcpy(msr->stream_input_data + msr->stream_input_length, buffer, buflen);
     msr->stream_input_length += buflen;
+#endif
 
     return 1;
 }
@@ -607,6 +656,19 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
     /* Note that we've read the body. */
     msr->msc_reqbody_read = 1;
 
+
+    /* Check that we are not over the request body no files limit. */
+    if (msr->msc_reqbody_no_files_length >= (unsigned long)msr->txcfg->reqbody_no_files_limit) {
+        *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
+            "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
+        if (msr->txcfg->debuglog_level >= 1) {
+            msr_log(msr, 1, "%s", *error_msg);
+        }
+
+        return -5;
+    }
+
+
     /* Finalise body processing. */
     if ((msr->msc_reqbody_processor != NULL) && (msr->msc_reqbody_error == 0)) {
         char *my_error_msg = NULL;
@@ -648,7 +710,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
         }
         else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
 #ifdef WITH_YAJL
-            if (json_complete(msr, &my_error_msg) < 0) {
+            if (json_complete(msr, &my_error_msg) < 0 && msr->msc_reqbody_length > 0) {
                 *error_msg = apr_psprintf(msr->mp, "JSON parser error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
