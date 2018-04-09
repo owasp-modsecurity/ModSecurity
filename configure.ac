@@ -567,9 +567,9 @@ AC_ARG_ENABLE(collection-global-lock,
 # Enable collection's memory database support
 AC_ARG_ENABLE(collection-memory-database,
               AS_HELP_STRING([--enable-collection-memory-database],
-                             [Enable memory database support for collection. This is enabled by default]),
+                             [Enable memory database support for collection.]),
 [
-  if test "$enableval" != "no"; then
+  if test "$enableval" = "yes"; then
     collection_memory_database="-I"`pwd`"/apache2/ag_mdb -DMEMORY_DATABASE_ENABLE"
     MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $collection_memory_database"
   else
