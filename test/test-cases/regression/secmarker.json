@@ -110,7 +110,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "Out of a SecMarker after skip 6.000000 rules.",
+      "debug_log": "Out of a SecMarker after skip 6 rules.",
       "error_log": ""
     },
     "rules": [

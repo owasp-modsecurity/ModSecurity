@@ -80,7 +80,7 @@ class Rules : public RulesProperties {
 
  private:
     int m_referenceCount;
-    double m_secmarker_skipped;
+    uint8_t m_secmarker_skipped;
 };
 
 #endif
