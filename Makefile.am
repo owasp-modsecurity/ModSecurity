@@ -141,6 +141,7 @@ TESTS+=test/test-cases/regression/misc.json
 TESTS+=test/test-cases/regression/misc-variable-under-quotes.json
 TESTS+=test/test-cases/regression/offset-variable.json
 TESTS+=test/test-cases/regression/operator-detectsqli.json
+TESTS+=test/test-cases/regression/operator-detectxss.json
 TESTS+=test/test-cases/regression/operator-fuzzyhash.json
 TESTS+=test/test-cases/regression/operator-inpectFile.json
 TESTS+=test/test-cases/regression/operator-ipMatchFromFile.json
