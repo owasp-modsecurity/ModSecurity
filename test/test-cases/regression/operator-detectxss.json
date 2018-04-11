@@ -36,7 +36,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Added DetectXSS match TX.0: f\\(f\\(f"
+      "debug_log":"Added DetectXSS match TX.0: <script>alert\(1\)</script"
     },
     "rules":[
       "SecRuleEngine On",
