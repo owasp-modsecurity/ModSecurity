@@ -452,6 +452,7 @@ using modsecurity::operators::Operator;
 
 
   VARIABLE_STATUS                              "VARIABLE_STATUS"
+  VARIABLE_STATUS_LINE                         "VARIABLE_STATUS_LINE"
   VARIABLE_IP                                  "VARIABLE_IP"
   VARIABLE_GLOBAL                              "VARIABLE_GLOBAL"
   VARIABLE_TX                                  "VARIABLE_TX"
@@ -2388,6 +2389,10 @@ var:
         VARIABLE_CONTAINER($$, new Variables::UserID());
       }
     | VARIABLE_STATUS
+      {
+        VARIABLE_CONTAINER($$, new Variables::Status());
+      }
+    | VARIABLE_STATUS_LINE
       {
         VARIABLE_CONTAINER($$, new Variables::Status());
       }
