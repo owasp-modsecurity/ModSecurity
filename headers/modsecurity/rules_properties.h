@@ -21,6 +21,7 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <unordered_set>
 #endif
 
 
@@ -440,7 +441,9 @@ class RulesProperties {
                 bool do_check = rule->m_secMarker == false;
 
                 if (do_check) {
-                    std::set<int64_t>::iterator it = to->m_ruleIds.find(rule->m_ruleId);
+                    std::unordered_set<int64_t>::iterator it =
+                        to->m_ruleIds.find(rule->m_ruleId);
+
                     if (it != to->m_ruleIds.end()) {
                         if (err != NULL) {
                             *err << "Rule id: " \
@@ -498,7 +501,7 @@ class RulesProperties {
     ConfigString m_secWebAppId;
     std::vector<actions::Action *> m_defaultActions[8];
     std::vector<modsecurity::Rule *> m_rules[8];
-    std::set<int64_t> m_ruleIds;
+    std::unordered_set<int64_t> m_ruleIds;
     ConfigUnicodeMap m_unicodeMapTable;
 };
 
