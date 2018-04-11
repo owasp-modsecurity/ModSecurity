@@ -252,7 +252,8 @@ VARIABLE_RULE                             (?i:RULE)
 VARIABLE_SESSION                          (?i:(SESSION))
 VARIABLE_IP                               (?i:(IP))
 VARIABLE_USER                             (?i:(USER))
-VARIABLE_STATUS                           (?i:(STATUS[^:]))
+VARIABLE_STATUS                           (?i:(STATUS))
+VARIABLE_STATUS_LINE                      (?i:(STATUS_LINE))
 VARIABLE_TX                               (?i:TX)
 VARIABLE_WEB_APP_ID                       (?i:WEBAPPID)
 RUN_TIME_VAR_BLD                          (?i:MODSEC_BUILD)
@@ -1005,6 +1006,7 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_RESOURCE}                         { return p::make_VARIABLE_RESOURCE(*driver.loc.back()); }
 {VARIABLE_SESSION}                          { return p::make_VARIABLE_SESSION(*driver.loc.back()); }
 {VARIABLE_STATUS}                           { return p::make_VARIABLE_STATUS(*driver.loc.back()); }
+{VARIABLE_STATUS_LINE}                      { return p::make_VARIABLE_STATUS_LINE(*driver.loc.back()); }
 {VARIABLE_TX}                               { return p::make_VARIABLE_TX(*driver.loc.back()); }
 {VARIABLE_USER}                             { return p::make_VARIABLE_USER(*driver.loc.back()); }
 }
