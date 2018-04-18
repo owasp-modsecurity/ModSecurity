@@ -2,6 +2,8 @@ pkglibdir = $(prefix)/lib
 pkglib_LTLIBRARIES = mod_security2.la
 
 mod_security2_la_SOURCES = acmp.c \
+    ag_mdb/murmur3.c \
+    ag_mdb/ag_mdb.cpp \
     apache2_config.c \
     apache2_io.c \
     apache2_util.c \

@@ -14,7 +14,29 @@
 
 #include "persist_dbm.h"
 #include "apr_sdbm.h"
+#ifdef MEMORY_DATABASE_ENABLE
+#include "ag_mdb_external.h"
+#endif
 
+#ifdef MEMORY_DATABASE_ENABLE
+void* dcfg_searchAGMDBhandler(const char* col_name, struct agmdb_handle_entry *handles){
+    struct agmdb_handle_entry *handle_entry = handles;
+    while(handle_entry != NULL){
+        if(strcmp(col_name, handle_entry->col_name) == 0)
+            break;
+        handle_entry = handle_entry->next;
+    }
+    if(handle_entry != NULL)
+        return handle_entry->handle;
+    else
+        return NULL;
+}
+
+void dcfg_insertAGMDBhandler(directory_config *root_dcfg, struct agmdb_handle_entry *new_handle){
+    new_handle->next = (struct agmdb_handle_entry *)root_dcfg->agmdb_handles;
+    root_dcfg->agmdb_handles = (void*)new_handle;
+}
+#endif
 /**
  *
  */
@@ -87,21 +109,32 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
 /**
  *
  */
-static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec *msr, const char *col_name,
-    const char *col_key, int col_key_len)
+static apr_table_t *collection_retrieve_ex(int db_option, void *existing_dbm, modsec_rec *msr, const char *col_name, const char *col_key, int col_key_len)
 {
-    char *dbm_filename = NULL;
-    apr_status_t rc;
+    apr_table_t *col = NULL;
     apr_sdbm_datum_t key;
     apr_sdbm_datum_t *value = NULL;
-    apr_sdbm_t *dbm = NULL;
-    apr_table_t *col = NULL;
     const apr_array_header_t *arr;
     apr_table_entry_t *te;
     int expired = 0;
     int i;
+    int rc;
+    int tmp_val_len = 0;
+#ifdef MEMORY_DATABASE_ENABLE
+    directory_config * root_dcfg;
 
+    //variables used for ag_dbm 
+    struct agmdb_handler *ag_dbm = NULL;
+    char buffer[AGMDB_MAX_ENTRY_SIZE];
+#endif
+    //variables used for apr_sdbm
+    struct apr_sdbm_t *apr_dbm = NULL;
+    char *dbm_filename = NULL;
 
+    //=================================
+    //function body
+    //=================================
+    
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "collection_retrieve_ex: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
             "SecDataDir to define data directory first.", log_escape(msr->mp, col_name),
@@ -109,72 +142,138 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         goto cleanup;
     }
 
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
-
+    //---------------------------------
+    //open database
+    //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
+    root_dcfg = msr->dcfg1->root_config;
+    if(db_option == DB_OPT_AGMDB){
+        if (existing_dbm == NULL) {
+            ag_dbm = dcfg_searchAGMDBhandler(col_name, (struct agmdb_handle_entry*)(root_dcfg->agmdb_handles));
+            if (ag_dbm == NULL) 
+                goto cleanup;            
+        }
+        else {
+            ag_dbm = (struct agmdb_handler *)existing_dbm;
+        }
+    }
+    else{
+#endif
+        if (msr->txcfg->data_dir == NULL) {
+            msr_log(msr, 1, "collection_retrieve_ex_origin: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
+                "SecDataDir to define data directory first.", log_escape(msr->mp, col_name),
+                log_escape_ex(msr->mp, col_key, col_key_len));
+            goto cleanup;
+        }
+        
+        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
+        
+        if (existing_dbm == NULL) {
+#ifdef GLOBAL_COLLECTION_LOCK
+            rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
+            if (rc != APR_SUCCESS) {
+                msr_log(msr, 1, "collection_retrieve_ex: Failed to lock proc mutex: %s",
+                        get_apr_error(msr->mp, rc));
+                goto cleanup;
+            }
+#endif
+            rc = apr_sdbm_open(&apr_dbm, dbm_filename, APR_READ | APR_SHARELOCK,
+                CREATEMODE, msr->mp);
+            if (rc != APR_SUCCESS) {
+                apr_dbm = NULL;
+#ifdef GLOBAL_COLLECTION_LOCK
+                apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+#endif
+                goto cleanup;
+            }
+        }
+        else {
+            apr_dbm = existing_dbm;
+        }
+#ifdef MEMORY_DATABASE_ENABLE
+    }
+#endif
+    
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "collection_retrieve_ex: collection_retrieve_ex: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
                 log_escape(msr->mp, dbm_filename));
     }
 
+    //---------------------------------
+    //prepare the key and value container
+    //---------------------------------
     key.dptr = (char *)col_key;
     key.dsize = col_key_len + 1;
 
-    if (existing_dbm == NULL) {
-#ifdef GLOBAL_COLLECTION_LOCK
-        rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "collection_retrieve_ex: Failed to lock proc mutex: %s",
-                    get_apr_error(msr->mp, rc));
+    value = (apr_sdbm_datum_t *)apr_pcalloc(msr->mp, sizeof(apr_sdbm_datum_t));
+
+    //---------------------------------
+    //get the key
+    //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
+    if(db_option == DB_OPT_AGMDB){
+        //if not called by collection_store(), need to get lock
+        if(existing_dbm == NULL ){
+            rc = AGMDB_getSharedLock(ag_dbm);
+            if(AGMDB_isError(rc)){
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to get shared lock. Error info: %s.", AGMDB_getErrorInfo(rc));
+                goto cleanup;
+            }
+        }
+        rc = AGMDB_get(ag_dbm, col_key, col_key_len, buffer, AGMDB_MAX_ENTRY_SIZE, &tmp_val_len);
+        if(AGMDB_isError(rc)) {
+            msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to read from database \"%s\": %s. Error info: %s.", log_escape(msr->mp,
+                col_name), col_key, AGMDB_getErrorInfo(rc));
             goto cleanup;
         }
+        
+        if(existing_dbm == NULL ){
+            rc = AGMDB_freeSharedLock(ag_dbm);
+            if(AGMDB_isError(rc)) {
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to free shared lock. Error info: %s.", AGMDB_getErrorInfo(rc));
+                goto cleanup;
+            }
+        }
+        if (tmp_val_len == 0) { /* Key not found in DBM file. */
+             goto cleanup;
+        }
+        value->dptr = buffer;
+        value->dsize = tmp_val_len;
+    }
+    else{
 #endif
-        rc = apr_sdbm_open(&dbm, dbm_filename, APR_READ | APR_SHARELOCK,
-            CREATEMODE, msr->mp);
+        rc = apr_sdbm_fetch(apr_dbm, value, key);
         if (rc != APR_SUCCESS) {
-            dbm = NULL;
+            msr_log(msr, 1, "collection_retrieve_ex: Failed to read from DBM file \"%s\": %s", log_escape(msr->mp,
+                dbm_filename), get_apr_error(msr->mp, rc));
+            goto cleanup;
+        }
+        if (value->dptr == NULL) { /* Key not found in DBM file. */
+            goto cleanup;
+        }
+        /* Close after "value" used from fetch or memory may be overwritten. */
+        if (existing_dbm == NULL) {
+            apr_sdbm_close(apr_dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
             apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #endif
-            goto cleanup;
+            apr_dbm = NULL;
         }
+#ifdef MEMORY_DATABASE_ENABLE
     }
-    else {
-        dbm = existing_dbm;
-    }
+#endif
 
-    value = (apr_sdbm_datum_t *)apr_pcalloc(msr->mp, sizeof(apr_sdbm_datum_t));
-    rc = apr_sdbm_fetch(dbm, value, key);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_retrieve_ex: Failed to read from DBM file \"%s\": %s", log_escape(msr->mp,
-            dbm_filename), get_apr_error(msr->mp, rc));
-        goto cleanup;
-    }
-
-    if (value->dptr == NULL) { /* Key not found in DBM file. */
-        goto cleanup;
-    }
-
-    /* ENH Need expiration (and perhaps other metadata) accessible in blob
-     * form to determine if converting to a table is needed.  This will
-     * save some cycles.
-     */
-
-    /* Transform raw data into a table. */
+    //---------------------------------
+    //unpack the collection
+    //---------------------------------
     col = collection_unpack(msr, (const unsigned char *)value->dptr, value->dsize, 1);
     if (col == NULL) {
         goto cleanup;
     }
 
-    /* Close after "value" used from fetch or memory may be overwritten. */
-    if (existing_dbm == NULL) {
-        apr_sdbm_close(dbm);
-#ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
-#endif
-        dbm = NULL;
-    }
-
-    /* Remove expired variables. */
+    //---------------------------------
+    // Remove expired variables. 
+    //---------------------------------
     do {
         arr = apr_table_elts(col);
         te = (apr_table_entry_t *)arr->elts;
@@ -209,57 +308,84 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         }
     } while(!expired && (i != arr->nelts));
 
-    /* Delete the collection if the variable "KEY" does not exist.
-     *
-     * ENH It would probably be more efficient to hold the DBM
-     * open until determined if it needs deleted than to open a second
-     * time.
-     */
+    //---------------------------------
+    //Delete the collection if the variable "KEY" does not exist.
+    //---------------------------------
     if (apr_table_get(col, "KEY") == NULL) {
-        if (existing_dbm == NULL) {
-#ifdef GLOBAL_COLLECTION_LOCK
-            rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
-            if (rc != APR_SUCCESS) {
-                msr_log(msr, 1, "collection_retrieve_ex: Failed to lock proc mutex: %s",
-                        get_apr_error(msr->mp, rc));
-                goto cleanup;
+        int fail_flag = 0;
+#ifdef MEMORY_DATABASE_ENABLE        
+        if(db_option == DB_OPT_AGMDB){
+            if(existing_dbm == NULL){
+                rc = AGMDB_getExclusiveLock(ag_dbm);
+                if(AGMDB_isError(rc)){
+                    msr_log(msr, 1, "collection_retrieve_ex: Failed to get exclusive lock. Error info: %s.", AGMDB_getErrorInfo(rc));
+                    goto cleanup;
+                }
             }
+            rc = AGMDB_delete(ag_dbm, col_key, col_key_len);
+            if(AGMDB_isError(rc))
+                fail_flag = 1;
+
+            if(existing_dbm == NULL){
+                rc = AGMDB_freeExclusiveLock(ag_dbm);
+                if(AGMDB_isError(rc)){
+                    msr_log(msr, 1, "collection_retrieve_ex: Failed to free exclusive lock. Error info: %s.", AGMDB_getErrorInfo(rc));
+                    goto cleanup;
+                }
+            }
+        }
+        else{
 #endif
-            rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
-                CREATEMODE, msr->mp);
-            if (rc != APR_SUCCESS) {
-                msr_log(msr, 1, "collection_retrieve_ex: Failed to access DBM file \"%s\": %s",
-                    log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
-                dbm = NULL;
+            if (existing_dbm == NULL) {
+#ifdef GLOBAL_COLLECTION_LOCK
+                rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
+                if (rc != APR_SUCCESS) {
+                    msr_log(msr, 1, "collection_retrieve_ex: Failed to lock proc mutex: %s",
+                            get_apr_error(msr->mp, rc));
+                    goto cleanup;
+                }
+#endif
+                rc = apr_sdbm_open(&apr_dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
+                    CREATEMODE, msr->mp);
+                if (rc != APR_SUCCESS) {
+                    msr_log(msr, 1, "collection_retrieve_ex: Failed to access DBM file \"%s\": %s",
+                        log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
+                    apr_dbm = NULL;
+#ifdef GLOBAL_COLLECTION_LOCK
+                    apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+#endif
+                    goto cleanup;
+                }
+            }
+            else {
+                apr_dbm = existing_dbm;
+            }
+
+            rc = apr_sdbm_delete(apr_dbm, key);
+            if (rc != APR_SUCCESS) 
+                fail_flag = 1;
+            if (existing_dbm == NULL) {
+                apr_sdbm_close(apr_dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
                 apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #endif
-                goto cleanup;
+                apr_dbm = NULL;
             }
+#ifdef MEMORY_DATABASE_ENABLE             
         }
-        else {
-            dbm = existing_dbm;
-        }
+#endif        
 
-        rc = apr_sdbm_delete(dbm, key);
-        if (rc != APR_SUCCESS) {
+        
+        if (fail_flag == 1) {
 #ifdef LOG_NO_COLL_DELET_PB
-		if (msr->txcfg->debuglog_level >= 9)
+            if (msr->txcfg->debuglog_level >= 9)
 #endif
-		msr_log(msr, 1, "collection_retrieve_ex: Failed deleting collection (name \"%s\", "
-			"key \"%s\"): %s", log_escape(msr->mp, col_name),
-			log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
-		msr->msc_sdbm_delete_error = 1;
-            goto cleanup;
-        }
-
-
-        if (existing_dbm == NULL) {
-            apr_sdbm_close(dbm);
-#ifdef GLOBAL_COLLECTION_LOCK
-            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
-#endif
-            dbm = NULL;
+                msr_log(msr, 1, "collection_retrieve_ex: Failed deleting collection (name \"%s\", "
+                        "key \"%s\"): %s", log_escape(msr->mp, col_name),
+                    log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
+                msr->msc_sdbm_delete_error = 1;
+                goto cleanup;
+            
         }
 
         if (expired && (msr->txcfg->debuglog_level >= 9)) {
@@ -273,7 +399,9 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         goto cleanup;
     }
 
-    /* Update UPDATE_RATE */
+    //---------------------------------
+    // Update UPDATE_RATE 
+    //---------------------------------
     {
         msc_string *var;
         int create_time, counter;
@@ -315,29 +443,35 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
             log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
     }
 
-    if ((existing_dbm == NULL) && dbm) {
+    if ((existing_dbm == NULL) && (apr_dbm != NULL) && (db_option == DB_OPT_ORIGIN)) {
         /* Should not ever get here */
         msr_log(msr, 1, "collection_retrieve_ex: Internal Error: Collection remained open (name \"%s\", key \"%s\").",
             log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
 
-        apr_sdbm_close(dbm);
+        apr_sdbm_close(apr_dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
         apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #endif
     }
 
     return col;
-
 cleanup:
-
-    if ((existing_dbm == NULL) && dbm) {
-        apr_sdbm_close(dbm);
-#ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
-#endif
+#ifdef MEMORY_DATABASE_ENABLE
+    if(db_option == DB_OPT_AGMDB){
+        return NULL;
     }
-
-    return NULL;
+    else{
+#endif
+        if ((existing_dbm == NULL) && apr_dbm) {
+            apr_sdbm_close(apr_dbm);
+#ifdef GLOBAL_COLLECTION_LOCK
+            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+#endif
+        }
+#ifdef MEMORY_DATABASE_ENABLE
+    }
+#endif
+    return NULL;    
 }
 
 /**
@@ -346,11 +480,19 @@ cleanup:
 apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     const char *col_key, int col_key_len)
 {
+
     apr_time_t time_before = apr_time_now();
     apr_table_t *rtable = NULL;
-    
-    rtable = collection_retrieve_ex(NULL, msr, col_name, col_key, col_key_len);
-    
+#ifdef MEMORY_DATABASE_ENABLE
+    if(msr->dcfg1->db_option == DB_OPT_AGMDB){
+        rtable = collection_retrieve_ex(DB_OPT_AGMDB , NULL, msr, col_name, col_key, col_key_len);
+    }
+    if(msr->dcfg1->db_option == DB_OPT_ORIGIN){
+#endif
+        rtable = collection_retrieve_ex(DB_OPT_ORIGIN, NULL, msr, col_name, col_key, col_key_len);
+#ifdef MEMORY_DATABASE_ENABLE
+    }
+#endif
     msr->time_storage_read += apr_time_now() - time_before;
     
     return rtable;
@@ -359,21 +501,34 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
 /**
  *
  */
-int collection_store(modsec_rec *msr, apr_table_t *col) {
-    char *dbm_filename = NULL;
+static int collection_store_ex(int db_option, modsec_rec *msr, apr_table_t *col){
     msc_string *var_name = NULL, *var_key = NULL;
     unsigned char *blob = NULL;
-    unsigned int blob_size, blob_offset;
-    apr_status_t rc;
+    unsigned int blob_size = 0, blob_offset = 0;
+    int rc;
     apr_sdbm_datum_t key;
     apr_sdbm_datum_t value;
-    apr_sdbm_t *dbm = NULL;
     const apr_array_header_t *arr;
     apr_table_entry_t *te;
     int i;
     const apr_table_t *stored_col = NULL;
     const apr_table_t *orig_col = NULL;
 
+    directory_config *dcfg = msr->dcfg1;
+#ifdef MEMORY_DATABASE_ENABLE
+    directory_config *root_dcfg = dcfg->root_config;
+
+    //variable used for AGMDB
+    struct agmdb_handler *ag_dbm = NULL;
+    struct agmdb_handle_entry *new_handle;
+#endif
+    //variable used for apr_sdbm
+    char *dbm_filename = NULL;
+    apr_sdbm_t *apr_dbm = NULL;
+
+    //---------------------------------
+    //prepare collection name and key
+    //---------------------------------
     var_name = (msc_string *)apr_table_get(col, "__name");
     if (var_name == NULL) {
         goto error;
@@ -391,31 +546,15 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         goto error;
     }
 
-    // ENH: lowercase the var name in the filename
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
-
-    if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "collection_store: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, var_name->value),
-                log_escape(msr->mp, dbm_filename));
-    }
-
-#ifdef GLOBAL_COLLECTION_LOCK
-    /* Need to lock to pull in the stored data again and apply deltas. */
-    rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_store: Failed to lock proc mutex: %s",
-                get_apr_error(msr->mp, rc));
-        goto error;
-    }
-#endif
-
     /* Delete IS_NEW on store. */
     apr_table_unset(col, "IS_NEW");
 
     /* Delete UPDATE_RATE on store to save space as it is calculated */
     apr_table_unset(col, "UPDATE_RATE");
 
-    /* Update the timeout value. */
+    //---------------------------------
+    // Update the timeout value. 
+    //---------------------------------
     {
         msc_string *var = (msc_string *)apr_table_get(col, "TIMEOUT");
         if (var != NULL) {
@@ -428,7 +567,9 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         }
     }
 
-    /* LAST_UPDATE_TIME */
+    //---------------------------------
+    // LAST_UPDATE_TIME 
+    //---------------------------------
     {
         msc_string *var = (msc_string *)apr_table_get(col, "LAST_UPDATE_TIME");
         if (var == NULL) {
@@ -441,7 +582,9 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         var->value_len = strlen(var->value);
     }
 
-    /* UPDATE_COUNTER */
+    //---------------------------------
+    // UPDATE_COUNTER 
+    //---------------------------------
     {
         msc_string *var = (msc_string *)apr_table_get(col, "UPDATE_COUNTER");
         int counter = 0;
@@ -457,45 +600,123 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         var->value_len = strlen(var->value);
     }
 
-    /* ENH Make the expiration timestamp accessible in blob form so that
-     * it is easier/faster to determine expiration without having to
-     * convert back to table form
-     */
-
-    rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
-        CREATEMODE, msr->mp);
-    if (rc != APR_SUCCESS) {
+    //---------------------------------
+    //open database
+    //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
+    if(db_option == DB_OPT_AGMDB){
+        ag_dbm = dcfg_searchAGMDBhandler(var_name->value, (struct agmdb_handle_entry*)(msr->dcfg1->agmdb_handles));
+        if(ag_dbm == NULL) {
+            //Create the DB
+            root_dcfg = msr->dcfg1->root_config;
+#ifdef _WIN32           
+            dbm_filename = apr_pstrcat(root_dcfg->mp, "Global\\", root_dcfg->data_dir, "/", var_name->value, NULL);
+#else
+            dbm_filename = apr_pstrcat(root_dcfg->mp, root_dcfg->data_dir, "/", var_name->value, NULL);
+#endif
+            if(root_dcfg == NULL){
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Cannot find root_config in msr->dcfg1.");
+                goto error;
+            }
+            new_handle = (struct agmdb_handle_entry *)apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handle_entry));
+            new_handle->col_name = (char*)apr_pcalloc(root_dcfg->mp, var_name->value_len);
+            new_handle->handle = apr_pcalloc(root_dcfg->mp, sizeof(struct agmdb_handler));
+            strcpy((char*)(new_handle->col_name), var_name->value);
+            
+            rc = AGMDB_openDB(new_handle->handle, dbm_filename, strlen(dbm_filename), MAXIMUM_AGMDB_ENTRY_NUM);
+            if(AGMDB_isError(rc)){
+                msr_log(msr, 1, "collection_retrieve_ex_agmdb: Failed to create DBM name: %s. Error info: %s", dbm_filename, AGMDB_getErrorInfo(rc));
+                goto error;
+            }
+            ag_dbm = new_handle->handle;
+            dcfg_insertAGMDBhandler(root_dcfg, new_handle);
+        }
+    }
+    else{
+#endif
+        // ENH: lowercase the var name in the filename
+        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "collection_store_ex_origin: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, var_name->value),
+                    log_escape(msr->mp, dbm_filename));
+        }
+        
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+        /* Need to lock to pull in the stored data again and apply deltas. */
+        rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
+        if (rc != APR_SUCCESS) {
+            msr_log(msr, 1, "collection_store: Failed to lock proc mutex: %s",
+                    get_apr_error(msr->mp, rc));
+            goto error;
+        }
 #endif
-        msr_log(msr, 1, "collection_store: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
-            get_apr_error(msr->mp, rc));
-        dbm = NULL;
-        goto error;
+        
+        rc = apr_sdbm_open(&apr_dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
+            CREATEMODE, msr->mp);
+        if (rc != APR_SUCCESS) {
+#ifdef GLOBAL_COLLECTION_LOCK
+            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+#endif
+            msr_log(msr, 1, "collection_store_ex_origin: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
+                get_apr_error(msr->mp, rc));
+            apr_dbm = NULL;
+            goto error;
+        }
+#ifdef MEMORY_DATABASE_ENABLE
     }
+#endif
 
+    //---------------------------------
+    //Lock and prepare to get the original collection
+    //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
+    if(db_option == DB_OPT_AGMDB){
+        rc = AGMDB_getExclusiveLock(ag_dbm);
+        if (AGMDB_isError(rc)) {
+#ifdef _WIN32
+            int lasterr = (int)GetLastError();
+            msr_log(msr, 1, "collection_store: Failed to getExclusiveLock, lasterr = %d. Error info: %s", lasterr, AGMDB_getErrorInfo(rc));
+#else
+            msr_log(msr, 1, "collection_store: Failed to getExclusiveLock, errno = %d. Error info: %s", errno, AGMDB_getErrorInfo(rc));
+#endif
+            goto error;
+        }
+    }
+    else{
+#endif 
 #ifndef GLOBAL_COLLECTION_LOCK
-    /* Need to lock to pull in the stored data again and apply deltas. */
-    rc = apr_sdbm_lock(dbm, APR_FLOCK_EXCLUSIVE);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_store: Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
-            get_apr_error(msr->mp, rc));
-        goto error;
+        /* Need to lock to pull in the stored data again and apply deltas. */
+        rc = apr_sdbm_lock(apr_dbm, APR_FLOCK_EXCLUSIVE);
+        if (rc != APR_SUCCESS) {
+            msr_log(msr, 1, "collection_store_ex_origin: Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
+                get_apr_error(msr->mp, rc));
+            goto error;
+        }
+#endif
+#ifdef MEMORY_DATABASE_ENABLE
     }
 #endif
 
-    /* If there is an original value, then create a delta and
-     * apply the delta to the current value */
+    //---------------------------------
+    //get the origin record
+    //---------------------------------
     orig_col = (const apr_table_t *)apr_table_get(msr->collections_original, var_name->value);
     if (orig_col != NULL) {
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "collection_store: Re-retrieving collection prior to store: %s",
                 apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
         }
-
-        stored_col = (const apr_table_t *)collection_retrieve_ex(dbm, msr, var_name->value, var_key->value, var_key->value_len);
+#ifdef MEMORY_DATABASE_ENABLE
+        if(db_option == DB_OPT_AGMDB)
+            stored_col = (const apr_table_t *)collection_retrieve_ex(db_option, ag_dbm, msr, var_name->value, var_key->value, var_key->value_len);
+        else
+#endif
+            stored_col = (const apr_table_t *)collection_retrieve_ex(db_option, apr_dbm, msr, var_name->value, var_key->value, var_key->value_len);
     }
 
+    //---------------------------------
+    //pack the collection
+    //---------------------------------
     /* Merge deltas and calculate the size first. */
     blob_size = 3 + 2;
     arr = apr_table_elts(col);
@@ -532,32 +753,47 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
             }
         }
 
-        // Allocate blob_size for keys
         len = var->name_len + 1;
         if (len >= 65536) len = 65536;
         blob_size += len + 2;
 
-        // Allocate blob_size for values
         len = var->value_len + 1;
         if (len >= 65536) len = 65536;
         blob_size += len + 2;
     }
 
     /* Now generate the binary object. */
-    blob = apr_pcalloc(msr->mp, blob_size);
-    if (blob == NULL) {
-        if (dbm != NULL) {
-#ifdef GLOBAL_COLLECTION_LOCK
-            apr_sdbm_close(dbm);
-            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
-#else
-            apr_sdbm_unlock(dbm);
-            apr_sdbm_close(dbm);
-#endif
+#ifdef MEMORY_DATABASE_ENABLE
+    if(db_option == DB_OPT_AGMDB){
+        blob = apr_pcalloc(msr->mp, blob_size);
+        if (blob == NULL) {
+            if (ag_dbm != NULL) {
+                rc = AGMDB_freeExclusiveLock(ag_dbm);
+                if(AGMDB_isError(rc))
+                    msr_log(msr, 1, "collection_stror_ex: Fail to free exclusive lock. Error info: %s", AGMDB_getErrorInfo(rc));
+            }
+            msr_log(msr, 1, "collection_store_ex_agdb: fail to create blob");            
+            return -1;
         }
-
-        return -1;
     }
+    else{
+#endif
+        blob = apr_pcalloc(msr->mp, blob_size);
+        if (blob == NULL) {
+            if (apr_dbm != NULL) {
+#ifdef GLOBAL_COLLECTION_LOCK
+                apr_sdbm_close(apr_dbm);
+                apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+#else
+                apr_sdbm_unlock(apr_dbm);
+                apr_sdbm_close(apr_dbm);
+#endif
+            }
+            return -1;
+        }
+#ifdef MEMORY_DATABASE_ENABLE
+    }
+#endif
 
     blob[0] = 0x49;
     blob[1] = 0x52;
@@ -598,36 +834,55 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     blob[blob_offset] = 0;
     blob[blob_offset + 1] = 0;
 
-    /* And, finally, store it. */
+    //---------------------------------
+    // And, finally, store it. 
+    //---------------------------------
     key.dptr = var_key->value;
     key.dsize = var_key->value_len + 1;
 
     value.dptr = (char *)blob;
     value.dsize = blob_size;
 
-    rc = apr_sdbm_store(dbm, key, value, APR_SDBM_REPLACE);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s", dbm_filename,
-                get_apr_error(msr->mp, rc));
-        if (dbm != NULL) {
-#ifdef GLOBAL_COLLECTION_LOCK
-            apr_sdbm_close(dbm);
-            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
-#else
-            apr_sdbm_unlock(dbm);
-            apr_sdbm_close(dbm);
-#endif
+#ifdef MEMORY_DATABASE_ENABLE
+    if(db_option == DB_OPT_AGMDB) {
+        rc = AGMDB_set(ag_dbm, var_key->value, var_key->value_len, (char*)blob, blob_size);
+        if(AGMDB_isError(rc)) {
+            msr_log(msr, 1, "collection_store_ex_agmdb: Failed to write to database key: %s. Error info: %s.", var_key->value, AGMDB_getErrorInfo(rc));
         }
 
-        return -1;
+        rc = AGMDB_freeExclusiveLock(ag_dbm);
+        if(AGMDB_isError(rc)){
+            msr_log(msr, 1, "collection_store_ex_agmdb: Failed to free exclusive lock. Error info: %s.", AGMDB_getErrorInfo(rc));
+            return -1;
+        }
     }
-
+    else {
+#endif
+        rc = apr_sdbm_store(apr_dbm, key, value, APR_SDBM_REPLACE);
+        if (rc != APR_SUCCESS) {
+            msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s", dbm_filename,
+                    get_apr_error(msr->mp, rc));
+            if (apr_dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
-    apr_sdbm_close(dbm);
-    apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+                apr_sdbm_close(apr_dbm);
+                apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #else
-    apr_sdbm_unlock(dbm);
-    apr_sdbm_close(dbm);
+                apr_sdbm_unlock(apr_dbm);
+                apr_sdbm_close(apr_dbm);
+#endif
+            }
+
+            return -1;
+        }
+#ifdef GLOBAL_COLLECTION_LOCK
+        apr_sdbm_close(apr_dbm);
+        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+#else
+        apr_sdbm_unlock(apr_dbm);
+        apr_sdbm_close(apr_dbm);
+#endif
+#ifdef MEMORY_DATABASE_ENABLE
+    }
 #endif
 
     if (msr->txcfg->debuglog_level >= 4) {
@@ -637,7 +892,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     }
 
     return 0;
-
+    
 error:
     return -1;
 }
@@ -645,16 +900,58 @@ error:
 /**
  *
  */
-int collections_remove_stale(modsec_rec *msr, const char *col_name) {
+int collection_store(modsec_rec *msr, apr_table_t *col){
+    int rc;
+#ifdef MEMORY_DATABASE_ENABLE
+    if(msr->dcfg1->db_option == DB_OPT_AGMDB){
+        rc = collection_store_ex(DB_OPT_AGMDB , msr, col);
+    }
+    if(msr->dcfg1->db_option == DB_OPT_ORIGIN){
+#endif
+        rc = collection_store_ex(DB_OPT_ORIGIN, msr, col);
+#ifdef MEMORY_DATABASE_ENABLE
+    }
+#endif
+    return rc;
+}
+
+/**
+ *
+ */
+static int collections_remove_stale_ex(int db_option, modsec_rec *msr, const char *col_name, int time_sec){
+#ifdef MEMORY_DATABASE_ENABLE
+    //variables for AGMDB
+    struct agmdb_handler *ag_dbm = NULL;
+    directory_config * root_dcfg = msr->dcfg1->root_config;
+#endif
+    //variables for apr_sdbm
     char *dbm_filename = NULL;
     apr_sdbm_datum_t key, value;
-    apr_sdbm_t *dbm = NULL;
+    apr_sdbm_t *apr_dbm = NULL;
     apr_status_t rc;
     apr_array_header_t *keys_arr;
     char **keys;
     apr_time_t now = apr_time_sec(msr->request_time);
-    int i;
-
+    int i,rc2;
+    
+    //---------------------------------
+    //AGMDB
+    //---------------------------------
+#ifdef MEMORY_DATABASE_ENABLE
+    if(db_option == DB_OPT_AGMDB){
+        if(root_dcfg == NULL)
+            return -1;
+        ag_dbm = dcfg_searchAGMDBhandler(col_name, (struct agmdb_handle_entry*)(root_dcfg->agmdb_handles));
+        if(ag_dbm == NULL)
+            return 1;
+        rc2 = AGMDB_removeStale(ag_dbm);
+        if(AGMDB_isError(rc2))
+        msr_log(msr, 1, "collections_remove_stale_ex_agmdb: error in remove stale. Error info: %s", AGMDB_getErrorInfo(rc2));
+    }
+#endif
+    //---------------------------------
+    //apr_sdbm
+    //---------------------------------
     if (msr->txcfg->data_dir == NULL) {
         /* The user has been warned about this problem enough times already by now.
          * msr_log(msr, 1, "Unable to access collection file (name \"%s\"). Use SecDataDir to "
@@ -681,8 +978,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
         goto error;
     }
 #endif
-
-    rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
+    rc = apr_sdbm_open(&apr_dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
             CREATEMODE, msr->mp);
     if (rc != APR_SUCCESS) {
 #ifdef GLOBAL_COLLECTION_LOCK
@@ -690,7 +986,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
 #endif
         msr_log(msr, 1, "collections_remove_stale: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
                 get_apr_error(msr->mp, rc));
-        dbm = NULL;
+        apr_dbm = NULL;
         goto error;
     }
 
@@ -698,7 +994,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     keys_arr = apr_array_make(msr->mp, 256, sizeof(char *));
 
 #ifndef GLOBAL_COLLECTION_LOCK
-    rc = apr_sdbm_lock(dbm, APR_FLOCK_SHARED);
+    rc = apr_sdbm_lock(apr_dbm, APR_FLOCK_SHARED);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "collections_remove_stale: Failed to lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
             get_apr_error(msr->mp, rc));
@@ -709,16 +1005,16 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     /* No one can write to the file while doing this so
      * do it as fast as possible.
      */
-    rc = apr_sdbm_firstkey(dbm, &key);
+    rc = apr_sdbm_firstkey(apr_dbm, &key);
     while(rc == APR_SUCCESS) {
         if (key.dsize) {
             char *s = apr_pstrmemdup(msr->mp, key.dptr, key.dsize - 1);
             *(char **)apr_array_push(keys_arr) = s;
         }
-        rc = apr_sdbm_nextkey(dbm, &key);
+        rc = apr_sdbm_nextkey(apr_dbm, &key);
     }
 #ifndef GLOBAL_COLLECTION_LOCK
-    apr_sdbm_unlock(dbm);
+    apr_sdbm_unlock(apr_dbm);
 #endif
 
     if (msr->txcfg->debuglog_level >= 9) {
@@ -732,7 +1028,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
         key.dptr = keys[i];
         key.dsize = strlen(key.dptr) + 1;
 
-        rc = apr_sdbm_fetch(dbm, &value, key);
+        rc = apr_sdbm_fetch(apr_dbm, &value, key);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "collections_remove_stale: Failed reading DBM file \"%s\": %s",
                 log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
@@ -763,15 +1059,15 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
                 }
 
                 if (expiry_time <= now) {
-                    rc = apr_sdbm_delete(dbm, key);
+                    rc = apr_sdbm_delete(apr_dbm, key);
                     if (rc != APR_SUCCESS) {
 #ifdef LOG_NO_COLL_DELET_PB
 			if (msr->txcfg->debuglog_level >= 9)
 #endif
-			msr_log(msr, 1, "collections_remove_stale: Failed deleting collection (name \"%s\", "
+                        msr_log(msr, 1, "collections_remove_stale: Failed deleting collection (name \"%s\", "
                             "key \"%s\"): %s", log_escape(msr->mp, col_name),
                             log_escape_ex(msr->mp, key.dptr, key.dsize - 1), get_apr_error(msr->mp, rc));
-			msr->msc_sdbm_delete_error = 1;
+                    msr->msc_sdbm_delete_error = 1;
                         goto error;
                     }
 
@@ -787,7 +1083,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
         }
     }
 
-    apr_sdbm_close(dbm);
+    apr_sdbm_close(apr_dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
     apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #endif
@@ -795,12 +1091,30 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
 
 error:
 
-    if (dbm) {
-        apr_sdbm_close(dbm);
+    if (apr_dbm) {
+        apr_sdbm_close(apr_dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
         apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
 #endif
     }
-
     return -1;
+}
+
+/**
+ *
+ */
+int collections_remove_stale(modsec_rec *msr, const char *col_name) {
+    int rc;
+    int time_sec = (int)time(NULL);
+#ifdef MEMORY_DATABASE_ENABLE
+    if(msr->dcfg1->db_option == DB_OPT_AGMDB){
+        return collections_remove_stale_ex(DB_OPT_AGMDB , msr, col_name, time_sec);       
+    }
+    if(msr->dcfg1->db_option == DB_OPT_ORIGIN){
+#endif
+        return collections_remove_stale_ex(DB_OPT_ORIGIN, msr, col_name, time_sec);
+#ifdef MEMORY_DATABASE_ENABLE
+    }
+#endif
+    
 }

@@ -3,6 +3,8 @@ pkglibdir = $(prefix)/lib
 pkglib_LTLIBRARIES = standalone.la
 
 standalone_la_SOURCES = ../apache2/acmp.c \
+    ../apache2/ag_mdb/murmur3.c \
+    ../apache2/ag_mdb/ag_mdb.cpp \
     ../apache2/apache2_config.c \
     ../apache2/apache2_io.c \
     ../apache2/apache2_util.c \

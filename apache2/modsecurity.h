@@ -639,6 +639,12 @@ struct directory_config {
 
     /* xml */
     int                 xml_external_entity;
+#ifdef MEMORY_DATABASE_ENABLE
+    /* AGMDB */
+    directory_config	*root_config;
+    int                 db_option;
+    void                *agmdb_handles;    
+#endif
 
     /* This will be used whenever ModSecurity will be ready
      * to ask the server for newer rules.

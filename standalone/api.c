@@ -292,7 +292,9 @@ const char *modsecProcessConfig(directory_config *config, const char *file, cons
 	apr_pool_create(&ptemp, config->mp);
 
     err = process_command_config(server, config, config->mp, ptemp, file);
-
+#ifdef MEMORY_DATABASE_ENABLE
+	config->root_config = config;
+#endif
     apr_pool_destroy(ptemp);
 
     return err;

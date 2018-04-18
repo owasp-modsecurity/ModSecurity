@@ -23,6 +23,8 @@ LT_INIT([dlopen])
 # Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
+AM_PROG_CC_C_O
+AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -562,6 +564,23 @@ AC_ARG_ENABLE(collection-global-lock,
 ])
 
 
+# Enable collection's memory database support
+AC_ARG_ENABLE(collection-memory-database,
+              AS_HELP_STRING([--enable-collection-memory-database],
+                             [Enable memory database support for collection.]),
+[
+  if test "$enableval" = "yes"; then
+    collection_memory_database="-I"`pwd`"/apache2/ag_mdb -DMEMORY_DATABASE_ENABLE"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $collection_memory_database"
+  else
+    collection_memory_database=""
+  fi
+],
+[
+  collection_memory_database="-I"`pwd`"/apache2/ag_mdb -DMEMORY_DATABASE_ENABLE"
+])
+
+
 # Ignore configure errors
 AC_ARG_ENABLE(errors,
               AS_HELP_STRING([--disable-errors],
@@ -828,7 +847,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input $collection_memory_database"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
