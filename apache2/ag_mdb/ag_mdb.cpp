@@ -206,6 +206,10 @@ int Lock_P(const struct agmdb_lock *db_lock, int index, int val) {
         lock_handle = db_lock->read_lock_handle;
     else
         lock_handle = db_lock->write_lock_handle;
+
+    if (lock_handle == INVALID_HANDLE_VALUE)
+	return AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL;
+
     rc = WaitForSingleObject(lock_handle, INFINITE);
     if (rc != WAIT_OBJECT_0)
         return AGMDB_ERROR_LOCK_WIN_GET_MUTEX_FAIL;
@@ -243,6 +247,10 @@ int Lock_V(const struct agmdb_lock *db_lock, int index, int val) {
         lock_handle = db_lock->read_lock_handle;
     else
         lock_handle = db_lock->write_lock_handle;
+
+    if (lock_handle == INVALID_HANDLE_VALUE)
+	return AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL;
+
     rc = ReleaseMutex(lock_handle);
     if (rc == 0)
         return AGMDB_ERROR_LOCK_WIN_RELEASE_MUTEX_FAIL;
