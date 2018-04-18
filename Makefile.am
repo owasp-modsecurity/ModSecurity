@@ -136,6 +136,7 @@ TESTS+=test/test-cases/regression/issue-1576.json
 TESTS+=test/test-cases/regression/issue-1591.json
 TESTS+=test/test-cases/regression/issue-394.json
 TESTS+=test/test-cases/regression/issue-960.json
+TESTS+=test/test-cases/regression/issue-1743.json
 TESTS+=test/test-cases/regression/misc.json
 TESTS+=test/test-cases/regression/misc-variable-under-quotes.json
 TESTS+=test/test-cases/regression/offset-variable.json
