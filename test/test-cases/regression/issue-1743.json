@@ -5,7 +5,7 @@
   "version_max": -1,
   "title": "Regex match does not work when arg ends with unescaped equal char (1/2)",
   "url": "https:\/\/github.com\/SpiderLabs\/ModSecurity\/issues\/1743",
-  "gihub_issue": 9999,
+  "gihub_issue": 1743,
   "client": {
     "ip": "200.249.12.31",
     "port": 2313
@@ -41,7 +41,7 @@
   "version_max": -1,
   "title": "Regex match does not work when arg ends with unescaped equal char (2/2)",
   "url": "https:\/\/github.com\/SpiderLabs\/ModSecurity\/issues\/1743",
-  "gihub_issue": 9999,
+  "gihub_issue": 1743,
   "client": {
     "ip": "200.249.12.31",
     "port": 2313
