@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix variable FILES_TMPNAMES 
+   [Issue #1646, #1610 - @victorhora, @zimmerle, @defanator]
  - Fix memory leak in Collections
    [Issue #1729, #1730 - @@defanator]
 
