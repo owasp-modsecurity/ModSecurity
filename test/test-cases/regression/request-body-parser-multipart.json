@@ -2448,6 +2448,452 @@
         "SecRule FILES_SIZES:/^image/ \"@eq 0\" \"phase:2,deny,id:500167\"",
         "SecRule &FILES_TMPNAMES \"!@eq 2\" \"phase:2,deny,id:500168\""
     ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"multipart parser (contains foreign bound., no UNMATCH rule)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=-----------------------------8842564605616207552020332273",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_token\"\r",
+              "\r",
+              "9e433de44c9e9b4ce19603269aa34edb\r",
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
+              "Content-Type: text/plain\r",
+              "\r",
+              "----ea520cef1a2937d8e928e357992c8fdd\r",
+              "Content-Transfer-Encoding: 7bit\r",
+              "Content-Type: text/plain; charset=US-ASCII;\r",
+              " format=flowed\r",
+              "\r",
+              "Test message, the txt file had been attached.\r",
+              "\r",
+              "--\r",
+              "Ervin\r",
+              "\r",
+              "\r",
+              "-------------------------------8842564605616207552020332273--\r"
+        ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log": "",
+      "http_code": 200
+    },
+    "rules":[
+        "SecRuleEngine On"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"multipart parser (contains foreign bound.)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=-----------------------------8842564605616207552020332273",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_token\"\r",
+              "\r",
+              "9e433de44c9e9b4ce19603269aa34edb\r",
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
+              "Content-Type: text/plain\r",
+              "\r",
+              "----ea520cef1a2937d8e928e357992c8fdd\r",
+              "Content-Transfer-Encoding: 7bit\r",
+              "Content-Type: text/plain; charset=US-ASCII;\r",
+              " format=flowed\r",
+              "\r",
+              "Test message, the txt file had been attached.\r",
+              "\r",
+              "--\r",
+              "Ervin\r",
+              "\r",
+              "\r",
+              "-------------------------------8842564605616207552020332273--\r"
+        ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log": "",
+      "http_code": 200
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 0\" \"phase:2,deny,id:500095\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"multipart parser (contains foreign bound., wrong lead bound.)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=-----------------------------8842564605616207552020332273",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+              "-------------------------------8842564605616207552020332274\r",
+              "Content-Disposition: form-data; name=\"_token\"\r",
+              "\r",
+              "9e433de44c9e9b4ce19603269aa34edb\r",
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
+              "Content-Type: text/plain\r",
+              "\r",
+              "----ea520cef1a2937d8e928e357992c8fdd\r",
+              "Content-Transfer-Encoding: 7bit\r",
+              "Content-Type: text/plain; charset=US-ASCII;\r",
+              " format=flowed\r",
+              "\r",
+              "Test message, the txt file had been attached.\r",
+              "\r",
+              "--\r",
+              "Ervin\r",
+              "\r",
+              "\r",
+              "-------------------------------8842564605616207552020332273--\r"
+        ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log": "",
+      "http_code": 200
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 0\" \"phase:2,deny,id:500095\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"multipart parser (contains foreign bound., wrong sep. bound.)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=-----------------------------8842564605616207552020332273",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_token\"\r",
+              "\r",
+              "9e433de44c9e9b4ce19603269aa34edb\r",
+              "-------------------------------8842564605616207552020332274\r",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
+              "Content-Type: text/plain\r",
+              "\r",
+              "----ea520cef1a2937d8e928e357992c8fdd\r",
+              "Content-Transfer-Encoding: 7bit\r",
+              "Content-Type: text/plain; charset=US-ASCII;\r",
+              " format=flowed\r",
+              "\r",
+              "Test message, the txt file had been attached.\r",
+              "\r",
+              "--\r",
+              "Ervin\r",
+              "\r",
+              "\r",
+              "-------------------------------8842564605616207552020332273--\r"
+        ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log": "",
+      "http_code": 200
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 0\" \"phase:2,deny,id:500095\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"multipart parser (contains foreign bound., wrong final bound.)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=-----------------------------8842564605616207552020332273",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_token\"\r",
+              "\r",
+              "9e433de44c9e9b4ce19603269aa34edb\r",
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
+              "Content-Type: text/plain\r",
+              "\r",
+              "----ea520cef1a2937d8e928e357992c8fdd\r",
+              "Content-Transfer-Encoding: 7bit\r",
+              "Content-Type: text/plain; charset=US-ASCII;\r",
+              " format=flowed\r",
+              "\r",
+              "Test message, the txt file had been attached.\r",
+              "\r",
+              "--\r",
+              "Ervin\r",
+              "\r",
+              "\r",
+              "-------------------------------8842564605616207552020332274--\r"
+        ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log": "",
+      "http_code": 403
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 0\" \"phase:2,deny,id:500095\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"multipart parser (contains foreign bound., one part, wrong lead)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=-----------------------------8842564605616207552020332273",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+              "-------------------------------8842564605616207552020332274\r",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
+              "Content-Type: text/plain\r",
+              "\r",
+              "----ea520cef1a2937d8e928e357992c8fdd\r",
+              "Content-Transfer-Encoding: 7bit\r",
+              "Content-Type: text/plain; charset=US-ASCII;\r",
+              " format=flowed\r",
+              "\r",
+              "Test message, the txt file had been attached.\r",
+              "\r",
+              "--\r",
+              "Ervin\r",
+              "\r",
+              "\r",
+              "-------------------------------8842564605616207552020332273--\r"
+        ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log": "",
+      "http_code": 403
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 0\" \"phase:2,deny,id:500095\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"multipart parser (contains foreign bound., one part, wrong final)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=-----------------------------8842564605616207552020332273",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+              "-------------------------------8842564605616207552020332273\r",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
+              "Content-Type: text/plain\r",
+              "\r",
+              "----ea520cef1a2937d8e928e357992c8fdd\r",
+              "Content-Transfer-Encoding: 7bit\r",
+              "Content-Type: text/plain; charset=US-ASCII;\r",
+              " format=flowed\r",
+              "\r",
+              "Test message, the txt file had been attached.\r",
+              "\r",
+              "--\r",
+              "Ervin\r",
+              "\r",
+              "\r",
+              "-------------------------------8842564605616207552020332274--\r"
+        ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log": "",
+      "http_code": 403
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 0\" \"phase:2,deny,id:500095\""
+    ]
   }
 ]
 

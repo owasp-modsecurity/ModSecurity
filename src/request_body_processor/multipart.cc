@@ -1482,6 +1482,11 @@ bool Multipart::process(const std::string& data, std::string *error,
                     && (strncmp(m_buf + 2, m_boundary.c_str(),
                         m_boundary.size()) == 0)) {
                     char *boundary_end = m_buf + 2 + m_boundary.size();
+                    /* if it match, AND there was a matched boundary at least,
+                       clear the m_flag_unmatched_boundary flag */
+                    if (m_boundary_count > 0) {
+                        m_flag_unmatched_boundary = 0;
+                    }
                     int is_final = 0;
 
                     /* Is this the final boundary? */
