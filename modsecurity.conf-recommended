@@ -115,7 +115,7 @@ SecResponseBodyAccess On
 # configuration below to catch documents but avoid static files
 # (e.g., images and archives).
 #
-SecResponseBodyMimeType text/plain text/html text/xml
+SecResponseBodyMimeType text/plain text/html text/xml application/json
 
 # Buffer response bodies of up to 512 KB in length.
 SecResponseBodyLimit 524288
