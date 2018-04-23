@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Add missing escapeSeqDecode, urlEncode and trimLeft/Right tfns to parser
+   [@victorhora, @zimmerle]
  - Fix variable FILES_TMPNAMES 
    [Issue #1646, #1610 - @victorhora, @zimmerle, @defanator]
  - Fix memory leak in Collections
