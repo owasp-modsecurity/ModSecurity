@@ -93,7 +93,7 @@ class ValidateDTD : public Operator {
 
  private:
     std::string m_resource;
-    xmlDtdPtr m_dtd;
+    xmlDtdPtr m_dtd = NULL;
 #endif
 };
 
