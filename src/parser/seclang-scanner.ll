@@ -139,6 +139,7 @@ ACTION_TRANSFORMATION_BASE_64_DECODE            (?i:t:base64Decode)
 ACTION_TRANSFORMATION_BASE_64_DECODE_EXT        (?i:t:base64DecodeExt)
 ACTION_TRANSFORMATION_CMD_LINE                  (?i:t:cmdLine)
 ACTION_TRANSFORMATION_COMPRESS_WHITESPACE       (?i:t:compressWhitespace)
+ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE       (?i:t:escapeSeqDecode)
 ACTION_TRANSFORMATION_CSS_DECODE                (?i:t:cssDecode)
 ACTION_TRANSFORMATION_HEX_ENCODE                (?i:t:hexEncode)
 ACTION_TRANSFORMATION_HEX_DECODE                (?i:t:hexDecode)
@@ -162,7 +163,10 @@ ACTION_TRANSFORMATION_REPLACE_NULLS             (?i:t:replaceNulls)
 ACTION_TRANSFORMATION_SHA1                      (?i:t:sha1)
 ACTION_TRANSFORMATION_SQL_HEX_DECODE            (?i:t:sqlHexDecode)
 ACTION_TRANSFORMATION_TRIM                      (?i:t:trim)
+ACTION_TRANSFORMATION_TRIM_LEFT                 (?i:t:trimLeft)
+ACTION_TRANSFORMATION_TRIM_RIGHT                (?i:t:trimRight)
 ACTION_TRANSFORMATION_UPPERCASE                 (?i:t:uppercase)
+ACTION_TRANSFORMATION_URL_ENCODE                (?i:t:urlEncode)
 ACTION_TRANSFORMATION_URL_DECODE                (?i:t:urlDecode)
 ACTION_TRANSFORMATION_URL_DECODE_UNI            (?i:t:urlDecodeUni)
 ACTION_TRANSFORMATION_UTF8_TO_UNICODE           (?i:t:utf8toUnicode)
@@ -574,10 +578,12 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_TRANSFORMATION_CMD_LINE}                                        { return p::make_ACTION_TRANSFORMATION_CMD_LINE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_SHA1}                                            { return p::make_ACTION_TRANSFORMATION_SHA1(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_MD5}                                             { return p::make_ACTION_TRANSFORMATION_MD5(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE}                               { return p::make_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_HEX_ENCODE}                                      { return p::make_ACTION_TRANSFORMATION_HEX_ENCODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_HEX_DECODE}                                      { return p::make_ACTION_TRANSFORMATION_HEX_DECODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_LOWERCASE}                                       { return p::make_ACTION_TRANSFORMATION_LOWERCASE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_UPPERCASE}                                       { return p::make_ACTION_TRANSFORMATION_UPPERCASE(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_URL_ENCODE}                                      { return p::make_ACTION_TRANSFORMATION_URL_ENCODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_URL_DECODE_UNI}                                  { return p::make_ACTION_TRANSFORMATION_URL_DECODE_UNI(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_URL_DECODE}                                      { return p::make_ACTION_TRANSFORMATION_URL_DECODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_NONE}                                            { return p::make_ACTION_TRANSFORMATION_NONE(yytext, *driver.loc.back()); }
@@ -589,6 +595,8 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_TRANSFORMATION_JS_DECODE}                                       { return p::make_ACTION_TRANSFORMATION_JS_DECODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_CSS_DECODE}                                      { return p::make_ACTION_TRANSFORMATION_CSS_DECODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_TRIM}                                            { return p::make_ACTION_TRANSFORMATION_TRIM(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_TRIM_LEFT}                                       { return p::make_ACTION_TRANSFORMATION_TRIM_LEFT(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_TRIM_RIGHT}                                      { return p::make_ACTION_TRANSFORMATION_TRIM_RIGHT(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_NORMALISE_PATH_WIN}                              { return p::make_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_NORMALISE_PATH}                                  { return p::make_ACTION_TRANSFORMATION_NORMALISE_PATH(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_LENGTH}                                          { return p::make_ACTION_TRANSFORMATION_LENGTH(yytext, *driver.loc.back()); }
