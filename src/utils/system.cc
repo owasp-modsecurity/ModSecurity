@@ -126,9 +126,9 @@ std::list<std::string> expandEnv(const std::string& var, int flags) {
                 std::ifstream *iss = new std::ifstream(exp[0], std::ios::in);
                 if (iss->is_open()) {
                     iss->close();
-                    delete iss;
                     vars.push_back(exp[0]);
                 }
+                delete iss;
             }
         }
         wordfree(&p);
