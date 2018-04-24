@@ -1,10 +1,12 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix utils::string::ssplit() to handle delimiter in the end of string
+   [Issues #1743, #1744 - @defanator]
  - Fix variable FILES_TMPNAMES 
    [Issue #1646, #1610 - @victorhora, @zimmerle, @defanator]
  - Fix memory leak in Collections
-   [Issue #1729, #1730 - @@defanator]
+   [Issue #1729, #1730 - @defanator]
 
 
 v3.0.2 - 2018-Apr-03
