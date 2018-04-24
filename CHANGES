@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix STATUS var parsing and accept STATUS_LINE var for v2 backward comp.
+   [Issue #1738 - @victorhora]
  - Fix memory leak in modsecurity::utils::expandEnv()
    [Issue #1750 - @defanator]
  - Initialize m_dtd member in ValidateDTD class as NULL
