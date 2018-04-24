@@ -47,14 +47,18 @@ class Rules : public RulesProperties {
     Rules()
         : RulesProperties(new DebugLog()),
         unicode_codepage(0),
-        m_referenceCount(0),
-        m_secmarker_skipped(0) { }
+#ifndef NO_LOGS
+        m_secmarker_skipped(0),
+#endif
+        m_referenceCount(0) { }
 
     explicit Rules(DebugLog *customLog)
         : RulesProperties(customLog),
         unicode_codepage(0),
-        m_referenceCount(0),
-        m_secmarker_skipped(0) { }
+#ifndef NO_LOGS
+        m_secmarker_skipped(0),
+#endif
+        m_referenceCount(0) { }
 
     ~Rules() { }
 
@@ -80,7 +84,9 @@ class Rules : public RulesProperties {
 
  private:
     int m_referenceCount;
+#ifndef NO_LOGS
     uint8_t m_secmarker_skipped;
+#endif
 };
 
 #endif

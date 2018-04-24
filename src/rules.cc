@@ -180,15 +180,21 @@ int Rules::evaluate(int phase, Transaction *transaction) {
     for (int i = 0; i < rules.size(); i++) {
         Rule *rule = rules[i];
         if (transaction->m_marker.empty() == false) {
+#ifndef NO_LOGS
             debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' due to a SecMarker: " + transaction->m_marker);
             m_secmarker_skipped++;
             debug(9, "Rule: " + rule->m_marker);
+#endif
             if (rule->m_secMarker && rule->m_marker == transaction->m_marker) {
+#ifndef NO_LOGS
                 debug(4, "Out of a SecMarker after skip " \
                     + std::to_string(m_secmarker_skipped) + " rules.");
+#endif
                 transaction->m_marker.clear();
+#ifndef NO_LOGS
                 m_secmarker_skipped = 0;
+#endif
             }
         } else if (transaction->m_skip_next > 0) {
             transaction->m_skip_next--;

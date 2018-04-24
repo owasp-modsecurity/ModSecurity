@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Disables skip counter if debug log is disabled
+   [@zimmerle]
  - Cosmetics: Represents amount of skipped rules without decimal
    [Issue #1737 - @p0pr0ck5]
  - Add missing escapeSeqDecode, urlEncode and trimLeft/Right tfns to parser
