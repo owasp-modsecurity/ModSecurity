@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix memory leak in modsecurity::utils::expandEnv()
+   [Issue #1750 - @defanator]
  - Initialize m_dtd member in ValidateDTD class as NULL
    [Issue #1751 - @airween]
  - Fix broken @detectxss operator regression test case
