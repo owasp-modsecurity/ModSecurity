@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Initialize m_dtd member in ValidateDTD class as NULL
+   [Issue #1751 - @airween]
  - Fix broken @detectxss operator regression test case
    [Issue #1739 - @p0pr0ck5]
  - Fix utils::string::ssplit() to handle delimiter in the end of string
