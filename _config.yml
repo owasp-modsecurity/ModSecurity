@@ -1,4 +1,13 @@
+
 theme: jekyll-theme-minimal
+
+title: ModSecurity
+description: n/a
+
+logo: https://github.com/SpiderLabs/ModSecurity/raw/v3/master/others/modsec.png
+show_downloads: true
+# google_analytics: [Your Google Analytics tracking ID]
+
 
 plugins:
    - jekyll-feed
