@@ -42,16 +42,59 @@ As a result of this goal we have rearchitechted Libmodsecurity such that it is n
 - https://github.com/SpiderLabs/ModSecurity/wiki/
 - https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-%28v2.x%29
 
+
 ### Contributing
+
+- https://help.github.com/articles/creating-a-pull-request/
+
 
 ### Rules
 
-### Demo
+#### Commercial Rules from Trustwave SpiderLabs
+
+The ModSecurity Rules from Trustwave SpiderLabs are based on intelligence gathered from real-world investigations, penetration tests and research. The rules package is updated daily by the SpiderLabs Research Team to ensure that customers receive critical updates in a timely manner.
+
+Here is a quick listing of security coverage:
+ - Virtual Patching
+ - IP Reputation
+ - Web-based Malware Detection
+ - Webshell/Backdoor Detection
+ - Botnet Attack Detection
+ - HTTP Denial of Service (DoS) Attack Detection
+ - Anti-Virus Scanning of File Attachments
+
+Get to know more about [Commercial Rules from Trustwave SpiderLabs](https://ssl.trustwave.com/web-application-firewall)
+
+
+#### OWASP ModSecurity Core Rule Set (CRS) Version 3
+
+The OWASP ModSecurity CRS Project's goal is to provide an easily "pluggable" set of generic attack detection rules that provide a base level of protection for any web application.
+
+Our latest 3.0 version provides protections if the following attack/threat categories:
+
+ - HTTP Protocol Protection
+ - Real-time Blacklist Lookups
+ - HTTP Denial of Service Protections
+ - Generic Web Attack Protection
+ - Error Detection and Hiding
+
 
 ### Need help?
 
 
+#### Commercial Services from Trustwave
+
+Trustwave offers a number of commercial offerings and services to support the ModSecurity community including:
+
+ - ModSecurity Support - Receive phone and email support from the Trustwave Technical Assistance Center (TAC) for ModSecurity configuration questions, alert analysis questions and trouble-shooting.
+
+ - ModSecurity Professional Services - Receive hands-on assistance directly from the SpiderLabs Research ModSecurity team for installation help, advanced/custom configurations and virtual patching.
+
+ - ModSecurity Training - The SpiderLabs Research ModSecurity Team teaches students how to defend web applications with ModSecurity including hands-on lab activities and is available online or onsite in one, two or three-day seminars.
 
 
+#### Community Support
 
+
+[Create a new issue](https://github.com/SpiderLabs/ModSecurity/issues/new) on our GitHub Project.
 
