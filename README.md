@@ -1,7 +1,18 @@
 
-<img src="https://github.com/SpiderLabs/ModSecurity/raw/v3/master/others/modsec.png" width="50%">
+### What is ModSecurity?
 
-### What can ModSecurity Do?
+#### What Can ModSecurity Do?
+
+### Documentation
+
+### Contributing
+
+### Rules
+
+### Demo
+
+### Need help?
+
 
 ModSecurity is a toolkit for real-time web application monitoring, logging, and access control. I like to think about it as an enabler: there are no hard rules telling you what to do; instead, it is up to you to choose your own path through the available features. That's why the title of this section asks what ModSecurity can do, not what it does.
 
