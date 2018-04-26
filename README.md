@@ -70,7 +70,7 @@ Here is a quick listing of security coverage:
 Get to know more about [Commercial Rules from Trustwave SpiderLabs](https://ssl.trustwave.com/web-application-firewall)
 
 
-### OWASP ModSecurity Core Rule Set (CRS) Version 3
+### OWASP ModSecurity Core Rule Set
 
 The OWASP ModSecurity CRS Project's goal is to provide an easily "pluggable" set of generic attack detection rules that provide a base level of protection for any web application.
 
