@@ -42,15 +42,14 @@ As a result of this goal we have rearchitechted ModSecurity such that it is no l
 
 The project documentation can be found in our GitHub wiki:
 
-- https://github.com/SpiderLabs/ModSecurity/wiki/
-- https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-%28v2.x%29
-
+- [Main GitHub page](https://github.com/SpiderLabs/ModSecurity/wiki/)
+- [Reference Manual for version 2.9](https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-%28v2.x%29)
 
 ### Contributing
 
 Contributions of all natures are more than welcomed. If you are willing to send us code, please check the GitHub instructions on how to create a pull request:
 
-- https://help.github.com/articles/creating-a-pull-request/
+- [GitHub documentation on how to create a pull request](https://help.github.com/articles/creating-a-pull-request/)
 
 
 ### Rules
