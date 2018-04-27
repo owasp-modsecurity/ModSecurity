@@ -30,7 +30,9 @@
         {% endif %}
 
         {% if site.show_downloads %}
-        <p class="view">ModSecurity v3.x
+        <script>
+          document.write('<p class="view">ModSecurity v3.x');
+        </script>
         <a href="https://github.com/SpiderLabs/ModSecurity/tree/v3/master"><small>v3/master</small></a>
         </p>
         <br>
@@ -41,6 +43,7 @@
         <p class="view">Releases
         <a href="https://github.com/SpiderLabs/ModSecurity/releases"><small>ModSecurity/releases</small></a>
         </p>
+         
         {% endif %}
         <br><br>
         <center>
