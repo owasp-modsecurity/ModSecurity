@@ -6,3 +6,7 @@ test 123
 <input name="a">
 
 <script>alert('a');</script>
+
+
+<a href="javascript:alert('a');">teste</a>
+
