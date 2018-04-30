@@ -221,7 +221,6 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     Utils::Regex variables("v([0-9]+),([0-9]+)");
     Utils::Regex operators("o([0-9]+),([0-9]+)");
     Utils::Regex transformations("t:(?:(?!t:).)+");
-    int i;
     yajl_gen g;
     std::string varValue;
     std::string opValue;
