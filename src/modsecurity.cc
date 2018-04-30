@@ -325,6 +325,8 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             varValue.c_str()),
             varValue.size());
         yajl_gen_map_close(g);
+
+        delete t;
     }
 
     yajl_gen_array_close(g);
