@@ -72,7 +72,7 @@ Get to know more about [Commercial Rules from Trustwave SpiderLabs](https://ssl.
 
 ### OWASP ModSecurity Core Rule Set
 
-The OWASP ModSecurity CRS Project's goal is to provide an easily "pluggable" set of generic attack detection rules that provide a base level of protection for any web application.
+The OWASP ModSecurity CRS Project's goal is to provide an easily "pluggable" set of generic attack detection rules that provide a base level of protection for any web application. As a generic rules set, it demands tweaks before deployment at the cost of false positives.
 
 Our latest 3.0 version provides protections if the following attack/threat categories:
 
