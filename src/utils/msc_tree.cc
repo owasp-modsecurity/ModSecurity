@@ -461,8 +461,11 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
     } else {
         i_node = CPTCreateNode();
 
-        if(i_node == NULL)
+        if (i_node == NULL) {
+            free(new_node->prefix);
+            free(new_node);
             return NULL;
+        }
 
         //i_node->prefix = NULL;
         i_node->bit = test_bit;
@@ -480,6 +483,9 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
             i_node->netmasks = reinterpret_cast<unsigned char *>(malloc((node->count - i) * sizeof(unsigned char)));
 
             if(i_node->netmasks == NULL) {
+                free(new_node->prefix);
+                free(new_node);
+                free(i_node);
                 return NULL;
             }
 
