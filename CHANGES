@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix setvar parsing of quoted data
+   [Issue #1733 - @victorhora, @defanator, @zimmerle]
  - Disables skip counter if debug log is disabled
    [@zimmerle]
  - Cosmetics: Represents amount of skipped rules without decimal
