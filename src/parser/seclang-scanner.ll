@@ -718,8 +718,8 @@ EQUALS_MINUS                            (?i:=\-)
 
 
 <SETVAR_ACTION_QUOTED_WAITING_CONTENT>{
-{FREE_TEXT_EQUALS_MACRO_EXPANSION}        { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 \'                        { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+{FREE_TEXT_EQUALS_MACRO_EXPANSION}        { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 .|\n                      { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); yyless(0); }
 }
 
