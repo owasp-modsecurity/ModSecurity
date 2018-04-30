@@ -55,7 +55,7 @@ unit_tests_LDADD = \
 	$(YAJL_LDADD)
 
 
-unit_tests_LDFLAG = \
+unit_tests_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
