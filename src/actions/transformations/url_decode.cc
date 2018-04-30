@@ -40,7 +40,7 @@ UrlDecode::UrlDecode(std::string action)
 std::string UrlDecode::evaluate(std::string value,
     Transaction *transaction) {
     unsigned char *val = NULL;
-    int invalid_count;
+    int invalid_count = 0;
     int changed;
 
     val = (unsigned char *) malloc(sizeof(char) * value.size() + 1);
