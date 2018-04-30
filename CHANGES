@@ -5,14 +5,12 @@ v3.0.3 - YYYY-MMM-DD (to be released)
    [Issue #1771 - @Artistan]
  - Checks if response body inspection is enabled before process it
    [Issue #1643 - @zoltan-fedor, @dennus, @defanator, @zimmerle]
- - processContentOffset Cleanup
-   [Issue #1757 - @p0pr0ck5]
+ - Code Cleanup.
+   [Issue #1757, #1755, #1756, #1761 - @p0pr0ck5]
  - Fix setvar parsing of quoted data
    [Issue #1733, #1759 - @JaiHarpalani, @victorhora, @defanator]
  - Fix LDFLAGS for unit tests.
    [Issue #1758 - @smlx]
- - Code cosmetics: Clean up MD5 hexdigest
-   [Issue #1761 - @p0pr0ck5]
  - Adds time stamp back to the audit logs
    [Issue #1762 - @Pjack, @zimmerle]
  - Disables skip counter if debug log is disabled
