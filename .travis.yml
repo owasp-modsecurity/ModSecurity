@@ -44,7 +44,7 @@ before_script:
 script:
   - ./build.sh
   - ./configure $OPTS
-  - make
+  - make -j$(getconf _NPROCESSORS_ONLN)
   - make check
   - make check-static
 
