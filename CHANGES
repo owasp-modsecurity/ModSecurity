@@ -1,6 +1,9 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ 
+ - Fix setvar parsing of quoted data
+   [Issue #1733, #1759 - @JaiHarpalani, @victorhora, @defanator]
  - Fix LDFLAGS for unit tests.
    [Issue #1758 - @smlx]
  - Code cosmetics: Clean up MD5 hexdigest
