@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix LDFLAGS for unit tests.
+   [Issue #1758 - @smlx]
  - Code cosmetics: Clean up MD5 hexdigest
    [Issue #1761 - @p0pr0ck5]
  - Adds time stamp back to the audit logs
