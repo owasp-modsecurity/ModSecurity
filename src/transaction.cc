@@ -1396,7 +1396,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     //ss << utils::string::dash_if_empty(
     //    this->m_collections.resolveFirst("LOCAL_USER").get());
     //ss << " ";
-    //ss << tstr << " ";
+    ss << tstr << " ";
 
     ss << "\"";
     ss << utils::string::dash_if_empty(m_variableRequestMethod.evaluate());

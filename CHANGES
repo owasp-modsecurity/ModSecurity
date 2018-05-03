@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds time stamp back to the audit logs
+   [Issue #1762 - @Pjack, @zimmerle]
  - Disables skip counter if debug log is disabled
    [@zimmerle]
  - Cosmetics: Represents amount of skipped rules without decimal
