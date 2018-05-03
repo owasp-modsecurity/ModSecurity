@@ -1,7 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
- 
+ - processContentOffset Cleanup
+   [Issue #1757 - @p0pr0ck5]
  - Fix setvar parsing of quoted data
    [Issue #1733, #1759 - @JaiHarpalani, @victorhora, @defanator]
  - Fix LDFLAGS for unit tests.
