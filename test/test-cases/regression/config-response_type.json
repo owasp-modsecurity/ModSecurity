@@ -35,6 +35,7 @@
     },
     "rules":[
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecResponseBodyMimeType text\/plain text\/html text\/xml",
       "SecRule RESPONSE_BODY \"@contains RESPONSE_CONTENT_TYPE\" \"id:9,pass,t:trim,phase:4\""
     ]
@@ -75,6 +76,7 @@
     },
     "rules":[
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecResponseBodyMimeType application\/something",
       "SecRule RESPONSE_BODY \"@contains RESPONSE_CONTENT_TYPE\" \"id:9,pass,t:trim,phase:4\""
     ]
@@ -115,6 +117,7 @@
     },
     "rules":[
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecResponseBodyMimeType text\/plain text\/tml text\/xml",
       "SecResponseBodyMimeTypesClear",
       "SecRule RESPONSE_BODY \"@contains RESPONSE_CONTENT_TYPE\" \"id:9,pass,t:trim,phase:4\""

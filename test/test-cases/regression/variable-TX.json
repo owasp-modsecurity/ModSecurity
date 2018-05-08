@@ -37,6 +37,7 @@
     },
     "rules":[
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecRequestBodyAccess On",
       "SecRule RESPONSE_BODY \"@rx ([0-9]+)\" \"id:1,phase:4,capture,id:105\"",
       "SecRule TX \"@rx ([A-z]+)\" \"phase:4,id:106\""

@@ -35,6 +35,7 @@
     },
     "rules":[  
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecRule OUTBOUND_DATA_ERROR \"@eq 1\" \"id:1,phase:4,pass,t:trim\""
     ]
   },
@@ -108,6 +109,7 @@
     },
     "rules":[  
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecResponseBodyLimit 2",
       "SecRule OUTBOUND_DATA_ERROR \"@eq 1\" \"id:1,phase:4,pass,t:trim\""
     ]

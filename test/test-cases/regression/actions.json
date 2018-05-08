@@ -55,6 +55,7 @@
     },
     "rules": [
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny\""
     ]
   },
@@ -352,6 +353,7 @@
     },
     "rules": [
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecRule ARGS \"@contains test\" \"id:1,phase:4,t:trim,status:500,deny\""
     ]
   }

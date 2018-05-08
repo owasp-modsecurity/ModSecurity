@@ -28,6 +28,7 @@
     },
     "rules":[
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecRule RESPONSE_BODY \"@contains denystring\" \"id:1,phase:4,deny\""
     ]
   }

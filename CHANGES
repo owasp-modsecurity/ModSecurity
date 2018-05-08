@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Checks if response body inspection is enabled before process it
+   [Issue #1643 - @zoltan-fedor, @dennus, @defanator, @zimmerle]
  - processContentOffset Cleanup
    [Issue #1757 - @p0pr0ck5]
  - Fix setvar parsing of quoted data

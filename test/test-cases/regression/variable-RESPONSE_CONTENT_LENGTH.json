@@ -36,6 +36,7 @@
     },
     "rules":[  
       "SecRuleEngine On",
+      "SecResponseBodyAccess On",
       "SecRule RESPONSE_CONTENT_LENGTH \"@contains test \" \"id:1,phase:4,pass,t:trim\""
     ]
   }

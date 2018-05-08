@@ -1093,6 +1093,13 @@ int Transaction::processResponseBody() {
         return true;
     }
 
+    if (m_rules->m_secResponseBodyAccess != RulesProperties::TrueConfigBoolean) {
+#ifndef NO_LOGS
+        debug(4, "Response body is disabled, returning... " + std::to_string(m_rules->m_secResponseBodyAccess));
+#endif
+        return true;
+    }
+
     std::set<std::string> &bi = \
         m_rules->m_responseBodyTypeToBeInspected.m_value;
     auto t = bi.find(m_variableResponseContentType.m_value);

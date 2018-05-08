@@ -77,6 +77,7 @@
       "SecRuleEngine On",
       "SecRule ARGS:key \"@contains other_value\" \"chain,pass,phase:response,id:28\"",
       "SecRule MATCHED_VAR \"@contains Aasdf\" \"\"",
+      "SecResponseBodyAccess On",
       "SecRule MATCHED_VAR \"@contains other_value\" \"id:29,phase:response,pass\"",
       "SecRule MATCHED_VAR \"@contains other_value\" \"id:30,phase:response,pass\""
     ]
