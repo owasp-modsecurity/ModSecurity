@@ -53,7 +53,7 @@ if test -n "${curl_path}"; then
         CURL_CONFIG="${curl_path}/${CURL_CONFIG}"
     fi
     AC_MSG_RESULT([${CURL_CONFIG}])
-    CURL_VERSION=`${CURL_CONFIG} --version | sed 's/^[[^0-9]][[^[:space:]]][[^[:space:]]]*[[[:space:]]]*//'`
+    CURL_VERSION=`${CURL_CONFIG} --version | sed 's/^[[^0-9]][[^[:space:]]][[^[:space:]]]*[[[:space:]]]*//' | tr '\r\n' ' '`
     if test ! -z "${CURL_VERSION}"; then AC_MSG_NOTICE(curl VERSION: $CURL_VERSION); fi
     CURL_CFLAGS="`${CURL_CONFIG} --cflags`"
     if test ! -z "${CURL_CFLAGS}"; then AC_MSG_NOTICE(curl CFLAGS: $CURL_CFLAGS); fi
