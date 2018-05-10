@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * build: fix when multiple lines for curl version
+   [Issue #1771 - @Artistan]
  * Fix arabic charset in unicode_mapping file
    [Issue #1619 - @alaa-ahmed-a]
  * Optionally preallocates memory when SecStreamInBodyInspection is on
