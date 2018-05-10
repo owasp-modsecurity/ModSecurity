@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * modsecurity.conf-recommended: Fix spelling
+   [Issue #1721 - @padraigdoran]
  * build: fix when multiple lines for curl version
    [Issue #1771 - @Artistan]
  * Fix arabic charset in unicode_mapping file
