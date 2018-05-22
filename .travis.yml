@@ -45,7 +45,13 @@ script:
   - ./build.sh
   - ./configure $OPTS
   - make parser
-  - make -j$(getconf _NPROCESSORS_ONLN)
+  - make
+#
+# Temporarily disabled.
+# - make -j$(getconf _NPROCESSORS_ONLN)
+# Leading build to crash with parser enabled.
+# Not sure why.
+#
   - make check
   - make check-static
 
