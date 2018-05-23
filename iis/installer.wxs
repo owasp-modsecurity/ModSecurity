@@ -346,7 +346,7 @@
                 <!-- Modify ApplicationHost.config -->
                 <util:XmlConfig Id="appHostEntry" File="$(var.ConfigFile)" Action="create" ElementPath="//configuration/configSections/sectionGroup[\[]@name='system.webServer'[\]]" VerifyPath="section[\[]@name='ModSecurity'[\]]" Name="section" Node="element" Sequence="1" On="install" />
                 <util:XmlConfig Id="appHostEntryName" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="name" Value="ModSecurity" Sequence="2" />
-                <util:XmlConfig Id="appHostEntryOverrideMode" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="overrideModeDefault" Value="Deny" Sequence="3" />
+                <util:XmlConfig Id="appHostEntryOverrideMode" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="overrideModeDefault" Value="Allow" Sequence="3" />
                 <util:XmlConfig Id="appHostEntryAllowDefinition" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="allowDefinition" Value="Everywhere" Sequence="4" />
                 <util:XmlConfig Id="removeAppHostEntry" File="$(var.ConfigFile)" Action="delete" ElementPath="/configuration/configSections/sectionGroup[\[]@name='system.webServer'[\]]" Node="element" VerifyPath="section[\[]@name='ModSecurity'[\]]" On="uninstall" Sequence="1" />
                 <util:XmlConfig Id="removeAppHostEntry2" File="$(var.ConfigFile)" Action="delete" ElementPath="/configuration/system.webServer" Node="element" VerifyPath="/configuration/system.webServer/ModSecurity" Name="section" On="uninstall" Sequence="2" />
