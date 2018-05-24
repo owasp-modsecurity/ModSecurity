@@ -3,16 +3,15 @@
 
 [![Build Status](https://travis-ci.org/SpiderLabs/ModSecurity.svg?branch=v3/master)](https://travis-ci.org/SpiderLabs/ModSecurity)
 [![](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.com)
-
-[![Build Status](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=alert_status)](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L)
+[![Build Status](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=alert_status)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
 [![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=sqale_rating
-)](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L)
+)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
 [![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=reliability_rating
-)](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L)
+)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
 [![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=security_rating
-)](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L)
+)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
 [![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=vulnerabilities
-)](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L)
+)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
 
 
 
