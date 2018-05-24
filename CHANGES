@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Return false in SharedFiles::open() when an error happens
+   [Issue #1783 - @weliu]
  - Use rvalue reference in ModSecurity::serverLog
    [Issue #1769 - @weliu]
  - Build System: Fix when multiple lines for curl version.
