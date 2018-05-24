@@ -1013,7 +1013,7 @@ static int hook_request_late(request_rec *r) {
     }
 
     rc = read_request_body(msr, &my_error_msg);
-    if (rc < 0) {
+    if (rc < 0 && msr->txcfg->is_enabled == MODSEC_ENABLED) {
         switch(rc) {
             case -1 :
                 if (my_error_msg != NULL) {
