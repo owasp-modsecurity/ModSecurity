@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix memory leak in error message for msc_rules_merge C APIs
+   [Issue #1765 - @weliu]
  - Return false in SharedFiles::open() when an error happens
    [Issue #1783 - @weliu]
  - Use rvalue reference in ModSecurity::serverLog
