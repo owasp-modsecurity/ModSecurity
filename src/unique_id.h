@@ -15,6 +15,7 @@
 
 #ifdef __cplusplus
 #include <string>
+#include <mutex>
 #endif
 
 #ifndef SRC_UNIQUE_ID_H_
@@ -37,9 +38,9 @@ class UniqueId {
     }
 
     static std::string uniqueId() {
-        if (UniqueId::getInstance().uniqueId_str.empty()) {
+        std::call_once(UniqueId::onceFlag,[]() {
             UniqueId::getInstance().fillUniqueId();
-        }
+        });
 
         return UniqueId::getInstance().uniqueId_str;
     }
@@ -59,6 +60,8 @@ class UniqueId {
     // C++ 11
     // UniqueId(UniqueId const&) = delete;
     // void operator=(UniqueId const&) = delete;
+
+    static std::once_flag onceFlag;
 };
 
 }  // namespace modsecurity
