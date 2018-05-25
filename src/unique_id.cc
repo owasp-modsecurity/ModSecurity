@@ -55,6 +55,8 @@
 
 namespace modsecurity {
 
+std::once_flag UniqueId::onceFlag;
+
 void UniqueId::fillUniqueId() {
     std::string macAddress;
     std::string name;
