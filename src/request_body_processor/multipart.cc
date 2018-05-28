@@ -1089,6 +1089,10 @@ int Multipart::multipart_complete(std::string *error) {
 #ifndef NO_LOGS
                 debug(1, "Multipart: Final boundary missing.");
 #endif
+                m_flag_unmatched_boundary = 1;
+                m_transaction->m_variableMultipartUnmatchedBoundary.set(
+                    std::to_string(m_flag_unmatched_boundary),
+                    m_transaction->m_variableOffset);
                 error->assign("Multipart: Final boundary missing.");
                 return false;
             }
@@ -1424,6 +1428,8 @@ bool Multipart::process(const std::string& data, std::string *error,
     unsigned int inleft = data.size();
     size_t z = 0;
 
+    std::list<std::string> boundaries;
+
     if (data.size() == 0) return true;
     m_seen_data = true;
 
@@ -1574,7 +1580,13 @@ bool Multipart::process(const std::string& data, std::string *error,
                         return false;
                     }
 
-                    m_flag_unmatched_boundary = 1;
+                    bool contains = std::find(boundaries.begin(), boundaries.end(), p) != boundaries.end();
+                    if (contains) {
+                        debug(4, "Multipart: unmatched boundary...  '" + std::string(p) + "'.");
+                        m_flag_unmatched_boundary = 1;
+                    } else {
+                        boundaries.push_back(p);
+                    }
                 }
             } else { /* We do not think the buffer contains a boundary. */
                 /* Look into the buffer to see if there's anything
@@ -1589,6 +1601,7 @@ bool Multipart::process(const std::string& data, std::string *error,
                             && (p[i + 1] == '-')) {
                             if (strncmp(p + i + 2, m_boundary.c_str(),
                                 m_boundary.size()) == 0) {
+                                debug(4, "Multipart: unmatched boundary.");
                                 m_flag_unmatched_boundary = 1;
                                 break;
                             }
