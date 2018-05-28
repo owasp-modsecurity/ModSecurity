@@ -321,7 +321,7 @@ extern "C" int msc_rules_merge(Rules *rules_dst,
     Rules *rules_from, const char **error) {
     int ret = rules_dst->merge(rules_from);
     if (ret < 0) {
-        *error = rules_dst->getParserError().c_str();
+        *error = strdup(rules_dst->getParserError().c_str());
     }
     return ret;
 }
@@ -331,7 +331,7 @@ extern "C" int msc_rules_add_remote(Rules *rules,
     const char *key, const char *uri, const char **error) {
     int ret = rules->loadRemote(key, uri);
     if (ret < 0) {
-        *error = rules->getParserError().c_str();
+        *error = strdup(rules->getParserError().c_str());
     }
     return ret;
 }
@@ -341,7 +341,7 @@ extern "C" int msc_rules_add_file(Rules *rules, const char *file,
     const char **error) {
     int ret = rules->loadFromUri(file);
     if (ret < 0) {
-        *error = rules->getParserError().c_str();
+        *error = strdup(rules->getParserError().c_str());
     }
     return ret;
 }
@@ -351,7 +351,7 @@ extern "C" int msc_rules_add(Rules *rules, const char *plain_rules,
     const char **error) {
     int ret = rules->load(plain_rules);
     if (ret < 0) {
-        *error = rules->getParserError().c_str();
+        *error = strdup(rules->getParserError().c_str());
     }
     return ret;
 }
