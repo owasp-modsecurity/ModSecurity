@@ -50,7 +50,7 @@ namespace backend {
 class LMDB :
     public Collection {
  public:
-    LMDB();
+    LMDB(std::string name);
     ~LMDB();
     void store(std::string key, std::string value) override;
 
