@@ -63,11 +63,11 @@ ModSecurity::ModSecurity()
     : m_connector(""),
     m_whoami(""),
 #ifdef WITH_LMDB
-    m_global_collection(new collection::backend::LMDB()),
-    m_resource_collection(new collection::backend::LMDB()),
-    m_ip_collection(new collection::backend::LMDB()),
-    m_session_collection(new collection::backend::LMDB()),
-    m_user_collection(new collection::backend::LMDB()),
+    m_global_collection(new collection::backend::LMDB("GLOBAL")),
+    m_resource_collection(new collection::backend::LMDB("RESOURCE")),
+    m_ip_collection(new collection::backend::LMDB("IP")),
+    m_session_collection(new collection::backend::LMDB("SESSION")),
+    m_user_collection(new collection::backend::LMDB("USER")),
 #else
     m_global_collection(new collection::backend::InMemoryPerProcess("GLOBAL")),
     m_ip_collection(new collection::backend::InMemoryPerProcess("IP")),
