@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * IIS: set overrideModeDefault to Allow so that individual websites can
+   add <ModSecurity ...> to their web.config file
+   [Issue #1781 - @default-kramer]
  * modsecurity.conf-recommended: Fix spelling
    [Issue #1721 - @padraigdoran]
  * build: fix when multiple lines for curl version
