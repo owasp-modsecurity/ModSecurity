@@ -87,6 +87,14 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
             size_t start = ovector[2*i];
             size_t end = ovector[2*i+1];
             size_t len = end - start;
+
+            match.match = std::string(tmpString, start, len);
+            match.m_offset = start;
+            match.m_length = len;
+            offset = start + len;
+
+            retList.push_front(match);
+
             if (end > s.size()) {
                 rc = 0;
                 break;
@@ -95,12 +103,6 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
                 rc = 0;
                 break;
             }
-            match.match = std::string(tmpString, start, len);
-            match.m_offset = start;
-            match.m_length = len;
-            offset = start + len;
-
-            retList.push_front(match);
         }
     } while (rc > 0);
 
