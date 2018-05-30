@@ -35,13 +35,13 @@ class Tx_DictElement : public Variable {
  public:
     explicit Tx_DictElement(std::string dictElement)
         : Variable("TX:" + dictElement),
-        m_dictElement(dictElement) { }
+        m_dictElement("TX:" + dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveMultiMatches(
-            m_dictElement, l);
+            m_name, l);
     }
 
     std::string m_dictElement;

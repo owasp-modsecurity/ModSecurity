@@ -34,14 +34,15 @@ namespace Variables {
 class Global_DictElement : public Variable {
  public:
     explicit Global_DictElement(std::string dictElement)
-        : Variable("GLOBAL"),
-        m_dictElement(dictElement) { }
+        : Variable("GLOBAL:" + dictElement),
+        m_dictElement("GLOBAL:" + dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_global_collection->resolveMultiMatches(
-            m_dictElement, t->m_collections.m_global_collection_key, l);
+            m_name, t->m_collections.m_global_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     std::string m_dictElement;
@@ -56,8 +57,9 @@ class Global_NoDictElement : public Variable {
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        t->m_collections.m_global_collection->resolveMultiMatches(m_name,
-            t->m_collections.m_global_collection_key, l);
+        t->m_collections.m_global_collection->resolveMultiMatches("",
+            t->m_collections.m_global_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 };
 
@@ -73,7 +75,9 @@ class Global_DictElementRegexp : public Variable {
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_global_collection->resolveRegularExpression(
-            m_dictElement, t->m_collections.m_global_collection_key, l);
+            m_dictElement,
+            t->m_collections.m_global_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     Utils::Regex m_r;
@@ -92,19 +96,24 @@ class Global_DynamicElement : public Variable {
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_global_collection->resolveMultiMatches(
-            string, t->m_collections.m_global_collection_key, l);
+            string,
+            t->m_collections.m_global_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
 
     }
 
     void del(Transaction *t, std::string k) {
         t->m_collections.m_global_collection->del(k,
-            t->m_collections.m_global_collection_key);
+            t->m_collections.m_global_collection_key,
+            t->m_rules->m_secWebAppId.m_value);
     }
 
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_global_collection->storeOrUpdateFirst(
-            var, t->m_collections.m_global_collection_key, value);
+            var, t->m_collections.m_global_collection_key,
+            t->m_rules->m_secWebAppId.m_value,
+            value);
     }
 
     std::unique_ptr<RunTimeString> m_string;

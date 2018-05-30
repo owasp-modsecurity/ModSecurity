@@ -40,9 +40,9 @@ class Ip_DictElement : public Variable {
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        t->m_collections.m_ip_collection->resolveMultiMatches(m_dictElement,
-            t->m_collections.m_ip_collection_key, l);
-
+        t->m_collections.m_ip_collection->resolveMultiMatches(
+            m_name, t->m_collections.m_ip_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     std::string m_dictElement;
@@ -57,8 +57,9 @@ class Ip_NoDictElement : public Variable {
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        t->m_collections.m_ip_collection->resolveMultiMatches(m_name,
-            t->m_collections.m_ip_collection_key, l);
+        t->m_collections.m_ip_collection->resolveMultiMatches("",
+            t->m_collections.m_ip_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 };
 
@@ -68,13 +69,14 @@ class Ip_DictElementRegexp : public Variable {
     explicit Ip_DictElementRegexp(std::string dictElement)
         : Variable("IP:regex(" + dictElement + ")"),
         m_r(dictElement),
-        m_dictElement("IP:" + dictElement) { }
+        m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_ip_collection->resolveRegularExpression(m_dictElement,
-            t->m_collections.m_ip_collection_key, l);
+            t->m_collections.m_ip_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     Utils::Regex m_r;
@@ -92,19 +94,24 @@ class Ip_DynamicElement : public Variable {
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
-        t->m_collections.m_ip_collection->resolveMultiMatches("IP:" + string,
-            t->m_collections.m_ip_collection_key, l);
+        t->m_collections.m_ip_collection->resolveMultiMatches(
+            string,
+            t->m_collections.m_ip_collection_key,
+            t->m_rules->m_secWebAppId.m_value, l);
     }
 
     void del(Transaction *t, std::string k) {
         t->m_collections.m_ip_collection->del(k,
-            t->m_collections.m_ip_collection_key);
+            t->m_collections.m_ip_collection_key,
+            t->m_rules->m_secWebAppId.m_value);
     }
 
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_ip_collection->storeOrUpdateFirst(
-            var, t->m_collections.m_ip_collection_key, value);
+            var, t->m_collections.m_ip_collection_key,
+            t->m_rules->m_secWebAppId.m_value,
+            value);
     }
 
     std::unique_ptr<RunTimeString> m_string;

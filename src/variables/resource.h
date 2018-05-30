@@ -35,13 +35,13 @@ class Resource_DictElement : public Variable {
  public:
     explicit Resource_DictElement(std::string dictElement)
         : Variable("RESOURCE:" + dictElement),
-        m_dictElement(dictElement) { }
+        m_dictElement("RESOURCE:" + dictElement) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        t->m_collections.m_resource_collection->resolveMultiMatches(m_dictElement,
-            t->m_collections.m_resource_collection_key,
+        t->m_collections.m_resource_collection->resolveMultiMatches(
+            m_name, t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, l);
     }
 
@@ -102,14 +102,14 @@ class Resource_DynamicElement : public Variable {
 
     void del(Transaction *t, std::string k) {
         t->m_collections.m_resource_collection->del(k,
-            t->m_collections.m_resource_collection_key);
+            t->m_collections.m_resource_collection_key,
+            t->m_rules->m_secWebAppId.m_value);
     }
 
     void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_resource_collection->storeOrUpdateFirst(
-            var,
-            t->m_collections.m_resource_collection_key,
+            var, t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, value);
     }
 
