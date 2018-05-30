@@ -1,6 +1,9 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Refactoring on {global,ip,resources,session,tx,user} collections
+   [Issue #1754, #1778 - @LeeShan87, @zimmerle, @victorhora, @wwd5613,
+                         @sobigboy]
  - Fix race condition in UniqueId::uniqueId()
    [Issue #1786 - @weliu]
  - Fix memory leak in error message for msc_rules_merge C APIs
