@@ -241,15 +241,14 @@ void Rule::updateRulesVariable(Transaction *trans) {
 
 
 void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
-    bool *containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage) {
+    bool *containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
     for (Action *a : this->m_actionsRuntimePos) {
         if (a->isDisruptive() == true) {
-            if (a->m_name == "pass") {
+            if (a->m_name == "block") {
 #ifndef NO_LOGS
-                trans->debug(9, "Rule contains a `pass' action");
+                trans->debug(9, "Rule contains a `block' action");
+                *containsBlock = true;
 #endif
-            } else {
-                *containsDisruptive = true;
             }
         } else {
             if (a->m_name == "setvar" || a->m_name == "msg"
@@ -661,7 +660,7 @@ std::vector<std::unique_ptr<VariableValue>> Rule::getFinalVars(
 
 
 void Rule::executeActionsAfterFullMatch(Transaction *trans,
-    bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage) {
+    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
 
     for (Action *a : trans->m_rules->m_defaultActions[this->m_phase]) {
         if (a->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
@@ -677,11 +676,11 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
             continue;
         }
 
-        if (containsDisruptive) {
+        if (!containsBlock) {
 #ifndef NO_LOGS
             trans->debug(4, "(SecDefaultAction) ignoring " \
                 "action: " + a->m_name + \
-                " (rule contains a disruptive action)");
+                " (rule does not cotains block)");
 #endif
             continue;
         }
@@ -690,7 +689,7 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
 #ifndef NO_LOGS
             trans->debug(4, "(SecDefaultAction) " \
                 "Running action: " + a->m_name + \
-                " (rule does not contain a disruptive action)");
+                ".");
 #endif
             a->evaluate(this, trans, ruleMessage);
             continue;
@@ -698,7 +697,7 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
 
 #ifndef NO_LOGS
         trans->debug(4, "(SecDefaultAction) Not running action: " \
-                + a->m_name + ". Rule does not contain a disruptive action,"\
+                + a->m_name + ". Rule contains 'block',"\
                 + " but SecRuleEngine is not On.");
 #endif
     }
@@ -736,7 +735,7 @@ bool Rule::evaluate(Transaction *trans,
     bool globalRet = false;
     std::vector<Variable *> *variables = this->m_variables;
     bool recursiveGlobalRet;
-    bool containsDisruptive = false;
+    bool containsBlock = false;
     std::vector<std::unique_ptr<VariableValue>> finalVars;
     std::string eparam;
 
@@ -756,7 +755,7 @@ bool Rule::evaluate(Transaction *trans,
             + ") Executing unconditional rule...");
 #endif
         executeActionsIndependentOfChainedRuleResult(trans,
-            &containsDisruptive, ruleMessage);
+            &containsBlock, ruleMessage);
         goto end_exec;
     }
 
@@ -827,7 +826,7 @@ bool Rule::evaluate(Transaction *trans,
                 ruleMessage->m_reference.append(*valueTemp.second);
                 updateMatchedVars(trans, key, value);
                 executeActionsIndependentOfChainedRuleResult(trans,
-                    &containsDisruptive, ruleMessage);
+                    &containsBlock, ruleMessage);
                 globalRet = true;
             }
         }
@@ -870,7 +869,7 @@ end_clean:
     return false;
 
 end_exec:
-    executeActionsAfterFullMatch(trans, containsDisruptive, ruleMessage);
+    executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
     if (m_ruleId != 0 && ruleMessage->m_saveMessage != false) {
         trans->serverLog(ruleMessage);
         trans->m_rulesMessages.push_back(*ruleMessage);

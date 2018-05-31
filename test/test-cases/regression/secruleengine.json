@@ -4,14 +4,14 @@
     "version_min":300000,
     "title":"Testing Disruptive actions (1/n)",
     "expected":{
-      "debug_log": " Running action: deny",
+      "debug_log": " Running action deny",
       "http_code":403
     },
     "rules":[
       "SecRuleEngine On",
       "SecRuleEngine On",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"id:'900001',phase:request,nolog,status:403,t:none\""
+      "SecAction \"id:'900001',phase:request,nolog,status:403,t:none,block\""
     ]
   },
   {
@@ -26,7 +26,7 @@
       "SecRuleEngine On",
       "SecRuleEngine Off",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"id:'1',phase:request,nolog,t:none\""
+      "SecAction \"id:'1',phase:request,nolog,t:none,block\""
     ]
   },
   {
@@ -41,7 +41,7 @@
       "SecRuleEngine On",
       "SecRuleEngine DetectionOnly",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"id:'1',phase:request,nolog,nolog,block,t:none\""
+      "SecAction \"id:'1',phase:request,nolog,nolog,block,t:none,block\""
     ]
   },
   {
@@ -56,7 +56,7 @@
       "SecRuleEngine On",
       "SecRuleEngine Off",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"id:'1',phase:request,nolog,t:none\""
+      "SecAction \"id:'1',phase:request,nolog,t:none,block\""
     ]
   },
   {
@@ -71,7 +71,7 @@
       "SecRuleEngine On",
       "SecRuleEngine Off",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"id:'1',phase:request,nolog,block,t:none\""
+      "SecAction \"id:'1',phase:request,nolog,block,t:none,block\""
     ]
   }
 ]

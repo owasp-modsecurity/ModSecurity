@@ -278,8 +278,8 @@
     "rules":[
       "SecRuleEngine On",
       "SecDefaultAction \"phase:2,log,auditlog,status:302,redirect:'http://www.google.com'\"",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1\"",
-      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1,block\"",
+      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none,block\""
     ]
   }
 ]

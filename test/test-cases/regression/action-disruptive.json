@@ -4,13 +4,13 @@
     "version_min":300000,
     "title":"Testing Disruptive actions (1/n)",
     "expected":{
-      "debug_log": " Running action: deny",
+      "debug_log": "Running action deny",
       "http_code":403
     },
     "rules":[
       "SecRuleEngine On",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"id:'900001',phase:request,nolog,status:403,t:none\""
+      "SecAction \"id:'900001',phase:request,nolog,status:403,t:none,block\""
     ]
   },
   {
@@ -18,13 +18,13 @@
     "version_min":300000,
     "title":"Testing Disruptive actions (2/n)",
     "expected":{
-      "debug_log": " Running action: deny",
+      "debug_log": "Running action deny",
       "http_code":404
     },
     "rules":[
       "SecRuleEngine On",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"id:'1',phase:request,nolog,t:none\""
+      "SecAction \"id:'1',phase:request,nolog,t:none,block\""
     ]
   },
   {
