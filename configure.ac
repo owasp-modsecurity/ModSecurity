@@ -346,6 +346,7 @@ AC_SUBST(GLOBAL_CFLAGS)
 
 # Files to be generated via autotools.
 AC_CONFIG_FILES([\
+    modsecurity.pc \
     Makefile \
     doc/Makefile \
     src/Makefile \

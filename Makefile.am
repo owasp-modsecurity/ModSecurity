@@ -306,3 +306,8 @@ TESTS+=test/test-cases/secrules-language-tests/operators/ipMatch.json
 TESTS+=test/test-cases/secrules-language-tests/operators/ge.json
 TESTS+=test/test-cases/secrules-language-tests/operators/lt.json
 
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = modsecurity.pc
+EXTRA_DIST = modsecurity.pc.in
+
