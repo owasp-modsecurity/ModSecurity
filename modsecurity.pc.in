@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: ModSecurity
+Description: ModSecurity API
+Version: @PACKAGE_VERSION@
+Cflags: -I@includedir@/@PACKAGE@
+Libs: -L@libdir@ -lmodsecurity
