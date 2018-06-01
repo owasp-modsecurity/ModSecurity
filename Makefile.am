@@ -304,3 +304,7 @@ TESTS+=test/test-cases/secrules-language-tests/transformations/urlDecode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/urlDecodeUni.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/urlEncode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/utf8toUnicode.json
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = modsecurity.pc
+EXTRA_DIST = modsecurity.pc.in
