@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix ip tree lookup on netmask content
+   [Issue #1793 - @tinselcity, @zimmerle]
  - Changes the behavior of the default sec actions
    [Issue #1629 - @mirkodziadzka-avi, @zimmerle, @victorhora]
  - Refactoring on {global,ip,resources,session,tx,user} collections
