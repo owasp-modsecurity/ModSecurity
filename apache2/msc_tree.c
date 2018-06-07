@@ -755,7 +755,7 @@ TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip
         return node;
     }
 
-    if (memcmp(node->prefix->buffer, temp_data, bytes) == 0) {
+    if ((node->netmasks == NULL) && (memcmp(node->prefix->buffer, temp_data, bytes) == 0)) {
         mask = SHIFT_LEFT_MASK(8 - ip_bitmask % 8);
 
         if ((ip_bitmask % 8) == 0) {
