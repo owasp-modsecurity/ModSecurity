@@ -68,8 +68,6 @@ class MODSECURITY_STORED_CONTEXT : public IHttpStoredContext
             USHORT*  pdwLengthDestination );
 
 	void*			  m_Config;
-	DWORD			  m_dwLastCheck;
-	FILETIME		  m_LastChange;
 
 private:
     HRESULT 
