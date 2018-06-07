@@ -810,19 +810,8 @@ CMyHttpModule::OnBeginRequest(
     }
     EnterCriticalSection(&m_csLock);
 
-    // Get the config again, in case it changed during the time we released the lock
-    hr = MODSECURITY_STORED_CONTEXT::GetConfig(pHttpContext, &pConfig);
-    if (FAILED(hr))
-    {
-        hr = S_OK;
-        goto Finished;
-    }
 
-	// every 3 seconds we check for changes in config file
-	//
-	DWORD ctime = GetTickCount();
-
-	if(pConfig->m_Config == NULL || (ctime - pConfig->m_dwLastCheck) > 3000)
+	if(pConfig->m_Config == NULL)
 	{
 		char *path;
 		USHORT pathlen;
@@ -835,55 +824,42 @@ CMyHttpModule::OnBeginRequest(
 			goto Finished;
 		}
 
-		WIN32_FILE_ATTRIBUTE_DATA fdata;
-		BOOL ret;
+		pConfig->m_Config = modsecGetDefaultConfig();
 
-		ret = GetFileAttributesEx(path, GetFileExInfoStandard, &fdata);
+		PCWSTR servpath = pHttpContext->GetApplication()->GetApplicationPhysicalPath();
+		char *apppath;
+		USHORT apppathlen;
 
-		pConfig->m_dwLastCheck = ctime;
+		hr = pConfig->GlobalWideCharToMultiByte((WCHAR *)servpath, wcslen(servpath), &apppath, &apppathlen);
 
-		if(pConfig->m_Config == NULL || (ret != 0 && (pConfig->m_LastChange.dwLowDateTime != fdata.ftLastWriteTime.dwLowDateTime ||
-			pConfig->m_LastChange.dwHighDateTime != fdata.ftLastWriteTime.dwHighDateTime)))
+		if ( FAILED( hr ) )
 		{
-			pConfig->m_LastChange.dwLowDateTime = fdata.ftLastWriteTime.dwLowDateTime;
-			pConfig->m_LastChange.dwHighDateTime = fdata.ftLastWriteTime.dwHighDateTime;
+			delete path;
+			hr = E_UNEXPECTED;
+			goto Finished;
+		}
 
-			pConfig->m_Config = modsecGetDefaultConfig();
+		if(path[0] != 0)
+		{
+			const char * err = modsecProcessConfig((directory_config *)pConfig->m_Config, path, apppath);
 
-			PCWSTR servpath = pHttpContext->GetApplication()->GetApplicationPhysicalPath();
-			char *apppath;
-			USHORT apppathlen;
-
-			hr = pConfig->GlobalWideCharToMultiByte((WCHAR *)servpath, wcslen(servpath), &apppath, &apppathlen);
-
-			if ( FAILED( hr ) )
+			if(err != NULL)
 			{
+				WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
+				delete apppath;
 				delete path;
-				hr = E_UNEXPECTED;
 				goto Finished;
 			}
 
-			if(path[0] != 0)
+			modsecReportRemoteLoadedRules();
+			if (this->status_call_already_sent == false)
 			{
-				const char * err = modsecProcessConfig((directory_config *)pConfig->m_Config, path, apppath);
-
-				if(err != NULL)
-				{
-					WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
-					delete apppath;
-					delete path;
-					goto Finished;
-				}
-
-				modsecReportRemoteLoadedRules();
-				if (this->status_call_already_sent == false)
-				{
-					this->status_call_already_sent = true;
-					modsecStatusEngineCall();
-				}
+				this->status_call_already_sent = true;
+				modsecStatusEngineCall();
 			}
-			delete apppath;
 		}
+
+		delete apppath;
 		delete path;
 	}
 
@@ -1140,7 +1116,9 @@ CMyHttpModule::OnBeginRequest(
 #endif
 	c->remote_host = NULL;
 
+    LeaveCriticalSection(&m_csLock);
 	int status = modsecProcessRequest(r);
+    EnterCriticalSection(&m_csLock);
 
 	if(status != DECLINED)
 	{
