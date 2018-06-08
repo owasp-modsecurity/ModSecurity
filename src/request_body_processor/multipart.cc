@@ -1482,6 +1482,17 @@ bool Multipart::process(const std::string& data, std::string *error,
                     && (strncmp(m_buf + 2, m_boundary.c_str(),
                         m_boundary.size()) == 0)) {
                     char *boundary_end = m_buf + 2 + m_boundary.size();
+                    /* if it match, AND there was a matched boundary at least,
+                       set the m_flag_unmatched_boundary flag to 2
+                       this indicates that there were an opened boundary, which
+                       matches the reference, and here is the final boundary.
+                       The flag will differ from 0, so the previous rules ("!@eq 0")
+                       will catch all "errors", without any modification, but we can
+                       use the new, permission mode with "@eq 1"
+                    */
+                    if (m_boundary_count > 0) {
+                        m_flag_unmatched_boundary = 2;
+                    }
                     int is_final = 0;
 
                     /* Is this the final boundary? */
