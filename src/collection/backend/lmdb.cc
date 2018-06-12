@@ -27,7 +27,6 @@
 
 #undef LMDB_STDOUT_COUT
 
-
 namespace modsecurity {
 namespace collection {
 namespace backend {
@@ -35,8 +34,8 @@ namespace backend {
 
 #ifdef WITH_LMDB
 
-
-LMDB::LMDB() : Collection(""), m_env(NULL) {
+LMDB::LMDB(std::string name) :
+    Collection(name), m_env(NULL) {
     mdb_env_create(&m_env);
     mdb_env_open(m_env, "./modsec-shared-collections",
         MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
@@ -121,7 +120,7 @@ void LMDB::lmdb_debug(int rc, std::string op, std::string scope) {
         }
         std::cout << std::endl;
     } else if (op == "del") {
-        td::cout << scope << ", delete procedure failed: ";
+        std::cout << scope << ", delete procedure failed: ";
         switch (rc) {
             case EACCES:
                 std::cout << "an attempt was made to write in a ";
@@ -494,22 +493,40 @@ void LMDB::resolveMultiMatches(const std::string& var,
     }
 
     while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
-        if (key.mv_size <= keySize + 1) {
-            continue;
-        }
+        //
+        // I don't see what's the reason of this clause
+        //
+        // eg:
+        // looking for the variable: 'test', keySize will 4
+        // found key: 'test', key.mv_size will 4
+        // key.mv_size IS LESS than keySize+1, so we will continue?
+        //
+        //if (key.mv_size <= keySize + 1) {
+        //    continue;
+        //}
         char *a = reinterpret_cast<char *>(key.mv_data);
-        if (a[keySize] != ':') {
-            continue;
-        }
+        //
+        // also don't understand this part
+        //
+        // key.mv_data will 'test', but there isn't ':' at the end,
+        // so we will skip it?
+        //
+        //if (a[keySize] != ':') {
+        //    continue;
+        //}
+
+        // this will never evaluate with the two statements above,
+        // but I think this is the only required check
         if (strncmp(var.c_str(), a, keySize) != 0) {
             continue;
         }
-        VariableValue *v = new VariableValue(
-            new std::string(reinterpret_cast<char *>(key.mv_data),
+        l->insert(l->begin(), new VariableValue(
+                &m_name, 
+                new std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
-            new std::string(reinterpret_cast<char *>(data.mv_data),
-                data.mv_size));
-        l->insert(l->begin(), v);
+                new std::string(reinterpret_cast<char *>(data.mv_data),
+                data.mv_size))
+        );
     }
 
     mdb_cursor_close(cursor);
