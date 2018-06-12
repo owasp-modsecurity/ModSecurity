@@ -492,41 +492,29 @@ void LMDB::resolveMultiMatches(const std::string& var,
         goto end_cursor_open;
     }
 
-    while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
-        //
-        // I don't see what's the reason of this clause
-        //
-        // eg:
-        // looking for the variable: 'test', keySize will 4
-        // found key: 'test', key.mv_size will 4
-        // key.mv_size IS LESS than keySize+1, so we will continue?
-        //
-        //if (key.mv_size <= keySize + 1) {
-        //    continue;
-        //}
-        char *a = reinterpret_cast<char *>(key.mv_data);
-        //
-        // also don't understand this part
-        //
-        // key.mv_data will 'test', but there isn't ':' at the end,
-        // so we will skip it?
-        //
-        //if (a[keySize] != ':') {
-        //    continue;
-        //}
-
-        // this will never evaluate with the two statements above,
-        // but I think this is the only required check
-        if (strncmp(var.c_str(), a, keySize) != 0) {
-            continue;
-        }
-        l->insert(l->begin(), new VariableValue(
+    if (keySize == 0) {
+        while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
+            l->insert(l->begin(), new VariableValue(
                 &m_name, 
                 new std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
                 new std::string(reinterpret_cast<char *>(data.mv_data),
                 data.mv_size))
-        );
+            );
+        }
+    } else {
+        while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
+            char *a = reinterpret_cast<char *>(key.mv_data);
+            if (strncmp(var.c_str(), a, keySize) == 0) {
+                l->insert(l->begin(), new VariableValue(
+                    &m_name, 
+                    new std::string(reinterpret_cast<char *>(key.mv_data),
+                    key.mv_size),
+                    new std::string(reinterpret_cast<char *>(data.mv_data),
+                    data.mv_size))
+                );
+            }
+        }
     }
 
     mdb_cursor_close(cursor);
@@ -549,30 +537,7 @@ void LMDB::resolveRegularExpression(const std::string& var,
     MDB_cursor *cursor;
     size_t pos;
 
-    pos = var.find(":");
-    if (pos == std::string::npos) {
-        return;
-    }
-    if (var.size() < pos + 3) {
-        return;
-    }
-    pos = var.find(":", pos + 2);
-    if (pos == std::string::npos) {
-        return;
-    }
-    if (var.size() < pos + 3) {
-        return;
-    }
-
-    std::string nameSpace = std::string(var, 0, pos);
-    size_t pos2 = var.find(":", pos + 1) - pos - 1;
-    std::string col = std::string(var, pos + 1, pos2);
-    pos = pos2 + pos + 3;
-    pos2 = var.size() - pos2 - pos;
-    std::string name = std::string(var, pos, pos2);
-
-    size_t keySize = nameSpace.size();
-    Utils::Regex r = Utils::Regex(name);
+    Utils::Regex r = Utils::Regex(var);
 
     rc = mdb_txn_begin(m_env, NULL, 0, &txn);
     lmdb_debug(rc, "txn", "resolveRegularExpression");
@@ -592,28 +557,12 @@ void LMDB::resolveRegularExpression(const std::string& var,
         goto end_cursor_open;
     }
 
-    std::cout << std::endl;
     while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
-        if (key.mv_size <= keySize) {
-            continue;
-        }
         char *a = reinterpret_cast<char *>(key.mv_data);
-        if (a[keySize] != ':') {
-            continue;
-        }
-        std::string ns = std::string(a, keySize);
-        if (ns != nameSpace) {
-            continue;
-        }
-
-        std::string content = std::string(a, keySize + 1,
-            key.mv_size - keySize - 1);
-
-        int ret = Utils::regex_search(content, r);
+        int ret = Utils::regex_search(a, r);
         if (ret <= 0) {
             continue;
         }
-
         VariableValue *v = new VariableValue(
             new std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
