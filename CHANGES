@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fixed false positive MULTIPART_UNMATCHED_BOUNDARY errors
+   [Issue #1747 - @airween]
  - Fix ip tree lookup on netmask content
    [Issue #1793 - @tinselcity, @zimmerle]
  - Changes the behavior of the default sec actions
