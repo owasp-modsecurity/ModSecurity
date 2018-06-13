@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds basic pkg-config info
+   [Issue #1790 - @gquintard, @zimmerle]
  - Fixed LMDB collection errors
    [Issue #1787 - @airween, @zimmerle]
  - Fixed false positive MULTIPART_UNMATCHED_BOUNDARY errors
