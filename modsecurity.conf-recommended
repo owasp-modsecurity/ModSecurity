@@ -76,8 +76,49 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 
 # Did we see anything that might be a boundary?
 #
+# Here is a short description about the ModSecurity Multipart parser: the
+# parser returns with value 0, if all "boundary-like" line matches with
+# the boundary string which given in MIME header. In any other cases it returns
+# with different value, eg. 1 or 2.
+#
+# The RFC 1341 descript the multipart content-type and its syntax must contains
+# only three mandatory lines (above the content):
+# * Content-Type: multipart/mixed; boundary=BOUNDARY_STRING
+# * --BOUNDARY_STRING
+# * --BOUNDARY_STRING--
+#
+# First line indicates, that this is a multipart content, second shows that
+# here starts a part of the multipart content, third shows the end of content.
+#
+# If there are any other lines, which starts with "--", then it should be
+# another boundary id - or not.
+#
+# After 3.0.3, there are two kinds of types of boundary errors: strict and permissive.
+#
+# If multipart content contains the three necessary lines with correct order, but
+# there are one or more lines with "--", then parser returns with value 2 (non-zero).
+#
+# If some of the necessary lines (usually the start or end) misses, or the order
+# is wrong, then parser returns with value 1 (also a non-zero).
+#
+# You can choose, which one is what you need. The example below contains the
+# 'strict' mode, which means if there are any lines with start of "--", then
+# ModSecurity blocked the content. But the next, commented example contains
+# the 'permissive' mode, then you check only if the necessary lines exists in
+# correct order. Whit this, you can enable to upload PEM files (eg "----BEGIN.."),
+# or other text files, which contains eg. HTTP headers.
+#
+# The difference is only the operator - in strict mode (first) the content blocked
+# in case of any non-zero value. In permissive mode (second, commented) the
+# content blocked only if the value is explicit 1. If it 0 or 2, the content will
+# allowed.
+#
+
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
 "id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
+#SecRule MULTIPART_UNMATCHED_BOUNDARY "@eq 1" \
+#"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
+
 
 # PCRE Tuning
 # We want to avoid a potential RegEx DoS condition
