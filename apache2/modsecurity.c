@@ -161,6 +161,16 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
         return -1;
     }
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+    /* Serial wafjson log mutext */
+    rc = apr_global_mutex_create(&msce->wafjsonlog_lock, NULL, APR_LOCK_DEFAULT, mp);
+    if (rc != APR_SUCCESS) {
+        //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_wafjsonlog_lock");
+        //return HTTP_INTERNAL_SERVER_ERROR;
+        return -1;
+    }
+#endif
+
 #if !defined(MSC_TEST)
 #ifdef __SET_MUTEX_PERMS
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
@@ -174,6 +184,21 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
         return -1;
     }
 #endif /* SET_MUTEX_PERMS */
+
+#ifdef WAF_JSON_LOGGING_ENABLE
+#ifdef __SET_MUTEX_PERMS
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    rc = ap_unixd_set_global_mutex_perms(msce->wafjsonlog_lock);
+#else
+    rc = unixd_set_global_mutex_perms(msce->wafjsonlog_lock);
+#endif
+    if (rc != APR_SUCCESS) {
+        // ap_log_error(APLOG_MARK, APLOG_ERR, rc, s, "mod_security: Could not set permissions on modsec_wafjsonlog_lock; check User and Group directives");
+        // return HTTP_INTERNAL_SERVER_ERROR;
+        return -1;
+    }
+#endif /* SET_MUTEX_PERMS */
+#endif
 
     rc = apr_global_mutex_create(&msce->geo_lock, NULL, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
@@ -226,6 +251,15 @@ void modsecurity_child_init(msc_engine *msce) {
             // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init auditlog mutex");
         }
     }
+
+#ifdef WAF_JSON_LOGGING_ENABLE
+    if (msce->wafjsonlog_lock != NULL) {
+        apr_status_t rc = apr_global_mutex_child_init(&msce->wafjsonlog_lock, NULL, msce->mp);
+        if (rc != APR_SUCCESS) {
+            // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init auditlog mutex");
+        }
+    }
+#endif
 
     if (msce->geo_lock != NULL) {
         apr_status_t rc = apr_global_mutex_child_init(&msce->geo_lock, NULL, msce->mp);

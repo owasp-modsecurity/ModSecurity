@@ -167,6 +167,11 @@ extern DSOLOCAL unsigned long int unicode_codepage;
 
 extern DSOLOCAL int *unicode_map_table;
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+extern DSOLOCAL char *msc_waf_resourceId;
+extern DSOLOCAL char *msc_waf_instanceId;
+#endif
+
 #define RESBODY_STATUS_NOT_READ         0   /* we were not configured to read the body */
 #define RESBODY_STATUS_ERROR            1   /* error occured while we were reading the body */
 #define RESBODY_STATUS_PARTIAL          2   /* partial body content available in the brigade */
@@ -575,6 +580,9 @@ struct directory_config {
 
     /* Misc */
     const char          *data_dir;
+#ifdef WAF_JSON_LOGGING_ENABLE
+    apr_file_t          *wafjsonlog_fd;
+#endif
     const char          *webappid;
     const char          *sensor_id;
     const char          *httpBlkey;
@@ -666,6 +674,9 @@ struct error_message_t {
 struct msc_engine {
     apr_pool_t              *mp;
     apr_global_mutex_t      *auditlog_lock;
+#ifdef WAF_JSON_LOGGING_ENABLE
+    apr_global_mutex_t      *wafjsonlog_lock;
+#endif
     apr_global_mutex_t      *geo_lock;
 #ifdef GLOBAL_COLLECTION_LOCK
     apr_global_mutex_t      *dbm_lock;

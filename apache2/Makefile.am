@@ -4,6 +4,8 @@ pkglib_LTLIBRARIES = mod_security2.la
 mod_security2_la_SOURCES = acmp.c \
     ag_mdb/murmur3.c \
     ag_mdb/ag_mdb.cpp \
+    waf_logging/waf_format.pb.cc \
+    waf_logging/waf_log_util.cc \
     apache2_config.c \
     apache2_io.c \
     apache2_util.c \

@@ -1,0 +1,43 @@
+syntax = "proto2";
+
+package waf_format;
+
+message Details {
+  optional string message = 1;
+  optional string data = 2;
+  optional string file = 3;
+  optional string line = 4;
+}
+
+
+message Properties {
+  optional string instanceId = 1;
+  optional string clientIp = 2;
+  optional string clientPort = 3;
+  optional string requestUri = 4;
+  optional string ruleSetType = 5;
+  optional string ruleSetVersion = 6;
+  optional string ruleId = 7;
+  optional string message = 8;
+
+  enum ActionType {
+    Detected = 0;
+    Blocked = 1;
+  }
+  optional ActionType action = 9;
+
+  enum SiteType {
+    Global = 0;
+  }
+  optional SiteType site = 10;
+  optional Details details = 11;
+  optional string hostname = 12;
+}
+
+message Waf_Format {
+  optional string resourceId = 1;
+  optional string operationName = 2;
+  optional string time = 3;
+  optional string category = 4;
+  optional Properties properties = 5;
+}
