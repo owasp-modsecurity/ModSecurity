@@ -38,12 +38,6 @@ SecRule REQUEST_HEADERS:Content-Type "application/json" \
 SecRequestBodyLimit 13107200
 SecRequestBodyNoFilesLimit 131072
 
-# Store up to 128 KB of request body data in memory. When the multipart
-# parser reaches this limit, it will start using your hard disk for
-# storage. That is slow, but unavoidable.
-#
-SecRequestBodyInMemoryLimit 131072
-
 # What do do if the request body size is above our configured limit.
 # Keep in mind that this setting will automatically be set to ProcessPartial
 # when SecRuleEngine is set to DetectionOnly mode in order to minimize
