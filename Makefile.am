@@ -87,6 +87,7 @@ LOG_COMPILER=test/test-suite.sh
 # for i in `find test/test-cases -iname *.json`; do echo TESTS+=$i; done
 TESTS=
 TESTS+=test/test-cases/regression/issue-1591.json
+TESTS+=test/test-cases/regression/issue-1785.json
 TESTS+=test/test-cases/regression/variable-RESPONSE_HEADERS.json
 TESTS+=test/test-cases/regression/config-include.json
 TESTS+=test/test-cases/regression/variable-WEBSERVER_ERROR_LOG.json

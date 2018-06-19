@@ -91,16 +91,16 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
                 rc = 0;
                 break;
             }
-            if (len == 0) {
-                rc = 0;
-                break;
-            }
             match.match = std::string(tmpString, start, len);
             match.m_offset = start;
             match.m_length = len;
             offset = start + len;
-
             retList.push_front(match);
+
+            if (len == 0) {
+                rc = 0;
+                break;
+            }
         }
     } while (rc > 0);
 
