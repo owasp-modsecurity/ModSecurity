@@ -21,6 +21,7 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <unordered_set>
 #endif
 
 
@@ -273,7 +274,7 @@ class RulesProperties {
         std::ostringstream *err) {
         int amount_of_rules = 0;
 
-        amount_of_rules = appendRules(from->m_rules, to->m_rules, err);
+        amount_of_rules = appendRules(from, to, err);
         if (amount_of_rules < 0) {
             return amount_of_rules;
         }
@@ -426,20 +427,24 @@ class RulesProperties {
 
 
     static int appendRules(
-        std::vector<modsecurity::Rule *> *from,
-        std::vector<modsecurity::Rule *> *to,
+        RulesProperties *from,
+        RulesProperties *to,
         std::ostringstream *err) {
+        std::vector<modsecurity::Rule *> *from_rules = from->m_rules;
+        std::vector<modsecurity::Rule *> *to_rules = to->m_rules;
         int amount_of_rules = 0;
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<modsecurity::Rule *> *rules_to = to+i;
-            std::vector<modsecurity::Rule *> *rules_from = from+i;
+            std::vector<modsecurity::Rule *> *rules_to = to_rules+i;
+            std::vector<modsecurity::Rule *> *rules_from = from_rules+i;
             for (size_t j = 0; j < rules_from->size(); j++) {
                 Rule *rule = rules_from->at(j);
-                for (size_t z = 0; z < rules_to->size(); z++) {
-                    Rule *rule_ckc = rules_to->at(z);
-                    if (rule_ckc->m_ruleId == rule->m_ruleId &&
-                        rule_ckc->m_secMarker == false &&
-                        rule->m_secMarker == false) {
+                bool do_check = rule->m_secMarker == false;
+
+                if (do_check) {
+                    std::unordered_set<int64_t>::iterator it =
+                        to->m_ruleIds.find(rule->m_ruleId);
+
+                    if (it != to->m_ruleIds.end()) {
                         if (err != NULL) {
                             *err << "Rule id: " \
                                  << std::to_string(rule->m_ruleId) \
@@ -448,9 +453,13 @@ class RulesProperties {
                         return -1;
                     }
                 }
+
                 amount_of_rules++;
                 rules_to->push_back(rule);
                 rule->refCountIncrease();
+
+                if (do_check)
+                    to->m_ruleIds.insert(rule->m_ruleId);
             }
         }
         return amount_of_rules;
@@ -492,6 +501,7 @@ class RulesProperties {
     ConfigString m_secWebAppId;
     std::vector<actions::Action *> m_defaultActions[8];
     std::vector<modsecurity::Rule *> m_rules[8];
+    std::unordered_set<int64_t> m_ruleIds;
     ConfigUnicodeMap m_unicodeMapTable;
 };
 
