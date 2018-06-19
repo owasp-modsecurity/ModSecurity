@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds support for ctl:requestBodyProcessor=URLENCODED
+   [Issue #1797 - @victorhora]
  - Adds basic pkg-config info
    [Issue #1790 - @gquintard, @zimmerle]
  - Fixed LMDB collection errors

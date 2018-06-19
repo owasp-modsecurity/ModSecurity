@@ -88,6 +88,7 @@ ACTION_CTL_AUDIT_ENGINE                         (?i:ctl:auditEngine)
 ACTION_CTL_AUDIT_LOG_PARTS                      (?i:ctl:auditLogParts)
 ACTION_CTL_BDY_JSON                             (?i:ctl:requestBodyProcessor=JSON)
 ACTION_CTL_BDY_XML                              (?i:ctl:requestBodyProcessor=XML)
+ACTION_CTL_BDY_URLENCODED                       (?i:ctl:requestBodyProcessor=URLENCODED)
 ACTION_CTL_FORCE_REQ_BODY_VAR                   (?i:ctl:forceRequestBodyVariable)
 ACTION_CTL_REQUEST_BODY_ACCESS                  (?i:ctl:requestBodyAccess)
 ACTION_CTL_RULE_ENGINE                          (?i:ctl:ruleEngine)
@@ -529,6 +530,7 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_CTL_AUDIT_LOG_PARTS}=[+|-]{AUDIT_PARTS}                         { return p::make_ACTION_CTL_AUDIT_LOG_PARTS(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_JSON}                                                   { return p::make_ACTION_CTL_BDY_JSON(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_XML}                                                    { return p::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
+{ACTION_CTL_BDY_URLENCODED}                                             { return p::make_ACTION_CTL_BDY_URLENCODED(yytext, *driver.loc.back()); }
 {ACTION_CTL_FORCE_REQ_BODY_VAR}=                                        { return p::make_ACTION_CTL_FORCE_REQ_BODY_VAR(yytext, *driver.loc.back()); }
 {ACTION_CTL_REQUEST_BODY_ACCESS}=                                       { return p::make_ACTION_CTL_REQUEST_BODY_ACCESS(yytext, *driver.loc.back()); }
 {ACTION_CTL_RULE_ENGINE}=                                               { return p::make_ACTION_CTL_RULE_ENGINE(*driver.loc.back()); }

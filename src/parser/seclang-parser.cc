@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.0.4.
+// A Bison parser, made by GNU Bison 3.0.2.
 
 // Skeleton implementation for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2015 Free Software Foundation, Inc.
+// Copyright (C) 2002-2013 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 
 // First part of user declarations.
 
-#line 37 "seclang-parser.cc" // lalr1.cc:404
+#line 37 "seclang-parser.cc" // lalr1.cc:399
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -47,13 +47,13 @@
 
 // User implementation prologue.
 
-#line 51 "seclang-parser.cc" // lalr1.cc:412
+#line 51 "seclang-parser.cc" // lalr1.cc:407
 // Unqualified %code blocks.
-#line 359 "seclang-parser.yy" // lalr1.cc:413
+#line 360 "seclang-parser.yy" // lalr1.cc:408
 
 #include "src/parser/driver.h"
 
-#line 57 "seclang-parser.cc" // lalr1.cc:413
+#line 57 "seclang-parser.cc" // lalr1.cc:408
 
 
 #ifndef YY_
@@ -130,7 +130,7 @@
 #endif // !YYDEBUG
 
 #define yyerrok         (yyerrstatus_ = 0)
-#define yyclearin       (yyla.clear ())
+#define yyclearin       (yyempty = true)
 
 #define YYACCEPT        goto yyacceptlab
 #define YYABORT         goto yyabortlab
@@ -139,7 +139,7 @@
 
 
 namespace yy {
-#line 143 "seclang-parser.cc" // lalr1.cc:479
+#line 143 "seclang-parser.cc" // lalr1.cc:474
 
   /* Return YYSTR after stripping away unnecessary quotes and
      backslashes, so that it's suitable for yyerror.  The heuristic is
@@ -202,7 +202,7 @@ namespace yy {
   // by_state.
   inline
   seclang_parser::by_state::by_state ()
-    : state (empty_state)
+    : state (empty)
   {}
 
   inline
@@ -212,17 +212,10 @@ namespace yy {
 
   inline
   void
-  seclang_parser::by_state::clear ()
-  {
-    state = empty_state;
-  }
-
-  inline
-  void
   seclang_parser::by_state::move (by_state& that)
   {
     state = that.state;
-    that.clear ();
+    that.state = empty;
   }
 
   inline
@@ -234,10 +227,7 @@ namespace yy {
   seclang_parser::symbol_number_type
   seclang_parser::by_state::type_get () const
   {
-    if (state == empty_state)
-      return empty_symbol;
-    else
-      return yystos_[state];
+    return state == empty ? 0 : yystos_[state];
   }
 
   inline
@@ -262,217 +252,218 @@ namespace yy {
       case 152: // "ACTION_CTL_AUDIT_LOG_PARTS"
       case 153: // "ACTION_CTL_BDY_JSON"
       case 154: // "ACTION_CTL_BDY_XML"
-      case 155: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
-      case 156: // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      case 157: // "ACTION_CTL_RULE_REMOVE_BY_ID"
-      case 158: // "ACTION_CTL_RULE_REMOVE_BY_TAG"
-      case 159: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
-      case 160: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
-      case 161: // "Deny"
-      case 162: // "DeprecateVar"
-      case 163: // "Drop"
-      case 164: // "Exec"
-      case 165: // "ExpireVar"
-      case 166: // "Id"
-      case 167: // "InitCol"
-      case 168: // "Log"
-      case 169: // "LogData"
-      case 170: // "Maturity"
-      case 171: // "Msg"
-      case 172: // "MultiMatch"
-      case 173: // "NoAuditLog"
-      case 174: // "NoLog"
-      case 175: // "Pass"
-      case 176: // "Pause"
-      case 177: // "Phase"
-      case 178: // "Prepend"
-      case 179: // "Proxy"
-      case 180: // "Redirect"
-      case 181: // "Rev"
-      case 182: // "SanatiseArg"
-      case 183: // "SanatiseMatched"
-      case 184: // "SanatiseMatchedBytes"
-      case 185: // "SanatiseRequestHeader"
-      case 186: // "SanatiseResponseHeader"
-      case 187: // "SetEnv"
-      case 188: // "SetRsc"
-      case 189: // "SetSid"
-      case 190: // "SetUID"
-      case 191: // "Severity"
-      case 192: // "Skip"
-      case 193: // "SkipAfter"
-      case 194: // "Status"
-      case 195: // "Tag"
-      case 196: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
-      case 197: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
-      case 198: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
-      case 199: // "ACTION_TRANSFORMATION_CMD_LINE"
-      case 200: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-      case 201: // "ACTION_TRANSFORMATION_CSS_DECODE"
-      case 202: // "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
-      case 203: // "ACTION_TRANSFORMATION_HEX_ENCODE"
-      case 204: // "ACTION_TRANSFORMATION_HEX_DECODE"
-      case 205: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-      case 206: // "ACTION_TRANSFORMATION_JS_DECODE"
-      case 207: // "ACTION_TRANSFORMATION_LENGTH"
-      case 208: // "ACTION_TRANSFORMATION_LOWERCASE"
-      case 209: // "ACTION_TRANSFORMATION_MD5"
-      case 210: // "ACTION_TRANSFORMATION_NONE"
-      case 211: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
-      case 212: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-      case 213: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-      case 214: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-      case 215: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-      case 216: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-      case 217: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-      case 218: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
-      case 219: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-      case 220: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-      case 221: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
-      case 222: // "ACTION_TRANSFORMATION_SHA1"
-      case 223: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-      case 224: // "ACTION_TRANSFORMATION_TRIM"
-      case 225: // "ACTION_TRANSFORMATION_TRIM_LEFT"
-      case 226: // "ACTION_TRANSFORMATION_TRIM_RIGHT"
-      case 227: // "ACTION_TRANSFORMATION_UPPERCASE"
-      case 228: // "ACTION_TRANSFORMATION_URL_ENCODE"
-      case 229: // "ACTION_TRANSFORMATION_URL_DECODE"
-      case 230: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-      case 231: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 232: // "Ver"
-      case 233: // "xmlns"
-      case 234: // "CONFIG_COMPONENT_SIG"
-      case 235: // "CONFIG_CONN_ENGINE"
-      case 236: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 237: // "CONFIG_SEC_WEB_APP_ID"
-      case 238: // "CONFIG_SEC_SERVER_SIG"
-      case 239: // "CONFIG_DIR_AUDIT_DIR"
-      case 240: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 241: // "CONFIG_DIR_AUDIT_ENG"
-      case 242: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 243: // "CONFIG_DIR_AUDIT_LOG"
-      case 244: // "CONFIG_DIR_AUDIT_LOG2"
-      case 245: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 246: // "CONFIG_DIR_AUDIT_STS"
-      case 247: // "CONFIG_DIR_AUDIT_TPE"
-      case 248: // "CONFIG_DIR_DEBUG_LOG"
-      case 249: // "CONFIG_DIR_DEBUG_LVL"
-      case 250: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 251: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
-      case 252: // "CONFIG_SEC_HASH_ENGINE"
-      case 253: // "CONFIG_SEC_HASH_KEY"
-      case 254: // "CONFIG_SEC_HASH_PARAM"
-      case 255: // "CONFIG_SEC_HASH_METHOD_RX"
-      case 256: // "CONFIG_SEC_HASH_METHOD_PM"
-      case 257: // "CONFIG_SEC_CHROOT_DIR"
-      case 258: // "CONFIG_DIR_GEO_DB"
-      case 259: // "CONFIG_DIR_GSB_DB"
-      case 260: // "CONFIG_SEC_GUARDIAN_LOG"
-      case 261: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 262: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 263: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
-      case 264: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
-      case 265: // "CONFIG_SEC_SENSOR_ID"
-      case 266: // "CONFIG_DIR_REQ_BODY"
-      case 267: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 268: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 269: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 270: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 271: // "CONFIG_DIR_RES_BODY"
-      case 272: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 273: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 274: // "CONFIG_SEC_RULE_INHERITANCE"
-      case 275: // "CONFIG_SEC_RULE_PERF_TIME"
-      case 276: // "CONFIG_DIR_RULE_ENG"
-      case 277: // "CONFIG_DIR_SEC_ACTION"
-      case 278: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 279: // "CONFIG_DIR_SEC_MARKER"
-      case 280: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 281: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 282: // "CONFIG_SEC_HTTP_BLKEY"
-      case 283: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 284: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 285: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 288: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 292: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 293: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 294: // "CONFIG_UPLOAD_DIR"
-      case 295: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 296: // "CONFIG_UPLOAD_FILE_MODE"
-      case 297: // "CONFIG_VALUE_ABORT"
-      case 298: // "CONFIG_VALUE_DETC"
-      case 299: // "CONFIG_VALUE_HTTPS"
-      case 300: // "CONFIG_VALUE_OFF"
-      case 301: // "CONFIG_VALUE_ON"
-      case 302: // "CONFIG_VALUE_PARALLEL"
-      case 303: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 304: // "CONFIG_VALUE_REJECT"
-      case 305: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 306: // "CONFIG_VALUE_SERIAL"
-      case 307: // "CONFIG_VALUE_WARN"
-      case 308: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 309: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 310: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 311: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 312: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 313: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 314: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 315: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 316: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 317: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 318: // "DIRECTIVE"
-      case 319: // "DIRECTIVE_SECRULESCRIPT"
-      case 320: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 321: // "QUOTATION_MARK"
-      case 322: // "RUN_TIME_VAR_BLD"
-      case 323: // "RUN_TIME_VAR_DUR"
-      case 324: // "RUN_TIME_VAR_HSV"
-      case 325: // "RUN_TIME_VAR_REMOTE_USER"
-      case 326: // "RUN_TIME_VAR_TIME"
-      case 327: // "RUN_TIME_VAR_TIME_DAY"
-      case 328: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 329: // "RUN_TIME_VAR_TIME_HOUR"
-      case 330: // "RUN_TIME_VAR_TIME_MIN"
-      case 331: // "RUN_TIME_VAR_TIME_MON"
-      case 332: // "RUN_TIME_VAR_TIME_SEC"
-      case 333: // "RUN_TIME_VAR_TIME_WDAY"
-      case 334: // "RUN_TIME_VAR_TIME_YEAR"
-      case 335: // "VARIABLE"
-      case 336: // "Dictionary element"
-      case 337: // "Dictionary element, selected by regexp"
+      case 155: // "ACTION_CTL_BDY_URLENCODED"
+      case 156: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
+      case 157: // "ACTION_CTL_REQUEST_BODY_ACCESS"
+      case 158: // "ACTION_CTL_RULE_REMOVE_BY_ID"
+      case 159: // "ACTION_CTL_RULE_REMOVE_BY_TAG"
+      case 160: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
+      case 161: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
+      case 162: // "Deny"
+      case 163: // "DeprecateVar"
+      case 164: // "Drop"
+      case 165: // "Exec"
+      case 166: // "ExpireVar"
+      case 167: // "Id"
+      case 168: // "InitCol"
+      case 169: // "Log"
+      case 170: // "LogData"
+      case 171: // "Maturity"
+      case 172: // "Msg"
+      case 173: // "MultiMatch"
+      case 174: // "NoAuditLog"
+      case 175: // "NoLog"
+      case 176: // "Pass"
+      case 177: // "Pause"
+      case 178: // "Phase"
+      case 179: // "Prepend"
+      case 180: // "Proxy"
+      case 181: // "Redirect"
+      case 182: // "Rev"
+      case 183: // "SanatiseArg"
+      case 184: // "SanatiseMatched"
+      case 185: // "SanatiseMatchedBytes"
+      case 186: // "SanatiseRequestHeader"
+      case 187: // "SanatiseResponseHeader"
+      case 188: // "SetEnv"
+      case 189: // "SetRsc"
+      case 190: // "SetSid"
+      case 191: // "SetUID"
+      case 192: // "Severity"
+      case 193: // "Skip"
+      case 194: // "SkipAfter"
+      case 195: // "Status"
+      case 196: // "Tag"
+      case 197: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      case 198: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      case 199: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
+      case 200: // "ACTION_TRANSFORMATION_CMD_LINE"
+      case 201: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+      case 202: // "ACTION_TRANSFORMATION_CSS_DECODE"
+      case 203: // "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
+      case 204: // "ACTION_TRANSFORMATION_HEX_ENCODE"
+      case 205: // "ACTION_TRANSFORMATION_HEX_DECODE"
+      case 206: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+      case 207: // "ACTION_TRANSFORMATION_JS_DECODE"
+      case 208: // "ACTION_TRANSFORMATION_LENGTH"
+      case 209: // "ACTION_TRANSFORMATION_LOWERCASE"
+      case 210: // "ACTION_TRANSFORMATION_MD5"
+      case 211: // "ACTION_TRANSFORMATION_NONE"
+      case 212: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
+      case 213: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+      case 214: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
+      case 215: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
+      case 216: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
+      case 217: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+      case 218: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+      case 219: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
+      case 220: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+      case 221: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+      case 222: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
+      case 223: // "ACTION_TRANSFORMATION_SHA1"
+      case 224: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
+      case 225: // "ACTION_TRANSFORMATION_TRIM"
+      case 226: // "ACTION_TRANSFORMATION_TRIM_LEFT"
+      case 227: // "ACTION_TRANSFORMATION_TRIM_RIGHT"
+      case 228: // "ACTION_TRANSFORMATION_UPPERCASE"
+      case 229: // "ACTION_TRANSFORMATION_URL_ENCODE"
+      case 230: // "ACTION_TRANSFORMATION_URL_DECODE"
+      case 231: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+      case 232: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      case 233: // "Ver"
+      case 234: // "xmlns"
+      case 235: // "CONFIG_COMPONENT_SIG"
+      case 236: // "CONFIG_CONN_ENGINE"
+      case 237: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 238: // "CONFIG_SEC_WEB_APP_ID"
+      case 239: // "CONFIG_SEC_SERVER_SIG"
+      case 240: // "CONFIG_DIR_AUDIT_DIR"
+      case 241: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 242: // "CONFIG_DIR_AUDIT_ENG"
+      case 243: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 244: // "CONFIG_DIR_AUDIT_LOG"
+      case 245: // "CONFIG_DIR_AUDIT_LOG2"
+      case 246: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 247: // "CONFIG_DIR_AUDIT_STS"
+      case 248: // "CONFIG_DIR_AUDIT_TPE"
+      case 249: // "CONFIG_DIR_DEBUG_LOG"
+      case 250: // "CONFIG_DIR_DEBUG_LVL"
+      case 251: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 252: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
+      case 253: // "CONFIG_SEC_HASH_ENGINE"
+      case 254: // "CONFIG_SEC_HASH_KEY"
+      case 255: // "CONFIG_SEC_HASH_PARAM"
+      case 256: // "CONFIG_SEC_HASH_METHOD_RX"
+      case 257: // "CONFIG_SEC_HASH_METHOD_PM"
+      case 258: // "CONFIG_SEC_CHROOT_DIR"
+      case 259: // "CONFIG_DIR_GEO_DB"
+      case 260: // "CONFIG_DIR_GSB_DB"
+      case 261: // "CONFIG_SEC_GUARDIAN_LOG"
+      case 262: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 263: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 264: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
+      case 265: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
+      case 266: // "CONFIG_SEC_SENSOR_ID"
+      case 267: // "CONFIG_DIR_REQ_BODY"
+      case 268: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 269: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 270: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 271: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 272: // "CONFIG_DIR_RES_BODY"
+      case 273: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 274: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 275: // "CONFIG_SEC_RULE_INHERITANCE"
+      case 276: // "CONFIG_SEC_RULE_PERF_TIME"
+      case 277: // "CONFIG_DIR_RULE_ENG"
+      case 278: // "CONFIG_DIR_SEC_ACTION"
+      case 279: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 280: // "CONFIG_DIR_SEC_MARKER"
+      case 281: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 282: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 283: // "CONFIG_SEC_HTTP_BLKEY"
+      case 284: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 285: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 292: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 293: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 294: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 295: // "CONFIG_UPLOAD_DIR"
+      case 296: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 297: // "CONFIG_UPLOAD_FILE_MODE"
+      case 298: // "CONFIG_VALUE_ABORT"
+      case 299: // "CONFIG_VALUE_DETC"
+      case 300: // "CONFIG_VALUE_HTTPS"
+      case 301: // "CONFIG_VALUE_OFF"
+      case 302: // "CONFIG_VALUE_ON"
+      case 303: // "CONFIG_VALUE_PARALLEL"
+      case 304: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 305: // "CONFIG_VALUE_REJECT"
+      case 306: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 307: // "CONFIG_VALUE_SERIAL"
+      case 308: // "CONFIG_VALUE_WARN"
+      case 309: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 310: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 311: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 312: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 313: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 314: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 315: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 316: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 317: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 318: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 319: // "DIRECTIVE"
+      case 320: // "DIRECTIVE_SECRULESCRIPT"
+      case 321: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 322: // "QUOTATION_MARK"
+      case 323: // "RUN_TIME_VAR_BLD"
+      case 324: // "RUN_TIME_VAR_DUR"
+      case 325: // "RUN_TIME_VAR_HSV"
+      case 326: // "RUN_TIME_VAR_REMOTE_USER"
+      case 327: // "RUN_TIME_VAR_TIME"
+      case 328: // "RUN_TIME_VAR_TIME_DAY"
+      case 329: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 330: // "RUN_TIME_VAR_TIME_HOUR"
+      case 331: // "RUN_TIME_VAR_TIME_MIN"
+      case 332: // "RUN_TIME_VAR_TIME_MON"
+      case 333: // "RUN_TIME_VAR_TIME_SEC"
+      case 334: // "RUN_TIME_VAR_TIME_WDAY"
+      case 335: // "RUN_TIME_VAR_TIME_YEAR"
+      case 336: // "VARIABLE"
+      case 337: // "Dictionary element"
+      case 338: // "Dictionary element, selected by regexp"
         value.move< std::string > (that.value);
         break;
 
-      case 344: // op
-      case 345: // op_before_init
+      case 345: // op
+      case 346: // op_before_init
         value.move< std::unique_ptr<Operator> > (that.value);
         break;
 
-      case 352: // run_time_string
+      case 353: // run_time_string
         value.move< std::unique_ptr<RunTimeString> > (that.value);
         break;
 
-      case 349: // var
+      case 350: // var
         value.move< std::unique_ptr<Variable> > (that.value);
         break;
 
-      case 350: // act
-      case 351: // setvar_action
+      case 351: // act
+      case 352: // setvar_action
         value.move< std::unique_ptr<actions::Action> > (that.value);
         break;
 
-      case 347: // variables
-      case 348: // variables_may_be_quoted
+      case 348: // variables
+      case 349: // variables_may_be_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (that.value);
         break;
 
-      case 342: // actions
-      case 343: // actions_may_quoted
+      case 343: // actions
+      case 344: // actions_may_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (that.value);
         break;
 
@@ -481,7 +472,7 @@ namespace yy {
     }
 
     // that is emptied.
-    that.type = empty_symbol;
+    that.type = empty;
   }
 
   inline
@@ -502,217 +493,218 @@ namespace yy {
       case 152: // "ACTION_CTL_AUDIT_LOG_PARTS"
       case 153: // "ACTION_CTL_BDY_JSON"
       case 154: // "ACTION_CTL_BDY_XML"
-      case 155: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
-      case 156: // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      case 157: // "ACTION_CTL_RULE_REMOVE_BY_ID"
-      case 158: // "ACTION_CTL_RULE_REMOVE_BY_TAG"
-      case 159: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
-      case 160: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
-      case 161: // "Deny"
-      case 162: // "DeprecateVar"
-      case 163: // "Drop"
-      case 164: // "Exec"
-      case 165: // "ExpireVar"
-      case 166: // "Id"
-      case 167: // "InitCol"
-      case 168: // "Log"
-      case 169: // "LogData"
-      case 170: // "Maturity"
-      case 171: // "Msg"
-      case 172: // "MultiMatch"
-      case 173: // "NoAuditLog"
-      case 174: // "NoLog"
-      case 175: // "Pass"
-      case 176: // "Pause"
-      case 177: // "Phase"
-      case 178: // "Prepend"
-      case 179: // "Proxy"
-      case 180: // "Redirect"
-      case 181: // "Rev"
-      case 182: // "SanatiseArg"
-      case 183: // "SanatiseMatched"
-      case 184: // "SanatiseMatchedBytes"
-      case 185: // "SanatiseRequestHeader"
-      case 186: // "SanatiseResponseHeader"
-      case 187: // "SetEnv"
-      case 188: // "SetRsc"
-      case 189: // "SetSid"
-      case 190: // "SetUID"
-      case 191: // "Severity"
-      case 192: // "Skip"
-      case 193: // "SkipAfter"
-      case 194: // "Status"
-      case 195: // "Tag"
-      case 196: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
-      case 197: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
-      case 198: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
-      case 199: // "ACTION_TRANSFORMATION_CMD_LINE"
-      case 200: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-      case 201: // "ACTION_TRANSFORMATION_CSS_DECODE"
-      case 202: // "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
-      case 203: // "ACTION_TRANSFORMATION_HEX_ENCODE"
-      case 204: // "ACTION_TRANSFORMATION_HEX_DECODE"
-      case 205: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-      case 206: // "ACTION_TRANSFORMATION_JS_DECODE"
-      case 207: // "ACTION_TRANSFORMATION_LENGTH"
-      case 208: // "ACTION_TRANSFORMATION_LOWERCASE"
-      case 209: // "ACTION_TRANSFORMATION_MD5"
-      case 210: // "ACTION_TRANSFORMATION_NONE"
-      case 211: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
-      case 212: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-      case 213: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-      case 214: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-      case 215: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-      case 216: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-      case 217: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-      case 218: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
-      case 219: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-      case 220: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-      case 221: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
-      case 222: // "ACTION_TRANSFORMATION_SHA1"
-      case 223: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-      case 224: // "ACTION_TRANSFORMATION_TRIM"
-      case 225: // "ACTION_TRANSFORMATION_TRIM_LEFT"
-      case 226: // "ACTION_TRANSFORMATION_TRIM_RIGHT"
-      case 227: // "ACTION_TRANSFORMATION_UPPERCASE"
-      case 228: // "ACTION_TRANSFORMATION_URL_ENCODE"
-      case 229: // "ACTION_TRANSFORMATION_URL_DECODE"
-      case 230: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-      case 231: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 232: // "Ver"
-      case 233: // "xmlns"
-      case 234: // "CONFIG_COMPONENT_SIG"
-      case 235: // "CONFIG_CONN_ENGINE"
-      case 236: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 237: // "CONFIG_SEC_WEB_APP_ID"
-      case 238: // "CONFIG_SEC_SERVER_SIG"
-      case 239: // "CONFIG_DIR_AUDIT_DIR"
-      case 240: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 241: // "CONFIG_DIR_AUDIT_ENG"
-      case 242: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 243: // "CONFIG_DIR_AUDIT_LOG"
-      case 244: // "CONFIG_DIR_AUDIT_LOG2"
-      case 245: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 246: // "CONFIG_DIR_AUDIT_STS"
-      case 247: // "CONFIG_DIR_AUDIT_TPE"
-      case 248: // "CONFIG_DIR_DEBUG_LOG"
-      case 249: // "CONFIG_DIR_DEBUG_LVL"
-      case 250: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 251: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
-      case 252: // "CONFIG_SEC_HASH_ENGINE"
-      case 253: // "CONFIG_SEC_HASH_KEY"
-      case 254: // "CONFIG_SEC_HASH_PARAM"
-      case 255: // "CONFIG_SEC_HASH_METHOD_RX"
-      case 256: // "CONFIG_SEC_HASH_METHOD_PM"
-      case 257: // "CONFIG_SEC_CHROOT_DIR"
-      case 258: // "CONFIG_DIR_GEO_DB"
-      case 259: // "CONFIG_DIR_GSB_DB"
-      case 260: // "CONFIG_SEC_GUARDIAN_LOG"
-      case 261: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 262: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 263: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
-      case 264: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
-      case 265: // "CONFIG_SEC_SENSOR_ID"
-      case 266: // "CONFIG_DIR_REQ_BODY"
-      case 267: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 268: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 269: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 270: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 271: // "CONFIG_DIR_RES_BODY"
-      case 272: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 273: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 274: // "CONFIG_SEC_RULE_INHERITANCE"
-      case 275: // "CONFIG_SEC_RULE_PERF_TIME"
-      case 276: // "CONFIG_DIR_RULE_ENG"
-      case 277: // "CONFIG_DIR_SEC_ACTION"
-      case 278: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 279: // "CONFIG_DIR_SEC_MARKER"
-      case 280: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 281: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 282: // "CONFIG_SEC_HTTP_BLKEY"
-      case 283: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 284: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 285: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 288: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 292: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 293: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 294: // "CONFIG_UPLOAD_DIR"
-      case 295: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 296: // "CONFIG_UPLOAD_FILE_MODE"
-      case 297: // "CONFIG_VALUE_ABORT"
-      case 298: // "CONFIG_VALUE_DETC"
-      case 299: // "CONFIG_VALUE_HTTPS"
-      case 300: // "CONFIG_VALUE_OFF"
-      case 301: // "CONFIG_VALUE_ON"
-      case 302: // "CONFIG_VALUE_PARALLEL"
-      case 303: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 304: // "CONFIG_VALUE_REJECT"
-      case 305: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 306: // "CONFIG_VALUE_SERIAL"
-      case 307: // "CONFIG_VALUE_WARN"
-      case 308: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 309: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 310: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 311: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 312: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 313: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 314: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 315: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 316: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 317: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 318: // "DIRECTIVE"
-      case 319: // "DIRECTIVE_SECRULESCRIPT"
-      case 320: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 321: // "QUOTATION_MARK"
-      case 322: // "RUN_TIME_VAR_BLD"
-      case 323: // "RUN_TIME_VAR_DUR"
-      case 324: // "RUN_TIME_VAR_HSV"
-      case 325: // "RUN_TIME_VAR_REMOTE_USER"
-      case 326: // "RUN_TIME_VAR_TIME"
-      case 327: // "RUN_TIME_VAR_TIME_DAY"
-      case 328: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 329: // "RUN_TIME_VAR_TIME_HOUR"
-      case 330: // "RUN_TIME_VAR_TIME_MIN"
-      case 331: // "RUN_TIME_VAR_TIME_MON"
-      case 332: // "RUN_TIME_VAR_TIME_SEC"
-      case 333: // "RUN_TIME_VAR_TIME_WDAY"
-      case 334: // "RUN_TIME_VAR_TIME_YEAR"
-      case 335: // "VARIABLE"
-      case 336: // "Dictionary element"
-      case 337: // "Dictionary element, selected by regexp"
+      case 155: // "ACTION_CTL_BDY_URLENCODED"
+      case 156: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
+      case 157: // "ACTION_CTL_REQUEST_BODY_ACCESS"
+      case 158: // "ACTION_CTL_RULE_REMOVE_BY_ID"
+      case 159: // "ACTION_CTL_RULE_REMOVE_BY_TAG"
+      case 160: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
+      case 161: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
+      case 162: // "Deny"
+      case 163: // "DeprecateVar"
+      case 164: // "Drop"
+      case 165: // "Exec"
+      case 166: // "ExpireVar"
+      case 167: // "Id"
+      case 168: // "InitCol"
+      case 169: // "Log"
+      case 170: // "LogData"
+      case 171: // "Maturity"
+      case 172: // "Msg"
+      case 173: // "MultiMatch"
+      case 174: // "NoAuditLog"
+      case 175: // "NoLog"
+      case 176: // "Pass"
+      case 177: // "Pause"
+      case 178: // "Phase"
+      case 179: // "Prepend"
+      case 180: // "Proxy"
+      case 181: // "Redirect"
+      case 182: // "Rev"
+      case 183: // "SanatiseArg"
+      case 184: // "SanatiseMatched"
+      case 185: // "SanatiseMatchedBytes"
+      case 186: // "SanatiseRequestHeader"
+      case 187: // "SanatiseResponseHeader"
+      case 188: // "SetEnv"
+      case 189: // "SetRsc"
+      case 190: // "SetSid"
+      case 191: // "SetUID"
+      case 192: // "Severity"
+      case 193: // "Skip"
+      case 194: // "SkipAfter"
+      case 195: // "Status"
+      case 196: // "Tag"
+      case 197: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      case 198: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      case 199: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
+      case 200: // "ACTION_TRANSFORMATION_CMD_LINE"
+      case 201: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+      case 202: // "ACTION_TRANSFORMATION_CSS_DECODE"
+      case 203: // "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
+      case 204: // "ACTION_TRANSFORMATION_HEX_ENCODE"
+      case 205: // "ACTION_TRANSFORMATION_HEX_DECODE"
+      case 206: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+      case 207: // "ACTION_TRANSFORMATION_JS_DECODE"
+      case 208: // "ACTION_TRANSFORMATION_LENGTH"
+      case 209: // "ACTION_TRANSFORMATION_LOWERCASE"
+      case 210: // "ACTION_TRANSFORMATION_MD5"
+      case 211: // "ACTION_TRANSFORMATION_NONE"
+      case 212: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
+      case 213: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+      case 214: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
+      case 215: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
+      case 216: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
+      case 217: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+      case 218: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+      case 219: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
+      case 220: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+      case 221: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+      case 222: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
+      case 223: // "ACTION_TRANSFORMATION_SHA1"
+      case 224: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
+      case 225: // "ACTION_TRANSFORMATION_TRIM"
+      case 226: // "ACTION_TRANSFORMATION_TRIM_LEFT"
+      case 227: // "ACTION_TRANSFORMATION_TRIM_RIGHT"
+      case 228: // "ACTION_TRANSFORMATION_UPPERCASE"
+      case 229: // "ACTION_TRANSFORMATION_URL_ENCODE"
+      case 230: // "ACTION_TRANSFORMATION_URL_DECODE"
+      case 231: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+      case 232: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      case 233: // "Ver"
+      case 234: // "xmlns"
+      case 235: // "CONFIG_COMPONENT_SIG"
+      case 236: // "CONFIG_CONN_ENGINE"
+      case 237: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 238: // "CONFIG_SEC_WEB_APP_ID"
+      case 239: // "CONFIG_SEC_SERVER_SIG"
+      case 240: // "CONFIG_DIR_AUDIT_DIR"
+      case 241: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 242: // "CONFIG_DIR_AUDIT_ENG"
+      case 243: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 244: // "CONFIG_DIR_AUDIT_LOG"
+      case 245: // "CONFIG_DIR_AUDIT_LOG2"
+      case 246: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 247: // "CONFIG_DIR_AUDIT_STS"
+      case 248: // "CONFIG_DIR_AUDIT_TPE"
+      case 249: // "CONFIG_DIR_DEBUG_LOG"
+      case 250: // "CONFIG_DIR_DEBUG_LVL"
+      case 251: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 252: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
+      case 253: // "CONFIG_SEC_HASH_ENGINE"
+      case 254: // "CONFIG_SEC_HASH_KEY"
+      case 255: // "CONFIG_SEC_HASH_PARAM"
+      case 256: // "CONFIG_SEC_HASH_METHOD_RX"
+      case 257: // "CONFIG_SEC_HASH_METHOD_PM"
+      case 258: // "CONFIG_SEC_CHROOT_DIR"
+      case 259: // "CONFIG_DIR_GEO_DB"
+      case 260: // "CONFIG_DIR_GSB_DB"
+      case 261: // "CONFIG_SEC_GUARDIAN_LOG"
+      case 262: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 263: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 264: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
+      case 265: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
+      case 266: // "CONFIG_SEC_SENSOR_ID"
+      case 267: // "CONFIG_DIR_REQ_BODY"
+      case 268: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 269: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 270: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 271: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 272: // "CONFIG_DIR_RES_BODY"
+      case 273: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 274: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 275: // "CONFIG_SEC_RULE_INHERITANCE"
+      case 276: // "CONFIG_SEC_RULE_PERF_TIME"
+      case 277: // "CONFIG_DIR_RULE_ENG"
+      case 278: // "CONFIG_DIR_SEC_ACTION"
+      case 279: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 280: // "CONFIG_DIR_SEC_MARKER"
+      case 281: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 282: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 283: // "CONFIG_SEC_HTTP_BLKEY"
+      case 284: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 285: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 292: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 293: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 294: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 295: // "CONFIG_UPLOAD_DIR"
+      case 296: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 297: // "CONFIG_UPLOAD_FILE_MODE"
+      case 298: // "CONFIG_VALUE_ABORT"
+      case 299: // "CONFIG_VALUE_DETC"
+      case 300: // "CONFIG_VALUE_HTTPS"
+      case 301: // "CONFIG_VALUE_OFF"
+      case 302: // "CONFIG_VALUE_ON"
+      case 303: // "CONFIG_VALUE_PARALLEL"
+      case 304: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 305: // "CONFIG_VALUE_REJECT"
+      case 306: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 307: // "CONFIG_VALUE_SERIAL"
+      case 308: // "CONFIG_VALUE_WARN"
+      case 309: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 310: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 311: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 312: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 313: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 314: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 315: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 316: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 317: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 318: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 319: // "DIRECTIVE"
+      case 320: // "DIRECTIVE_SECRULESCRIPT"
+      case 321: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 322: // "QUOTATION_MARK"
+      case 323: // "RUN_TIME_VAR_BLD"
+      case 324: // "RUN_TIME_VAR_DUR"
+      case 325: // "RUN_TIME_VAR_HSV"
+      case 326: // "RUN_TIME_VAR_REMOTE_USER"
+      case 327: // "RUN_TIME_VAR_TIME"
+      case 328: // "RUN_TIME_VAR_TIME_DAY"
+      case 329: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 330: // "RUN_TIME_VAR_TIME_HOUR"
+      case 331: // "RUN_TIME_VAR_TIME_MIN"
+      case 332: // "RUN_TIME_VAR_TIME_MON"
+      case 333: // "RUN_TIME_VAR_TIME_SEC"
+      case 334: // "RUN_TIME_VAR_TIME_WDAY"
+      case 335: // "RUN_TIME_VAR_TIME_YEAR"
+      case 336: // "VARIABLE"
+      case 337: // "Dictionary element"
+      case 338: // "Dictionary element, selected by regexp"
         value.copy< std::string > (that.value);
         break;
 
-      case 344: // op
-      case 345: // op_before_init
+      case 345: // op
+      case 346: // op_before_init
         value.copy< std::unique_ptr<Operator> > (that.value);
         break;
 
-      case 352: // run_time_string
+      case 353: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (that.value);
         break;
 
-      case 349: // var
+      case 350: // var
         value.copy< std::unique_ptr<Variable> > (that.value);
         break;
 
-      case 350: // act
-      case 351: // setvar_action
+      case 351: // act
+      case 352: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (that.value);
         break;
 
-      case 347: // variables
-      case 348: // variables_may_be_quoted
+      case 348: // variables
+      case 349: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (that.value);
         break;
 
-      case 342: // actions
-      case 343: // actions_may_quoted
+      case 343: // actions
+      case 344: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (that.value);
         break;
 
@@ -743,10 +735,6 @@ namespace yy {
     std::ostream& yyoutput = yyo;
     YYUSE (yyoutput);
     symbol_number_type yytype = yysym.type_get ();
-    // Avoid a (spurious) G++ 4.8 warning about "array subscript is
-    // below array bounds".
-    if (yysym.empty ())
-      std::abort ();
     yyo << (yytype < yyntokens_ ? "token" : "nterm")
         << ' ' << yytname_[yytype] << " ("
         << yysym.location << ": ";
@@ -831,6 +819,9 @@ namespace yy {
   int
   seclang_parser::parse ()
   {
+    /// Whether yyla contains a lookahead.
+    bool yyempty = true;
+
     // State.
     int yyn;
     /// Length of the RHS of the rule being reduced.
@@ -857,13 +848,13 @@ namespace yy {
 
 
     // User initialization code.
-    #line 352 "/home/zimmerle/core-trustwave/ModSecurity/src/parser/seclang-parser.yy" // lalr1.cc:741
+    #line 353 "/home/vhora/ModSecurity-v3-LATEST-JUNE/src/parser/seclang-parser.yy" // lalr1.cc:725
 {
   // Initialize the initial location.
   yyla.location.begin.filename = yyla.location.end.filename = &driver.file;
 }
 
-#line 867 "seclang-parser.cc" // lalr1.cc:741
+#line 858 "seclang-parser.cc" // lalr1.cc:725
 
     /* Initialize the stack.  The initial state will be set in
        yynewstate, since the latter expects the semantical and the
@@ -891,7 +882,7 @@ namespace yy {
       goto yydefault;
 
     // Read a lookahead token.
-    if (yyla.empty ())
+    if (yyempty)
       {
         YYCDEBUG << "Reading a token: ";
         try
@@ -904,6 +895,7 @@ namespace yy {
             error (yyexc);
             goto yyerrlab1;
           }
+        yyempty = false;
       }
     YY_SYMBOL_PRINT ("Next token is", yyla);
 
@@ -922,6 +914,9 @@ namespace yy {
         yyn = -yyn;
         goto yyreduce;
       }
+
+    // Discard the token being shifted.
+    yyempty = true;
 
     // Count tokens shifted since error; after three, turn off error status.
     if (yyerrstatus_)
@@ -964,217 +959,218 @@ namespace yy {
       case 152: // "ACTION_CTL_AUDIT_LOG_PARTS"
       case 153: // "ACTION_CTL_BDY_JSON"
       case 154: // "ACTION_CTL_BDY_XML"
-      case 155: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
-      case 156: // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      case 157: // "ACTION_CTL_RULE_REMOVE_BY_ID"
-      case 158: // "ACTION_CTL_RULE_REMOVE_BY_TAG"
-      case 159: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
-      case 160: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
-      case 161: // "Deny"
-      case 162: // "DeprecateVar"
-      case 163: // "Drop"
-      case 164: // "Exec"
-      case 165: // "ExpireVar"
-      case 166: // "Id"
-      case 167: // "InitCol"
-      case 168: // "Log"
-      case 169: // "LogData"
-      case 170: // "Maturity"
-      case 171: // "Msg"
-      case 172: // "MultiMatch"
-      case 173: // "NoAuditLog"
-      case 174: // "NoLog"
-      case 175: // "Pass"
-      case 176: // "Pause"
-      case 177: // "Phase"
-      case 178: // "Prepend"
-      case 179: // "Proxy"
-      case 180: // "Redirect"
-      case 181: // "Rev"
-      case 182: // "SanatiseArg"
-      case 183: // "SanatiseMatched"
-      case 184: // "SanatiseMatchedBytes"
-      case 185: // "SanatiseRequestHeader"
-      case 186: // "SanatiseResponseHeader"
-      case 187: // "SetEnv"
-      case 188: // "SetRsc"
-      case 189: // "SetSid"
-      case 190: // "SetUID"
-      case 191: // "Severity"
-      case 192: // "Skip"
-      case 193: // "SkipAfter"
-      case 194: // "Status"
-      case 195: // "Tag"
-      case 196: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
-      case 197: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
-      case 198: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
-      case 199: // "ACTION_TRANSFORMATION_CMD_LINE"
-      case 200: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-      case 201: // "ACTION_TRANSFORMATION_CSS_DECODE"
-      case 202: // "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
-      case 203: // "ACTION_TRANSFORMATION_HEX_ENCODE"
-      case 204: // "ACTION_TRANSFORMATION_HEX_DECODE"
-      case 205: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-      case 206: // "ACTION_TRANSFORMATION_JS_DECODE"
-      case 207: // "ACTION_TRANSFORMATION_LENGTH"
-      case 208: // "ACTION_TRANSFORMATION_LOWERCASE"
-      case 209: // "ACTION_TRANSFORMATION_MD5"
-      case 210: // "ACTION_TRANSFORMATION_NONE"
-      case 211: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
-      case 212: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-      case 213: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-      case 214: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-      case 215: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-      case 216: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-      case 217: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-      case 218: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
-      case 219: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-      case 220: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-      case 221: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
-      case 222: // "ACTION_TRANSFORMATION_SHA1"
-      case 223: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-      case 224: // "ACTION_TRANSFORMATION_TRIM"
-      case 225: // "ACTION_TRANSFORMATION_TRIM_LEFT"
-      case 226: // "ACTION_TRANSFORMATION_TRIM_RIGHT"
-      case 227: // "ACTION_TRANSFORMATION_UPPERCASE"
-      case 228: // "ACTION_TRANSFORMATION_URL_ENCODE"
-      case 229: // "ACTION_TRANSFORMATION_URL_DECODE"
-      case 230: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-      case 231: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 232: // "Ver"
-      case 233: // "xmlns"
-      case 234: // "CONFIG_COMPONENT_SIG"
-      case 235: // "CONFIG_CONN_ENGINE"
-      case 236: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 237: // "CONFIG_SEC_WEB_APP_ID"
-      case 238: // "CONFIG_SEC_SERVER_SIG"
-      case 239: // "CONFIG_DIR_AUDIT_DIR"
-      case 240: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 241: // "CONFIG_DIR_AUDIT_ENG"
-      case 242: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 243: // "CONFIG_DIR_AUDIT_LOG"
-      case 244: // "CONFIG_DIR_AUDIT_LOG2"
-      case 245: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 246: // "CONFIG_DIR_AUDIT_STS"
-      case 247: // "CONFIG_DIR_AUDIT_TPE"
-      case 248: // "CONFIG_DIR_DEBUG_LOG"
-      case 249: // "CONFIG_DIR_DEBUG_LVL"
-      case 250: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 251: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
-      case 252: // "CONFIG_SEC_HASH_ENGINE"
-      case 253: // "CONFIG_SEC_HASH_KEY"
-      case 254: // "CONFIG_SEC_HASH_PARAM"
-      case 255: // "CONFIG_SEC_HASH_METHOD_RX"
-      case 256: // "CONFIG_SEC_HASH_METHOD_PM"
-      case 257: // "CONFIG_SEC_CHROOT_DIR"
-      case 258: // "CONFIG_DIR_GEO_DB"
-      case 259: // "CONFIG_DIR_GSB_DB"
-      case 260: // "CONFIG_SEC_GUARDIAN_LOG"
-      case 261: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 262: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 263: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
-      case 264: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
-      case 265: // "CONFIG_SEC_SENSOR_ID"
-      case 266: // "CONFIG_DIR_REQ_BODY"
-      case 267: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 268: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 269: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 270: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 271: // "CONFIG_DIR_RES_BODY"
-      case 272: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 273: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 274: // "CONFIG_SEC_RULE_INHERITANCE"
-      case 275: // "CONFIG_SEC_RULE_PERF_TIME"
-      case 276: // "CONFIG_DIR_RULE_ENG"
-      case 277: // "CONFIG_DIR_SEC_ACTION"
-      case 278: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 279: // "CONFIG_DIR_SEC_MARKER"
-      case 280: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 281: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 282: // "CONFIG_SEC_HTTP_BLKEY"
-      case 283: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 284: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 285: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 288: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 292: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 293: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 294: // "CONFIG_UPLOAD_DIR"
-      case 295: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 296: // "CONFIG_UPLOAD_FILE_MODE"
-      case 297: // "CONFIG_VALUE_ABORT"
-      case 298: // "CONFIG_VALUE_DETC"
-      case 299: // "CONFIG_VALUE_HTTPS"
-      case 300: // "CONFIG_VALUE_OFF"
-      case 301: // "CONFIG_VALUE_ON"
-      case 302: // "CONFIG_VALUE_PARALLEL"
-      case 303: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 304: // "CONFIG_VALUE_REJECT"
-      case 305: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 306: // "CONFIG_VALUE_SERIAL"
-      case 307: // "CONFIG_VALUE_WARN"
-      case 308: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 309: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 310: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 311: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 312: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 313: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 314: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 315: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 316: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 317: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 318: // "DIRECTIVE"
-      case 319: // "DIRECTIVE_SECRULESCRIPT"
-      case 320: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 321: // "QUOTATION_MARK"
-      case 322: // "RUN_TIME_VAR_BLD"
-      case 323: // "RUN_TIME_VAR_DUR"
-      case 324: // "RUN_TIME_VAR_HSV"
-      case 325: // "RUN_TIME_VAR_REMOTE_USER"
-      case 326: // "RUN_TIME_VAR_TIME"
-      case 327: // "RUN_TIME_VAR_TIME_DAY"
-      case 328: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 329: // "RUN_TIME_VAR_TIME_HOUR"
-      case 330: // "RUN_TIME_VAR_TIME_MIN"
-      case 331: // "RUN_TIME_VAR_TIME_MON"
-      case 332: // "RUN_TIME_VAR_TIME_SEC"
-      case 333: // "RUN_TIME_VAR_TIME_WDAY"
-      case 334: // "RUN_TIME_VAR_TIME_YEAR"
-      case 335: // "VARIABLE"
-      case 336: // "Dictionary element"
-      case 337: // "Dictionary element, selected by regexp"
+      case 155: // "ACTION_CTL_BDY_URLENCODED"
+      case 156: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
+      case 157: // "ACTION_CTL_REQUEST_BODY_ACCESS"
+      case 158: // "ACTION_CTL_RULE_REMOVE_BY_ID"
+      case 159: // "ACTION_CTL_RULE_REMOVE_BY_TAG"
+      case 160: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
+      case 161: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
+      case 162: // "Deny"
+      case 163: // "DeprecateVar"
+      case 164: // "Drop"
+      case 165: // "Exec"
+      case 166: // "ExpireVar"
+      case 167: // "Id"
+      case 168: // "InitCol"
+      case 169: // "Log"
+      case 170: // "LogData"
+      case 171: // "Maturity"
+      case 172: // "Msg"
+      case 173: // "MultiMatch"
+      case 174: // "NoAuditLog"
+      case 175: // "NoLog"
+      case 176: // "Pass"
+      case 177: // "Pause"
+      case 178: // "Phase"
+      case 179: // "Prepend"
+      case 180: // "Proxy"
+      case 181: // "Redirect"
+      case 182: // "Rev"
+      case 183: // "SanatiseArg"
+      case 184: // "SanatiseMatched"
+      case 185: // "SanatiseMatchedBytes"
+      case 186: // "SanatiseRequestHeader"
+      case 187: // "SanatiseResponseHeader"
+      case 188: // "SetEnv"
+      case 189: // "SetRsc"
+      case 190: // "SetSid"
+      case 191: // "SetUID"
+      case 192: // "Severity"
+      case 193: // "Skip"
+      case 194: // "SkipAfter"
+      case 195: // "Status"
+      case 196: // "Tag"
+      case 197: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      case 198: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      case 199: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
+      case 200: // "ACTION_TRANSFORMATION_CMD_LINE"
+      case 201: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+      case 202: // "ACTION_TRANSFORMATION_CSS_DECODE"
+      case 203: // "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
+      case 204: // "ACTION_TRANSFORMATION_HEX_ENCODE"
+      case 205: // "ACTION_TRANSFORMATION_HEX_DECODE"
+      case 206: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+      case 207: // "ACTION_TRANSFORMATION_JS_DECODE"
+      case 208: // "ACTION_TRANSFORMATION_LENGTH"
+      case 209: // "ACTION_TRANSFORMATION_LOWERCASE"
+      case 210: // "ACTION_TRANSFORMATION_MD5"
+      case 211: // "ACTION_TRANSFORMATION_NONE"
+      case 212: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
+      case 213: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+      case 214: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
+      case 215: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
+      case 216: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
+      case 217: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+      case 218: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+      case 219: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
+      case 220: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+      case 221: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+      case 222: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
+      case 223: // "ACTION_TRANSFORMATION_SHA1"
+      case 224: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
+      case 225: // "ACTION_TRANSFORMATION_TRIM"
+      case 226: // "ACTION_TRANSFORMATION_TRIM_LEFT"
+      case 227: // "ACTION_TRANSFORMATION_TRIM_RIGHT"
+      case 228: // "ACTION_TRANSFORMATION_UPPERCASE"
+      case 229: // "ACTION_TRANSFORMATION_URL_ENCODE"
+      case 230: // "ACTION_TRANSFORMATION_URL_DECODE"
+      case 231: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+      case 232: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      case 233: // "Ver"
+      case 234: // "xmlns"
+      case 235: // "CONFIG_COMPONENT_SIG"
+      case 236: // "CONFIG_CONN_ENGINE"
+      case 237: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 238: // "CONFIG_SEC_WEB_APP_ID"
+      case 239: // "CONFIG_SEC_SERVER_SIG"
+      case 240: // "CONFIG_DIR_AUDIT_DIR"
+      case 241: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 242: // "CONFIG_DIR_AUDIT_ENG"
+      case 243: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 244: // "CONFIG_DIR_AUDIT_LOG"
+      case 245: // "CONFIG_DIR_AUDIT_LOG2"
+      case 246: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 247: // "CONFIG_DIR_AUDIT_STS"
+      case 248: // "CONFIG_DIR_AUDIT_TPE"
+      case 249: // "CONFIG_DIR_DEBUG_LOG"
+      case 250: // "CONFIG_DIR_DEBUG_LVL"
+      case 251: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 252: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
+      case 253: // "CONFIG_SEC_HASH_ENGINE"
+      case 254: // "CONFIG_SEC_HASH_KEY"
+      case 255: // "CONFIG_SEC_HASH_PARAM"
+      case 256: // "CONFIG_SEC_HASH_METHOD_RX"
+      case 257: // "CONFIG_SEC_HASH_METHOD_PM"
+      case 258: // "CONFIG_SEC_CHROOT_DIR"
+      case 259: // "CONFIG_DIR_GEO_DB"
+      case 260: // "CONFIG_DIR_GSB_DB"
+      case 261: // "CONFIG_SEC_GUARDIAN_LOG"
+      case 262: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 263: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 264: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
+      case 265: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
+      case 266: // "CONFIG_SEC_SENSOR_ID"
+      case 267: // "CONFIG_DIR_REQ_BODY"
+      case 268: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 269: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 270: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 271: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 272: // "CONFIG_DIR_RES_BODY"
+      case 273: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 274: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 275: // "CONFIG_SEC_RULE_INHERITANCE"
+      case 276: // "CONFIG_SEC_RULE_PERF_TIME"
+      case 277: // "CONFIG_DIR_RULE_ENG"
+      case 278: // "CONFIG_DIR_SEC_ACTION"
+      case 279: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 280: // "CONFIG_DIR_SEC_MARKER"
+      case 281: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 282: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 283: // "CONFIG_SEC_HTTP_BLKEY"
+      case 284: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 285: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 292: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 293: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 294: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 295: // "CONFIG_UPLOAD_DIR"
+      case 296: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 297: // "CONFIG_UPLOAD_FILE_MODE"
+      case 298: // "CONFIG_VALUE_ABORT"
+      case 299: // "CONFIG_VALUE_DETC"
+      case 300: // "CONFIG_VALUE_HTTPS"
+      case 301: // "CONFIG_VALUE_OFF"
+      case 302: // "CONFIG_VALUE_ON"
+      case 303: // "CONFIG_VALUE_PARALLEL"
+      case 304: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 305: // "CONFIG_VALUE_REJECT"
+      case 306: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 307: // "CONFIG_VALUE_SERIAL"
+      case 308: // "CONFIG_VALUE_WARN"
+      case 309: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 310: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 311: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 312: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 313: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 314: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 315: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 316: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 317: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 318: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 319: // "DIRECTIVE"
+      case 320: // "DIRECTIVE_SECRULESCRIPT"
+      case 321: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 322: // "QUOTATION_MARK"
+      case 323: // "RUN_TIME_VAR_BLD"
+      case 324: // "RUN_TIME_VAR_DUR"
+      case 325: // "RUN_TIME_VAR_HSV"
+      case 326: // "RUN_TIME_VAR_REMOTE_USER"
+      case 327: // "RUN_TIME_VAR_TIME"
+      case 328: // "RUN_TIME_VAR_TIME_DAY"
+      case 329: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 330: // "RUN_TIME_VAR_TIME_HOUR"
+      case 331: // "RUN_TIME_VAR_TIME_MIN"
+      case 332: // "RUN_TIME_VAR_TIME_MON"
+      case 333: // "RUN_TIME_VAR_TIME_SEC"
+      case 334: // "RUN_TIME_VAR_TIME_WDAY"
+      case 335: // "RUN_TIME_VAR_TIME_YEAR"
+      case 336: // "VARIABLE"
+      case 337: // "Dictionary element"
+      case 338: // "Dictionary element, selected by regexp"
         yylhs.value.build< std::string > ();
         break;
 
-      case 344: // op
-      case 345: // op_before_init
+      case 345: // op
+      case 346: // op_before_init
         yylhs.value.build< std::unique_ptr<Operator> > ();
         break;
 
-      case 352: // run_time_string
+      case 353: // run_time_string
         yylhs.value.build< std::unique_ptr<RunTimeString> > ();
         break;
 
-      case 349: // var
+      case 350: // var
         yylhs.value.build< std::unique_ptr<Variable> > ();
         break;
 
-      case 350: // act
-      case 351: // setvar_action
+      case 351: // act
+      case 352: // setvar_action
         yylhs.value.build< std::unique_ptr<actions::Action> > ();
         break;
 
-      case 347: // variables
-      case 348: // variables_may_be_quoted
+      case 348: // variables
+      case 349: // variables_may_be_quoted
         yylhs.value.build< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
         break;
 
-      case 342: // actions
-      case 343: // actions_may_quoted
+      case 343: // actions
+      case 344: // actions_may_quoted
         yylhs.value.build< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ();
         break;
 
@@ -1196,241 +1192,241 @@ namespace yy {
           switch (yyn)
             {
   case 2:
-#line 740 "seclang-parser.yy" // lalr1.cc:859
+#line 742 "seclang-parser.yy" // lalr1.cc:847
     {
         return 0;
       }
-#line 1204 "seclang-parser.cc" // lalr1.cc:859
+#line 1200 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 6:
-#line 753 "seclang-parser.yy" // lalr1.cc:859
+#line 755 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setStorageDirMode(strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8));
       }
-#line 1212 "seclang-parser.cc" // lalr1.cc:859
+#line 1208 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 7:
-#line 759 "seclang-parser.yy" // lalr1.cc:859
+#line 761 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setStorageDir(yystack_[0].value.as< std::string > ());
       }
-#line 1220 "seclang-parser.cc" // lalr1.cc:859
+#line 1216 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 8:
-#line 765 "seclang-parser.yy" // lalr1.cc:859
+#line 767 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
       }
-#line 1228 "seclang-parser.cc" // lalr1.cc:859
+#line 1224 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 9:
-#line 769 "seclang-parser.yy" // lalr1.cc:859
+#line 771 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
       }
-#line 1236 "seclang-parser.cc" // lalr1.cc:859
+#line 1232 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 10:
-#line 773 "seclang-parser.yy" // lalr1.cc:859
+#line 775 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
       }
-#line 1244 "seclang-parser.cc" // lalr1.cc:859
+#line 1240 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 11:
-#line 779 "seclang-parser.yy" // lalr1.cc:859
+#line 781 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setFileMode(strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8));
       }
-#line 1252 "seclang-parser.cc" // lalr1.cc:859
+#line 1248 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 12:
-#line 785 "seclang-parser.yy" // lalr1.cc:859
+#line 787 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setFilePath2(yystack_[0].value.as< std::string > ());
       }
-#line 1260 "seclang-parser.cc" // lalr1.cc:859
+#line 1256 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 13:
-#line 791 "seclang-parser.yy" // lalr1.cc:859
+#line 793 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setParts(yystack_[0].value.as< std::string > ());
       }
-#line 1268 "seclang-parser.cc" // lalr1.cc:859
+#line 1264 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 14:
-#line 797 "seclang-parser.yy" // lalr1.cc:859
+#line 799 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setFilePath1(yystack_[0].value.as< std::string > ());
       }
-#line 1276 "seclang-parser.cc" // lalr1.cc:859
+#line 1272 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 15:
-#line 802 "seclang-parser.yy" // lalr1.cc:859
+#line 804 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::JSONAuditLogFormat);
       }
-#line 1284 "seclang-parser.cc" // lalr1.cc:859
+#line 1280 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 16:
-#line 807 "seclang-parser.yy" // lalr1.cc:859
+#line 809 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::NativeAuditLogFormat);
       }
-#line 1292 "seclang-parser.cc" // lalr1.cc:859
+#line 1288 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 17:
-#line 813 "seclang-parser.yy" // lalr1.cc:859
+#line 815 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string relevant_status(yystack_[0].value.as< std::string > ());
         driver.m_auditLog->setRelevantStatus(relevant_status);
       }
-#line 1301 "seclang-parser.cc" // lalr1.cc:859
+#line 1297 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 18:
-#line 820 "seclang-parser.yy" // lalr1.cc:859
+#line 822 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
       }
-#line 1309 "seclang-parser.cc" // lalr1.cc:859
+#line 1305 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 19:
-#line 824 "seclang-parser.yy" // lalr1.cc:859
+#line 826 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
       }
-#line 1317 "seclang-parser.cc" // lalr1.cc:859
+#line 1313 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 20:
-#line 828 "seclang-parser.yy" // lalr1.cc:859
+#line 830 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
       }
-#line 1325 "seclang-parser.cc" // lalr1.cc:859
+#line 1321 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 21:
-#line 834 "seclang-parser.yy" // lalr1.cc:859
+#line 836 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
       }
-#line 1333 "seclang-parser.cc" // lalr1.cc:859
+#line 1329 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 22:
-#line 838 "seclang-parser.yy" // lalr1.cc:859
+#line 840 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
       }
-#line 1341 "seclang-parser.cc" // lalr1.cc:859
+#line 1337 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 23:
-#line 842 "seclang-parser.yy" // lalr1.cc:859
+#line 844 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[2].location, "SecUploadKeepFiles RelevantOnly is not currently supported. Accepted values are On or Off");
         YYERROR;
       }
-#line 1350 "seclang-parser.cc" // lalr1.cc:859
+#line 1346 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 24:
-#line 847 "seclang-parser.yy" // lalr1.cc:859
+#line 849 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_uploadFileLimit.m_set = true;
         driver.m_uploadFileLimit.m_value = strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 10);
       }
-#line 1359 "seclang-parser.cc" // lalr1.cc:859
+#line 1355 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 25:
-#line 852 "seclang-parser.yy" // lalr1.cc:859
+#line 854 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_uploadFileMode.m_set = true;
         driver.m_uploadFileMode.m_value = strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8);
       }
-#line 1368 "seclang-parser.cc" // lalr1.cc:859
+#line 1364 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 26:
-#line 857 "seclang-parser.yy" // lalr1.cc:859
+#line 859 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_uploadDirectory.m_set = true;
         driver.m_uploadDirectory.m_value = yystack_[0].value.as< std::string > ();
       }
-#line 1377 "seclang-parser.cc" // lalr1.cc:859
+#line 1373 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 27:
-#line 862 "seclang-parser.yy" // lalr1.cc:859
+#line 864 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
       }
-#line 1385 "seclang-parser.cc" // lalr1.cc:859
+#line 1381 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 28:
-#line 866 "seclang-parser.yy" // lalr1.cc:859
+#line 868 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
       }
-#line 1393 "seclang-parser.cc" // lalr1.cc:859
+#line 1389 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 29:
-#line 873 "seclang-parser.yy" // lalr1.cc:859
+#line 875 "seclang-parser.yy" // lalr1.cc:847
     {
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > () = std::move(yystack_[1].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ());
       }
-#line 1401 "seclang-parser.cc" // lalr1.cc:859
+#line 1397 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 30:
-#line 877 "seclang-parser.yy" // lalr1.cc:859
+#line 879 "seclang-parser.yy" // lalr1.cc:847
     {
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > () = std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ());
       }
-#line 1409 "seclang-parser.cc" // lalr1.cc:859
+#line 1405 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 31:
-#line 884 "seclang-parser.yy" // lalr1.cc:859
+#line 886 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_INIT(yystack_[0].value.as< std::unique_ptr<actions::Action> > (), yystack_[3].location)
         yystack_[2].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ()->push_back(std::move(yystack_[0].value.as< std::unique_ptr<actions::Action> > ()));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > () = std::move(yystack_[2].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ());
       }
-#line 1419 "seclang-parser.cc" // lalr1.cc:859
+#line 1415 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 32:
-#line 890 "seclang-parser.yy" // lalr1.cc:859
+#line 892 "seclang-parser.yy" // lalr1.cc:847
     {
         std::unique_ptr<std::vector<std::unique_ptr<actions::Action>>> b(new std::vector<std::unique_ptr<actions::Action>>());
         ACTION_INIT(yystack_[0].value.as< std::unique_ptr<actions::Action> > (), yystack_[1].location)
         b->push_back(std::move(yystack_[0].value.as< std::unique_ptr<actions::Action> > ()));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > () = std::move(b);
       }
-#line 1430 "seclang-parser.cc" // lalr1.cc:859
+#line 1426 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 33:
-#line 900 "seclang-parser.yy" // lalr1.cc:859
+#line 902 "seclang-parser.yy" // lalr1.cc:847
     {
         yylhs.value.as< std::unique_ptr<Operator> > () = std::move(yystack_[0].value.as< std::unique_ptr<Operator> > ());
         std::string error;
@@ -1439,11 +1435,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 1443 "seclang-parser.cc" // lalr1.cc:859
+#line 1439 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 34:
-#line 909 "seclang-parser.yy" // lalr1.cc:859
+#line 911 "seclang-parser.yy" // lalr1.cc:847
     {
         yylhs.value.as< std::unique_ptr<Operator> > () = std::move(yystack_[0].value.as< std::unique_ptr<Operator> > ());
         yylhs.value.as< std::unique_ptr<Operator> > ()->m_negation = true;
@@ -1453,11 +1449,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 1457 "seclang-parser.cc" // lalr1.cc:859
+#line 1453 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 35:
-#line 919 "seclang-parser.yy" // lalr1.cc:859
+#line 921 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
         std::string error;
@@ -1466,11 +1462,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 1470 "seclang-parser.cc" // lalr1.cc:859
+#line 1466 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 36:
-#line 928 "seclang-parser.yy" // lalr1.cc:859
+#line 930 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
         yylhs.value.as< std::unique_ptr<Operator> > ()->m_negation = true;
@@ -1480,286 +1476,286 @@ namespace yy {
             YYERROR;
         }
       }
-#line 1484 "seclang-parser.cc" // lalr1.cc:859
+#line 1480 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 37:
-#line 941 "seclang-parser.yy" // lalr1.cc:859
+#line 943 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::UnconditionalMatch());
       }
-#line 1492 "seclang-parser.cc" // lalr1.cc:859
+#line 1488 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 38:
-#line 945 "seclang-parser.yy" // lalr1.cc:859
+#line 947 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::DetectSQLi());
       }
-#line 1500 "seclang-parser.cc" // lalr1.cc:859
+#line 1496 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 39:
-#line 949 "seclang-parser.yy" // lalr1.cc:859
+#line 951 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::DetectXSS());
       }
-#line 1508 "seclang-parser.cc" // lalr1.cc:859
+#line 1504 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 40:
-#line 953 "seclang-parser.yy" // lalr1.cc:859
+#line 955 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::ValidateUrlEncoding());
       }
-#line 1516 "seclang-parser.cc" // lalr1.cc:859
+#line 1512 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 41:
-#line 957 "seclang-parser.yy" // lalr1.cc:859
+#line 959 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::ValidateUtf8Encoding());
       }
-#line 1524 "seclang-parser.cc" // lalr1.cc:859
+#line 1520 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 42:
-#line 961 "seclang-parser.yy" // lalr1.cc:859
+#line 963 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::InspectFile(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1532 "seclang-parser.cc" // lalr1.cc:859
+#line 1528 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 43:
-#line 965 "seclang-parser.yy" // lalr1.cc:859
+#line 967 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::FuzzyHash(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1540 "seclang-parser.cc" // lalr1.cc:859
+#line 1536 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 44:
-#line 969 "seclang-parser.yy" // lalr1.cc:859
+#line 971 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::ValidateByteRange(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1548 "seclang-parser.cc" // lalr1.cc:859
+#line 1544 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 45:
-#line 973 "seclang-parser.yy" // lalr1.cc:859
+#line 975 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::ValidateDTD(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1556 "seclang-parser.cc" // lalr1.cc:859
+#line 1552 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 46:
-#line 977 "seclang-parser.yy" // lalr1.cc:859
+#line 979 "seclang-parser.yy" // lalr1.cc:847
     {
         /* $$ = new operators::ValidateHash($1); */
         OPERATOR_NOT_SUPPORTED("ValidateHash", yystack_[2].location);
       }
-#line 1565 "seclang-parser.cc" // lalr1.cc:859
+#line 1561 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 47:
-#line 982 "seclang-parser.yy" // lalr1.cc:859
+#line 984 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::ValidateSchema(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1573 "seclang-parser.cc" // lalr1.cc:859
+#line 1569 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 48:
-#line 986 "seclang-parser.yy" // lalr1.cc:859
+#line 988 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::VerifyCC(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1581 "seclang-parser.cc" // lalr1.cc:859
+#line 1577 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 49:
-#line 990 "seclang-parser.yy" // lalr1.cc:859
+#line 992 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::VerifyCPF(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1589 "seclang-parser.cc" // lalr1.cc:859
+#line 1585 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 50:
-#line 994 "seclang-parser.yy" // lalr1.cc:859
+#line 996 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::VerifySSN(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1597 "seclang-parser.cc" // lalr1.cc:859
+#line 1593 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 51:
-#line 998 "seclang-parser.yy" // lalr1.cc:859
+#line 1000 "seclang-parser.yy" // lalr1.cc:847
     {
         /* $$ = new operators::GsbLookup($1); */
         OPERATOR_NOT_SUPPORTED("GsbLookup", yystack_[2].location);
       }
-#line 1606 "seclang-parser.cc" // lalr1.cc:859
+#line 1602 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 52:
-#line 1003 "seclang-parser.yy" // lalr1.cc:859
+#line 1005 "seclang-parser.yy" // lalr1.cc:847
     {
         /* $$ = new operators::Rsub($1); */
         OPERATOR_NOT_SUPPORTED("Rsub", yystack_[2].location);
       }
-#line 1615 "seclang-parser.cc" // lalr1.cc:859
+#line 1611 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 53:
-#line 1008 "seclang-parser.yy" // lalr1.cc:859
+#line 1010 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Within(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1623 "seclang-parser.cc" // lalr1.cc:859
+#line 1619 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 54:
-#line 1012 "seclang-parser.yy" // lalr1.cc:859
+#line 1014 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::ContainsWord(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1631 "seclang-parser.cc" // lalr1.cc:859
+#line 1627 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 55:
-#line 1016 "seclang-parser.yy" // lalr1.cc:859
+#line 1018 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Contains(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1639 "seclang-parser.cc" // lalr1.cc:859
+#line 1635 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 56:
-#line 1020 "seclang-parser.yy" // lalr1.cc:859
+#line 1022 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::EndsWith(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1647 "seclang-parser.cc" // lalr1.cc:859
+#line 1643 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 57:
-#line 1024 "seclang-parser.yy" // lalr1.cc:859
+#line 1026 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Eq(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1655 "seclang-parser.cc" // lalr1.cc:859
+#line 1651 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 58:
-#line 1028 "seclang-parser.yy" // lalr1.cc:859
+#line 1030 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Ge(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1663 "seclang-parser.cc" // lalr1.cc:859
+#line 1659 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 59:
-#line 1032 "seclang-parser.yy" // lalr1.cc:859
+#line 1034 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Gt(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1671 "seclang-parser.cc" // lalr1.cc:859
+#line 1667 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 60:
-#line 1036 "seclang-parser.yy" // lalr1.cc:859
+#line 1038 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::IpMatchF(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1679 "seclang-parser.cc" // lalr1.cc:859
+#line 1675 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 61:
-#line 1040 "seclang-parser.yy" // lalr1.cc:859
+#line 1042 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::IpMatch(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1687 "seclang-parser.cc" // lalr1.cc:859
+#line 1683 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 62:
-#line 1044 "seclang-parser.yy" // lalr1.cc:859
+#line 1046 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Le(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1695 "seclang-parser.cc" // lalr1.cc:859
+#line 1691 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 63:
-#line 1048 "seclang-parser.yy" // lalr1.cc:859
+#line 1050 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Lt(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1703 "seclang-parser.cc" // lalr1.cc:859
+#line 1699 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 64:
-#line 1052 "seclang-parser.yy" // lalr1.cc:859
+#line 1054 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::PmFromFile(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1711 "seclang-parser.cc" // lalr1.cc:859
+#line 1707 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 65:
-#line 1056 "seclang-parser.yy" // lalr1.cc:859
+#line 1058 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Pm(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1719 "seclang-parser.cc" // lalr1.cc:859
+#line 1715 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 66:
-#line 1060 "seclang-parser.yy" // lalr1.cc:859
+#line 1062 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Rbl(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1727 "seclang-parser.cc" // lalr1.cc:859
+#line 1723 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 67:
-#line 1064 "seclang-parser.yy" // lalr1.cc:859
+#line 1066 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1735 "seclang-parser.cc" // lalr1.cc:859
+#line 1731 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 68:
-#line 1068 "seclang-parser.yy" // lalr1.cc:859
+#line 1070 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::StrEq(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1743 "seclang-parser.cc" // lalr1.cc:859
+#line 1739 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 69:
-#line 1072 "seclang-parser.yy" // lalr1.cc:859
+#line 1074 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::StrMatch(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1751 "seclang-parser.cc" // lalr1.cc:859
+#line 1747 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 70:
-#line 1076 "seclang-parser.yy" // lalr1.cc:859
+#line 1078 "seclang-parser.yy" // lalr1.cc:847
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::BeginsWith(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 1759 "seclang-parser.cc" // lalr1.cc:859
+#line 1755 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 71:
-#line 1080 "seclang-parser.yy" // lalr1.cc:859
+#line 1082 "seclang-parser.yy" // lalr1.cc:847
     {
 #ifdef WITH_GEOIP
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::GeoLookup());
@@ -1770,11 +1766,11 @@ namespace yy {
             YYERROR;
 #endif  // WITH_GEOIP
       }
-#line 1774 "seclang-parser.cc" // lalr1.cc:859
+#line 1770 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 73:
-#line 1095 "seclang-parser.yy" // lalr1.cc:859
+#line 1097 "seclang-parser.yy" // lalr1.cc:847
     {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         for (auto &i : *yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ().get()) {
@@ -1798,11 +1794,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 1802 "seclang-parser.cc" // lalr1.cc:859
+#line 1798 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 74:
-#line 1119 "seclang-parser.yy" // lalr1.cc:859
+#line 1121 "seclang-parser.yy" // lalr1.cc:847
     {
         std::vector<Variable *> *v = new std::vector<Variable *>();
         for (auto &i : *yystack_[1].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ().get()) {
@@ -1821,11 +1817,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 1825 "seclang-parser.cc" // lalr1.cc:859
+#line 1821 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 75:
-#line 1138 "seclang-parser.yy" // lalr1.cc:859
+#line 1140 "seclang-parser.yy" // lalr1.cc:847
     {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         for (auto &i : *yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ().get()) {
@@ -1840,11 +1836,11 @@ namespace yy {
             );
         driver.addSecAction(rule);
       }
-#line 1844 "seclang-parser.cc" // lalr1.cc:859
+#line 1840 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 76:
-#line 1153 "seclang-parser.yy" // lalr1.cc:859
+#line 1155 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
@@ -1868,11 +1864,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 1872 "seclang-parser.cc" // lalr1.cc:859
+#line 1868 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 77:
-#line 1177 "seclang-parser.yy" // lalr1.cc:859
+#line 1179 "seclang-parser.yy" // lalr1.cc:847
     {
         bool hasDisruptive = false;
         std::vector<actions::Action *> *actions = new std::vector<actions::Action *>();
@@ -1928,75 +1924,75 @@ namespace yy {
 
         delete actions;
       }
-#line 1932 "seclang-parser.cc" // lalr1.cc:859
+#line 1928 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 78:
-#line 1233 "seclang-parser.yy" // lalr1.cc:859
+#line 1235 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.addSecMarker(modsecurity::utils::string::removeBracketsIfNeeded(yystack_[0].value.as< std::string > ()));
       }
-#line 1940 "seclang-parser.cc" // lalr1.cc:859
+#line 1936 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 79:
-#line 1237 "seclang-parser.yy" // lalr1.cc:859
+#line 1239 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
       }
-#line 1948 "seclang-parser.cc" // lalr1.cc:859
+#line 1944 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 80:
-#line 1241 "seclang-parser.yy" // lalr1.cc:859
+#line 1243 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
       }
-#line 1956 "seclang-parser.cc" // lalr1.cc:859
+#line 1952 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 81:
-#line 1245 "seclang-parser.yy" // lalr1.cc:859
+#line 1247 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
       }
-#line 1964 "seclang-parser.cc" // lalr1.cc:859
+#line 1960 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 82:
-#line 1249 "seclang-parser.yy" // lalr1.cc:859
+#line 1251 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
       }
-#line 1972 "seclang-parser.cc" // lalr1.cc:859
+#line 1968 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 83:
-#line 1253 "seclang-parser.yy" // lalr1.cc:859
+#line 1255 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
-#line 1980 "seclang-parser.cc" // lalr1.cc:859
+#line 1976 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 84:
-#line 1257 "seclang-parser.yy" // lalr1.cc:859
+#line 1259 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
       }
-#line 1988 "seclang-parser.cc" // lalr1.cc:859
+#line 1984 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 85:
-#line 1261 "seclang-parser.yy" // lalr1.cc:859
+#line 1263 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
-#line 1996 "seclang-parser.cc" // lalr1.cc:859
+#line 1992 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 86:
-#line 1265 "seclang-parser.yy" // lalr1.cc:859
+#line 1267 "seclang-parser.yy" // lalr1.cc:847
     {
         if (yystack_[0].value.as< std::string > ().length() != 1) {
           driver.error(yystack_[1].location, "Argument separator should be set to a single character.");
@@ -2005,259 +2001,259 @@ namespace yy {
         driver.m_secArgumentSeparator.m_value = yystack_[0].value.as< std::string > ();
         driver.m_secArgumentSeparator.m_set = true;
       }
-#line 2009 "seclang-parser.cc" // lalr1.cc:859
+#line 2005 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 87:
-#line 1274 "seclang-parser.yy" // lalr1.cc:859
+#line 1276 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_components.push_back(yystack_[0].value.as< std::string > ());
       }
-#line 2017 "seclang-parser.cc" // lalr1.cc:859
+#line 2013 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 88:
-#line 1278 "seclang-parser.yy" // lalr1.cc:859
+#line 1280 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[2].location, "SecConnEngine is not yet supported.");
         YYERROR;
       }
-#line 2026 "seclang-parser.cc" // lalr1.cc:859
+#line 2022 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 89:
-#line 1283 "seclang-parser.yy" // lalr1.cc:859
+#line 1285 "seclang-parser.yy" // lalr1.cc:847
     {
       }
-#line 2033 "seclang-parser.cc" // lalr1.cc:859
+#line 2029 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 90:
-#line 1286 "seclang-parser.yy" // lalr1.cc:859
+#line 1288 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secWebAppId.m_value = yystack_[0].value.as< std::string > ();
         driver.m_secWebAppId.m_set = true;
       }
-#line 2042 "seclang-parser.cc" // lalr1.cc:859
+#line 2038 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 91:
-#line 1291 "seclang-parser.yy" // lalr1.cc:859
+#line 1293 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecServerSignature is not supported.");
         YYERROR;
       }
-#line 2051 "seclang-parser.cc" // lalr1.cc:859
+#line 2047 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 92:
-#line 1296 "seclang-parser.yy" // lalr1.cc:859
+#line 1298 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecCacheTransformations is not supported.");
         YYERROR;
       }
-#line 2060 "seclang-parser.cc" // lalr1.cc:859
+#line 2056 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 93:
-#line 1301 "seclang-parser.yy" // lalr1.cc:859
+#line 1303 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[2].location, "SecDisableBackendCompression is not supported.");
         YYERROR;
       }
-#line 2069 "seclang-parser.cc" // lalr1.cc:859
+#line 2065 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 94:
-#line 1306 "seclang-parser.yy" // lalr1.cc:859
+#line 1308 "seclang-parser.yy" // lalr1.cc:847
     {
       }
-#line 2076 "seclang-parser.cc" // lalr1.cc:859
+#line 2072 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 95:
-#line 1309 "seclang-parser.yy" // lalr1.cc:859
+#line 1311 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[2].location, "SecContentInjection is not yet supported.");
         YYERROR;
       }
-#line 2085 "seclang-parser.cc" // lalr1.cc:859
+#line 2081 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 96:
-#line 1314 "seclang-parser.yy" // lalr1.cc:859
+#line 1316 "seclang-parser.yy" // lalr1.cc:847
     {
       }
-#line 2092 "seclang-parser.cc" // lalr1.cc:859
+#line 2088 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 97:
-#line 1317 "seclang-parser.yy" // lalr1.cc:859
+#line 1319 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecChrootDir is not supported.");
         YYERROR;
       }
-#line 2101 "seclang-parser.cc" // lalr1.cc:859
+#line 2097 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 98:
-#line 1322 "seclang-parser.yy" // lalr1.cc:859
+#line 1324 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[2].location, "SecHashEngine is not yet supported.");
         YYERROR;
       }
-#line 2110 "seclang-parser.cc" // lalr1.cc:859
+#line 2106 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 99:
-#line 1327 "seclang-parser.yy" // lalr1.cc:859
+#line 1329 "seclang-parser.yy" // lalr1.cc:847
     {
       }
-#line 2117 "seclang-parser.cc" // lalr1.cc:859
+#line 2113 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 100:
-#line 1330 "seclang-parser.yy" // lalr1.cc:859
+#line 1332 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecHashKey is not yet supported.");
         YYERROR;
       }
-#line 2126 "seclang-parser.cc" // lalr1.cc:859
+#line 2122 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 101:
-#line 1335 "seclang-parser.yy" // lalr1.cc:859
+#line 1337 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecHashParam is not yet supported.");
         YYERROR;
       }
-#line 2135 "seclang-parser.cc" // lalr1.cc:859
+#line 2131 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 102:
-#line 1340 "seclang-parser.yy" // lalr1.cc:859
+#line 1342 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecHashMethodRx is not yet supported.");
         YYERROR;
       }
-#line 2144 "seclang-parser.cc" // lalr1.cc:859
+#line 2140 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 103:
-#line 1345 "seclang-parser.yy" // lalr1.cc:859
+#line 1347 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecHashMethodPm is not yet supported.");
         YYERROR;
       }
-#line 2153 "seclang-parser.cc" // lalr1.cc:859
+#line 2149 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 104:
-#line 1350 "seclang-parser.yy" // lalr1.cc:859
+#line 1352 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecGsbLookupDb is not supported.");
         YYERROR;
       }
-#line 2162 "seclang-parser.cc" // lalr1.cc:859
+#line 2158 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 105:
-#line 1355 "seclang-parser.yy" // lalr1.cc:859
+#line 1357 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecGuardianLog is not supported.");
         YYERROR;
       }
-#line 2171 "seclang-parser.cc" // lalr1.cc:859
+#line 2167 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 106:
-#line 1360 "seclang-parser.yy" // lalr1.cc:859
+#line 1362 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[2].location, "SecInterceptOnError is not yet supported.");
         YYERROR;
       }
-#line 2180 "seclang-parser.cc" // lalr1.cc:859
+#line 2176 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 107:
-#line 1365 "seclang-parser.yy" // lalr1.cc:859
+#line 1367 "seclang-parser.yy" // lalr1.cc:847
     {
       }
-#line 2187 "seclang-parser.cc" // lalr1.cc:859
+#line 2183 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 108:
-#line 1368 "seclang-parser.yy" // lalr1.cc:859
+#line 1370 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecConnReadStateLimit is not yet supported.");
         YYERROR;
       }
-#line 2196 "seclang-parser.cc" // lalr1.cc:859
+#line 2192 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 109:
-#line 1373 "seclang-parser.yy" // lalr1.cc:859
+#line 1375 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecConnWriteStateLimit is not yet supported.");
         YYERROR;
       }
-#line 2205 "seclang-parser.cc" // lalr1.cc:859
+#line 2201 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 110:
-#line 1378 "seclang-parser.yy" // lalr1.cc:859
+#line 1380 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecSensorId is not yet supported.");
         YYERROR;
       }
-#line 2214 "seclang-parser.cc" // lalr1.cc:859
+#line 2210 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 111:
-#line 1383 "seclang-parser.yy" // lalr1.cc:859
+#line 1385 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[2].location, "SecRuleInheritance is not yet supported.");
         YYERROR;
       }
-#line 2223 "seclang-parser.cc" // lalr1.cc:859
+#line 2219 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 112:
-#line 1388 "seclang-parser.yy" // lalr1.cc:859
+#line 1390 "seclang-parser.yy" // lalr1.cc:847
     {
       }
-#line 2230 "seclang-parser.cc" // lalr1.cc:859
+#line 2226 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 113:
-#line 1391 "seclang-parser.yy" // lalr1.cc:859
+#line 1393 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecRulePerfTime is not yet supported.");
         YYERROR;
       }
-#line 2239 "seclang-parser.cc" // lalr1.cc:859
+#line 2235 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 114:
-#line 1396 "seclang-parser.yy" // lalr1.cc:859
+#line 1398 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecStreamInBodyInspection is not supported.");
         YYERROR;
       }
-#line 2248 "seclang-parser.cc" // lalr1.cc:859
+#line 2244 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 115:
-#line 1401 "seclang-parser.yy" // lalr1.cc:859
+#line 1403 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecStreamOutBodyInspection is not supported.");
         YYERROR;
       }
-#line 2257 "seclang-parser.cc" // lalr1.cc:859
+#line 2253 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 116:
-#line 1406 "seclang-parser.yy" // lalr1.cc:859
+#line 1408 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string error;
         if (driver.m_exceptions.load(yystack_[0].value.as< std::string > (), &error) == false) {
@@ -2270,11 +2266,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 2274 "seclang-parser.cc" // lalr1.cc:859
+#line 2270 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 117:
-#line 1419 "seclang-parser.yy" // lalr1.cc:859
+#line 1421 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string error;
         if (driver.m_exceptions.loadRemoveRuleByTag(yystack_[0].value.as< std::string > (), &error) == false) {
@@ -2287,11 +2283,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 2291 "seclang-parser.cc" // lalr1.cc:859
+#line 2287 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 118:
-#line 1432 "seclang-parser.yy" // lalr1.cc:859
+#line 1434 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string error;
         if (driver.m_exceptions.loadRemoveRuleByMsg(yystack_[0].value.as< std::string > (), &error) == false) {
@@ -2304,11 +2300,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 2308 "seclang-parser.cc" // lalr1.cc:859
+#line 2304 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 119:
-#line 1445 "seclang-parser.yy" // lalr1.cc:859
+#line 1447 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string error;
         if (driver.m_exceptions.loadUpdateTargetByTag(yystack_[1].value.as< std::string > (), std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
@@ -2321,11 +2317,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 2325 "seclang-parser.cc" // lalr1.cc:859
+#line 2321 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 120:
-#line 1458 "seclang-parser.yy" // lalr1.cc:859
+#line 1460 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string error;
         if (driver.m_exceptions.loadUpdateTargetByMsg(yystack_[1].value.as< std::string > (), std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
@@ -2338,11 +2334,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 2342 "seclang-parser.cc" // lalr1.cc:859
+#line 2338 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 121:
-#line 1471 "seclang-parser.yy" // lalr1.cc:859
+#line 1473 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string error;
         double ruleId;
@@ -2368,11 +2364,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 2372 "seclang-parser.cc" // lalr1.cc:859
+#line 2368 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 122:
-#line 1497 "seclang-parser.yy" // lalr1.cc:859
+#line 1499 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string error;
         double ruleId;
@@ -2397,11 +2393,11 @@ namespace yy {
         driver.error(yystack_[2].location, "SecRuleUpdateActionById is not yet supported");
         YYERROR;
       }
-#line 2401 "seclang-parser.cc" // lalr1.cc:859
+#line 2397 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 123:
-#line 1523 "seclang-parser.yy" // lalr1.cc:859
+#line 1525 "seclang-parser.yy" // lalr1.cc:847
     {
         if (driver.m_debugLog != NULL) {
           driver.m_debugLog->setDebugLogLevel(atoi(yystack_[0].value.as< std::string > ().c_str()));
@@ -2413,11 +2409,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 2417 "seclang-parser.cc" // lalr1.cc:859
+#line 2413 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 124:
-#line 1535 "seclang-parser.yy" // lalr1.cc:859
+#line 1537 "seclang-parser.yy" // lalr1.cc:847
     {
         if (driver.m_debugLog != NULL) {
             std::string error;
@@ -2436,11 +2432,11 @@ namespace yy {
             YYERROR;
         }
       }
-#line 2440 "seclang-parser.cc" // lalr1.cc:859
+#line 2436 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 125:
-#line 1555 "seclang-parser.yy" // lalr1.cc:859
+#line 1557 "seclang-parser.yy" // lalr1.cc:847
     {
 #ifdef WITH_GEOIP
         std::string err;
@@ -2467,29 +2463,29 @@ namespace yy {
         YYERROR;
 #endif  // WITH_GEOIP
       }
-#line 2471 "seclang-parser.cc" // lalr1.cc:859
+#line 2467 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 126:
-#line 1583 "seclang-parser.yy" // lalr1.cc:859
+#line 1585 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_requestBodyLimit.m_set = true;
         driver.m_requestBodyLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
-#line 2480 "seclang-parser.cc" // lalr1.cc:859
+#line 2476 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 127:
-#line 1588 "seclang-parser.yy" // lalr1.cc:859
+#line 1590 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_requestBodyNoFilesLimit.m_set = true;
         driver.m_requestBodyNoFilesLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
-#line 2489 "seclang-parser.cc" // lalr1.cc:859
+#line 2485 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 128:
-#line 1593 "seclang-parser.yy" // lalr1.cc:859
+#line 1595 "seclang-parser.yy" // lalr1.cc:847
     {
         std::stringstream ss;
         ss << "As of ModSecurity version 3.0, SecRequestBodyInMemoryLimit is no longer ";
@@ -2498,68 +2494,68 @@ namespace yy {
         driver.error(yystack_[1].location, ss.str());
         YYERROR;
       }
-#line 2502 "seclang-parser.cc" // lalr1.cc:859
+#line 2498 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 129:
-#line 1602 "seclang-parser.yy" // lalr1.cc:859
+#line 1604 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_responseBodyLimit.m_set = true;
         driver.m_responseBodyLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
-#line 2511 "seclang-parser.cc" // lalr1.cc:859
+#line 2507 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 130:
-#line 1607 "seclang-parser.yy" // lalr1.cc:859
+#line 1609 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
-#line 2519 "seclang-parser.cc" // lalr1.cc:859
+#line 2515 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 131:
-#line 1611 "seclang-parser.yy" // lalr1.cc:859
+#line 1613 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
-#line 2527 "seclang-parser.cc" // lalr1.cc:859
+#line 2523 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 132:
-#line 1615 "seclang-parser.yy" // lalr1.cc:859
+#line 1617 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
-#line 2535 "seclang-parser.cc" // lalr1.cc:859
+#line 2531 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 133:
-#line 1619 "seclang-parser.yy" // lalr1.cc:859
+#line 1621 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
-#line 2543 "seclang-parser.cc" // lalr1.cc:859
+#line 2539 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 134:
-#line 1623 "seclang-parser.yy" // lalr1.cc:859
+#line 1625 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
-#line 2551 "seclang-parser.cc" // lalr1.cc:859
+#line 2547 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 135:
-#line 1627 "seclang-parser.yy" // lalr1.cc:859
+#line 1629 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
-#line 2559 "seclang-parser.cc" // lalr1.cc:859
+#line 2555 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 138:
-#line 1641 "seclang-parser.yy" // lalr1.cc:859
+#line 1643 "seclang-parser.yy" // lalr1.cc:847
     {
         std::istringstream buf(yystack_[0].value.as< std::string > ());
         std::istream_iterator<std::string> beg(buf), end;
@@ -2571,37 +2567,37 @@ namespace yy {
             driver.m_responseBodyTypeToBeInspected.m_value.insert(*it);
         }
       }
-#line 2575 "seclang-parser.cc" // lalr1.cc:859
+#line 2571 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 139:
-#line 1653 "seclang-parser.yy" // lalr1.cc:859
+#line 1655 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_responseBodyTypeToBeInspected.m_set = true;
         driver.m_responseBodyTypeToBeInspected.m_clear = true;
         driver.m_responseBodyTypeToBeInspected.m_value.clear();
       }
-#line 2585 "seclang-parser.cc" // lalr1.cc:859
+#line 2581 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 140:
-#line 1659 "seclang-parser.yy" // lalr1.cc:859
+#line 1661 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
       }
-#line 2593 "seclang-parser.cc" // lalr1.cc:859
+#line 2589 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 141:
-#line 1663 "seclang-parser.yy" // lalr1.cc:859
+#line 1665 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
       }
-#line 2601 "seclang-parser.cc" // lalr1.cc:859
+#line 2597 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 142:
-#line 1667 "seclang-parser.yy" // lalr1.cc:859
+#line 1669 "seclang-parser.yy" // lalr1.cc:847
     {
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
         std::stringstream ss;
@@ -2612,2396 +2608,2404 @@ namespace yy {
         YYERROR;
 */
       }
-#line 2616 "seclang-parser.cc" // lalr1.cc:859
+#line 2612 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 145:
-#line 1688 "seclang-parser.yy" // lalr1.cc:859
+#line 1690 "seclang-parser.yy" // lalr1.cc:847
     {
         if (atoi(yystack_[0].value.as< std::string > ().c_str()) == 1) {
           driver.error(yystack_[1].location, "SecCookieFormat 1 is not yet supported.");
           YYERROR;
         }
       }
-#line 2627 "seclang-parser.cc" // lalr1.cc:859
+#line 2623 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 146:
-#line 1695 "seclang-parser.yy" // lalr1.cc:859
+#line 1697 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.error(yystack_[1].location, "SecCookieV0Separator is not yet supported.");
         YYERROR;
       }
-#line 2636 "seclang-parser.cc" // lalr1.cc:859
+#line 2632 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 149:
-#line 1710 "seclang-parser.yy" // lalr1.cc:859
+#line 1712 "seclang-parser.yy" // lalr1.cc:847
     {
 /* Parser error disabled to avoid breaking default CRS installations with crs-setup.conf-recommended
         driver.error(@0, "SecCollectionTimeout is not yet supported.");
         YYERROR;
 */
       }
-#line 2647 "seclang-parser.cc" // lalr1.cc:859
+#line 2643 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 150:
-#line 1717 "seclang-parser.yy" // lalr1.cc:859
+#line 1719 "seclang-parser.yy" // lalr1.cc:847
     {
         driver.m_httpblKey.m_set = true;
         driver.m_httpblKey.m_value = yystack_[0].value.as< std::string > ();
       }
-#line 2656 "seclang-parser.cc" // lalr1.cc:859
+#line 2652 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 151:
-#line 1725 "seclang-parser.yy" // lalr1.cc:859
+#line 1727 "seclang-parser.yy" // lalr1.cc:847
     {
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
-#line 2664 "seclang-parser.cc" // lalr1.cc:859
+#line 2660 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 152:
-#line 1729 "seclang-parser.yy" // lalr1.cc:859
+#line 1731 "seclang-parser.yy" // lalr1.cc:847
     {
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[1].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
-#line 2672 "seclang-parser.cc" // lalr1.cc:859
+#line 2668 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 153:
-#line 1736 "seclang-parser.yy" // lalr1.cc:859
+#line 1738 "seclang-parser.yy" // lalr1.cc:847
     {
         yystack_[2].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ()));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[2].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
-#line 2681 "seclang-parser.cc" // lalr1.cc:859
+#line 2677 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 154:
-#line 1741 "seclang-parser.yy" // lalr1.cc:859
+#line 1743 "seclang-parser.yy" // lalr1.cc:847
     {
         std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
         yystack_[3].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(c));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[3].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
-#line 2691 "seclang-parser.cc" // lalr1.cc:859
+#line 2687 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 155:
-#line 1747 "seclang-parser.yy" // lalr1.cc:859
+#line 1749 "seclang-parser.yy" // lalr1.cc:847
     {
         std::unique_ptr<Variable> c(new VariableModificatorCount(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
         yystack_[3].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(c));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[3].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
-#line 2701 "seclang-parser.cc" // lalr1.cc:859
+#line 2697 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 156:
-#line 1753 "seclang-parser.yy" // lalr1.cc:859
+#line 1755 "seclang-parser.yy" // lalr1.cc:847
     {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         b->push_back(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ()));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(b);
       }
-#line 2711 "seclang-parser.cc" // lalr1.cc:859
+#line 2707 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 157:
-#line 1759 "seclang-parser.yy" // lalr1.cc:859
+#line 1761 "seclang-parser.yy" // lalr1.cc:847
     {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
         b->push_back(std::move(c));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(b);
       }
-#line 2722 "seclang-parser.cc" // lalr1.cc:859
+#line 2718 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 158:
-#line 1766 "seclang-parser.yy" // lalr1.cc:859
+#line 1768 "seclang-parser.yy" // lalr1.cc:847
     {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         std::unique_ptr<Variable> c(new VariableModificatorCount(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
         b->push_back(std::move(c));
         yylhs.value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(b);
       }
-#line 2733 "seclang-parser.cc" // lalr1.cc:859
+#line 2729 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 159:
-#line 1776 "seclang-parser.yy" // lalr1.cc:859
+#line 1778 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2741 "seclang-parser.cc" // lalr1.cc:859
+#line 2737 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 160:
-#line 1780 "seclang-parser.yy" // lalr1.cc:859
+#line 1782 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2749 "seclang-parser.cc" // lalr1.cc:859
+#line 2745 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 161:
-#line 1784 "seclang-parser.yy" // lalr1.cc:859
+#line 1786 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Args_NoDictElement());
       }
-#line 2757 "seclang-parser.cc" // lalr1.cc:859
+#line 2753 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 162:
-#line 1788 "seclang-parser.yy" // lalr1.cc:859
+#line 1790 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2765 "seclang-parser.cc" // lalr1.cc:859
+#line 2761 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 163:
-#line 1792 "seclang-parser.yy" // lalr1.cc:859
+#line 1794 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2773 "seclang-parser.cc" // lalr1.cc:859
+#line 2769 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 164:
-#line 1796 "seclang-parser.yy" // lalr1.cc:859
+#line 1798 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPost_NoDictElement());
       }
-#line 2781 "seclang-parser.cc" // lalr1.cc:859
+#line 2777 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 165:
-#line 1800 "seclang-parser.yy" // lalr1.cc:859
+#line 1802 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2789 "seclang-parser.cc" // lalr1.cc:859
+#line 2785 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 166:
-#line 1804 "seclang-parser.yy" // lalr1.cc:859
+#line 1806 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2797 "seclang-parser.cc" // lalr1.cc:859
+#line 2793 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 167:
-#line 1808 "seclang-parser.yy" // lalr1.cc:859
+#line 1810 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGet_NoDictElement());
       }
-#line 2805 "seclang-parser.cc" // lalr1.cc:859
+#line 2801 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 168:
-#line 1812 "seclang-parser.yy" // lalr1.cc:859
+#line 1814 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2813 "seclang-parser.cc" // lalr1.cc:859
+#line 2809 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 169:
-#line 1816 "seclang-parser.yy" // lalr1.cc:859
+#line 1818 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2821 "seclang-parser.cc" // lalr1.cc:859
+#line 2817 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 170:
-#line 1820 "seclang-parser.yy" // lalr1.cc:859
+#line 1822 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesSizes_NoDictElement());
       }
-#line 2829 "seclang-parser.cc" // lalr1.cc:859
+#line 2825 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 171:
-#line 1824 "seclang-parser.yy" // lalr1.cc:859
+#line 1826 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2837 "seclang-parser.cc" // lalr1.cc:859
+#line 2833 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 172:
-#line 1828 "seclang-parser.yy" // lalr1.cc:859
+#line 1830 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2845 "seclang-parser.cc" // lalr1.cc:859
+#line 2841 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 173:
-#line 1832 "seclang-parser.yy" // lalr1.cc:859
+#line 1834 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesNames_NoDictElement());
       }
-#line 2853 "seclang-parser.cc" // lalr1.cc:859
+#line 2849 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 174:
-#line 1836 "seclang-parser.yy" // lalr1.cc:859
+#line 1838 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2861 "seclang-parser.cc" // lalr1.cc:859
+#line 2857 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 175:
-#line 1840 "seclang-parser.yy" // lalr1.cc:859
+#line 1842 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2869 "seclang-parser.cc" // lalr1.cc:859
+#line 2865 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 176:
-#line 1844 "seclang-parser.yy" // lalr1.cc:859
+#line 1846 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpContent_NoDictElement());
       }
-#line 2877 "seclang-parser.cc" // lalr1.cc:859
+#line 2873 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 177:
-#line 1848 "seclang-parser.yy" // lalr1.cc:859
+#line 1850 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2885 "seclang-parser.cc" // lalr1.cc:859
+#line 2881 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 178:
-#line 1852 "seclang-parser.yy" // lalr1.cc:859
+#line 1854 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2893 "seclang-parser.cc" // lalr1.cc:859
+#line 2889 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 179:
-#line 1856 "seclang-parser.yy" // lalr1.cc:859
+#line 1858 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartFileName_NoDictElement());
       }
-#line 2901 "seclang-parser.cc" // lalr1.cc:859
+#line 2897 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 180:
-#line 1860 "seclang-parser.yy" // lalr1.cc:859
+#line 1862 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2909 "seclang-parser.cc" // lalr1.cc:859
+#line 2905 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 181:
-#line 1864 "seclang-parser.yy" // lalr1.cc:859
+#line 1866 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2917 "seclang-parser.cc" // lalr1.cc:859
+#line 2913 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 182:
-#line 1868 "seclang-parser.yy" // lalr1.cc:859
+#line 1870 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultiPartName_NoDictElement());
       }
-#line 2925 "seclang-parser.cc" // lalr1.cc:859
+#line 2921 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 183:
-#line 1872 "seclang-parser.yy" // lalr1.cc:859
+#line 1874 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2933 "seclang-parser.cc" // lalr1.cc:859
+#line 2929 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 184:
-#line 1876 "seclang-parser.yy" // lalr1.cc:859
+#line 1878 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2941 "seclang-parser.cc" // lalr1.cc:859
+#line 2937 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 185:
-#line 1880 "seclang-parser.yy" // lalr1.cc:859
+#line 1882 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarsNames_NoDictElement());
       }
-#line 2949 "seclang-parser.cc" // lalr1.cc:859
+#line 2945 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 186:
-#line 1884 "seclang-parser.yy" // lalr1.cc:859
+#line 1886 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2957 "seclang-parser.cc" // lalr1.cc:859
+#line 2953 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 187:
-#line 1888 "seclang-parser.yy" // lalr1.cc:859
+#line 1890 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2965 "seclang-parser.cc" // lalr1.cc:859
+#line 2961 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 188:
-#line 1892 "seclang-parser.yy" // lalr1.cc:859
+#line 1894 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVars_NoDictElement());
       }
-#line 2973 "seclang-parser.cc" // lalr1.cc:859
+#line 2969 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 189:
-#line 1896 "seclang-parser.yy" // lalr1.cc:859
+#line 1898 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 2981 "seclang-parser.cc" // lalr1.cc:859
+#line 2977 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 190:
-#line 1900 "seclang-parser.yy" // lalr1.cc:859
+#line 1902 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 2989 "seclang-parser.cc" // lalr1.cc:859
+#line 2985 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 191:
-#line 1904 "seclang-parser.yy" // lalr1.cc:859
+#line 1906 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Files_NoDictElement());
       }
-#line 2997 "seclang-parser.cc" // lalr1.cc:859
+#line 2993 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 192:
-#line 1908 "seclang-parser.yy" // lalr1.cc:859
+#line 1910 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3005 "seclang-parser.cc" // lalr1.cc:859
+#line 3001 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 193:
-#line 1912 "seclang-parser.yy" // lalr1.cc:859
+#line 1914 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3013 "seclang-parser.cc" // lalr1.cc:859
+#line 3009 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 194:
-#line 1916 "seclang-parser.yy" // lalr1.cc:859
+#line 1918 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookies_NoDictElement());
       }
-#line 3021 "seclang-parser.cc" // lalr1.cc:859
+#line 3017 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 195:
-#line 1920 "seclang-parser.yy" // lalr1.cc:859
+#line 1922 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3029 "seclang-parser.cc" // lalr1.cc:859
+#line 3025 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 196:
-#line 1924 "seclang-parser.yy" // lalr1.cc:859
+#line 1926 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3037 "seclang-parser.cc" // lalr1.cc:859
+#line 3033 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 197:
-#line 1928 "seclang-parser.yy" // lalr1.cc:859
+#line 1930 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeaders_NoDictElement());
       }
-#line 3045 "seclang-parser.cc" // lalr1.cc:859
+#line 3041 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 198:
-#line 1932 "seclang-parser.yy" // lalr1.cc:859
+#line 1934 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3053 "seclang-parser.cc" // lalr1.cc:859
+#line 3049 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 199:
-#line 1936 "seclang-parser.yy" // lalr1.cc:859
+#line 1938 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3061 "seclang-parser.cc" // lalr1.cc:859
+#line 3057 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 200:
-#line 1940 "seclang-parser.yy" // lalr1.cc:859
+#line 1942 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeaders_NoDictElement());
       }
-#line 3069 "seclang-parser.cc" // lalr1.cc:859
+#line 3065 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 201:
-#line 1944 "seclang-parser.yy" // lalr1.cc:859
+#line 1946 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3077 "seclang-parser.cc" // lalr1.cc:859
+#line 3073 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 202:
-#line 1948 "seclang-parser.yy" // lalr1.cc:859
+#line 1950 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3085 "seclang-parser.cc" // lalr1.cc:859
+#line 3081 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 203:
-#line 1952 "seclang-parser.yy" // lalr1.cc:859
+#line 1954 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Geo_NoDictElement());
       }
-#line 3093 "seclang-parser.cc" // lalr1.cc:859
+#line 3089 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 204:
-#line 1956 "seclang-parser.yy" // lalr1.cc:859
+#line 1958 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3101 "seclang-parser.cc" // lalr1.cc:859
+#line 3097 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 205:
-#line 1960 "seclang-parser.yy" // lalr1.cc:859
+#line 1962 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3109 "seclang-parser.cc" // lalr1.cc:859
+#line 3105 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 206:
-#line 1964 "seclang-parser.yy" // lalr1.cc:859
+#line 1966 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestCookiesNames_NoDictElement());
       }
-#line 3117 "seclang-parser.cc" // lalr1.cc:859
+#line 3113 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 207:
-#line 1968 "seclang-parser.yy" // lalr1.cc:859
+#line 1970 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3125 "seclang-parser.cc" // lalr1.cc:859
+#line 3121 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 208:
-#line 1972 "seclang-parser.yy" // lalr1.cc:859
+#line 1974 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3133 "seclang-parser.cc" // lalr1.cc:859
+#line 3129 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 209:
-#line 1976 "seclang-parser.yy" // lalr1.cc:859
+#line 1978 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Rule_NoDictElement());
       }
-#line 3141 "seclang-parser.cc" // lalr1.cc:859
+#line 3137 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 210:
-#line 1980 "seclang-parser.yy" // lalr1.cc:859
+#line 1982 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Env("ENV:" + yystack_[0].value.as< std::string > ()));
       }
-#line 3149 "seclang-parser.cc" // lalr1.cc:859
+#line 3145 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 211:
-#line 1984 "seclang-parser.yy" // lalr1.cc:859
+#line 1986 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Env("ENV:" + yystack_[0].value.as< std::string > ()));
       }
-#line 3157 "seclang-parser.cc" // lalr1.cc:859
+#line 3153 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 212:
-#line 1988 "seclang-parser.yy" // lalr1.cc:859
+#line 1990 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Env("ENV"));
       }
-#line 3165 "seclang-parser.cc" // lalr1.cc:859
+#line 3161 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 213:
-#line 1992 "seclang-parser.yy" // lalr1.cc:859
+#line 1994 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::XML("XML:" + yystack_[0].value.as< std::string > ()));
       }
-#line 3173 "seclang-parser.cc" // lalr1.cc:859
+#line 3169 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 214:
-#line 1996 "seclang-parser.yy" // lalr1.cc:859
+#line 1998 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::XML("XML:" + yystack_[0].value.as< std::string > ()));
       }
-#line 3181 "seclang-parser.cc" // lalr1.cc:859
+#line 3177 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 215:
-#line 2000 "seclang-parser.yy" // lalr1.cc:859
+#line 2002 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::XML_NoDictElement());
       }
-#line 3189 "seclang-parser.cc" // lalr1.cc:859
+#line 3185 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 216:
-#line 2004 "seclang-parser.yy" // lalr1.cc:859
+#line 2006 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3197 "seclang-parser.cc" // lalr1.cc:859
+#line 3193 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 217:
-#line 2008 "seclang-parser.yy" // lalr1.cc:859
+#line 2010 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3205 "seclang-parser.cc" // lalr1.cc:859
+#line 3201 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 218:
-#line 2012 "seclang-parser.yy" // lalr1.cc:859
+#line 2014 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesTmpNames_NoDictElement());
       }
-#line 3213 "seclang-parser.cc" // lalr1.cc:859
+#line 3209 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 219:
-#line 2016 "seclang-parser.yy" // lalr1.cc:859
+#line 2018 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Resource_DynamicElement(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 3221 "seclang-parser.cc" // lalr1.cc:859
+#line 3217 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 220:
-#line 2020 "seclang-parser.yy" // lalr1.cc:859
+#line 2022 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Resource_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3229 "seclang-parser.cc" // lalr1.cc:859
+#line 3225 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 221:
-#line 2024 "seclang-parser.yy" // lalr1.cc:859
+#line 2026 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Resource_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3237 "seclang-parser.cc" // lalr1.cc:859
+#line 3233 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 222:
-#line 2028 "seclang-parser.yy" // lalr1.cc:859
+#line 2030 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Resource_NoDictElement());
       }
-#line 3245 "seclang-parser.cc" // lalr1.cc:859
+#line 3241 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 223:
-#line 2032 "seclang-parser.yy" // lalr1.cc:859
+#line 2034 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_DynamicElement(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 3253 "seclang-parser.cc" // lalr1.cc:859
+#line 3249 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 224:
-#line 2036 "seclang-parser.yy" // lalr1.cc:859
+#line 2038 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3261 "seclang-parser.cc" // lalr1.cc:859
+#line 3257 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 225:
-#line 2040 "seclang-parser.yy" // lalr1.cc:859
+#line 2042 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3269 "seclang-parser.cc" // lalr1.cc:859
+#line 3265 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 226:
-#line 2044 "seclang-parser.yy" // lalr1.cc:859
+#line 2046 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Ip_NoDictElement());
       }
-#line 3277 "seclang-parser.cc" // lalr1.cc:859
+#line 3273 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 227:
-#line 2048 "seclang-parser.yy" // lalr1.cc:859
+#line 2050 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_DynamicElement(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 3285 "seclang-parser.cc" // lalr1.cc:859
+#line 3281 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 228:
-#line 2052 "seclang-parser.yy" // lalr1.cc:859
+#line 2054 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3293 "seclang-parser.cc" // lalr1.cc:859
+#line 3289 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 229:
-#line 2056 "seclang-parser.yy" // lalr1.cc:859
+#line 2058 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3301 "seclang-parser.cc" // lalr1.cc:859
+#line 3297 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 230:
-#line 2060 "seclang-parser.yy" // lalr1.cc:859
+#line 2062 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Global_NoDictElement());
       }
-#line 3309 "seclang-parser.cc" // lalr1.cc:859
+#line 3305 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 231:
-#line 2064 "seclang-parser.yy" // lalr1.cc:859
+#line 2066 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::User_DynamicElement(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 3317 "seclang-parser.cc" // lalr1.cc:859
+#line 3313 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 232:
-#line 2068 "seclang-parser.yy" // lalr1.cc:859
+#line 2070 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::User_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3325 "seclang-parser.cc" // lalr1.cc:859
+#line 3321 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 233:
-#line 2072 "seclang-parser.yy" // lalr1.cc:859
+#line 2074 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::User_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3333 "seclang-parser.cc" // lalr1.cc:859
+#line 3329 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 234:
-#line 2076 "seclang-parser.yy" // lalr1.cc:859
+#line 2078 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::User_NoDictElement());
       }
-#line 3341 "seclang-parser.cc" // lalr1.cc:859
+#line 3337 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 235:
-#line 2080 "seclang-parser.yy" // lalr1.cc:859
+#line 2082 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_DynamicElement(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 3349 "seclang-parser.cc" // lalr1.cc:859
+#line 3345 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 236:
-#line 2084 "seclang-parser.yy" // lalr1.cc:859
+#line 2086 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3357 "seclang-parser.cc" // lalr1.cc:859
+#line 3353 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 237:
-#line 2088 "seclang-parser.yy" // lalr1.cc:859
+#line 2090 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3365 "seclang-parser.cc" // lalr1.cc:859
+#line 3361 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 238:
-#line 2092 "seclang-parser.yy" // lalr1.cc:859
+#line 2094 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Tx_NoDictElement());
       }
-#line 3373 "seclang-parser.cc" // lalr1.cc:859
+#line 3369 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 239:
-#line 2096 "seclang-parser.yy" // lalr1.cc:859
+#line 2098 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_DynamicElement(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 3381 "seclang-parser.cc" // lalr1.cc:859
+#line 3377 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 240:
-#line 2100 "seclang-parser.yy" // lalr1.cc:859
+#line 2102 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3389 "seclang-parser.cc" // lalr1.cc:859
+#line 3385 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 241:
-#line 2104 "seclang-parser.yy" // lalr1.cc:859
+#line 2106 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3397 "seclang-parser.cc" // lalr1.cc:859
+#line 3393 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 242:
-#line 2108 "seclang-parser.yy" // lalr1.cc:859
+#line 2110 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Session_NoDictElement());
       }
-#line 3405 "seclang-parser.cc" // lalr1.cc:859
+#line 3401 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 243:
-#line 2112 "seclang-parser.yy" // lalr1.cc:859
+#line 2114 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3413 "seclang-parser.cc" // lalr1.cc:859
+#line 3409 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 244:
-#line 2116 "seclang-parser.yy" // lalr1.cc:859
+#line 2118 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3421 "seclang-parser.cc" // lalr1.cc:859
+#line 3417 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 245:
-#line 2120 "seclang-parser.yy" // lalr1.cc:859
+#line 2122 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsNames_NoDictElement());
       }
-#line 3429 "seclang-parser.cc" // lalr1.cc:859
+#line 3425 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 246:
-#line 2124 "seclang-parser.yy" // lalr1.cc:859
+#line 2126 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGetNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3437 "seclang-parser.cc" // lalr1.cc:859
+#line 3433 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 247:
-#line 2128 "seclang-parser.yy" // lalr1.cc:859
+#line 2130 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGetNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3445 "seclang-parser.cc" // lalr1.cc:859
+#line 3441 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 248:
-#line 2132 "seclang-parser.yy" // lalr1.cc:859
+#line 2134 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsGetNames_NoDictElement());
       }
-#line 3453 "seclang-parser.cc" // lalr1.cc:859
+#line 3449 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 249:
-#line 2137 "seclang-parser.yy" // lalr1.cc:859
+#line 2139 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPostNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3461 "seclang-parser.cc" // lalr1.cc:859
+#line 3457 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 250:
-#line 2141 "seclang-parser.yy" // lalr1.cc:859
+#line 2143 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPostNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3469 "seclang-parser.cc" // lalr1.cc:859
+#line 3465 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 251:
-#line 2145 "seclang-parser.yy" // lalr1.cc:859
+#line 2147 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsPostNames_NoDictElement());
       }
-#line 3477 "seclang-parser.cc" // lalr1.cc:859
+#line 3473 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 252:
-#line 2150 "seclang-parser.yy" // lalr1.cc:859
+#line 2152 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeadersNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3485 "seclang-parser.cc" // lalr1.cc:859
+#line 3481 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 253:
-#line 2154 "seclang-parser.yy" // lalr1.cc:859
+#line 2156 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeadersNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3493 "seclang-parser.cc" // lalr1.cc:859
+#line 3489 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 254:
-#line 2158 "seclang-parser.yy" // lalr1.cc:859
+#line 2160 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestHeadersNames_NoDictElement());
       }
-#line 3501 "seclang-parser.cc" // lalr1.cc:859
+#line 3497 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 255:
-#line 2163 "seclang-parser.yy" // lalr1.cc:859
+#line 2165 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseContentType());
       }
-#line 3509 "seclang-parser.cc" // lalr1.cc:859
+#line 3505 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 256:
-#line 2168 "seclang-parser.yy" // lalr1.cc:859
+#line 2170 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeadersNames_DictElement(yystack_[0].value.as< std::string > ()));
       }
-#line 3517 "seclang-parser.cc" // lalr1.cc:859
+#line 3513 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 257:
-#line 2172 "seclang-parser.yy" // lalr1.cc:859
+#line 2174 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeadersNames_DictElementRegexp(yystack_[0].value.as< std::string > ()));
       }
-#line 3525 "seclang-parser.cc" // lalr1.cc:859
+#line 3521 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 258:
-#line 2176 "seclang-parser.yy" // lalr1.cc:859
+#line 2178 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseHeadersNames_NoDictElement());
       }
-#line 3533 "seclang-parser.cc" // lalr1.cc:859
+#line 3529 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 259:
-#line 2180 "seclang-parser.yy" // lalr1.cc:859
+#line 2182 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ArgsCombinedSize());
       }
-#line 3541 "seclang-parser.cc" // lalr1.cc:859
+#line 3537 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 260:
-#line 2184 "seclang-parser.yy" // lalr1.cc:859
+#line 2186 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::AuthType());
       }
-#line 3549 "seclang-parser.cc" // lalr1.cc:859
+#line 3545 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 261:
-#line 2188 "seclang-parser.yy" // lalr1.cc:859
+#line 2190 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FilesCombinedSize());
       }
-#line 3557 "seclang-parser.cc" // lalr1.cc:859
+#line 3553 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 262:
-#line 2192 "seclang-parser.yy" // lalr1.cc:859
+#line 2194 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FullRequest());
       }
-#line 3565 "seclang-parser.cc" // lalr1.cc:859
+#line 3561 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 263:
-#line 2196 "seclang-parser.yy" // lalr1.cc:859
+#line 2198 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::FullRequestLength());
       }
-#line 3573 "seclang-parser.cc" // lalr1.cc:859
+#line 3569 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 264:
-#line 2200 "seclang-parser.yy" // lalr1.cc:859
+#line 2202 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::InboundDataError());
       }
-#line 3581 "seclang-parser.cc" // lalr1.cc:859
+#line 3577 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 265:
-#line 2204 "seclang-parser.yy" // lalr1.cc:859
+#line 2206 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVar());
       }
-#line 3589 "seclang-parser.cc" // lalr1.cc:859
+#line 3585 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 266:
-#line 2208 "seclang-parser.yy" // lalr1.cc:859
+#line 2210 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MatchedVarName());
       }
-#line 3597 "seclang-parser.cc" // lalr1.cc:859
+#line 3593 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 267:
-#line 2212 "seclang-parser.yy" // lalr1.cc:859
+#line 2214 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartBoundaryQuoted());
       }
-#line 3605 "seclang-parser.cc" // lalr1.cc:859
+#line 3601 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 268:
-#line 2216 "seclang-parser.yy" // lalr1.cc:859
+#line 2218 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartBoundaryWhiteSpace());
       }
-#line 3613 "seclang-parser.cc" // lalr1.cc:859
+#line 3609 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 269:
-#line 2220 "seclang-parser.yy" // lalr1.cc:859
+#line 2222 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartCrlfLFLines());
       }
-#line 3621 "seclang-parser.cc" // lalr1.cc:859
+#line 3617 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 270:
-#line 2224 "seclang-parser.yy" // lalr1.cc:859
+#line 2226 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartDateAfter());
       }
-#line 3629 "seclang-parser.cc" // lalr1.cc:859
+#line 3625 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 271:
-#line 2228 "seclang-parser.yy" // lalr1.cc:859
+#line 2230 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartDateBefore());
       }
-#line 3637 "seclang-parser.cc" // lalr1.cc:859
+#line 3633 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 272:
-#line 2232 "seclang-parser.yy" // lalr1.cc:859
+#line 2234 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartFileLimitExceeded());
       }
-#line 3645 "seclang-parser.cc" // lalr1.cc:859
+#line 3641 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 273:
-#line 2236 "seclang-parser.yy" // lalr1.cc:859
+#line 2238 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartHeaderFolding());
       }
-#line 3653 "seclang-parser.cc" // lalr1.cc:859
+#line 3649 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 274:
-#line 2240 "seclang-parser.yy" // lalr1.cc:859
+#line 2242 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartInvalidHeaderFolding());
       }
-#line 3661 "seclang-parser.cc" // lalr1.cc:859
+#line 3657 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 275:
-#line 2244 "seclang-parser.yy" // lalr1.cc:859
+#line 2246 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartInvalidPart());
       }
-#line 3669 "seclang-parser.cc" // lalr1.cc:859
+#line 3665 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 276:
-#line 2248 "seclang-parser.yy" // lalr1.cc:859
+#line 2250 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartInvalidQuoting());
       }
-#line 3677 "seclang-parser.cc" // lalr1.cc:859
+#line 3673 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 277:
-#line 2252 "seclang-parser.yy" // lalr1.cc:859
+#line 2254 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartLFLine());
       }
-#line 3685 "seclang-parser.cc" // lalr1.cc:859
+#line 3681 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 278:
-#line 2256 "seclang-parser.yy" // lalr1.cc:859
+#line 2258 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartMissingSemicolon());
       }
-#line 3693 "seclang-parser.cc" // lalr1.cc:859
+#line 3689 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 279:
-#line 2260 "seclang-parser.yy" // lalr1.cc:859
+#line 2262 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartMissingSemicolon());
       }
-#line 3701 "seclang-parser.cc" // lalr1.cc:859
+#line 3697 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 280:
-#line 2264 "seclang-parser.yy" // lalr1.cc:859
+#line 2266 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartStrictError());
       }
-#line 3709 "seclang-parser.cc" // lalr1.cc:859
+#line 3705 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 281:
-#line 2268 "seclang-parser.yy" // lalr1.cc:859
+#line 2270 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::MultipartUnmatchedBoundary());
       }
-#line 3717 "seclang-parser.cc" // lalr1.cc:859
+#line 3713 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 282:
-#line 2272 "seclang-parser.yy" // lalr1.cc:859
+#line 2274 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::OutboundDataError());
       }
-#line 3725 "seclang-parser.cc" // lalr1.cc:859
+#line 3721 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 283:
-#line 2276 "seclang-parser.yy" // lalr1.cc:859
+#line 2278 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::PathInfo());
       }
-#line 3733 "seclang-parser.cc" // lalr1.cc:859
+#line 3729 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 284:
-#line 2280 "seclang-parser.yy" // lalr1.cc:859
+#line 2282 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::QueryString());
       }
-#line 3741 "seclang-parser.cc" // lalr1.cc:859
+#line 3737 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 285:
-#line 2284 "seclang-parser.yy" // lalr1.cc:859
+#line 2286 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemoteAddr());
       }
-#line 3749 "seclang-parser.cc" // lalr1.cc:859
+#line 3745 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 286:
-#line 2288 "seclang-parser.yy" // lalr1.cc:859
+#line 2290 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemoteHost());
       }
-#line 3757 "seclang-parser.cc" // lalr1.cc:859
+#line 3753 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 287:
-#line 2292 "seclang-parser.yy" // lalr1.cc:859
+#line 2294 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RemotePort());
       }
-#line 3765 "seclang-parser.cc" // lalr1.cc:859
+#line 3761 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 288:
-#line 2296 "seclang-parser.yy" // lalr1.cc:859
+#line 2298 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyError());
       }
-#line 3773 "seclang-parser.cc" // lalr1.cc:859
+#line 3769 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 289:
-#line 2300 "seclang-parser.yy" // lalr1.cc:859
+#line 2302 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyErrorMsg());
       }
-#line 3781 "seclang-parser.cc" // lalr1.cc:859
+#line 3777 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 290:
-#line 2304 "seclang-parser.yy" // lalr1.cc:859
+#line 2306 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessor());
       }
-#line 3789 "seclang-parser.cc" // lalr1.cc:859
+#line 3785 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 291:
-#line 2308 "seclang-parser.yy" // lalr1.cc:859
+#line 2310 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessorError());
       }
-#line 3797 "seclang-parser.cc" // lalr1.cc:859
+#line 3793 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 292:
-#line 2312 "seclang-parser.yy" // lalr1.cc:859
+#line 2314 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ReqbodyProcessorErrorMsg());
       }
-#line 3805 "seclang-parser.cc" // lalr1.cc:859
+#line 3801 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 293:
-#line 2316 "seclang-parser.yy" // lalr1.cc:859
+#line 2318 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBasename());
       }
-#line 3813 "seclang-parser.cc" // lalr1.cc:859
+#line 3809 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 294:
-#line 2320 "seclang-parser.yy" // lalr1.cc:859
+#line 2322 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBody());
       }
-#line 3821 "seclang-parser.cc" // lalr1.cc:859
+#line 3817 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 295:
-#line 2324 "seclang-parser.yy" // lalr1.cc:859
+#line 2326 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestBodyLength());
       }
-#line 3829 "seclang-parser.cc" // lalr1.cc:859
+#line 3825 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 296:
-#line 2328 "seclang-parser.yy" // lalr1.cc:859
+#line 2330 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestFilename());
       }
-#line 3837 "seclang-parser.cc" // lalr1.cc:859
+#line 3833 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 297:
-#line 2332 "seclang-parser.yy" // lalr1.cc:859
+#line 2334 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestLine());
       }
-#line 3845 "seclang-parser.cc" // lalr1.cc:859
+#line 3841 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 298:
-#line 2336 "seclang-parser.yy" // lalr1.cc:859
+#line 2338 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestMethod());
       }
-#line 3853 "seclang-parser.cc" // lalr1.cc:859
+#line 3849 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 299:
-#line 2340 "seclang-parser.yy" // lalr1.cc:859
+#line 2342 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestProtocol());
       }
-#line 3861 "seclang-parser.cc" // lalr1.cc:859
+#line 3857 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 300:
-#line 2344 "seclang-parser.yy" // lalr1.cc:859
+#line 2346 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestURI());
       }
-#line 3869 "seclang-parser.cc" // lalr1.cc:859
+#line 3865 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 301:
-#line 2348 "seclang-parser.yy" // lalr1.cc:859
+#line 2350 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::RequestURIRaw());
       }
-#line 3877 "seclang-parser.cc" // lalr1.cc:859
+#line 3873 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 302:
-#line 2352 "seclang-parser.yy" // lalr1.cc:859
+#line 2354 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseBody());
       }
-#line 3885 "seclang-parser.cc" // lalr1.cc:859
+#line 3881 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 303:
-#line 2356 "seclang-parser.yy" // lalr1.cc:859
+#line 2358 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseContentLength());
       }
-#line 3893 "seclang-parser.cc" // lalr1.cc:859
+#line 3889 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 304:
-#line 2360 "seclang-parser.yy" // lalr1.cc:859
+#line 2362 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseProtocol());
       }
-#line 3901 "seclang-parser.cc" // lalr1.cc:859
+#line 3897 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 305:
-#line 2364 "seclang-parser.yy" // lalr1.cc:859
+#line 2366 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ResponseStatus());
       }
-#line 3909 "seclang-parser.cc" // lalr1.cc:859
+#line 3905 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 306:
-#line 2368 "seclang-parser.yy" // lalr1.cc:859
+#line 2370 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerAddr());
       }
-#line 3917 "seclang-parser.cc" // lalr1.cc:859
+#line 3913 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 307:
-#line 2372 "seclang-parser.yy" // lalr1.cc:859
+#line 2374 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerName());
       }
-#line 3925 "seclang-parser.cc" // lalr1.cc:859
+#line 3921 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 308:
-#line 2376 "seclang-parser.yy" // lalr1.cc:859
+#line 2378 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::ServerPort());
       }
-#line 3933 "seclang-parser.cc" // lalr1.cc:859
+#line 3929 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 309:
-#line 2380 "seclang-parser.yy" // lalr1.cc:859
+#line 2382 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::SessionID());
       }
-#line 3941 "seclang-parser.cc" // lalr1.cc:859
+#line 3937 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 310:
-#line 2384 "seclang-parser.yy" // lalr1.cc:859
+#line 2386 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UniqueID());
       }
-#line 3949 "seclang-parser.cc" // lalr1.cc:859
+#line 3945 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 311:
-#line 2388 "seclang-parser.yy" // lalr1.cc:859
+#line 2390 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UrlEncodedError());
       }
-#line 3957 "seclang-parser.cc" // lalr1.cc:859
+#line 3953 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 312:
-#line 2392 "seclang-parser.yy" // lalr1.cc:859
+#line 2394 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::UserID());
       }
-#line 3965 "seclang-parser.cc" // lalr1.cc:859
+#line 3961 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 313:
-#line 2396 "seclang-parser.yy" // lalr1.cc:859
+#line 2398 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Status());
       }
-#line 3973 "seclang-parser.cc" // lalr1.cc:859
+#line 3969 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 314:
-#line 2400 "seclang-parser.yy" // lalr1.cc:859
+#line 2402 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::Status());
       }
-#line 3981 "seclang-parser.cc" // lalr1.cc:859
+#line 3977 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 315:
-#line 2404 "seclang-parser.yy" // lalr1.cc:859
+#line 2406 "seclang-parser.yy" // lalr1.cc:847
     {
         VARIABLE_CONTAINER(yylhs.value.as< std::unique_ptr<Variable> > (), new Variables::WebAppId());
       }
-#line 3989 "seclang-parser.cc" // lalr1.cc:859
+#line 3985 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 316:
-#line 2408 "seclang-parser.yy" // lalr1.cc:859
+#line 2410 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new Duration(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4000 "seclang-parser.cc" // lalr1.cc:859
+#line 3996 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 317:
-#line 2416 "seclang-parser.yy" // lalr1.cc:859
+#line 2418 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new ModsecBuild(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4011 "seclang-parser.cc" // lalr1.cc:859
+#line 4007 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 318:
-#line 2423 "seclang-parser.yy" // lalr1.cc:859
+#line 2425 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new HighestSeverity(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4022 "seclang-parser.cc" // lalr1.cc:859
+#line 4018 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 319:
-#line 2430 "seclang-parser.yy" // lalr1.cc:859
+#line 2432 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new RemoteUser(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4033 "seclang-parser.cc" // lalr1.cc:859
+#line 4029 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 320:
-#line 2437 "seclang-parser.yy" // lalr1.cc:859
+#line 2439 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new Time(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4044 "seclang-parser.cc" // lalr1.cc:859
+#line 4040 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 321:
-#line 2444 "seclang-parser.yy" // lalr1.cc:859
+#line 2446 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeDay(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4055 "seclang-parser.cc" // lalr1.cc:859
+#line 4051 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 322:
-#line 2451 "seclang-parser.yy" // lalr1.cc:859
+#line 2453 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeEpoch(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4066 "seclang-parser.cc" // lalr1.cc:859
+#line 4062 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 323:
-#line 2458 "seclang-parser.yy" // lalr1.cc:859
+#line 2460 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeHour(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4077 "seclang-parser.cc" // lalr1.cc:859
+#line 4073 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 324:
-#line 2465 "seclang-parser.yy" // lalr1.cc:859
+#line 2467 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeMin(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4088 "seclang-parser.cc" // lalr1.cc:859
+#line 4084 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 325:
-#line 2472 "seclang-parser.yy" // lalr1.cc:859
+#line 2474 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeMon(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4099 "seclang-parser.cc" // lalr1.cc:859
+#line 4095 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 326:
-#line 2479 "seclang-parser.yy" // lalr1.cc:859
+#line 2481 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
             std::unique_ptr<Variable> c(new TimeSec(name));
             yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4110 "seclang-parser.cc" // lalr1.cc:859
+#line 4106 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 327:
-#line 2486 "seclang-parser.yy" // lalr1.cc:859
+#line 2488 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeWDay(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4121 "seclang-parser.cc" // lalr1.cc:859
+#line 4117 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 328:
-#line 2493 "seclang-parser.yy" // lalr1.cc:859
+#line 2495 "seclang-parser.yy" // lalr1.cc:847
     {
         std::string name(yystack_[0].value.as< std::string > ());
         char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeYear(name));
         yylhs.value.as< std::unique_ptr<Variable> > () = std::move(c);
       }
-#line 4132 "seclang-parser.cc" // lalr1.cc:859
+#line 4128 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 329:
-#line 2503 "seclang-parser.yy" // lalr1.cc:859
+#line 2505 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Accuracy(yystack_[0].value.as< std::string > ()));
       }
-#line 4140 "seclang-parser.cc" // lalr1.cc:859
+#line 4136 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 330:
-#line 2507 "seclang-parser.yy" // lalr1.cc:859
+#line 2509 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Allow(yystack_[0].value.as< std::string > ()));
       }
-#line 4148 "seclang-parser.cc" // lalr1.cc:859
+#line 4144 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 331:
-#line 2511 "seclang-parser.yy" // lalr1.cc:859
+#line 2513 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_NOT_SUPPORTED("Append", yystack_[1].location);
       }
-#line 4156 "seclang-parser.cc" // lalr1.cc:859
+#line 4152 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 332:
-#line 2515 "seclang-parser.yy" // lalr1.cc:859
+#line 2517 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::AuditLog(yystack_[0].value.as< std::string > ()));
       }
-#line 4164 "seclang-parser.cc" // lalr1.cc:859
+#line 4160 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 333:
-#line 2519 "seclang-parser.yy" // lalr1.cc:859
+#line 2521 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Block(yystack_[0].value.as< std::string > ()));
       }
-#line 4172 "seclang-parser.cc" // lalr1.cc:859
+#line 4168 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 334:
-#line 2523 "seclang-parser.yy" // lalr1.cc:859
+#line 2525 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Capture(yystack_[0].value.as< std::string > ()));
       }
-#line 4180 "seclang-parser.cc" // lalr1.cc:859
+#line 4176 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 335:
-#line 2527 "seclang-parser.yy" // lalr1.cc:859
+#line 2529 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Chain(yystack_[0].value.as< std::string > ()));
       }
-#line 4188 "seclang-parser.cc" // lalr1.cc:859
+#line 4184 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 336:
-#line 2531 "seclang-parser.yy" // lalr1.cc:859
+#line 2533 "seclang-parser.yy" // lalr1.cc:847
     {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 4197 "seclang-parser.cc" // lalr1.cc:859
+#line 4193 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 337:
-#line 2536 "seclang-parser.yy" // lalr1.cc:859
+#line 2538 "seclang-parser.yy" // lalr1.cc:847
     {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 4206 "seclang-parser.cc" // lalr1.cc:859
+#line 4202 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 338:
-#line 2541 "seclang-parser.yy" // lalr1.cc:859
+#line 2543 "seclang-parser.yy" // lalr1.cc:847
     {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 4215 "seclang-parser.cc" // lalr1.cc:859
+#line 4211 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 339:
-#line 2546 "seclang-parser.yy" // lalr1.cc:859
+#line 2548 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::AuditLogParts(yystack_[0].value.as< std::string > ()));
       }
-#line 4223 "seclang-parser.cc" // lalr1.cc:859
+#line 4219 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 340:
-#line 2550 "seclang-parser.yy" // lalr1.cc:859
+#line 2552 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorJSON(yystack_[0].value.as< std::string > ()));
       }
-#line 4231 "seclang-parser.cc" // lalr1.cc:859
+#line 4227 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 341:
-#line 2554 "seclang-parser.yy" // lalr1.cc:859
+#line 2556 "seclang-parser.yy" // lalr1.cc:847
     {
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorXML(yystack_[0].value.as< std::string > ()));
       }
-#line 4239 "seclang-parser.cc" // lalr1.cc:859
+#line 4235 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 342:
-#line 2558 "seclang-parser.yy" // lalr1.cc:859
+#line 2560 "seclang-parser.yy" // lalr1.cc:847
     {
-        //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorURLENCODED(yystack_[0].value.as< std::string > ()));
       }
-#line 4248 "seclang-parser.cc" // lalr1.cc:859
+#line 4243 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 343:
-#line 2563 "seclang-parser.yy" // lalr1.cc:859
+#line 2564 "seclang-parser.yy" // lalr1.cc:847
     {
         //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 4257 "seclang-parser.cc" // lalr1.cc:859
+#line 4252 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 344:
-#line 2568 "seclang-parser.yy" // lalr1.cc:859
+#line 2569 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as< std::string > () + "true"));
+        //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as< std::string > ()));
       }
-#line 4265 "seclang-parser.cc" // lalr1.cc:859
+#line 4261 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 345:
-#line 2572 "seclang-parser.yy" // lalr1.cc:859
+#line 2574 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as< std::string > () + "false"));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as< std::string > () + "true"));
       }
-#line 4273 "seclang-parser.cc" // lalr1.cc:859
+#line 4269 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 346:
-#line 2576 "seclang-parser.yy" // lalr1.cc:859
+#line 2578 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=on"));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as< std::string > () + "false"));
       }
-#line 4281 "seclang-parser.cc" // lalr1.cc:859
+#line 4277 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 347:
-#line 2580 "seclang-parser.yy" // lalr1.cc:859
+#line 2582 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=off"));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=on"));
       }
-#line 4289 "seclang-parser.cc" // lalr1.cc:859
+#line 4285 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 348:
-#line 2584 "seclang-parser.yy" // lalr1.cc:859
+#line 2586 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=detectiononly"));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=off"));
       }
-#line 4297 "seclang-parser.cc" // lalr1.cc:859
+#line 4293 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 349:
-#line 2588 "seclang-parser.yy" // lalr1.cc:859
+#line 2590 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveById(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=detectiononly"));
       }
-#line 4305 "seclang-parser.cc" // lalr1.cc:859
+#line 4301 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 350:
-#line 2592 "seclang-parser.yy" // lalr1.cc:859
+#line 2594 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveByTag(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveById(yystack_[0].value.as< std::string > ()));
       }
-#line 4313 "seclang-parser.cc" // lalr1.cc:859
+#line 4309 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 351:
-#line 2596 "seclang-parser.yy" // lalr1.cc:859
+#line 2598 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetById(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveByTag(yystack_[0].value.as< std::string > ()));
       }
-#line 4321 "seclang-parser.cc" // lalr1.cc:859
+#line 4317 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 352:
-#line 2600 "seclang-parser.yy" // lalr1.cc:859
+#line 2602 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetByTag(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetById(yystack_[0].value.as< std::string > ()));
       }
-#line 4329 "seclang-parser.cc" // lalr1.cc:859
+#line 4325 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 353:
-#line 2604 "seclang-parser.yy" // lalr1.cc:859
+#line 2606 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Deny(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetByTag(yystack_[0].value.as< std::string > ()));
       }
-#line 4337 "seclang-parser.cc" // lalr1.cc:859
+#line 4333 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 354:
-#line 2608 "seclang-parser.yy" // lalr1.cc:859
+#line 2610 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("DeprecateVar", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Deny(yystack_[0].value.as< std::string > ()));
       }
-#line 4345 "seclang-parser.cc" // lalr1.cc:859
+#line 4341 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 355:
-#line 2612 "seclang-parser.yy" // lalr1.cc:859
+#line 2614 "seclang-parser.yy" // lalr1.cc:847
+    {
+        ACTION_NOT_SUPPORTED("DeprecateVar", yystack_[1].location);
+      }
+#line 4349 "seclang-parser.cc" // lalr1.cc:847
+    break;
+
+  case 356:
+#line 2618 "seclang-parser.yy" // lalr1.cc:847
     {
         //ACTION_NOT_SUPPORTED("Drop", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[0].value.as< std::string > ()));
       }
-#line 4354 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 356:
-#line 2617 "seclang-parser.yy" // lalr1.cc:859
-    {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Exec(yystack_[0].value.as< std::string > ()));
-      }
-#line 4362 "seclang-parser.cc" // lalr1.cc:859
+#line 4358 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 357:
-#line 2621 "seclang-parser.yy" // lalr1.cc:859
+#line 2623 "seclang-parser.yy" // lalr1.cc:847
+    {
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Exec(yystack_[0].value.as< std::string > ()));
+      }
+#line 4366 "seclang-parser.cc" // lalr1.cc:847
+    break;
+
+  case 358:
+#line 2627 "seclang-parser.yy" // lalr1.cc:847
     {
         //ACTION_NOT_SUPPORTED("ExpireVar", @0);
         ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[0].value.as< std::string > ()));
       }
-#line 4371 "seclang-parser.cc" // lalr1.cc:859
-    break;
-
-  case 358:
-#line 2626 "seclang-parser.yy" // lalr1.cc:859
-    {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::RuleId(yystack_[0].value.as< std::string > ()));
-      }
-#line 4379 "seclang-parser.cc" // lalr1.cc:859
+#line 4375 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 359:
-#line 2630 "seclang-parser.yy" // lalr1.cc:859
+#line 2632 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::InitCol(yystack_[1].value.as< std::string > (), std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::RuleId(yystack_[0].value.as< std::string > ()));
       }
-#line 4387 "seclang-parser.cc" // lalr1.cc:859
+#line 4383 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 360:
-#line 2634 "seclang-parser.yy" // lalr1.cc:859
+#line 2636 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::LogData(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::InitCol(yystack_[1].value.as< std::string > (), std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4395 "seclang-parser.cc" // lalr1.cc:859
+#line 4391 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 361:
-#line 2638 "seclang-parser.yy" // lalr1.cc:859
+#line 2640 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Log(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::LogData(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4403 "seclang-parser.cc" // lalr1.cc:859
+#line 4399 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 362:
-#line 2642 "seclang-parser.yy" // lalr1.cc:859
+#line 2644 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Maturity(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Log(yystack_[0].value.as< std::string > ()));
       }
-#line 4411 "seclang-parser.cc" // lalr1.cc:859
+#line 4407 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 363:
-#line 2646 "seclang-parser.yy" // lalr1.cc:859
+#line 2648 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Msg(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Maturity(yystack_[0].value.as< std::string > ()));
       }
-#line 4419 "seclang-parser.cc" // lalr1.cc:859
+#line 4415 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 364:
-#line 2650 "seclang-parser.yy" // lalr1.cc:859
+#line 2652 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::MultiMatch(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Msg(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4427 "seclang-parser.cc" // lalr1.cc:859
+#line 4423 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 365:
-#line 2654 "seclang-parser.yy" // lalr1.cc:859
+#line 2656 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::NoAuditLog(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::MultiMatch(yystack_[0].value.as< std::string > ()));
       }
-#line 4435 "seclang-parser.cc" // lalr1.cc:859
+#line 4431 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 366:
-#line 2658 "seclang-parser.yy" // lalr1.cc:859
+#line 2660 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::NoLog(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::NoAuditLog(yystack_[0].value.as< std::string > ()));
       }
-#line 4443 "seclang-parser.cc" // lalr1.cc:859
+#line 4439 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 367:
-#line 2662 "seclang-parser.yy" // lalr1.cc:859
+#line 2664 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Pass(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::NoLog(yystack_[0].value.as< std::string > ()));
       }
-#line 4451 "seclang-parser.cc" // lalr1.cc:859
+#line 4447 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 368:
-#line 2666 "seclang-parser.yy" // lalr1.cc:859
+#line 2668 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("Pause", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Pass(yystack_[0].value.as< std::string > ()));
       }
-#line 4459 "seclang-parser.cc" // lalr1.cc:859
+#line 4455 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 369:
-#line 2670 "seclang-parser.yy" // lalr1.cc:859
+#line 2672 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Phase(yystack_[0].value.as< std::string > ()));
+        ACTION_NOT_SUPPORTED("Pause", yystack_[1].location);
       }
-#line 4467 "seclang-parser.cc" // lalr1.cc:859
+#line 4463 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 370:
-#line 2674 "seclang-parser.yy" // lalr1.cc:859
+#line 2676 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("Prepend", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Phase(yystack_[0].value.as< std::string > ()));
       }
-#line 4475 "seclang-parser.cc" // lalr1.cc:859
+#line 4471 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 371:
-#line 2678 "seclang-parser.yy" // lalr1.cc:859
+#line 2680 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("Proxy", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("Prepend", yystack_[1].location);
       }
-#line 4483 "seclang-parser.cc" // lalr1.cc:859
+#line 4479 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 372:
-#line 2682 "seclang-parser.yy" // lalr1.cc:859
+#line 2684 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Redirect(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_NOT_SUPPORTED("Proxy", yystack_[1].location);
       }
-#line 4491 "seclang-parser.cc" // lalr1.cc:859
+#line 4487 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 373:
-#line 2686 "seclang-parser.yy" // lalr1.cc:859
+#line 2688 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Rev(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::disruptive::Redirect(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4499 "seclang-parser.cc" // lalr1.cc:859
+#line 4495 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 374:
-#line 2690 "seclang-parser.yy" // lalr1.cc:859
+#line 2692 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("SanatiseArg", yystack_[1].location);
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Rev(yystack_[0].value.as< std::string > ()));
       }
-#line 4507 "seclang-parser.cc" // lalr1.cc:859
+#line 4503 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 375:
-#line 2694 "seclang-parser.yy" // lalr1.cc:859
+#line 2696 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("SanatiseMatched", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseArg", yystack_[1].location);
       }
-#line 4515 "seclang-parser.cc" // lalr1.cc:859
+#line 4511 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 376:
-#line 2698 "seclang-parser.yy" // lalr1.cc:859
+#line 2700 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("SanatiseMatchedBytes", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseMatched", yystack_[1].location);
       }
-#line 4523 "seclang-parser.cc" // lalr1.cc:859
+#line 4519 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 377:
-#line 2702 "seclang-parser.yy" // lalr1.cc:859
+#line 2704 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("SanatiseRequestHeader", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseMatchedBytes", yystack_[1].location);
       }
-#line 4531 "seclang-parser.cc" // lalr1.cc:859
+#line 4527 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 378:
-#line 2706 "seclang-parser.yy" // lalr1.cc:859
+#line 2708 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("SanatiseResponseHeader", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseRequestHeader", yystack_[1].location);
       }
-#line 4539 "seclang-parser.cc" // lalr1.cc:859
+#line 4535 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 379:
-#line 2710 "seclang-parser.yy" // lalr1.cc:859
+#line 2712 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_NOT_SUPPORTED("SetEnv", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanatiseResponseHeader", yystack_[1].location);
       }
-#line 4547 "seclang-parser.cc" // lalr1.cc:859
+#line 4543 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 380:
-#line 2714 "seclang-parser.yy" // lalr1.cc:859
+#line 2716 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetRSC(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_NOT_SUPPORTED("SetEnv", yystack_[1].location);
       }
-#line 4555 "seclang-parser.cc" // lalr1.cc:859
+#line 4551 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 381:
-#line 2718 "seclang-parser.yy" // lalr1.cc:859
+#line 2720 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetSID(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetRSC(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4563 "seclang-parser.cc" // lalr1.cc:859
+#line 4559 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 382:
-#line 2722 "seclang-parser.yy" // lalr1.cc:859
+#line 2724 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetUID(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetSID(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4571 "seclang-parser.cc" // lalr1.cc:859
+#line 4567 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 383:
-#line 2726 "seclang-parser.yy" // lalr1.cc:859
+#line 2728 "seclang-parser.yy" // lalr1.cc:847
     {
-        yylhs.value.as< std::unique_ptr<actions::Action> > () = std::move(yystack_[0].value.as< std::unique_ptr<actions::Action> > ());
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetUID(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4579 "seclang-parser.cc" // lalr1.cc:859
+#line 4575 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 384:
-#line 2730 "seclang-parser.yy" // lalr1.cc:859
+#line 2732 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Severity(yystack_[0].value.as< std::string > ()));
+        yylhs.value.as< std::unique_ptr<actions::Action> > () = std::move(yystack_[0].value.as< std::unique_ptr<actions::Action> > ());
       }
-#line 4587 "seclang-parser.cc" // lalr1.cc:859
+#line 4583 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 385:
-#line 2734 "seclang-parser.yy" // lalr1.cc:859
+#line 2736 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Skip(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Severity(yystack_[0].value.as< std::string > ()));
       }
-#line 4595 "seclang-parser.cc" // lalr1.cc:859
+#line 4591 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 386:
-#line 2738 "seclang-parser.yy" // lalr1.cc:859
+#line 2740 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SkipAfter(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Skip(yystack_[0].value.as< std::string > ()));
       }
-#line 4603 "seclang-parser.cc" // lalr1.cc:859
+#line 4599 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 387:
-#line 2742 "seclang-parser.yy" // lalr1.cc:859
+#line 2744 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::data::Status(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SkipAfter(yystack_[0].value.as< std::string > ()));
       }
-#line 4611 "seclang-parser.cc" // lalr1.cc:859
+#line 4607 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 388:
-#line 2746 "seclang-parser.yy" // lalr1.cc:859
+#line 2748 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Tag(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::data::Status(yystack_[0].value.as< std::string > ()));
       }
-#line 4619 "seclang-parser.cc" // lalr1.cc:859
+#line 4615 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 389:
-#line 2750 "seclang-parser.yy" // lalr1.cc:859
+#line 2752 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Ver(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Tag(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4627 "seclang-parser.cc" // lalr1.cc:859
+#line 4623 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 390:
-#line 2754 "seclang-parser.yy" // lalr1.cc:859
+#line 2756 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::XmlNS(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::Ver(yystack_[0].value.as< std::string > ()));
       }
-#line 4635 "seclang-parser.cc" // lalr1.cc:859
+#line 4631 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 391:
-#line 2758 "seclang-parser.yy" // lalr1.cc:859
+#line 2760 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityZero7bit(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::XmlNS(yystack_[0].value.as< std::string > ()));
       }
-#line 4643 "seclang-parser.cc" // lalr1.cc:859
+#line 4639 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 392:
-#line 2762 "seclang-parser.yy" // lalr1.cc:859
+#line 2764 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityOdd7bit(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityZero7bit(yystack_[0].value.as< std::string > ()));
       }
-#line 4651 "seclang-parser.cc" // lalr1.cc:859
+#line 4647 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 393:
-#line 2766 "seclang-parser.yy" // lalr1.cc:859
+#line 2768 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityEven7bit(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityOdd7bit(yystack_[0].value.as< std::string > ()));
       }
-#line 4659 "seclang-parser.cc" // lalr1.cc:859
+#line 4655 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 394:
-#line 2770 "seclang-parser.yy" // lalr1.cc:859
+#line 2772 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::SqlHexDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ParityEven7bit(yystack_[0].value.as< std::string > ()));
       }
-#line 4667 "seclang-parser.cc" // lalr1.cc:859
+#line 4663 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 395:
-#line 2774 "seclang-parser.yy" // lalr1.cc:859
+#line 2776 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Base64Encode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::SqlHexDecode(yystack_[0].value.as< std::string > ()));
       }
-#line 4675 "seclang-parser.cc" // lalr1.cc:859
+#line 4671 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 396:
-#line 2778 "seclang-parser.yy" // lalr1.cc:859
+#line 2780 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Base64Decode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Base64Encode(yystack_[0].value.as< std::string > ()));
       }
-#line 4683 "seclang-parser.cc" // lalr1.cc:859
+#line 4679 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 397:
-#line 2782 "seclang-parser.yy" // lalr1.cc:859
+#line 2784 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Base64DecodeExt(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Base64Decode(yystack_[0].value.as< std::string > ()));
       }
-#line 4691 "seclang-parser.cc" // lalr1.cc:859
+#line 4687 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 398:
-#line 2786 "seclang-parser.yy" // lalr1.cc:859
+#line 2788 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CmdLine(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Base64DecodeExt(yystack_[0].value.as< std::string > ()));
       }
-#line 4699 "seclang-parser.cc" // lalr1.cc:859
+#line 4695 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 399:
-#line 2790 "seclang-parser.yy" // lalr1.cc:859
+#line 2792 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Sha1(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CmdLine(yystack_[0].value.as< std::string > ()));
       }
-#line 4707 "seclang-parser.cc" // lalr1.cc:859
+#line 4703 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 400:
-#line 2794 "seclang-parser.yy" // lalr1.cc:859
+#line 2796 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Md5(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Sha1(yystack_[0].value.as< std::string > ()));
       }
-#line 4715 "seclang-parser.cc" // lalr1.cc:859
+#line 4711 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 401:
-#line 2798 "seclang-parser.yy" // lalr1.cc:859
+#line 2800 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::EscapeSeqDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Md5(yystack_[0].value.as< std::string > ()));
       }
-#line 4723 "seclang-parser.cc" // lalr1.cc:859
+#line 4719 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 402:
-#line 2802 "seclang-parser.yy" // lalr1.cc:859
+#line 2804 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HexEncode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::EscapeSeqDecode(yystack_[0].value.as< std::string > ()));
       }
-#line 4731 "seclang-parser.cc" // lalr1.cc:859
+#line 4727 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 403:
-#line 2806 "seclang-parser.yy" // lalr1.cc:859
+#line 2808 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HexDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HexEncode(yystack_[0].value.as< std::string > ()));
       }
-#line 4739 "seclang-parser.cc" // lalr1.cc:859
+#line 4735 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 404:
-#line 2810 "seclang-parser.yy" // lalr1.cc:859
+#line 2812 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::LowerCase(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HexDecode(yystack_[0].value.as< std::string > ()));
       }
-#line 4747 "seclang-parser.cc" // lalr1.cc:859
+#line 4743 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 405:
-#line 2814 "seclang-parser.yy" // lalr1.cc:859
+#line 2816 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UpperCase(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::LowerCase(yystack_[0].value.as< std::string > ()));
       }
-#line 4755 "seclang-parser.cc" // lalr1.cc:859
+#line 4751 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 406:
-#line 2818 "seclang-parser.yy" // lalr1.cc:859
+#line 2820 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecodeUni(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UpperCase(yystack_[0].value.as< std::string > ()));
       }
-#line 4763 "seclang-parser.cc" // lalr1.cc:859
+#line 4759 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 407:
-#line 2822 "seclang-parser.yy" // lalr1.cc:859
+#line 2824 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecodeUni(yystack_[0].value.as< std::string > ()));
       }
-#line 4771 "seclang-parser.cc" // lalr1.cc:859
+#line 4767 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 408:
-#line 2826 "seclang-parser.yy" // lalr1.cc:859
+#line 2828 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlEncode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecode(yystack_[0].value.as< std::string > ()));
       }
-#line 4779 "seclang-parser.cc" // lalr1.cc:859
+#line 4775 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 409:
-#line 2830 "seclang-parser.yy" // lalr1.cc:859
+#line 2832 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::None(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::UrlEncode(yystack_[0].value.as< std::string > ()));
       }
-#line 4787 "seclang-parser.cc" // lalr1.cc:859
+#line 4783 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 410:
-#line 2834 "seclang-parser.yy" // lalr1.cc:859
+#line 2836 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CompressWhitespace(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::None(yystack_[0].value.as< std::string > ()));
       }
-#line 4795 "seclang-parser.cc" // lalr1.cc:859
+#line 4791 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 411:
-#line 2838 "seclang-parser.yy" // lalr1.cc:859
+#line 2840 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveWhitespace(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CompressWhitespace(yystack_[0].value.as< std::string > ()));
       }
-#line 4803 "seclang-parser.cc" // lalr1.cc:859
+#line 4799 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 412:
-#line 2842 "seclang-parser.yy" // lalr1.cc:859
+#line 2844 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceNulls(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveWhitespace(yystack_[0].value.as< std::string > ()));
       }
-#line 4811 "seclang-parser.cc" // lalr1.cc:859
+#line 4807 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 413:
-#line 2846 "seclang-parser.yy" // lalr1.cc:859
+#line 2848 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveNulls(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceNulls(yystack_[0].value.as< std::string > ()));
       }
-#line 4819 "seclang-parser.cc" // lalr1.cc:859
+#line 4815 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 414:
-#line 2850 "seclang-parser.yy" // lalr1.cc:859
+#line 2852 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HtmlEntityDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveNulls(yystack_[0].value.as< std::string > ()));
       }
-#line 4827 "seclang-parser.cc" // lalr1.cc:859
+#line 4823 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 415:
-#line 2854 "seclang-parser.yy" // lalr1.cc:859
+#line 2856 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::JsDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::HtmlEntityDecode(yystack_[0].value.as< std::string > ()));
       }
-#line 4835 "seclang-parser.cc" // lalr1.cc:859
+#line 4831 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 416:
-#line 2858 "seclang-parser.yy" // lalr1.cc:859
+#line 2860 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CssDecode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::JsDecode(yystack_[0].value.as< std::string > ()));
       }
-#line 4843 "seclang-parser.cc" // lalr1.cc:859
+#line 4839 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 417:
-#line 2862 "seclang-parser.yy" // lalr1.cc:859
+#line 2864 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Trim(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::CssDecode(yystack_[0].value.as< std::string > ()));
       }
-#line 4851 "seclang-parser.cc" // lalr1.cc:859
+#line 4847 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 418:
-#line 2866 "seclang-parser.yy" // lalr1.cc:859
+#line 2868 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::TrimLeft(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Trim(yystack_[0].value.as< std::string > ()));
       }
-#line 4859 "seclang-parser.cc" // lalr1.cc:859
+#line 4855 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 419:
-#line 2870 "seclang-parser.yy" // lalr1.cc:859
+#line 2872 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::TrimRight(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::TrimLeft(yystack_[0].value.as< std::string > ()));
       }
-#line 4867 "seclang-parser.cc" // lalr1.cc:859
+#line 4863 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 420:
-#line 2874 "seclang-parser.yy" // lalr1.cc:859
+#line 2876 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePathWin(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::TrimRight(yystack_[0].value.as< std::string > ()));
       }
-#line 4875 "seclang-parser.cc" // lalr1.cc:859
+#line 4871 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 421:
-#line 2878 "seclang-parser.yy" // lalr1.cc:859
+#line 2880 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePath(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePathWin(yystack_[0].value.as< std::string > ()));
       }
-#line 4883 "seclang-parser.cc" // lalr1.cc:859
+#line 4879 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 422:
-#line 2882 "seclang-parser.yy" // lalr1.cc:859
+#line 2884 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Length(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePath(yystack_[0].value.as< std::string > ()));
       }
-#line 4891 "seclang-parser.cc" // lalr1.cc:859
+#line 4887 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 423:
-#line 2886 "seclang-parser.yy" // lalr1.cc:859
+#line 2888 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Utf8ToUnicode(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Length(yystack_[0].value.as< std::string > ()));
       }
-#line 4899 "seclang-parser.cc" // lalr1.cc:859
+#line 4895 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 424:
-#line 2890 "seclang-parser.yy" // lalr1.cc:859
+#line 2892 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveCommentsChar(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::Utf8ToUnicode(yystack_[0].value.as< std::string > ()));
       }
-#line 4907 "seclang-parser.cc" // lalr1.cc:859
+#line 4903 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 425:
-#line 2894 "seclang-parser.yy" // lalr1.cc:859
+#line 2896 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveComments(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveCommentsChar(yystack_[0].value.as< std::string > ()));
       }
-#line 4915 "seclang-parser.cc" // lalr1.cc:859
+#line 4911 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 426:
-#line 2898 "seclang-parser.yy" // lalr1.cc:859
+#line 2900 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceComments(yystack_[0].value.as< std::string > ()));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveComments(yystack_[0].value.as< std::string > ()));
       }
-#line 4923 "seclang-parser.cc" // lalr1.cc:859
+#line 4919 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 427:
-#line 2905 "seclang-parser.yy" // lalr1.cc:859
+#line 2904 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::unsetOperation, std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceComments(yystack_[0].value.as< std::string > ()));
       }
-#line 4931 "seclang-parser.cc" // lalr1.cc:859
+#line 4927 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 428:
-#line 2909 "seclang-parser.yy" // lalr1.cc:859
+#line 2911 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setToOneOperation, std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::unsetOperation, std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
       }
-#line 4939 "seclang-parser.cc" // lalr1.cc:859
+#line 4935 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 429:
-#line 2913 "seclang-parser.yy" // lalr1.cc:859
+#line 2915 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setOperation, std::move(yystack_[2].value.as< std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setToOneOperation, std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ())));
       }
-#line 4947 "seclang-parser.cc" // lalr1.cc:859
+#line 4943 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 430:
-#line 2917 "seclang-parser.yy" // lalr1.cc:859
+#line 2919 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, std::move(yystack_[2].value.as< std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setOperation, std::move(yystack_[2].value.as< std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4955 "seclang-parser.cc" // lalr1.cc:859
+#line 4951 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 431:
-#line 2921 "seclang-parser.yy" // lalr1.cc:859
+#line 2923 "seclang-parser.yy" // lalr1.cc:847
     {
-        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, std::move(yystack_[2].value.as< std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, std::move(yystack_[2].value.as< std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
       }
-#line 4963 "seclang-parser.cc" // lalr1.cc:859
+#line 4959 "seclang-parser.cc" // lalr1.cc:847
     break;
 
   case 432:
-#line 2928 "seclang-parser.yy" // lalr1.cc:859
+#line 2927 "seclang-parser.yy" // lalr1.cc:847
+    {
+        ACTION_CONTAINER(yylhs.value.as< std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, std::move(yystack_[2].value.as< std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
+      }
+#line 4967 "seclang-parser.cc" // lalr1.cc:847
+    break;
+
+  case 433:
+#line 2934 "seclang-parser.yy" // lalr1.cc:847
     {
         yystack_[1].value.as< std::unique_ptr<RunTimeString> > ()->appendText(yystack_[0].value.as< std::string > ());
         yylhs.value.as< std::unique_ptr<RunTimeString> > () = std::move(yystack_[1].value.as< std::unique_ptr<RunTimeString> > ());
       }
-#line 4972 "seclang-parser.cc" // lalr1.cc:859
+#line 4976 "seclang-parser.cc" // lalr1.cc:847
     break;
 
-  case 433:
-#line 2933 "seclang-parser.yy" // lalr1.cc:859
+  case 434:
+#line 2939 "seclang-parser.yy" // lalr1.cc:847
     {
         yystack_[1].value.as< std::unique_ptr<RunTimeString> > ()->appendVar(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ()));
         yylhs.value.as< std::unique_ptr<RunTimeString> > () = std::move(yystack_[1].value.as< std::unique_ptr<RunTimeString> > ());
       }
-#line 4981 "seclang-parser.cc" // lalr1.cc:859
+#line 4985 "seclang-parser.cc" // lalr1.cc:847
     break;
 
-  case 434:
-#line 2938 "seclang-parser.yy" // lalr1.cc:859
+  case 435:
+#line 2944 "seclang-parser.yy" // lalr1.cc:847
     {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
         r->appendText(yystack_[0].value.as< std::string > ());
         yylhs.value.as< std::unique_ptr<RunTimeString> > () = std::move(r);
       }
-#line 4991 "seclang-parser.cc" // lalr1.cc:859
+#line 4995 "seclang-parser.cc" // lalr1.cc:847
     break;
 
-  case 435:
-#line 2944 "seclang-parser.yy" // lalr1.cc:859
+  case 436:
+#line 2950 "seclang-parser.yy" // lalr1.cc:847
     {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
         r->appendVar(std::move(yystack_[0].value.as< std::unique_ptr<Variable> > ()));
         yylhs.value.as< std::unique_ptr<RunTimeString> > () = std::move(r);
       }
-#line 5001 "seclang-parser.cc" // lalr1.cc:859
+#line 5005 "seclang-parser.cc" // lalr1.cc:847
     break;
 
 
-#line 5005 "seclang-parser.cc" // lalr1.cc:859
+#line 5009 "seclang-parser.cc" // lalr1.cc:847
             default:
               break;
             }
@@ -5029,7 +5033,8 @@ namespace yy {
     if (!yyerrstatus_)
       {
         ++yynerrs_;
-        error (yyla.location, yysyntax_error_ (yystack_[0].state, yyla));
+        error (yyla.location, yysyntax_error_ (yystack_[0].state,
+                                           yyempty ? yyempty_ : yyla.type_get ()));
       }
 
 
@@ -5042,10 +5047,10 @@ namespace yy {
         // Return failure if at end of input.
         if (yyla.type_get () == yyeof_)
           YYABORT;
-        else if (!yyla.empty ())
+        else if (!yyempty)
           {
             yy_destroy_ ("Error: discarding", yyla);
-            yyla.clear ();
+            yyempty = true;
           }
       }
 
@@ -5121,7 +5126,7 @@ namespace yy {
     goto yyreturn;
 
   yyreturn:
-    if (!yyla.empty ())
+    if (!yyempty)
       yy_destroy_ ("Cleanup: discarding lookahead", yyla);
 
     /* Do not reclaim the symbols of the rule whose action triggered
@@ -5141,7 +5146,7 @@ namespace yy {
                  << std::endl;
         // Do not try to display the values of the reclaimed symbols,
         // as their printer might throw an exception.
-        if (!yyla.empty ())
+        if (!yyempty)
           yy_destroy_ (YY_NULLPTR, yyla);
 
         while (1 < yystack_.size ())
@@ -5161,8 +5166,9 @@ namespace yy {
 
   // Generate an error message.
   std::string
-  seclang_parser::yysyntax_error_ (state_type yystate, const symbol_type& yyla) const
+  seclang_parser::yysyntax_error_ (state_type yystate, symbol_number_type yytoken) const
   {
+    std::string yyres;
     // Number of reported tokens (one for the "unexpected", one per
     // "expected").
     size_t yycount = 0;
@@ -5176,7 +5182,7 @@ namespace yy {
          the only way this function was invoked is if the default action
          is an error action.  In that case, don't check for expected
          tokens because there are none.
-       - The only way there can be no lookahead present (in yyla) is
+       - The only way there can be no lookahead present (in yytoken) is
          if this state is a consistent state with a default action.
          Thus, detecting the absence of a lookahead is sufficient to
          determine that there is no unexpected or expected token to
@@ -5196,9 +5202,8 @@ namespace yy {
          token that will not be accepted due to an error action in a
          later state.
     */
-    if (!yyla.empty ())
+    if (yytoken != yyempty_)
       {
-        int yytoken = yyla.type_get ();
         yyarg[yycount++] = yytname_[yytoken];
         int yyn = yypact_[yystate];
         if (!yy_pact_value_is_default_ (yyn))
@@ -5241,7 +5246,6 @@ namespace yy {
 #undef YYCASE_
       }
 
-    std::string yyres;
     // Argument number.
     size_t yyi = 0;
     for (char const* yyp = yyformat; *yyp; ++yyp)
@@ -5256,66 +5260,66 @@ namespace yy {
   }
 
 
-  const short int seclang_parser::yypact_ninf_ = -402;
+  const short int seclang_parser::yypact_ninf_ = -389;
 
   const signed char seclang_parser::yytable_ninf_ = -1;
 
   const short int
   seclang_parser::yypact_[] =
   {
-    2722,  -402,  -262,  -402,   -90,  -402,  -154,  -402,  -402,  -402,
-    -402,  -402,  -285,  -402,  -402,  -402,  -402,  -402,  -277,  -402,
-    -402,  -402,  -151,  -149,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -147,  -402,  -402,
-    -146,  -402,  -141,  -402,  -142,  -137,  -402,  -258,   -88,   -88,
-    -402,  -402,  -402,  -402,  -130,  -294,  -402,  -402,  -402,  1464,
-    1464,  1464,   -88,  -270,  -128,  -402,  -402,  -402,  -126,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  1464,   -88,
-    2879,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  2296,  -254,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -264,  -402,  -402,  -402,  -124,  -122,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  2426,  -402,
-    2426,  -402,  2426,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  2426,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  2426,
-    2426,  2426,  -402,  -402,  -402,  -402,  2426,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  3077,  -402,     5,  -402,  -402,
-    -402,  -402,  -402,  -402,  2621,  2621,  -156,  -153,  -150,  -148,
-    -145,  -143,  -140,  -136,  -134,  -132,  -129,  -127,  -125,  -123,
-    -121,  -119,  -402,  -117,  -115,  -113,  -111,  -402,  -402,  -109,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -107,  -402,  -402,  -402,  -402,
-    -402,   450,  -402,  -402,  -402,  -105,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,   539,   628,
-     956,  1045,  1134,  -102,  -100,  1555,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-       8,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  1971,  -402,  -402,  -402,  2621,   -52,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  2515,  2515,  2515,  2515,  2515,  2515,  2515,  2515,     9,
-    3077,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,
-    -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  -402,  2515,
-    -402,  -402,  -402,  -402,  2515,  -402,  -402,  2515,  -402,  -402,
-    2515,  -402,  -402,  2515,  -402,  -402,  2515,  -402,  -402,  -402,
-    -402,     4,  1646,  2101,  2426,  2426,  2426,  -402,  -402,  2426,
-    2426,  2426,  -402,  2426,  2426,  2426,  2426,  2426,  2426,  2426,
-    2426,  2426,  2426,  2426,  2426,  2426,  2426,  2426,  -402,  2426,
-    2426,  2426,  2426,  -402,  -402,  2426,  2426,  2426,  2426,   -88,
-    -402,  2515,  -402,  2426,  2426,  2426,  -402,  -402,  -402,  -402,
-    -402,  2621,  2621,  -402,  -402,  2515,  2515,  2515,  2515,  2515,
-    2515,  2515,  2515,  2515,  2515,  2515,  2515,  2515,  2515,  2515,
-    2515,  2515,  2515,  2515,  2515,  2515,  2515,  2515,  2515,  2515,
-    2515,  2515,  2515,  2515,  2515,  -402,  2515,  2515,  2515,  -402,
-    -402
+    2728,  -389,  -277,  -389,  -102,  -389,  -249,  -389,  -389,  -389,
+    -389,  -389,  -280,  -389,  -389,  -389,  -389,  -389,  -293,  -389,
+    -389,  -389,  -153,  -150,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -148,  -389,  -389,
+    -146,  -389,  -141,  -389,  -142,  -137,  -389,  -258,   -87,   -87,
+    -389,  -389,  -389,  -389,  -129,  -295,  -389,  -389,  -389,  1467,
+    1467,  1467,   -87,  -270,  -127,  -389,  -389,  -389,  -125,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  1467,   -87,
+    2886,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  2301,  -254,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -264,  -389,  -389,  -389,  -389,  -123,  -121,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  2431,
+    -389,  2431,  -389,  2431,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  2431,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    2431,  2431,  2431,  -389,  -389,  -389,  -389,  2431,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  3085,  -389,    12,  -389,
+    -389,  -389,  -389,  -389,  -389,  2627,  2627,  -155,  -152,  -149,
+    -147,  -145,  -143,  -140,  -138,  -135,  -133,  -131,  -128,  -126,
+    -124,  -122,  -120,  -389,  -118,  -116,  -114,  -112,  -389,  -389,
+    -110,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -108,  -389,  -389,  -389,
+    -389,  -389,   451,  -389,  -389,  -389,  -106,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,   540,
+     629,   958,  1047,  1136,  -104,  -101,  1558,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,    21,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  1975,  -389,  -389,  -389,  2627,   -51,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  2520,  2520,  2520,  2520,  2520,  2520,  2520,  2520,
+       5,  3085,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,  -389,
+    2520,  -389,  -389,  -389,  -389,  2520,  -389,  -389,  2520,  -389,
+    -389,  2520,  -389,  -389,  2520,  -389,  -389,  2520,  -389,  -389,
+    -389,  -389,    10,  1649,  2105,  2431,  2431,  2431,  -389,  -389,
+    2431,  2431,  2431,  -389,  2431,  2431,  2431,  2431,  2431,  2431,
+    2431,  2431,  2431,  2431,  2431,  2431,  2431,  2431,  2431,  -389,
+    2431,  2431,  2431,  2431,  -389,  -389,  2431,  2431,  2431,  2431,
+     -87,  -389,  2520,  -389,  2431,  2431,  2431,  -389,  -389,  -389,
+    -389,  -389,  2627,  2627,  -389,  -389,  2520,  2520,  2520,  2520,
+    2520,  2520,  2520,  2520,  2520,  2520,  2520,  2520,  2520,  2520,
+    2520,  2520,  2520,  2520,  2520,  2520,  2520,  2520,  2520,  2520,
+    2520,  2520,  2520,  2520,  2520,  2520,  -389,  2520,  2520,  2520,
+    -389,  -389
   };
 
   const unsigned short int
@@ -5333,113 +5337,113 @@ namespace yy {
        9,    10,     8,    20,    19,    18,    94,    93,    99,    98,
       83,    82,   130,   131,    85,    84,   132,   133,   112,   111,
       81,    79,    80,     0,     0,   329,   330,   331,   332,   333,
-     334,   335,     0,   339,   340,   341,     0,     0,   349,   350,
-     351,   352,   353,   354,   355,   356,   357,   358,     0,   361,
-       0,   362,     0,   364,   365,   366,   367,   368,   369,   370,
-     371,     0,   373,   374,   375,   376,   377,   378,   379,     0,
-       0,     0,   384,   385,   386,   387,     0,   395,   396,   397,
-     398,   410,   416,   401,   402,   403,   414,   415,   422,   404,
-     400,   409,   421,   420,   393,   392,   391,   425,   424,   413,
-     411,   426,   412,   399,   394,   417,   418,   419,   405,   408,
-     407,   406,   423,   389,   390,     0,    75,    30,    32,    77,
-     107,   106,   134,   135,     0,     0,   161,   164,   167,   170,
-     173,   176,   179,   182,   185,   188,   191,   194,   197,   200,
-     203,   206,   259,   248,   209,   245,   251,   260,   261,   218,
-     262,   263,   264,   265,   266,   267,   268,   269,   270,   271,
-     272,   273,   274,   275,   276,   277,   278,   279,   280,   281,
-     282,   283,   284,   285,   286,   287,   289,   288,   292,   291,
-     290,   293,   295,   294,   296,   254,   297,   298,   299,   301,
-     300,   222,   302,   303,   255,   258,   304,   305,   306,   307,
-     308,   309,   310,   311,   312,   315,   313,   314,   226,   230,
-     238,   242,   234,   212,   215,     0,   317,   316,   318,   319,
-     320,   321,   322,   323,   324,   325,   326,   327,   328,   119,
-     151,   156,   120,   121,   122,    22,    21,    23,    28,    27,
-     140,   141,     0,    76,     1,     3,     0,   428,   383,   348,
-     347,   346,   337,   336,   338,   343,   342,   345,   344,   434,
-     435,   359,   360,   363,   372,   380,   381,   382,   388,     0,
-       0,   158,   157,   159,   160,   162,   163,   165,   166,   168,
-     169,   171,   172,   174,   175,   177,   178,   180,   181,   183,
-     184,   186,   187,   189,   190,   192,   193,   195,   196,   198,
-     199,   201,   202,   204,   205,   246,   247,   207,   208,   243,
-     244,   249,   250,   216,   217,   252,   253,   220,   221,   219,
-     256,   257,   224,   225,   223,   228,   229,   227,   236,   237,
-     235,   240,   241,   239,   232,   233,   231,   210,   211,   213,
-     214,     0,     0,     0,     0,     0,     0,    38,    39,     0,
-       0,     0,    71,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,    37,     0,
-       0,     0,     0,    40,    41,     0,     0,     0,     0,    74,
-      33,    35,   427,     0,     0,     0,   432,   433,    29,    31,
-     152,     0,     0,   153,    34,    36,    70,    55,    54,    56,
-      57,    43,    58,    51,    59,    42,    60,    61,    62,    63,
-      64,    65,    66,    52,    67,    68,    69,    44,    45,    46,
-      47,    48,    49,    50,    53,    73,   429,   430,   431,   155,
-     154
+     334,   335,     0,   339,   340,   341,   342,     0,     0,   350,
+     351,   352,   353,   354,   355,   356,   357,   358,   359,     0,
+     362,     0,   363,     0,   365,   366,   367,   368,   369,   370,
+     371,   372,     0,   374,   375,   376,   377,   378,   379,   380,
+       0,     0,     0,   385,   386,   387,   388,     0,   396,   397,
+     398,   399,   411,   417,   402,   403,   404,   415,   416,   423,
+     405,   401,   410,   422,   421,   394,   393,   392,   426,   425,
+     414,   412,   427,   413,   400,   395,   418,   419,   420,   406,
+     409,   408,   407,   424,   390,   391,     0,    75,    30,    32,
+      77,   107,   106,   134,   135,     0,     0,   161,   164,   167,
+     170,   173,   176,   179,   182,   185,   188,   191,   194,   197,
+     200,   203,   206,   259,   248,   209,   245,   251,   260,   261,
+     218,   262,   263,   264,   265,   266,   267,   268,   269,   270,
+     271,   272,   273,   274,   275,   276,   277,   278,   279,   280,
+     281,   282,   283,   284,   285,   286,   287,   289,   288,   292,
+     291,   290,   293,   295,   294,   296,   254,   297,   298,   299,
+     301,   300,   222,   302,   303,   255,   258,   304,   305,   306,
+     307,   308,   309,   310,   311,   312,   315,   313,   314,   226,
+     230,   238,   242,   234,   212,   215,     0,   317,   316,   318,
+     319,   320,   321,   322,   323,   324,   325,   326,   327,   328,
+     119,   151,   156,   120,   121,   122,    22,    21,    23,    28,
+      27,   140,   141,     0,    76,     1,     3,     0,   429,   384,
+     349,   348,   347,   337,   336,   338,   344,   343,   346,   345,
+     435,   436,   360,   361,   364,   373,   381,   382,   383,   389,
+       0,     0,   158,   157,   159,   160,   162,   163,   165,   166,
+     168,   169,   171,   172,   174,   175,   177,   178,   180,   181,
+     183,   184,   186,   187,   189,   190,   192,   193,   195,   196,
+     198,   199,   201,   202,   204,   205,   246,   247,   207,   208,
+     243,   244,   249,   250,   216,   217,   252,   253,   220,   221,
+     219,   256,   257,   224,   225,   223,   228,   229,   227,   236,
+     237,   235,   240,   241,   239,   232,   233,   231,   210,   211,
+     213,   214,     0,     0,     0,     0,     0,     0,    38,    39,
+       0,     0,     0,    71,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    37,
+       0,     0,     0,     0,    40,    41,     0,     0,     0,     0,
+      74,    33,    35,   428,     0,     0,     0,   433,   434,    29,
+      31,   152,     0,     0,   153,    34,    36,    70,    55,    54,
+      56,    57,    43,    58,    51,    59,    42,    60,    61,    62,
+      63,    64,    65,    66,    52,    67,    68,    69,    44,    45,
+      46,    47,    48,    49,    50,    53,    73,   430,   431,   432,
+     155,   154
   };
 
   const short int
   seclang_parser::yypgoto_[] =
   {
-    -402,  -402,   -56,  -402,   -45,  -184,  -402,  -401,  -402,   -55,
-    -260,   -59,  -307,  -402,  -133
+    -389,  -389,   -62,  -389,   -45,  -173,  -389,  -388,  -389,   -55,
+    -251,   -59,  -206,  -389,  -132
   };
 
   const short int
   seclang_parser::yydefgoto_[] =
   {
-      -1,    80,    81,    82,   206,   207,   469,   470,    83,   319,
-     320,   350,   208,   338,   351
+      -1,    80,    81,    82,   207,   208,   470,   471,    83,   320,
+     321,   351,   209,   339,   352
   };
 
   const unsigned short int
   seclang_parser::yytable_[] =
   {
-     321,   321,   321,   212,   209,   322,   323,   352,   360,   353,
-     432,   113,   360,   213,   432,    90,    91,   324,   354,   321,
-      92,   359,    93,   332,   335,    94,   355,   356,   357,    95,
-     325,   326,   484,   358,   333,   327,   342,   343,    84,    85,
-     110,   344,   111,   112,   339,   431,   340,   341,   473,   474,
-     475,    86,    87,   479,   337,   114,   115,   116,   117,   118,
-     119,   120,   121,   122,   123,   124,   125,   126,   127,   128,
-     129,   130,   131,   132,   133,   134,   135,   136,   137,   138,
-     139,   140,   141,   142,   143,   144,   145,   146,   147,   148,
-     149,   150,   151,   152,   153,   154,   155,   156,   157,   158,
-     159,   160,   161,   162,   163,   164,   165,   166,   167,   168,
-     169,   170,   171,   172,   173,   174,   175,   176,   177,   178,
-     179,   180,   181,   182,   183,   184,   185,   186,   187,   188,
-     189,   190,   191,   192,   193,   194,   195,   196,   197,   198,
-     199,   200,   201,   202,   203,   204,    88,    89,   409,    96,
-      97,    98,    99,   100,   101,   361,   362,   102,   103,   104,
-     105,   106,   107,   108,   109,   414,   417,   420,   423,   426,
-     210,   211,   328,   329,   330,   331,   345,   346,   347,   348,
-     363,   364,     0,   365,   366,     0,   367,   368,   369,   370,
-       0,   371,   372,   373,   374,     0,   375,   376,     0,   471,
-     377,   378,   379,   380,   381,   382,     0,   383,   384,   385,
-     386,   387,   388,   389,   390,   391,   392,   393,   394,   395,
-     396,   397,   398,   399,   400,   401,   402,   403,   404,   405,
-     406,   410,   411,   205,   427,   428,   429,   430,     0,     0,
-       0,     0,     0,     0,     0,     0,   321,     0,     0,     0,
+     322,   322,   322,   213,   210,   323,   324,    93,   361,   353,
+      94,   354,   113,   214,    95,   361,   433,   325,   336,   322,
+     355,    90,    91,   333,    84,    85,    92,   433,   356,   357,
+     358,   326,   327,   360,   334,   359,   328,   343,   344,    86,
+      87,   110,   345,   111,   112,   340,   485,   341,   342,   474,
+     475,   476,    88,    89,   338,   432,   114,   115,   116,   117,
+     118,   119,   120,   121,   122,   123,   124,   125,   126,   127,
+     128,   129,   130,   131,   132,   133,   134,   135,   136,   137,
+     138,   139,   140,   141,   142,   143,   144,   145,   146,   147,
+     148,   149,   150,   151,   152,   153,   154,   155,   156,   157,
+     158,   159,   160,   161,   162,   163,   164,   165,   166,   167,
+     168,   169,   170,   171,   172,   173,   174,   175,   176,   177,
+     178,   179,   180,   181,   182,   183,   184,   185,   186,   187,
+     188,   189,   190,   191,   192,   193,   194,   195,   196,   197,
+     198,   199,   200,   201,   202,   203,   204,   205,    96,    97,
+     410,    98,    99,   100,   101,   480,   362,   363,   102,   103,
+     104,   105,   106,   107,   108,   109,     0,   415,   418,   421,
+     424,   427,   211,   212,   329,   330,   331,   332,   346,   347,
+     348,   349,   364,   365,     0,   366,   367,     0,   368,   369,
+     370,   371,   372,   373,   374,   375,     0,   376,   377,   378,
+     379,   472,   380,   381,   382,   383,   384,   385,     0,   386,
+     387,   388,   389,   390,   391,   392,   393,   394,   395,   396,
+     397,   398,   399,   400,   401,   402,   403,   404,   405,   406,
+     407,   411,   412,   428,   429,   206,   430,   431,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,   322,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,   472,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   473,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,   477,   477,   477,   477,   477,   477,   477,   477,
-     485,   486,   487,   488,     0,     0,   489,   490,   491,     0,
-     492,   493,   494,   495,   496,   497,   498,   499,   500,   501,
-     502,   503,   504,   505,   506,   480,   507,   508,   509,   510,
-     478,     0,   511,   512,   513,   514,     0,     0,     0,     0,
-     516,   517,   518,     0,     0,     0,     0,     0,     0,     0,
-     477,     0,     0,     0,     0,   477,     0,     0,   477,     0,
-       0,   477,     0,     0,   477,     0,     0,   477,     0,     0,
-       0,     0,     0,   483,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,   478,   478,   478,   478,   478,   478,   478,
+     478,     0,   486,   487,   488,   489,     0,     0,   490,   491,
+     492,     0,   493,   494,   495,   496,   497,   498,   499,   500,
+     501,   502,   503,   504,   505,   506,   507,   479,   508,   509,
+     510,   511,   481,     0,   512,   513,   514,   515,     0,     0,
+       0,     0,   517,   518,   519,     0,     0,     0,     0,     0,
+       0,   478,     0,     0,     0,     0,   478,     0,     0,   478,
+       0,     0,   478,     0,     0,   478,     0,     0,   478,     0,
+       0,     0,     0,     0,   484,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,   477,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,   519,   520,   515,     0,   477,   477,   477,   477,
-     477,   477,   477,   477,   477,   477,   477,   477,   477,   477,
-     477,   477,   477,   477,   477,   477,   477,   477,   477,   477,
-     477,   477,   477,   477,   477,   477,     0,   477,   477,   477,
-     216,   217,   218,   219,   220,   221,   222,   223,   224,   225,
+       0,     0,     0,   478,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,   520,   521,   516,     0,   478,   478,   478,
+     478,   478,   478,   478,   478,   478,   478,   478,   478,   478,
+     478,   478,   478,   478,   478,   478,   478,   478,   478,   478,
+     478,   478,   478,   478,   478,   478,   478,     0,   478,   478,
+     478,   217,   218,   219,   220,   221,   222,   223,   224,   225,
      226,   227,   228,   229,   230,   231,   232,   233,   234,   235,
      236,   237,   238,   239,   240,   241,   242,   243,   244,   245,
      246,   247,   248,   249,   250,   251,   252,   253,   254,   255,
@@ -5447,7 +5451,7 @@ namespace yy {
      266,   267,   268,   269,   270,   271,   272,   273,   274,   275,
      276,   277,   278,   279,   280,   281,   282,   283,   284,   285,
      286,   287,   288,   289,   290,   291,   292,   293,   294,   295,
-     296,   297,   298,   299,   300,   301,   302,   303,   304,   216,
+     296,   297,   298,   299,   300,   301,   302,   303,   304,   305,
      217,   218,   219,   220,   221,   222,   223,   224,   225,   226,
      227,   228,   229,   230,   231,   232,   233,   234,   235,   236,
      237,   238,   239,   240,   241,   242,   243,   244,   245,   246,
@@ -5456,7 +5460,7 @@ namespace yy {
      267,   268,   269,   270,   271,   272,   273,   274,   275,   276,
      277,   278,   279,   280,   281,   282,   283,   284,   285,   286,
      287,   288,   289,   290,   291,   292,   293,   294,   295,   296,
-     297,   298,   299,   300,   301,   302,   303,   304,   216,   217,
+     297,   298,   299,   300,   301,   302,   303,   304,   305,   217,
      218,   219,   220,   221,   222,   223,   224,   225,   226,   227,
      228,   229,   230,   231,   232,   233,   234,   235,   236,   237,
      238,   239,   240,   241,   242,   243,   244,   245,   246,   247,
@@ -5465,31 +5469,40 @@ namespace yy {
      268,   269,   270,   271,   272,   273,   274,   275,   276,   277,
      278,   279,   280,   281,   282,   283,   284,   285,   286,   287,
      288,   289,   290,   291,   292,   293,   294,   295,   296,   297,
-     298,   299,   300,   301,   302,   303,   304,     0,     0,     0,
+     298,   299,   300,   301,   302,   303,   304,   305,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-     349,     0,   306,   307,   308,   309,   310,   311,   312,   313,
-     314,   315,   316,   317,   318,     0,   407,   408,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,   349,
-       0,   306,   307,   308,   309,   310,   311,   312,   313,   314,
-     315,   316,   317,   318,     0,   412,   413,     0,     0,     0,
+       0,     0,   350,     0,   307,   308,   309,   310,   311,   312,
+     313,   314,   315,   316,   317,   318,   319,     0,   408,   409,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   349,     0,
-     306,   307,   308,   309,   310,   311,   312,   313,   314,   315,
-     316,   317,   318,     0,   415,   416,   216,   217,   218,   219,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,   350,     0,   307,   308,   309,   310,   311,   312,   313,
+     314,   315,   316,   317,   318,   319,     0,   413,   414,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     350,     0,   307,   308,   309,   310,   311,   312,   313,   314,
+     315,   316,   317,   318,   319,     0,   416,   417,   217,   218,
+     219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
+     229,   230,   231,   232,   233,   234,   235,   236,   237,   238,
+     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
+     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
+     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
+     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
+     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
+     289,   290,   291,   292,   293,   294,   295,   296,   297,   298,
+     299,   300,   301,   302,   303,   304,   305,   217,   218,   219,
      220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
      230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
      240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
@@ -5498,7 +5511,7 @@ namespace yy {
      270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
      280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
      290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
-     300,   301,   302,   303,   304,   216,   217,   218,   219,   220,
+     300,   301,   302,   303,   304,   305,   217,   218,   219,   220,
      221,   222,   223,   224,   225,   226,   227,   228,   229,   230,
      231,   232,   233,   234,   235,   236,   237,   238,   239,   240,
      241,   242,   243,   244,   245,   246,   247,   248,   249,   250,
@@ -5507,7 +5520,82 @@ namespace yy {
      271,   272,   273,   274,   275,   276,   277,   278,   279,   280,
      281,   282,   283,   284,   285,   286,   287,   288,   289,   290,
      291,   292,   293,   294,   295,   296,   297,   298,   299,   300,
-     301,   302,   303,   304,   216,   217,   218,   219,   220,   221,
+     301,   302,   303,   304,   305,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   350,
+       0,   307,   308,   309,   310,   311,   312,   313,   314,   315,
+     316,   317,   318,   319,     0,   419,   420,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   350,     0,
+     307,   308,   309,   310,   311,   312,   313,   314,   315,   316,
+     317,   318,   319,     0,   422,   423,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,   350,     0,   307,
+     308,   309,   310,   311,   312,   313,   314,   315,   316,   317,
+     318,   319,     0,   425,   426,   215,   216,   217,   218,   219,
+     220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
+     230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
+     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
+     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
+     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
+     270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
+     280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
+     290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
+     300,   301,   302,   303,   304,   305,   215,   216,   217,   218,
+     219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
+     229,   230,   231,   232,   233,   234,   235,   236,   237,   238,
+     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
+     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
+     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
+     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
+     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
+     289,   290,   291,   292,   293,   294,   295,   296,   297,   298,
+     299,   300,   301,   302,   303,   304,   305,   482,   483,   217,
+     218,   219,   220,   221,   222,   223,   224,   225,   226,   227,
+     228,   229,   230,   231,   232,   233,   234,   235,   236,   237,
+     238,   239,   240,   241,   242,   243,   244,   245,   246,   247,
+     248,   249,   250,   251,   252,   253,   254,   255,   256,   257,
+     258,   259,   260,   261,   262,   263,   264,   265,   266,   267,
+     268,   269,   270,   271,   272,   273,   274,   275,   276,   277,
+     278,   279,   280,   281,   282,   283,   284,   285,   286,   287,
+     288,   289,   290,   291,   292,   293,   294,   295,   296,   297,
+     298,   299,   300,   301,   302,   303,   304,   305,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   306,
+     307,   308,   309,   310,   311,   312,   313,   314,   315,   316,
+     317,   318,   319,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,   307,   308,   309,   310,   311,   312,   313,   314,   315,
+     316,   317,   318,   319,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,   307,   308,   309,   310,   311,   312,   313,   314,
+     315,   316,   317,   318,   319,   217,   218,   219,   220,   221,
      222,   223,   224,   225,   226,   227,   228,   229,   230,   231,
      232,   233,   234,   235,   236,   237,   238,   239,   240,   241,
      242,   243,   244,   245,   246,   247,   248,   249,   250,   251,
@@ -5516,31 +5604,11 @@ namespace yy {
      272,   273,   274,   275,   276,   277,   278,   279,   280,   281,
      282,   283,   284,   285,   286,   287,   288,   289,   290,   291,
      292,   293,   294,   295,   296,   297,   298,   299,   300,   301,
-     302,   303,   304,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,   349,     0,   306,   307,
-     308,   309,   310,   311,   312,   313,   314,   315,   316,   317,
-     318,     0,   418,   419,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,   349,     0,   306,   307,   308,
-     309,   310,   311,   312,   313,   314,   315,   316,   317,   318,
-       0,   421,   422,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,   349,     0,   306,   307,   308,   309,
-     310,   311,   312,   313,   314,   315,   316,   317,   318,     0,
-     424,   425,   214,   215,   216,   217,   218,   219,   220,   221,
+     302,   303,   304,   305,     0,     0,     0,     0,   434,   435,
+     436,   437,   438,   439,   440,   441,   442,   443,   444,   445,
+     446,   447,   448,   449,   450,   451,   452,   453,   454,   455,
+       0,   456,   457,   458,   459,   460,   461,   462,   463,   464,
+     465,   466,   467,   468,   469,   217,   218,   219,   220,   221,
      222,   223,   224,   225,   226,   227,   228,   229,   230,   231,
      232,   233,   234,   235,   236,   237,   238,   239,   240,   241,
      242,   243,   244,   245,   246,   247,   248,   249,   250,   251,
@@ -5549,233 +5617,178 @@ namespace yy {
      272,   273,   274,   275,   276,   277,   278,   279,   280,   281,
      282,   283,   284,   285,   286,   287,   288,   289,   290,   291,
      292,   293,   294,   295,   296,   297,   298,   299,   300,   301,
-     302,   303,   304,   214,   215,   216,   217,   218,   219,   220,
-     221,   222,   223,   224,   225,   226,   227,   228,   229,   230,
-     231,   232,   233,   234,   235,   236,   237,   238,   239,   240,
-     241,   242,   243,   244,   245,   246,   247,   248,   249,   250,
-     251,   252,   253,   254,   255,   256,   257,   258,   259,   260,
-     261,   262,   263,   264,   265,   266,   267,   268,   269,   270,
-     271,   272,   273,   274,   275,   276,   277,   278,   279,   280,
-     281,   282,   283,   284,   285,   286,   287,   288,   289,   290,
-     291,   292,   293,   294,   295,   296,   297,   298,   299,   300,
-     301,   302,   303,   304,   481,   482,   216,   217,   218,   219,
-     220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
-     230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
-     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
-     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
-     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
-     270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
-     280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
-     290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
-     300,   301,   302,   303,   304,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,   305,   306,   307,   308,   309,
-     310,   311,   312,   313,   314,   315,   316,   317,   318,     0,
+     302,   303,   304,   305,     0,     0,     0,     0,     0,   435,
+     436,   437,   438,   439,   440,   441,   442,   443,   444,   445,
+     446,   447,   448,   449,   450,   451,   452,   453,   454,   455,
+       0,   456,   457,   458,   459,   460,   461,   462,   463,   464,
+     465,   466,   467,   468,   469,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,   306,   307,   308,
+       0,     0,     0,     0,     0,     0,   350,     0,   307,   308,
      309,   310,   311,   312,   313,   314,   315,   316,   317,   318,
+     319,   217,   218,   219,   220,   221,   222,   223,   224,   225,
+     226,   227,   228,   229,   230,   231,   232,   233,   234,   235,
+     236,   237,   238,   239,   240,   241,   242,   243,   244,   245,
+     246,   247,   248,   249,   250,   251,   252,   253,   254,   255,
+     256,   257,   258,   259,   260,   261,   262,   263,   264,   265,
+     266,   267,   268,   269,   270,   271,   272,   273,   274,   275,
+     276,   277,   278,   279,   280,   281,   282,   283,   284,   285,
+     286,   287,   288,   289,   290,   291,   292,   293,   294,   295,
+     296,   297,   298,   299,   300,   301,   302,   303,   304,   305,
+       0,     0,     0,     0,   337,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   306,   307,
-     308,   309,   310,   311,   312,   313,   314,   315,   316,   317,
-     318,   216,   217,   218,   219,   220,   221,   222,   223,   224,
-     225,   226,   227,   228,   229,   230,   231,   232,   233,   234,
-     235,   236,   237,   238,   239,   240,   241,   242,   243,   244,
-     245,   246,   247,   248,   249,   250,   251,   252,   253,   254,
-     255,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-       0,     0,     0,     0,   433,   434,   435,   436,   437,   438,
-     439,   440,   441,   442,   443,   444,   445,   446,   447,   448,
-     449,   450,   451,   452,   453,   454,     0,   455,   456,   457,
-     458,   459,   460,   461,   462,   463,   464,   465,   466,   467,
-     468,   216,   217,   218,   219,   220,   221,   222,   223,   224,
-     225,   226,   227,   228,   229,   230,   231,   232,   233,   234,
-     235,   236,   237,   238,   239,   240,   241,   242,   243,   244,
-     245,   246,   247,   248,   249,   250,   251,   252,   253,   254,
-     255,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-       0,     0,     0,     0,     0,   434,   435,   436,   437,   438,
-     439,   440,   441,   442,   443,   444,   445,   446,   447,   448,
-     449,   450,   451,   452,   453,   454,     0,   455,   456,   457,
-     458,   459,   460,   461,   462,   463,   464,   465,   466,   467,
-     468,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,   349,     0,   306,   307,   308,   309,   310,   311,   312,
-     313,   314,   315,   316,   317,   318,   216,   217,   218,   219,
-     220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
-     230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
-     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
-     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
-     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
-     270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
-     280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
-     290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
-     300,   301,   302,   303,   304,     0,     0,     0,     0,   336,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,   349,     0,   306,   307,   308,   309,   310,   311,   312,
-     313,   314,   315,   316,   317,   318,   216,   217,   218,   219,
-     220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
-     230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
-     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
-     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
-     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
-     270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
-     280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
-     290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
-     300,   301,   302,   303,   304,   216,   217,   218,   219,   220,
-     221,   222,   223,   224,   225,   226,   227,   228,   229,   230,
-     231,   232,   233,   234,   235,   236,   237,   238,   239,   240,
-     241,   242,   243,   244,   245,   246,   247,   248,   249,   250,
-     251,   252,   253,   254,   255,   256,   257,   258,   259,   260,
-     261,   262,   263,   264,   265,   266,   267,   268,   269,   270,
-     271,   272,   273,   274,   275,   276,   277,   278,   279,   280,
-     281,   282,   283,   284,   285,   286,   287,   288,   289,   290,
-     291,   292,   293,   294,   295,   296,   297,   298,   299,   300,
-     301,   302,   303,   304,     0,     0,     0,     0,   306,   307,
-     308,   309,   310,   311,   312,   313,   314,   315,   316,   317,
-     318,   216,   217,   218,   219,   220,   221,   222,   223,   224,
-     225,   226,   227,   228,   229,   230,   231,   232,   233,   234,
-     235,   236,   237,   238,   239,   240,   241,   242,   243,   244,
-     245,   246,   247,   248,   249,   250,   251,   252,   253,   254,
-     255,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-       0,     0,     1,     0,     0,     0,     2,     3,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,   349,     0,   306,   307,
-     308,   309,   310,   311,   312,   313,   314,   315,   316,   317,
-     318,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,   476,     0,   306,   307,   308,
+       0,     0,     0,     0,     0,     0,   350,     0,   307,   308,
      309,   310,   311,   312,   313,   314,   315,   316,   317,   318,
+     319,   217,   218,   219,   220,   221,   222,   223,   224,   225,
+     226,   227,   228,   229,   230,   231,   232,   233,   234,   235,
+     236,   237,   238,   239,   240,   241,   242,   243,   244,   245,
+     246,   247,   248,   249,   250,   251,   252,   253,   254,   255,
+     256,   257,   258,   259,   260,   261,   262,   263,   264,   265,
+     266,   267,   268,   269,   270,   271,   272,   273,   274,   275,
+     276,   277,   278,   279,   280,   281,   282,   283,   284,   285,
+     286,   287,   288,   289,   290,   291,   292,   293,   294,   295,
+     296,   297,   298,   299,   300,   301,   302,   303,   304,   305,
+     217,   218,   219,   220,   221,   222,   223,   224,   225,   226,
+     227,   228,   229,   230,   231,   232,   233,   234,   235,   236,
+     237,   238,   239,   240,   241,   242,   243,   244,   245,   246,
+     247,   248,   249,   250,   251,   252,   253,   254,   255,   256,
+     257,   258,   259,   260,   261,   262,   263,   264,   265,   266,
+     267,   268,   269,   270,   271,   272,   273,   274,   275,   276,
+     277,   278,   279,   280,   281,   282,   283,   284,   285,   286,
+     287,   288,   289,   290,   291,   292,   293,   294,   295,   296,
+     297,   298,   299,   300,   301,   302,   303,   304,   305,     0,
+       0,     0,     0,     0,   307,   308,   309,   310,   311,   312,
+     313,   314,   315,   316,   317,   318,   319,   217,   218,   219,
+     220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
+     230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
+     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
+     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
+     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
+     270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
+     280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
+     290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
+     300,   301,   302,   303,   304,   305,     0,     0,     1,     0,
+       0,     0,     2,     3,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     4,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,   334,
-       0,     0,     0,     2,     3,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,   306,   307,   308,   309,   310,   311,   312,
-     313,   314,   315,   316,   317,   318,     5,     6,     7,     8,
-       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
-      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
-      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
-      59,    60,    61,    62,    63,    64,    65,    66,    67,     4,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      68,    69,    70,    71,    72,    73,    74,    75,    76,    77,
-      78,    79,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,   350,     0,   307,   308,   309,   310,   311,   312,
+     313,   314,   315,   316,   317,   318,   319,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     5,     6,     7,     8,     9,    10,    11,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,   477,     0,   307,   308,   309,   310,   311,   312,   313,
+     314,   315,   316,   317,   318,   319,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     4,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,   335,     0,     0,     0,
+       2,     3,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     307,   308,   309,   310,   311,   312,   313,   314,   315,   316,
+     317,   318,   319,     5,     6,     7,     8,     9,    10,    11,
       12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
       22,    23,    24,    25,    26,    27,    28,    29,    30,    31,
       32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
       42,    43,    44,    45,    46,    47,    48,    49,    50,    51,
       52,    53,    54,    55,    56,    57,    58,    59,    60,    61,
-      62,    63,    64,    65,    66,    67,   113,     0,     0,     0,
+      62,    63,    64,    65,    66,    67,     4,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,    68,    69,    70,
       71,    72,    73,    74,    75,    76,    77,    78,    79,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-     114,   115,   116,   117,   118,   119,   120,   121,   122,   123,
-     124,   125,   126,   127,   128,   129,   130,   131,   132,   133,
-     134,   135,   136,   137,   138,   139,   140,   141,   142,   143,
-     144,   145,   146,   147,   148,   149,   150,   151,   152,   153,
-     154,   155,   156,   157,   158,   159,   160,   161,   162,   163,
-     164,   165,   166,   167,   168,   169,   170,   171,   172,   173,
-     174,   175,   176,   177,   178,   179,   180,   181,   182,   183,
-     184,   185,   186,   187,   188,   189,   190,   191,   192,   193,
-     194,   195,   196,   197,   198,   199,   200,   201,   202,   203,
-     204
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     5,     6,     7,     8,     9,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
+      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
+      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
+      64,    65,    66,    67,   113,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    68,    69,    70,    71,    72,
+      73,    74,    75,    76,    77,    78,    79,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   114,   115,
+     116,   117,   118,   119,   120,   121,   122,   123,   124,   125,
+     126,   127,   128,   129,   130,   131,   132,   133,   134,   135,
+     136,   137,   138,   139,   140,   141,   142,   143,   144,   145,
+     146,   147,   148,   149,   150,   151,   152,   153,   154,   155,
+     156,   157,   158,   159,   160,   161,   162,   163,   164,   165,
+     166,   167,   168,   169,   170,   171,   172,   173,   174,   175,
+     176,   177,   178,   179,   180,   181,   182,   183,   184,   185,
+     186,   187,   188,   189,   190,   191,   192,   193,   194,   195,
+     196,   197,   198,   199,   200,   201,   202,   203,   204,   205
   };
 
   const short int
   seclang_parser::yycheck_[] =
   {
-      59,    60,    61,   297,    49,    60,    61,   140,     3,   142,
-       6,    99,     3,   307,     6,   300,   301,    62,   151,    78,
-     305,   205,   299,    78,    80,   302,   159,   160,   161,   306,
-     300,   301,   433,   166,    79,   305,   300,   301,   300,   301,
-     298,   305,   300,   301,   298,   305,   300,   301,   100,   101,
-     102,   141,   142,   360,   113,   143,   144,   145,   146,   147,
-     148,   149,   150,   151,   152,   153,   154,   155,   156,   157,
-     158,   159,   160,   161,   162,   163,   164,   165,   166,   167,
-     168,   169,   170,   171,   172,   173,   174,   175,   176,   177,
-     178,   179,   180,   181,   182,   183,   184,   185,   186,   187,
-     188,   189,   190,   191,   192,   193,   194,   195,   196,   197,
-     198,   199,   200,   201,   202,   203,   204,   205,   206,   207,
-     208,   209,   210,   211,   212,   213,   214,   215,   216,   217,
-     218,   219,   220,   221,   222,   223,   224,   225,   226,   227,
-     228,   229,   230,   231,   232,   233,   300,   301,   281,   300,
-     301,   300,   301,   300,   301,   214,   215,   303,   304,   300,
-     301,   303,   304,   300,   301,   298,   299,   300,   301,   302,
-     300,   301,   300,   301,   300,   301,   300,   301,   300,   301,
-     336,   337,    -1,   336,   337,    -1,   336,   337,   336,   337,
-      -1,   336,   337,   336,   337,    -1,   336,   337,    -1,   332,
-     336,   337,   336,   337,   336,   337,    -1,   336,   337,   336,
-     337,   336,   337,   336,   337,   336,   337,   336,   337,   336,
-     337,   336,   337,   336,   337,   336,   337,   336,   337,   336,
-     337,   336,   337,   321,   336,   337,   336,   337,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,   305,    -1,    -1,    -1,
+      59,    60,    61,   298,    49,    60,    61,   300,     3,   141,
+     303,   143,    99,   308,   307,     3,     6,    62,    80,    78,
+     152,   301,   302,    78,   301,   302,   306,     6,   160,   161,
+     162,   301,   302,   206,    79,   167,   306,   301,   302,   141,
+     142,   299,   306,   301,   302,   299,   434,   301,   302,   100,
+     101,   102,   301,   302,   113,   306,   143,   144,   145,   146,
+     147,   148,   149,   150,   151,   152,   153,   154,   155,   156,
+     157,   158,   159,   160,   161,   162,   163,   164,   165,   166,
+     167,   168,   169,   170,   171,   172,   173,   174,   175,   176,
+     177,   178,   179,   180,   181,   182,   183,   184,   185,   186,
+     187,   188,   189,   190,   191,   192,   193,   194,   195,   196,
+     197,   198,   199,   200,   201,   202,   203,   204,   205,   206,
+     207,   208,   209,   210,   211,   212,   213,   214,   215,   216,
+     217,   218,   219,   220,   221,   222,   223,   224,   225,   226,
+     227,   228,   229,   230,   231,   232,   233,   234,   301,   302,
+     282,   301,   302,   301,   302,   361,   215,   216,   304,   305,
+     301,   302,   304,   305,   301,   302,    -1,   299,   300,   301,
+     302,   303,   301,   302,   301,   302,   301,   302,   301,   302,
+     301,   302,   337,   338,    -1,   337,   338,    -1,   337,   338,
+     337,   338,   337,   338,   337,   338,    -1,   337,   338,   337,
+     338,   333,   337,   338,   337,   338,   337,   338,    -1,   337,
+     338,   337,   338,   337,   338,   337,   338,   337,   338,   337,
+     338,   337,   338,   337,   338,   337,   338,   337,   338,   337,
+     338,   337,   338,   337,   338,   322,   337,   338,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,   306,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,   336,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   337,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,   351,   352,   353,   354,   355,   356,   357,   358,
-     433,   434,   435,   436,    -1,    -1,   439,   440,   441,    -1,
-     443,   444,   445,   446,   447,   448,   449,   450,   451,   452,
-     453,   454,   455,   456,   457,   321,   459,   460,   461,   462,
-     321,    -1,   465,   466,   467,   468,    -1,    -1,    -1,    -1,
-     473,   474,   475,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-     409,    -1,    -1,    -1,    -1,   414,    -1,    -1,   417,    -1,
-      -1,   420,    -1,    -1,   423,    -1,    -1,   426,    -1,    -1,
-      -1,    -1,    -1,   432,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,   352,   353,   354,   355,   356,   357,   358,
+     359,    -1,   434,   435,   436,   437,    -1,    -1,   440,   441,
+     442,    -1,   444,   445,   446,   447,   448,   449,   450,   451,
+     452,   453,   454,   455,   456,   457,   458,   322,   460,   461,
+     462,   463,   322,    -1,   466,   467,   468,   469,    -1,    -1,
+      -1,    -1,   474,   475,   476,    -1,    -1,    -1,    -1,    -1,
+      -1,   410,    -1,    -1,    -1,    -1,   415,    -1,    -1,   418,
+      -1,    -1,   421,    -1,    -1,   424,    -1,    -1,   427,    -1,
+      -1,    -1,    -1,    -1,   433,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,   471,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,   481,   482,   469,    -1,   485,   486,   487,   488,
+      -1,    -1,    -1,   472,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,   482,   483,   470,    -1,   486,   487,   488,
      489,   490,   491,   492,   493,   494,   495,   496,   497,   498,
      499,   500,   501,   502,   503,   504,   505,   506,   507,   508,
-     509,   510,   511,   512,   513,   514,    -1,   516,   517,   518,
+     509,   510,   511,   512,   513,   514,   515,    -1,   517,   518,
+     519,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
+      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
+      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
+      59,    60,    61,    62,    63,    64,    65,    66,    67,    68,
+      69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
       10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
       20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
       30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
@@ -5793,7 +5806,31 @@ namespace yy {
       61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
       71,    72,    73,    74,    75,    76,    77,    78,    79,    80,
       81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
-      91,    92,    93,    94,    95,    96,    97,    98,    10,    11,
+      91,    92,    93,    94,    95,    96,    97,    98,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,   321,    -1,   323,   324,   325,   326,   327,   328,
+     329,   330,   331,   332,   333,   334,   335,    -1,   337,   338,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,   321,    -1,   323,   324,   325,   326,   327,   328,   329,
+     330,   331,   332,   333,   334,   335,    -1,   337,   338,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+     321,    -1,   323,   324,   325,   326,   327,   328,   329,   330,
+     331,   332,   333,   334,   335,    -1,   337,   338,    10,    11,
       12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
       22,    23,    24,    25,    26,    27,    28,    29,    30,    31,
       32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
@@ -5802,100 +5839,16 @@ namespace yy {
       62,    63,    64,    65,    66,    67,    68,    69,    70,    71,
       72,    73,    74,    75,    76,    77,    78,    79,    80,    81,
       82,    83,    84,    85,    86,    87,    88,    89,    90,    91,
-      92,    93,    94,    95,    96,    97,    98,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-     320,    -1,   322,   323,   324,   325,   326,   327,   328,   329,
-     330,   331,   332,   333,   334,    -1,   336,   337,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   320,
-      -1,   322,   323,   324,   325,   326,   327,   328,   329,   330,
-     331,   332,   333,   334,    -1,   336,   337,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   320,    -1,
-     322,   323,   324,   325,   326,   327,   328,   329,   330,   331,
-     332,   333,   334,    -1,   336,   337,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
-      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
-      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
-      64,    65,    66,    67,    68,    69,    70,    71,    72,    73,
-      74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
-      94,    95,    96,    97,    98,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
-      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
-      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
-      95,    96,    97,    98,    10,    11,    12,    13,    14,    15,
-      16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
-      26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
-      46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
-      56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
-      66,    67,    68,    69,    70,    71,    72,    73,    74,    75,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
-      96,    97,    98,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,   320,    -1,   322,   323,
-     324,   325,   326,   327,   328,   329,   330,   331,   332,   333,
-     334,    -1,   336,   337,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,   320,    -1,   322,   323,   324,
-     325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-      -1,   336,   337,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,   320,    -1,   322,   323,   324,   325,
-     326,   327,   328,   329,   330,   331,   332,   333,   334,    -1,
-     336,   337,     8,     9,    10,    11,    12,    13,    14,    15,
-      16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
-      26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
-      46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
-      56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
-      66,    67,    68,    69,    70,    71,    72,    73,    74,    75,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
-      96,    97,    98,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
-      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
-      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
-      95,    96,    97,    98,     8,     9,    10,    11,    12,    13,
+      92,    93,    94,    95,    96,    97,    98,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
+      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
+      43,    44,    45,    46,    47,    48,    49,    50,    51,    52,
+      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
+      63,    64,    65,    66,    67,    68,    69,    70,    71,    72,
+      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,    97,    98,    10,    11,    12,    13,
       14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
       24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
       34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
@@ -5908,81 +5861,78 @@ namespace yy {
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,   321,   322,   323,   324,   325,
-     326,   327,   328,   329,   330,   331,   332,   333,   334,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   321,
+      -1,   323,   324,   325,   326,   327,   328,   329,   330,   331,
+     332,   333,   334,   335,    -1,   337,   338,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,   322,   323,   324,
-     325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   321,    -1,
+     323,   324,   325,   326,   327,   328,   329,   330,   331,   332,
+     333,   334,   335,    -1,   337,   338,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   322,   323,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,   321,    -1,   323,
      324,   325,   326,   327,   328,   329,   330,   331,   332,   333,
-     334,    10,    11,    12,    13,    14,    15,    16,    17,    18,
-      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
-      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
-      59,    60,    61,    62,    63,    64,    65,    66,    67,    68,
-      69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
-      89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
-      -1,    -1,    -1,    -1,   103,   104,   105,   106,   107,   108,
-     109,   110,   111,   112,   113,   114,   115,   116,   117,   118,
-     119,   120,   121,   122,   123,   124,    -1,   126,   127,   128,
-     129,   130,   131,   132,   133,   134,   135,   136,   137,   138,
-     139,    10,    11,    12,    13,    14,    15,    16,    17,    18,
-      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
-      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
-      59,    60,    61,    62,    63,    64,    65,    66,    67,    68,
-      69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
-      89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
-      -1,    -1,    -1,    -1,    -1,   104,   105,   106,   107,   108,
-     109,   110,   111,   112,   113,   114,   115,   116,   117,   118,
-     119,   120,   121,   122,   123,   124,    -1,   126,   127,   128,
-     129,   130,   131,   132,   133,   134,   135,   136,   137,   138,
-     139,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+     334,   335,    -1,   337,   338,     8,     9,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
+      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
+      43,    44,    45,    46,    47,    48,    49,    50,    51,    52,
+      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
+      63,    64,    65,    66,    67,    68,    69,    70,    71,    72,
+      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,    97,    98,     8,     9,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
+      22,    23,    24,    25,    26,    27,    28,    29,    30,    31,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      42,    43,    44,    45,    46,    47,    48,    49,    50,    51,
+      52,    53,    54,    55,    56,    57,    58,    59,    60,    61,
+      62,    63,    64,    65,    66,    67,    68,    69,    70,    71,
+      72,    73,    74,    75,    76,    77,    78,    79,    80,    81,
+      82,    83,    84,    85,    86,    87,    88,    89,    90,    91,
+      92,    93,    94,    95,    96,    97,    98,     8,     9,    10,
+      11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
+      21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
+      31,    32,    33,    34,    35,    36,    37,    38,    39,    40,
+      41,    42,    43,    44,    45,    46,    47,    48,    49,    50,
+      51,    52,    53,    54,    55,    56,    57,    58,    59,    60,
+      61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
+      71,    72,    73,    74,    75,    76,    77,    78,    79,    80,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    93,    94,    95,    96,    97,    98,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   322,
+     323,   324,   325,   326,   327,   328,   329,   330,   331,   332,
+     333,   334,   335,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,   320,    -1,   322,   323,   324,   325,   326,   327,   328,
-     329,   330,   331,   332,   333,   334,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
-      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
-      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
-      64,    65,    66,    67,    68,    69,    70,    71,    72,    73,
-      74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
-      94,    95,    96,    97,    98,    -1,    -1,    -1,    -1,   103,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,   320,    -1,   322,   323,   324,   325,   326,   327,   328,
-     329,   330,   331,   332,   333,   334,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
-      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
-      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
-      64,    65,    66,    67,    68,    69,    70,    71,    72,    73,
-      74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
-      94,    95,    96,    97,    98,    10,    11,    12,    13,    14,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,   323,   324,   325,   326,   327,   328,   329,   330,   331,
+     332,   333,   334,   335,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,   323,   324,   325,   326,   327,   328,   329,   330,
+     331,   332,   333,   334,   335,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
       35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
@@ -5991,9 +5941,31 @@ namespace yy {
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
       75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
       85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
-      95,    96,    97,    98,    -1,    -1,    -1,    -1,   322,   323,
-     324,   325,   326,   327,   328,   329,   330,   331,   332,   333,
-     334,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      95,    96,    97,    98,    -1,    -1,    -1,    -1,   103,   104,
+     105,   106,   107,   108,   109,   110,   111,   112,   113,   114,
+     115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
+      -1,   126,   127,   128,   129,   130,   131,   132,   133,   134,
+     135,   136,   137,   138,   139,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
+      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
+      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,    97,    98,    -1,    -1,    -1,    -1,    -1,   104,
+     105,   106,   107,   108,   109,   110,   111,   112,   113,   114,
+     115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
+      -1,   126,   127,   128,   129,   130,   131,   132,   133,   134,
+     135,   136,   137,   138,   139,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,   321,    -1,   323,   324,
+     325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
+     335,    10,    11,    12,    13,    14,    15,    16,    17,    18,
       19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
       29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
       39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
@@ -6002,83 +5974,115 @@ namespace yy {
       69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
       79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
       89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
-      -1,    -1,     0,    -1,    -1,    -1,     4,     5,    -1,    -1,
+      -1,    -1,    -1,    -1,   103,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,   320,    -1,   322,   323,
-     324,   325,   326,   327,   328,   329,   330,   331,   332,   333,
-     334,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,   320,    -1,   322,   323,   324,
+      -1,    -1,    -1,    -1,    -1,    -1,   321,    -1,   323,   324,
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
+     335,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
+      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
+      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
+      59,    60,    61,    62,    63,    64,    65,    66,    67,    68,
+      69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    44,    45,    46,    47,    48,    49,
+      50,    51,    52,    53,    54,    55,    56,    57,    58,    59,
+      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
+      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
+      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,    97,    98,    -1,
+      -1,    -1,    -1,    -1,   323,   324,   325,   326,   327,   328,
+     329,   330,   331,   332,   333,   334,   335,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
+      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
+      43,    44,    45,    46,    47,    48,    49,    50,    51,    52,
+      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
+      63,    64,    65,    66,    67,    68,    69,    70,    71,    72,
+      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,    97,    98,    -1,    -1,     0,    -1,
+      -1,    -1,     4,     5,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,   140,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,     0,
-      -1,    -1,    -1,     4,     5,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,   322,   323,   324,   325,   326,   327,   328,
-     329,   330,   331,   332,   333,   334,   234,   235,   236,   237,
-     238,   239,   240,   241,   242,   243,   244,   245,   246,   247,
-     248,   249,   250,   251,   252,   253,   254,   255,   256,   257,
-     258,   259,   260,   261,   262,   263,   264,   265,   266,   267,
-     268,   269,   270,   271,   272,   273,   274,   275,   276,   277,
-     278,   279,   280,   281,   282,   283,   284,   285,   286,   287,
-     288,   289,   290,   291,   292,   293,   294,   295,   296,   140,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-     308,   309,   310,   311,   312,   313,   314,   315,   316,   317,
-     318,   319,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,   234,   235,   236,   237,   238,   239,   240,
-     241,   242,   243,   244,   245,   246,   247,   248,   249,   250,
-     251,   252,   253,   254,   255,   256,   257,   258,   259,   260,
-     261,   262,   263,   264,   265,   266,   267,   268,   269,   270,
-     271,   272,   273,   274,   275,   276,   277,   278,   279,   280,
-     281,   282,   283,   284,   285,   286,   287,   288,   289,   290,
-     291,   292,   293,   294,   295,   296,    99,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,   308,   309,   310,
-     311,   312,   313,   314,   315,   316,   317,   318,   319,    -1,
+      -1,    -1,   321,    -1,   323,   324,   325,   326,   327,   328,
+     329,   330,   331,   332,   333,   334,   335,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-     143,   144,   145,   146,   147,   148,   149,   150,   151,   152,
-     153,   154,   155,   156,   157,   158,   159,   160,   161,   162,
-     163,   164,   165,   166,   167,   168,   169,   170,   171,   172,
-     173,   174,   175,   176,   177,   178,   179,   180,   181,   182,
-     183,   184,   185,   186,   187,   188,   189,   190,   191,   192,
-     193,   194,   195,   196,   197,   198,   199,   200,   201,   202,
-     203,   204,   205,   206,   207,   208,   209,   210,   211,   212,
-     213,   214,   215,   216,   217,   218,   219,   220,   221,   222,
-     223,   224,   225,   226,   227,   228,   229,   230,   231,   232,
-     233
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,   321,    -1,   323,   324,   325,   326,   327,   328,   329,
+     330,   331,   332,   333,   334,   335,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   140,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,     0,    -1,    -1,    -1,
+       4,     5,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+     323,   324,   325,   326,   327,   328,   329,   330,   331,   332,
+     333,   334,   335,   235,   236,   237,   238,   239,   240,   241,
+     242,   243,   244,   245,   246,   247,   248,   249,   250,   251,
+     252,   253,   254,   255,   256,   257,   258,   259,   260,   261,
+     262,   263,   264,   265,   266,   267,   268,   269,   270,   271,
+     272,   273,   274,   275,   276,   277,   278,   279,   280,   281,
+     282,   283,   284,   285,   286,   287,   288,   289,   290,   291,
+     292,   293,   294,   295,   296,   297,   140,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,   309,   310,   311,
+     312,   313,   314,   315,   316,   317,   318,   319,   320,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,   235,   236,   237,   238,   239,   240,   241,   242,   243,
+     244,   245,   246,   247,   248,   249,   250,   251,   252,   253,
+     254,   255,   256,   257,   258,   259,   260,   261,   262,   263,
+     264,   265,   266,   267,   268,   269,   270,   271,   272,   273,
+     274,   275,   276,   277,   278,   279,   280,   281,   282,   283,
+     284,   285,   286,   287,   288,   289,   290,   291,   292,   293,
+     294,   295,   296,   297,    99,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,   309,   310,   311,   312,   313,
+     314,   315,   316,   317,   318,   319,   320,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   143,   144,
+     145,   146,   147,   148,   149,   150,   151,   152,   153,   154,
+     155,   156,   157,   158,   159,   160,   161,   162,   163,   164,
+     165,   166,   167,   168,   169,   170,   171,   172,   173,   174,
+     175,   176,   177,   178,   179,   180,   181,   182,   183,   184,
+     185,   186,   187,   188,   189,   190,   191,   192,   193,   194,
+     195,   196,   197,   198,   199,   200,   201,   202,   203,   204,
+     205,   206,   207,   208,   209,   210,   211,   212,   213,   214,
+     215,   216,   217,   218,   219,   220,   221,   222,   223,   224,
+     225,   226,   227,   228,   229,   230,   231,   232,   233,   234
   };
 
   const unsigned short int
   seclang_parser::yystos_[] =
   {
-       0,     0,     4,     5,   140,   234,   235,   236,   237,   238,
-     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
-     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
-     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
-     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
-     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
-     289,   290,   291,   292,   293,   294,   295,   296,   308,   309,
-     310,   311,   312,   313,   314,   315,   316,   317,   318,   319,
-     339,   340,   341,   346,   300,   301,   141,   142,   300,   301,
-     300,   301,   305,   299,   302,   306,   300,   301,   300,   301,
-     300,   301,   303,   304,   300,   301,   303,   304,   300,   301,
-     298,   300,   301,    99,   143,   144,   145,   146,   147,   148,
+       0,     0,     4,     5,   140,   235,   236,   237,   238,   239,
+     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
+     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
+     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
+     270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
+     280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
+     290,   291,   292,   293,   294,   295,   296,   297,   309,   310,
+     311,   312,   313,   314,   315,   316,   317,   318,   319,   320,
+     340,   341,   342,   347,   301,   302,   141,   142,   301,   302,
+     301,   302,   306,   300,   303,   307,   301,   302,   301,   302,
+     301,   302,   304,   305,   301,   302,   304,   305,   301,   302,
+     299,   301,   302,    99,   143,   144,   145,   146,   147,   148,
      149,   150,   151,   152,   153,   154,   155,   156,   157,   158,
      159,   160,   161,   162,   163,   164,   165,   166,   167,   168,
      169,   170,   171,   172,   173,   174,   175,   176,   177,   178,
@@ -6087,77 +6091,60 @@ namespace yy {
      199,   200,   201,   202,   203,   204,   205,   206,   207,   208,
      209,   210,   211,   212,   213,   214,   215,   216,   217,   218,
      219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
-     229,   230,   231,   232,   233,   321,   342,   343,   350,   342,
-     300,   301,   297,   307,     8,     9,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
-      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
-      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
-      64,    65,    66,    67,    68,    69,    70,    71,    72,    73,
-      74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
-      94,    95,    96,    97,    98,   321,   322,   323,   324,   325,
-     326,   327,   328,   329,   330,   331,   332,   333,   334,   347,
-     348,   349,   347,   347,   342,   300,   301,   305,   300,   301,
-     300,   301,   347,   342,     0,   340,   103,   349,   351,   298,
-     300,   301,   300,   301,   305,   300,   301,   300,   301,   320,
-     349,   352,   352,   352,   352,   352,   352,   352,   352,   343,
-       3,   349,   349,   336,   337,   336,   337,   336,   337,   336,
-     337,   336,   337,   336,   337,   336,   337,   336,   337,   336,
-     337,   336,   337,   336,   337,   336,   337,   336,   337,   336,
-     337,   336,   337,   336,   337,   336,   337,   336,   337,   336,
-     337,   336,   337,   336,   337,   336,   337,   336,   337,   352,
-     336,   337,   336,   337,   352,   336,   337,   352,   336,   337,
-     352,   336,   337,   352,   336,   337,   352,   336,   337,   336,
-     337,   348,     6,   103,   104,   105,   106,   107,   108,   109,
-     110,   111,   112,   113,   114,   115,   116,   117,   118,   119,
-     120,   121,   122,   123,   124,   126,   127,   128,   129,   130,
-     131,   132,   133,   134,   135,   136,   137,   138,   139,   344,
-     345,   352,   349,   100,   101,   102,   320,   349,   321,   350,
-     321,     8,     9,   349,   345,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   342,   352,   352,   352,   349,
-     349
+     229,   230,   231,   232,   233,   234,   322,   343,   344,   351,
+     343,   301,   302,   298,   308,     8,     9,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
+      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
+      43,    44,    45,    46,    47,    48,    49,    50,    51,    52,
+      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
+      63,    64,    65,    66,    67,    68,    69,    70,    71,    72,
+      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,    97,    98,   322,   323,   324,   325,
+     326,   327,   328,   329,   330,   331,   332,   333,   334,   335,
+     348,   349,   350,   348,   348,   343,   301,   302,   306,   301,
+     302,   301,   302,   348,   343,     0,   341,   103,   350,   352,
+     299,   301,   302,   301,   302,   306,   301,   302,   301,   302,
+     321,   350,   353,   353,   353,   353,   353,   353,   353,   353,
+     344,     3,   350,   350,   337,   338,   337,   338,   337,   338,
+     337,   338,   337,   338,   337,   338,   337,   338,   337,   338,
+     337,   338,   337,   338,   337,   338,   337,   338,   337,   338,
+     337,   338,   337,   338,   337,   338,   337,   338,   337,   338,
+     337,   338,   337,   338,   337,   338,   337,   338,   337,   338,
+     353,   337,   338,   337,   338,   353,   337,   338,   353,   337,
+     338,   353,   337,   338,   353,   337,   338,   353,   337,   338,
+     337,   338,   349,     6,   103,   104,   105,   106,   107,   108,
+     109,   110,   111,   112,   113,   114,   115,   116,   117,   118,
+     119,   120,   121,   122,   123,   124,   126,   127,   128,   129,
+     130,   131,   132,   133,   134,   135,   136,   137,   138,   139,
+     345,   346,   353,   350,   100,   101,   102,   321,   350,   322,
+     351,   322,     8,     9,   350,   346,   353,   353,   353,   353,
+     353,   353,   353,   353,   353,   353,   353,   353,   353,   353,
+     353,   353,   353,   353,   353,   353,   353,   353,   353,   353,
+     353,   353,   353,   353,   353,   353,   343,   353,   353,   353,
+     350,   350
   };
 
   const unsigned short int
   seclang_parser::yyr1_[] =
   {
-       0,   338,   339,   339,   339,   340,   341,   341,   341,   341,
-     341,   341,   341,   341,   341,   341,   341,   341,   341,   341,
-     341,   341,   341,   341,   341,   341,   341,   341,   341,   342,
-     342,   343,   343,   344,   344,   344,   344,   345,   345,   345,
-     345,   345,   345,   345,   345,   345,   345,   345,   345,   345,
-     345,   345,   345,   345,   345,   345,   345,   345,   345,   345,
-     345,   345,   345,   345,   345,   345,   345,   345,   345,   345,
-     345,   345,   346,   346,   346,   346,   346,   346,   346,   346,
+       0,   339,   340,   340,   340,   341,   342,   342,   342,   342,
+     342,   342,   342,   342,   342,   342,   342,   342,   342,   342,
+     342,   342,   342,   342,   342,   342,   342,   342,   342,   343,
+     343,   344,   344,   345,   345,   345,   345,   346,   346,   346,
      346,   346,   346,   346,   346,   346,   346,   346,   346,   346,
      346,   346,   346,   346,   346,   346,   346,   346,   346,   346,
      346,   346,   346,   346,   346,   346,   346,   346,   346,   346,
-     346,   346,   346,   346,   346,   346,   346,   346,   346,   346,
-     346,   346,   346,   346,   346,   346,   346,   346,   346,   346,
-     346,   346,   346,   346,   346,   346,   346,   346,   346,   346,
-     346,   346,   346,   346,   346,   346,   346,   346,   346,   346,
-     346,   347,   347,   348,   348,   348,   348,   348,   348,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
-     349,   349,   349,   349,   349,   349,   349,   349,   349,   350,
+     346,   346,   347,   347,   347,   347,   347,   347,   347,   347,
+     347,   347,   347,   347,   347,   347,   347,   347,   347,   347,
+     347,   347,   347,   347,   347,   347,   347,   347,   347,   347,
+     347,   347,   347,   347,   347,   347,   347,   347,   347,   347,
+     347,   347,   347,   347,   347,   347,   347,   347,   347,   347,
+     347,   347,   347,   347,   347,   347,   347,   347,   347,   347,
+     347,   347,   347,   347,   347,   347,   347,   347,   347,   347,
+     347,   347,   347,   347,   347,   347,   347,   347,   347,   347,
+     347,   348,   348,   349,   349,   349,   349,   349,   349,   350,
      350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
      350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
      350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
@@ -6167,8 +6154,25 @@ namespace yy {
      350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
      350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
      350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
-     350,   350,   350,   350,   350,   350,   350,   351,   351,   351,
-     351,   351,   352,   352,   352,   352
+     350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
+     350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
+     350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
+     350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
+     350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
+     350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
+     350,   350,   350,   350,   350,   350,   350,   350,   350,   350,
+     350,   350,   350,   350,   350,   350,   350,   350,   350,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
+     351,   351,   351,   351,   351,   351,   351,   351,   352,   352,
+     352,   352,   352,   353,   353,   353,   353
   };
 
   const unsigned char
@@ -6208,16 +6212,16 @@ namespace yy {
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     2,     2,     2,     1,
-       1,     1,     2,     2,     2,     2,     2,     2,     2,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     2,
-       2,     1,     1,     2,     1,     1,     1,     1,     1,     1,
-       1,     1,     2,     1,     1,     1,     1,     1,     1,     1,
-       2,     2,     2,     2,     1,     1,     1,     1,     2,     1,
+       1,     1,     1,     2,     2,     2,     2,     2,     2,     2,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       2,     2,     1,     1,     2,     1,     1,     1,     1,     1,
+       1,     1,     1,     2,     1,     1,     1,     1,     1,     1,
+       1,     2,     2,     2,     2,     1,     1,     1,     1,     2,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     2,     1,     3,
-       3,     3,     2,     2,     1,     1
+       1,     1,     1,     1,     1,     1,     1,     1,     2,     1,
+       3,     3,     3,     2,     2,     1,     1
   };
 
 
@@ -6288,7 +6292,7 @@ namespace yy {
   "\"AuditLog\"", "\"Block\"", "\"Capture\"", "\"Chain\"",
   "\"ACTION_CTL_AUDIT_ENGINE\"", "\"ACTION_CTL_AUDIT_LOG_PARTS\"",
   "\"ACTION_CTL_BDY_JSON\"", "\"ACTION_CTL_BDY_XML\"",
-  "\"ACTION_CTL_FORCE_REQ_BODY_VAR\"",
+  "\"ACTION_CTL_BDY_URLENCODED\"", "\"ACTION_CTL_FORCE_REQ_BODY_VAR\"",
   "\"ACTION_CTL_REQUEST_BODY_ACCESS\"", "\"ACTION_CTL_RULE_REMOVE_BY_ID\"",
   "\"ACTION_CTL_RULE_REMOVE_BY_TAG\"",
   "\"ACTION_CTL_RULE_REMOVE_TARGET_BY_ID\"",
@@ -6402,50 +6406,50 @@ namespace yy {
   const unsigned short int
   seclang_parser::yyrline_[] =
   {
-       0,   739,   739,   743,   744,   747,   752,   758,   764,   768,
-     772,   778,   784,   790,   796,   801,   806,   812,   819,   823,
-     827,   833,   837,   841,   846,   851,   856,   861,   865,   872,
-     876,   883,   889,   899,   908,   918,   927,   940,   944,   948,
-     952,   956,   960,   964,   968,   972,   976,   981,   985,   989,
-     993,   997,  1002,  1007,  1011,  1015,  1019,  1023,  1027,  1031,
-    1035,  1039,  1043,  1047,  1051,  1055,  1059,  1063,  1067,  1071,
-    1075,  1079,  1093,  1094,  1118,  1137,  1152,  1176,  1232,  1236,
-    1240,  1244,  1248,  1252,  1256,  1260,  1264,  1273,  1277,  1282,
-    1285,  1290,  1295,  1300,  1305,  1308,  1313,  1316,  1321,  1326,
-    1329,  1334,  1339,  1344,  1349,  1354,  1359,  1364,  1367,  1372,
-    1377,  1382,  1387,  1390,  1395,  1400,  1405,  1418,  1431,  1444,
-    1457,  1470,  1496,  1522,  1534,  1554,  1582,  1587,  1592,  1601,
-    1606,  1610,  1614,  1618,  1622,  1626,  1630,  1635,  1640,  1652,
-    1658,  1662,  1666,  1677,  1686,  1687,  1694,  1699,  1704,  1709,
-    1716,  1724,  1728,  1735,  1740,  1746,  1752,  1758,  1765,  1775,
-    1779,  1783,  1787,  1791,  1795,  1799,  1803,  1807,  1811,  1815,
-    1819,  1823,  1827,  1831,  1835,  1839,  1843,  1847,  1851,  1855,
-    1859,  1863,  1867,  1871,  1875,  1879,  1883,  1887,  1891,  1895,
-    1899,  1903,  1907,  1911,  1915,  1919,  1923,  1927,  1931,  1935,
-    1939,  1943,  1947,  1951,  1955,  1959,  1963,  1967,  1971,  1975,
-    1979,  1983,  1987,  1991,  1995,  1999,  2003,  2007,  2011,  2015,
-    2019,  2023,  2027,  2031,  2035,  2039,  2043,  2047,  2051,  2055,
-    2059,  2063,  2067,  2071,  2075,  2079,  2083,  2087,  2091,  2095,
-    2099,  2103,  2107,  2111,  2115,  2119,  2123,  2127,  2131,  2136,
-    2140,  2144,  2149,  2153,  2157,  2162,  2167,  2171,  2175,  2179,
-    2183,  2187,  2191,  2195,  2199,  2203,  2207,  2211,  2215,  2219,
-    2223,  2227,  2231,  2235,  2239,  2243,  2247,  2251,  2255,  2259,
-    2263,  2267,  2271,  2275,  2279,  2283,  2287,  2291,  2295,  2299,
-    2303,  2307,  2311,  2315,  2319,  2323,  2327,  2331,  2335,  2339,
-    2343,  2347,  2351,  2355,  2359,  2363,  2367,  2371,  2375,  2379,
-    2383,  2387,  2391,  2395,  2399,  2403,  2407,  2415,  2422,  2429,
-    2436,  2443,  2450,  2457,  2464,  2471,  2478,  2485,  2492,  2502,
-    2506,  2510,  2514,  2518,  2522,  2526,  2530,  2535,  2540,  2545,
-    2549,  2553,  2557,  2562,  2567,  2571,  2575,  2579,  2583,  2587,
-    2591,  2595,  2599,  2603,  2607,  2611,  2616,  2620,  2625,  2629,
-    2633,  2637,  2641,  2645,  2649,  2653,  2657,  2661,  2665,  2669,
-    2673,  2677,  2681,  2685,  2689,  2693,  2697,  2701,  2705,  2709,
-    2713,  2717,  2721,  2725,  2729,  2733,  2737,  2741,  2745,  2749,
-    2753,  2757,  2761,  2765,  2769,  2773,  2777,  2781,  2785,  2789,
-    2793,  2797,  2801,  2805,  2809,  2813,  2817,  2821,  2825,  2829,
-    2833,  2837,  2841,  2845,  2849,  2853,  2857,  2861,  2865,  2869,
-    2873,  2877,  2881,  2885,  2889,  2893,  2897,  2904,  2908,  2912,
-    2916,  2920,  2927,  2932,  2937,  2943
+       0,   741,   741,   745,   746,   749,   754,   760,   766,   770,
+     774,   780,   786,   792,   798,   803,   808,   814,   821,   825,
+     829,   835,   839,   843,   848,   853,   858,   863,   867,   874,
+     878,   885,   891,   901,   910,   920,   929,   942,   946,   950,
+     954,   958,   962,   966,   970,   974,   978,   983,   987,   991,
+     995,   999,  1004,  1009,  1013,  1017,  1021,  1025,  1029,  1033,
+    1037,  1041,  1045,  1049,  1053,  1057,  1061,  1065,  1069,  1073,
+    1077,  1081,  1095,  1096,  1120,  1139,  1154,  1178,  1234,  1238,
+    1242,  1246,  1250,  1254,  1258,  1262,  1266,  1275,  1279,  1284,
+    1287,  1292,  1297,  1302,  1307,  1310,  1315,  1318,  1323,  1328,
+    1331,  1336,  1341,  1346,  1351,  1356,  1361,  1366,  1369,  1374,
+    1379,  1384,  1389,  1392,  1397,  1402,  1407,  1420,  1433,  1446,
+    1459,  1472,  1498,  1524,  1536,  1556,  1584,  1589,  1594,  1603,
+    1608,  1612,  1616,  1620,  1624,  1628,  1632,  1637,  1642,  1654,
+    1660,  1664,  1668,  1679,  1688,  1689,  1696,  1701,  1706,  1711,
+    1718,  1726,  1730,  1737,  1742,  1748,  1754,  1760,  1767,  1777,
+    1781,  1785,  1789,  1793,  1797,  1801,  1805,  1809,  1813,  1817,
+    1821,  1825,  1829,  1833,  1837,  1841,  1845,  1849,  1853,  1857,
+    1861,  1865,  1869,  1873,  1877,  1881,  1885,  1889,  1893,  1897,
+    1901,  1905,  1909,  1913,  1917,  1921,  1925,  1929,  1933,  1937,
+    1941,  1945,  1949,  1953,  1957,  1961,  1965,  1969,  1973,  1977,
+    1981,  1985,  1989,  1993,  1997,  2001,  2005,  2009,  2013,  2017,
+    2021,  2025,  2029,  2033,  2037,  2041,  2045,  2049,  2053,  2057,
+    2061,  2065,  2069,  2073,  2077,  2081,  2085,  2089,  2093,  2097,
+    2101,  2105,  2109,  2113,  2117,  2121,  2125,  2129,  2133,  2138,
+    2142,  2146,  2151,  2155,  2159,  2164,  2169,  2173,  2177,  2181,
+    2185,  2189,  2193,  2197,  2201,  2205,  2209,  2213,  2217,  2221,
+    2225,  2229,  2233,  2237,  2241,  2245,  2249,  2253,  2257,  2261,
+    2265,  2269,  2273,  2277,  2281,  2285,  2289,  2293,  2297,  2301,
+    2305,  2309,  2313,  2317,  2321,  2325,  2329,  2333,  2337,  2341,
+    2345,  2349,  2353,  2357,  2361,  2365,  2369,  2373,  2377,  2381,
+    2385,  2389,  2393,  2397,  2401,  2405,  2409,  2417,  2424,  2431,
+    2438,  2445,  2452,  2459,  2466,  2473,  2480,  2487,  2494,  2504,
+    2508,  2512,  2516,  2520,  2524,  2528,  2532,  2537,  2542,  2547,
+    2551,  2555,  2559,  2563,  2568,  2573,  2577,  2581,  2585,  2589,
+    2593,  2597,  2601,  2605,  2609,  2613,  2617,  2622,  2626,  2631,
+    2635,  2639,  2643,  2647,  2651,  2655,  2659,  2663,  2667,  2671,
+    2675,  2679,  2683,  2687,  2691,  2695,  2699,  2703,  2707,  2711,
+    2715,  2719,  2723,  2727,  2731,  2735,  2739,  2743,  2747,  2751,
+    2755,  2759,  2763,  2767,  2771,  2775,  2779,  2783,  2787,  2791,
+    2795,  2799,  2803,  2807,  2811,  2815,  2819,  2823,  2827,  2831,
+    2835,  2839,  2843,  2847,  2851,  2855,  2859,  2863,  2867,  2871,
+    2875,  2879,  2883,  2887,  2891,  2895,  2899,  2903,  2910,  2914,
+    2918,  2922,  2926,  2933,  2938,  2943,  2949
   };
 
   // Print the state stack on the debug stream.
@@ -6480,8 +6484,8 @@ namespace yy {
 
 
 } // yy
-#line 6484 "seclang-parser.cc" // lalr1.cc:1167
-#line 2950 "seclang-parser.yy" // lalr1.cc:1168
+#line 6488 "seclang-parser.cc" // lalr1.cc:1155
+#line 2956 "seclang-parser.yy" // lalr1.cc:1156
 
 
 void yy::seclang_parser::error (const location_type& l, const std::string& m) {
