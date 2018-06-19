@@ -196,7 +196,7 @@ char *get_env_var(request_rec *r, char *name) {
 /**
  * Retrieve waf log field.
  */
-void get_field_value(const char* from, const char* to, const char* text, char* output) {
+static void get_field_value(const char* from, const char* to, const char* text, char* output) {
     char* first = strstr(text, from);
     int first_index = first - text;
 
@@ -230,7 +230,7 @@ void get_field_value(const char* from, const char* to, const char* text, char* o
 /**
  * get ip and port number.
  */
-void get_ip_port(const char* ip_port, char* waf_ip, char* waf_port) {
+static void get_ip_port(const char* ip_port, char* waf_ip, char* waf_port) {
     char *comma = strstr(ip_port, ":");
     if (comma!= NULL) {
         strcpy(waf_port, comma+1);
@@ -244,7 +244,7 @@ void get_ip_port(const char* ip_port, char* waf_ip, char* waf_port) {
 /**
  * get detail_messages.
  */
-void get_detail_message(const char* str1, char* waf_detail_message) {
+static void get_detail_message(const char* str1, char* waf_detail_message) {
     char *end = strstr(str1, "[file ");
     if (end != NULL) {
         strncpy(waf_detail_message, str1, end - str1);
@@ -254,7 +254,7 @@ void get_detail_message(const char* str1, char* waf_detail_message) {
 /**
  * only expose short path.
  */
-void get_short_filename(char* waf_filename) {
+static void get_short_filename(char* waf_filename) {
     char tmp_filename[1024] = ""; 
     char *index = strstr(waf_filename, WAF_RULESET_PREFIX);
 
@@ -271,7 +271,7 @@ void get_short_filename(char* waf_filename) {
 /**
  * get crs type and version.
  */
-void get_ruleset_type_version(char* waf_ruleset_info, char* waf_ruleset_type, char* waf_ruleset_version) {
+static void get_ruleset_type_version(char* waf_ruleset_info, char* waf_ruleset_type, char* waf_ruleset_version) {
     char ruleset_info_no_quote[200] = "";
     char *type_start = NULL;
     char *type_end = NULL;
@@ -289,7 +289,7 @@ void get_ruleset_type_version(char* waf_ruleset_info, char* waf_ruleset_type, ch
     }
 }
 
-int write_file_with_lock(apr_global_mutex_t* lock, apr_file_t* fd, char* str) {
+static int write_file_with_lock(apr_global_mutex_t* lock, apr_file_t* fd, char* str) {
     int rc;
     apr_size_t nbytes, nbytes_written;
 
@@ -311,7 +311,7 @@ int write_file_with_lock(apr_global_mutex_t* lock, apr_file_t* fd, char* str) {
     return WAF_LOG_UTIL_SUCCESS;
 }
 
-char *waf_current_logtime(apr_pool_t *mp) {
+static char *waf_current_logtime(apr_pool_t *mp) {
     apr_time_exp_t t;
     char tstr[100];
     apr_size_t len;
@@ -325,7 +325,7 @@ char *waf_current_logtime(apr_pool_t *mp) {
 /**
  * send all waf fields in json format to a file.
  */
-void send_waf_log(apr_global_mutex_t* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, const char* time, int mode, const char* hostname, request_rec *r) {
+static void send_waf_log(apr_global_mutex_t* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, const char* time, int mode, const char* hostname, request_rec *r) {
     int rc = 0;
     char* json_str;
     char waf_filename[1024] = "";
