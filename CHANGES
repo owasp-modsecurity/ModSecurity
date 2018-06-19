@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Allow empty strings to be evaluated by regex::searchAll
+   [Issue #1799, #1785 - @victorhora, @XuanHuyDuong, @zimmerle]
  - Adds basic pkg-config info
    [Issue #1790 - @gquintard, @zimmerle]
  - Fixed LMDB collection errors
