@@ -17,7 +17,7 @@
 #include "src/collection/backend/in_memory-per_process.h"
 
 #ifdef __cplusplus
-#include <string>
+#include <string.h>
 #include <iostream>
 #include <unordered_map>
 #include <list>
@@ -106,7 +106,7 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
         }
     } else {
         for (auto &a : *this) {
-            if (a.first.compare(0, var.size(), var) == 0) {
+            if (strncasecmp(a.first.c_str(), var.c_str(), a.first.size()) == 0) {
                 l->insert(l->begin(), new VariableValue(&m_name, &var, &a.second));
             }
         }

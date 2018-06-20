@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix variables case sensitiveness
+   [Issue #1808 - @victorhora, @theMiddleBlue, @michaelgranzow-avi]
  - Allow empty strings to be evaluated by regex::searchAll
    [Issue #1799, #1785 - @victorhora, @XuanHuyDuong, @zimmerle]
  - Adds basic pkg-config info
