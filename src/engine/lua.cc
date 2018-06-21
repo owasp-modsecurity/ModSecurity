@@ -82,7 +82,7 @@ bool Lua::load(std::string script, std::string *err) {
         return false;
     }
 
-#ifdef WITH_LUA_5_2
+#if defined (WITH_LUA_5_2) || defined (WITH_LUA_5_1)
     if (lua_dump(L, Lua::blob_keeper, reinterpret_cast<void *>(&m_blob))) {
 #else
     if (lua_dump(L, Lua::blob_keeper, reinterpret_cast<void *>(&m_blob), 0)) {
@@ -138,8 +138,12 @@ int Lua::run(Transaction *t) {
     luaL_setfuncs(L, mscLuaLib, 0);
     lua_setglobal(L, "m");
 
+#ifdef WITH_LUA_5_1
+    int rc = lua_load(L, Lua::blob_reader, &m_blob, m_scriptName.c_str());
+#else
     int rc = lua_load(L, Lua::blob_reader, &m_blob, m_scriptName.c_str(),
         NULL);
+#endif
     if (rc != LUA_OK) {
         std::string e;
         e.assign("Failed to execute lua script: " + m_scriptName + ". ");
@@ -150,9 +154,11 @@ int Lua::run(Transaction *t) {
             case LUA_ERRMEM:
                 e.assign("Memory error. ");
                 break;
+#ifndef WITH_LUA_5_1
             case LUA_ERRGCMM:
                 e.assign("Garbage Collector error. ");
                 break;
+#endif
         }
         e.append(lua_tostring(L, -1));
 #ifndef NO_LOGS
@@ -402,7 +408,11 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
 
     if (lua_istable(L, idx)) {
         const char *name = NULL;
+#ifdef WITH_LUA_5_1
+        int i, n = lua_objlen(L, idx);
+#else
         int i, n = lua_rawlen(L, idx);
+#endif
 
         for (i = 1; i <= n; i++) {
             lua_rawgeti(L, idx, i);
