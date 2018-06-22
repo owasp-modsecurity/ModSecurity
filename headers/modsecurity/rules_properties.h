@@ -433,20 +433,27 @@ class RulesProperties {
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
             std::vector<modsecurity::Rule *> *rules_to = to+i;
             std::vector<modsecurity::Rule *> *rules_from = from+i;
+            // TODO: std::vector could be replaced with something more efficient.
+            std::vector<int64_t> v;
+            v.reserve(rules_to->size());
+            for (size_t z = 0; z < rules_to->size(); z++) {
+                Rule *rule_ckc = rules_to->at(z);
+                if (rule_ckc->m_secMarker == false) {
+                    continue;
+                }
+                v.push_back(rule_ckc->m_ruleId);
+            }
+            std::sort (v.begin(), v.end());
+
             for (size_t j = 0; j < rules_from->size(); j++) {
                 Rule *rule = rules_from->at(j);
-                for (size_t z = 0; z < rules_to->size(); z++) {
-                    Rule *rule_ckc = rules_to->at(z);
-                    if (rule_ckc->m_ruleId == rule->m_ruleId &&
-                        rule_ckc->m_secMarker == false &&
-                        rule->m_secMarker == false) {
-                        if (err != NULL) {
-                            *err << "Rule id: " \
-                                 << std::to_string(rule->m_ruleId) \
-                                 << " is duplicated" << std::endl;
-                        }
-                        return -1;
+                if (std::binary_search (v.begin(), v.end(), rule->m_ruleId)) {
+                    if (err != NULL) {
+                        *err << "Rule id: " \
+                            << std::to_string(rule->m_ruleId) \
+                            << " is duplicated" << std::endl;
                     }
+                    return -1;
                 }
                 amount_of_rules++;
                 rules_to->push_back(rule);
