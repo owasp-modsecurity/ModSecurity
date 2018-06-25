@@ -95,6 +95,7 @@ TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
 #ifdef WAF_JSON_LOGGING_ENABLE
 char DSOLOCAL *msc_waf_resourceId = "";
 char DSOLOCAL *msc_waf_instanceId = "";
+char DSOLOCAL *msc_waf_lock_owner = "root";
 #endif
 
 #if defined(WIN32) || defined(VERSION_NGINX)

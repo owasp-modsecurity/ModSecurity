@@ -742,25 +742,10 @@ class Waf_Format : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::std::string* release_operationname();
   void set_allocated_operationname(::std::string* operationname);
 
-  // optional string time = 3;
-  bool has_time() const;
-  void clear_time();
-  static const int kTimeFieldNumber = 3;
-  const ::std::string& time() const;
-  void set_time(const ::std::string& value);
-  #if LANG_CXX11
-  void set_time(::std::string&& value);
-  #endif
-  void set_time(const char* value);
-  void set_time(const char* value, size_t size);
-  ::std::string* mutable_time();
-  ::std::string* release_time();
-  void set_allocated_time(::std::string* time);
-
-  // optional string category = 4;
+  // optional string category = 3;
   bool has_category() const;
   void clear_category();
-  static const int kCategoryFieldNumber = 4;
+  static const int kCategoryFieldNumber = 3;
   const ::std::string& category() const;
   void set_category(const ::std::string& value);
   #if LANG_CXX11
@@ -772,10 +757,10 @@ class Waf_Format : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::std::string* release_category();
   void set_allocated_category(::std::string* category);
 
-  // optional .waf_format.Properties properties = 5;
+  // optional .waf_format.Properties properties = 4;
   bool has_properties() const;
   void clear_properties();
-  static const int kPropertiesFieldNumber = 5;
+  static const int kPropertiesFieldNumber = 4;
   const ::waf_format::Properties& properties() const;
   ::waf_format::Properties* release_properties();
   ::waf_format::Properties* mutable_properties();
@@ -787,8 +772,6 @@ class Waf_Format : public ::google::protobuf::Message /* @@protoc_insertion_poin
   void clear_has_resourceid();
   void set_has_operationname();
   void clear_has_operationname();
-  void set_has_time();
-  void clear_has_time();
   void set_has_category();
   void clear_has_category();
   void set_has_properties();
@@ -799,7 +782,6 @@ class Waf_Format : public ::google::protobuf::Message /* @@protoc_insertion_poin
   mutable int _cached_size_;
   ::google::protobuf::internal::ArenaStringPtr resourceid_;
   ::google::protobuf::internal::ArenaStringPtr operationname_;
-  ::google::protobuf::internal::ArenaStringPtr time_;
   ::google::protobuf::internal::ArenaStringPtr category_;
   ::waf_format::Properties* properties_;
   friend struct ::protobuf_waf_5fformat_2eproto::TableStruct;
@@ -1873,78 +1855,15 @@ inline void Waf_Format::set_allocated_operationname(::std::string* operationname
   // @@protoc_insertion_point(field_set_allocated:waf_format.Waf_Format.operationName)
 }
 
-// optional string time = 3;
-inline bool Waf_Format::has_time() const {
+// optional string category = 3;
+inline bool Waf_Format::has_category() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void Waf_Format::set_has_time() {
+inline void Waf_Format::set_has_category() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void Waf_Format::clear_has_time() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void Waf_Format::clear_time() {
-  time_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_time();
-}
-inline const ::std::string& Waf_Format::time() const {
-  // @@protoc_insertion_point(field_get:waf_format.Waf_Format.time)
-  return time_.GetNoArena();
-}
-inline void Waf_Format::set_time(const ::std::string& value) {
-  set_has_time();
-  time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:waf_format.Waf_Format.time)
-}
-#if LANG_CXX11
-inline void Waf_Format::set_time(::std::string&& value) {
-  set_has_time();
-  time_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:waf_format.Waf_Format.time)
-}
-#endif
-inline void Waf_Format::set_time(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  set_has_time();
-  time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:waf_format.Waf_Format.time)
-}
-inline void Waf_Format::set_time(const char* value, size_t size) {
-  set_has_time();
-  time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:waf_format.Waf_Format.time)
-}
-inline ::std::string* Waf_Format::mutable_time() {
-  set_has_time();
-  // @@protoc_insertion_point(field_mutable:waf_format.Waf_Format.time)
-  return time_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Waf_Format::release_time() {
-  // @@protoc_insertion_point(field_release:waf_format.Waf_Format.time)
-  clear_has_time();
-  return time_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Waf_Format::set_allocated_time(::std::string* time) {
-  if (time != NULL) {
-    set_has_time();
-  } else {
-    clear_has_time();
-  }
-  time_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), time);
-  // @@protoc_insertion_point(field_set_allocated:waf_format.Waf_Format.time)
-}
-
-// optional string category = 4;
-inline bool Waf_Format::has_category() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void Waf_Format::set_has_category() {
-  _has_bits_[0] |= 0x00000008u;
-}
 inline void Waf_Format::clear_has_category() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void Waf_Format::clear_category() {
   category_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -1999,15 +1918,15 @@ inline void Waf_Format::set_allocated_category(::std::string* category) {
   // @@protoc_insertion_point(field_set_allocated:waf_format.Waf_Format.category)
 }
 
-// optional .waf_format.Properties properties = 5;
+// optional .waf_format.Properties properties = 4;
 inline bool Waf_Format::has_properties() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
 inline void Waf_Format::set_has_properties() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000008u;
 }
 inline void Waf_Format::clear_has_properties() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void Waf_Format::clear_properties() {
   if (properties_ != NULL) properties_->Clear();

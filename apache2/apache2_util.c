@@ -311,21 +311,10 @@ static int write_file_with_lock(apr_global_mutex_t* lock, apr_file_t* fd, char* 
     return WAF_LOG_UTIL_SUCCESS;
 }
 
-static char *waf_current_logtime(apr_pool_t *mp) {
-    apr_time_exp_t t;
-    char tstr[100];
-    apr_size_t len;
-
-    apr_time_exp_lt(&t, apr_time_now());
-
-    apr_strftime(tstr, &len, 80, "%Y-%m-%dT%H:%M:%SZ", &t);
-    return apr_pstrdup(mp, tstr);
-}
-
 /**
  * send all waf fields in json format to a file.
  */
-static void send_waf_log(apr_global_mutex_t* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, const char* time, int mode, const char* hostname, request_rec *r) {
+static void send_waf_log(apr_global_mutex_t* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, request_rec *r) {
     int rc = 0;
     char* json_str;
     char waf_filename[1024] = "";
@@ -351,7 +340,7 @@ static void send_waf_log(apr_global_mutex_t* lock, apr_file_t* fd, const char* s
     get_short_filename(waf_filename);
     get_ruleset_type_version(waf_ruleset_info, waf_ruleset_type, waf_ruleset_version); 
 
-    rc = generate_json(&json_str, msc_waf_resourceId, WAF_LOG_UTIL_OPERATION_NAME, WAF_LOG_UTIL_CATEGORY, msc_waf_instanceId, waf_ip, waf_port, uri, waf_ruleset_type, waf_ruleset_version, waf_id, waf_message, mode, 0, waf_detail_message, waf_data, waf_filename, waf_line, hostname, time);
+    rc = generate_json(&json_str, msc_waf_resourceId, WAF_LOG_UTIL_OPERATION_NAME, WAF_LOG_UTIL_CATEGORY, msc_waf_instanceId, waf_ip, waf_port, uri, waf_ruleset_type, waf_ruleset_version, waf_id, waf_message, mode, 0, waf_detail_message, waf_data, waf_filename, waf_line, hostname);
     if (rc == WAF_LOG_UTIL_FAILED) {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
        ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
@@ -466,7 +455,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
         else requestheaderhostname = "";
 
 #ifdef WAF_JSON_LOGGING_ENABLE
-        send_waf_log(msr->modsecurity->wafjsonlog_lock, dcfg->wafjsonlog_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), waf_current_logtime(msr->mp), dcfg->is_enabled, (char*)msr->hostname, r);
+        send_waf_log(msr->modsecurity->wafjsonlog_lock, dcfg->wafjsonlog_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), dcfg->is_enabled, (char*)msr->hostname, r);
 #endif
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2

@@ -1200,6 +1200,19 @@ static const char *cmd_waf_instanceId(cmd_parms *cmd,
 
     return NULL;
 }
+
+static const char *cmd_waf_lock_owner(cmd_parms *cmd,
+        void *_dcfg, const char *p1)
+{
+
+    if (cmd->server->is_virtual) {
+        return "ModSecurity: SecWafLockOwner not allowed in VirtualHost";
+    }
+
+    msc_waf_lock_owner = (char *)p1;
+
+    return NULL;
+}
 #endif
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1)
@@ -1531,7 +1544,7 @@ static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
     strcat( wafjsonlog_path, WAF_LOG_UTIL_FILE );
     rc = apr_file_open(&dcfg->wafjsonlog_fd, wafjsonlog_path,
                    APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
-                   CREATEMODE, cmd->pool);
+                   CREATEMODE | APR_WREAD, cmd->pool);
 
     if (rc != APR_SUCCESS) {
         return apr_psprintf(cmd->pool, "ModSecurity: Failed to open wafjson log file: %s",
@@ -4031,6 +4044,13 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "Set waf instanceId"
+    ),
+    AP_INIT_TAKE1 (
+        "SecWafLockOwner",
+        cmd_waf_lock_owner,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Set waf lock owner"
     ),
 #endif
     { NULL }

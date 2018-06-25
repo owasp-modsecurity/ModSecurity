@@ -2,7 +2,7 @@
 #include "waf_log_util_external.h"
 
 // This function fills in a waf format message based on modsec input.
-void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, char* hostname, char* time) {
+void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, char* hostname) {
     waf_format::Properties *properties;
     waf_format::Details *details;
 
@@ -15,10 +15,6 @@ void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* 
 
     if (operationName != NULL) {
         waf_format->set_operationname(operationName);
-    }
-
-    if (time != NULL) {
-        waf_format->set_time(time);
     }
 
     if (category != NULL) {
@@ -94,7 +90,7 @@ void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* 
 }
 
 // Main function:  get fields from modsec, set the protobuf object and write to file in json.
-int generate_json(char** result_json, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, char* hostname, char* time) {
+int generate_json(char** result_json, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, char* hostname) {
     waf_format::Waf_Format waf_format;
     std::string json_string;
     google::protobuf::util::JsonPrintOptions options;
@@ -107,9 +103,9 @@ int generate_json(char** result_json, char* resourceId, char* operationName, cha
         GOOGLE_PROTOBUF_VERIFY_VERSION;
         
         // Set Waf format.
-        set_waf_format(&waf_format, resourceId, operationName, category, instanceId, clientIP, clientPort, requestUri, ruleSetType, ruleSetVersion, ruleId, messages, action, site, details_messages, details_data, details_file, details_line, hostname, time); 
+        set_waf_format(&waf_format, resourceId, operationName, category, instanceId, clientIP, clientPort, requestUri, ruleSetType, ruleSetVersion, ruleId, messages, action, site, details_messages, details_data, details_file, details_line, hostname); 
         
-        options.add_whitespace = true;
+        options.add_whitespace = false;
         options.always_print_primitive_fields = true;
         options.preserve_proto_field_names = true;
         
@@ -124,7 +120,7 @@ int generate_json(char** result_json, char* resourceId, char* operationName, cha
     }
     
     // Write the waf json string to disk.
-    *result_json = strdup(json_string.c_str());
+    *result_json = strdup((json_string + "\n").c_str());
     return WAF_LOG_UTIL_SUCCESS; 
 }
 

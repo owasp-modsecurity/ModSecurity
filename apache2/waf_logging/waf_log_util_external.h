@@ -11,7 +11,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int generate_json(char** result, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, char* hostname, char* time);
+int generate_json(char** result, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, char* hostname);
 void free_json(char* str);
 #ifdef __cplusplus
 }

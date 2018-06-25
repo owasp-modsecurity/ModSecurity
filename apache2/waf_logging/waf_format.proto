@@ -37,7 +37,6 @@ message Properties {
 message Waf_Format {
   optional string resourceId = 1;
   optional string operationName = 2;
-  optional string time = 3;
-  optional string category = 4;
-  optional Properties properties = 5;
+  optional string category = 3;
+  optional Properties properties = 4;
 }

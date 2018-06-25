@@ -170,6 +170,7 @@ extern DSOLOCAL int *unicode_map_table;
 #ifdef WAF_JSON_LOGGING_ENABLE
 extern DSOLOCAL char *msc_waf_resourceId;
 extern DSOLOCAL char *msc_waf_instanceId;
+extern DSOLOCAL char *msc_waf_lock_owner;
 #endif
 
 #define RESBODY_STATUS_NOT_READ         0   /* we were not configured to read the body */

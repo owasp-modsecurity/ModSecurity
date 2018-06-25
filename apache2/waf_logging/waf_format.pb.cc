@@ -155,19 +155,17 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::waf_format::Waf_Format, resourceid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::waf_format::Waf_Format, operationname_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::waf_format::Waf_Format, time_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::waf_format::Waf_Format, category_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::waf_format::Waf_Format, properties_),
   0,
   1,
   2,
   3,
-  4,
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, 9, sizeof(::waf_format::Details)},
   { 13, 30, sizeof(::waf_format::Properties)},
-  { 42, 52, sizeof(::waf_format::Waf_Format)},
+  { 42, 51, sizeof(::waf_format::Waf_Format)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -210,13 +208,13 @@ void AddDescriptorsImpl() {
       ".SiteType\022$\n\007details\030\013 \001(\0132\023.waf_format."
       "Details\022\020\n\010hostname\030\014 \001(\t\"\'\n\nActionType\022"
       "\014\n\010Detected\020\000\022\013\n\007Blocked\020\001\"\026\n\010SiteType\022\n"
-      "\n\006Global\020\000\"\203\001\n\nWaf_Format\022\022\n\nresourceId\030"
-      "\001 \001(\t\022\025\n\roperationName\030\002 \001(\t\022\014\n\004time\030\003 \001"
-      "(\t\022\020\n\010category\030\004 \001(\t\022*\n\nproperties\030\005 \001(\013"
-      "2\026.waf_format.Properties"
+      "\n\006Global\020\000\"u\n\nWaf_Format\022\022\n\nresourceId\030\001"
+      " \001(\t\022\025\n\roperationName\030\002 \001(\t\022\020\n\010category\030"
+      "\003 \001(\t\022*\n\nproperties\030\004 \001(\0132\026.waf_format.P"
+      "roperties"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 624);
+      descriptor, 609);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "waf_format.proto", &protobuf_RegisterTypes);
 }
@@ -1640,7 +1638,6 @@ void Waf_Format::InitAsDefaultInstance() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Waf_Format::kResourceIdFieldNumber;
 const int Waf_Format::kOperationNameFieldNumber;
-const int Waf_Format::kTimeFieldNumber;
 const int Waf_Format::kCategoryFieldNumber;
 const int Waf_Format::kPropertiesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -1667,10 +1664,6 @@ Waf_Format::Waf_Format(const Waf_Format& from)
   if (from.has_operationname()) {
     operationname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.operationname_);
   }
-  time_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.has_time()) {
-    time_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.time_);
-  }
   category_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_category()) {
     category_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.category_);
@@ -1687,7 +1680,6 @@ void Waf_Format::SharedCtor() {
   _cached_size_ = 0;
   resourceid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   operationname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  time_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   category_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   properties_ = NULL;
 }
@@ -1700,7 +1692,6 @@ Waf_Format::~Waf_Format() {
 void Waf_Format::SharedDtor() {
   resourceid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   operationname_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  time_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   category_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete properties_;
 }
@@ -1735,7 +1726,7 @@ void Waf_Format::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 31u) {
+  if (cached_has_bits & 15u) {
     if (cached_has_bits & 0x00000001u) {
       GOOGLE_DCHECK(!resourceid_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
       (*resourceid_.UnsafeRawStringPointer())->clear();
@@ -1745,14 +1736,10 @@ void Waf_Format::Clear() {
       (*operationname_.UnsafeRawStringPointer())->clear();
     }
     if (cached_has_bits & 0x00000004u) {
-      GOOGLE_DCHECK(!time_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*time_.UnsafeRawStringPointer())->clear();
-    }
-    if (cached_has_bits & 0x00000008u) {
       GOOGLE_DCHECK(!category_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
       (*category_.UnsafeRawStringPointer())->clear();
     }
-    if (cached_has_bits & 0x00000010u) {
+    if (cached_has_bits & 0x00000008u) {
       GOOGLE_DCHECK(properties_ != NULL);
       properties_->Clear();
     }
@@ -1803,26 +1790,10 @@ bool Waf_Format::MergePartialFromCodedStream(
         break;
       }
 
-      // optional string time = 3;
+      // optional string category = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_time()));
-          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->time().data(), static_cast<int>(this->time().length()),
-            ::google::protobuf::internal::WireFormat::PARSE,
-            "waf_format.Waf_Format.time");
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // optional string category = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_category()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
@@ -1835,10 +1806,10 @@ bool Waf_Format::MergePartialFromCodedStream(
         break;
       }
 
-      // optional .waf_format.Properties properties = 5;
-      case 5: {
+      // optional .waf_format.Properties properties = 4;
+      case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_properties()));
         } else {
@@ -1894,30 +1865,20 @@ void Waf_Format::SerializeWithCachedSizes(
       2, this->operationname(), output);
   }
 
-  // optional string time = 3;
+  // optional string category = 3;
   if (cached_has_bits & 0x00000004u) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->time().data(), static_cast<int>(this->time().length()),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "waf_format.Waf_Format.time");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->time(), output);
-  }
-
-  // optional string category = 4;
-  if (cached_has_bits & 0x00000008u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->category().data(), static_cast<int>(this->category().length()),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "waf_format.Waf_Format.category");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      4, this->category(), output);
+      3, this->category(), output);
   }
 
-  // optional .waf_format.Properties properties = 5;
-  if (cached_has_bits & 0x00000010u) {
+  // optional .waf_format.Properties properties = 4;
+  if (cached_has_bits & 0x00000008u) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, *this->properties_, output);
+      4, *this->properties_, output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1957,33 +1918,22 @@ void Waf_Format::SerializeWithCachedSizes(
         2, this->operationname(), target);
   }
 
-  // optional string time = 3;
+  // optional string category = 3;
   if (cached_has_bits & 0x00000004u) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->time().data(), static_cast<int>(this->time().length()),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "waf_format.Waf_Format.time");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->time(), target);
-  }
-
-  // optional string category = 4;
-  if (cached_has_bits & 0x00000008u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->category().data(), static_cast<int>(this->category().length()),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "waf_format.Waf_Format.category");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->category(), target);
+        3, this->category(), target);
   }
 
-  // optional .waf_format.Properties properties = 5;
-  if (cached_has_bits & 0x00000010u) {
+  // optional .waf_format.Properties properties = 4;
+  if (cached_has_bits & 0x00000008u) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        5, *this->properties_, deterministic, target);
+        4, *this->properties_, deterministic, target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2003,7 +1953,7 @@ size_t Waf_Format::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         _internal_metadata_.unknown_fields());
   }
-  if (_has_bits_[0 / 32] & 31u) {
+  if (_has_bits_[0 / 32] & 15u) {
     // optional string resourceId = 1;
     if (has_resourceid()) {
       total_size += 1 +
@@ -2018,21 +1968,14 @@ size_t Waf_Format::ByteSizeLong() const {
           this->operationname());
     }
 
-    // optional string time = 3;
-    if (has_time()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::StringSize(
-          this->time());
-    }
-
-    // optional string category = 4;
+    // optional string category = 3;
     if (has_category()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->category());
     }
 
-    // optional .waf_format.Properties properties = 5;
+    // optional .waf_format.Properties properties = 4;
     if (has_properties()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSize(
@@ -2070,7 +2013,7 @@ void Waf_Format::MergeFrom(const Waf_Format& from) {
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 31u) {
+  if (cached_has_bits & 15u) {
     if (cached_has_bits & 0x00000001u) {
       set_has_resourceid();
       resourceid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.resourceid_);
@@ -2080,14 +2023,10 @@ void Waf_Format::MergeFrom(const Waf_Format& from) {
       operationname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.operationname_);
     }
     if (cached_has_bits & 0x00000004u) {
-      set_has_time();
-      time_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.time_);
-    }
-    if (cached_has_bits & 0x00000008u) {
       set_has_category();
       category_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.category_);
     }
-    if (cached_has_bits & 0x00000010u) {
+    if (cached_has_bits & 0x00000008u) {
       mutable_properties()->::waf_format::Properties::MergeFrom(from.properties());
     }
   }
@@ -2119,7 +2058,6 @@ void Waf_Format::InternalSwap(Waf_Format* other) {
   using std::swap;
   resourceid_.Swap(&other->resourceid_);
   operationname_.Swap(&other->operationname_);
-  time_.Swap(&other->time_);
   category_.Swap(&other->category_);
   swap(properties_, other->properties_);
   swap(_has_bits_[0], other->_has_bits_[0]);
