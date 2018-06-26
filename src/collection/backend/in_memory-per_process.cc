@@ -105,10 +105,9 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
             l->insert(l->begin(), new VariableValue(&m_name, &i.first, &i.second));
         }
     } else {
-        for (auto &a : *this) {
-            if (a.first.compare(0, var.size(), var) == 0) {
-                l->insert(l->begin(), new VariableValue(&m_name, &var, &a.second));
-            }
+        auto range = this->equal_range(var);
+        for (auto it = range.first; it != range.second; ++it) {
+            l->insert(l->begin(), new VariableValue(&m_name, &var, &it->second));
         }
     }
 }
