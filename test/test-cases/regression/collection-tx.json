@@ -1,4 +1,43 @@
 [
+   {
+    "enabled": 1,
+    "version_min":300000,
+    "version_max":0,
+    "title":"Collection :: TX full vs partial match",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":2313
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "User-Agent":"Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)"
+      },
+      "uri":"/",
+      "method":"GET",
+      "http_version":1.1,
+      "body":""
+    },
+    "response":{
+      "headers":{
+        "Content-Type":"text/xml; charset=utf-8\n"
+      },
+      "body":[
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+      ]
+    },
+    "expected":{
+	"http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@unconditionalMatch\" \"id:1,deny,setvar:TX.partial_match=1,chain\"",
+      "SecRule TX.partial \"@gt 0\" \"id:2,t:lowercase,t:none,status:444\""
+    ]
+  },
   {
     "enabled":1,
     "version_min":300000,
