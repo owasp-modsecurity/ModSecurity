@@ -9,6 +9,7 @@
 #include "src/utils/https_client.h"
 #include "src/utils/string.h"
 #include "others/mbedtls/aes.h"
+#include "others/mbedtls/sha512.h"
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;
@@ -1287,42 +1288,85 @@ EQUALS_MINUS                            (?i:=\-)
     free(f);
 }
 
-{CONFIG_SEC_BINARY_RULES}[ ]+[^\n\r ]+ {
-// https://tls.mbed.org/kb/how-to/encrypt-with-aes-cbc
-    mbedtls_aes_context aes;
+{CONFIG_SEC_BINARY_RULES}[ ]+[^\n\r ]+[ ]+[^\n\r ]+ {
+    std::stringstream z;
     std::vector<std::string> conf = modsecurity::utils::string::split(yytext, ' ');
-    if (conf.size() < 2) {
-        driver.error (*driver.loc.back(), "", "SecRemoteRules demands a key and a URI");
+
+    std::cout << " --> " << yytext << std::endl;
+    for (std::string a : conf) {
+        std::cout << a << std::endl;
+    }
+
+    if (conf.size() < 3) {
+        driver.error (*driver.loc.back(), "", "SecBinaryRules demands a key and a File");
+        throw p::syntax_error(*driver.loc.back(), "");
+    }
+    std::string file(conf[2]);
+    std::ifstream infile(file);
+
+    if (!infile) {
+        driver.error (*driver.loc.back(), "", "SecBinaryRules demands a target file. " + file +  " does not seems to be valid.");
         throw p::syntax_error(*driver.loc.back(), "");
     }
 
-    std::ifstream t(conf[1]);
-    std::string str;
-        std::cout << conf[1] << std::endl;
+    infile.seekg(0, infile.end);
+    size_t inlen = infile.tellg();
+    infile.seekg(0, infile.beg);
+    mbedtls_aes_context ctx;
+    unsigned char iv[16] = { 0x11, 0x22, 0xed, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+    unsigned char key[16] =  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    size_t inblock_size = 16;
+    unsigned char input[inblock_size];
+    unsigned char output[inblock_size];
+    unsigned char hash_output[64];
+    mbedtls_sha512_context ct;
+    mbedtls_sha512_init( &ct );
+    mbedtls_sha512_starts( &ct, 0 );
+    mbedtls_aes_init( &ctx );
 
+    for (int i = 0; i < 16 && i < conf[1].size(); i++) {
+        key[i] = conf[1].at(i);
+    }
 
-    t.seekg(0, std::ios::end);
-    str.reserve(t.tellg());
-    t.seekg(0, std::ios::beg);
+    mbedtls_aes_setkey_dec(&ctx, key, 128);
 
-    str.assign((std::istreambuf_iterator<char>(t)),
-        std::istreambuf_iterator<char>());
+    for (int i = 0; inlen - i > 64 + inblock_size; i = i+inblock_size) {
+        infile.read((char*)input, inblock_size);
+        mbedtls_aes_crypt_cbc( &ctx, MBEDTLS_AES_DECRYPT, inblock_size, iv, input, output);
+        mbedtls_sha512_update( &ct, output, inblock_size );
+        z.write((char*)output, inblock_size);
+    }
 
-    std::cout << str << std::endl;
+    infile.read((char*)input, inblock_size);
+    mbedtls_aes_crypt_cbc( &ctx, MBEDTLS_AES_DECRYPT, inblock_size, iv, input, output);
+    mbedtls_sha512_update( &ct, output, inblock_size );
 
-    driver.ref.push_back(conf[1]);
+    int i = inblock_size - 1;
+    for (; i >= 0; i--) {
+        if (output[i] != 0x01) {
+            break;
+        }
+    }
+
+    z.write((char*)output, i+1);
+    mbedtls_sha512_finish( &ct, hash_output );
+    unsigned char given_hash[64];
+    infile.read((char*)given_hash, 64);
+
+    driver.ref.push_back(file);
     driver.loc.push_back(new yy::location());
     YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
     yypush_buffer_state(temp);
 
-    unsigned char key[32] = { 0 };
-    unsigned char iv[16] = { 0 };
-    unsigned char *output = (unsigned char *)malloc(str.size() + 1);
-    mbedtls_aes_setkey_enc( &aes, key, 256 );
-    mbedtls_aes_crypt_cbc( &aes, MBEDTLS_AES_DECRYPT, 24, iv, (unsigned char *) str.c_str(), output );
+    for (size_t i = 0; i < 64; ++i) {
+        if (given_hash[i] != hash_output[i]) {
+            driver.error (*driver.loc.back(), "", "Binary file is corrupted or password is wrong.");
+            throw p::syntax_error(*driver.loc.back(), "");
+            break;
+        }
+    }
 
-    yy_scan_string(str.c_str());
-
+    yy_scan_string(z.str().c_str());
 }
 
 {CONFIG_SEC_REMOTE_RULES}[ ][^ ]+[ ][^\n\r ]+ {

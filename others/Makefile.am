@@ -25,6 +25,7 @@ libmbedtls_la_SOURCES = \
 	mbedtls/md5.c \
 	mbedtls/aes.c \
 	mbedtls/aesni.c \
+	mbedtls/sha512.c \
 	mbedtls/platform_util.c \
 	mbedtls/sha1.c
 
