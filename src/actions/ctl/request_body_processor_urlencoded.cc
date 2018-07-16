@@ -27,7 +27,7 @@ namespace ctl {
 
 bool RequestBodyProcessorURLENCODED::evaluate(Rule *rule,
     Transaction *transaction) {
-    transaction->m_requestBodyProcessor = Transaction::WWWFormUrlEncoded;
+    transaction->m_requestBodyType = Transaction::WWWFormUrlEncoded;
     transaction->m_variableReqbodyProcessor.set("URLENCODED",
         transaction->m_variableOffset);
 

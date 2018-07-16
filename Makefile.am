@@ -149,6 +149,7 @@ TESTS+=test/test-cases/regression/debug_log.json
 TESTS+=test/test-cases/regression/action-initcol.json
 TESTS+=test/test-cases/regression/variable-TIME_WDAY.json
 TESTS+=test/test-cases/regression/action-ctl_request_body_processor.json
+TESTS+=test/test-cases/regression/action-ctl_request_body_processor_urlencoded.json
 TESTS+=test/test-cases/regression/variable-REMOTE_ADDR.json
 TESTS+=test/test-cases/regression/action-tag.json
 TESTS+=test/test-cases/regression/variable-TIME_HOUR.json
