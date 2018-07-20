@@ -1545,7 +1545,7 @@ std::string Transaction::toBuf() {
     a.append(m_uri);
     a.append(" HTTP/");
     a.append(m_httpVersion);
-    a.append("\n");
+    a.append("\r\n");
     std::vector<const collection::Variable *> l;
     m_variableRequestHeaders.resolve(&l);
     for (auto h : l) {
@@ -1553,12 +1553,13 @@ std::string Transaction::toBuf() {
         a.append((h->m_key.c_str() + pos));
         a.append(": ");
         a.append((h->m_value.c_str()));
+        a.append("\r\n");
     }
 
-    a.append("\n\n");
+    a.append("\r\n\r\n");
     if (this->m_requestBody.str().length() > 0) {
         a.append(this->m_requestBody.str().c_str());
-        a.append("\n\n");
+        a.append("\r\n\r\n");
     }
 #if 0
     l.clear();
