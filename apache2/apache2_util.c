@@ -293,15 +293,17 @@ static int write_file_with_lock(apr_global_mutex_t* lock, apr_file_t* fd, char* 
     int rc;
     apr_size_t nbytes, nbytes_written;
 
+    if (lock == NULL || fd == NULL || str == NULL) {
+        return WAF_LOG_UTIL_FAILED;
+    }
+
     rc = apr_global_mutex_lock(lock);
     if (rc != APR_SUCCESS) {
         return WAF_LOG_UTIL_FAILED;
     }
 
-    if (fd != NULL) {
-        nbytes = strlen(str);
-        apr_file_write_full(fd, str, nbytes, &nbytes_written);
-    }
+    nbytes = strlen(str);
+    apr_file_write_full(fd, str, nbytes, &nbytes_written);
 
     rc = apr_global_mutex_unlock(lock);
     if (rc != APR_SUCCESS) {
