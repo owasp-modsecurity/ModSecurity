@@ -262,7 +262,7 @@ extern "C" {
      * Notice that the highlight can be calculate post-analisys. Calculate it
      * during the analisys may delay the analisys process.
      *
-    */
+     */
      IncludeFullHighlightLogProperty = 4,
     };
 
