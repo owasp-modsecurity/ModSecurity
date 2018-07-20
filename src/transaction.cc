@@ -1546,7 +1546,7 @@ std::string Transaction::toBuf() {
     a.append(" HTTP/");
     a.append(m_httpVersion);
     a.append("\n");
-    std::vector<const collection::Variable *> l;
+    std::vector<const VariableValue *> l;
     m_variableRequestHeaders.resolve(&l);
     for (auto h : l) {
         size_t pos = strlen("REQUEST_HEADERS:");
