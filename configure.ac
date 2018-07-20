@@ -609,7 +609,7 @@ AC_ARG_ENABLE(waf_json_logging,
   fi
 ],
 [
-  waf_json_logging="-I"`pwd`"/apache2/waf_logging -DWAF_JSON_LOGGING_ENABLE"
+  waf_json_logging=""
 ])
 
 
