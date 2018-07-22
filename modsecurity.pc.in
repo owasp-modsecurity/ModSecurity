@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: ModSecurity
 Description: ModSecurity API
 Version: @MSC_VERSION_WITH_PATCHLEVEL@
-Cflags: -I@includedir@/@PACKAGE@
+Cflags: -I@includedir@
 Libs: -L@libdir@ -lmodsecurity
