@@ -82,6 +82,7 @@ char *sa_name = "standalone";
 const char *sa_name_argv[] = { "standalone", NULL };
 server_rec *server;
 apr_pool_t *pool = NULL;
+apr_pool_t *root = NULL;
 
 apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *b,
                             ap_input_mode_t mode, apr_read_type_e block,
@@ -89,11 +90,17 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *b,
 apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b);
 
 server_rec *modsecInit()    {
-    apr_initialize();
 
-    apr_pool_create(&pool, NULL);
-
-    apr_hook_global_pool = pool;
+    if (root == NULL) {
+      apr_initialize();
+      apr_pool_create(&root, NULL);
+      apr_hook_global_pool = root;
+    }
+ 
+    if (pool != NULL)
+      apr_pool_destroy(pool);
+ 
+    apr_pool_create(&pool, root);
 
     server = apr_palloc(pool, sizeof(server_rec));
 
@@ -235,8 +242,8 @@ apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
 }
 
 void modsecTerminate()  {
-    apr_pool_destroy(pool);
-    pool = NULL;
+    apr_pool_destroy(root);
+    root = NULL;
     apr_terminate();
 }
 
