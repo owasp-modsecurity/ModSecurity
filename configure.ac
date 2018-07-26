@@ -332,7 +332,7 @@ AM_CONDITIONAL([USE_MUTEX_ON_PM], [test $mutexPm = true])
 
 
 # General link options
-if test "$PLATFORM" != "MacOSX"; then
+if test "$PLATFORM" != "MacOSX" -a "$PLATFORM" != "OpenBSD"; then
     GLOBAL_LDADD="-lrt  "
 fi
 
