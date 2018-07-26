@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 
 #define FORKS 5
 #define REQUESTS_PER_PROCESS 100
