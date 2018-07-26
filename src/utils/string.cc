@@ -17,7 +17,11 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#ifdef __OpenBSD__
+#include <glob.h>
+#else
 #include <wordexp.h>
+#endif
 #include <stdint.h>
 #include <inttypes.h>
 
