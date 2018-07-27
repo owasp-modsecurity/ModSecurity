@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Allow LuaJIT to be used
+   [Issue #1809 - @victorhora, @p0pr0ck5]
  - Implement support for Lua 5.1
    [Issue #1809 - @p0pr0ck5, @victorhora]
  - Variable names must match fully, not partially. Match should be case

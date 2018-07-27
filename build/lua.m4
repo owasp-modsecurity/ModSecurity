@@ -6,7 +6,7 @@ AC_DEFUN([CHECK_LUA],
 [dnl
 
 # Possible names for the lua library/package (pkg-config)
-LUA_POSSIBLE_LIB_NAMES="lua lua53 lua5.3 lua52 lua5.2 lua51 lua5.1"
+LUA_POSSIBLE_LIB_NAMES="lua lua53 lua5.3 lua52 lua5.2 lua51 lua5.1 luajit luajit-5.1"
 
 # Possible extensions for the library
 LUA_POSSIBLE_EXTENSIONS="so so0 la sl dll dylib so.0.0.0"
@@ -68,6 +68,7 @@ else
         case $LUA_PKG_VERSION in
            (5.1*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
            (5.2*) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ; lua_5_2=1 ;;
+           (2.*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
         esac
            AC_MSG_NOTICE([LUA pkg-config version: ${LUA_PKG_VERSION}])
         fi
@@ -168,6 +169,9 @@ AC_DEFUN([CHECK_FOR_LUA_AT], [
 	LUA_VERSION=502
     elif test -e "${path}/include/lua5.1/lua.h"; then
         lua_inc_path="${path}/include/lua5.1"
+	LUA_VERSION=501
+    elif test -e "${path}/include/luajit-2.0/lua.h"; then
+        lua_inc_path="${path}/include/luajit-2.0"
 	LUA_VERSION=501
     fi
 
