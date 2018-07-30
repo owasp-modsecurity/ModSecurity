@@ -576,7 +576,7 @@ int modsecProcessResponse(request_rec *r)   {
         int is_eos = 0;
         char buf[8192];
         while(!is_eos)  {
-            modsecReadResponse(r, buf, 8192, &readcnt, &is_eos);
+            modsecReadResponse(r, buf, sizeof(buf)-1, &readcnt, &is_eos);
 
             if(readcnt > 0) {
                 char *tmp = (char *)apr_palloc(r->pool, readcnt);
