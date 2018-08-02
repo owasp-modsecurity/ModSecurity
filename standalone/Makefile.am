@@ -7,6 +7,7 @@ standalone_la_SOURCES = ../apache2/acmp.c \
     ../apache2/ag_mdb/ag_mdb.cpp \
     ../apache2/waf_logging/waf_format.pb.cc \
     ../apache2/waf_logging/waf_log_util.cc \
+    ../apache2/waf_lock/waf_lock.cpp \
     ../apache2/apache2_config.c \
     ../apache2/apache2_io.c \
     ../apache2/apache2_util.c \
