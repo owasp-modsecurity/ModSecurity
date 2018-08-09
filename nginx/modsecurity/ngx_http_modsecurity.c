@@ -1038,10 +1038,8 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
-    if (r->method == NGX_HTTP_POST 
-            && modsecIsRequestBodyAccessEnabled(ctx->req) ) {
 
-        /* read POST request body, should we process PUT? */
+    if (modsecIsRequestBodyAccessEnabled(ctx->req) && (r->headers_in.content_length || r->headers_in.chunked)) {
         rc = ngx_http_read_client_request_body(r, ngx_http_modsecurity_body_handler);
         if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
             return rc;
@@ -1049,8 +1047,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
         return NGX_DONE;
     }
-    
-    /* other method */
+
     return ngx_http_modsecurity_status(r, modsecProcessRequestBody(ctx->req));
 }
 
