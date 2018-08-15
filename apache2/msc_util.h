@@ -126,6 +126,8 @@ int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int i
 
 int DSOLOCAL urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_length, int *invalid_count, int *changed);
 
+char* DSOLOCAL rfc5987_decode(apr_pool_t *mptmp, char* value);
+
 int DSOLOCAL html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int len);
 
 int DSOLOCAL ansi_c_sequences_decode_inplace(unsigned char *input, int len);

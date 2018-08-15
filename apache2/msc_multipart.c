@@ -198,23 +198,44 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     log_escape_nq(msr->mp, value));
             }
         }
-        else
-        if (strcmp(name, "filename") == 0) {
+        else if ((strcmp(name, "filename") == 0) || (strcmp(name, "filename*") == 0))
+        {
 
-            validate_quotes(msr, value);
+            char *decoded_filename = NULL;
 
-            msr->multipart_filename = apr_pstrdup(msr->mp, value);
+            if (strcmp(name, "filename*") == 0)
+            {
+                decoded_filename = rfc5987_decode(msr->mp, value);
+                if (!decoded_filename)
+                {
+                    msr_log(msr, 4, "Multipart: Could not decode extended filename parameter in RFC 5987 format: %s",
+                            log_escape_nq(msr->mp, value));
+                    return -16;
+                }
+                msr->multipart_filename = decoded_filename;
 
-            if (msr->mpd->mpp->filename != NULL) {
+                // Make sure to turn of INVALID quoting since RFC 5987 expects quotes in the filename format.
+                msr->mpd->flag_invalid_quoting = 0;
+            }
+            else
+            {
+                decoded_filename = value;
+                validate_quotes(msr, value);
+                msr->multipart_filename = apr_pstrdup(msr->mp, decoded_filename);
+            }
+
+            if (msr->mpd->mpp->filename != NULL)
+            {
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
-                    log_escape_nq(msr->mp, value));
+                        log_escape_nq(msr->mp, decoded_filename));
                 return -15;
             }
-            msr->mpd->mpp->filename = value;
+            msr->mpd->mpp->filename = decoded_filename;
 
-            if (msr->txcfg->debuglog_level >= 9) {
+            if (msr->txcfg->debuglog_level >= 9)
+            {
                 msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
-                    log_escape_nq(msr->mp, value));
+                        log_escape_nq(msr->mp, decoded_filename));
             }
         }
         else return -11;
@@ -307,7 +328,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
              * values from the C-D header. We need to check for the case where they
              * didn't understand C-D but we did.
              */
-            if (strstr(header_value, "filename=") == NULL) {
+            if ((strstr(header_value, "filename=") == NULL) && (strstr(header_value, "filename*=") == NULL)) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (filename).");
                 return -1;
             }
