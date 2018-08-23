@@ -28,6 +28,7 @@ class Driver;
 #include "src/actions/ctl/rule_engine.h"
 #include "src/actions/ctl/request_body_processor_json.h"
 #include "src/actions/ctl/request_body_processor_xml.h"
+#include "src/actions/ctl/request_body_processor_urlencoded.h"
 #include "src/actions/ctl/rule_remove_by_id.h"
 #include "src/actions/ctl/rule_remove_by_tag.h"
 #include "src/actions/ctl/rule_remove_target_by_id.h"
@@ -523,6 +524,7 @@ using modsecurity::operators::Operator;
   ACTION_CTL_AUDIT_LOG_PARTS                   "ACTION_CTL_AUDIT_LOG_PARTS"
   ACTION_CTL_BDY_JSON                          "ACTION_CTL_BDY_JSON"
   ACTION_CTL_BDY_XML                           "ACTION_CTL_BDY_XML"
+  ACTION_CTL_BDY_URLENCODED                    "ACTION_CTL_BDY_URLENCODED"
   ACTION_CTL_FORCE_REQ_BODY_VAR                "ACTION_CTL_FORCE_REQ_BODY_VAR"
   ACTION_CTL_REQUEST_BODY_ACCESS               "ACTION_CTL_REQUEST_BODY_ACCESS"
   ACTION_CTL_RULE_REMOVE_BY_ID                 "ACTION_CTL_RULE_REMOVE_BY_ID"
@@ -2553,6 +2555,10 @@ act:
     | ACTION_CTL_BDY_XML
       {
         ACTION_CONTAINER($$, new actions::ctl::RequestBodyProcessorXML($1));
+      }
+    | ACTION_CTL_BDY_URLENCODED
+      {
+        ACTION_CONTAINER($$, new actions::ctl::RequestBodyProcessorURLENCODED($1));
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_ON
       {

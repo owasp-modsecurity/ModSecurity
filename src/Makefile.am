@@ -112,6 +112,7 @@ ACTIONS = \
 	actions/ctl/rule_engine.cc \
 	actions/ctl/request_body_processor_json.cc \
 	actions/ctl/request_body_processor_xml.cc \
+	actions/ctl/request_body_processor_urlencoded.cc \
 	actions/ctl/rule_remove_target_by_tag.cc \
 	actions/ctl/rule_remove_target_by_id.cc \
 	actions/ctl/rule_remove_by_id.cc \
