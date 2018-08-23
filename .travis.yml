@@ -1,0 +1,17 @@
+# We are going to run the build in a container. 
+# The reason we run the build in a container is that we have dependency on protobuf when we are building on Linux. 
+# Building protobuf as a build step is quite time consuming, so we want to package the protobuf as a container image with all the dependencies captured and run the build within this container.
+sudo: required
+language: c
+services:
+  - docker
+
+install: 
+# Setting up docker credentials.
+  - echo "$DOCKER_PASSWORD" | docker login appgwreg.azurecr.io -u "$DOCKER_USERNAME" --password-stdin
+  - docker pull appgwreg.azurecr.io/modsecurity:latest
+
+script:
+  - docker-compose run --rm autoconf
+  - docker-compose run --rm configure
+  - docker-compose run --rm make

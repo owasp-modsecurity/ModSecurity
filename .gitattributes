@@ -1,0 +1,13 @@
+# Build
+*.sh text eol=lf
+*.ac text eol=lf
+*.am text eol=lf
+Makefile text eol=lf
+CMakelists.txt text eol=lf
+
+# Code
+*.c text eol=lf
+*.h text eol=lf
+*.cpp text eol=lf
+*.cc text eol=lf
+*.hh text eol=lf
