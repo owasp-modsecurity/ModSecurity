@@ -10,7 +10,8 @@ v3.0.3 - YYYY-MMM-DD (to be released)
  - Variable names must match fully, not partially. Match should be case
    insensitive.
    [Issue #1818, #1820, #1810, #1808 - @michaelgranzow-avi, @victorhora,
-                                       @theMiddleBlue, @airween, @zimmerle]
+                                       @theMiddleBlue, @airween, @zimmerle,
+                                       @LeeShan87]
  - Improves the performance while loading the rules
    [Issue #1735 - @zimmerle, @p0pr0ck5, @victorhora]
  - Allow empty strings to be evaluated by regex::searchAll
