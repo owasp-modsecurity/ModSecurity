@@ -21,8 +21,7 @@
 // Linux
 int lock_create(struct waf_lock *new_lock, struct waf_lock_args *new_lock_args) {
     union semun sem_union;
-    uid_t uid;
-    gid_t gid;
+
     if (new_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
     new_lock->sem_id = semget(new_lock_args->lock_id, SEM_NUMBERS, IPC_CREAT | IPC_EXCL);
@@ -30,14 +29,8 @@ int lock_create(struct waf_lock *new_lock, struct waf_lock_args *new_lock_args) 
         // A new semaphore set is created, need to initialize the semaphore set
         // Set permssion
 	struct semid_ds buf;
-	if ((GetUserId(new_lock_args->lock_owner, &uid) == WAF_LOCK_ERROR) || (GetGroupId(new_lock_args->lock_owner, &gid) == WAF_LOCK_ERROR)) {
-            lock_destroy(new_lock);
-            return WAF_ERROR_LOCK_LINUX_SEM_GET_USER_FAIL;
-	}
 
-	buf.sem_perm.uid = uid; 
-	buf.sem_perm.gid = gid; 
-	buf.sem_perm.mode = 0600;
+	buf.sem_perm.mode = 0666;
 	sem_union.buf = &buf;
 	// Set the permission for the new lock
         if (semctl(new_lock->sem_id, 0, IPC_SET, sem_union) == -1) {
@@ -164,7 +157,7 @@ int lock_destroy(struct waf_lock *waf_lock) {
     if (waf_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
     rc = lock_close(waf_lock);
-    if (Waf_lock_isError(rc))
+    if (waf_lock_is_error(rc))
         return rc;
     if (waf_lock->sem_id == -1)
         return WAF_LOCK_SUCCESS;
@@ -183,7 +176,7 @@ int lock_destroy(struct waf_lock *waf_lock) {
     if (waf_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
     rc = lock_close(waf_lock);
-    if (Waf_lock_isError(rc))
+    if (waf_lock_is_error(rc))
         return rc;
     /* Locks destroy doesn't support on Windows */
     return WAF_ERROR_LOCK_WIN_DESTROY_NOT_SUPPORT;
@@ -352,7 +345,7 @@ int Waf_lock_isstring(const char* str, int str_len) {
 ** return: True if there is an error;
 False if not.
 */
-bool Waf_lock_isError(int return_code) {
+bool waf_lock_is_error(int return_code) {
     if (return_code < WAF_LOCK_ERROR)
         return false;
     else
@@ -397,7 +390,7 @@ int Waf_lock_init(struct waf_lock* waf_lock) {
 ** @param waf_lock: lock handler you want to lock.
 ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
 */
-int Waf_getSharedLock(struct waf_lock *waf_lock) {
+int waf_get_shared_lock(struct waf_lock *waf_lock) {
     int rc;
     if (waf_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
@@ -426,7 +419,7 @@ int Waf_getSharedLock(struct waf_lock *waf_lock) {
 ** @param waf_lock: the lock handler you want to return the lock.
 ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
 */
-int Waf_getExclusiveLock(struct waf_lock *waf_lock) {
+int waf_get_exclusive_lock(struct waf_lock *waf_lock) {
     int rc;
     if (waf_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
@@ -449,7 +442,7 @@ int Waf_getExclusiveLock(struct waf_lock *waf_lock) {
 ** @param waf_lock: the lock handler you want to return the lock.
 ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
 */
-int Waf_freeSharedLock(struct waf_lock *waf_lock) {
+int waf_free_shared_lock(struct waf_lock *waf_lock) {
     int rc;
     if (waf_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
@@ -466,7 +459,7 @@ int Waf_freeSharedLock(struct waf_lock *waf_lock) {
 ** @param waf_lock: the lock handler you want to return the lock.
 ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
 */
-int Waf_freeExclusiveLock(struct waf_lock *waf_lock) {
+int waf_free_exclusive_lock(struct waf_lock *waf_lock) {
     int rc;
     if (waf_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
@@ -487,7 +480,7 @@ int Waf_freeExclusiveLock(struct waf_lock *waf_lock) {
 ** @param lock_args: the lock properties needed to create lock.
 ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
 */
-int Waf_createLock(struct waf_lock* waf_lock, struct waf_lock_args* waf_lock_args) {
+int waf_create_lock(struct waf_lock* waf_lock, struct waf_lock_args* waf_lock_args) {
     int rc = WAF_LOCK_SUCCESS;
 
     rc = Waf_lock_init(waf_lock);
@@ -497,7 +490,7 @@ int Waf_createLock(struct waf_lock* waf_lock, struct waf_lock_args* waf_lock_arg
 
     /* Create or open the lock */
     rc = lock_create(waf_lock, waf_lock_args);
-    if (Waf_lock_isError(rc))
+    if (waf_lock_is_error(rc))
     {
         return rc;
     }
@@ -513,7 +506,7 @@ int Waf_createLock(struct waf_lock* waf_lock, struct waf_lock_args* waf_lock_arg
 ** @param waf_lock: the waf_lock you want to destroy.
 ** return: WAF_LOCK_SUCCESS if successfully destroyed or WAF_LOCK_ERROR if failed.
 */
-int Waf_destroyLock(struct waf_lock *waf_lock) {
+int waf_destory_lock(struct waf_lock *waf_lock) {
     int rc_lock = WAF_LOCK_SUCCESS;
 
     if (waf_lock == NULL)
@@ -521,7 +514,7 @@ int Waf_destroyLock(struct waf_lock *waf_lock) {
 
     rc_lock = lock_destroy(waf_lock);
 
-    if (Waf_lock_isError(rc_lock))
+    if (waf_lock_is_error(rc_lock))
         return rc_lock;
     else
         return WAF_LOCK_SUCCESS;
@@ -532,37 +525,15 @@ int Waf_destroyLock(struct waf_lock *waf_lock) {
 ** @param lock: the lock you want to close.
 ** return: WAF_LOCK_SUCCESS if successfully closed or WAF_LOCK_ERROR if failed.
 */
-int Waf_closeLock(struct waf_lock *waf_lock) {
+int waf_close_lock(struct waf_lock *waf_lock) {
     int rc_lock = WAF_LOCK_SUCCESS;
 
     if (waf_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
 
     rc_lock = lock_close(waf_lock);
-    if (Waf_lock_isError(rc_lock))
+    if (waf_lock_is_error(rc_lock))
         return rc_lock;
     else
         return WAF_LOCK_SUCCESS;
-}
-
-int GetGroupId(const char *name, gid_t *id)
-{
-    struct group *grp = getgrnam(name); /* don't free, see getgrnam() for details */
-    if(grp == NULL) {
-        return WAF_LOCK_ERROR;
-    } 
-
-    *id = grp->gr_gid;
-    return WAF_LOCK_SUCCESS;
-}
-
-int GetUserId(const char *name, uid_t *id)
-{
-    struct passwd *pwd = getpwnam(name); /* don't free, see getpwnam() for details */
-    if(pwd == NULL) {
-        return WAF_LOCK_ERROR;
-    } 
-
-    *id = pwd->pw_uid;
-    return WAF_LOCK_SUCCESS;
 }

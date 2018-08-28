@@ -603,7 +603,7 @@ AC_ARG_ENABLE(waf_json_logging,
 [
   if test "$enableval" != "no"; then
     waf_json_logging="-I"`pwd`"/apache2/waf_logging -DWAF_JSON_LOGGING_ENABLE"
-    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $collection_memory_database"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $waf_json_logging"
   else
     waf_json_logging=""
   fi
@@ -612,6 +612,8 @@ AC_ARG_ENABLE(waf_json_logging,
   waf_json_logging=""
 ])
 
+# Always Enable json waf logging support
+waf_lock="-I"`pwd`"/apache2/waf_lock"
 
 # Ignore configure errors
 AC_ARG_ENABLE(errors,
@@ -879,7 +881,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input $collection_memory_database $waf_json_logging"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input $collection_memory_database $waf_json_logging $waf_lock"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

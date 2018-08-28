@@ -19,6 +19,7 @@
 
 #ifdef WAF_JSON_LOGGING_ENABLE
 #include "waf_log_util_external.h"
+#include "waf_lock_external.h"
 #include "string.h"
 #endif
 
@@ -289,7 +290,7 @@ static void get_ruleset_type_version(char* waf_ruleset_info, char* waf_ruleset_t
     }
 }
 
-static int write_file_with_lock(apr_global_mutex_t* lock, apr_file_t* fd, char* str) {
+static int write_file_with_lock(struct waf_lock* lock, apr_file_t* fd, char* str) {
     int rc;
     apr_size_t nbytes, nbytes_written;
 
@@ -297,16 +298,16 @@ static int write_file_with_lock(apr_global_mutex_t* lock, apr_file_t* fd, char* 
         return WAF_LOG_UTIL_FAILED;
     }
 
-    rc = apr_global_mutex_lock(lock);
-    if (rc != APR_SUCCESS) {
+    rc = waf_get_exclusive_lock(lock);
+    if (waf_lock_is_error(rc)) {
         return WAF_LOG_UTIL_FAILED;
     }
 
     nbytes = strlen(str);
     apr_file_write_full(fd, str, nbytes, &nbytes_written);
 
-    rc = apr_global_mutex_unlock(lock);
-    if (rc != APR_SUCCESS) {
+    rc = waf_free_exclusive_lock(lock);
+    if (waf_lock_is_error(rc)) {
         return WAF_LOG_UTIL_FAILED;
     }
 
@@ -316,7 +317,7 @@ static int write_file_with_lock(apr_global_mutex_t* lock, apr_file_t* fd, char* 
 /**
  * send all waf fields in json format to a file.
  */
-static void send_waf_log(apr_global_mutex_t* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, request_rec *r) {
+static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, request_rec *r) {
     int rc = 0;
     char* json_str;
     char waf_filename[1024] = "";

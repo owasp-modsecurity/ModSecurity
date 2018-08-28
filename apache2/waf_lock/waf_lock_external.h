@@ -36,7 +36,6 @@ extern "C" {
 #define WAF_ERROR_LOCK_LINUX_SEM_MODIFY_FAIL                    1103
 #define WAF_ERROR_LOCK_LINUX_SEM_DESTROY_FAIL                   1104
 #define WAF_ERROR_LOCK_LINUX_SEM_SET_PERMISSION_FAIL            1105
-#define	WAF_ERROR_LOCK_LINUX_SEM_GET_USER_FAIL                  1106
 
 #define WAF_ERROR_LOCK_WIN_NAME_INVALID_STRING                  1200
 #define WAF_ERROR_LOCK_WIN_MUTEX_CREATE_FAIL                    1201
@@ -89,7 +88,6 @@ struct waf_lock {
 struct waf_lock_args {
 #ifndef _WIN32
     int   lock_id;
-    char *lock_owner; 
 #else
     char *lock_name;
     int   lock_name_length;
@@ -107,21 +105,21 @@ struct waf_lock_args {
  ** @param lock: lock handler.
  ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
  */
-int Waf_createLock(struct waf_lock *lock, struct waf_lock_args *lock_args);
+int waf_create_lock(struct waf_lock *lock, struct waf_lock_args *lock_args);
 
 /**
  ** Destroy a lock.
  ** @param lock: lock handler.
  ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
  */
-int Waf_destroyLock(struct waf_lock *lock);
+int waf_destory_lock(struct waf_lock *lock);
 
 /**
  ** Close a lock.
  ** @param lock: lock handler.
  ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
  */
-int Waf_cLoseLock(struct waf_lock *lock);
+int waf_close_lock(struct waf_lock *lock);
 
 /**
  ** Get a shared lock for read only.
@@ -129,28 +127,28 @@ int Waf_cLoseLock(struct waf_lock *lock);
  ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
  */
 
-int Waf_getSharedLock(struct waf_lock *lock);
+int waf_get_shared_lock(struct waf_lock *lock);
 
 /**
  ** Get a exclusive lock for read and write.
  ** @param lock: lock handler.
  ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
  */
-int Waf_getExclusiveLock(struct waf_lock *lock);
+int waf_get_exclusive_lock(struct waf_lock *lock);
 
 /**
  ** Free a shared lock that you have got before.
  ** @param lock: lock handler.
  ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
  */
-int Waf_freeSharedLock(struct waf_lock *lock);
+int waf_free_shared_lock(struct waf_lock *lock);
 
 /**
  ** Free a exclusive lock that you have got before.
  ** @param lock: lock handler.
  ** return: WAF_LOCK_SUCCESS if successfully created or WAF_LOCK_ERROR if failed.
  */
-int Waf_freeExclusiveLock(struct waf_lock *lock);
+int waf_free_exclusive_lock(struct waf_lock *lock);
 
 /**
  **========================================================
@@ -163,7 +161,7 @@ int Waf_freeExclusiveLock(struct waf_lock *lock);
  ** return: True if there is an error;
             False if not.
  */
-bool Waf_lock_isError(int return_code);
+bool waf_lock_is_error(int return_code);
 
 #ifdef __cplusplus
 }

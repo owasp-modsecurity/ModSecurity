@@ -29,6 +29,7 @@
 #include <yajl/yajl_gen.h>
 #include "msc_logging_json.h"
 #endif
+#include "waf_lock_external.h"
 
 /**
  * Write the supplied data to the audit log (if the FD is ready), update
@@ -734,8 +735,8 @@ void sec_audit_logger_json(modsec_rec *msr) {
 
     /* Lock the mutex, but only if we are using serial format. */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-        rc = apr_global_mutex_lock(msr->modsecurity->auditlog_lock);
-        if (rc != APR_SUCCESS) {
+	    rc = waf_get_exclusive_lock(msr->modsecurity->auditlog_lock);
+        if (waf_lock_is_error(rc)) {
             msr_log(msr, 1, "Audit log: Failed to lock global mutex: %s",
                 get_apr_error(msr->mp, rc));
         }
@@ -1446,8 +1447,8 @@ void sec_audit_logger_json(modsec_rec *msr) {
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
 
         /* Unlock the mutex we used to serialise access to the audit log file. */
-        rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
-        if (rc != APR_SUCCESS) {
+	    rc = waf_free_exclusive_lock(msr->modsecurity->auditlog_lock);
+        if (waf_lock_is_error(rc)) {
             msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s",
                     get_apr_error(msr->mp, rc));
         }
@@ -1621,8 +1622,8 @@ void sec_audit_logger_native(modsec_rec *msr) {
 
     /* Lock the mutex, but only if we are using serial format. */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-        rc = apr_global_mutex_lock(msr->modsecurity->auditlog_lock);
-        if (rc != APR_SUCCESS) {
+	    rc = waf_get_exclusive_lock(msr->modsecurity->auditlog_lock);
+        if (waf_lock_is_error(rc)) {
             msr_log(msr, 1, "Audit log: Failed to lock global mutex: %s",
                 get_apr_error(msr->mp, rc));
         }
@@ -2226,8 +2227,8 @@ void sec_audit_logger_native(modsec_rec *msr) {
         sec_auditlog_write(msr, "\n", 1);
 
         /* Unlock the mutex we used to serialise access to the audit log file. */
-        rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
-        if (rc != APR_SUCCESS) {
+	    rc = waf_free_exclusive_lock(msr->modsecurity->auditlog_lock);
+        if (waf_lock_is_error(rc)) {
             msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s",
                     get_apr_error(msr->mp, rc));
         }

@@ -56,6 +56,7 @@ typedef struct msc_parm msc_parm;
 #include "http_config.h"
 #include "http_log.h"
 #include "http_protocol.h"
+#include "waf_lock_external.h"
 
 #if defined(WITH_LUA)
 #include "msc_lua.h"
@@ -172,6 +173,16 @@ extern DSOLOCAL char *msc_waf_resourceId;
 extern DSOLOCAL char *msc_waf_instanceId;
 extern DSOLOCAL char *msc_waf_lock_owner;
 #endif
+
+#define AUDITLOG_LOCK_ID                1
+#define WAFJSONLOG_LOCK_ID              2
+#define GEO_LOCK_ID                     3
+#define DBM_LOCK_ID                     4
+
+#define AUDITLOG_LOCK_NAME              "Global\\auditlog_lock"
+#define WAFJSONLOG_LOCK_NAME            "Global\\wafjsonlog_lock"
+#define GEO_LOCK_NAME                   "Global\\geo_lock"
+#define DBM_LOCK_NAME                   "Global\\dbm_lock"
 
 #define RESBODY_STATUS_NOT_READ         0   /* we were not configured to read the body */
 #define RESBODY_STATUS_ERROR            1   /* error occured while we were reading the body */
@@ -674,13 +685,13 @@ struct error_message_t {
 
 struct msc_engine {
     apr_pool_t              *mp;
-    apr_global_mutex_t      *auditlog_lock;
+    struct waf_lock         *auditlog_lock;
 #ifdef WAF_JSON_LOGGING_ENABLE
-    apr_global_mutex_t      *wafjsonlog_lock;
+    struct waf_lock         *wafjsonlog_lock;
 #endif
-    apr_global_mutex_t      *geo_lock;
+    struct waf_lock         *geo_lock;
 #ifdef GLOBAL_COLLECTION_LOCK
-    apr_global_mutex_t      *dbm_lock;
+    struct waf_lock         *dbm_lock;
 #endif
     msre_engine             *msre;
     unsigned int             processing_mode;
