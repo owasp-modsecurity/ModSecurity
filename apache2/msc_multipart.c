@@ -94,8 +94,9 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
     if (*p != ';') return -2;
     p++;
 
-    /* parse the appended parts */
+    int filenamePresent = 0;
 
+    /* parse the appended parts */
     while(*p != '\0') {
         char *name = NULL, *value = NULL, *start = NULL;
 
@@ -198,23 +199,68 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     log_escape_nq(msr->mp, value));
             }
         }
-        else
-        if (strcmp(name, "filename") == 0) {
+        else if ((strcmp(name, "filename") == 0) || (strcmp(name, "filename*") == 0))
+        {
 
-            validate_quotes(msr, value);
+            char *decoded_filename = NULL;
 
-            msr->multipart_filename = apr_pstrdup(msr->mp, value);
+            if (strcmp(name, "filename*") == 0)
+            {
+                 // Make sure to turn of INVALID quoting since RFC 5987 expects quotes in the filename format.
+                msr->mpd->flag_invalid_quoting = 0;
 
-            if (msr->mpd->mpp->filename != NULL) {
-                msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
-                    log_escape_nq(msr->mp, value));
-                return -15;
+                decoded_filename = rfc5987_decode(msr->mp, value);
+                if (!decoded_filename)
+                {
+                    msr_log(msr, 4, "Multipart: Could not decode extended filename parameter in RFC 5987 format: %s",
+                            log_escape_nq(msr->mp, value));
+                    return -16;
+                }
+                msr->multipart_filename = decoded_filename;
+
+               
+                if (msr->mpd->mpp->filenameext != NULL) {
+                    msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename*: %s",
+                     log_escape_nq(msr->mp, decoded_filename));
+                     return -17;
+                }
+
+                msr->mpd->mpp->filenameext = apr_pstrdup(msr->mp, decoded_filename);
+
+                // The `filename*` RCF 5987 encoded filename always overrides the `filename` parameter in content-disposition header.
+                msr->mpd->mpp->filename = msr->mpd->mpp->filenameext;
+
+                // Re-run the validation check on the filename. We shouldn't be seeing quotes in the UTF-8 formatted filename either.
+                validate_quotes(msr, msr->mpd->mpp->filename);
             }
-            msr->mpd->mpp->filename = value;
+            else
+            {
+                // Process the `filename` attribute in the content-disposition header only if `filename*` does not exist.
+                filenamePresent++;
+                if (filenamePresent > 1)
+                {
+                    // Duplicate `filename` attributes are not allowed.
+                    msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
+                            log_escape_nq(msr->mp, decoded_filename));
+                    return -15;
+                }
 
-            if (msr->txcfg->debuglog_level >= 9) {
+                if (msr->mpd->mpp->filenameext == NULL)
+                {
+                    // "name == 'filename'"
+                    decoded_filename = value;
+                    validate_quotes(msr, value);
+                    msr->multipart_filename = apr_pstrdup(msr->mp, decoded_filename);
+                    msr->mpd->mpp->filename = decoded_filename;
+                }
+            }
+
+            
+
+            if (msr->txcfg->debuglog_level >= 9)
+            {
                 msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
-                    log_escape_nq(msr->mp, value));
+                        log_escape_nq(msr->mp, decoded_filename));
             }
         }
         else return -11;
@@ -307,7 +353,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
              * values from the C-D header. We need to check for the case where they
              * didn't understand C-D but we did.
              */
-            if (strstr(header_value, "filename=") == NULL) {
+            if ((strstr(header_value, "filename=") == NULL) && (strstr(header_value, "filename*=") == NULL)) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (filename).");
                 return -1;
             }
@@ -695,40 +741,27 @@ static int multipart_boundary_characters_valid(char *boundary) {
 
     if (p == NULL) return -1;
 
-    while((c = *p) != '\0') {
-        /* Control characters and space not allowed. */
-        if (c < 32) {
+    while ((c = *p) != '\0') {
+        // Check against allowed list defined in RFC2046 page 21
+        if (!(
+            ('0' <= c && c <= '9')
+            || ('A' <= c && c <= 'Z')
+            || ('a' <= c && c <= 'z')
+            || (c == ' ' && *(p + 1) != '\0') // space allowed, but not as last character
+            || c == '\''
+            || c == '('
+            || c == ')'
+            || c == '+'
+            || c == '_'
+            || c == ','
+            || c == '-'
+            || c == '.'
+            || c == '/'
+            || c == ':'
+            || c == '='
+            || c == '?'
+            )) {
             return 0;
-        }
-
-        /* Non-ASCII characters not allowed. */
-        if (c > 126) {
-            return 0;
-        }
-
-        switch(c) {
-            /* Special characters not allowed. */
-            case '(' :
-            case ')' :
-            case '<' :
-            case '>' :
-            case '@' :
-            case ',' :
-            case ';' :
-            case ':' :
-            case '\\' :
-            case '"' :
-            case '/' :
-            case '[' :
-            case ']' :
-            case '?' :
-            case '=' :
-                return 0;
-                break;
-
-            default :
-                /* Do nothing. */
-                break;
         }
 
         p++;

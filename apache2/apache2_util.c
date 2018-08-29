@@ -17,6 +17,12 @@
 #include "http_core.h"
 #include "util_script.h"
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+#include "waf_log_util_external.h"
+#include "waf_lock_external.h"
+#include "string.h"
+#endif
+
 /**
  * Sends a brigade with an error bucket down the filter chain.
  */
@@ -187,6 +193,183 @@ char *get_env_var(request_rec *r, char *name) {
     return result;
 }
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+/**
+ * Retrieve waf log field.
+ */
+static void get_field_value(const char* from, const char* to, const char* text, char* output) {
+    char* first = strstr(text, from);
+    int first_index = first - text;
+
+    if (first != NULL ) {
+        if ((first_index > 0 && (first-1)[0] != "\\") || (first_index == 0)) {
+            first += strlen(from);
+        }
+        else {
+            first = NULL;
+        }
+    }
+    else {
+        return;
+    }
+
+    char* last = strstr(first, to);
+    int last_index = last- first;
+    if (last != NULL ) {
+        if ((last_index > 0 && (last-1)[0] != "\\") || (last_index == 0)) {
+        }
+        else {
+            last = NULL;
+        }
+    }
+
+    if (first != NULL && last != NULL) {
+        strncpy(output, first, last - first);
+    }
+}
+
+/**
+ * get ip and port number.
+ */
+static void get_ip_port(const char* ip_port, char* waf_ip, char* waf_port) {
+    char *comma = strstr(ip_port, ":");
+    if (comma!= NULL) {
+        strcpy(waf_port, comma+1);
+        strncpy(waf_ip, ip_port, comma - ip_port);
+    }
+    else {
+        strcpy(waf_ip, ip_port);
+    }
+}
+
+/**
+ * get detail_messages.
+ */
+static void get_detail_message(const char* str1, char* waf_detail_message) {
+    char *end = strstr(str1, "[file ");
+    if (end != NULL) {
+        strncpy(waf_detail_message, str1, end - str1);
+    }
+}
+
+/**
+ * only expose short path.
+ */
+static void get_short_filename(char* waf_filename) {
+    char tmp_filename[1024] = ""; 
+    char *index = strstr(waf_filename, WAF_RULESET_PREFIX);
+
+    if (index != NULL) {
+        index += strlen(WAF_RULESET_PREFIX);
+        index = strstr(index, "/");
+        if (index != NULL) {
+            strcpy(tmp_filename, index+1);
+            strcpy(waf_filename, tmp_filename);
+        }
+    }
+}
+
+/**
+ * get crs type and version.
+ */
+static void get_ruleset_type_version(char* waf_ruleset_info, char* waf_ruleset_type, char* waf_ruleset_version) {
+    char ruleset_info_no_quote[200] = "";
+    char *type_start = NULL;
+    char *type_end = NULL;
+
+    get_field_value("\"", "\"", waf_ruleset_info, ruleset_info_no_quote);
+    type_start = ruleset_info_no_quote;
+
+    type_end = strstr(type_start, "/");
+    if (type_end != NULL) {
+        strncpy(waf_ruleset_type, type_start, type_end - type_start);
+        strcpy(waf_ruleset_version, type_end + 1);
+    }
+    else {
+        strcpy(waf_ruleset_type, type_start + 1);
+    }
+}
+
+static int write_file_with_lock(struct waf_lock* lock, apr_file_t* fd, char* str) {
+    int rc;
+    apr_size_t nbytes, nbytes_written;
+
+    if (lock == NULL || fd == NULL || str == NULL) {
+        return WAF_LOG_UTIL_FAILED;
+    }
+
+    rc = waf_get_exclusive_lock(lock);
+    if (waf_lock_is_error(rc)) {
+        return WAF_LOG_UTIL_FAILED;
+    }
+
+    nbytes = strlen(str);
+    apr_file_write_full(fd, str, nbytes, &nbytes_written);
+
+    rc = waf_free_exclusive_lock(lock);
+    if (waf_lock_is_error(rc)) {
+        return WAF_LOG_UTIL_FAILED;
+    }
+
+    return WAF_LOG_UTIL_SUCCESS;
+}
+
+/**
+ * send all waf fields in json format to a file.
+ */
+static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, request_rec *r) {
+    int rc = 0;
+    char* json_str;
+    char waf_filename[1024] = "";
+    char waf_line[1024] = "";
+    char waf_id[1024] = "";
+    char waf_message[1024] = "";
+    char waf_data[1024] = "";
+    char waf_ip[50] = "";
+    char waf_port[50] = "";
+    char waf_ruleset_info[200] = "";
+    char waf_ruleset_type[50] = "";
+    char waf_ruleset_version[50] = "";
+    char waf_detail_message[1024] = "";
+
+    get_field_value("[file ", "]", str1, waf_filename);
+    get_field_value("[id ", "]", str1, waf_id);
+    get_field_value("[line ", "]", str1, waf_line);
+    get_field_value("[msg ", "]", str1, waf_message);
+    get_field_value("[data ", "]", str1, waf_data);
+    get_field_value("[ver ", "]", str1, waf_ruleset_info);
+    get_ip_port(ip_port, waf_ip, waf_port);
+    get_detail_message(str1, waf_detail_message); 
+    get_short_filename(waf_filename);
+    get_ruleset_type_version(waf_ruleset_info, waf_ruleset_type, waf_ruleset_version); 
+
+    rc = generate_json(&json_str, msc_waf_resourceId, WAF_LOG_UTIL_OPERATION_NAME, WAF_LOG_UTIL_CATEGORY, msc_waf_instanceId, waf_ip, waf_port, uri, waf_ruleset_type, waf_ruleset_version, waf_id, waf_message, mode, 0, waf_detail_message, waf_data, waf_filename, waf_line, hostname);
+    if (rc == WAF_LOG_UTIL_FAILED) {
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+       ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
+            "ModSecurity: can't print json log");
+#else
+        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
+            "ModSecurity: can't print json log");
+#endif
+        return;
+    }
+
+    rc = write_file_with_lock(lock, fd, json_str);
+    if (rc == WAF_LOG_UTIL_FAILED) {
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+       ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
+            "ModSecurity: can't print json log");
+#else
+        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
+            "ModSecurity: can't print json log");
+#endif
+    }
+
+    free_json(json_str);
+}
+#endif
+
 /**
  * Extended internal log helper function. Use msr_log instead. If fixup is
  * true, the message will be stripped of any trailing newline and any
@@ -254,6 +437,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
     if (level <= 3) {
         char *unique_id = (char *)get_env_var(r, "UNIQUE_ID");
         char *hostname = (char *)msr->hostname;
+        char *requestheaderhostname = (char *)r->hostname;
 
         if (unique_id != NULL) {
             unique_id = apr_psprintf(msr->mp, " [unique_id \"%s\"]",
@@ -267,14 +451,24 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
         }
         else hostname = "";
 
+        if (requestheaderhostname != NULL) {
+            requestheaderhostname = apr_psprintf(msr->mp, " [requestheaderhostname \"%s\"]",
+                log_escape(msr->mp, requestheaderhostname));
+        }
+        else requestheaderhostname = "";
+
+#ifdef WAF_JSON_LOGGING_ENABLE
+        send_waf_log(msr->modsecurity->wafjsonlog_lock, dcfg->wafjsonlog_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), dcfg->is_enabled, (char*)msr->hostname, r);
+#endif
+
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
 	ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
-            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->useragent_ip ? r->useragent_ip : r->connection->client_ip, str1,
-            hostname, log_escape(msr->mp, r->uri), unique_id);
+            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s%s", r->useragent_ip ? r->useragent_ip : r->connection->client_ip, str1,
+            hostname, log_escape(msr->mp, r->uri), unique_id, requestheaderhostname);
 #else
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-                "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", msr->remote_addr ? msr->remote_addr : r->connection->remote_ip, str1,
-                hostname, log_escape(msr->mp, r->uri), unique_id);
+                "[client %s] ModSecurity: %s%s [uri \"%s\"]%s%s", msr->remote_addr ? msr->remote_addr : r->connection->remote_ip, str1,
+                hostname, log_escape(msr->mp, r->uri), unique_id, requestheaderhostname);
 #endif
 
         /* Add this message to the list. */

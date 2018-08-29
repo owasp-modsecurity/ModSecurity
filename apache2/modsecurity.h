@@ -56,6 +56,7 @@ typedef struct msc_parm msc_parm;
 #include "http_config.h"
 #include "http_log.h"
 #include "http_protocol.h"
+#include "waf_lock_external.h"
 
 #if defined(WITH_LUA)
 #include "msc_lua.h"
@@ -166,6 +167,22 @@ extern DSOLOCAL TreeRoot *conn_write_state_suspicious_list;
 extern DSOLOCAL unsigned long int unicode_codepage;
 
 extern DSOLOCAL int *unicode_map_table;
+
+#ifdef WAF_JSON_LOGGING_ENABLE
+extern DSOLOCAL char *msc_waf_resourceId;
+extern DSOLOCAL char *msc_waf_instanceId;
+extern DSOLOCAL char *msc_waf_lock_owner;
+#endif
+
+#define AUDITLOG_LOCK_ID                1
+#define WAFJSONLOG_LOCK_ID              2
+#define GEO_LOCK_ID                     3
+#define DBM_LOCK_ID                     4
+
+#define AUDITLOG_LOCK_NAME              "Global\\auditlog_lock"
+#define WAFJSONLOG_LOCK_NAME            "Global\\wafjsonlog_lock"
+#define GEO_LOCK_NAME                   "Global\\geo_lock"
+#define DBM_LOCK_NAME                   "Global\\dbm_lock"
 
 #define RESBODY_STATUS_NOT_READ         0   /* we were not configured to read the body */
 #define RESBODY_STATUS_ERROR            1   /* error occured while we were reading the body */
@@ -575,6 +592,9 @@ struct directory_config {
 
     /* Misc */
     const char          *data_dir;
+#ifdef WAF_JSON_LOGGING_ENABLE
+    apr_file_t          *wafjsonlog_fd;
+#endif
     const char          *webappid;
     const char          *sensor_id;
     const char          *httpBlkey;
@@ -639,6 +659,12 @@ struct directory_config {
 
     /* xml */
     int                 xml_external_entity;
+#ifdef MEMORY_DATABASE_ENABLE
+    /* AGMDB */
+    directory_config	*root_config;
+    int                 db_option;
+    void                *agmdb_handles;    
+#endif
 
     /* This will be used whenever ModSecurity will be ready
      * to ask the server for newer rules.
@@ -659,10 +685,13 @@ struct error_message_t {
 
 struct msc_engine {
     apr_pool_t              *mp;
-    apr_global_mutex_t      *auditlog_lock;
-    apr_global_mutex_t      *geo_lock;
+    struct waf_lock         *auditlog_lock;
+#ifdef WAF_JSON_LOGGING_ENABLE
+    struct waf_lock         *wafjsonlog_lock;
+#endif
+    struct waf_lock         *geo_lock;
 #ifdef GLOBAL_COLLECTION_LOCK
-    apr_global_mutex_t      *dbm_lock;
+    struct waf_lock         *dbm_lock;
 #endif
     msre_engine             *msre;
     unsigned int             processing_mode;

@@ -59,7 +59,28 @@ const char * msc_alert_message(modsec_rec *msr, msre_actionset *actionset, const
 void msc_alert(modsec_rec *msr, int level, msre_actionset *actionset, const char *action_message,
     const char *rule_message)
 {
-    const char *message = msc_alert_message(msr, actionset, action_message, rule_message);
+    directory_config *dcfg = msr->txcfg;
+    apr_file_t *debuglog_fd = NULL;
+    int filter_debug_level = 0;
+    char *message;
+
+    if (dcfg != NULL) {
+        if ((dcfg->debuglog_fd != NULL)&&(dcfg->debuglog_fd != NOT_SET_P)) {
+            debuglog_fd = dcfg->debuglog_fd;
+        }
+
+        if (dcfg->debuglog_level != NOT_SET) {
+            filter_debug_level = dcfg->debuglog_level;
+        }
+    }
+
+    /* Return immediately if we don't have where to write
+     * or if the log level of the message is higher than
+     * wanted in the log.
+     */
+    if ((level > 3)&&( (debuglog_fd == NULL) || (level > filter_debug_level) )) return;
+
+    message = msc_alert_message(msr, actionset, action_message, rule_message);
 
     msr_log(msr, level, "%s", message);
 }
@@ -114,6 +135,38 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
     return msce;
 }
 
+static void set_lock_args(struct waf_lock_args *lock_args, int lock_id) {
+    if (lock_args == NULL) {
+        return;
+    }
+
+#ifdef _WIN32
+    switch(lock_id) {
+        case AUDITLOG_LOCK_ID:
+            lock_args->lock_name = AUDITLOG_LOCK_NAME;
+            lock_args->lock_name_length = strlen(AUDITLOG_LOCK_NAME);
+            break;
+        case WAFJSONLOG_LOCK_ID:
+            lock_args->lock_name = WAFJSONLOG_LOCK_NAME;
+            lock_args->lock_name_length = strlen(WAFJSONLOG_LOCK_NAME);
+            break;
+        case GEO_LOCK_ID:
+            lock_args->lock_name = GEO_LOCK_NAME;
+            lock_args->lock_name_length = strlen(GEO_LOCK_NAME);
+            break;
+        case DBM_LOCK_ID:
+            lock_args->lock_name = DBM_LOCK_NAME;
+            lock_args->lock_name_length = strlen(DBM_LOCK_NAME);
+            break;
+        default:
+            break;
+    }
+
+#else
+    lock_args->lock_id = lock_id;
+#endif
+}
+
 /**
  * Initialise the modsecurity engine. This function must be invoked
  * after configuration processing is complete as Apache needs to know the
@@ -121,6 +174,8 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
  */
 int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     apr_status_t rc;
+    struct waf_lock_args *lock_args;
+    char *lock_name;
 
     /**
      * Notice that curl is initialized here but never cleaned up. First version
@@ -132,60 +187,51 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
 #ifdef WITH_CURL
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
+    lock_args = apr_pcalloc(mp, sizeof(struct waf_lock_args));
+
     /* Serial audit log mutext */
-    rc = apr_global_mutex_create(&msce->auditlog_lock, NULL, APR_LOCK_DEFAULT, mp);
-    if (rc != APR_SUCCESS) {
+    set_lock_args(lock_args, AUDITLOG_LOCK_ID);
+
+    msce->auditlog_lock = apr_pcalloc(mp, sizeof(struct waf_lock));
+    rc = waf_create_lock(msce->auditlog_lock, lock_args);    
+    if (waf_lock_is_error(rc)) {
         //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_auditlog_lock");
         //return HTTP_INTERNAL_SERVER_ERROR;
         return -1;
     }
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+    /* Serial wafjson log mutext */
+    set_lock_args(lock_args, WAFJSONLOG_LOCK_ID);
+
+    msce->wafjsonlog_lock = apr_pcalloc(mp, sizeof(struct waf_lock));
+    rc = waf_create_lock(msce->wafjsonlog_lock, lock_args);    
+    if (waf_lock_is_error(rc)) {
+        //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_wafjsonlog_lock");
+        //return HTTP_INTERNAL_SERVER_ERROR;
+        return -1;
+    }
+#endif
+
+// Have removed all the lock permission related code since we implment in different way now
+
 #if !defined(MSC_TEST)
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->auditlog_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->auditlog_lock);
-#endif
-    if (rc != APR_SUCCESS) {
-        // ap_log_error(APLOG_MARK, APLOG_ERR, rc, s, "mod_security: Could not set permissions on modsec_auditlog_lock; check User and Group directives");
-        // return HTTP_INTERNAL_SERVER_ERROR;
-        return -1;
-    }
-#endif /* SET_MUTEX_PERMS */
+    set_lock_args(lock_args, GEO_LOCK_ID);
 
-    rc = apr_global_mutex_create(&msce->geo_lock, NULL, APR_LOCK_DEFAULT, mp);
-    if (rc != APR_SUCCESS) {
+    msce->geo_lock = apr_pcalloc(mp, sizeof(struct waf_lock));
+    rc = waf_create_lock(msce->geo_lock, lock_args);    
+    if (waf_lock_is_error(rc)) {
         return -1;
     }
-
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->geo_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->geo_lock);
-#endif
-    if (rc != APR_SUCCESS) {
-        return -1;
-    }
-#endif /* SET_MUTEX_PERMS */
 
 #ifdef GLOBAL_COLLECTION_LOCK
-    rc = apr_global_mutex_create(&msce->dbm_lock, NULL, APR_LOCK_DEFAULT, mp);
-    if (rc != APR_SUCCESS) {
-        return -1;
-    }
+    set_lock_args(lock_args, DBM_LOCK_ID);
 
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->dbm_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->dbm_lock);
-#endif
-    if (rc != APR_SUCCESS) {
+    msce->dbm_lock = apr_pcalloc(mp, sizeof(struct waf_lock));
+    rc = waf_create_lock(msce->dbm_lock, lock_args);    
+    if (waf_lock_is_error(rc)) {
         return -1;
     }
-#endif /* SET_MUTEX_PERMS */
 #endif
 #endif
 
@@ -196,30 +242,47 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
  * Performs per-child (new process) initialisation.
  */
 void modsecurity_child_init(msc_engine *msce) {
+    struct waf_lock_args *lock_args;
+    char *lock_name;
+
     /* Need to call this once per process before any other XML calls. */
     xmlInitParser();
+    lock_args = apr_pcalloc(msce->mp, sizeof(struct waf_lock_args));
 
-    if (msce->auditlog_lock != NULL) {
-        apr_status_t rc = apr_global_mutex_child_init(&msce->auditlog_lock, NULL, msce->mp);
-        if (rc != APR_SUCCESS) {
-            // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init auditlog mutex");
-        }
+    if (msce->auditlog_lock == NULL) {
+        msce->auditlog_lock = apr_pcalloc(msce->mp, sizeof(struct waf_lock));
     }
 
-    if (msce->geo_lock != NULL) {
-        apr_status_t rc = apr_global_mutex_child_init(&msce->geo_lock, NULL, msce->mp);
-        if (rc != APR_SUCCESS) {
-            // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init geo mutex");
-        }
+    set_lock_args(lock_args, AUDITLOG_LOCK_ID);
+
+    waf_create_lock(msce->auditlog_lock, lock_args);    
+
+#ifdef WAF_JSON_LOGGING_ENABLE
+    if (msce->wafjsonlog_lock == NULL) {
+        msce->wafjsonlog_lock = apr_pcalloc(msce->mp, sizeof(struct waf_lock));
     }
+
+    set_lock_args(lock_args, WAFJSONLOG_LOCK_ID);
+
+    waf_create_lock(msce->wafjsonlog_lock, lock_args);    
+#endif
+
+    if (msce->geo_lock == NULL) {
+        msce->geo_lock = apr_pcalloc(msce->mp, sizeof(struct waf_lock));
+    }
+
+    set_lock_args(lock_args, GEO_LOCK_ID);
+
+    waf_create_lock(msce->geo_lock, lock_args);    
 
 #ifdef GLOBAL_COLLECTION_LOCK
-    if (msce->dbm_lock != NULL) {
-        apr_status_t rc = apr_global_mutex_child_init(&msce->dbm_lock, NULL, msce->mp);
-        if (rc != APR_SUCCESS) {
-            // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init dbm mutex");
-        }
+    if (msce->dbm_lock == NULL) {
+        msce->dbm_lock = apr_pcalloc(msce->mp, sizeof(struct waf_lock));
     }
+
+    set_lock_args(lock_args, DBM_LOCK_ID);
+
+    waf_create_lock(msce->dbm_lock, lock_args);    
 #endif
 
 }

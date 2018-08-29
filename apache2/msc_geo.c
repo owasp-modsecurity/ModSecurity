@@ -13,6 +13,7 @@
 */
 
 #include "msc_geo.h"
+#include "waf_lock_external.h"
 
 
 /* -- Lookup Tables -- */
@@ -315,8 +316,8 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08lx). %lu", targetip, ipnum, ipnum);
     }
 
-    ret = apr_global_mutex_lock(msr->modsecurity->geo_lock);
-    if (ret != APR_SUCCESS) {
+    ret = waf_get_exclusive_lock(msr->modsecurity->geo_lock);
+    if (waf_lock_is_error(ret)) {
         msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
                 get_apr_error(msr->mp, ret));
     }
@@ -352,8 +353,8 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\").", log_escape(msr->mp, target));
         msr_log(msr, 4, "%s", *error_msg);
 
-        ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
-        if (ret != APR_SUCCESS) {
+        ret = waf_free_exclusive_lock(msr->modsecurity->geo_lock);
+        if (waf_lock_is_error(ret)) {
             msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
                     get_apr_error(msr->mp, ret));
         }
@@ -368,8 +369,8 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
             *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\" (country %d).", log_escape(msr->mp, target), country);
             msr_log(msr, 4, "%s", *error_msg);
 
-            ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
-            if (ret != APR_SUCCESS) {
+            ret = waf_free_exclusive_lock(msr->modsecurity->geo_lock);
+            if (waf_lock_is_error(ret)) {
                 msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
                         get_apr_error(msr->mp, ret));
             }
@@ -399,8 +400,8 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
             *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\" (country %d).", log_escape(msr->mp, target), country);
             msr_log(msr, 4, "%s", *error_msg);
 
-            ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
-            if (ret != APR_SUCCESS) {
+            ret = waf_free_exclusive_lock(msr->modsecurity->geo_lock);
+            if (waf_lock_is_error(ret)) {
                 msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
                         get_apr_error(msr->mp, ret));
             }
@@ -494,8 +495,8 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
     *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded.", log_escape(msr->mp, target));
 
-    ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
-    if (ret != APR_SUCCESS) {
+    ret = waf_free_exclusive_lock(msr->modsecurity->geo_lock);
+    if (waf_lock_is_error(ret)) {
         msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
                 get_apr_error(msr->mp, ret));
     }

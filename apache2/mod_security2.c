@@ -92,6 +92,11 @@ unsigned long int DSOLOCAL conn_write_state_limit = 0;
 TreeRoot DSOLOCAL *conn_write_state_whitelist = 0;
 TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+char DSOLOCAL *msc_waf_resourceId = "";
+char DSOLOCAL *msc_waf_instanceId = "";
+char DSOLOCAL *msc_waf_lock_owner = "root";
+#endif
 
 #if defined(WIN32) || defined(VERSION_NGINX)
 int (*modsecDropAction)(request_rec *r) = NULL;
@@ -1013,7 +1018,7 @@ static int hook_request_late(request_rec *r) {
     }
 
     rc = read_request_body(msr, &my_error_msg);
-    if (rc < 0) {
+    if (rc < 0 && msr->txcfg->is_enabled == MODSEC_ENABLED) {
         switch(rc) {
             case -1 :
                 if (my_error_msg != NULL) {

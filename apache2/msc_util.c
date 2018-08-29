@@ -1482,15 +1482,21 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
             {
                 /* \uHHHH */
 
-                /* Use only the lower byte. */
-                *d = x2c(&input[i + 4]);
+                unsigned char lowestByte = x2c(&input[i + 4]);
 
-                /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
-                if (   (*d > 0x00) && (*d < 0x5f)
+                if ((lowestByte > 0x00) && (lowestByte < 0x5f)
                         && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
                         && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
                 {
-                    (*d) += 0x20;
+                    /* Full width ASCII (ff01 - ff5e) needs 0x20 added. */
+                    /* This is because the first printable char in ASCII is 0x20, and corresponds to 0xFF00. */
+                    *d = lowestByte + 0x20;
+                }
+                else
+                {
+                    /* There was no good ASCII character to map this unicode character to. */
+                    /* Put a placeholder that is hopefully as innocent as the unicode character. */
+                    *d = 'x';
                 }
 
                 d++;
@@ -1633,15 +1639,21 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len,
                         if(hmap != -1)  {
                             *d = hmap;
                         } else {
-                            /* We first make use of the lower byte here, ignoring the higher byte. */
-                            *d = x2c(&input[i + 4]);
+                            unsigned char lowestByte = x2c(&input[i + 4]);
 
-                            /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
-                            if (   (*d > 0x00) && (*d < 0x5f)
-                                    && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
-                                    && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                            if ((lowestByte > 0x00) && (lowestByte < 0x5f)
+                                && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                                && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
                             {
-                                (*d) += 0x20;
+                                /* Full width ASCII (ff01 - ff5e) needs 0x20 added. */
+                                /* This is because the first printable char in ASCII is 0x20, and corresponds to 0xFF00. */
+                                *d = lowestByte + 0x20;
+                            }
+                            else
+                            {
+                                /* There was no good ASCII character to map this unicode character to. */
+                                /* Put a placeholder that is hopefully as innocent as the unicode character. */
+                                *d = 'x';
                             }
                         }
                         d++;
@@ -1765,6 +1777,84 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
     *d = '\0';
 
     return count;
+}
+
+// RFC 5987 allows HTTP values to be non-ASCII characters.
+// As per RFC 5987 the value can be encoded as UTF-8 or ISO-8859-1. Since HTTP doesn't support non-ASCII characters, 
+// when using the extended value format specified by RFC 5987 the value is double encoded.
+// The value is first encoded into an octet stream in the format specified in the extended format (UTF-8 or ISO-8859-1)
+// and then the octet stream itself is encoded using URL encoding.
+// RFC 5987 specifies the extended value format to be as follows:
+//  `value = <utf-8|iso-8859-1>'<language>'<URL encoded octect stream>.
+// The function, takes in a RFC 5987 encoded value and decodes it to a UTF-8 encoded string (even if the RFC 5987 was encoded using ISO-8859-1).
+char *rfc5987_decode(apr_pool_t *mptmp, char *value)
+{
+    const char utf8[] = "utf-8";
+    const char iso88591[] = "iso-8859-1";
+    const char rfc5987Delimiter[] = "'";
+    int len = strlen(value);
+    char *urlEncodedValue = strstr(value, rfc5987Delimiter);
+
+    if (!urlEncodedValue)
+    {
+        return NULL;
+    }
+
+    // Find the URL encoded string. 'URLEncodedValue' is already set to the first occurence of the quote, the format of the extended value as per RFC 5987 is
+    // `value = <utf-8|iso-8859-1>'<language>'<URL encoded octect stream>
+    if (strlen(urlEncodedValue) > 0)
+    {
+        // Remove the leading single quotes.
+        urlEncodedValue++;
+        urlEncodedValue = strstr(urlEncodedValue, rfc5987Delimiter);
+
+        if (!urlEncodedValue)
+        {
+            return NULL;
+        }
+
+        // Remove the terminating single quotes.
+        urlEncodedValue++;
+    }
+
+    // The decode that we perform will be in place, hence lets allocate a new buffer for URL encoded value that we are processing.
+    urlEncodedValue = apr_pstrdup(mptmp, urlEncodedValue);
+
+    if (strncmp(value, utf8, strlen(utf8)) == 0)
+    {
+        // The value is an extended value with UTF-8 encoding.
+        int invalid_count;
+        int changed;
+        if (urldecode_nonstrict_inplace_ex(urlEncodedValue, strlen(urlEncodedValue), &invalid_count, &changed) > 0)
+        {
+            return urlEncodedValue;
+        }
+    }
+    else if (strncmp(value, iso88591, strlen(iso88591)) == 0)
+    {
+        // The value is an extended value with ISO-8859-1 encoding.
+        int invalid_count;
+        int changed;
+        int isoCount = 0;
+        char *utf8EncodedValue = NULL;
+        int outLen = 0;
+        if ((isoCount = urldecode_nonstrict_inplace_ex(urlEncodedValue, strlen(urlEncodedValue), &invalid_count, &changed)) > 0)
+        {
+            // The URLdecoded string is in ISO-8859-1 format, convert it to UTF-8.
+            outLen = 2 * isoCount;
+            utf8EncodedValue = apr_palloc(mptmp, outLen);
+
+            if (isolat1ToUTF8(utf8EncodedValue, &outLen, (const unsigned char *)urlEncodedValue, &isoCount) > 0)
+            {
+                // We want a null-terminated UTF-8 string.
+                utf8EncodedValue[outLen + 1] = '\0';
+                return utf8EncodedValue;
+            }
+        }
+    }
+
+    // Error
+    return NULL;
 }
 
 /**

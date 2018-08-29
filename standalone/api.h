@@ -40,6 +40,9 @@
 #include "ap_config.h"
 #include "http_config.h"
 
+#if defined(_MSC_VER)
+#define inline __inline
+#endif
 
 #ifdef	__cplusplus
 extern "C"

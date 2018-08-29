@@ -21,9 +21,15 @@
 #include "apr_lib.h"
 #include "acmp.h"
 #include "msc_crypt.h"
+#ifdef MEMORY_DATABASE_ENABLE
+#include "persist_dbm.h"
+#endif
 
 #if defined(WITH_LUA)
 #include "msc_lua.h"
+#endif
+#ifdef WAF_JSON_LOGGING_ENABLE
+#include "waf_log_util_external.h"
 #endif
 
 
@@ -43,7 +49,11 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     dcfg->mp = mp;
     dcfg->is_enabled = NOT_SET;
-
+#ifdef MEMORY_DATABASE_ENABLE
+    dcfg->root_config = NOT_SET_P;
+    dcfg->db_option = 0;
+    dcfg->agmdb_handles = NOT_SET_P;
+#endif
     dcfg->reqbody_access = NOT_SET;
     dcfg->reqintercept_oe = NOT_SET;
     dcfg->reqbody_buffering = NOT_SET;
@@ -104,6 +114,9 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     /* Misc */
     dcfg->data_dir = NOT_SET_P;
+#ifdef WAF_JSON_LOGGING_ENABLE
+    dcfg->wafjsonlog_fd = NOT_SET_P;
+#endif
     dcfg->webappid = NOT_SET_P;
     dcfg->sensor_id = NOT_SET_P;
     dcfg->httpBlkey = NOT_SET_P;
@@ -317,7 +330,14 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     /* Use values from the child configuration where possible,
      * otherwise use the parent's.
      */
-
+#ifdef MEMORY_DATABASE_ENABLE
+    merged->root_config = (child->root_config == NOT_SET_P
+        ? parent->root_config : child->root_config);
+    merged->db_option = (child->db_option == NOT_SET
+        ? parent->db_option : child->db_option);
+    merged->agmdb_handles = (child->agmdb_handles == NOT_SET_P
+        ? parent->agmdb_handles : child->agmdb_handles);
+#endif
     merged->is_enabled = (child->is_enabled == NOT_SET
         ? parent->is_enabled : child->is_enabled);
 
@@ -534,6 +554,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     /* Misc */
     merged->data_dir = (child->data_dir == NOT_SET_P
         ? parent->data_dir : child->data_dir);
+#ifdef WAF_JSON_LOGGING_ENABLE
+    merged->wafjsonlog_fd = (child->wafjsonlog_fd == NOT_SET_P
+        ? parent->wafjsonlog_fd : child->wafjsonlog_fd);
+#endif
     merged->webappid = (child->webappid == NOT_SET_P
         ? parent->webappid : child->webappid);
     merged->sensor_id = (child->sensor_id == NOT_SET_P
@@ -638,7 +662,11 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 void init_directory_config(directory_config *dcfg)
 {
     if (dcfg == NULL) return;
-
+#ifdef MEMORY_DATABASE_ENABLE
+    if (dcfg->root_config == NOT_SET_P) dcfg->root_config = NULL;
+    if (dcfg->db_option == NOT_SET) dcfg->db_option = 0;
+    if (dcfg->agmdb_handles == NOT_SET_P) dcfg->agmdb_handles = NULL;
+#endif
     if (dcfg->is_enabled == NOT_SET) dcfg->is_enabled = 0;
 
     if (dcfg->reqbody_access == NOT_SET) dcfg->reqbody_access = 0;
@@ -698,6 +726,9 @@ void init_directory_config(directory_config *dcfg)
 
     /* Misc */
     if (dcfg->data_dir == NOT_SET_P) dcfg->data_dir = NULL;
+#ifdef WAF_JSON_LOGGING_ENABLE
+    if (dcfg->wafjsonlog_fd == NOT_SET_P) dcfg->wafjsonlog_fd = NULL;
+#endif
     if (dcfg->webappid == NOT_SET_P) dcfg->webappid = "default";
     if (dcfg->sensor_id == NOT_SET_P) dcfg->sensor_id = "default";
     if (dcfg->httpBlkey == NOT_SET_P) dcfg->httpBlkey = NULL;
@@ -732,8 +763,7 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->col_timeout == NOT_SET) dcfg->col_timeout = 3600;
 
     /* Hash */
-    if (dcfg->crypto_key == NOT_SET_P) dcfg->crypto_key = getkey(dcfg->mp);
-    if (dcfg->crypto_key_len == NOT_SET) dcfg->crypto_key_len = strlen(dcfg->crypto_key);
+
     if (dcfg->crypto_key_add == NOT_SET) dcfg->crypto_key_add = HASH_KEYONLY;
     if (dcfg->crypto_param_name == NOT_SET_P) dcfg->crypto_param_name = "crypt";
     if (dcfg->hash_is_enabled == NOT_SET) dcfg->hash_is_enabled = HASH_DISABLED;
@@ -1128,6 +1158,63 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
 
 /* -- Configuration directives -- */
 
+#ifdef MEMORY_DATABASE_ENABLE
+static const char *cmd_db_option(cmd_parms *cmd, void *_dcfg, const char *p1){
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if((strcmp(p1,"origin") == 0))
+        dcfg->db_option = DB_OPT_ORIGIN;
+    else if((strcmp(p1,"agmdb") == 0)) {
+        dcfg->db_option = DB_OPT_AGMDB;
+        dcfg->agmdb_handles = NULL;
+    }
+    else
+        dcfg->db_option = DB_OPT_ORIGIN;
+    return NULL;
+}
+#endif
+
+/* resourceId and instanceId */ 
+#ifdef WAF_JSON_LOGGING_ENABLE
+static const char *cmd_waf_resourceId(cmd_parms *cmd,
+        void *_dcfg, const char *p1)
+{
+
+    if (cmd->server->is_virtual) {
+        return "ModSecurity: SecWafResourceId not allowed in VirtualHost";
+    }
+
+    msc_waf_resourceId = (char *)p1;
+
+    return NULL;
+}
+
+static const char *cmd_waf_instanceId(cmd_parms *cmd,
+        void *_dcfg, const char *p1)
+{
+
+    if (cmd->server->is_virtual) {
+        return "ModSecurity: SecWafInstanceId not allowed in VirtualHost";
+    }
+
+    msc_waf_instanceId = (char *)p1;
+
+    return NULL;
+}
+
+static const char *cmd_waf_lock_owner(cmd_parms *cmd,
+        void *_dcfg, const char *p1)
+{
+
+    if (cmd->server->is_virtual) {
+        return "ModSecurity: SecWafLockOwner not allowed in VirtualHost";
+    }
+
+    msc_waf_lock_owner = (char *)p1;
+
+    return NULL;
+}
+#endif
+
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_ACTION, SECACTION_TARGETS, SECACTION_ARGS, p1);
@@ -1440,6 +1527,10 @@ static const char *cmd_content_injection(cmd_parms *cmd, void *_dcfg, int flag)
 
 static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+#ifdef WAF_JSON_LOGGING_ENABLE
+    int rc;
+    char wafjsonlog_path[1024]; 
+#endif
     directory_config *dcfg = (directory_config *)_dcfg;
 
     if (cmd->server->is_virtual) {
@@ -1448,6 +1539,18 @@ static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 
     dcfg->data_dir = ap_server_root_relative(cmd->pool, p1);
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+    strcpy( wafjsonlog_path, dcfg->data_dir );
+    strcat( wafjsonlog_path, WAF_LOG_UTIL_FILE );
+    rc = apr_file_open(&dcfg->wafjsonlog_fd, wafjsonlog_path,
+                   APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
+                   CREATEMODE | APR_WREAD, cmd->pool);
+
+    if (rc != APR_SUCCESS) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Failed to open wafjson log file: %s",
+            wafjsonlog_path);
+    }
+#endif
     return NULL;
 }
 
@@ -3918,6 +4021,37 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "Set Hash parameter"
     ),
-
+#ifdef MEMORY_DATABASE_ENABLE
+    AP_INIT_TAKE1 (
+        "SecDBOption",
+        cmd_db_option,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Choose database. (origin/redis/agdb)"
+    ),
+#endif
+#ifdef WAF_JSON_LOGGING_ENABLE 
+    AP_INIT_TAKE1 (
+        "SecWafResourceId",
+        cmd_waf_resourceId,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Set waf resourceId"
+    ),
+    AP_INIT_TAKE1 (
+        "SecWafInstanceId",
+        cmd_waf_instanceId,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Set waf instanceId"
+    ),
+    AP_INIT_TAKE1 (
+        "SecWafLockOwner",
+        cmd_waf_lock_owner,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Set waf lock owner"
+    ),
+#endif
     { NULL }
 };

@@ -1104,7 +1104,7 @@ ProcessInclude:
 				incpath = w;
 
 				/* locate the start of the directories proper */
-				status = apr_filepath_root(&rootpath, &incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, ptemp);
+				status = apr_filepath_root((const char **)&rootpath, (const char **)&incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, ptemp);
 
 				/* we allow APR_SUCCESS and APR_EINCOMPLETE */
 				if (APR_ERELATIVE == status) {
