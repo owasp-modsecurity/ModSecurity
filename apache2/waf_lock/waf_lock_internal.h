@@ -14,13 +14,13 @@
 #include<sys/sem.h>
 #include<sys/ipc.h>
 #include <errno.h>
+#include<pwd.h>
+#include<grp.h>
 #endif
 #include<cstring>
 #include<stdlib.h>
 #include<time.h>
 #include<stdio.h>
-#include<pwd.h>
-#include<grp.h>
 #include"waf_lock_external.h"
 
 #ifdef __cplusplus

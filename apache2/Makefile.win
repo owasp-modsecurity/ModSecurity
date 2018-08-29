@@ -37,7 +37,8 @@ INCLUDES = -I. -I.. \
            -I$(PCRE)\include -I$(PCRE) \
            -I$(LIBXML2)\include \
            -I$(APACHE)\include \
-           -I.\ag_mdb 
+           -I.\ag_mdb \
+           -I.\waf_lock
 
 # Enables support for SecRemoteRules and external resources.
 DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
@@ -63,7 +64,8 @@ CFLAGS= -MD $(INCLUDES) $(DEFS)
 
 LDFLAGS =
 
-OBJS = ag_mdb/ag_mdb.obj ag_mdb/murmur3.obj \
+OBJS = waf_lock/waf_lock.obj \
+       ag_mdb/ag_mdb.obj ag_mdb/murmur3.obj \
        mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
        re.obj re_operators.obj re_actions.obj re_tfns.obj re_variables.obj \
        msc_logging.obj msc_xml.obj msc_multipart.obj modsecurity.obj \

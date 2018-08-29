@@ -36,7 +36,8 @@ INCLUDES = -I. -I.. \
            -I$(APACHE)\include \
            -I..\apache2 \
            -I..\standalone \
-           -I..\apache2\ag_mdb 
+           -I..\apache2\ag_mdb \
+           -I..\apache2\waf_lock
 
 # Enables support for SecRemoteRules and external resources.
 DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
@@ -90,6 +91,7 @@ OBJS4 = libinjection_html5.obj \
     
 OBJS6 = murmur3.obj
 OBJS7 = ag_mdb.obj
+OBJS8 = waf_lock.obj
 
 all: $(DLL)
 
@@ -111,12 +113,14 @@ $(OBJS6): ..\apache2\ag_mdb\$*.c
 $(OBJS7): ..\apache2\ag_mdb\$*.cpp
         $(CC) $(CFLAGS) -c ..\apache2\ag_mdb\$*.cpp -Fo$@
    
+$(OBJS8): ..\apache2\waf_lock\$*.cpp
+        $(CC) $(CFLAGS) -c ..\apache2\waf_lock\$*.cpp -Fo$@
 
 .cpp.obj:
         $(CC) $(CFLAGS) -c $< -Fo$@
 
-$(DLL): $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)  $(OBJS6) $(OBJS7)
-        $(LINK) $(LDFLAGS) $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS6) $(OBJS7) $(LIBS)
+$(DLL): $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)  $(OBJS6) $(OBJS7) $(OBJS8)
+        $(LINK) $(LDFLAGS) $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS6) $(OBJS7) $(OBJS8) $(LIBS)
         IF EXIST $(DLL).manifest $(MT) -manifest $(DLL).manifest -outputresource:$(DLL);#1
 
 clean:
