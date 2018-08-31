@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix SecResponseBodyAccess and ctl:requestBodyAccess directives
+   [Issue #1531 - @victorhora, @defanator]
  - Adds support for ctl:requestBodyProcessor=URLENCODED
    [Issue #1797 - @victorhora]
  - Add LUA compatibility for CentOS and try to use LuaJIT first if available

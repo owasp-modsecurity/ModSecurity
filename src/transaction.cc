@@ -766,14 +766,11 @@ int Transaction::processRequestBody() {
         m_variableReqbodyProcessorError.set("0", m_variableOffset);
     }
 
-#if 1
-    if (m_rules->m_secRequestBodyAccess != RulesProperties::TrueConfigBoolean) {
+    if (m_rules->m_secRequestBodyAccess == RulesProperties::FalseConfigBoolean) {
         if (m_requestBodyAccess != RulesProperties::TrueConfigBoolean) {
 #ifndef NO_LOGS
             debug(4, "Request body processing is disabled");
 #endif
-
-            this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
             return true;
         } else {
 #ifndef NO_LOGS
@@ -786,14 +783,12 @@ int Transaction::processRequestBody() {
         if (m_requestBodyAccess == RulesProperties::FalseConfigBoolean) {
 #ifndef NO_LOGS
             debug(4, "Request body processing is enabled, but " \
-                "disable to this transaction due to ctl:requestBodyAccess " \
+                "disabled to this transaction due to ctl:requestBodyAccess " \
                 "action");
 #endif
-            this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
             return true;
         }
     }
-#endif
 
     /**
      * FIXME: This variable should be calculated on demand, it is
