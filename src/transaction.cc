@@ -766,7 +766,7 @@ int Transaction::processRequestBody() {
         m_variableReqbodyProcessorError.set("0", m_variableOffset);
     }
 
-    if (m_rules->m_secRequestBodyAccess != RulesProperties::TrueConfigBoolean) {
+    if (m_rules->m_secRequestBodyAccess == RulesProperties::FalseConfigBoolean) {
         if (m_requestBodyAccess != RulesProperties::TrueConfigBoolean) {
 #ifndef NO_LOGS
             debug(4, "Request body processing is disabled");

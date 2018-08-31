@@ -51,7 +51,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Request body processing is enabled, but disable to this transaction due to ctl:requestBodyAccess action"
+      "debug_log":"Request body processing is enabled, but disabled to this transaction due to ctl:requestBodyAccess action"
     },
     "rules":[
       "SecRuleEngine On",
