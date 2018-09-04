@@ -86,7 +86,7 @@ int ValidateUtf8Encoding::detect_utf8_character(
             unicode_len = 4;
             /* compute character number */
             d = ((c & 0x07) << 18) | ((*(p_read + 1) & 0x3F) << 12)
-                | ((*(p_read + 2) & 0x3F) < 6) | (*(p_read + 3) & 0x3F);
+                | ((*(p_read + 2) & 0x3F) << 6) | (*(p_read + 3) & 0x3F);
         }
     } else {
         /* any other first byte is invalid (RFC 3629) */
