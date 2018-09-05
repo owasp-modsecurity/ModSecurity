@@ -4321,7 +4321,7 @@ static int detect_utf8_character(const unsigned char *p_read, unsigned int lengt
         else {
             unicode_len = 4;
             /* compute character number */
-            d = ((c & 0x07) << 18) | ((*(p_read + 1) & 0x3F) << 12) | ((*(p_read + 2) & 0x3F) < 6) | (*(p_read + 3) & 0x3F);
+            d = ((c & 0x07) << 18) | ((*(p_read + 1) & 0x3F) << 12) | ((*(p_read + 2) & 0x3F) << 6) | (*(p_read + 3) & 0x3F);
         }
     }
     /* any other first byte is invalid (RFC 3629) */

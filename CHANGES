@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Fix utf-8 character encoding conversion
+   [Issue #1794 - @tinselcity, @zimmerle]
  * Fix ip tree lookup on netmask content
    [Issue #1793 - @tinselcity, @zimmerle]
  * IIS: set overrideModeDefault to Allow so that individual websites can
