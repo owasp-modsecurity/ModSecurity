@@ -1,5 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
+
+ * Let body parsers observe SecRequestBodyNoFilesLimit
+   [Issue #1613 - @allanbomsft]
  * potential off by one in parse_arguments
    [Issue #1799 - @tinselcity, @zimmerle]
  * Fix utf-8 character encoding conversion
