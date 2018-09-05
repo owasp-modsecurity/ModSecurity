@@ -475,8 +475,29 @@
 		"arg1=val1&arg2=val2",
 	),
 },
-
-
+{
+	type => "target",
+	comment => "REQUEST_BASENAME (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_BASENAME "index.html" "phase:2,log,pass,id:500189"
+	),
+	match_log => {
+		error => [ qr/Pattern match "index.html" at REQUEST_BASENAME.*/s, 1 ],
+		debug => [ qr/Pattern match "index.html" at REQUEST_BASENAME.*/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/index.html?apath=/my/cool/path.com",
+	),
+},
 
 # AUTH_TYPE
 #{
