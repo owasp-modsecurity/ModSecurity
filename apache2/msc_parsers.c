@@ -266,7 +266,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
         if (status == 0) {
             /* parameter name */
             arg->name_origin_offset = i;
-            while ((s[i] != '=') && (s[i] != argument_separator) && (i < inputlength)) {
+            while ((i < inputlength) && (s[i] != '=') && (s[i] != argument_separator))  {
                 buf[j] = s[i];
                 j++;
                 i++;

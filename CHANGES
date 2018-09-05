@@ -1,6 +1,7 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
-
+ * potential off by one in parse_arguments
+   [Issue #1799 - @tinselcity, @zimmerle]
  * Fix utf-8 character encoding conversion
    [Issue #1794 - @tinselcity, @zimmerle]
  * Fix ip tree lookup on netmask content
