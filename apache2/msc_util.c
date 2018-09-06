@@ -405,7 +405,8 @@ char *parse_pm_content(const char *op_parm, unsigned short int op_len, msre_rule
     char converted = 0;
     int i, x;
     unsigned char bin = 0, esc = 0, bin_offset = 0;
-    unsigned char bin_parm[3], c = 0;
+    unsigned char c = 0;
+    unsigned char bin_parm[3] = { 0 };
     char *processed = NULL;
 
     content = apr_pstrdup(rule->ruleset->mp, op_parm);

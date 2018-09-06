@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * good practices: Initialize variables before use it
+   [Issue #1889 - Marc Stern]
  * Let body parsers observe SecRequestBodyNoFilesLimit
    [Issue #1613 - @allanbomsft]
  * potential off by one in parse_arguments
