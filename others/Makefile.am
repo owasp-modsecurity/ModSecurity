@@ -16,6 +16,8 @@ noinst_HEADERS = \
 	mbedtls/mbed-tls-config.h \
 	mbedtls/md5.h \
 	mbedtls/platform.h \
+	mbedtls/platform_time.h \
+	mbedtls/platform_util.h \
 	mbedtls/sha1.h
 
 libmbedtls_la_SOURCES = \
