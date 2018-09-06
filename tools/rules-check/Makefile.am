@@ -6,7 +6,7 @@ modsec_rules_check_SOURCES = \
         rules-check.cc
 
 modsec_rules_check_LDADD = \
-	$(top_builddir)/src/.libs/libmodsecurity.a \
+	$(top_builddir)/src/.libs/libmodsecurity.la \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
 	$(MAXMIND_LDADD) \
