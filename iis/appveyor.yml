@@ -1,0 +1,10 @@
+version: 1.0.{build}
+install:
+- cmd: "curl -o %USERPROFILE%\\Downloads\\cmake-3.8.2-win32-x86.zip https://modsecurity.blob.core.windows.net/windows-artifacts/cmake-3.8.2-win32-x86.zip\ncurl -o %USERPROFILE%\\Downloads\\httpd-2.4.27-win32-VC11.zip https://modsecurity.blob.core.windows.net/windows-artifacts/httpd-2.4.27-win32-VC11.zip\ncurl -o %USERPROFILE%\\Downloads\\httpd-2.4.27.tar.gz  https://modsecurity.blob.core.windows.net/windows-artifacts/httpd-2.4.27.tar.gz\ncurl -o %USERPROFILE%\\Downloads\\httpd-2.4.27-win64-VC11.zip https://modsecurity.blob.core.windows.net/windows-artifacts/httpd-2.4.27-win64-VC11.zip \ncurl -o %USERPROFILE%\\Downloads\\libxml2-2.9.4.tar.gz https://modsecurity.blob.core.windows.net/windows-artifacts/libxml2-2.9.4.tar.gz\ncurl -o %USERPROFILE%\\Downloads\\lua-5.3.4.tar.gz https://modsecurity.blob.core.windows.net/windows-artifacts/lua-5.3.4.tar.gz\ncurl -o %USERPROFILE%\\Downloads\\pcre-8.40.zip https://modsecurity.blob.core.windows.net/windows-artifacts/pcre-8.40.zip\ncurl -o %USERPROFILE%\\Downloads\\ssdeep-2.13.tar.gz https://modsecurity.blob.core.windows.net/windows-artifacts/ssdeep-2.13.tar.gz\ncurl -o %USERPROFILE%\\Downloads\\ssdeep-2.13.zip https://modsecurity.blob.core.windows.net/windows-artifacts/ssdeep-2.13.zip\ncurl -o %USERPROFILE%\\Downloads\\yajl-2.1.0.zip https://modsecurity.blob.core.windows.net/windows-artifacts/yajl-2.1.0.zip\ncurl -o %USERPROFILE%\\Downloads\\zlib-1.2.11.tar.gz https://modsecurity.blob.core.windows.net/windows-artifacts/zlib-1.2.11.tar.gz\ncurl -o %USERPROFILE%\\Downloads\\curl-7.54.1.zip https://modsecurity.blob.core.windows.net/windows-artifacts/curl-7.54.1.zip\n\n\ncd iis"
+build_script:
+- cmd: ./build_release_amd64.bat
+notifications:
+- provider: GitHubPullRequest
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
