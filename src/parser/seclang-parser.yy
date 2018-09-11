@@ -1080,11 +1080,11 @@ op_before_init:
       }
     | OPERATOR_GEOLOOKUP
       {
-#ifdef WITH_GEOIP
+#if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         OPERATOR_CONTAINER($$, new operators::GeoLookup());
 #else
         std::stringstream ss;
-            ss << "This version of ModSecurity was not compiled with GeoIP support.";
+            ss << "This version of ModSecurity was not compiled with GeoIP or MaxMind support.";
             driver.error(@0, ss.str());
             YYERROR;
 #endif  // WITH_GEOIP
@@ -1555,7 +1555,7 @@ expression:
     /* Debug log: end */
     | CONFIG_DIR_GEO_DB
       {
-#ifdef WITH_GEOIP
+#if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         std::string err;
         std::string file = modsecurity::utils::find_resource($1,
             driver.ref.back(), &err);
@@ -1575,7 +1575,7 @@ expression:
         }
 #else
         std::stringstream ss;
-        ss << "This version of ModSecurity was not compiled with GeoIP support.";
+        ss << "This version of ModSecurity was not compiled with GeoIP or MaxMind support.";
         driver.error(@0, ss.str());
         YYERROR;
 #endif  // WITH_GEOIP
