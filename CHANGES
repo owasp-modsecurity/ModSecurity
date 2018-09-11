@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix parser to support GeoLookup with MaxMind
+   [Issue #1884, #1895 - @victorhora, @everping]
  - parser: Fix simple quote setvar in the end of the line
    [Issue #1831 - @zimmerle, @csanders-git]
  - Fix pc file
