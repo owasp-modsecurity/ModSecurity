@@ -21,7 +21,7 @@ MAXMIND_POSSIBLE_LIB_NAMES="libmaxminddb maxminddb maxmind"
 MAXMIND_POSSIBLE_EXTENSIONS="so la sl dll dylib"
 
 # Possible paths (if pkg-config was not found, proceed with the file lookup)
-MAXMIND_POSSIBLE_PATHS="/usr/local/libmaxmind /usr/local/maxmind /usr/local /opt/libmaxmind /opt/maxmind /opt /usr /opt/local/include /opt/local /usr/lib /usr/local/lib /usr/lib64 /usr"
+MAXMIND_POSSIBLE_PATHS="/usr/local/libmaxmind /usr/local/maxmind /usr/local /opt/libmaxmind /opt/maxmind /opt /usr /opt/local/include /opt/local /usr/lib /usr/local/lib /usr/lib64 /usr /usr/include/x86_64-linux-gnu/"
 
 # Variables to be set by this very own script.
 MAXMIND_VERSION=""
