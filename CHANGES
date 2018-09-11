@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix parser to support GeoLookup with MaxMind
+   [Issue #1884 - @victorhora, @everping]
  - Fix pc file
    [Issue #1847 - @gquintard]
  - modsec_rules_check: uses the gnu `.la' instead of `.a' file

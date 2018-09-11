@@ -848,7 +848,7 @@ namespace yy {
 
 
     // User initialization code.
-    #line 353 "/home/vhora/ModSecurity-v3-LATEST-JUNE/src/parser/seclang-parser.yy" // lalr1.cc:725
+    #line 353 "/home/vhora/ModSecurity-v3-AUGUST/src/parser/seclang-parser.yy" // lalr1.cc:725
 {
   // Initialize the initial location.
   yyla.location.begin.filename = yyla.location.end.filename = &driver.file;
@@ -1757,11 +1757,11 @@ namespace yy {
   case 71:
 #line 1082 "seclang-parser.yy" // lalr1.cc:847
     {
-#ifdef WITH_GEOIP
+#if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::GeoLookup());
 #else
         std::stringstream ss;
-            ss << "This version of ModSecurity was not compiled with GeoIP support.";
+            ss << "This version of ModSecurity was not compiled with GeoIP or MaxMind support.";
             driver.error(yystack_[1].location, ss.str());
             YYERROR;
 #endif  // WITH_GEOIP
@@ -2438,7 +2438,7 @@ namespace yy {
   case 125:
 #line 1557 "seclang-parser.yy" // lalr1.cc:847
     {
-#ifdef WITH_GEOIP
+#if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         std::string err;
         std::string file = modsecurity::utils::find_resource(yystack_[0].value.as< std::string > (),
             driver.ref.back(), &err);
@@ -2458,7 +2458,7 @@ namespace yy {
         }
 #else
         std::stringstream ss;
-        ss << "This version of ModSecurity was not compiled with GeoIP support.";
+        ss << "This version of ModSecurity was not compiled with GeoIP or MaxMind support.";
         driver.error(yystack_[1].location, ss.str());
         YYERROR;
 #endif  // WITH_GEOIP
