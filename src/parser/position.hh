@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.0.4.
+// A Bison parser, made by GNU Bison 3.0.5.
 
 // Positions for Bison parsers in C++
 
-// Copyright (C) 2002-2015 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015, 2018 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,26 +52,25 @@
 
 
 namespace yy {
-#line 56 "position.hh" // location.cc:296
+#line 56 "position.hh" // location.cc:292
   /// Abstract a position.
   class position
   {
   public:
     /// Construct a position.
     explicit position (std::string* f = YY_NULLPTR,
-                       unsigned int l = 1u,
-                       unsigned int c = 1u)
+                       unsigned l = 1u,
+                       unsigned c = 1u)
       : filename (f)
       , line (l)
       , column (c)
-    {
-    }
+    {}
 
 
     /// Initialization.
     void initialize (std::string* fn = YY_NULLPTR,
-                     unsigned int l = 1u,
-                     unsigned int c = 1u)
+                     unsigned l = 1u,
+                     unsigned c = 1u)
     {
       filename = fn;
       line = l;
@@ -100,15 +99,15 @@ namespace yy {
     /// File name to which this position refers.
     std::string* filename;
     /// Current line number.
-    unsigned int line;
+    unsigned line;
     /// Current column number.
-    unsigned int column;
+    unsigned column;
 
   private:
     /// Compute max(min, lhs+rhs) (provided min <= lhs).
-    static unsigned int add_ (unsigned int lhs, int rhs, unsigned int min)
+    static unsigned add_ (unsigned lhs, int rhs, unsigned min)
     {
-      return (0 < rhs || -static_cast<unsigned int>(rhs) < lhs
+      return (0 < rhs || -static_cast<unsigned>(rhs) < lhs
               ? rhs + lhs
               : min);
     }
@@ -176,5 +175,5 @@ namespace yy {
 
 
 } // yy
-#line 180 "position.hh" // location.cc:296
+#line 179 "position.hh" // location.cc:292
 #endif // !YY_YY_POSITION_HH_INCLUDED
