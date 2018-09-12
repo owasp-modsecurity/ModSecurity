@@ -663,11 +663,11 @@ namespace yy {
       // "Proxy"
       // "Redirect"
       // "Rev"
-      // "SanatiseArg"
-      // "SanatiseMatched"
-      // "SanatiseMatchedBytes"
-      // "SanatiseRequestHeader"
-      // "SanatiseResponseHeader"
+      // "SanitiseArg"
+      // "SanitiseMatched"
+      // "SanitiseMatchedBytes"
+      // "SanitiseRequestHeader"
+      // "SanitiseResponseHeader"
       // "SetEnv"
       // "SetRsc"
       // "SetSid"
@@ -1045,11 +1045,11 @@ namespace yy {
         TOK_ACTION_PROXY = 435,
         TOK_ACTION_REDIRECT = 436,
         TOK_ACTION_REV = 437,
-        TOK_ACTION_SANATISE_ARG = 438,
-        TOK_ACTION_SANATISE_MATCHED = 439,
-        TOK_ACTION_SANATISE_MATCHED_BYTES = 440,
-        TOK_ACTION_SANATISE_REQUEST_HEADER = 441,
-        TOK_ACTION_SANATISE_RESPONSE_HEADER = 442,
+        TOK_ACTION_SANITISE_ARG = 438,
+        TOK_ACTION_SANITISE_MATCHED = 439,
+        TOK_ACTION_SANITISE_MATCHED_BYTES = 440,
+        TOK_ACTION_SANITISE_REQUEST_HEADER = 441,
+        TOK_ACTION_SANITISE_RESPONSE_HEADER = 442,
         TOK_ACTION_SETENV = 443,
         TOK_ACTION_SETRSC = 444,
         TOK_ACTION_SETSID = 445,
@@ -2045,23 +2045,23 @@ namespace yy {
 
     static inline
     symbol_type
-    make_ACTION_SANATISE_ARG (const std::string& v, const location_type& l);
+    make_ACTION_SANITISE_ARG (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ACTION_SANATISE_MATCHED (const std::string& v, const location_type& l);
+    make_ACTION_SANITISE_MATCHED (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ACTION_SANATISE_MATCHED_BYTES (const std::string& v, const location_type& l);
+    make_ACTION_SANITISE_MATCHED_BYTES (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ACTION_SANATISE_REQUEST_HEADER (const std::string& v, const location_type& l);
+    make_ACTION_SANITISE_REQUEST_HEADER (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ACTION_SANATISE_RESPONSE_HEADER (const std::string& v, const location_type& l);
+    make_ACTION_SANITISE_RESPONSE_HEADER (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
@@ -3027,11 +3027,11 @@ namespace yy {
       case 180: // "Proxy"
       case 181: // "Redirect"
       case 182: // "Rev"
-      case 183: // "SanatiseArg"
-      case 184: // "SanatiseMatched"
-      case 185: // "SanatiseMatchedBytes"
-      case 186: // "SanatiseRequestHeader"
-      case 187: // "SanatiseResponseHeader"
+      case 183: // "SanitiseArg"
+      case 184: // "SanitiseMatched"
+      case 185: // "SanitiseMatchedBytes"
+      case 186: // "SanitiseRequestHeader"
+      case 187: // "SanitiseResponseHeader"
       case 188: // "SetEnv"
       case 189: // "SetRsc"
       case 190: // "SetSid"
@@ -3268,11 +3268,11 @@ namespace yy {
       case 180: // "Proxy"
       case 181: // "Redirect"
       case 182: // "Rev"
-      case 183: // "SanatiseArg"
-      case 184: // "SanatiseMatched"
-      case 185: // "SanatiseMatchedBytes"
-      case 186: // "SanatiseRequestHeader"
-      case 187: // "SanatiseResponseHeader"
+      case 183: // "SanitiseArg"
+      case 184: // "SanitiseMatched"
+      case 185: // "SanitiseMatchedBytes"
+      case 186: // "SanitiseRequestHeader"
+      case 187: // "SanitiseResponseHeader"
       case 188: // "SetEnv"
       case 189: // "SetRsc"
       case 190: // "SetSid"
@@ -3582,11 +3582,11 @@ namespace yy {
       case 180: // "Proxy"
       case 181: // "Redirect"
       case 182: // "Rev"
-      case 183: // "SanatiseArg"
-      case 184: // "SanatiseMatched"
-      case 185: // "SanatiseMatchedBytes"
-      case 186: // "SanatiseRequestHeader"
-      case 187: // "SanatiseResponseHeader"
+      case 183: // "SanitiseArg"
+      case 184: // "SanitiseMatched"
+      case 185: // "SanitiseMatchedBytes"
+      case 186: // "SanitiseRequestHeader"
+      case 187: // "SanitiseResponseHeader"
       case 188: // "SetEnv"
       case 189: // "SetRsc"
       case 190: // "SetSid"
@@ -3829,11 +3829,11 @@ namespace yy {
       case 180: // "Proxy"
       case 181: // "Redirect"
       case 182: // "Rev"
-      case 183: // "SanatiseArg"
-      case 184: // "SanatiseMatched"
-      case 185: // "SanatiseMatchedBytes"
-      case 186: // "SanatiseRequestHeader"
-      case 187: // "SanatiseResponseHeader"
+      case 183: // "SanitiseArg"
+      case 184: // "SanitiseMatched"
+      case 185: // "SanitiseMatchedBytes"
+      case 186: // "SanitiseRequestHeader"
+      case 187: // "SanitiseResponseHeader"
       case 188: // "SetEnv"
       case 189: // "SetRsc"
       case 190: // "SetSid"
@@ -5196,33 +5196,33 @@ namespace yy {
   }
 
   seclang_parser::symbol_type
-  seclang_parser::make_ACTION_SANATISE_ARG (const std::string& v, const location_type& l)
+  seclang_parser::make_ACTION_SANITISE_ARG (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::TOK_ACTION_SANATISE_ARG, v, l);
+    return symbol_type (token::TOK_ACTION_SANITISE_ARG, v, l);
   }
 
   seclang_parser::symbol_type
-  seclang_parser::make_ACTION_SANATISE_MATCHED (const std::string& v, const location_type& l)
+  seclang_parser::make_ACTION_SANITISE_MATCHED (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::TOK_ACTION_SANATISE_MATCHED, v, l);
+    return symbol_type (token::TOK_ACTION_SANITISE_MATCHED, v, l);
   }
 
   seclang_parser::symbol_type
-  seclang_parser::make_ACTION_SANATISE_MATCHED_BYTES (const std::string& v, const location_type& l)
+  seclang_parser::make_ACTION_SANITISE_MATCHED_BYTES (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::TOK_ACTION_SANATISE_MATCHED_BYTES, v, l);
+    return symbol_type (token::TOK_ACTION_SANITISE_MATCHED_BYTES, v, l);
   }
 
   seclang_parser::symbol_type
-  seclang_parser::make_ACTION_SANATISE_REQUEST_HEADER (const std::string& v, const location_type& l)
+  seclang_parser::make_ACTION_SANITISE_REQUEST_HEADER (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::TOK_ACTION_SANATISE_REQUEST_HEADER, v, l);
+    return symbol_type (token::TOK_ACTION_SANITISE_REQUEST_HEADER, v, l);
   }
 
   seclang_parser::symbol_type
-  seclang_parser::make_ACTION_SANATISE_RESPONSE_HEADER (const std::string& v, const location_type& l)
+  seclang_parser::make_ACTION_SANITISE_RESPONSE_HEADER (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::TOK_ACTION_SANATISE_RESPONSE_HEADER, v, l);
+    return symbol_type (token::TOK_ACTION_SANITISE_RESPONSE_HEADER, v, l);
   }
 
   seclang_parser::symbol_type

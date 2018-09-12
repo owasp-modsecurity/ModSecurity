@@ -6002,27 +6002,27 @@ YY_RULE_SETUP
 case 17:
 YY_RULE_SETUP
 #line 518 "seclang-scanner.ll"
-{ return p::make_ACTION_SANATISE_ARG(yytext, *driver.loc.back()); }
+{ return p::make_ACTION_SANITISE_ARG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 519 "seclang-scanner.ll"
-{ return p::make_ACTION_SANATISE_MATCHED(yytext, *driver.loc.back()); }
+{ return p::make_ACTION_SANITISE_MATCHED(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 520 "seclang-scanner.ll"
-{ return p::make_ACTION_SANATISE_MATCHED_BYTES(yytext, *driver.loc.back()); }
+{ return p::make_ACTION_SANITISE_MATCHED_BYTES(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 521 "seclang-scanner.ll"
-{ return p::make_ACTION_SANATISE_REQUEST_HEADER(yytext, *driver.loc.back()); }
+{ return p::make_ACTION_SANITISE_REQUEST_HEADER(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 522 "seclang-scanner.ll"
-{ return p::make_ACTION_SANATISE_RESPONSE_HEADER(yytext, *driver.loc.back()); }
+{ return p::make_ACTION_SANITISE_RESPONSE_HEADER(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP

@@ -552,11 +552,11 @@ using modsecurity::operators::Operator;
   ACTION_PROXY                                 "Proxy"
   ACTION_REDIRECT                              "Redirect"
   ACTION_REV                                   "Rev"
-  ACTION_SANATISE_ARG                          "SanatiseArg"
-  ACTION_SANATISE_MATCHED                      "SanatiseMatched"
-  ACTION_SANATISE_MATCHED_BYTES                "SanatiseMatchedBytes"
-  ACTION_SANATISE_REQUEST_HEADER               "SanatiseRequestHeader"
-  ACTION_SANATISE_RESPONSE_HEADER              "SanatiseResponseHeader"
+  ACTION_SANITISE_ARG                          "SanitiseArg"
+  ACTION_SANITISE_MATCHED                      "SanitiseMatched"
+  ACTION_SANITISE_MATCHED_BYTES                "SanitiseMatchedBytes"
+  ACTION_SANITISE_REQUEST_HEADER               "SanitiseRequestHeader"
+  ACTION_SANITISE_RESPONSE_HEADER              "SanitiseResponseHeader"
   ACTION_SETENV                                "SetEnv"
   ACTION_SETRSC                                "SetRsc"
   ACTION_SETSID                                "SetSid"
@@ -2692,25 +2692,25 @@ act:
       {
         ACTION_CONTAINER($$, new actions::Rev($1));
       }
-    | ACTION_SANATISE_ARG
+    | ACTION_SANITISE_ARG
       {
-        ACTION_NOT_SUPPORTED("SanatiseArg", @0);
+        ACTION_NOT_SUPPORTED("SanitiseArg", @0);
       }
-    | ACTION_SANATISE_MATCHED
+    | ACTION_SANITISE_MATCHED
       {
-        ACTION_NOT_SUPPORTED("SanatiseMatched", @0);
+        ACTION_NOT_SUPPORTED("SanitiseMatched", @0);
       }
-    | ACTION_SANATISE_MATCHED_BYTES
+    | ACTION_SANITISE_MATCHED_BYTES
       {
-        ACTION_NOT_SUPPORTED("SanatiseMatchedBytes", @0);
+        ACTION_NOT_SUPPORTED("SanitiseMatchedBytes", @0);
       }
-    | ACTION_SANATISE_REQUEST_HEADER
+    | ACTION_SANITISE_REQUEST_HEADER
       {
-        ACTION_NOT_SUPPORTED("SanatiseRequestHeader", @0);
+        ACTION_NOT_SUPPORTED("SanitiseRequestHeader", @0);
       }
-    | ACTION_SANATISE_RESPONSE_HEADER
+    | ACTION_SANITISE_RESPONSE_HEADER
       {
-        ACTION_NOT_SUPPORTED("SanatiseResponseHeader", @0);
+        ACTION_NOT_SUPPORTED("SanitiseResponseHeader", @0);
       }
     | ACTION_SETENV
       {

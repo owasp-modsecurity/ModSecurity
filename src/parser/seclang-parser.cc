@@ -281,11 +281,11 @@ namespace yy {
       case 180: // "Proxy"
       case 181: // "Redirect"
       case 182: // "Rev"
-      case 183: // "SanatiseArg"
-      case 184: // "SanatiseMatched"
-      case 185: // "SanatiseMatchedBytes"
-      case 186: // "SanatiseRequestHeader"
-      case 187: // "SanatiseResponseHeader"
+      case 183: // "SanitiseArg"
+      case 184: // "SanitiseMatched"
+      case 185: // "SanitiseMatchedBytes"
+      case 186: // "SanitiseRequestHeader"
+      case 187: // "SanitiseResponseHeader"
       case 188: // "SetEnv"
       case 189: // "SetRsc"
       case 190: // "SetSid"
@@ -518,11 +518,11 @@ namespace yy {
       case 180: // "Proxy"
       case 181: // "Redirect"
       case 182: // "Rev"
-      case 183: // "SanatiseArg"
-      case 184: // "SanatiseMatched"
-      case 185: // "SanatiseMatchedBytes"
-      case 186: // "SanatiseRequestHeader"
-      case 187: // "SanatiseResponseHeader"
+      case 183: // "SanitiseArg"
+      case 184: // "SanitiseMatched"
+      case 185: // "SanitiseMatchedBytes"
+      case 186: // "SanitiseRequestHeader"
+      case 187: // "SanitiseResponseHeader"
       case 188: // "SetEnv"
       case 189: // "SetRsc"
       case 190: // "SetSid"
@@ -758,11 +758,11 @@ namespace yy {
       case 180: // "Proxy"
       case 181: // "Redirect"
       case 182: // "Rev"
-      case 183: // "SanatiseArg"
-      case 184: // "SanatiseMatched"
-      case 185: // "SanatiseMatchedBytes"
-      case 186: // "SanatiseRequestHeader"
-      case 187: // "SanatiseResponseHeader"
+      case 183: // "SanitiseArg"
+      case 184: // "SanitiseMatched"
+      case 185: // "SanitiseMatchedBytes"
+      case 186: // "SanitiseRequestHeader"
+      case 187: // "SanitiseResponseHeader"
       case 188: // "SetEnv"
       case 189: // "SetRsc"
       case 190: // "SetSid"
@@ -1217,11 +1217,11 @@ namespace yy {
       case 180: // "Proxy"
       case 181: // "Redirect"
       case 182: // "Rev"
-      case 183: // "SanatiseArg"
-      case 184: // "SanatiseMatched"
-      case 185: // "SanatiseMatchedBytes"
-      case 186: // "SanatiseRequestHeader"
-      case 187: // "SanatiseResponseHeader"
+      case 183: // "SanitiseArg"
+      case 184: // "SanitiseMatched"
+      case 185: // "SanitiseMatchedBytes"
+      case 186: // "SanitiseRequestHeader"
+      case 187: // "SanitiseResponseHeader"
       case 188: // "SetEnv"
       case 189: // "SetRsc"
       case 190: // "SetSid"
@@ -4736,7 +4736,7 @@ namespace yy {
   case 375:
 #line 2696 "seclang-parser.yy" // lalr1.cc:856
     {
-        ACTION_NOT_SUPPORTED("SanatiseArg", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanitiseArg", yystack_[1].location);
       }
 #line 4742 "seclang-parser.cc" // lalr1.cc:856
     break;
@@ -4744,7 +4744,7 @@ namespace yy {
   case 376:
 #line 2700 "seclang-parser.yy" // lalr1.cc:856
     {
-        ACTION_NOT_SUPPORTED("SanatiseMatched", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanitiseMatched", yystack_[1].location);
       }
 #line 4750 "seclang-parser.cc" // lalr1.cc:856
     break;
@@ -4752,7 +4752,7 @@ namespace yy {
   case 377:
 #line 2704 "seclang-parser.yy" // lalr1.cc:856
     {
-        ACTION_NOT_SUPPORTED("SanatiseMatchedBytes", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanitiseMatchedBytes", yystack_[1].location);
       }
 #line 4758 "seclang-parser.cc" // lalr1.cc:856
     break;
@@ -4760,7 +4760,7 @@ namespace yy {
   case 378:
 #line 2708 "seclang-parser.yy" // lalr1.cc:856
     {
-        ACTION_NOT_SUPPORTED("SanatiseRequestHeader", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanitiseRequestHeader", yystack_[1].location);
       }
 #line 4766 "seclang-parser.cc" // lalr1.cc:856
     break;
@@ -4768,7 +4768,7 @@ namespace yy {
   case 379:
 #line 2712 "seclang-parser.yy" // lalr1.cc:856
     {
-        ACTION_NOT_SUPPORTED("SanatiseResponseHeader", yystack_[1].location);
+        ACTION_NOT_SUPPORTED("SanitiseResponseHeader", yystack_[1].location);
       }
 #line 4774 "seclang-parser.cc" // lalr1.cc:856
     break;
@@ -6531,8 +6531,8 @@ namespace yy {
   "\"InitCol\"", "\"Log\"", "\"LogData\"", "\"Maturity\"", "\"Msg\"",
   "\"MultiMatch\"", "\"NoAuditLog\"", "\"NoLog\"", "\"Pass\"", "\"Pause\"",
   "\"Phase\"", "\"Prepend\"", "\"Proxy\"", "\"Redirect\"", "\"Rev\"",
-  "\"SanatiseArg\"", "\"SanatiseMatched\"", "\"SanatiseMatchedBytes\"",
-  "\"SanatiseRequestHeader\"", "\"SanatiseResponseHeader\"", "\"SetEnv\"",
+  "\"SanitiseArg\"", "\"SanitiseMatched\"", "\"SanitiseMatchedBytes\"",
+  "\"SanitiseRequestHeader\"", "\"SanitiseResponseHeader\"", "\"SetEnv\"",
   "\"SetRsc\"", "\"SetSid\"", "\"SetUID\"", "\"Severity\"", "\"Skip\"",
   "\"SkipAfter\"", "\"Status\"", "\"Tag\"",
   "\"ACTION_TRANSFORMATION_BASE_64_ENCODE\"",

@@ -117,11 +117,11 @@ ACTION_PREPEND                                  (?i:prepend)
 ACTION_PROXY                                    (?i:proxy)
 ACTION_REDIRECT                                 (?i:redirect)
 ACTION_REV                                      (?i:rev)
-ACTION_SANATISE_ARG                             (?i:sanitiseArg)
-ACTION_SANATISE_MATCHED_BYTES                   (?i:sanitiseMatchedBytes)
-ACTION_SANATISE_MATCHED                         (?i:sanitiseMatched)
-ACTION_SANATISE_REQUEST_HEADER                  (?i:sanitiseRequestHeader)
-ACTION_SANATISE_RESPONSE_HEADER                 (?i:sanitiseResponseHeader)
+ACTION_SANITISE_ARG                             (?i:sanitiseArg)
+ACTION_SANITISE_MATCHED_BYTES                   (?i:sanitiseMatchedBytes)
+ACTION_SANITISE_MATCHED                         (?i:sanitiseMatched)
+ACTION_SANITISE_REQUEST_HEADER                  (?i:sanitiseRequestHeader)
+ACTION_SANITISE_RESPONSE_HEADER                 (?i:sanitiseResponseHeader)
 ACTION_SETENV                                   (?i:setenv)
 ACTION_SETRSC                                   (?i:setrsc)
 ACTION_SETSID                                   (?i:setsid)
@@ -514,11 +514,11 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_PAUSE}                                                          { return p::make_ACTION_PAUSE(yytext, *driver.loc.back()); }
 {ACTION_PREPEND}                                                        { return p::make_ACTION_PREPEND(yytext, *driver.loc.back()); }
 {ACTION_PROXY}                                                          { return p::make_ACTION_PROXY(yytext, *driver.loc.back()); }
-{ACTION_SANATISE_ARG}                                                   { return p::make_ACTION_SANATISE_ARG(yytext, *driver.loc.back()); }
-{ACTION_SANATISE_MATCHED}                                               { return p::make_ACTION_SANATISE_MATCHED(yytext, *driver.loc.back()); }
-{ACTION_SANATISE_MATCHED_BYTES}                                         { return p::make_ACTION_SANATISE_MATCHED_BYTES(yytext, *driver.loc.back()); }
-{ACTION_SANATISE_REQUEST_HEADER}                                        { return p::make_ACTION_SANATISE_REQUEST_HEADER(yytext, *driver.loc.back()); }
-{ACTION_SANATISE_RESPONSE_HEADER}                                       { return p::make_ACTION_SANATISE_RESPONSE_HEADER(yytext, *driver.loc.back()); }
+{ACTION_SANITISE_ARG}                                                   { return p::make_ACTION_SANITISE_ARG(yytext, *driver.loc.back()); }
+{ACTION_SANITISE_MATCHED}                                               { return p::make_ACTION_SANITISE_MATCHED(yytext, *driver.loc.back()); }
+{ACTION_SANITISE_MATCHED_BYTES}                                         { return p::make_ACTION_SANITISE_MATCHED_BYTES(yytext, *driver.loc.back()); }
+{ACTION_SANITISE_REQUEST_HEADER}                                        { return p::make_ACTION_SANITISE_REQUEST_HEADER(yytext, *driver.loc.back()); }
+{ACTION_SANITISE_RESPONSE_HEADER}                                       { return p::make_ACTION_SANITISE_RESPONSE_HEADER(yytext, *driver.loc.back()); }
 {ACTION_SETRSC}:                                                        { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_SETRSC(yytext, *driver.loc.back()); }
 
 {ACTION_STATUS}                                                         { return p::make_ACTION_STATUS(yytext, *driver.loc.back()); }
