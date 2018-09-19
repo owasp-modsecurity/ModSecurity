@@ -399,7 +399,13 @@ int Lua::setvar(lua_State *L) {
                     t->m_rules->m_secWebAppId.m_value,
             var_value);
     }
+    else if (collection == "USER") {
+        t->m_collections.m_user_collection->storeOrUpdateFirst(
+            variableName, t->m_collections.m_user_collection_key,
+                    t->m_rules->m_secWebAppId.m_value,
+            var_value);
 
+    }
     return 0;
 }
 
