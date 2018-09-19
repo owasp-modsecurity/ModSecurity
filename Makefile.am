@@ -131,6 +131,7 @@ TESTS+=test/test-cases/regression/variable-ARGS.json
 TESTS+=test/test-cases/regression/variable-ARGS_POST_NAMES.json
 TESTS+=test/test-cases/regression/config-remove_by_tag.json
 TESTS+=test/test-cases/regression/collection-regular_expression_selection.json
+TESTS+=test/test-cases/regression/collection-lua.json
 TESTS+=test/test-cases/regression/issue-960.json
 TESTS+=test/test-cases/regression/variable-WEBAPPID.json
 TESTS+=test/test-cases/regression/variable-ARGS_GET_NAMES.json
