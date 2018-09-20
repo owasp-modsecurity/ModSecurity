@@ -102,7 +102,7 @@ static const struct luaL_Reg mscLuaLib[] = {
 }  // namespace modsecurity
 
 #ifdef WITH_LUA
-#if defined LUA_VERSION_NUM && LUA_VERSION_NUM < 502
+#if defined LUA_VERSION_NUM && LUA_VERSION_NUM < 502 && !defined WITH_LUA_JIT_2_1
 /*
 ** Adapted from Lua 5.2.0
 */
