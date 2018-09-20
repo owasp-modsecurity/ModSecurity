@@ -24,6 +24,7 @@
 
 #include "modsecurity/variable_value.h"
 #include "src/utils/regex.h"
+#include "src/variables/variable.h"
 
 #undef LMDB_STDOUT_COUT
 
@@ -465,7 +466,8 @@ end_txn:
 
 
 void LMDB::resolveMultiMatches(const std::string& var,
-    std::vector<const VariableValue *> *l) {
+    std::vector<const VariableValue *> *l,
+    Variables::KeyExclusions &ke) {
     MDB_val key, data;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
@@ -495,24 +497,22 @@ void LMDB::resolveMultiMatches(const std::string& var,
     if (keySize == 0) {
         while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
             l->insert(l->begin(), new VariableValue(
-                &m_name, 
+                &m_name,
                 new std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
                 new std::string(reinterpret_cast<char *>(data.mv_data),
-                data.mv_size))
-            );
+                data.mv_size)));
         }
     } else {
         while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
             char *a = reinterpret_cast<char *>(key.mv_data);
             if (strncmp(var.c_str(), a, keySize) == 0) {
                 l->insert(l->begin(), new VariableValue(
-                    &m_name, 
+                    &m_name,
                     new std::string(reinterpret_cast<char *>(key.mv_data),
                     key.mv_size),
                     new std::string(reinterpret_cast<char *>(data.mv_data),
-                    data.mv_size))
-                );
+                    data.mv_size)));
             }
         }
     }
@@ -528,7 +528,8 @@ end_txn:
 
 
 void LMDB::resolveRegularExpression(const std::string& var,
-    std::vector<const VariableValue *> *l) {
+    std::vector<const VariableValue *> *l,
+    Variables::KeyExclusions &ke) {
     MDB_val key, data;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
@@ -563,6 +564,11 @@ void LMDB::resolveRegularExpression(const std::string& var,
         if (ret <= 0) {
             continue;
         }
+        if (ke.toOmit(std::string(reinterpret_cast<char *>(key.mv_data),
+                key.mv_size))) {
+            continue;
+        }
+
         VariableValue *v = new VariableValue(
             new std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),

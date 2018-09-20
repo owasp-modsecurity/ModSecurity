@@ -53,7 +53,7 @@ class ArgsPost_NoDictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        transaction->m_variableArgsPost.resolve(l);
+        transaction->m_variableArgsPost.resolve(l, m_keyExclusion);
     }
 };
 
@@ -67,7 +67,8 @@ class ArgsPost_DictElementRegexp : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        transaction->m_variableArgsPost.resolveRegularExpression(&m_r, l);
+        transaction->m_variableArgsPost.resolveRegularExpression(&m_r, l,
+            m_keyExclusion);
     }
 
     Utils::Regex m_r;

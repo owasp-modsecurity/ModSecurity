@@ -48,12 +48,13 @@
     },
     "expected":{  
       "audit_log":"",
-      "debug_log":"Variable: REQUEST_HEADERS:Accept is part of the exclusion list, skipping...",
-      "error_log":""
+      "debug_log":"",
+      "error_log":"",
+      "http_code":200
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecRule REQUEST_HEADERS|!REQUEST_HEADERS:Accept|!REMOTE_HOST \"@contains test \" \"id:1,t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS|!REQUEST_HEADERS:Accept|!REMOTE_HOST \"@contains html\" \"id:1,t:lowercase,t:none,block,deny,status:300\""
     ]
   },
   {  
@@ -105,12 +106,13 @@
     },
     "expected":{  
       "audit_log":"",
-      "debug_log":"Variable: REQUEST_HEADERS:Accept-Encoding is part of the exclusion list, skipping...",
-      "error_log":""
+      "debug_log":"",
+      "error_log":"",
+      "http_code": 200
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecRule REQUEST_HEADERS|!REQUEST_HEADERS \"@contains test \" \"id:1,t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS|!REQUEST_HEADERS \"@contains html\" \"id:1,t:lowercase,t:none,block,deny,status:300\""
     ]
   }
 ]

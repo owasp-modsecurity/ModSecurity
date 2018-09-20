@@ -54,7 +54,7 @@ class FilesNames_NoDictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesNames.resolve(l);
+        transaction->m_variableFilesNames.resolve(l, m_keyExclusion);
     }
 };
 
@@ -70,7 +70,7 @@ class FilesNames_DictElementRegexp : public Variable {
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         transaction->m_variableFilesNames.resolveRegularExpression(
-            &m_r, l);
+            &m_r, l, m_keyExclusion);
     }
 
     Utils::Regex m_r;

@@ -51,7 +51,10 @@ void Env::evaluate(Transaction *transaction,
         if (x.first != m_name && m_name.length() > 0) {
             continue;
         }
-        l->push_back(new VariableValue(&m_collectionName, &x.first, &x.second));
+        if (!m_keyExclusion.toOmit(x.first)) {
+            l->push_back(new VariableValue(&m_collectionName, &x.first,
+                &x.second));
+        }
     }
 }
 

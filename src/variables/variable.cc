@@ -32,7 +32,8 @@ Variable::Variable(std::string name)
     : m_name(name),
     m_collectionName(""),
     m_isExclusion(false),
-    m_isCount(false) {
+    m_isCount(false),
+    m_regex("") {
     size_t a = m_name.find(":");
     if (a == std::string::npos) {
         a = m_name.find(".");
@@ -40,13 +41,17 @@ Variable::Variable(std::string name)
     if (a != std::string::npos) {
         m_collectionName = utils::string::toupper(std::string(m_name, 0, a));
         m_name = std::string(m_name, a + 1, m_name.size());
-        m_fullName = std::make_shared<std::string>(m_collectionName + ":" + m_name);
+        m_fullName = std::make_shared<std::string>(m_collectionName
+            + ":" + m_name);
     } else {
         m_fullName = std::make_shared<std::string>(m_name);
         m_collectionName = m_name;
         m_name = "";
     }
 }
+
+
+
 
 
 std::string Variable::to_s(

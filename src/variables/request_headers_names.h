@@ -53,7 +53,7 @@ class RequestHeadersNames_NoDictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        transaction->m_variableRequestHeadersNames.resolve(l);
+        transaction->m_variableRequestHeadersNames.resolve(l, m_keyExclusion);
     }
 };
 
@@ -67,7 +67,7 @@ class RequestHeadersNames_DictElementRegexp : public Variable {
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         transaction->m_variableRequestHeadersNames.resolveRegularExpression(
-            &m_r, l);
+            &m_r, l, m_keyExclusion);
     }
 
     Utils::Regex m_r;

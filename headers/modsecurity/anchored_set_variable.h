@@ -41,6 +41,9 @@ class Transaction;
 namespace Utils {
 class Regex;
 }
+namespace Variables {
+class KeyExclusions;
+}
 
 
 struct MyEqual {
@@ -82,12 +85,18 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
     void setCopy(std::string key, std::string value, size_t offset);
 
     void resolve(std::vector<const VariableValue *> *l);
+    void resolve(std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke);
 
     void resolve(const std::string &key,
         std::vector<const VariableValue *> *l);
 
     void resolveRegularExpression(Utils::Regex *r,
         std::vector<const VariableValue *> *l);
+
+    void resolveRegularExpression(Utils::Regex *r,
+        std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke);
 
     std::unique_ptr<std::string> resolveFirst(const std::string &key);
 

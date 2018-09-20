@@ -38,7 +38,6 @@ class Env : public Variable {
         std::vector<const VariableValue *> *l) override;
 };
 
-
 }  // namespace Variables
 }  // namespace modsecurity
 

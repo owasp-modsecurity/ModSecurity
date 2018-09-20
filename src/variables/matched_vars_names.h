@@ -54,7 +54,7 @@ class MatchedVarsNames_NoDictElement : public Variable {
     void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        transaction->m_variableMatchedVarsNames.resolve(l);
+        transaction->m_variableMatchedVarsNames.resolve(l, m_keyExclusion);
     }
 };
 
@@ -69,7 +69,7 @@ class MatchedVarsNames_DictElementRegexp : public Variable {
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         transaction->m_variableMatchedVarsNames.resolveRegularExpression(
-            &m_r, l);
+            &m_r, l, m_keyExclusion);
     }
 
      Utils::Regex m_r;

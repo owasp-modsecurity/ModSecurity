@@ -27,6 +27,7 @@
 
 #include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
+#include "src/variables/variable.h"
 
 #ifndef SRC_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_
 #define SRC_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_
@@ -71,7 +72,7 @@ class InMemoryPerProcess :
         /*std::hash<std::string>*/MyHash, MyEqual>,
     public Collection {
  public:
-    InMemoryPerProcess(std::string name);
+    explicit InMemoryPerProcess(std::string name);
     ~InMemoryPerProcess();
     void store(std::string key, std::string value) override;
 
@@ -88,9 +89,11 @@ class InMemoryPerProcess :
     void resolveSingleMatch(const std::string& var,
         std::vector<const VariableValue *> *l) override;
     void resolveMultiMatches(const std::string& var,
-        std::vector<const VariableValue *> *l) override;
+        std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) override;
     void resolveRegularExpression(const std::string& var,
-        std::vector<const VariableValue *> *l) override;
+        std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) override;
 
  private:
     pthread_mutex_t m_lock;

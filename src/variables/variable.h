@@ -13,12 +13,12 @@
  *
  */
 
-#include <vector>
-#include <string>
-#include <list>
-#include <utility>
-#include <memory>
 #include <exception>
+#include <list>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
@@ -33,6 +33,55 @@ namespace modsecurity {
 
 class Transaction;
 namespace Variables {
+
+
+class KeyExclusion {
+ public:
+    virtual bool match(std::string &a) = 0;
+};
+
+
+// FIXME: use pre built regex.
+class KeyExclusionRegex : public KeyExclusion {
+ public:
+    KeyExclusionRegex(std::string &re)
+        : m_re(re) { };
+
+    bool match(std::string &a) override {
+        return m_re.searchAll(a).size() > 0;
+    }
+
+    Utils::Regex m_re;
+};
+
+
+class KeyExclusionString : public KeyExclusion {
+ public:
+    KeyExclusionString(std::string &a)
+        : m_key(utils::string::toupper(a)) { };
+
+bool match(std::string &a) override {
+    return a.size() == m_key.size() && std::equal(a.begin(), a.end(), m_key.begin(),
+        [](char aa, char bb) {
+            return (char) toupper(aa) == (char) bb;
+        });
+    }
+
+    std::string m_key;
+};
+
+
+class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
+ public:
+    bool toOmit(std::string a) {
+        for (auto &z : *this) {
+            if (z->match(a)) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
 
 
 class Variable {
@@ -53,6 +102,34 @@ class Variable {
             return toupper(aa) == bb;
         });
     }
+
+
+    bool inline belongsToCollection(Variable *var) {
+        return m_collectionName.size() == var->m_collectionName.size()
+             && std::equal(m_collectionName.begin(), m_collectionName.end(), var->m_collectionName.begin(),
+            [](char aa, char bb) {
+            return toupper(aa) == bb;
+        });
+    }
+
+
+    void inline addsKeyExclusion(Variable *v) {
+        if (v->m_regex.empty()) {
+            std::unique_ptr<KeyExclusion> r(new KeyExclusionString(v->m_name));
+            m_keyExclusion.push_back(std::move(r));
+        } else {
+            std::unique_ptr<KeyExclusion> r(new KeyExclusionRegex(v->m_regex));
+            m_keyExclusion.push_back(std::move(r));
+        }
+    }
+
+
+    bool operator==(const Variable& b) {
+        return m_collectionName == b.m_collectionName &&
+            m_name == b.m_name &&
+            *m_fullName == *b.m_fullName;
+    }
+
 
     static void stringMatchResolveMulti(Transaction *t,
         const std::string &variable,
@@ -425,6 +502,9 @@ class Variable {
     std::string m_name;
     std::string m_collectionName;
     std::shared_ptr<std::string> m_fullName;
+    std::string m_regex;
+
+    KeyExclusions m_keyExclusion;
 
     bool m_isExclusion;
     bool m_isCount;
@@ -437,6 +517,7 @@ class VariableModificatorExclusion : public Variable {
         : Variable(*var->m_fullName.get()),
         m_var(std::move(var)) {
             m_isExclusion = true;
+            m_regex = m_var->m_regex;
         }
 
     void evaluate(Transaction *t,

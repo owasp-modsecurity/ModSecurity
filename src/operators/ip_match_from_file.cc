@@ -16,9 +16,9 @@
 #include "src/operators/ip_match_from_file.h"
 #include "src/utils/system.h"
 
-#include <string.h>
-
 #include <string>
+
+#include <string.h>
 
 #include "src/operators/operator.h"
 

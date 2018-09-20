@@ -725,7 +725,7 @@ using modsecurity::operators::Operator;
   op
 ;
 
-
+%type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables_pre_process
 %type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables_may_be_quoted
 %type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables
 %type <std::unique_ptr<Variable>> var
@@ -1443,7 +1443,7 @@ expression:
             YYERROR;
         }
       }
-    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG variables
+    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG variables_pre_process
       {
         std::string error;
         if (driver.m_exceptions.loadUpdateTargetByTag($1, std::move($2), &error) == false) {
@@ -1456,7 +1456,7 @@ expression:
             YYERROR;
         }
       }
-    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG variables
+    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG variables_pre_process
       {
         std::string error;
         if (driver.m_exceptions.loadUpdateTargetByMsg($1, std::move($2), &error) == false) {
@@ -1469,7 +1469,7 @@ expression:
             YYERROR;
         }
       }
-    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID variables
+    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID variables_pre_process
       {
         std::string error;
         double ruleId;
@@ -1723,6 +1723,43 @@ expression:
     ;
 
 variables:
+    variables_pre_process
+      {
+        std::unique_ptr<std::vector<std::unique_ptr<Variable> > > originalList = std::move($1);
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> newList(new std::vector<std::unique_ptr<Variable>>());
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> newNewList(new std::vector<std::unique_ptr<Variable>>());
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> exclusionVars(new std::vector<std::unique_ptr<Variable>>());
+        while (!originalList->empty()) {
+            std::unique_ptr<Variable> var = std::move(originalList->back());
+            originalList->pop_back();
+            if (var->m_isExclusion) {
+                exclusionVars->push_back(std::move(var));
+            } else {
+                newList->push_back(std::move(var));
+            }
+        }
+
+        while (!newList->empty()) {
+            bool doNotAdd = false;
+            std::unique_ptr<Variable> var = std::move(newList->back());
+            newList->pop_back();
+            for (auto &i : *exclusionVars) {
+                if (*var == *i) {
+                    doNotAdd = true;
+                }
+                if (i->belongsToCollection(var.get())) {
+                    var->addsKeyExclusion(i.get());
+                }
+            }
+            if (!doNotAdd) {
+                newNewList->push_back(std::move(var));
+            }
+        }
+        $$ = std::move(newNewList);
+      }
+    ;
+
+variables_pre_process:
     variables_may_be_quoted
       {
         $$ = std::move($1);

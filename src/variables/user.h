@@ -14,10 +14,11 @@
  */
 
 #include <iostream>
-#include <string>
-#include <vector>
 #include <list>
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 #ifndef SRC_VARIABLES_USER_H_
 #define SRC_VARIABLES_USER_H_
@@ -42,7 +43,7 @@ class User_DictElement : public Variable {
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveMultiMatches(
             m_name, t->m_collections.m_user_collection_key,
-            t->m_rules->m_secWebAppId.m_value, l);
+            t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
     std::string m_dictElement;
@@ -59,7 +60,7 @@ class User_NoDictElement : public Variable {
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveMultiMatches(m_name,
             t->m_collections.m_user_collection_key,
-            t->m_rules->m_secWebAppId.m_value, l);
+            t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 };
 
@@ -76,7 +77,7 @@ class User_DictElementRegexp : public Variable {
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_user_collection_key,
-            t->m_rules->m_secWebAppId.m_value, l);
+            t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
     Utils::Regex m_r;
@@ -97,7 +98,7 @@ class User_DynamicElement : public Variable {
         t->m_collections.m_user_collection->resolveMultiMatches(
             string,
             t->m_collections.m_user_collection_key,
-            t->m_rules->m_secWebAppId.m_value, l);
+            t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
     void del(Transaction *t, std::string k) {

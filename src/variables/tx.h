@@ -18,6 +18,7 @@
 #include <vector>
 #include <list>
 #include <utility>
+#include <memory>
 
 #ifndef SRC_VARIABLES_TX_H_
 #define SRC_VARIABLES_TX_H_
@@ -41,7 +42,7 @@ class Tx_DictElement : public Variable {
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveMultiMatches(
-            m_name, l);
+            m_name, l, m_keyExclusion);
     }
 
     std::string m_dictElement;
@@ -56,7 +57,8 @@ class Tx_NoDictElement : public Variable {
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        t->m_collections.m_tx_collection->resolveMultiMatches("", l);
+        t->m_collections.m_tx_collection->resolveMultiMatches("", l,
+            m_keyExclusion);
     }
 };
 
@@ -72,7 +74,7 @@ class Tx_DictElementRegexp : public Variable {
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveRegularExpression(
-            m_dictElement, l);
+            m_dictElement, l, m_keyExclusion);
     }
 
     Utils::Regex m_r;
@@ -90,7 +92,8 @@ class Tx_DynamicElement : public Variable {
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
-        t->m_collections.m_tx_collection->resolveMultiMatches(string, l);
+        t->m_collections.m_tx_collection->resolveMultiMatches(string, l,
+            m_keyExclusion);
     }
 
     void del(Transaction *t, std::string k) {
