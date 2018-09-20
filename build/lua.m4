@@ -68,7 +68,8 @@ else
         case $LUA_PKG_VERSION in
            (5.1*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
            (5.2*) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ; lua_5_2=1 ;;
-           (2.*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
+           (2.0*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
+           (2.1*) LUA_CFLAGS="-DWITH_LUA_5_1 -DWITH_LUA_JIT_2_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
         esac
            AC_MSG_NOTICE([LUA pkg-config version: ${LUA_PKG_VERSION}])
         fi
