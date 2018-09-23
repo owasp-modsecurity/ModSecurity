@@ -239,9 +239,9 @@ static void copy_rules_phase(apr_pool_t *mp,
 
                 /* Copy the rule. */
                 *(msre_rule **)apr_array_push(child_phase_arr) = rule;
-                if (rule->actionset->is_chained) mode = 2;
+                if (rule->actionset && rule->actionset->is_chained) mode = 2;
             } else {
-                if (rule->actionset->is_chained) mode = 1;
+                if (rule->actionset && rule->actionset->is_chained) mode = 1;
             }
         } else {
             if (mode == 2) {
@@ -897,8 +897,10 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         rule->actionset, 1);
 
     /* Keep track of the parent action for "block" */
-    rule->actionset->parent_intercept_action_rec = dcfg->tmp_default_actionset->intercept_action_rec;
-    rule->actionset->parent_intercept_action = dcfg->tmp_default_actionset->intercept_action;
+    if (rule->actionset) {
+        rule->actionset->parent_intercept_action_rec = dcfg->tmp_default_actionset->intercept_action_rec;
+        rule->actionset->parent_intercept_action = dcfg->tmp_default_actionset->intercept_action;
+    }
 
     /* Must NOT specify a disruptive action in logging phase. */
     if ((rule->actionset != NULL)
@@ -913,7 +915,9 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     if (dcfg->tmp_chain_starter != NULL) {
         rule->chain_starter = dcfg->tmp_chain_starter;
-        rule->actionset->phase = rule->chain_starter->actionset->phase;
+        if (rule->actionset) {
+            rule->actionset->phase = rule->chain_starter->actionset->phase;
+        }
     }
 
     if (rule->actionset->is_chained != 1) {
