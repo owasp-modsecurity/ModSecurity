@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Code cosmetics: checks if actionset is not null before use it
+   [Issue #1556 - @marcstern, @zimmerle, @victorhora]
  * Only generate SecHashKey when SecHashEngine is On
    [Issue #1671 - @dmuey, @monkburger, @zimmerle]
  * Docs: Reformat README to Markdown and update dependencies
