@@ -1781,7 +1781,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
         }
 
         if (rc == RULE_NO_MATCH) {
-            if (rule->actionset && rule->actionset->is_chained) {
+            if (rule->actionset->is_chained) {
                 /* If the current rule is part of a chain then
                  * we need to skip over all the rules in the chain.
                  */
@@ -1905,7 +1905,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                 apr_table_clear(msr->matched_vars);
                 return -1;
             } else  {
-                if (rule->actionset->is_chained) {
+                if (rule->actionset && rule->actionset->is_chained) {
                     /* If the current rule is part of a chain then
                      * we need to skip over all the rules in the chain.
                      */
