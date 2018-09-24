@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartDateAfter : public Variable {
- public:
-    MultipartDateAfter()
-        : Variable("MULTIPART_DATA_AFTER") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartDataAfter.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartDateAfter, MULTIPART_DATA_AFTER,
+    m_variableMultipartDataAfter)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

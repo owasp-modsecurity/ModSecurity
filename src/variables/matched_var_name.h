@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MatchedVarName : public Variable {
- public:
-    MatchedVarName()
-        : Variable("MATCHED_VAR_NAME") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableMatchedVarName.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MatchedVarName, MATCHED_VAR_NAME, m_variableMatchedVarName)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

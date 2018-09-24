@@ -65,11 +65,10 @@ class Resource_NoDictElement : public Variable {
 };
 
 
-class Resource_DictElementRegexp : public Variable {
+class Resource_DictElementRegexp : public VariableRegex {
  public:
     explicit Resource_DictElementRegexp(std::string dictElement)
-        : Variable("RESOURCE:regex(" + dictElement + ")"),
-        m_r(dictElement),
+        : VariableRegex("RESOURCE:", dictElement),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
@@ -80,7 +79,6 @@ class Resource_DictElementRegexp : public Variable {
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
-    Utils::Regex m_r;
     std::string m_dictElement;
 };
 

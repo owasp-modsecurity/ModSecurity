@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class QueryString : public Variable {
- public:
-    QueryString()
-        : Variable("QUERY_STRING") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableQueryString.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(QueryString, QUERY_STRING, m_variableQueryString)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

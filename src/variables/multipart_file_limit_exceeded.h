@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartFileLimitExceeded : public Variable {
- public:
-    MultipartFileLimitExceeded()
-        : Variable("MULTIPART_FILE_LIMIT_EXCEEDED") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartFileLimitExceeded.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartFileLimitExceeded, MULTIPART_FILE_LIMIT_EXCEEDED,
+    m_variableMultipartFileLimitExceeded)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

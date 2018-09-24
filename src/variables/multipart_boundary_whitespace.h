@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartBoundaryWhiteSpace : public Variable {
- public:
-    MultipartBoundaryWhiteSpace()
-        : Variable("MULTIPART_BOUNDARY_WHITESPACE") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartBoundaryWhiteSpace.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartBoundaryWhiteSpace, MULTIPART_BOUNDARY_WHITESPACE,
+    m_variableMultipartBoundaryWhiteSpace)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

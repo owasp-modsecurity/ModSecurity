@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class AuthType : public Variable {
- public:
-    AuthType()
-        : Variable("AUTH_TYPE") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableAuthType.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(AuthType, AUTH_TYPE, m_variableAuthType)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

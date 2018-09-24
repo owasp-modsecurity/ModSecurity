@@ -29,51 +29,8 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class Geo_DictElement : public Variable {
- public:
-    explicit Geo_DictElement(std::string dictElement)
-        : Variable("GEO" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableGeo.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
-
-
-class Geo_NoDictElement : public Variable {
- public:
-    Geo_NoDictElement()
-        : Variable("GEO") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableGeo.resolve(l, m_keyExclusion);
-    }
-};
-
-
-class Geo_DictElementRegexp : public Variable {
- public:
-    explicit Geo_DictElementRegexp(std::string dictElement)
-        : Variable("GEO:regex(" + dictElement + ")"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableGeo.resolveRegularExpression(
-            &m_r, l, m_keyExclusion);
-    }
-
-    Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(Geo, GEO, m_variableGeo)
 
 
 }  // namespace Variables

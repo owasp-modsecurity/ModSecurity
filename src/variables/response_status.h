@@ -29,16 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class ResponseStatus : public Variable {
- public:
-    ResponseStatus()
-        : Variable("RESPONSE_STATUS") { }
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableResponseStatus.evaluate(l);
-    }
-};
+
+DEFINE_VARIABLE(ResponseStatus, RESPONSE_STATUS, m_variableResponseStatus)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

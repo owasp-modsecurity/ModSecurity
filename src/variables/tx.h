@@ -63,11 +63,10 @@ class Tx_NoDictElement : public Variable {
 };
 
 
-class Tx_DictElementRegexp : public Variable {
+class Tx_DictElementRegexp : public VariableRegex {
  public:
     explicit Tx_DictElementRegexp(std::string dictElement)
-        : Variable("TX:regex(" + dictElement + ")"),
-        m_r(dictElement),
+        : VariableRegex("TX", dictElement),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
@@ -77,7 +76,6 @@ class Tx_DictElementRegexp : public Variable {
             m_dictElement, l, m_keyExclusion);
     }
 
-    Utils::Regex m_r;
     std::string m_dictElement;
 };
 

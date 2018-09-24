@@ -29,16 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class RequestMethod : public Variable {
- public:
-    RequestMethod()
-        : Variable("REQUEST_METHOD") { }
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableRequestMethod.evaluate(l);
-    }
-};
+
+DEFINE_VARIABLE(RequestMethod, REQUEST_METHOD, m_variableRequestMethod)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

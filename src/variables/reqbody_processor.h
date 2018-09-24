@@ -29,16 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class ReqbodyProcessor : public Variable {
- public:
-    ReqbodyProcessor()
-        : Variable("REQBODY_PROCESSOR") { }
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableReqbodyProcessor.evaluate(l);
-    }
-};
+
+DEFINE_VARIABLE(ReqbodyProcessor, REQBODY_PROCESSOR, m_variableReqbodyProcessor)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

@@ -65,11 +65,10 @@ class User_NoDictElement : public Variable {
 };
 
 
-class User_DictElementRegexp : public Variable {
+class User_DictElementRegexp : public VariableRegex {
  public:
     explicit User_DictElementRegexp(std::string dictElement)
-        : Variable("USER:regex(" + dictElement + ")"),
-        m_r(dictElement),
+        : VariableRegex("USER", dictElement),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
@@ -80,7 +79,6 @@ class User_DictElementRegexp : public Variable {
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
-    Utils::Regex m_r;
     std::string m_dictElement;
 };
 

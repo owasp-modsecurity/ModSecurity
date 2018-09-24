@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartBoundaryQuoted : public Variable {
- public:
-    MultipartBoundaryQuoted()
-        : Variable("MULTIPART_BOUNDARY_QUOTED") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartBoundaryQuoted.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartBoundaryQuoted, MULTIPART_BOUNDARY_QUOTED,
+    m_variableMultipartBoundaryQuoted)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartLFLine : public Variable {
- public:
-    MultipartLFLine()
-        : Variable("MULTIPART_LF_LINE") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartLFLine.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartLFLine, MULTIPART_LF_LINE, m_variableMultipartLFLine)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

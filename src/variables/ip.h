@@ -65,11 +65,10 @@ class Ip_NoDictElement : public Variable {
 };
 
 
-class Ip_DictElementRegexp : public Variable {
+class Ip_DictElementRegexp : public VariableRegex {
  public:
     explicit Ip_DictElementRegexp(std::string dictElement)
-        : Variable("IP:regex(" + dictElement + ")"),
-        m_r(dictElement),
+        : VariableRegex("IP", dictElement),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
@@ -80,7 +79,6 @@ class Ip_DictElementRegexp : public Variable {
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
-    Utils::Regex m_r;
     std::string m_dictElement;
 };
 

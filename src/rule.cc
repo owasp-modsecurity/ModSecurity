@@ -70,7 +70,7 @@ Rule::Rule(std::string marker)
 
 
 Rule::Rule(Operator *_op,
-        std::vector<Variable *> *_variables,
+        Variables::Variables *_variables,
         std::vector<Action *> *actions,
         std::string fileName,
         int lineNumber)
@@ -425,7 +425,7 @@ std::vector<std::unique_ptr<VariableValue>> Rule::getFinalVars(
     std::list<std::string> exclusions_update_by_tag_remove;
     std::list<std::string> exclusions_update_by_msg_remove;
     std::list<std::string> exclusions_update_by_id_remove;
-    std::vector<Variables::Variable *> variables;
+    Variables::Variables variables;
     std::vector<std::unique_ptr<VariableValue>> finalVars;
 
     std::copy(m_variables->begin(), m_variables->end(),
@@ -436,7 +436,8 @@ std::vector<std::unique_ptr<VariableValue>> Rule::getFinalVars(
         if (containsTag(*a.first.get(), trans) == false) {
             continue;
         }
-        if (a.second->m_isExclusion) {
+        if (dynamic_cast<Variables::VariableModificatorExclusion*>(
+                a.second.get())) {
             std::vector<const VariableValue *> z;
             a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
@@ -458,7 +459,8 @@ std::vector<std::unique_ptr<VariableValue>> Rule::getFinalVars(
         if (containsMsg(*a.first.get(), trans) == false) {
             continue;
         }
-        if (a.second->m_isExclusion) {
+        if (dynamic_cast<Variables::VariableModificatorExclusion*>(
+                a.second.get())) {
             std::vector<const VariableValue *> z;
             a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
@@ -480,7 +482,8 @@ std::vector<std::unique_ptr<VariableValue>> Rule::getFinalVars(
         if (m_ruleId != a.first) {
             continue;
         }
-        if (a.second->m_isExclusion) {
+        if (dynamic_cast<Variables::VariableModificatorExclusion*>(
+                a.second.get())) {
             std::vector<const VariableValue *> z;
             a.second->evaluate(trans, this, &z);
             for (auto &y : z) {
@@ -712,7 +715,7 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
 bool Rule::evaluate(Transaction *trans,
     std::shared_ptr<RuleMessage> ruleMessage) {
     bool globalRet = false;
-    std::vector<Variable *> *variables = this->m_variables;
+    Variables::Variables *variables = this->m_variables;
     bool recursiveGlobalRet;
     bool containsBlock = false;
     std::vector<std::unique_ptr<VariableValue>> finalVars;
@@ -764,14 +767,14 @@ bool Rule::evaluate(Transaction *trans,
         + "\" with param " \
         + eparam \
         + " against " \
-        + Variable::to_s(variables) + ".");
+        + variables + ".");
 #endif
     } else {
 #ifndef NO_LOGS
     trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
         + ") Executing operator \"" + this->m_op->m_op \
         + " against " \
-        + Variable::to_s(variables) + ".");
+        + variables + ".");
 #endif
     }
 

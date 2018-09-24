@@ -1099,7 +1099,7 @@ expression:
         for (auto &i : *$4.get()) {
             a->push_back(i.release());
         }
-        std::vector<Variable *> *v = new std::vector<Variable *>();
+        Variables::Variables *v = new Variables::Variables();
         for (auto &i : *$2.get()) {
             v->push_back(i.release());
         }
@@ -1119,7 +1119,7 @@ expression:
       }
     | DIRECTIVE variables op
       {
-        std::vector<Variable *> *v = new std::vector<Variable *>();
+        Variables::Variables *v = new Variables::Variables();
         for (auto &i : *$2.get()) {
             v->push_back(i.release());
         }
@@ -1732,7 +1732,7 @@ variables:
         while (!originalList->empty()) {
             std::unique_ptr<Variable> var = std::move(originalList->back());
             originalList->pop_back();
-            if (var->m_isExclusion) {
+            if (dynamic_cast<VariableModificatorExclusion*>(var.get())) {
                 exclusionVars->push_back(std::move(var));
             } else {
                 newList->push_back(std::move(var));

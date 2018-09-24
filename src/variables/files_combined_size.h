@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class FilesCombinedSize : public Variable {
- public:
-    FilesCombinedSize()
-        : Variable("FILES_COMBINED_SIZE") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableFilesCombinedSize.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(FilesCombinedSize, FILES_COMBINED_SIZE,
+    m_variableFilesCombinedSize)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

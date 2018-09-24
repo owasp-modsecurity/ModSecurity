@@ -29,51 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MatchedVarsNames_DictElement : public Variable {
- public:
-    explicit MatchedVarsNames_DictElement(std::string dictElement)
-        : Variable("MATCHED_VARS_NAMES" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableMatchedVarsNames.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
-
-
-class MatchedVarsNames_NoDictElement : public Variable {
- public:
-    MatchedVarsNames_NoDictElement()
-        : Variable("MATCHED_VARS_NAMES") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableMatchedVarsNames.resolve(l, m_keyExclusion);
-    }
-};
-
-
-class MatchedVarsNames_DictElementRegexp : public Variable {
- public:
-    explicit MatchedVarsNames_DictElementRegexp(std::string dictElement)
-        : Variable("MATCHED_VARS_NAMES:regex(" + dictElement + ")"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableMatchedVarsNames.resolveRegularExpression(
-            &m_r, l, m_keyExclusion);
-    }
-
-     Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(MatchedVarsNames, MATCHED_VARS_NAMES,
+   m_variableMatchedVarsNames)
 
 
 }  // namespace Variables

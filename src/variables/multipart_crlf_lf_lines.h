@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartCrlfLFLines : public Variable {
- public:
-    MultipartCrlfLFLines()
-        : Variable("MULTIPART_CRLF_LF_LINES") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartCrlfLFLines.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartCrlfLFLines, MULTIPART_CRLF_LF_LINES,
+    m_variableMultipartCrlfLFLines)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

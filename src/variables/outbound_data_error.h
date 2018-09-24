@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class OutboundDataError : public Variable {
- public:
-    OutboundDataError()
-        : Variable("OUTBOUND_DATA_ERROR") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableOutboundDataError.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(OutboundDataError, OUTBOUND_DATA_ERROR,
+    m_variableOutboundDataError)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

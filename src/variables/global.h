@@ -65,11 +65,10 @@ class Global_NoDictElement : public Variable {
 };
 
 
-class Global_DictElementRegexp : public Variable {
+class Global_DictElementRegexp : public VariableRegex {
  public:
     explicit Global_DictElementRegexp(std::string dictElement)
-        : Variable("GLOBAL:regex(" + dictElement + ")"),
-        m_r(dictElement),
+        : VariableRegex("GLOBAL", dictElement),
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
@@ -81,7 +80,6 @@ class Global_DictElementRegexp : public Variable {
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
-    Utils::Regex m_r;
     std::string m_dictElement;
 };
 

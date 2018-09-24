@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartUnmatchedBoundary : public Variable {
- public:
-    MultipartUnmatchedBoundary()
-        : Variable("MULTIPART_UNMATCHED_BOUNDARY") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartUnmatchedBoundary.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartUnmatchedBoundary, MULTIPART_UNMATCHED_BOUNDARY,
+    m_variableMultipartUnmatchedBoundary)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

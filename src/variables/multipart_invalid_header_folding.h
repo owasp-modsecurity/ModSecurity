@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartInvalidHeaderFolding : public Variable {
- public:
-    MultipartInvalidHeaderFolding()
-        : Variable("MULTIPART_INVALID_HEADER_FOLDING") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartInvalidHeaderFolding.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartInvalidHeaderFolding, MULTIPART_INVALID_HEADER_FOLDING, m_variableMultipartInvalidHeaderFolding)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

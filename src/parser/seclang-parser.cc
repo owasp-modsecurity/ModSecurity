@@ -2011,7 +2011,7 @@ namespace yy {
         for (auto &i : *yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ().get()) {
             a->push_back(i.release());
         }
-        std::vector<Variable *> *v = new std::vector<Variable *>();
+        Variables::Variables *v = new Variables::Variables();
         for (auto &i : *yystack_[2].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ().get()) {
             v->push_back(i.release());
         }
@@ -2035,7 +2035,7 @@ namespace yy {
   case 74:
 #line 1121 "seclang-parser.yy" // lalr1.cc:856
     {
-        std::vector<Variable *> *v = new std::vector<Variable *>();
+        Variables::Variables *v = new Variables::Variables();
         for (auto &i : *yystack_[1].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ().get()) {
             v->push_back(i.release());
         }
@@ -2896,7 +2896,7 @@ namespace yy {
         while (!originalList->empty()) {
             std::unique_ptr<Variable> var = std::move(originalList->back());
             originalList->pop_back();
-            if (var->m_isExclusion) {
+            if (dynamic_cast<VariableModificatorExclusion*>(var.get())) {
                 exclusionVars->push_back(std::move(var));
             } else {
                 newList->push_back(std::move(var));
