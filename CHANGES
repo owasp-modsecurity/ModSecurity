@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Treating variables exception on load-time instead of run time.
+   [0x028e0 and 0x275a1 - @zimmerle]
  - Fix: function m.setvar in Lua scripts and add testcases
    [Issue #1859 - @nowaits, @victorhora]
  - Fix SecResponseBodyAccess and ctl:requestBodyAccess directives
