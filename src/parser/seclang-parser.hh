@@ -85,6 +85,7 @@ class Driver;
 #include "src/actions/phase.h"
 #include "src/actions/rev.h"
 #include "src/actions/rule_id.h"
+#include "src/actions/set_env.h"
 #include "src/actions/set_rsc.h"
 #include "src/actions/set_sid.h"
 #include "src/actions/set_uid.h"
@@ -380,7 +381,7 @@ using modsecurity::operators::Operator;
 
 
 
-#line 384 "seclang-parser.hh" // lalr1.cc:379
+#line 385 "seclang-parser.hh" // lalr1.cc:379
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -457,7 +458,7 @@ using modsecurity::operators::Operator;
 
 
 namespace yy {
-#line 461 "seclang-parser.hh" // lalr1.cc:379
+#line 462 "seclang-parser.hh" // lalr1.cc:379
 
 
 
@@ -836,6 +837,7 @@ namespace yy {
       char dummy5[sizeof(std::unique_ptr<actions::Action>)];
 
       // variables
+      // variables_pre_process
       // variables_may_be_quoted
       char dummy6[sizeof(std::unique_ptr<std::vector<std::unique_ptr<Variable> > > )];
 
@@ -2874,9 +2876,9 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 3319,     ///< Last index in yytable_.
-      yynnts_ = 15,  ///< Number of nonterminal symbols.
-      yyfinal_ = 335, ///< Termination state number.
+      yylast_ = 3321,     ///< Last index in yytable_.
+      yynnts_ = 16,  ///< Number of nonterminal symbols.
+      yyfinal_ = 336, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
       yyntokens_ = 339  ///< Number of tokens.
@@ -3191,21 +3193,22 @@ namespace yy {
         value.copy< std::unique_ptr<Operator> > (other.value);
         break;
 
-      case 353: // run_time_string
+      case 354: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (other.value);
         break;
 
-      case 350: // var
+      case 351: // var
         value.copy< std::unique_ptr<Variable> > (other.value);
         break;
 
-      case 351: // act
-      case 352: // setvar_action
+      case 352: // act
+      case 353: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (other.value);
         break;
 
       case 348: // variables
-      case 349: // variables_may_be_quoted
+      case 349: // variables_pre_process
+      case 350: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (other.value);
         break;
 
@@ -3432,21 +3435,22 @@ namespace yy {
         value.copy< std::unique_ptr<Operator> > (v);
         break;
 
-      case 353: // run_time_string
+      case 354: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (v);
         break;
 
-      case 350: // var
+      case 351: // var
         value.copy< std::unique_ptr<Variable> > (v);
         break;
 
-      case 351: // act
-      case 352: // setvar_action
+      case 352: // act
+      case 353: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (v);
         break;
 
       case 348: // variables
-      case 349: // variables_may_be_quoted
+      case 349: // variables_pre_process
+      case 350: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (v);
         break;
 
@@ -3746,21 +3750,22 @@ namespace yy {
         value.template destroy< std::unique_ptr<Operator> > ();
         break;
 
-      case 353: // run_time_string
+      case 354: // run_time_string
         value.template destroy< std::unique_ptr<RunTimeString> > ();
         break;
 
-      case 350: // var
+      case 351: // var
         value.template destroy< std::unique_ptr<Variable> > ();
         break;
 
-      case 351: // act
-      case 352: // setvar_action
+      case 352: // act
+      case 353: // setvar_action
         value.template destroy< std::unique_ptr<actions::Action> > ();
         break;
 
       case 348: // variables
-      case 349: // variables_may_be_quoted
+      case 349: // variables_pre_process
+      case 350: // variables_may_be_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
         break;
 
@@ -3993,21 +3998,22 @@ namespace yy {
         value.move< std::unique_ptr<Operator> > (s.value);
         break;
 
-      case 353: // run_time_string
+      case 354: // run_time_string
         value.move< std::unique_ptr<RunTimeString> > (s.value);
         break;
 
-      case 350: // var
+      case 351: // var
         value.move< std::unique_ptr<Variable> > (s.value);
         break;
 
-      case 351: // act
-      case 352: // setvar_action
+      case 352: // act
+      case 353: // setvar_action
         value.move< std::unique_ptr<actions::Action> > (s.value);
         break;
 
       case 348: // variables
-      case 349: // variables_may_be_quoted
+      case 349: // variables_pre_process
+      case 350: // variables_may_be_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (s.value);
         break;
 
@@ -6134,7 +6140,7 @@ namespace yy {
 
 
 } // yy
-#line 6138 "seclang-parser.hh" // lalr1.cc:379
+#line 6144 "seclang-parser.hh" // lalr1.cc:379
 
 
 

@@ -96,25 +96,33 @@ void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
 
 
 void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
-    std::vector<const VariableValue *> *l) {
+    std::vector<const VariableValue *> *l, Variables::KeyExclusions &ke) {
     size_t keySize = var.size();
     l->reserve(15);
 
     if (keySize == 0) {
         for (auto &i : *this) {
-            l->insert(l->begin(), new VariableValue(&m_name, &i.first, &i.second));
+            if (ke.toOmit(i.first)) {
+                continue;
+            }
+            l->insert(l->begin(), new VariableValue(&m_name, &i.first,
+                &i.second));
         }
     } else {
         auto range = this->equal_range(var);
         for (auto it = range.first; it != range.second; ++it) {
-            l->insert(l->begin(), new VariableValue(&m_name, &var, &it->second));
+            if (ke.toOmit(var)) {
+                continue;
+            }
+            l->insert(l->begin(), new VariableValue(&m_name, &var,
+                &it->second));
         }
     }
 }
 
 
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
-    std::vector<const VariableValue *> *l) {
+    std::vector<const VariableValue *> *l, Variables::KeyExclusions &ke) {
 
     //if (var.find(":") == std::string::npos) {
     //    return;
@@ -144,7 +152,9 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
         if (ret <= 0) {
             continue;
         }
-
+        if (ke.toOmit(x.first)) {
+            continue;
+        }
         l->insert(l->begin(), new VariableValue(&m_name, &x.first, &x.second));
     }
 }

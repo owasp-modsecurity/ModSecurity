@@ -371,8 +371,9 @@ class RulesProperties {
                 from->m_responseBodyTypeToBeInspected.m_value.clear();
             } else {
                 for (std::set<std::string>::iterator
-                        it = from->m_responseBodyTypeToBeInspected.m_value.begin();
-                        it != from->m_responseBodyTypeToBeInspected.m_value.end(); ++it) {
+                    it = from->m_responseBodyTypeToBeInspected.m_value.begin();
+                    it != from->m_responseBodyTypeToBeInspected.m_value.end();
+                    ++it) {
                     to->m_responseBodyTypeToBeInspected.m_value.insert(*it);
                 }
             }
@@ -450,9 +451,10 @@ class RulesProperties {
             std::vector<modsecurity::Rule *> *rules_to = to+i;
             for (size_t j = 0; j < rules_from->size(); j++) {
                 Rule *rule = rules_from->at(j);
-                if (std::binary_search (v.begin(), v.end(), rule->m_ruleId)) {
+                if (std::binary_search(v.begin(), v.end(), rule->m_ruleId)) {
                     if (err != NULL) {
-                        *err << "Rule id: " << std::to_string(rule->m_ruleId) \
+                        *err << "Rule id: " \
+                            << std::to_string(rule->m_ruleId) \
                             << " is duplicated" << std::endl;
                     }
                     return -1;

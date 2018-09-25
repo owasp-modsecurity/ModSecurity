@@ -36,6 +36,7 @@
 
 #include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
+#include "src/variables/variable.h"
 
 #ifndef SRC_COLLECTION_BACKEND_LMDB_H_
 #define SRC_COLLECTION_BACKEND_LMDB_H_
@@ -50,7 +51,7 @@ namespace backend {
 class LMDB :
     public Collection {
  public:
-    LMDB(std::string name);
+    explicit LMDB(std::string name);
     ~LMDB();
     void store(std::string key, std::string value) override;
 
@@ -67,9 +68,11 @@ class LMDB :
     void resolveSingleMatch(const std::string& var,
         std::vector<const VariableValue *> *l) override;
     void resolveMultiMatches(const std::string& var,
-        std::vector<const VariableValue *> *l) override;
+        std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) override;
     void resolveRegularExpression(const std::string& var,
-        std::vector<const VariableValue *> *l) override;
+        std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) override;
 
  private:
     void string2val(const std::string& str, MDB_val *val);

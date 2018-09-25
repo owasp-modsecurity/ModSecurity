@@ -40,8 +40,8 @@ typedef struct Transaction_t Transaction;
 typedef struct Rules_t Rules;
 #endif
 
-#include "anchored_set_variable.h"
-#include "anchored_variable.h"
+#include "modsecurity/anchored_set_variable.h"
+#include "modsecurity/anchored_variable.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/collection/collections.h"
 #include "modsecurity/variable_value.h"
@@ -267,6 +267,8 @@ class TransactionAnchoredVariables {
 class Transaction : public TransactionAnchoredVariables {
  public:
     Transaction(ModSecurity *transaction, Rules *rules, void *logCbData);
+    Transaction(ModSecurity *transaction, Rules *rules, char *id,
+        void *logCbData);
     ~Transaction();
 
     /** TODO: Should be an structure that fits an IP address */
@@ -576,6 +578,10 @@ extern "C" {
 /** @ingroup ModSecurity_C_API */
 Transaction *msc_new_transaction(ModSecurity *ms,
     Rules *rules, void *logCbData);
+
+/** @ingroup ModSecurity_C_API */
+Transaction *msc_new_transaction_with_id(ModSecurity *ms,
+    Rules *rules, char *id, void *logCbData);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_connection(Transaction *transaction,

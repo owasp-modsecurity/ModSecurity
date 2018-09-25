@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class UrlEncodedError : public Variable {
- public:
-    UrlEncodedError()
-        : Variable("URLENCODED_ERROR") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableUrlEncodedError.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(UrlEncodedError, URLENCODED_ERROR, m_variableUrlEncodedError)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

@@ -29,6 +29,12 @@ void CustomDebugLog::write(int level, const std::string& message) {
     m_log << "[" << level << "] " << message << std::endl;
 }
 
+void CustomDebugLog::write(int level, const std::string &id,
+    const std::string &uri, const std::string &msg) {
+    std::string msgf = "[" + std::to_string(level) + "] " + msg;
+    msgf = "[" + id + "] [" + uri + "] " + msgf;
+    m_log << msgf << std::endl;
+}
 
 bool CustomDebugLog::contains(const std::string& pattern) {
     modsecurity::Utils::Regex re(pattern);

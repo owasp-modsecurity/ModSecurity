@@ -29,16 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartInvalidQuoting : public Variable {
- public:
-    MultipartInvalidQuoting()
-        : Variable("MULTIPART_INVALID_QUOTING") { }
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartInvalidQuoting.evaluate(l);
-    }
-};
+
+DEFINE_VARIABLE(MultipartInvalidQuoting, MULTIPART_INVALID_QUOTING,
+    m_variableMultipartInvalidQuoting)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

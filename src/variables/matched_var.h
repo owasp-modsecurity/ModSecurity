@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MatchedVar : public Variable {
- public:
-    MatchedVar()
-        : Variable("MATCHED_VAR") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMatchedVar.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MatchedVar, MATCHED_VAR, m_variableMatchedVar)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

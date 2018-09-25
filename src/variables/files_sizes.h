@@ -29,51 +29,8 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class FilesSizes_DictElement : public Variable {
- public:
-    explicit FilesSizes_DictElement(std::string dictElement)
-        : Variable("FILES_SIZES" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesSizes.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
-
-
-class FilesSizes_NoDictElement : public Variable {
- public:
-    FilesSizes_NoDictElement()
-        : Variable("FILES_SIZES") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesSizes.resolve(l);
-    }
-};
-
-
-class FilesSizes_DictElementRegexp : public Variable {
- public:
-    explicit FilesSizes_DictElementRegexp(std::string dictElement)
-        : Variable("FILES_SIZES"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesSizes.resolveRegularExpression(
-            &m_r, l);
-    }
-
-    Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(FilesSizes, FILES_SIZES, m_variableFilesSizes)
 
 
 }  // namespace Variables

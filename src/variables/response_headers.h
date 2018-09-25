@@ -29,51 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class ResponseHeaders_DictElement : public Variable {
- public:
-    explicit ResponseHeaders_DictElement(std::string dictElement)
-        : Variable("RESPONSE_HEADERS" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableResponseHeaders.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
-
-
-class ResponseHeaders_NoDictElement : public Variable {
- public:
-    ResponseHeaders_NoDictElement()
-        : Variable("RESPONSE_HEADERS") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableResponseHeaders.resolve(l);
-    }
-};
-
-
-class ResponseHeaders_DictElementRegexp : public Variable {
- public:
-    explicit ResponseHeaders_DictElementRegexp(std::string dictElement)
-        : Variable("RESPONSE_HEADERS"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableResponseHeaders.resolveRegularExpression(
-            &m_r, l);
-    }
-
-    Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(ResponseHeaders, RESPONSE_HEADERS,
+    m_variableResponseHeaders)
 
 
 }  // namespace Variables

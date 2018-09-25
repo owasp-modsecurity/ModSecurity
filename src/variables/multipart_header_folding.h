@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartHeaderFolding : public Variable {
- public:
-    MultipartHeaderFolding()
-        : Variable("MULTIPART_HEADER_FOLDING") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartHeaderFolding.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartHeaderFolding, MULTIPART_HEADER_FOLDING,
+    m_variableMultipartHeaderFolding)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

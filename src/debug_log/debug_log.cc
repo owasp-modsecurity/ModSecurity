@@ -72,6 +72,18 @@ int DebugLog::getDebugLogLevel() {
 }
 
 
+void DebugLog::write(int level, const std::string &id,
+    const std::string &uri, const std::string &msg) {
+    if (level <= m_debugLevel) {
+        std::string msgf = "[" + std::to_string(level) + "] " + msg;
+        msgf = "[" + id + "] [" + uri + "] " + msgf;
+
+        DebugLogWriter &d = DebugLogWriter::getInstance();
+        d.write_log(m_fileName, msgf);
+    }
+}
+
+
 void DebugLog::write(int level, const std::string &msg) {
     if (level <= m_debugLevel) {
         std::string msgf = "[" + std::to_string(level) + "] " + msg;

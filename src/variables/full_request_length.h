@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class FullRequestLength : public Variable {
- public:
-    FullRequestLength()
-        : Variable("FULL_REQUEST_LENGTH") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableFullRequestLength.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(FullRequestLength, FULL_REQUEST_LENGTH,
+    m_variableFullRequestLength)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

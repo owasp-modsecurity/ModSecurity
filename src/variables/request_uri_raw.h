@@ -29,16 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class RequestURIRaw : public Variable {
- public:
-    RequestURIRaw()
-        : Variable("REQUEST_URI_RAW") { }
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableRequestURIRaw.evaluate(l);
-    }
-};
+
+DEFINE_VARIABLE(RequestURIRaw, REQUEST_URI_RAW, m_variableRequestURIRaw)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

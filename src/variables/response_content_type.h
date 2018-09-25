@@ -29,16 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class ResponseContentType : public Variable {
- public:
-    ResponseContentType()
-        : Variable("RESPONSE_CONTENT_TYPE") { }
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableResponseContentType.evaluate(l);
-    }
-};
+
+DEFINE_VARIABLE(ResponseContentType, RESPONSE_CONTENT_TYPE,
+    m_variableResponseContentType)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

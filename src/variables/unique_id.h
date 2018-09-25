@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class UniqueID : public Variable {
- public:
-    UniqueID()
-        : Variable("UNIQUEID") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableUniqueID.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(UniqueID, UNIQUEID, m_variableUniqueID)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

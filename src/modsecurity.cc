@@ -71,8 +71,10 @@ ModSecurity::ModSecurity()
 #else
     m_global_collection(new collection::backend::InMemoryPerProcess("GLOBAL")),
     m_ip_collection(new collection::backend::InMemoryPerProcess("IP")),
-    m_resource_collection(new collection::backend::InMemoryPerProcess("RESOURCE")),
-    m_session_collection(new collection::backend::InMemoryPerProcess("SESSION")),
+    m_resource_collection(
+        new collection::backend::InMemoryPerProcess("RESOURCE")),
+    m_session_collection(
+        new collection::backend::InMemoryPerProcess("SESSION")),
     m_user_collection(new collection::backend::InMemoryPerProcess("USER")),
 #endif
     m_logCb(NULL) {

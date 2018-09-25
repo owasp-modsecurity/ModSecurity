@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class PathInfo : public Variable {
- public:
-    PathInfo()
-        : Variable("PATH_INFO") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variablePathInfo.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(PathInfo, PATH_INFO, m_variablePathInfo)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

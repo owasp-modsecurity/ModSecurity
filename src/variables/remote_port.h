@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class RemotePort : public Variable {
- public:
-    RemotePort()
-        : Variable("REMOTE_PORT") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableRemotePort.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(RemotePort, REMOTE_PORT, m_variableRemotePort)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class FullRequest : public Variable {
- public:
-    FullRequest()
-        : Variable("FULL_REQUEST") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableFullRequest.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(FullRequest, FULL_REQUEST, m_variableFullRequest)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

@@ -29,51 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultiPartFileName_DictElement : public Variable {
- public:
-    explicit MultiPartFileName_DictElement(std::string dictElement)
-        : Variable("MULTIPART_FILENAME" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableMultipartFileName.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
-
-
-class MultiPartFileName_NoDictElement : public Variable {
- public:
-    MultiPartFileName_NoDictElement()
-        : Variable("MULTIPART_FILENAME") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableMultipartFileName.resolve(l);
-    }
-};
-
-
-class MultiPartFileName_DictElementRegexp : public Variable {
- public:
-    explicit MultiPartFileName_DictElementRegexp(std::string dictElement)
-        : Variable("MULTIPART_FILENAME:regex(" + dictElement + ")"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableMultipartFileName.resolveRegularExpression(
-            &m_r, l);
-    }
-
-    Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(MultiPartFileName, MULTIPART_FILENAME,
+    m_variableMultipartFileName)
 
 
 }  // namespace Variables

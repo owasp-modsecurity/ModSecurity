@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class RemoteAddr : public Variable {
- public:
-    RemoteAddr()
-        : Variable("REMOTE_ADDR") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableRemoteAddr.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(RemoteAddr, REMOTE_ADDR, m_variableRemoteAddr)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

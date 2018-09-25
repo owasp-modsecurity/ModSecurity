@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartInvalidPart : public Variable {
- public:
-    MultipartInvalidPart()
-        : Variable("MULTIPART_INVALID_PART") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartInvalidPart.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartInvalidPart, MULTIPART_INVALID_PART,
+    m_variableMultipartInvalidHeaderFolding)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

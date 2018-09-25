@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartStrictError : public Variable {
- public:
-    MultipartStrictError()
-        : Variable("MULTIPART_STRICT_ERROR") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartStrictError.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartStrictError, MULTIPART_STRICT_ERROR,
+    m_variableMultipartStrictError)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

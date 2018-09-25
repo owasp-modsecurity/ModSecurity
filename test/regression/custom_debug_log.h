@@ -29,6 +29,8 @@ class CustomDebugLog : public modsecurity::debug_log::DebugLog {
     ~CustomDebugLog();
 
     void write(int level, const std::string& message) override;
+    void write(int level, const std::string &id,
+        const std::string &uri, const std::string &msg) override;
     bool contains(const std::string& pattern);
     std::string log_messages();
     std::string error_log_messages();

@@ -30,9 +30,7 @@ namespace Variables {
 
 Variable::Variable(std::string name)
     : m_name(name),
-    m_collectionName(""),
-    m_isExclusion(false),
-    m_isCount(false) {
+    m_collectionName("") {
     size_t a = m_name.find(":");
     if (a == std::string::npos) {
         a = m_name.find(".");
@@ -40,7 +38,8 @@ Variable::Variable(std::string name)
     if (a != std::string::npos) {
         m_collectionName = utils::string::toupper(std::string(m_name, 0, a));
         m_name = std::string(m_name, a + 1, m_name.size());
-        m_fullName = std::make_shared<std::string>(m_collectionName + ":" + m_name);
+        m_fullName = std::make_shared<std::string>(m_collectionName
+            + ":" + m_name);
     } else {
         m_fullName = std::make_shared<std::string>(m_name);
         m_collectionName = m_name;
@@ -49,33 +48,50 @@ Variable::Variable(std::string name)
 }
 
 
-std::string Variable::to_s(
-    std::vector<Variable *> *variables) {
-    std::string ret;
-    std::string except("");
-    for (int i = 0; i < variables->size() ; i++) {
-        VariableModificatorExclusion *e =
-            dynamic_cast<VariableModificatorExclusion *>(variables->at(i));
-        if (e != NULL) {
-            if (except.empty()) {
-                except = except + *variables->at(i)->m_fullName.get();
-            } else {
-                except = except + "|" + *variables->at(i)->m_fullName.get();
-            }
-            continue;
-        }
+Variable::Variable(Variable *var) :
+    m_name(var->m_name),
+    m_collectionName(var->m_collectionName),
+    m_fullName(var->m_fullName) { }
 
-        if (i == 0) {
-            ret = ret + *variables->at(i)->m_fullName.get();
+
+void Variable::addsKeyExclusion(Variable *v) {
+    std::unique_ptr<KeyExclusion> r;
+    VariableModificatorExclusion *ve = \
+        dynamic_cast<VariableModificatorExclusion *>(v);
+    VariableRegex *vr;
+
+    if (!ve) {
+        return;
+    }
+
+    vr = dynamic_cast<VariableRegex *>(ve->m_base.get());
+
+    if (vr == NULL) {
+        r.reset(new KeyExclusionString(v->m_name));
+    } else {
+        r.reset(new KeyExclusionRegex(vr->m_regex));
+    }
+
+    m_keyExclusion.push_back(std::move(r));
+}
+
+
+std::string operator+(std::string a, Variable *v) {
+    return *v->m_fullName.get();
+}
+
+
+std::string operator+(std::string a, Variables *v) {
+    std::string test;
+    for (auto &b : *v) {
+        if (test.empty()) {
+            test = std::string("") + b;
         } else {
-            ret = ret + "|" + *variables->at(i)->m_fullName.get();
+            test = test + "|" + b;
         }
     }
 
-    if (except.empty() == false) {
-        ret = ret + ", except for: " + except;
-    }
-    return ret;
+    return a + test;
 }
 
 

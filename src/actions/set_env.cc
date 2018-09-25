@@ -13,29 +13,36 @@
  *
  */
 
+#include "src/actions/set_env.h"
+
 #include <iostream>
 #include <string>
-#include <vector>
-#include <list>
-#include <utility>
 
-#ifndef SRC_VARIABLES_MATCHED_VARS_NAMES_H_
-#define SRC_VARIABLES_MATCHED_VARS_NAMES_H_
-
-#include "src/variables/variable.h"
+#include "modsecurity/transaction.h"
+#include "modsecurity/rule.h"
+#include "src/utils/string.h"
 
 namespace modsecurity {
-
-class Transaction;
-namespace Variables {
+namespace actions {
 
 
-DEFINE_VARIABLE_DICT(MatchedVarsNames, MATCHED_VARS_NAMES,
-   m_variableMatchedVarsNames)
+bool SetENV::init(std::string *error) {
+    return true;
+}
 
 
-}  // namespace Variables
+bool SetENV::evaluate(Rule *rule, Transaction *t) {
+    std::string colNameExpanded(m_string->evaluate(t));
+
+#ifndef NO_LOGS
+    t->debug(8, "Setting envoriment variable: "
+        + colNameExpanded + ".");
+#endif
+
+    putenv((char *)colNameExpanded.c_str());
+
+    return true;
+}
+
+}  // namespace actions
 }  // namespace modsecurity
-
-#endif  // SRC_VARIABLES_MATCHED_VARS_NAMES_H_
-

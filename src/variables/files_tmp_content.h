@@ -29,51 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class FilesTmpContent_DictElement : public Variable {
- public:
-    explicit FilesTmpContent_DictElement(std::string dictElement)
-        : Variable("FILES_TMP_CONTENT" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesTmpContent.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
-
-
-class FilesTmpContent_NoDictElement : public Variable {
- public:
-    FilesTmpContent_NoDictElement()
-        : Variable("FILES_TMP_CONTENT") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesTmpContent.resolve(l);
-    }
-};
-
-
-class FilesTmpContent_DictElementRegexp : public Variable {
- public:
-    explicit FilesTmpContent_DictElementRegexp(std::string dictElement)
-        : Variable("FILES_TMP_CONTENT:regex(" + dictElement + ")"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesTmpContent.resolveRegularExpression(
-            &m_r, l);
-    }
-
-    Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(FilesTmpContent, FILES_TMP_CONTENT,
+    m_variableFilesTmpContent)
 
 
 }  // namespace Variables

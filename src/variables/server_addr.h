@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class ServerAddr : public Variable {
- public:
-    ServerAddr()
-        : Variable("SERVER_ADDR") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableServerAddr.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(ServerAddr, SERVER_ADDR, m_variableServerAddr)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

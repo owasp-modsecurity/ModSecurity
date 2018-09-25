@@ -29,51 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class RequestCookiesNames_DictElement : public Variable {
- public:
-    explicit RequestCookiesNames_DictElement(std::string dictElement)
-        : Variable("REQUEST_COOKIES_NAMES" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableRequestCookiesNames.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
-
-
-class RequestCookiesNames_NoDictElement : public Variable {
- public:
-    RequestCookiesNames_NoDictElement()
-        : Variable("REQUEST_COOKIES_NAMES") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableRequestCookiesNames.resolve(l);
-    }
-};
-
-
-class RequestCookiesNames_DictElementRegexp : public Variable {
- public:
-    explicit RequestCookiesNames_DictElementRegexp(std::string dictElement)
-        : Variable("REQUEST_COOKIES_NAMES:regex(" + dictElement + ")"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableRequestCookiesNames.resolveRegularExpression(
-            &m_r, l);
-    }
-
-    Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(RequestCookiesNames, REQUEST_COOKIES_NAMES,
+    m_variableRequestCookiesNames)
 
 
 }  // namespace Variables

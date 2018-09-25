@@ -29,49 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class RequestHeadersNames_DictElement : public Variable {
- public:
-    explicit RequestHeadersNames_DictElement(std::string dictElement)
-        : Variable("REQUEST_HEADERS_NAMES" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableRequestHeadersNames.resolve(m_dictElement, l);
-    }
+DEFINE_VARIABLE_DICT(RequestHeadersNames, REQUEST_HEADERS_NAMES,
+    m_variableRequestHeadersNames)
 
-    std::string m_dictElement;
-};
-
-class RequestHeadersNames_NoDictElement : public Variable {
- public:
-    RequestHeadersNames_NoDictElement()
-        : Variable("REQUEST_HEADERS_NAMES") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableRequestHeadersNames.resolve(l);
-    }
-};
-
-class RequestHeadersNames_DictElementRegexp : public Variable {
- public:
-    explicit RequestHeadersNames_DictElementRegexp(std::string dictElement)
-        : Variable("REQUEST_HEADERS_NAMES:regex(" + dictElement + ")"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableRequestHeadersNames.resolveRegularExpression(
-            &m_r, l);
-    }
-
-    Utils::Regex m_r;
-};
 
 }  // namespace Variables
 }  // namespace modsecurity

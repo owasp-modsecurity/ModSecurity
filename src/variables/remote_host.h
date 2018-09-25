@@ -29,17 +29,9 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class RemoteHost : public Variable {
- public:
-    RemoteHost()
-        : Variable("REMOTE_HOST") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableRemoteHost.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(RemoteHost, REMOTE_HOST, m_variableRemoteHost)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

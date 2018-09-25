@@ -23,6 +23,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/regex.h"
+#include "src/variables/variable.h"
 
 namespace modsecurity {
 
@@ -52,7 +53,8 @@ void AnchoredSetVariable::set(const std::string &key,
     const std::string &value, size_t offset, size_t len) {
     std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
     std::string *v = new std::string(value);
-    VariableValue *var = new VariableValue(std::make_shared<std::string>(m_name + ":" + key), v);
+    VariableValue *var = new VariableValue(std::make_shared<std::string>(
+        m_name + ":" + key), v);
     delete v;
 
     origin->m_offset = offset;
@@ -67,7 +69,8 @@ void AnchoredSetVariable::set(const std::string &key,
     const std::string &value, size_t offset) {
     std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
     std::string *v = new std::string(value);
-    VariableValue *var = new VariableValue(std::make_shared<std::string>(m_name + ":" + key), v);
+    VariableValue *var = new VariableValue(std::make_shared<std::string>(
+        m_name + ":" + key), v);
     delete v;
 
     origin->m_offset = offset;
@@ -82,6 +85,20 @@ void AnchoredSetVariable::resolve(
     std::vector<const VariableValue *> *l) {
     for (const auto& x : *this) {
         l->insert(l->begin(), new VariableValue(x.second));
+    }
+}
+
+
+void AnchoredSetVariable::resolve(
+    std::vector<const VariableValue *> *l,
+    Variables::KeyExclusions &ke) {
+    for (const auto& x : *this) {
+        if (!ke.toOmit(x.first)) {
+            l->insert(l->begin(), new VariableValue(x.second));
+        } else {
+            m_transaction->debug(7, "Excluding key: " + x.first
+                + " from target value.");
+        }
     }
 }
 
@@ -115,6 +132,24 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
             continue;
         }
         l->insert(l->begin(), new VariableValue(x.second));
+    }
+}
+
+
+void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
+    std::vector<const VariableValue *> *l,
+    Variables::KeyExclusions &ke) {
+    for (const auto& x : *this) {
+        int ret = Utils::regex_search(x.first, *r);
+        if (ret <= 0) {
+            continue;
+        }
+        if (!ke.toOmit(x.first)) {
+            l->insert(l->begin(), new VariableValue(x.second));
+        } else {
+            m_transaction->debug(7, "Excluding key: " + x.first
+                + " from target value.");
+        }
     }
 }
 

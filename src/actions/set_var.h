@@ -13,7 +13,9 @@
  *
  */
 
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "modsecurity/actions/action.h"
 #include "src/run_time_string.h"

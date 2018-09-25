@@ -52,12 +52,18 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
     std::vector<const VariableValue *> l;
 
     auto *v = m_variable.get();
-    Variables::Tx_DynamicElement *tx = dynamic_cast<Variables::Tx_DynamicElement *> (v);
-    Variables::Session_DynamicElement *session = dynamic_cast<Variables::Session_DynamicElement *> (v);
-    Variables::Ip_DynamicElement *ip = dynamic_cast<Variables::Ip_DynamicElement *> (v);
-    Variables::Resource_DynamicElement *resource = dynamic_cast<Variables::Resource_DynamicElement *> (v);
-    Variables::Global_DynamicElement *global = dynamic_cast<Variables::Global_DynamicElement *> (v);
-    Variables::User_DynamicElement *user = dynamic_cast<Variables::User_DynamicElement *> (v);
+    Variables::Tx_DynamicElement *tx = dynamic_cast<
+        Variables::Tx_DynamicElement *> (v);
+    Variables::Session_DynamicElement *session = dynamic_cast<
+        Variables::Session_DynamicElement *> (v);
+    Variables::Ip_DynamicElement *ip = dynamic_cast<
+        Variables::Ip_DynamicElement *> (v);
+    Variables::Resource_DynamicElement *resource = dynamic_cast<
+        Variables::Resource_DynamicElement *> (v);
+    Variables::Global_DynamicElement *global = dynamic_cast<
+        Variables::Global_DynamicElement *> (v);
+    Variables::User_DynamicElement *user = dynamic_cast<
+        Variables::User_DynamicElement *> (v);
     if (tx) {
         m_variableNameExpanded = tx->m_string->evaluate(t);
     } else if (session) {

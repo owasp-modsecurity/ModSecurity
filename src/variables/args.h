@@ -29,50 +29,7 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class Args_DictElement : public Variable {
- public:
-    explicit Args_DictElement(std::string dictElement)
-        : Variable("ARGS" + std::string(":") + std::string(dictElement)),
-        m_dictElement(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableArgs.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
-
-
-class Args_NoDictElement : public Variable {
- public:
-    Args_NoDictElement()
-        : Variable("ARGS") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableArgs.resolve(l);
-    }
-};
-
-
-class Args_DictElementRegexp : public Variable {
- public:
-    explicit Args_DictElementRegexp(std::string dictElement)
-        : Variable("ARGS:regex(" + dictElement + ")"),
-        m_r(dictElement) {
-    }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableArgs.resolveRegularExpression(&m_r, l);
-    }
-
-    Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(Args, ARGS, m_variableArgs)
 
 
 }  // namespace Variables

@@ -34,6 +34,7 @@
 namespace modsecurity {
 namespace Variables {
 class Variable;
+class Variables;
 }
 namespace actions {
 class Action;
@@ -45,7 +46,7 @@ class Operator;
 class Rule {
  public:
     Rule(operators::Operator *_op,
-            std::vector<Variables::Variable *> *_variables,
+            Variables::Variables *_variables,
             std::vector<actions::Action *> *_actions,
             std::string fileName,
             int lineNumber);
@@ -110,7 +111,7 @@ class Rule {
     std::string m_rev;
     int64_t m_ruleId;
     bool m_secMarker;
-    std::vector<Variables::Variable *> *m_variables;
+    modsecurity::Variables::Variables *m_variables;
     std::string m_ver;
 
  private:

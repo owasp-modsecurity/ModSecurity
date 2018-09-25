@@ -51,6 +51,7 @@ class Driver;
 #include "src/actions/phase.h"
 #include "src/actions/rev.h"
 #include "src/actions/rule_id.h"
+#include "src/actions/set_env.h"
 #include "src/actions/set_rsc.h"
 #include "src/actions/set_sid.h"
 #include "src/actions/set_uid.h"
@@ -725,7 +726,7 @@ using modsecurity::operators::Operator;
   op
 ;
 
-
+%type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables_pre_process
 %type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables_may_be_quoted
 %type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables
 %type <std::unique_ptr<Variable>> var
@@ -1099,7 +1100,7 @@ expression:
         for (auto &i : *$4.get()) {
             a->push_back(i.release());
         }
-        std::vector<Variable *> *v = new std::vector<Variable *>();
+        Variables::Variables *v = new Variables::Variables();
         for (auto &i : *$2.get()) {
             v->push_back(i.release());
         }
@@ -1119,7 +1120,7 @@ expression:
       }
     | DIRECTIVE variables op
       {
-        std::vector<Variable *> *v = new std::vector<Variable *>();
+        Variables::Variables *v = new Variables::Variables();
         for (auto &i : *$2.get()) {
             v->push_back(i.release());
         }
@@ -1443,7 +1444,7 @@ expression:
             YYERROR;
         }
       }
-    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG variables
+    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG variables_pre_process
       {
         std::string error;
         if (driver.m_exceptions.loadUpdateTargetByTag($1, std::move($2), &error) == false) {
@@ -1456,7 +1457,7 @@ expression:
             YYERROR;
         }
       }
-    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG variables
+    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG variables_pre_process
       {
         std::string error;
         if (driver.m_exceptions.loadUpdateTargetByMsg($1, std::move($2), &error) == false) {
@@ -1469,7 +1470,7 @@ expression:
             YYERROR;
         }
       }
-    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID variables
+    | CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID variables_pre_process
       {
         std::string error;
         double ruleId;
@@ -1723,6 +1724,43 @@ expression:
     ;
 
 variables:
+    variables_pre_process
+      {
+        std::unique_ptr<std::vector<std::unique_ptr<Variable> > > originalList = std::move($1);
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> newList(new std::vector<std::unique_ptr<Variable>>());
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> newNewList(new std::vector<std::unique_ptr<Variable>>());
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> exclusionVars(new std::vector<std::unique_ptr<Variable>>());
+        while (!originalList->empty()) {
+            std::unique_ptr<Variable> var = std::move(originalList->back());
+            originalList->pop_back();
+            if (dynamic_cast<VariableModificatorExclusion*>(var.get())) {
+                exclusionVars->push_back(std::move(var));
+            } else {
+                newList->push_back(std::move(var));
+            }
+        }
+
+        while (!newList->empty()) {
+            bool doNotAdd = false;
+            std::unique_ptr<Variable> var = std::move(newList->back());
+            newList->pop_back();
+            for (auto &i : *exclusionVars) {
+                if (*var == *i) {
+                    doNotAdd = true;
+                }
+                if (i->belongsToCollection(var.get())) {
+                    var->addsKeyExclusion(i.get());
+                }
+            }
+            if (!doNotAdd) {
+                newNewList->push_back(std::move(var));
+            }
+        }
+        $$ = std::move(newNewList);
+      }
+    ;
+
+variables_pre_process:
     variables_may_be_quoted
       {
         $$ = std::move($1);
@@ -2712,9 +2750,9 @@ act:
       {
         ACTION_NOT_SUPPORTED("SanitiseResponseHeader", @0);
       }
-    | ACTION_SETENV
+    | ACTION_SETENV run_time_string
       {
-        ACTION_NOT_SUPPORTED("SetEnv", @0);
+        ACTION_CONTAINER($$, new actions::SetENV(std::move($2)));
       }
     | ACTION_SETRSC run_time_string
       {

@@ -37,11 +37,14 @@ typedef struct Variable_t Variables;
 
 #ifdef __cplusplus
 namespace modsecurity {
+namespace Variables {
+class KeyExclusions;
+}
 namespace collection {
 
 class Collection {
  public:
-    Collection(std::string a) : m_name(a) { }
+    explicit Collection(std::string a) : m_name(a) { }
     virtual ~Collection() { }
     virtual void store(std::string key, std::string value) = 0;
 
@@ -59,9 +62,11 @@ class Collection {
     virtual void resolveSingleMatch(const std::string& var,
         std::vector<const VariableValue *> *l) = 0;
     virtual void resolveMultiMatches(const std::string& var,
-        std::vector<const VariableValue *> *l) = 0;
+        std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) = 0;
     virtual void resolveRegularExpression(const std::string& var,
-        std::vector<const VariableValue *> *l) = 0;
+        std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) = 0;
 
 
     /* store */
@@ -157,33 +162,36 @@ class Collection {
 
     /* resolveMultiMatches */
     virtual void resolveMultiMatches(const std::string& var,
-        std::string compartment, std::vector<const VariableValue *> *l) {
+        std::string compartment, std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) {
         std::string nkey = compartment + "::" + var;
-        resolveMultiMatches(nkey, l);
+        resolveMultiMatches(nkey, l, ke);
     }
 
 
     virtual void resolveMultiMatches(const std::string& var,
         std::string compartment, std::string compartment2,
-        std::vector<const VariableValue *> *l) {
+        std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
-        resolveMultiMatches(nkey, l);
+        resolveMultiMatches(nkey, l, ke);
     }
 
 
     /* resolveRegularExpression */
     virtual void resolveRegularExpression(const std::string& var,
-        std::string compartment, std::vector<const VariableValue *> *l) {
+        std::string compartment, std::vector<const VariableValue *> *l,
+        Variables::KeyExclusions &ke) {
         std::string nkey = compartment + "::" + var;
-        resolveRegularExpression(nkey, l);
+        resolveRegularExpression(nkey, l, ke);
     }
 
 
     virtual void resolveRegularExpression(const std::string& var,
         std::string compartment, std::string compartment2,
-        std::vector<const VariableValue *> *l) {
+        std::vector<const VariableValue *> *l, Variables::KeyExclusions &ke) {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
-        resolveRegularExpression(nkey, l);
+        resolveRegularExpression(nkey, l, ke);
     }
 
     std::string m_name;

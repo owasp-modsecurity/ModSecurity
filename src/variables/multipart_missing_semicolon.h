@@ -29,17 +29,10 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class MultipartMissingSemicolon : public Variable {
- public:
-    MultipartMissingSemicolon()
-        : Variable("MULTIPART_MISSING_SEMICOLON") { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) {
-        transaction->m_variableMultipartMissingSemicolon.evaluate(l);
-    }
-};
+DEFINE_VARIABLE(MultipartMissingSemicolon, MULTIPART_MISSING_SEMICOLON,
+    m_variableMultipartMissingSemicolon)
+
 
 }  // namespace Variables
 }  // namespace modsecurity

@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
                 key = op;
             }
             if (z->m_variables != NULL) {
-                std::string var = Variable::to_s(z->m_variables);
+                std::string var = std::string("") + z->m_variables;
                 if (variables.count(var) > 0) {
                     variables[var] = 1 + variables[var];
                 } else {
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
         for (auto &z : operators) {
             auto &s = z.second;
             std::cout << "   " << std::left << std::setw(20) << z.first;
-            std::cout << std::right << std::setw(4) << std::to_string(s);
+            std::cout << std::right << std::setw(4) << s;
             std::cout << std::endl;
         }
 
@@ -127,14 +127,14 @@ int main(int argc, char **argv) {
         for (auto &z : variables) {
             auto &s = z.second;
             std::cout << "   " << std::left << std::setw(20) << z.first;
-            std::cout << std::right << std::setw(4) << std::to_string(s);
+            std::cout << std::right << std::setw(4) << s;
             std::cout << std::endl;
         }
         std::cout << " Operators applied to variables" << std::endl;
         for (auto &z : op2var) {
             auto &s = z.second;
             std::cout << "   " << std::left << std::setw(40) << z.first;
-            std::cout << std::right << std::setw(4) << std::to_string(s);
+            std::cout << std::right << std::setw(4) << s;
             std::cout << std::endl;
         }
 

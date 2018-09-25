@@ -28,51 +28,9 @@ namespace modsecurity {
 
 class Transaction;
 namespace Variables {
-class FilesTmpNames_DictElement : public Variable {
- public:
-    explicit FilesTmpNames_DictElement(std::string dictElement)
-        : Variable("FILES_TMPNAMES" + std::string(":") +
-            std::string(dictElement)),
-        m_dictElement(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesTmpNames.resolve(m_dictElement, l);
-    }
-
-    std::string m_dictElement;
-};
 
 
-class FilesTmpNames_NoDictElement : public Variable {
- public:
-    FilesTmpNames_NoDictElement()
-        : Variable("FILES_TMPNAMES") { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesTmpNames.resolve(l);
-    }
-};
-
-
-class FilesTmpNames_DictElementRegexp : public Variable {
- public:
-    explicit FilesTmpNames_DictElementRegexp(std::string dictElement)
-        : Variable("FILES_TMPNAMES:regex(" + dictElement + ")"),
-        m_r(dictElement) { }
-
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override {
-        transaction->m_variableFilesTmpNames.resolveRegularExpression(
-            &m_r, l);
-    }
-
-    Utils::Regex m_r;
-};
+DEFINE_VARIABLE_DICT(FilesTmpNames, FILES_TMPNAMES, m_variableFilesTmpNames)
 
 
 }  // namespace Variables
