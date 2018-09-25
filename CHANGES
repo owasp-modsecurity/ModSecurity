@@ -1,6 +1,9 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds new transaction constructor that accepts the transaction id
+   as parameter.
+   [Issue #1627 - @defanator, @zimmerle]
  - Adds request IDs and URIs to the debug log
    [Issue #1627 - @defanator, @zimmerle]
  - Treating variables exception on load-time instead of run time.

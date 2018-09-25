@@ -267,6 +267,8 @@ class TransactionAnchoredVariables {
 class Transaction : public TransactionAnchoredVariables {
  public:
     Transaction(ModSecurity *transaction, Rules *rules, void *logCbData);
+    Transaction(ModSecurity *transaction, Rules *rules, char *id,
+        void *logCbData);
     ~Transaction();
 
     /** TODO: Should be an structure that fits an IP address */
@@ -576,6 +578,10 @@ extern "C" {
 /** @ingroup ModSecurity_C_API */
 Transaction *msc_new_transaction(ModSecurity *ms,
     Rules *rules, void *logCbData);
+
+/** @ingroup ModSecurity_C_API */
+Transaction *msc_new_transaction_with_id(ModSecurity *ms,
+    Rules *rules, char *id, void *logCbData);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_connection(Transaction *transaction,

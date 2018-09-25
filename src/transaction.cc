@@ -145,6 +145,51 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     intervention::clean(&m_it);
 }
 
+Transaction::Transaction(ModSecurity *ms, Rules *rules, char *id, void *logCbData)
+    : m_clientPort(0),
+    m_serverPort(0),
+    m_uri_no_query_string_decoded(""),
+    m_rules(rules),
+    m_timeStamp(std::time(NULL)),
+    m_httpCodeReturned(200),
+    m_highestSeverityAction(255),
+    m_ARGScombinedSizeDouble(0),
+    m_requestBodyType(UnknownFormat),
+    m_requestBodyProcessor(UnknownFormat),
+    m_requestBodyAccess(Rules::PropertyNotSetConfigBoolean),
+    m_marker(""),
+    m_allowType(modsecurity::actions::disruptive::NoneAllowType),
+    m_skip_next(0),
+    m_creationTimeStamp(utils::cpu_seconds()),
+    m_logCbData(logCbData),
+    m_ms(ms),
+    m_secRuleEngine(RulesProperties::PropertyNotSetRuleEngine),
+    m_collections(ms->m_global_collection, ms->m_ip_collection,
+        ms->m_session_collection, ms->m_user_collection,
+        ms->m_resource_collection),
+#ifdef WITH_YAJL
+    m_json(new RequestBodyProcessor::JSON(this)),
+#else
+    m_json(NULL),
+#endif
+#ifdef WITH_LIBXML2
+    m_xml(new RequestBodyProcessor::XML(this)),
+#else
+    m_xml(NULL),
+#endif
+    TransactionAnchoredVariables(this) {
+    m_id = std::string(id);
+    m_rules->incrementReferenceCount();
+
+    m_variableUrlEncodedError.set("0", 0);
+
+#ifndef NO_LOGS
+    this->debug(4, "Initializing transaction");
+#endif
+
+    intervention::clean(&m_it);
+}
+
 
 Transaction::~Transaction() {
     m_responseBody.str(std::string());
@@ -1795,7 +1840,10 @@ extern "C" Transaction *msc_new_transaction(ModSecurity *ms,
     Rules *rules, void *logCbData) {
     return new Transaction(ms, rules, logCbData);
 }
-
+extern "C" Transaction *msc_new_transaction_with_id(ModSecurity *ms,
+    Rules *rules, char *id, void *logCbData) {
+    return new Transaction(ms, rules, id, logCbData);
+}
 
 /**
  * @name    msc_process_connection
