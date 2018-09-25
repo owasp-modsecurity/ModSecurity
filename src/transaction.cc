@@ -186,7 +186,7 @@ void Transaction::debug(int level, std::string message) const {
         return;
     }
 
-    m_rules->debug(level, message);
+    m_rules->debug(level, m_id, m_uri, message);
 }
 #endif
 
