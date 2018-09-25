@@ -552,10 +552,7 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_REDIRECT}:                                                      { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_REDIRECT(yytext, *driver.loc.back()); }
 {ACTION_REV}:'{FREE_TEXT_QUOTE_COMMA}'                                  { return p::make_ACTION_REV(yytext, *driver.loc.back()); }
 {ACTION_REV}:{FREE_TEXT_QUOTE_COMMA}                                    { return p::make_ACTION_REV(yytext, *driver.loc.back()); }
-{ACTION_SETENV}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'           { return p::make_ACTION_SETENV(yytext, *driver.loc.back()); }
-{ACTION_SETENV}:'{VAR_FREE_TEXT_QUOTE}'                                 { return p::make_ACTION_SETENV(yytext, *driver.loc.back()); }
-{ACTION_SETENV}:{VAR_FREE_TEXT_SPACE_COMMA}                             { return p::make_ACTION_SETENV(yytext, *driver.loc.back()); }
-{ACTION_SETENV}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}       { return p::make_ACTION_SETENV(yytext, *driver.loc.back()); }
+{ACTION_SETENV}:                                                         { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_SETENV(yytext, *driver.loc.back()); }
 {ACTION_SETSID}:                                                        { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_SETSID(yytext, *driver.loc.back()); }
 {ACTION_SETUID}:                                                        { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_SETUID(yytext, *driver.loc.back()); }
 

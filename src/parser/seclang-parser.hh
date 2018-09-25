@@ -85,6 +85,7 @@ class Driver;
 #include "src/actions/phase.h"
 #include "src/actions/rev.h"
 #include "src/actions/rule_id.h"
+#include "src/actions/set_env.h"
 #include "src/actions/set_rsc.h"
 #include "src/actions/set_sid.h"
 #include "src/actions/set_uid.h"
@@ -380,7 +381,7 @@ using modsecurity::operators::Operator;
 
 
 
-#line 384 "seclang-parser.hh" // lalr1.cc:379
+#line 385 "seclang-parser.hh" // lalr1.cc:379
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -457,7 +458,7 @@ using modsecurity::operators::Operator;
 
 
 namespace yy {
-#line 461 "seclang-parser.hh" // lalr1.cc:379
+#line 462 "seclang-parser.hh" // lalr1.cc:379
 
 
 
@@ -2875,7 +2876,7 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 3320,     ///< Last index in yytable_.
+      yylast_ = 3321,     ///< Last index in yytable_.
       yynnts_ = 16,  ///< Number of nonterminal symbols.
       yyfinal_ = 336, ///< Termination state number.
       yyterror_ = 1,
@@ -6139,7 +6140,7 @@ namespace yy {
 
 
 } // yy
-#line 6143 "seclang-parser.hh" // lalr1.cc:379
+#line 6144 "seclang-parser.hh" // lalr1.cc:379
 
 
 

@@ -117,6 +117,7 @@ TESTS+=test/test-cases/regression/variable-MATCHED_VAR.json
 TESTS+=test/test-cases/regression/variable-REQUEST_URI.json
 TESTS+=test/test-cases/regression/variable-ENV.json
 TESTS+=test/test-cases/regression/variable-URLENCODED_ERROR.json
+TESTS+=test/test-cases/regression/action-setenv.json
 TESTS+=test/test-cases/regression/action-setsid.json
 TESTS+=test/test-cases/regression/variable-AUTH_TYPE.json
 TESTS+=test/test-cases/regression/variable-TIME_DAY.json

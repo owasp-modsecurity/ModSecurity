@@ -51,6 +51,7 @@ class Driver;
 #include "src/actions/phase.h"
 #include "src/actions/rev.h"
 #include "src/actions/rule_id.h"
+#include "src/actions/set_env.h"
 #include "src/actions/set_rsc.h"
 #include "src/actions/set_sid.h"
 #include "src/actions/set_uid.h"
@@ -2749,9 +2750,9 @@ act:
       {
         ACTION_NOT_SUPPORTED("SanitiseResponseHeader", @0);
       }
-    | ACTION_SETENV
+    | ACTION_SETENV run_time_string
       {
-        ACTION_NOT_SUPPORTED("SetEnv", @0);
+        ACTION_CONTAINER($$, new actions::SetENV(std::move($2)));
       }
     | ACTION_SETRSC run_time_string
       {
