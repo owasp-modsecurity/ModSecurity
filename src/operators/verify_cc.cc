@@ -143,7 +143,7 @@ bool VerifyCC::evaluate(Transaction *t, Rule *rule,
             if (is_cc) {
                 if (t) {
                     if (rule && t
-                        && rule->getActionsByName("capture").size() > 0) {
+                        && rule->getActionsByName("capture", t).size() > 0) {
                         t->m_collections.m_tx_collection->storeOrUpdateFirst(
                             "0", std::string(match));
 #ifndef NO_LOGS

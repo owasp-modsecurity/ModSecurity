@@ -1513,12 +1513,16 @@ expression:
         }
 
 
-        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        for (auto &i : *$2.get()) {
-            a->push_back(i.release());
+        if (driver.m_exceptions.loadUpdateActionById(ruleId, std::move($2), &error) == false) {
+            std::stringstream ss;
+            ss << "SecRuleUpdateActionById: failed to load:";
+            ss << $1;
+            ss << ". ";
+            ss << error;
+            driver.error(@0, ss.str());
+            YYERROR;
         }
 
-        driver.error(@0, "SecRuleUpdateActionById is not yet supported");
         YYERROR;
       }
     /* Debug log: start */

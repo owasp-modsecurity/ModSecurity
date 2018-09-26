@@ -134,7 +134,7 @@ bool VerifyCPF::evaluate(Transaction *t, Rule *rule,
             if (is_cpf) {
                 logOffset(ruleMessage, i.m_offset, i.m_length);
                 if (rule && t
-                    && rule->getActionsByName("capture").size() > 0) {
+                    && rule->getActionsByName("capture", t).size() > 0) {
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", std::string(i.match));
 #ifndef NO_LOGS

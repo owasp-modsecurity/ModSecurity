@@ -31,6 +31,32 @@ RulesExceptions::~RulesExceptions() {
 }
 
 
+bool RulesExceptions::loadUpdateActionById(double id,
+    std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > actions,
+    std::string *error) {
+
+    for (auto &a : *actions) {
+        if (a->action_kind == actions::Action::ConfigurationKind) {
+            std::cout << "General failure, action: " << a->m_name;
+            std::cout << " has not expected to be used with UpdateActionByID.";
+            std::cout << std::endl;
+        } else if (a->action_kind
+            == actions::Action::RunTimeBeforeMatchAttemptKind) {
+            m_action_pre_update_target_by_id.emplace(std::pair<double,
+                std::unique_ptr<actions::Action>>(id , std::move(a)));
+        } else if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind) {
+            m_action_pos_update_target_by_id.emplace(std::pair<double,
+                std::unique_ptr<actions::Action>>(id , std::move(a)));
+        } else {
+            std::cout << "General failure, action: " << a->m_name;
+            std::cout << " has an unknown type." << std::endl;
+        }
+    }
+
+    return true;
+}
+
+
 bool RulesExceptions::loadRemoveRuleByMsg(const std::string &msg,
     std::string *error) {
     m_remove_rule_by_msg.push_back(msg);

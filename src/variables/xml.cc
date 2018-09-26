@@ -93,7 +93,7 @@ void XML::evaluate(Transaction *t,
         t->debug(2, "XML: Can't look for xmlns, internal error.");
 #endif
     } else {
-        std::vector<actions::Action *> acts = rule->getActionsByName("xmlns");
+        std::vector<actions::Action *> acts = rule->getActionsByName("xmlns", t);
         for (auto &x : acts) {
             actions::XmlNS *z = (actions::XmlNS *)x;
             if (xmlXPathRegisterNs(xpathCtx, (const xmlChar*)z->m_scope.c_str(),
