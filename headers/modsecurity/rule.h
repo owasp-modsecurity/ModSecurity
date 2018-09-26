@@ -74,11 +74,12 @@ class Rule {
     void cleanMatchedVars(Transaction *trasn);
     void updateRulesVariable(Transaction *trasn);
 
-    std::vector<std::string> getActionNames();
-    std::vector<actions::Action *> getActionsByName(const std::string& name);
+    //std::vector<std::string> getActionNames();
+    std::vector<actions::Action *> getActionsByName(const std::string& name,
+        Transaction *t);
     bool containsTag(const std::string& name, Transaction *t);
     bool containsMsg(const std::string& name, Transaction *t);
-    bool containsDisruptiveAction();
+    bool containsStaticDisruptiveAction();
 
     int refCountDecreaseAndCheck() {
         m_referenceCount--;

@@ -96,7 +96,8 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
 #ifdef MODSEC_MUTEX_ON_PM
     pthread_mutex_unlock(&m_lock);
 #endif
-    bool capture = rule && rule->getActionsByName("capture").size() > 0;
+    bool capture = rule && rule->getActionsByName("capture",
+        transaction).size() > 0;
 
     if (rc > 0 && transaction) {
         std::string match_(match);

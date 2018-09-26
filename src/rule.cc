@@ -161,7 +161,7 @@ Rule::~Rule() {
     }
 }
 
-
+/*
 std::vector<std::string> Rule::getActionNames() {
     std::vector<std::string> a;
     for (auto &z : this->m_actionsRuntimePos) {
@@ -173,10 +173,25 @@ std::vector<std::string> Rule::getActionNames() {
     for (auto &z : this->m_actionsConf) {
         a.push_back(z->m_name);
     }
-
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+        a.push_back(z->m_name);
+    }
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+        a.push_back(z->m_name);
+    }
     return a;
 }
-
+*/
 
 bool Rule::evaluateActions(Transaction *trans) {
     return true;
@@ -216,21 +231,21 @@ void Rule::updateRulesVariable(Transaction *trans) {
         trans->m_variableRule.set("rev",
             m_rev, 0);
     }
-    if (getActionsByName("msg").size() > 0) {
+    if (getActionsByName("msg", trans).size() > 0) {
         actions::Msg *msg = dynamic_cast<actions::Msg*>(
-            getActionsByName("msg")[0]);
+            getActionsByName("msg", trans)[0]);
         trans->m_variableRule.set("msg",
            msg->data(trans), 0);
     }
-    if (getActionsByName("logdata").size() > 0) {
+    if (getActionsByName("logdata", trans).size() > 0) {
         actions::LogData *data = dynamic_cast<actions::LogData*>(
-            getActionsByName("logdata")[0]);
+            getActionsByName("logdata", trans)[0]);
         trans->m_variableRule.set("logdata",
             data->data(trans), 0);
     }
-    if (getActionsByName("severity").size() > 0) {
+    if (getActionsByName("severity", trans).size() > 0) {
         actions::Severity *data = dynamic_cast<actions::Severity*>(
-            getActionsByName("severity")[0]);
+            getActionsByName("severity", trans)[0]);
         trans->m_variableRule.set("severity",
             std::to_string(data->m_severity), 0);
     }
@@ -243,6 +258,30 @@ void Rule::updateRulesVariable(Transaction *trans) {
 void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     bool *containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
     for (Action *a : this->m_actionsRuntimePos) {
+        if (a->isDisruptive() == true) {
+            if (a->m_name == "block") {
+#ifndef NO_LOGS
+                trans->debug(9, "Rule contains a `block' action");
+                *containsBlock = true;
+#endif
+            }
+        } else {
+            if (a->m_name == "setvar" || a->m_name == "msg"
+                || a->m_name == "log") {
+#ifndef NO_LOGS
+                trans->debug(4, "Running [independent] (non-disruptive) " \
+                    "action: " + a->m_name);
+#endif
+				a->evaluate(this, trans, ruleMessage);
+            }
+        }
+    }
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
         if (a->isDisruptive() == true) {
             if (a->m_name == "block") {
 #ifndef NO_LOGS
@@ -401,6 +440,56 @@ std::list<std::pair<std::shared_ptr<std::string>,
             none--;
         }
     }
+
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        if (a->m_isNone) {
+            none++;
+        }
+    }
+
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        if (none == 0) {
+            newValue = std::shared_ptr<std::string>(
+                new std::string(a->evaluate(*value, trans)));
+
+            if (multiMatch == true) {
+                if (*value != *newValue) {
+                    ret.push_back(std::make_pair(
+                        newValue,
+                        transStr));
+                    value = newValue;
+                }
+            }
+
+            value = newValue;
+#ifndef NO_LOGS
+            trans->debug(9, " T (" + \
+                std::to_string(transformations) + ") " + \
+                a->m_name + ": \"" + \
+                utils::string::limitTo(80, *value) + "\"");
+#endif
+            if (transStr->empty()) {
+                transStr->append(a->m_name);
+            } else {
+                transStr->append("," + a->m_name);
+            }
+            transformations++;
+        }
+        if (a->m_isNone) {
+            none--;
+        }
+    }
+
     if (multiMatch == true) {
         // v2 checks the last entry twice. Don't know why.
         ret.push_back(ret.back());
@@ -709,6 +798,36 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
                 a->m_name + ". SecRuleEngine is not On");
 #endif
     }
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        if (a->isDisruptive() == false) {
+            if (a->m_name != "setvar" && a->m_name != "log"
+                && a->m_name != "msg") {
+#ifndef NO_LOGS
+                trans->debug(4, "Running (non-disruptive) action: " \
+		    + a->m_name);
+#endif
+                a->evaluate(this, trans, ruleMessage);
+            }
+            continue;
+        }
+        if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
+#ifndef NO_LOGS
+            trans->debug(4, "Running (disruptive)     action: " + a->m_name);
+#endif
+            a->evaluate(this, trans, ruleMessage);
+            continue;
+        }
+
+#ifndef NO_LOGS
+        trans->debug(4, "Not running disruptive action: " + \
+                a->m_name + ". SecRuleEngine is not On");
+#endif
+    }
 }
 
 
@@ -789,7 +908,7 @@ bool Rule::evaluate(Transaction *trans,
         std::list<std::pair<std::shared_ptr<std::string>,
             std::shared_ptr<std::string>>> values;
 
-        bool multiMatch = getActionsByName("multimatch").size() > 0;
+        bool multiMatch = getActionsByName("multimatch", trans).size() > 0;
 
         values = executeDefaultTransformations(trans, value,
             multiMatch);
@@ -861,7 +980,7 @@ end_exec:
 }
 
 
-bool Rule::containsDisruptiveAction() {
+bool Rule::containsStaticDisruptiveAction() {
     for (Action *a : m_actionsRuntimePos) {
         if (a->isDisruptive() == true) {
             return true;
@@ -877,12 +996,13 @@ bool Rule::containsDisruptiveAction() {
             return true;
         }
     }
-
     return false;
 }
 
 
-std::vector<actions::Action *> Rule::getActionsByName(const std::string& name) {
+
+std::vector<actions::Action *> Rule::getActionsByName(const std::string& name,
+    Transaction *trans) {
     std::vector<actions::Action *> ret;
     for (auto &z : m_actionsRuntimePos) {
         if (z->m_name == name) {
@@ -899,6 +1019,26 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name) {
             ret.push_back(z);
         }
     }
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+        if (z->m_name == name) {
+            ret.push_back(z);
+        }
+    }
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+        if (z->m_name == name) {
+            ret.push_back(z);
+        }
+    }
     return ret;
 }
 
@@ -910,6 +1050,17 @@ bool Rule::containsTag(const std::string& name, Transaction *t) {
             return true;
         }
     }
+    for (auto &b :
+        t->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        actions::Tag *tag = dynamic_cast<actions::Tag *> (a);
+        if (tag != NULL && tag->getName(t) == name) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -917,6 +1068,17 @@ bool Rule::containsTag(const std::string& name, Transaction *t) {
 bool Rule::containsMsg(const std::string& name, Transaction *t) {
     for (auto &z : this->m_actionsRuntimePos) {
         actions::Msg *msg = dynamic_cast<actions::Msg *> (z);
+        if (msg != NULL && msg->data(t) == name) {
+            return true;
+        }
+    }
+    for (auto &b :
+        t->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        actions::Msg *msg = dynamic_cast<actions::Msg *> (a);
         if (msg != NULL && msg->data(t) == name) {
             return true;
         }

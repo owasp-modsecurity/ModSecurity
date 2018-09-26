@@ -35,6 +35,9 @@
 
 
 namespace modsecurity {
+namespace actions {
+class Action;
+}
 namespace Variables {
 class Variable;
 }
@@ -65,12 +68,20 @@ class RulesExceptions {
         std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > v,
         std::string *error);
 
+    bool loadUpdateActionById(double id,
+        std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > actions,
+        std::string *error);
+
     std::unordered_multimap<std::shared_ptr<std::string>,
-	std::unique_ptr<Variables::Variable>> m_variable_update_target_by_tag;
+        std::unique_ptr<Variables::Variable>> m_variable_update_target_by_tag;
     std::unordered_multimap<std::shared_ptr<std::string>,
-	std::unique_ptr<Variables::Variable>> m_variable_update_target_by_msg;
+        std::unique_ptr<Variables::Variable>> m_variable_update_target_by_msg;
     std::unordered_multimap<double,
-	std::unique_ptr<Variables::Variable>> m_variable_update_target_by_id;
+        std::unique_ptr<Variables::Variable>> m_variable_update_target_by_id;
+    std::unordered_multimap<double,
+        std::unique_ptr<actions::Action>> m_action_pre_update_target_by_id;
+    std::unordered_multimap<double,
+        std::unique_ptr<actions::Action>> m_action_pos_update_target_by_id;
     std::list<std::string> m_remove_rule_by_msg;
     std::list<std::string> m_remove_rule_by_tag;
 
