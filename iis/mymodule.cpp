@@ -32,12 +32,6 @@
 
 #include "winsock2.h"
 
-// Used to hold each chunk of request body that gets read before the full ModSec engine is invoked
-typedef struct preAllocBodyChunk {
-    preAllocBodyChunk* next;
-    size_t length;
-    void* data;
-} preAllocBodyChunk;
 
 class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 {
@@ -89,8 +83,6 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 	char				*m_pResponseBuffer;
 	ULONGLONG			m_pResponseLength;
 	ULONGLONG			m_pResponsePosition;
-
-    preAllocBodyChunk* requestBodyBufferHead;
 };
 
 
@@ -296,43 +288,6 @@ REQUEST_STORED_CONTEXT *RetrieveIISContext(request_rec *r)
     return NULL;
 }
 
-HRESULT GetRequestBodyFromIIS(IHttpRequest* pRequest, preAllocBodyChunk** head)
-{
-    HRESULT hr = S_OK;
-    HTTP_REQUEST * pRawRequest = pRequest->GetRawHttpRequest();
-    preAllocBodyChunk** cur = head;
-    while (pRequest->GetRemainingEntityBytes() > 0)
-    {
-        // Allocate memory for the preAllocBodyChunk linked list structure, and also the actual body content
-        // HUGE_STRING_LEN is hardcoded because this is also hardcoded in apache2_io.c's call to ap_get_brigade
-        preAllocBodyChunk* chunk = (preAllocBodyChunk*)malloc(sizeof(preAllocBodyChunk) + HUGE_STRING_LEN);
-        chunk->next = NULL;
-
-        // Pointer to rest of allocated memory, for convenience
-        chunk->data = chunk + 1;
-
-        DWORD readcnt = 0;
-        hr = pRequest->ReadEntityBody(chunk->data, HUGE_STRING_LEN, false, &readcnt, NULL);
-        if (ERROR_HANDLE_EOF == (hr & 0x0000FFFF))
-        {
-            free(chunk);
-            hr = S_OK;
-            break;
-        }
-        chunk->length = readcnt;
-
-        // Append to linked list
-        *cur = chunk;
-        cur = &(chunk->next);
-
-        if (hr != S_OK)
-        {
-            break;
-        }
-    }
-
-    return hr;
-}
 
 HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
 {
@@ -800,17 +755,6 @@ CMyHttpModule::OnBeginRequest(
         goto Finished;
 	}
 
-    // Get request body without holding lock, because some clients may be slow at sending
-    LeaveCriticalSection(&m_csLock);
-    preAllocBodyChunk* requestBodyBufferHead = NULL;
-    hr = GetRequestBodyFromIIS(pRequest, &requestBodyBufferHead);
-    if (hr != S_OK)
-    {
-        goto FinishedWithoutLock;
-    }
-    EnterCriticalSection(&m_csLock);
-
-
 	if(pConfig->m_Config == NULL)
 	{
 		char *path;
@@ -883,8 +827,6 @@ CMyHttpModule::OnBeginRequest(
 	rsc->m_pRequestRec = r;
 	rsc->m_pHttpContext = pHttpContext;
 	rsc->m_pProvider = pProvider;
-    rsc->requestBodyBufferHead = requestBodyBufferHead;
-    requestBodyBufferHead = NULL; // This is to indicate to the cleanup process to use rsc->requestBodyBufferHead instead of requestBodyBufferHead now
 
 	pHttpContext->GetModuleContextContainer()->SetModuleContext(rsc, g_pModuleContext);
 
@@ -1132,16 +1074,6 @@ CMyHttpModule::OnBeginRequest(
 Finished:
 	LeaveCriticalSection(&m_csLock);
 
-FinishedWithoutLock:
-    // Free the preallocated body in case there was a failure and it wasn't consumed already
-    preAllocBodyChunk* chunkToFree = requestBodyBufferHead ? requestBodyBufferHead : rsc->requestBodyBufferHead;
-    while (chunkToFree != NULL)
-    {
-        preAllocBodyChunk* next = chunkToFree->next;
-        free(chunkToFree);
-        chunkToFree = next;
-    }
-
     if ( FAILED( hr )  )
     {
         return RQ_NOTIFICATION_FINISH_REQUEST;
@@ -1149,27 +1081,39 @@ FinishedWithoutLock:
 	return RQ_NOTIFICATION_CONTINUE;
 }
 
+
 apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
 {
     REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
 
-    if (rsc->requestBodyBufferHead == NULL)
+    *readcnt = 0;
+
+    if (rsc == NULL)
     {
         *is_eos = 1;
         return APR_SUCCESS;
     }
 
-    *readcnt = length < (unsigned int) rsc->requestBodyBufferHead->length ? length : (unsigned int) rsc->requestBodyBufferHead->length;
-    void* src = (char*)rsc->requestBodyBufferHead->data;
-    memcpy_s(buf, length, src, *readcnt);
+    IHttpContext *pHttpContext = rsc->m_pHttpContext;
+    IHttpRequest *pRequest = pHttpContext->GetRequest();
 
-    // Remove the front and proceed to next chunk in the linked list
-    preAllocBodyChunk* chunkToFree = rsc->requestBodyBufferHead;
-    rsc->requestBodyBufferHead = rsc->requestBodyBufferHead->next;
-    free(chunkToFree);
-
-    if (rsc->requestBodyBufferHead == NULL)
+    if (pRequest->GetRemainingEntityBytes() == 0)
     {
+        *is_eos = 1;
+        return APR_SUCCESS;
+    }
+
+    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, (DWORD *)readcnt, NULL);
+
+    if (FAILED(hr))
+    {
+        // End of data is okay.
+        if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
+        {
+            // Set the error status.
+            rsc->m_pProvider->SetErrorStatus(hr);
+        }
+
         *is_eos = 1;
     }
 
