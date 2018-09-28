@@ -222,8 +222,7 @@ bool Rbl::evaluate(Transaction *t, Rule *rule,
     furtherInfo(sin, ipStr, t);
 
     freeaddrinfo(info);
-    if (rule && t
-        && rule->getActionsByName("capture", t).size() > 0) {
+    if (rule && t && rule->m_containsCaptureAction) {
         t->m_collections.m_tx_collection->storeOrUpdateFirst(
         "0", std::string(ipStr));
 #ifndef NO_LOGS

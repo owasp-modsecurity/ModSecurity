@@ -31,11 +31,12 @@
       ]
     },
     "expected":{
-      "debug_log":"ARGS:key is part of the exclusion list \\(from update by tag\\), skipping"
+      "http_code": 200
     },
     "rules":[
+      "SecRuleEngine On",
       "SecRuleUpdateTargetByTag test !ARGS",
-      "SecRule ARGS \"@contains test\" \"id:1,pass,t:trim,tag:'test'\""
+      "SecRule ARGS \"@contains value\" \"id:1,pass,t:trim,tag:'test',deny\""
     ]
   }
 ]

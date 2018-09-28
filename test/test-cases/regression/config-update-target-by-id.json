@@ -31,11 +31,11 @@
       ]
     },
     "expected":{
-      "debug_log":"ARGS:key is part of the exclusion list \\(from update by ID\\), skipping"
+      "http_code": 200
     },
     "rules":[
       "SecRuleUpdateTargetById 1 !ARGS",
-      "SecRule ARGS \"@contains test\" \"id:1,pass,t:trim,tag:'test'\""
+      "SecRule ARGS \"@contains value\" \"id:1,pass,t:trim,tag:'test',deny\""
     ]
   }
 ]

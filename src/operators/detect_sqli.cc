@@ -40,8 +40,7 @@ bool DetectSQLi::evaluate(Transaction *t, Rule *rule,
                 "fingerprint '" + std::string(fingerprint) + "' at: '" +
                 input + "'");
 #endif
-            if (rule && t
-                && rule->getActionsByName("capture", t).size() > 0) {
+            if (rule && t && rule->m_containsCaptureAction) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst(
                     "0", std::string(fingerprint));
 #ifndef NO_LOGS

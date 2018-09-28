@@ -124,8 +124,7 @@ bool VerifySSN::evaluate(Transaction *t, Rule *rule,
             is_ssn = verify(i.match.c_str(), i.match.size());
             if (is_ssn) {
                 logOffset(ruleMessage, i.m_offset, i.m_length);
-                if (rule && t
-                    && rule->getActionsByName("capture", t).size() > 0) {
+                if (rule && t && rule->m_containsCaptureAction) {
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", std::string(i.match));
 #ifndef NO_LOGS

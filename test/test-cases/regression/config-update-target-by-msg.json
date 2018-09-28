@@ -31,11 +31,12 @@
       ]
     },
     "expected":{
-      "debug_log":"ARGS:key is part of the exclusion list \\(from update by msg\\), skipping"
+      "http_code": 200
     },
     "rules":[
+      "SecRuleEngine On",
       "SecRuleUpdateTargetByMsg test !ARGS",
-      "SecRule ARGS \"@contains test\" \"id:1,pass,t:trim,msg:'test'\""
+      "SecRule ARGS \"@contains value\" \"id:1,pass,t:trim,msg:'test',deny\""
     ]
   }
 ]

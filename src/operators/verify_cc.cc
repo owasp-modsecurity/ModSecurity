@@ -142,8 +142,7 @@ bool VerifyCC::evaluate(Transaction *t, Rule *rule,
             is_cc = luhnVerify(match.c_str(), match.size());
             if (is_cc) {
                 if (t) {
-                    if (rule && t
-                        && rule->getActionsByName("capture", t).size() > 0) {
+                    if (rule && t && rule->m_containsCaptureAction) {
                         t->m_collections.m_tx_collection->storeOrUpdateFirst(
                             "0", std::string(match));
 #ifndef NO_LOGS

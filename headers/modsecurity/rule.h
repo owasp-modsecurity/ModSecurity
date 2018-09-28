@@ -38,6 +38,12 @@ class Variables;
 }
 namespace actions {
 class Action;
+class Severity;
+class LogData;
+class Msg;
+class Rev;
+class SetVar;
+class Tag;
 }
 namespace operators {
 class Operator;
@@ -55,15 +61,31 @@ class Rule {
 
     virtual bool evaluate(Transaction *transaction,
         std::shared_ptr<RuleMessage> rm);
-    bool evaluateActions(Transaction *transaction);
-    std::vector<std::unique_ptr<VariableValue>>
-	getFinalVars(Transaction *trasn);
+
+    void organizeActions(std::vector<actions::Action *> *actions);
+    void cleanUpActions();
+    void executeAction(Transaction *trans,
+    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
+        actions::Action *a, bool context);
+
+    inline void executeTransformation(actions::Action *a,
+        std::shared_ptr<std::string> *value,
+        Transaction *trans,
+        std::list<std::pair<std::shared_ptr<std::string>,
+        std::shared_ptr<std::string>>> *ret,
+        std::string *path,
+        int *nth);
+
+    void getVariablesExceptions(Transaction *t,
+        Variables::Variables *exclusion, Variables::Variables *addition);
+    inline void getFinalVars(Variables::Variables *vars,
+        Variables::Variables *eclusion, Transaction *trans);
     void executeActionsAfterFullMatch(Transaction *trasn,
         bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage);
 
     std::list<std::pair<std::shared_ptr<std::string>,
         std::shared_ptr<std::string>>> executeDefaultTransformations(
-        Transaction *trasn, const std::string &value, bool multiMatch);
+        Transaction *trasn, const std::string &value);
 
     bool executeOperatorAt(Transaction *trasn, std::string key,
         std::string value, std::shared_ptr<RuleMessage> rm);
@@ -72,14 +94,12 @@ class Rule {
     void updateMatchedVars(Transaction *trasn, std::string key,
         std::string value);
     void cleanMatchedVars(Transaction *trasn);
-    void updateRulesVariable(Transaction *trasn);
+    void updateRulesVariable(Transaction *trasn, std::shared_ptr<RuleMessage> rm);
 
-    //std::vector<std::string> getActionNames();
     std::vector<actions::Action *> getActionsByName(const std::string& name,
         Transaction *t);
     bool containsTag(const std::string& name, Transaction *t);
     bool containsMsg(const std::string& name, Transaction *t);
-    bool containsStaticDisruptiveAction();
 
     int refCountDecreaseAndCheck() {
         m_referenceCount--;
@@ -95,26 +115,48 @@ class Rule {
         m_referenceCount++;
     }
 
+    void executeTransformations(
+        actions::Action *a,
+        std::shared_ptr<std::string> newValue,
+        std::shared_ptr<std::string> value,
+        Transaction *trans,
+        std::list<std::pair<std::shared_ptr<std::string>,
+        std::shared_ptr<std::string>>> *ret,
+        std::shared_ptr<std::string> transStr,
+        int nth);
 
-    int m_accuracy;
-    std::vector<actions::Action *> m_actionsConf;
     std::vector<actions::Action *> m_actionsRuntimePos;
     std::vector<actions::Action *> m_actionsRuntimePre;
     bool m_chained;
     Rule *m_chainedRule;
     std::string m_fileName;
     int m_lineNumber;
-    std::string m_logData;
     std::string m_marker;
-    int m_maturity;
     operators::Operator *m_op;
-    int m_phase;
-    std::string m_rev;
-    int64_t m_ruleId;
     bool m_secMarker;
     modsecurity::Variables::Variables *m_variables;
-    std::string m_ver;
 
+
+    int64_t m_ruleId;
+    std::string m_rev;
+    // msg ?
+    std::string m_ver;
+    //std::string m_logData;
+
+    //if (child->severity != NOT_SET) merged->severity = child->severity;
+    int m_accuracy;
+    int m_maturity;
+    int m_phase;
+
+    bool m_containsStaticDisruptiveAction;
+    bool m_containsCaptureAction;
+    bool m_containsMultiMatchAction;
+    bool m_containsStaticBlockAction;
+    actions::Severity *m_severity;
+    actions::LogData *m_logData;
+    actions::Msg *m_msg;
+    std::vector<actions::SetVar *> m_actionsSetVar;
+    std::vector<actions::Tag *> m_actionsTag;
  private:
     bool m_unconditional;
     int m_referenceCount;
