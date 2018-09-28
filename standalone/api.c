@@ -39,6 +39,7 @@
 #include "http_config.h"
 
 #include "api.h"
+#include "hooks.h"
 
 #ifdef WIN32
 #include "msc_status_engine.h"
@@ -64,6 +65,7 @@ extern ns##_HOOK_##name##_t *hookfn_##name;
 #define DECLARE_HOOK(ret,name,args) \
     DECLARE_EXTERNAL_HOOK(ap,AP,ret,name,args)
 
+
 DECLARE_HOOK(int,pre_config,(apr_pool_t *pconf,apr_pool_t *plog, apr_pool_t *ptemp))
 DECLARE_HOOK(int,post_config,(apr_pool_t *pconf,apr_pool_t *plog, apr_pool_t *ptemp,server_rec *s))
 DECLARE_HOOK(void,child_init,(apr_pool_t *pchild, server_rec *s))
@@ -77,6 +79,10 @@ DECLARE_HOOK(void, error_log, (const char *file, int line, int level,
 DECLARE_HOOK(int,log_transaction,(request_rec *r))
 DECLARE_HOOK(void,insert_filter,(request_rec *r))
 DECLARE_HOOK(void,insert_error_filter,(request_rec *r))
+
+#ifndef _WIN32
+DECLARE_HOOK(void,set_lock_owner,(const char *user, const char *group))
+#endif
 
 char *sa_name = "standalone";
 const char *sa_name_argv[] = { "standalone", NULL };
@@ -321,6 +327,12 @@ void modsecFinalizeConfig() {
 void modsecInitProcess()    {
     hookfn_child_init(pool, server);
 }
+
+#ifndef _WIN32
+void modsecSetLockOwner(const char *user, const char *group)    {
+    hookfn_set_lock_owner(user, group);
+}
+#endif
 
 conn_rec *modsecNewConnection() {
     conn_rec *c;

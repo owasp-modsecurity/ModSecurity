@@ -36,7 +36,7 @@
 #include "apr_lib.h"
 #include "ap_config.h"
 #include "http_config.h"
-
+#include "hooks.h"
 
 #define DECLARE_EXTERNAL_HOOK(ns,link,ret,name,args) \
 ns##_HOOK_##name##_t *hookfn_##name = NULL; \
@@ -49,6 +49,7 @@ link##_DECLARE(void) ns##_hook_##name(ns##_HOOK_##name##_t *pf, \
 
 #define DECLARE_HOOK(ret,name,args) \
 	DECLARE_EXTERNAL_HOOK(ap,AP,ret,name,args)
+
 
 DECLARE_HOOK(int,pre_config,(apr_pool_t *pconf,apr_pool_t *plog, apr_pool_t *ptemp))
 DECLARE_HOOK(int,post_config,(apr_pool_t *pconf,apr_pool_t *plog, apr_pool_t *ptemp,server_rec *s))
@@ -63,3 +64,7 @@ DECLARE_HOOK(void, error_log, (const char *file, int line, int level,
 DECLARE_HOOK(int,log_transaction,(request_rec *r))
 DECLARE_HOOK(void,insert_filter,(request_rec *r))
 DECLARE_HOOK(void,insert_error_filter,(request_rec *r))
+
+#ifndef _WIN32
+DECLARE_HOOK(void,set_lock_owner,(const char *user, const char *group))
+#endif

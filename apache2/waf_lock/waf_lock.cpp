@@ -21,6 +21,8 @@
 // Linux
 int lock_create(struct waf_lock *new_lock, struct waf_lock_args *new_lock_args) {
     union semun sem_union;
+    uid_t uid;
+    gid_t gid;
 
     if (new_lock == NULL)
         return WAF_LOCK_ERROR_HANDLE_NULL;
@@ -30,7 +32,23 @@ int lock_create(struct waf_lock *new_lock, struct waf_lock_args *new_lock_args) 
         // Set permssion
 	struct semid_ds buf;
 
-	buf.sem_perm.mode = 0666;
+    if (new_lock_args->user != NULL && new_lock_args->group != NULL)
+    {
+        if ((GetUserId(new_lock_args->user, &uid) == WAF_LOCK_ERROR) || (GetGroupId(new_lock_args->group, &gid) == WAF_LOCK_ERROR)) 
+        {
+            lock_destroy(new_lock);
+            return WAF_ERROR_LOCK_LINUX_SEM_GET_USER_FAIL;
+	    }
+
+ 	    buf.sem_perm.uid = uid; 
+	    buf.sem_perm.gid = gid; 
+	    buf.sem_perm.mode = 0600;
+    }
+    else
+    {
+	    buf.sem_perm.mode = 0666;
+    }
+
 	sem_union.buf = &buf;
 	// Set the permission for the new lock
         if (semctl(new_lock->sem_id, 0, IPC_SET, sem_union) == -1) {
@@ -537,3 +555,26 @@ int waf_close_lock(struct waf_lock *waf_lock) {
     else
         return WAF_LOCK_SUCCESS;
 }
+
+#ifndef _WIN32
+int GetGroupId(const char *name, gid_t *id)
+{
+    struct group *grp = getgrnam(name); /* don't free, see getgrnam() for details */
+    if(grp == NULL) 
+    {
+        return WAF_LOCK_ERROR;
+    } 
+    *id = grp->gr_gid;
+    return WAF_LOCK_SUCCESS;
+}
+ int GetUserId(const char *name, uid_t *id)
+{
+    struct passwd *pwd = getpwnam(name); /* don't free, see getpwnam() for details */
+    if(pwd == NULL) 
+    {
+        return WAF_LOCK_ERROR;
+    } 
+    *id = pwd->pw_uid;
+    return WAF_LOCK_SUCCESS;
+}
+#endif
