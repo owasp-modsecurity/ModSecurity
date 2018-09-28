@@ -35,6 +35,10 @@
 #include "src/actions/msg.h"
 #include "src/actions/log_data.h"
 #include "src/actions/severity.h"
+#include "src/actions/capture.h"
+#include "src/actions/multi_match.h"
+#include "src/actions/set_var.h"
+#include "src/actions/disruptive/block.h"
 #include "src/variables/variable.h"
 
 
@@ -48,14 +52,14 @@ using actions::transformations::None;
 
 Rule::Rule(std::string marker)
     : m_accuracy(0),
-    m_actionsConf(),
     m_actionsRuntimePos(),
     m_actionsRuntimePre(),
+    m_actionsSetVar(),
+    m_actionsTag(),
     m_chained(false),
     m_chainedRule(NULL),
     m_fileName(""),
     m_lineNumber(0),
-    m_logData(""),
     m_marker(marker),
     m_maturity(0),
     m_op(NULL),
@@ -66,23 +70,30 @@ Rule::Rule(std::string marker)
     m_variables(NULL),
     m_ver(""),
     m_unconditional(false),
-    m_referenceCount(1) { }
+    m_referenceCount(1),
+    m_containsStaticDisruptiveAction(false),
+    m_containsStaticBlockAction(false),
+    m_containsCaptureAction(false),
+    m_containsMultiMatchAction(false),
+    m_severity(nullptr),
+    m_logData(nullptr),
+    m_msg(nullptr) { }
 
 
 Rule::Rule(Operator *_op,
-        Variables::Variables *_variables,
-        std::vector<Action *> *actions,
-        std::string fileName,
-        int lineNumber)
+    Variables::Variables *_variables,
+    std::vector<Action *> *actions,
+    std::string fileName,
+    int lineNumber)
     : m_accuracy(0),
-    m_actionsConf(),
     m_actionsRuntimePos(),
     m_actionsRuntimePre(),
+    m_actionsSetVar(),
+    m_actionsTag(),
     m_chained(false),
     m_chainedRule(NULL),
     m_fileName(fileName),
     m_lineNumber(lineNumber),
-    m_logData(""),
     m_marker(""),
     m_maturity(0),
     m_op(_op),
@@ -93,24 +104,17 @@ Rule::Rule(Operator *_op,
     m_variables(_variables),
     m_ver(""),
     m_unconditional(false),
-    m_referenceCount(1) {
-    if (actions != NULL) {
-        for (Action *a : *actions) {
-            if (a->action_kind == Action::ConfigurationKind) {
-                m_actionsConf.push_back(a);
-                a->evaluate(this, NULL);
-            } else if (a->action_kind
-                == Action::RunTimeBeforeMatchAttemptKind) {
-                m_actionsRuntimePre.push_back(a);
-            } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
-                m_actionsRuntimePos.push_back(a);
-            } else {
-                std::cout << "General failure, action: " << a->m_name;
-                std::cout << " has an unknown type." << std::endl;
-                delete a;
-            }
-        }
-    }
+    m_referenceCount(1),
+    m_containsStaticDisruptiveAction(false),
+    m_containsStaticBlockAction(false),
+    m_containsCaptureAction(false),
+    m_containsMultiMatchAction(false),
+    m_severity(nullptr),
+    m_logData(nullptr),
+    m_msg(nullptr) {
+    /* */
+    organizeActions(actions);
+
     /**
      * If phase is not entered, we assume phase 2. For historical reasons.
      *
@@ -119,9 +123,7 @@ Rule::Rule(Operator *_op,
         m_phase = modsecurity::Phases::RequestHeadersPhase;
     }
 
-    if (m_op == NULL) {
-        m_unconditional = true;
-    }
+    m_unconditional = (m_op == NULL);
 
     delete actions;
 }
@@ -131,21 +133,9 @@ Rule::~Rule() {
     if (m_op != NULL) {
         delete m_op;
     }
-    while (m_actionsConf.empty() == false) {
-        auto *a = m_actionsConf.back();
-        m_actionsConf.pop_back();
-        delete a;
-    }
-    while (m_actionsRuntimePre.empty() == false) {
-        auto *a = m_actionsRuntimePre.back();
-        m_actionsRuntimePre.pop_back();
-        delete a;
-    }
-    while (m_actionsRuntimePos.empty() == false) {
-        auto *a = m_actionsRuntimePos.back();
-        m_actionsRuntimePos.pop_back();
-        delete a;
-    }
+
+    cleanUpActions();
+
     while (m_variables != NULL && m_variables->empty() == false) {
         auto *a = m_variables->back();
         m_variables->pop_back();
@@ -161,40 +151,86 @@ Rule::~Rule() {
     }
 }
 
-/*
-std::vector<std::string> Rule::getActionNames() {
-    std::vector<std::string> a;
-    for (auto &z : this->m_actionsRuntimePos) {
-        a.push_back(z->m_name);
-    }
-    for (auto &z : this->m_actionsRuntimePre) {
-        a.push_back(z->m_name);
-    }
-    for (auto &z : this->m_actionsConf) {
-        a.push_back(z->m_name);
-    }
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
-        a.push_back(z->m_name);
-    }
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
-        a.push_back(z->m_name);
-    }
-    return a;
-}
-*/
 
-bool Rule::evaluateActions(Transaction *trans) {
-    return true;
+void Rule::organizeActions(std::vector<Action *> *actions) {
+    if (!actions) {
+        return;
+    }
+    for (Action *a : *actions) {
+        if (a->action_kind == Action::ConfigurationKind) {
+            a->evaluate(this, NULL);
+            delete a;
+        } else if (a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
+            m_actionsRuntimePre.push_back(a);
+        } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
+            if (dynamic_cast<actions::Capture *>(a)) {
+                m_containsCaptureAction = true;
+                delete a;
+            } else if (dynamic_cast<actions::MultiMatch *>(a)) {
+                m_containsMultiMatchAction = true;
+                delete a;
+            } else if (dynamic_cast<actions::Severity *>(a)) {
+                m_severity = dynamic_cast<actions::Severity *>(a);
+            } else if (dynamic_cast<actions::LogData *>(a)) {
+                m_logData = dynamic_cast<actions::LogData*>(a);
+            } else if (dynamic_cast<actions::Msg *>(a)) {
+                m_msg = dynamic_cast<actions::Msg*>(a);
+            } else if (dynamic_cast<actions::SetVar *>(a)) {
+                m_actionsSetVar.push_back(
+                    dynamic_cast<actions::SetVar *>(a));
+            } else if (dynamic_cast<actions::Tag *>(a)) {
+                m_actionsTag.push_back(dynamic_cast<actions::Tag *>(a));
+            } else if (dynamic_cast<actions::disruptive::Block *>(a)) {
+                m_actionsRuntimePos.push_back(a);
+                m_containsStaticBlockAction = true;
+            } else if (a->isDisruptive() == true) {
+                m_actionsRuntimePos.push_back(a);
+                m_containsStaticDisruptiveAction = true;
+            } else {
+                m_actionsRuntimePos.push_back(a);
+            }
+        } else {
+            std::cout << "General failure, action: " << a->m_name;
+            std::cout << " has an unknown type." << std::endl;
+            delete a;
+        }
+    }
+}
+
+
+void Rule::cleanUpActions() {
+    if (m_severity) {
+        delete m_severity;
+        m_severity = nullptr;
+    }
+    if (m_logData) {
+        delete m_logData;
+        m_logData = nullptr;
+    }
+    if (m_msg) {
+        delete m_msg;
+        m_msg = nullptr;
+    }
+    while (m_actionsRuntimePre.empty() == false) {
+        auto *a = m_actionsRuntimePre.back();
+        m_actionsRuntimePre.pop_back();
+        delete a;
+    }
+    while (m_actionsRuntimePos.empty() == false) {
+        auto *a = m_actionsRuntimePos.back();
+        m_actionsRuntimePos.pop_back();
+        delete a;
+    }
+    while (m_actionsSetVar.empty() == false) {
+        auto *a = m_actionsSetVar.back();
+        m_actionsSetVar.pop_back();
+        delete a;
+    }
+    while (m_actionsTag.empty() == false) {
+        auto *a = m_actionsTag.back();
+        m_actionsTag.pop_back();
+        delete a;
+    }
 }
 
 
@@ -222,83 +258,68 @@ void Rule::cleanMatchedVars(Transaction *trans) {
 }
 
 
-void Rule::updateRulesVariable(Transaction *trans) {
+void Rule::updateRulesVariable(Transaction *trans,
+    std::shared_ptr<RuleMessage> rm) {
     if (m_ruleId != 0) {
-        trans->m_variableRule.set("id",
-            std::to_string(m_ruleId), 0);
+        trans->m_variableRule.set("id", std::to_string(m_ruleId), 0);
     }
     if (m_rev.empty() == false) {
-        trans->m_variableRule.set("rev",
-            m_rev, 0);
+        trans->m_variableRule.set("rev", m_rev, 0);
     }
-    if (getActionsByName("msg", trans).size() > 0) {
-        actions::Msg *msg = dynamic_cast<actions::Msg*>(
-            getActionsByName("msg", trans)[0]);
-        trans->m_variableRule.set("msg",
-           msg->data(trans), 0);
-    }
-    if (getActionsByName("logdata", trans).size() > 0) {
-        actions::LogData *data = dynamic_cast<actions::LogData*>(
-            getActionsByName("logdata", trans)[0]);
-        trans->m_variableRule.set("logdata",
-            data->data(trans), 0);
-    }
-    if (getActionsByName("severity", trans).size() > 0) {
-        actions::Severity *data = dynamic_cast<actions::Severity*>(
-            getActionsByName("severity", trans)[0]);
+    if (m_severity) {
         trans->m_variableRule.set("severity",
-            std::to_string(data->m_severity), 0);
+            std::to_string(m_severity->m_severity), 0);
+    }
+    if (m_logData) {
+        trans->m_variableRule.set("logdata", m_logData->data(trans), 0);
+    }
+    if (m_msg) {
+        trans->m_variableRule.set("msg", m_msg->data(trans), 0);
     }
 }
 
 
-
-
-
 void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     bool *containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
-    for (Action *a : this->m_actionsRuntimePos) {
-        if (a->isDisruptive() == true) {
-            if (a->m_name == "block") {
+
+    for (actions::SetVar *a : m_actionsSetVar) {
 #ifndef NO_LOGS
-                trans->debug(9, "Rule contains a `block' action");
-                *containsBlock = true;
+        trans->debug(4, "Running [independent] (non-disruptive) " \
+            "action: " + a->m_name);
 #endif
-            }
-        } else {
-            if (a->m_name == "setvar" || a->m_name == "msg"
-                || a->m_name == "log") {
-#ifndef NO_LOGS
-                trans->debug(4, "Running [independent] (non-disruptive) " \
-                    "action: " + a->m_name);
-#endif
-				a->evaluate(this, trans, ruleMessage);
-            }
-        }
+        a->evaluate(this, trans);
     }
+
     for (auto &b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        if (a->isDisruptive() == true) {
-            if (a->m_name == "block") {
+        if (a->isDisruptive() == true && a->m_name == "block") {
 #ifndef NO_LOGS
-                trans->debug(9, "Rule contains a `block' action");
+            trans->debug(9, "Rule contains a `block' action");
                 *containsBlock = true;
 #endif
-            }
-        } else {
-            if (a->m_name == "setvar" || a->m_name == "msg"
-                || a->m_name == "log") {
+        } else if (a->m_name == "setvar") {
 #ifndef NO_LOGS
-                trans->debug(4, "Running [independent] (non-disruptive) " \
-                    "action: " + a->m_name);
+            trans->debug(4, "Running [independent] (non-disruptive) " \
+                "action: " + a->m_name);
 #endif
-				a->evaluate(this, trans, ruleMessage);
-            }
+            a->evaluate(this, trans, ruleMessage);
         }
+    }
+
+    if (m_severity) {
+        m_severity->evaluate(this, trans, ruleMessage);
+    }
+
+    if (m_logData) {
+        m_logData->evaluate(this, trans, ruleMessage);
+    }
+
+    if (m_msg) {
+        m_msg->evaluate(this, trans, ruleMessage);
     }
 }
 
@@ -339,32 +360,61 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
 }
 
 
+inline void Rule::executeTransformation(actions::Action *a,
+    std::shared_ptr<std::string> *value,
+    Transaction *trans,
+    std::list<std::pair<std::shared_ptr<std::string>,
+        std::shared_ptr<std::string>>> *ret,
+    std::string *path,
+    int *nth) {
+
+    std::string *oldValue = (*value).get();
+    std::string newValue = a->evaluate(*oldValue, trans);
+
+    if (newValue != *oldValue) {
+        std::shared_ptr<std::string> u(new std::string(newValue));
+        if (m_containsMultiMatchAction) {
+            std::shared_ptr<std::string> t(new std::string(a->m_name));
+            ret->push_back(std::make_pair(u, t));
+        }
+        *value = u;
+    }
+
+    if (path->empty()) {
+        path->append(a->m_name);
+    } else {
+        path->append("," + a->m_name);
+    }
+
+#ifndef NO_LOGS
+    trans->debug(9, " T (" + \
+        std::to_string(*nth) + ") " + \
+        a->m_name + ": \"" + \
+        utils::string::limitTo(80, newValue) +"\"");
+#endif
+    (*nth)++;
+}
+
+
 std::list<std::pair<std::shared_ptr<std::string>,
     std::shared_ptr<std::string>>>
     Rule::executeDefaultTransformations(
-
-    Transaction *trans, const std::string &in, bool multiMatch) {
+    Transaction *trans, const std::string &in) {
     int none = 0;
     int transformations = 0;
-
+    std::string path("");
     std::list<std::pair<std::shared_ptr<std::string>,
         std::shared_ptr<std::string>>> ret;
-
-
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
-    std::shared_ptr<std::string> newValue;
 
-    std::shared_ptr<std::string> transStr =
-        std::shared_ptr<std::string>(new std::string());
-
-    if (multiMatch == true) {
+    if (m_containsMultiMatchAction == true) {
         ret.push_back(std::make_pair(
             std::shared_ptr<std::string>(value),
-            std::shared_ptr<std::string>(transStr)));
+            std::shared_ptr<std::string>(new std::string(path))));
         ret.push_back(std::make_pair(
             std::shared_ptr<std::string>(value),
-            std::shared_ptr<std::string>(transStr)));
+            std::shared_ptr<std::string>(new std::string(path))));
     }
 
     for (Action *a : this->m_actionsRuntimePre) {
@@ -379,62 +429,19 @@ std::list<std::pair<std::shared_ptr<std::string>,
     if (none == 0) {
         for (Action *a : trans->m_rules->m_defaultActions[this->m_phase]) {
             if (a->action_kind \
-                == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                newValue = std::unique_ptr<std::string>(
-                    new std::string(a->evaluate(*value, trans)));
-
-                if (multiMatch == true) {
-                    if (*newValue != *value) {
-                        ret.push_back(std::make_pair(
-                            newValue,
-                                          transStr));
-                    }
-                }
-                value = std::shared_ptr<std::string>(newValue);
-                if (transStr->empty()) {
-                    transStr->append(a->m_name);
-                } else {
-                    transStr->append("," + a->m_name);
-                }
-#ifndef NO_LOGS
-                trans->debug(9, "(SecDefaultAction) T (" + \
-                    std::to_string(transformations) + ") " + \
-                    a->m_name + ": \"" + \
-                    utils::string::limitTo(80, *value) +"\"");
-#endif
-
-                transformations++;
+                != actions::Action::RunTimeBeforeMatchAttemptKind) {
+                continue;
             }
+
+            executeTransformation(a, &value, trans, &ret, &path,
+                &transformations);
         }
     }
 
     for (Action *a : this->m_actionsRuntimePre) {
         if (none == 0) {
-            newValue = std::shared_ptr<std::string>(
-                new std::string(a->evaluate(*value, trans)));
-
-            if (multiMatch == true) {
-                if (*value != *newValue) {
-                    ret.push_back(std::make_pair(
-                        newValue,
-                                      transStr));
-                    value = newValue;
-                }
-            }
-
-            value = newValue;
-#ifndef NO_LOGS
-            trans->debug(9, " T (" + \
-                std::to_string(transformations) + ") " + \
-                a->m_name + ": \"" + \
-                utils::string::limitTo(80, *value) + "\"");
-#endif
-            if (transStr->empty()) {
-                transStr->append(a->m_name);
-            } else {
-                transStr->append("," + a->m_name);
-            }
-            transformations++;
+            executeTransformation(a, &value, trans, &ret, &path,
+                &transformations);
         }
         if (a->m_isNone) {
             none--;
@@ -459,38 +466,15 @@ std::list<std::pair<std::shared_ptr<std::string>,
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
         if (none == 0) {
-            newValue = std::shared_ptr<std::string>(
-                new std::string(a->evaluate(*value, trans)));
-
-            if (multiMatch == true) {
-                if (*value != *newValue) {
-                    ret.push_back(std::make_pair(
-                        newValue,
-                        transStr));
-                    value = newValue;
-                }
-            }
-
-            value = newValue;
-#ifndef NO_LOGS
-            trans->debug(9, " T (" + \
-                std::to_string(transformations) + ") " + \
-                a->m_name + ": \"" + \
-                utils::string::limitTo(80, *value) + "\"");
-#endif
-            if (transStr->empty()) {
-                transStr->append(a->m_name);
-            } else {
-                transStr->append("," + a->m_name);
-            }
-            transformations++;
+            executeTransformation(a, &value, trans, &ret, &path,
+                &transformations);
         }
         if (a->m_isNone) {
             none--;
         }
     }
 
-    if (multiMatch == true) {
+    if (m_containsMultiMatchAction == true) {
         // v2 checks the last entry twice. Don't know why.
         ret.push_back(ret.back());
 
@@ -501,233 +485,137 @@ std::list<std::pair<std::shared_ptr<std::string>,
 #endif
     } else {
         ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(value),
-            std::shared_ptr<std::string>(transStr)));
+            value,
+            std::shared_ptr<std::string>(new std::string(path))));
     }
 
     return ret;
 }
 
 
-std::vector<std::unique_ptr<VariableValue>> Rule::getFinalVars(
-    Transaction *trans) {
-    std::list<std::string> exclusions_update_by_tag_remove;
-    std::list<std::string> exclusions_update_by_msg_remove;
-    std::list<std::string> exclusions_update_by_id_remove;
-    Variables::Variables variables;
-    std::vector<std::unique_ptr<VariableValue>> finalVars;
-
-    std::copy(m_variables->begin(), m_variables->end(),
-        std::back_inserter(variables));
-
-    for (auto &a :
-        trans->m_rules->m_exceptions.m_variable_update_target_by_tag) {
-        if (containsTag(*a.first.get(), trans) == false) {
+void Rule::getVariablesExceptions(Transaction *t,
+    Variables::Variables *exclusion, Variables::Variables *addition) {
+    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) {
+        if (containsTag(*a.first.get(), t) == false) {
             continue;
         }
-        if (dynamic_cast<Variables::VariableModificatorExclusion*>(
-                a.second.get())) {
-            std::vector<const VariableValue *> z;
-            a.second->evaluate(trans, this, &z);
-            for (auto &y : z) {
-                exclusions_update_by_tag_remove.push_back(
-                    std::string(y->m_key));
-                delete y;
-            }
-            exclusions_update_by_tag_remove.push_back(
-                std::string(a.second->m_name));
-
+        Variable *b = a.second.get();
+        if (dynamic_cast<Variables::VariableModificatorExclusion*>(b)) {
+            exclusion->push_back(
+                dynamic_cast<Variables::VariableModificatorExclusion*>(
+                    b)->m_base.get());
         } else {
-            Variable *b = a.second.get();
-            variables.push_back(b);
+            addition->push_back(b);
         }
     }
 
-    for (auto &a :
-        trans->m_rules->m_exceptions.m_variable_update_target_by_msg) {
-        if (containsMsg(*a.first.get(), trans) == false) {
+    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_msg) {
+        if (containsMsg(*a.first.get(), t) == false) {
             continue;
         }
-        if (dynamic_cast<Variables::VariableModificatorExclusion*>(
-                a.second.get())) {
-            std::vector<const VariableValue *> z;
-            a.second->evaluate(trans, this, &z);
-            for (auto &y : z) {
-                exclusions_update_by_msg_remove.push_back(
-                    std::string(y->m_key));
-                delete y;
-            }
-            exclusions_update_by_msg_remove.push_back(
-                std::string(a.second->m_name));
-
+        Variable *b = a.second.get();
+        if (dynamic_cast<Variables::VariableModificatorExclusion*>(b)) {
+            exclusion->push_back(
+                dynamic_cast<Variables::VariableModificatorExclusion*>(
+                    b)->m_base.get());
         } else {
-            Variable *b = a.second.get();
-            variables.push_back(b);
+            addition->push_back(b);
         }
     }
 
-    for (auto &a :
-        trans->m_rules->m_exceptions.m_variable_update_target_by_id) {
+    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
         if (m_ruleId != a.first) {
             continue;
         }
-        if (dynamic_cast<Variables::VariableModificatorExclusion*>(
-                a.second.get())) {
-            std::vector<const VariableValue *> z;
-            a.second->evaluate(trans, this, &z);
-            for (auto &y : z) {
-                exclusions_update_by_id_remove.push_back(std::string(y->m_key));
-                delete y;
-            }
-            exclusions_update_by_id_remove.push_back(
-                std::string(a.second->m_name));
+        Variable *b = a.second.get();
+        if (dynamic_cast<Variables::VariableModificatorExclusion*>(b)) {
+            exclusion->push_back(
+                dynamic_cast<Variables::VariableModificatorExclusion*>(
+                    b)->m_base.get());
         } else {
-            Variable *b = a.second.get();
-            variables.push_back(b);
+            addition->push_back(b);
         }
     }
-
-
-    for (int i = 0; i < variables.size(); i++) {
-        Variable *variable = variables.at(i);
-        std::vector<const VariableValue *> e;
-        bool ignoreVariable = false;
-
-        variable->evaluate(trans, this, &e);
-        for (const VariableValue *v : e) {
-            std::string key = v->m_key;
-
-
-            if (std::find_if(exclusions_update_by_tag_remove.begin(),
-                exclusions_update_by_tag_remove.end(),
-                [key](std::string m) -> bool { return key == m; })
-                != exclusions_update_by_tag_remove.end()) {
-#ifndef NO_LOGS
-                trans->debug(9, "Variable: " + key +
-                    " is part of the exclusion list (from update by tag" +
-                    "), skipping...");
-#endif
-                    delete v;
-                    v = NULL;
-                continue;
-            }
-
-            if (std::find_if(exclusions_update_by_msg_remove.begin(),
-                exclusions_update_by_msg_remove.end(),
-                [key](std::string m) -> bool { return key == m; })
-                != exclusions_update_by_msg_remove.end()) {
-#ifndef NO_LOGS
-                trans->debug(9, "Variable: " + key +
-                    " is part of the exclusion list (from update by msg" +
-                    "), skipping...");
-#endif
-                    delete v;
-                    v = NULL;
-                continue;
-            }
-
-            if (std::find_if(exclusions_update_by_id_remove.begin(),
-                exclusions_update_by_id_remove.end(),
-                [key](std::string m) -> bool { return key == m; })
-                != exclusions_update_by_id_remove.end()) {
-#ifndef NO_LOGS
-                trans->debug(9, "Variable: " + key +
-                    " is part of the exclusion list (from " \
-                    "update by ID), skipping...");
-#endif
-                    delete v;
-                    v = NULL;
-                continue;
-            }
-
-
-            for (auto &i : trans->m_ruleRemoveTargetByTag) {
-                std::string tag = i.first;
-                std::string args = i.second;
-                size_t posa = key.find(":");
-
-                if (containsTag(tag, trans) == false) {
-                    continue;
-                }
-
-                if (args == key) {
-#ifndef NO_LOGS
-                    trans->debug(9, "Variable: " + key +
-                        " was excluded by ruleRemoteTargetByTag...");
-#endif
-                    ignoreVariable = true;
-                    break;
-                }
-                if (posa != std::string::npos) {
-                    std::string var = std::string(key, posa);
-                    if (var == args) {
-#ifndef NO_LOGS
-                        trans->debug(9, "Variable: " + key +
-                            " was excluded by ruleRemoteTargetByTag...");
-#endif
-                        ignoreVariable = true;
-                        break;
-                    }
-                }
-            }
-
-
-            if (ignoreVariable) {
-                    delete v;
-                    v = NULL;
-                continue;
-            }
-
-
-            for (auto &i : trans->m_ruleRemoveTargetById) {
-                int id = i.first;
-                std::string args = i.second;
-                size_t posa = key.find(":");
-
-                if (m_ruleId != id) {
-                    continue;
-                }
-
-                if (args == key) {
-#ifndef NO_LOGS
-                    trans->debug(9, "Variable: " + key +
-                        " was excluded by ruleRemoveTargetById...");
-#endif
-                    ignoreVariable = true;
-                    break;
-                }
-                if (posa != std::string::npos) {
-                    if (key.size() > posa) {
-                        std::string var = std::string(key, 0, posa);
-                        if (var == args) {
-#ifndef NO_LOGS
-                            trans->debug(9, "Variable: " + var +
-                                " was excluded by ruleRemoveTargetById...");
-#endif
-                            ignoreVariable = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-
-            if (ignoreVariable) {
-                    delete v;
-                    v = NULL;
-                continue;
-            }
-
-            std::unique_ptr<VariableValue> var(
-                new VariableValue(v));
-            delete v;
-            v = NULL;
-            finalVars.push_back(std::move(var));
-        }
-    }
-
-    return finalVars;
 }
+
+
+inline void Rule::getFinalVars(Variables::Variables *vars,
+    Variables::Variables *exclusion, Transaction *trans) {
+    Variables::Variables addition;
+
+    getVariablesExceptions(trans, exclusion, &addition);
+
+    for (int i = 0; i < m_variables->size(); i++) {
+        Variable *variable = m_variables->at(i);
+        std::vector<const VariableValue *> e;
+
+
+        if (exclusion->contains(variable)) {
+            continue;
+        }
+        if (std::find_if(trans->m_ruleRemoveTargetById.begin(),
+                trans->m_ruleRemoveTargetById.end(),
+                [&, variable, this](std::pair<int, std::string> &m) -> bool {
+                    return m.first == m_ruleId
+                        && m.second == *variable->m_fullName.get();
+                }) != trans->m_ruleRemoveTargetById.end()) {
+            continue;
+        }
+        if (std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
+                    trans->m_ruleRemoveTargetByTag.end(),
+                    [&, variable, trans, this](
+                        std::pair<std::string, std::string> &m) -> bool {
+                        return containsTag(m.first, trans)
+                            && m.second == *variable->m_fullName.get();
+                    }) != trans->m_ruleRemoveTargetByTag.end()) {
+            continue;
+        }
+        vars->push_back(variable);
+    }
+
+    for (int i = 0; i < addition.size(); i++) {
+        Variable *variable = addition.at(i);
+        vars->push_back(variable);
+    }
+}
+
+
+
+void Rule::executeAction(Transaction *trans,
+    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
+    Action *a, bool defaultContext) {
+    if (a->isDisruptive() == false) {
+#ifndef NO_LOGS
+        trans->debug(9, "Running " \
+            "action: " + a->m_name);
+#endif
+        a->evaluate(this, trans, ruleMessage);
+        return;
+    }
+
+    if (defaultContext && !containsBlock) {
+#ifndef NO_LOGS
+        trans->debug(4, "Ignoring action: " + a->m_name + \
+            " (rule does not cotains block)");
+#endif
+        return;
+    }
+
+    if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
+#ifndef NO_LOGS
+        trans->debug(4, "Running (disruptive)     action: " + a->m_name + \
+            ".");
+#endif
+        a->evaluate(this, trans, ruleMessage);
+        return;
+    }
+
+#ifndef NO_LOGS
+    trans->debug(4, "Not running disruptive action: " \
+        + a->m_name + ". SecRuleEngine is not On.");
+#endif
+}
+
 
 
 void Rule::executeActionsAfterFullMatch(Transaction *trans,
@@ -737,96 +625,27 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         if (a->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
+        executeAction(trans, containsBlock, ruleMessage, a, true);
+    }
 
-        if (a->isDisruptive() == false) {
+    for (actions::Tag *a : this->m_actionsTag) {
 #ifndef NO_LOGS
-            trans->debug(9, "(SecDefaultAction) Running " \
-                "action: " + a->m_name);
+        trans->debug(4, "Running (non-disruptive) action: " \
+            + a->m_name);
 #endif
-            a->evaluate(this, trans, ruleMessage);
-            continue;
-        }
-
-        if (!containsBlock) {
-#ifndef NO_LOGS
-            trans->debug(4, "(SecDefaultAction) ignoring " \
-                "action: " + a->m_name + \
-                " (rule does not cotains block)");
-#endif
-            continue;
-        }
-
-        if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
-#ifndef NO_LOGS
-            trans->debug(4, "(SecDefaultAction) " \
-                "Running action: " + a->m_name + \
-                ".");
-#endif
-            a->evaluate(this, trans, ruleMessage);
-            continue;
-        }
-
-#ifndef NO_LOGS
-        trans->debug(4, "(SecDefaultAction) Not running action: " \
-                + a->m_name + ". Rule contains 'block',"\
-                + " but SecRuleEngine is not On.");
-#endif
+        a->evaluate(this, trans, ruleMessage);
     }
 
     for (Action *a : this->m_actionsRuntimePos) {
-        if (a->isDisruptive() == false) {
-            if (a->m_name != "setvar" && a->m_name != "log"
-                && a->m_name != "msg") {
-#ifndef NO_LOGS
-                trans->debug(4, "Running (non-disruptive) action: " \
-		    + a->m_name);
-#endif
-                a->evaluate(this, trans, ruleMessage);
-            }
-            continue;
-        }
-        if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
-#ifndef NO_LOGS
-            trans->debug(4, "Running (disruptive)     action: " + a->m_name);
-#endif
-            a->evaluate(this, trans, ruleMessage);
-            continue;
-        }
-
-#ifndef NO_LOGS
-        trans->debug(4, "Not running disruptive action: " + \
-                a->m_name + ". SecRuleEngine is not On");
-#endif
+        executeAction(trans, containsBlock, ruleMessage, a, false);
     }
     for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        if (a->isDisruptive() == false) {
-            if (a->m_name != "setvar" && a->m_name != "log"
-                && a->m_name != "msg") {
-#ifndef NO_LOGS
-                trans->debug(4, "Running (non-disruptive) action: " \
-		    + a->m_name);
-#endif
-                a->evaluate(this, trans, ruleMessage);
-            }
-            continue;
-        }
-        if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
-#ifndef NO_LOGS
-            trans->debug(4, "Running (disruptive)     action: " + a->m_name);
-#endif
-            a->evaluate(this, trans, ruleMessage);
-            continue;
-        }
-
-#ifndef NO_LOGS
-        trans->debug(4, "Not running disruptive action: " + \
-                a->m_name + ". SecRuleEngine is not On");
-#endif
+        executeAction(trans, containsBlock, ruleMessage, a, false);
     }
 }
 
@@ -836,9 +655,12 @@ bool Rule::evaluate(Transaction *trans,
     bool globalRet = false;
     Variables::Variables *variables = this->m_variables;
     bool recursiveGlobalRet;
-    bool containsBlock = false;
+    bool containsBlock = m_containsStaticBlockAction;
     std::vector<std::unique_ptr<VariableValue>> finalVars;
     std::string eparam;
+    Variables::Variables vars;
+    vars.reserve(4);
+    Variables::Variables exclusion;
 
     if (ruleMessage == NULL) {
         ruleMessage = std::shared_ptr<RuleMessage>(
@@ -850,6 +672,7 @@ bool Rule::evaluate(Transaction *trans,
     if (m_secMarker == true) {
         return true;
     }
+
     if (m_unconditional == true) {
 #ifndef NO_LOGS
         trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
@@ -897,40 +720,69 @@ bool Rule::evaluate(Transaction *trans,
 #endif
     }
 
-    updateRulesVariable(trans);
+    updateRulesVariable(trans, ruleMessage);
 
-    finalVars = getFinalVars(trans);
+    getFinalVars(&vars, &exclusion, trans);
 
-    for (auto &v : finalVars) {
-        const std::string value = v->m_value;
-        const std::string key = v->m_key;
+    for (auto &var : vars) {
+        std::vector<const VariableValue *> e;
+        var->evaluate(trans, this, &e);
+        for (const VariableValue *v : e) {
+            const std::string &value = v->m_value;
+            const std::string &key = v->m_key;
 
-        std::list<std::pair<std::shared_ptr<std::string>,
-            std::shared_ptr<std::string>>> values;
-
-        bool multiMatch = getActionsByName("multimatch", trans).size() > 0;
-
-        values = executeDefaultTransformations(trans, value,
-            multiMatch);
-        for (const auto &valueTemp : values) {
-            bool ret;
-            std::string valueAfterTrans = std::move(*valueTemp.first);
-
-            ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
-
-            if (ret == true) {
-                ruleMessage->m_match = m_op->resolveMatchMessage(trans,
-                    key, value);
-                for (auto &i : v->m_orign) {
-                    ruleMessage->m_reference.append(i->toText());
-                }
-                ruleMessage->m_reference.append(*valueTemp.second);
-                updateMatchedVars(trans, key, value);
-                executeActionsIndependentOfChainedRuleResult(trans,
-                    &containsBlock, ruleMessage);
-                globalRet = true;
+            if (exclusion.contains(v->m_key) ||
+                std::find_if(trans->m_ruleRemoveTargetById.begin(),
+                    trans->m_ruleRemoveTargetById.end(),
+                    [&, v, this](std::pair<int, std::string> &m) -> bool {
+                        return m.first == m_ruleId && m.second == v->m_key;
+                    }) != trans->m_ruleRemoveTargetById.end()
+            ) {
+                delete v;
+                v = NULL;
+                continue;
             }
+            if (exclusion.contains(v->m_key) ||
+                std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
+                    trans->m_ruleRemoveTargetByTag.end(),
+                    [&, v, trans, this](std::pair<std::string, std::string> &m) -> bool {
+                        return containsTag(m.first, trans) && m.second == v->m_key;
+                    }) != trans->m_ruleRemoveTargetByTag.end()
+            ) {
+                delete v;
+                v = NULL;
+                continue;
+            }
+
+            std::list<std::pair<std::shared_ptr<std::string>,
+                std::shared_ptr<std::string>>> values;
+
+            values = executeDefaultTransformations(trans, value);
+
+            for (const auto &valueTemp : values) {
+                bool ret;
+                std::string valueAfterTrans = std::move(*valueTemp.first);
+
+                ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
+
+                if (ret == true) {
+                    ruleMessage->m_match = m_op->resolveMatchMessage(trans,
+                        key, value);
+                    for (auto &i : v->m_orign) {
+                        ruleMessage->m_reference.append(i->toText());
+                    }
+                    ruleMessage->m_reference.append(*valueTemp.second);
+                    updateMatchedVars(trans, key, value);
+                    executeActionsIndependentOfChainedRuleResult(trans,
+                        &containsBlock, ruleMessage);
+                    globalRet = true;
+                }
+            }
+            delete v;
+            v = NULL;
         }
+        e.clear();
+        e.reserve(4);
     }
 
     if (globalRet == false) {
@@ -980,27 +832,6 @@ end_exec:
 }
 
 
-bool Rule::containsStaticDisruptiveAction() {
-    for (Action *a : m_actionsRuntimePos) {
-        if (a->isDisruptive() == true) {
-            return true;
-        }
-    }
-    for (Action *a : m_actionsRuntimePre) {
-        if (a->isDisruptive() == true) {
-            return true;
-        }
-    }
-    for (Action *a : m_actionsConf) {
-        if (a->isDisruptive() == true) {
-            return true;
-        }
-    }
-    return false;
-}
-
-
-
 std::vector<actions::Action *> Rule::getActionsByName(const std::string& name,
     Transaction *trans) {
     std::vector<actions::Action *> ret;
@@ -1010,11 +841,6 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name,
         }
     }
     for (auto &z : m_actionsRuntimePre) {
-        if (z->m_name == name) {
-            ret.push_back(z);
-        }
-    }
-    for (auto &z : m_actionsConf) {
         if (z->m_name == name) {
             ret.push_back(z);
         }
@@ -1044,19 +870,7 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name,
 
 
 bool Rule::containsTag(const std::string& name, Transaction *t) {
-    for (auto &z : this->m_actionsRuntimePos) {
-        actions::Tag *tag = dynamic_cast<actions::Tag *> (z);
-        if (tag != NULL && tag->getName(t) == name) {
-            return true;
-        }
-    }
-    for (auto &b :
-        t->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        actions::Tag *tag = dynamic_cast<actions::Tag *> (a);
+    for (auto &tag : m_actionsTag) {
         if (tag != NULL && tag->getName(t) == name) {
             return true;
         }
@@ -1066,24 +880,7 @@ bool Rule::containsTag(const std::string& name, Transaction *t) {
 
 
 bool Rule::containsMsg(const std::string& name, Transaction *t) {
-    for (auto &z : this->m_actionsRuntimePos) {
-        actions::Msg *msg = dynamic_cast<actions::Msg *> (z);
-        if (msg != NULL && msg->data(t) == name) {
-            return true;
-        }
-    }
-    for (auto &b :
-        t->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        actions::Msg *msg = dynamic_cast<actions::Msg *> (a);
-        if (msg != NULL && msg->data(t) == name) {
-            return true;
-        }
-    }
-    return false;
+    return m_msg && m_msg->data(t) == name;
 }
 
 

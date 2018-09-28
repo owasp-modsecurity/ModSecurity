@@ -36,8 +36,7 @@ bool DetectXSS::evaluate(Transaction *t, Rule *rule,
 #ifndef NO_LOGS
             t->debug(5, "detected XSS using libinjection.");
 #endif
-            if (rule && t
-                && rule->getActionsByName("capture", t).size() > 0) {
+            if (rule && t && rule->m_containsCaptureAction) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst(
                     "0", std::string(input));
 #ifndef NO_LOGS

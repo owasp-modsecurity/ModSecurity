@@ -605,6 +605,16 @@ class VariableRegex : public Variable {
 
 class Variables : public std::vector<Variable *> {
  public:
+    bool contains(Variable *v) {
+        return std::find_if(begin(), end(),
+            [v](Variable *m) -> bool { return *v == *m; }) != end();
+    };
+    bool contains(const std::string &v) {
+        return std::find_if(begin(), end(),
+            [v](Variable *m) -> bool {
+                return v == *m->m_fullName.get();
+            }) != end();
+    };
 };
 
 
