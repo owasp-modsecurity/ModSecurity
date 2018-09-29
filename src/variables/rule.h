@@ -21,6 +21,10 @@
 #define SRC_VARIABLES_RULE_H_
 
 #include "src/variables/variable.h"
+#include "src/actions/severity.h"
+#include "src/actions/log_data.h"
+#include "src/actions/msg.h"
+
 
 namespace modsecurity {
 
@@ -28,7 +32,182 @@ class Transaction;
 namespace Variables {
 
 
-DEFINE_VARIABLE_DICT(Rule, RULE, m_variableRule)
+class Rule_DictElement : public VariableDictElement { \
+ public:
+    explicit Rule_DictElement(std::string dictElement)
+        : VariableDictElement("RULE", dictElement) { }
+
+    static void id(Transaction *t,
+        Rule *rule,
+        std::vector<const VariableValue *> *l) {
+        if (!rule) {
+            return;
+        }
+        std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+        std::string *a = new std::string(std::to_string(rule->m_ruleId));
+        VariableValue *var = new VariableValue(
+            std::make_shared<std::string>("RULE:id"),
+            a
+        );
+        delete a;
+        origin->m_offset = 0;
+        origin->m_length = 0;
+        var->m_orign.push_back(std::move(origin));
+        l->push_back(var);
+    }
+
+
+    static void rev(Transaction *t,
+        Rule *rule,
+        std::vector<const VariableValue *> *l) {
+        if (!rule) {
+            return;
+        }
+        std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+        std::string *a = new std::string(rule->m_rev);
+        VariableValue *var = new VariableValue(
+            std::make_shared<std::string>("RULE:rev"),
+            a
+        );
+        delete a;
+        origin->m_offset = 0;
+        origin->m_length = 0;
+        var->m_orign.push_back(std::move(origin));
+        l->push_back(var);
+    }
+
+
+    static void severity(Transaction *t,
+        Rule *rule,
+        std::vector<const VariableValue *> *l) {
+        if (rule && rule->m_severity) {
+            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+            std::string *a = new std::string(std::to_string(rule->m_severity->m_severity));
+            VariableValue *var = new VariableValue(
+                std::make_shared<std::string>("RULE:severity"),
+                a
+            );
+            delete a;
+            origin->m_offset = 0;
+            origin->m_length = 0;
+            var->m_orign.push_back(std::move(origin));
+            l->push_back(var);
+        }
+    }
+
+
+    static void logData(Transaction *t,
+        Rule *rule,
+        std::vector<const VariableValue *> *l) {
+        if (rule && rule->m_logData) {
+            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+            std::string *a = new std::string(rule->m_logData->data(t));
+            VariableValue *var = new VariableValue(
+                std::make_shared<std::string>("RULE:logdata"),
+                a
+            );
+            delete a;
+            origin->m_offset = 0;
+            origin->m_length = 0;
+            var->m_orign.push_back(std::move(origin));
+            l->push_back(var);
+        }
+    }
+
+    static void msg(Transaction *t,
+        Rule *rule,
+        std::vector<const VariableValue *> *l) {
+        if (rule && rule->m_msg) {
+            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+            std::string *a = new std::string(rule->m_msg->data(t));
+            VariableValue *var = new VariableValue(
+                std::make_shared<std::string>("RULE:msg"),
+                a
+            );
+            delete a;
+            origin->m_offset = 0;
+            origin->m_length = 0;
+            var->m_orign.push_back(std::move(origin));
+            l->push_back(var);
+        }
+    }
+
+    void evaluate(Transaction *t,
+        Rule *rule,
+        std::vector<const VariableValue *> *l) override {
+        if (m_dictElement == "id") {
+            id(t, rule, l);
+            return;
+        }
+        if (rule && m_dictElement == "rev") {
+            rev(t, rule, l);
+            return;
+        }
+        if (rule && m_dictElement == "severity") {
+            severity(t, rule, l);
+            return;
+        }
+        if (m_dictElement == "logdata") {
+            logData(t, rule, l);
+            return;
+        }
+        if (m_dictElement == "msg") {
+            msg(t, rule, l);
+            return;
+        }
+    }
+};
+
+
+class Rule_DictElementRegexp : public VariableRegex {
+ public:
+    explicit Rule_DictElementRegexp(std::string regex)
+        : VariableRegex("RULE", regex) { }
+
+    void evaluate(Transaction *t,
+        Rule *rule,
+        std::vector<const VariableValue *> *l) override {
+        if (Utils::regex_search("id", m_r) > 0) {
+            Rule_DictElement::id(t, rule, l);
+            return;
+        }
+        if (Utils::regex_search("rev", m_r) > 0) {
+            Rule_DictElement::rev(t, rule, l);
+            return;
+        }
+        if (Utils::regex_search("severity", m_r) > 0) {
+            Rule_DictElement::severity(t, rule, l);
+            return;
+        }
+        if (Utils::regex_search("logdata", m_r) > 0) {
+            Rule_DictElement::logData(t, rule, l);
+            return;
+        }
+        if (Utils::regex_search("msg", m_r) > 0) {
+            Rule_DictElement::msg(t, rule, l);
+            return;
+        }
+    }
+};
+
+
+class Rule_NoDictElement : public Variable {
+ public:
+    explicit Rule_NoDictElement()
+        : Variable("RULE") { }
+
+    void evaluate(Transaction *t,
+        Rule *rule,
+        std::vector<const VariableValue *> *l) override {
+        Rule_DictElement::id(t, rule, l);
+        Rule_DictElement::rev(t, rule, l);
+        Rule_DictElement::severity(t, rule, l);
+        Rule_DictElement::logData(t, rule, l);
+        Rule_DictElement::msg(t, rule, l);
+    }
+};
+
+// DEFINE_VARIABLE_DICT(Rule, RULE, m_variableRule)
 
 
 }  // namespace Variables

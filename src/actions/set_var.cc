@@ -45,7 +45,7 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
     std::string resolvedPre;
 
     if (m_string) {
-        resolvedPre = m_string->evaluate(t);
+        resolvedPre = m_string->evaluate(t, rule);
     }
 
     std::string m_variableNameExpanded;

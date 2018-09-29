@@ -292,8 +292,6 @@ class VariableMonkeyResolution {
                 t->m_variableArgsGetNames.resolve(var, l);
             } else if (comp(variable, "ARGS_POST_NAMES")) {
                 t->m_variableArgsPostNames.resolve(var, l);
-            } else if (comp(col, "RULE")) {
-                t->m_variableRule.resolve(var, l);
             } else if (comp(col, "ARGS_GET")) {
                 t->m_variableArgsGet.resolve(var, l);
             } else if (comp(col, "ARGS_POST")) {
@@ -474,8 +472,6 @@ class VariableMonkeyResolution {
                 vv = t->m_variableArgsGetNames.resolveFirst(var);
             } else if (comp(variable, "ARGS_POST_NAMES")) {
                 vv = t->m_variableArgsPostNames.resolveFirst(var);
-            } else if (comp(col, "RULE")) {
-                vv = t->m_variableRule.resolveFirst(var);
             } else if (comp(col, "ARGS_GET")) {
                 vv = t->m_variableArgsGet.resolveFirst(var);
             } else if (comp(col, "ARGS_POST")) {
