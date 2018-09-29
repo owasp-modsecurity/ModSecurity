@@ -47,13 +47,18 @@ void RunTimeString::appendVar(
 
 
 std::string RunTimeString::evaluate(Transaction *t) {
+    return evaluate(t, NULL);
+}
+
+
+std::string RunTimeString::evaluate(Transaction *t, Rule *r) {
     std::string s;
     for (auto &z : m_elements) {
         if (z->m_string.size() > 0) {
             s.append(z->m_string);
         } else if (z->m_var != NULL && t != NULL) {
             std::vector<const VariableValue *> l;
-            z->m_var->evaluate(t, NULL, &l);
+            z->m_var->evaluate(t, r, &l);
             if (l.size() > 0) {
                 s.append(l[0]->m_value);
             }
@@ -64,6 +69,5 @@ std::string RunTimeString::evaluate(Transaction *t) {
     }
     return s;
 }
-
 
 }  // namespace modsecurity

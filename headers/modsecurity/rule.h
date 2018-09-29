@@ -94,7 +94,6 @@ class Rule {
     void updateMatchedVars(Transaction *trasn, std::string key,
         std::string value);
     void cleanMatchedVars(Transaction *trasn);
-    void updateRulesVariable(Transaction *trasn, std::shared_ptr<RuleMessage> rm);
 
     std::vector<actions::Action *> getActionsByName(const std::string& name,
         Transaction *t);

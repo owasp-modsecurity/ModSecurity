@@ -258,27 +258,6 @@ void Rule::cleanMatchedVars(Transaction *trans) {
 }
 
 
-void Rule::updateRulesVariable(Transaction *trans,
-    std::shared_ptr<RuleMessage> rm) {
-    if (m_ruleId != 0) {
-        trans->m_variableRule.set("id", std::to_string(m_ruleId), 0);
-    }
-    if (m_rev.empty() == false) {
-        trans->m_variableRule.set("rev", m_rev, 0);
-    }
-    if (m_severity) {
-        trans->m_variableRule.set("severity",
-            std::to_string(m_severity->m_severity), 0);
-    }
-    if (m_logData) {
-        trans->m_variableRule.set("logdata", m_logData->data(trans), 0);
-    }
-    if (m_msg) {
-        trans->m_variableRule.set("msg", m_msg->data(trans), 0);
-    }
-}
-
-
 void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     bool *containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
 
@@ -719,8 +698,6 @@ bool Rule::evaluate(Transaction *trans,
         + variables + ".");
 #endif
     }
-
-    updateRulesVariable(trans, ruleMessage);
 
     getFinalVars(&vars, &exclusion, trans);
 

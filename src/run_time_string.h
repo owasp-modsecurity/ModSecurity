@@ -49,6 +49,7 @@ class RunTimeString {
     void appendText(std::string text);
     void appendVar(std::unique_ptr<modsecurity::Variables::Variable> var);
     std::string evaluate(Transaction *t);
+    std::string evaluate(Transaction *t, Rule *r);
     std::string evaluate() {
         return evaluate(NULL);
     }
