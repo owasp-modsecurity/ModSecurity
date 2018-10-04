@@ -106,6 +106,7 @@ ACTIONS = \
 	actions/accuracy.cc \
 	actions/action.cc \
 	actions/audit_log.cc \
+	actions/block.cc \
 	actions/capture.cc \
 	actions/chain.cc \
 	actions/ctl/audit_log_parts.cc \
@@ -119,7 +120,6 @@ ACTIONS = \
 	actions/ctl/rule_remove_by_tag.cc \
 	actions/ctl/request_body_access.cc\
 	actions/disruptive/allow.cc \
-	actions/disruptive/block.cc \
 	actions/disruptive/deny.cc \
 	actions/disruptive/redirect.cc \
 	actions/disruptive/pass.cc \

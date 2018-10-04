@@ -55,6 +55,7 @@ class Driver;
 
 #include "src/actions/accuracy.h"
 #include "src/actions/audit_log.h"
+#include "src/actions/block.h"
 #include "src/actions/capture.h"
 #include "src/actions/chain.h"
 #include "src/actions/ctl/audit_log_parts.h"
@@ -69,7 +70,6 @@ class Driver;
 #include "src/actions/ctl/rule_remove_target_by_tag.h"
 #include "src/actions/data/status.h"
 #include "src/actions/disruptive/allow.h"
-#include "src/actions/disruptive/block.h"
 #include "src/actions/disruptive/deny.h"
 #include "src/actions/disruptive/pass.h"
 #include "src/actions/disruptive/redirect.h"

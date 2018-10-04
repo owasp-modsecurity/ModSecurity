@@ -22,7 +22,7 @@
 #include "modsecurity/rule.h"
 #include "src/utils/string.h"
 
-#include "src/actions/disruptive/block.h"
+#include "src/actions/block.h"
 #include "src/actions/chain.h"
 #include "src/actions/disruptive/deny.h"
 #include "src/actions/disruptive/redirect.h"

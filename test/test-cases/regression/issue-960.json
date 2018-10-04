@@ -69,8 +69,8 @@
   },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\(Rule: 960032\\) .* Rule returned 1.",
-      "error_log": ""
+      "error_log": "",
+      "http_code": 418
     },
   "rules": [
     "SecDefaultAction \"phase:1,log,deny,status:418,tag:'Host: %{request_headers.host}'\"",
@@ -109,8 +109,8 @@
   },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\(Rule: 960032\\) .* Rule returned 1.",
-      "error_log": ""
+      "error_log": "",
+      "http_code": 418
     },
   "rules": [
     "SecDefaultAction \"phase:1,log,deny,status:418,tag:'Host: %{request_headers.host}'\"",
