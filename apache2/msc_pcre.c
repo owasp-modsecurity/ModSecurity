@@ -21,10 +21,14 @@
 static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
     if (regex != NULL) {
         if (regex->pe != NULL) {
+#ifdef WITH_PCRE_STUDY
+            pcre_free_study(regex->pe);
+#else
 #if defined(VERSION_NGINX)
             pcre_free(regex->pe);
 #else
             free(regex->pe);
+#endif
 #endif
             regex->pe = NULL;
         }
