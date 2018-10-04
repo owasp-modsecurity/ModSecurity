@@ -124,36 +124,29 @@ class Rule {
         std::shared_ptr<std::string> transStr,
         int nth);
 
-    std::vector<actions::Action *> m_actionsRuntimePos;
-    std::vector<actions::Action *> m_actionsRuntimePre;
+    actions::Action *m_theDisruptiveAction;
+    actions::LogData *m_logData;
+    actions::Msg *m_msg;
+    actions::Severity *m_severity;
     bool m_chained;
-    Rule *m_chainedRule;
-    std::string m_fileName;
-    int m_lineNumber;
-    std::string m_marker;
-    operators::Operator *m_op;
-    bool m_secMarker;
-    modsecurity::Variables::Variables *m_variables;
-
-
-    int64_t m_ruleId;
-    std::string m_rev;
-    // msg ?
-    std::string m_ver;
-    //std::string m_logData;
-
-    //if (child->severity != NOT_SET) merged->severity = child->severity;
-    int m_accuracy;
-    int m_maturity;
-    int m_phase;
-
-    bool m_containsStaticDisruptiveAction;
     bool m_containsCaptureAction;
     bool m_containsMultiMatchAction;
     bool m_containsStaticBlockAction;
-    actions::Severity *m_severity;
-    actions::LogData *m_logData;
-    actions::Msg *m_msg;
+    bool m_secMarker;
+    int64_t m_ruleId;
+    int m_accuracy;
+    int m_lineNumber;
+    int m_maturity;
+    int m_phase;
+    modsecurity::Variables::Variables *m_variables;
+    operators::Operator *m_op;
+    Rule *m_chainedRule;
+    std::string m_fileName;
+    std::string m_marker;
+    std::string m_rev;
+    std::string m_ver;
+    std::vector<actions::Action *> m_actionsRuntimePos;
+    std::vector<actions::Action *> m_actionsRuntimePre;
     std::vector<actions::SetVar *> m_actionsSetVar;
     std::vector<actions::Tag *> m_actionsTag;
  private:

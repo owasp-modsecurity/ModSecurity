@@ -29,7 +29,6 @@ namespace modsecurity {
 class Transaction;
 
 namespace actions {
-namespace disruptive {
 
 
 class Block : public Action {
@@ -38,11 +37,9 @@ class Block : public Action {
 
     bool evaluate(Rule *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;
-    bool isDisruptive() override { return true; }
 };
 
 
-}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
 #endif

@@ -21,6 +21,7 @@ class Driver;
 
 #include "src/actions/accuracy.h"
 #include "src/actions/audit_log.h"
+#include "src/actions/block.h"
 #include "src/actions/capture.h"
 #include "src/actions/chain.h"
 #include "src/actions/ctl/audit_log_parts.h"
@@ -35,7 +36,6 @@ class Driver;
 #include "src/actions/ctl/rule_remove_target_by_tag.h"
 #include "src/actions/data/status.h"
 #include "src/actions/disruptive/allow.h"
-#include "src/actions/disruptive/block.h"
 #include "src/actions/disruptive/deny.h"
 #include "src/actions/disruptive/pass.h"
 #include "src/actions/disruptive/redirect.h"
@@ -1188,7 +1188,7 @@ expression:
         int secRuleDefinedPhase = -1;
         for (actions::Action *a : *actions) {
             actions::Phase *phase = dynamic_cast<actions::Phase *>(a);
-            if (a->isDisruptive() == true && dynamic_cast<actions::disruptive::Block *>(a) == NULL) {
+            if (a->isDisruptive() == true && dynamic_cast<actions::Block *>(a) == NULL) {
                 hasDisruptive = true;
             }
             if (phase != NULL) {
@@ -1522,8 +1522,6 @@ expression:
             driver.error(@0, ss.str());
             YYERROR;
         }
-
-        YYERROR;
       }
     /* Debug log: start */
     | CONFIG_DIR_DEBUG_LVL
@@ -2561,7 +2559,7 @@ act:
       }
     | ACTION_BLOCK
       {
-        ACTION_CONTAINER($$, new actions::disruptive::Block($1));
+        ACTION_CONTAINER($$, new actions::Block($1));
       }
     | ACTION_CAPTURE
       {

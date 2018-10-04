@@ -38,7 +38,7 @@
 #include "src/actions/capture.h"
 #include "src/actions/multi_match.h"
 #include "src/actions/set_var.h"
-#include "src/actions/disruptive/block.h"
+#include "src/actions/block.h"
 #include "src/variables/variable.h"
 
 
@@ -71,7 +71,7 @@ Rule::Rule(std::string marker)
     m_ver(""),
     m_unconditional(false),
     m_referenceCount(1),
-    m_containsStaticDisruptiveAction(false),
+    m_theDisruptiveAction(nullptr),
     m_containsStaticBlockAction(false),
     m_containsCaptureAction(false),
     m_containsMultiMatchAction(false),
@@ -105,7 +105,7 @@ Rule::Rule(Operator *_op,
     m_ver(""),
     m_unconditional(false),
     m_referenceCount(1),
-    m_containsStaticDisruptiveAction(false),
+    m_theDisruptiveAction(nullptr),
     m_containsStaticBlockAction(false),
     m_containsCaptureAction(false),
     m_containsMultiMatchAction(false),
@@ -180,12 +180,15 @@ void Rule::organizeActions(std::vector<Action *> *actions) {
                     dynamic_cast<actions::SetVar *>(a));
             } else if (dynamic_cast<actions::Tag *>(a)) {
                 m_actionsTag.push_back(dynamic_cast<actions::Tag *>(a));
-            } else if (dynamic_cast<actions::disruptive::Block *>(a)) {
+            } else if (dynamic_cast<actions::Block *>(a)) {
                 m_actionsRuntimePos.push_back(a);
                 m_containsStaticBlockAction = true;
             } else if (a->isDisruptive() == true) {
-                m_actionsRuntimePos.push_back(a);
-                m_containsStaticDisruptiveAction = true;
+                if (m_theDisruptiveAction != nullptr) {
+                    delete m_theDisruptiveAction;
+                    m_theDisruptiveAction = nullptr;
+                }
+                m_theDisruptiveAction = a;
             } else {
                 m_actionsRuntimePos.push_back(a);
             }
@@ -230,6 +233,10 @@ void Rule::cleanUpActions() {
         auto *a = m_actionsTag.back();
         m_actionsTag.pop_back();
         delete a;
+    }
+    if (m_theDisruptiveAction != nullptr) {
+        delete m_theDisruptiveAction;
+        m_theDisruptiveAction = nullptr;
     }
 }
 
@@ -599,12 +606,15 @@ void Rule::executeAction(Transaction *trans,
 
 void Rule::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
+    bool disruptiveAlreadyExecuted = false;
 
     for (Action *a : trans->m_rules->m_defaultActions[this->m_phase]) {
         if (a->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
-        executeAction(trans, containsBlock, ruleMessage, a, true);
+        if (!a->isDisruptive()) {
+            executeAction(trans, containsBlock, ruleMessage, a, true);
+        }
     }
 
     for (actions::Tag *a : this->m_actionsTag) {
@@ -615,9 +625,6 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         a->evaluate(this, trans, ruleMessage);
     }
 
-    for (Action *a : this->m_actionsRuntimePos) {
-        executeAction(trans, containsBlock, ruleMessage, a, false);
-    }
     for (auto &b :
         trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
         if (m_ruleId != b.first) {
@@ -625,6 +632,18 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
         executeAction(trans, containsBlock, ruleMessage, a, false);
+        disruptiveAlreadyExecuted = true;
+    }
+    for (Action *a : this->m_actionsRuntimePos) {
+        if (!a->isDisruptive()
+                && !(disruptiveAlreadyExecuted
+                && dynamic_cast<actions::Block *>(a))) {
+            executeAction(trans, containsBlock, ruleMessage, a, false);
+        }
+    }
+    if (!disruptiveAlreadyExecuted && m_theDisruptiveAction != nullptr) {
+        executeAction(trans, containsBlock, ruleMessage,
+            m_theDisruptiveAction, false);
     }
 }
 

@@ -238,6 +238,20 @@ bool RulesExceptions::merge(RulesExceptions *from) {
                     std::move(p.second)));
     }
 
+    for (auto &p : from->m_action_pos_update_target_by_id) {
+        m_action_pos_update_target_by_id.emplace(
+            std::pair<double,
+                std::unique_ptr<actions::Action>>(p.first,
+                    std::move(p.second)));
+    }
+
+    for (auto &p : from->m_action_pre_update_target_by_id) {
+        m_action_pre_update_target_by_id.emplace(
+            std::pair<double,
+                std::unique_ptr<actions::Action>>(p.first,
+                    std::move(p.second)));
+    }
+
     for (auto &p : from->m_remove_rule_by_msg) {
         m_remove_rule_by_msg.push_back(p);
     }

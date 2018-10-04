@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/actions/disruptive/block.h"
+#include "src/actions/block.h"
 
 #include <iostream>
 #include <string>
@@ -27,7 +27,6 @@
 
 namespace modsecurity {
 namespace actions {
-namespace disruptive {
 
 
 bool Block::evaluate(Rule *rule, Transaction *transaction,
@@ -37,8 +36,7 @@ bool Block::evaluate(Rule *rule, Transaction *transaction,
 #endif
 
     for (Action *a : transaction->m_rules->m_defaultActions[rule->m_phase]) {
-        if (a->isDisruptive() == false
-            || dynamic_cast<actions::disruptive::Block *>(a) != NULL) {
+        if (a->isDisruptive() == false) {
             continue;
         }
         a->evaluate(rule, transaction, rm);
@@ -48,6 +46,5 @@ bool Block::evaluate(Rule *rule, Transaction *transaction,
 }
 
 
-}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity

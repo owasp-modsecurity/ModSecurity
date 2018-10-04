@@ -183,6 +183,7 @@ TESTS+=test/test-cases/regression/variable-RESPONSE_BODY.json
 TESTS+=test/test-cases/regression/config-calling_phases_by_name.json
 TESTS+=test/test-cases/regression/variable-FILES_COMBINED_SIZE.json
 TESTS+=test/test-cases/regression/variable-FULL_REQUEST_LENGTH.json
+TESTS+=test/test-cases/regression/config-update-action-by-id.json
 TESTS+=test/test-cases/regression/config-update-target-by-id.json
 TESTS+=test/test-cases/regression/variable-REQUEST_HEADERS.json
 TESTS+=test/test-cases/regression/misc.json

@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds support to UpdateActionById.
+   [Issue #1800 - @zimmerle, @victorhora, @NisariAIT]
  - Add correct C function prototypes for msc_init and msc_create_rule_set
    [Issue #1922 - @steven-j-wojcik]
  - Allow LuaJIT 2.1 to be used
