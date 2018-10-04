@@ -22,7 +22,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=<script>alert(1)</script&param2=value2"
+        "param1=<script>alert(1)<\/script&param2=value2"
       ]
     },
     "response":{
@@ -36,7 +36,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Added DetectXSS match TX.0: <script>alert\(1\)</script"
+      "debug_log":"Added DetectXSS match TX.0: <script>alert"
     },
     "rules":[
       "SecRuleEngine On",
