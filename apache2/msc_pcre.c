@@ -18,6 +18,7 @@
 /**
  * Releases the resources used by a single regular expression pattern.
  */
+// FIXME
 static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
     if (regex != NULL) {
         if (regex->pe != NULL) {
