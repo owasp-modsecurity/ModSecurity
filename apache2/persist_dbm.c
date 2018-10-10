@@ -101,6 +101,14 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     int expired = 0;
     int i;
 
+    /**
+     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
+     */
+    char *username;
+    apr_uid_t uid;
+    apr_gid_t gid;
+    apr_uid_current(&uid, &gid, msr->mp);
+    apr_uid_name_get(&username, uid, msr->mp);
 
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "collection_retrieve_ex: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
@@ -109,7 +117,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         goto cleanup;
     }
 
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
+    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", username, "-", col_name, NULL);
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "collection_retrieve_ex: collection_retrieve_ex: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
@@ -374,6 +382,15 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     const apr_table_t *stored_col = NULL;
     const apr_table_t *orig_col = NULL;
 
+    /**
+     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
+     */
+    char *username;
+    apr_uid_t uid;
+    apr_gid_t gid;
+    apr_uid_current(&uid, &gid, msr->mp);
+    apr_uid_name_get(&username, uid, msr->mp);
+
     var_name = (msc_string *)apr_table_get(col, "__name");
     if (var_name == NULL) {
         goto error;
@@ -392,7 +409,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     }
 
     // ENH: lowercase the var name in the filename
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
+    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", username, "-", var_name->value, NULL);
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "collection_store: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, var_name->value),
@@ -655,6 +672,15 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     apr_time_t now = apr_time_sec(msr->request_time);
     int i;
 
+    /**
+     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
+     */
+    char *username;
+    apr_uid_t uid;
+    apr_gid_t gid;
+    apr_uid_current(&uid, &gid, msr->mp);
+    apr_uid_name_get(&username, uid, msr->mp);
+
     if (msr->txcfg->data_dir == NULL) {
         /* The user has been warned about this problem enough times already by now.
          * msr_log(msr, 1, "Unable to access collection file (name \"%s\"). Use SecDataDir to "
@@ -664,9 +690,9 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     }
 
     if(strstr(col_name,"USER") || strstr(col_name,"SESSION") || strstr(col_name, "RESOURCE"))
-        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", msr->txcfg->webappid, "_", col_name, NULL);
+        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", username, "-", msr->txcfg->webappid, "_", col_name, NULL);
     else
-        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
+        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", username, "-", col_name, NULL);
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "collections_remove_stale: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
