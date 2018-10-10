@@ -169,7 +169,7 @@
 		        phase:2,deny,id:12345"
 	),
 	match_log => {
-		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*validation failed because content is not well formed/s, 1 ],
+		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*/s, 1 ],
 		-debug => [ qr/Failed to load|Successfully validated/, 1 ],
 		-error => [ qr/Failed to load|Successfully validated/, 1 ],
 		audit => [ qr/^Message: .*Failed parsing document.*\nMessage:/m, 1 ],
@@ -357,7 +357,7 @@
 		        phase:2,deny,id:12345"
 	),
 	match_log => {
-		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*validation failed because content is not well formed/s, 1 ],
+		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*/s, 1 ],
 		-debug => [ qr/Failed to load|Successfully validated/, 1 ],
 		-error => [ qr/Failed to load|Successfully validated/, 1 ],
 	},
