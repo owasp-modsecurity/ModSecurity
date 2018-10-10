@@ -768,7 +768,7 @@ bool Rule::evaluate(Transaction *trans,
                         ruleMessage->m_reference.append(i->toText());
                     }
                     ruleMessage->m_reference.append(*valueTemp.second);
-                    updateMatchedVars(trans, key, value);
+                    updateMatchedVars(trans, key, valueAfterTrans);
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
                     globalRet = true;
