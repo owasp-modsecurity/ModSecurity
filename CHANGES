@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Using values after transformation at MATCHED_VARS
+   [0x14316 - @zimmerle]
  - Adds support to UpdateActionById.
    [Issue #1800 - @zimmerle, @victorhora, @NisariAIT]
  - Add correct C function prototypes for msc_init and msc_create_rule_set
