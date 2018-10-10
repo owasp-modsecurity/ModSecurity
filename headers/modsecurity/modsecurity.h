@@ -317,7 +317,7 @@ extern "C" {
 #endif
 
 /** @ingroup ModSecurity_C_API */
-ModSecurity *msc_init();
+ModSecurity *msc_init(void);
 /** @ingroup ModSecurity_C_API */
 const char *msc_who_am_i(ModSecurity *msc);
 /** @ingroup ModSecurity_C_API */

@@ -96,7 +96,7 @@ class Rules : public RulesProperties {
 extern "C" {
 #endif
 
-Rules *msc_create_rules_set();
+Rules *msc_create_rules_set(void);
 void msc_rules_dump(Rules *rules);
 int msc_rules_merge(Rules *rules_dst, Rules *rules_from, const char **error);
 int msc_rules_add_remote(Rules *rules, const char *key, const char *uri,
