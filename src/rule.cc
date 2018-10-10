@@ -362,6 +362,7 @@ inline void Rule::executeTransformation(actions::Action *a,
         if (m_containsMultiMatchAction) {
             std::shared_ptr<std::string> t(new std::string(a->m_name));
             ret->push_back(std::make_pair(u, t));
+            (*nth)++;
         }
         *value = u;
     }
@@ -378,7 +379,6 @@ inline void Rule::executeTransformation(actions::Action *a,
         a->m_name + ": \"" + \
         utils::string::limitTo(80, newValue) +"\"");
 #endif
-    (*nth)++;
 }
 
 
@@ -396,10 +396,7 @@ std::list<std::pair<std::shared_ptr<std::string>,
 
     if (m_containsMultiMatchAction == true) {
         ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(value),
-            std::shared_ptr<std::string>(new std::string(path))));
-        ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(value),
+            std::shared_ptr<std::string>(new std::string(*value)),
             std::shared_ptr<std::string>(new std::string(path))));
     }
 
@@ -461,17 +458,16 @@ std::list<std::pair<std::shared_ptr<std::string>,
     }
 
     if (m_containsMultiMatchAction == true) {
-        // v2 checks the last entry twice. Don't know why.
-        ret.push_back(ret.back());
-
 #ifndef NO_LOGS
         trans->debug(9, "multiMatch is enabled. " \
             + std::to_string(ret.size()) + \
             " values to be tested.");
 #endif
-    } else {
+    }
+
+    if (!m_containsMultiMatchAction) {
         ret.push_back(std::make_pair(
-            value,
+            std::shared_ptr<std::string>(new std::string(*value)),
             std::shared_ptr<std::string>(new std::string(path))));
     }
 
