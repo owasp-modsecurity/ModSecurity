@@ -581,7 +581,7 @@
 		-debug => [ qr/Request body is larger than the configured limit/, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^500$/,
 	},
 	request => normalize_raw_request_data(
 		qq(

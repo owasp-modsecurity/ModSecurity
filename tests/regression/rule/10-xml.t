@@ -175,7 +175,7 @@
 		audit => [ qr/^Message: .*Failed parsing document.*\nMessage:/m, 1 ],
 	},
 	match_response => {
-		status => qr/^403$/,
+		status => qr/^500$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -362,7 +362,7 @@
 		-error => [ qr/Failed to load|Successfully validated/, 1 ],
 	},
 	match_response => {
-		status => qr/^403$/,
+		status => qr/^500$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",

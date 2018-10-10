@@ -270,7 +270,7 @@
         debug => [ qr/Final boundary missing/, 1 ],
     },
     match_response => {
-        status => qr/^200$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1084,7 +1084,7 @@
         debug => [ qr/boundary whitespace in C-T header/, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1180,7 +1180,7 @@
         debug => [ qr/No boundaries found in payload/, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1322,7 +1322,7 @@
         debug => [ qr/boundary was quoted.*No boundaries found in payload/s, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1369,7 +1369,7 @@
         debug => [ qr/boundary was quoted.*No boundaries found in payload/s, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
