@@ -91,9 +91,9 @@ class Rule {
         std::string value, std::shared_ptr<RuleMessage> rm);
     void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
         bool *b, std::shared_ptr<RuleMessage> ruleMessage);
-    void updateMatchedVars(Transaction *trasn, std::string key,
-        std::string value);
-    void cleanMatchedVars(Transaction *trasn);
+    inline void updateMatchedVars(Transaction *trasn, const std::string &key,
+        const std::string &value);
+    inline void cleanMatchedVars(Transaction *trasn);
 
     std::vector<actions::Action *> getActionsByName(const std::string& name,
         Transaction *t);
