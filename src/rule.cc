@@ -241,8 +241,8 @@ void Rule::cleanUpActions() {
 }
 
 
-void Rule::updateMatchedVars(Transaction *trans, std::string key,
-    std::string value) {
+inline void Rule::updateMatchedVars(Transaction *trans, const std::string &key,
+    const std::string &value) {
 #ifndef NO_LOGS
     trans->debug(9, "Matched vars updated.");
 #endif
@@ -254,7 +254,7 @@ void Rule::updateMatchedVars(Transaction *trans, std::string key,
 }
 
 
-void Rule::cleanMatchedVars(Transaction *trans) {
+inline void Rule::cleanMatchedVars(Transaction *trans) {
 #ifndef NO_LOGS
     trans->debug(9, "Matched vars cleaned.");
 #endif
