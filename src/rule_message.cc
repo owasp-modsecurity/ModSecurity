@@ -93,7 +93,10 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }
 
-
+/*
+ * Depricated. Do not use. Should be removed before merge.
+ *
+ */
 RuleMessageHighlight RuleMessage::computeHighlight(const RuleMessage *rm,
     const std::string buf) {
     RuleMessageHighlight ret;

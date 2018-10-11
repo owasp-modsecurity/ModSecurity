@@ -237,6 +237,10 @@ end:
             modsecurity::RuleMessage::computeHighlight(ruleMessage,
                 ruleMessage->m_buf);
         highlightToText(h);
+        std::cout << "Highlight JSON:" << std::endl;
+        std::cout << ruleMessage->m_highlightJSON << std::endl;
+        std::cout << "Request:" << std::endl;
+        std::cout << ruleMessage->m_buf;
         std::cout << std::endl;
     }
 
