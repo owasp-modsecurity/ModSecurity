@@ -24,6 +24,11 @@
 #ifndef HEADERS_MODSECURITY_RULE_MESSAGE_H_
 #define HEADERS_MODSECURITY_RULE_MESSAGE_H_
 
+#ifdef __cplusplus
+#include <utility>
+#endif
+
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 
@@ -32,6 +37,31 @@
 
 namespace modsecurity {
 
+class RuleMessageHighlightArea {
+ public:
+    RuleMessageHighlightArea()
+        : m_startingAt(0),
+        m_size(0) { }
+    size_t m_startingAt;
+    size_t m_size;
+};
+
+
+class RuleMessageHighlightOperator {
+ public:
+    RuleMessageHighlightOperator()
+        : m_value("") { }
+    RuleMessageHighlightArea m_area;
+    std::string m_value;
+};
+
+
+class RuleMessageHighlight {
+ public:
+    std::list<RuleMessageHighlightArea> m_variable;
+    std::list<std::pair<std::string, std::string>> m_value;
+    std::list<RuleMessageHighlightOperator> m_op;
+};
 
 
 class RuleMessage {
@@ -88,10 +118,14 @@ class RuleMessage {
         return RuleMessage::log(rm, 0);
     }
 
+    static RuleMessageHighlight computeHighlight(const RuleMessage *rm,
+        const std::string buf);
+
     static std::string _details(const RuleMessage *rm);
     static std::string _errorLogTail(const RuleMessage *rm);
 
     int m_accuracy;
+    std::string m_buf;
     std::string m_clientIpAddress;
     std::string m_data;
     std::string m_id;
@@ -100,6 +134,7 @@ class RuleMessage {
     int m_maturity;
     std::string m_message;
     bool m_noAuditLog;
+    std::string m_opValue;
     int m_phase;
     std::string m_reference;
     std::string m_rev;
@@ -111,9 +146,11 @@ class RuleMessage {
     std::string m_serverIpAddress;
     int m_severity;
     std::string m_uriNoQueryStringDecoded;
+    std::string m_varValue;
     std::string m_ver;
 
     std::list<std::string> m_tags;
+    RuleMessageHighlight m_highlight;
 };
 
 
