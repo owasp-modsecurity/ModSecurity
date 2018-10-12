@@ -1,6 +1,10 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Allow LuaJIT 2.1 to be used
+   [Issue #1909 - @victorhora, @mdunc]
+ - Match m_id JSON log with RuleMessage and v2 format
+   [Issue #1185 - @victorhora]
  - Adds support to setenv action.
    [Issue #1044 - @zimmerle]
  - Adds new transaction constructor that accepts the transaction id
