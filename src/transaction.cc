@@ -1614,7 +1614,7 @@ std::string Transaction::toJSON(int parts) {
     LOGFY_ADD_NUM("client_port", m_clientPort);
     LOGFY_ADD("host_ip", m_serverIpAddress.c_str());
     LOGFY_ADD_NUM("host_port", m_serverPort);
-    LOGFY_ADD("id", this->m_id.c_str());
+    LOGFY_ADD("unique_id", this->m_id.c_str());
 
     /* request */
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("request"),
