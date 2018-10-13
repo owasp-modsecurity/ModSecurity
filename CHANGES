@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Fix mpm-itk / mod_ruid2 compatibility
+   [Issue #712 - @ju5t , @derhansen, @meatlayer, @victorhora]
  * Code cosmetics: checks if actionset is not null before use it
    [Issue #1556 - @marcstern, @zimmerle, @victorhora]
  * Only generate SecHashKey when SecHashEngine is On
