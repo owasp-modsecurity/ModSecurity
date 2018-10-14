@@ -102,23 +102,22 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # is wrong, then parser returns with value 1 (also a non-zero).
 #
 # You can choose, which one is what you need. The example below contains the
-# 'strict' mode, which means if there are any lines with start of "--", then
-# ModSecurity blocked the content. But the next, commented example contains
+# 'strict' logging mode, which means if there are any lines with start of "--", then
+# ModSecurity warns about the request. But the next, example contains
 # the 'permissive' mode, then you check only if the necessary lines exists in
 # correct order. Whit this, you can enable to upload PEM files (eg "----BEGIN.."),
 # or other text files, which contains eg. HTTP headers.
 #
-# The difference is only the operator - in strict mode (first) the content blocked
+# The difference is only the operator - in strict mode (first) the content logs
 # in case of any non-zero value. In permissive mode (second, commented) the
 # content blocked only if the value is explicit 1. If it 0 or 2, the content will
 # allowed.
 #
 
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
-"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
-#SecRule MULTIPART_UNMATCHED_BOUNDARY "@eq 1" \
-#"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
-
+"id:'200004',phase:2,t:none,log,pass,msg:'Multipart parser detected a possible unmatched boundary.'"
+SecRule MULTIPART_UNMATCHED_BOUNDARY "@eq 1" \
+"id:'200006',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 
 # PCRE Tuning
 # We want to avoid a potential RegEx DoS condition
