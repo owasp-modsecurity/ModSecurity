@@ -209,24 +209,36 @@ bool AuditLog::setType(AuditLogType audit_type) {
 
 
 bool AuditLog::init(std::string *error) {
+    audit_log::writer::Writer *tmp_writer;
+
+    if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
+        if (m_writer) {
+            delete m_writer;
+            m_writer = NULL;
+        }
+        return true;
+    }
+
     if (m_type == ParallelAuditLogType) {
-        m_writer = new audit_log::writer::Parallel(this);
+        tmp_writer = new audit_log::writer::Parallel(this);
     } else if (m_type == HttpsAuditLogType) {
-        m_writer = new audit_log::writer::Https(this);
+        tmp_writer = new audit_log::writer::Https(this);
     } else {
         /*
          * if (m_type == SerialAuditLogType
          * || m_type == NotSetAuditLogType)
          *
          */
-        m_writer = new audit_log::writer::Serial(this);
+        tmp_writer = new audit_log::writer::Serial(this);
     }
 
-    if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
-        return true;
+    if (tmp_writer == NULL) {
+        error->assign("Writer memory alloc failed!");
+        return false;
     }
 
-    if (m_writer == NULL || m_writer->init(error) == false) {
+    if (tmp_writer->init(error) == false) {
+        delete tmp_writer;
         return false;
     }
 
@@ -234,16 +246,22 @@ bool AuditLog::init(std::string *error) {
     if (m_status == RelevantOnlyAuditLogStatus) {
         if (m_relevant.empty()) {
             /*
-            error->assign("m_relevant cannot be null while status is set to " \
+             error->assign("m_relevant cannot be null while status is set to " \
                 "RelevantOnly");
-            return false;
-            */
+             return false;
+             */
             // FIXME: this should be a warning. There is not point to
             // have the logs on relevant only if nothing is relevant.
             //
             // Not returning an error to keep the compatibility with v2.
         }
     }
+
+    if (m_writer) {
+        delete m_writer;
+    }
+
+    m_writer = tmp_writer;
 
     return true;
 }
