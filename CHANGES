@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix RulesProperties::appendRules()
+   [Issue #1901 - @steven-j-wojcik]
  - Fix RULE lookup in chained rules
    [0x3077c - @zimmerle]
  - @ipMatch "Could not add entry" on slash/32 notation in 2.9.0
