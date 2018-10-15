@@ -218,6 +218,7 @@ TESTS+=test/test-cases/regression/variable-ARGS_GET.json
 TESTS+=test/test-cases/regression/config-update-target-by-msg.json
 TESTS+=test/test-cases/regression/variable-UNIQUE_ID.json
 TESTS+=test/test-cases/regression/issue-1528.json
+TESTS+=test/test-cases/regression/issue-849.json
 TESTS+=test/test-cases/regression/variable-REQBODY_PROCESSOR_ERROR.json
 TESTS+=test/test-cases/regression/operator-detectxss.json
 TESTS+=test/test-cases/regression/config-update-target-by-tag.json

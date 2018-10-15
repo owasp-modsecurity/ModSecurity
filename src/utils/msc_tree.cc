@@ -846,16 +846,14 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
                 ptr = NULL;
                 return NULL;
             }
-
-            if(ptr != NULL) {
+            if (ptr != NULL) {
                 free(ptr);
                 ptr = NULL;
             }
-
-            if(netmask_v4 == 0) {
+            if (netmask_v4 == 0) {
                 return NULL;
             }
-            else if (netmask_v4 != NETMASK_32 && pos < strlen(ip_strv4)) {
+            else if (pos < strlen(ip_strv4)) {
                 ip_strv4[pos] = '\0';
             }
 
@@ -864,11 +862,9 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
             if (ret <= 0) {
                 return NULL;
             }
-
             ip = addr4.s_addr;
 
             tree->count++;
-
             return CPTAddElement((unsigned char *)&ip, NETMASK_32, tree, netmask_v4);
 
         case IPV6_TREE:
@@ -1067,6 +1063,9 @@ unsigned char is_netmask_v4(char *ip_strv4) {
         }
 
         cidr = atoi(mask_str);
+        if (cidr == 32) {
+            return 32;
+        }
         if ((cidr < 0) || (cidr > 32)) {
             return 0;
         }

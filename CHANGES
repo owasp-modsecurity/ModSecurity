@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - @ipMatch "Could not add entry" on slash/32 notation in 2.9.0
+   [Issue #849 - @zimmerle, @dune73]
  - Using values after transformation at MATCHED_VARS
    [0x14316 - @zimmerle]
  - Adds support to UpdateActionById.
