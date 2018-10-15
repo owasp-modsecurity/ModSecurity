@@ -140,7 +140,8 @@ class Rule {
     int m_phase;
     modsecurity::Variables::Variables *m_variables;
     operators::Operator *m_op;
-    Rule *m_chainedRule;
+    Rule *m_chainedRuleChild;
+    Rule *m_chainedRuleParent;
     std::string m_fileName;
     std::string m_marker;
     std::string m_rev;

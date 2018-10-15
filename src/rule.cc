@@ -57,7 +57,7 @@ Rule::Rule(std::string marker)
     m_actionsSetVar(),
     m_actionsTag(),
     m_chained(false),
-    m_chainedRule(NULL),
+    m_chainedRuleChild(NULL),
     m_fileName(""),
     m_lineNumber(0),
     m_marker(marker),
@@ -91,7 +91,8 @@ Rule::Rule(Operator *_op,
     m_actionsSetVar(),
     m_actionsTag(),
     m_chained(false),
-    m_chainedRule(NULL),
+    m_chainedRuleChild(NULL),
+    m_chainedRuleParent(NULL),
     m_fileName(fileName),
     m_lineNumber(lineNumber),
     m_marker(""),
@@ -146,8 +147,8 @@ Rule::~Rule() {
         delete m_variables;
     }
 
-    if (m_chainedRule != NULL) {
-        delete m_chainedRule;
+    if (m_chainedRuleChild != NULL) {
+        delete m_chainedRuleChild;
     }
 }
 
@@ -793,7 +794,7 @@ bool Rule::evaluate(Transaction *trans,
         goto end_exec;
     }
 
-    if (this->m_chainedRule == NULL) {
+    if (this->m_chainedRuleChild == NULL) {
 #ifndef NO_LOGS
         trans->debug(4, "Rule is marked as chained but there " \
             "isn't a subsequent rule.");
@@ -804,7 +805,7 @@ bool Rule::evaluate(Transaction *trans,
 #ifndef NO_LOGS
     trans->debug(4, "Executing chained rule.");
 #endif
-    recursiveGlobalRet = this->m_chainedRule->evaluate(trans, ruleMessage);
+    recursiveGlobalRet = this->m_chainedRuleChild->evaluate(trans, ruleMessage);
 
     if (recursiveGlobalRet == true) {
         goto end_exec;

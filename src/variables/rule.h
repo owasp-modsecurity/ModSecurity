@@ -40,11 +40,17 @@ class Rule_DictElement : public VariableDictElement { \
     static void id(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) {
-        if (!rule) {
+        Rule *r = rule;
+
+        while (r && r->m_ruleId == 0) {
+            r = r->m_chainedRuleParent;
+        }
+
+        if (!r || r->m_ruleId == 0) {
             return;
         }
         std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-        std::string *a = new std::string(std::to_string(rule->m_ruleId));
+        std::string *a = new std::string(std::to_string(r->m_ruleId));
         VariableValue *var = new VariableValue(
             std::make_shared<std::string>("RULE:id"),
             a
@@ -60,11 +66,18 @@ class Rule_DictElement : public VariableDictElement { \
     static void rev(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) {
-        if (!rule) {
+        Rule *r = rule;
+
+        while (r && r->m_rev.empty()) {
+            r = r->m_chainedRuleParent;
+        }
+
+        if (!r) {
             return;
         }
+
         std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-        std::string *a = new std::string(rule->m_rev);
+        std::string *a = new std::string(r->m_rev);
         VariableValue *var = new VariableValue(
             std::make_shared<std::string>("RULE:rev"),
             a
@@ -80,9 +93,15 @@ class Rule_DictElement : public VariableDictElement { \
     static void severity(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) {
-        if (rule && rule->m_severity) {
+        Rule *r = rule;
+
+        while (r && !r->m_severity) {
+            r = r->m_chainedRuleParent;
+        }
+
+        if (r && r->m_severity) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(std::to_string(rule->m_severity->m_severity));
+            std::string *a = new std::string(std::to_string(r->m_severity->m_severity));
             VariableValue *var = new VariableValue(
                 std::make_shared<std::string>("RULE:severity"),
                 a
@@ -99,9 +118,15 @@ class Rule_DictElement : public VariableDictElement { \
     static void logData(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) {
-        if (rule && rule->m_logData) {
+        Rule *r = rule;
+
+        while (r && !r->m_logData) {
+            r = r->m_chainedRuleParent;
+        }
+
+        if (r && r->m_logData) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(rule->m_logData->data(t));
+            std::string *a = new std::string(r->m_logData->data(t));
             VariableValue *var = new VariableValue(
                 std::make_shared<std::string>("RULE:logdata"),
                 a
@@ -117,9 +142,15 @@ class Rule_DictElement : public VariableDictElement { \
     static void msg(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) {
-        if (rule && rule->m_msg) {
+        Rule *r = rule;
+
+        while (r && !r->m_msg) {
+            r = r->m_chainedRuleParent;
+        }
+
+        if (r && r->m_msg) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(rule->m_msg->data(t));
+            std::string *a = new std::string(r->m_msg->data(t));
             VariableValue *var = new VariableValue(
                 std::make_shared<std::string>("RULE:msg"),
                 a
