@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix memory leak in AuditLog::init()
+   [Issue #1897 - @weliu]
  - Fix RulesProperties::appendRules()
    [Issue #1901 - @steven-j-wojcik]
  - Fix RULE lookup in chained rules
