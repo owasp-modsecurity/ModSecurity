@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix crash in msc_rules_add_file() when using disruptive action in chain
+   [Issue #1849 - @victorhora, @zimmerle, @rperper]
  - Fix memory leak in AuditLog::init()
    [Issue #1897 - @weliu]
  - Fix RulesProperties::appendRules()

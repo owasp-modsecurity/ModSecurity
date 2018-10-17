@@ -80,13 +80,13 @@ int Driver::addSecRule(Rule *rule) {
     if (lastRule && lastRule->m_chained) {
         if (lastRule->m_chainedRuleChild == NULL) {
             rule->m_phase = lastRule->m_phase;
-            lastRule->m_chainedRuleChild = rule;
-            rule->m_chainedRuleParent = lastRule;
             if (rule->m_theDisruptiveAction) {
                 m_parserError << "Disruptive actions can only be specified by";
                 m_parserError << " chain starter rules.";
                 return false;
             }
+            lastRule->m_chainedRuleChild = rule;
+            rule->m_chainedRuleParent = lastRule;
             return true;
         } else {
             Rule *a = lastRule->m_chainedRuleChild;
