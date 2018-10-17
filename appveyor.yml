@@ -1,0 +1,82 @@
+version: 1.0.{build}
+
+services:
+    - iis                 # start IIS
+
+install:
+    - "python --version"
+    - ps: cd iis; .\getModSecurityPkgs.ps1 https://modsecurity.blob.core.windows.net/windows-artifacts
+
+
+before_build:
+    - ps: |
+        # copy the required pkgs from the ModSecurity blob and install them (c++ & ModSecurity)
+        Invoke-WebRequest -Uri https://modsecurity.blob.core.windows.net/windows-artifacts/vcredist_x64.exe -OutFile vcredist_x64.exe
+        Start-Process vcredist_x64.exe -Wait -ArgumentList '/install /passive /norestart'
+        #setup the python virtual env - not a must but still
+        pip install virtualenv
+        virtualenv --version
+        $python_proj_name = "test_crs3"
+        virtualenv $python_proj_name
+        & ".\$python_proj_name\Scripts\activate.ps1"
+
+build_script:
+    - cmd: ./build_release_amd64.bat
+
+before_test:
+    - ps: |
+        $modsec_repo = "C:\projects\ModSecurity"
+        $modsec_conf = "$modsec_repo\iis\wix\modsecurity.conf"
+        $modsec_iis_conf = "$modsec_repo\iis\wix\modsecurity_iis.conf"
+        & {iisreset /stop}  #need to stop iis before copy of files that are used by it
+        #copy the xml file to the schema
+        Copy-Item "$modsec_repo\iis\ModSecurity.xml" -Destination "$env:SystemRoot\System32\inetsrv\config\schema" -Force
+        #set modsecurity in applicationhost.cofig 
+        [System.Reflection.Assembly]::LoadFrom("$env:systemroot\system32\inetsrv\Microsoft.Web.Administration.dll")
+        $sm = new-object Microsoft.Web.Administration.ServerManager
+        $rootSG = $sm.GetApplicationHostConfiguration().RootSectionGroup
+        $rootSG.SectionGroups["system.webServer"].Sections.Add("ModSecurity")
+        $rootSG.SectionGroups["system.webServer"].Sections["ModSecurity"].OverrideModeDefault = "Deny"
+        $rootSG.SectionGroups["system.webServer"].Sections["ModSecurity"].AllowDefinition = "Everywhere"
+        $sm.CommitChanges()
+        & "$env:SystemRoot\System32\inetsrv\appcmd.exe" install module /name:"ModSecurity" /image:"$modsec_repo\iis\release\amd64\ModSecurityIIS.dll"
+        & "$env:SystemRoot\System32\inetsrv\appcmd.exe" set config /section:"system.webServer/ModSecurity" /"enabled:true" /"configFile:$modsec_iis_conf"
+        #setup the crs repo and the modsec config
+        $crs_path = "C:\projects\owasp-modsecurity-crs"
+        git clone -q https://github.com/SpiderLabs/owasp-modsecurity-crs.git $crs_path
+        cd "$modsec_repo\tests"
+        Rename-Item -Path "$crs_path\crs-setup.conf.example" -NewName "crs-setup.conf"
+        Copy-Item "$crs_path\util\regression-tests\requirements.txt" -Destination "$modsec_repo\tests" -Force
+        #setup the test env with depending python pkgs
+        pip install -r requirements.txt
+        #configure modsec to use crs 3 and set if for the python testing
+        $dbg_file = "$modsec_repo\modsec_debug.log"
+        Add-Content $modsec_conf "SecDebugLog $dbg_file`r`nSecDebugLogLevel 3"
+        Clear-Content $modsec_iis_conf
+        #configure modsecurity_iis.conf for crs 3 and for runnig the python tests
+        Add-Content $modsec_iis_conf "Include modsecurity.conf"
+        Add-Content $modsec_iis_conf "SecAction ""id:900005,\`r`n  phase:1,\`r`n  nolog,\`r`n  pass,\`r`n  ctl:ruleEngine=DetectionOnly,\`r`n  ctl:ruleRemoveById=910000,\"
+        Add-Content $modsec_iis_conf "  setvar:tx.paranoia_level=4,\`r`n  setvar:tx.crs_validate_utf8_encoding=1,\`r`n  setvar:tx.arg_name_length=100,\`r`n  setvar:tx.arg_length=400"""
+        Add-Content $modsec_iis_conf "include $crs_path\crs-setup.conf"
+        Add-Content $modsec_iis_conf "include $crs_path/rules/*.conf"
+        & {iisreset /start}; Start-Service W3SVC # finished all the modsec config, start iis
+
+test_script:
+    - ps: |
+        #usually the first test fail, due to i/o
+        py.test.exe -v CRS_Tests_modsec_dbg.py --rule="$crs_path\util\regression-tests\tests\test.yaml"
+        #running all the tests
+        py.test.exe -q CRS_Tests_modsec_dbg.py --ruledir_recurse="$crs_path\util\regression-tests\tests\" --result-log=res.txt --tb=no --junit-xml=res.xml
+        python Parse_test_res.py res.txt
+
+notifications:
+    - provider: GitHubPullRequest
+      on_build_success: true
+      on_build_failure: true
+      on_build_status_changed: true
+      
+    - provider: Email
+      to:
+        - wafcore@microsoft.com
+        #subject: 'Build {{status}}'                  # optional
+        #message: "{{message}}, {{commitId}}, ..."    # optional
