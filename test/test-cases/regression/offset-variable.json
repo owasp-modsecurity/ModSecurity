@@ -314,7 +314,7 @@
       ]
     },
     "expected":{
-      "error_log":"o0,6v17,6t:trimo0,6v149,6t:trim"
+      "error_log":"o0,6v17,6t:trim"
     },
     "rules":[
       "SecRequestBodyAccess On",

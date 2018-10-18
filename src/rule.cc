@@ -23,6 +23,7 @@
 #include <cstring>
 #include <list>
 #include <utility>
+#include <memory>
 
 #include "src/operators/operator.h"
 #include "modsecurity/actions/action.h"
@@ -396,6 +397,7 @@ std::list<std::pair<std::shared_ptr<std::string>,
         std::shared_ptr<std::string>(new std::string(in));
 
     if (m_containsMultiMatchAction == true) {
+        /* keep the original value */
         ret.push_back(std::make_pair(
             std::shared_ptr<std::string>(new std::string(*value)),
             std::shared_ptr<std::string>(new std::string(path))));
@@ -764,10 +766,24 @@ bool Rule::evaluate(Transaction *trans,
                     for (auto &i : v->m_orign) {
                         ruleMessage->m_reference.append(i->toText());
                     }
+
                     ruleMessage->m_reference.append(*valueTemp.second);
                     updateMatchedVars(trans, key, valueAfterTrans);
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
+
+                    bool isItToBeLogged = ruleMessage->m_saveMessage;
+                    if (m_containsMultiMatchAction && isItToBeLogged) {
+                        /* warn */
+                        trans->m_rulesMessages.push_back(*ruleMessage);
+                        /* error */
+                        trans->serverLog(ruleMessage);
+
+                        RuleMessage *rm = new RuleMessage(this, trans);
+                        rm->m_saveMessage = ruleMessage->m_saveMessage;
+                        ruleMessage.reset(rm);
+                    }
+
                     globalRet = true;
                 }
             }
@@ -816,9 +832,21 @@ end_clean:
 
 end_exec:
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
-    if (m_ruleId != 0 && ruleMessage->m_saveMessage != false) {
-        trans->serverLog(ruleMessage);
+
+    /* last rule in the chain. */
+    bool isItToBeLogged = ruleMessage->m_saveMessage;
+    if (isItToBeLogged && !m_containsMultiMatchAction
+        && !ruleMessage->m_message.empty()) {
+        /* warn */
         trans->m_rulesMessages.push_back(*ruleMessage);
+        /* error */
+        trans->serverLog(ruleMessage);
+    }
+    else if (m_containsStaticBlockAction && !m_containsMultiMatchAction) {
+        /* warn */
+        trans->m_rulesMessages.push_back(*ruleMessage);
+        /* error */
+        trans->serverLog(ruleMessage);
     }
 
     return true;

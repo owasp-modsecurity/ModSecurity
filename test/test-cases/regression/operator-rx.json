@@ -83,7 +83,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule REQUEST_HEADERS:Content-Length \"!^0$\" \"id:1,phase:2,pass,t:trim\""
+      "SecRule REQUEST_HEADERS:Content-Length \"!^0$\" \"id:1,phase:2,pass,t:trim,block\""
     ]
   }
 ]
