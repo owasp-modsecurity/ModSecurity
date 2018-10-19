@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * IIS: Remove body prebuffering due to no locking in modsecProcessRequest
+   [Issue #1917 - @allanbomsft, @victorhora]
  * Fix mpm-itk / mod_ruid2 compatibility
    [Issue #712 - @ju5t , @derhansen, @meatlayer, @victorhora]
  * Code cosmetics: checks if actionset is not null before use it
