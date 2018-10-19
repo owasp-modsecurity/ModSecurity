@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.0.5.
+// A Bison parser, made by GNU Bison 3.1.
 
 // Positions for Bison parsers in C++
 
@@ -52,7 +52,7 @@
 
 
 namespace yy {
-#line 56 "position.hh" // location.cc:292
+#line 56 "position.hh" // location.cc:290
   /// Abstract a position.
   class position
   {
@@ -104,12 +104,10 @@ namespace yy {
     unsigned column;
 
   private:
-    /// Compute max(min, lhs+rhs) (provided min <= lhs).
-    static unsigned add_ (unsigned lhs, int rhs, unsigned min)
+    /// Compute max(min, lhs+rhs).
+    static unsigned add_ (unsigned lhs, int rhs, int min)
     {
-      return (0 < rhs || -static_cast<unsigned>(rhs) < lhs
-              ? rhs + lhs
-              : min);
+      return static_cast<unsigned>(std::max(min, static_cast<int>(lhs) + rhs));
     }
   };
 
@@ -165,7 +163,7 @@ namespace yy {
    ** \param pos a reference to the position to redirect
    */
   template <typename YYChar>
-  inline std::basic_ostream<YYChar>&
+  std::basic_ostream<YYChar>&
   operator<< (std::basic_ostream<YYChar>& ostr, const position& pos)
   {
     if (pos.filename)
@@ -175,5 +173,5 @@ namespace yy {
 
 
 } // yy
-#line 179 "position.hh" // location.cc:292
+#line 177 "position.hh" // location.cc:290
 #endif // !YY_YY_POSITION_HH_INCLUDED

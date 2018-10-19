@@ -82,9 +82,10 @@ class ConfigSet {
 
 class ConfigUnicodeMap {
  public:
-    ConfigUnicodeMap() : m_set(false), m_unicode_map_table(NULL) { }
+    ConfigUnicodeMap() : m_set(false), m_unicode_map_table(NULL), m_unicode_codepage(0) { }
     bool m_set;
     int *m_unicode_map_table;
+    unsigned long int m_unicode_codepage;
 };
 
 class RulesProperties {
@@ -352,6 +353,8 @@ class RulesProperties {
         if (from->m_unicodeMapTable.m_set == true) {
             to->m_unicodeMapTable.m_unicode_map_table = \
                 from->m_unicodeMapTable.m_unicode_map_table;
+            to->m_unicodeMapTable.m_unicode_codepage = \
+                from->m_unicodeMapTable.m_unicode_codepage;
             to->m_unicodeMapTable.m_set = true;
         }
 

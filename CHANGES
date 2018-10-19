@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix the SecUnicodeMapFile and SecUnicodeCodePage
+   [xxxx - @zimmerle]
  - Changes the timing to save the rule message
    [0xca270 - @zimmerle]
  - Fix crash in msc_rules_add_file() when using disruptive action in chain

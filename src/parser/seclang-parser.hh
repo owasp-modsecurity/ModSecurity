@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.0.5.
+// A Bison parser, made by GNU Bison 3.1.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
@@ -40,7 +40,7 @@
 #ifndef YY_YY_SECLANG_PARSER_HH_INCLUDED
 # define YY_YY_SECLANG_PARSER_HH_INCLUDED
 // //                    "%code requires" blocks.
-#line 10 "seclang-parser.yy" // lalr1.cc:379
+#line 10 "seclang-parser.yy" // lalr1.cc:380
 
 #include <string>
 #include <iterator>
@@ -379,9 +379,10 @@ using modsecurity::operators::Operator;
     std::unique_ptr<Variable> c(b); \
     a = std::move(c);
 
+#define CODEPAGE_SEPARATORS  " \t\n\r"
 
 
-#line 385 "seclang-parser.hh" // lalr1.cc:379
+#line 386 "seclang-parser.hh" // lalr1.cc:380
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -432,7 +433,7 @@ using modsecurity::operators::Operator;
 # define YYUSE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
+#if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
 # define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
     _Pragma ("GCC diagnostic push") \
@@ -451,6 +452,13 @@ using modsecurity::operators::Operator;
 # define YY_INITIAL_VALUE(Value) /* Nothing. */
 #endif
 
+# ifndef YY_NULLPTR
+#  if defined __cplusplus && 201103L <= __cplusplus
+#   define YY_NULLPTR nullptr
+#  else
+#   define YY_NULLPTR 0
+#  endif
+# endif
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
@@ -458,7 +466,7 @@ using modsecurity::operators::Operator;
 
 
 namespace yy {
-#line 462 "seclang-parser.hh" // lalr1.cc:379
+#line 470 "seclang-parser.hh" // lalr1.cc:380
 
 
 
@@ -475,7 +483,8 @@ namespace yy {
 
     /// Empty construction.
     variant ()
-      : yytypeid_ (YY_NULLPTR)
+      : yybuffer_ ()
+      , yytypeid_ (YY_NULLPTR)
     {}
 
     /// Construct and fill.
@@ -501,7 +510,7 @@ namespace yy {
       YYASSERT (!yytypeid_);
       YYASSERT (sizeof (T) <= S);
       yytypeid_ = & typeid (T);
-      return *new (yyas_<T> ()) T;
+      return *new (yyas_<T> ()) T ();
     }
 
     /// Instantiate a \a T in here from \a t.
@@ -520,6 +529,7 @@ namespace yy {
     T&
     as ()
     {
+      YYASSERT (yytypeid_);
       YYASSERT (*yytypeid_ == typeid (T));
       YYASSERT (sizeof (T) <= S);
       return *yyas_<T> ();
@@ -530,6 +540,7 @@ namespace yy {
     const T&
     as () const
     {
+      YYASSERT (yytypeid_);
       YYASSERT (*yytypeid_ == typeid (T));
       YYASSERT (sizeof (T) <= S);
       return *yyas_<T> ();
@@ -763,6 +774,7 @@ namespace yy {
       // "CONFIG_DIR_SEC_DEFAULT_ACTION"
       // "CONFIG_DIR_SEC_MARKER"
       // "CONFIG_DIR_UNICODE_MAP_FILE"
+      // "CONFIG_DIR_UNICODE_CODE_PAGE"
       // "CONFIG_SEC_COLLECTION_TIMEOUT"
       // "CONFIG_SEC_HTTP_BLKEY"
       // "CONFIG_SEC_INTERCEPT_ON_ERROR"
@@ -1146,63 +1158,64 @@ namespace yy {
         TOK_CONFIG_DIR_SEC_DEFAULT_ACTION = 534,
         TOK_CONFIG_DIR_SEC_MARKER = 535,
         TOK_CONFIG_DIR_UNICODE_MAP_FILE = 536,
-        TOK_CONFIG_SEC_COLLECTION_TIMEOUT = 537,
-        TOK_CONFIG_SEC_HTTP_BLKEY = 538,
-        TOK_CONFIG_SEC_INTERCEPT_ON_ERROR = 539,
-        TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION = 540,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_ID = 541,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG = 542,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG = 543,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG = 544,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG = 545,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID = 546,
-        TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID = 547,
-        TOK_CONFIG_UPDLOAD_KEEP_FILES = 548,
-        TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES = 549,
-        TOK_CONFIG_UPLOAD_DIR = 550,
-        TOK_CONFIG_UPLOAD_FILE_LIMIT = 551,
-        TOK_CONFIG_UPLOAD_FILE_MODE = 552,
-        TOK_CONFIG_VALUE_ABORT = 553,
-        TOK_CONFIG_VALUE_DETC = 554,
-        TOK_CONFIG_VALUE_HTTPS = 555,
-        TOK_CONFIG_VALUE_OFF = 556,
-        TOK_CONFIG_VALUE_ON = 557,
-        TOK_CONFIG_VALUE_PARALLEL = 558,
-        TOK_CONFIG_VALUE_PROCESS_PARTIAL = 559,
-        TOK_CONFIG_VALUE_REJECT = 560,
-        TOK_CONFIG_VALUE_RELEVANT_ONLY = 561,
-        TOK_CONFIG_VALUE_SERIAL = 562,
-        TOK_CONFIG_VALUE_WARN = 563,
-        TOK_CONFIG_XML_EXTERNAL_ENTITY = 564,
-        TOK_CONGIG_DIR_RESPONSE_BODY_MP = 565,
-        TOK_CONGIG_DIR_SEC_ARG_SEP = 566,
-        TOK_CONGIG_DIR_SEC_COOKIE_FORMAT = 567,
-        TOK_CONFIG_SEC_COOKIEV0_SEPARATOR = 568,
-        TOK_CONGIG_DIR_SEC_DATA_DIR = 569,
-        TOK_CONGIG_DIR_SEC_STATUS_ENGINE = 570,
-        TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION = 571,
-        TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION = 572,
-        TOK_CONGIG_DIR_SEC_TMP_DIR = 573,
-        TOK_DIRECTIVE = 574,
-        TOK_DIRECTIVE_SECRULESCRIPT = 575,
-        TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION = 576,
-        TOK_QUOTATION_MARK = 577,
-        TOK_RUN_TIME_VAR_BLD = 578,
-        TOK_RUN_TIME_VAR_DUR = 579,
-        TOK_RUN_TIME_VAR_HSV = 580,
-        TOK_RUN_TIME_VAR_REMOTE_USER = 581,
-        TOK_RUN_TIME_VAR_TIME = 582,
-        TOK_RUN_TIME_VAR_TIME_DAY = 583,
-        TOK_RUN_TIME_VAR_TIME_EPOCH = 584,
-        TOK_RUN_TIME_VAR_TIME_HOUR = 585,
-        TOK_RUN_TIME_VAR_TIME_MIN = 586,
-        TOK_RUN_TIME_VAR_TIME_MON = 587,
-        TOK_RUN_TIME_VAR_TIME_SEC = 588,
-        TOK_RUN_TIME_VAR_TIME_WDAY = 589,
-        TOK_RUN_TIME_VAR_TIME_YEAR = 590,
-        TOK_VARIABLE = 591,
-        TOK_DICT_ELEMENT = 592,
-        TOK_DICT_ELEMENT_REGEXP = 593
+        TOK_CONFIG_DIR_UNICODE_CODE_PAGE = 537,
+        TOK_CONFIG_SEC_COLLECTION_TIMEOUT = 538,
+        TOK_CONFIG_SEC_HTTP_BLKEY = 539,
+        TOK_CONFIG_SEC_INTERCEPT_ON_ERROR = 540,
+        TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION = 541,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_ID = 542,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG = 543,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG = 544,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG = 545,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG = 546,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID = 547,
+        TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID = 548,
+        TOK_CONFIG_UPDLOAD_KEEP_FILES = 549,
+        TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES = 550,
+        TOK_CONFIG_UPLOAD_DIR = 551,
+        TOK_CONFIG_UPLOAD_FILE_LIMIT = 552,
+        TOK_CONFIG_UPLOAD_FILE_MODE = 553,
+        TOK_CONFIG_VALUE_ABORT = 554,
+        TOK_CONFIG_VALUE_DETC = 555,
+        TOK_CONFIG_VALUE_HTTPS = 556,
+        TOK_CONFIG_VALUE_OFF = 557,
+        TOK_CONFIG_VALUE_ON = 558,
+        TOK_CONFIG_VALUE_PARALLEL = 559,
+        TOK_CONFIG_VALUE_PROCESS_PARTIAL = 560,
+        TOK_CONFIG_VALUE_REJECT = 561,
+        TOK_CONFIG_VALUE_RELEVANT_ONLY = 562,
+        TOK_CONFIG_VALUE_SERIAL = 563,
+        TOK_CONFIG_VALUE_WARN = 564,
+        TOK_CONFIG_XML_EXTERNAL_ENTITY = 565,
+        TOK_CONGIG_DIR_RESPONSE_BODY_MP = 566,
+        TOK_CONGIG_DIR_SEC_ARG_SEP = 567,
+        TOK_CONGIG_DIR_SEC_COOKIE_FORMAT = 568,
+        TOK_CONFIG_SEC_COOKIEV0_SEPARATOR = 569,
+        TOK_CONGIG_DIR_SEC_DATA_DIR = 570,
+        TOK_CONGIG_DIR_SEC_STATUS_ENGINE = 571,
+        TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION = 572,
+        TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION = 573,
+        TOK_CONGIG_DIR_SEC_TMP_DIR = 574,
+        TOK_DIRECTIVE = 575,
+        TOK_DIRECTIVE_SECRULESCRIPT = 576,
+        TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION = 577,
+        TOK_QUOTATION_MARK = 578,
+        TOK_RUN_TIME_VAR_BLD = 579,
+        TOK_RUN_TIME_VAR_DUR = 580,
+        TOK_RUN_TIME_VAR_HSV = 581,
+        TOK_RUN_TIME_VAR_REMOTE_USER = 582,
+        TOK_RUN_TIME_VAR_TIME = 583,
+        TOK_RUN_TIME_VAR_TIME_DAY = 584,
+        TOK_RUN_TIME_VAR_TIME_EPOCH = 585,
+        TOK_RUN_TIME_VAR_TIME_HOUR = 586,
+        TOK_RUN_TIME_VAR_TIME_MIN = 587,
+        TOK_RUN_TIME_VAR_TIME_MON = 588,
+        TOK_RUN_TIME_VAR_TIME_SEC = 589,
+        TOK_RUN_TIME_VAR_TIME_WDAY = 590,
+        TOK_RUN_TIME_VAR_TIME_YEAR = 591,
+        TOK_VARIABLE = 592,
+        TOK_DICT_ELEMENT = 593,
+        TOK_DICT_ELEMENT_REGEXP = 594
       };
     };
 
@@ -1216,7 +1229,7 @@ namespace yy {
     enum { empty_symbol = -2 };
 
     /// Internal symbol number for tokens (subsumed by symbol_number_type).
-    typedef unsigned short int token_number_type;
+    typedef unsigned short token_number_type;
 
     /// A complete symbol.
     ///
@@ -1240,19 +1253,19 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::string& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator> v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator>& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString> v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString>& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::unique_ptr<Variable> v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<Variable>& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::unique_ptr<actions::Action> v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<actions::Action>& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<Variable> > > & v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > & v, const location_type& l);
 
 
       /// Constructor for symbols with semantic value.
@@ -2443,6 +2456,10 @@ namespace yy {
 
     static inline
     symbol_type
+    make_CONFIG_DIR_UNICODE_CODE_PAGE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
     make_CONFIG_SEC_COLLECTION_TIMEOUT (const std::string& v, const location_type& l);
 
     static inline
@@ -2727,7 +2744,7 @@ namespace yy {
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const short int yypact_ninf_;
+    static const short yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
@@ -2736,32 +2753,32 @@ namespace yy {
     // Tables.
   // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
   // STATE-NUM.
-  static const short int yypact_[];
+  static const short yypact_[];
 
   // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
   // Performed when YYTABLE does not specify something else to do.  Zero
   // means the default is an error.
-  static const unsigned short int yydefact_[];
+  static const unsigned short yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const short int yypgoto_[];
+  static const short yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
-  static const short int yydefgoto_[];
+  static const short yydefgoto_[];
 
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const unsigned short int yytable_[];
+  static const unsigned short yytable_[];
 
-  static const short int yycheck_[];
+  static const short yycheck_[];
 
   // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
   // symbol of state STATE-NUM.
-  static const unsigned short int yystos_[];
+  static const unsigned short yystos_[];
 
   // YYR1[YYN] -- Symbol number of symbol that rule YYN derives.
-  static const unsigned short int yyr1_[];
+  static const unsigned short yyr1_[];
 
   // YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.
   static const unsigned char yyr2_[];
@@ -2775,7 +2792,7 @@ namespace yy {
     static const char* const yytname_[];
 #if YYDEBUG
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-  static const unsigned short int yyrline_[];
+  static const unsigned short yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
     virtual void yy_reduce_print_ (int r);
     /// Print the state stack on the debug stream.
@@ -2840,7 +2857,7 @@ namespace yy {
       typedef basic_symbol<by_state> super_type;
       /// Construct an empty symbol.
       stack_symbol_type ();
-      /// Copy construct.
+      /// Copy construct (for efficiency).
       stack_symbol_type (const stack_symbol_type& that);
       /// Steal the contents from \a sym to build this.
       stack_symbol_type (state_type s, symbol_type& sym);
@@ -2876,12 +2893,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 3321,     ///< Last index in yytable_.
+      yylast_ = 3329,     ///< Last index in yytable_.
       yynnts_ = 16,  ///< Number of nonterminal symbols.
-      yyfinal_ = 336, ///< Termination state number.
+      yyfinal_ = 337, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 339  ///< Number of tokens.
+      yyntokens_ = 340  ///< Number of tokens.
     };
 
 
@@ -2957,9 +2974,9 @@ namespace yy {
      305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
      315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-     335,   336,   337,   338
+     335,   336,   337,   338,   339
     };
-    const unsigned user_token_number_max_ = 593;
+    const unsigned user_token_number_max_ = 594;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int> (t) <= yyeof_)
@@ -2980,6 +2997,7 @@ namespace yy {
   template <typename Base>
   seclang_parser::basic_symbol<Base>::basic_symbol ()
     : value ()
+    , location ()
   {}
 
   template <typename Base>
@@ -3128,92 +3146,93 @@ namespace yy {
       case 279: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
       case 280: // "CONFIG_DIR_SEC_MARKER"
       case 281: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 282: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 283: // "CONFIG_SEC_HTTP_BLKEY"
-      case 284: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 285: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 292: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 293: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 294: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 295: // "CONFIG_UPLOAD_DIR"
-      case 296: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 297: // "CONFIG_UPLOAD_FILE_MODE"
-      case 298: // "CONFIG_VALUE_ABORT"
-      case 299: // "CONFIG_VALUE_DETC"
-      case 300: // "CONFIG_VALUE_HTTPS"
-      case 301: // "CONFIG_VALUE_OFF"
-      case 302: // "CONFIG_VALUE_ON"
-      case 303: // "CONFIG_VALUE_PARALLEL"
-      case 304: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 305: // "CONFIG_VALUE_REJECT"
-      case 306: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 307: // "CONFIG_VALUE_SERIAL"
-      case 308: // "CONFIG_VALUE_WARN"
-      case 309: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 310: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 311: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 312: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 313: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 314: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 315: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 316: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 317: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 318: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 319: // "DIRECTIVE"
-      case 320: // "DIRECTIVE_SECRULESCRIPT"
-      case 321: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 322: // "QUOTATION_MARK"
-      case 323: // "RUN_TIME_VAR_BLD"
-      case 324: // "RUN_TIME_VAR_DUR"
-      case 325: // "RUN_TIME_VAR_HSV"
-      case 326: // "RUN_TIME_VAR_REMOTE_USER"
-      case 327: // "RUN_TIME_VAR_TIME"
-      case 328: // "RUN_TIME_VAR_TIME_DAY"
-      case 329: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 330: // "RUN_TIME_VAR_TIME_HOUR"
-      case 331: // "RUN_TIME_VAR_TIME_MIN"
-      case 332: // "RUN_TIME_VAR_TIME_MON"
-      case 333: // "RUN_TIME_VAR_TIME_SEC"
-      case 334: // "RUN_TIME_VAR_TIME_WDAY"
-      case 335: // "RUN_TIME_VAR_TIME_YEAR"
-      case 336: // "VARIABLE"
-      case 337: // "Dictionary element"
-      case 338: // "Dictionary element, selected by regexp"
+      case 282: // "CONFIG_DIR_UNICODE_CODE_PAGE"
+      case 283: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 284: // "CONFIG_SEC_HTTP_BLKEY"
+      case 285: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 286: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 289: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 292: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 293: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 294: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 295: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 296: // "CONFIG_UPLOAD_DIR"
+      case 297: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 298: // "CONFIG_UPLOAD_FILE_MODE"
+      case 299: // "CONFIG_VALUE_ABORT"
+      case 300: // "CONFIG_VALUE_DETC"
+      case 301: // "CONFIG_VALUE_HTTPS"
+      case 302: // "CONFIG_VALUE_OFF"
+      case 303: // "CONFIG_VALUE_ON"
+      case 304: // "CONFIG_VALUE_PARALLEL"
+      case 305: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 306: // "CONFIG_VALUE_REJECT"
+      case 307: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 308: // "CONFIG_VALUE_SERIAL"
+      case 309: // "CONFIG_VALUE_WARN"
+      case 310: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 311: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 312: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 313: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 314: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 315: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 316: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 317: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 318: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 319: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 320: // "DIRECTIVE"
+      case 321: // "DIRECTIVE_SECRULESCRIPT"
+      case 322: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 323: // "QUOTATION_MARK"
+      case 324: // "RUN_TIME_VAR_BLD"
+      case 325: // "RUN_TIME_VAR_DUR"
+      case 326: // "RUN_TIME_VAR_HSV"
+      case 327: // "RUN_TIME_VAR_REMOTE_USER"
+      case 328: // "RUN_TIME_VAR_TIME"
+      case 329: // "RUN_TIME_VAR_TIME_DAY"
+      case 330: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 331: // "RUN_TIME_VAR_TIME_HOUR"
+      case 332: // "RUN_TIME_VAR_TIME_MIN"
+      case 333: // "RUN_TIME_VAR_TIME_MON"
+      case 334: // "RUN_TIME_VAR_TIME_SEC"
+      case 335: // "RUN_TIME_VAR_TIME_WDAY"
+      case 336: // "RUN_TIME_VAR_TIME_YEAR"
+      case 337: // "VARIABLE"
+      case 338: // "Dictionary element"
+      case 339: // "Dictionary element, selected by regexp"
         value.copy< std::string > (other.value);
         break;
 
-      case 345: // op
-      case 346: // op_before_init
+      case 346: // op
+      case 347: // op_before_init
         value.copy< std::unique_ptr<Operator> > (other.value);
         break;
 
-      case 354: // run_time_string
+      case 355: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (other.value);
         break;
 
-      case 351: // var
+      case 352: // var
         value.copy< std::unique_ptr<Variable> > (other.value);
         break;
 
-      case 352: // act
-      case 353: // setvar_action
+      case 353: // act
+      case 354: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (other.value);
         break;
 
-      case 348: // variables
-      case 349: // variables_pre_process
-      case 350: // variables_may_be_quoted
+      case 349: // variables
+      case 350: // variables_pre_process
+      case 351: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (other.value);
         break;
 
-      case 343: // actions
-      case 344: // actions_may_quoted
+      case 344: // actions
+      case 345: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (other.value);
         break;
 
@@ -3370,92 +3389,93 @@ namespace yy {
       case 279: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
       case 280: // "CONFIG_DIR_SEC_MARKER"
       case 281: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 282: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 283: // "CONFIG_SEC_HTTP_BLKEY"
-      case 284: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 285: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 292: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 293: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 294: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 295: // "CONFIG_UPLOAD_DIR"
-      case 296: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 297: // "CONFIG_UPLOAD_FILE_MODE"
-      case 298: // "CONFIG_VALUE_ABORT"
-      case 299: // "CONFIG_VALUE_DETC"
-      case 300: // "CONFIG_VALUE_HTTPS"
-      case 301: // "CONFIG_VALUE_OFF"
-      case 302: // "CONFIG_VALUE_ON"
-      case 303: // "CONFIG_VALUE_PARALLEL"
-      case 304: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 305: // "CONFIG_VALUE_REJECT"
-      case 306: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 307: // "CONFIG_VALUE_SERIAL"
-      case 308: // "CONFIG_VALUE_WARN"
-      case 309: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 310: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 311: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 312: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 313: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 314: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 315: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 316: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 317: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 318: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 319: // "DIRECTIVE"
-      case 320: // "DIRECTIVE_SECRULESCRIPT"
-      case 321: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 322: // "QUOTATION_MARK"
-      case 323: // "RUN_TIME_VAR_BLD"
-      case 324: // "RUN_TIME_VAR_DUR"
-      case 325: // "RUN_TIME_VAR_HSV"
-      case 326: // "RUN_TIME_VAR_REMOTE_USER"
-      case 327: // "RUN_TIME_VAR_TIME"
-      case 328: // "RUN_TIME_VAR_TIME_DAY"
-      case 329: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 330: // "RUN_TIME_VAR_TIME_HOUR"
-      case 331: // "RUN_TIME_VAR_TIME_MIN"
-      case 332: // "RUN_TIME_VAR_TIME_MON"
-      case 333: // "RUN_TIME_VAR_TIME_SEC"
-      case 334: // "RUN_TIME_VAR_TIME_WDAY"
-      case 335: // "RUN_TIME_VAR_TIME_YEAR"
-      case 336: // "VARIABLE"
-      case 337: // "Dictionary element"
-      case 338: // "Dictionary element, selected by regexp"
+      case 282: // "CONFIG_DIR_UNICODE_CODE_PAGE"
+      case 283: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 284: // "CONFIG_SEC_HTTP_BLKEY"
+      case 285: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 286: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 289: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 292: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 293: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 294: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 295: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 296: // "CONFIG_UPLOAD_DIR"
+      case 297: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 298: // "CONFIG_UPLOAD_FILE_MODE"
+      case 299: // "CONFIG_VALUE_ABORT"
+      case 300: // "CONFIG_VALUE_DETC"
+      case 301: // "CONFIG_VALUE_HTTPS"
+      case 302: // "CONFIG_VALUE_OFF"
+      case 303: // "CONFIG_VALUE_ON"
+      case 304: // "CONFIG_VALUE_PARALLEL"
+      case 305: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 306: // "CONFIG_VALUE_REJECT"
+      case 307: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 308: // "CONFIG_VALUE_SERIAL"
+      case 309: // "CONFIG_VALUE_WARN"
+      case 310: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 311: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 312: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 313: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 314: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 315: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 316: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 317: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 318: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 319: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 320: // "DIRECTIVE"
+      case 321: // "DIRECTIVE_SECRULESCRIPT"
+      case 322: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 323: // "QUOTATION_MARK"
+      case 324: // "RUN_TIME_VAR_BLD"
+      case 325: // "RUN_TIME_VAR_DUR"
+      case 326: // "RUN_TIME_VAR_HSV"
+      case 327: // "RUN_TIME_VAR_REMOTE_USER"
+      case 328: // "RUN_TIME_VAR_TIME"
+      case 329: // "RUN_TIME_VAR_TIME_DAY"
+      case 330: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 331: // "RUN_TIME_VAR_TIME_HOUR"
+      case 332: // "RUN_TIME_VAR_TIME_MIN"
+      case 333: // "RUN_TIME_VAR_TIME_MON"
+      case 334: // "RUN_TIME_VAR_TIME_SEC"
+      case 335: // "RUN_TIME_VAR_TIME_WDAY"
+      case 336: // "RUN_TIME_VAR_TIME_YEAR"
+      case 337: // "VARIABLE"
+      case 338: // "Dictionary element"
+      case 339: // "Dictionary element, selected by regexp"
         value.copy< std::string > (v);
         break;
 
-      case 345: // op
-      case 346: // op_before_init
+      case 346: // op
+      case 347: // op_before_init
         value.copy< std::unique_ptr<Operator> > (v);
         break;
 
-      case 354: // run_time_string
+      case 355: // run_time_string
         value.copy< std::unique_ptr<RunTimeString> > (v);
         break;
 
-      case 351: // var
+      case 352: // var
         value.copy< std::unique_ptr<Variable> > (v);
         break;
 
-      case 352: // act
-      case 353: // setvar_action
+      case 353: // act
+      case 354: // setvar_action
         value.copy< std::unique_ptr<actions::Action> > (v);
         break;
 
-      case 348: // variables
-      case 349: // variables_pre_process
-      case 350: // variables_may_be_quoted
+      case 349: // variables
+      case 350: // variables_pre_process
+      case 351: // variables_may_be_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (v);
         break;
 
-      case 343: // actions
-      case 344: // actions_may_quoted
+      case 344: // actions
+      case 345: // actions_may_quoted
         value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (v);
         break;
 
@@ -3470,54 +3490,53 @@ namespace yy {
   template <typename Base>
   seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const location_type& l)
     : Base (t)
-    , value ()
     , location (l)
   {}
 
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l)
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator> v, const location_type& l)
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator>& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString> v, const location_type& l)
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString>& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<Variable> v, const location_type& l)
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<Variable>& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<actions::Action> v, const location_type& l)
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<actions::Action>& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  v, const location_type& l)
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<Variable> > > & v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  v, const location_type& l)
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > & v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -3685,92 +3704,93 @@ namespace yy {
       case 279: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
       case 280: // "CONFIG_DIR_SEC_MARKER"
       case 281: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 282: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 283: // "CONFIG_SEC_HTTP_BLKEY"
-      case 284: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 285: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 292: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 293: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 294: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 295: // "CONFIG_UPLOAD_DIR"
-      case 296: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 297: // "CONFIG_UPLOAD_FILE_MODE"
-      case 298: // "CONFIG_VALUE_ABORT"
-      case 299: // "CONFIG_VALUE_DETC"
-      case 300: // "CONFIG_VALUE_HTTPS"
-      case 301: // "CONFIG_VALUE_OFF"
-      case 302: // "CONFIG_VALUE_ON"
-      case 303: // "CONFIG_VALUE_PARALLEL"
-      case 304: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 305: // "CONFIG_VALUE_REJECT"
-      case 306: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 307: // "CONFIG_VALUE_SERIAL"
-      case 308: // "CONFIG_VALUE_WARN"
-      case 309: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 310: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 311: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 312: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 313: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 314: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 315: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 316: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 317: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 318: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 319: // "DIRECTIVE"
-      case 320: // "DIRECTIVE_SECRULESCRIPT"
-      case 321: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 322: // "QUOTATION_MARK"
-      case 323: // "RUN_TIME_VAR_BLD"
-      case 324: // "RUN_TIME_VAR_DUR"
-      case 325: // "RUN_TIME_VAR_HSV"
-      case 326: // "RUN_TIME_VAR_REMOTE_USER"
-      case 327: // "RUN_TIME_VAR_TIME"
-      case 328: // "RUN_TIME_VAR_TIME_DAY"
-      case 329: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 330: // "RUN_TIME_VAR_TIME_HOUR"
-      case 331: // "RUN_TIME_VAR_TIME_MIN"
-      case 332: // "RUN_TIME_VAR_TIME_MON"
-      case 333: // "RUN_TIME_VAR_TIME_SEC"
-      case 334: // "RUN_TIME_VAR_TIME_WDAY"
-      case 335: // "RUN_TIME_VAR_TIME_YEAR"
-      case 336: // "VARIABLE"
-      case 337: // "Dictionary element"
-      case 338: // "Dictionary element, selected by regexp"
+      case 282: // "CONFIG_DIR_UNICODE_CODE_PAGE"
+      case 283: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 284: // "CONFIG_SEC_HTTP_BLKEY"
+      case 285: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 286: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 289: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 292: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 293: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 294: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 295: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 296: // "CONFIG_UPLOAD_DIR"
+      case 297: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 298: // "CONFIG_UPLOAD_FILE_MODE"
+      case 299: // "CONFIG_VALUE_ABORT"
+      case 300: // "CONFIG_VALUE_DETC"
+      case 301: // "CONFIG_VALUE_HTTPS"
+      case 302: // "CONFIG_VALUE_OFF"
+      case 303: // "CONFIG_VALUE_ON"
+      case 304: // "CONFIG_VALUE_PARALLEL"
+      case 305: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 306: // "CONFIG_VALUE_REJECT"
+      case 307: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 308: // "CONFIG_VALUE_SERIAL"
+      case 309: // "CONFIG_VALUE_WARN"
+      case 310: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 311: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 312: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 313: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 314: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 315: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 316: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 317: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 318: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 319: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 320: // "DIRECTIVE"
+      case 321: // "DIRECTIVE_SECRULESCRIPT"
+      case 322: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 323: // "QUOTATION_MARK"
+      case 324: // "RUN_TIME_VAR_BLD"
+      case 325: // "RUN_TIME_VAR_DUR"
+      case 326: // "RUN_TIME_VAR_HSV"
+      case 327: // "RUN_TIME_VAR_REMOTE_USER"
+      case 328: // "RUN_TIME_VAR_TIME"
+      case 329: // "RUN_TIME_VAR_TIME_DAY"
+      case 330: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 331: // "RUN_TIME_VAR_TIME_HOUR"
+      case 332: // "RUN_TIME_VAR_TIME_MIN"
+      case 333: // "RUN_TIME_VAR_TIME_MON"
+      case 334: // "RUN_TIME_VAR_TIME_SEC"
+      case 335: // "RUN_TIME_VAR_TIME_WDAY"
+      case 336: // "RUN_TIME_VAR_TIME_YEAR"
+      case 337: // "VARIABLE"
+      case 338: // "Dictionary element"
+      case 339: // "Dictionary element, selected by regexp"
         value.template destroy< std::string > ();
         break;
 
-      case 345: // op
-      case 346: // op_before_init
+      case 346: // op
+      case 347: // op_before_init
         value.template destroy< std::unique_ptr<Operator> > ();
         break;
 
-      case 354: // run_time_string
+      case 355: // run_time_string
         value.template destroy< std::unique_ptr<RunTimeString> > ();
         break;
 
-      case 351: // var
+      case 352: // var
         value.template destroy< std::unique_ptr<Variable> > ();
         break;
 
-      case 352: // act
-      case 353: // setvar_action
+      case 353: // act
+      case 354: // setvar_action
         value.template destroy< std::unique_ptr<actions::Action> > ();
         break;
 
-      case 348: // variables
-      case 349: // variables_pre_process
-      case 350: // variables_may_be_quoted
+      case 349: // variables
+      case 350: // variables_pre_process
+      case 351: // variables_may_be_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
         break;
 
-      case 343: // actions
-      case 344: // actions_may_quoted
+      case 344: // actions
+      case 345: // actions_may_quoted
         value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ();
         break;
 
@@ -3933,92 +3953,93 @@ namespace yy {
       case 279: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
       case 280: // "CONFIG_DIR_SEC_MARKER"
       case 281: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 282: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 283: // "CONFIG_SEC_HTTP_BLKEY"
-      case 284: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 285: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 286: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 289: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 292: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 293: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 294: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 295: // "CONFIG_UPLOAD_DIR"
-      case 296: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 297: // "CONFIG_UPLOAD_FILE_MODE"
-      case 298: // "CONFIG_VALUE_ABORT"
-      case 299: // "CONFIG_VALUE_DETC"
-      case 300: // "CONFIG_VALUE_HTTPS"
-      case 301: // "CONFIG_VALUE_OFF"
-      case 302: // "CONFIG_VALUE_ON"
-      case 303: // "CONFIG_VALUE_PARALLEL"
-      case 304: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 305: // "CONFIG_VALUE_REJECT"
-      case 306: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 307: // "CONFIG_VALUE_SERIAL"
-      case 308: // "CONFIG_VALUE_WARN"
-      case 309: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 310: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 311: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 312: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 313: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 314: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 315: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 316: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 317: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 318: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 319: // "DIRECTIVE"
-      case 320: // "DIRECTIVE_SECRULESCRIPT"
-      case 321: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 322: // "QUOTATION_MARK"
-      case 323: // "RUN_TIME_VAR_BLD"
-      case 324: // "RUN_TIME_VAR_DUR"
-      case 325: // "RUN_TIME_VAR_HSV"
-      case 326: // "RUN_TIME_VAR_REMOTE_USER"
-      case 327: // "RUN_TIME_VAR_TIME"
-      case 328: // "RUN_TIME_VAR_TIME_DAY"
-      case 329: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 330: // "RUN_TIME_VAR_TIME_HOUR"
-      case 331: // "RUN_TIME_VAR_TIME_MIN"
-      case 332: // "RUN_TIME_VAR_TIME_MON"
-      case 333: // "RUN_TIME_VAR_TIME_SEC"
-      case 334: // "RUN_TIME_VAR_TIME_WDAY"
-      case 335: // "RUN_TIME_VAR_TIME_YEAR"
-      case 336: // "VARIABLE"
-      case 337: // "Dictionary element"
-      case 338: // "Dictionary element, selected by regexp"
+      case 282: // "CONFIG_DIR_UNICODE_CODE_PAGE"
+      case 283: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 284: // "CONFIG_SEC_HTTP_BLKEY"
+      case 285: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 286: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 287: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 289: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 290: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 292: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 293: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 294: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 295: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 296: // "CONFIG_UPLOAD_DIR"
+      case 297: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 298: // "CONFIG_UPLOAD_FILE_MODE"
+      case 299: // "CONFIG_VALUE_ABORT"
+      case 300: // "CONFIG_VALUE_DETC"
+      case 301: // "CONFIG_VALUE_HTTPS"
+      case 302: // "CONFIG_VALUE_OFF"
+      case 303: // "CONFIG_VALUE_ON"
+      case 304: // "CONFIG_VALUE_PARALLEL"
+      case 305: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 306: // "CONFIG_VALUE_REJECT"
+      case 307: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 308: // "CONFIG_VALUE_SERIAL"
+      case 309: // "CONFIG_VALUE_WARN"
+      case 310: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 311: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 312: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 313: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 314: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 315: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 316: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 317: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 318: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 319: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 320: // "DIRECTIVE"
+      case 321: // "DIRECTIVE_SECRULESCRIPT"
+      case 322: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 323: // "QUOTATION_MARK"
+      case 324: // "RUN_TIME_VAR_BLD"
+      case 325: // "RUN_TIME_VAR_DUR"
+      case 326: // "RUN_TIME_VAR_HSV"
+      case 327: // "RUN_TIME_VAR_REMOTE_USER"
+      case 328: // "RUN_TIME_VAR_TIME"
+      case 329: // "RUN_TIME_VAR_TIME_DAY"
+      case 330: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 331: // "RUN_TIME_VAR_TIME_HOUR"
+      case 332: // "RUN_TIME_VAR_TIME_MIN"
+      case 333: // "RUN_TIME_VAR_TIME_MON"
+      case 334: // "RUN_TIME_VAR_TIME_SEC"
+      case 335: // "RUN_TIME_VAR_TIME_WDAY"
+      case 336: // "RUN_TIME_VAR_TIME_YEAR"
+      case 337: // "VARIABLE"
+      case 338: // "Dictionary element"
+      case 339: // "Dictionary element, selected by regexp"
         value.move< std::string > (s.value);
         break;
 
-      case 345: // op
-      case 346: // op_before_init
+      case 346: // op
+      case 347: // op_before_init
         value.move< std::unique_ptr<Operator> > (s.value);
         break;
 
-      case 354: // run_time_string
+      case 355: // run_time_string
         value.move< std::unique_ptr<RunTimeString> > (s.value);
         break;
 
-      case 351: // var
+      case 352: // var
         value.move< std::unique_ptr<Variable> > (s.value);
         break;
 
-      case 352: // act
-      case 353: // setvar_action
+      case 353: // act
+      case 354: // setvar_action
         value.move< std::unique_ptr<actions::Action> > (s.value);
         break;
 
-      case 348: // variables
-      case 349: // variables_pre_process
-      case 350: // variables_may_be_quoted
+      case 349: // variables
+      case 350: // variables_pre_process
+      case 351: // variables_may_be_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (s.value);
         break;
 
-      case 343: // actions
-      case 344: // actions_may_quoted
+      case 344: // actions
+      case 345: // actions_may_quoted
         value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (s.value);
         break;
 
@@ -4074,7 +4095,7 @@ namespace yy {
     // YYTOKNUM[NUM] -- (External) token number corresponding to the
     // (internal) symbol number NUM (which must be that of a token).  */
     static
-    const unsigned short int
+    const unsigned short
     yytoken_number_[] =
     {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
@@ -4110,7 +4131,7 @@ namespace yy {
      555,   556,   557,   558,   559,   560,   561,   562,   563,   564,
      565,   566,   567,   568,   569,   570,   571,   572,   573,   574,
      575,   576,   577,   578,   579,   580,   581,   582,   583,   584,
-     585,   586,   587,   588,   589,   590,   591,   592,   593
+     585,   586,   587,   588,   589,   590,   591,   592,   593,   594
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -5796,6 +5817,12 @@ namespace yy {
   }
 
   seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_UNICODE_CODE_PAGE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_UNICODE_CODE_PAGE, v, l);
+  }
+
+  seclang_parser::symbol_type
   seclang_parser::make_CONFIG_SEC_COLLECTION_TIMEOUT (const std::string& v, const location_type& l)
   {
     return symbol_type (token::TOK_CONFIG_SEC_COLLECTION_TIMEOUT, v, l);
@@ -6140,7 +6167,7 @@ namespace yy {
 
 
 } // yy
-#line 6144 "seclang-parser.hh" // lalr1.cc:379
+#line 6171 "seclang-parser.hh" // lalr1.cc:380
 
 
 

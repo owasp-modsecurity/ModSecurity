@@ -345,6 +345,7 @@ using modsecurity::operators::Operator;
     std::unique_ptr<Variable> c(b); \
     a = std::move(c);
 
+#define CODEPAGE_SEPARATORS  " \t\n\r"
 
 }
 // The parsing context.
@@ -652,6 +653,7 @@ using modsecurity::operators::Operator;
   CONFIG_DIR_SEC_DEFAULT_ACTION                "CONFIG_DIR_SEC_DEFAULT_ACTION"
   CONFIG_DIR_SEC_MARKER                        "CONFIG_DIR_SEC_MARKER"
   CONFIG_DIR_UNICODE_MAP_FILE                  "CONFIG_DIR_UNICODE_MAP_FILE"
+  CONFIG_DIR_UNICODE_CODE_PAGE                 "CONFIG_DIR_UNICODE_CODE_PAGE"
   CONFIG_SEC_COLLECTION_TIMEOUT                "CONFIG_SEC_COLLECTION_TIMEOUT"
   CONFIG_SEC_HTTP_BLKEY                        "CONFIG_SEC_HTTP_BLKEY"
   CONFIG_SEC_INTERCEPT_ON_ERROR                "CONFIG_SEC_INTERCEPT_ON_ERROR"
@@ -1706,11 +1708,103 @@ expression:
         driver.error(@0, "SecStatusEngine is not yet supported.");
         YYERROR;
 */
+    | CONFIG_DIR_UNICODE_CODE_PAGE
+      {
+        long val;
+
+        val = atol($1.c_str());
+        if (val <= 0) {
+            std::stringstream ss;
+            ss << "Invalid setting for SecUnicodeCodePage: " << $1 << " ";
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+
+        driver.m_unicodeMapTable.m_unicode_codepage = val;
+
+      }
     | CONFIG_DIR_UNICODE_MAP_FILE
-/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
-        driver.error(@0, "SecUnicodeMapFile is not yet supported. utils::string::x2c");
-        YYERROR;
-*/
+      {
+        std::string err;
+        char *buf = NULL, *p = NULL, *savedptr = NULL;
+        int found = 0;
+        int code = 0;
+        unsigned int codepage = 0;
+        int Map = 0;
+        char *ucode = NULL, *hmap = NULL;
+        int processing = 0;
+
+        std::string file = modsecurity::utils::find_resource($1,
+            driver.ref.back(), &err);
+        if (file.empty()) {
+            std::stringstream ss;
+            ss << "Failed to load locate the unicode map file from: " << $1 << " ";
+            ss << err;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+
+        driver.m_unicodeMapTable.m_set = true;
+        driver.m_unicodeMapTable.m_unicode_map_table = static_cast<int *>(malloc(sizeof(int) * 65536));
+
+        // FIXME: that deservers to have its own file. Too much code to be here.
+
+        if (driver.m_unicodeMapTable.m_unicode_map_table  == NULL) {
+            std::stringstream ss;
+            ss << "Failed to allocate memory for the unicode map file - " << $1 << " ";
+            ss << err;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+
+        memset(driver.m_unicodeMapTable.m_unicode_map_table, -1, (sizeof(int)*65536));
+
+        /* Setting some unicode values - http://tools.ietf.org/html/rfc3490#section-3.1 */
+
+        /* Set 0x3002 -> 0x2e */
+        driver.m_unicodeMapTable.m_unicode_map_table[0x3002] = 0x2e;
+        /* Set 0xFF61 -> 0x2e */
+        driver.m_unicodeMapTable.m_unicode_map_table[0xff61] = 0x2e;
+        /* Set 0xFF0E -> 0x2e */
+        driver.m_unicodeMapTable.m_unicode_map_table[0xff0e] = 0x2e;
+        /* Set 0x002E -> 0x2e */
+        driver.m_unicodeMapTable.m_unicode_map_table[0x002e] = 0x2e;
+
+        p = strtok_r(buf, CODEPAGE_SEPARATORS, &savedptr);
+
+        while (p != NULL)   {
+            codepage = atol(p);
+
+            if (codepage == driver.m_unicodeMapTable.m_unicode_codepage)   {
+                found = 1;
+            }
+
+            if (found == 1 && (strchr(p,':') != NULL))   {
+                char *mapping = strdup(p);
+                processing = 1;
+
+                if (mapping != NULL) {
+                    ucode = strtok_r(mapping, ":", &hmap);
+                    sscanf(ucode, "%x", &code);
+                    sscanf(hmap, "%x", &Map);
+                    if (code >= 0 && code <= 65535)    {
+                        driver.m_unicodeMapTable.m_unicode_map_table[code] = Map;
+                    }
+
+                    free(mapping);
+                    mapping = NULL;
+                }
+            }
+
+            if (processing == 1 && (strchr(p,':') == NULL)) {
+                free(buf);
+                buf = NULL;
+                break;
+            }
+
+            p = strtok_r(NULL,CODEPAGE_SEPARATORS,&savedptr);
+        }
+      }
     | CONFIG_SEC_COLLECTION_TIMEOUT
       {
 /* Parser error disabled to avoid breaking default CRS installations with crs-setup.conf-recommended

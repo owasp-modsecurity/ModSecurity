@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.0.5.
+// A Bison parser, made by GNU Bison 3.1.
 
 // Locations for Bison parsers in C++
 
@@ -42,7 +42,7 @@
 
 
 namespace yy {
-#line 46 "location.hh" // location.cc:292
+#line 46 "location.hh" // location.cc:290
   /// Abstract a location.
   class location
   {
@@ -167,7 +167,7 @@ namespace yy {
    ** Avoid duplicate information.
    */
   template <typename YYChar>
-  inline std::basic_ostream<YYChar>&
+  std::basic_ostream<YYChar>&
   operator<< (std::basic_ostream<YYChar>& ostr, const location& loc)
   {
     unsigned end_col = 0 < loc.end.column ? loc.end.column - 1 : 0;
@@ -185,5 +185,5 @@ namespace yy {
 
 
 } // yy
-#line 189 "location.hh" // location.cc:292
+#line 189 "location.hh" // location.cc:290
 #endif // !YY_YY_LOCATION_HH_INCLUDED

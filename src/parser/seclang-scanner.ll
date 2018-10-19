@@ -372,6 +372,7 @@ CONFIG_DIR_SEC_DEFAULT_ACTION           (?i:SecDefaultAction)
 CONFIG_SEC_DISABLE_BACKEND_COMPRESS     (?i:SecDisableBackendCompression)
 CONFIG_DIR_SEC_MARKER                   (?i:SecMarker)
 CONFIG_DIR_UNICODE_MAP_FILE             (?i:SecUnicodeMapFile)
+CONFIG_DIR_UNICODE_CODE_PAGE            (?i:SecUnicodeCodePage)
 CONFIG_INCLUDE                          (?i:Include)
 CONFIG_SEC_COLLECTION_TIMEOUT           (?i:SecCollectionTimeout)
 CONFIG_SEC_HTTP_BLKEY                   (?i:SecHttpBlKey)
@@ -774,6 +775,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_DIR_SEC_MARKER}[ \t]+["]{NEW_LINE_FREE_TEXT}["]                 { return p::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_SEC_MARKER}[ \t]+{NEW_LINE_FREE_TEXT}                       { return p::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_UNICODE_MAP_FILE}[ ]{FREE_TEXT_NEW_LINE}                    { return p::make_CONFIG_DIR_UNICODE_MAP_FILE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_UNICODE_CODE_PAGE}[ ]{FREE_TEXT_NEW_LINE}               { return p::make_CONFIG_DIR_UNICODE_CODE_PAGE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_ID}[ ]+{FREE_TEXT_NEW_LINE}                 { return p::make_CONFIG_SEC_RULE_REMOVE_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_MSG}[ \t]+{FREE_TEXT_NEW_LINE}              { return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_MSG}[ \t]+["]{FREE_TEXT_NEW_LINE}["]        { return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
