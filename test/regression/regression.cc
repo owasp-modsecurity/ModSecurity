@@ -169,6 +169,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             continue;
         }
 
+        modsec_rules->load("SecDebugLogLevel 9");
         if (modsec_rules->load(t->rules.c_str(), filename) < 0) {
             /* Parser error */
             if (t->parser_error.empty() == true) {

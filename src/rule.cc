@@ -245,9 +245,7 @@ void Rule::cleanUpActions() {
 
 inline void Rule::updateMatchedVars(Transaction *trans, const std::string &key,
     const std::string &value) {
-#ifndef NO_LOGS
-    trans->debug(9, "Matched vars updated.");
-#endif
+    ms_dbg_a(trans, 9, "Matched vars updated.");
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
     trans->m_variableMatchedVarName.set(key, trans->m_variableOffset);
 
@@ -257,9 +255,7 @@ inline void Rule::updateMatchedVars(Transaction *trans, const std::string &key,
 
 
 inline void Rule::cleanMatchedVars(Transaction *trans) {
-#ifndef NO_LOGS
-    trans->debug(9, "Matched vars cleaned.");
-#endif
+    ms_dbg_a(trans, 9, "Matched vars cleaned.");
     trans->m_variableMatchedVar.unset();
     trans->m_variableMatchedVars.unset();
     trans->m_variableMatchedVarName.unset();
@@ -271,10 +267,9 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     bool *containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
 
     for (actions::SetVar *a : m_actionsSetVar) {
-#ifndef NO_LOGS
-        trans->debug(4, "Running [independent] (non-disruptive) " \
+        ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
             "action: " + a->m_name);
-#endif
+
         a->evaluate(this, trans);
     }
 
@@ -285,15 +280,11 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
         if (a->isDisruptive() == true && a->m_name == "block") {
-#ifndef NO_LOGS
-            trans->debug(9, "Rule contains a `block' action");
+            ms_dbg_a(trans, 9, "Rule contains a `block' action");
                 *containsBlock = true;
-#endif
         } else if (a->m_name == "setvar") {
-#ifndef NO_LOGS
-            trans->debug(4, "Running [independent] (non-disruptive) " \
+            ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
                 "action: " + a->m_name);
-#endif
             a->evaluate(this, trans, ruleMessage);
         }
     }
@@ -321,14 +312,9 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
 #endif
     bool ret;
 
-#ifndef NO_LOGS
-    if (trans && trans->m_rules && trans->m_rules->m_debugLog
-        && trans->m_rules->m_debugLog->getDebugLogLevel() >= 9) {
-        trans->debug(9, "Target value: \"" + utils::string::limitTo(80,
-            utils::string::toHexIfNeeded(value)) \
-            + "\" (Variable: " + key + ")");
-    }
-#endif
+    ms_dbg_a(trans, 9, "Target value: \"" + utils::string::limitTo(80,
+        utils::string::toHexIfNeeded(value)) \
+        + "\" (Variable: " + key + ")");
 
     ret = this->m_op->evaluateInternal(trans, this, value, ruleMessage);
     if (ret == false) {
@@ -339,10 +325,8 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
     end = clock();
     elapsed_s = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-#ifndef NO_LOGS
-    trans->debug(5, "Operator completed in " + \
+    ms_dbg_a(trans, 5, "Operator completed in " + \
         std::to_string(elapsed_s) + " seconds");
-#endif
 #endif
     return ret;
 }
@@ -375,12 +359,10 @@ inline void Rule::executeTransformation(actions::Action *a,
         path->append("," + a->m_name);
     }
 
-#ifndef NO_LOGS
-    trans->debug(9, " T (" + \
+    ms_dbg_a(trans, 9, " T (" + \
         std::to_string(*nth) + ") " + \
         a->m_name + ": \"" + \
         utils::string::limitTo(80, newValue) +"\"");
-#endif
 }
 
 
@@ -461,11 +443,9 @@ std::list<std::pair<std::shared_ptr<std::string>,
     }
 
     if (m_containsMultiMatchAction == true) {
-#ifndef NO_LOGS
-        trans->debug(9, "multiMatch is enabled. " \
+        ms_dbg_a(trans, 9, "multiMatch is enabled. " \
             + std::to_string(ret.size()) + \
             " values to be tested.");
-#endif
     }
 
     if (!m_containsMultiMatchAction) {
@@ -570,35 +550,27 @@ void Rule::executeAction(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
     Action *a, bool defaultContext) {
     if (a->isDisruptive() == false) {
-#ifndef NO_LOGS
-        trans->debug(9, "Running " \
+        ms_dbg_a(trans, 9, "Running " \
             "action: " + a->m_name);
-#endif
         a->evaluate(this, trans, ruleMessage);
         return;
     }
 
     if (defaultContext && !containsBlock) {
-#ifndef NO_LOGS
-        trans->debug(4, "Ignoring action: " + a->m_name + \
+        ms_dbg_a(trans, 4, "Ignoring action: " + a->m_name + \
             " (rule does not cotains block)");
-#endif
         return;
     }
 
     if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
-#ifndef NO_LOGS
-        trans->debug(4, "Running (disruptive)     action: " + a->m_name + \
+        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + a->m_name + \
             ".");
-#endif
         a->evaluate(this, trans, ruleMessage);
         return;
     }
 
-#ifndef NO_LOGS
-    trans->debug(4, "Not running disruptive action: " \
+    ms_dbg_a(trans, 4, "Not running disruptive action: " \
         + a->m_name + ". SecRuleEngine is not On.");
-#endif
 }
 
 
@@ -617,10 +589,8 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
     }
 
     for (actions::Tag *a : this->m_actionsTag) {
-#ifndef NO_LOGS
-        trans->debug(4, "Running (non-disruptive) action: " \
+        ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
             + a->m_name);
-#endif
         a->evaluate(this, trans, ruleMessage);
     }
 
@@ -671,10 +641,8 @@ bool Rule::evaluate(Transaction *trans,
     }
 
     if (m_unconditional == true) {
-#ifndef NO_LOGS
-        trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
+        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
             + ") Executing unconditional rule...");
-#endif
         executeActionsIndependentOfChainedRuleResult(trans,
             &containsBlock, ruleMessage);
         goto end_exec;
@@ -684,10 +652,8 @@ bool Rule::evaluate(Transaction *trans,
         if (m_ruleId != i) {
             continue;
         }
-#ifndef NO_LOGS
-        trans->debug(9, "Rule id: " + std::to_string(m_ruleId) +
+        ms_dbg_a(trans, 9, "Rule id: " + std::to_string(m_ruleId) +
             " was skipped due to a ruleRemoveById action...");
-#endif
         return true;
     }
 
@@ -700,21 +666,17 @@ bool Rule::evaluate(Transaction *trans,
         } else {
             eparam = "\"" + eparam + "\"";
         }
-#ifndef NO_LOGS
-    trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
+    ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
         + ") Executing operator \"" + this->m_op->m_op \
         + "\" with param " \
         + eparam \
         + " against " \
         + variables + ".");
-#endif
     } else {
-#ifndef NO_LOGS
-    trans->debug(4, "(Rule: " + std::to_string(m_ruleId) \
-        + ") Executing operator \"" + this->m_op->m_op \
-        + " against " \
-        + variables + ".");
-#endif
+        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
+            + ") Executing operator \"" + this->m_op->m_op \
+            + " against " \
+            + variables + ".");
     }
 
     getFinalVars(&vars, &exclusion, trans);
@@ -795,32 +757,23 @@ bool Rule::evaluate(Transaction *trans,
     }
 
     if (globalRet == false) {
-#ifndef NO_LOGS
-        trans->debug(4, "Rule returned 0.");
-#endif
+        ms_dbg_a(trans, 4, "Rule returned 0.");
         cleanMatchedVars(trans);
         goto end_clean;
     }
-
-#ifndef NO_LOGS
-    trans->debug(4, "Rule returned 1.");
-#endif
+    ms_dbg_a(trans, 4, "Rule returned 1.");
 
     if (this->m_chained == false) {
         goto end_exec;
     }
 
     if (this->m_chainedRuleChild == NULL) {
-#ifndef NO_LOGS
-        trans->debug(4, "Rule is marked as chained but there " \
+        ms_dbg_a(trans, 4, "Rule is marked as chained but there " \
             "isn't a subsequent rule.");
-#endif
         goto end_clean;
     }
 
-#ifndef NO_LOGS
-    trans->debug(4, "Executing chained rule.");
-#endif
+    ms_dbg_a(trans, 4, "Executing chained rule.");
     recursiveGlobalRet = this->m_chainedRuleChild->evaluate(trans, ruleMessage);
 
     if (recursiveGlobalRet == true) {

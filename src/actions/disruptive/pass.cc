@@ -21,6 +21,7 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rules.h"
 #include "modsecurity/rule_message.h"
 
 namespace modsecurity {
@@ -33,9 +34,7 @@ bool Pass::evaluate(Rule *rule, Transaction *transaction,
     intervention::free(&transaction->m_it);
     intervention::reset(&transaction->m_it);
 
-#ifndef NO_LOGS
-    transaction->debug(8, "Running action pass");
-#endif
+    ms_dbg_a(transaction, 8, "Running action pass");
 
     return true;
 }

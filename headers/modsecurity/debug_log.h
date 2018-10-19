@@ -50,8 +50,8 @@ class DebugLog {
     const std::string& getDebugLogFile();
     virtual int getDebugLogLevel();
 
- private:
     int m_debugLevel;
+ private:
     std::string m_fileName;
 };
 

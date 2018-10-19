@@ -50,9 +50,7 @@ bool Msg::evaluate(Rule *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
     std::string msg = data(transaction);
     rm->m_message = msg;
-#ifndef NO_LOGS
-    transaction->debug(9, "Saving msg: " + msg);
-#endif
+    ms_dbg_a(transaction, 9, "Saving msg: " + msg);
 
     return true;
 }

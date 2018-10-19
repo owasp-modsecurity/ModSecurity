@@ -96,7 +96,7 @@ void AnchoredSetVariable::resolve(
         if (!ke.toOmit(x.first)) {
             l->insert(l->begin(), new VariableValue(x.second));
         } else {
-            m_transaction->debug(7, "Excluding key: " + x.first
+            ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
         }
     }
@@ -147,7 +147,7 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
         if (!ke.toOmit(x.first)) {
             l->insert(l->begin(), new VariableValue(x.second));
         } else {
-            m_transaction->debug(7, "Excluding key: " + x.first
+            ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
         }
     }

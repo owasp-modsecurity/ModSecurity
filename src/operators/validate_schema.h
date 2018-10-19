@@ -105,9 +105,7 @@ class ValidateSchema : public Operator {
         if (len > 0) {
             s = "XML Error: " + std::string(buf);
         }
-#ifndef NO_LOGS
-        t->debug(4, s);
-#endif
+        ms_dbg_a(t, 4, s);
     }
 
 
@@ -124,9 +122,7 @@ class ValidateSchema : public Operator {
         if (len > 0) {
             s = "XML Warning: " + std::string(buf);
         }
-#ifndef NO_LOGS
-        t->debug(4, s);
-#endif
+        ms_dbg_a(t, 4, s);
     }
 
     static void null_error(void *ctx, const char *msg, ...) {

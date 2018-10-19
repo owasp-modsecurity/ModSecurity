@@ -31,9 +31,7 @@ namespace actions {
 
 bool Block::evaluate(Rule *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
-#ifndef NO_LOGS
-    transaction->debug(8, "Marking request as disruptive.");
-#endif
+    ms_dbg_a(transaction, 8, "Marking request as disruptive.");
 
     for (Action *a : transaction->m_rules->m_defaultActions[rule->m_phase]) {
         if (a->isDisruptive() == false) {

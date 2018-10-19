@@ -33,6 +33,11 @@
 namespace modsecurity {
 namespace operators {
 
+bool GeoLookup::debug(Transaction *transaction, int x, std::string a) {
+    ms_dbg_a(transaction, x, a);
+    return true;
+}
+
 
 bool GeoLookup::evaluate(Transaction *trans, const std::string &exp) {
     using std::placeholders::_1;

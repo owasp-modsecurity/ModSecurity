@@ -136,10 +136,8 @@ bool VerifyCPF::evaluate(Transaction *t, Rule *rule,
                 if (rule && t && rule->m_containsCaptureAction) {
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", std::string(i.match));
-#ifndef NO_LOGS
-                    t->debug(7, "Added VerifyCPF match TX.0: " + \
+                    ms_dbg_a(t, 7, "Added VerifyCPF match TX.0: " + \
                         std::string(i.match));
-#endif
                 }
 
                 goto out;

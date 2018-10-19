@@ -158,18 +158,18 @@ int Rules::evaluate(int phase, Transaction *t) {
 
     std::vector<Rule *> rules = m_rules[phase];
 
-    t->debug(9, "This phase consists of " \
+    ms_dbg_a(t, 9, "This phase consists of " \
         + std::to_string(rules.size()) + " rule(s).");
 
     if (t->m_allowType == actions::disruptive::FromNowOnAllowType
         && phase != modsecurity::Phases::LoggingPhase) {
-        t->debug(9, "Skipping all rules evaluation on this phase as request " \
+        ms_dbg_a(t, 9, "Skipping all rules evaluation on this phase as request " \
             "through the utilization of an `allow' action.");
         return true;
     }
     if (t->m_allowType == actions::disruptive::RequestAllowType
         && phase <= modsecurity::Phases::RequestBodyPhase) {
-        t->debug(9, "Skipping all rules evaluation on this phase as request " \
+        ms_dbg_a(t, 9, "Skipping all rules evaluation on this phase as request " \
             "through the utilization of an `allow' action.");
         return true;
     }
@@ -180,17 +180,16 @@ int Rules::evaluate(int phase, Transaction *t) {
     for (int i = 0; i < rules.size(); i++) {
         Rule *rule = rules[i];
         if (t->m_marker.empty() == false) {
-#ifndef NO_LOGS
-            t->debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
+            ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' due to a SecMarker: " + t->m_marker);
-            m_secmarker_skipped++;
-            t->debug(9, "Rule: " + rule->m_marker);
-#endif
-            if (rule->m_secMarker && rule->m_marker == t->m_marker) {
 #ifndef NO_LOGS
-                t->debug(4, "Out of a SecMarker after skip " \
-                    + std::to_string(m_secmarker_skipped) + " rules.");
+            m_secmarker_skipped++;
 #endif
+            ms_dbg_a(t, 9, "Rule: " + rule->m_marker);
+
+            if (rule->m_secMarker && rule->m_marker == t->m_marker) {
+                ms_dbg_a(t, 4, "Out of a SecMarker after skip " \
+                    + std::to_string(m_secmarker_skipped) + " rules.");
                 t->m_marker.clear();
 #ifndef NO_LOGS
                 m_secmarker_skipped = 0;
@@ -198,22 +197,22 @@ int Rules::evaluate(int phase, Transaction *t) {
             }
         } else if (t->m_skip_next > 0) {
             t->m_skip_next--;
-            t->debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
+            ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' due to a `skip' action. Still " + \
                 std::to_string(t->m_skip_next) + " to be skipped.");
         } else if (t->m_allowType
             != actions::disruptive::NoneAllowType) {
-            t->debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
+            ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' as request trough the utilization of an `allow' action.");
         } else if (m_exceptions.contains(rule->m_ruleId)) {
-            t->debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
+            ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "'. Removed by an SecRuleRemove directive.");
         } else {
             bool remove_rule = false;
             if (m_exceptions.m_remove_rule_by_msg.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_msg) {
                     if (rule->containsMsg(z, t) == true) {
-                        t->debug(9, "Skipped rule id '" \
+                        ms_dbg_a(t, 9, "Skipped rule id '" \
                             + std::to_string(rule->m_ruleId) \
                             + "'. Removed by a SecRuleRemoveByMsg directive.");
                         remove_rule = true;
@@ -228,7 +227,7 @@ int Rules::evaluate(int phase, Transaction *t) {
             if (m_exceptions.m_remove_rule_by_tag.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_tag) {
                     if (rule->containsTag(z, t) == true) {
-                        t->debug(9, "Skipped rule id '" \
+                        ms_dbg_a(t, 9, "Skipped rule id '" \
                             + std::to_string(rule->m_ruleId) \
                             + "'. Removed by a SecRuleRemoveByTag directive.");
                         remove_rule = true;
@@ -242,7 +241,7 @@ int Rules::evaluate(int phase, Transaction *t) {
 
             for (auto &z : t->m_ruleRemoveByTag) {
                 if (rule->containsTag(z, t) == true) {
-                    t->debug(9, "Skipped rule id '" \
+                    ms_dbg_a(t, 9, "Skipped rule id '" \
                         + std::to_string(rule->m_ruleId) \
                         + "'. Skipped due to a ruleRemoveByTag action.");
                     remove_rule = true;
@@ -252,7 +251,7 @@ int Rules::evaluate(int phase, Transaction *t) {
 
             rule->evaluate(t, NULL);
             if (t->m_it.disruptive == true) {
-                t->debug(8, "Skipping this phase as this " \
+                ms_dbg_a(t, 8, "Skipping this phase as this " \
                     "request was already intercepted.");
                 break;
             }

@@ -34,10 +34,8 @@ bool SetENV::init(std::string *error) {
 bool SetENV::evaluate(Rule *rule, Transaction *t) {
     std::string colNameExpanded(m_string->evaluate(t));
 
-#ifndef NO_LOGS
-    t->debug(8, "Setting envoriment variable: "
+    ms_dbg_a(t, 8, "Setting envoriment variable: "
         + colNameExpanded + ".");
-#endif
 
     putenv((char *)colNameExpanded.c_str());
 

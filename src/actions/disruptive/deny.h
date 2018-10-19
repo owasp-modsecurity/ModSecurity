@@ -18,6 +18,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/rules.h"
 #include "modsecurity/rule_message.h"
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_DENY_H_

@@ -48,6 +48,30 @@ typedef struct Rules_t Rules;
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
 
+#ifndef NO_LOGS
+#define ms_dbg(b, c) \
+  do { \
+      if (m_rules && m_rules->m_debugLog && m_rules->m_debugLog->m_debugLevel >= b) { \
+          m_rules->debug(b, m_id, m_uri, c); \
+      } \
+  } while (0);
+#else
+#define ms_dbg(b, c) \
+  do { } while (0);
+#endif
+
+#ifndef NO_LOGS
+#define ms_dbg_a(t, b, c) \
+  do { \
+      if (t && t->m_rules && t->m_rules->m_debugLog && t->m_rules->m_debugLog->m_debugLevel >= b) { \
+          t->debug(b, c); \
+      } \
+  } while (0);
+#else
+#define ms_dbg_a(t, b, c) \
+    do { } while (0);
+#endif
+
 
 #define LOGFY_ADD(a, b) \
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \

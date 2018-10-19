@@ -33,11 +33,8 @@ bool SetUID::init(std::string *error) {
 
 bool SetUID::evaluate(Rule *rule, Transaction *t) {
     std::string colNameExpanded(m_string->evaluate(t));
-
-#ifndef NO_LOGS
-    t->debug(8, "User collection initiated with value: \'"
+    ms_dbg_a(t, 8, "User collection initiated with value: \'"
         + colNameExpanded + "\'.");
-#endif
 
     t->m_collections.m_user_collection_key = colNameExpanded;
     t->m_variableUserID.set(colNameExpanded, t->m_variableOffset);

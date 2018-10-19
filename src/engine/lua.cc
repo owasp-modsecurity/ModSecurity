@@ -161,9 +161,7 @@ int Lua::run(Transaction *t) {
 #endif
         }
         e.append(lua_tostring(L, -1));
-#ifndef NO_LOGS
-        t->debug(2, e);
-#endif
+        ms_dbg_a(t, 2, e);
         ret = false;
         goto err;
     }
@@ -177,9 +175,8 @@ int Lua::run(Transaction *t) {
             e.append(" - ");
             e.append(luaerr);
         }
-#ifndef NO_LOGS
-        t->debug(2, e);
-#endif
+        ms_dbg_a(t, 2, e);
+
         ret = false;
         goto err;
     }
@@ -195,9 +192,8 @@ int Lua::run(Transaction *t) {
             e.append(" - ");
             e.append(luaerr);
         }
-#ifndef NO_LOGS
-        t->debug(2, e);
-#endif
+        ms_dbg_a(t, 2, e);
+
         ret = false;
         goto err;
     }
@@ -206,9 +202,8 @@ int Lua::run(Transaction *t) {
     if (a != NULL) {
         luaRet.assign(a);
     }
-#ifndef NO_LOGS
-    t->debug(9, "Returning from lua script: " + luaRet);
-#endif
+
+    ms_dbg_a(t, 9, "Returning from lua script: " + luaRet);
 
     if (luaRet.size() == 0) {
         ret = false;
@@ -221,9 +216,8 @@ err:
 
     return ret;
 #else
-#ifndef NO_LOGS
-    t->debug(9, "Lua support was not enabled.");
-#endif
+    ms_dbg_a(t, 9, "Lua support was not enabled.");
+
     return false;
 #endif
 }
@@ -245,9 +239,7 @@ int Lua::log(lua_State *L) {
 
     /* Log message. */
     if (t != NULL) {
-#ifndef NO_LOGS
-        t->debug(level, text);
-#endif
+        ms_dbg_a(t, level, text);
     }
 
     return 0;
@@ -339,9 +331,8 @@ int Lua::setvar(lua_State *L) {
 
 
     if (nargs != 2) {
-#ifndef NO_LOGS
-        t->debug(8, "m.setvar: Failed m.setvar funtion must has 2 arguments");
-#endif
+        ms_dbg_a(t, 8,
+            "m.setvar: Failed m.setvar funtion must has 2 arguments");
         return -1;
     }
     var_value = luaL_checkstring(L, 2);
@@ -362,10 +353,9 @@ int Lua::setvar(lua_State *L) {
             std::string::npos);
 
     } else {
-#ifndef NO_LOGS
-        t->debug(8, "m.setvar: Must specify a collection using dot character" \
+        ms_dbg_a(t, 8,
+            "m.setvar: Must specify a collection using dot character" \
             " - ie m.setvar(tx.myvar,mydata)");
-#endif
         return -1;
     }
 
@@ -443,10 +433,9 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
             if (tfn) {
                 newVar = tfn->evaluate(newVar, t);
             } else {
-#ifndef NO_LOGS
-                t->debug(1, "SecRuleScript: Invalid transformation function: " \
+                ms_dbg_a(t, 1,
+                    "SecRuleScript: Invalid transformation function: " \
                     + std::string(name));
-#endif
             }
             delete tfn;
         }
@@ -467,19 +456,15 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
             newVar = tfn->evaluate(newVar, t);
             delete tfn;
         } else {
-#ifndef NO_LOGS
-            t->debug(1, "SecRuleScript: Invalid transformation function: " \
+            ms_dbg_a(t, 1, "SecRuleScript: Invalid transformation function: " \
                 + std::string(name));
-#endif
         }
         return newVar;
     }
-#ifndef NO_LOGS
-    t->debug(8, "SecRuleScript: Transformation parameter must be a " \
+    ms_dbg_a(t, 8, "SecRuleScript: Transformation parameter must be a " \
         "transformation name or array of transformation names, but found " \
         "" + std::string(lua_typename(L, idx)) + " (type " \
         + std::to_string(lua_type(L, idx)) + ")");
-#endif
     return newVar;
 }
 #endif

@@ -79,12 +79,6 @@ class JSON {
     static int yajl_start_array(void *ctx);
     static int yajl_end_array(void *ctx);
 
-#ifndef NO_LOGS
-    void debug(int a, std::string str) {
-        m_transaction->debug(a, str);
-    }
-#endif
-
     bool isPreviousArray() {
         JSONContainerArray *prev = NULL;
         if (m_containers.size() < 1) {

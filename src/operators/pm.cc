@@ -106,10 +106,8 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
     if (rule && rule->m_containsCaptureAction && transaction && rc) {
         transaction->m_collections.m_tx_collection->storeOrUpdateFirst("0",
             std::string(match));
-#ifndef NO_LOGS
-        transaction->debug(7, "Added pm match TX.0: " + \
+        ms_dbg_a(transaction, 7, "Added pm match TX.0: " + \
             std::string(match));
-#endif
     }
 
     return rc > 0;

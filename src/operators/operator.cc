@@ -68,13 +68,6 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Operator::debug(Transaction *transaction, int x, std::string a) {
-#ifndef NO_LOGS
-    transaction->debug(x, a);
-#endif
-    return true;
-}
-
 bool Operator::evaluateInternal(Transaction *transaction,
     Rule *rule, const std::string& a, std::shared_ptr<RuleMessage> rm) {
     bool res = evaluate(transaction, rule, a, rm);
@@ -138,13 +131,8 @@ std::string Operator::resolveMatchMessage(Transaction *t,
 
 
 bool Operator::evaluate(Transaction *transaction, const std::string& a) {
-#ifndef NO_LOGS
-    if (transaction) {
-        transaction->debug(2, "Operator: " + this->m_op + \
-            " is not implemented or malfunctioning.");
-    }
-#endif
-
+    ms_dbg_a(transaction, 2, "Operator: " + m_op + \
+        " is not implemented or malfunctioning.");
     return true;
 }
 

@@ -75,9 +75,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
     if (m_data.parsing_ctx == NULL) {
         /* First invocation. */
 
-#ifndef NO_LOGS
-        debug(4, "XML: Initialising parser.");
-#endif
+        ms_dbg_a(m_transaction, 4, "XML: Initialising parser.");
 
         /* NOTE When Sax interface is used libxml will not
          *      create the document object, but we need it.
@@ -96,9 +94,8 @@ bool XML::processChunk(const char *buf, unsigned int size,
             buf, size, "body.xml");
 
         if (m_data.parsing_ctx == NULL) {
-#ifndef NO_LOGS
-            debug(4, "XML: Failed to create parsing context.");
-#endif
+            ms_dbg_a(m_transaction, 4,
+                "XML: Failed to create parsing context.");
             error->assign("XML: Failed to create parsing context.");
             return false;
         }
@@ -109,9 +106,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
     xmlParseChunk(m_data.parsing_ctx, buf, size, 0);
     if (m_data.parsing_ctx->wellFormed != 1) {
         error->assign("XML: Failed to create parsing context.");
-#ifndef NO_LOGS
-        debug(4, "XML: Failed parsing document.");
-#endif
+        ms_dbg_a(m_transaction, 4, "XML: Failed parsing document.");
         return false;
     }
 
@@ -132,16 +127,12 @@ bool XML::complete(std::string *error) {
         /* Clean up everything else. */
         xmlFreeParserCtxt(m_data.parsing_ctx);
         m_data.parsing_ctx = NULL;
-#ifndef NO_LOGS
-        debug(4, "XML: Parsing complete (well_formed " \
+        ms_dbg_a(m_transaction, 4, "XML: Parsing complete (well_formed " \
             + std::to_string(m_data.well_formed) + ").");
-#endif
 
         if (m_data.well_formed != 1) {
             error->assign("XML: Failed parsing document.");
-#ifndef NO_LOGS
-            debug(4, "XML: Failed parsing document.");
-#endif
+            ms_dbg_a(m_transaction, 4, "XML: Failed parsing document.");
             return false;
         }
     }

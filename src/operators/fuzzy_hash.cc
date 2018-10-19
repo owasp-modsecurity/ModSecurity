@@ -103,19 +103,15 @@ bool FuzzyHash::evaluate(Transaction *t, const std::string &str) {
 
     if (fuzzy_hash_buf((const unsigned char*)str.c_str(),
         str.size(), result)) {
-#ifndef NO_LOGS
-        t->debug(4, "Problems generating fuzzy hash");
-#endif
+        ms_dbg_a(t, 4, "Problems generating fuzzy hash");
         return false;
     }
 
     while (chunk != NULL) {
         int i = fuzzy_compare(chunk->data, result);
         if (i >= m_threshold) {
-#ifndef NO_LOGS
-            t->debug(4, "Fuzzy hash: matched " \
+            ms_dbg_a(t, 4, "Fuzzy hash: matched " \
                 "with score: " + std::to_string(i) + ".");
-#endif
             return true;
         }
         chunk = chunk->next;

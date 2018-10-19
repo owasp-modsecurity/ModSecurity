@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modsecurity/rules_properties.h"
+#include "modsecurity/rules.h"
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {
@@ -50,9 +51,7 @@ bool RuleEngine::evaluate(Rule *rule, Transaction *transaction) {
     a << modsecurity::RulesProperties::ruleEngineStateString(m_ruleEngine);
     a << " as requested by a ctl:ruleEngine action";
 
-#ifndef NO_LOGS
-    transaction->debug(8, a.str());
-#endif
+    ms_dbg_a(transaction, 8, a.str());
 
     transaction->m_secRuleEngine = m_ruleEngine;
     return true;

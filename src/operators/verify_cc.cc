@@ -145,16 +145,12 @@ bool VerifyCC::evaluate(Transaction *t, Rule *rule,
                     if (rule && t && rule->m_containsCaptureAction) {
                         t->m_collections.m_tx_collection->storeOrUpdateFirst(
                             "0", std::string(match));
-#ifndef NO_LOGS
-                        t->debug(7, "Added VerifyCC match TX.0: " + \
+                        ms_dbg_a(t, 7, "Added VerifyCC match TX.0: " + \
                             std::string(match));
-#endif
                     }
-#ifndef NO_LOGS
-                    t->debug(9, "CC# match \"" + m_param +
+                    ms_dbg_a(t, 9, "CC# match \"" + m_param +
                         "\" at " + i + ". [offset " +
                         std::to_string(offset) + "]");
-#endif
                 }
                 return true;
             }

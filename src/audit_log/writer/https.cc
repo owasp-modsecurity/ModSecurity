@@ -27,8 +27,10 @@
 
 #include "modsecurity/audit_log.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/rules.h"
 #include "src/utils/md5.h"
 #include "src/utils/https_client.h"
+
 
 
 namespace modsecurity {
@@ -47,9 +49,7 @@ bool Https::init(std::string *error) {
 
 bool Https::write(Transaction *transaction, int parts, std::string *error) {
     Utils::HttpsClient m_http_client;
-#ifndef NO_LOGS
-    transaction->debug(7, "Sending logs to: " + m_audit->m_path1);
-#endif
+    ms_dbg_a(transaction, 7, "Sending logs to: " + m_audit->m_path1);
 
     std::string log = transaction->toJSON(parts);
     m_http_client.setRequestType("application/json");

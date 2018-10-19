@@ -142,9 +142,6 @@ class Operator {
     std::string m_param;
     std::unique_ptr<RunTimeString> m_string;
     bool m_couldContainsMacro;
-
- protected:
-    bool debug(Transaction *transaction, int x, std::string a);
 };
 
 }  // namespace operators

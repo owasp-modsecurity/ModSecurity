@@ -33,11 +33,8 @@ bool SetRSC::init(std::string *error) {
 
 bool SetRSC::evaluate(Rule *rule, Transaction *t) {
     std::string colNameExpanded(m_string->evaluate(t));
-
-#ifndef NO_LOGS
-    t->debug(8, "RESOURCE initiated with value: \'"
+    ms_dbg_a(t, 8, "RESOURCE initiated with value: \'"
         + colNameExpanded + "\'.");
-#endif
 
     t->m_collections.m_resource_collection_key = colNameExpanded;
     t->m_variableResource.set(colNameExpanded, t->m_variableOffset);

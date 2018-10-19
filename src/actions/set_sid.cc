@@ -33,11 +33,8 @@ bool SetSID::init(std::string *error) {
 
 bool SetSID::evaluate(Rule *rule, Transaction *t) {
     std::string colNameExpanded(m_string->evaluate(t));
-
-#ifndef NO_LOGS
-    t->debug(8, "Session ID initiated with value: \'"
+    ms_dbg_a(t, 8, "Session ID initiated with value: \'"
         + colNameExpanded + "\'.");
-#endif
 
     t->m_collections.m_session_collection_key = colNameExpanded;
     t->m_variableSessionID.set(colNameExpanded, t->m_variableOffset);

@@ -30,6 +30,9 @@ class GeoLookup : public Operator {
     GeoLookup()
         : Operator("GeoLookup") { }
     bool evaluate(Transaction *transaction, const std::string &exp) override;
+
+ protected:
+    bool debug(Transaction *transaction, int x, std::string a);
 };
 
 }  // namespace operators

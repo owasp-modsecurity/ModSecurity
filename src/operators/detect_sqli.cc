@@ -35,26 +35,20 @@ bool DetectSQLi::evaluate(Transaction *t, Rule *rule,
     if (issqli) {
         if (t) {
             t->m_matched.push_back(fingerprint);
-#ifndef NO_LOGS
-            t->debug(4, "detected SQLi using libinjection with " \
+            ms_dbg_a(t, 4, "detected SQLi using libinjection with " \
                 "fingerprint '" + std::string(fingerprint) + "' at: '" +
                 input + "'");
-#endif
             if (rule && t && rule->m_containsCaptureAction) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst(
                     "0", std::string(fingerprint));
-#ifndef NO_LOGS
-                t->debug(7, "Added DetectSQLi match TX.0: " + \
+                ms_dbg_a(t, 7, "Added DetectSQLi match TX.0: " + \
                     std::string(fingerprint));
-#endif
                 }
         }
     } else {
         if (t) {
-#ifndef NO_LOGS
-            t->debug(9, "detected SQLi: not able to find an " \
+            ms_dbg_a(t, 9, "detected SQLi: not able to find an " \
                 "inject on '" + input + "'");
-#endif
         }
     }
 

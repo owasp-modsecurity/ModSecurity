@@ -20,6 +20,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/rules.h"
 
 
 namespace modsecurity {
@@ -27,9 +28,7 @@ namespace actions {
 
 
 bool SkipAfter::evaluate(Rule *rule, Transaction *transaction) {
-#ifndef NO_LOGS
-    transaction->debug(5, "Setting skipAfter for: " + m_parser_payload);
-#endif
+    ms_dbg_a(transaction, 5, "Setting skipAfter for: " + m_parser_payload);
     transaction->m_marker = m_parser_payload;
     return true;
 }

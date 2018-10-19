@@ -33,22 +33,16 @@ bool DetectXSS::evaluate(Transaction *t, Rule *rule,
 
     if (t) {
         if (is_xss) {
-#ifndef NO_LOGS
-            t->debug(5, "detected XSS using libinjection.");
-#endif
+            ms_dbg_a(t, 5, "detected XSS using libinjection.");
             if (rule && t && rule->m_containsCaptureAction) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst(
                     "0", std::string(input));
-#ifndef NO_LOGS
-                t->debug(7, "Added DetectXSS match TX.0: " + \
+                ms_dbg_a(t, 7, "Added DetectXSS match TX.0: " + \
                     std::string(input));
-#endif
-            } 
+            }
         } else {
-#ifndef NO_LOGS
-            t->debug(9, "libinjection was not able to " \
-            "find any XSS in: " + input);
-#endif
+            ms_dbg_a(t, 9, "libinjection was not able to " \
+                "find any XSS in: " + input);
             }
     }
     return is_xss != 0;

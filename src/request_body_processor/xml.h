@@ -53,11 +53,6 @@ class XML {
     static xmlParserInputBufferPtr unloadExternalEntity(const char *URI,
         xmlCharEncoding enc);
 
-#ifndef NO_LOGS
-    void debug(int a, std::string str) {
-        m_transaction->debug(a, str);
-    }
-#endif
     xml_data m_data;
 
  private:

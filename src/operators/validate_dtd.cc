@@ -50,25 +50,19 @@ bool ValidateDTD::evaluate(Transaction *t, const std::string &str) {
     if (m_dtd == NULL) {
         std::string err = std::string("XML: Failed to load DTD: ") \
             + m_resource;
-#ifndef NO_LOGS
-        t->debug(4, err);
-#endif
+        ms_dbg_a(t, 4, err);
         return true;
     }
 
     if (t->m_xml->m_data.doc == NULL) {
-#ifndef NO_LOGS
-        t->debug(4, "XML document tree could not "\
+        ms_dbg_a(t, 4, "XML document tree could not "\
             "be found for DTD validation.");
-#endif
         return true;
     }
 
     if (t->m_xml->m_data.well_formed != 1) {
-#ifndef NO_LOGS
-        t->debug(4, "XML: DTD validation failed because " \
+        ms_dbg_a(t, 4, "XML: DTD validation failed because " \
             "content is not well formed.");
-#endif
         return true;
     }
 
@@ -84,9 +78,7 @@ bool ValidateDTD::evaluate(Transaction *t, const std::string &str) {
 
     cvp = xmlNewValidCtxt();
     if (cvp == NULL) {
-#ifndef NO_LOGS
-        t->debug(4, "XML: Failed to create a validation context.");
-#endif
+        ms_dbg_a(t, 4, "XML: Failed to create a validation context.");
         return true;
     }
 
@@ -96,17 +88,13 @@ bool ValidateDTD::evaluate(Transaction *t, const std::string &str) {
     cvp->userData = t;
 
     if (!xmlValidateDtd(cvp, t->m_xml->m_data.doc, m_dtd)) {
-#ifndef NO_LOGS
-        t->debug(4, "XML: DTD validation failed.");
-#endif
+        ms_dbg_a(t, 4, "XML: DTD validation failed.");
         xmlFreeValidCtxt(cvp);
         return true;
     }
 
-#ifndef NO_LOGS
-    t->debug(4, std::string("XML: Successfully validated " \
+    ms_dbg_a(t, 4, std::string("XML: Successfully validated " \
         "payload against DTD: ") + m_resource);
-#endif
 
     xmlFreeValidCtxt(cvp);
 

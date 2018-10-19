@@ -21,6 +21,7 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rules.h"
 #include "src/utils/system.h"
 #include "src/engine/lua.h"
 
@@ -49,9 +50,7 @@ bool Exec::init(std::string *error) {
 
 
 bool Exec::evaluate(Rule *rule, Transaction *t) {
-#ifndef NO_LOGS
-    t->debug(8, "Running script... " + m_script);
-#endif
+    ms_dbg_a(t, 8, "Running script... " + m_script);
     m_lua.run(t);
     return true;
 }

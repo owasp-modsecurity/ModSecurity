@@ -39,7 +39,7 @@ std::string Rbl::mapIpToAddress(std::string ipStr, Transaction *trans) {
     }
 
     if (sscanf(ipStr.c_str(), "%d.%d.%d.%d", &h0, &h1, &h2, &h3) != 4) {
-        debug(trans, 0, std::string("Failed to understand `" + ipStr +
+        ms_dbg_a(trans, 0, std::string("Failed to understand `" + ipStr +
             "' as a valid IP address, assuming domain format input"));
 
         addr = ipStr + "." + m_service;
@@ -47,7 +47,7 @@ std::string Rbl::mapIpToAddress(std::string ipStr, Transaction *trans) {
     }
 
     if (m_demandsPassword && key.empty()) {
-        debug(trans, 0, std::string("Missing RBL key, cannot continue " \
+        ms_dbg_a(trans, 0, std::string("Missing RBL key, cannot continue " \
             "with the operator execution, please set the key using: " \
             "SecHttpBlKey"));
         return addr;
@@ -76,12 +76,12 @@ void Rbl::futherInfo_httpbl(struct sockaddr_in *sin, std::string ipStr,
     respBl = inet_ntoa(sin->sin_addr);
 
     if (sscanf(respBl, "%d.%d.%d.%d", &first, &days, &score, &type) != 4) {
-        debug(trans, 4, "RBL lookup of " + ipStr + " failed: bad response");
+        ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " failed: bad response");
         return;
     }
 
     if (first != 127) {
-        debug(trans, 4, "RBL lookup of " + ipStr + " failed: bad response");
+        ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " failed: bad response");
         return;
     }
 
@@ -114,7 +114,7 @@ void Rbl::futherInfo_httpbl(struct sockaddr_in *sin, std::string ipStr,
             ptype = " ";
     }
 
-    debug(trans, 4, "RBL lookup of " + ipStr + " succeeded. %s: " \
+    ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded. %s: " \
         + std::to_string(days) + " " \
         "days since last activity, threat score " \
         + std::to_string(score) +  ". Case: " + ptype);
@@ -126,23 +126,23 @@ void Rbl::futherInfo_spamhaus(unsigned int high8bits, std::string ipStr,
     switch (high8bits) {
         case 2:
         case 3:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
                 "(Static UBE sources).");
             break;
         case 4:
         case 5:
         case 6:
         case 7:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
                 "(Illegal 3rd party exploits).");
             break;
         case 10:
         case 11:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
                 "(Delivering unauthenticated SMTP email).");
             break;
         default:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded ");
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded ");
             break;
     }
 }
@@ -152,24 +152,24 @@ void Rbl::futherInfo_uribl(unsigned int high8bits, std::string ipStr,
     Transaction *trans) {
     switch (high8bits) {
         case 2:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded (BLACK).");
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded (BLACK).");
         break;
         case 4:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded (GREY).");
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded (GREY).");
             break;
         case 8:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded (RED).");
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded (RED).");
             break;
         case 14:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
                 "(BLACK,GREY,RED).");
             break;
         case 255:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded " \
                 "(DNS IS BLOCKED).");
             break;
         default:
-            debug(trans, 4, "RBL lookup of " + ipStr + " succeeded (WHITE).");
+            ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded (WHITE).");
             break;
     }
 }
@@ -181,7 +181,7 @@ void Rbl::furtherInfo(struct sockaddr_in *sin, std::string ipStr,
 
     switch (m_provider) {
         case RblProvider::UnknownProvider:
-            debug(trans, 2, "RBL lookup of " + ipStr + " succeeded.");
+            ms_dbg_a(trans, 2, "RBL lookup of " + ipStr + " succeeded.");
             break;
         case RblProvider::httpbl:
             futherInfo_httpbl(sin, ipStr, trans);
@@ -213,7 +213,7 @@ bool Rbl::evaluate(Transaction *t, Rule *rule,
         if (info != NULL) {
             freeaddrinfo(info);
         }
-        debug(t, 5, "RBL lookup of " + ipStr + " failed.");
+        ms_dbg_a(t, 5, "RBL lookup of " + ipStr + " failed.");
         return false;
     }
 
@@ -225,10 +225,8 @@ bool Rbl::evaluate(Transaction *t, Rule *rule,
     if (rule && t && rule->m_containsCaptureAction) {
         t->m_collections.m_tx_collection->storeOrUpdateFirst(
         "0", std::string(ipStr));
-#ifndef NO_LOGS
-        t->debug(7, "Added RXL match TX.0: " + \
+        ms_dbg_a(t, 7, "Added RXL match TX.0: " + \
             std::string(ipStr));
-#endif
     }
 
     return true;

@@ -189,12 +189,6 @@ class Multipart {
     int m_flag_invalid_header_folding;
     int m_flag_file_limit_exceeded;
 
-#ifndef NO_LOGS
-    void debug(int a, std::string str) {
-        m_transaction->debug(a, str);
-    }
-#endif
-
  private:
     std::string m_header;
     Transaction *m_transaction;
