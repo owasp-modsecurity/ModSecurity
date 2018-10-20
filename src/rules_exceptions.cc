@@ -96,7 +96,8 @@ bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
         m_variable_update_target_by_tag.emplace(
             std::pair<std::shared_ptr<std::string>,
                 std::unique_ptr<Variables::Variable>>(
-                    std::make_shared<std::string>(tag), std::move(i)));
+                    std::make_shared<std::string>(tag),
+                    std::move(i)));
     }
 
     return true;
@@ -110,7 +111,8 @@ bool RulesExceptions::loadUpdateTargetById(double id,
     for (auto &i : *var) {
         m_variable_update_target_by_id.emplace(
             std::pair<double,
-                std::unique_ptr<Variables::Variable>>(id , std::move(i)));
+                std::unique_ptr<Variables::Variable>>(id,
+                std::move(i)));
     }
 
     return true;
@@ -220,36 +222,36 @@ bool RulesExceptions::merge(RulesExceptions *from) {
     for (auto &p : from->m_variable_update_target_by_tag) {
         m_variable_update_target_by_tag.emplace(
             std::pair<std::shared_ptr<std::string>,
-            std::unique_ptr<Variables::Variable>>(p.first,
-                std::move(p.second)));
+            std::shared_ptr<Variables::Variable>>(p.first,
+                p.second));
     }
 
     for (auto &p : from->m_variable_update_target_by_msg) {
         m_variable_update_target_by_msg.emplace(
             std::pair<std::shared_ptr<std::string>,
-            std::unique_ptr<Variables::Variable>>(p.first,
-                std::move(p.second)));
+            std::shared_ptr<Variables::Variable>>(p.first,
+                p.second));
     }
 
     for (auto &p : from->m_variable_update_target_by_id) {
         m_variable_update_target_by_id.emplace(
             std::pair<double,
-                std::unique_ptr<Variables::Variable>>(p.first,
-                    std::move(p.second)));
+                std::shared_ptr<Variables::Variable>>(p.first,
+                    p.second));
     }
 
     for (auto &p : from->m_action_pos_update_target_by_id) {
         m_action_pos_update_target_by_id.emplace(
             std::pair<double,
-                std::unique_ptr<actions::Action>>(p.first,
-                    std::move(p.second)));
+                std::shared_ptr<actions::Action>>(p.first,
+                    p.second));
     }
 
     for (auto &p : from->m_action_pre_update_target_by_id) {
         m_action_pre_update_target_by_id.emplace(
             std::pair<double,
-                std::unique_ptr<actions::Action>>(p.first,
-                    std::move(p.second)));
+                std::shared_ptr<actions::Action>>(p.first,
+                    p.second));
     }
 
     for (auto &p : from->m_remove_rule_by_msg) {
