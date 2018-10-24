@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - m_lineNumber in Rule not mapping with the correct line number in file
+   [Issue #1844 - @zimmerle, @victorhora, @xizeng]
  - Using shared_ptr instead of unique_ptr on rules exceptions
    [Issue #1697 - @zimmerle, @brianp9906, @victorhora, @LeSwiss, @defanator]
  - Changes debuglogs schema to avoid unecessary str allocation

@@ -8148,37 +8148,37 @@ case 504:
 /* rule 504 can match eol */
 YY_RULE_SETUP
 #line 1164 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 505:
 /* rule 505 can match eol */
 YY_RULE_SETUP
 #line 1165 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 506:
 /* rule 506 can match eol */
 YY_RULE_SETUP
 #line 1166 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 507:
 /* rule 507 can match eol */
 YY_RULE_SETUP
 #line 1167 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 508:
 /* rule 508 can match eol */
 YY_RULE_SETUP
 #line 1169 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 509:
 /* rule 509 can match eol */
 YY_RULE_SETUP
 #line 1170 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 510:
 YY_RULE_SETUP
@@ -8189,13 +8189,13 @@ case 511:
 /* rule 511 can match eol */
 YY_RULE_SETUP
 #line 1173 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 512:
 /* rule 512 can match eol */
 YY_RULE_SETUP
 #line 1174 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 
 

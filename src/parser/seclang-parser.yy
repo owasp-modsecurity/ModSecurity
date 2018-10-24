@@ -1113,8 +1113,9 @@ expression:
             /* variables */ v,
             /* actions */ a,
             /* file name */ driver.ref.back(),
-            /* line number */ @0.end.line
+            /* line number */ @1.end.line
             );
+
         if (driver.addSecRule(rule) == false) {
             delete rule;
             YYERROR;
@@ -1132,7 +1133,7 @@ expression:
             /* variables */ v,
             /* actions */ NULL,
             /* file name */ driver.ref.back(),
-            /* line number */ @0.end.line
+            /* line number */ @1.end.line
             );
         if (driver.addSecRule(rule) == false) {
             delete rule;
@@ -1150,7 +1151,7 @@ expression:
             /* variables */ NULL,
             /* actions */ a,
             /* file name */ driver.ref.back(),
-            /* line number */ @0.end.line
+            /* line number */ @1.end.line
             );
         driver.addSecAction(rule);
       }
@@ -1165,7 +1166,7 @@ expression:
             /* path to script */ $1,
             /* actions */ a,
             /* file name */ driver.ref.back(),
-            /* line number */ @0.end.line
+            /* line number */ @1.end.line
             );
 
         if (r->init(&err) == false) {

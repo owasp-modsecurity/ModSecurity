@@ -1160,17 +1160,17 @@ EQUALS_MINUS                            (?i:=\-)
 <TRANSACTION_FROM_OPERATOR_TO_ACTIONS,TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS>{
 [ \t]*\"[ \t]*                        { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 [ \t]*\"[ \t]*\"[ \t]*                { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
-[ \t]*\"[ \t]*\\\n[ \t]*\"[ \t]*      { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
-\\\n[ \t]*\"[ \t]*                    { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
-[ \t]*\"[ \t]*\\\r\n[ \t]*\"[ \t]*    { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
-[ \t]*\\\n[ \t]*\"[ \t]*                      { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+[ \t]*\"[ \t]*\\\n[ \t]*\"[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+\\\n[ \t]*\"[ \t]*                    { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+[ \t]*\"[ \t]*\\\r\n[ \t]*\"[ \t]*    { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+[ \t]*\\\n[ \t]*\"[ \t]*              { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 
-[ \t]*\\\n[ \t]*                      { BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
-[ \t]*\\\r\n[ \t]*                    { BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+[ \t]*\\\n[ \t]*                      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+[ \t]*\\\r\n[ \t]*                    { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 
 [ ]+                                  { BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
-[ \t]*\r\n[ \t]*                      { BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
-[ \t]*\n[ \t]*                        { BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+[ \t]*\r\n[ \t]*                      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+[ \t]*\n[ \t]*                        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 }
 
 
