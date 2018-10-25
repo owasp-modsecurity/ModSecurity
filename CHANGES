@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Organizes the server logs
+   [0xb7c36 and 0x5ac20 - @zimmerle]
  - m_lineNumber in Rule not mapping with the correct line number in file
    [Issue #1844 - @zimmerle, @victorhora, @xizeng]
  - Using shared_ptr instead of unique_ptr on rules exceptions
