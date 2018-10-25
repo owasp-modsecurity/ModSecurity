@@ -741,8 +741,11 @@ bool Rule::evaluate(Transaction *trans,
                     if (m_containsMultiMatchAction && isItToBeLogged) {
                         /* warn */
                         trans->m_rulesMessages.push_back(*ruleMessage);
+
                         /* error */
-                        trans->serverLog(ruleMessage);
+                        if (!ruleMessage->m_isDisruptive) {
+                            trans->serverLog(ruleMessage);
+                        }
 
                         RuleMessage *rm = new RuleMessage(this, trans);
                         rm->m_saveMessage = ruleMessage->m_saveMessage;
@@ -795,14 +798,19 @@ end_exec:
         && !ruleMessage->m_message.empty()) {
         /* warn */
         trans->m_rulesMessages.push_back(*ruleMessage);
+
         /* error */
-        trans->serverLog(ruleMessage);
+        if (!ruleMessage->m_isDisruptive) {
+            trans->serverLog(ruleMessage);
+	}
     }
     else if (m_containsStaticBlockAction && !m_containsMultiMatchAction) {
         /* warn */
         trans->m_rulesMessages.push_back(*ruleMessage);
         /* error */
-        trans->serverLog(ruleMessage);
+        if (!ruleMessage->m_isDisruptive) {
+            trans->serverLog(ruleMessage);
+        }
     }
 
     return true;
