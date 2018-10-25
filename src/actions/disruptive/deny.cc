@@ -38,10 +38,10 @@ bool Deny::evaluate(Rule *rule, Transaction *transaction,
 
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
+    rm->m_isDisruptive = true;
     transaction->m_it.log = strdup(
         rm->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
 
-    rm->m_isDisruptive = true;
     return true;
 }
 
