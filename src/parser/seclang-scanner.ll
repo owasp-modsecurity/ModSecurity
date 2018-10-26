@@ -658,7 +658,6 @@ EQUALS_MINUS                            (?i:=\-)
 
 <EXPECTING_ACTION_PREDICATE_VARIABLE>{
 [}] { BEGIN_PREVIOUS(); }
-[}][%] { BEGIN_PREVIOUS(); }
 }
 
 <ACTION_PREDICATE_ENDS_WITH_QUOTE>{
