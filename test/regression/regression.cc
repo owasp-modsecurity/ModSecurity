@@ -59,7 +59,7 @@ bool contains(const std::string &s, const std::string &pattern) {
 
 
 void actions(ModSecurityTestResults<RegressionTest> *r,
-    modsecurity::Transaction *a) {
+    modsecurity::Transaction *a, std::stringstream *serverLog) {
     modsecurity::ModSecurityIntervention it;
     memset(&it, '\0', sizeof(modsecurity::ModSecurityIntervention));
     it.status = 200;
@@ -76,6 +76,7 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
 	    it.url = NULL;
         }
         if (it.log != NULL) {
+            *serverLog << it.log;
             free(it.log);
             it.log = NULL;
         }
@@ -273,7 +274,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         modsec_transaction->processConnection(t->clientIp.c_str(),
             t->clientPort, t->serverIp.c_str(), t->serverPort);
 
-        actions(&r, modsec_transaction);
+        actions(&r, modsec_transaction, &serverLog);
 #if 0
         if (r.status != 200) {
              goto end;
@@ -283,7 +284,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         modsec_transaction->processURI(t->uri.c_str(), t->method.c_str(),
             t->httpVersion.c_str());
 
-        actions(&r, modsec_transaction);
+        actions(&r, modsec_transaction, &serverLog);
 #if 0
         if (r.status != 200) {
             goto end;
@@ -297,7 +298,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         }
 
         modsec_transaction->processRequestHeaders();
-        actions(&r, modsec_transaction);
+        actions(&r, modsec_transaction, &serverLog);
 #if 0
         if (r.status != 200) {
             goto end;
@@ -308,7 +309,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             (unsigned char *)t->request_body.c_str(),
             t->request_body.size());
         modsec_transaction->processRequestBody();
-        actions(&r, modsec_transaction);
+        actions(&r, modsec_transaction, &serverLog);
 #if 0
         if (r.status != 200) {
             goto end;
@@ -323,7 +324,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
 
         modsec_transaction->processResponseHeaders(r.status,
             t->response_protocol);
-        actions(&r, modsec_transaction);
+        actions(&r, modsec_transaction, &serverLog);
 #if 0
         if (r.status != 200) {
             goto end;
@@ -334,7 +335,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             (unsigned char *)t->response_body.c_str(),
             t->response_body.size());
         modsec_transaction->processResponseBody();
-        actions(&r, modsec_transaction);
+        actions(&r, modsec_transaction, &serverLog);
 #if 0
         if (r.status != 200) {
             goto end;
