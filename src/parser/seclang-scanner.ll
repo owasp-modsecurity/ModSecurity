@@ -774,7 +774,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_DIR_RULE_ENG}                                                   { return p::make_CONFIG_DIR_RULE_ENG(yytext, *driver.loc.back()); }
 {CONFIG_DIR_SEC_MARKER}[ \t]+["]{NEW_LINE_FREE_TEXT}["]                 { return p::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_SEC_MARKER}[ \t]+{NEW_LINE_FREE_TEXT}                       { return p::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{CONFIG_DIR_UNICODE_MAP_FILE}[ ]{FREE_TEXT_NEW_LINE}                    { return p::make_CONFIG_DIR_UNICODE_MAP_FILE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_UNICODE_MAP_FILE}[ ]+{FREE_TEXT_NEW_LINE}[ ]+{CONFIG_VALUE_NUMBER}                    { return p::make_CONFIG_DIR_UNICODE_MAP_FILE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_UNICODE_CODE_PAGE}[ ]{FREE_TEXT_NEW_LINE}               { return p::make_CONFIG_DIR_UNICODE_CODE_PAGE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_ID}[ ]+{FREE_TEXT_NEW_LINE}                 { return p::make_CONFIG_SEC_RULE_REMOVE_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_SEC_REMOVE_RULES_BY_MSG}[ \t]+{FREE_TEXT_NEW_LINE}              { return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
