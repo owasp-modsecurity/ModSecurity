@@ -51,6 +51,9 @@ apache2/waf_lock/.deps/
 apache2/waf_lock/.dirstamp
 apache2/waf_logging/.deps/
 apache2/waf_logging/.dirstamp
+apache2/waf_logging/waf_format.pb.h
+
+apache2/waf_logging/waf_format.pb.cc
 autom4te.cache/
 build/apxs-wrapper
 build/ar-lib
