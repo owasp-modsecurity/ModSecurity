@@ -15,6 +15,7 @@
 #include "modsecurity.h"
 #include <ctype.h>
 #include <sys/stat.h>
+#include <stdint.h>
 
 #include "msc_multipart.h"
 #include "msc_util.h"
@@ -94,7 +95,8 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
     if (*p != ';') return -2;
     p++;
 
-    int filenamePresent = 0;
+    uint8_t filename_present = FALSE;
+    uint8_t filename_ext_present = FALSE;
 
     /* parse the appended parts */
     while(*p != '\0') {
@@ -206,7 +208,17 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
             if (strcmp(name, "filename*") == 0)
             {
-                 // Make sure to turn of INVALID quoting since RFC 5987 expects quotes in the filename format.
+                // We allow only one instance of `filename*` attribute to be present in the Content-Disposition header.
+                if (filename_ext_present)
+                {
+                    msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename*: %s",
+                            log_escape_nq(msr->mp, decoded_filename));
+                    return -17;
+                }
+
+                filename_ext_present = TRUE;
+
+                // Make sure to turn of INVALID quoting since RFC 5987 expects quotes in the filename format.
                 msr->mpd->flag_invalid_quoting = 0;
 
                 decoded_filename = rfc5987_decode(msr->mp, value);
@@ -218,26 +230,16 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 }
                 msr->multipart_filename = decoded_filename;
 
-               
-                if (msr->mpd->mpp->filenameext != NULL) {
-                    msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename*: %s",
-                     log_escape_nq(msr->mp, decoded_filename));
-                     return -17;
-                }
-
-                msr->mpd->mpp->filenameext = apr_pstrdup(msr->mp, decoded_filename);
-
                 // The `filename*` RCF 5987 encoded filename always overrides the `filename` parameter in content-disposition header.
-                msr->mpd->mpp->filename = msr->mpd->mpp->filenameext;
+                msr->mpd->mpp->filename = apr_pstrdup(msr->mp, decoded_filename);
 
                 // Re-run the validation check on the filename. We shouldn't be seeing quotes in the UTF-8 formatted filename either.
                 validate_quotes(msr, msr->mpd->mpp->filename);
             }
             else
             {
-                // Process the `filename` attribute in the content-disposition header only if `filename*` does not exist.
-                filenamePresent++;
-                if (filenamePresent > 1)
+                // We allow only one instance of `filename` attribute to be present in the Content-Disposition header.
+                if (filename_present)
                 {
                     // Duplicate `filename` attributes are not allowed.
                     msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
@@ -245,7 +247,10 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     return -15;
                 }
 
-                if (msr->mpd->mpp->filenameext == NULL)
+                filename_present = TRUE;
+
+                // Process the `filename` attribute in the content-disposition header only if `filename*` does not exist.
+                if (!filename_ext_present)
                 {
                     // "name == 'filename'"
                     decoded_filename = value;

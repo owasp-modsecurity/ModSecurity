@@ -1200,20 +1200,35 @@ static const char *cmd_waf_instanceId(cmd_parms *cmd,
 
     return NULL;
 }
+#endif
 
-static const char *cmd_waf_lock_owner(cmd_parms *cmd,
+#ifndef _WIN32
+static const char *cmd_waf_lock_user(cmd_parms *cmd,
         void *_dcfg, const char *p1)
 {
 
     if (cmd->server->is_virtual) {
-        return "ModSecurity: SecWafLockOwner not allowed in VirtualHost";
+        return "ModSecurity: SecWafLockUser not allowed in VirtualHost";
     }
 
-    msc_waf_lock_owner = (char *)p1;
+    msc_waf_lock_user = (char *)p1;
 
     return NULL;
 }
-#endif
+
+static const char *cmd_waf_lock_group(cmd_parms *cmd,
+        void *_dcfg, const char *p1)
+{
+
+    if (cmd->server->is_virtual) {
+        return "ModSecurity: SecWafLockGroup not allowed in VirtualHost";
+    }
+
+    msc_waf_lock_group = (char *)p1;
+
+    return NULL;
+}
+#endif // _WIN32
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
@@ -4045,13 +4060,22 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "Set waf instanceId"
     ),
+#endif
+#ifndef _WIN32
     AP_INIT_TAKE1 (
-        "SecWafLockOwner",
-        cmd_waf_lock_owner,
+        "SecWafLockUser",
+        cmd_waf_lock_user,
         NULL,
         CMD_SCOPE_ANY,
-        "Set waf lock owner"
+        "Set waf lock user"
     ),
-#endif
+    AP_INIT_TAKE1 (
+        "SecWafLockGroup",
+        cmd_waf_lock_group,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Set waf lock group"
+    ),
+#endif // __WIN32
     { NULL }
 };

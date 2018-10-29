@@ -53,9 +53,6 @@ struct multipart_part {
     /* files only, filename as supplied by the browser */
     char                    *filename;
 
-    /* files only, filename as supplied by the browser in RFC 5987 format */
-    char                    *filenameext;
-
     char                    *last_header_name;
     apr_table_t             *headers;
 

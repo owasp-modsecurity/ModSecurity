@@ -171,7 +171,11 @@ extern DSOLOCAL int *unicode_map_table;
 #ifdef WAF_JSON_LOGGING_ENABLE
 extern DSOLOCAL char *msc_waf_resourceId;
 extern DSOLOCAL char *msc_waf_instanceId;
-extern DSOLOCAL char *msc_waf_lock_owner;
+#endif
+
+#ifndef _WIN32
+extern DSOLOCAL char *msc_waf_lock_user;
+extern DSOLOCAL char *msc_waf_lock_group;
 #endif
 
 #define AUDITLOG_LOCK_ID                1
@@ -735,6 +739,10 @@ msc_engine DSOLOCAL *modsecurity_create(apr_pool_t *mp, int processing_mode);
 int DSOLOCAL modsecurity_init(msc_engine *msce, apr_pool_t *mp);
 
 void DSOLOCAL modsecurity_child_init(msc_engine *msce);
+
+#ifndef _WIN32
+void DSOLOCAL modsecurity_set_lock_owner(const char* user, const char* group);
+#endif
 
 void DSOLOCAL modsecurity_shutdown(msc_engine *msce);
 
