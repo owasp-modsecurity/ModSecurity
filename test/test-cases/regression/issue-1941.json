@@ -40,5 +40,27 @@
       "SecRuleEngine On",
       "SecUnicodeMapFile does-not-exist-unicode.mapping eita"
     ]
-  }
+  },
+{
+   "enabled":1,
+   "version_min":209000,
+   "version_max":-1,
+   "title":"Test SecUnicodeMapFile: ... 4/n",
+   "url":"https:\/\/github.com\/SpiderLabs\/ModSecurity\/issues\/1941",
+   "request":{
+      "uri":"/?param=дор",
+      "headers":"",
+      "body":"",
+      "method":"GET",
+      "http_version":1.1
+   },
+   "expected":{
+      "debug_log": "Target value: \"dop\""
+   },
+   "rules":[
+      "SecRuleEngine On",
+      "SecUnicodeMapFile test-cases/data/unicode.mapping-reduced 1251",
+      "SecRule ARGS \"@contains dop\" \"phase:1,id:999,deny,log,auditlog,t:none,t:utf8toUnicode,t:urlDecodeUni,multiMatch\""
+   ]
+ }
 ]
