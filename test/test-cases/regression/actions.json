@@ -123,7 +123,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "actions :: trim,status:500,redirect:http://www.google.com",
+    "title": "actions :: trim,status:306,redirect:http://www.google.com",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -171,12 +171,12 @@
       "audit_log": "",
       "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
       "error_log": "",
-      "http_code": 500,
+      "http_code": 306,
       "redirect_url": "http://www.google.com"
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@contains test\" \"id:1,t:trim,status:500,redirect:'http://www.google.com'\""
+      "SecRule ARGS \"@contains test\" \"id:1,t:trim,status:306,redirect:'http://www.google.com'\""
     ]
   },
        {

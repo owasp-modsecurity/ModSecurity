@@ -91,6 +91,7 @@ TESTS+=test/test-cases/regression/issue-1785.json
 TESTS+=test/test-cases/regression/issue-1812.json
 TESTS+=test/test-cases/regression/issue-1831.json
 TESTS+=test/test-cases/regression/issue-1844.json
+TESTS+=test/test-cases/regression/issue-1850.json
 TESTS+=test/test-cases/regression/issue-1725.json
 TESTS+=test/test-cases/regression/issue-1941.json
 TESTS+=test/test-cases/regression/variable-RESPONSE_HEADERS.json
