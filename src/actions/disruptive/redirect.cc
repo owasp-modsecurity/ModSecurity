@@ -38,7 +38,8 @@ bool Redirect::evaluate(Rule *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
     std::string m_urlExpanded(m_string->evaluate(transaction));
     /* if it was changed before, lets keep it. */
-    if (transaction->m_it.status == 200) {
+    if (transaction->m_it.status == 200
+        || (!(transaction->m_it.status <= 307 && transaction->m_it.status >= 301))) {
         transaction->m_it.status = m_status;
     }
 

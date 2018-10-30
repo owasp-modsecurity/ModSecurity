@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Override the default status code if not suitable to redirect action
+   [Issue #1850 - @zimmerle, @victorhora]
  - parser: Fix the support for CRLF configuration files
    [Issue #1945 - @zimmerle, @defanator, @kjakub]
  - Organizes the server logs
