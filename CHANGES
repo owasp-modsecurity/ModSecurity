@@ -14,7 +14,7 @@ v3.0.3 - YYYY-MMM-DD (to be released)
  - Changes debuglogs schema to avoid unecessary str allocation
    [0xb2840 - @zimmerle]
  - Fix the SecUnicodeMapFile and SecUnicodeCodePage
-   [0x3094d - @zimmerle]
+   [0x3094d - @zimmerle, @victorhora]
  - Changes the timing to save the rule message
    [0xca270 - @zimmerle]
  - Fix crash in msc_rules_add_file() when using disruptive action in chain

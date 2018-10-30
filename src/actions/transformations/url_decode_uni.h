@@ -16,15 +16,16 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "modsecurity/rules_properties.h"
 #include "src/actions/transformations/transformation.h"
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_URL_DECODE_UNI_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_URL_DECODE_UNI_H_
 
+
 #ifdef __cplusplus
 namespace modsecurity {
 class Transaction;
-
 namespace actions {
 namespace transformations {
 

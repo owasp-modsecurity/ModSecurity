@@ -96,6 +96,7 @@ class Driver;
 #include "src/actions/tag.h"
 #include "src/actions/transformations/none.h"
 #include "src/actions/transformations/transformation.h"
+#include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/ver.h"
 #include "src/actions/xmlns.h"
 
@@ -379,10 +380,8 @@ using modsecurity::operators::Operator;
     std::unique_ptr<Variable> c(b); \
     a = std::move(c);
 
-#define CODEPAGE_SEPARATORS  " \t\n\r"
 
-
-#line 386 "seclang-parser.hh" // lalr1.cc:380
+#line 385 "seclang-parser.hh" // lalr1.cc:380
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -466,7 +465,7 @@ using modsecurity::operators::Operator;
 
 
 namespace yy {
-#line 470 "seclang-parser.hh" // lalr1.cc:380
+#line 469 "seclang-parser.hh" // lalr1.cc:380
 
 
 
@@ -2893,9 +2892,9 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 3329,     ///< Last index in yytable_.
+      yylast_ = 3295,     ///< Last index in yytable_.
       yynnts_ = 16,  ///< Number of nonterminal symbols.
-      yyfinal_ = 337, ///< Termination state number.
+      yyfinal_ = 336, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
       yyntokens_ = 340  ///< Number of tokens.
@@ -6167,7 +6166,7 @@ namespace yy {
 
 
 } // yy
-#line 6171 "seclang-parser.hh" // lalr1.cc:380
+#line 6170 "seclang-parser.hh" // lalr1.cc:380
 
 
 

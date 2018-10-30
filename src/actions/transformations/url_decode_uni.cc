@@ -28,7 +28,10 @@
 #include "modsecurity/transaction.h"
 #include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
+#include "src/utils/system.h"
 #include "modsecurity/rules.h"
+#include "modsecurity/rules_properties.h"
+
 
 namespace modsecurity {
 namespace actions {
@@ -88,8 +91,8 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
 
                         if (t
                             && t->m_rules->m_unicodeMapTable.m_set == true
-                            && t->m_rules->m_unicodeMapTable.m_unicode_map_table != NULL
-                            && t->m_rules->unicode_codepage > 0)  {
+                            && t->m_rules->m_unicodeMapTable.m_unicodeMapTable != NULL
+                            && t->m_rules->m_unicodeMapTable.m_unicodeCodePage > 0)  {
                             for (j = 5; j >= 2; j--) {
                                 if (isxdigit((input[i+j]))) {
                                     if (input[i+j] >= 97) {
@@ -106,7 +109,7 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
 
                             if (Code >= 0 && Code <= 65535)  {
                                 Rules *r = t->m_rules;
-                                hmap = r->m_unicodeMapTable.m_unicode_map_table[Code];
+                                hmap = r->m_unicodeMapTable.m_unicodeMapTable[Code];
                             }
                         }
 

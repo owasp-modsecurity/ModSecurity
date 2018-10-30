@@ -21,6 +21,7 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <cstring>
 #endif
 
 
@@ -34,6 +35,7 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/audit_log.h"
 
+#define CODEPAGE_SEPARATORS  " \t\n\r"
 
 #ifdef __cplusplus
 
@@ -80,13 +82,33 @@ class ConfigSet {
 };
 
 
+class RulesProperties;
 class ConfigUnicodeMap {
  public:
-    ConfigUnicodeMap() : m_set(false), m_unicode_map_table(NULL), m_unicode_codepage(0) { }
+    ConfigUnicodeMap() : m_set(false),
+        m_unicodeCodePage(0),
+        m_unicodeMapTable(NULL) { }
+
+    static void loadConfig(std::string f, double codePage,
+        RulesProperties *driver, std::string *errg);
+
+    void merge(ConfigUnicodeMap *from) {
+        if (from->m_set == false) {
+            return;
+        }
+
+        m_set = true;
+        m_unicodeCodePage = from->m_unicodeCodePage;
+        m_unicodeMapTable = from->m_unicodeMapTable;
+
+        return;
+    }
+
     bool m_set;
-    int *m_unicode_map_table;
-    unsigned long int m_unicode_codepage;
+    double m_unicodeCodePage;
+    std::shared_ptr<int[]> m_unicodeMapTable;
 };
+
 
 class RulesProperties {
  public:
@@ -350,13 +372,7 @@ class RulesProperties {
             to->m_secWebAppId.m_set = true;
         }
 
-        if (from->m_unicodeMapTable.m_set == true) {
-            to->m_unicodeMapTable.m_unicode_map_table = \
-                from->m_unicodeMapTable.m_unicode_map_table;
-            to->m_unicodeMapTable.m_unicode_codepage = \
-                from->m_unicodeMapTable.m_unicode_codepage;
-            to->m_unicodeMapTable.m_set = true;
-        }
+        to->m_unicodeMapTable.merge(&from->m_unicodeMapTable);
 
         if (from->m_httpblKey.m_set == true) {
             to->m_httpblKey.m_value = from->m_httpblKey.m_value;
@@ -507,6 +523,7 @@ class RulesProperties {
     std::vector<modsecurity::Rule *> m_rules[8];
     ConfigUnicodeMap m_unicodeMapTable;
 };
+
 
 #endif
 

@@ -279,6 +279,7 @@ libmodsecurity_la_SOURCES = \
 	rule_script.cc \
 	unique_id.cc \
 	rules_exceptions.cc \
+	rules_properties.cc \
 	${BODY_PROCESSORS} \
 	${ACTIONS} \
 	${ENGINES} \
