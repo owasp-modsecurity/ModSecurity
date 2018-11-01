@@ -82,6 +82,22 @@ class ConfigSet {
 };
 
 
+class UnicodeMapHolder {
+ public:
+    UnicodeMapHolder() {
+        memset(m_data, -1, (sizeof(int)*65536));
+    };
+
+    int& operator[](int index) { return m_data[index]; }
+    int operator[](int index) const { return m_data[index]; }
+
+    int at(int index) const { return m_data[index]; }
+    void change(int i, int a) { m_data[i] = a; }
+
+    int m_data[65536];
+};
+
+
 class RulesProperties;
 class ConfigUnicodeMap {
  public:
@@ -106,7 +122,7 @@ class ConfigUnicodeMap {
 
     bool m_set;
     double m_unicodeCodePage;
-    std::shared_ptr<int[]> m_unicodeMapTable;
+    std::shared_ptr<modsecurity::UnicodeMapHolder> m_unicodeMapTable;
 };
 
 

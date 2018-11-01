@@ -40,20 +40,17 @@ void ConfigUnicodeMap::loadConfig(std::string f, double configCodePage,
     driver->m_unicodeMapTable.m_set = true;
     driver->m_unicodeMapTable.m_unicodeCodePage = configCodePage;
 
-    std::unique_ptr<int[]> a(new int[65536], std::default_delete<int[]>());
-    driver->m_unicodeMapTable.m_unicodeMapTable = std::move(a);
-    memset(driver->m_unicodeMapTable.m_unicodeMapTable.get(), -1,
-        (sizeof(int)*65536));
+    driver->m_unicodeMapTable.m_unicodeMapTable.reset(new modsecurity::UnicodeMapHolder());
 
     /* Setting some unicode values - http://tools.ietf.org/html/rfc3490#section-3.1 */
     /* Set 0x3002 -> 0x2e */
-    driver->m_unicodeMapTable.m_unicodeMapTable[0x3002] = 0x2e;
+    driver->m_unicodeMapTable.m_unicodeMapTable->change(0x3002, 0x2e);
     /* Set 0xFF61 -> 0x2e */
-    driver->m_unicodeMapTable.m_unicodeMapTable[0xff61] = 0x2e;
+    driver->m_unicodeMapTable.m_unicodeMapTable->change(0xff61, 0x2e);
     /* Set 0xFF0E -> 0x2e */
-    driver->m_unicodeMapTable.m_unicodeMapTable[0xff0e] = 0x2e;
+    driver->m_unicodeMapTable.m_unicodeMapTable->change(0xff0e, 0x2e);
     /* Set 0x002E -> 0x2e */
-    driver->m_unicodeMapTable.m_unicodeMapTable[0x002e] = 0x2e;
+    driver->m_unicodeMapTable.m_unicodeMapTable->change(0x002e, 0x2e);
 
 
     std::ifstream file_stream(f, std::ios::in | std::ios::binary);
@@ -106,7 +103,7 @@ void ConfigUnicodeMap::loadConfig(std::string f, double configCodePage,
                 sscanf(ucode, "%x", &code);
                 sscanf(hmap, "%x", &Map);
                 if (code >= 0 && code <= 65535)    {
-                    driver->m_unicodeMapTable.m_unicodeMapTable[code] = Map;
+                    driver->m_unicodeMapTable.m_unicodeMapTable->change(code, Map);
                 }
 
                 free(mapping);

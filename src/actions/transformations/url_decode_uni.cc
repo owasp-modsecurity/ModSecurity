@@ -109,7 +109,7 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
 
                             if (Code >= 0 && Code <= 65535)  {
                                 Rules *r = t->m_rules;
-                                hmap = r->m_unicodeMapTable.m_unicodeMapTable[Code];
+                                hmap = r->m_unicodeMapTable.m_unicodeMapTable->at(Code);
                             }
                         }
 
