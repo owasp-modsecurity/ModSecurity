@@ -114,10 +114,12 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # allowed.
 #
 
-SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
-"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
-#SecRule MULTIPART_UNMATCHED_BOUNDARY "@eq 1" \
-#"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
+#
+# See #1747 and #1924 for further information on the possible values for
+# MULTIPART_UNMATCHED_BOUNDARY.
+#
+SecRule MULTIPART_UNMATCHED_BOUNDARY "@eq 1" \
+    "id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 
 
 # PCRE Tuning
