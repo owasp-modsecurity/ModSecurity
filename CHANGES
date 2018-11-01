@@ -1,6 +1,8 @@
 v3.0.3 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix double macros bug
+   [Issue #1943 - @supplient, @zimmerle]
  - Override the default status code if not suitable to redirect action
    [Issue #1850 - @zimmerle, @victorhora]
  - parser: Fix the support for CRLF configuration files
