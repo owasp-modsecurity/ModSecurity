@@ -72,10 +72,10 @@ test "x$HAS_LIBINJECTION" = "x" && AC_MSG_ERROR([\
 
    ])
 # Libinjection version
-AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(PWD="others/libinjection" git describe))
+AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git describe && cd ../..))
 
 # SecLang test version
-AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(PWD="test/test-cases/secrules-language-tests" git log -1 --format="%h" --abbrev-commit))
+AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(cd "test/test-cases/secrules-language-tests" && git log -1 --format="%h" --abbrev-commit && cd ../../..))
 
 
 # Check for yajl
