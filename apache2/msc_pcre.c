@@ -37,6 +37,10 @@ static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
     return APR_SUCCESS;
 }
 
+#if defined(VERSION_NGINX)
+pthread_mutex_t msc_pregcomp_ex_mtx;
+#endif
+
 /**
  * Compiles the provided regular expression pattern. The _err*
  * parameters are optional, but if they are provided and an error
@@ -54,8 +58,17 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     msc_regex_t *regex;
     pcre_extra *pe = NULL;
 
+#if defined(VERSION_NGINX)
+    pthread_mutex_lock(&msc_pregcomp_ex_mtx);
+#endif
+
     regex = apr_pcalloc(pool, sizeof(msc_regex_t));
-    if (regex == NULL) return NULL;
+    if (regex == NULL) {
+#if defined(VERSION_NGINX)
+        pthread_mutex_unlock(&msc_pregcomp_ex_mtx);
+#endif
+        return NULL;
+    }
     regex->pattern = pattern;
 
     if ((_errptr == NULL)||(_erroffset == NULL)) {
@@ -63,7 +76,13 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     } else {
         regex->re = pcre_compile(pattern, options, _errptr, _erroffset, NULL);
     }
-    if (regex->re == NULL) return NULL;
+
+    if (regex->re == NULL) {
+#if defined(VERSION_NGINX)
+        pthread_mutex_unlock(&msc_pregcomp_ex_mtx);
+#endif
+        return NULL;
+    }
 
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
@@ -81,6 +100,9 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
         pe = malloc(sizeof(pcre_extra));
 #endif
         if (pe == NULL) {
+#if defined(VERSION_NGINX)
+            pthread_mutex_unlock(&msc_pregcomp_ex_mtx);
+#endif
             return NULL;
         }
         memset(pe, 0, sizeof(pcre_extra));
@@ -129,6 +151,9 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     apr_pool_cleanup_register(pool, (void *)regex,
         (apr_status_t (*)(void *))msc_pcre_cleanup, apr_pool_cleanup_null);
 
+#if defined(VERSION_NGINX)
+    pthread_mutex_unlock(&msc_pregcomp_ex_mtx);
+#endif
     return regex;
 }
 
