@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Fix NetBSD build by renaming the hmac function to avoid conflicts
+   [Issue #1241 - @victorhora, @joerg, @sevan]
  * IIS: Windows build, fix duplicate YAJL dir in script
    [Issue #1612 - @allanbomsft, @victorhora]
  * IIS: Remove body prebuffering due to no locking in modsecProcessRequest

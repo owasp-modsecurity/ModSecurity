@@ -27,8 +27,13 @@
 #define INT32_MAX      (2147483647)
 #endif
 
+#ifdef __NetBSD__
+char DSOLOCAL *mschmac(modsec_rec *msr, const char *key, int key_len,
+                     unsigned char *msg, int msglen);
+#else
 char DSOLOCAL *hmac(modsec_rec *msr, const char *key, int key_len,
                      unsigned char *msg, int msglen);
+#endif
 char DSOLOCAL *do_hash_link(modsec_rec *msr, char *link,
                       int type);
 char DSOLOCAL *getkey(apr_pool_t *mp);

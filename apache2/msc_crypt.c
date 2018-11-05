@@ -188,8 +188,13 @@ char *getkey(apr_pool_t *mp) {
  *
  * \retval hex_digest The MAC
  */
+#ifdef __NetBSD__
+char *mschmac(modsec_rec *msr, const char *key, int key_len,
+        unsigned char *msg, int msglen) {
+#else
 char *hmac(modsec_rec *msr, const char *key, int key_len,
         unsigned char *msg, int msglen) {
+#endif
     apr_sha1_ctx_t ctx;
     unsigned char digest[APR_SHA1_DIGESTSIZE];
     unsigned char hmac_ipad[HMAC_PAD_SIZE], hmac_opad[HMAC_PAD_SIZE];
@@ -1260,8 +1265,11 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 }
 
             if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
+#ifdef __NetBSD__
+                hash_value =  mschmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#else
                 hash_value =  hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
-
+#endif
             if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
                 if(msr->sessionid == NULL || strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
@@ -1272,13 +1280,21 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                     if (msr->txcfg->debuglog_level >= 4)
                         msr_log(msr, 4, "Session id is empty. Using REMOTE_IP");
                     msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                    hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#else
                     hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#endif
                 } else {
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->sessionid);
                     if (msr->txcfg->debuglog_level >= 4)
                         msr_log(msr, 4, "Using session id [%s]", msr->sessionid);
                     msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                    hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#else
                     hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#endif
                 }
             }
 
@@ -1289,7 +1305,11 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->remote_ip);
 #endif
                 msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#else
                 hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#endif
             }
         } else  {
             return NULL;
@@ -1303,8 +1323,11 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 }
 
                 if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
+#ifdef __NetBSD__
+                    hash_value =  mschmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#else
                     hash_value =  hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
-
+#endif
                 if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
                     if(msr->sessionid == NULL || strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
@@ -1315,13 +1338,21 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                         if (msr->txcfg->debuglog_level >= 4)
                             msr_log(msr, 4, "Session id is empty. Using REMOTE_IP");
                         msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                        hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#else
                         hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#endif
                     } else {
                         const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->sessionid);
                         if (msr->txcfg->debuglog_level >= 4)
                             msr_log(msr, 4, "Using session id [%s]", msr->sessionid);
                         msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                        hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#else
                         hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#endif
                     }
                 }
 
@@ -1332,7 +1363,11 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->remote_ip);
 #endif
                     msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                    hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#else
                     hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
+#endif
                 }
             } else  {
                 return NULL;
@@ -1344,8 +1379,11 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 }
 
             if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
+#ifdef __NetBSD__
+                hash_value = mschmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
+#else
                 hash_value = hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
-
+#endif
             if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
                 if(msr->sessionid == NULL || strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
@@ -1356,13 +1394,21 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                     if (msr->txcfg->debuglog_level >= 4)
                         msr_log(msr, 4, "Session id is empty. Using REMOTE_IP");
                     msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                    hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
+#else
                     hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
+#endif
                 } else  {
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->sessionid);
                     if (msr->txcfg->debuglog_level >= 4)
                         msr_log(msr, 4, "Using session id [%s]", msr->sessionid);
                     msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                    hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
+#else
                     hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
+#endif
                 }
             }
 
@@ -1373,7 +1419,11 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->remote_ip);
 #endif
                 msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
+#else
                 hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
+#endif
             }
 
         }
@@ -1398,7 +1448,11 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 }
 
             if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
+#ifdef __NetBSD__
+                hash_value = mschmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
+#else
                 hash_value = hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
+#endif
 
             if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
                 if(msr->sessionid == NULL || strlen(msr->sessionid) == 0)   {
@@ -1410,13 +1464,21 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                     if (msr->txcfg->debuglog_level >= 4)
                         msr_log(msr, 4, "Session id is empty. Using REMOTE_IP");
                     msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                    hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
+#else
                     hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
+#endif
                 } else {
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->sessionid);
                     if (msr->txcfg->debuglog_level >= 4)
                         msr_log(msr, 4, "Using session id [%s]", msr->sessionid);
                     msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                    hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
+#else
                     hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
+#endif
                 }
             }
 
@@ -1427,7 +1489,11 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->remote_ip);
 #endif
                 msr->txcfg->crypto_key_len = strlen(new_pwd);
+#ifdef __NetBSD__
+                hash_value = mschmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
+#else
                 hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
+#endif
             }
 
         link = relative_uri;
