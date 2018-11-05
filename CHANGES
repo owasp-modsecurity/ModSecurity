@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Add sanity check for a couple malloc() and make code more resilient
+   [Issue #979 - @dogbert2, @victorhora, @zimmerl]
  * Fix NetBSD build by renaming the hmac function to avoid conflicts
    [Issue #1241 - @victorhora, @joerg, @sevan]
  * IIS: Windows build, fix duplicate YAJL dir in script

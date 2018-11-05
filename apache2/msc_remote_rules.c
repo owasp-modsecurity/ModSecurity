@@ -312,6 +312,11 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
         struct curl_slist *headers_chunk = NULL;
 #ifdef WIN32
         char *buf = malloc(sizeof(TCHAR) * (2048 + 1));
+       if (buf == NULL) { /* malloc failed... */
+           *error_msg = apr_psprintf(mp, "Unable to allocate memory");
+           ret = -2;
+           goto failed;    
+       }    
         char *ptr = NULL;
         DWORD res_len;
 #endif
