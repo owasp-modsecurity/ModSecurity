@@ -50,7 +50,6 @@ namespace utils {
 
 typedef struct msc_file_handler {
     int shm_id_structure;
-    pthread_mutex_t lock;
     char file_name[];
 } msc_file_handler_t;
 
