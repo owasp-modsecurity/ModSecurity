@@ -1,6 +1,10 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * IIS: Set SecStreamInBodyInspection by default on IIS builds (#1299)
+   [Issue #1299 - @victorhora]
+ * IIS: Update modsecurity.conf
+   [Issue #788 - @victorhora, @brianclark]
  * Add sanity check for a couple malloc() and make code more resilient
    [Issue #979 - @dogbert2, @victorhora, @zimmerl]
  * Fix NetBSD build by renaming the hmac function to avoid conflicts
