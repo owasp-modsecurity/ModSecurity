@@ -1,6 +1,6 @@
 
 
-set PATH="%PATH%;C:\Program Files (x86)\WiX Toolset v3.8\bin;C:\Program Files (x86)\WiX Toolset v3.7\bin;"
+set PATH="%PATH%;C:\Program Files (x86)\WiX Toolset v3.11\bin;C:\Program Files (x86)\WiX Toolset v3.8\bin;C:\Program Files (x86)\WiX Toolset v3.7\bin;"
 set CURRENT_DIR=%cd%
 
 del installer.wix*

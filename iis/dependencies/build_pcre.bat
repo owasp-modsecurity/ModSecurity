@@ -10,14 +10,16 @@ set PCRE_DIR=%PCRE:~0,-4%
 move "%PCRE_DIR%" "pcre"
 
 @if "%PCRE_DIR%" == "pcre-8.40" (
-	Echo. && Echo "PCRE 8.40 found... patching with patch-pcre-8.40.vbs..." 
-	cscript /B /Nologo ../patch-pcre-8.40.vbs
+	Echo. && Echo "PCRE 8.40 found... trying to patch it to compile cleanly" 
+	::cscript /B /Nologo ../patch-pcre-8.40.vbs
+	cd "pcre"
+	cat CMakeLists.txt | sed "s/PCRE_STATIC_RUNTIME OFF CACHE BOOL/PCRE_STATIC_RUNTIME/g" > CMakeLists.txt.ops
+	move CMakeLists.txt CMakeLists.txt.old
+	move CMakeLists.txt.ops CMakeLists.txt
+	cd ..
 )
 
 cd "pcre"
-cat CMakeLists.txt | sed "s/PCRE_STATIC_RUNTIME OFF CACHE BOOL/PCRE_STATIC_RUNTIME/g" > CMakeLists.txt.ops
-move CMakeLists.txt CMakeLists.txt.old
-move CMakeLists.txt.ops CMakeLists.txt
 CMAKE -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 NMAKE

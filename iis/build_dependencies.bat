@@ -7,15 +7,15 @@
 @set SOURCE_DIR=%USERPROFILE%\Downloads
 
 :: Dependencies
-@set CMAKE=cmake-3.8.2-win32-x86.zip
-@set PCRE=pcre-8.40.zip
+@set CMAKE=cmake-3.12.4-win32-x86.zip
+@set PCRE=pcre-8.41.zip
 @set ZLIB=zlib-1.2.11.tar.gz
-@set LIBXML2=libxml2-2.9.4.tar.gz
-@set LUA=lua-5.3.4.tar.gz
-@set CURL=curl-7.54.1.zip
-@set APACHE_SRC=httpd-2.4.27.tar.gz
-@set APACHE_BIN32=httpd-2.4.27-win32-VC11.zip
-@set APACHE_BIN64=httpd-2.4.27-win64-VC11.zip
+@set LIBXML2=libxml2-2.9.8.tar.gz
+@set LUA=lua-5.3.5.tar.gz
+@set CURL=curl-7.62.0.zip
+@set APACHE_SRC=httpd-2.4.37.tar.gz
+@set APACHE_BIN32=httpd-2.4.37-win32-VC11.zip
+@set APACHE_BIN64=httpd-2.4.37-win64-VC11.zip
 @set YAJL=yajl-2.1.0.zip
 @set SSDEEP=ssdeep-2.13.tar.gz
 @set SSDEEP_BIN=ssdeep-2.13.zip

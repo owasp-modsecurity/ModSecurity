@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * IIS: Update dependencies for Windows build
+   [Issue #1848 - @victorhora, @hsluoyz]
  * IIS: Set SecStreamInBodyInspection by default on IIS builds (#1299)
    [Issue #1299 - @victorhora]
  * IIS: Update modsecurity.conf
