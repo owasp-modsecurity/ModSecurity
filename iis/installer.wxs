@@ -132,121 +132,89 @@
             <?endif ?>
             <Directory Id="$(var.PlatformProgramFilesFolder)">
 		    <Directory Id="INSTALLFOLDER" Name="ModSecurity IIS">
-                        <Component Id="OWASP_CRS_V_2_2_9_SETUP" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6500">
- 			   <File Id="MODSECURITY_CRS_10_SETUP.CONF.EXAMPLE" Name="modsecurity_crs_10_setup.conf" Source="release\owasp_crs\modsecurity_crs_10_setup.conf.example" />
+                        <Component Id="OWASP_CRS_V_3_0_2_SETUP" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6500">
+ 			   <File Id="CRS_SETUP.CONF.EXAMPLE" Name="crs-setup.conf.example" Source="release\owasp_crs\crs-setup.conf.example" />
                         </Component>
                     <Directory Id="OWASP_CRS" Name="owasp_crs">
-                        <Component Id="OWASP_CRS_V_2_2_9" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6502">
+                        <Component Id="OWASP_CRS_V_3_0_2" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6502">
                             <File Id="CHANGES" Name="CHANGES" Source="release\owasp_crs\CHANGES" />
+                            <File Id="CONTRIBUTORS" Name="CONTRIBUTORS" Source="release\owasp_crs\CONTRIBUTORS" />
+                            <File Id="IDNUMBERING" Name="IDNUMBERING" Source="release\owasp_crs\IDNUMBERING" />
                             <File Id="INSTALL" Name="INSTALL" Source="release\owasp_crs\INSTALL" />
                             <File Id="LICENSE" Name="LICENSE" Source="release\owasp_crs\LICENSE" />
+                            <File Id="KNOWN_BUGS" Name="KNOWN_BUGS" Source="release\owasp_crs\KNOWN_BUGS" />
                             <File Id="README.MD" Name="README.md" Source="release\owasp_crs\README.md" />
                         </Component>
-                        <Directory Id="ACTIVATED_RULES" Name="activated_rules">
+                        <Directory Id="DOCUMENTATION" Name="documentation">
                             <Component Id="README" DiskId="1" Guid="F06FC044-52E6-412E-80E6-6644486A522B">
-                                <File Id="README" Name="README" Source="release\owasp_crs\activated_rules\README" />
+                                <File Id="README" Name="README" Source="release\owasp_crs\documentation\README" />
+                            </Component>
+                            <Directory Id="OWASP_CRS_DOCUMENTATION" Name="OWASP-CRS-Documentation">
+                            </Directory>
+                        </Directory>
+                        <Directory Id="ID_RENUMBERING" Name="id_renumbering">
+                            <Component Id="ID_NUMBERING" DiskId="1" Guid="F06FC044-52E6-412E-80E6-6644486A522D">
+                                <File Id="IDNUMBERING_1" Name="IDNUMBERING" Source="release\owasp_crs\id_renumbering\IDNUMBERING" />
+                                <File Id="IDNUMBERING.CSV" Name="IdNumbering.csv" Source="release\owasp_crs\id_renumbering\IdNumbering.csv" />
+                                <File Id="UPDATE.PY" Name="update.py" Source="release\owasp_crs\id_renumbering\update.py" />
                             </Component>
                         </Directory>
-                        <Directory Id="BASE_RULES" Name="base_rules">
-                            <Component Id="BASE_RULES" DiskId="1" Guid="66EB7DE9-E12D-4360-B096-75CAB0498E88">
-                                <File Id="MODSECURITY_35_BAD_ROBOTS.DATA" Name="modsecurity_35_bad_robots.data" Source="release\owasp_crs\base_rules\modsecurity_35_bad_robots.data" />
-                                <File Id="MODSECURITY_35_SCANNERS.DATA" Name="modsecurity_35_scanners.data" Source="release\owasp_crs\base_rules\modsecurity_35_scanners.data" />
-                                <File Id="MODSECURITY_40_GENERIC_ATTACKS.DATA" Name="modsecurity_40_generic_attacks.data" Source="release\owasp_crs\base_rules\modsecurity_40_generic_attacks.data" />
-                                <File Id="MODSECURITY_50_OUTBOUND.DATA" Name="modsecurity_50_outbound.data" Source="release\owasp_crs\base_rules\modsecurity_50_outbound.data" />
-                                <File Id="MODSECURITY_50_OUTBOUND_MALWARE.DATA" Name="modsecurity_50_outbound_malware.data" Source="release\owasp_crs\base_rules\modsecurity_50_outbound_malware.data" />
-                                <File Id="MODSECURITY_CRS_20_PROTOCOL_VIOLATIONS.CONF" Name="modsecurity_crs_20_protocol_violations.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_20_protocol_violations.conf" />
-                                <File Id="MODSECURITY_CRS_21_PROTOCOL_ANOMALIES.CONF" Name="modsecurity_crs_21_protocol_anomalies.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_21_protocol_anomalies.conf" />
-                                <File Id="MODSECURITY_CRS_23_REQUEST_LIMITS.CONF" Name="modsecurity_crs_23_request_limits.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_23_request_limits.conf" />
-                                <File Id="MODSECURITY_CRS_30_HTTP_POLICY.CONF" Name="modsecurity_crs_30_http_policy.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_30_http_policy.conf" />
-                                <File Id="MODSECURITY_CRS_35_BAD_ROBOTS.CONF" Name="modsecurity_crs_35_bad_robots.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_35_bad_robots.conf" />
-                                <File Id="MODSECURITY_CRS_40_GENERIC_ATTACKS.CONF" Name="modsecurity_crs_40_generic_attacks.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_40_generic_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_41_SQL_INJECTION_ATTACKS.CONF" Name="modsecurity_crs_41_sql_injection_attacks.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_41_sql_injection_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_41_XSS_ATTACKS.CONF" Name="modsecurity_crs_41_xss_attacks.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_41_xss_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_42_TIGHT_SECURITY.CONF" Name="modsecurity_crs_42_tight_security.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_42_tight_security.conf" />
-                                <File Id="MODSECURITY_CRS_45_TROJANS.CONF" Name="modsecurity_crs_45_trojans.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_45_trojans.conf" />
-                                <File Id="MODSECURITY_CRS_47_COMMON_EXCEPTIONS.CONF" Name="modsecurity_crs_47_common_exceptions.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_47_common_exceptions.conf" />
-                                <File Id="MODSECURITY_CRS_48_LOCAL_EXCEPTIONS.CONF.EXAMPLE" Name="modsecurity_crs_48_local_exceptions.conf.example" Source="release\owasp_crs\base_rules\modsecurity_crs_48_local_exceptions.conf.example" />
-                                <File Id="MODSECURITY_CRS_49_INBOUND_BLOCKING.CONF" Name="modsecurity_crs_49_inbound_blocking.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_49_inbound_blocking.conf" />
-                                <File Id="MODSECURITY_CRS_50_OUTBOUND.CONF" Name="modsecurity_crs_50_outbound.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_50_outbound.conf" />
-                                <File Id="MODSECURITY_CRS_59_OUTBOUND_BLOCKING.CONF" Name="modsecurity_crs_59_outbound_blocking.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_59_outbound_blocking.conf" />
-                                <File Id="MODSECURITY_CRS_60_CORRELATION.CONF" Name="modsecurity_crs_60_correlation.conf" Source="release\owasp_crs\base_rules\modsecurity_crs_60_correlation.conf" />
-                            </Component>
-                        </Directory>
-                        <Directory Id="EXPERIMENTAL_RULES" Name="experimental_rules">
-                            <Component Id="EXPERIMENTAL_RULES" DiskId="1" Guid="B2504C95-7338-49CA-9786-ACEF671ABB93">
-                                <File Id="MODSECURITY_CRS_11_BRUTE_FORCE.CONF" Name="modsecurity_crs_11_brute_force.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_11_brute_force.conf" />
-                                <File Id="MODSECURITY_CRS_11_DOS_PROTECTION.CONF" Name="modsecurity_crs_11_dos_protection.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_11_dos_protection.conf" />
-                                <File Id="MODSECURITY_CRS_11_PROXY_ABUSE.CONF" Name="modsecurity_crs_11_proxy_abuse.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_11_proxy_abuse.conf" />
-                                <File Id="MODSECURITY_CRS_11_SLOW_DOS_PROTECTION.CONF" Name="modsecurity_crs_11_slow_dos_protection.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_11_slow_dos_protection.conf" />
-                                <File Id="MODSECURITY_CRS_16_SCANNER_INTEGRATION.CONF" Name="modsecurity_crs_16_scanner_integration.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_16_scanner_integration.conf" />
-                                <File Id="MODSECURITY_CRS_25_CC_TRACK_PAN.CONF" Name="modsecurity_crs_25_cc_track_pan.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_25_cc_track_pan.conf" />
-                                <File Id="MODSECURITY_CRS_40_APPSENSOR_DETECTION_POINT_2.0_SETUP.CONF" Name="modsecurity_crs_40_appsensor_detection_point_2.0_setup.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_40_appsensor_detection_point_2.0_setup.conf" />
-                                <File Id="MODSECURITY_CRS_40_APPSENSOR_DETECTION_POINT_2.1_REQUEST_EXCEPTION.CONF" Name="modsecurity_crs_40_appsensor_detection_point_2.1_request_exception.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_40_appsensor_detection_point_2.1_request_exception.conf" />
-                                <File Id="MODSECURITY_CRS_40_APPSENSOR_DETECTION_POINT_2.9_HONEYTRAP.CONF" Name="modsecurity_crs_40_appsensor_detection_point_2.9_honeytrap.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_40_appsensor_detection_point_2.9_honeytrap.conf" />
-                                <File Id="MODSECURITY_CRS_40_APPSENSOR_DETECTION_POINT_3.0_END.CONF" Name="modsecurity_crs_40_appsensor_detection_point_3.0_end.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_40_appsensor_detection_point_3.0_end.conf" />
-                                <File Id="MODSECURITY_CRS_40_HTTP_PARAMETER_POLLUTION.CONF" Name="modsecurity_crs_40_http_parameter_pollution.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_40_http_parameter_pollution.conf" />
-                                <File Id="MODSECURITY_CRS_42_CSP_ENFORCEMENT.CONF" Name="modsecurity_crs_42_csp_enforcement.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_42_csp_enforcement.conf" />
-                                <File Id="MODSECURITY_CRS_46_SCANNER_INTEGRATION.CONF" Name="modsecurity_crs_46_scanner_integration.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_46_scanner_integration.conf" />
-                                <File Id="MODSECURITY_CRS_48_BAYES_ANALYSIS.CONF" Name="modsecurity_crs_48_bayes_analysis.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_48_bayes_analysis.conf" />
-                                <File Id="MODSECURITY_CRS_55_RESPONSE_PROFILING.CONF" Name="modsecurity_crs_55_response_profiling.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_55_response_profiling.conf" />
-                                <File Id="MODSECURITY_CRS_56_PVI_CHECKS.CONF" Name="modsecurity_crs_56_pvi_checks.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_56_pvi_checks.conf" />
-                                <File Id="MODSECURITY_CRS_61_IP_FORENSICS.CONF" Name="modsecurity_crs_61_ip_forensics.conf" Source="release\owasp_crs\experimental_rules\modsecurity_crs_61_ip_forensics.conf" />
-                            </Component>
-                        </Directory>
-                        <Directory Id="LUA" Name="lua">
-                            <Component Id="LUA" DiskId="1" Guid="BF9033A5-C9A4-4867-92CA-CDD174CBE420">
-                                <File Id="ADVANCED_FILTER_CONVERTER.LUA" Name="advanced_filter_converter.lua" Source="release\owasp_crs\lua\advanced_filter_converter.lua" />
-                                <File Id="APPSENSOR_REQUEST_EXCEPTION_ENFORCE.LUA" Name="appsensor_request_exception_enforce.lua" Source="release\owasp_crs\lua\appsensor_request_exception_enforce.lua" />
-                                <File Id="APPSENSOR_REQUEST_EXCEPTION_PROFILE.LUA" Name="appsensor_request_exception_profile.lua" Source="release\owasp_crs\lua\appsensor_request_exception_profile.lua" />
-                                <File Id="ARACHNI_INTEGRATION.LUA" Name="arachni_integration.lua" Source="release\owasp_crs\lua\arachni_integration.lua" />
-                                <File Id="BAYES_CHECK_SPAM.LUA" Name="bayes_check_spam.lua" Source="release\owasp_crs\lua\bayes_check_spam.lua" />
-                                <File Id="BAYES_TRAIN_HAM.LUA" Name="bayes_train_ham.lua" Source="release\owasp_crs\lua\bayes_train_ham.lua" />
-                                <File Id="BAYES_TRAIN_SPAM.LUA" Name="bayes_train_spam.lua" Source="release\owasp_crs\lua\bayes_train_spam.lua" />
-                                <File Id="GATHER_IP_DATA.LUA" Name="gather_ip_data.lua" Source="release\owasp_crs\lua\gather_ip_data.lua" />
-                                <File Id="OSVDB.LUA" Name="osvdb.lua" Source="release\owasp_crs\lua\osvdb.lua" />
-                                <File Id="PROFILE_PAGE_SCRIPTS.LUA" Name="profile_page_scripts.lua" Source="release\owasp_crs\lua\profile_page_scripts.lua" />
-                            </Component>
-                        </Directory>
-                        <Directory Id="OPTIONAL_RULES" Name="optional_rules">
-                            <Component Id="OPTIONAL_RULES" DiskId="1" Guid="8744C127-31F0-4C4E-85FB-D86BDEA3627B">
-                                <File Id="MODSECURITY_42_COMMENT_SPAM.DATA" Name="modsecurity_42_comment_spam.data" Source="release\owasp_crs\optional_rules\modsecurity_42_comment_spam.data" />
-                                <File Id="MODSECURITY_CRS_10_IGNORE_STATIC.CONF" Name="modsecurity_crs_10_ignore_static.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_10_ignore_static.conf" />
-                                <File Id="MODSECURITY_CRS_11_AVS_TRAFFIC.CONF" Name="modsecurity_crs_11_avs_traffic.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_11_avs_traffic.conf" />
-                                <File Id="MODSECURITY_CRS_13_XML_ENABLER.CONF" Name="modsecurity_crs_13_xml_enabler.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_13_xml_enabler.conf" />
-                                <File Id="MODSECURITY_CRS_16_AUTHENTICATION_TRACKING.CONF" Name="modsecurity_crs_16_authentication_tracking.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_16_authentication_tracking.conf" />
-                                <File Id="MODSECURITY_CRS_16_SESSION_HIJACKING.CONF" Name="modsecurity_crs_16_session_hijacking.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_16_session_hijacking.conf" />
-                                <File Id="MODSECURITY_CRS_16_USERNAME_TRACKING.CONF" Name="modsecurity_crs_16_username_tracking.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_16_username_tracking.conf" />
-                                <File Id="MODSECURITY_CRS_25_CC_KNOWN.CONF" Name="modsecurity_crs_25_cc_known.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_25_cc_known.conf" />
-                                <File Id="MODSECURITY_CRS_42_COMMENT_SPAM.CONF" Name="modsecurity_crs_42_comment_spam.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_42_comment_spam.conf" />
-                                <File Id="MODSECURITY_CRS_43_CSRF_PROTECTION.CONF" Name="modsecurity_crs_43_csrf_protection.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_43_csrf_protection.conf" />
-                                <File Id="MODSECURITY_CRS_46_AV_SCANNING.CONF" Name="modsecurity_crs_46_av_scanning.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_46_av_scanning.conf" />
-                                <File Id="MODSECURITY_CRS_47_SKIP_OUTBOUND_CHECKS.CONF" Name="modsecurity_crs_47_skip_outbound_checks.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_47_skip_outbound_checks.conf" />
-                                <File Id="MODSECURITY_CRS_49_HEADER_TAGGING.CONF" Name="modsecurity_crs_49_header_tagging.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_49_header_tagging.conf" />
-                                <File Id="MODSECURITY_CRS_55_APPLICATION_DEFECTS.CONF" Name="modsecurity_crs_55_application_defects.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_55_application_defects.conf" />
-                                <File Id="MODSECURITY_CRS_55_MARKETING.CONF" Name="modsecurity_crs_55_marketing.conf" Source="release\owasp_crs\optional_rules\modsecurity_crs_55_marketing.conf" />
-                            </Component>
-                        </Directory>
-                        <Directory Id="SLR_RULES" Name="slr_rules">
-                            <Component Id="SLR_RULES" DiskId="1" Guid="A880D035-8933-4A83-9D14-2FE010F4BF79">
-                                <File Id="MODSECURITY_46_SLR_ET_JOOMLA.DATA" Name="modsecurity_46_slr_et_joomla.data" Source="release\owasp_crs\slr_rules\modsecurity_46_slr_et_joomla.data" />
-                                <File Id="MODSECURITY_46_SLR_ET_LFI.DATA" Name="modsecurity_46_slr_et_lfi.data" Source="release\owasp_crs\slr_rules\modsecurity_46_slr_et_lfi.data" />
-                                <File Id="MODSECURITY_46_SLR_ET_PHPBB.DATA" Name="modsecurity_46_slr_et_phpbb.data" Source="release\owasp_crs\slr_rules\modsecurity_46_slr_et_phpbb.data" />
-                                <File Id="MODSECURITY_46_SLR_ET_RFI.DATA" Name="modsecurity_46_slr_et_rfi.data" Source="release\owasp_crs\slr_rules\modsecurity_46_slr_et_rfi.data" />
-                                <File Id="MODSECURITY_46_SLR_ET_SQLI.DATA" Name="modsecurity_46_slr_et_sqli.data" Source="release\owasp_crs\slr_rules\modsecurity_46_slr_et_sqli.data" />
-                                <File Id="MODSECURITY_46_SLR_ET_WORDPRESS.DATA" Name="modsecurity_46_slr_et_wordpress.data" Source="release\owasp_crs\slr_rules\modsecurity_46_slr_et_wordpress.data" />
-                                <File Id="MODSECURITY_46_SLR_ET_XSS.DATA" Name="modsecurity_46_slr_et_xss.data" Source="release\owasp_crs\slr_rules\modsecurity_46_slr_et_xss.data" />
-                                <File Id="MODSECURITY_CRS_46_SLR_ET_JOOMLA_ATTACKS.CONF" Name="modsecurity_crs_46_slr_et_joomla_attacks.conf" Source="release\owasp_crs\slr_rules\modsecurity_crs_46_slr_et_joomla_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_46_SLR_ET_LFI_ATTACKS.CONF" Name="modsecurity_crs_46_slr_et_lfi_attacks.conf" Source="release\owasp_crs\slr_rules\modsecurity_crs_46_slr_et_lfi_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_46_SLR_ET_PHPBB_ATTACKS.CONF" Name="modsecurity_crs_46_slr_et_phpbb_attacks.conf" Source="release\owasp_crs\slr_rules\modsecurity_crs_46_slr_et_phpbb_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_46_SLR_ET_RFI_ATTACKS.CONF" Name="modsecurity_crs_46_slr_et_rfi_attacks.conf" Source="release\owasp_crs\slr_rules\modsecurity_crs_46_slr_et_rfi_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_46_SLR_ET_SQLI_ATTACKS.CONF" Name="modsecurity_crs_46_slr_et_sqli_attacks.conf" Source="release\owasp_crs\slr_rules\modsecurity_crs_46_slr_et_sqli_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_46_SLR_ET_WORDPRESS_ATTACKS.CONF" Name="modsecurity_crs_46_slr_et_wordpress_attacks.conf" Source="release\owasp_crs\slr_rules\modsecurity_crs_46_slr_et_wordpress_attacks.conf" />
-                                <File Id="MODSECURITY_CRS_46_SLR_ET_XSS_ATTACKS.CONF" Name="modsecurity_crs_46_slr_et_xss_attacks.conf" Source="release\owasp_crs\slr_rules\modsecurity_crs_46_slr_et_xss_attacks.conf" />
+                        <Directory Id="RULES" Name="rules">
+                            <Component Id="RULES" DiskId="1" Guid="66EB7DE9-E12D-4360-B096-75CAB0498E88">
+                                <File Id="CRAWLERS_USER_AGENTS.DATA" Name="crawlers-user-agents.data" Source="release\owasp_crs\rules\crawlers-user-agents.data" />
+                                <File Id="IIS_ERRORS.DATA" Name="iis-errors.data" Source="release\owasp_crs\rules\iis-errors.data" />
+                                <File Id="JAVA_CODE_LEAKAGES.DATA" Name="java-code-leakages.data" Source="release\owasp_crs\rules\java-code-leakages.data" />
+                                <File Id="JAVA_ERRORS.DATA" Name="java-errors.data" Source="release\owasp_crs\rules\java-errors.data" />
+                                <File Id="LFI_OS_FILES.DATA" Name="lfi-os-files.data" Source="release\owasp_crs\rules\lfi-os-files.data" />
+                                <File Id="PHP_CONFIG_DIRECTIVES.DATA" Name="php-config-directives.data" Source="release\owasp_crs\rules\php-config-directives.data" />
+                                <File Id="PHP_ERRORS.DATA" Name="php-errors.data" Source="release\owasp_crs\rules\php-errors.data" />
+                                <File Id="PHP_FUNCTION_NAMES_933150.DATA" Name="php-function-names-933150.data" Source="release\owasp_crs\rules\php-function-names-933150.data" />
+                                <File Id="PHP_FUNCTION_NAMES_933151.DATA" Name="php-function-names-933151.data" Source="release\owasp_crs\rules\php-function-names-933151.data" />
+                                <File Id="PHP_VARIABLES.DATA" Name="php-variables.data" Source="release\owasp_crs\rules\php-variables.data" />
+                                <File Id="REQUEST_900_EXCLUSION_RULES_BEFORE_CRS.conf.example" Name="REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf" Source="release\owasp_crs\rules\REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf" />
+                                <File Id="REQUEST_901_INITIALIZATION.conf" Name="REQUEST-901-INITIALIZATION.conf" Source="release\owasp_crs\rules\REQUEST-901-INITIALIZATION.conf" />
+                                <File Id="REQUEST_903.9001_DRUPAL_EXCLUSION_RULES.conf" Name="REQUEST-903.9001-DRUPAL-EXCLUSION-RULES.conf" Source="release\owasp_crs\rules\REQUEST-903.9001-DRUPAL-EXCLUSION-RULES.conf" />
+                                <File Id="REQUEST_903.9002_WORDPRESS_EXCLUSION_RULES.conf" Name="REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES.conf" Source="release\owasp_crs\rules\REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES.conf" />
+                                <File Id="REQUEST_905_COMMON_EXCEPTIONS.conf" Name="REQUEST-905-COMMON-EXCEPTIONS.conf" Source="release\owasp_crs\rules\REQUEST-905-COMMON-EXCEPTIONS.conf" />
+                                <File Id="REQUEST_910_IP_REPUTATION.conf" Name="REQUEST-910-IP-REPUTATION.conf" Source="release\owasp_crs\rules\REQUEST-910-IP-REPUTATION.conf" />
+                                <File Id="REQUEST_911_METHOD_ENFORCEMENT.conf" Name="REQUEST-911-METHOD-ENFORCEMENT.conf" Source="release\owasp_crs\rules\REQUEST-911-METHOD-ENFORCEMENT.conf" />
+                                <File Id="REQUEST_912_DOS_PROTECTION.conf" Name="REQUEST-912-DOS-PROTECTION.conf" Source="release\owasp_crs\rules\REQUEST-912-DOS-PROTECTION.conf" />
+                                <File Id="REQUEST_913_SCANNER_DETECTION.conf" Name="REQUEST-913-SCANNER-DETECTION.conf" Source="release\owasp_crs\rules\REQUEST-913-SCANNER-DETECTION.conf" />
+                                <File Id="REQUEST_920_PROTOCOL_ENFORCEMENT.conf" Name="REQUEST-920-PROTOCOL-ENFORCEMENT.conf" Source="release\owasp_crs\rules\REQUEST-920-PROTOCOL-ENFORCEMENT.conf" />
+                                <File Id="REQUEST_921_PROTOCOL_ATTACK.conf" Name="REQUEST-921-PROTOCOL-ATTACK.conf" Source="release\owasp_crs\rules\REQUEST-921-PROTOCOL-ATTACK.conf" />
+                                <File Id="REQUEST_930_APPLICATION_ATTACK_LFI.conf" Name="REQUEST-930-APPLICATION-ATTACK-LFI.conf" Source="release\owasp_crs\rules\REQUEST-930-APPLICATION-ATTACK-LFI.conf" />
+                                <File Id="REQUEST_931_APPLICATION_ATTACK_RFI.conf" Name="REQUEST-931-APPLICATION-ATTACK-RFI.conf" Source="release\owasp_crs\rules\REQUEST-931-APPLICATION-ATTACK-RFI.conf" />
+                                <File Id="REQUEST_932_APPLICATION_ATTACK_RCE.conf" Name="REQUEST-932-APPLICATION-ATTACK-RCE.conf" Source="release\owasp_crs\rules\REQUEST-932-APPLICATION-ATTACK-RCE.conf" />
+                                <File Id="REQUEST_933_APPLICATION_ATTACK_PHP.conf" Name="REQUEST-933-APPLICATION-ATTACK-PHP.conf" Source="release\owasp_crs\rules\REQUEST-933-APPLICATION-ATTACK-PHP.conf" />
+                                <File Id="REQUEST_941_APPLICATION_ATTACK_XSS.conf" Name="REQUEST-941-APPLICATION-ATTACK-XSS.conf" Source="release\owasp_crs\rules\REQUEST-941-APPLICATION-ATTACK-XSS.conf" />
+                                <File Id="REQUEST_942_APPLICATION_ATTACK_SQLI.conf" Name="REQUEST-942-APPLICATION-ATTACK-SQLI.conf" Source="release\owasp_crs\rules\REQUEST-942-APPLICATION-ATTACK-SQLI.conf" />
+                                <File Id="REQUEST_943_APPLICATION_ATTACK_SESSION_FIXATION.conf" Name="REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf" Source="release\owasp_crs\rules\REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf" />
+                                <File Id="REQUEST_949_BLOCKING_EVALUATION.conf" Name="REQUEST-949-BLOCKING-EVALUATION.conf" Source="release\owasp_crs\rules\REQUEST-949-BLOCKING-EVALUATION.conf" />
+                                <File Id="RESPONSE_950_DATA_LEAKAGES.conf" Name="RESPONSE-950-DATA-LEAKAGES.conf" Source="release\owasp_crs\rules\RESPONSE-950-DATA-LEAKAGES.conf" />
+                                <File Id="RESPONSE_951_DATA_LEAKAGES_SQL.conf" Name="RESPONSE-951-DATA-LEAKAGES-SQL.conf" Source="release\owasp_crs\rules\RESPONSE-951-DATA-LEAKAGES-SQL.conf" />
+                                <File Id="RESPONSE_952_DATA_LEAKAGES_JAVA.conf" Name="RESPONSE-952-DATA-LEAKAGES-JAVA.conf" Source="release\owasp_crs\rules\RESPONSE-952-DATA-LEAKAGES-JAVA.conf" />
+                                <File Id="RESPONSE_953_DATA_LEAKAGES_PHP.conf" Name="RESPONSE-953-DATA-LEAKAGES-PHP.conf" Source="release\owasp_crs\rules\RESPONSE-953-DATA-LEAKAGES-PHP.conf" />
+                                <File Id="RESPONSE_954_DATA_LEAKAGES_IIS.conf" Name="RESPONSE-954-DATA-LEAKAGES-IIS.conf" Source="release\owasp_crs\rules\RESPONSE-954-DATA-LEAKAGES-IIS.conf" />
+                                <File Id="RESPONSE_959_BLOCKING_EVALUATION.conf" Name="RESPONSE-959-BLOCKING-EVALUATION.conf" Source="release\owasp_crs\rules\RESPONSE-959-BLOCKING-EVALUATION.conf" />
+                                <File Id="RESPONSE_980_CORRELATION.conf" Name="RESPONSE-980-CORRELATION.conf" Source="release\owasp_crs\rules\RESPONSE-980-CORRELATION.conf" />
+                                <File Id="RESPONSE_999_EXCLUSION_RULES_AFTER_CRS.conf" Name="RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf" Source="release\owasp_crs\rules\RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf" />
+                                <File Id="RESTRICTED_FILES.DATA" Name="restricted-files.data" Source="release\owasp_crs\rules\restricted-files.data" />
+                                <File Id="SCANNERS_HEADERS.DATA" Name="scanners-headers.data" Source="release\owasp_crs\rules\scanners-headers.data" />
+                                <File Id="SCANNERS_URLS.DATA" Name="scanners-urls.data" Source="release\owasp_crs\rules\scanners-urls.data" />
+                                <File Id="SCANNERS_USER_AGENTS.DATA" Name="scanners-user-agents.data" Source="release\owasp_crs\rules\scanners-user-agents.data" />
+                                <File Id="SCRIPTING_USER_AGENTS.DATA" Name="scripting-user-agents.data" Source="release\owasp_crs\rules\scripting-user-agents.data" />
+                                <File Id="SQL_ERRORS.DATA" Name="sql-errors.data" Source="release\owasp_crs\rules\sql-errors.data" />
+                                <File Id="SQL_FUNCTION_NAMES.DATA" Name="sql-function-names.data" Source="release\owasp_crs\rules\sql-function-names.data" />
+                                <File Id="UNIX_SHELL.DATA" Name="unix-shell.data" Source="release\owasp_crs\rules\unix-shell.data" />
+                                <File Id="WINDOWS_POWERSHELL_COMMANDS.DATA" Name="windows-powershell-commands.data" Source="release\owasp_crs\rules\windows-powershell-commands.data" />
                             </Component>
                         </Directory>
                         <Directory Id="UTIL" Name="util">
                             <Component Id="UTIL" DiskId="1" Guid="A95D50D7-4E87-4A87-BAD1-12370B8F5B9B">
+                                <File Id="ID_RANGE" Name="id-range" Source="release\owasp_crs\util\id-range" />
                                 <File Id="README_1" Name="README" Source="release\owasp_crs\util\README" />
+                                <File Id="UPGRADE.PY" Name="upgrade.py" Source="release\owasp_crs\util\upgrade.py" />
+                                <File Id="VERIFY.RB" Name="verify.rb" Source="release\owasp_crs\util\verify.rb" />
                             </Component>
                             <Directory Id="AV_SCANNING" Name="av-scanning">
                                 <Component Id="RUNAV" DiskId="1" Guid="398B0257-F78A-4F8C-B313-90D0F61581A9">
@@ -267,6 +235,43 @@
                                     <File Id="JS_OVERRIDES.JS" Name="js-overrides.js" Source="release\owasp_crs\util\browser-tools\js-overrides.js" />
                                 </Component>
                             </Directory>
+                            <Directory Id="DEBUG" Name="debug">
+                                <Component Id="DEBUG" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045A8">
+                                    <File Id="RESPONSE_981_DEBUG.CONF" Name="RESPONSE-981-DEBUG.conf" Source="release\owasp_crs\util\debug\RESPONSE-981-DEBUG.conf" />
+                                </Component>
+                            </Directory>
+                            <Directory Id="GEO_LOCATION" Name="geo-location">
+                                <Component Id="GEO_LOCATION" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045A9">
+                                    <File Id="README_2" Name="README" Source="release\owasp_crs\util\geo-location\README" />
+                                </Component>
+                            </Directory>    
+                            <Directory Id="INTEGRATION" Name="integration">
+                                <Component Id="INTEGRATION" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045B0">
+                                    <File Id="FORMAT_TESTS.PY" Name="format_tests.py" Source="release\owasp_crs\util\integration\format_tests.py" />
+                                    <File Id="REQUIREMENTS.TXT" Name="requirements.txt" Source="release\owasp_crs\util\integration\requirements.txt" />
+                                </Component>
+                            </Directory>
+                            <Directory Id="JOIN_MULTILINE_RULES" Name="join-multiline-rules">
+                                <Component Id="JOIN_MULTILINE_RULES" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045B1">
+                                    <File Id="JOIN.PY" Name="join.py" Source="release\owasp_crs\util\join-multiline-rules\join.py" />
+                                </Component>
+                            </Directory>
+                            <Directory Id="REGEXP_ASSEMBLE" Name="regexp-assemble">
+                                <Component Id="REGEXP_ASSEMBLE" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045B2">
+                                    <File Id="REGEXP_932130.DATA" Name="regexp-932130.data" Source="release\owasp_crs\util\regexp-assemble\regexp-932130.data" />
+                                    <File Id="REGEXP_932140.DATA" Name="regexp-932140.data" Source="release\owasp_crs\util\regexp-assemble\regexp-932140.data" />
+                                    <File Id="REGEXP_933131.DATA" Name="regexp-933131.data" Source="release\owasp_crs\util\regexp-assemble\regexp-933131.data" />
+                                    <File Id="REGEXP_933160.DATA" Name="regexp-933160.data" Source="release\owasp_crs\util\regexp-assemble\regexp-933160.data" />
+                                    <File Id="REGEXP_933161.DATA" Name="regexp-933161.data" Source="release\owasp_crs\util\regexp-assemble\regexp-933161.data" />
+                                    <File Id="REGEXP_ASSEMBLE.PL" Name="regexp-assemble.pl" Source="release\owasp_crs\util\regexp-assemble\regexp-assemble.pl" />
+                                    <File Id="REGEXP_932100.TXT" Name="regexp-932100.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932100.txt" />
+                                    <File Id="REGEXP_932105.TXT" Name="regexp-932105.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932105.txt" />
+                                    <File Id="REGEXP_932110.TXT" Name="regexp-932110.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932110.txt" />
+                                    <File Id="REGEXP_932115.TXT" Name="regexp-932115.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932115.txt" />
+                                    <File Id="REGEXP_932150.TXT" Name="regexp-932150.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932150.txt" />
+                                    <File Id="REGEXP_CMDLINE.PY" Name="regexp-cmdline.py" Source="release\owasp_crs\util\regexp-assemble\regexp-cmdline.py" />
+                                </Component>
+                            </Directory>    
                             <Directory Id="HONEYPOT_SENSOR" Name="honeypot-sensor">
                                 <Component Id="HONEYPOT_SENSOR" DiskId="1" Guid="3D3DD51F-70FF-41CE-A756-2C2935A71BA8">
                                     <File Id="MLOGC_HONEYPOT_SENSOR.CONF" Name="mlogc-honeypot-sensor.conf" Source="release\owasp_crs\util\honeypot-sensor\mlogc-honeypot-sensor.conf" />
@@ -276,34 +281,10 @@
                             </Directory>
                             <Directory Id="REGRESSION_TESTS" Name="regression-tests">
                                 <Component Id="REGRESSION_TESTS" DiskId="1" Guid="02AF3C5A-DCF9-4DB6-A1C8-B1EF140C8EBC">
-                                    <File Id="INSTALL_1" Name="INSTALL" Source="release\owasp_crs\util\regression-tests\INSTALL" />
-                                    <File Id="MODSECURITY_CRS_59_HEADER_TAGGING.CONF" Name="modsecurity_crs_59_header_tagging.conf" Source="release\owasp_crs\util\regression-tests\modsecurity_crs_59_header_tagging.conf" />
-                                    <File Id="README_2" Name="README" Source="release\owasp_crs\util\regression-tests\README" />
-                                    <File Id="RULESTEST.CONF" Name="rulestest.conf" Source="release\owasp_crs\util\regression-tests\rulestest.conf" />
-                                    <File Id="RULESTEST.PL" Name="rulestest.pl" Source="release\owasp_crs\util\regression-tests\rulestest.pl" />
-                                    <File Id="TESTSERVER.CGI" Name="testserver.cgi" Source="release\owasp_crs\util\regression-tests\testserver.cgi" />
+                                    <File Id="README_3" Name="README" Source="release\owasp_crs\util\regression-tests\README" />
                                 </Component>
-                                <Directory Id="TESTS" Name="tests">
-                                    <Component Id="TESTS" DiskId="1" Guid="FCCBB8FE-4327-4AF0-AB5C-3120858EBB16">
-                                        <File Id="MODSECURITY_CRS_20_PROTOCOL_VIOLATIONS.TESTS" Name="modsecurity_crs_20_protocol_violations.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_20_protocol_violations.tests" />
-					<File Id="MODSECURITY_CRS_21_PROTOCOL_ANOMALIES.TESTS" Name="modsecurity_crs_21_protocol_anomalies.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_21_protocol_anomalies.tests" />
-                                        <File Id="MODSECURITY_CRS_23_REQUEST_LIMITS.TESTS" Name="modsecurity_crs_23_request_limits.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_23_request_limits.tests" />
-                                        <File Id="MODSECURITY_CRS_30_HTTP_POLICY.TESTS" Name="modsecurity_crs_30_http_policy.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_30_http_policy.tests" />
-                                        <File Id="MODSECURITY_CRS_35_BAD_ROBOTS.TESTS" Name="modsecurity_crs_35_bad_robots.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_35_bad_robots.tests" />
-                                        <File Id="MODSECURITY_CRS_40_GENERIC_ATTACKS.TESTS" Name="modsecurity_crs_40_generic_attacks.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_40_generic_attacks.tests" />
-                                        <File Id="MODSECURITY_CRS_41_SQL_INJECTION_ATTACKS.TESTS" Name="modsecurity_crs_41_sql_injection_attacks.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_41_sql_injection_attacks.tests" />
-                                        <File Id="MODSECURITY_CRS_41_XSS_ATTACKS.TESTS" Name="modsecurity_crs_41_xss_attacks.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_41_xss_attacks.tests" />
-                                        <File Id="MODSECURITY_CRS_50_OUTBOUND.TESTS" Name="modsecurity_crs_50_outbound.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_50_outbound.tests" />
-                                        <File Id="RUBY.TESTS" Name="ruby.tests" Source="release\owasp_crs\util\regression-tests\tests\ruby.tests" />
-                                    </Component>
+                                <Directory Id="OWASP_CRS_REGRESSIONS" Name="OWASP-CRS-regressions">
                                 </Directory>
-                            </Directory>
-                            <Directory Id="RULE_MANAGEMENT" Name="rule-management">
-                                <Component Id="RULE_MANAGEMENT" DiskId="1" Guid="0368949F-5721-4648-A789-1D5598F327F5">
-                                    <File Id="ID_RANGE" Name="id-range" Source="release\owasp_crs\util\rule-management\id-range" />
-                                    <File Id="REMOVE_2.7_ACTIONS.PL" Name="remove-2.7-actions.pl" Source="release\owasp_crs\util\rule-management\remove-2.7-actions.pl" />
-                                    <File Id="VERIFY.RB" Name="verify.rb" Source="release\owasp_crs\util\rule-management\verify.rb" />
-                                </Component>
                             </Directory>
                             <Directory Id="VIRTUAL_PATCHING" Name="virtual-patching">
                                 <Component Id="VIRTUAL_PATCHING" DiskId="1" Guid="DDDD3A2B-CEC1-42B3-9984-2987CA5BA311">
@@ -340,6 +321,7 @@
                 <File Id="EULA.RTF" Name="EULA.rtf" Source="wix\EULA.rtf" />
                 <File Id="modsecurity.conf" Name="modsecurity.conf" Source="wix\modsecurity.conf" />
                 <File Id="modsecurity_iis.conf" Name="modsecurity_iis.conf" Source="wix\modsecurity_iis.conf" />
+                <File Id="unicode.mapping" Name="unicode.mapping" Source="wix\unicode.mapping" />
 	<!-- <File Id="modsecurity_crs_10_setup.conf" Name="modsecurity_crs_10_setup.conf" Source="wix\modsecurity_crs_10_setup.conf" /> -->
                 <File Id="LIST_DEPENDENCIES.BAT" Name="list_dependencies.bat" Source="wix\list_dependencies.bat" />
                 <File Id="ModSecurity.xml" Name="ModSecurity.xml" Source="ModSecurity.xml" />
@@ -428,24 +410,24 @@
             <ComponentRef Id="ConfigSchema64" />
             <?endif ?>
             <ComponentRef Id="StartMenuShortcuts" />
-            <Feature Id="OWASP_ModSecurity_CRS_v2.2.9" Level="1" Title="OWASP ModSecurity CRS v2.2.9" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="Install OWASP CRS v2.2.9">
-		    <ComponentRef Id="OWASP_CRS_V_2_2_9" />
-		    <ComponentRef Id="OWASP_CRS_V_2_2_9_SETUP" />
+            <Feature Id="OWASP_ModSecurity_CRS_v3.0.2" Level="1" Title="OWASP ModSecurity CRS v3.0.2" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="Install OWASP CRS v3.0.2">
+		    <ComponentRef Id="OWASP_CRS_V_3_0_2" />
+		    <ComponentRef Id="OWASP_CRS_V_3_0_2_SETUP" />
 		    
+                <ComponentRef Id="ID_NUMBERING" />
                 <ComponentRef Id="README" />
-                <ComponentRef Id="BASE_RULES" />
-                <ComponentRef Id="EXPERIMENTAL_RULES" />
-                <ComponentRef Id="LUA" />
-                <ComponentRef Id="OPTIONAL_RULES" />
-                <ComponentRef Id="SLR_RULES" />
+                <ComponentRef Id="RULES" />
                 <ComponentRef Id="UTIL" />
                 <ComponentRef Id="RUNAV" />
                 <ComponentRef Id="RUNAV_RUNAV" />
                 <ComponentRef Id="BROWSER_TOOLS" />
+                <ComponentRef Id="DEBUG" />
+                <ComponentRef Id="GEO_LOCATION" />
+                <ComponentRef Id="INTEGRATION" />
+                <ComponentRef Id="JOIN_MULTILINE_RULES" />
+                <ComponentRef Id="REGEXP_ASSEMBLE" />
                 <ComponentRef Id="HONEYPOT_SENSOR" />
                 <ComponentRef Id="REGRESSION_TESTS" />
-                <ComponentRef Id="TESTS" />
-                <ComponentRef Id="RULE_MANAGEMENT" />
                 <ComponentRef Id="VIRTUAL_PATCHING" />
             </Feature>
         </Feature>
