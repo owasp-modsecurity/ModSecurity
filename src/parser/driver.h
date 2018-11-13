@@ -26,7 +26,7 @@
 #define SRC_PARSER_DRIVER_H_
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules.h"
+#include "modsecurity/rules_set.h"
 #include "modsecurity/rules_properties.h"
 #include "modsecurity/audit_log.h"
 #include "src/rule_script.h"
@@ -35,7 +35,7 @@
 #endif
 
 using modsecurity::Rule;
-using modsecurity::Rules;
+using modsecurity::RulesSet;
 
 
 # define YY_DECL \

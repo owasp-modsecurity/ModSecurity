@@ -23,9 +23,8 @@
 #include <list>
 #include <algorithm>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules.h"
-
 #include "test/common/modsecurity_test.h"
 #include "test/common/colors.h"
 #include "test/regression/regression_test.h"
@@ -99,7 +98,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
     for (RegressionTest *t : *tests) {
         CustomDebugLog *debug_log = new CustomDebugLog();
         modsecurity::ModSecurity *modsec = NULL;
-        modsecurity::Rules *modsec_rules = NULL;
+        modsecurity::RulesSet *modsec_rules = NULL;
         modsecurity::Transaction *modsec_transaction = NULL;
         ModSecurityTestResults<RegressionTest> r;
         std::stringstream serverLog;
@@ -148,7 +147,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
             " (ModSecurity regression test utility)");
         modsec->setServerLogCb(logCb);
-        modsec_rules = new modsecurity::Rules(debug_log);
+        modsec_rules = new modsecurity::RulesSet(debug_log);
 
         bool found = true;
         if (t->resource.empty() == false) {

@@ -20,8 +20,8 @@
 #include <string>
 #include <list>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules.h"
 #include "src/utils/system.h"
 #include "src/parser/driver.h"
 #include "src/utils/https_client.h"
@@ -36,7 +36,7 @@ void print_help() {
 
 
 int main(int argc, char **argv) {
-    modsecurity::Rules *modsecRules = new modsecurity::Rules();
+    modsecurity::RulesSet *modsecRules = new modsecurity::RulesSet();
     std::list<std::string> files;
     int total = 0;
 

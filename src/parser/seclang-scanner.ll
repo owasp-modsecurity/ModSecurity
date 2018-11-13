@@ -1308,10 +1308,10 @@ EQUALS_MINUS                            (?i:=\-)
 
     if (ret == false) {
         BEGIN(INITIAL);
-        if (driver.m_remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction) {
+        if (driver.m_remoteRulesActionOnFailed == RulesSet::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction) {
             /** TODO: Implement the server logging mechanism. */
         }
-        if (driver.m_remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction) {
+        if (driver.m_remoteRulesActionOnFailed == RulesSet::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction) {
             driver.error (*driver.loc.back(), "", yytext + std::string(" - Failed to download: ") + c.error);
             throw p::syntax_error(*driver.loc.back(), "");
         }

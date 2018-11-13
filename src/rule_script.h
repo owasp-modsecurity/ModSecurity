@@ -18,6 +18,7 @@
 #include <memory>
 #include <vector>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/rule.h"
 #include "src/engine/lua.h"
 #include "src/operators/operator.h"
@@ -26,7 +27,6 @@
 #include "src/actions/transformations/none.h"
 #include "src/actions/tag.h"
 #include "src/utils/string.h"
-#include "modsecurity/rules.h"
 #include "modsecurity/rule_message.h"
 #include "src/actions/msg.h"
 #include "src/actions/log_data.h"

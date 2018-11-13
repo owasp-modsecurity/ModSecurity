@@ -22,7 +22,7 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/audit_log.h"
 #include "src/utils/shared_files.h"
-#include "modsecurity/rules.h"
+#include "modsecurity/rules_set.h"
 
 #ifdef __cplusplus
 

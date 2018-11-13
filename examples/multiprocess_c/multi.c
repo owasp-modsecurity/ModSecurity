@@ -15,7 +15,7 @@
 
 #include <modsecurity/modsecurity.h>
 #include <modsecurity/transaction.h>
-#include <modsecurity/rules.h>
+#include <modsecurity/rules_set.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,12 +24,13 @@
 #include <sys/wait.h>
 #include <sys/time.h>
 
+
 #define FORKS 5
 #define REQUESTS_PER_PROCESS 100
 
 
 char main_rule_uri[] = "basic_rules.conf";
-Rules *rules = NULL;
+RulesSet *rules = NULL;
 ModSecurity *modsec = NULL;
 
 

@@ -25,9 +25,9 @@
 #include <fstream>
 #include <mutex>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/audit_log.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rules.h"
 #include "src/utils/md5.h"
 #include "src/utils/https_client.h"
 

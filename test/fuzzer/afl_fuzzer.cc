@@ -15,9 +15,8 @@
 
 
 #include <string.h>
-
+#include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules.h"
 #include "src/actions/transformations/transformation.h"
 
 /**
@@ -135,7 +134,7 @@ int main(int argc, char** argv) {
         std::string z = lastString;
 
         ModSecurity *ms = new ModSecurity();
-        Rules *rules = new Rules();
+        RulesSet *rules = new RulesSet();
         // Here it is possible to load a real transaction from a JSON.
         // like we do on the regression tests.
         Transaction *t = new Transaction(ms, rules, NULL);

@@ -18,8 +18,8 @@
 #include <iostream>
 #include <string>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/rules_properties.h"
-#include "modsecurity/rules.h"
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {
