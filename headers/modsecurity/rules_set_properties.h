@@ -25,8 +25,8 @@
 #endif
 
 
-#ifndef HEADERS_MODSECURITY_RULES_PROPERTIES_H_
-#define HEADERS_MODSECURITY_RULES_PROPERTIES_H_
+#ifndef HEADERS_MODSECURITY_RULES_SET_PROPERTIES_H_
+#define HEADERS_MODSECURITY_RULES_SET_PROPERTIES_H_
 
 
 #include "modsecurity/modsecurity.h"
@@ -140,7 +140,7 @@ class UnicodeMapHolder {
 };
 
 
-class RulesProperties;
+class RulesSetProperties;
 class ConfigUnicodeMap {
  public:
     ConfigUnicodeMap() : m_set(false),
@@ -148,7 +148,7 @@ class ConfigUnicodeMap {
         m_unicodeMapTable(NULL) { }
 
     static void loadConfig(std::string f, double codePage,
-        RulesProperties *driver, std::string *errg);
+        RulesSetProperties *driver, std::string *errg);
 
     void merge(ConfigUnicodeMap *from) {
         if (from->m_set == false) {
@@ -168,9 +168,9 @@ class ConfigUnicodeMap {
 };
 
 
-class RulesProperties {
+class RulesSetProperties {
  public:
-    RulesProperties() :
+    RulesSetProperties() :
         m_auditLog(new AuditLog()),
         m_requestBodyLimitAction(PropertyNotSetBodyLimitAction),
         m_responseBodyLimitAction(PropertyNotSetBodyLimitAction),
@@ -184,7 +184,7 @@ class RulesProperties {
         m_secRuleEngine(PropertyNotSetRuleEngine) { }
 
 
-    explicit RulesProperties(DebugLog *debugLog) :
+    explicit RulesSetProperties(DebugLog *debugLog) :
         m_auditLog(new AuditLog()),
         m_requestBodyLimitAction(PropertyNotSetBodyLimitAction),
         m_responseBodyLimitAction(PropertyNotSetBodyLimitAction),
@@ -198,7 +198,7 @@ class RulesProperties {
         m_secRuleEngine(PropertyNotSetRuleEngine) { }
 
 
-    ~RulesProperties() {
+    ~RulesSetProperties() {
         int i = 0;
         /** Cleanup the rules */
         for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
@@ -350,7 +350,7 @@ class RulesProperties {
     }
 
 
-    static int mergeProperties(RulesProperties *from, RulesProperties *to,
+    static int mergeProperties(RulesSetProperties *from, RulesSetProperties *to,
         std::ostringstream *err) {
         int amount_of_rules = 0;
 
@@ -558,4 +558,4 @@ class RulesProperties {
 }  // namespace modsecurity
 #endif
 
-#endif  // HEADERS_MODSECURITY_RULES_PROPERTIES_H_
+#endif  // HEADERS_MODSECURITY_RULES_SET_PROPERTIES_H_

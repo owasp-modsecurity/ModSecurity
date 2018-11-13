@@ -1585,7 +1585,7 @@ namespace yy {
   case 21:
 #line 839 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_uploadKeepFiles = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 1591 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1593,7 +1593,7 @@ namespace yy {
   case 22:
 #line 843 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_uploadKeepFiles = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 1599 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1637,7 +1637,7 @@ namespace yy {
   case 27:
 #line 867 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_tmpSaveUploadedFiles = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 1643 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1645,7 +1645,7 @@ namespace yy {
   case 28:
 #line 871 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_tmpSaveUploadedFiles = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 1651 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2225,7 +2225,7 @@ namespace yy {
   case 82:
 #line 1255 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 2231 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2233,7 +2233,7 @@ namespace yy {
   case 83:
 #line 1259 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 2239 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2241,7 +2241,7 @@ namespace yy {
   case 84:
 #line 1263 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 2247 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2249,7 +2249,7 @@ namespace yy {
   case 85:
 #line 1267 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 2255 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2848,7 +2848,7 @@ namespace yy {
   case 140:
 #line 1667 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secXMLExternalEntity = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 2854 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2856,7 +2856,7 @@ namespace yy {
   case 141:
 #line 1671 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secXMLExternalEntity = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 2862 "seclang-parser.cc" // lalr1.cc:906
     break;

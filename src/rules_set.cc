@@ -263,8 +263,8 @@ int RulesSet::evaluate(int phase, Transaction *t) {
 int RulesSet::merge(Driver *from) {
     int amount_of_rules = 0;
     amount_of_rules = mergeProperties(
-        dynamic_cast<RulesProperties *>(from),
-        dynamic_cast<RulesProperties *>(this),
+        dynamic_cast<RulesSetProperties *>(from),
+        dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
 
     return amount_of_rules;
@@ -274,8 +274,8 @@ int RulesSet::merge(Driver *from) {
 int RulesSet::merge(RulesSet *from) {
     int amount_of_rules = 0;
     amount_of_rules = mergeProperties(
-        dynamic_cast<RulesProperties *>(from),
-        dynamic_cast<RulesProperties *>(this),
+        dynamic_cast<RulesSetProperties *>(from),
+        dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
 
     return amount_of_rules;

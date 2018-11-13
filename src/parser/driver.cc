@@ -15,9 +15,9 @@
 
 #include "src/parser/driver.h"
 
+#include "modsecurity/rules_set_properties.h"
 #include "src/parser/seclang-parser.hh"
 #include "modsecurity/audit_log.h"
-#include "modsecurity/rules_properties.h"
 
 using modsecurity::audit_log::AuditLog;
 using modsecurity::Rule;
@@ -26,7 +26,7 @@ namespace modsecurity {
 namespace Parser {
 
 Driver::Driver()
-  : RulesProperties(),
+  : RulesSetProperties(),
   trace_scanning(false),
   trace_parsing(false),
   lastRule(NULL) { }
