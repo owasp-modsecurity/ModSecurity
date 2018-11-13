@@ -18,7 +18,7 @@
 #include <stdlib.h>
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules.h"
+#include "modsecurity/rules_set.h"
 
 
 char main_rule_uri[] = "basic_rules.conf";
@@ -29,7 +29,7 @@ int main (int argc, char **argv)
     const char *error = NULL;
     ModSecurity *modsec;
     Transaction *transaction = NULL;
-    Rules *rules;
+    RulesSet *rules;
 
     modsec = msc_init();
 

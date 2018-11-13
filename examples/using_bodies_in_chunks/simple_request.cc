@@ -19,12 +19,13 @@
 
 
 #include <modsecurity/modsecurity.h>
-#include <modsecurity/rules.h>
+#include <modsecurity/rules_set.h>
 #include <modsecurity/rule_message.h>
 
 
 #include <string>
 #include <memory>
+
 
 
 
@@ -125,7 +126,7 @@ int process_intervention(modsecurity::Transaction *transaction) {
 
 int main(int argc, char **argv) {
     modsecurity::ModSecurity *modsec;
-    modsecurity::Rules *rules;
+    modsecurity::RulesSet *rules;
     modsecurity::ModSecurityIntervention it;
 
     if (argc < 2) {
@@ -151,7 +152,7 @@ int main(int argc, char **argv) {
      * loading the rules....
      *
      */
-    rules = new modsecurity::Rules();
+    rules = new modsecurity::RulesSet();
     if (rules->loadFromUri(rules_arg.c_str()) < 0) {
         std::cout << "Problems loading the rules..." << std::endl;
         std::cout << rules->m_parserError.str() << std::endl;
