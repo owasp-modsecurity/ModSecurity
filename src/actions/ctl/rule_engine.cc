@@ -18,8 +18,8 @@
 #include <iostream>
 #include <string>
 
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/rules_set.h"
-#include "modsecurity/rules_properties.h"
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {
@@ -31,11 +31,11 @@ bool RuleEngine::init(std::string *error) {
     std::string what(m_parser_payload, 11, m_parser_payload.size() - 11);
 
     if (what == "on") {
-        m_ruleEngine = RulesProperties::EnabledRuleEngine;
+        m_ruleEngine = RulesSetProperties::EnabledRuleEngine;
     } else if (what == "off") {
-        m_ruleEngine = RulesProperties::DisabledRuleEngine;
+        m_ruleEngine = RulesSetProperties::DisabledRuleEngine;
     } else if (what == "detectiononly") {
-        m_ruleEngine = RulesProperties::DetectionOnlyRuleEngine;
+        m_ruleEngine = RulesSetProperties::DetectionOnlyRuleEngine;
     } else {
         error->assign("Internal error. Expected: On, Off or DetectionOnly; " \
             "got: " + m_parser_payload);
@@ -48,7 +48,7 @@ bool RuleEngine::init(std::string *error) {
 bool RuleEngine::evaluate(Rule *rule, Transaction *transaction) {
     std::stringstream a;
     a << "Setting SecRuleEngine to ";
-    a << modsecurity::RulesProperties::ruleEngineStateString(m_ruleEngine);
+    a << modsecurity::RulesSetProperties::ruleEngineStateString(m_ruleEngine);
     a << " as requested by a ctl:ruleEngine action";
 
     ms_dbg_a(transaction, 8, a.str());

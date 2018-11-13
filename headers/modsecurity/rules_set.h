@@ -28,7 +28,7 @@
 #ifndef HEADERS_MODSECURITY_RULES_H_
 #define HEADERS_MODSECURITY_RULES_H_
 
-#include "modsecurity/rules_properties.h"
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 
@@ -42,10 +42,10 @@ class Driver;
 
 
 /** @ingroup ModSecurity_CPP_API */
-class RulesSet : public RulesProperties {
+class RulesSet : public RulesSetProperties {
  public:
     RulesSet()
-        : RulesProperties(new DebugLog()),
+        : RulesSetProperties(new DebugLog()),
         unicode_codepage(0),
 #ifndef NO_LOGS
         m_secmarker_skipped(0),
@@ -53,7 +53,7 @@ class RulesSet : public RulesProperties {
         m_referenceCount(0) { }
 
     explicit RulesSet(DebugLog *customLog)
-        : RulesProperties(customLog),
+        : RulesSetProperties(customLog),
         unicode_codepage(0),
 #ifndef NO_LOGS
         m_secmarker_skipped(0),

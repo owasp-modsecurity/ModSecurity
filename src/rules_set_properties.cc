@@ -13,10 +13,9 @@
  *
  */
 
-#include "modsecurity/rules_properties.h"
-
 #include <string>
 
+#include "modsecurity/rules_set_properties.h"
 #include "src/utils/string.h"
 #include "src/variables/variable.h"
 
@@ -24,7 +23,7 @@ namespace modsecurity {
 
 
 void ConfigUnicodeMap::loadConfig(std::string f, double configCodePage,
-    RulesProperties *driver, std::string *errg) {
+    RulesSetProperties *driver, std::string *errg) {
     char *buf = NULL;
     char *hmap = NULL;
     char *p = NULL;

@@ -25,12 +25,12 @@
 #include <locale>
 #include <cstring>
 
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
 #include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
-#include "modsecurity/rules_properties.h"
 
 
 namespace modsecurity {
