@@ -148,7 +148,7 @@ class Driver;
 
 #include "modsecurity/audit_log.h"
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules_properties.h"
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/rule.h"
 #include "src/operators/operator.h"
 #include "src/utils/geo_lookup.h"
@@ -837,11 +837,11 @@ audit_log:
     /* Upload */
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_ON
       {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_uploadKeepFiles = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_OFF
       {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_uploadKeepFiles = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_RELEVANT_ONLY
       {
@@ -865,11 +865,11 @@ audit_log:
       }
     | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_ON
       {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_tmpSaveUploadedFiles = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
     | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_OFF
       {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_tmpSaveUploadedFiles = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
     ;
 
@@ -1241,31 +1241,31 @@ expression:
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {
-        driver.m_secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
+        driver.m_secRuleEngine = modsecurity::RulesSet::DisabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_ON
       {
-        driver.m_secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
+        driver.m_secRuleEngine = modsecurity::RulesSet::EnabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_DETC
       {
-        driver.m_secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
+        driver.m_secRuleEngine = modsecurity::RulesSet::DetectionOnlyRuleEngine;
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_ON
       {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_OFF
       {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
     | CONFIG_DIR_RES_BODY CONFIG_VALUE_ON
       {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
     | CONFIG_DIR_RES_BODY CONFIG_VALUE_OFF
       {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
     | CONFIG_SEC_ARGUMENT_SEPARATOR
       {
@@ -1613,27 +1613,27 @@ expression:
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
-        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_requestBodyLimitAction = modsecurity::RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
-        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_requestBodyLimitAction = modsecurity::RulesSet::BodyLimitAction::RejectBodyLimitAction;
       }
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
-        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_responseBodyLimitAction = modsecurity::RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
-        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_responseBodyLimitAction = modsecurity::RulesSet::BodyLimitAction::RejectBodyLimitAction;
       }
     | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_ABORT
       {
-        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
+        driver.m_remoteRulesActionOnFailed = RulesSet::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
     | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_WARN
       {
-        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
+        driver.m_remoteRulesActionOnFailed = RulesSet::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
     | CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
@@ -1665,11 +1665,11 @@ expression:
       }
     | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_OFF
       {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secXMLExternalEntity = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
     | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_ON
       {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secXMLExternalEntity = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
     | CONGIG_DIR_SEC_TMP_DIR
       {
