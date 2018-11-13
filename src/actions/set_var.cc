@@ -19,8 +19,8 @@
 #include <string>
 #include <memory>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rules.h"
 #include "modsecurity/rule.h"
 #include "src/utils/string.h"
 #include "src/variables/global.h"

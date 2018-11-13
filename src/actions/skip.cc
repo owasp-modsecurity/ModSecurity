@@ -18,9 +18,9 @@
 #include <iostream>
 #include <string>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rules.h"
 
 namespace modsecurity {
 namespace actions {

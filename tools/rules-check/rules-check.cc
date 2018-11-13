@@ -21,8 +21,8 @@
 #include <iostream>
 #include <string>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules.h"
 
 
 void print_help(const char *name) {
@@ -32,9 +32,9 @@ void print_help(const char *name) {
 
 
 int main(int argc, char **argv) {
-    modsecurity::Rules *rules;
+    modsecurity::RulesSet *rules;
     char **args = argv;
-    rules = new modsecurity::Rules();
+    rules = new modsecurity::RulesSet();
     int ret = 0;
 
     args++;
