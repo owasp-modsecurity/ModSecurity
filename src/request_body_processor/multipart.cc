@@ -71,12 +71,12 @@ Multipart::Multipart(std:: string header, Transaction *transaction)
 Multipart::~Multipart() {
     ms_dbg_a(m_transaction, 4,
         "Multipart: Cleanup started (keep files set to " \
-        + RulesProperties::configBooleanString(
+        + RulesSetProperties::configBooleanString(
             m_transaction->m_rules->m_uploadKeepFiles) \
         + ")");
 
     if (m_transaction->m_rules->m_uploadKeepFiles
-        != RulesProperties::TrueConfigBoolean) {
+        != RulesSetProperties::TrueConfigBoolean) {
         for (MultipartPart *m : m_parts) {
             if (m->m_type == MULTIPART_FILE) {
                 if (!m->m_tmp_file_name.empty()) {
@@ -462,9 +462,9 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
     /* add data to the part we are building */
     if (m_mpp->m_type == MULTIPART_FILE) {
         bool extract = m_transaction->m_rules->m_uploadKeepFiles \
-            == RulesProperties::TrueConfigBoolean \
+            == RulesSetProperties::TrueConfigBoolean \
             || m_transaction->m_rules->m_tmpSaveUploadedFiles \
-            == RulesProperties::TrueConfigBoolean;
+            == RulesSetProperties::TrueConfigBoolean;
 
         /* remember where we started */
         if (m_mpp->m_length == 0) {

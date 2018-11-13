@@ -15,9 +15,9 @@
 
 #include <string>
 
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rules_properties.h"
 
 
 #ifndef SRC_ACTIONS_CTL_RULE_ENGINE_H_
@@ -32,12 +32,12 @@ class RuleEngine : public Action {
  public:
     explicit RuleEngine(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind),
-        m_ruleEngine(RulesProperties::PropertyNotSetRuleEngine) { }
+        m_ruleEngine(RulesSetProperties::PropertyNotSetRuleEngine) { }
 
     bool init(std::string *error) override;
     bool evaluate(Rule *rule, Transaction *transaction) override;
 
-    RulesProperties::RuleEngine m_ruleEngine;
+    RulesSetProperties::RuleEngine m_ruleEngine;
 };
 
 

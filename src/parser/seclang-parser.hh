@@ -187,7 +187,7 @@ class Driver;
 
 #include "modsecurity/audit_log.h"
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules_properties.h"
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/rule.h"
 #include "src/operators/operator.h"
 #include "src/utils/geo_lookup.h"

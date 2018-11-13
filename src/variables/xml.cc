@@ -36,7 +36,7 @@
 #include <utility>
 
 #include "modsecurity/transaction.h"
-#include "modsecurity/rules_properties.h"
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/rules_set.h"
 
 #include "src/request_body_processor/xml.h"

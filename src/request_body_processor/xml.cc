@@ -48,7 +48,7 @@ XML::~XML() {
 bool XML::init() {
     xmlParserInputBufferCreateFilenameFunc entity;
     if (m_transaction->m_rules->m_secXMLExternalEntity
-        == RulesProperties::TrueConfigBoolean) {
+        == RulesSetProperties::TrueConfigBoolean) {
         entity = xmlParserInputBufferCreateFilenameDefault(
             __xmlParserInputBufferCreateFilename);
     } else {
