@@ -43,7 +43,7 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
 	../headers/modsecurity/rule_message.h \
-	../headers/modsecurity/rules.h \
+	../headers/modsecurity/rules_set.h \
 	../headers/modsecurity/rules_exceptions.h \
 	../headers/modsecurity/rules_properties.h \
 	../headers/modsecurity/transaction.h \

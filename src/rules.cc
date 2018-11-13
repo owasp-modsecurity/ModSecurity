@@ -13,14 +13,13 @@
  *
  */
 
-#include "modsecurity/rules.h"
-
 #include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/parser/driver.h"
@@ -47,7 +46,7 @@ namespace modsecurity {
  * @return Number of the current transactions using this rules
  *
  */
-void Rules::incrementReferenceCount(void) {
+void RulesSet::incrementReferenceCount(void) {
     this->m_referenceCount++;
 }
 
@@ -60,7 +59,7 @@ void Rules::incrementReferenceCount(void) {
  * @return Number of the current transactions using this rules
  *
  */
-void Rules::decrementReferenceCount(void) {
+void RulesSet::decrementReferenceCount(void) {
     this->m_referenceCount--;
     if (this->m_referenceCount == 0) {
         /**
@@ -92,7 +91,7 @@ void Rules::decrementReferenceCount(void) {
  * @retval false Problem loading the rules.
  *
  */
-int Rules::loadFromUri(const char *uri) {
+int RulesSet::loadFromUri(const char *uri) {
     Driver *driver = new Driver();
 
     if (driver->parseFile(uri) == false) {
@@ -108,7 +107,7 @@ int Rules::loadFromUri(const char *uri) {
 }
 
 
-int Rules::load(const char *file, const std::string &ref) {
+int RulesSet::load(const char *file, const std::string &ref) {
     Driver *driver = new Driver();
 
     if (driver->parse(file, ref) == false) {
@@ -128,7 +127,7 @@ int Rules::load(const char *file, const std::string &ref) {
 }
 
 
-int Rules::loadRemote(const char *key, const char *uri) {
+int RulesSet::loadRemote(const char *key, const char *uri) {
     HttpsClient client;
     client.setKey(key);
     bool ret = client.download(uri);
@@ -141,17 +140,17 @@ int Rules::loadRemote(const char *key, const char *uri) {
 }
 
 
-int Rules::load(const char *plainRules) {
+int RulesSet::load(const char *plainRules) {
     return this->load(plainRules, "");
 }
 
 
-std::string Rules::getParserError() {
+std::string RulesSet::getParserError() {
     return this->m_parserError.str();
 }
 
 
-int Rules::evaluate(int phase, Transaction *t) {
+int RulesSet::evaluate(int phase, Transaction *t) {
     if (phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
        return 0;
     }
@@ -266,7 +265,7 @@ int Rules::evaluate(int phase, Transaction *t) {
 }
 
 
-int Rules::merge(Driver *from) {
+int RulesSet::merge(Driver *from) {
     int amount_of_rules = 0;
     amount_of_rules = mergeProperties(
         dynamic_cast<RulesProperties *>(from),
@@ -277,7 +276,7 @@ int Rules::merge(Driver *from) {
 }
 
 
-int Rules::merge(Rules *from) {
+int RulesSet::merge(RulesSet *from) {
     int amount_of_rules = 0;
     amount_of_rules = mergeProperties(
         dynamic_cast<RulesProperties *>(from),
@@ -288,7 +287,7 @@ int Rules::merge(Rules *from) {
 }
 
 
-void Rules::debug(int level, const std::string &id,
+void RulesSet::debug(int level, const std::string &id,
     const std::string &uri, const std::string &msg) {
     if (m_debugLog != NULL) {
         m_debugLog->write(level, id, uri, msg);
@@ -296,7 +295,7 @@ void Rules::debug(int level, const std::string &id,
 }
 
 
-void Rules::dump() {
+void RulesSet::dump() {
     std::cout << "Rules: " << std::endl;
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = m_rules[i];
@@ -311,18 +310,18 @@ void Rules::dump() {
 }
 
 
-extern "C" Rules *msc_create_rules_set(void) {
-    return new Rules();
+extern "C" RulesSet *msc_create_rules_set(void) {
+    return new RulesSet();
 }
 
 
-extern "C" void msc_rules_dump(Rules *rules) {
+extern "C" void msc_rules_dump(RulesSet *rules) {
     rules->dump();
 }
 
 
-extern "C" int msc_rules_merge(Rules *rules_dst,
-    Rules *rules_from, const char **error) {
+extern "C" int msc_rules_merge(RulesSet *rules_dst,
+    RulesSet *rules_from, const char **error) {
     int ret = rules_dst->merge(rules_from);
     if (ret < 0) {
         *error = strdup(rules_dst->getParserError().c_str());
@@ -331,7 +330,7 @@ extern "C" int msc_rules_merge(Rules *rules_dst,
 }
 
 
-extern "C" int msc_rules_add_remote(Rules *rules,
+extern "C" int msc_rules_add_remote(RulesSet *rules,
     const char *key, const char *uri, const char **error) {
     int ret = rules->loadRemote(key, uri);
     if (ret < 0) {
@@ -341,7 +340,7 @@ extern "C" int msc_rules_add_remote(Rules *rules,
 }
 
 
-extern "C" int msc_rules_add_file(Rules *rules, const char *file,
+extern "C" int msc_rules_add_file(RulesSet *rules, const char *file,
     const char **error) {
     int ret = rules->loadFromUri(file);
     if (ret < 0) {
@@ -351,7 +350,7 @@ extern "C" int msc_rules_add_file(Rules *rules, const char *file,
 }
 
 
-extern "C" int msc_rules_add(Rules *rules, const char *plain_rules,
+extern "C" int msc_rules_add(RulesSet *rules, const char *plain_rules,
     const char **error) {
     int ret = rules->load(plain_rules);
     if (ret < 0) {
@@ -361,7 +360,7 @@ extern "C" int msc_rules_add(Rules *rules, const char *plain_rules,
 }
 
 
-extern "C" int msc_rules_cleanup(Rules *rules) {
+extern "C" int msc_rules_cleanup(RulesSet *rules) {
     delete rules;
     return true;
 }

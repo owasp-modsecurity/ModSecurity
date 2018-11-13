@@ -25,11 +25,11 @@
 #include <locale>
 #include <cstring>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
 #include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
-#include "modsecurity/rules.h"
 #include "modsecurity/rules_properties.h"
 
 
@@ -108,7 +108,7 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
                             }
 
                             if (Code >= 0 && Code <= 65535)  {
-                                Rules *r = t->m_rules;
+                                RulesSet *r = t->m_rules;
                                 hmap = r->m_unicodeMapTable.m_unicodeMapTable->at(Code);
                             }
                         }

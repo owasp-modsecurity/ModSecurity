@@ -99,7 +99,7 @@ namespace modsecurity {
  * @endcode
  *
  */
-Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
+Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     : m_clientPort(0),
     m_serverPort(0),
     m_uri_no_query_string_decoded(""),
@@ -110,7 +110,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_ARGScombinedSizeDouble(0),
     m_requestBodyType(UnknownFormat),
     m_requestBodyProcessor(UnknownFormat),
-    m_requestBodyAccess(Rules::PropertyNotSetConfigBoolean),
+    m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
     m_marker(""),
     m_allowType(modsecurity::actions::disruptive::NoneAllowType),
     m_skip_next(0),
@@ -143,7 +143,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     intervention::clean(&m_it);
 }
 
-Transaction::Transaction(ModSecurity *ms, Rules *rules, char *id, void *logCbData)
+Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCbData)
     : m_clientPort(0),
     m_serverPort(0),
     m_uri_no_query_string_decoded(""),
@@ -154,7 +154,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, char *id, void *logCbDat
     m_ARGScombinedSizeDouble(0),
     m_requestBodyType(UnknownFormat),
     m_requestBodyProcessor(UnknownFormat),
-    m_requestBodyAccess(Rules::PropertyNotSetConfigBoolean),
+    m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
     m_marker(""),
     m_allowType(modsecurity::actions::disruptive::NoneAllowType),
     m_skip_next(0),
@@ -504,7 +504,7 @@ int Transaction::processURI(const char *uri, const char *method,
 int Transaction::processRequestHeaders() {
     ms_dbg(4, "Starting phase REQUEST_HEADERS.  (SecRules 1)");
 
-    if (getRuleEngineState() == Rules::DisabledRuleEngine) {
+    if (getRuleEngineState() == RulesSet::DisabledRuleEngine) {
         ms_dbg(4, "Rule engine disabled, returning...");
         return true;
     }
@@ -945,7 +945,7 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
         ms_dbg(5, "Request body is bigger than the maximum expected.");
 
         if (this->m_rules->m_requestBodyLimitAction ==
-            Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
+            RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
             size_t spaceLeft = this->m_rules->m_requestBodyLimit.m_value
                 - current_size;
             this->m_requestBody.write(reinterpret_cast<const char*>(buf),
@@ -954,10 +954,10 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
             return false;
         } else {
             if (this->m_rules->m_requestBodyLimitAction ==
-                Rules::BodyLimitAction::RejectBodyLimitAction) {
+                RulesSet::BodyLimitAction::RejectBodyLimitAction) {
                 ms_dbg(5, "Request body limit is marked to reject the " \
                     "request");
-                if (getRuleEngineState() == Rules::EnabledRuleEngine) {
+                if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
                     intervention::free(&m_it);
                     m_it.log = strdup("Request body limit is marked to " \
                             "reject the request");
@@ -1002,7 +1002,7 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
     m_variableResponseStatus.set(std::to_string(code), m_variableOffset);
     m_variableResponseProtocol.set(proto, m_variableOffset);
 
-    if (getRuleEngineState() == Rules::DisabledRuleEngine) {
+    if (getRuleEngineState() == RulesSet::DisabledRuleEngine) {
         ms_dbg(4, "Rule engine disabled, returning...");
         return true;
     }
@@ -1123,7 +1123,7 @@ int Transaction::addResponseHeader(const unsigned char *key, size_t key_n,
 int Transaction::processResponseBody() {
     ms_dbg(4, "Starting phase RESPONSE_BODY. (SecRules 4)");
 
-    if (getRuleEngineState() == Rules::DisabledRuleEngine) {
+    if (getRuleEngineState() == RulesSet::DisabledRuleEngine) {
         ms_dbg(4, "Rule engine disabled, returning...");
         return true;
     }
@@ -1204,7 +1204,7 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
         m_variableOutboundDataError.set("1", m_variableOffset);
         ms_dbg(5, "Response body is bigger than the maximum expected.");
         if (this->m_rules->m_responseBodyLimitAction ==
-            Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
+            RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
             size_t spaceLeft = this->m_rules->m_responseBodyLimit.m_value \
                 - current_size;
             this->m_responseBody.write(reinterpret_cast<const char*>(buf),
@@ -1213,10 +1213,10 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
             return false;
         } else {
             if (this->m_rules->m_responseBodyLimitAction ==
-                Rules::BodyLimitAction::RejectBodyLimitAction) {
+                RulesSet::BodyLimitAction::RejectBodyLimitAction) {
                 ms_dbg(5, "Response body limit is marked to reject the " \
                     "request");
-                if (getRuleEngineState() == Rules::EnabledRuleEngine) {
+                if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
                     intervention::free(&m_it);
                     m_it.log = strdup("Response body limit is marked to reject " \
                         "the request");
@@ -1311,7 +1311,7 @@ size_t Transaction::getRequestBodyLength() {
 int Transaction::processLogging() {
     ms_dbg(4, "Starting phase LOGGING. (SecRules 5)");
 
-    if (getRuleEngineState() == Rules::DisabledRuleEngine) {
+    if (getRuleEngineState() == RulesSet::DisabledRuleEngine) {
         ms_dbg(4, "Rule engine disabled, returning...");
         return true;
     }
@@ -1667,7 +1667,7 @@ std::string Transaction::toJSON(int parts) {
 
         /* producer > engine state */
         LOGFY_ADD("secrules_engine",
-            Rules::ruleEngineStateString(
+            RulesSet::ruleEngineStateString(
             (RulesProperties::RuleEngine) getRuleEngineState()));
 
         /* producer > components */
@@ -1806,11 +1806,11 @@ int Transaction::updateStatusCode(int code) {
  *
  */
 extern "C" Transaction *msc_new_transaction(ModSecurity *ms,
-    Rules *rules, void *logCbData) {
+    RulesSet *rules, void *logCbData) {
     return new Transaction(ms, rules, logCbData);
 }
 extern "C" Transaction *msc_new_transaction_with_id(ModSecurity *ms,
-    Rules *rules, char *id, void *logCbData) {
+    RulesSet *rules, char *id, void *logCbData) {
     return new Transaction(ms, rules, id, logCbData);
 }
 

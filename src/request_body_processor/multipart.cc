@@ -27,8 +27,8 @@
 #include <string>
 #include <utility>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/collection/collections.h"
-#include "modsecurity/rules.h"
 #include "src/utils/string.h"
 
 

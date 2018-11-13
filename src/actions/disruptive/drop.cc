@@ -21,7 +21,11 @@
 #include <cstring>
 #include <memory>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule.h"
+#include "src/utils/string.h"
+#include "modsecurity/modsecurity.h"
 
 namespace modsecurity {
 namespace actions {

@@ -15,7 +15,6 @@
 
 #include "src/operators/rbl.h"
 
-#include <modsecurity/rules.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -24,6 +23,7 @@
 
 #include <string>
 
+#include "modsecurity/rules_set.h"
 #include "src/operators/operator.h"
 
 namespace modsecurity {

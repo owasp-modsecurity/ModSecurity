@@ -13,10 +13,9 @@
  *
  */
 
-#include "modsecurity/rules.h"
-
 #include "modsecurity/rule_message.h"
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"
