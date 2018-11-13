@@ -25,13 +25,13 @@
 #include <utility>
 #include <memory>
 
+#include "modsecurity/rules_set.h"
 #include "src/operators/operator.h"
 #include "modsecurity/actions/action.h"
 #include "modsecurity/modsecurity.h"
 #include "src/actions/transformations/none.h"
 #include "src/actions/tag.h"
 #include "src/utils/string.h"
-#include "modsecurity/rules.h"
 #include "modsecurity/rule_message.h"
 #include "src/actions/msg.h"
 #include "src/actions/log_data.h"
@@ -562,7 +562,7 @@ void Rule::executeAction(Transaction *trans,
         return;
     }
 
-    if (trans->getRuleEngineState() == Rules::EnabledRuleEngine) {
+    if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + a->m_name + \
             ".");
         a->evaluate(this, trans, ruleMessage);

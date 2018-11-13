@@ -42,9 +42,9 @@ class Driver;
 
 
 /** @ingroup ModSecurity_CPP_API */
-class Rules : public RulesProperties {
+class RulesSet : public RulesProperties {
  public:
-    Rules()
+    RulesSet()
         : RulesProperties(new DebugLog()),
         unicode_codepage(0),
 #ifndef NO_LOGS
@@ -52,7 +52,7 @@ class Rules : public RulesProperties {
 #endif
         m_referenceCount(0) { }
 
-    explicit Rules(DebugLog *customLog)
+    explicit RulesSet(DebugLog *customLog)
         : RulesProperties(customLog),
         unicode_codepage(0),
 #ifndef NO_LOGS
@@ -60,7 +60,7 @@ class Rules : public RulesProperties {
 #endif
         m_referenceCount(0) { }
 
-    ~Rules() { }
+    ~RulesSet() { }
 
     void incrementReferenceCount(void);
     void decrementReferenceCount(void);
@@ -73,7 +73,7 @@ class Rules : public RulesProperties {
     void dump();
 
     int merge(Parser::Driver *driver);
-    int merge(Rules *rules);
+    int merge(RulesSet *rules);
 
     int evaluate(int phase, Transaction *transaction);
     std::string getParserError();
@@ -96,14 +96,14 @@ class Rules : public RulesProperties {
 extern "C" {
 #endif
 
-Rules *msc_create_rules_set(void);
-void msc_rules_dump(Rules *rules);
-int msc_rules_merge(Rules *rules_dst, Rules *rules_from, const char **error);
-int msc_rules_add_remote(Rules *rules, const char *key, const char *uri,
+RulesSet *msc_create_rules_set(void);
+void msc_rules_dump(RulesSet *rules);
+int msc_rules_merge(RulesSet *rules_dst, RulesSet *rules_from, const char **error);
+int msc_rules_add_remote(RulesSet *rules, const char *key, const char *uri,
     const char **error);
-int msc_rules_add_file(Rules *rules, const char *file, const char **error);
-int msc_rules_add(Rules *rules, const char *plain_rules, const char **error);
-int msc_rules_cleanup(Rules *rules);
+int msc_rules_add_file(RulesSet *rules, const char *file, const char **error);
+int msc_rules_add(RulesSet *rules, const char *plain_rules, const char **error);
+int msc_rules_cleanup(RulesSet *rules);
 
 #ifdef __cplusplus
 }

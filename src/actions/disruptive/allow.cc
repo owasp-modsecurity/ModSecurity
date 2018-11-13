@@ -18,9 +18,9 @@
 #include <iostream>
 #include <string>
 
+#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-#include "modsecurity/rules.h"
 #include "src/utils/string.h"
 #include "modsecurity/modsecurity.h"
 

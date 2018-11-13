@@ -69,14 +69,14 @@ char ip[] = "200.249.12.31";
 
 struct data_ms {
     modsecurity::ModSecurity *modsec;
-    modsecurity::Rules *rules;
+    modsecurity::RulesSet *rules;
 };
 
 
 static void *process_request(void *data) {
     struct data_ms *a = (struct data_ms *)data;
     modsecurity::ModSecurity *modsec = a->modsec;
-    modsecurity::Rules *rules = a->rules;
+    modsecurity::RulesSet *rules = a->rules;
     int z = 0;
 
     for (z = 0; z < 10000; z++) {
@@ -132,7 +132,7 @@ class ReadingLogsViaRuleMessage {
         void *status;
 
         modsecurity::ModSecurity *modsec;
-        modsecurity::Rules *rules;
+        modsecurity::RulesSet *rules;
         modsecurity::ModSecurityIntervention it;
 
         modsec = new modsecurity::ModSecurity();
@@ -141,7 +141,7 @@ class ReadingLogsViaRuleMessage {
         modsec->setServerLogCb(logCb, modsecurity::RuleMessageLogProperty
             | modsecurity::IncludeFullHighlightLogProperty);
 
-        rules = new modsecurity::Rules();
+        rules = new modsecurity::RulesSet();
         if (rules->loadFromUri(m_rules.c_str()) < 0) {
             std::cout << "Problems loading the rules..." << std::endl;
             std::cout << rules->m_parserError.str() << std::endl;

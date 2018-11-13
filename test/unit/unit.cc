@@ -20,9 +20,8 @@
 #include <ctime>
 #include <string>
 
-
+#include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rules.h"
 #include "src/operators/operator.h"
 #include "src/actions/transformations/transformation.h"
 #include "modsecurity/transaction.h"
