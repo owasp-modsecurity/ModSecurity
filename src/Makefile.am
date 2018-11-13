@@ -45,8 +45,8 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/rule_message.h \
 	../headers/modsecurity/rules.h \
 	../headers/modsecurity/rules_set.h \
+	../headers/modsecurity/rules_set_properties.h \
 	../headers/modsecurity/rules_exceptions.h \
-	../headers/modsecurity/rules_properties.h \
 	../headers/modsecurity/transaction.h \
 	../headers/modsecurity/variable_origin.h \
 	../headers/modsecurity/variable_value.h
@@ -274,7 +274,8 @@ libmodsecurity_la_SOURCES = \
 	audit_log/writer/serial.cc \
 	audit_log/writer/parallel.cc \
 	modsecurity.cc \
-	rules.cc \
+	rules_set.cc \
+	rules_set_properties.cc \
 	debug_log/debug_log.cc \
 	debug_log/debug_log_writer.cc \
 	run_time_string.cc \
@@ -283,7 +284,6 @@ libmodsecurity_la_SOURCES = \
 	rule_script.cc \
 	unique_id.cc \
 	rules_exceptions.cc \
-	rules_properties.cc \
 	${BODY_PROCESSORS} \
 	${ACTIONS} \
 	${ENGINES} \

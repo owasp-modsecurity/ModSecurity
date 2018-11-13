@@ -15,8 +15,8 @@
 
 #include <string>
 
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/actions/action.h"
-#include "modsecurity/rules_properties.h"
 #include "src/actions/transformations/transformation.h"
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_URL_DECODE_UNI_H_

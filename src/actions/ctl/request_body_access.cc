@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/rules_properties.h"
+#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {
@@ -44,9 +44,9 @@ bool RequestBodyAccess::init(std::string *error) {
 
 bool RequestBodyAccess::evaluate(Rule *rule, Transaction *transaction) {
     if (m_request_body_access) {
-        transaction->m_requestBodyAccess = RulesProperties::TrueConfigBoolean;
+        transaction->m_requestBodyAccess = RulesSetProperties::TrueConfigBoolean;
     } else {
-        transaction->m_requestBodyAccess = RulesProperties::FalseConfigBoolean;
+        transaction->m_requestBodyAccess = RulesSetProperties::FalseConfigBoolean;
     }
 
     return true;

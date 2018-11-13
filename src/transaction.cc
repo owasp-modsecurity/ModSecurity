@@ -49,7 +49,7 @@
 #include "src/utils/random.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
-#include "modsecurity/rules_properties.h"
+#include "modsecurity/rules_set_properties.h"
 #include "src/actions/disruptive/allow.h"
 #include "src/variables/remote_user.h"
 
@@ -147,7 +147,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
 #else
     m_json(NULL),
 #endif
-    m_secRuleEngine(RulesProperties::PropertyNotSetRuleEngine),
+    m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
     m_variableDuration(""),
     m_variableEnvs(),
     m_variableHighestSeverityAction(""),
@@ -220,7 +220,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
 #else
     m_json(NULL),
 #endif
-    m_secRuleEngine(RulesProperties::PropertyNotSetRuleEngine),
+    m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
     m_variableDuration(""),
     m_variableEnvs(),
     m_variableHighestSeverityAction(""),
@@ -778,7 +778,7 @@ int Transaction::addRequestHeader(const unsigned char *key, size_t key_n,
 int Transaction::processRequestBody() {
     ms_dbg(4, "Starting phase REQUEST_BODY. (SecRules 2)");
 
-    if (getRuleEngineState() == RulesProperties::DisabledRuleEngine) {
+    if (getRuleEngineState() == RulesSetProperties::DisabledRuleEngine) {
         ms_dbg(4, "Rule engine disabled, returning...");
         return true;
     }
@@ -891,8 +891,8 @@ int Transaction::processRequestBody() {
         m_variableReqbodyProcessorError.set("0", m_variableOffset);
     }
 
-    if (m_rules->m_secRequestBodyAccess == RulesProperties::FalseConfigBoolean) {
-        if (m_requestBodyAccess != RulesProperties::TrueConfigBoolean) {
+    if (m_rules->m_secRequestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
+        if (m_requestBodyAccess != RulesSetProperties::TrueConfigBoolean) {
             ms_dbg(4, "Request body processing is disabled");
             return true;
         } else {
@@ -901,7 +901,7 @@ int Transaction::processRequestBody() {
                 "action");
         }
     } else {
-        if (m_requestBodyAccess == RulesProperties::FalseConfigBoolean) {
+        if (m_requestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
             ms_dbg(4, "Request body processing is enabled, but " \
                 "disabled to this transaction due to ctl:requestBodyAccess " \
                 "action");
@@ -1189,7 +1189,7 @@ int Transaction::processResponseBody() {
         return true;
     }
 
-    if (m_rules->m_secResponseBodyAccess != RulesProperties::TrueConfigBoolean) {
+    if (m_rules->m_secResponseBodyAccess != RulesSetProperties::TrueConfigBoolean) {
         ms_dbg(4, "Response body is disabled, returning... " + std::to_string(m_rules->m_secResponseBodyAccess));
         return true;
     }
@@ -1729,7 +1729,7 @@ std::string Transaction::toJSON(int parts) {
         /* producer > engine state */
         LOGFY_ADD("secrules_engine",
             RulesSet::ruleEngineStateString(
-            (RulesProperties::RuleEngine) getRuleEngineState()));
+            (RulesSetProperties::RuleEngine) getRuleEngineState()));
 
         /* producer > components */
         yajl_gen_string(g,
@@ -1816,7 +1816,7 @@ void Transaction::serverLog(std::shared_ptr<RuleMessage> rm) {
 
 
 int Transaction::getRuleEngineState() const {
-    if (m_secRuleEngine == RulesProperties::PropertyNotSetRuleEngine) {
+    if (m_secRuleEngine == RulesSetProperties::PropertyNotSetRuleEngine) {
         return m_rules->m_secRuleEngine;
     }
 

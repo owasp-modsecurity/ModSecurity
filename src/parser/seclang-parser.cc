@@ -1847,7 +1847,7 @@ namespace yy {
   case 21:
 #line 803 "seclang-parser.yy"
       {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_uploadKeepFiles = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 1853 "seclang-parser.cc"
     break;
@@ -1855,7 +1855,7 @@ namespace yy {
   case 22:
 #line 807 "seclang-parser.yy"
       {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_uploadKeepFiles = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 1861 "seclang-parser.cc"
     break;
@@ -1899,7 +1899,7 @@ namespace yy {
   case 27:
 #line 831 "seclang-parser.yy"
       {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_tmpSaveUploadedFiles = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 1905 "seclang-parser.cc"
     break;
@@ -1907,7 +1907,7 @@ namespace yy {
   case 28:
 #line 835 "seclang-parser.yy"
       {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_tmpSaveUploadedFiles = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 1913 "seclang-parser.cc"
     break;
@@ -2495,7 +2495,7 @@ namespace yy {
   case 83:
 #line 1223 "seclang-parser.yy"
       {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 2501 "seclang-parser.cc"
     break;
@@ -2503,7 +2503,7 @@ namespace yy {
   case 84:
 #line 1227 "seclang-parser.yy"
       {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 2509 "seclang-parser.cc"
     break;
@@ -2511,7 +2511,7 @@ namespace yy {
   case 85:
 #line 1231 "seclang-parser.yy"
       {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 2517 "seclang-parser.cc"
     break;
@@ -2519,7 +2519,7 @@ namespace yy {
   case 86:
 #line 1235 "seclang-parser.yy"
       {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 2525 "seclang-parser.cc"
     break;
@@ -3127,7 +3127,7 @@ namespace yy {
   case 142:
 #line 1640 "seclang-parser.yy"
       {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_secXMLExternalEntity = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
 #line 3133 "seclang-parser.cc"
     break;
@@ -3135,7 +3135,7 @@ namespace yy {
   case 143:
 #line 1644 "seclang-parser.yy"
       {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_secXMLExternalEntity = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
 #line 3141 "seclang-parser.cc"
     break;
