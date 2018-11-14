@@ -1,0 +1,199 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Config :: Phases (1/n)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"SecRules 0.*\n.*This phase consists of 1 rule\\(s\\)"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule ARGS \"@unconditionalMatch other_value\" \"id:1,phase:0,block,status:404\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Config :: Phases (2/n)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"SecRules 1.*\n.*This phase consists of 1 rule\\(s\\)"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule ARGS \"@unconditionalMatch other_value\" \"id:1,phase:1,block,status:404\""
+    ]
+},
+{
+  "enabled":1,
+  "version_min":300000,
+  "title":"Testing Config :: Phases (3/n)",
+  "client":{
+    "ip":"200.249.12.31",
+    "port":123
+  },
+  "server":{
+    "ip":"200.249.12.31",
+    "port":80
+  },
+  "request":{
+    "headers":{
+      "Host":"localhost",
+      "User-Agent":"curl/7.38.0",
+      "Accept":"*/*"
+    },
+    "uri":"/?key=value&key=other_value",
+    "method":"GET"
+  },
+  "response":{
+    "headers":{
+      "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+      "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+      "Content-Type":"text/html"
+    },
+    "body":[
+      "no need."
+    ]
+  },
+  "expected":{
+    "debug_log":"SecRules 3.*\n.*This phase consists of 1 rule\\(s\\)"
+  },
+  "rules":[
+    "SecRuleEngine On",
+    "SecRule ARGS \"@unconditionalMatch other_value\" \"id:1,phase:3,block,status:404\""
+  ]
+},
+{
+  "enabled":1,
+  "version_min":300000,
+  "title":"Testing Config :: Phases (4/n)",
+  "client":{
+    "ip":"200.249.12.31",
+    "port":123
+  },
+  "server":{
+    "ip":"200.249.12.31",
+    "port":80
+  },
+  "request":{
+    "headers":{
+      "Host":"localhost",
+      "User-Agent":"curl/7.38.0",
+      "Accept":"*/*"
+    },
+    "uri":"/?key=value&key=other_value",
+    "method":"GET"
+  },
+  "response":{
+    "headers":{
+      "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+      "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+      "Content-Type":"text/html"
+    },
+    "body":[
+      "no need."
+    ]
+  },
+  "expected":{
+    "debug_log":"SecRules 4.*\n.*This phase consists of 1 rule\\(s\\)"
+  },
+  "rules":[
+    "SecRuleEngine On",
+    "SecResponseBodyAccess On",
+    "SecRule ARGS \"@unconditionalMatch other_value\" \"id:1,phase:4,block,status:404\""
+  ]
+},
+{
+  "enabled":1,
+  "version_min":300000,
+  "title":"Testing Config :: Phases (5/n)",
+  "client":{
+    "ip":"200.249.12.31",
+    "port":123
+  },
+  "server":{
+    "ip":"200.249.12.31",
+    "port":80
+  },
+  "request":{
+    "headers":{
+      "Host":"localhost",
+      "User-Agent":"curl/7.38.0",
+      "Accept":"*/*"
+    },
+    "uri":"/?key=value&key=other_value",
+    "method":"GET"
+  },
+  "response":{
+    "headers":{
+      "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+      "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+      "Content-Type":"text/html"
+    },
+    "body":[
+      "no need."
+    ]
+  },
+  "expected":{
+    "debug_log":"SecRules 5.*\n.*This phase consists of 1 rule\\(s\\)"
+  },
+  "rules":[
+    "SecRuleEngine On",
+    "SecRule ARGS \"@unconditionalMatch other_value\" \"id:1,phase:5,block,status:404\""
+  ]
+}
+]
+
