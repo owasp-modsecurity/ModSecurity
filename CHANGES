@@ -1,7 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
-
+ - Make the boundary check less strict as per RFC2046
+   [Issue #1943 - @victorhora, @allanbomsft]
 
 
 v3.0.3 - 2018-Nov-05

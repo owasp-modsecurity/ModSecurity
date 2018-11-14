@@ -293,6 +293,55 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"id:1,phase:3,pass,t:trim\""
     ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: MULTIPART_STRICT_ERROR - RFC2046",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '()+_,-./:=?",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+        "--0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '()+_,-./:=?",
+        "Content-Disposition: form-data; name=\"name\"",
+        "",
+        "1",
+        "--0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '()+_,-./:=?--"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"Target value: \"0\" \\(Variable: REQBODY_ERROR\\)"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQBODY_ERROR \"@contains 0\" \"id:1,phase:3,pass,t:trim\""
+    ]
   }
 ]
 
