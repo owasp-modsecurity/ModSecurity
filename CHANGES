@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Fix buffer size for utf8toUnicode transformation 
+   [Issue #1208 - @katef, @victorhora]
  * Fix sanitizing JSON request bodies in native audit log format
    [p0pr0ck5, @victorhora]
  * IIS: Update Wix installer to bundle a supported CRS version (3.0)

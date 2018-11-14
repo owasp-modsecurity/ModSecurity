@@ -113,8 +113,9 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
     unsigned char *unicode = NULL;
 
     *changed = 0;
-
-    len = input_len * 7 + 1;
+    /* RFC3629 states that UTF-8 are encoded using sequences of 1 to 4 octets. */
+    /* Max size per character should fit in 4 bytes */
+    len = input_len * 4 + 1;
     data = rval = apr_palloc(mp, len);
     if (rval == NULL) return NULL;
 
