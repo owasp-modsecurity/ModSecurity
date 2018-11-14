@@ -200,17 +200,7 @@ class RulesSetProperties {
 
     ~RulesSetProperties() {
         int i = 0;
-        /** Cleanup the rules */
-        for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<Rule *> rules = m_rules[i];
-            while (rules.empty() == false) {
-                Rule *rule = rules.back();
-                rules.pop_back();
-                if (rule->refCountDecreaseAndCheck()) {
-                    rule = NULL;
-                }
-            }
-        }
+
         for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
             std::vector<actions::Action *> *tmp = &m_defaultActions[i];
             while (tmp->empty() == false) {
@@ -352,12 +342,6 @@ class RulesSetProperties {
 
     static int mergeProperties(RulesSetProperties *from, RulesSetProperties *to,
         std::ostringstream *err) {
-        int amount_of_rules = 0;
-
-        amount_of_rules = appendRules(from->m_rules, to->m_rules, err);
-        if (amount_of_rules < 0) {
-            return amount_of_rules;
-        }
 
         merge_ruleengine_value(to->m_secRuleEngine, from->m_secRuleEngine,
                                PropertyNotSetRuleEngine);
@@ -468,56 +452,7 @@ class RulesSetProperties {
             }
         }
 
-        return amount_of_rules;
-    }
-
-
-    static int appendRules(
-        std::vector<modsecurity::Rule *> *from,
-        std::vector<modsecurity::Rule *> *to,
-        std::ostringstream *err) {
-        int amount_of_rules = 0;
-        // TODO: std::vector could be replaced with something more efficient.
-        std::vector<int64_t> v;
-        for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<modsecurity::Rule *> *rules_to = to+i;
-            v.reserve(rules_to->size());
-            for (size_t z = 0; z < rules_to->size(); z++) {
-                Rule *rule_ckc = rules_to->at(z);
-                if (rule_ckc->m_secMarker == true) {
-                    continue;
-                }
-                v.push_back(rule_ckc->m_ruleId);
-            }
-        }
-        std::sort (v.begin(), v.end());
-
-        for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<modsecurity::Rule *> *rules_from = from+i;
-            std::vector<modsecurity::Rule *> *rules_to = to+i;
-            for (size_t j = 0; j < rules_from->size(); j++) {
-                Rule *rule = rules_from->at(j);
-                if (std::binary_search(v.begin(), v.end(), rule->m_ruleId)) {
-                    if (err != NULL) {
-                        *err << "Rule id: " << std::to_string(rule->m_ruleId) \
-                            << " is duplicated" << std::endl;
-                    }
-                    return -1;
-                }
-                amount_of_rules++;
-                rule->refCountIncrease();
-                rules_to->push_back(rule);
-            }
-        }
-        return amount_of_rules;
-    }
-
-
-    std::vector<modsecurity::Rule *> *getRulesForPhase(int phase) {
-        if (phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
-            return NULL;
-        }
-        return &m_rules[phase];
+        return 1;
     }
 
 
@@ -547,7 +482,6 @@ class RulesSetProperties {
     ConfigString m_secArgumentSeparator;
     ConfigString m_secWebAppId;
     std::vector<actions::Action *> m_defaultActions[modsecurity::Phases::NUMBER_OF_PHASES];
-    std::vector<modsecurity::Rule *> m_rules[modsecurity::Phases::NUMBER_OF_PHASES];
     ConfigUnicodeMap m_unicodeMapTable;
 };
 

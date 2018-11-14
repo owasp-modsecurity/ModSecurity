@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
     int nphases = modsecurity::Phases::NUMBER_OF_PHASES;
     for (int i = 0; i < nphases; i++) {
-        std::vector<Rule *> rules = modsecRules->m_rules[i];
+        std::vector<Rule *> rules = modsecRules->m_rulesSetPhases[i];
         if (rules.size() == 0) {
             continue;
         }
