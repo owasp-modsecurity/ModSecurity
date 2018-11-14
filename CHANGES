@@ -1,7 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
-
+ * Fix buffer size for utf8toUnicode transformation 
+   [Issue #1208 - @katef, @victorhora]
 
 
 v3.0.3 - 2018-Nov-05

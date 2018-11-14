@@ -72,7 +72,9 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
     unsigned char unicode[8];
     *changed = 0;
 
-    len = input_len * 7 + 1;
+    /* RFC3629 states that UTF-8 are encoded using sequences of 1 to 4 octets. */
+    /* Max size per character should fit in 4 bytes */
+    len = input_len * 4 + 1;
     data = reinterpret_cast<char *>(malloc(sizeof(char) * len));
     if (data == NULL) {
         return NULL;
