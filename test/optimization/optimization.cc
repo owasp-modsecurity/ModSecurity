@@ -68,11 +68,11 @@ int main(int argc, char **argv) {
 
     int nphases = modsecurity::Phases::NUMBER_OF_PHASES;
     for (int j = 0; j < nphases; j++) {
-        std::vector<Rule *> rules = modsecRules->m_rules[i];
+        std::vector<Rule *> rules = modsecRules->m_rulesSetPhases[j];
         if (rules.size() == 0) {
             continue;
         }
-        std::cout << "Phase: " << std::to_string(i);
+        std::cout << "Phase: " << std::to_string(j);
         std::cout << " (" << std::to_string(rules.size());
         std::cout << " rules)" << std::endl;
 

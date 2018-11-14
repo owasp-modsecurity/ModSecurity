@@ -110,7 +110,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
        return 0;
     }
 
-    std::vector<Rule *> rules = m_rules[phase];
+    std::vector<Rule *> rules = m_rulesSetPhases[phase];
 
     ms_dbg_a(t, 9, "This phase consists of " \
         + std::to_string(rules.size()) + " rule(s).");
@@ -222,7 +222,10 @@ int RulesSet::evaluate(int phase, Transaction *t) {
 
 int RulesSet::merge(Driver *from) {
     int amount_of_rules = 0;
-    amount_of_rules = mergeProperties(
+
+    amount_of_rules = m_rulesSetPhases.append(&from->m_rulesSetPhases,
+        &m_parserError);
+    mergeProperties(
         dynamic_cast<RulesSetProperties *>(from),
         dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
@@ -233,7 +236,10 @@ int RulesSet::merge(Driver *from) {
 
 int RulesSet::merge(RulesSet *from) {
     int amount_of_rules = 0;
-    amount_of_rules = mergeProperties(
+
+    amount_of_rules = m_rulesSetPhases.append(&from->m_rulesSetPhases,
+        &m_parserError);
+    mergeProperties(
         dynamic_cast<RulesSetProperties *>(from),
         dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
@@ -252,17 +258,7 @@ void RulesSet::debug(int level, const std::string &id,
 
 
 void RulesSet::dump() const {
-    std::cout << "Rules: " << std::endl;
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = m_rules[i];
-        std::cout << "Phase: " << std::to_string(i);
-        std::cout << " (" << std::to_string(rules.size());
-        std::cout << " rules)" << std::endl;
-        for (int j = 0; j < rules.size(); j++) {
-            std::cout << "    Rule ID: " << std::to_string(rules[j]->m_ruleId);
-            std::cout << "--" << rules[j] << std::endl;
-        }
-    }
+    m_rulesSetPhases.dump();
 }
 
 

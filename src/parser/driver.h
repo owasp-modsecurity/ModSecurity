@@ -90,6 +90,8 @@ class Driver : public RulesSetProperties {
 
     std::string buffer;
     Rule *lastRule;
+
+    RulesSetPhases m_rulesSetPhases;
 };
 
 
