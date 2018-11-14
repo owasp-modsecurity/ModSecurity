@@ -1618,7 +1618,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"multipart parser (boundary special char - trailing comma+token)",
+    "title":"multipart parser (boundary special char - trailing exclamation+token)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -1633,7 +1633,7 @@
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
         "Content-Length":"330",
-        "Content-Type":"multipart/form-data;boundary=0000,1111",
+        "Content-Type":"multipart/form-data;boundary=0000!1111",
         "Expect":"100-continue"
       },
       "uri":"/",
@@ -1850,7 +1850,7 @@
     },
     "expected":{
       "http_code": 403,
-      "debug_log": "boundary was quoted.*No boundaries found in payload"
+      "debug_log": "Invalid boundary in C-T \\(characters\\).*boundary was quoted."
     },
     "rules":[
         "SecRuleEngine On",
@@ -1911,7 +1911,7 @@
     },
     "expected":{
       "http_code": 403,
-      "debug_log": "boundary was quoted.*No boundaries found in payload"
+      "debug_log": "Invalid boundary in C-T \\(characters\\).*boundary was quoted."
     },
     "rules":[
         "SecRuleEngine On",
