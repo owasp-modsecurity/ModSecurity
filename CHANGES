@@ -3,7 +3,7 @@ v3.0.4 - YYYY-MMM-DD (to be released)
 
  - Make the boundary check less strict as per RFC2046
    [Issue #1943 - @victorhora, @allanbomsft]
- - Fix buffer size for utf8toUnicode transformation 
+ - Fix buffer size for utf8toUnicode transformation
    [Issue #1208 - @katef, @victorhora]
 
 
