@@ -692,9 +692,8 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         first_time = 1;
         apr_pool_userdata_set((const void *)1, "modsecurity-init-flag",
                 apr_pool_cleanup_null, s->process->pool);
-    } else {
-        modsecurity_init(modsecurity, mp);
     }
+    modsecurity_init(modsecurity, mp);
 
     /* Store the original server signature */
     real_server_signature = apr_pstrdup(mp, apache_get_server_version());

@@ -133,7 +133,8 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
     /* Serial audit log mutext */
-    rc = apr_global_mutex_create(&msce->auditlog_lock, NULL, APR_LOCK_DEFAULT, mp);
+    tmpnam(auditlog_lock_name);
+    rc = apr_global_mutex_create(&msce->auditlog_lock, auditlog_lock_name, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_auditlog_lock");
         //return HTTP_INTERNAL_SERVER_ERROR;
@@ -154,7 +155,8 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     }
 #endif /* SET_MUTEX_PERMS */
 
-    rc = apr_global_mutex_create(&msce->geo_lock, NULL, APR_LOCK_DEFAULT, mp);
+    tmpnam(geo_lock_name);
+    rc = apr_global_mutex_create(&msce->geo_lock, geo_lock_name, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         return -1;
     }
@@ -171,7 +173,8 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
 #endif /* SET_MUTEX_PERMS */
 
 #ifdef GLOBAL_COLLECTION_LOCK
-    rc = apr_global_mutex_create(&msce->dbm_lock, NULL, APR_LOCK_DEFAULT, mp);
+    tmpnam(dbm_lock_name);
+    rc = apr_global_mutex_create(&msce->dbm_lock, dbm_lock_name, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         return -1;
     }
