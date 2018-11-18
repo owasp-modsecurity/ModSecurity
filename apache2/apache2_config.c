@@ -193,7 +193,7 @@ static void copy_rules_phase(apr_pool_t *mp,
                 switch(exceptions[j]->type) {
                     case RULE_EXCEPTION_REMOVE_ID :
                         if ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) {
-                            int ruleid = atoi(rule->actionset->id);
+                            long ruleid = strtol(rule->actionset->id, 0, 10);
                             if (rule_id_in_range(ruleid, exceptions[j]->param)) copy--;
                         }
                         break;

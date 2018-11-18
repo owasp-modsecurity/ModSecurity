@@ -531,7 +531,7 @@ int msre_ruleset_rule_matches_exception(msre_rule *rule, rule_exception *re)   {
         switch(re->type) {
             case RULE_EXCEPTION_REMOVE_ID :
                 if ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) {
-                    int ruleid = atoi(rule->actionset->id);
+                    long ruleid = atoi(rule->actionset->id);
 
                     if (rule_id_in_range(ruleid, re->param)) {
                         match = 1;
@@ -3385,7 +3385,7 @@ static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
 /**
  * Checks whether the given rule ID is in the given range.
  */
-int rule_id_in_range(int ruleid, const char *range) {
+int rule_id_in_range(long ruleid, const char *range) {
     char *p = NULL, *saveptr = NULL;
     char *data = NULL;
 
