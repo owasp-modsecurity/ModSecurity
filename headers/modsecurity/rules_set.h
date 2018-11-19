@@ -25,12 +25,14 @@
 #endif
 
 
-#ifndef HEADERS_MODSECURITY_RULES_H_
-#define HEADERS_MODSECURITY_RULES_H_
+#ifndef HEADERS_MODSECURITY_RULES_SET_H_
+#define HEADERS_MODSECURITY_RULES_SET_H_
 
 #include "modsecurity/rules_set_properties.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule.h"
+#include "modsecurity/rules.h"
 
 #ifdef __cplusplus
 
@@ -40,17 +42,16 @@ namespace Parser {
 class Driver;
 }
 
-
 class RulesSetPhases {
  public:
 
     ~RulesSetPhases() {
         /** Cleanup the rules */
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<Rule *> rules = m_rules[i];
-            while (rules.empty() == false) {
-                Rule *rule = rules.back();
-                rules.pop_back();
+            Rules *rules = &m_rules[i];
+            while (rules->empty() == false) {
+                Rule *rule = rules->back();
+                rules->pop_back();
                 if (rule->refCountDecreaseAndCheck()) {
                     rule = NULL;
                 }
@@ -84,8 +85,8 @@ class RulesSetPhases {
         std::sort (v.begin(), v.end());
 
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            for (size_t j = 0; j < from->at(i).size(); j++) {
-                Rule *rule = from->at(i).at(j);
+            for (size_t j = 0; j < from->at(i)->size(); j++) {
+                Rule *rule = from->at(i)->at(j);
                 if (std::binary_search(v.begin(), v.end(), rule->m_ruleId)) {
                     if (err != NULL) {
                         *err << "Rule id: " << std::to_string(rule->m_ruleId) \
@@ -115,10 +116,10 @@ class RulesSetPhases {
         }
     }
 
-    std::vector<modsecurity::Rule *> operator[](int index) { return m_rules[index]; }
-    std::vector<modsecurity::Rule *> at(int index) { return m_rules[index]; }
+    Rules *operator[](int index) { return &m_rules[index]; }
+    Rules *at(int index) { return &m_rules[index]; }
 
-    std::vector<modsecurity::Rule *> m_rules[8];
+    Rules m_rules[8];
 };
 
 
@@ -192,4 +193,4 @@ int msc_rules_cleanup(RulesSet *rules);
 }  // namespace modsecurity
 #endif
 
-#endif  // HEADERS_MODSECURITY_RULES_H_
+#endif  // HEADERS_MODSECURITY_RULES_SET_H_
