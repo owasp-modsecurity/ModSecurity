@@ -119,9 +119,9 @@ int Driver::addSecRule(Rule *rule) {
         return false;
     }
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = m_rulesSetPhases[i];
-        for (int j = 0; j < rules.size(); j++) {
-            if (rules[j]->m_ruleId == rule->m_ruleId) {
+        Rules *rules = m_rulesSetPhases[i];
+        for (int j = 0; j < rules->size(); j++) {
+            if (rules->at(j)->m_ruleId == rule->m_ruleId) {
                 m_parserError << "Rule id: " << std::to_string(rule->m_ruleId) \
                     << " is duplicated" << std::endl;
                 return false;
