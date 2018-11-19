@@ -24,6 +24,7 @@
 #include "modsecurity/transaction.h"
 #include "src/parser/driver.h"
 #include "src/utils/https_client.h"
+#include "modsecurity/rules.h"
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;
@@ -110,10 +111,10 @@ int RulesSet::evaluate(int phase, Transaction *t) {
        return 0;
     }
 
-    std::vector<Rule *> rules = m_rulesSetPhases[phase];
+    std::vector<Rule *> *rules = m_rulesSetPhases[phase];
 
     ms_dbg_a(t, 9, "This phase consists of " \
-        + std::to_string(rules.size()) + " rule(s).");
+        + std::to_string(rules->size()) + " rule(s).");
 
     if (t->m_allowType == actions::disruptive::FromNowOnAllowType
         && phase != modsecurity::Phases::LoggingPhase) {
@@ -131,8 +132,8 @@ int RulesSet::evaluate(int phase, Transaction *t) {
     t->m_allowType = actions::disruptive::NoneAllowType;
     //}
 
-    for (int i = 0; i < rules.size(); i++) {
-        Rule *rule = rules[i];
+    for (int i = 0; i < rules->size(); i++) {
+        Rule *rule = rules->at(i);
         if (t->m_marker.empty() == false) {
             ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' due to a SecMarker: " + t->m_marker);
@@ -254,7 +255,6 @@ void RulesSet::debug(int level, const std::string &id,
         m_debugLog->write(level, id, uri, msg);
     }
 }
-
 
 
 void RulesSet::dump() const {

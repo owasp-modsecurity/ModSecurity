@@ -1,3 +1,4 @@
+
 /*
  * ModSecurity, http://www.modsecurity.org/
  * Copyright (c) 2015 - 2020 Trustwave Holdings, Inc. (http://www.trustwave.com/)
@@ -13,7 +14,6 @@
  *
  */
 
-
 #include <stdio.h>
 #include <string.h>
 
@@ -26,22 +26,35 @@
 #endif
 
 
-#ifndef HEADERS_MODSECURITY_RULES_H_
-#define HEADERS_MODSECURITY_RULES_H_
+#ifndef HEADERS_MODSECURITY_RULES_SET_PHASES_H_
+#define HEADERS_MODSECURITY_RULES_SET_PHASES_H_
 
+#include "modsecurity/rules.h"
 
 #ifdef __cplusplus
+
 namespace modsecurity {
 class Rule;
 
-class Rules : public std::vector<Rule *> {
+/** @ingroup ModSecurity_CPP_API */
+class RulesSetPhases {
  public:
+
+    ~RulesSetPhases();
+
+    bool insert(Rule *rule);
+
+    int append(RulesSetPhases *from, std::ostringstream *err);
+    void dump() const;
+
+    Rules *operator[](int index) { return &m_rules[index]; }
+    Rules *at(int index) { return &m_rules[index]; }
+
+    Rules m_rules[8];
 };
 
 
 }  // namespace modsecurity
 #endif
 
-
-#endif  // HEADERS_MODSECURITY_RULES_H_
-
+#endif  // HEADERS_MODSECURITY_RULES_SET_PHASES_H_
