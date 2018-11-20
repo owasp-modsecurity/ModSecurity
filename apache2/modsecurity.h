@@ -135,7 +135,9 @@ typedef struct msc_parm msc_parm;
 
 static char auditlog_lock_name[L_tmpnam];
 static char geo_lock_name[L_tmpnam];
+#ifdef GLOBAL_COLLECTION_LOCK
 static char dbm_lock_name[L_tmpnam];
+#endif
 
 extern DSOLOCAL char *new_server_signature;
 extern DSOLOCAL char *real_server_signature;
