@@ -39,6 +39,29 @@ namespace modsecurity {
 
 class Rules : public std::vector<Rule *> {
  public:
+    void dump() {
+        for (int j = 0; j < size(); j++) {
+            std::cout << "    Rule ID: " << std::to_string(at(j)->m_ruleId);
+            std::cout << "--" << at(j) << std::endl;
+        }
+    }
+
+    int append(Rules *from, const std::vector<int64_t> &ids, std::ostringstream *err) {
+        size_t j = 0;
+        for (; j < from->size(); j++) {
+            Rule *rule = from->at(j);
+            if (std::binary_search(ids.begin(), ids.end(), rule->m_ruleId)) {
+                if (err != NULL) {
+                    *err << "Rule id: " << std::to_string(rule->m_ruleId) \
+                         << " is duplicated" << std::endl;
+                }
+                return -1;
+            }
+            rule->refCountIncrease();
+        }
+        insert(end(), from->begin(), from->end());
+        return j;
+    }
 };
 
 
