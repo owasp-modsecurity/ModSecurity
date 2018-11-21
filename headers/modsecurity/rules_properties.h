@@ -415,7 +415,7 @@ class RulesProperties {
             to->m_responseBodyTypeToBeInspected.m_set = true;
         }
 
-        for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+        for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
             std::vector<actions::Action *> *actions_from = \
                 from->m_defaultActions+i;
             std::vector<actions::Action *> *actions_to = to->m_defaultActions+i;
@@ -535,8 +535,8 @@ class RulesProperties {
     ConfigString m_uploadTmpDirectory;
     ConfigString m_secArgumentSeparator;
     ConfigString m_secWebAppId;
-    std::vector<actions::Action *> m_defaultActions[8];
-    std::vector<modsecurity::Rule *> m_rules[8];
+    std::vector<actions::Action *> m_defaultActions[modsecurity::Phases::NUMBER_OF_PHASES];
+    std::vector<modsecurity::Rule *> m_rules[modsecurity::Phases::NUMBER_OF_PHASES];
     ConfigUnicodeMap m_unicodeMapTable;
 };
 
