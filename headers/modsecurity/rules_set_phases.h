@@ -35,7 +35,7 @@ class RulesSetPhases {
     ~RulesSetPhases() {
         /** Cleanup the rules */
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            Rules *rules = &m_rules[i];
+            Rules *rules = &m_rulesAtPhase[i];
             while (rules->empty() == false) {
                 Rule *rule = rules->back();
                 rules->pop_back();
@@ -50,7 +50,7 @@ class RulesSetPhases {
         if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
             return false;
         }
-        m_rules[rule->m_phase].push_back(rule);
+        m_rulesAtPhase[rule->m_phase].push_back(rule);
 
         return true;
     }
@@ -60,9 +60,9 @@ class RulesSetPhases {
         std::vector<int64_t> v;
 
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            v.reserve(m_rules[i].size());
-            for (size_t z = 0; z < m_rules[i].size(); z++) {
-                Rule *rule_ckc = m_rules[i].at(z);
+            v.reserve(m_rulesAtPhase[i].size());
+            for (size_t z = 0; z < m_rulesAtPhase[i].size(); z++) {
+                Rule *rule_ckc = m_rulesAtPhase[i].at(z);
                 if (rule_ckc->m_secMarker == true) {
                     continue;
                 }
@@ -72,41 +72,31 @@ class RulesSetPhases {
         std::sort (v.begin(), v.end());
 
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            for (size_t j = 0; j < from->at(i)->size(); j++) {
-                Rule *rule = from->at(i)->at(j);
-                if (std::binary_search(v.begin(), v.end(), rule->m_ruleId)) {
-                    if (err != NULL) {
-                        *err << "Rule id: " << std::to_string(rule->m_ruleId) \
-                            << " is duplicated" << std::endl;
-                    }
-                    return -1;
-                }
-                amount_of_rules++;
-                rule->refCountIncrease();
-                m_rules[i].push_back(rule);
+            int res = m_rulesAtPhase[i].append(from->at(i), v, err);
+            if (res < 0) {
+                return res;
             }
+            amount_of_rules = amount_of_rules + res;
         }
 
         return amount_of_rules;
     }
 
     void dump() {
-        for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<Rule *> rules = m_rules[i];
+        for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+            Rules *rules = &m_rulesAtPhase[i];
             std::cout << "Phase: " << std::to_string(i);
-            std::cout << " (" << std::to_string(rules.size());
+            std::cout << " (" << std::to_string(rules->size());
             std::cout << " rules)" << std::endl;
-            for (int j = 0; j < rules.size(); j++) {
-                std::cout << "    Rule ID: " << std::to_string(rules[j]->m_ruleId);
-                std::cout << "--" << rules[j] << std::endl;
-            }
+            rules->dump();
         }
     }
 
-    Rules *operator[](int index) { return &m_rules[index]; }
-    Rules *at(int index) { return &m_rules[index]; }
+    Rules *operator[](int index) { return &m_rulesAtPhase[index]; }
+    Rules *at(int index) { return &m_rulesAtPhase[index]; }
 
-    Rules m_rules[8];
+ private:
+    Rules m_rulesAtPhase[8];
 };
 
 }  // namespace modsecurity
