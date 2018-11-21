@@ -51,6 +51,9 @@ bool Phase::init(std::string *error) {
         } else if (m_phase == 5) {
             m_phase = modsecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
+        } else {
+            error->assign("Unknown phase: " + m_parser_payload);
+            return false;
         }
     } catch (...) {
         if (a == "request") {
@@ -63,16 +66,6 @@ bool Phase::init(std::string *error) {
             m_phase = modsecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
         }
-    }
-    if (m_phase == -1) {
-        error->assign("Not able to associate the given rule to any phase: " + \
-            m_parser_payload);
-        return false;
-    }
-
-    if (m_phase > modsecurity::Phases::NUMBER_OF_PHASES) {
-        error->assign("Unknown phase: " + std::to_string(m_phase));
-        return false;
     }
 
     return true;

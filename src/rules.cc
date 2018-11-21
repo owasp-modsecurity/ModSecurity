@@ -152,7 +152,7 @@ std::string Rules::getParserError() {
 
 
 int Rules::evaluate(int phase, Transaction *t) {
-    if (phase > modsecurity::Phases::NUMBER_OF_PHASES) {
+    if (phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
        return 0;
     }
 
@@ -293,7 +293,7 @@ void Rules::debug(int level, const std::string &id,
 
 void Rules::dump() {
     std::cout << "Rules: " << std::endl;
-    for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = m_rules[i];
         std::cout << "Phase: " << std::to_string(i);
         std::cout << " (" << std::to_string(rules.size());
