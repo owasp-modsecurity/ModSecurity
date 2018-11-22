@@ -37,19 +37,19 @@
 namespace modsecurity {
 
 
-class Rules : public std::vector<Rule *> {
+class Rules {
  public:
     void dump() {
-        for (int j = 0; j < size(); j++) {
-            std::cout << "    Rule ID: " << std::to_string(at(j)->m_ruleId);
-            std::cout << "--" << at(j) << std::endl;
+        for (int j = 0; j < m_rules.size(); j++) {
+            std::cout << "    Rule ID: " << std::to_string(m_rules.at(j)->m_ruleId);
+            std::cout << "--" << m_rules.at(j) << std::endl;
         }
     }
 
     int append(Rules *from, const std::vector<int64_t> &ids, std::ostringstream *err) {
         size_t j = 0;
         for (; j < from->size(); j++) {
-            Rule *rule = from->at(j);
+            Rule *rule = from->at(j).get();
             if (std::binary_search(ids.begin(), ids.end(), rule->m_ruleId)) {
                 if (err != NULL) {
                     *err << "Rule id: " << std::to_string(rule->m_ruleId) \
@@ -57,11 +57,34 @@ class Rules : public std::vector<Rule *> {
                 }
                 return -1;
             }
-            rule->refCountIncrease();
         }
-        insert(end(), from->begin(), from->end());
+        m_rules.insert(m_rules.end(), from->m_rules.begin(), from->m_rules.end());
         return j;
     }
+
+    bool insert(std::shared_ptr<Rule> rule) {
+        return insert(rule, nullptr, nullptr);
+    }
+
+    bool insert(std::shared_ptr<Rule> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
+        if (ids != nullptr && err != nullptr
+            && std::binary_search(ids->begin(), ids->end(), rule->m_ruleId)) {
+            if (err != NULL) {
+                *err << "Rule id: " << std::to_string(rule->m_ruleId) \
+                    << " is duplicated" << std::endl;
+            }
+            return false;
+        }
+
+        m_rules.push_back(rule);
+        return true;
+    }
+
+    size_t size() { return m_rules.size(); }
+    std::shared_ptr<Rule> operator[](int index) { return m_rules[index]; }
+    std::shared_ptr<Rule> at(int index) { return m_rules[index]; }
+
+    std::vector<std::shared_ptr<Rule> > m_rules;
 };
 
 

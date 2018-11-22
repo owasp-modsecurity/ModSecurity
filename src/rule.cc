@@ -71,7 +71,6 @@ Rule::Rule(std::string marker)
     m_variables(NULL),
     m_ver(""),
     m_unconditional(false),
-    m_referenceCount(1),
     m_theDisruptiveAction(nullptr),
     m_containsStaticBlockAction(false),
     m_containsCaptureAction(false),
@@ -106,7 +105,6 @@ Rule::Rule(Operator *_op,
     m_variables(_variables),
     m_ver(""),
     m_unconditional(false),
-    m_referenceCount(1),
     m_theDisruptiveAction(nullptr),
     m_containsStaticBlockAction(false),
     m_containsCaptureAction(false),
@@ -146,10 +144,6 @@ Rule::~Rule() {
 
     if (m_variables != NULL) {
         delete m_variables;
-    }
-
-    if (m_chainedRuleChild != NULL) {
-        delete m_chainedRuleChild;
     }
 }
 

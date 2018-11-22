@@ -55,10 +55,10 @@ class Driver : public RulesSetProperties {
     Driver();
     virtual ~Driver();
 
-    int addSecRule(Rule *rule);
-    int addSecAction(Rule *rule);
+    int addSecRule(std::unique_ptr<Rule> rule);
+    int addSecAction(std::unique_ptr<Rule> rule);
     int addSecMarker(std::string marker);
-    int addSecRuleScript(RuleScript *rule);
+    int addSecRuleScript(std::unique_ptr<RuleScript> rule);
 
     bool scan_begin();
     void scan_end();
@@ -79,7 +79,7 @@ class Driver : public RulesSetProperties {
 
     std::list<std::string> ref;
     std::string buffer;
-    Rule *lastRule;
+    std::shared_ptr<Rule> m_lastRule;
 
     RulesSetPhases m_rulesSetPhases;
 };

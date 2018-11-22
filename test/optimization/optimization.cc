@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
     int nphases = modsecurity::Phases::NUMBER_OF_PHASES;
     for (int i = 0; i < nphases; i++) {
-        std::vector<Rule *> *rules = modsecRules->m_rulesSetPhases[i];
+        Rules *rules = modsecRules->m_rulesSetPhases[i];
         if (rules->size() == 0) {
             continue;
         }
@@ -79,7 +79,9 @@ int main(int argc, char **argv) {
         std::unordered_map<std::string, int> operators;
         std::unordered_map<std::string, int> variables;
         std::unordered_map<std::string, int> op2var;
-        for (auto &z : *rules) {
+
+        for (int i = 0; i < rules->size(); i++) {
+            std::shared_ptr<Rule> z = rules->at(i);
             std::string key;
             if (z == NULL) {
                 continue;

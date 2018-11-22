@@ -155,7 +155,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
        return 0;
     }
 
-    std::vector<Rule *> *rules = m_rulesSetPhases[phase];
+    Rules *rules = m_rulesSetPhases[phase];
 
     ms_dbg_a(t, 9, "This phase consists of " \
         + std::to_string(rules->size()) + " rule(s).");
@@ -177,7 +177,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
     }
 
     for (int i = 0; i < rules->size(); i++) {
-        Rule *rule = rules->at(i);
+        Rule *rule = rules->at(i).get();
         if (t->m_marker.empty() == false) {
             ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' due to a SecMarker: " + t->m_marker);
