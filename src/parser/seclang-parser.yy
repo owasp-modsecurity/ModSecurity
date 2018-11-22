@@ -1075,16 +1075,15 @@ expression:
         }
 
         Operator *op = $3.release();
-        Rule *rule = new Rule(
+        std::unique_ptr<Rule> rule(new Rule(
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
             /* file name */ *@1.end.filename,
             /* line number */ @1.end.line
-            );
+            ));
 
-        if (driver.addSecRule(rule) == false) {
-            delete rule;
+        if (driver.addSecRule(std::move(rule)) == false) {
             YYERROR;
         }
       }
@@ -1095,15 +1094,14 @@ expression:
             v->push_back(i.release());
         }
 
-        Rule *rule = new Rule(
+        std::unique_ptr<Rule> rule(new Rule(
             /* op */ $3.release(),
             /* variables */ v,
             /* actions */ NULL,
             /* file name */ *@1.end.filename,
             /* line number */ @1.end.line
-            );
-        if (driver.addSecRule(rule) == false) {
-            delete rule;
+            ));
+        if (driver.addSecRule(std::move(rule)) == false) {
             YYERROR;
         }
       }
@@ -1113,14 +1111,14 @@ expression:
         for (auto &i : *$2.get()) {
             a->push_back(i.release());
         }
-        Rule *rule = new Rule(
+        std::unique_ptr<Rule> rule(new Rule(
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
             /* file name */ *@1.end.filename,
             /* line number */ @1.end.line
-            );
-        driver.addSecAction(rule);
+            ));
+        driver.addSecAction(std::move(rule));
       }
     | DIRECTIVE_SECRULESCRIPT actions
       {
@@ -1129,20 +1127,18 @@ expression:
         for (auto &i : *$2.get()) {
             a->push_back(i.release());
         }
-        RuleScript *r = new RuleScript(
+        std::unique_ptr<RuleScript> r(new RuleScript(
             /* path to script */ $1,
             /* actions */ a,
             /* file name */ *@1.end.filename,
             /* line number */ @1.end.line
-            );
+            ));
 
         if (r->init(&err) == false) {
             driver.error(@0, "Failed to load script: " + err);
-            delete r;
             YYERROR;
         }
-        if (driver.addSecRuleScript(r) == false) {
-            delete r;
+        if (driver.addSecRuleScript(std::move(r)) == false) {
             YYERROR;
         }
       }

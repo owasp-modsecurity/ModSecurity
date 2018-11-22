@@ -100,20 +100,6 @@ class Rule {
     bool containsTag(const std::string& name, Transaction *t);
     bool containsMsg(const std::string& name, Transaction *t);
 
-    int refCountDecreaseAndCheck() {
-        m_referenceCount--;
-        if (m_referenceCount == 0) {
-            delete this;
-            return 1;
-        }
-        return 0;
-    }
-
-
-    void refCountIncrease() {
-        m_referenceCount++;
-    }
-
     void executeTransformations(
         actions::Action *a,
         std::shared_ptr<std::string> newValue,
@@ -140,7 +126,7 @@ class Rule {
     int m_phase;
     modsecurity::variables::Variables *m_variables;
     operators::Operator *m_op;
-    Rule *m_chainedRuleChild;
+    std::unique_ptr<Rule> m_chainedRuleChild;
     Rule *m_chainedRuleParent;
     std::string m_fileName;
     std::string m_marker;
@@ -152,7 +138,6 @@ class Rule {
     std::vector<actions::Tag *> m_actionsTag;
  private:
     bool m_unconditional;
-    int m_referenceCount;
 };
 
 
