@@ -39,10 +39,9 @@ class Rule;
 /** @ingroup ModSecurity_CPP_API */
 class RulesSetPhases {
  public:
-
     ~RulesSetPhases();
 
-    bool insert(Rule *rule);
+    bool insert(std::shared_ptr<Rule> rule);
 
     int append(RulesSetPhases *from, std::ostringstream *err);
     void dump() const;

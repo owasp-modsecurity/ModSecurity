@@ -40,14 +40,14 @@ int main(int argc, char **argv) {
     std::list<std::string> files;
     int total = 0;
 
-    int i = 1;
-    while (i < argc) {
+    int p = 1;
+    while (p < argc) {
         std::list<std::string> tfiles = modsecurity::utils::expandEnv(
-            argv[i], 0);
+            argv[p], 0);
         for (const auto &file : tfiles) {
             files.insert(files.begin(), file);
         }
-        i++;
+        p++;
     }
 
 
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
     int nphases = modsecurity::Phases::NUMBER_OF_PHASES;
     for (int j = 0; j < nphases; j++) {
-        std::vector<Rule *> *rules = modsecRules->m_rulesSetPhases[j];
+        Rules *rules = modsecRules->m_rulesSetPhases[j];
         if (rules->size() == 0) {
             continue;
         }
@@ -79,7 +79,9 @@ int main(int argc, char **argv) {
         std::unordered_map<std::string, int> operators;
         std::unordered_map<std::string, int> variables;
         std::unordered_map<std::string, int> op2var;
-        for (auto &z : *rules) {
+
+        for (int i = 0; i < rules->size(); i++) {
+            std::shared_ptr<Rule> z = rules->at(i);
             std::string key;
             if (z == NULL) {
                 continue;

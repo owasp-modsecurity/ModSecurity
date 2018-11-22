@@ -29,7 +29,7 @@ Driver::Driver()
   : RulesSetProperties(),
   trace_scanning(false),
   trace_parsing(false),
-  lastRule(NULL) { }
+  m_lastRule(nullptr) { }
 
 
 Driver::~Driver() {
@@ -43,15 +43,15 @@ Driver::~Driver() {
 
 int Driver::addSecMarker(std::string marker) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        Rule *rule = new Rule(marker);
+        std::unique_ptr<Rule> rule(new Rule(marker));
         rule->m_phase = i;
-        m_rulesSetPhases.insert(rule);
+        m_rulesSetPhases.insert(std::move(rule));
     }
     return 0;
 }
 
 
-int Driver::addSecAction(Rule *rule) {
+int Driver::addSecAction(std::unique_ptr<Rule> rule) {
     if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(rule->m_phase);
         m_parserError << std::endl;
@@ -59,55 +59,40 @@ int Driver::addSecAction(Rule *rule) {
     }
 
 
-    m_rulesSetPhases.insert(rule);
+    m_rulesSetPhases.insert(std::move(rule));
 
     return true;
 }
 
 
-int Driver::addSecRuleScript(RuleScript *rule) {
-    m_rulesSetPhases.insert(rule);
+int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
+    m_rulesSetPhases.insert(std::move(rule));
     return true;
 }
 
 
-int Driver::addSecRule(Rule *rule) {
-    if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
-        m_parserError << "Unknown phase: " << std::to_string(rule->m_phase);
+int Driver::addSecRule(std::unique_ptr<Rule> r) {
+    if (r->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
+        m_parserError << "Unknown phase: " << std::to_string(r->m_phase);
         m_parserError << std::endl;
         return false;
     }
 
-    if (lastRule && lastRule->m_chained) {
-        if (lastRule->m_chainedRuleChild == NULL) {
-            rule->m_phase = lastRule->m_phase;
-            if (rule->m_theDisruptiveAction) {
-                m_parserError << "Disruptive actions can only be specified by";
-                m_parserError << " chain starter rules.";
-                return false;
-            }
-            lastRule->m_chainedRuleChild = rule;
-            rule->m_chainedRuleParent = lastRule;
-            return true;
-        } else {
-            Rule *a = lastRule->m_chainedRuleChild;
-            while (a->m_chained && a->m_chainedRuleChild != NULL) {
-                a = a->m_chainedRuleChild;
-            }
-            if (a->m_chained && a->m_chainedRuleChild == NULL) {
-                a->m_chainedRuleChild = rule;
-                rule->m_chainedRuleParent = a;
-                if (a->m_theDisruptiveAction) {
-                    m_parserError << "Disruptive actions can only be ";
-                    m_parserError << "specified by chain starter rules.";
-                    return false;
-                }
-                return true;
-            }
+    /* is it a chained rule? */
+    if (m_lastRule != nullptr && m_lastRule->m_chained) {
+        r->m_phase = m_lastRule->m_phase;
+        if (r->m_theDisruptiveAction) {
+            m_parserError << "Disruptive actions can only be specified by";
+            m_parserError << " chain starter rules.";
+            return false;
         }
+        m_lastRule->m_chainedRuleChild = std::move(r);
+        m_lastRule->m_chainedRuleChild->m_chainedRuleParent = m_lastRule;
+        m_lastRule = m_lastRule->m_chainedRuleChild.get();
+        return true;
     }
 
-
+    std::shared_ptr<Rule> rule(std::move(r));
     /*
      * Checking if the rule has an ID and also checking if this ID is not used
      * by other rule
@@ -118,6 +103,7 @@ int Driver::addSecRule(Rule *rule) {
         m_parserError << std::to_string(rule->m_lineNumber) << std::endl;
         return false;
     }
+
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         Rules *rules = m_rulesSetPhases[i];
         for (int j = 0; j < rules->size(); j++) {
@@ -129,14 +115,15 @@ int Driver::addSecRule(Rule *rule) {
         }
     }
 
-    lastRule = rule;
+    m_lastRule = rule.get();
     m_rulesSetPhases.insert(rule);
+
     return true;
 }
 
 
 int Driver::parse(const std::string &f, const std::string &ref) {
-    lastRule = NULL;
+    m_lastRule = nullptr;
     loc.push_back(new yy::location());
     if (ref.empty()) {
         loc.back()->begin.filename = loc.back()->end.filename = new std::string("<<reference missing or not informed>>");
@@ -154,6 +141,19 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     parser.set_debug_level(trace_parsing);
     int res = parser.parse();
     scan_end();
+
+    /*
+     * need to check for rules marked as chained but without
+     * a chained rule.
+     *
+     */
+    /*
+    if (m_lastRule != nullptr && m_lastRule->m_chained) {
+        m_parserError << "Last rule is marked as chained but there " \
+            "isn't a subsequent rule." << std::endl;
+        return false;
+    }
+    */
 
     /*
     if (m_auditLog->init(&error) == false) {

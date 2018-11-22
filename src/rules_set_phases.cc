@@ -29,24 +29,13 @@
 namespace modsecurity {
 
 RulesSetPhases::~RulesSetPhases() {
-    /** Cleanup the rules */
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        Rules *rules = &m_rules[i];
-        while (rules->empty() == false) {
-            Rule *rule = rules->back();
-            rules->pop_back();
-            if (rule->refCountDecreaseAndCheck()) {
-                rule = NULL;
-            }
-        }
-    }
 }
 
-bool RulesSetPhases::insert(Rule *rule) {
+bool RulesSetPhases::insert(std::shared_ptr<Rule> rule) {
     if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
         return false;
     }
-    m_rules[rule->m_phase].push_back(rule);
+    m_rules[rule->m_phase].insert(rule);
     return true;
 }
 
@@ -58,7 +47,7 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         v.reserve(m_rules[i].size());
         for (size_t z = 0; z < m_rules[i].size(); z++) {
-            Rule *rule_ckc = m_rules[i].at(z);
+            Rule *rule_ckc = m_rules[i].at(z).get();
             if (rule_ckc->m_secMarker == true) {
                 continue;
             }
@@ -67,19 +56,9 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
     }
     std::sort (v.begin(), v.end());
 
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        for (size_t j = 0; j < from->at(i)->size(); j++) {
-            Rule *rule = from->at(i)->at(j);
-            if (std::binary_search(v.begin(), v.end(), rule->m_ruleId)) {
-                if (err != NULL) {
-                    *err << "Rule id: " << std::to_string(rule->m_ruleId) \
-                        << " is duplicated" << std::endl;
-                }
-                return -1;
-            }
-            amount_of_rules++;
-            rule->refCountIncrease();
-            m_rules[i].push_back(rule);
+    for (int phase = 0; phase < modsecurity::Phases::NUMBER_OF_PHASES; phase++) {
+        if (m_rules[phase].append(from->at(phase), v, err) < 0) {
+            return -1;
         }
     }
 
@@ -91,10 +70,7 @@ void RulesSetPhases::dump() const {
         std::cout << "Phase: " << std::to_string(i);
         std::cout << " (" << std::to_string(m_rules[i].size());
         std::cout << " rules)" << std::endl;
-        for (int j = 0; j < m_rules[i].size(); j++) {
-            std::cout << "    Rule ID: " << std::to_string(m_rules[i][j]->m_ruleId);
-            std::cout << "--" << m_rules[i][j] << std::endl;
-        }
+        m_rules[i].dump();
     }
 }
 

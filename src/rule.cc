@@ -68,7 +68,7 @@ Rule::Rule(const std::string &marker)
     m_phase(-1),
     m_variables(NULL),
     m_op(NULL),
-    m_chainedRuleChild(NULL),
+    m_chainedRuleChild(nullptr),
     m_chainedRuleParent(NULL),
     m_fileName(""),
     m_marker(marker),
@@ -78,9 +78,7 @@ Rule::Rule(const std::string &marker)
     m_actionsRuntimePre(),
     m_actionsSetVar(),
     m_actionsTag(),
-    m_unconditional(false),
-    m_referenceCount(1) { }
-
+    m_unconditional(false) { }
 
 Rule::Rule(Operator *_op,
     variables::Variables *_variables,
@@ -103,7 +101,7 @@ Rule::Rule(Operator *_op,
     m_phase(-1),
     m_variables(_variables),
     m_op(_op),
-    m_chainedRuleChild(NULL),
+    m_chainedRuleChild(nullptr),
     m_chainedRuleParent(NULL),
     m_fileName(fileName),
     m_marker(""),
@@ -113,9 +111,7 @@ Rule::Rule(Operator *_op,
     m_actionsRuntimePre(),
     m_actionsSetVar(),
     m_actionsTag(),
-    m_unconditional(false),
-    m_referenceCount(1)
-    {
+    m_unconditional(false) {
     /* */
     organizeActions(actions);
 
@@ -148,10 +144,6 @@ Rule::~Rule() {
 
     if (m_variables != NULL) {
         delete m_variables;
-    }
-
-    if (m_chainedRuleChild != NULL) {
-        delete m_chainedRuleChild;
     }
 }
 
@@ -779,14 +771,15 @@ bool Rule::evaluate(Transaction *trans,
         goto end_exec;
     }
 
-    if (this->m_chainedRuleChild == NULL) {
+    /* FIXME: this check should happens on the parser. */
+    if (this->m_chainedRuleChild == nullptr) {
         ms_dbg_a(trans, 4, "Rule is marked as chained but there " \
             "isn't a subsequent rule.");
         goto end_clean;
     }
 
     ms_dbg_a(trans, 4, "Executing chained rule.");
-    recursiveGlobalRet = this->m_chainedRuleChild->evaluate(trans, ruleMessage);
+    recursiveGlobalRet = m_chainedRuleChild->evaluate(trans, ruleMessage);
 
     if (recursiveGlobalRet == true) {
         goto end_exec;
