@@ -31,26 +31,11 @@ class Driver;
 /** @ingroup ModSecurity_CPP_API */
 class RulesSetPhases {
  public:
-
-    ~RulesSetPhases() {
-        /** Cleanup the rules */
-        for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            Rules *rules = &m_rulesAtPhase[i];
-            while (rules->empty() == false) {
-                Rule *rule = rules->back();
-                rules->pop_back();
-                if (rule->refCountDecreaseAndCheck()) {
-                    rule = NULL;
-                }
-            }
-        }
-    }
-
-    bool insert(Rule *rule) {
+    bool insert(std::shared_ptr<Rule> rule) {
         if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
             return false;
         }
-        m_rulesAtPhase[rule->m_phase].push_back(rule);
+        m_rulesAtPhase[rule->m_phase].insert(rule);
 
         return true;
     }
@@ -62,7 +47,7 @@ class RulesSetPhases {
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
             v.reserve(m_rulesAtPhase[i].size());
             for (size_t z = 0; z < m_rulesAtPhase[i].size(); z++) {
-                Rule *rule_ckc = m_rulesAtPhase[i].at(z);
+                Rule *rule_ckc = m_rulesAtPhase[i].at(z).get();
                 if (rule_ckc->m_secMarker == true) {
                     continue;
                 }
