@@ -150,6 +150,60 @@ static int yajl_number(void *ctx, const char *value, size_t length)
     return json_add_argument(msr, value, length);
 }
 
+static int yajl_start_array(void *ctx) {
+    modsec_rec *msr = (modsec_rec *) ctx;
+
+    if (!msr->json->current_key && !msr->json->prefix) {
+        msr->json->prefix = apr_pstrdup(msr->mp, "array");
+        msr->json->current_key = apr_pstrdup(msr->mp, "array");
+    }
+    else if (msr->json->prefix) {
+        msr->json->prefix = apr_psprintf(msr->mp, "%s.%s", msr->json->prefix,
+            msr->json->current_key);
+    }
+    else {
+        msr->json->prefix = apr_pstrdup(msr->mp, msr->json->current_key);
+    }
+
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "New JSON hash context (prefix '%s')", msr->json->prefix);
+    }
+
+
+    return 1;
+}
+
+
+static int yajl_end_array(void *ctx) {
+    modsec_rec *msr = (modsec_rec *) ctx;
+    unsigned char *separator = (unsigned char *) NULL;
+
+    /**
+     * If we have no prefix, then this is the end of a top-level hash and
+     * we don't do anything
+     */
+    if (msr->json->prefix == NULL) return 1;
+
+    /**
+     * Current prefix might or not include a separator character; top-level
+     * hash keys do not have separators in the variable name
+     */
+    separator = strrchr(msr->json->prefix, '.');
+
+    if (separator) {
+        msr->json->prefix = apr_pstrmemdup(msr->mp, msr->json->prefix,
+            separator - msr->json->prefix);
+    }
+    else {
+        /**
+         * TODO: Check if it is safe to do this kind of pointer tricks
+         */
+        msr->json->prefix = (unsigned char *) NULL;
+    }
+
+    return 1;
+}
+
 /**
  * Callback for a new hash, which indicates a new subtree, labeled as the current
  * argument name, is being created
@@ -237,8 +291,8 @@ int json_init(modsec_rec *msr, char **error_msg) {
         yajl_start_map,
         yajl_map_key,
         yajl_end_map,
-        NULL /* yajl_start_array */,
-        NULL /* yajl_end_array  */
+        yajl_start_array,
+        yajl_end_array
     };
 
     if (error_msg == NULL) return -1;
