@@ -65,17 +65,17 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
     Variables::User_DynamicElement *user = dynamic_cast<
         Variables::User_DynamicElement *> (v);
     if (tx) {
-        m_variableNameExpanded = tx->m_string->evaluate(t);
+        m_variableNameExpanded = tx->m_string->evaluate(t, rule);
     } else if (session) {
-        m_variableNameExpanded = session->m_string->evaluate(t);
+        m_variableNameExpanded = session->m_string->evaluate(t, rule);
     } else if (ip) {
-        m_variableNameExpanded = ip->m_string->evaluate(t);
+        m_variableNameExpanded = ip->m_string->evaluate(t, rule);
     } else if (resource) {
-        m_variableNameExpanded = resource->m_string->evaluate(t);
+        m_variableNameExpanded = resource->m_string->evaluate(t, rule);
     } else if (global) {
-        m_variableNameExpanded = global->m_string->evaluate(t);
+        m_variableNameExpanded = global->m_string->evaluate(t, rule);
     } else if (user) {
-        m_variableNameExpanded = user->m_string->evaluate(t);
+        m_variableNameExpanded = user->m_string->evaluate(t, rule);
     } else {
         m_variableNameExpanded = m_variable->m_name;
     }
