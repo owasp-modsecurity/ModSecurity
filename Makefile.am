@@ -95,6 +95,7 @@ TESTS+=test/test-cases/regression/issue-1850.json
 TESTS+=test/test-cases/regression/issue-1725.json
 TESTS+=test/test-cases/regression/issue-1941.json
 TESTS+=test/test-cases/regression/issue-1943.json
+TESTS+=test/test-cases/regression/issue-1956.json
 TESTS+=test/test-cases/regression/variable-RESPONSE_HEADERS.json
 TESTS+=test/test-cases/regression/config-include.json
 TESTS+=test/test-cases/regression/variable-WEBSERVER_ERROR_LOG.json

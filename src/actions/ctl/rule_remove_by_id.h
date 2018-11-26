@@ -30,13 +30,13 @@ namespace ctl {
 class RuleRemoveById : public Action {
  public:
     explicit RuleRemoveById(std::string action)
-        : Action(action, RunTimeOnlyIfMatchKind),
-        m_id(0) { }
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool init(std::string *error) override;
     bool evaluate(Rule *rule, Transaction *transaction) override;
 
-    int m_id;
+    std::list<std::pair<int, int> > m_ranges;
+    std::list<int> m_ids;
 };
 
 

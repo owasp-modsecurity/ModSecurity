@@ -656,6 +656,14 @@ bool Rule::evaluate(Transaction *trans,
             " was skipped due to a ruleRemoveById action...");
         return true;
     }
+    for (auto &i : trans->m_ruleRemoveByIdRange) {
+        if (!(i.first <= m_ruleId && i.second >= m_ruleId)) {
+            continue;
+        }
+        ms_dbg_a(trans, 9, "Rule id: " + std::to_string(m_ruleId) +
+            " was skipped due to a ruleRemoveById action...");
+        return true;
+    }
 
     if (m_op->m_string) {
         eparam = m_op->m_string->evaluate(trans);

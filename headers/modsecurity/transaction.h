@@ -461,6 +461,7 @@ class Transaction : public TransactionAnchoredVariables {
      *
      */
     std::list<int > m_ruleRemoveById;
+    std::list<std::pair<int, int> > m_ruleRemoveByIdRange;
 
     /**
      *

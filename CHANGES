@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds support to multiple ranges in ctl:ruleRemoveById
+   [Issue #1956 - @theseion, @victorhora, @zimmerle]
  - Rule variable interpolation broken
    [Issue #1961 - @soonum, @zimmerle] 
  - Make the boundary check less strict as per RFC2046
