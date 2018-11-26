@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Include unanmed JSON values in unnamed ARGS
+   [Issue #1577, #1576 - @marcstern, @victorhora, @zimmerle]
  * Fix buffer size for utf8toUnicode transformation 
    [Issue #1208 - @katef, @victorhora]
  * Fix sanitizing JSON request bodies in native audit log format
