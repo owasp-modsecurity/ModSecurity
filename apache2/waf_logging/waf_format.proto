@@ -19,12 +19,7 @@ message Properties {
   optional string ruleSetVersion = 6;
   optional string ruleId = 7;
   optional string message = 8;
-
-  enum ActionType {
-    Detected = 0;
-    Blocked = 1;
-  }
-  optional ActionType action = 9;
+  optional string action = 9;
 
   enum SiteType {
     Global = 0;
@@ -32,6 +27,7 @@ message Properties {
   optional SiteType site = 10;
   optional Details details = 11;
   optional string hostname = 12;
+  optional string transactionId = 13;
 }
 
 message Waf_Format {

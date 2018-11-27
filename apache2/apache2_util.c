@@ -200,9 +200,10 @@ char *get_env_var(request_rec *r, char *name) {
 static void get_field_value(const char* from, const char* to, const char* text, char* output) {
     char* first = strstr(text, from);
     int first_index = first - text;
+	char backslash[] = "\\";
 
     if (first != NULL ) {
-        if ((first_index > 0 && (first-1)[0] != "\\") || (first_index == 0)) {
+        if ((first_index > 0 && strncmp((first-1), backslash, 2) != 0) || (first_index == 0)) {
             first += strlen(from);
         }
         else {
@@ -216,7 +217,7 @@ static void get_field_value(const char* from, const char* to, const char* text, 
     char* last = strstr(first, to);
     int last_index = last- first;
     if (last != NULL ) {
-        if ((last_index > 0 && (last-1)[0] != "\\") || (last_index == 0)) {
+        if ((last_index > 0 && strncmp((last - 1), backslash, 2) != 0) || (last_index == 0)) {
         }
         else {
             last = NULL;
@@ -317,7 +318,7 @@ static int write_file_with_lock(struct waf_lock* lock, apr_file_t* fd, char* str
 /**
  * send all waf fields in json format to a file.
  */
-static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, request_rec *r) {
+static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, char* unique_id, request_rec *r) {
     int rc = 0;
     char* json_str;
     char waf_filename[1024] = "";
@@ -331,19 +332,21 @@ static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1
     char waf_ruleset_type[50] = "";
     char waf_ruleset_version[50] = "";
     char waf_detail_message[1024] = "";
+	char waf_unique_id[100] = "";
 
     get_field_value("[file ", "]", str1, waf_filename);
     get_field_value("[id ", "]", str1, waf_id);
     get_field_value("[line ", "]", str1, waf_line);
     get_field_value("[msg ", "]", str1, waf_message);
     get_field_value("[data ", "]", str1, waf_data);
-    get_field_value("[ver ", "]", str1, waf_ruleset_info);
-    get_ip_port(ip_port, waf_ip, waf_port);
+	get_field_value("[ver ", "]", str1, waf_ruleset_info);
+	get_field_value("[unique_id ", "]", unique_id, waf_unique_id);
+	get_ip_port(ip_port, waf_ip, waf_port);
     get_detail_message(str1, waf_detail_message); 
     get_short_filename(waf_filename);
     get_ruleset_type_version(waf_ruleset_info, waf_ruleset_type, waf_ruleset_version); 
 
-    rc = generate_json(&json_str, msc_waf_resourceId, WAF_LOG_UTIL_OPERATION_NAME, WAF_LOG_UTIL_CATEGORY, msc_waf_instanceId, waf_ip, waf_port, uri, waf_ruleset_type, waf_ruleset_version, waf_id, waf_message, mode, 0, waf_detail_message, waf_data, waf_filename, waf_line, hostname);
+    rc = generate_json(&json_str, msc_waf_resourceId, WAF_LOG_UTIL_OPERATION_NAME, WAF_LOG_UTIL_CATEGORY, msc_waf_instanceId, waf_ip, waf_port, uri, waf_ruleset_type, waf_ruleset_version, waf_id, waf_message, mode, 0, waf_detail_message, waf_data, waf_filename, waf_line, hostname, waf_unique_id);
     if (rc == WAF_LOG_UTIL_FAILED) {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
        ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
@@ -434,8 +437,8 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
 
     /* Send message levels 1-3 to the Apache error log and 
      * add it to the message list in the audit log. */
-    if (level <= 3) {
-        char *unique_id = (char *)get_env_var(r, "UNIQUE_ID");
+	char *unique_id = (char *)get_env_var(r, "UNIQUE_ID");
+	if (level <= 3) {
         char *hostname = (char *)msr->hostname;
         char *requestheaderhostname = (char *)r->hostname;
 
@@ -458,7 +461,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
         else requestheaderhostname = "";
 
 #ifdef WAF_JSON_LOGGING_ENABLE
-        send_waf_log(msr->modsecurity->wafjsonlog_lock, dcfg->wafjsonlog_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), dcfg->is_enabled, (char*)msr->hostname, r);
+        send_waf_log(msr->modsecurity->wafjsonlog_lock, dcfg->wafjsonlog_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), dcfg->is_enabled, (char*)msr->hostname, unique_id, r);
 #endif
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2

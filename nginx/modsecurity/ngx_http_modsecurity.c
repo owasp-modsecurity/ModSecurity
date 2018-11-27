@@ -22,6 +22,7 @@
 #undef CRLF
 
 #include "api.h"
+#include <waf_log_util_external.h>
 
 #define NOTE_NGINX_REQUEST_CTX "nginx-ctx"
 
@@ -976,6 +977,8 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
 
     extern pthread_mutex_t msc_pregcomp_ex_mtx;
     pthread_mutex_init(&msc_pregcomp_ex_mtx, NULL);
+
+    init_appgw_rules_id_hash();
 
     return NGX_OK;
 }

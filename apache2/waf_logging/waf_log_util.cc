@@ -1,8 +1,11 @@
 #include "waf_log_util_internal.h"
 #include "waf_log_util_external.h"
 
+using namespace std;
+unordered_map<int, bool> appgw_ruleid_hash;
+
 // This function fills in a waf format message based on modsec input.
-void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, char* hostname) {
+void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, const char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, const char* hostname, char* waf_unique_id) {
     waf_format::Properties *properties;
     waf_format::Details *details;
 
@@ -46,25 +49,57 @@ void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* 
     }
     
     if (ruleId != NULL) {
-        properties->set_ruleid(ruleId);
+		ruleId[strlen(ruleId) - 1] = '\0';
+		properties->set_ruleid(ruleId+1);
     }
     
-    if (messages != NULL) {
-        properties->set_message(messages);
-    }
+	bool is_mandatory = false;
+    try {
+		int tmpid = atoi(ruleId+1);
+		is_mandatory = rule_is_mandatory(tmpid);
+
+		if (ruleSetVersion[0] != '2' && !is_mandatory)
+			properties->set_action(WAF_ACTION_MATCHED);
+		else {
+			switch (action) {
+			case MODSEC_MODE_DETECT:
+				properties->set_action(WAF_ACTION_DETECTED);
+				break;
+			case MODSEC_MODE_PREVENT:
+				properties->set_action(WAF_ACTION_BLOCKED);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+    catch (...) {
+		properties->set_action("");
+	}
     
-    switch(action) {
-        case 1:
-            properties->set_action(waf_format::Properties::Detected);
-            break;
-        case 2:
-            properties->set_action(waf_format::Properties::Blocked);
-            break;
-        default:
-            break;
-    }
-    
-    if (site == 0) {
+	if (messages != NULL) {
+		if (is_mandatory) {
+			char mandatory_message[1024] = "Mandatory rule. Cannot be disabled. ";
+			int ind = strlen(mandatory_message) - 1;
+			int i;
+			for (i = 1; i < strlen(messages) - 1; i++) {
+				if (i + ind < 1023) {
+					mandatory_message[ind + i] = messages[i];
+				}
+				else {
+					break;
+				}
+			}
+			mandatory_message[ind + i] = '\0';
+			properties->set_message(mandatory_message);
+		}
+		else {
+			messages[strlen(messages) - 1] = '\0';
+			properties->set_message(messages+1);
+		}		
+	}
+
+	if (site == 0) {
         properties->set_site(waf_format::Properties::Global);
     }
     
@@ -73,7 +108,8 @@ void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* 
     }
     
     if (details_data != NULL) {
-        details->set_data(details_data);
+		details_data[strlen(details_data) - 1] = '\0';
+        details->set_data(details_data+1);
     }
     
     if (details_file != NULL) {
@@ -81,18 +117,24 @@ void set_waf_format(waf_format::Waf_Format* waf_format, char* resourceId, char* 
     }
     
     if (details_line != NULL) {
-        details->set_line(details_line);
+		details_line[strlen(details_line) - 1] = '\0';
+        details->set_line(details_line+1);
     }
     
-    if (hostname != NULL) {
-        properties->set_hostname(hostname);
-    }
+	if (hostname != NULL) {
+		properties->set_hostname(hostname);
+	}
+
+	if (waf_unique_id != NULL) {
+		waf_unique_id[strlen(waf_unique_id) - 1] = '\0';
+		properties->set_transactionid(waf_unique_id+1);
+	}
 }
 
 // Main function:  get fields from modsec, set the protobuf object and write to file in json.
-int generate_json(char** result_json, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, char* hostname) {
+int generate_json(char** result_json, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, const char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, const char* hostname, char* waf_unique_id) {
     waf_format::Waf_Format waf_format;
-    std::string json_string;
+    string json_string;
     google::protobuf::util::JsonPrintOptions options;
     google::protobuf::util::Status convert_result;
     char* json_str;
@@ -103,7 +145,7 @@ int generate_json(char** result_json, char* resourceId, char* operationName, cha
         GOOGLE_PROTOBUF_VERIFY_VERSION;
         
         // Set Waf format.
-        set_waf_format(&waf_format, resourceId, operationName, category, instanceId, clientIP, clientPort, requestUri, ruleSetType, ruleSetVersion, ruleId, messages, action, site, details_messages, details_data, details_file, details_line, hostname); 
+        set_waf_format(&waf_format, resourceId, operationName, category, instanceId, clientIP, clientPort, requestUri, ruleSetType, ruleSetVersion, ruleId, messages, action, site, details_messages, details_data, details_file, details_line, hostname, waf_unique_id); 
         
         options.add_whitespace = false;
         options.always_print_primitive_fields = true;
@@ -126,4 +168,21 @@ int generate_json(char** result_json, char* resourceId, char* operationName, cha
 
 void free_json(char* str) {
     free(str);
+}
+
+void init_appgw_rules_id_hash() {
+	ifstream infile(RULES_ID_FILE);
+	string line;
+
+	while (getline(infile, line)) {
+		int rule_id = stoi(line);
+		appgw_ruleid_hash[rule_id] = true;
+	}
+	infile.close();
+
+	return;
+}
+
+bool rule_is_mandatory(int rule_id) {
+	return (appgw_ruleid_hash.find(rule_id) == appgw_ruleid_hash.end());
 }
