@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Correct the usage of modsecurity::Phases::NUMBER_OF_PHASES
+   [Issue #1959 - @weliu]
  - Adds support to multiple ranges in ctl:ruleRemoveById
    [Issue #1956 - @theseion, @victorhora, @zimmerle]
  - Rule variable interpolation broken
