@@ -323,5 +323,7 @@ TESTS+=test/test-cases/secrules-language-tests/operators/lt.json
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = modsecurity.pc
-EXTRA_DIST = modsecurity.pc.in
+EXTRA_DIST = modsecurity.pc.in \
+             modsecurity.conf-recommended \
+             unicode.mapping
 
