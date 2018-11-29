@@ -29,7 +29,7 @@ v3.0.3 - 2018-Nov-05
  - parser: Fix the support for CRLF configuration files
    [Issue #1945 - @zimmerle, @defanator, @kjakub]
  - Organizes the server logs
-   [0xb7c36 and 0x5ac20 - @zimmerle]
+   [0xb7c36 and 0x5ac20 - @zimmerle, @steven-j-wojcik]
  - m_lineNumber in Rule not mapping with the correct line number in file
    [Issue #1844 - @zimmerle, @victorhora, @xizeng]
  - Using shared_ptr instead of unique_ptr on rules exceptions
