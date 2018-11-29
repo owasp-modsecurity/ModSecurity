@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Allow 0 length JSON requests.
+   [Issue #1822 - @allanbomsft, @zimmerle, @victorhora, @marcstern]
  - Fix "make dist" target to include default configuration
    [Issue #1966 - @defanator]
  - Replaced log locking using mutex with fcntl lock

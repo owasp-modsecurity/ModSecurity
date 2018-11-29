@@ -734,7 +734,7 @@ int Transaction::processRequestBody() {
                 &error);
             m_json->complete(&error);
         }
-        if (error.empty() == false) {
+        if (error.empty() == false && m_requestBody.str().size() > 0) {
             m_variableReqbodyError.set("1", m_variableOffset);
             m_variableReqbodyProcessorError.set("1", m_variableOffset);
             m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
