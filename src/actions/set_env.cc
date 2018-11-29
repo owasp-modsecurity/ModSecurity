@@ -37,7 +37,7 @@ bool SetENV::evaluate(Rule *rule, Transaction *t) {
     ms_dbg_a(t, 8, "Setting envoriment variable: "
         + colNameExpanded + ".");
 
-    putenv((char *)colNameExpanded.c_str());
+    putenv(strdup(colNameExpanded.c_str()));
 
     return true;
 }

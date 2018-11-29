@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix setenv action to strdup key=variable
+   [@zimmerle]
  - Allow 0 length JSON requests.
    [Issue #1822 - @allanbomsft, @zimmerle, @victorhora, @marcstern]
  - Fix "make dist" target to include default configuration
