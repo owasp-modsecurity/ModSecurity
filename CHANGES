@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix "make dist" target to include default configuration
+   [Issue #1966 - @defanator]
  - Replaced log locking using mutex with fcntl lock
    [Issue #1949, #1927 - @Cloaked9000]
  - Correct the usage of modsecurity::Phases::NUMBER_OF_PHASES
