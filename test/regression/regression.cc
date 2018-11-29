@@ -424,6 +424,11 @@ after_debug_log:
 
 int main(int argc, char **argv) {
     ModSecurityTest<RegressionTest> test;
+
+    std::string ver(MODSECURITY_VERSION);
+    std::string envvar("MODSECURITY=ModSecurity " + ver + " regression tests");
+
+    putenv(strdup(envvar.c_str()));
 #ifndef NO_LOGS
     int test_number = 0;
 #endif

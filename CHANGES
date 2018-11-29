@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Regression: Sets MODSECURITY env var during the tests execution
+   [@zimmerle]
  - Fix setenv action to strdup key=variable
    [@zimmerle]
  - Allow 0 length JSON requests.
