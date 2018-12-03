@@ -1,5 +1,5 @@
-DD MMM YYYY - 2.9.3 - To be released
-------------------------------------
+05 Dec 2018 - 2.9.3
+-------------------
 
  * Enable optimization for large stream input by default on IIS
    [Issue #1299 - @victorhora, @zimmerle]
