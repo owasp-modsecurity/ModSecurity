@@ -21,9 +21,8 @@ and applying traditional ModSecurity processing. In general, it provides the
 capability to load/interpret rules written in the ModSecurity SecRules format
 and apply them to HTTP content provided by your application via Connectors.
 
-Currently, libmodsecurity is known to be compatible with the following
-Connectors: ModSecurity Nginx Connector (ModSecurity-nginx).
-
+If you are looking for ModSecurity for Apache (aka ModSecurity v2.x), it is still under maintenence and available:
+[here](https://github.com/SpiderLabs/ModSecurity/tree/v2/master).
 
 ### What is the difference between this project and the old ModSecurity (v2.x.x)?
 
