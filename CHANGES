@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix tests on FreeBSD
+   [Issue #1973 - @defanator]
  - Changes ENV test case to read the default MODSECURTIY env var
    [Issue #1969 - @zimmerle, @airween, @inittab]
  - Regression: Sets MODSECURITY env var during the tests execution
