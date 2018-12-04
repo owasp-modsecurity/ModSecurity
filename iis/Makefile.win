@@ -37,8 +37,8 @@ INCLUDES = -I. -I.. \
            -I..\apache2 \
            -I..\standalone
 
-# Enables support for SecRemoteRules and external resources.
-DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
+# Enables support for SecRemoteRules, external resources and enable optimization for large stream input by default on IIS.
+DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES -DMSC_LARGE_STREAM_INPUT
 
 #	   -I$(SSDEEP) \
 # Lua is optional

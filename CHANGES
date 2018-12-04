@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.3 - To be released
 ------------------------------------
 
+ * Enable optimization for large stream input by default on IIS
+   [Issue #1299 - @victorhora, @zimmerle]
  * Allow 0 length JSON requests.
    [Issue #1822 - @allanbomsft, @zimmerle, @victorhora, @marcstern]
  * Include unanmed JSON values in unnamed ARGS
