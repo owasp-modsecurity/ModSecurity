@@ -426,8 +426,9 @@ int main(int argc, char **argv) {
 
     std::string ver(MODSECURITY_VERSION);
     std::string envvar("MODSECURITY=ModSecurity " + ver + " regression tests");
+    char *eenvvar = strdup(envvar.c_str());
 
-    putenv(strdup(envvar.c_str()));
+    putenv(eenvvar);
 #ifndef NO_LOGS
     int test_number = 0;
 #endif
@@ -557,5 +558,6 @@ int main(int argc, char **argv) {
     }
 
 #endif
+    free(eenvvar);
     return 0;
 }
