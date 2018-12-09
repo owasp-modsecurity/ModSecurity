@@ -832,7 +832,7 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
     switch(type)    {
 
         case IPV4_TREE:
-            memset(&addr4, 0, sizeof(addr4));
+            memset(&(addr4.s_addr), 0, sizeof(addr4.s_addr));
             memset(ip_strv4, 0x0, NETMASK_32);
 
             strncpy(ip_strv4, buffer, sizeof(ip_strv4));
@@ -857,18 +857,17 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
                 ip_strv4[pos] = '\0';
             }
 
-            ret = inet_pton(AF_INET, ip_strv4, &addr4);
+            ret = inet_pton(AF_INET, ip_strv4, &(addr4.s_addr));
 
             if (ret <= 0) {
                 return NULL;
             }
-            ip = addr4.s_addr;
 
             tree->count++;
-            return CPTAddElement((unsigned char *)&ip, NETMASK_32, tree, netmask_v4);
+            return CPTAddElement((unsigned char *)&(addr4.s_addr), NETMASK_32, tree, netmask_v4);
 
         case IPV6_TREE:
-            memset(&addr6, 0, sizeof(addr6));
+            memset(&(addr6.s6_addr), 0, sizeof(addr6.s6_addr));
             memset(ip_strv6, 0x0, NETMASK_128);
 
             strncpy(ip_strv6, buffer, sizeof(ip_strv6));
@@ -895,7 +894,7 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
                 ip_strv6[pos] = '\0';
             }
 
-            ret = inet_pton(AF_INET6, ip_strv6, &addr6);
+            ret = inet_pton(AF_INET6, ip_strv6, &(addr6.s6_addr));
 
             if (ret <= 0)
             {
@@ -904,7 +903,7 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
 
             tree->count++;
 
-            return CPTAddElement((unsigned char *)&addr6.s6_addr, NETMASK_128, tree, netmask_v6);
+            return CPTAddElement((unsigned char *)&(addr6.s6_addr), NETMASK_128, tree, netmask_v6);
         default:
             return NULL;
     }
@@ -933,25 +932,25 @@ int tree_contains_ip(TreeRoot *rtree,
     }
 
     if (strchr(value, ':') == NULL) {
-        if (inet_pton(AF_INET, value, &in) <= 0) {
+        if (inet_pton(AF_INET, value, &(in.s_addr)) <= 0) {
             //*error_msg = apr_psprintf(mp, "IPmatch: bad IPv4 " \
             //    "specification \"%s\".", value);
             return -1;
         }
 
-        if (CPTIpMatch((unsigned char *)&in.s_addr, rtree->ipv4_tree,
+        if (CPTIpMatch((unsigned char *)&(in.s_addr), rtree->ipv4_tree,
             IPV4_TREE) != NULL) {
             return 1;
         }
     }
     else {
-        if (inet_pton(AF_INET6, value, &in6) <= 0) {
+        if (inet_pton(AF_INET6, value, &(in6.s6_addr)) <= 0) {
             //*error_msg = apr_psprintf(mp, "IPmatch: bad IPv6 " \
              //   "specification \"%s\".", value);
             return -1;
         }
 
-        if (CPTIpMatch((unsigned char *)&in6.s6_addr, rtree->ipv6_tree,
+        if (CPTIpMatch((unsigned char *)&(in6.s6_addr), rtree->ipv6_tree,
             IPV6_TREE) != NULL) {
             return 1;
         }
