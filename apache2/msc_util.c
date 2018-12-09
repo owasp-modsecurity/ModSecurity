@@ -2712,26 +2712,26 @@ int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
     }
 
     if (strchr(value, ':') == NULL) {
-        if (inet_pton(AF_INET, value, &in) <= 0) {
+        if (inet_pton(AF_INET, value, &(in.s_addr)) <= 0) {
             *error_msg = apr_psprintf(mp, "IPmatch: bad IPv4 " \
                 "specification \"%s\".", value);
             return -1;
         }
 
-        if (CPTIpMatch(msr, (unsigned char *)&in.s_addr, rtree->ipv4_tree,
+        if (CPTIpMatch(msr, (unsigned char *)&(in.s_addr), rtree->ipv4_tree,
             IPV4_TREE) != NULL) {
             return 1;
         }
     }
 #if APR_HAVE_IPV6
     else {
-        if (inet_pton(AF_INET6, value, &in6) <= 0) {
+        if (inet_pton(AF_INET6, value, &(in6.s6_addr)) <= 0) {
             *error_msg = apr_psprintf(mp, "IPmatch: bad IPv6 " \
                 "specification \"%s\".", value);
             return -1;
         }
 
-        if (CPTIpMatch(msr, (unsigned char *)&in6.s6_addr, rtree->ipv6_tree,
+        if (CPTIpMatch(msr, (unsigned char *)&(in6.s6_addr), rtree->ipv6_tree,
             IPV6_TREE) != NULL) {
             return 1;
         }
