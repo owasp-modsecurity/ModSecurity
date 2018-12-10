@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 ------------------------------------
 
+ * Fix inet addr handling on 64 bit big endian systems
+   [Issue #1980 - @zimmerle, @airween]
 
 
 05 Dec 2018 - 2.9.3
