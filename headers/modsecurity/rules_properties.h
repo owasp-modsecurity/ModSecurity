@@ -343,10 +343,12 @@ class RulesProperties {
 
         if (from->m_requestBodyLimit.m_set == true) {
             to->m_requestBodyLimit.m_value = from->m_requestBodyLimit.m_value;
+            to->m_requestBodyLimit.m_set = true;
         }
 
         if (from->m_responseBodyLimit.m_set == true) {
             to->m_responseBodyLimit.m_value = from->m_responseBodyLimit.m_value;
+            to->m_responseBodyLimit.m_set = true;
         }
 
         if (from->m_requestBodyLimitAction != PropertyNotSetBodyLimitAction) {
@@ -359,10 +361,12 @@ class RulesProperties {
 
         if (from->m_uploadFileLimit.m_set == true) {
             to->m_uploadFileLimit.m_value = from->m_uploadFileLimit.m_value;
+            to->m_uploadFileLimit.m_set = true;
         }
 
         if (from->m_uploadFileMode.m_set == true) {
             to->m_uploadFileMode.m_value = from->m_uploadFileMode.m_value;
+            to->m_uploadFileMode.m_set = true;
         }
 
         if (from->m_uploadDirectory.m_set == true) {
