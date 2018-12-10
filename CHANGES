@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 ------------------------------------
 
+ * Fix for apr_global_mutex_create() crashes with mod_security
+   [Issue #1957 - @blappm]
  * Fix inet addr handling on 64 bit big endian systems
    [Issue #1980 - @zimmerle, @airween]
 
