@@ -55,8 +55,8 @@ AC_PROG_MAKE_SET
 # AX_CXX_COMPILE_STDCXX_11(,mandatory)
 
 # Check for libinjection
-AC_CHECK_FILE("others/libinjection/src/libinjection_html5.c", HAS_LIBINJECTION=1)
-test "x$HAS_LIBINJECTION" = "x" && AC_MSG_ERROR([\
+if ! test -f "others/libinjection/src/libinjection_html5.c"; then
+AC_MSG_ERROR([\
 
 
   libInjection was not found within ModSecurity source directory.
@@ -71,6 +71,7 @@ test "x$HAS_LIBINJECTION" = "x" && AC_MSG_ERROR([\
      $ git submodule update
 
    ])
+fi
 # Libinjection version
 AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git describe && cd ../..))
 
