@@ -2780,8 +2780,8 @@ int ip_tree_from_param(apr_pool_t *mp,
 }
 
 #ifdef WITH_CURL
-size_t msc_curl_write_memory_cb(apr_pool_t *mp, void *contents, size_t size,
-        size_t nmemb, void *userp, char **error_msg)
+size_t msc_curl_write_memory_cb(void *contents, size_t size,
+        size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
     struct msc_curl_memory_buffer_t *mem = (struct msc_curl_memory_buffer_t *)userp;
@@ -2790,19 +2790,13 @@ size_t msc_curl_write_memory_cb(apr_pool_t *mp, void *contents, size_t size,
     {
         mem->memory = malloc(realsize + 1);
         if (mem->memory == NULL) {
-            *error_msg = apr_psprintf(mp, "Unable to allocate buffer for mem->memory");
             return 0;
         }
         memset(mem->memory, '\0', sizeof(realsize + 1));
     }
     else
     {
-        void *tmp;
-        tmp = mem->memory;
-        tmp = realloc(mem->memory, mem->size + realsize + 1);
-        if (tmp != NULL) {
-            mem->memory = tmp;
-        }
+        mem->memory = realloc(mem->memory, mem->size + realsize + 1);
         memset(mem->memory + mem->size, '\0', sizeof(realsize + 1));
     }
 

@@ -166,8 +166,8 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
 
 int read_line(char *buff, int size, FILE *fp);
 
-size_t msc_curl_write_memory_cb(apr_pool_t *mp, void *contents, size_t size,
-    size_t nmemb, void *userp, char **error_msg);
+size_t msc_curl_write_memory_cb(void *contents, size_t size,
+    size_t nmemb, void *userp);
 
 struct msc_curl_memory_buffer_t
 {
