@@ -18,6 +18,7 @@
 #include "src/parser/seclang-parser.hh"
 #include "modsecurity/audit_log.h"
 #include "modsecurity/rules_properties.h"
+#include "modsecurity/parser/default_driver_trail.h"
 
 using modsecurity::audit_log::AuditLog;
 using modsecurity::Rule;
@@ -25,122 +26,40 @@ using modsecurity::Rule;
 namespace modsecurity {
 namespace Parser {
 
-Driver::Driver()
-  : RulesProperties(),
-  trace_scanning(false),
-  trace_parsing(false),
-  lastRule(NULL) { }
+
+Driver::Driver() :
+    m_traceScanning(false),
+    m_traceParsing(false),
+    m_trail(new DefaultDriverTrail()) { }
+
+
+Driver::Driver(DriverTrail *trail) :
+    m_traceScanning(false),
+    m_traceParsing(false),
+    m_trail(trail) { }
 
 
 Driver::~Driver() {
-    while (loc.empty() == false) {
-        yy::location *a = loc.back();
-        loc.pop_back();
+    while (m_location.empty() == false) {
+        yy::location *a = m_location.back();
+        m_location.pop_back();
         delete a;
     }
-}
 
-
-int Driver::addSecMarker(std::string marker) {
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        Rule *rule = new Rule(marker);
-        rule->m_phase = i;
-        m_rules[i].push_back(rule);
+    if (m_trail != NULL) {
+        delete m_trail;
+        m_trail = NULL;
     }
-    return 0;
-}
-
-
-int Driver::addSecAction(Rule *rule) {
-    if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
-        m_parserError << "Unknown phase: " << std::to_string(rule->m_phase);
-        m_parserError << std::endl;
-        return false;
-    }
-
-    m_rules[rule->m_phase].push_back(rule);
-
-    return true;
-}
-
-
-int Driver::addSecRuleScript(RuleScript *rule) {
-    m_rules[rule->m_phase].push_back(rule);
-    return true;
-}
-
-
-int Driver::addSecRule(Rule *rule) {
-    if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
-        m_parserError << "Unknown phase: " << std::to_string(rule->m_phase);
-        m_parserError << std::endl;
-        return false;
-    }
-
-    if (lastRule && lastRule->m_chained) {
-        if (lastRule->m_chainedRuleChild == NULL) {
-            rule->m_phase = lastRule->m_phase;
-            if (rule->m_theDisruptiveAction) {
-                m_parserError << "Disruptive actions can only be specified by";
-                m_parserError << " chain starter rules.";
-                return false;
-            }
-            lastRule->m_chainedRuleChild = rule;
-            rule->m_chainedRuleParent = lastRule;
-            return true;
-        } else {
-            Rule *a = lastRule->m_chainedRuleChild;
-            while (a->m_chained && a->m_chainedRuleChild != NULL) {
-                a = a->m_chainedRuleChild;
-            }
-            if (a->m_chained && a->m_chainedRuleChild == NULL) {
-                a->m_chainedRuleChild = rule;
-                rule->m_chainedRuleParent = a;
-                if (a->m_theDisruptiveAction) {
-                    m_parserError << "Disruptive actions can only be ";
-                    m_parserError << "specified by chain starter rules.";
-                    return false;
-                }
-                return true;
-            }
-        }
-    }
-
-
-    /*
-     * Checking if the rule has an ID and also checking if this ID is not used
-     * by other rule
-     */
-    if (rule->m_ruleId == 0) {
-        m_parserError << "Rules must have an ID. File: ";
-        m_parserError << rule->m_fileName << " at line: ";
-        m_parserError << std::to_string(rule->m_lineNumber) << std::endl;
-        return false;
-    }
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = m_rules[i];
-        for (int j = 0; j < rules.size(); j++) {
-            if (rules[j]->m_ruleId == rule->m_ruleId) {
-                m_parserError << "Rule id: " << std::to_string(rule->m_ruleId) \
-                    << " is duplicated" << std::endl;
-                return false;
-            }
-        }
-    }
-
-    lastRule = rule;
-    m_rules[rule->m_phase].push_back(rule);
-    return true;
 }
 
 
 int Driver::parse(const std::string &f, const std::string &ref) {
-    lastRule = NULL;
-    loc.push_back(new yy::location());
-    if (ref.empty()) {
-        this->ref.push_back("<<reference missing or not informed>>");
+    //m_trail->m_lastRule = NULL;
+    m_location.push_back(new yy::location());
+    if (m_reference.empty()) {
+        m_reference.push_back("<<reference missing or not informed>>");
     } else {
-        this->ref.push_back(ref);
+        m_reference.push_back(ref);
     }
 
     if (f.empty()) {
@@ -148,11 +67,11 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     }
 
     buffer = f;
-    scan_begin();
+    scanBegin();
     yy::seclang_parser parser(*this);
-    parser.set_debug_level(trace_parsing);
+    parser.set_debug_level(m_traceParsing);
     int res = parser.parse();
-    scan_end();
+    scanEnd();
 
     /*
     if (m_auditLog->init(&error) == false) {
@@ -193,10 +112,13 @@ void Driver::error(const yy::location& l, const std::string& m) {
 
 void Driver::error(const yy::location& l, const std::string& m,
     const std::string& c) {
+    if (m_trail->m_error.tellp() > 0) {
+        m_parserError << m_trail;
+    }
     if (m_parserError.tellp() == 0) {
         m_parserError << "Rules error. ";
-        if (ref.empty() == false) {
-            m_parserError << "File: " << ref.back() << ". ";
+        if (m_reference.empty() == false) {
+            m_parserError << "File: " << m_reference.back() << ". ";
         }
         m_parserError << "Line: " << l.end.line << ". ";
         m_parserError << "Column: " << l.end.column - 1 << ". ";

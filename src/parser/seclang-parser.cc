@@ -1109,7 +1109,7 @@ namespace yy {
 #line 355 "seclang-parser.yy" // lalr1.cc:783
 {
   // Initialize the initial location.
-  yyla.location.begin.filename = yyla.location.end.filename = &driver.file;
+  yyla.location.begin.filename = yyla.location.end.filename = &driver.m_file;
 }
 
 #line 1116 "seclang-parser.cc" // lalr1.cc:783
@@ -1464,7 +1464,7 @@ namespace yy {
   case 6:
 #line 758 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setStorageDirMode(strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8));
+        driver.m_trail->m_auditLog->setStorageDirMode(strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8));
       }
 #line 1470 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1472,7 +1472,7 @@ namespace yy {
   case 7:
 #line 764 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setStorageDir(yystack_[0].value.as< std::string > ());
+        driver.m_trail->m_auditLog->setStorageDir(yystack_[0].value.as< std::string > ());
       }
 #line 1478 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1480,7 +1480,7 @@ namespace yy {
   case 8:
 #line 770 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
+        driver.m_trail->m_auditLog->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
       }
 #line 1486 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1488,7 +1488,7 @@ namespace yy {
   case 9:
 #line 774 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
+        driver.m_trail->m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
       }
 #line 1494 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1496,7 +1496,7 @@ namespace yy {
   case 10:
 #line 778 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
+        driver.m_trail->m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
       }
 #line 1502 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1504,7 +1504,7 @@ namespace yy {
   case 11:
 #line 784 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setFileMode(strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8));
+        driver.m_trail->m_auditLog->setFileMode(strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8));
       }
 #line 1510 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1512,7 +1512,7 @@ namespace yy {
   case 12:
 #line 790 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setFilePath2(yystack_[0].value.as< std::string > ());
+        driver.m_trail->m_auditLog->setFilePath2(yystack_[0].value.as< std::string > ());
       }
 #line 1518 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1520,7 +1520,7 @@ namespace yy {
   case 13:
 #line 796 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setParts(yystack_[0].value.as< std::string > ());
+        driver.m_trail->m_auditLog->setParts(yystack_[0].value.as< std::string > ());
       }
 #line 1526 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1528,7 +1528,7 @@ namespace yy {
   case 14:
 #line 802 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setFilePath1(yystack_[0].value.as< std::string > ());
+        driver.m_trail->m_auditLog->setFilePath1(yystack_[0].value.as< std::string > ());
       }
 #line 1534 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1536,7 +1536,7 @@ namespace yy {
   case 15:
 #line 807 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::JSONAuditLogFormat);
+        driver.m_trail->m_auditLog->setFormat(modsecurity::audit_log::AuditLog::JSONAuditLogFormat);
       }
 #line 1542 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1544,7 +1544,7 @@ namespace yy {
   case 16:
 #line 812 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::NativeAuditLogFormat);
+        driver.m_trail->m_auditLog->setFormat(modsecurity::audit_log::AuditLog::NativeAuditLogFormat);
       }
 #line 1550 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1553,7 +1553,7 @@ namespace yy {
 #line 818 "seclang-parser.yy" // lalr1.cc:906
     {
         std::string relevant_status(yystack_[0].value.as< std::string > ());
-        driver.m_auditLog->setRelevantStatus(relevant_status);
+        driver.m_trail->m_auditLog->setRelevantStatus(relevant_status);
       }
 #line 1559 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1561,7 +1561,7 @@ namespace yy {
   case 18:
 #line 825 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
+        driver.m_trail->m_auditLog->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
       }
 #line 1567 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1569,7 +1569,7 @@ namespace yy {
   case 19:
 #line 829 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
+        driver.m_trail->m_auditLog->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
       }
 #line 1575 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1577,7 +1577,7 @@ namespace yy {
   case 20:
 #line 833 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
+        driver.m_trail->m_auditLog->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
       }
 #line 1583 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1585,7 +1585,7 @@ namespace yy {
   case 21:
 #line 839 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
       }
 #line 1591 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1593,7 +1593,7 @@ namespace yy {
   case 22:
 #line 843 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
       }
 #line 1599 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1610,8 +1610,8 @@ namespace yy {
   case 24:
 #line 852 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_uploadFileLimit.m_set = true;
-        driver.m_uploadFileLimit.m_value = strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 10);
+        driver.m_trail->m_uploadFileLimit.m_set = true;
+        driver.m_trail->m_uploadFileLimit.m_value = strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 10);
       }
 #line 1617 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1619,8 +1619,8 @@ namespace yy {
   case 25:
 #line 857 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_uploadFileMode.m_set = true;
-        driver.m_uploadFileMode.m_value = strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8);
+        driver.m_trail->m_uploadFileMode.m_set = true;
+        driver.m_trail->m_uploadFileMode.m_value = strtol(yystack_[0].value.as< std::string > ().c_str(), NULL, 8);
       }
 #line 1626 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1628,8 +1628,8 @@ namespace yy {
   case 26:
 #line 862 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_uploadDirectory.m_set = true;
-        driver.m_uploadDirectory.m_value = yystack_[0].value.as< std::string > ();
+        driver.m_trail->m_uploadDirectory.m_set = true;
+        driver.m_trail->m_uploadDirectory.m_value = yystack_[0].value.as< std::string > ();
       }
 #line 1635 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1637,7 +1637,7 @@ namespace yy {
   case 27:
 #line 867 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
       }
 #line 1643 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1645,7 +1645,7 @@ namespace yy {
   case 28:
 #line 871 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
       }
 #line 1651 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -1692,7 +1692,7 @@ namespace yy {
     {
         yylhs.value.as< std::unique_ptr<Operator> > () = std::move(yystack_[0].value.as< std::unique_ptr<Operator> > ());
         std::string error;
-        if (yylhs.value.as< std::unique_ptr<Operator> > ()->init(driver.ref.back(), &error) == false) {
+        if (yylhs.value.as< std::unique_ptr<Operator> > ()->init(driver.m_reference.back(), &error) == false) {
             driver.error(yystack_[1].location, error);
             YYERROR;
         }
@@ -1706,7 +1706,7 @@ namespace yy {
         yylhs.value.as< std::unique_ptr<Operator> > () = std::move(yystack_[0].value.as< std::unique_ptr<Operator> > ());
         yylhs.value.as< std::unique_ptr<Operator> > ()->m_negation = true;
         std::string error;
-        if (yylhs.value.as< std::unique_ptr<Operator> > ()->init(driver.ref.back(), &error) == false) {
+        if (yylhs.value.as< std::unique_ptr<Operator> > ()->init(driver.m_reference.back(), &error) == false) {
             driver.error(yystack_[2].location, error);
             YYERROR;
         }
@@ -1719,7 +1719,7 @@ namespace yy {
     {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
         std::string error;
-        if (yylhs.value.as< std::unique_ptr<Operator> > ()->init(driver.ref.back(), &error) == false) {
+        if (yylhs.value.as< std::unique_ptr<Operator> > ()->init(driver.m_reference.back(), &error) == false) {
             driver.error(yystack_[1].location, error);
             YYERROR;
         }
@@ -1733,7 +1733,7 @@ namespace yy {
         OPERATOR_CONTAINER(yylhs.value.as< std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as< std::unique_ptr<RunTimeString> > ())));
         yylhs.value.as< std::unique_ptr<Operator> > ()->m_negation = true;
         std::string error;
-        if (yylhs.value.as< std::unique_ptr<Operator> > ()->init(driver.ref.back(), &error) == false) {
+        if (yylhs.value.as< std::unique_ptr<Operator> > ()->init(driver.m_reference.back(), &error) == false) {
             driver.error(yystack_[2].location, error);
             YYERROR;
         }
@@ -2048,7 +2048,7 @@ namespace yy {
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ driver.m_reference.back(),
             /* line number */ yystack_[3].location.end.line
             );
 
@@ -2072,7 +2072,7 @@ namespace yy {
             /* op */ yystack_[0].value.as< std::unique_ptr<Operator> > ().release(),
             /* variables */ v,
             /* actions */ NULL,
-            /* file name */ driver.ref.back(),
+            /* file name */ driver.m_reference.back(),
             /* line number */ yystack_[2].location.end.line
             );
         if (driver.addSecRule(rule) == false) {
@@ -2094,7 +2094,7 @@ namespace yy {
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ driver.m_reference.back(),
             /* line number */ yystack_[1].location.end.line
             );
         driver.addSecAction(rule);
@@ -2113,7 +2113,7 @@ namespace yy {
         RuleScript *r = new RuleScript(
             /* path to script */ yystack_[1].value.as< std::string > (),
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ driver.m_reference.back(),
             /* line number */ yystack_[1].location.end.line
             );
 
@@ -2172,7 +2172,7 @@ namespace yy {
             YYERROR;
         }
 
-        if (!driver.m_defaultActions[definedPhase].empty()) {
+        if (!driver.m_trail->m_defaultActions[definedPhase].empty()) {
             std::stringstream ss;
             ss << "SecDefaultActions can only be placed once per phase and configuration context. Phase ";
             ss << secRuleDefinedPhase;
@@ -2182,7 +2182,7 @@ namespace yy {
         }
 
         for (actions::Action *a : checkedActions) {
-            driver.m_defaultActions[definedPhase].push_back(a);
+            driver.m_trail->m_defaultActions[definedPhase].push_back(a);
         }
 
         delete actions;
@@ -2201,7 +2201,7 @@ namespace yy {
   case 79:
 #line 1243 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
+        driver.m_trail->m_secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
       }
 #line 2207 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2209,7 +2209,7 @@ namespace yy {
   case 80:
 #line 1247 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
+        driver.m_trail->m_secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
       }
 #line 2215 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2217,7 +2217,7 @@ namespace yy {
   case 81:
 #line 1251 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
+        driver.m_trail->m_secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
       }
 #line 2223 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2225,7 +2225,7 @@ namespace yy {
   case 82:
 #line 1255 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
       }
 #line 2231 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2233,7 +2233,7 @@ namespace yy {
   case 83:
 #line 1259 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
 #line 2239 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2241,7 +2241,7 @@ namespace yy {
   case 84:
 #line 1263 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
       }
 #line 2247 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2249,7 +2249,7 @@ namespace yy {
   case 85:
 #line 1267 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
 #line 2255 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2261,8 +2261,8 @@ namespace yy {
           driver.error(yystack_[1].location, "Argument separator should be set to a single character.");
           YYERROR;
         }
-        driver.m_secArgumentSeparator.m_value = yystack_[0].value.as< std::string > ();
-        driver.m_secArgumentSeparator.m_set = true;
+        driver.m_trail->m_secArgumentSeparator.m_value = yystack_[0].value.as< std::string > ();
+        driver.m_trail->m_secArgumentSeparator.m_set = true;
       }
 #line 2268 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2270,7 +2270,7 @@ namespace yy {
   case 87:
 #line 1280 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_components.push_back(yystack_[0].value.as< std::string > ());
+        driver.m_trail->m_components.push_back(yystack_[0].value.as< std::string > ());
       }
 #line 2276 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2294,8 +2294,8 @@ namespace yy {
   case 90:
 #line 1292 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secWebAppId.m_value = yystack_[0].value.as< std::string > ();
-        driver.m_secWebAppId.m_set = true;
+        driver.m_trail->m_secWebAppId.m_value = yystack_[0].value.as< std::string > ();
+        driver.m_trail->m_secWebAppId.m_set = true;
       }
 #line 2301 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2519,7 +2519,7 @@ namespace yy {
 #line 1412 "seclang-parser.yy" // lalr1.cc:906
     {
         std::string error;
-        if (driver.m_exceptions.load(yystack_[0].value.as< std::string > (), &error) == false) {
+        if (driver.m_trail->m_exceptions.load(yystack_[0].value.as< std::string > (), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveById: failed to load:";
             ss << yystack_[0].value.as< std::string > ();
@@ -2536,7 +2536,7 @@ namespace yy {
 #line 1425 "seclang-parser.yy" // lalr1.cc:906
     {
         std::string error;
-        if (driver.m_exceptions.loadRemoveRuleByTag(yystack_[0].value.as< std::string > (), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadRemoveRuleByTag(yystack_[0].value.as< std::string > (), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveByTag: failed to load:";
             ss << yystack_[0].value.as< std::string > ();
@@ -2553,7 +2553,7 @@ namespace yy {
 #line 1438 "seclang-parser.yy" // lalr1.cc:906
     {
         std::string error;
-        if (driver.m_exceptions.loadRemoveRuleByMsg(yystack_[0].value.as< std::string > (), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadRemoveRuleByMsg(yystack_[0].value.as< std::string > (), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveByMsg: failed to load:";
             ss << yystack_[0].value.as< std::string > ();
@@ -2570,7 +2570,7 @@ namespace yy {
 #line 1451 "seclang-parser.yy" // lalr1.cc:906
     {
         std::string error;
-        if (driver.m_exceptions.loadUpdateTargetByTag(yystack_[1].value.as< std::string > (), std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadUpdateTargetByTag(yystack_[1].value.as< std::string > (), std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetByTag: failed to load:";
             ss << yystack_[1].value.as< std::string > ();
@@ -2587,7 +2587,7 @@ namespace yy {
 #line 1464 "seclang-parser.yy" // lalr1.cc:906
     {
         std::string error;
-        if (driver.m_exceptions.loadUpdateTargetByMsg(yystack_[1].value.as< std::string > (), std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadUpdateTargetByMsg(yystack_[1].value.as< std::string > (), std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetByMsg: failed to load:";
             ss << yystack_[1].value.as< std::string > ();
@@ -2617,7 +2617,7 @@ namespace yy {
             YYERROR;
         }
 
-        if (driver.m_exceptions.loadUpdateTargetById(ruleId, std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadUpdateTargetById(ruleId, std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetById: failed to load:";
             ss << yystack_[1].value.as< std::string > ();
@@ -2648,7 +2648,7 @@ namespace yy {
         }
 
 
-        if (driver.m_exceptions.loadUpdateActionById(ruleId, std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ()), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadUpdateActionById(ruleId, std::move(yystack_[0].value.as< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ()), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateActionById: failed to load:";
             ss << yystack_[1].value.as< std::string > ();
@@ -2664,8 +2664,8 @@ namespace yy {
   case 123:
 #line 1531 "seclang-parser.yy" // lalr1.cc:906
     {
-        if (driver.m_debugLog != NULL) {
-          driver.m_debugLog->setDebugLogLevel(atoi(yystack_[0].value.as< std::string > ().c_str()));
+        if (driver.m_trail->m_debugLog != NULL) {
+          driver.m_trail->m_debugLog->setDebugLogLevel(atoi(yystack_[0].value.as< std::string > ().c_str()));
         } else {
             std::stringstream ss;
             ss << "Internal error, there is no DebugLog ";
@@ -2680,9 +2680,9 @@ namespace yy {
   case 124:
 #line 1543 "seclang-parser.yy" // lalr1.cc:906
     {
-        if (driver.m_debugLog != NULL) {
+        if (driver.m_trail->m_debugLog != NULL) {
             std::string error;
-            driver.m_debugLog->setDebugLogFile(yystack_[0].value.as< std::string > (), &error);
+            driver.m_trail->m_debugLog->setDebugLogFile(yystack_[0].value.as< std::string > (), &error);
             if (error.size() > 0) {
                 std::stringstream ss;
                 ss << "Failed to start DebugLog: " << error;
@@ -2706,7 +2706,7 @@ namespace yy {
 #if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         std::string err;
         std::string file = modsecurity::utils::find_resource(yystack_[0].value.as< std::string > (),
-            driver.ref.back(), &err);
+            driver.m_reference.back(), &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to load locate the GeoDB file from: " << yystack_[0].value.as< std::string > () << " ";
@@ -2734,8 +2734,8 @@ namespace yy {
   case 126:
 #line 1591 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_requestBodyLimit.m_set = true;
-        driver.m_requestBodyLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
+        driver.m_trail->m_requestBodyLimit.m_set = true;
+        driver.m_trail->m_requestBodyLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
 #line 2741 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2743,8 +2743,8 @@ namespace yy {
   case 127:
 #line 1596 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_requestBodyNoFilesLimit.m_set = true;
-        driver.m_requestBodyNoFilesLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
+        driver.m_trail->m_requestBodyNoFilesLimit.m_set = true;
+        driver.m_trail->m_requestBodyNoFilesLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
 #line 2750 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2765,8 +2765,8 @@ namespace yy {
   case 129:
 #line 1610 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_responseBodyLimit.m_set = true;
-        driver.m_responseBodyLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
+        driver.m_trail->m_responseBodyLimit.m_set = true;
+        driver.m_trail->m_responseBodyLimit.m_value = atoi(yystack_[0].value.as< std::string > ().c_str());
       }
 #line 2772 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2774,7 +2774,7 @@ namespace yy {
   case 130:
 #line 1615 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_trail->m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
 #line 2780 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2782,7 +2782,7 @@ namespace yy {
   case 131:
 #line 1619 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_trail->m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
 #line 2788 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2790,7 +2790,7 @@ namespace yy {
   case 132:
 #line 1623 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_trail->m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
 #line 2796 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2798,7 +2798,7 @@ namespace yy {
   case 133:
 #line 1627 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_trail->m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
 #line 2804 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2806,7 +2806,7 @@ namespace yy {
   case 134:
 #line 1631 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
+        driver.m_trail->m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
 #line 2812 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2814,7 +2814,7 @@ namespace yy {
   case 135:
 #line 1635 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
+        driver.m_trail->m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
 #line 2820 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2825,11 +2825,11 @@ namespace yy {
         std::istringstream buf(yystack_[0].value.as< std::string > ());
         std::istream_iterator<std::string> beg(buf), end;
         std::set<std::string> tokens(beg, end);
-        driver.m_responseBodyTypeToBeInspected.m_set = true;
+        driver.m_trail->m_responseBodyTypeToBeInspected.m_set = true;
         for (std::set<std::string>::iterator it=tokens.begin();
             it!=tokens.end(); ++it)
         {
-            driver.m_responseBodyTypeToBeInspected.m_value.insert(*it);
+            driver.m_trail->m_responseBodyTypeToBeInspected.m_value.insert(*it);
         }
       }
 #line 2836 "seclang-parser.cc" // lalr1.cc:906
@@ -2838,9 +2838,9 @@ namespace yy {
   case 139:
 #line 1661 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_responseBodyTypeToBeInspected.m_set = true;
-        driver.m_responseBodyTypeToBeInspected.m_clear = true;
-        driver.m_responseBodyTypeToBeInspected.m_value.clear();
+        driver.m_trail->m_responseBodyTypeToBeInspected.m_set = true;
+        driver.m_trail->m_responseBodyTypeToBeInspected.m_clear = true;
+        driver.m_trail->m_responseBodyTypeToBeInspected.m_value.clear();
       }
 #line 2846 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2848,7 +2848,7 @@ namespace yy {
   case 140:
 #line 1667 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
       }
 #line 2854 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2856,7 +2856,7 @@ namespace yy {
   case 141:
 #line 1671 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
       }
 #line 2862 "seclang-parser.cc" // lalr1.cc:906
     break;
@@ -2934,7 +2934,7 @@ namespace yy {
             param.pop_back();
         }
 
-        file = modsecurity::utils::find_resource(f, driver.ref.back(), &err);
+        file = modsecurity::utils::find_resource(f, driver.m_reference.back(), &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to locate the unicode map file from: " << f << " ";
@@ -2943,7 +2943,7 @@ namespace yy {
             YYERROR;
         }
 
-        ConfigUnicodeMap::loadConfig(file, num, &driver, &error);
+        ConfigUnicodeMap::loadConfig(file, num, driver.m_trail, &error);
 
         if (!error.empty()) {
             driver.error(yystack_[1].location, error);
@@ -2968,8 +2968,8 @@ namespace yy {
   case 150:
 #line 1774 "seclang-parser.yy" // lalr1.cc:906
     {
-        driver.m_httpblKey.m_set = true;
-        driver.m_httpblKey.m_value = yystack_[0].value.as< std::string > ();
+        driver.m_trail->m_httpblKey.m_set = true;
+        driver.m_trail->m_httpblKey.m_value = yystack_[0].value.as< std::string > ();
       }
 #line 2975 "seclang-parser.cc" // lalr1.cc:906
     break;

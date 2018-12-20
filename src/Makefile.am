@@ -262,6 +262,7 @@ libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.cc \
 	parser/seclang-scanner.cc \
 	parser/driver.cc \
+	parser/default_driver_trail.cc \
 	transaction.cc \
 	anchored_set_variable.cc \
 	anchored_variable.cc \

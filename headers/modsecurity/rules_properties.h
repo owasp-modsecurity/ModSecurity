@@ -532,7 +532,6 @@ class RulesProperties {
     RuleEngine m_secRuleEngine;
     RulesExceptions m_exceptions;
     std::list<std::string> m_components;
-    std::ostringstream m_parserError;
     ConfigSet m_responseBodyTypeToBeInspected;
     ConfigString m_httpblKey;
     ConfigString m_uploadDirectory;

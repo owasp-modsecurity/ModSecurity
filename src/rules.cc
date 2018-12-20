@@ -147,7 +147,7 @@ int Rules::load(const char *plainRules) {
 
 
 std::string Rules::getParserError() {
-    return this->m_parserError.str();
+    return m_parserError.str();
 }
 
 

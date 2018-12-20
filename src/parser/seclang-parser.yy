@@ -354,7 +354,7 @@ using modsecurity::operators::Operator;
 %initial-action
 {
   // Initialize the initial location.
-  @$.begin.filename = @$.end.filename = &driver.file;
+  @$.begin.filename = @$.end.filename = &driver.m_file;
 };
 %define parse.trace
 %define parse.error verbose
@@ -756,92 +756,92 @@ audit_log:
     /* SecAuditLogDirMode */
     CONFIG_DIR_AUDIT_DIR_MOD
       {
-        driver.m_auditLog->setStorageDirMode(strtol($1.c_str(), NULL, 8));
+        driver.m_trail->m_auditLog->setStorageDirMode(strtol($1.c_str(), NULL, 8));
       }
 
     /* SecAuditLogStorageDir */
     | CONFIG_DIR_AUDIT_DIR
       {
-        driver.m_auditLog->setStorageDir($1);
+        driver.m_trail->m_auditLog->setStorageDir($1);
       }
 
     /* SecAuditEngine */
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_RELEVANT_ONLY
       {
-        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
+        driver.m_trail->m_auditLog->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
       }
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_OFF
       {
-        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
+        driver.m_trail->m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
       }
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_ON
       {
-        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
+        driver.m_trail->m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
       }
 
     /* SecAuditLogFileMode */
     | CONFIG_DIR_AUDIT_FLE_MOD
       {
-        driver.m_auditLog->setFileMode(strtol($1.c_str(), NULL, 8));
+        driver.m_trail->m_auditLog->setFileMode(strtol($1.c_str(), NULL, 8));
       }
 
     /* SecAuditLog2 */
     | CONFIG_DIR_AUDIT_LOG2
       {
-        driver.m_auditLog->setFilePath2($1);
+        driver.m_trail->m_auditLog->setFilePath2($1);
       }
 
     /* SecAuditLogParts */
     | CONFIG_DIR_AUDIT_LOG_P
       {
-        driver.m_auditLog->setParts($1);
+        driver.m_trail->m_auditLog->setParts($1);
       }
 
     /* SecAuditLog */
     | CONFIG_DIR_AUDIT_LOG
       {
-        driver.m_auditLog->setFilePath1($1);
+        driver.m_trail->m_auditLog->setFilePath1($1);
       }
 
     | CONFIG_DIR_AUDIT_LOG_FMT JSON
       {
-        driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::JSONAuditLogFormat);
+        driver.m_trail->m_auditLog->setFormat(modsecurity::audit_log::AuditLog::JSONAuditLogFormat);
       }
 
     | CONFIG_DIR_AUDIT_LOG_FMT NATIVE
       {
-        driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::NativeAuditLogFormat);
+        driver.m_trail->m_auditLog->setFormat(modsecurity::audit_log::AuditLog::NativeAuditLogFormat);
       }
 
     /* SecAuditLogRelevantStatus */
     | CONFIG_DIR_AUDIT_STS
       {
         std::string relevant_status($1);
-        driver.m_auditLog->setRelevantStatus(relevant_status);
+        driver.m_trail->m_auditLog->setRelevantStatus(relevant_status);
       }
 
     /* SecAuditLogType */
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_SERIAL
       {
-        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
+        driver.m_trail->m_auditLog->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
       }
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_PARALLEL
       {
-        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
+        driver.m_trail->m_auditLog->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
       }
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_HTTPS
       {
-        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
+        driver.m_trail->m_auditLog->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
       }
 
     /* Upload */
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_ON
       {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_OFF
       {
-        driver.m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_RELEVANT_ONLY
       {
@@ -850,26 +850,26 @@ audit_log:
       }
     | CONFIG_UPLOAD_FILE_LIMIT
       {
-        driver.m_uploadFileLimit.m_set = true;
-        driver.m_uploadFileLimit.m_value = strtol($1.c_str(), NULL, 10);
+        driver.m_trail->m_uploadFileLimit.m_set = true;
+        driver.m_trail->m_uploadFileLimit.m_value = strtol($1.c_str(), NULL, 10);
       }
     | CONFIG_UPLOAD_FILE_MODE
       {
-        driver.m_uploadFileMode.m_set = true;
-        driver.m_uploadFileMode.m_value = strtol($1.c_str(), NULL, 8);
+        driver.m_trail->m_uploadFileMode.m_set = true;
+        driver.m_trail->m_uploadFileMode.m_value = strtol($1.c_str(), NULL, 8);
       }
     | CONFIG_UPLOAD_DIR
       {
-        driver.m_uploadDirectory.m_set = true;
-        driver.m_uploadDirectory.m_value = $1;
+        driver.m_trail->m_uploadDirectory.m_set = true;
+        driver.m_trail->m_uploadDirectory.m_value = $1;
       }
     | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_ON
       {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_OFF
       {
-        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     ;
 
@@ -905,7 +905,7 @@ op:
       {
         $$ = std::move($1);
         std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
+        if ($$->init(driver.m_reference.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -915,7 +915,7 @@ op:
         $$ = std::move($2);
         $$->m_negation = true;
         std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
+        if ($$->init(driver.m_reference.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -924,7 +924,7 @@ op:
       {
         OPERATOR_CONTAINER($$, new operators::Rx(std::move($1)));
         std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
+        if ($$->init(driver.m_reference.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -934,7 +934,7 @@ op:
         OPERATOR_CONTAINER($$, new operators::Rx(std::move($2)));
         $$->m_negation = true;
         std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
+        if ($$->init(driver.m_reference.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -1112,7 +1112,7 @@ expression:
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ driver.m_reference.back(),
             /* line number */ @1.end.line
             );
 
@@ -1132,7 +1132,7 @@ expression:
             /* op */ $3.release(),
             /* variables */ v,
             /* actions */ NULL,
-            /* file name */ driver.ref.back(),
+            /* file name */ driver.m_reference.back(),
             /* line number */ @1.end.line
             );
         if (driver.addSecRule(rule) == false) {
@@ -1150,7 +1150,7 @@ expression:
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ driver.m_reference.back(),
             /* line number */ @1.end.line
             );
         driver.addSecAction(rule);
@@ -1165,7 +1165,7 @@ expression:
         RuleScript *r = new RuleScript(
             /* path to script */ $1,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ driver.m_reference.back(),
             /* line number */ @1.end.line
             );
 
@@ -1220,7 +1220,7 @@ expression:
             YYERROR;
         }
 
-        if (!driver.m_defaultActions[definedPhase].empty()) {
+        if (!driver.m_trail->m_defaultActions[definedPhase].empty()) {
             std::stringstream ss;
             ss << "SecDefaultActions can only be placed once per phase and configuration context. Phase ";
             ss << secRuleDefinedPhase;
@@ -1230,7 +1230,7 @@ expression:
         }
 
         for (actions::Action *a : checkedActions) {
-            driver.m_defaultActions[definedPhase].push_back(a);
+            driver.m_trail->m_defaultActions[definedPhase].push_back(a);
         }
 
         delete actions;
@@ -1241,31 +1241,31 @@ expression:
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {
-        driver.m_secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
+        driver.m_trail->m_secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_ON
       {
-        driver.m_secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
+        driver.m_trail->m_secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_DETC
       {
-        driver.m_secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
+        driver.m_trail->m_secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_ON
       {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_OFF
       {
-        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     | CONFIG_DIR_RES_BODY CONFIG_VALUE_ON
       {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONFIG_DIR_RES_BODY CONFIG_VALUE_OFF
       {
-        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     | CONFIG_SEC_ARGUMENT_SEPARATOR
       {
@@ -1273,12 +1273,12 @@ expression:
           driver.error(@0, "Argument separator should be set to a single character.");
           YYERROR;
         }
-        driver.m_secArgumentSeparator.m_value = $1;
-        driver.m_secArgumentSeparator.m_set = true;
+        driver.m_trail->m_secArgumentSeparator.m_value = $1;
+        driver.m_trail->m_secArgumentSeparator.m_set = true;
       }
     | CONFIG_COMPONENT_SIG
       {
-        driver.m_components.push_back($1);
+        driver.m_trail->m_components.push_back($1);
       }
     | CONFIG_CONN_ENGINE CONFIG_VALUE_ON
       {
@@ -1290,8 +1290,8 @@ expression:
       }
     | CONFIG_SEC_WEB_APP_ID
       {
-        driver.m_secWebAppId.m_value = $1;
-        driver.m_secWebAppId.m_set = true;
+        driver.m_trail->m_secWebAppId.m_value = $1;
+        driver.m_trail->m_secWebAppId.m_set = true;
       }
     | CONFIG_SEC_SERVER_SIG
       {
@@ -1411,7 +1411,7 @@ expression:
     | CONFIG_SEC_RULE_REMOVE_BY_ID
       {
         std::string error;
-        if (driver.m_exceptions.load($1, &error) == false) {
+        if (driver.m_trail->m_exceptions.load($1, &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveById: failed to load:";
             ss << $1;
@@ -1424,7 +1424,7 @@ expression:
     | CONFIG_SEC_RULE_REMOVE_BY_TAG
       {
         std::string error;
-        if (driver.m_exceptions.loadRemoveRuleByTag($1, &error) == false) {
+        if (driver.m_trail->m_exceptions.loadRemoveRuleByTag($1, &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveByTag: failed to load:";
             ss << $1;
@@ -1437,7 +1437,7 @@ expression:
     | CONFIG_SEC_RULE_REMOVE_BY_MSG
       {
         std::string error;
-        if (driver.m_exceptions.loadRemoveRuleByMsg($1, &error) == false) {
+        if (driver.m_trail->m_exceptions.loadRemoveRuleByMsg($1, &error) == false) {
             std::stringstream ss;
             ss << "SecRuleRemoveByMsg: failed to load:";
             ss << $1;
@@ -1450,7 +1450,7 @@ expression:
     | CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG variables_pre_process
       {
         std::string error;
-        if (driver.m_exceptions.loadUpdateTargetByTag($1, std::move($2), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadUpdateTargetByTag($1, std::move($2), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetByTag: failed to load:";
             ss << $1;
@@ -1463,7 +1463,7 @@ expression:
     | CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG variables_pre_process
       {
         std::string error;
-        if (driver.m_exceptions.loadUpdateTargetByMsg($1, std::move($2), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadUpdateTargetByMsg($1, std::move($2), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetByMsg: failed to load:";
             ss << $1;
@@ -1489,7 +1489,7 @@ expression:
             YYERROR;
         }
 
-        if (driver.m_exceptions.loadUpdateTargetById(ruleId, std::move($2), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadUpdateTargetById(ruleId, std::move($2), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetById: failed to load:";
             ss << $1;
@@ -1516,7 +1516,7 @@ expression:
         }
 
 
-        if (driver.m_exceptions.loadUpdateActionById(ruleId, std::move($2), &error) == false) {
+        if (driver.m_trail->m_exceptions.loadUpdateActionById(ruleId, std::move($2), &error) == false) {
             std::stringstream ss;
             ss << "SecRuleUpdateActionById: failed to load:";
             ss << $1;
@@ -1529,8 +1529,8 @@ expression:
     /* Debug log: start */
     | CONFIG_DIR_DEBUG_LVL
       {
-        if (driver.m_debugLog != NULL) {
-          driver.m_debugLog->setDebugLogLevel(atoi($1.c_str()));
+        if (driver.m_trail->m_debugLog != NULL) {
+          driver.m_trail->m_debugLog->setDebugLogLevel(atoi($1.c_str()));
         } else {
             std::stringstream ss;
             ss << "Internal error, there is no DebugLog ";
@@ -1541,9 +1541,9 @@ expression:
       }
     | CONFIG_DIR_DEBUG_LOG
       {
-        if (driver.m_debugLog != NULL) {
+        if (driver.m_trail->m_debugLog != NULL) {
             std::string error;
-            driver.m_debugLog->setDebugLogFile($1, &error);
+            driver.m_trail->m_debugLog->setDebugLogFile($1, &error);
             if (error.size() > 0) {
                 std::stringstream ss;
                 ss << "Failed to start DebugLog: " << error;
@@ -1564,7 +1564,7 @@ expression:
 #if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         std::string err;
         std::string file = modsecurity::utils::find_resource($1,
-            driver.ref.back(), &err);
+            driver.m_reference.back(), &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to load locate the GeoDB file from: " << $1 << " ";
@@ -1589,13 +1589,13 @@ expression:
     /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT
       {
-        driver.m_requestBodyLimit.m_set = true;
-        driver.m_requestBodyLimit.m_value = atoi($1.c_str());
+        driver.m_trail->m_requestBodyLimit.m_set = true;
+        driver.m_trail->m_requestBodyLimit.m_value = atoi($1.c_str());
       }
     | CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
       {
-        driver.m_requestBodyNoFilesLimit.m_set = true;
-        driver.m_requestBodyNoFilesLimit.m_value = atoi($1.c_str());
+        driver.m_trail->m_requestBodyNoFilesLimit.m_set = true;
+        driver.m_trail->m_requestBodyNoFilesLimit.m_value = atoi($1.c_str());
       }
     | CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
       {
@@ -1608,32 +1608,32 @@ expression:
       }
     | CONFIG_DIR_RES_BODY_LIMIT
       {
-        driver.m_responseBodyLimit.m_set = true;
-        driver.m_responseBodyLimit.m_value = atoi($1.c_str());
+        driver.m_trail->m_responseBodyLimit.m_set = true;
+        driver.m_trail->m_responseBodyLimit.m_value = atoi($1.c_str());
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
-        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_trail->m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
-        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_trail->m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
-        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_trail->m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
-        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_trail->m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
     | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_ABORT
       {
-        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
+        driver.m_trail->m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
     | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_WARN
       {
-        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
+        driver.m_trail->m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
     | CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
@@ -1650,26 +1650,26 @@ expression:
         std::istringstream buf($1);
         std::istream_iterator<std::string> beg(buf), end;
         std::set<std::string> tokens(beg, end);
-        driver.m_responseBodyTypeToBeInspected.m_set = true;
+        driver.m_trail->m_responseBodyTypeToBeInspected.m_set = true;
         for (std::set<std::string>::iterator it=tokens.begin();
             it!=tokens.end(); ++it)
         {
-            driver.m_responseBodyTypeToBeInspected.m_value.insert(*it);
+            driver.m_trail->m_responseBodyTypeToBeInspected.m_value.insert(*it);
         }
       }
     | CONGIG_DIR_RESPONSE_BODY_MP_CLEAR
       {
-        driver.m_responseBodyTypeToBeInspected.m_set = true;
-        driver.m_responseBodyTypeToBeInspected.m_clear = true;
-        driver.m_responseBodyTypeToBeInspected.m_value.clear();
+        driver.m_trail->m_responseBodyTypeToBeInspected.m_set = true;
+        driver.m_trail->m_responseBodyTypeToBeInspected.m_clear = true;
+        driver.m_trail->m_responseBodyTypeToBeInspected.m_value.clear();
       }
     | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_OFF
       {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
+        driver.m_trail->m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_ON
       {
-        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
+        driver.m_trail->m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONGIG_DIR_SEC_TMP_DIR
       {
@@ -1746,7 +1746,7 @@ expression:
             param.pop_back();
         }
 
-        file = modsecurity::utils::find_resource(f, driver.ref.back(), &err);
+        file = modsecurity::utils::find_resource(f, driver.m_reference.back(), &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to locate the unicode map file from: " << f << " ";
@@ -1755,7 +1755,7 @@ expression:
             YYERROR;
         }
 
-        ConfigUnicodeMap::loadConfig(file, num, &driver, &error);
+        ConfigUnicodeMap::loadConfig(file, num, driver.m_trail, &error);
 
         if (!error.empty()) {
             driver.error(@0, error);
@@ -1772,8 +1772,8 @@ expression:
       }
     | CONFIG_SEC_HTTP_BLKEY
       {
-        driver.m_httpblKey.m_set = true;
-        driver.m_httpblKey.m_value = $1;
+        driver.m_trail->m_httpblKey.m_set = true;
+        driver.m_trail->m_httpblKey.m_value = $1;
       }
     ;
 

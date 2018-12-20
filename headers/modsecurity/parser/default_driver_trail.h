@@ -21,23 +21,38 @@
 #include <list>
 #endif
 
+#ifndef HEADERS_MODSECURITY_PARSER_DEFAULT_DRIVER_TRAIL_H_
+#define HEADERS_MODSECURITY_PARSER_DEFAULT_DRIVER_TRAIL_H_
+
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
 #include "modsecurity/rules_properties.h"
 #include "modsecurity/audit_log.h"
-#include "src/rule_script.h"
-#include "src/parser/seclang-parser.hh"
+#include "modsecurity/parser/driver_trail.h"
 
 
-#ifndef SRC_PARSER_DRIVER_H_
-#define SRC_PARSER_DRIVER_H_
+namespace modsecurity {
+namespace Parser {
 
-# define YY_DECL \
-  yy::seclang_parser::symbol_type yylex(modsecurity::Parser::Driver& driver)
+#ifdef __cplusplus
+class DriverTrail;
+#else
+typedef struct DriverTrail_t DriverTrail;
+#endif
 
-YY_DECL;
+
+class DefaultDriverTrail : public DriverTrail {
+ public:
+    int addSecRule(Rule *rule);
+    int addSecAction(Rule *rule);
+    int addSecMarker(std::string marker);
+    int addSecRuleScript(Rule *rule);
+
+    Rule *m_lastRule;
+};
 
 
-#include "modsecurity/parser/driver.h"
+}  // namespace Parser
+}  // namespace modsecurity
 
-#endif  // SRC_PARSER_DRIVER_H_
+#endif  // HEADERS_MODSECURITY_PARSER_DEFAULT_DRIVER_TRAIL_H_

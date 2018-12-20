@@ -83,6 +83,7 @@ class Rules : public RulesProperties {
 
     int64_t unicode_codepage;
 
+    std::ostringstream m_parserError;
  private:
     int m_referenceCount;
 #ifndef NO_LOGS
