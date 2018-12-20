@@ -35,6 +35,9 @@
 using modsecurity::Rule;
 using modsecurity::Rules;
 
+namespace yy {
+class location;
+}
 
 namespace modsecurity {
 namespace Parser {
@@ -69,24 +72,31 @@ class Driver {
         }
         return m_trail->addSecRule(rule);
     }
+
+
     int addSecAction(Rule *rule) {
         if (!m_trail) {
             return -1;
         }
         return m_trail->addSecAction(rule);
     }
+
+
     int addSecMarker(std::string marker) {
         if (!m_trail) {
             return -1;
         }
         return m_trail->addSecMarker(marker);
     }
-    int addSecRuleScript(RuleScript *rule) {
+
+
+    int addSecRuleScript(Rule *rule) {
         if (!m_trail) {
             return -1;
         }
         return m_trail->addSecRuleScript(rule);
     }
+
 
     DriverTrail *m_trail;
 
@@ -102,5 +112,6 @@ class Driver {
 
 }  // namespace Parser
 }  // namespace modsecurity
+
 
 #endif  // HEADERS_MODSECURITY_PARSER_DRIVER_H_

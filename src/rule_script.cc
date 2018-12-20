@@ -15,7 +15,6 @@
 
 #include "src/rule_script.h"
 
-
 namespace modsecurity {
 
 bool RuleScript::init(std::string *err) {

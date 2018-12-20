@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I build
 
 
 SUBDIRS = \
+	custom_parser_trail \
 	multiprocess_c \
 	reading_logs_with_offset \
 	reading_logs_via_rule_message \

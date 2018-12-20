@@ -25,9 +25,13 @@
 #include "modsecurity/rules.h"
 #include "modsecurity/rules_properties.h"
 #include "modsecurity/audit_log.h"
-#include "src/rule_script.h"
 #include "src/parser/seclang-parser.hh"
+#include "src/rule_script.h"
+#include "modsecurity/parser/driver_trail.h"
 
+
+using modsecurity::Rule;
+using modsecurity::Rules;
 
 #ifndef SRC_PARSER_DRIVER_H_
 #define SRC_PARSER_DRIVER_H_
@@ -37,6 +41,17 @@
 
 YY_DECL;
 
+namespace modsecurity {
+namespace Parser {
+
+#ifdef __cplusplus
+class Driver;
+#else
+typedef struct Driver_t Driver;
+#endif
+
+}  // namespace Parser
+}  // namespace modsecurity
 
 #include "modsecurity/parser/driver.h"
 

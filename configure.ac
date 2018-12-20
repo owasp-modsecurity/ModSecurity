@@ -368,6 +368,7 @@ AM_COND_IF([TEST_UTILITIES],
 AM_COND_IF([EXAMPLES],
        [AC_CONFIG_FILES([ \
             examples/Makefile \
+            examples/custom_parser_trail/Makefile \
             examples/simple_example_using_c/Makefile \
             examples/multiprocess_c/Makefile \
             examples/reading_logs_with_offset/Makefile \
