@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Complete merging of particular rule properties
+   [Issue #1978 - @defanator]
  - Replaces AC_CHECK_FILE with 'test -f'
    [Issue #1984 - @chuckwolber]
  - Fix inet addr handling on 64 bit big endian systems
