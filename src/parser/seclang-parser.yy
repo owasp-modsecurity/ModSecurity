@@ -37,6 +37,7 @@ class Driver;
 #include "src/actions/data/status.h"
 #include "src/actions/disruptive/allow.h"
 #include "src/actions/disruptive/deny.h"
+#include "src/actions/disruptive/drop.h"
 #include "src/actions/disruptive/pass.h"
 #include "src/actions/disruptive/redirect.h"
 #include "src/actions/init_col.h"
@@ -2707,8 +2708,7 @@ act:
       }
     | ACTION_DROP
       {
-        //ACTION_NOT_SUPPORTED("Drop", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::disruptive::Drop($1));
       }
     | ACTION_EXEC
       {

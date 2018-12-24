@@ -121,6 +121,7 @@ ACTIONS = \
 	actions/ctl/request_body_access.cc\
 	actions/disruptive/allow.cc \
 	actions/disruptive/deny.cc \
+	actions/disruptive/drop.cc \
 	actions/disruptive/redirect.cc \
 	actions/disruptive/pass.cc \
 	actions/exec.cc \

@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds initially support to the drop action.
+   [@zimmerle]
  - Complete merging of particular rule properties
    [Issue #1978 - @defanator]
  - Replaces AC_CHECK_FILE with 'test -f'

@@ -64,5 +64,17 @@
       "SecDefaultAction \"phase:2,deny,status:404\"",
       "SecAction \"id:'1',phase:request,nolog,pass,t:none\""
     ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Disruptive actions (6/n)",
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecAction \"id:'1',phase:request,drop,nolog,t:none\""
+    ]
   }
 ]
