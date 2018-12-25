@@ -47,6 +47,11 @@
         to = (from == PropertyNotSetRuleEngine) ? default : from;            \
     }
 
+#define merge_bodylimitaction_value(to, from, default)                       \
+    if (to == PropertyNotSetBodyLimitAction) {                               \
+        to = (from == PropertyNotSetBodyLimitAction) ? default : from;       \
+    }
+
 #ifdef __cplusplus
 
 namespace modsecurity {
@@ -380,13 +385,13 @@ class RulesProperties {
         to->m_requestBodyLimit.merge(&from->m_requestBodyLimit);
         to->m_responseBodyLimit.merge(&from->m_responseBodyLimit);
 
-        if (from->m_requestBodyLimitAction != PropertyNotSetBodyLimitAction) {
-            to->m_requestBodyLimitAction = from->m_requestBodyLimitAction;
-        }
+        merge_bodylimitaction_value(to->m_requestBodyLimitAction,
+                                    from->m_requestBodyLimitAction,
+                                    PropertyNotSetBodyLimitAction);
 
-        if (from->m_responseBodyLimitAction != PropertyNotSetBodyLimitAction) {
-            to->m_responseBodyLimitAction = from->m_responseBodyLimitAction;
-        }
+        merge_bodylimitaction_value(to->m_responseBodyLimitAction,
+                                    from->m_responseBodyLimitAction,
+                                    PropertyNotSetBodyLimitAction);
 
         to->m_uploadFileLimit.merge(&from->m_uploadFileLimit);
         to->m_uploadFileMode.merge(&from->m_uploadFileMode);
