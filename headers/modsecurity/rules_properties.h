@@ -37,6 +37,11 @@
 
 #define CODEPAGE_SEPARATORS  " \t\n\r"
 
+#define merge_boolean_value(to, from, default)                               \
+    if (to == PropertyNotSetConfigBoolean) {                                 \
+        to = (from == PropertyNotSetConfigBoolean) ? default : from;         \
+    }
+
 #ifdef __cplusplus
 
 namespace modsecurity {
@@ -348,25 +353,25 @@ class RulesProperties {
             to->m_secRuleEngine = from->m_secRuleEngine;
         }
 
-        if (from->m_secRequestBodyAccess != PropertyNotSetConfigBoolean) {
-            to->m_secRequestBodyAccess = from->m_secRequestBodyAccess;
-        }
+        merge_boolean_value(to->m_secRequestBodyAccess,
+                            from->m_secRequestBodyAccess,
+                            PropertyNotSetConfigBoolean);
 
-        if (from->m_secResponseBodyAccess != PropertyNotSetConfigBoolean) {
-            to->m_secResponseBodyAccess = from->m_secResponseBodyAccess;
-        }
+        merge_boolean_value(to->m_secResponseBodyAccess,
+                            from->m_secResponseBodyAccess,
+                            PropertyNotSetConfigBoolean);
 
-        if (from->m_secXMLExternalEntity != PropertyNotSetConfigBoolean) {
-            to->m_secXMLExternalEntity = from->m_secXMLExternalEntity;
-        }
+        merge_boolean_value(to->m_secXMLExternalEntity,
+                            from->m_secXMLExternalEntity,
+                            PropertyNotSetConfigBoolean);
 
-        if (from->m_uploadKeepFiles != PropertyNotSetConfigBoolean) {
-            to->m_uploadKeepFiles = from->m_uploadKeepFiles;
-        }
+        merge_boolean_value(to->m_uploadKeepFiles,
+                            from->m_uploadKeepFiles,
+                            PropertyNotSetConfigBoolean);
 
-        if (from->m_tmpSaveUploadedFiles != PropertyNotSetConfigBoolean) {
-            to->m_tmpSaveUploadedFiles = from->m_tmpSaveUploadedFiles;
-        }
+        merge_boolean_value(to->m_tmpSaveUploadedFiles,
+                            from->m_tmpSaveUploadedFiles,
+                            PropertyNotSetConfigBoolean);
 
         to->m_requestBodyLimit.merge(&from->m_requestBodyLimit);
         to->m_responseBodyLimit.merge(&from->m_responseBodyLimit);
