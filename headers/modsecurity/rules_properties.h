@@ -42,6 +42,11 @@
         to = (from == PropertyNotSetConfigBoolean) ? default : from;         \
     }
 
+#define merge_ruleengine_value(to, from, default)                            \
+    if (to == PropertyNotSetRuleEngine) {                                    \
+        to = (from == PropertyNotSetRuleEngine) ? default : from;            \
+    }
+
 #ifdef __cplusplus
 
 namespace modsecurity {
@@ -349,9 +354,8 @@ class RulesProperties {
             return amount_of_rules;
         }
 
-        if (from->m_secRuleEngine != PropertyNotSetRuleEngine) {
-            to->m_secRuleEngine = from->m_secRuleEngine;
-        }
+        merge_ruleengine_value(to->m_secRuleEngine, from->m_secRuleEngine,
+                               PropertyNotSetRuleEngine);
 
         merge_boolean_value(to->m_secRequestBodyAccess,
                             from->m_secRequestBodyAccess,
