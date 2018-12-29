@@ -66,10 +66,17 @@ std::string Base64::decode(const std::string& data) {
     size_t decoded_len = 0;
     unsigned char *d;
     std::string ret;
+    int err = 0;
     size_t len = strlen(data.c_str());
-
-    mbedtls_base64_decode(NULL, 0, &decoded_len,
+   
+    err = mbedtls_base64_decode(NULL, 0, &decoded_len,
         reinterpret_cast<const unsigned char*>(data.c_str()), len);
+
+    if (err == MBEDTLS_ERR_BASE64_INVALID_CHARACTER) {
+         /* input is invalid */
+         ret.assign(data);
+	 goto END;
+    }
 
     d = reinterpret_cast<unsigned char*>(malloc(sizeof(char) * decoded_len));
     if (d == NULL) {
@@ -84,6 +91,7 @@ std::string Base64::decode(const std::string& data) {
     ret.assign(reinterpret_cast<const char*>(d), decoded_len);
     free(d);
 
+END:
     return ret;
 }
 
