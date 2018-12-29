@@ -36,6 +36,8 @@ class PmFromFile : public Pm {
         : Pm(n, std::move(param)) { }
 
     bool init(const std::string &file, std::string *error) override;
+
+    bool isComment(const std::string &s);
 };
 
 

@@ -25,6 +25,23 @@
 namespace modsecurity {
 namespace operators {
 
+bool PmFromFile::isComment(const std::string &s) {
+    if (s.size() == 0) {
+	  return true;
+    }
+    size_t pos = s.find("#");
+    if (pos != std::string::npos) {
+        for (int i = 0; i < pos; i++) {
+	    if (!std::isspace(s[i])) {
+		return false;
+	    }
+	}
+    } else {
+	return false;
+    }
+
+    return true;
+}
 
 bool PmFromFile::init(const std::string &config, std::string *error) {
     std::istream *iss;
@@ -50,7 +67,9 @@ bool PmFromFile::init(const std::string &config, std::string *error) {
     }
 
     for (std::string line; std::getline(*iss, line); ) {
-        acmp_add_pattern(m_p, line.c_str(), NULL, NULL, line.length());
+        if (isComment(line) == false) {
+            acmp_add_pattern(m_p, line.c_str(), NULL, NULL, line.length());
+	}
     }
 
     while (m_p->is_failtree_done == 0) {
