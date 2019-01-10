@@ -22,6 +22,10 @@
 #include <libxml/tree.h>
 #include <libxml/HTMLparser.h>
 
+#ifdef APLOG_USE_MODULE
+APLOG_USE_MODULE(security2);
+#endif
+
 typedef struct rule_exception rule_exception;
 typedef struct rule_exception hash_method;
 typedef struct modsec_rec modsec_rec;
