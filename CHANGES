@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fixed buffer overflow in Utils::Md5::hexdigest()
+   [Issue #2002 - @defanator]
  - Implemented merge() method for ConfigInt, ConfigDouble, ConfigString
    [Issue #1990 - @defanator]
  - Adds initially support to the drop action.
