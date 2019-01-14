@@ -13,7 +13,7 @@ std::string Md5::hexdigest(std::string& input) {
     mbedtls_md5(reinterpret_cast<const unsigned char *>(input.c_str()),
         input.size(), digest);
 
-    char buf[32];
+    char buf[33];
     for (int i = 0; i < 16; i++) {
         sprintf(buf+i*2, "%02x", digest[i]);
     }
