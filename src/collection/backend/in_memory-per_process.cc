@@ -134,7 +134,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
     //std::string name = std::string(var, var.find(":") + 2,
     //    var.size() - var.find(":") - 3);
     //size_t keySize = col.size();
-    Utils::Regex r = Utils::Regex(var);
+    Utils::Regex r(var);
 
     for (const auto& x : *this) {
         //if (x.first.size() <= keySize + 1) {

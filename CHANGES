@@ -37,6 +37,8 @@ v3.0.4 - YYYY-MMM-DD (to be released)
    [Issue #1943 - @victorhora, @allanbomsft]
  - Fix buffer size for utf8toUnicode transformation
    [Issue #1208 - @katef, @victorhora]
+ - Refactoring on Regex and SMatch classes.
+   [@WGH-]
 
 
 v3.0.3 - 2018-Nov-05

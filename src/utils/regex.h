@@ -31,39 +31,48 @@ namespace Utils {
 
 class SMatch {
  public:
-    SMatch() : size_(0),
-        m_offset(0),
-        m_length(0),
-        match("") { }
-    size_t size() const { return size_; }
-    std::string str() const { return match; }
+    SMatch()
+    : m_match(), m_offset(0)
+    {}
 
-    int size_;
-    int m_offset;
-    int m_length;
-    std::string match;
+    SMatch(const std::string &match, size_t offset)
+    : m_match(match), m_offset(offset)
+    {}
+
+    const std::string& str() const { return m_match; }
+    size_t offset() const { return m_offset; }
+
+ private:
+    std::string m_match;
+    size_t m_offset;
 };
-
 
 class Regex {
  public:
     explicit Regex(const std::string& pattern_);
     ~Regex();
-    std::string pattern;
+
+    // m_pc and m_pce can't be easily copied
+    Regex(const Regex&) = delete;
+    Regex& operator=(const Regex&) = delete;
+
+    std::list<SMatch> searchAll(const std::string& s) const;
+    int search(const std::string &s, SMatch *m) const;
+    int search(const std::string &s) const;
+
+    const std::string pattern;
+ private:
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;
-    int m_ovector[OVECCOUNT];
-
-    std::list<SMatch> searchAll(const std::string& s);
 };
 
+static inline int regex_search(const std::string& s, SMatch *match, const Regex& regex) {
+    return regex.search(s, match);
+}
 
-int regex_search(const std::string& s, SMatch *m,
-    const Regex& regex);
-
-int regex_search(const std::string& s, const Regex& r);
-
-
+static inline int regex_search(const std::string& s, const Regex& regex) {
+    return regex.search(s);
+}
 
 }  // namespace Utils
 }  // namespace modsecurity

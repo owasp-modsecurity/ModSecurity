@@ -62,8 +62,7 @@ void json2bin(std::string *str) {
     modsecurity::Utils::Regex re2("\\\\u([a-z0-9A-Z]{4})");
     modsecurity::Utils::SMatch match;
 
-    while (modsecurity::Utils::regex_search(*str, &match, re)
-        && match.size() > 0) {
+    while (modsecurity::Utils::regex_search(*str, &match, re)) {
         unsigned int p;
         std::string toBeReplaced = match.str();
         toBeReplaced.erase(0, 2);
@@ -71,8 +70,7 @@ void json2bin(std::string *str) {
         replaceAll(str, match.str(), p);
     }
 
-    while (modsecurity::Utils::regex_search(*str, &match, re2)
-        && match.size() > 0) {
+    while (modsecurity::Utils::regex_search(*str, &match, re2)) {
         unsigned int p;
         std::string toBeReplaced = match.str();
         toBeReplaced.erase(0, 2);
