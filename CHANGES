@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Refactoring on Regex and SMatch classes.
+   [@WGH-]
  - Fixed buffer overflow in Utils::Md5::hexdigest()
    [Issue #2002 - @defanator]
  - Implemented merge() method for ConfigInt, ConfigDouble, ConfigString

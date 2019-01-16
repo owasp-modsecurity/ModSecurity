@@ -259,9 +259,9 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
         std::string value;
         yajl_gen_map_open(g);
         vars.pop_back();
-        std::string startingAt = vars.back().match;
+        const std::string &startingAt = vars.back().str();
         vars.pop_back();
-        std::string size = vars.back().match;
+        const std::string &size = vars.back().str();
         vars.pop_back();
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("startingAt"),
@@ -311,11 +311,11 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             strlen("transformation"));
 
         yajl_gen_string(g,
-            reinterpret_cast<const unsigned char*>(trans.back().match.c_str()),
-            trans.back().match.size());
+            reinterpret_cast<const unsigned char*>(trans.back().str().c_str()),
+            trans.back().str().size());
 
         t = modsecurity::actions::transformations::Transformation::instantiate(
-            trans.back().match.c_str());
+            trans.back().str().c_str());
         varValueRes = t->evaluate(varValue, NULL);
         varValue.assign(varValueRes);
         trans.pop_back();
@@ -343,9 +343,9 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             strlen("highlight"));
         yajl_gen_map_open(g);
         ops.pop_back();
-        std::string startingAt = ops.back().match;
+        std::string startingAt = ops.back().str();
         ops.pop_back();
-        std::string size = ops.back().match;
+        std::string size = ops.back().str();
         ops.pop_back();
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("startingAt"),

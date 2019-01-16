@@ -202,7 +202,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             SMatch match;
             std::string s = modsec_rules->getParserError();
 
-            if (regex_search(s, &match, re) && match.size() >= 1) {
+            if (regex_search(s, &match, re)) {
                 if (test->m_automake_output) {
                     std::cout << ":test-result: PASS " << filename \
                         << ":" << t->name << std::endl;
