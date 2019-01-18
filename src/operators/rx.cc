@@ -51,11 +51,11 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
         re = m_re;
     }
 
-    std::vector<regex::SMatchCapture> captures;
+    std::vector<regex::RegexMatchCapture> captures;
     re->searchOneMatch(input, captures);
 
     if (rule && rule->hasCaptureAction() && transaction) {
-        for (const regex::SMatchCapture& capture : captures) {
+        for (const regex::RegexMatchCapture& capture : captures) {
             const std::string capture_substring(input.substr(capture.m_offset,capture.m_length));
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                 std::to_string(capture.m_group), capture_substring);

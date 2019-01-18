@@ -60,7 +60,7 @@ void replaceAll(std::string *s, const std::string &search,
 void json2bin(std::string *str) {
     modsecurity::regex::Regex re("\\\\x([a-z0-9A-Z]{2})");
     modsecurity::regex::Regex re2("\\\\u([a-z0-9A-Z]{4})");
-    modsecurity::regex::SMatch match;
+    modsecurity::regex::RegexMatch match;
 
     while (modsecurity::regex::regex_search(*str, &match, re)) {
         unsigned int p;

@@ -31,13 +31,13 @@ namespace regex {
 
 #define OVECCOUNT 900
 
-class SMatch {
+class RegexMatch {
  public:
-    SMatch() :
+    RegexMatch() :
 	m_match(),
 	m_offset(0) { }
 
-    SMatch(const std::string &match, size_t offset) :
+    RegexMatch(const std::string &match, size_t offset) :
 	m_match(match),
 	m_offset(offset) { }
 
@@ -49,8 +49,8 @@ class SMatch {
     size_t m_offset;
 };
 
-struct SMatchCapture {
-    SMatchCapture(size_t group, size_t offset, size_t length) :
+struct RegexMatchCapture {
+    RegexMatchCapture(size_t group, size_t offset, size_t length) :
 	m_group(group),
 	m_offset(offset),
 	m_length(length) { }
@@ -69,9 +69,9 @@ class Regex {
     Regex(const Regex&) = delete;
     Regex& operator=(const Regex&) = delete;
 
-    std::list<SMatch> searchAll(const std::string& s) const;
-    bool searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const;
-    int search(const std::string &s, SMatch *match) const;
+    std::list<RegexMatch> searchAll(const std::string& s) const;
+    bool searchOneMatch(const std::string& s, std::vector<RegexMatchCapture>& captures) const;
+    int search(const std::string &s, RegexMatch *m) const;
     int search(const std::string &s) const;
 
     const std::string pattern;
@@ -81,7 +81,7 @@ class Regex {
 };
 
 
-static inline int regex_search(const std::string& s, SMatch *match, const Regex& regex) {
+static inline int regex_search(const std::string& s, RegexMatch *match, const Regex& regex) {
     return regex.search(s, match);
 }
 

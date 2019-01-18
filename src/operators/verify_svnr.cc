@@ -79,7 +79,7 @@ bool VerifySVNR::verify(const char *svnrnumber, int len) {
 
 bool VerifySVNR::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
-    std::list<SMatch> matches;
+    std::list<RegexMatch> matches;
     bool is_svnr = false;
     int i;
 
