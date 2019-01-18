@@ -13,12 +13,15 @@
  *
  */
 
-#include <pcre.h>
+
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <list>
+
+#include "src/regex/backend/pcre.h"
+#include "src/regex/regex_match.h"
 
 #ifndef SRC_REGEX_REGEX_H_
 #define SRC_REGEX_REGEX_H_
@@ -27,47 +30,14 @@
 namespace modsecurity {
 namespace regex {
 
+using selectedBackend = backend::Pcre;
 
-#define OVECCOUNT 30
-
-class RegexMatch {
- public:
-    RegexMatch() :
-	m_match(),
-	m_offset(0) { }
-
-    RegexMatch(const std::string &match, size_t offset) :
-	m_match(match),
-	m_offset(offset) { }
-
-    const std::string& str() const { return m_match; }
-    size_t offset() const { return m_offset; }
-
- private:
-    std::string m_match;
-    size_t m_offset;
+class Regex : public selectedBackend {
+  public:
+    explicit Regex(const std::string& pattern) :
+        selectedBackend(pattern) { };
+    ~Regex() { };
 };
-
-
-class Regex {
- public:
-    explicit Regex(const std::string& pattern_);
-    ~Regex();
-
-    // m_pc and m_pce can't be easily copied
-    Regex(const Regex&) = delete;
-    Regex& operator=(const Regex&) = delete;
-
-    std::list<RegexMatch> searchAll(const std::string& s) const;
-    int search(const std::string &s, RegexMatch *m) const;
-    int search(const std::string &s) const;
-
-    const std::string pattern;
- private:
-    pcre *m_pc = NULL;
-    pcre_extra *m_pce = NULL;
-};
-
 
 }  // namespace regex
 }  // namespace modsecurity

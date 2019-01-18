@@ -23,6 +23,16 @@ AC_ARG_WITH(
 
 AC_MSG_CHECKING([for libpcre config script])
 
+if test "x${with_pcre}" == "xno"; then
+    AC_MSG_NOTICE([Support for PCRE was disabled by the utilization of --without-pcre or --with-pcre=no])
+    PCRE_DISABLED=yes
+else
+    if test "x${with_pcre}" == "xyes"; then
+        PCRE_MANDATORY=yes
+        AC_MSG_NOTICE([PCRE support was marked as mandatory by the utilization of --with-pcre=yes])
+        test_paths="/usr/local/libpcre /usr/local/pcre /usr/local /opt/libpcre /opt/pcre /opt /usr /opt/local"
+    fi
+
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
     if test ! -d "$x" -a -e "$x"; then
@@ -55,7 +65,7 @@ if test -n "${pcre_path}"; then
     AC_MSG_RESULT([${PCRE_CONFIG}])
     PCRE_VERSION="`${PCRE_CONFIG} --version`"
     if test ! -z "${PCRE_VERSION}"; then AC_MSG_NOTICE(pcre VERSION: $PCRE_VERSION); fi
-    PCRE_CFLAGS="`${PCRE_CONFIG} --cflags`"
+    PCRE_CFLAGS="`${PCRE_CONFIG} --cflags` -DWITH_PCRE"
     if test ! -z "${PCRE_CFLAGS}"; then AC_MSG_NOTICE(pcre CFLAGS: $PCRE_CFLAGS); fi
     PCRE_LDADD="`${PCRE_CONFIG} --libs`"
     if test ! -z "${PCRE_LDADD}"; then AC_MSG_NOTICE(pcre LDADD: $PCRE_LDADD); fi
@@ -90,20 +100,31 @@ if test -n "${PCRE_VERSION}"; then
     LDFLAGS=$save_$LDFLAGS
 fi
 
-AC_SUBST(PCRE_CONFIG)
-AC_SUBST(PCRE_VERSION)
-AC_SUBST(PCRE_CPPFLAGS)
-AC_SUBST(PCRE_CFLAGS)
-AC_SUBST(PCRE_LDFLAGS)
-AC_SUBST(PCRE_LDADD)
-AC_SUBST(PCRE_LD_PATH)
+fi
 
-if test -z "${PCRE_VERSION}"; then
-    AC_MSG_NOTICE([*** pcre library not found.])
-    ifelse([$2], , AC_MSG_ERROR([pcre library is required]), $2)
+
+if test -z "${PCRE_LDADD}"; then
+    if test -z "${PCRE_MANDATORY}"; then
+        if test -z "${PCRE_DISABLED}"; then
+            PCRE_FOUND=0
+        else
+            PCRE_FOUND=2
+        fi
+    else
+        AC_MSG_ERROR([PCRE was explicitly referenced but it was not found])
+        PCRE_FOUND=-1
+    fi
 else
-    AC_MSG_NOTICE([using pcre v${PCRE_VERSION}])
-    ifelse([$1], , , $1) 
-    PCRE_LDADD="${PCRE_LDADD} -lpcre"
-fi 
+    PCRE_FOUND=1
+    AC_SUBST(PCRE_CONFIG)
+    AC_SUBST(PCRE_VERSION)
+    AC_SUBST(PCRE_CPPFLAGS)
+    AC_SUBST(PCRE_CFLAGS)
+    AC_SUBST(PCRE_LDFLAGS)
+    AC_SUBST(PCRE_LDADD)
+    AC_SUBST(PCRE_LD_PATH)
+    PCRE_DISPLAY="${PCRE_LDADD}, ${PCRE_CFLAGS}"
+    AC_SUBST(PCRE_DISPLAY)
+fi
+
 ])
