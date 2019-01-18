@@ -16,7 +16,8 @@ modsec_rules_check_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(RE2_LDADD)
 
 modsec_rules_check_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
@@ -25,7 +26,8 @@ modsec_rules_check_LDFLAGS = \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(YAJL_LDFLAGS) \
+	$(RE2_LDFLAGS)
 
 modsec_rules_check_CPPFLAGS = \
 	-std=c++11 \
@@ -34,7 +36,8 @@ modsec_rules_check_CPPFLAGS = \
 	$(PCRE_CFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(MAXMIND_CFLAGS) \
-	$(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(RE2_CFLAGS)
 
 MAINTAINERCLEANFILES = \
         Makefile.in

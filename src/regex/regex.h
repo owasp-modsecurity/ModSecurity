@@ -30,6 +30,14 @@
 namespace modsecurity {
 namespace regex {
 
+#ifdef WITH_PCRE
+using selectedBackend = backend::Pcre;
+#elif WITH_RE2
+//using selectedBackend = backend::Re2;
+#else
+#error "no regex backend selected"
+#endif
+
 using selectedBackend = backend::Pcre;
 
 class Regex : public selectedBackend {
