@@ -26,7 +26,7 @@
 
 
 namespace modsecurity {
-using regex::SMatch;
+using regex::RegexMatch;
 using regex::regex_search;
 using regex::Regex;
 

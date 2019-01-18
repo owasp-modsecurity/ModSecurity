@@ -228,9 +228,9 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     const unsigned char *buf;
     size_t jsonSize;
 
-    std::list<regex::SMatch> vars = variables.searchAll(matchString);
-    std::list<regex::SMatch> ops = operators.searchAll(matchString);
-    std::list<regex::SMatch> trans = transformations.searchAll(matchString);
+    std::list<regex::RegexMatch> vars = variables.searchAll(matchString);
+    std::list<regex::RegexMatch> ops = operators.searchAll(matchString);
+    std::list<regex::RegexMatch> trans = transformations.searchAll(matchString);
 
     g = yajl_gen_alloc(NULL);
     if (g == NULL) {

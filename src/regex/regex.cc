@@ -66,12 +66,12 @@ Regex::~Regex() {
 }
 
 
-std::list<SMatch> Regex::searchAll(const std::string& s) const {
+std::list<RegexMatch> Regex::searchAll(const std::string& s) const {
     const char *subject = s.c_str();
     const std::string tmpString = std::string(s.c_str(), s.size());
     int ovector[OVECCOUNT];
     int rc, i, offset = 0;
-    std::list<SMatch> retList;
+    std::list<RegexMatch> retList;
 
     do {
         rc = pcre_exec(m_pc, m_pce, subject,
@@ -87,7 +87,7 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
             }
             std::string match = std::string(tmpString, start, len);
             offset = start + len;
-            retList.push_front(SMatch(match, start));
+            retList.push_front(RegexMatch(match, start));
 
             if (len == 0) {
                 rc = 0;
@@ -99,13 +99,13 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
     return retList;
 }
 
-int Regex::search(const std::string& s, SMatch *match) const {
+int Regex::search(const std::string& s, RegexMatch *match) const {
     int ovector[OVECCOUNT];
     int ret = pcre_exec(m_pc, m_pce, s.c_str(),
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 
     if (ret > 0) {
-        *match = SMatch(
+        *match = RegexMatch(
             std::string(s, ovector[ret-1], ovector[ret] - ovector[ret-1]),
             0);
     }

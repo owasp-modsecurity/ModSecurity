@@ -30,13 +30,13 @@ namespace regex {
 
 #define OVECCOUNT 30
 
-class SMatch {
+class RegexMatch {
  public:
-    SMatch() :
+    RegexMatch() :
 	m_match(),
 	m_offset(0) { }
 
-    SMatch(const std::string &match, size_t offset) :
+    RegexMatch(const std::string &match, size_t offset) :
 	m_match(match),
 	m_offset(offset) { }
 
@@ -58,8 +58,8 @@ class Regex {
     Regex(const Regex&) = delete;
     Regex& operator=(const Regex&) = delete;
 
-    std::list<SMatch> searchAll(const std::string& s) const;
-    int search(const std::string &s, SMatch *m) const;
+    std::list<RegexMatch> searchAll(const std::string& s) const;
+    int search(const std::string &s, RegexMatch *m) const;
     int search(const std::string &s) const;
 
     const std::string pattern;
@@ -69,7 +69,7 @@ class Regex {
 };
 
 
-static inline int regex_search(const std::string& s, SMatch *match, const Regex& regex) {
+static inline int regex_search(const std::string& s, RegexMatch *match, const Regex& regex) {
     return regex.search(s, match);
 }
 

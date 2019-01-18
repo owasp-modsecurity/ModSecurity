@@ -119,7 +119,7 @@ bool VerifyCPF::verify(const char *cpfnumber, int len) {
 
 bool VerifyCPF::evaluate(Transaction *t, Rule *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
-    std::list<SMatch> matches;
+    std::list<RegexMatch> matches;
     bool is_cpf = false;
     int i;
 

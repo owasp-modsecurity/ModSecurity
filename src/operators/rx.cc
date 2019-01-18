@@ -38,7 +38,7 @@ bool Rx::init(const std::string &arg, std::string *error) {
 
 bool Rx::evaluate(Transaction *transaction, Rule *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
-    std::list<SMatch> matches;
+    std::list<RegexMatch> matches;
     Regex *re;
 
     if (m_param.empty() && !m_string->m_containsMacro) {
@@ -56,7 +56,7 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
     if (rule && rule->m_containsCaptureAction && transaction) {
         int i = 0;
         matches.reverse();
-        for (const SMatch& a : matches) {
+        for (const RegexMatch& a : matches) {
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                 std::to_string(i), a.str());
             ms_dbg_a(transaction, 7, "Added regex subexpression TX." +
