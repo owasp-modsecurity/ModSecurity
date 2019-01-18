@@ -13,7 +13,9 @@
  *
  */
 
+#ifdef WITH_PCRE
 #include <pcre.h>
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -30,6 +32,7 @@ namespace modsecurity {
 namespace regex {
 namespace backend {
 
+#ifdef WITH_PCRE
 
 #define OVECCOUNT 900
 
@@ -54,6 +57,7 @@ class Pcre {
     pcre_extra *m_pce = NULL;
 };
 
+#endif
 
 }  // namespace backend
 }  // namespace regex

@@ -105,6 +105,9 @@ AM_CONDITIONAL([SSDEEP_CFLAGS], [test "SSDEEP_CFLAGS" != ""])
 CHECK_LUA
 AM_CONDITIONAL([LUA_CFLAGS], [test "LUA_CFLAGS" != ""])
 
+# Check for RE2
+PROG_RE2
+AM_CONDITIONAL([RE2_CFLAGS], [test "RE2_CFLAGS" != ""])
 
 #
 # Check for curl
@@ -546,6 +549,68 @@ if test "x$LUA_FOUND" = "x1"; then
 fi
 if test "x$LUA_FOUND" = "x2"; then
     echo "   + LUA                                           ....disabled"
+fi
+
+
+## REGEX
+echo "   + Regular expression engine"
+
+REGEX_SELECTED_RE2="          "
+REGEX_SELECTED_PCRE="          "
+
+if test "x$RE2_FOUND" = "x1"; then
+    MSC_REGEX_ENG="re2"
+fi
+if test "x$PCRE_FOUND" = "x1"; then
+    MSC_REGEX_ENG="pcre"
+fi
+
+AC_SUBST(MSC_REGEX_ENG)
+
+if test "x$MSC_REGEX_ENG" = "xpcre"; then
+    MSC_REGEX_ENG_IS_PCRE=1
+    REGEX_SELECTED_PCRE="[[selected]]"
+    AC_SUBST(MSC_REGEX_ENG_IS_PCRE)
+fi
+if test "x$MSC_REGEX_ENG" = "xre2"; then
+    MSC_REGEX_ENG_IS_RE2=1
+    REGEX_SELECTED_PCRE="[[selected]]"
+    AC_SUBST(MSC_REGEX_ENG_IS_RE2)
+fi
+
+
+#### RE2
+if test "x$RE2_FOUND" = "x0"; then
+    echo "      * RE2 (experimental)                         ....not found"
+fi
+if test "x$RE2_FOUND" = "x1"; then
+    echo -n "      * RE2 (experimental)             ${REGEX_SELECTED_RE2}  ....found "
+    if ! test "x$RE2_VERSION" = "x"; then
+        echo "v${RE2_VERSION}"
+    else
+        echo ""
+    fi
+    echo "         ${RE2_DISPLAY}"
+fi
+if test "x$RE2_FOUND" = "x2"; then
+    echo "      * RE2 (experimental)                        ....disabled"
+fi
+
+#### PCRE
+if test "x$PCRE_FOUND" = "x0"; then
+    echo "      * PCRE                                       ....not found"
+fi
+if test "x$PCRE_FOUND" = "x1"; then
+    echo -n "      * PCRE                           ${REGEX_SELECTED_PCRE}  ....found "
+    if ! test "x$PCRE_VERSION" = "x"; then
+        echo "v${PCRE_VERSION}"
+    else
+        echo ""
+    fi
+    echo "         ${PCRE_DISPLAY}"
+fi
+if test "x$PCRE_FOUND" = "x2"; then
+    echo "      * PCRE                                       ....disabled"
 fi
 
 
