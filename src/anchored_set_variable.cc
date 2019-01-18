@@ -127,7 +127,7 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
 void AnchoredSetVariable::resolveRegularExpression(regex::Regex *r,
     std::vector<const VariableValue *> *l) {
     for (const auto& x : *this) {
-        int ret = regex::regex_search(x.first, *r);
+        int ret = r->search(x.first);
         if (ret <= 0) {
             continue;
         }
@@ -140,7 +140,7 @@ void AnchoredSetVariable::resolveRegularExpression(regex::Regex *r,
     std::vector<const VariableValue *> *l,
     Variables::KeyExclusions &ke) {
     for (const auto& x : *this) {
-        int ret = regex::regex_search(x.first, *r);
+        int ret = r->search(x.first);
         if (ret <= 0) {
             continue;
         }

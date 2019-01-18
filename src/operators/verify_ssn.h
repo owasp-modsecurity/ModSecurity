@@ -26,7 +26,6 @@
 
 namespace modsecurity {
 using regex::RegexMatch;
-using regex::regex_search;
 using regex::Regex;
 
 namespace operators {

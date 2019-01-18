@@ -39,7 +39,6 @@ using modsecurity_test::ModSecurityTestResults;
 using modsecurity_test::RegressionTest;
 using modsecurity_test::RegressionTestResult;
 
-using modsecurity::regex::regex_search;
 using modsecurity::regex::RegexMatch;
 using modsecurity::regex::Regex;
 
@@ -55,7 +54,7 @@ void print_help() {
 bool contains(const std::string &s, const std::string &pattern) {
     bool ret;
     modsecurity::regex::Regex re(pattern);
-    ret = modsecurity::regex::regex_search(s, re);
+    ret = re.search(s);
     return ret;
 }
 
@@ -210,7 +209,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             RegexMatch match;
             std::string s = modsec_rules->getParserError();
 
-            if (regex_search(s, &match, re)) {
+            if (re.search(s, &match)) {
                 if (test->m_automake_output) {
                     std::cout << ":test-result: PASS " << filename \
                         << ":" << t->name << std::endl;

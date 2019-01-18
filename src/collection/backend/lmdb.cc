@@ -560,7 +560,7 @@ void LMDB::resolveRegularExpression(const std::string& var,
 
     while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
         char *a = reinterpret_cast<char *>(key.mv_data);
-        int ret = regex::regex_search(a, r);
+        int ret = r.search(a);
         if (ret <= 0) {
             continue;
         }

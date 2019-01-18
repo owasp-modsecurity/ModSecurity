@@ -198,23 +198,23 @@ class Rule_DictElementRegexp : public VariableRegex {
     void evaluate(Transaction *t,
         Rule *rule,
         std::vector<const VariableValue *> *l) override {
-        if (regex::regex_search("id", m_r) > 0) {
+        if (m_r.search("id") > 0) {
             Rule_DictElement::id(t, rule, l);
             return;
         }
-        if (regex::regex_search("rev", m_r) > 0) {
+        if (m_r.search("rev") > 0) {
             Rule_DictElement::rev(t, rule, l);
             return;
         }
-        if (regex::regex_search("severity", m_r) > 0) {
+        if (m_r.search("severity") > 0) {
             Rule_DictElement::severity(t, rule, l);
             return;
         }
-        if (regex::regex_search("logdata", m_r) > 0) {
+        if (m_r.search("logdata") > 0) {
             Rule_DictElement::logData(t, rule, l);
             return;
         }
-        if (regex::regex_search("msg", m_r) > 0) {
+        if (m_r.search("msg") > 0) {
             Rule_DictElement::msg(t, rule, l);
             return;
         }

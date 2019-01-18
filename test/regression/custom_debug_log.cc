@@ -39,7 +39,7 @@ void CustomDebugLog::write(int level, const std::string &id,
 bool CustomDebugLog::contains(const std::string& pattern) {
     modsecurity::regex::Regex re(pattern);
     std::string s = m_log.str();
-    return modsecurity::regex::regex_search(s, re);
+    return re.search(s);
 }
 
 std::string CustomDebugLog::log_messages() {
