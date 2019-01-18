@@ -31,13 +31,13 @@ namespace Utils {
 
 class SMatch {
  public:
-    SMatch()
-    : m_match(), m_offset(0)
-    {}
+    SMatch() :
+	m_match(),
+	m_offset(0) { }
 
-    SMatch(const std::string &match, size_t offset)
-    : m_match(match), m_offset(offset)
-    {}
+    SMatch(const std::string &match, size_t offset) :
+	m_match(match),
+	m_offset(offset) { }
 
     const std::string& str() const { return m_match; }
     size_t offset() const { return m_offset; }
@@ -46,6 +46,7 @@ class SMatch {
     std::string m_match;
     size_t m_offset;
 };
+
 
 class Regex {
  public:
@@ -66,13 +67,16 @@ class Regex {
     pcre_extra *m_pce = NULL;
 };
 
+
 static inline int regex_search(const std::string& s, SMatch *match, const Regex& regex) {
     return regex.search(s, match);
 }
 
+
 static inline int regex_search(const std::string& s, const Regex& regex) {
     return regex.search(s);
 }
+
 
 }  // namespace Utils
 }  // namespace modsecurity

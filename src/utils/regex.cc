@@ -39,8 +39,7 @@ namespace Utils {
 
 
 Regex::Regex(const std::string& pattern_)
-    : pattern(pattern_.empty() ? ".*" : pattern_)
-{
+    : pattern(pattern_.empty() ? ".*" : pattern_) {
     const char *errptr = NULL;
     int erroffset;
 
@@ -108,8 +107,7 @@ int Regex::search(const std::string& s, SMatch *match) const {
     if (ret > 0) {
         *match = SMatch(
             std::string(s, ovector[ret-1], ovector[ret] - ovector[ret-1]),
-            0
-        );
+            0);
     }
 
     return ret;
