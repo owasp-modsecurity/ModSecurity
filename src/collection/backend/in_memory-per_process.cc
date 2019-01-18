@@ -148,7 +148,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
         //}
         //std::string content = std::string(x.first, keySize + 1,
          //                                 x.first.size() - keySize - 1);
-        int ret = regex::regex_search(x.first, r);
+        int ret = r.search(x.first);
         if (ret <= 0) {
             continue;
         }

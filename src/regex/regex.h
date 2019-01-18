@@ -69,16 +69,6 @@ class Regex {
 };
 
 
-static inline int regex_search(const std::string& s, RegexMatch *match, const Regex& regex) {
-    return regex.search(s, match);
-}
-
-
-static inline int regex_search(const std::string& s, const Regex& regex) {
-    return regex.search(s);
-}
-
-
 }  // namespace regex
 }  // namespace modsecurity
 
