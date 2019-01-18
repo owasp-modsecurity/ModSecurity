@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 
 #include <pcre.h>
 #include <sys/socket.h>
@@ -35,7 +35,7 @@
 #endif
 
 namespace modsecurity {
-namespace Utils {
+namespace regex {
 
 
 Regex::Regex(const std::string& pattern_)
@@ -119,5 +119,5 @@ int Regex::search(const std::string& s) const {
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 }
 
-}  // namespace Utils
+}  // namespace regex
 }  // namespace modsecurity

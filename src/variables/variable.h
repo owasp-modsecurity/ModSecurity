@@ -25,7 +25,7 @@
 #include "modsecurity/rule.h"
 #include "modsecurity/rules.h"
 #include "src/utils/string.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 
 #ifndef SRC_VARIABLES_VARIABLE_H_
 #define SRC_VARIABLES_VARIABLE_H_
@@ -114,7 +114,7 @@ class KeyExclusion {
 // FIXME: use pre built regex.
 class KeyExclusionRegex : public KeyExclusion {
  public:
-    explicit KeyExclusionRegex(Utils::Regex re)
+    explicit KeyExclusionRegex(regex::Regex re)
         : m_re(re.pattern) { }
     explicit KeyExclusionRegex(std::string re)
         : m_re(re) { }
@@ -125,7 +125,7 @@ class KeyExclusionRegex : public KeyExclusion {
         return m_re.searchAll(a).size() > 0;
     }
 
-    Utils::Regex m_re;
+    regex::Regex m_re;
 };
 
 
@@ -596,7 +596,7 @@ class VariableRegex : public Variable {
 
     // FIXME: no need for that.
     std::string m_regex;
-    Utils::Regex m_r;
+    regex::Regex m_r;
 };
 
 class Variables : public std::vector<Variable *> {

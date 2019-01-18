@@ -38,7 +38,7 @@
 #include "src/collection/backend/in_memory-per_process.h"
 #include "src/collection/backend/lmdb.h"
 #include "src/unique_id.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 #include "src/utils/geo_lookup.h"
 #include "src/actions/transformations/transformation.h"
 
@@ -219,18 +219,18 @@ void ModSecurity::serverLog(void *data, std::shared_ptr<RuleMessage> rm) {
 int ModSecurity::processContentOffset(const char *content, size_t len,
     const char *matchString, std::string *json, const char **err) {
 #ifdef WITH_YAJL
-    Utils::Regex variables("v([0-9]+),([0-9]+)");
-    Utils::Regex operators("o([0-9]+),([0-9]+)");
-    Utils::Regex transformations("t:(?:(?!t:).)+");
+    regex::Regex variables("v([0-9]+),([0-9]+)");
+    regex::Regex operators("o([0-9]+),([0-9]+)");
+    regex::Regex transformations("t:(?:(?!t:).)+");
     yajl_gen g;
     std::string varValue;
     std::string opValue;
     const unsigned char *buf;
     size_t jsonSize;
 
-    std::list<Utils::SMatch> vars = variables.searchAll(matchString);
-    std::list<Utils::SMatch> ops = operators.searchAll(matchString);
-    std::list<Utils::SMatch> trans = transformations.searchAll(matchString);
+    std::list<regex::SMatch> vars = variables.searchAll(matchString);
+    std::list<regex::SMatch> ops = operators.searchAll(matchString);
+    std::list<regex::SMatch> trans = transformations.searchAll(matchString);
 
     g = yajl_gen_alloc(NULL);
     if (g == NULL) {

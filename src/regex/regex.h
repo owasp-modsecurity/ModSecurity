@@ -20,12 +20,13 @@
 #include <string>
 #include <list>
 
-#ifndef SRC_UTILS_REGEX_H_
-#define SRC_UTILS_REGEX_H_
+#ifndef SRC_REGEX_REGEX_H_
+#define SRC_REGEX_REGEX_H_
 
 
 namespace modsecurity {
-namespace Utils {
+namespace regex {
+
 
 #define OVECCOUNT 30
 
@@ -78,7 +79,7 @@ static inline int regex_search(const std::string& s, const Regex& regex) {
 }
 
 
-}  // namespace Utils
+}  // namespace regex
 }  // namespace modsecurity
 
-#endif  // SRC_UTILS_REGEX_H_
+#endif  // SRC_REGEX_REGEX_H_

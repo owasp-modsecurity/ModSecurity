@@ -19,7 +19,7 @@
 #include <string>
 
 #include "modsecurity/debug_log.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 
 namespace modsecurity_test {
 
@@ -37,9 +37,9 @@ void CustomDebugLog::write(int level, const std::string &id,
 }
 
 bool CustomDebugLog::contains(const std::string& pattern) {
-    modsecurity::Utils::Regex re(pattern);
+    modsecurity::regex::Regex re(pattern);
     std::string s = m_log.str();
-    return modsecurity::Utils::regex_search(s, re);
+    return modsecurity::regex::regex_search(s, re);
 }
 
 std::string CustomDebugLog::log_messages() {
