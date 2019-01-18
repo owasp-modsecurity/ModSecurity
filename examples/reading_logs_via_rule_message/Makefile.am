@@ -16,7 +16,8 @@ simple_request_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(RE2_LDADD)
 
 simple_request_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
@@ -25,7 +26,8 @@ simple_request_LDFLAGS = \
 	$(LUA_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(YAJL_LDFLAGS) \
+	$(RE2_LDFLAGS)
 
 simple_request_CPPFLAGS = \
 	$(GLOBAL_CFLAGS) \
@@ -43,7 +45,8 @@ simple_request_CPPFLAGS = \
 	$(LMDB_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(PCRE_CFLAGS) \
-	$(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(RE2_CFLAGS)
 
 
 MAINTAINERCLEANFILES = \
