@@ -278,8 +278,7 @@ bool AuditLog::isRelevant(int status) {
         return true;
     }
 
-    return regex::regex_search(sstatus,
-        regex::Regex(m_relevant)) != 0;
+    return regex::Regex(m_relevant).search(sstatus) != 0;
 }
 
 
