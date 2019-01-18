@@ -40,7 +40,7 @@ using modsecurity_test::RegressionTest;
 using modsecurity_test::RegressionTestResult;
 
 using modsecurity::regex::regex_search;
-using modsecurity::regex::SMatch;
+using modsecurity::regex::RegexMatch;
 using modsecurity::regex::Regex;
 
 std::string default_test_path = "test-cases/regression";
@@ -207,7 +207,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             }
 
             Regex re(t->parser_error);
-            SMatch match;
+            RegexMatch match;
             std::string s = modsec_rules->getParserError();
 
             if (regex_search(s, &match, re)) {
