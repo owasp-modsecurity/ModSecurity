@@ -13,23 +13,34 @@
  *
  */
 
-#include "src/regex/regex.h"
 
-#include <pcre.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string>
-#include <list>
-
-#include <fstream>
-#include <iostream>
-
+#ifndef SRC_REGEX_REGEX_MATCH_H_
+#define SRC_REGEX_REGEX_MATCH_H_
 
 namespace modsecurity {
 namespace regex {
 
 
+class RegexMatch {
+ public:
+    RegexMatch() :
+	m_match(),
+	m_offset(0) { }
+
+    RegexMatch(const std::string &match, size_t offset) :
+	m_match(match),
+	m_offset(offset) { }
+
+    const std::string& str() const { return m_match; }
+    size_t offset() const { return m_offset; }
+
+ private:
+    std::string m_match;
+    size_t m_offset;
+};
+
+
 }  // namespace regex
 }  // namespace modsecurity
+
+#endif  // SRC_REGEX_REGEX_MATCH_H_

@@ -20,14 +20,40 @@
 #include <string>
 #include <list>
 
+#include "src/regex/regex_match.h"
+
 #ifndef SRC_REGEX_BACKEND_PCRE_H_
 #define SRC_REGEX_BACKEND_PCRE_H_
 
 namespace modsecurity {
 namespace regex {
+namespace backend {
 
 
+#define OVECCOUNT 30
 
+
+class Pcre {
+ public:
+    explicit Pcre(const std::string& pattern_);
+    ~Pcre();
+
+    // m_pc and m_pce can't be easily copied
+    Pcre(const Pcre&) = delete;
+    Pcre& operator=(const Pcre&) = delete;
+
+    std::list<RegexMatch> searchAll(const std::string& s) const;
+    int search(const std::string &s, RegexMatch *m) const;
+    int search(const std::string &s) const;
+
+    const std::string pattern;
+ private:
+    pcre *m_pc = NULL;
+    pcre_extra *m_pce = NULL;
+};
+
+
+}  // namespace backend
 }  // namespace regex
 }  // namespace modsecurity
 
