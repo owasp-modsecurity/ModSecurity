@@ -23,7 +23,7 @@
 #include <iterator>
 
 #include "test/common/colors.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 #include "src/utils/string.h"
 
 
@@ -58,11 +58,11 @@ void replaceAll(std::string *s, const std::string &search,
 
 
 void json2bin(std::string *str) {
-    modsecurity::Utils::Regex re("\\\\x([a-z0-9A-Z]{2})");
-    modsecurity::Utils::Regex re2("\\\\u([a-z0-9A-Z]{4})");
-    modsecurity::Utils::SMatch match;
+    modsecurity::regex::Regex re("\\\\x([a-z0-9A-Z]{2})");
+    modsecurity::regex::Regex re2("\\\\u([a-z0-9A-Z]{4})");
+    modsecurity::regex::SMatch match;
 
-    while (modsecurity::Utils::regex_search(*str, &match, re)) {
+    while (modsecurity::regex::regex_search(*str, &match, re)) {
         unsigned int p;
         std::string toBeReplaced = match.str();
         toBeReplaced.erase(0, 2);
@@ -70,7 +70,7 @@ void json2bin(std::string *str) {
         replaceAll(str, match.str(), p);
     }
 
-    while (modsecurity::Utils::regex_search(*str, &match, re2)) {
+    while (modsecurity::regex::regex_search(*str, &match, re2)) {
         unsigned int p;
         std::string toBeReplaced = match.str();
         toBeReplaced.erase(0, 2);

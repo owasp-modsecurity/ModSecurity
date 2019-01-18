@@ -22,13 +22,13 @@
 #include <utility>
 
 #include "src/operators/operator.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 
 
 namespace modsecurity {
-using Utils::SMatch;
-using Utils::regex_search;
-using Utils::Regex;
+using regex::SMatch;
+using regex::regex_search;
+using regex::Regex;
 
 namespace operators {
 
