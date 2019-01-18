@@ -26,7 +26,7 @@
 #include "src/audit_log/writer/parallel.h"
 #include "src/audit_log/writer/serial.h"
 #include "src/audit_log/writer/writer.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 
 #define PARTS_CONSTAINS(a, c) \
     if (new_parts.find(toupper(a)) != std::string::npos \
@@ -279,8 +279,8 @@ bool AuditLog::isRelevant(int status) {
         return true;
     }
 
-    return Utils::regex_search(sstatus,
-        Utils::Regex(m_relevant)) != 0;
+    return regex::regex_search(sstatus,
+        regex::Regex(m_relevant)) != 0;
 }
 
 

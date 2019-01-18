@@ -38,7 +38,7 @@
 
 namespace modsecurity {
 class Transaction;
-namespace Utils {
+namespace regex {
 class Regex;
 }
 namespace Variables {
@@ -91,10 +91,10 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
     void resolve(const std::string &key,
         std::vector<const VariableValue *> *l);
 
-    void resolveRegularExpression(Utils::Regex *r,
+    void resolveRegularExpression(regex::Regex *r,
         std::vector<const VariableValue *> *l);
 
-    void resolveRegularExpression(Utils::Regex *r,
+    void resolveRegularExpression(regex::Regex *r,
         std::vector<const VariableValue *> *l,
         Variables::KeyExclusions &ke);
 

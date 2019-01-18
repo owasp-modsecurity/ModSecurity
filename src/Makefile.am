@@ -239,11 +239,15 @@ UTILS = \
 	utils/md5.cc \
 	utils/msc_tree.cc \
 	utils/random.cc \
-	utils/regex.cc \
 	utils/sha1.cc \
 	utils/string.cc \
 	utils/system.cc \
 	utils/shared_files.cc
+
+
+REGEX = \
+	regex/regex.cc \
+	regex/backend/pcre.cc
 
 
 COLLECTION = \
@@ -287,6 +291,7 @@ libmodsecurity_la_SOURCES = \
 	${COLLECTION} \
 	${OPERATORS} \
 	${UTILS} \
+	${REGEX} \
 	${VARIABLES}
 
 

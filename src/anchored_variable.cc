@@ -22,7 +22,7 @@
 #include "../headers/modsecurity/anchored_variable.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 
 namespace modsecurity {
 

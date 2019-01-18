@@ -31,7 +31,7 @@
 #include "test/regression/regression_test.h"
 #include "test/common/modsecurity_test_results.h"
 #include "test/regression/custom_debug_log.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 
 using modsecurity_test::CustomDebugLog;
 using modsecurity_test::ModSecurityTest;
@@ -39,9 +39,9 @@ using modsecurity_test::ModSecurityTestResults;
 using modsecurity_test::RegressionTest;
 using modsecurity_test::RegressionTestResult;
 
-using modsecurity::Utils::regex_search;
-using modsecurity::Utils::SMatch;
-using modsecurity::Utils::Regex;
+using modsecurity::regex::regex_search;
+using modsecurity::regex::SMatch;
+using modsecurity::regex::Regex;
 
 std::string default_test_path = "test-cases/regression";
 std::list<std::string> resources;
@@ -54,8 +54,8 @@ void print_help() {
 
 bool contains(const std::string &s, const std::string &pattern) {
     bool ret;
-    modsecurity::Utils::Regex re(pattern);
-    ret = modsecurity::Utils::regex_search(s, re);
+    modsecurity::regex::Regex re(pattern);
+    ret = modsecurity::regex::regex_search(s, re);
     return ret;
 }
 

@@ -27,7 +27,7 @@
 #include <pthread.h>
 
 #include "modsecurity/variable_value.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 #include "src/utils/string.h"
 
 
@@ -134,7 +134,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
     //std::string name = std::string(var, var.find(":") + 2,
     //    var.size() - var.find(":") - 3);
     //size_t keySize = col.size();
-    Utils::Regex r(var);
+    regex::Regex r(var);
 
     for (const auto& x : *this) {
         //if (x.first.size() <= keySize + 1) {
@@ -148,7 +148,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
         //}
         //std::string content = std::string(x.first, keySize + 1,
          //                                 x.first.size() - keySize - 1);
-        int ret = Utils::regex_search(x.first, r);
+        int ret = regex::regex_search(x.first, r);
         if (ret <= 0) {
             continue;
         }
