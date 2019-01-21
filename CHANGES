@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix: Extra whitespace in some configuration directives causing error
+   [Issue #2006 - @porjo, @zimmerle]
  - Refactoring on Regex and SMatch classes.
    [@WGH-]
  - Fixed buffer overflow in Utils::Md5::hexdigest()
