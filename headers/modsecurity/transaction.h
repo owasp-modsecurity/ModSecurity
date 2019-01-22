@@ -396,7 +396,7 @@ class Transaction : public TransactionAnchoredVariables {
     /**
      * Holds the server IP Address
      */
-    std::string m_serverIpAddress;
+    std::shared_ptr<std::string> m_serverIpAddress;
 
     /**
      * Holds the raw URI that was requested.

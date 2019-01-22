@@ -108,7 +108,7 @@ class RuleMessage {
     int m_ruleId;
     int m_ruleLine;
     bool m_saveMessage;
-    std::string m_serverIpAddress;
+    std::shared_ptr<std::string> m_serverIpAddress;
     int m_severity;
     std::string m_uriNoQueryStringDecoded;
     std::string m_ver;
