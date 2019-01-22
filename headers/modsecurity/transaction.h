@@ -406,7 +406,7 @@ class Transaction : public TransactionAnchoredVariables {
     /**
      * Holds the URI that was requests (without the query string).
      */
-    std::string m_uri_no_query_string_decoded;
+    std::shared_ptr<std::string> m_uri_no_query_string_decoded;
 
     /**
      * Holds the combined size of all arguments, later used to fill the
