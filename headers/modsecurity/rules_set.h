@@ -48,16 +48,14 @@ class Driver;
 class RulesSet : public RulesSetProperties {
  public:
     RulesSet()
-        : RulesSetProperties(new DebugLog()),
-        unicode_codepage(0)
+        : RulesSetProperties(new DebugLog())
 #ifndef NO_LOGS
         ,m_secmarker_skipped(0)
 #endif
         { }
 
     explicit RulesSet(DebugLog *customLog)
-        : RulesSetProperties(customLog),
-        unicode_codepage(0)
+        : RulesSetProperties(customLog)
 #ifndef NO_LOGS
         ,m_secmarker_skipped(0)
 #endif
@@ -80,8 +78,6 @@ class RulesSet : public RulesSetProperties {
 
     void debug(int level, const std::string &id, const std::string &uri,
         const std::string &msg);
-
-    int64_t unicode_codepage;
 
     RulesSetPhases m_rulesSetPhases;
  private:
