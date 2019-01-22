@@ -92,7 +92,7 @@ class RuleMessage {
     static std::string _errorLogTail(const RuleMessage *rm);
 
     int m_accuracy;
-    std::string m_clientIpAddress;
+    std::shared_ptr<std::string> m_clientIpAddress;
     std::string m_data;
     std::string m_id;
     bool m_isDisruptive;
