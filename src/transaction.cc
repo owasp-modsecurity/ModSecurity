@@ -102,7 +102,7 @@ namespace modsecurity {
 Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     : m_clientPort(0),
     m_serverPort(0),
-    m_uri_no_query_string_decoded(""),
+    m_uri_no_query_string_decoded(nullptr),
     m_rules(rules),
     m_timeStamp(std::time(NULL)),
     m_httpCodeReturned(200),
@@ -145,7 +145,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
 Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCbData)
     : m_clientPort(0),
     m_serverPort(0),
-    m_uri_no_query_string_decoded(""),
+    m_uri_no_query_string_decoded(nullptr),
     m_rules(rules),
     m_timeStamp(std::time(NULL)),
     m_httpCodeReturned(200),
@@ -405,9 +405,11 @@ int Transaction::processURI(const char *uri, const char *method,
 
 
     if (pos != std::string::npos) {
-        m_uri_no_query_string_decoded = std::string(m_uri_decoded, 0, pos);
+        m_uri_no_query_string_decoded = std::unique_ptr<std::string>(
+            new std::string(m_uri_decoded, 0, pos));
     } else {
-        m_uri_no_query_string_decoded = std::string(m_uri_decoded);
+        m_uri_no_query_string_decoded = std::unique_ptr<std::string>(
+            new std::string(m_uri_decoded));
     }
 
 
