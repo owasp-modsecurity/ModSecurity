@@ -61,8 +61,7 @@ AuditLog::AuditLog()
     m_status(NotSetLogStatus),
     m_type(NotSetAuditLogType),
     m_relevant(""),
-    m_writer(NULL),
-    m_refereceCount(1) { }
+    m_writer(NULL) { }
 
 
 AuditLog::~AuditLog() {
