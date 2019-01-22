@@ -42,6 +42,10 @@ class UnitTest {
     int obtained;
     int skipped;
     std::string obtainedOutput;
+
+    // for regular expression operator tests
+    std::vector<std::string> re_groups;
+    std::vector<std::string> obtained_re_groups;
 };
 
 }  // namespace modsecurity_test
