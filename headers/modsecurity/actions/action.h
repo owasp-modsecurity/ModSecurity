@@ -43,8 +43,7 @@ class Action {
         temporaryAction(false),
         action_kind(2),
         m_name(""),
-        m_parser_payload(""),
-        m_referenceCount(1) {
+        m_parser_payload("") {
             set_name_and_payload(_action);
         }
     explicit Action(const std::string& _action, int kind)
@@ -52,8 +51,7 @@ class Action {
         temporaryAction(false),
         action_kind(kind),
         m_name(""),
-        m_parser_payload(""),
-        m_referenceCount(1) {
+        m_parser_payload("") {
             set_name_and_payload(_action);
         }
 
@@ -90,19 +88,6 @@ class Action {
             m_parser_payload.erase(0, 1);
             m_parser_payload.pop_back();
         }
-    }
-
-    int refCountDecreaseAndCheck() {
-        this->m_referenceCount--;
-        if (this->m_referenceCount == 0) {
-            delete this;
-            return 1;
-        }
-        return 0;
-    }
-
-    void refCountIncrease() {
-        this->m_referenceCount++;
     }
 
     bool m_isNone;
@@ -142,10 +127,7 @@ class Action {
      */
      RunTimeOnlyIfMatchKind,
     };
-
- private:
-    int m_referenceCount;
-};
+ };
 
 
 }  // namespace actions
