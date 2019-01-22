@@ -42,8 +42,7 @@ namespace writer {
 class Writer {
  public:
     explicit Writer(AuditLog *audit)
-        : m_audit(audit),
-        m_refereceCount(1) { }
+        : m_audit(audit) { }
 
     virtual ~Writer() { }
 
@@ -53,23 +52,8 @@ class Writer {
 
     static void generateBoundary(std::string *boundary);
 
-    void refCountIncrease() {
-        m_refereceCount++;
-    }
-
-
-    bool refCountDecreaseAndCheck() {
-        m_refereceCount--;
-        if (m_refereceCount == 0) {
-            delete this;
-            return true;
-        }
-        return false;
-    }
-
  protected:
     AuditLog *m_audit;
-    int m_refereceCount;
 };
 
 
