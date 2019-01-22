@@ -181,18 +181,6 @@ class AuditLog {
     std::string m_path2;
     std::string m_storage_dir;
 
-    void refCountIncrease() {
-        m_refereceCount++;
-    }
-
-    bool refCountDecreaseAndCheck() {
-        m_refereceCount--;
-        if (m_refereceCount == 0) {
-            delete this;
-            return true;
-        }
-        return false;
-    }
     AuditLogFormat m_format;
 
  protected:
@@ -213,7 +201,6 @@ class AuditLog {
     std::string m_relevant;
 
     audit_log::writer::Writer *m_writer;
-    int m_refereceCount;
 };
 
 
