@@ -251,7 +251,7 @@ void Transaction::debug(int level, std::string message) const {
 int Transaction::processConnection(const char *client, int cPort,
     const char *server, int sPort) {
     m_clientIpAddress = std::unique_ptr<std::string>(new std::string(client));
-    this->m_serverIpAddress = server;
+    m_serverIpAddress = std::unique_ptr<std::string>(new std::string(server));
     this->m_clientPort = cPort;
     this->m_serverPort = sPort;
     ms_dbg(4, "Transaction context created.");
@@ -261,7 +261,7 @@ int Transaction::processConnection(const char *client, int cPort,
     m_variableRemoteHost.set(*m_clientIpAddress.get(), m_variableOffset);
     m_variableUniqueID.set(m_id, m_variableOffset);
     m_variableRemoteAddr.set(*m_clientIpAddress.get(), m_variableOffset);
-    m_variableServerAddr.set(m_serverIpAddress, m_variableOffset);
+    m_variableServerAddr.set(*m_serverIpAddress.get(), m_variableOffset);
     m_variableServerPort.set(std::to_string(this->m_serverPort),
         m_variableOffset);
     m_variableRemotePort.set(std::to_string(this->m_clientPort),
@@ -1458,7 +1458,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     audit_log << " " << this->m_id.c_str();
     audit_log << " " << this->m_clientIpAddress;
     audit_log << " " << this->m_clientPort;
-    audit_log << " " << this->m_serverIpAddress;
+    audit_log << " " << m_serverIpAddress;
     audit_log << " " << this->m_serverPort;
     audit_log << std::endl;
 
@@ -1579,7 +1579,7 @@ std::string Transaction::toJSON(int parts) {
     LOGFY_ADD("time_stamp", ts.c_str());
     LOGFY_ADD("server_id", uniqueId.c_str());
     LOGFY_ADD_NUM("client_port", m_clientPort);
-    LOGFY_ADD("host_ip", m_serverIpAddress.c_str());
+    LOGFY_ADD("host_ip", m_serverIpAddress->c_str());
     LOGFY_ADD_NUM("host_port", m_serverPort);
     LOGFY_ADD("unique_id", this->m_id.c_str());
 

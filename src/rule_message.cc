@@ -40,7 +40,7 @@ std::string RuleMessage::_details(const RuleMessage *rm) {
     for (auto &a : rm->m_tags) {
         msg.append(" [tag \"" + a + "\"]");
     }
-    msg.append(" [hostname \"" + std::string(rm->m_serverIpAddress) \
+    msg.append(" [hostname \"" + *rm->m_serverIpAddress.get() \
         + "\"]");
     msg.append(" [uri \"" + utils::string::limitTo(200, rm->m_uriNoQueryStringDecoded) + "\"]");
     msg.append(" [unique_id \"" + rm->m_id + "\"]");
@@ -53,7 +53,7 @@ std::string RuleMessage::_details(const RuleMessage *rm) {
 std::string RuleMessage::_errorLogTail(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append("[hostname \"" + std::string(rm->m_serverIpAddress) + "\"]");
+    msg.append("[hostname \"" + *rm->m_serverIpAddress.get() + "\"]");
     msg.append(" [uri \"" + utils::string::limitTo(200, rm->m_uriNoQueryStringDecoded) + "\"]");
     msg.append(" [unique_id \"" + rm->m_id + "\"]");
 
