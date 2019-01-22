@@ -48,24 +48,19 @@ class RulesSet : public RulesSetProperties {
  public:
     RulesSet()
         : RulesSetProperties(new DebugLog()),
-        unicode_codepage(0),
 #ifndef NO_LOGS
         m_secmarker_skipped(0),
 #endif
-        m_referenceCount(0) { }
+        unicode_codepage(0) { }
 
     explicit RulesSet(DebugLog *customLog)
         : RulesSetProperties(customLog),
-        unicode_codepage(0),
 #ifndef NO_LOGS
         m_secmarker_skipped(0),
 #endif
-        m_referenceCount(0) { }
+        unicode_codepage(0) { }
 
     ~RulesSet() { }
-
-    void incrementReferenceCount(void);
-    void decrementReferenceCount(void);
 
     int loadFromUri(const char *uri);
     int loadRemote(const char *key, const char *uri);
@@ -87,7 +82,6 @@ class RulesSet : public RulesSetProperties {
 
     RulesSetPhases m_rulesSetPhases;
  private:
-    int m_referenceCount;
 #ifndef NO_LOGS
     uint8_t m_secmarker_skipped;
 #endif

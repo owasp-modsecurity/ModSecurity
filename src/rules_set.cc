@@ -32,51 +32,6 @@ namespace modsecurity {
 
 
 /**
- * @name    incrementReferenceCount
- * @brief   Increment the number of transactions using this class
- * @ingroup ModSecCore
- *
- * At certain point it is expected to have two differnt
- * groups of rules attached to a specific core, this happens
- * for instance when a webserver is reloading its
- * configurations, the old configurations/rules is available
- * for the old connections and the new rules are available 
- * for the newest connections.
- *
- * @return Number of the current transactions using this rules
- *
- */
-void RulesSet::incrementReferenceCount(void) {
-    this->m_referenceCount++;
-}
-
-
-/**
- * @name    decrementReferenceCount
- * @brief   Decrement the number of transactions using this class
- * @ingroup ModSecCore
- *
- * @return Number of the current transactions using this rules
- *
- */
-void RulesSet::decrementReferenceCount(void) {
-    this->m_referenceCount--;
-    if (this->m_referenceCount == 0) {
-        /**
-         * FIXME: If there are new rules loaded (new instance
-         *        of this class) and the reference is zero, we
-         *        can delete this instance freeing some memory.
-         *
-         */
-        /*
-         * std::cout << "We may want to delete this rules instance" \
-         *   << std::endl;
-         */
-    }
-}
-
-
-/**
  * @name    loadFromUri
  * @brief   load rules from a give uri
  * @ingroup ModSecCore
