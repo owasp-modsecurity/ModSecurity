@@ -250,7 +250,7 @@ void Transaction::debug(int level, std::string message) const {
  */
 int Transaction::processConnection(const char *client, int cPort,
     const char *server, int sPort) {
-    this->m_clientIpAddress = client;
+    m_clientIpAddress = std::unique_ptr<std::string>(new std::string(client));
     this->m_serverIpAddress = server;
     this->m_clientPort = cPort;
     this->m_serverPort = sPort;
@@ -258,9 +258,9 @@ int Transaction::processConnection(const char *client, int cPort,
     ms_dbg(4, "Starting phase CONNECTION. (SecRules 0)");
 
 
-    m_variableRemoteHost.set(m_clientIpAddress, m_variableOffset);
+    m_variableRemoteHost.set(*m_clientIpAddress.get(), m_variableOffset);
     m_variableUniqueID.set(m_id, m_variableOffset);
-    m_variableRemoteAddr.set(m_clientIpAddress, m_variableOffset);
+    m_variableRemoteAddr.set(*m_clientIpAddress.get(), m_variableOffset);
     m_variableServerAddr.set(m_serverIpAddress, m_variableOffset);
     m_variableServerPort.set(std::to_string(this->m_serverPort),
         m_variableOffset);
@@ -1397,7 +1397,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << utils::string::dash_if_empty(
        m_variableRequestHeaders.resolveFirst("Host").get())
         << " ";
-    ss << utils::string::dash_if_empty(this->m_clientIpAddress.c_str()) << " ";
+    ss << utils::string::dash_if_empty(this->m_clientIpAddress->c_str()) << " ";
     /** TODO: Check variable */
     variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
     std::vector<const VariableValue *> l;
@@ -1575,7 +1575,7 @@ std::string Transaction::toJSON(int parts) {
 
     yajl_gen_map_open(g);
     /* Part: A (header mandatory) */
-    LOGFY_ADD("client_ip", this->m_clientIpAddress.c_str());
+    LOGFY_ADD("client_ip", this->m_clientIpAddress->c_str());
     LOGFY_ADD("time_stamp", ts.c_str());
     LOGFY_ADD("server_id", uniqueId.c_str());
     LOGFY_ADD_NUM("client_port", m_clientPort);
