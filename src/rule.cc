@@ -389,13 +389,13 @@ std::list<std::pair<std::shared_ptr<std::string>,
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (Action *a : trans->m_rules->m_defaultActions[this->m_phase]) {
+        for (auto &a : trans->m_rules->m_defaultActions[this->m_phase]) {
             if (a->action_kind \
                 != actions::Action::RunTimeBeforeMatchAttemptKind) {
                 continue;
             }
 
-            executeTransformation(a, &value, trans, &ret, &path,
+            executeTransformation(a.get(), &value, trans, &ret, &path,
                 &transformations);
         }
     }
@@ -573,12 +573,12 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (Action *a : trans->m_rules->m_defaultActions[this->m_phase]) {
-        if (a->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
+    for (auto &a : trans->m_rules->m_defaultActions[this->m_phase]) {
+        if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
-        if (!a->isDisruptive()) {
-            executeAction(trans, containsBlock, ruleMessage, a, true);
+        if (!a.get()->isDisruptive()) {
+            executeAction(trans, containsBlock, ruleMessage, a.get(), true);
         }
     }
 
