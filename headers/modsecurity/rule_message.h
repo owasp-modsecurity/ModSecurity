@@ -110,7 +110,7 @@ class RuleMessage {
     bool m_saveMessage;
     std::shared_ptr<std::string> m_serverIpAddress;
     int m_severity;
-    std::string m_uriNoQueryStringDecoded;
+    std::shared_ptr<std::string> m_uriNoQueryStringDecoded;
     std::string m_ver;
 
     std::list<std::string> m_tags;
