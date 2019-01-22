@@ -1187,7 +1187,8 @@ expression:
         }
 
         for (actions::Action *a : checkedActions) {
-            driver.m_defaultActions[definedPhase].push_back(a);
+            driver.m_defaultActions[definedPhase].push_back(
+                std::unique_ptr<actions::Action>(a));
         }
 
         delete actions;
