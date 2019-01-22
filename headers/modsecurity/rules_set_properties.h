@@ -204,13 +204,10 @@ class RulesSetProperties {
         int i = 0;
 
         for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<actions::Action *> *tmp = &m_defaultActions[i];
+            std::vector<std::shared_ptr<actions::Action> > *tmp = \
+                &m_defaultActions[i];
             while (tmp->empty() == false) {
-                actions::Action *a = tmp->back();
                 tmp->pop_back();
-                if (a->refCountDecreaseAndCheck()) {
-                    a = NULL;
-                }
             }
         }
 
@@ -342,8 +339,8 @@ class RulesSetProperties {
     }
 
 
-    static int mergeProperties(RulesSetProperties *from, RulesSetProperties *to,
-        std::ostringstream *err) {
+    static int mergeProperties(RulesSetProperties *from,
+        RulesSetProperties *to, std::ostringstream *err) {
 
         merge_ruleengine_value(to->m_secRuleEngine, from->m_secRuleEngine,
                                PropertyNotSetRuleEngine);
@@ -414,13 +411,12 @@ class RulesSetProperties {
         }
 
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<actions::Action *> *actions_from = \
-                from->m_defaultActions+i;
-            std::vector<actions::Action *> *actions_to = to->m_defaultActions+i;
+            std::vector<std::shared_ptr<actions::Action> > *actions_from = \
+                &from->m_defaultActions[i];
+            std::vector<std::shared_ptr<actions::Action> > *actions_to = \
+                &to->m_defaultActions[i];
             for (size_t j = 0; j < actions_from->size(); j++) {
-                actions::Action *action = actions_from->at(j);
-                action->refCountIncrease();
-                actions_to->push_back(action);
+                actions_to->push_back(actions_from->at(j));
             }
         }
 
@@ -485,7 +481,8 @@ class RulesSetProperties {
     ConfigString m_uploadTmpDirectory;
     ConfigString m_secArgumentSeparator;
     ConfigString m_secWebAppId;
-    std::vector<actions::Action *> m_defaultActions[modsecurity::Phases::NUMBER_OF_PHASES];
+    std::vector<std::shared_ptr<actions::Action> > \
+        m_defaultActions[modsecurity::Phases::NUMBER_OF_PHASES];
     ConfigUnicodeMap m_unicodeMapTable;
 };
 
