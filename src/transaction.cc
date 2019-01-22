@@ -1699,7 +1699,7 @@ std::string Transaction::toJSON(int parts) {
             LOGFY_ADD("match", a.m_match.c_str());
             LOGFY_ADD("reference", a.m_reference.c_str());
             LOGFY_ADD("ruleId", std::to_string(a.m_ruleId).c_str());
-            LOGFY_ADD("file", a.m_ruleFile.c_str());
+            LOGFY_ADD("file", a.m_ruleFile->c_str());
             LOGFY_ADD("lineNumber", std::to_string(a.m_ruleLine).c_str());
             LOGFY_ADD("data", a.m_data.c_str());
             LOGFY_ADD("severity", std::to_string(a.m_severity).c_str());

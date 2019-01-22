@@ -1079,7 +1079,7 @@ expression:
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* file name */ *@1.end.filename,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
 
@@ -1098,7 +1098,7 @@ expression:
             /* op */ $3.release(),
             /* variables */ v,
             /* actions */ NULL,
-            /* file name */ *@1.end.filename,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
         if (driver.addSecRule(std::move(rule)) == false) {
@@ -1115,7 +1115,7 @@ expression:
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
-            /* file name */ *@1.end.filename,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
         driver.addSecAction(std::move(rule));
@@ -1130,7 +1130,7 @@ expression:
         std::unique_ptr<RuleScript> r(new RuleScript(
             /* path to script */ $1,
             /* actions */ a,
-            /* file name */ *@1.end.filename,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
 

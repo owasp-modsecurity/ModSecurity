@@ -26,7 +26,7 @@ namespace modsecurity {
 std::string RuleMessage::_details(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append(" [file \"" + std::string(rm->m_ruleFile) + "\"]");
+    msg.append(" [file \"" + std::string(*rm->m_ruleFile.get()) + "\"]");
     msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
     msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
     msg.append(" [rev \"" + rm->m_rev + "\"]");

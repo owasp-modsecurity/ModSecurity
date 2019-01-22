@@ -54,7 +54,7 @@ class Rule {
     Rule(operators::Operator *_op,
             variables::Variables *_variables,
             std::vector<actions::Action *> *_actions,
-            std::string fileName,
+            std::unique_ptr<std::string> fileName,
             int lineNumber);
     explicit Rule(std::string marker);
     virtual ~Rule();
@@ -128,7 +128,7 @@ class Rule {
     operators::Operator *m_op;
     std::unique_ptr<Rule> m_chainedRuleChild;
     Rule *m_chainedRuleParent;
-    std::string m_fileName;
+    std::shared_ptr<std::string> m_fileName;
     std::string m_marker;
     std::string m_rev;
     std::string m_ver;
