@@ -33,19 +33,7 @@ class DebugLogWriterAgent : public std::ofstream {
     }
 
     void write(const std::string& msg);
-    bool refCountDecreaseAndCheck() {
-        this->m_referenceCount--;
-        if (this->m_referenceCount == 0) {
-            return true;
-        }
-        return false;
-    }
 
-    void refCountIncrease() {
-        this->m_referenceCount++;
-    }
-
-    int m_referenceCount;
     std::string m_fileName;
 };
 
