@@ -104,7 +104,7 @@ class RuleMessage {
     std::string m_reference;
     std::string m_rev;
     Rule *m_rule;
-    std::string m_ruleFile;
+    std::shared_ptr<std::string> m_ruleFile;
     int m_ruleId;
     int m_ruleLine;
     bool m_saveMessage;

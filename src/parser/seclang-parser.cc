@@ -2318,7 +2318,7 @@ namespace yy {
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* file name */ *yystack_[3].location.end.filename,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*yystack_[3].location.end.filename)),
             /* line number */ yystack_[3].location.end.line
             ));
 
@@ -2341,7 +2341,7 @@ namespace yy {
             /* op */ yystack_[0].value.as < std::unique_ptr<Operator> > ().release(),
             /* variables */ v,
             /* actions */ NULL,
-            /* file name */ *yystack_[2].location.end.filename,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*yystack_[2].location.end.filename)),
             /* line number */ yystack_[2].location.end.line
             ));
         if (driver.addSecRule(std::move(rule)) == false) {
@@ -2362,7 +2362,7 @@ namespace yy {
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
-            /* file name */ *yystack_[1].location.end.filename,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*yystack_[1].location.end.filename)),
             /* line number */ yystack_[1].location.end.line
             ));
         driver.addSecAction(std::move(rule));
@@ -2381,7 +2381,7 @@ namespace yy {
         std::unique_ptr<RuleScript> r(new RuleScript(
             /* path to script */ yystack_[1].value.as < std::string > (),
             /* actions */ a,
-            /* file name */ *yystack_[1].location.end.filename,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*yystack_[1].location.end.filename)),
             /* line number */ yystack_[1].location.end.line
             ));
 
