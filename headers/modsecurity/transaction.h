@@ -386,7 +386,7 @@ class Transaction : public TransactionAnchoredVariables {
     /**
      * Holds the client IP address.
      */
-    std::string m_clientIpAddress;
+    std::shared_ptr<std::string> m_clientIpAddress;
 
     /**
      * Holds the HTTP version: 1.2, 2.0, 3.0 and so on....
