@@ -52,7 +52,7 @@ typedef struct Rules_t RulesSet;
 #define ms_dbg(b, c) \
   do { \
       if (m_rules && m_rules->m_debugLog && m_rules->m_debugLog->m_debugLevel >= b) { \
-          m_rules->debug(b, m_id, m_uri, c); \
+          m_rules->debug(b, *m_id.get(), m_uri, c); \
       } \
   } while (0);
 #else
@@ -512,7 +512,7 @@ class Transaction : public TransactionAnchoredVariables {
      * Contains the unique ID of the transaction. Use by the variable
 	 * `UNIQUE_ID'. This unique id is also saved as part of the AuditLog.
      */
-    std::string m_id;
+    std::shared_ptr<std::string> m_id;
 
     /**
      * Holds the SecMarker name that this transaction should wait to perform

@@ -132,8 +132,9 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     m_xml(NULL),
 #endif
     TransactionAnchoredVariables(this) {
-    m_id = std::to_string(this->m_timeStamp) + \
-        std::to_string(modsecurity::utils::generate_transaction_unique_id());
+    m_id = std::unique_ptr<std::string>(
+        new std::string(
+            std::to_string(m_timeStamp)));
 
     m_variableUrlEncodedError.set("0", 0);
 
@@ -175,7 +176,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_xml(NULL),
 #endif
     TransactionAnchoredVariables(this) {
-    m_id = std::string(id);
+    m_id = std::unique_ptr<std::string>(new std::string(id));
 
     m_variableUrlEncodedError.set("0", 0);
 
@@ -223,7 +224,7 @@ void Transaction::debug(int level, std::string message) const {
         return;
     }
 
-    m_rules->debug(level, m_id, m_uri, message);
+    m_rules->debug(level, *m_id.get(), m_uri, message);
 }
 #endif
 
@@ -259,7 +260,7 @@ int Transaction::processConnection(const char *client, int cPort,
 
 
     m_variableRemoteHost.set(*m_clientIpAddress.get(), m_variableOffset);
-    m_variableUniqueID.set(m_id, m_variableOffset);
+    m_variableUniqueID.set(*m_id.get(), m_variableOffset);
     m_variableRemoteAddr.set(*m_clientIpAddress.get(), m_variableOffset);
     m_variableServerAddr.set(*m_serverIpAddress.get(), m_variableOffset);
     m_variableServerPort.set(std::to_string(this->m_serverPort),
@@ -1431,7 +1432,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << utils::string::dash_if_empty(
         m_variableRequestHeaders.resolveFirst("User-Agent").get());
     ss << "\" ";
-    ss << this->m_id << " ";
+    ss << *m_id.get() << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
         m_variableRequestHeaders.resolveFirst("REFERER").get()) << " ";
@@ -1457,7 +1458,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     audit_log << "--" << trailer << "-" << "A--" << std::endl;
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
     audit_log << tstr;
-    audit_log << " " << this->m_id.c_str();
+    audit_log << " " << m_id->c_str();
     audit_log << " " << this->m_clientIpAddress;
     audit_log << " " << this->m_clientPort;
     audit_log << " " << m_serverIpAddress;
@@ -1583,7 +1584,7 @@ std::string Transaction::toJSON(int parts) {
     LOGFY_ADD_NUM("client_port", m_clientPort);
     LOGFY_ADD("host_ip", m_serverIpAddress->c_str());
     LOGFY_ADD_NUM("host_port", m_serverPort);
-    LOGFY_ADD("unique_id", this->m_id.c_str());
+    LOGFY_ADD("unique_id", m_id->c_str());
 
     /* request */
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("request"),
