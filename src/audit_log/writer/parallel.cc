@@ -119,7 +119,7 @@ bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
     }
 
     std::string logPath = m_audit->m_storage_dir;
-    fileName = logPath + fileName + "-" + transaction->m_id;
+    fileName = logPath + fileName + "-" + *transaction->m_id.get();
 
     if (logPath.empty()) {
         error->assign("Log path is not valid.");
