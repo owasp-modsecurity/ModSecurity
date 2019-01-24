@@ -433,7 +433,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 }
 #if !defined(MSC_TEST)
                 else {
-                    ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Trying to append variable name [%s] value [%s]", name, value);
+                    // ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Trying to append variable name [%s] value [%s]", name, value);
                 }
 #endif
                 match = 0;
@@ -501,7 +501,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             }
 #if !defined(MSC_TEST)
             else {
-                ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Successfully appended variable");
+                // ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Successfully appended variable");
             }
 #endif
         }
