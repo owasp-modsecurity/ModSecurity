@@ -247,7 +247,8 @@ UTILS = \
 
 REGEX = \
 	regex/regex.cc \
-	regex/backend/pcre.cc
+	regex/backend/pcre.cc \
+	regex/backend/re2.cc
 
 
 COLLECTION = \
