@@ -29,15 +29,18 @@ namespace backend {
 static RE2::Options get_re2_options() {
     RE2::Options res;
 
+    // Re2 is usually used with fallback to libpcre,
+    // so disable unnecessary stderr noise
+    res.set_log_errors(false);
+
     res.set_dot_nl(true);
 
     return res;
 }
 
 
-Re2::Re2(const std::string& pattern_)
-    : pattern(pattern_.empty() ? ".*" : pattern_),
-      re(pattern, get_re2_options())
+Re2::Re2(const std::string& pattern)
+    : re(pattern.empty() ? ".*" : pattern, get_re2_options())
 {
 }
 

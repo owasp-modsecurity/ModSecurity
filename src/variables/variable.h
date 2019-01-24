@@ -115,7 +115,7 @@ class KeyExclusion {
 class KeyExclusionRegex : public KeyExclusion {
  public:
     explicit KeyExclusionRegex(regex::Regex re)
-        : m_re(re.pattern) { }
+        : m_re(re.getPattern()) { }
     explicit KeyExclusionRegex(std::string re)
         : m_re(re) { }
 
