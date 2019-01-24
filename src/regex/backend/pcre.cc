@@ -87,11 +87,11 @@ std::list<RegexMatch> Pcre::searchAll(const std::string& s) const {
             std::string match = std::string(tmpString, start, len);
             offset = start + len;
             retList.push_front(RegexMatch(match, start));
+        }
 
-            if (len == 0) {
-                rc = 0;
-                break;
-            }
+        offset = ovector[1]; // end
+        if (offset == ovector[0]) { // start == end (size == 0)
+            offset++;
         }
     } while (rc > 0);
 
