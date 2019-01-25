@@ -44,55 +44,71 @@ Re2::Re2(const std::string& pattern)
 {
 }
 
-std::list<RegexMatch> Re2::searchAll(const std::string& s) const {
-    std::list<RegexMatch> retList;
+static bool do_match(
+        const RE2 &re,
+        const char *s,
+        size_t n,
+        RegexMatch *m,
+        ssize_t max_groups,
+        size_t offset)
+{
+    if (m == nullptr) {
+        max_groups = 0;
+    }
 
-    re2::StringPiece subject(s);
+    // "+1" is required for full match (aka group 0)
+    size_t ngroups = re.NumberOfCapturingGroups() + 1;
+    if (max_groups >= 0 && max_groups < ngroups) {
+        ngroups = max_groups;
+    }
+    re2::StringPiece submatches[ngroups];
 
+    if (re.Match(re2::StringPiece(s, n), offset, n, RE2::UNANCHORED,
+        &submatches[0], ngroups)) {
+        if (ngroups != 0) {
+            RegexMatch::MatchGroupContainer groups;
+            groups.reserve(ngroups);
+            for (size_t i = 0; i < ngroups; i++) {
+                size_t start = submatches[i].data() - s;
+                std::string group = submatches[i].as_string();
+                groups.push_back(MatchGroup{start, std::move(group)});
+            }
+            *m = RegexMatch(std::move(groups));
+        }
+        return true;
+    }
+    return false;
+}
+
+std::vector<RegexMatch> Re2::searchAll(const std::string& s, bool overlapping) const {
+    std::vector<RegexMatch> res;
     size_t offset = 0;
-    while (offset <= s.size()) {
-        int ngroups = re.NumberOfCapturingGroups() + 1;
-        re2::StringPiece submatches[ngroups];
 
-        if (!re.Match(subject, offset, s.size(), RE2::UNANCHORED,
-            &submatches[0], ngroups)) {
-            break;
-        }
+    while (1) {
+        RegexMatch m;
+        bool match = do_match(re, s.data(), s.size(), &m, -1, offset);
+        if (!match) break;
 
-        for (int i = 0; i < ngroups; i++) {
-            // N.B. StringPiece::as_string returns value, not reference
-            auto match_string =  submatches[i].as_string();
-            auto start = &submatches[i][0] - &subject[0];
-            retList.push_front(RegexMatch(std::move(match_string), start));
+        if (overlapping) {
+            // start just after the beginning of the last match
+            offset = m.group(0).offset + 1;
+        } else {
+            // start just at the end of the last match
+            offset = m.group(0).offset + m.group(0).string.size();
+            if (offset == m.group(0).offset) {
+                // empty match - advance by one to not match empty string repeatedly
+                offset++;
+            }
         }
-
-        offset = (&submatches[0][0] - &subject[0]) + submatches[0].length();
-        if (submatches[0].size() == 0) {
-            offset++;
-        }
+        res.push_back(std::move(m));
     }
-
-    return retList;
+    return res;
 }
 
-int Re2::search(const std::string& s, RegexMatch *match) const {
-    re2::StringPiece subject(s);
-    re2::StringPiece submatches[1];
-    if (re.Match(subject, 0, s.size(), RE2::UNANCHORED, &submatches[0], 1)) {
-        // N.B. StringPiece::as_string returns value, not reference
-        auto match_string = submatches[0].as_string();
-        auto start = &submatches[0][0] - &subject[0];
-        *match = RegexMatch(std::move(match_string), start);
-        return 1;
-    } else {
-        return 0;
-    }
+bool Re2::search(const std::string &s, RegexMatch *m, ssize_t max_groups) const {
+    return do_match(re, s.data(), s.size(), m, max_groups, 0);
 }
 
-int Re2::search(const std::string& s) const {
-    re2::StringPiece subject(s);
-    return re.Match(subject, 0, s.size(), RE2::UNANCHORED, NULL, 0);
-}
 #endif
 
 }  // namespace backend
