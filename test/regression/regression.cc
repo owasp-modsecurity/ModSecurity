@@ -15,6 +15,8 @@
 
 #include <string.h>
 
+#include <unistd.h>
+
 #include <ctime>
 #include <iostream>
 #include <string>
@@ -135,6 +137,12 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             testRes->reason << "JSON disabled";
             continue;
         }
+
+#ifdef WITH_LMDB
+        // some tests (e.g. issue-1831.json)  don't like it when data persists between runs
+        unlink("./modsec-shared-collections");
+        unlink("./modsec-shared-collections-lock");
+#endif
 
         modsec = new modsecurity::ModSecurity();
         modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
