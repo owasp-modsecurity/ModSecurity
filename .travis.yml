@@ -30,6 +30,7 @@ env:
   - OPTS="--without-ssdeep $OPTS"
   - OPTS="--without-lua $OPTS"
   - OPTS="--without-maxmind $OPTS"
+  - OPTS="--without-re2 $OPTS"
 
 before_script:
   - echo $TRAVIS_OS_NAME
@@ -41,6 +42,7 @@ before_script:
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-get update'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-cache search maxmind'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-get install -y libmaxminddb-dev'
+  - '[ "$OPTS" == "*--without-re2*" ] || ./.travis/install_re2.sh'
 
 script:
   - ./build.sh
