@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Enables LMDB on the regression tests.
+   [Issue #2011, #2008 - @WGH-, @mdunc]
  - Fix: Extra whitespace in some configuration directives causing error
    [Issue #2006 - @porjo, @zimmerle]
  - Refactoring on Regex and SMatch classes.
