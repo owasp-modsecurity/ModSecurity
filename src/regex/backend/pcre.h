@@ -34,9 +34,6 @@ namespace backend {
 
 #ifdef WITH_PCRE
 
-#define OVECCOUNT 30
-
-
 class Pcre : public Backend {
  public:
     explicit Pcre(const std::string& pattern_);
@@ -50,15 +47,16 @@ class Pcre : public Backend {
         return m_pc != NULL;
     }
 
-    std::list<RegexMatch> searchAll(const std::string& s) const override;
-    int search(const std::string &s, RegexMatch *m) const override;
-    int search(const std::string &s) const override;
+    std::vector<RegexMatch> searchAll(const std::string& s, bool overlapping = false) const override;
+    bool search(const std::string &s, RegexMatch *m = nullptr, ssize_t max_groups = -1) const override;
 
     virtual const std::string& getPattern() const override {
         return pattern;
     };
  private:
     const std::string pattern;
+
+    int m_capture_count;
 
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;

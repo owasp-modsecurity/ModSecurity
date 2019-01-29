@@ -30,9 +30,8 @@ public:
 
     virtual bool ok() const = 0;
 
-    virtual std::list<RegexMatch> searchAll(const std::string& s) const = 0;
-    virtual int search(const std::string &s, RegexMatch *m) const = 0;
-    virtual int search(const std::string &s) const = 0;
+    virtual std::vector<RegexMatch> searchAll(const std::string& s, bool overlapping = false) const = 0;
+    virtual bool search(const std::string &s, RegexMatch *m = nullptr, ssize_t max_groups = -1) const = 0;
 
     virtual const std::string& getPattern() const = 0;
 };

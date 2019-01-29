@@ -44,9 +44,8 @@ class Re2 : public Backend {
         return re.ok();
     }
 
-    std::list<RegexMatch> searchAll(const std::string& s) const override;
-    int search(const std::string &s, RegexMatch *m) const override;
-    int search(const std::string &s) const override;
+    std::vector<RegexMatch> searchAll(const std::string& s, bool overlapping = false) const override;
+    bool search(const std::string &s, RegexMatch *m = nullptr, ssize_t max_groups = -1) const override;
 
     virtual const std::string& getPattern() const override {
         return re.pattern();

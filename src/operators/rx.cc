@@ -38,7 +38,6 @@ bool Rx::init(const std::string &arg, std::string *error) {
 
 bool Rx::evaluate(Transaction *transaction, Rule *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
-    std::list<RegexMatch> matches;
     Regex *re;
 
     if (m_param.empty() && !m_string->m_containsMacro) {
@@ -52,33 +51,30 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
         re = m_re;
     }
 
-    matches = re->searchAll(input);
-    if (rule && rule->m_containsCaptureAction && transaction) {
-        int i = 0;
-        matches.reverse();
-        for (const RegexMatch& a : matches) {
+    regex::RegexMatch m;
+    bool matched = re->search(input, &m, 9);
+
+    if (matched && rule && rule->m_containsCaptureAction && transaction) {
+        for (int i = 0; i < m.num_groups(); i++) {
+            auto key = std::to_string(i);
+            const std::string &value = m.group(i).string;
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
-                std::to_string(i), a.str());
+                key, value);
             ms_dbg_a(transaction, 7, "Added regex subexpression TX." +
-                std::to_string(i) + ": " + a.str());
-            transaction->m_matched.push_back(a.str());
-            i++;
+                key + ": " + value);
+            transaction->m_matched.push_back(value);
         }
     }
-
-    for (const auto & i : matches) {
-        logOffset(ruleMessage, i.offset(), i.str().size());
+    for (int i = 0; i < m.num_groups(); i++) {
+        const regex::MatchGroup &g = m.group(i);
+        logOffset(ruleMessage, g.offset, g.string.size());
     }
 
     if (m_string->m_containsMacro) {
         delete re;
     }
 
-    if (matches.size() > 0) {
-        return true;
-    }
-
-    return false;
+    return matched;
 }
 
 

@@ -17,28 +17,38 @@
 #ifndef SRC_REGEX_REGEX_MATCH_H_
 #define SRC_REGEX_REGEX_MATCH_H_
 
+#include <vector>
+#include <string>
+
 namespace modsecurity {
 namespace regex {
 
-
-class RegexMatch {
- public:
-    RegexMatch() :
-	m_match(),
-	m_offset(0) { }
-
-    RegexMatch(const std::string &match, size_t offset) :
-	m_match(match),
-	m_offset(offset) { }
-
-    const std::string& str() const { return m_match; }
-    size_t offset() const { return m_offset; }
-
- private:
-    std::string m_match;
-    size_t m_offset;
+struct MatchGroup {
+    size_t offset;
+    std::string string;
 };
 
+class RegexMatch {
+public:
+    using MatchGroupContainer = std::vector<MatchGroup>;
+
+    RegexMatch() {}
+
+    RegexMatch(MatchGroupContainer groups)
+        : m_groups(std::move(groups))
+    {}
+
+    size_t num_groups() const {
+        return m_groups.size();
+    }
+
+    const MatchGroup& group(size_t i) const {
+        return m_groups[i];
+    }
+
+private:
+    MatchGroupContainer m_groups;
+};
 
 }  // namespace regex
 }  // namespace modsecurity

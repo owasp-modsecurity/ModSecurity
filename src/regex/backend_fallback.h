@@ -49,14 +49,12 @@ public:
         return backend->ok();
     }
 
-    std::list<RegexMatch> searchAll(const std::string& s) const override {
-        return backend->searchAll(s);
+    std::vector<RegexMatch> searchAll(const std::string& s, bool overlapping = false) const override {
+        return backend->searchAll(s, overlapping);
     }
-    int search(const std::string &s, RegexMatch *m) const override {
-        return backend->search(s, m);
-    }
-    int search(const std::string &s) const override {
-        return backend->search(s);
+
+    bool search(const std::string &s, RegexMatch *m = nullptr, ssize_t max_groups = -1) const override {
+        return backend->search(s, m, max_groups);
     }
 
     const std::string& getPattern() const override {

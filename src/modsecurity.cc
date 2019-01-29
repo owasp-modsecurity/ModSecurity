@@ -228,9 +228,9 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     const unsigned char *buf;
     size_t jsonSize;
 
-    std::list<regex::RegexMatch> vars = variables.searchAll(matchString);
-    std::list<regex::RegexMatch> ops = operators.searchAll(matchString);
-    std::list<regex::RegexMatch> trans = transformations.searchAll(matchString);
+    auto vars = variables.searchAll(matchString);
+    auto ops = operators.searchAll(matchString);
+    auto trans = transformations.searchAll(matchString);
 
     g = yajl_gen_alloc(NULL);
     if (g == NULL) {
@@ -255,14 +255,12 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             strlen("highlight"));
 
         yajl_gen_array_open(g);
-    while (vars.size() > 0) {
+
+    for (const auto &m : vars) {
         std::string value;
         yajl_gen_map_open(g);
-        vars.pop_back();
-        const std::string &startingAt = vars.back().str();
-        vars.pop_back();
-        const std::string &size = vars.back().str();
-        vars.pop_back();
+        const std::string &startingAt = m.group(1).string;
+        const std::string &size = m.group(2).string;
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("startingAt"),
             strlen("startingAt"));
@@ -298,11 +296,11 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     yajl_gen_map_open(g);
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("value"),
             strlen("value"));
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(varValue.c_str()),
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(varValue.data()),
             varValue.size());
     yajl_gen_map_close(g);
 
-    while (trans.size() > 0) {
+    for (const auto &m : trans) {
         modsecurity::actions::transformations::Transformation *t;
         std::string varValueRes;
         yajl_gen_map_open(g);
@@ -310,20 +308,22 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             reinterpret_cast<const unsigned char*>("transformation"),
             strlen("transformation"));
 
+        const std::string &transformation = m.group(0).string;
+
         yajl_gen_string(g,
-            reinterpret_cast<const unsigned char*>(trans.back().str().c_str()),
-            trans.back().str().size());
+            reinterpret_cast<const unsigned char*>(transformation.data()),
+            transformation.size());
 
         t = modsecurity::actions::transformations::Transformation::instantiate(
-            trans.back().str().c_str());
+            transformation.c_str());
         varValueRes = t->evaluate(varValue, NULL);
         varValue.assign(varValueRes);
-        trans.pop_back();
+
 
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("value"),
             strlen("value"));
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>(
-            varValue.c_str()),
+            varValue.data()),
             varValue.size());
         yajl_gen_map_close(g);
 
@@ -337,26 +337,23 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
     yajl_gen_map_open(g);
 
-    while (ops.size() > 0) {
+    for (const auto &m : ops) {
         std::string value;
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("highlight"),
             strlen("highlight"));
         yajl_gen_map_open(g);
-        ops.pop_back();
-        std::string startingAt = ops.back().str();
-        ops.pop_back();
-        std::string size = ops.back().str();
-        ops.pop_back();
+        const std::string &startingAt = m.group(1).string;
+        const std::string &size = m.group(2).string;
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("startingAt"),
             strlen("startingAt"));
         yajl_gen_string(g,
-            reinterpret_cast<const unsigned char*>(startingAt.c_str()),
+            reinterpret_cast<const unsigned char*>(startingAt.data()),
             startingAt.size());
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("size"),
             strlen("size"));
         yajl_gen_string(g,
-            reinterpret_cast<const unsigned char*>(size.c_str()),
+            reinterpret_cast<const unsigned char*>(size.data()),
             size.size());
         yajl_gen_map_close(g);
 

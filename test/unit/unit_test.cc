@@ -64,18 +64,16 @@ void json2bin(std::string *str) {
 
     while (re.search(*str, &match)) {
         unsigned int p;
-        std::string toBeReplaced = match.str();
-        toBeReplaced.erase(0, 2);
-        sscanf(toBeReplaced.c_str(), "%x", &p);
-        replaceAll(str, match.str(), p);
+        std::string toBeReplaced = match.group(0).string;
+        sscanf(toBeReplaced.substr(2).c_str(), "%x", &p);
+        replaceAll(str, toBeReplaced, p);
     }
 
     while (re2.search(*str, &match)) {
         unsigned int p;
-        std::string toBeReplaced = match.str();
-        toBeReplaced.erase(0, 2);
-        sscanf(toBeReplaced.c_str(), "%4x", &p);
-        replaceAll(str, match.str(), p);
+        std::string toBeReplaced = match.group(0).string;
+        sscanf(toBeReplaced.substr(2).c_str(), "%4x", &p);
+        replaceAll(str, toBeReplaced, p);
     }
 
     /*

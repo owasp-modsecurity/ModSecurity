@@ -17,7 +17,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <list>
 
 
 #include "src/regex/backend/pcre.h"
@@ -46,6 +45,8 @@ Pcre::Pcre(const std::string& pattern_)
         &errptr, &erroffset, NULL);
 
     m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
+
+    pcre_fullinfo(m_pc, m_pce, PCRE_INFO_CAPTURECOUNT, &m_capture_count);
 }
 
 
@@ -64,60 +65,76 @@ Pcre::~Pcre() {
     }
 }
 
-
-std::list<RegexMatch> Pcre::searchAll(const std::string& s) const {
-    const char *subject = s.c_str();
-    const std::string tmpString = std::string(s.c_str(), s.size());
-    int ovector[OVECCOUNT];
-    int rc, i, offset = 0;
-    std::list<RegexMatch> retList;
-
-    do {
-        rc = pcre_exec(m_pc, m_pce, subject,
-            s.size(), offset, 0, ovector, OVECCOUNT);
-
-        for (i = 0; i < rc; i++) {
-            size_t start = ovector[2*i];
-            size_t end = ovector[2*i+1];
-            size_t len = end - start;
-            if (end > s.size()) {
-                rc = 0;
-                break;
-            }
-            std::string match = std::string(tmpString, start, len);
-            offset = start + len;
-            retList.push_front(RegexMatch(match, start));
-        }
-
-        offset = ovector[1]; // end
-        if (offset == ovector[0]) { // start == end (size == 0)
-            offset++;
-        }
-    } while (rc > 0);
-
-    return retList;
-}
-
-
-int Pcre::search(const std::string& s, RegexMatch *match) const {
-    int ovector[OVECCOUNT];
-    int ret = pcre_exec(m_pc, m_pce, s.c_str(),
-        s.size(), 0, 0, ovector, OVECCOUNT) > 0;
-
-    if (ret > 0) {
-        *match = RegexMatch(
-            std::string(s, ovector[ret-1], ovector[ret] - ovector[ret-1]),
-            0);
+static bool do_match(
+        pcre *pc,
+        pcre_extra *pce,
+        int pcre_capture_count,
+        const char *s,
+        size_t n,
+        RegexMatch *m,
+        ssize_t max_groups,
+        size_t offset)
+{
+    if (m == nullptr) {
+        max_groups = 0;
     }
 
-    return ret;
+    // "+1" is required for full match (aka group 0)
+    int ovecsize = (pcre_capture_count+1) * 3;
+    int ovector[ovecsize];
+    int ret = pcre_exec(pc, pce, s, n, offset, 0, ovector, ovecsize);
+
+    if (ret > 0) {
+        if (max_groups < 0) {
+            max_groups = ret;
+        }
+
+        if (max_groups > 0) {
+            size_t ngroups = std::min<size_t>(max_groups, ret);
+            RegexMatch::MatchGroupContainer groups;
+            groups.reserve(ngroups);
+            for (size_t i = 0; i < ngroups; i++) {
+                size_t start = ovector[2*i];
+                size_t end = ovector[2*i+1];
+                std::string group(s + start, end - start);
+
+                groups.push_back(MatchGroup{start, std::move(group)});
+            }
+            *m = RegexMatch(std::move(groups));
+        }
+        return true;
+    }
+    return false;
+
 }
 
+std::vector<RegexMatch> Pcre::searchAll(const std::string& s, bool overlapping) const {
+    std::vector<RegexMatch> res;
+    size_t offset = 0;
 
-int Pcre::search(const std::string& s) const {
-    int ovector[OVECCOUNT];
-    return pcre_exec(m_pc, m_pce, s.c_str(),
-        s.size(), 0, 0, ovector, OVECCOUNT) > 0;
+    while (1) {
+        RegexMatch m;
+        bool match = do_match(m_pc, m_pce, m_capture_count, s.data(), s.size(), &m, -1, offset);
+        if (!match) break;
+
+        if (overlapping) {
+            // start just after the beginning of the last match
+            offset = m.group(0).offset + 1;
+        } else {
+            // start just at the end of the last match
+            offset = m.group(0).offset + m.group(0).string.size();
+            if (offset == m.group(0).offset) {
+                // empty match - advance by one to not match empty string repeatedly
+                offset++;
+            }
+        }
+        res.push_back(std::move(m));
+    }
+    return res;
+}
+
+bool Pcre::search(const std::string &s, RegexMatch *m, ssize_t max_groups) const {
+    return do_match(m_pc, m_pce, m_capture_count, s.data(), s.size(), m, max_groups, 0);
 }
 
 #endif
