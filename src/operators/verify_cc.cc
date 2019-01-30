@@ -15,37 +15,14 @@
 
 #include "src/operators/verify_cc.h"
 
-#include <pcre.h>
 #include <iostream>
 #include <cstring>
 #include <vector>
 
 #include "src/operators/operator.h"
 
-#if PCRE_HAVE_JIT
-#define pcre_study_opt PCRE_STUDY_JIT_COMPILE
-#else
-#define pcre_study_opt 0
-#endif
-
-
 namespace modsecurity {
 namespace operators {
-
-VerifyCC::~VerifyCC() {
-    if (m_pc != NULL) {
-        pcre_free(m_pc);
-        m_pc = NULL;
-    }
-    if (m_pce != NULL) {
-#if PCRE_HAVE_JIT
-        pcre_free_study(m_pce);
-#else
-        pcre_free(m_pce);
-#endif
-        m_pce = NULL;
-    }
-}
 
 /**
  * Luhn Mod-10 Method (ISO 2894/ANSI 4.13)
@@ -90,70 +67,36 @@ int VerifyCC::luhnVerify(const char *ccnumber, int len) {
 
 
 bool VerifyCC::init(const std::string &param2, std::string *error) {
-    const char *errptr = NULL;
-    int erroffset = 0;
+    m_re.reset(new modsecurity::regex::Regex(m_param));
 
-    m_pc = pcre_compile(m_param.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
-        &errptr, &erroffset, NULL);
-    if (m_pc == NULL) {
-        error->assign(errptr);
+    if (!m_re->ok()) {
+        *error = "Failed to compile regular expression " + m_re->getPattern();
         return false;
     }
-
-    m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
-    if (m_pce == NULL) {
-        if (errptr == NULL) {
-            /*
-             * Per pcre_study(3) m_pce == NULL && errptr == NULL means
-             * that no addional information is found, so no need to study
-             */
-            return true;
-        }
-        error->assign(errptr);
-        return false;
-    }
-
     return true;
 }
 
 
 bool VerifyCC::evaluate(Transaction *t, Rule *rule,
     const std::string& i, std::shared_ptr<RuleMessage> ruleMessage) {
-    int offset = 0;
-    bool is_cc = false;
-    int target_length = i.length();
 
-    for (offset = 0; offset < target_length; offset++) {
-        std::string match;
-        int ovector[33];
-        memset(ovector, 0, sizeof(ovector));
-        int ret = pcre_exec(m_pc, m_pce, i.c_str(), i.size(), offset,
-            0, ovector, 33) > 0;
-
-        /* If there was no match, then we are done. */
-        if (ret == PCRE_ERROR_NOMATCH) {
-            break;
-        }
-        if (ret < 0) {
-            return false;
-        }
-        if (ret > 0) {
-            match = std::string(i, ovector[0], ovector[1] - ovector[0]);
-            is_cc = luhnVerify(match.c_str(), match.size());
-            if (is_cc) {
-                if (t) {
-                    if (rule && t && rule->m_containsCaptureAction) {
-                        t->m_collections.m_tx_collection->storeOrUpdateFirst(
-                            "0", std::string(match));
-                        ms_dbg_a(t, 7, "Added VerifyCC match TX.0: " + \
-                            std::string(match));
-                    }
-                    ms_dbg_a(t, 9, "CC# match \"" + m_param +
-                        "\" at " + i + ". [offset " +
-                        std::to_string(offset) + "]");
+    // ModSecurity v2 chacked for overlapping matches here,
+    // so do we here
+    for (const auto &m : m_re->searchAll(i, /* overlapping */ true)) {
+        const auto &s = m.group(0).string;
+        bool is_cc = luhnVerify(s.data(), s.size());
+        if (is_cc) {
+            if (t) {
+                if (rule && t && rule->m_containsCaptureAction) {
+                    t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                        "0", s);
+                    ms_dbg_a(t, 7, "Added VerifyCC match TX.0: " + s);
                 }
-                return true;
+                ms_dbg_a(t, 9, "CC# match \"" + m_param +
+                    "\" at " + i + ". [offset " +
+                    std::to_string(m.group(0).offset) + "]");
             }
+            return true;
         }
     }
 

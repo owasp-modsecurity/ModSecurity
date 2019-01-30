@@ -16,7 +16,6 @@
 #ifndef SRC_OPERATORS_VERIFY_CC_H_
 #define SRC_OPERATORS_VERIFY_CC_H_
 
-#include <pcre.h>
 #include <string>
 #include <memory>
 #include <utility>
@@ -30,10 +29,8 @@ class VerifyCC : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit VerifyCC(std::unique_ptr<RunTimeString> param)
-        : Operator("VerifyCC", std::move(param)),
-        m_pc(NULL),
-        m_pce(NULL) { }
-    ~VerifyCC();
+        : Operator("VerifyCC", std::move(param))
+        { }
 
     int luhnVerify(const char *ccnumber, int len);
     bool evaluate(Transaction *t, Rule *rule,
@@ -41,8 +38,7 @@ class VerifyCC : public Operator {
         std::shared_ptr<RuleMessage> ruleMessage)  override;
     bool init(const std::string &param, std::string *error) override;
  private:
-    pcre *m_pc;
-    pcre_extra *m_pce;
+    std::unique_ptr<modsecurity::regex::Regex> m_re;
 };
 
 }  // namespace operators
