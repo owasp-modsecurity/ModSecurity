@@ -1,9 +1,8 @@
 [
-
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: OWASP CRS id:942130",
+    "title":"Testing Variables :: OWASP CRS id:920120",
     "client":{
       "ip":"200.249.12.31",
       "port":123
