@@ -45,8 +45,8 @@ public:
         : backend(compile_regex_fallback<Args...>(pattern))
     {}
 
-    virtual bool ok() const override {
-        return backend->ok();
+    virtual bool ok(std::string *error = nullptr) const override {
+        return backend->ok(error);
     }
 
     std::list<RegexMatch> searchAll(const std::string& s) const override {

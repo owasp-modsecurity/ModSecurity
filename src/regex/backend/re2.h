@@ -45,8 +45,14 @@ class Re2 : public Backend {
     bool searchOneMatch(const std::string& s, std::vector<RegexMatchCapture>& captures) const override;
     int search(const std::string &s, RegexMatch *m) const override;
     int search(const std::string &s) const override;
-    virtual bool ok() const override {
-        return re.ok();
+    virtual bool ok(std::string *error = nullptr) const override {
+        if (re.ok()) {
+            return true;
+        }
+        if (error != nullptr) {
+            *error = re.error();
+        }
+        return false;
     }
 
     virtual const std::string& getPattern() const override {

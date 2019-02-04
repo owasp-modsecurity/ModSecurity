@@ -52,8 +52,15 @@ class Pcre : public Backend {
     int search(const std::string &s, RegexMatch *m) const override;
     int search(const std::string &s) const override;
 
-    virtual bool ok() const override {
-        return m_pc != NULL;
+    virtual bool ok(std::string *error = nullptr) const override {
+        if (m_pc != NULL) {
+            return true;
+        }
+        if (error != nullptr) {
+            *error= m_error;
+        }
+
+        return false;
     }
 
     virtual const std::string& getPattern() const override {
@@ -64,6 +71,8 @@ class Pcre : public Backend {
 
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;
+
+    std::string m_error;
 };
 
 #endif

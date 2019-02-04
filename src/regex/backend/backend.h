@@ -29,7 +29,7 @@ class Backend {
 public:
     virtual ~Backend() {}
 
-    virtual bool ok() const = 0;
+    virtual bool ok(std::string *error = nullptr) const = 0;
 
     virtual std::list<RegexMatch> searchAll(const std::string& s) const = 0;
     virtual bool searchOneMatch(const std::string& s, std::vector<RegexMatchCapture>& captures) const = 0;

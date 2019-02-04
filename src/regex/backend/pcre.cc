@@ -44,8 +44,18 @@ Pcre::Pcre(const std::string& pattern_)
 
     m_pc = pcre_compile(pattern.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
         &errptr, &erroffset, NULL);
+    if (m_pc == NULL) {
+        m_error = "pcre_compile error at offset " + std::to_string(erroffset) + ": " + std::string(errptr);
+        return;
+    }
 
     m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
+    if (m_pce == NULL) {
+        m_error = "pcre_study error: " + std::string(errptr);
+        pcre_free(m_pc);
+        m_pc = nullptr;
+        return;
+    }
 }
 
 
