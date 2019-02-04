@@ -28,7 +28,7 @@ class Backend {
 public:
     virtual ~Backend() {}
 
-    virtual bool ok() const = 0;
+    virtual bool ok(std::string *error = nullptr) const = 0;
 
     virtual std::vector<RegexMatch> searchAll(const std::string& s, bool overlapping = false) const = 0;
     virtual bool search(const std::string &s, RegexMatch *m = nullptr, ssize_t max_groups = -1) const = 0;

@@ -40,8 +40,14 @@ class Re2 : public Backend {
     Re2(const Re2&) = delete;
     Re2& operator=(const Re2&) = delete;
 
-    virtual bool ok() const override {
-        return re.ok();
+    virtual bool ok(std::string *error = nullptr) const override {
+        if (re.ok()) {
+            return true;
+        }
+        if (error != nullptr) {
+            *error = re.error();
+        }
+        return false;
     }
 
     std::vector<RegexMatch> searchAll(const std::string& s, bool overlapping = false) const override;

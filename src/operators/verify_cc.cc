@@ -69,8 +69,9 @@ int VerifyCC::luhnVerify(const char *ccnumber, int len) {
 bool VerifyCC::init(const std::string &param2, std::string *error) {
     m_re.reset(new modsecurity::regex::Regex(m_param));
 
-    if (!m_re->ok()) {
-        *error = "Failed to compile regular expression " + m_re->getPattern();
+    std::string regex_error;
+    if (!m_re->ok(&regex_error)) {
+        *error = "Failed to compile regular expression " + m_re->getPattern() + ": " + regex_error;
         return false;
     }
     return true;

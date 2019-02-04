@@ -43,8 +43,15 @@ class Pcre : public Backend {
     Pcre(const Pcre&) = delete;
     Pcre& operator=(const Pcre&) = delete;
 
-    virtual bool ok() const override {
-        return m_pc != NULL;
+    virtual bool ok(std::string *error = nullptr) const override {
+        if (m_pc != NULL) {
+            return true;
+        }
+        if (error != nullptr) {
+            *error= m_error;
+        }
+
+        return false;
     }
 
     std::vector<RegexMatch> searchAll(const std::string& s, bool overlapping = false) const override;
@@ -60,6 +67,8 @@ class Pcre : public Backend {
 
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;
+
+    std::string m_error;
 };
 
 #endif
