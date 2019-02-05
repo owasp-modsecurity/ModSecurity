@@ -49,6 +49,18 @@ Regex::Regex(const std::string& pattern_)
     m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
 }
 
+Regex::Regex(const std::string& pattern_, int flags)
+    : pattern(pattern_.empty() ? ".*" : pattern_){
+    const char *errptr = NULL;
+    int erroffset;
+
+    flags |= (PCRE_DOTALL|PCRE_MULTILINE);
+
+    m_pc = pcre_compile(pattern.c_str(), flags,
+        &errptr, &erroffset, NULL);
+
+    m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
+}
 
 Regex::~Regex() {
     if (m_pc != NULL) {

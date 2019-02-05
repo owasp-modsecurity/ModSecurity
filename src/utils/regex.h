@@ -27,7 +27,7 @@
 namespace modsecurity {
 namespace Utils {
 
-#define OVECCOUNT 30
+#define OVECCOUNT 50
 
 class SMatch {
  public:
@@ -51,6 +51,7 @@ class SMatch {
 class Regex {
  public:
     explicit Regex(const std::string& pattern_);
+    explicit Regex(const std::string& pattern_, int flags);
     ~Regex();
 
     // m_pc and m_pce can't be easily copied
