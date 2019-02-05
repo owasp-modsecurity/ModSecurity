@@ -1,0 +1,90 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar :: OWASP CRS id:920450 ('Translate' match)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Translate": "test"
+      },
+      "uri":"/",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":400
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,deny,block,status:400,log\"",
+      "SecRule &TX:restricted_headers \"@eq 0\" \"id:901165,phase:1,pass,nolog,setvar:'tx.restricted_headers=/proxy/ /lock-token/ /content-range/ /translate/ /if/'\"",
+      "SecRule REQUEST_HEADERS_NAMES \"@rx ^.*$\" \"id:920450,phase:2,block,capture,t:none,t:lowercase,msg:'HTTP header is restricted by policy (%{MATCHED_VAR})',logdata:' Restricted header detected %{MATCHED_VAR}',ver:'OWASP_CRS/3.1.0',severity:'CRITICAL',setvar:'tx.header_name_%{tx.0}=/%{tx.0}/',chain",
+      "SecRule TX:/^HEADER_NAME_/ \"@within %{tx.restricted_headers}\" \"setvar:'tx.msg=%{rule.msg}',setvar:'tx.anomaly_score_pl1=+%{tx.critical_anomaly_score}',setvar:'tx.%{rule.id}-OWASP_CRS/POLICY/HEADERS_RESTRICTED-%{MATCHED_VAR_NAME}=%{MATCHED_VAR}'"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar :: OWASP CRS id:920450 ('Proxy-Connection' not match)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Accept": "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
+        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+        "Accept-Encoding": "gzip,deflate",
+        "Accept-Language": "en-us,en;q=0.5",
+        "Host": "localhost",
+        "Keep-Alive": "300",
+        "Proxy-Connection": "keep-alive",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv"
+      },
+      "uri":"/",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,deny,block,status:400,log\"",
+      "SecRule &TX:restricted_headers \"@eq 0\" \"id:901165,phase:1,pass,nolog,setvar:'tx.restricted_headers=/proxy/ /lock-token/ /content-range/ /translate/ /if/'\"",
+      "SecRule REQUEST_HEADERS_NAMES \"@rx ^.*$\" \"id:920450,phase:2,block,capture,t:none,t:lowercase,msg:'HTTP header is restricted by policy (%{MATCHED_VAR})',logdata:' Restricted header detected %{MATCHED_VAR}',ver:'OWASP_CRS/3.1.0',severity:'CRITICAL',setvar:'tx.header_name_%{tx.0}=/%{tx.0}/',chain",
+      "SecRule TX:/^HEADER_NAME_/ \"@within %{tx.restricted_headers}\" \"setvar:'tx.msg=%{rule.msg}',setvar:'tx.anomaly_score_pl1=+%{tx.critical_anomaly_score}',setvar:'tx.%{rule.id}-OWASP_CRS/POLICY/HEADERS_RESTRICTED-%{MATCHED_VAR_NAME}=%{MATCHED_VAR}'"
+    ]
+  }
+]
+
