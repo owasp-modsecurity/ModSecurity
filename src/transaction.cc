@@ -571,6 +571,14 @@ int Transaction::addRequestHeader(const std::string& key,
                 m_variableRequestCookies.set(s[0], s[1], localOffset);
                 localOffset = localOffset + s[1].size() + 2;
             }
+            else {
+                if (s[0].at(0) == ' ') {
+                    s[0].erase(0, 1);
+                }
+                m_variableRequestCookiesNames.set(s[0],
+                    s[0], localOffset);
+                m_variableRequestCookies.set(s[0], "", localOffset);
+            }
         }
     }
     /**
