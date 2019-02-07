@@ -27,7 +27,7 @@
 namespace modsecurity {
 namespace Utils {
 
-#define OVECCOUNT 50
+#define OVECCOUNT 900
 
 class SMatch {
  public:
