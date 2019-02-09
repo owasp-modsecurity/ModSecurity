@@ -16,6 +16,8 @@
 
 #undef inline
 
+#include <memory>
+
 //  IIS7 Server API header file
 #include "httpserv.h"
 
@@ -24,78 +26,42 @@
 #include "mymodulefactory.h"
 
 //  Global server instance
-IHttpServer *                       g_pHttpServer = NULL;
+IHttpServer* g_pHttpServer = nullptr;
 
 //  Global module context id
-PVOID                               g_pModuleContext = NULL;
+void* g_pModuleContext = nullptr;
 
 //  The RegisterModule entrypoint implementation.
 //  This method is called by the server when the module DLL is 
 //  loaded in order to create the module factory,
 //  and register for server events.
-HRESULT
-__stdcall
-RegisterModule(
-    DWORD                           dwServerVersion,
-    IHttpModuleRegistrationInfo *   pModuleInfo,
-    IHttpServer *                   pHttpServer
-)
+HRESULT __stdcall
+RegisterModule(DWORD, IHttpModuleRegistrationInfo* moduleInfo, IHttpServer * httpServer)
 {
-    HRESULT                             hr = S_OK;
-    CMyHttpModuleFactory  *             pFactory = NULL;
-    //IHttpModuleRegistrationInfo2 *		pModuleInfo2;
-
-    if ( pModuleInfo == NULL || pHttpServer == NULL )
+    if (moduleInfo == nullptr || httpServer == nullptr)
     {
-        hr = HRESULT_FROM_WIN32( ERROR_INVALID_PARAMETER );
-        goto Finished;
+        return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
     }
-
-    /*hr = HttpGetExtendedInterface( g_pGlobalInfo, 
-                                   pModuleInfo, 
-                                   &pModuleInfo2 );
-    if ( FAILED ( hr ) )
-    {
-        goto Finished;
-    }*/
 
     // step 1: save the IHttpServer and the module context id for future use
 	//
-    g_pModuleContext = pModuleInfo->GetId();
-    g_pHttpServer = pHttpServer;
+    g_pModuleContext = moduleInfo->GetId();
+    g_pHttpServer = httpServer;
 
-    // step 2: create the module factory
-	//
-    pFactory = new CMyHttpModuleFactory();
-    if ( pFactory == NULL )
+    try
     {
-        hr = HRESULT_FROM_WIN32( ERROR_NOT_ENOUGH_MEMORY );
-        goto Finished;
+        // step 2: create the module factory
+        //
+        auto factory = std::make_unique<CMyHttpModuleFactory>();
+
+        // step 3: register for server events
+        //
+        return moduleInfo->SetRequestNotifications(factory.release(), /* module factory */
+                                                    RQ_BEGIN_REQUEST /* server event mask */,
+                                                    0 /* server post event mask */);
     }
-
-    // step 3: register for server events
-	//
-    hr = pModuleInfo->SetRequestNotifications( pFactory, /* module factory */
-                                               RQ_BEGIN_REQUEST | RQ_SEND_RESPONSE /* server event mask */,
-                                               RQ_END_REQUEST /* server post event mask */);
-    if ( FAILED( hr ) )
+    catch (const std::bad_alloc&)
     {
-        goto Finished;
+        return HRESULT_FROM_WIN32(ERROR_NOT_ENOUGH_MEMORY);
     }
-
-	hr = pModuleInfo->SetPriorityForRequestNotification(RQ_BEGIN_REQUEST, PRIORITY_ALIAS_FIRST);
-	hr = pModuleInfo->SetPriorityForRequestNotification(RQ_SEND_RESPONSE, PRIORITY_ALIAS_LAST);	// reverted!
-	//hr = pModuleInfo2->SetPriorityForPostRequestNotification(RQ_END_REQUEST, PRIORITY_ALIAS_LAST);
-
-    pFactory = NULL;
-
-Finished:
-    
-/*    if ( pFactory != NULL )
-    {
-        delete pFactory;
-        pFactory = NULL;
-    }   */
-
-    return hr;
 }

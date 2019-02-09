@@ -24,7 +24,7 @@ class CMyHttpModuleFactory : public IHttpModuleFactory
 		CRITICAL_SECTION			m_csLock;
 
 public:
-	CMyHttpModuleFactory()
+    CMyHttpModuleFactory() /* noexcept */
 	{
 		m_pModule = NULL;
 
