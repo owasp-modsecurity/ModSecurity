@@ -15,7 +15,6 @@
 #define WIN32_LEAN_AND_MEAN
 
 #undef inline
-#define inline inline
 
 //  IIS7 Server API header file
 #include <Windows.h>
