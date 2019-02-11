@@ -15,6 +15,8 @@
 #ifndef __MY_MODULE_H__
 #define __MY_MODULE_H__
 
+#include "critical_section.h"
+
 //  The module implementation.
 //  This class is responsible for implementing the 
 //  module functionality for each of the server events
@@ -22,9 +24,9 @@
 class CMyHttpModule : public CHttpModule
 {
 public:
-    HANDLE				m_hEventLog;
-    DWORD				m_dwPageSize;
-	CRITICAL_SECTION	m_csLock;
+    HANDLE m_hEventLog;
+    DWORD m_dwPageSize;
+    CriticalSection cs;
 
     REQUEST_NOTIFICATION_STATUS
     OnBeginRequest(

@@ -16,6 +16,8 @@
 
 #undef inline
 
+#include <memory>
+
 //  IIS7 Server API header file
 #include <Windows.h>
 #include <sal.h>
@@ -31,61 +33,113 @@
 
 #include "winsock2.h"
 
+// These helpers make sure that the underlying structures
+// are correctly released on any exit path due to RAII.
+using ConnRecPtr =
+    std::unique_ptr<conn_rec, decltype(modsecFinishConnection)*>;
 
-class REQUEST_STORED_CONTEXT : public IHttpStoredContext
+using RequestRecPtr =
+    std::unique_ptr<request_rec, decltype(modsecFinishRequest)*>;
+
+ConnRecPtr MakeConnReq()
 {
- public:
-    REQUEST_STORED_CONTEXT()
-	{
-		m_pConnRec = NULL;
-		m_pRequestRec = NULL;
-		m_pHttpContext = NULL;
-		m_pProvider = NULL;
-		m_pResponseBuffer = NULL;
-		m_pResponseLength = 0;
-		m_pResponsePosition = 0;
-	}
+    ConnRecPtr c{modsecNewConnection(), modsecFinishConnection};
+    modsecProcessConnection(c.get());
+    return c;
+}
 
-    ~REQUEST_STORED_CONTEXT()
-	{
-		FinishRequest();
-	}
-    
-    // virtual
-    VOID
-    CleanupStoredContext(
-        VOID
-    )
+RequestRecPtr MakeRequestRec(conn_rec* c, directory_config* config)
+{
+    return {modsecNewRequest(c, config), modsecFinishRequest};
+}
+
+class RequestStoredContext
+    : public IHttpStoredContext
+{
+public:
+    RequestStoredContext(directory_config* config,
+            IHttpContext* httpContext, IHttpEventProvider* provider)
+        : connRec(MakeConnReq())
+        , requestRec(MakeRequestRec(connRec.get(), config))
+        , httpContext(httpContext)
+        , provider(provider)
+    {}
+
+    RequestStoredContext(const RequestStoredContext&) = delete;
+    RequestStoredContext& operator=(const RequestStoredContext&) = delete;
+
+    // NB: these could have been defaulted with '= default' but VS2013 doesn't support it...
+    RequestStoredContext(RequestStoredContext&& rhs)
+        : connRec(std::move(rhs.connRec))
+        , requestRec(std::move(rhs.requestRec))
+        , httpContext(rhs.httpContext)
+        , provider(rhs.provider)
+    {}
+
+    RequestStoredContext& operator=(RequestStoredContext&& rhs)
     {
-		FinishRequest();
+        connRec = std::move(rhs.connRec);
+        requestRec = std::move(rhs.requestRec);
+        httpContext = rhs.httpContext;
+        provider = rhs.provider;
+        return *this;
+    }
+
+    void CleanupStoredContext() override
+    {
         delete this;
     }
 
-	void FinishRequest()
-	{
-		if(m_pRequestRec != NULL)
-		{
-			modsecFinishRequest(m_pRequestRec);
-			m_pRequestRec = NULL;
-		}
-		if(m_pConnRec != NULL)
-		{
-			modsecFinishConnection(m_pConnRec);
-			m_pConnRec = NULL;
-		}
-	}
+    conn_rec* Connection() const
+    {
+        return connRec.get();
+    }
 
-	conn_rec			*m_pConnRec;
-	request_rec			*m_pRequestRec;
-	IHttpContext		*m_pHttpContext;
-	IHttpEventProvider	*m_pProvider;
-	char				*m_pResponseBuffer;
-	ULONGLONG			m_pResponseLength;
-	ULONGLONG			m_pResponsePosition;
+    request_rec* Request() const
+    {
+        return requestRec.get();
+    }
+
+    IHttpContext* HttpContext() const
+    {
+        return httpContext;
+    }
+
+    IHttpEventProvider* Provider() const
+    {
+        return provider;
+    }
+
+    char*& ResponseBuffer()
+    {
+        return responseBuffer;
+    }
+
+    ULONGLONG& ResponseLength()
+    {
+        return responseLength;
+    }
+
+    ULONGLONG& ResponsePosition()
+    {
+        return responsePosition;
+    }
+
+    void FinishRequest()
+    {
+        requestRec.reset();
+        connRec.reset();
+    }
+
+private:
+	ConnRecPtr connRec;
+	RequestRecPtr requestRec;
+	IHttpContext* httpContext;
+	IHttpEventProvider* provider;
+    char* responseBuffer = nullptr;
+    ULONGLONG responseLength = 0;
+    ULONGLONG responsePosition = 0;
 };
-
-
-//----------------------------------------------------------------------------
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 {
@@ -247,18 +301,18 @@ void Log(void *obj, int level, char *str)
 
 #define NOTE_IIS "iis-tx-context"
 
-void StoreIISContext(request_rec *r, REQUEST_STORED_CONTEXT *rsc)
+void StoreIISContext(request_rec *r, RequestStoredContext *rsc)
 {
     apr_table_setn(r->notes, NOTE_IIS, (const char *)rsc);
 }
 
-REQUEST_STORED_CONTEXT *RetrieveIISContext(request_rec *r)
+RequestStoredContext *RetrieveIISContext(request_rec *r)
 {
-    REQUEST_STORED_CONTEXT *msr = NULL;
+    RequestStoredContext *msr = NULL;
     request_rec *rx = NULL;
 
     /* Look in the current request first. */
-    msr = (REQUEST_STORED_CONTEXT *)apr_table_get(r->notes, NOTE_IIS);
+    msr = (RequestStoredContext *)apr_table_get(r->notes, NOTE_IIS);
     if (msr != NULL) {
         //msr->r = r;
         return msr;
@@ -266,7 +320,7 @@ REQUEST_STORED_CONTEXT *RetrieveIISContext(request_rec *r)
 
     /* If this is a subrequest then look in the main request. */
     if (r->main != NULL) {
-        msr = (REQUEST_STORED_CONTEXT *)apr_table_get(r->main->notes, NOTE_IIS);
+        msr = (RequestStoredContext *)apr_table_get(r->main->notes, NOTE_IIS);
         if (msr != NULL) {
             //msr->r = r;
             return msr;
@@ -276,7 +330,7 @@ REQUEST_STORED_CONTEXT *RetrieveIISContext(request_rec *r)
     /* If the request was redirected then look in the previous requests. */
     rx = r->prev;
     while(rx != NULL) {
-        msr = (REQUEST_STORED_CONTEXT *)apr_table_get(rx->notes, NOTE_IIS);
+        msr = (RequestStoredContext *)apr_table_get(rx->notes, NOTE_IIS);
         if (msr != NULL) {
             //msr->r = r;
             return msr;
@@ -419,15 +473,12 @@ CMyHttpModule::OnSendResponse(
     IN ISendResponseProvider * pResponseProvider
 )
 {
-	REQUEST_STORED_CONTEXT *rsc = NULL;
+    RequestStoredContext* rsc = dynamic_cast<RequestStoredContext*>(pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext));
 
-	rsc = (REQUEST_STORED_CONTEXT *)pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext);
-
-	EnterCriticalSection(&m_csLock);
-
+    CriticalSectionLock lock{cs};
 	// here we must check if response body processing is enabled
 	//
-	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer != NULL || !modsecIsResponseBodyAccessEnabled(rsc->m_pRequestRec))
+	if(rsc == nullptr || rsc->Request() == nullptr || rsc->ResponseBuffer() != nullptr || !modsecIsResponseBodyAccessEnabled(rsc->Request()))
 	{
 		goto Exit;
 	}
@@ -441,7 +492,7 @@ CMyHttpModule::OnSendResponse(
     REQUEST_NOTIFICATION_STATUS ret = RQ_NOTIFICATION_CONTINUE;
 	ULONGLONG ulTotalLength = 0;
 	DWORD c;
-	request_rec *r = rsc->m_pRequestRec;
+    request_rec *r = rsc->Request();
 
 	pHttpResponse = pHttpContext->GetResponse();
 	pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
@@ -583,7 +634,7 @@ CMyHttpModule::OnSendResponse(
         }
     }
 
-	rsc->m_pResponseBuffer = (char *)apr_palloc(rsc->m_pRequestRec->pool, ulTotalLength);
+	rsc->ResponseBuffer() = (char *)apr_palloc(rsc->Request()->pool, ulTotalLength);
 
 	ulTotalLength = 0;
 
@@ -594,13 +645,13 @@ CMyHttpModule::OnSendResponse(
         switch( pSourceDataChunk->DataChunkType )
         {
             case HttpDataChunkFromMemory:
-				memcpy(rsc->m_pResponseBuffer + ulTotalLength, pSourceDataChunk->FromMemory.pBuffer, pSourceDataChunk->FromMemory.BufferLength);
+				memcpy(rsc->ResponseBuffer() + ulTotalLength, pSourceDataChunk->FromMemory.pBuffer, pSourceDataChunk->FromMemory.BufferLength);
                 ulTotalLength += pSourceDataChunk->FromMemory.BufferLength;
                 break;
             case HttpDataChunkFromFileHandle:
                 pFileByteRange = &pSourceDataChunk->FromFileHandle.ByteRange;
 
-				if(ReadFileChunk(pSourceDataChunk, rsc->m_pResponseBuffer + ulTotalLength) != S_OK)
+				if(ReadFileChunk(pSourceDataChunk, rsc->ResponseBuffer() + ulTotalLength) != S_OK)
 				{
 			        DWORD dwErr = GetLastError();
 
@@ -618,7 +669,7 @@ CMyHttpModule::OnSendResponse(
         }
     }
 
-	rsc->m_pResponseLength = ulTotalLength;
+	rsc->ResponseLength() = ulTotalLength;
 
 	//
     // If there's no content-length set, we need to set it to avoid chunked transfer mode
@@ -659,7 +710,7 @@ CMyHttpModule::OnSendResponse(
 
 Finished:
 
-	int status = modsecProcessResponse(rsc->m_pRequestRec);
+	int status = modsecProcessResponse(rsc->Request());
 
 	// the logic here is temporary, needs clarification
 	//
@@ -670,8 +721,6 @@ Finished:
 		pHttpContext->SetRequestHandled();
 
 		rsc->FinishRequest();
-
-		LeaveCriticalSection(&m_csLock);
 		
 		return RQ_NOTIFICATION_FINISH_REQUEST;
 	}
@@ -680,8 +729,6 @@ Exit:
 	//
 	if(rsc != NULL)
 		rsc->FinishRequest();
-
-	LeaveCriticalSection(&m_csLock);
 		
 	return RQ_NOTIFICATION_CONTINUE;
 }
@@ -692,146 +739,106 @@ CMyHttpModule::OnPostEndRequest(
     IN IHttpEventProvider * pProvider
 )
 {
-	REQUEST_STORED_CONTEXT *rsc = NULL;
-
-	rsc = (REQUEST_STORED_CONTEXT *)pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext);
+	RequestStoredContext* rsc = dynamic_cast<RequestStoredContext*>(pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext));
 
 	// only finish request if OnSendResponse have been called already
 	//
-	if(rsc != NULL && rsc->m_pResponseBuffer != NULL)
-	{
-		EnterCriticalSection(&m_csLock);
-
+	if(rsc != nullptr && rsc->ResponseBuffer() != nullptr)
+    {
+        CriticalSectionLock lock{cs};
 		rsc->FinishRequest();
-
-		LeaveCriticalSection(&m_csLock);
 	}
 
 	return RQ_NOTIFICATION_CONTINUE;
 }
 
 REQUEST_NOTIFICATION_STATUS
-CMyHttpModule::OnBeginRequest(
-    IN IHttpContext * pHttpContext,
-    IN IHttpEventProvider * pProvider
-)
+CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* provider)
 {
-    HRESULT                         hr                  = S_OK;
-    IHttpRequest*                   pRequest            = NULL;
-	MODSECURITY_STORED_CONTEXT*		pConfig = NULL;
-    
-    UNREFERENCED_PARAMETER ( pProvider );
-
-	EnterCriticalSection(&m_csLock);
-
-    if ( pHttpContext == NULL ) 
+    if (httpContext == nullptr || httpContext->GetRequest() == nullptr)
     {
-        hr = E_UNEXPECTED;
-        goto Finished;
+        return RQ_NOTIFICATION_FINISH_REQUEST;
     }
 
-    pRequest = pHttpContext->GetRequest();
-
-    if ( pRequest == NULL )
+    CriticalSectionLock lock{cs};
+    MODSECURITY_STORED_CONTEXT* config = nullptr;
+    HRESULT hr = MODSECURITY_STORED_CONTEXT::GetConfig(httpContext, &config);
+    if (FAILED(hr))
     {
-        hr = E_UNEXPECTED;
-        goto Finished;
+        return RQ_NOTIFICATION_CONTINUE;
     }
 
-    hr = MODSECURITY_STORED_CONTEXT::GetConfig(pHttpContext, &pConfig );
-    
-    if ( FAILED( hr ) )
+    // If module is disabled, don't go any further
+    //
+    if (!config->GetIsEnabled())
     {
-        //hr = E_UNEXPECTED;
-		hr = S_OK;
-        goto Finished;
+        return RQ_NOTIFICATION_CONTINUE;
     }
 
-	// If module is disabled, dont go any further
-	//
-	if( pConfig->GetIsEnabled() == false )
-	{
-        goto Finished;
-	}
+    if (config->m_Config == NULL)
+    {
+        char *path;
+        USHORT pathlen;
 
-	if(pConfig->m_Config == NULL)
-	{
-		char *path;
-		USHORT pathlen;
+        hr = config->GlobalWideCharToMultiByte(config->GetPath(), wcslen(config->GetPath()), &path, &pathlen);
+        if (FAILED(hr))
+        {
+            return RQ_NOTIFICATION_FINISH_REQUEST;
+        }
 
-		hr = pConfig->GlobalWideCharToMultiByte(pConfig->GetPath(), wcslen(pConfig->GetPath()), &path, &pathlen);
+        config->m_Config = modsecGetDefaultConfig();
 
-		if ( FAILED( hr ) )
-		{
-			hr = E_UNEXPECTED;
-			goto Finished;
-		}
+        PCWSTR servpath = httpContext->GetApplication()->GetApplicationPhysicalPath();
+        char *apppath;
+        USHORT apppathlen;
 
-		pConfig->m_Config = modsecGetDefaultConfig();
+        hr = config->GlobalWideCharToMultiByte((WCHAR *)servpath, wcslen(servpath), &apppath, &apppathlen);
 
-		PCWSTR servpath = pHttpContext->GetApplication()->GetApplicationPhysicalPath();
-		char *apppath;
-		USHORT apppathlen;
+        if (FAILED(hr))
+        {
+            delete path;
+            return RQ_NOTIFICATION_FINISH_REQUEST;
+        }
 
-		hr = pConfig->GlobalWideCharToMultiByte((WCHAR *)servpath, wcslen(servpath), &apppath, &apppathlen);
+        if (path[0] != 0)
+        {
+            const char * err = modsecProcessConfig((directory_config *)config->m_Config, path, apppath);
 
-		if ( FAILED( hr ) )
-		{
-			delete path;
-			hr = E_UNEXPECTED;
-			goto Finished;
-		}
+            if (err != NULL)
+            {
+                WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
+                delete apppath;
+                delete path;
+                return RQ_NOTIFICATION_CONTINUE;
+            }
 
-		if(path[0] != 0)
-		{
-			const char * err = modsecProcessConfig((directory_config *)pConfig->m_Config, path, apppath);
+            modsecReportRemoteLoadedRules();
+            if (this->status_call_already_sent == false)
+            {
+                this->status_call_already_sent = true;
+                modsecStatusEngineCall();
+            }
+        }
 
-			if(err != NULL)
-			{
-				WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
-				delete apppath;
-				delete path;
-				goto Finished;
-			}
+        delete apppath;
+        delete path;
+    }
 
-			modsecReportRemoteLoadedRules();
-			if (this->status_call_already_sent == false)
-			{
-				this->status_call_already_sent = true;
-				modsecStatusEngineCall();
-			}
-		}
+    auto rsc = std::make_unique<RequestStoredContext>(
+        static_cast<directory_config*>(config->m_Config), httpContext, provider);
+    conn_rec* c = rsc->Connection();
+    request_rec* r = rsc->Request();
 
-		delete apppath;
-		delete path;
-	}
+    // on IIS we force input stream inspection flag, because its absence does not add any performance gain
+    // it's because on IIS request body must be restored each time it was read
+    //
+    modsecSetConfigForIISRequestBody(r);
 
-	conn_rec *c;
-	request_rec *r;
+    StoreIISContext(r, rsc.get());
 
-	c = modsecNewConnection();
+    httpContext->GetModuleContextContainer()->SetModuleContext(rsc.release(), g_pModuleContext);
 
-	modsecProcessConnection(c);
-
-	r = modsecNewRequest(c, (directory_config *)pConfig->m_Config);
-
-	// on IIS we force input stream inspection flag, because its absence does not add any performance gain
-	// it's because on IIS request body must be restored each time it was read
-	//
-	modsecSetConfigForIISRequestBody(r);
-
-	REQUEST_STORED_CONTEXT *rsc = new REQUEST_STORED_CONTEXT();
-
-	rsc->m_pConnRec = c;
-	rsc->m_pRequestRec = r;
-	rsc->m_pHttpContext = pHttpContext;
-	rsc->m_pProvider = pProvider;
-
-	pHttpContext->GetModuleContextContainer()->SetModuleContext(rsc, g_pModuleContext);
-
-	StoreIISContext(r, rsc);
-
-	HTTP_REQUEST *req = pRequest->GetRawHttpRequest();
+	HTTP_REQUEST *req = httpContext->GetRequest()->GetRawHttpRequest();
 
 	r->hostname = ConvertUTF16ToUTF8(req->CookedUrl.pHost, req->CookedUrl.HostLength / sizeof(WCHAR), r->pool);
 	r->path_info = ConvertUTF16ToUTF8(req->CookedUrl.pAbsPath, req->CookedUrl.AbsPathLength / sizeof(WCHAR), r->pool);
@@ -1040,13 +1047,13 @@ CMyHttpModule::OnBeginRequest(
 	HTTP_REQUEST_ID httpRequestID;
 	char *pszValue = (char *)apr_palloc(r->pool, 24);
 
-	httpRequestID = pRequest->GetRawHttpRequest()->RequestId;
+	httpRequestID = httpContext->GetRequest()->GetRawHttpRequest()->RequestId;
 
 	_ui64toa(httpRequestID, pszValue, 10);
 
 	apr_table_setn(r->subprocess_env, "UNIQUE_ID", pszValue);
 
-	PSOCKADDR pAddr = pRequest->GetRemoteAddress();
+    PSOCKADDR pAddr = httpContext->GetRequest()->GetRemoteAddress();
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     c->remote_addr = CopySockAddr(r->pool, pAddr);
@@ -1057,33 +1064,25 @@ CMyHttpModule::OnBeginRequest(
 #endif
 	c->remote_host = NULL;
 
-    LeaveCriticalSection(&m_csLock);
-	int status = modsecProcessRequest(r);
-    EnterCriticalSection(&m_csLock);
+    lock.unlock();
+    int status = modsecProcessRequest(r);
+    lock.lock();
 
 	if(status != DECLINED)
 	{
-		pHttpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
-		pHttpContext->SetRequestHandled();
+		httpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
+		httpContext->SetRequestHandled();
 
-		hr = E_FAIL;
-		goto Finished;
+        return RQ_NOTIFICATION_FINISH_REQUEST;
 	}
 
-Finished:
-	LeaveCriticalSection(&m_csLock);
-
-    if ( FAILED( hr )  )
-    {
-        return RQ_NOTIFICATION_FINISH_REQUEST;
-    }
 	return RQ_NOTIFICATION_CONTINUE;
 }
 
 
 apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
 {
-    REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
+    RequestStoredContext *rsc = RetrieveIISContext(r);
 
     *readcnt = 0;
 
@@ -1093,7 +1092,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
         return APR_SUCCESS;
     }
 
-    IHttpContext *pHttpContext = rsc->m_pHttpContext;
+    IHttpContext *pHttpContext = rsc->HttpContext();
     IHttpRequest *pRequest = pHttpContext->GetRequest();
 
     if (pRequest->GetRemainingEntityBytes() == 0)
@@ -1110,7 +1109,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
         if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
         {
             // Set the error status.
-            rsc->m_pProvider->SetErrorStatus(hr);
+            rsc->Provider()->SetErrorStatus(hr);
         }
 
         *is_eos = 1;
@@ -1121,12 +1120,12 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
 
 apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
 {
-	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
+	RequestStoredContext *rsc = RetrieveIISContext(r);
 
-	if(rsc == NULL || rsc->m_pRequestRec == NULL)
+	if(rsc == NULL || rsc->Request() == NULL)
 		return APR_SUCCESS;
 
-	IHttpContext *pHttpContext = rsc->m_pHttpContext;
+	IHttpContext *pHttpContext = rsc->HttpContext();
 	IHttpRequest *pHttpRequest = pHttpContext->GetRequest();
 
     CHAR szLength[21]; //Max length for a 64 bit int is 20
@@ -1184,11 +1183,11 @@ apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
 
 apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
 {
-	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
+	RequestStoredContext* rsc = RetrieveIISContext(r);
 
 	*readcnt = 0;
 
-	if(rsc == NULL || rsc->m_pResponseBuffer == NULL)
+	if(rsc == nullptr || rsc->ResponseBuffer() == nullptr)
 	{
 		*is_eos = 1;
 		return APR_SUCCESS;
@@ -1196,15 +1195,15 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 
 	unsigned int size = length;
 
-	if(size > rsc->m_pResponseLength - rsc->m_pResponsePosition)
-		size = rsc->m_pResponseLength - rsc->m_pResponsePosition;
+	if(size > rsc->ResponseLength() - rsc->ResponsePosition())
+		size = rsc->ResponseLength() - rsc->ResponsePosition();
 
-	memcpy(buf, rsc->m_pResponseBuffer + rsc->m_pResponsePosition, size);
+	memcpy(buf, rsc->ResponseBuffer() + rsc->ResponsePosition(), size);
 
 	*readcnt = size;
-	rsc->m_pResponsePosition += size;
+	rsc->ResponsePosition() += size;
 
-	if(rsc->m_pResponsePosition >= rsc->m_pResponseLength)
+	if(rsc->ResponsePosition() >= rsc->ResponseLength())
 		*is_eos = 1;
 
 	return APR_SUCCESS;
@@ -1212,15 +1211,15 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 
 apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int length)
 {
-	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
+	RequestStoredContext* rsc = RetrieveIISContext(r);
 
-	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer == NULL)
+	if(rsc == nullptr || rsc->Request() == nullptr || rsc->ResponseBuffer() == nullptr)
 		return APR_SUCCESS;
 
-	IHttpContext *pHttpContext = rsc->m_pHttpContext;
+	IHttpContext *pHttpContext = rsc->HttpContext();
 	IHttpResponse *pHttpResponse = pHttpContext->GetResponse();
 	HTTP_RESPONSE *pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
-	HTTP_DATA_CHUNK *pDataChunk = (HTTP_DATA_CHUNK *)apr_palloc(rsc->m_pRequestRec->pool, sizeof(HTTP_DATA_CHUNK));
+	HTTP_DATA_CHUNK *pDataChunk = (HTTP_DATA_CHUNK *)apr_palloc(rsc->Request()->pool, sizeof(HTTP_DATA_CHUNK));
 
 	pRawHttpResponse->EntityChunkCount = 0;
 
@@ -1270,14 +1269,7 @@ CMyHttpModule::CMyHttpModule()
     // Open a handle to the Event Viewer.
     m_hEventLog = RegisterEventSource( NULL, "ModSecurity" );
 
-    SYSTEM_INFO         sysInfo;
-
-    GetSystemInfo(&sysInfo);
-    m_dwPageSize = sysInfo.dwPageSize;
-
     this->status_call_already_sent = false;
-
-	InitializeCriticalSection(&m_csLock);
 
 	modsecSetLogHook(this, Log);
 
@@ -1293,6 +1285,10 @@ CMyHttpModule::CMyHttpModule()
 	GetComputerName(compname, &size);
 
 	s->server_hostname = compname;
+
+    SYSTEM_INFO         sysInfo;
+    GetSystemInfo(&sysInfo);
+    m_dwPageSize = sysInfo.dwPageSize;
 
 	modsecStartConfig();
 
@@ -1316,8 +1312,6 @@ CMyHttpModule::~CMyHttpModule()
         // Close the handle to the Event Viewer.
         DeregisterEventSource( m_hEventLog );
         m_hEventLog = NULL;
-
-		DeleteCriticalSection(&m_csLock);
     }
 }
 
