@@ -22,6 +22,8 @@ extern IHttpServer *                       g_pHttpServer;
 
 extern PVOID                               g_pModuleContext;
 
+struct directory_config; // forward declaration
+
 class MODSECURITY_STORED_CONTEXT : public IHttpStoredContext
 {
  public:
@@ -67,7 +69,7 @@ class MODSECURITY_STORED_CONTEXT : public IHttpStoredContext
             CHAR**  ppszDestination,
             USHORT*  pdwLengthDestination );
 
-	void*			  m_Config;
+    directory_config* config = nullptr;
 
 private:
     HRESULT 

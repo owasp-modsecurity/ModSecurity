@@ -775,7 +775,7 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
         return RQ_NOTIFICATION_CONTINUE;
     }
 
-    if (config->m_Config == NULL)
+    if (config->config == nullptr)
     {
         char *path;
         USHORT pathlen;
@@ -786,14 +786,13 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
             return RQ_NOTIFICATION_FINISH_REQUEST;
         }
 
-        config->m_Config = modsecGetDefaultConfig();
+        config->config = modsecGetDefaultConfig();
 
         PCWSTR servpath = httpContext->GetApplication()->GetApplicationPhysicalPath();
         char *apppath;
         USHORT apppathlen;
 
         hr = config->GlobalWideCharToMultiByte((WCHAR *)servpath, wcslen(servpath), &apppath, &apppathlen);
-
         if (FAILED(hr))
         {
             delete path;
@@ -802,7 +801,7 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 
         if (path[0] != 0)
         {
-            const char * err = modsecProcessConfig((directory_config *)config->m_Config, path, apppath);
+            const char * err = modsecProcessConfig(config->config, path, apppath);
 
             if (err != NULL)
             {
@@ -824,8 +823,7 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
         delete path;
     }
 
-    auto rsc = std::make_unique<RequestStoredContext>(
-        static_cast<directory_config*>(config->m_Config), httpContext, provider);
+    auto rsc = std::make_unique<RequestStoredContext>(config->config, httpContext, provider);
     conn_rec* c = rsc->Connection();
     request_rec* r = rsc->Request();
 
