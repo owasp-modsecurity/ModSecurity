@@ -12,75 +12,55 @@
 * directly using the email address security@modsecurity.org.
 */
 
-#ifndef __MODULE_FACTORY_H__
-#define __MODULE_FACTORY_H__
+#pragma once
+
+#include <memory>
+#include <mutex>
 
 // Factory class for CMyHttpModule.
 // This class is responsible for creating instances
 // of CMyHttpModule for each request.
 class CMyHttpModuleFactory : public IHttpModuleFactory
 {
-        CMyHttpModule *				m_pModule;
-		CRITICAL_SECTION			m_csLock;
-
 public:
-    CMyHttpModuleFactory() /* noexcept */
-	{
-		m_pModule = NULL;
+    CMyHttpModuleFactory() /* noexcept */ = default;
 
-		InitializeCriticalSection(&m_csLock);
-	}
-
-	virtual
-    HRESULT
-    GetHttpModule(
-        OUT CHttpModule            **ppModule, 
-        IN IModuleAllocator        *
-    )
+    HRESULT GetHttpModule(CHttpModule** ppModule, IModuleAllocator*) override
     {
-        HRESULT                    hr = S_OK;
-
-	    if ( ppModule == NULL )
+	    if (ppModule == nullptr)
         {
-            hr = HRESULT_FROM_WIN32( ERROR_INVALID_PARAMETER );
-            goto Finished;
+            return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
         }
 
-		EnterCriticalSection(&m_csLock);
+        try
+        {
+            // In the unlikely case if the module allocation fails,
+            // the init_flag will not be set and the next time another
+            // attempt will be made to initialize the module.
+            std::call_once(init_flag, [this] {
+                this->module = std::make_unique<CMyHttpModule>();
+            });
+        }
+        catch (const std::bad_alloc&) 
+        {
+            return HRESULT_FROM_WIN32(ERROR_NOT_ENOUGH_MEMORY);
+        }
 
-		if(m_pModule == NULL)
-		{
-			m_pModule = new CMyHttpModule();
-
-			if ( m_pModule == NULL )
-			{
-				hr = HRESULT_FROM_WIN32( ERROR_NOT_ENOUGH_MEMORY );
-				goto Finished;
-			}
-		}
-
-		LeaveCriticalSection(&m_csLock);
-
-        *ppModule = m_pModule;
-
-	Finished:
-
-        return hr;
+        *ppModule = module.get();
+        return S_OK;
     }
 
-    virtual 
-    void
-    Terminate()
+    void Terminate() override
     {
-        if ( m_pModule != NULL )
+        if (module)
         {
-			//m_pModule->WriteEventViewerLog("Module terminated.");
-            delete m_pModule;
-            m_pModule = NULL;
+            module.reset();
         }
 
         delete this;
     }
-};
 
-#endif
+private:
+    std::unique_ptr<CMyHttpModule> module;
+    std::once_flag init_flag;
+};
