@@ -16,45 +16,38 @@
 #define __MY_MODULE_H__
 
 #include "critical_section.h"
+#include "event_logger.h"
 
 //  The module implementation.
 //  This class is responsible for implementing the 
 //  module functionality for each of the server events
 //  that it registers for.
-class CMyHttpModule : public CHttpModule
+class CMyHttpModule 
+    : public CHttpModule
 {
 public:
-    HANDLE m_hEventLog;
-    DWORD m_dwPageSize;
-    CriticalSection cs;
-
-    REQUEST_NOTIFICATION_STATUS
-    OnBeginRequest(
-        IN IHttpContext * pHttpContext,
-        IN IHttpEventProvider * pProvider
-    );
-
-    REQUEST_NOTIFICATION_STATUS
-    OnSendResponse(
-    IN IHttpContext * pHttpContext,
-        IN ISendResponseProvider * pProvider
-    );
-
-    REQUEST_NOTIFICATION_STATUS
-    OnPostEndRequest(
-    IN IHttpContext * pHttpContext,
-    IN IHttpEventProvider * pProvider
-    );
-
-    HRESULT ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf);
-
     CMyHttpModule();
-    ~CMyHttpModule();
 
-    void Dispose();
+    REQUEST_NOTIFICATION_STATUS
+    OnBeginRequest(IHttpContext*, IHttpEventProvider*) override;
+
+    REQUEST_NOTIFICATION_STATUS
+    OnSendResponse(IHttpContext*, ISendResponseProvider*) override;
+
+    REQUEST_NOTIFICATION_STATUS
+    OnPostEndRequest(IHttpContext*, IHttpEventProvider*) override;
+
+    void Dispose() override;
+
+    HRESULT ReadFileChunk(HTTP_DATA_CHUNK* chunk, char* buf);
 
     BOOL WriteEventViewerLog(LPCSTR szNotification, WORD category = EVENTLOG_INFORMATION_TYPE);
-    BOOL status_call_already_sent;
+
+private:
+    CriticalSection cs;
+    EventLogger logger;
+    DWORD pageSize = 0;
+    bool statusCallAlreadySent = false;
 };
 
 #endif

@@ -283,7 +283,7 @@ char *ConvertUTF16ToUTF8( __in const WCHAR * pszTextUTF16, size_t cchUTF16, apr_
     return pszUTF8;
 }
  
-void Log(void *obj, int level, char *str)
+static void Log(void *obj, int level, char *str)
 {
 	CMyHttpModule *mod = (CMyHttpModule *)obj;
 	WORD logcat = EVENTLOG_INFORMATION_TYPE;
@@ -380,13 +380,13 @@ HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
 		ZeroMemory(&ovl, sizeof ovl);
 		ovl.hEvent     = hIoEvent;
 		ovl.Offset = (DWORD)offset;
-		dwDataStartOffset = ovl.Offset & (m_dwPageSize - 1);
-		ovl.Offset &= ~(m_dwPageSize - 1);
+		dwDataStartOffset = ovl.Offset & (pageSize - 1);
+		ovl.Offset &= ~(pageSize - 1);
 		ovl.OffsetHigh = offset >> 32;
 
 		if (!ReadFile(chunk->FromFileHandle.FileHandle,
 					  pIoBuffer,
-					  m_dwPageSize,
+					  pageSize,
 					  &bytesRead,
 					  &ovl))
 		{
@@ -812,9 +812,9 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
             }
 
             modsecReportRemoteLoadedRules();
-            if (this->status_call_already_sent == false)
+            if (!statusCallAlreadySent)
             {
-                this->status_call_already_sent = true;
+                statusCallAlreadySent = true;
                 modsecStatusEngineCall();
             }
         }
@@ -1261,56 +1261,27 @@ apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int lengt
 	return APR_SUCCESS;
 }
 
-
 CMyHttpModule::CMyHttpModule()
 {
-    // Open a handle to the Event Viewer.
-    m_hEventLog = RegisterEventSource( NULL, "ModSecurity" );
+    modsecSetLogHook(this, Log);
+    modsecSetReadBody(ReadBodyCallback);
+    modsecSetReadResponse(ReadResponseCallback);
+    modsecSetWriteBody(WriteBodyCallback);
+    modsecSetWriteResponse(WriteResponseCallback);
 
-    this->status_call_already_sent = false;
-
-	modsecSetLogHook(this, Log);
-
-	modsecSetReadBody(ReadBodyCallback);
-	modsecSetReadResponse(ReadResponseCallback);
-	modsecSetWriteBody(WriteBodyCallback);
-	modsecSetWriteResponse(WriteResponseCallback);
-
-	server_rec *s = modsecInit();
-	char *compname = (char *)malloc(128);
-	DWORD size = 128;
-
-	GetComputerName(compname, &size);
-
-	s->server_hostname = compname;
-
-    SYSTEM_INFO         sysInfo;
-    GetSystemInfo(&sysInfo);
-    m_dwPageSize = sysInfo.dwPageSize;
-
-	modsecStartConfig();
-
-	modsecFinalizeConfig();
-
-	modsecInitProcess();
-}
-
-CMyHttpModule::~CMyHttpModule()
-{
-	// ModSecurity registers APR pool cleanups, which interfere with APR pool tear down process
-	// this causes crashes and since we are exiting the process here, so this is a temporary solution
-	//
-	//modsecTerminate();
-
-	//WriteEventViewerLog("Module deleted.");
-
-	// Test whether the handle for the Event Viewer is open.
-    if (NULL != m_hEventLog)
+    server_rec* s = modsecInit();
+    DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
+    char* compname = static_cast<char *>(malloc(size));
+    if (compname == nullptr)
     {
-        // Close the handle to the Event Viewer.
-        DeregisterEventSource( m_hEventLog );
-        m_hEventLog = NULL;
+        throw std::bad_alloc();
     }
+    GetComputerName(compname, &size);
+    s->server_hostname = compname;
+
+    modsecStartConfig();
+    modsecFinalizeConfig();
+    modsecInitProcess();
 }
 
 void CMyHttpModule::Dispose()
@@ -1319,14 +1290,5 @@ void CMyHttpModule::Dispose()
 
 BOOL CMyHttpModule::WriteEventViewerLog(LPCSTR szNotification, WORD category)
 {
-    // Test whether the handle for the Event Viewer is open.
-    if (NULL != m_hEventLog)
-    {
-        // Write any strings to the Event Viewer and return.
-        return ReportEvent(
-            m_hEventLog,
-            category, 0, 0x1,
-            NULL, 1, 0, &szNotification, NULL );
-    }
-    return FALSE;
+    return logger.Log(szNotification, category);
 }
