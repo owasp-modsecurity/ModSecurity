@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Allow empty anchored variable
+   [Issue #2024 - @airween]
  - Fixed FILES_NAMES collection after the end of multipart parsing
    [Issue #2016 - @airween]
  - Fixed validateByteRange parsing method
