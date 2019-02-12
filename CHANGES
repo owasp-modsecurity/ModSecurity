@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fixed validateByteRange parsing method
+   [Issue #2017 - @airween]
  - Removes a memory leak on the JSON parser
    [@zimmerle]
  - Enables LMDB on the regression tests.
