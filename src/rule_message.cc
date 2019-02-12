@@ -23,35 +23,43 @@
 namespace modsecurity {
 
 
-inline void RuleMessage::_details(const RuleMessage *rm, std::string *msg) {
-    *msg += " [file \"" + std::string(*rm->m_ruleFile.get()) + "\"]" \
-        " [line \"" + std::to_string(rm->m_ruleLine) + "\"]" \
-        " [id \"" + std::to_string(rm->m_ruleId) + "\"]" \
-        " [rev \"" + rm->m_rev + "\"]" \
-        " [msg \"" + rm->m_message + "\"]" \
-        " [data \"" + utils::string::limitTo(200, rm->m_data) + "\"]" \
-        " [severity \"" + std::to_string(rm->m_severity) + "\"]" \
-        " [ver \"" + rm->m_ver + "\"]" \
-        " [maturity \"" + std::to_string(rm->m_maturity) + "\"]" \
-        " [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]";
+std::string RuleMessage::_details(const RuleMessage *rm) {
+    std::string msg;
+
+    msg.append(" [file \"" + std::string(*rm->m_ruleFile.get()) + "\"]");
+    msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
+    msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
+    msg.append(" [rev \"" + rm->m_rev + "\"]");
+    msg.append(" [msg \"" + rm->m_message + "\"]");
+    msg.append(" [data \"" + utils::string::limitTo(200, rm->m_data) + "\"]");
+    msg.append(" [severity \"" +
+        std::to_string(rm->m_severity) + "\"]");
+    msg.append(" [ver \"" + rm->m_ver + "\"]");
+    msg.append(" [maturity \"" + std::to_string(rm->m_maturity) + "\"]");
+    msg.append(" [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]");
 
     for (auto &a : rm->m_tags) {
-        *msg += " [tag \"" + a + "\"]";
+        msg.append(" [tag \"" + a + "\"]");
     }
 
-    *msg += " [hostname \"" + *rm->m_serverIpAddress.get() + "\"]" \
-        " [uri \"" + *rm->m_uriNoQueryStringDecoded.get() + "\"]" \
-        " [unique_id \"" + *rm->m_id.get() + "\"]" \
-        " [ref \"" + utils::string::limitTo(200, rm->m_reference) + "\"]";
+    msg.append(" [hostname \"" + *rm->m_serverIpAddress.get() \
+        + "\"]");
+    msg.append(" [uri \"" + utils::string::limitTo(200, *rm->m_uriNoQueryStringDecoded.get()) + "\"]");
+    msg.append(" [unique_id \"" + *rm->m_id + "\"]");
+    msg.append(" [ref \"" + utils::string::limitTo(200, rm->m_reference) + "\"]");
+
+    return msg;
 }
 
 
-inline void RuleMessage::_errorLogTail(const RuleMessage *rm,
-    std::string *msg) {
-    *msg += " [hostname \"" + *rm->m_serverIpAddress.get() + "\"]" \
-        " [uri \"" + utils::string::limitTo(200,
-            *rm->m_uriNoQueryStringDecoded.get()) + "\"]" \
-        " [unique_id \"" + *rm->m_id.get() + "\"]";
+std::string RuleMessage::_errorLogTail(const RuleMessage *rm) {
+    std::string msg;
+
+    msg.append("[hostname \"" + *rm->m_serverIpAddress.get() + "\"]");
+    msg.append(" [uri \"" + utils::string::limitTo(200, *rm->m_uriNoQueryStringDecoded.get()) + "\"]");
+    msg.append(" [unique_id \"" + *rm->m_id + "\"]");
+
+    return msg;
 }
 
 
@@ -60,26 +68,27 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
     msg.reserve(2048);
 
     if (props & ClientLogMessageInfo) {
-        msg += "[client " + std::string(*rm->m_clientIpAddress.get()) + "] ";
+        msg.append("[client " + std::string(*rm->m_clientIpAddress.get()) + "] ");
     }
 
     if (rm->m_isDisruptive) {
-        msg += "ModSecurity: Access denied with code ";
+        msg.append("ModSecurity: Access denied with code ");
         if (code == -1) {
-            msg += "%d";
+            msg.append("%d");
         } else {
-            msg += std::to_string(code);
+            msg.append(std::to_string(code));
         }
-        msg += " (phase " + std::to_string(rm->m_rule->m_phase - 1) + "). ";
+        msg.append(" (phase ");
+        msg.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
     } else {
-        msg += "ModSecurity: Warning. ";
+        msg.append("ModSecurity: Warning. ");
     }
 
-    msg += (rm->m_match);
-    _details(rm, &msg);
+    msg.append(rm->m_match);
+    msg.append(_details(rm));
 
     if (props & ErrorLogTailLogMessageInfo) {
-        _errorLogTail(rm, &msg);
+        msg.append(" " + _errorLogTail(rm));
     }
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
