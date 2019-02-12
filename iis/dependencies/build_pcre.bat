@@ -18,15 +18,17 @@ cd "pcre"
 cat CMakeLists.txt | sed "s/PCRE_STATIC_RUNTIME OFF CACHE BOOL/PCRE_STATIC_RUNTIME/g" | sed "s/PCRE_NO_RECURSE OFF/PCRE_NO_RECURSE ON/g" > CMakeLists.txt.ops
 move CMakeLists.txt CMakeLists.txt.old
 move CMakeLists.txt.ops CMakeLists.txt
-CMAKE -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True
+mkdir build
+cd build
+CMAKE -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True ../
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 NMAKE
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 cd "%WORK%"
 
-copy /y "%WORK_DIR%\pcre\pcre.dll" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\pcre\pcre.pdb" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\pcre\pcre.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\pcre\build\pcre.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\pcre\build\pcre.pdb" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\pcre\build\pcre.lib" "%OUTPUT_DIR%"
 copy /y "%WORK_DIR%\pcre\pcre.h.generic" "%WORK_DIR%\pcre\pcre.h"
 echo "a"
 @exit /B 0
