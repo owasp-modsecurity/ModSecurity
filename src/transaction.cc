@@ -560,24 +560,20 @@ int Transaction::addRequestHeader(const std::string& key,
         for (const std::string &c : cookies) {
             std::vector<std::string> s = utils::string::split(c,
                '=');
-            if (s.size() > 1) {
-                if (s[0].at(0) == ' ') {
+            if (s.size() > 0) {
+                while (s[0].at(0) == ' ') {
                     s[0].erase(0, 1);
                 }
                 m_variableRequestCookiesNames.set(s[0],
                     s[0], localOffset);
-
                 localOffset = localOffset + s[0].size() + 1;
-                m_variableRequestCookies.set(s[0], s[1], localOffset);
-                localOffset = localOffset + s[1].size() + 2;
-            }
-            else {
-                if (s[0].at(0) == ' ') {
-                    s[0].erase(0, 1);
+                if (s.size() > 1) {
+                    m_variableRequestCookies.set(s[0], s[1], localOffset);
+                    localOffset = localOffset + s[1].size() + 2;
                 }
-                m_variableRequestCookiesNames.set(s[0],
-                    s[0], localOffset);
-                m_variableRequestCookies.set(s[0], "", localOffset);
+                else {
+                    m_variableRequestCookies.set(s[0], "", localOffset);
+                }
             }
         }
     }

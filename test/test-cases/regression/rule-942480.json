@@ -1,0 +1,41 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar :: OWASP CRS id:942480",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "Cookie": "'msdasql'"
+      },
+      "uri":"/",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":400
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,deny,block,status:400,log\"",
+      "SecRule REQUEST_COOKIES|!REQUEST_COOKIES:/__utm/|!REQUEST_COOKIES:/_pk_ref/|REQUEST_COOKIES_NAMES|ARGS_NAMES|ARGS|XML:/* \"@rx (?i:(?:\\b(?:(?:s(?:elect\\b.{1,100}?\\b(?:(?:(?:length|count)\\b.{1,100}?|.*?\\bdump\\b.*)\\bfrom|to(?:p\\b.{1,100}?\\bfrom|_(?:numbe|cha)r)|(?:from\\b.{1,100}?\\bwher|data_typ)e|instr)|ys_context)|in(?:to\\b\\W*?\\b(?:dump|out)file|sert\\b\\W*?\\binto|ner\\b\\W*?\\bjoin)|u(?:nion\\b.{1,100}?\\bselect|tl_inaddr)|group\\b.*?\\bby\\b.{1,100}?\\bhaving|d(?:elete\\b\\W*?\\bfrom|bms_\\w+\\.)|load\\b\\W*?\\bdata\\b.*?\\binfile)\\b|print\\b\\W*?\\@\\@)|(?:;\\W*?\\b(?:shutdown|drop)|collation\\W*?\\(a|\\@\\@version)\\b|'(?:s(?:qloledb|a)|msdasql|dbo)'))\" \"id:942480,phase:2,block,capture,t:none,t:urlDecodeUni,msg:'SQL Injection Attack',logdata:'Matched Data: %{TX.0} found within %{MATCHED_VAR_NAME}: %{MATCHED_VAR}',ctl:auditLogParts=+E,ver:'OWASP_CRS/3.1.0',severity:'CRITICAL',setvar:'tx.msg=%{rule.msg}',setvar:'tx.sql_injection_score=+%{tx.critical_anomaly_score}', setvar:'tx.anomaly_score_pl2=+%{tx.critical_anomaly_score}',setvar:'tx.%{rule.id}-OWASP_CRS/WEB_ATTACK/SQL_INJECTION-%{MATCHED_VAR_NAME}=%{tx.0}'\""
+    ]
+  }
+]
