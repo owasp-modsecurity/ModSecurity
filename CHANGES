@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fixed FILES_NAMES collection after the end of multipart parsing
+   [Issue #2016 - @airween]
  - Fixed validateByteRange parsing method
    [Issue #2017 - @airween]
  - Removes a memory leak on the JSON parser
