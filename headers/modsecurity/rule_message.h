@@ -88,8 +88,8 @@ class RuleMessage {
         return RuleMessage::log(rm, 0);
     }
 
-    static inline void _details(const RuleMessage *rm, std::string *msg);
-    static inline void _errorLogTail(const RuleMessage *rm, std::string *msg);
+    static std::string _details(const RuleMessage *rm);
+    static std::string _errorLogTail(const RuleMessage *rm);
 
     int m_accuracy;
     std::shared_ptr<std::string> m_clientIpAddress;
