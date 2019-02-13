@@ -35,11 +35,8 @@
 
 // These helpers make sure that the underlying structures
 // are correctly released on any exit path due to RAII.
-using ConnRecPtr =
-    std::unique_ptr<conn_rec, decltype(modsecFinishConnection)*>;
-
-using RequestRecPtr =
-    std::unique_ptr<request_rec, decltype(modsecFinishRequest)*>;
+using ConnRecPtr = std::shared_ptr<conn_rec>;
+using RequestRecPtr = std::shared_ptr<request_rec>;
 
 ConnRecPtr MakeConnReq()
 {
