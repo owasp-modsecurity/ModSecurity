@@ -33,7 +33,7 @@ namespace transformations {
 class LowerCase : public Transformation {
  public:
     explicit LowerCase(std::string action);
-    std::string evaluate(std::string exp,
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 };
 
