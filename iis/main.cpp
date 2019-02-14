@@ -56,9 +56,22 @@ RegisterModule(DWORD, IHttpModuleRegistrationInfo* moduleInfo, IHttpServer * htt
 
         // step 3: register for server events
         //
-        return moduleInfo->SetRequestNotifications(factory.release(), /* module factory */
-                                                    RQ_BEGIN_REQUEST /* server event mask */,
-                                                    0 /* server post event mask */);
+        auto result = moduleInfo->SetRequestNotifications(
+            factory.release(), /* module factory */
+            RQ_BEGIN_REQUEST | RQ_SEND_RESPONSE /* server event mask */,
+            RQ_END_REQUEST /* server post event mask */);
+        if (FAILED(result))
+        {
+            return result;
+        }
+
+        result = moduleInfo->SetPriorityForRequestNotification(RQ_BEGIN_REQUEST, PRIORITY_ALIAS_FIRST);
+        if (FAILED(result))
+        {
+            return result;
+        }
+
+        return moduleInfo->SetPriorityForRequestNotification(RQ_SEND_RESPONSE, PRIORITY_ALIAS_LAST);
     }
     catch (const std::bad_alloc&)
     {
