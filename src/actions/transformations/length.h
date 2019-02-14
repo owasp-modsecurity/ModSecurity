@@ -30,8 +30,10 @@ namespace transformations {
 
 class Length : public Transformation {
  public:
-    explicit Length(const std::string &action) ;
-    std::string evaluate(std::string exp,
+
+    explicit Length(const std::string &action);
+
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 };
 

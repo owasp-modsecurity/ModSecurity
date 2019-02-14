@@ -37,7 +37,7 @@ class Utf8ToUnicode : public Transformation {
  public:
     explicit Utf8ToUnicode(const std::string &action)  : Transformation(action) { }
 
-    std::string evaluate(std::string exp,
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 
     static char *inplace(unsigned char *input, uint64_t input_len,

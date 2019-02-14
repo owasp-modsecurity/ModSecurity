@@ -33,9 +33,10 @@ namespace actions {
 namespace transformations {
 
 
-std::string RemoveNulls::evaluate(std::string value,
+std::string RemoveNulls::evaluate(const std::string &val,
     Transaction *transaction) {
     int64_t i;
+    std::string value(val);
 
     i = 0;
     while (i < value.size()) {

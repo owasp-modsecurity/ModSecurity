@@ -38,7 +38,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string UrlDecodeUni::evaluate(std::string value,
+std::string UrlDecodeUni::evaluate(const std::string &value,
     Transaction *t) {
     std::string ret;
     unsigned char *input;

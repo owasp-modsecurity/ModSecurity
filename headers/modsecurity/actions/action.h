@@ -57,7 +57,7 @@ class Action {
 
     virtual ~Action() { }
 
-    virtual std::string evaluate(std::string exp,
+    virtual std::string evaluate(const std::string &exp,
         Transaction *transaction);
     virtual bool evaluate(Rule *rule, Transaction *transaction);
     virtual bool evaluate(Rule *rule, Transaction *transaction,

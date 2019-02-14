@@ -45,7 +45,7 @@ namespace modsecurity {
 namespace actions {
 
 
-std::string Action::evaluate(std::string value,
+std::string Action::evaluate(const std::string &value,
     Transaction *transaction) {
     return value;
 }

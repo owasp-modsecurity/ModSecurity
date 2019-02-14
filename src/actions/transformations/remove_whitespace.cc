@@ -36,8 +36,9 @@ RemoveWhitespace::RemoveWhitespace(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string RemoveWhitespace::evaluate(std::string value,
+std::string RemoveWhitespace::evaluate(const std::string &val,
     Transaction *transaction) {
+    std::string value(val);
 
     int64_t i = 0;
 

@@ -35,9 +35,10 @@ ReplaceNulls::ReplaceNulls(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string ReplaceNulls::evaluate(std::string value,
+std::string ReplaceNulls::evaluate(const std::string &val,
     Transaction *transaction) {
     int64_t i;
+    std::string value(val);
 
     i = 0;
     while (i < value.size()) {

@@ -30,8 +30,9 @@ namespace transformations {
 
 class RemoveCommentsChar : public Transformation {
  public:
-    explicit RemoveCommentsChar(const std::string &action) ;
-    std::string evaluate(std::string exp,
+    explicit RemoveCommentsChar(const std::string &action);
+
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 };
 
