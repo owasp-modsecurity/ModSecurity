@@ -69,7 +69,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string Transformation::evaluate(std::string value,
+std::string Transformation::evaluate(const std::string &value,
     Transaction *transaction) {
     return value;
 }

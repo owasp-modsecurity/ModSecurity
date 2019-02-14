@@ -31,9 +31,9 @@ namespace actions {
 namespace transformations {
 
 
-std::string Md5::evaluate(std::string value,
+std::string Md5::evaluate(const std::string &value,
     Transaction *transaction) {
-    std::string ret =  Utils::Md5::digest(value);
+    std::string ret = Utils::Md5::digest(value);
 
     return ret;
 }

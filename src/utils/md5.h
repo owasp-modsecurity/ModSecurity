@@ -31,8 +31,8 @@ class Md5 {
  public:
     Md5() { }
 
-    static std::string hexdigest(std::string& input);
-    static std::string digest(std::string& input);
+    static std::string hexdigest(const std::string& input);
+    static std::string digest(const std::string& input);
 };
 
 }  // namespace Utils
