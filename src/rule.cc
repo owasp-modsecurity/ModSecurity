@@ -262,7 +262,7 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
 
     for (actions::SetVar *a : m_actionsSetVar) {
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
-            "action: " + a->m_name);
+            "action: " + *a->m_name.get());
 
         a->evaluate(this, trans);
     }
@@ -273,12 +273,12 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
             continue;
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        if (a->isDisruptive() == true && a->m_name == "block") {
+        if (a->isDisruptive() == true && *a->m_name.get() == "block") {
             ms_dbg_a(trans, 9, "Rule contains a `block' action");
                 *containsBlock = true;
-        } else if (a->m_name == "setvar") {
+        } else if (*a->m_name.get() == "setvar") {
             ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
-                "action: " + a->m_name);
+                "action: " + *a->m_name.get());
             a->evaluate(this, trans, ruleMessage);
         }
     }
@@ -340,22 +340,21 @@ inline void Rule::executeTransformation(actions::Action *a,
     if (newValue != *oldValue) {
         std::shared_ptr<std::string> u(new std::string(newValue));
         if (m_containsMultiMatchAction) {
-            std::shared_ptr<std::string> t(new std::string(a->m_name));
-            ret->push_back(std::make_pair(u, t));
+            ret->push_back(std::make_pair(u, a->m_name));
             (*nth)++;
         }
         *value = u;
     }
 
     if (path->empty()) {
-        path->append(a->m_name);
+        path->append(*a->m_name.get());
     } else {
-        path->append("," + a->m_name);
+        path->append("," + *a->m_name.get());
     }
 
     ms_dbg_a(trans, 9, " T (" + \
         std::to_string(*nth) + ") " + \
-        a->m_name + ": \"" + \
+        *a->m_name.get() + ": \"" + \
         utils::string::limitTo(80, newValue) +"\"");
 }
 
@@ -543,28 +542,28 @@ inline void Rule::getFinalVars(variables::Variables *vars,
 void Rule::executeAction(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
     Action *a, bool defaultContext) {
-    if (a->isDisruptive() == false && a->m_name != "block") {
+    if (a->isDisruptive() == false && *a->m_name.get() != "block") {
         ms_dbg_a(trans, 9, "Running " \
-            "action: " + a->m_name);
+            "action: " + *a->m_name.get());
         a->evaluate(this, trans, ruleMessage);
         return;
     }
 
     if (defaultContext && !containsBlock) {
-        ms_dbg_a(trans, 4, "Ignoring action: " + a->m_name + \
+        ms_dbg_a(trans, 4, "Ignoring action: " + *a->m_name.get() + \
             " (rule does not cotains block)");
         return;
     }
 
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
-        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + a->m_name + \
+        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
             ".");
         a->evaluate(this, trans, ruleMessage);
         return;
     }
 
     ms_dbg_a(trans, 4, "Not running any disruptive action (or block): " \
-        + a->m_name + ". SecRuleEngine is not On.");
+        + *a->m_name.get() + ". SecRuleEngine is not On.");
 }
 
 
@@ -584,7 +583,7 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
 
     for (actions::Tag *a : this->m_actionsTag) {
         ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
-            + a->m_name);
+            + *a->m_name.get());
         a->evaluate(this, trans, ruleMessage);
     }
 
@@ -815,12 +814,12 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name,
     Transaction *trans) {
     std::vector<actions::Action *> ret;
     for (auto &z : m_actionsRuntimePos) {
-        if (z->m_name == name) {
+        if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
     }
     for (auto &z : m_actionsRuntimePre) {
-        if (z->m_name == name) {
+        if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
     }
@@ -830,7 +829,7 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name,
             continue;
         }
         actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
-        if (z->m_name == name) {
+        if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
     }
@@ -840,7 +839,7 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name,
             continue;
         }
         actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
-        if (z->m_name == name) {
+        if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
     }

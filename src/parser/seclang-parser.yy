@@ -1170,7 +1170,7 @@ expression:
                 }
                 checkedActions.push_back(a);
             } else {
-                driver.error(@0, "The action '" + a->m_name + "' is not suitable to be part of the SecDefaultActions");
+                driver.error(@0, "The action '" + *a->m_name.get() + "' is not suitable to be part of the SecDefaultActions");
                 YYERROR;
             }
         }
