@@ -42,7 +42,7 @@ class Action {
         : m_isNone(false),
         temporaryAction(false),
         action_kind(2),
-        m_name(""),
+        m_name(nullptr),
         m_parser_payload("") {
             set_name_and_payload(_action);
         }
@@ -50,7 +50,7 @@ class Action {
         : m_isNone(false),
         temporaryAction(false),
         action_kind(kind),
-        m_name(""),
+        m_name(nullptr),
         m_parser_payload("") {
             set_name_and_payload(_action);
         }
@@ -77,11 +77,11 @@ class Action {
         }
 
         if (pos == std::string::npos) {
-            m_name = data;
+            m_name = std::shared_ptr<std::string>(new std::string(data));
             return;
         }
 
-        m_name = std::string(data, 0, pos);
+        m_name = std::shared_ptr<std::string>(new std::string(data, 0, pos));
         m_parser_payload = std::string(data, pos + 1, data.length());
 
         if (m_parser_payload.at(0) == '\'' && m_parser_payload.size() > 2) {
@@ -93,7 +93,7 @@ class Action {
     bool m_isNone;
     bool temporaryAction;
     int action_kind;
-    std::string m_name;
+    std::shared_ptr<std::string> m_name;
     std::string m_parser_payload;
 
     /**
