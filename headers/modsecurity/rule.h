@@ -72,7 +72,7 @@ class Rule {
         std::shared_ptr<std::string> *value,
         Transaction *trans,
         std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> *ret,
+            std::weak_ptr<std::string>>> *ret,
         std::string *path,
         int *nth);
 
@@ -84,7 +84,7 @@ class Rule {
         bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage);
 
     std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> executeDefaultTransformations(
+        std::weak_ptr<std::string>>> executeDefaultTransformations(
         Transaction *trasn, const std::string &value);
 
     bool executeOperatorAt(Transaction *trasn, std::string key,
@@ -106,7 +106,7 @@ class Rule {
         std::shared_ptr<std::string> value,
         Transaction *trans,
         std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> *ret,
+            std::weak_ptr<std::string>>> *ret,
         std::shared_ptr<std::string> transStr,
         int nth);
 

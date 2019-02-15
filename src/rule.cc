@@ -330,7 +330,7 @@ inline void Rule::executeTransformation(actions::Action *a,
     std::shared_ptr<std::string> *value,
     Transaction *trans,
     std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> *ret,
+        std::weak_ptr<std::string>>> *ret,
     std::string *path,
     int *nth) {
 
@@ -338,7 +338,7 @@ inline void Rule::executeTransformation(actions::Action *a,
     std::string newValue = a->evaluate(*oldValue, trans);
 
     if (newValue != *oldValue) {
-        std::shared_ptr<std::string> u(new std::string(newValue));
+        std::shared_ptr<std::string> u(&newValue);
         if (m_containsMultiMatchAction) {
             ret->push_back(std::make_pair(u, a->m_name));
             (*nth)++;
@@ -360,14 +360,14 @@ inline void Rule::executeTransformation(actions::Action *a,
 
 
 std::list<std::pair<std::shared_ptr<std::string>,
-    std::shared_ptr<std::string>>>
+    std::weak_ptr<std::string>>>
     Rule::executeDefaultTransformations(
     Transaction *trans, const std::string &in) {
     int none = 0;
     int transformations = 0;
     std::string path("");
     std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> ret;
+        std::weak_ptr<std::string>>> ret;
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
 
@@ -716,7 +716,7 @@ bool Rule::evaluate(Transaction *trans,
             }
 
             std::list<std::pair<std::shared_ptr<std::string>,
-                std::shared_ptr<std::string>>> values;
+                std::weak_ptr<std::string>>> values;
 
             values = executeDefaultTransformations(trans, value);
 
