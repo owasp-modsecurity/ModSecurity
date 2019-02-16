@@ -44,10 +44,17 @@ class Msg;
 class Rev;
 class SetVar;
 class Tag;
+namespace transformations {
+class Transformation;
+}
 }
 namespace operators {
 class Operator;
 }
+
+using TransformationResult = std::pair<std::shared_ptr<std::string>,
+    std::shared_ptr<std::string>>;
+using TransformationResults = std::list<TransformationResult>;
 
 class Rule {
  public:
@@ -68,24 +75,12 @@ class Rule {
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
         actions::Action *a, bool context);
 
-    inline void executeTransformation(actions::Action *a,
-        std::shared_ptr<std::string> *value,
-        Transaction *trans,
-        std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> *ret,
-        std::string *path,
-        int *nth);
-
     void getVariablesExceptions(Transaction *t,
         variables::Variables *exclusion, variables::Variables *addition);
     inline void getFinalVars(variables::Variables *vars,
         variables::Variables *eclusion, Transaction *trans);
     void executeActionsAfterFullMatch(Transaction *trasn,
         bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage);
-
-    std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> executeDefaultTransformations(
-        Transaction *trasn, const std::string &value);
 
     bool executeOperatorAt(Transaction *trasn, std::string key,
         std::string value, std::shared_ptr<RuleMessage> rm);
@@ -100,15 +95,16 @@ class Rule {
     bool containsTag(const std::string& name, Transaction *t);
     bool containsMsg(const std::string& name, Transaction *t);
 
+
     void executeTransformations(
-        actions::Action *a,
-        std::shared_ptr<std::string> newValue,
-        std::shared_ptr<std::string> value,
+        Transaction *trasn, const std::string &value, TransformationResults &ret);
+
+    inline void executeTransformation(actions::transformations::Transformation *a,
+        std::shared_ptr<std::string> *value,
         Transaction *trans,
-        std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> *ret,
-        std::shared_ptr<std::string> transStr,
-        int nth);
+        TransformationResults *ret,
+        std::string *path,
+        int *nth);
 
     actions::Action *m_theDisruptiveAction;
     actions::LogData *m_logData;
