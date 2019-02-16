@@ -49,7 +49,7 @@ using operators::Operator;
 using actions::Action;
 using variables::Variable;
 using actions::transformations::None;
-
+using actions::transformations::Transformation;
 
 Rule::Rule(std::string marker)
     : m_accuracy(0),
@@ -326,11 +326,11 @@ bool Rule::executeOperatorAt(Transaction *trans, std::string key,
 }
 
 
-inline void Rule::executeTransformation(actions::Action *a,
+inline void Rule::executeTransformation(
+    actions::transformations::Transformation *a,
     std::shared_ptr<std::string> *value,
     Transaction *trans,
-    std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> *ret,
+    TransformationResults *ret,
     std::string *path,
     int *nth) {
 
@@ -359,15 +359,11 @@ inline void Rule::executeTransformation(actions::Action *a,
 }
 
 
-std::list<std::pair<std::shared_ptr<std::string>,
-    std::shared_ptr<std::string>>>
-    Rule::executeDefaultTransformations(
-    Transaction *trans, const std::string &in) {
+void Rule::executeTransformations(
+    Transaction *trans, const std::string &in, TransformationResults &ret) {
     int none = 0;
     int transformations = 0;
     std::string path("");
-    std::list<std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>> ret;
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
 
@@ -394,14 +390,17 @@ std::list<std::pair<std::shared_ptr<std::string>,
                 continue;
             }
 
-            executeTransformation(a.get(), &value, trans, &ret, &path,
+            // FIXME: here the object needs to be a transformation already.
+            Transformation *t = dynamic_cast<Transformation *>(a.get());
+            executeTransformation(t, &value, trans, &ret, &path,
                 &transformations);
         }
     }
 
     for (Action *a : this->m_actionsRuntimePre) {
         if (none == 0) {
-            executeTransformation(a, &value, trans, &ret, &path,
+            Transformation *t = dynamic_cast<Transformation *>(a);
+            executeTransformation(t, &value, trans, &ret, &path,
                 &transformations);
         }
         if (a->m_isNone) {
@@ -427,7 +426,8 @@ std::list<std::pair<std::shared_ptr<std::string>,
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
         if (none == 0) {
-            executeTransformation(a, &value, trans, &ret, &path,
+            Transformation *t = dynamic_cast<Transformation *>(a);
+            executeTransformation(t, &value, trans, &ret, &path,
                 &transformations);
         }
         if (a->m_isNone) {
@@ -446,8 +446,6 @@ std::list<std::pair<std::shared_ptr<std::string>,
             std::shared_ptr<std::string>(new std::string(*value)),
             std::shared_ptr<std::string>(new std::string(path))));
     }
-
-    return ret;
 }
 
 
@@ -715,10 +713,9 @@ bool Rule::evaluate(Transaction *trans,
                 continue;
             }
 
-            std::list<std::pair<std::shared_ptr<std::string>,
-                std::shared_ptr<std::string>>> values;
+            TransformationResults values;
 
-            values = executeDefaultTransformations(trans, value);
+            executeTransformations(trans, value, values);
 
             for (const auto &valueTemp : values) {
                 bool ret;
