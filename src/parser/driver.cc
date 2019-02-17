@@ -44,7 +44,7 @@ Driver::~Driver() {
 int Driver::addSecMarker(std::string marker) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::unique_ptr<Rule> rule(new Rule(marker));
-        rule->m_phase = i;
+        rule->setPhase(i);
         m_rulesSetPhases.insert(std::move(rule));
     }
     return 0;
@@ -52,8 +52,8 @@ int Driver::addSecMarker(std::string marker) {
 
 
 int Driver::addSecAction(std::unique_ptr<Rule> rule) {
-    if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
-        m_parserError << "Unknown phase: " << std::to_string(rule->m_phase);
+    if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
+        m_parserError << "Unknown phase: " << std::to_string(rule->getPhase());
         m_parserError << std::endl;
         return false;
     }
@@ -72,16 +72,16 @@ int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
 
 
 int Driver::addSecRule(std::unique_ptr<Rule> r) {
-    if (r->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
-        m_parserError << "Unknown phase: " << std::to_string(r->m_phase);
+    if (r->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
+        m_parserError << "Unknown phase: " << std::to_string(r->getPhase());
         m_parserError << std::endl;
         return false;
     }
 
     /* is it a chained rule? */
-    if (m_lastRule != nullptr && m_lastRule->m_chained) {
-        r->m_phase = m_lastRule->m_phase;
-        if (r->m_theDisruptiveAction) {
+    if (m_lastRule != nullptr && m_lastRule->isChained()) {
+        r->setPhase(m_lastRule->getPhase());
+        if (r->hasDisruptiveAction()) {
             m_parserError << "Disruptive actions can only be specified by";
             m_parserError << " chain starter rules.";
             return false;
@@ -148,7 +148,7 @@ int Driver::parse(const std::string &f, const std::string &ref) {
      *
      */
     /*
-    if (m_lastRule != nullptr && m_lastRule->m_chained) {
+    if (m_lastRule != nullptr && m_lastRule->isChained()) {
         m_parserError << "Last rule is marked as chained but there " \
             "isn't a subsequent rule." << std::endl;
         return false;

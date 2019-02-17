@@ -222,7 +222,7 @@ bool Rbl::evaluate(Transaction *t, Rule *rule,
     furtherInfo(sin, ipStr, t);
 
     freeaddrinfo(info);
-    if (rule && t && rule->m_containsCaptureAction) {
+    if (rule && t && rule->hasCaptureAction()) {
         t->m_collections.m_tx_collection->storeOrUpdateFirst(
         "0", std::string(ipStr));
         ms_dbg_a(t, 7, "Added RXL match TX.0: " + \

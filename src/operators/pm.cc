@@ -103,7 +103,7 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
         transaction->m_matched.push_back(match_);
     }
 
-    if (rule && rule->m_containsCaptureAction && transaction && rc) {
+    if (rule && rule->hasCaptureAction() && transaction && rc) {
         transaction->m_collections.m_tx_collection->storeOrUpdateFirst("0",
             std::string(match));
         ms_dbg_a(transaction, 7, "Added pm match TX.0: " + \

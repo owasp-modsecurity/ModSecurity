@@ -53,7 +53,7 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
     }
 
     matches = re->searchAll(input);
-    if (rule && rule->m_containsCaptureAction && transaction) {
+    if (rule && rule->hasCaptureAction() && transaction) {
         int i = 0;
         matches.reverse();
         for (const SMatch& a : matches) {

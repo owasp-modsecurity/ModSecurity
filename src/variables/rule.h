@@ -95,13 +95,13 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         Rule *r = rule;
 
-        while (r && !r->m_severity) {
+        while (r && !r->hasSeverity()) {
             r = r->m_chainedRuleParent;
         }
 
-        if (r && r->m_severity) {
+        if (r && r->hasSeverity()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(std::to_string(r->m_severity->m_severity));
+            std::string *a = new std::string(std::to_string(r->severity()));
             VariableValue *var = new VariableValue(
                 std::make_shared<std::string>("RULE:severity"),
                 a
@@ -120,13 +120,13 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         Rule *r = rule;
 
-        while (r && !r->m_logData) {
+        while (r && !r->hasLogData()) {
             r = r->m_chainedRuleParent;
         }
 
-        if (r && r->m_logData) {
+        if (r && r->hasLogData()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(r->m_logData->data(t));
+            std::string *a = new std::string(r->logData(t));
             VariableValue *var = new VariableValue(
                 std::make_shared<std::string>("RULE:logdata"),
                 a
@@ -144,13 +144,13 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         Rule *r = rule;
 
-        while (r && !r->m_msg) {
+        while (r && !r->hasMsg()) {
             r = r->m_chainedRuleParent;
         }
 
-        if (r && r->m_msg) {
+        if (r && r->hasMsg()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(r->m_msg->data(t));
+            std::string *a = new std::string(r->msg(t));
             VariableValue *var = new VariableValue(
                 std::make_shared<std::string>("RULE:msg"),
                 a

@@ -32,10 +32,10 @@ class Driver;
 class RulesSetPhases {
  public:
     bool insert(std::shared_ptr<Rule> rule) {
-        if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
+        if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
             return false;
         }
-        m_rulesAtPhase[rule->m_phase].insert(rule);
+        m_rulesAtPhase[rule->getPhase()].insert(rule);
 
         return true;
     }
@@ -48,7 +48,7 @@ class RulesSetPhases {
             v.reserve(m_rulesAtPhase[i].size());
             for (size_t z = 0; z < m_rulesAtPhase[i].size(); z++) {
                 Rule *rule_ckc = m_rulesAtPhase[i].at(z).get();
-                if (rule_ckc->m_secMarker == true) {
+                if (rule_ckc->isMarker() == true) {
                     continue;
                 }
                 v.push_back(rule_ckc->m_ruleId);
