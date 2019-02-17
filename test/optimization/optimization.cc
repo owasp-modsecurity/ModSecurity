@@ -86,8 +86,8 @@ int main(int argc, char **argv) {
             if (z == NULL) {
                 continue;
             }
-            if (z->m_op != NULL) {
-                std::string op = z->m_op->m_op;
+            if (z->isUnconditional() == false) {
+                std::string op = z->getOperatorName();
                 if (operators.count(op) > 0) {
                     operators[op] = 1 + operators[op];
                 } else {
@@ -95,6 +95,11 @@ int main(int argc, char **argv) {
                 }
                 key = op;
             }
+            #if 0
+
+            FIXME: This test may not be useful anymore. Disabling it for now.
+
+            
             if (z->m_variables != NULL) {
                 std::string var = std::string("") + z->m_variables;
                 if (variables.count(var) > 0) {
@@ -111,6 +116,7 @@ int main(int argc, char **argv) {
                     op2var[key] = 1;
                 }
             }
+            #endif
         }
 
         if (operators.empty() && variables.empty() && op2var.empty()) {

@@ -61,12 +61,12 @@ class Driver;
 #include "src/actions/skip_after.h"
 #include "src/actions/skip.h"
 #include "src/actions/tag.h"
-#include "src/actions/transformations/none.h"
-#include "src/actions/transformations/transformation.h"
-#include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/ver.h"
 #include "src/actions/xmlns.h"
 
+#include "src/actions/transformations/none.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/transformations/hex_encode.h"
 #include "src/actions/transformations/parity_even_7bit.h"
 #include "src/actions/transformations/utf8_to_unicode.h"
@@ -1066,8 +1066,13 @@ expression:
     | DIRECTIVE variables op actions
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$4.get()) {
-            a->push_back(i.release());
+            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            } else {
+              a->push_back(i.release());
+            }
         }
         variables::Variables *v = new variables::Variables();
         for (auto &i : *$2.get()) {
@@ -1079,6 +1084,7 @@ expression:
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
+            /* transformations */ t,
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
@@ -1098,6 +1104,7 @@ expression:
             /* op */ $3.release(),
             /* variables */ v,
             /* actions */ NULL,
+            /* transformations */ NULL,
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
@@ -1108,13 +1115,19 @@ expression:
     | CONFIG_DIR_SEC_ACTION actions
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$2.get()) {
-            a->push_back(i.release());
+            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            } else {
+              a->push_back(i.release());
+            }
         }
         std::unique_ptr<Rule> rule(new Rule(
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
+            /* transformations */ t,
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
@@ -1124,12 +1137,18 @@ expression:
       {
         std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$2.get()) {
-            a->push_back(i.release());
+            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            } else {
+              a->push_back(i.release());
+            }
         }
         std::unique_ptr<RuleScript> r(new RuleScript(
             /* path to script */ $1,
             /* actions */ a,
+            /* transformations */ t,
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
@@ -1163,7 +1182,7 @@ expression:
                 delete phase;
             } else if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind ||
                 a->action_kind == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
+                                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
                 if (none != NULL) {
                     driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");
                     YYERROR;

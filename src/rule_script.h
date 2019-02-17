@@ -46,9 +46,10 @@ class RuleScript : public Rule {
  public:
     RuleScript(std::string name,
         std::vector<Action *> *actions,
+        Transformations *t,
         std::unique_ptr<std::string> fileName,
         int lineNumber)
-            : Rule(NULL, NULL, actions, std::move(fileName), lineNumber),
+            : Rule(NULL, NULL, actions, t, std::move(fileName), lineNumber),
         m_name(name) { }
 
     bool init(std::string *err);

@@ -124,7 +124,7 @@ bool VerifySSN::evaluate(Transaction *t, Rule *rule,
             is_ssn = verify(i.str().c_str(), i.str().size());
             if (is_ssn) {
                 logOffset(ruleMessage, i.offset(), i.str().size());
-                if (rule && t && rule->m_containsCaptureAction) {
+                if (rule && t && rule->hasCaptureAction()) {
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", i.str());
                     ms_dbg_a(t, 7, "Added VerifySSN match TX.0: " + \

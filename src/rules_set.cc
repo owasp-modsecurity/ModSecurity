@@ -141,7 +141,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
 #endif
             ms_dbg_a(t, 9, "Rule: " + rule->m_marker);
 
-            if (rule->m_secMarker && rule->m_marker == t->m_marker) {
+            if (rule->isMarker() && rule->m_marker == t->m_marker) {
                 ms_dbg_a(t, 4, "Out of a SecMarker after skip " \
                     + std::to_string(m_secmarker_skipped) + " rules.");
                 t->m_marker.clear();
