@@ -79,7 +79,7 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
             msg.append(std::to_string(code));
         }
         msg.append(" (phase ");
-        msg.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
+        msg.append(std::to_string(rm->m_rule->getPhase() - 1) + "). ");
     } else {
         msg.append("ModSecurity: Warning. ");
     }

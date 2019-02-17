@@ -52,67 +52,68 @@ using actions::transformations::None;
 using actions::transformations::Transformation;
 
 Rule::Rule(const std::string &marker)
-    : m_theDisruptiveAction(nullptr),
-    m_logData(nullptr),
-    m_msg(nullptr),
-    m_severity(nullptr),
-    m_chained(false),
-    m_containsCaptureAction(false),
-    m_containsMultiMatchAction(false),
-    m_containsStaticBlockAction(false),
-    m_secMarker(true),
-    m_ruleId(0),
-    m_accuracy(0),
-    m_lineNumber(0),
-    m_maturity(0),
-    m_phase(-1),
-    m_variables(NULL),
-    m_op(NULL),
+    : m_ruleId(0),
     m_chainedRuleChild(nullptr),
     m_chainedRuleParent(NULL),
     /* m_fileName(""), */
     m_marker(marker),
     m_rev(""),
     m_ver(""),
-    m_actionsRuntimePos(),
-    m_actionsRuntimePre(),
-    m_actionsSetVar(),
-    m_actionsTag(),
-    m_unconditional(false) { }
-
-Rule::Rule(Operator *_op,
-    variables::Variables *_variables,
-    std::vector<Action *> *actions,
-    std::unique_ptr<std::string> fileName,
-    int lineNumber)
-    : m_theDisruptiveAction(nullptr),
+    m_accuracy(0),
+    m_maturity(0),
+    m_lineNumber(0),
+    m_variables(NULL),
+    m_operator(NULL),
+    m_disruptiveAction(nullptr),
     m_logData(nullptr),
     m_msg(nullptr),
     m_severity(nullptr),
-    m_chained(false),
+    m_actionsRuntimePos(),
+    m_actionsSetVar(),
+    m_actionsTag(),
+    m_transformations(),
     m_containsCaptureAction(false),
     m_containsMultiMatchAction(false),
     m_containsStaticBlockAction(false),
-    m_secMarker(false),
-    m_ruleId(0),
-    m_accuracy(0),
-    m_lineNumber(lineNumber),
-    m_maturity(0),
-    m_phase(-1),
-    m_variables(_variables),
-    m_op(_op),
+    m_isChained(false),
+    m_isSecMarker(true),
+    m_unconditional(false),
+    m_phase(-1) { }
+
+Rule::Rule(Operator *op,
+    variables::Variables *variables,
+    std::vector<Action *> *actions,
+    Transformations *transformations,
+    std::unique_ptr<std::string> fileName,
+    int lineNumber)
+    : m_ruleId(0),
     m_chainedRuleChild(nullptr),
     m_chainedRuleParent(NULL),
     m_fileName(std::move(fileName)),
     m_marker(""),
     m_rev(""),
     m_ver(""),
+    m_accuracy(0),
+    m_maturity(0),
+    m_lineNumber(lineNumber),
+    m_variables(variables),
+    m_operator(op),
+    m_disruptiveAction(nullptr),
+    m_logData(nullptr),
+    m_msg(nullptr),
+    m_severity(nullptr),
     m_actionsRuntimePos(),
-    m_actionsRuntimePre(),
     m_actionsSetVar(),
     m_actionsTag(),
-    m_unconditional(false) {
-    /* */
+    m_transformations(transformations != NULL ? *transformations : Transformations()),
+    m_containsCaptureAction(false),
+    m_containsMultiMatchAction(false),
+    m_containsStaticBlockAction(false),
+    m_isChained(false),
+    m_isSecMarker(false),
+    m_unconditional(false),
+    m_phase(-1) {
+
     organizeActions(actions);
 
     /**
@@ -123,15 +124,13 @@ Rule::Rule(Operator *_op,
         m_phase = modsecurity::Phases::RequestHeadersPhase;
     }
 
-    m_unconditional = (m_op == NULL);
-
     delete actions;
 }
 
 
 Rule::~Rule() {
-    if (m_op != NULL) {
-        delete m_op;
+    if (m_operator != NULL) {
+        delete m_operator;
     }
 
     cleanUpActions();
@@ -156,8 +155,6 @@ void Rule::organizeActions(std::vector<Action *> *actions) {
         if (a->action_kind == Action::ConfigurationKind) {
             a->evaluate(this, NULL);
             delete a;
-        } else if (a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
-            m_actionsRuntimePre.push_back(a);
         } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
             if (dynamic_cast<actions::Capture *>(a)) {
                 m_containsCaptureAction = true;
@@ -180,11 +177,11 @@ void Rule::organizeActions(std::vector<Action *> *actions) {
                 m_actionsRuntimePos.push_back(a);
                 m_containsStaticBlockAction = true;
             } else if (a->isDisruptive() == true) {
-                if (m_theDisruptiveAction != nullptr) {
-                    delete m_theDisruptiveAction;
-                    m_theDisruptiveAction = nullptr;
+                if (m_disruptiveAction != nullptr) {
+                    delete m_disruptiveAction;
+                    m_disruptiveAction = nullptr;
                 }
-                m_theDisruptiveAction = a;
+                m_disruptiveAction = a;
             } else {
                 m_actionsRuntimePos.push_back(a);
             }
@@ -210,9 +207,9 @@ void Rule::cleanUpActions() {
         delete m_msg;
         m_msg = nullptr;
     }
-    while (m_actionsRuntimePre.empty() == false) {
-        auto *a = m_actionsRuntimePre.back();
-        m_actionsRuntimePre.pop_back();
+    while (m_transformations.empty() == false) {
+        auto *a = m_transformations.back();
+        m_transformations.pop_back();
         delete a;
     }
     while (m_actionsRuntimePos.empty() == false) {
@@ -230,9 +227,9 @@ void Rule::cleanUpActions() {
         m_actionsTag.pop_back();
         delete a;
     }
-    if (m_theDisruptiveAction != nullptr) {
-        delete m_theDisruptiveAction;
-        m_theDisruptiveAction = nullptr;
+    if (m_disruptiveAction != nullptr) {
+        delete m_disruptiveAction;
+        m_disruptiveAction = nullptr;
     }
 }
 
@@ -310,7 +307,7 @@ bool Rule::executeOperatorAt(Transaction *trans, const std::string &key,
         utils::string::toHexIfNeeded(value)) \
         + "\" (Variable: " + key + ")");
 
-    ret = this->m_op->evaluateInternal(trans, this, value, ruleMessage);
+    ret = this->m_operator->evaluateInternal(trans, this, value, ruleMessage);
     if (ret == false) {
         return false;
     }
@@ -374,7 +371,7 @@ void Rule::executeTransformations(
             std::shared_ptr<std::string>(new std::string(path))));
     }
 
-    for (Action *a : this->m_actionsRuntimePre) {
+    for (Action *a : m_transformations) {
         if (a->m_isNone) {
             none++;
         }
@@ -397,7 +394,7 @@ void Rule::executeTransformations(
         }
     }
 
-    for (Action *a : this->m_actionsRuntimePre) {
+    for (Transformation *a : m_transformations) {
         if (none == 0) {
             Transformation *t = dynamic_cast<Transformation *>(a);
             executeTransformation(t, &value, trans, &ret, &path,
@@ -408,12 +405,14 @@ void Rule::executeTransformations(
         }
     }
 
+    // FIXME: It can't be something different from transformation. Sort this
+    //        on rules compile time.
     for (auto &b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
         }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        Transformation *a = dynamic_cast<Transformation*>(b.second.get());
         if (a->m_isNone) {
             none++;
         }
@@ -424,7 +423,7 @@ void Rule::executeTransformations(
         if (m_ruleId != b.first) {
             continue;
         }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        Transformation *a = dynamic_cast<Transformation*>(b.second.get());
         if (none == 0) {
             Transformation *t = dynamic_cast<Transformation *>(a);
             executeTransformation(t, &value, trans, &ret, &path,
@@ -598,9 +597,9 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
             executeAction(trans, containsBlock, ruleMessage, a, false);
         }
     }
-    if (!disruptiveAlreadyExecuted && m_theDisruptiveAction != nullptr) {
+    if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
         executeAction(trans, containsBlock, ruleMessage,
-            m_theDisruptiveAction, false);
+            m_disruptiveAction, false);
     }
 }
 
@@ -623,11 +622,11 @@ bool Rule::evaluate(Transaction *trans,
 
     trans->m_matched.clear();
 
-    if (m_secMarker == true) {
+    if (isMarker() == true) {
         return true;
     }
 
-    if (m_unconditional == true) {
+    if (isUnconditional() == true) {
         ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
             + ") Executing unconditional rule...");
         executeActionsIndependentOfChainedRuleResult(trans,
@@ -652,24 +651,24 @@ bool Rule::evaluate(Transaction *trans,
         return true;
     }
 
-    if (m_op->m_string) {
-        eparam = m_op->m_string->evaluate(trans);
+    if (m_operator->m_string) {
+        eparam = m_operator->m_string->evaluate(trans);
 
-        if (m_op->m_string->containsMacro()) {
+        if (m_operator->m_string->containsMacro()) {
             eparam = "\"" + eparam + "\" Was: \"" \
-                + m_op->m_string->evaluate(NULL) + "\"";
+                + m_operator->m_string->evaluate(NULL) + "\"";
         } else {
             eparam = "\"" + eparam + "\"";
         }
     ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
-        + ") Executing operator \"" + this->m_op->m_op \
+        + ") Executing operator \"" + getOperatorName() \
         + "\" with param " \
         + eparam \
         + " against " \
         + variables + ".");
     } else {
         ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
-            + ") Executing operator \"" + this->m_op->m_op \
+            + ") Executing operator \"" + getOperatorName() \
             + " against " \
             + variables + ".");
     }
@@ -720,7 +719,7 @@ bool Rule::evaluate(Transaction *trans,
                 ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
 
                 if (ret == true) {
-                    ruleMessage->m_match = m_op->resolveMatchMessage(trans,
+                    ruleMessage->m_match = m_operator->resolveMatchMessage(trans,
                         key, value);
                     for (auto &i : v->getOrigin()) {
                         ruleMessage->m_reference.append(i->toText());
@@ -763,7 +762,7 @@ bool Rule::evaluate(Transaction *trans,
     }
     ms_dbg_a(trans, 4, "Rule returned 1.");
 
-    if (this->m_chained == false) {
+    if (this->isChained() == false) {
         goto end_exec;
     }
 
@@ -811,7 +810,7 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name,
             ret.push_back(z);
         }
     }
-    for (auto &z : m_actionsRuntimePre) {
+    for (auto &z : m_transformations) {
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
@@ -854,5 +853,9 @@ bool Rule::containsMsg(const std::string& name, Transaction *t) {
     return m_msg && m_msg->data(t) == name;
 }
 
+std::string Rule::getOperatorName() const { return m_operator->m_op; }
+std::string Rule::logData(Transaction *t) { return m_logData->data(t); }
+std::string Rule::msg(Transaction *t) { return m_msg->data(t); }
+int Rule::severity() const { return m_severity->m_severity; }
 
 }  // namespace modsecurity

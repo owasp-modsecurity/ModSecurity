@@ -51,7 +51,7 @@ class RuleMessage {
         m_maturity(rule->m_maturity),
         m_message(""),
         m_noAuditLog(false),
-        m_phase(rule->m_phase - 1),
+        m_phase(rule->getPhase() - 1),
         m_reference(""),
         m_rev(rule->m_rev),
         m_rule(rule),

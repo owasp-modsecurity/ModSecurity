@@ -56,11 +56,19 @@ using TransformationResult = std::pair<std::shared_ptr<std::string>,
     std::shared_ptr<std::string>>;
 using TransformationResults = std::list<TransformationResult>;
 
+using Transformation = actions::transformations::Transformation;
+using Transformations = std::vector<Transformation *>;
+
+using Tags = std::vector<actions::Tag *>;
+using SetVars = std::vector<actions::SetVar *>;
+using MatchActions = std::vector<actions::Action *>;
+
 class Rule {
  public:
-    Rule(operators::Operator *_op,
-            variables::Variables *_variables,
-            std::vector<actions::Action *> *_actions,
+    Rule(operators::Operator *op,
+            variables::Variables *variables,
+            std::vector<actions::Action *> *actions,
+            Transformations *transformations,
             std::unique_ptr<std::string> fileName,
             int lineNumber);
     explicit Rule(const std::string &marker);
@@ -108,37 +116,67 @@ class Rule {
         int *nth) const;
 
 
-    actions::Action *m_theDisruptiveAction;
-    actions::LogData *m_logData;
-    actions::Msg *m_msg;
-    actions::Severity *m_severity;
-    bool m_chained;
-    bool m_containsCaptureAction;
-    bool m_containsMultiMatchAction;
-    bool m_containsStaticBlockAction;
-    bool m_secMarker;
+
+    inline bool isUnconditional() const { return m_operator == NULL; }
+
+    virtual bool isMarker() { return m_isSecMarker; }
+
+    inline bool isChained() const { return m_isChained == true; }
+    inline bool hasCaptureAction() const { return m_containsCaptureAction == true; }
+    inline void setChained(bool b) { m_isChained = b; }
+    inline bool hasDisruptiveAction() const { return m_disruptiveAction != NULL; }
+
+
+    inline bool hasLogData() const { return m_logData != NULL; }
+    std::string logData(Transaction *t);
+    inline bool hasMsg() const { return m_msg != NULL; }
+    std::string msg(Transaction *t);
+    inline bool hasSeverity() const { return m_severity != NULL; }
+    int severity() const;
+    int getPhase() const { return m_phase; }
+    void setPhase(int phase) { m_phase = phase; }
+
+    std::string getOperatorName() const;
+
     int64_t m_ruleId;
-    int m_accuracy;
-    int m_lineNumber;
-    int m_maturity;
-    int m_phase;
-    modsecurity::variables::Variables *m_variables;
-    operators::Operator *m_op;
     std::unique_ptr<Rule> m_chainedRuleChild;
     Rule *m_chainedRuleParent;
+
     std::shared_ptr<std::string> m_fileName;
+
     std::string m_marker;
     std::string m_rev;
     std::string m_ver;
-    std::vector<actions::Action *> m_actionsRuntimePos;
-    std::vector<actions::Action *> m_actionsRuntimePre;
-    std::vector<actions::SetVar *> m_actionsSetVar;
-    std::vector<actions::Tag *> m_actionsTag;
+    int m_accuracy;
+    int m_maturity;
+    int m_lineNumber;
 
  private:
-    bool m_unconditional;
-};
+    modsecurity::variables::Variables *m_variables;
+    operators::Operator *m_operator;
 
+    /* actions */
+    actions::Action *m_disruptiveAction;
+    actions::LogData *m_logData;
+    actions::Msg *m_msg;
+    actions::Severity *m_severity;
+    MatchActions m_actionsRuntimePos;
+    SetVars m_actionsSetVar;
+    Tags m_actionsTag;
+
+    /* actions > transformations */
+    Transformations m_transformations;
+
+    bool m_containsCaptureAction:1;
+    bool m_containsMultiMatchAction:1;
+    bool m_containsStaticBlockAction:1;
+    bool m_isChained:1;
+    bool m_isSecMarker:1;
+    bool m_unconditional:1;
+
+    int m_phase;
+
+};
 
 }  // namespace modsecurity
 #endif

@@ -28,14 +28,13 @@
 
 namespace modsecurity {
 
-RulesSetPhases::~RulesSetPhases() {
-}
 
 bool RulesSetPhases::insert(std::shared_ptr<Rule> rule) {
-    if (rule->m_phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
+    if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
         return false;
     }
-    m_rules[rule->m_phase].insert(rule);
+    m_rulesAtPhase[rule->getPhase()].insert(rule);
+
     return true;
 }
 
@@ -45,10 +44,10 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
     std::vector<int64_t> v;
 
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        v.reserve(m_rules[i].size());
-        for (size_t z = 0; z < m_rules[i].size(); z++) {
-            Rule *rule_ckc = m_rules[i].at(z).get();
-            if (rule_ckc->m_secMarker == true) {
+        v.reserve(m_rulesAtPhase[i].size());
+        for (size_t z = 0; z < m_rulesAtPhase[i].size(); z++) {
+            Rule *rule_ckc = m_rulesAtPhase[i].at(z).get();
+            if (rule_ckc->isMarker() == true) {
                 continue;
             }
             v.push_back(rule_ckc->m_ruleId);
@@ -57,9 +56,11 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
     std::sort (v.begin(), v.end());
 
     for (int phase = 0; phase < modsecurity::Phases::NUMBER_OF_PHASES; phase++) {
-        if (m_rules[phase].append(from->at(phase), v, err) < 0) {
-            return -1;
+        int res = m_rulesAtPhase[phase].append(from->at(phase), v, err);
+        if (res < 0) {
+            return res;
         }
+        amount_of_rules = amount_of_rules + res;
     }
 
     return amount_of_rules;
@@ -68,9 +69,9 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
 void RulesSetPhases::dump() const {
     for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::cout << "Phase: " << std::to_string(i);
-        std::cout << " (" << std::to_string(m_rules[i].size());
+        std::cout << " (" << std::to_string(m_rulesAtPhase[i].size());
         std::cout << " rules)" << std::endl;
-        m_rules[i].dump();
+        m_rulesAtPhase[i].dump();
     }
 }
 

@@ -39,17 +39,18 @@ class Rule;
 /** @ingroup ModSecurity_CPP_API */
 class RulesSetPhases {
  public:
-    ~RulesSetPhases();
 
     bool insert(std::shared_ptr<Rule> rule);
 
     int append(RulesSetPhases *from, std::ostringstream *err);
     void dump() const;
 
-    Rules *operator[](int index) { return &m_rules[index]; }
-    Rules *at(int index) { return &m_rules[index]; }
+    Rules *operator[](int index) { return &m_rulesAtPhase[index]; }
+    Rules *at(int index) { return &m_rulesAtPhase[index]; }
 
-    Rules m_rules[8];
+ private:
+    Rules m_rulesAtPhase[8];
+
 };
 
 
