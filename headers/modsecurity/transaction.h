@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include <stack>
 #endif
 
 #include <stdlib.h>
@@ -47,6 +48,7 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
+
 
 #ifndef NO_LOGS
 #define ms_dbg(b, c) \
@@ -284,9 +286,38 @@ class TransactionAnchoredVariables {
     int m_variableOffset;
 };
 
+class TransactionSecMarkerManagement {
+ public:
+    bool isInsideAMarker() {
+        if (m_marker) {
+            return true;
+        }
+
+        return false;
+    }
+
+    std::shared_ptr<std::string> getCurrentMarker() {
+        if (m_marker) {
+            return m_marker;
+        } else {
+            throw;
+        }
+    }
+
+    void removeMarker() {
+        m_marker.reset();
+    }
+
+    void addMarker(std::shared_ptr<std::string> name) {
+        m_marker = name;
+    }
+
+ private:
+    std::shared_ptr<std::string> m_marker;
+};
 
 /** @ingroup ModSecurity_CPP_API */
-class Transaction : public TransactionAnchoredVariables {
+class Transaction : public TransactionAnchoredVariables, public TransactionSecMarkerManagement {
  public:
     Transaction(ModSecurity *transaction, RulesSet *rules, void *logCbData);
     Transaction(ModSecurity *transaction, RulesSet *rules, char *id,
@@ -513,12 +544,6 @@ class Transaction : public TransactionAnchoredVariables {
 	 * `UNIQUE_ID'. This unique id is also saved as part of the AuditLog.
      */
     std::shared_ptr<std::string> m_id;
-
-    /**
-     * Holds the SecMarker name that this transaction should wait to perform
-     * rules evaluation again.
-     */
-    std::string m_marker;
 
     /**
      * Holds the amount of rules that should be skipped. If bigger than 0 the

@@ -31,7 +31,7 @@ class Driver;
 /** @ingroup ModSecurity_CPP_API */
 class RulesSetPhases {
  public:
-    bool insert(std::shared_ptr<Rule> rule) {
+    bool insert(std::shared_ptr<RuleBase> rule) {
         if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
             return false;
         }
@@ -43,12 +43,11 @@ class RulesSetPhases {
     int append(RulesSetPhases *from, std::ostringstream *err) {
         int amount_of_rules = 0;
         std::vector<int64_t> v;
-
         for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
             v.reserve(m_rulesAtPhase[i].size());
             for (size_t z = 0; z < m_rulesAtPhase[i].size(); z++) {
-                Rule *rule_ckc = m_rulesAtPhase[i].at(z).get();
-                if (rule_ckc->isMarker() == true) {
+                Rule *rule_ckc = dynamic_cast<Rule *>(m_rulesAtPhase->at(i).get());
+                if (!rule_ckc) {
                     continue;
                 }
                 v.push_back(rule_ckc->m_ruleId);
