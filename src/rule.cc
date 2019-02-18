@@ -51,17 +51,18 @@ using variables::Variable;
 using actions::transformations::None;
 using actions::transformations::Transformation;
 
-Rule::Rule(const std::string &marker)
-    : m_ruleId(0),
+Rule::Rule(const std::string &marker,
+    std::unique_ptr<std::string> fileName,
+    int lineNumber)
+    : RuleBase(std::move(fileName), lineNumber),
+    m_ruleId(0),
     m_chainedRuleChild(nullptr),
     m_chainedRuleParent(NULL),
-    /* m_fileName(""), */
     m_marker(marker),
     m_rev(""),
     m_ver(""),
     m_accuracy(0),
     m_maturity(0),
-    m_lineNumber(0),
     m_variables(NULL),
     m_operator(NULL),
     m_disruptiveAction(nullptr),
@@ -77,8 +78,7 @@ Rule::Rule(const std::string &marker)
     m_containsStaticBlockAction(false),
     m_isChained(false),
     m_isSecMarker(true),
-    m_unconditional(false),
-    m_phase(-1) { }
+    m_unconditional(false) { }
 
 Rule::Rule(Operator *op,
     variables::Variables *variables,
@@ -86,16 +86,15 @@ Rule::Rule(Operator *op,
     Transformations *transformations,
     std::unique_ptr<std::string> fileName,
     int lineNumber)
-    : m_ruleId(0),
+    : RuleBase(std::move(fileName), lineNumber),
+    m_ruleId(0),
     m_chainedRuleChild(nullptr),
     m_chainedRuleParent(NULL),
-    m_fileName(std::move(fileName)),
     m_marker(""),
     m_rev(""),
     m_ver(""),
     m_accuracy(0),
     m_maturity(0),
-    m_lineNumber(lineNumber),
     m_variables(variables),
     m_operator(op),
     m_disruptiveAction(nullptr),
@@ -111,18 +110,9 @@ Rule::Rule(Operator *op,
     m_containsStaticBlockAction(false),
     m_isChained(false),
     m_isSecMarker(false),
-    m_unconditional(false),
-    m_phase(-1) {
+    m_unconditional(false) {
 
     organizeActions(actions);
-
-    /**
-     * If phase is not entered, we assume phase 2. For historical reasons.
-     *
-     */
-    if (m_phase == -1) {
-        m_phase = modsecurity::Phases::RequestHeadersPhase;
-    }
 
     delete actions;
 }
@@ -381,7 +371,7 @@ void Rule::executeTransformations(
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (auto &a : trans->m_rules->m_defaultActions[this->m_phase]) {
+        for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
             if (a->action_kind \
                 != actions::Action::RunTimeBeforeMatchAttemptKind) {
                 continue;
@@ -566,7 +556,7 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (auto &a : trans->m_rules->m_defaultActions[this->m_phase]) {
+    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
         if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }

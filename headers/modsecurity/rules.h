@@ -40,7 +40,7 @@ class Rules {
  public:
     void dump() const {
         for (int j = 0; j < m_rules.size(); j++) {
-            std::cout << "    Rule ID: " << std::to_string(m_rules.at(j)->m_ruleId);
+            std::cout << "    Rule ID: " << m_rules.at(j)->getReference();
             std::cout << "--" << m_rules.at(j) << std::endl;
         }
     }
@@ -48,8 +48,8 @@ class Rules {
     int append(Rules *from, const std::vector<int64_t> &ids, std::ostringstream *err) {
          size_t j = 0;
          for (; j < from->size(); j++) {
-            Rule *rule = from->at(j).get();
-             if (std::binary_search(ids.begin(), ids.end(), rule->m_ruleId)) {
+            Rule *rule = dynamic_cast<Rule *>(from->at(j).get());
+            if (rule && std::binary_search(ids.begin(), ids.end(), rule->m_ruleId)) {
                  if (err != NULL) {
                      *err << "Rule id: " << std::to_string(rule->m_ruleId) \
                         << " is duplicated" << std::endl;
@@ -61,28 +61,28 @@ class Rules {
          return j;
     }
 
-    bool insert(std::shared_ptr<Rule> rule) {
+    bool insert(std::shared_ptr<RuleBase> rule) {
         return insert(rule, nullptr, nullptr);
     }
 
-    bool insert(std::shared_ptr<Rule> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
-        if (ids != nullptr && std::binary_search(ids->begin(), ids->end(), rule->m_ruleId)) {
+    bool insert(std::shared_ptr<RuleBase> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
+        Rule *r = dynamic_cast<Rule *>(rule.get());
+        if (ids != nullptr && std::binary_search(ids->begin(), ids->end(), r->m_ruleId)) {
             if (err != nullptr) {
-                *err << "Rule id: " << std::to_string(rule->m_ruleId) \
+                *err << "Rule id: " << std::to_string(r->m_ruleId) \
                     << " is duplicated" << std::endl;
             }
             return false;
         }
-
         m_rules.push_back(rule);
         return true;
     }
 
     size_t size() const { return m_rules.size(); }
-    std::shared_ptr<Rule> operator[](int index) const { return m_rules[index]; }
-    std::shared_ptr<Rule> at(int index) const { return m_rules[index]; }
+    std::shared_ptr<RuleBase> operator[](int index) const { return m_rules[index]; }
+    std::shared_ptr<RuleBase> at(int index) const { return m_rules[index]; }
 
-    std::vector<std::shared_ptr<Rule> > m_rules;
+    std::vector<std::shared_ptr<RuleBase> > m_rules;
 };
 
 

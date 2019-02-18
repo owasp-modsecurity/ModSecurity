@@ -40,7 +40,7 @@ class Rule;
 class RulesSetPhases {
  public:
 
-    bool insert(std::shared_ptr<Rule> rule);
+    bool insert(std::shared_ptr<RuleBase> rule);
 
     int append(RulesSetPhases *from, std::ostringstream *err);
     void dump() const;

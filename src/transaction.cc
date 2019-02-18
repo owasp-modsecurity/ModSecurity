@@ -126,7 +126,6 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     m_requestBody(),
     m_responseBody(),
     /* m_id(), */
-    m_marker(""),
     m_skip_next(0),
     m_allowType(modsecurity::actions::disruptive::NoneAllowType),
     m_uri_decoded(""),
@@ -200,7 +199,6 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_requestBody(),
     m_responseBody(),
     m_id(std::unique_ptr<std::string>(new std::string(id))),
-    m_marker(""),
     m_skip_next(0),
     m_allowType(modsecurity::actions::disruptive::NoneAllowType),
     m_uri_decoded(""),

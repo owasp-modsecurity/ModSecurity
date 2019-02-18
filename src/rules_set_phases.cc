@@ -29,7 +29,7 @@
 namespace modsecurity {
 
 
-bool RulesSetPhases::insert(std::shared_ptr<Rule> rule) {
+bool RulesSetPhases::insert(std::shared_ptr<RuleBase> rule) {
     if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
         return false;
     }
@@ -46,8 +46,8 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         v.reserve(m_rulesAtPhase[i].size());
         for (size_t z = 0; z < m_rulesAtPhase[i].size(); z++) {
-            Rule *rule_ckc = m_rulesAtPhase[i].at(z).get();
-            if (rule_ckc->isMarker() == true) {
+            Rule *rule_ckc = dynamic_cast<Rule *>(m_rulesAtPhase[i].at(z).get());
+            if (!rule_ckc) {
                 continue;
             }
             v.push_back(rule_ckc->m_ruleId);

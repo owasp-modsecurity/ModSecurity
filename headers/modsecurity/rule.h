@@ -26,6 +26,7 @@
 #define HEADERS_MODSECURITY_RULE_H_
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/variable_value.h"
 
 
@@ -63,7 +64,80 @@ using Tags = std::vector<actions::Tag *>;
 using SetVars = std::vector<actions::SetVar *>;
 using MatchActions = std::vector<actions::Action *>;
 
-class Rule {
+class RuleBase {
+ public:
+    RuleBase(std::unique_ptr<std::string> fileName, int lineNumber)
+        : m_fileName(std::move(fileName)),
+        m_lineNumber(lineNumber),
+        m_phase(modsecurity::Phases::RequestHeadersPhase) {
+        }
+
+    virtual bool evaluate(Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm) = 0;
+
+    std::shared_ptr<std::string> getFileName() const {
+        return m_fileName;
+    }
+
+    int getLineNumber() const {
+        return m_lineNumber;
+    }
+
+    int getPhase() const { return m_phase; }
+    void setPhase(int phase) { m_phase = phase; }
+
+    virtual std::string getReference() {
+        return *m_fileName + ":" + std::to_string(m_lineNumber);
+    }
+
+
+    virtual bool isMarker() { return false; }
+
+ private:
+    std::shared_ptr<std::string> m_fileName;
+    int m_lineNumber;
+    // FIXME: phase may not be neede to SecMarker.
+    int m_phase;
+};
+
+
+class RuleMarker : public RuleBase {
+ public:
+    RuleMarker(
+        const std::string &name,
+        std::unique_ptr<std::string> fileName,
+        int lineNumber)
+        : RuleBase(std::move(fileName), lineNumber),
+        m_name(std::make_shared<std::string>(name)) { }
+
+
+    virtual bool evaluate(Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm) override {
+
+        if (transaction->isInsideAMarker()) {
+            if (*transaction->getCurrentMarker() == *m_name) {
+                transaction->removeMarker();
+                // FIXME: Move this to .cc
+                //        ms_dbg_a(transaction, 4, "Out of a SecMarker " + *m_name);
+            }
+        }
+
+        return true;
+    };
+
+
+    std::shared_ptr<std::string> getName() const {
+        return m_name;
+    }
+
+    bool isMarker() override { return true; }
+
+ private:
+    std::shared_ptr<std::string> m_name;
+};
+
+
+class Rule : public RuleBase {
  public:
     Rule(operators::Operator *op,
             variables::Variables *variables,
@@ -71,11 +145,13 @@ class Rule {
             Transformations *transformations,
             std::unique_ptr<std::string> fileName,
             int lineNumber);
-    explicit Rule(const std::string &marker);
+    explicit Rule(const std::string &marker,
+            std::unique_ptr<std::string> fileName,
+            int lineNumber);
     virtual ~Rule();
 
     virtual bool evaluate(Transaction *transaction,
-        std::shared_ptr<RuleMessage> rm);
+        std::shared_ptr<RuleMessage> rm) override;
 
     void organizeActions(std::vector<actions::Action *> *actions);
     void cleanUpActions();
@@ -119,8 +195,6 @@ class Rule {
 
     inline bool isUnconditional() const { return m_operator == NULL; }
 
-    virtual bool isMarker() { return m_isSecMarker; }
-
     inline bool isChained() const { return m_isChained == true; }
     inline bool hasCaptureAction() const { return m_containsCaptureAction == true; }
     inline void setChained(bool b) { m_isChained = b; }
@@ -133,23 +207,23 @@ class Rule {
     std::string msg(Transaction *t);
     inline bool hasSeverity() const { return m_severity != NULL; }
     int severity() const;
-    int getPhase() const { return m_phase; }
-    void setPhase(int phase) { m_phase = phase; }
 
     std::string getOperatorName() const;
 
     int64_t m_ruleId;
+
+    virtual std::string getReference() override {
+        return std::to_string(m_ruleId);
+    }
+
     std::unique_ptr<Rule> m_chainedRuleChild;
     Rule *m_chainedRuleParent;
-
-    std::shared_ptr<std::string> m_fileName;
 
     std::string m_marker;
     std::string m_rev;
     std::string m_ver;
     int m_accuracy;
     int m_maturity;
-    int m_lineNumber;
 
  private:
     modsecurity::variables::Variables *m_variables;
@@ -174,7 +248,7 @@ class Rule {
     bool m_isSecMarker:1;
     bool m_unconditional:1;
 
-    int m_phase;
+
 
 };
 
