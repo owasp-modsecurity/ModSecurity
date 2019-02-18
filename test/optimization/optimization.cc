@@ -81,11 +81,12 @@ int main(int argc, char **argv) {
         std::unordered_map<std::string, int> op2var;
 
         for (int i = 0; i < rules->size(); i++) {
-            std::shared_ptr<Rule> z = rules->at(i);
+            auto z = rules->at(i);
             std::string key;
             if (z == NULL) {
                 continue;
             }
+            #if 0
             if (z->isUnconditional() == false) {
                 std::string op = z->getOperatorName();
                 if (operators.count(op) > 0) {
@@ -95,6 +96,7 @@ int main(int argc, char **argv) {
                 }
                 key = op;
             }
+            #endif
             #if 0
 
             FIXME: This test may not be useful anymore. Disabling it for now.

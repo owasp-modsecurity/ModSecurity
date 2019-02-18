@@ -66,7 +66,7 @@ class Driver : public RulesSetProperties {
 
     int addSecRule(std::unique_ptr<Rule> rule);
     int addSecAction(std::unique_ptr<Rule> rule);
-    int addSecMarker(std::string marker);
+    int addSecMarker(std::string marker, std::unique_ptr<std::string> fileName, int lineNumber);
     int addSecRuleScript(std::unique_ptr<RuleScript> rule);
 
     bool scan_begin();
