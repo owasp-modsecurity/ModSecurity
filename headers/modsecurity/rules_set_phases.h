@@ -31,7 +31,7 @@ class Driver;
 /** @ingroup ModSecurity_CPP_API */
 class RulesSetPhases {
  public:
-    bool insert(std::shared_ptr<RuleBase> rule) {
+    bool insert(std::shared_ptr<Rule> rule) {
         if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
             return false;
         }

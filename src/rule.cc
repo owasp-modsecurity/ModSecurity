@@ -57,7 +57,7 @@ RuleWithActions::RuleWithActions(
     Transformations *transformations,
     std::unique_ptr<std::string> fileName,
     int lineNumber)
-    : RuleBase(std::move(fileName), lineNumber),
+    : Rule(std::move(fileName), lineNumber),
     m_accuracy(0),
     m_actionsRuntimePos(),
     m_transformations(transformations != NULL ? *transformations : Transformations()),

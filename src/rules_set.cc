@@ -134,7 +134,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
     for (int i = 0; i < rules->size(); i++) {
         // FIXME: This is not meant to be here. At the end of this refactoring,
         //        the shared pointer won't be used.
-        std::shared_ptr<RuleBase> rule = rules->at(i);
+        std::shared_ptr<Rule> rule = rules->at(i);
         if (t->isInsideAMarker() && !rule->isMarker()) {
             ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
                 + "' due to a SecMarker: " + *t->getCurrentMarker());
@@ -151,7 +151,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
             ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
                 + "' as request trough the utilization of an `allow' action.");
         } else {
-            RuleBase *base = rule.get();
+            Rule *base = rule.get();
             RuleWithOperator *ruleWithOperator = dynamic_cast<RuleWithOperator *>(base);
             if (m_exceptions.contains(ruleWithOperator->m_ruleId)) {
                 ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
