@@ -50,8 +50,7 @@ class SMatch {
 
 class Regex {
  public:
-    explicit Regex(const std::string& pattern_);
-    explicit Regex(const std::string& pattern_, int flags);
+    explicit Regex(const std::string& pattern_, bool caseSensitive = false);
     ~Regex();
 
     // m_pc and m_pce can't be easily copied
