@@ -42,14 +42,14 @@ namespace modsecurity {
 using actions::Action;
 
 /** @ingroup ModSecurity_CPP_API */
-class RuleScript : public Rule {
+class RuleScript : public RuleWithOperator {
  public:
     RuleScript(std::string name,
         std::vector<Action *> *actions,
         Transformations *t,
         std::unique_ptr<std::string> fileName,
         int lineNumber)
-            : Rule(NULL, NULL, actions, t, std::move(fileName), lineNumber),
+            : RuleWithOperator(NULL, NULL, actions, t, std::move(fileName), lineNumber),
         m_name(name) { }
 
     bool init(std::string *err);

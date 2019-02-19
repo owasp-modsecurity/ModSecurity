@@ -113,7 +113,7 @@ bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
 
         try {
             std::vector<const VariableValue *> l;
-            Rule *rr = dynamic_cast<Rule *>(rule);
+            RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(rule);
             m_variable->evaluate(t, rr, &l);
             if (l.size() == 0) {
                 value = 0;

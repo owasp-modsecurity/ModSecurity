@@ -221,15 +221,15 @@ class RuleWithActions : public RuleBase {
 };
 
 
-class Rule : public RuleWithActions {
+class RuleWithOperator : public RuleWithActions {
  public:
-    Rule(operators::Operator *_op,
+    RuleWithOperator(operators::Operator *_op,
             variables::Variables *_variables,
             std::vector<actions::Action *> *_actions,
             Transformations *transformations,
             std::unique_ptr<std::string> fileName,
             int lineNumber);
-    virtual ~Rule();
+    virtual ~RuleWithOperator();
 
     bool evaluate(Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;
@@ -254,8 +254,8 @@ class Rule : public RuleWithActions {
         return std::to_string(m_ruleId);
     }
 
-    std::unique_ptr<Rule> m_chainedRuleChild;
-    Rule *m_chainedRuleParent;
+    std::unique_ptr<RuleWithOperator> m_chainedRuleChild;
+    RuleWithOperator *m_chainedRuleParent;
 
  private:
     modsecurity::variables::Variables *m_variables;
