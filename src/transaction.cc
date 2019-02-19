@@ -556,25 +556,45 @@ int Transaction::addRequestHeader(const std::string& key,
 
     if (keyl == "cookie") {
         size_t localOffset = m_variableOffset;
+        size_t pos1, pos2;
         std::vector<std::string> cookies = utils::string::ssplit(value, ';');
         for (const std::string &c : cookies) {
-            std::vector<std::string> s = utils::string::split(c,
-               '=');
-            if (s.size() > 0) {
-                while (s[0].at(0) == ' ') {
-                    s[0].erase(0, 1);
-                }
-                m_variableRequestCookiesNames.set(s[0],
-                    s[0], localOffset);
-                localOffset = localOffset + s[0].size() + 1;
-                if (s.size() > 1) {
-                    m_variableRequestCookies.set(s[0], s[1], localOffset);
-                    localOffset = localOffset + s[1].size() + 2;
-                }
-                else {
-                    m_variableRequestCookies.set(s[0], "", localOffset);
-                }
+            pos1 = c.find_first_of("=", 0);
+            std::string ckey = "";
+            std::string cval = "";
+
+            // if the cookie doesn't contains '=', its just a key
+            if (pos1 == std::string::npos) {
+                ckey = c;
             }
+            // else split to two substrings
+            else {
+                ckey = c.substr(0, pos1);
+                cval = c.substr(pos1+1, c.length());
+            }
+
+            // remove leading spaces from key
+            while (ckey.at(0) == ' ') {
+                ckey.erase(0, 1);
+                localOffset++;
+            }
+            // replace remained spaces with underscore in key
+            pos2 = 0;
+            while(pos2 < ckey.length()) {
+                if (ckey.at(pos2) == ' ') {
+                    ckey.replace(pos2, 1, "_");
+                }
+                pos2++;
+            }
+            if (ckey.length() > 0) {
+                // set cookie name
+                m_variableRequestCookiesNames.set(ckey,
+                        ckey, localOffset);
+                localOffset = localOffset + ckey.length() + 1;
+                // set cookie value
+                m_variableRequestCookies.set(ckey, cval, localOffset);
+            }
+            localOffset = localOffset + cval.length() + 1;
         }
     }
     /**
