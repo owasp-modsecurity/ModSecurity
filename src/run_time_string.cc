@@ -59,7 +59,7 @@ std::string RunTimeString::evaluate(Transaction *t, RuleBase *r) {
         } else if (z->m_var != NULL && t != NULL) {
             std::vector<const VariableValue *> l;
             // FIXME: This cast should be removed.
-            Rule *rr = dynamic_cast<Rule *>(r);
+            RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(r);
             z->m_var->evaluate(t, rr, &l);
             if (l.size() > 0) {
                 s.append(l[0]->getValue());

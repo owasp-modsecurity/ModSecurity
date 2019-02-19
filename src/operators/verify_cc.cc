@@ -117,7 +117,7 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
 }
 
 
-bool VerifyCC::evaluate(Transaction *t, Rule *rule,
+bool VerifyCC::evaluate(Transaction *t, RuleWithOperator *rule,
     const std::string& i, std::shared_ptr<RuleMessage> ruleMessage) {
     int offset = 0;
     bool is_cc = false;

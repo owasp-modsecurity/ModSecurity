@@ -31,7 +31,7 @@
 
 namespace modsecurity {
 class Transaction;
-class Rule;
+class RuleWithOperator;
 class RuleWithActions;
 
 namespace actions {

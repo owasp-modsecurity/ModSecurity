@@ -75,7 +75,7 @@ class Rbl : public Operator {
                 m_provider = RblProvider::httpbl;
             }
         }
-    bool evaluate(Transaction *transaction, Rule *rule,
+    bool evaluate(Transaction *transaction, RuleWithOperator *rule,
         const std::string& input,
         std::shared_ptr<RuleMessage> ruleMessage) override;
 

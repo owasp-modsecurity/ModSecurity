@@ -35,7 +35,7 @@ class TimeEpoch : public Variable {
         m_retName("TIME_EPOCH") { }
 
     void evaluate(Transaction *transaction,
-        Rule *rule,
+        RuleWithOperator *rule,
         std::vector<const VariableValue *> *l) override;
     std::string m_retName;
 };

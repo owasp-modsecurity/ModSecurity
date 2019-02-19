@@ -49,7 +49,7 @@ class Rules {
     int append(Rules *from, const std::vector<int64_t> &ids, std::ostringstream *err) {
         size_t j = 0;
         for (; j < from->size(); j++) {
-            Rule *rule = dynamic_cast<Rule *>(from->at(j).get());
+            RuleWithOperator *rule = dynamic_cast<RuleWithOperator *>(from->at(j).get());
             if (rule && std::binary_search(ids.begin(), ids.end(), rule->m_ruleId)) {
                 if (err != NULL) {
                     *err << "Rule id: " << std::to_string(rule->m_ruleId) \
@@ -67,7 +67,7 @@ class Rules {
     }
 
     bool insert(std::shared_ptr<RuleBase> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
-        Rule *r = dynamic_cast<Rule *>(rule.get());
+        RuleWithOperator *r = dynamic_cast<RuleWithOperator *>(rule.get());
         if (r && ids != nullptr && err != nullptr
             && std::binary_search(ids->begin(), ids->end(), r->m_ruleId)) {
             if (err != NULL) {

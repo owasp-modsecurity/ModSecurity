@@ -295,7 +295,6 @@ class Driver;
 #include "src/variables/session.h"
 #include "src/variables/status.h"
 
-
 using namespace modsecurity;
 using namespace modsecurity::variables;
 using namespace modsecurity::Utils;
@@ -348,7 +347,7 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 352 "seclang-parser.hh" // lalr1.cc:401
+#line 351 "seclang-parser.hh" // lalr1.cc:401
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -464,7 +463,7 @@ using namespace modsecurity::operators;
 
 
 namespace yy {
-#line 468 "seclang-parser.hh" // lalr1.cc:401
+#line 467 "seclang-parser.hh" // lalr1.cc:401
 
 
 
@@ -8128,7 +8127,7 @@ switch (yytype)
 
 
 } // yy
-#line 8132 "seclang-parser.hh" // lalr1.cc:401
+#line 8131 "seclang-parser.hh" // lalr1.cc:401
 
 
 

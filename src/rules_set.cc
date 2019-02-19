@@ -152,7 +152,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 + "' as request trough the utilization of an `allow' action.");
         } else {
             RuleBase *base = rule.get();
-            Rule *ruleWithOperator = dynamic_cast<Rule *>(base);
+            RuleWithOperator *ruleWithOperator = dynamic_cast<RuleWithOperator *>(base);
             if (m_exceptions.contains(ruleWithOperator->m_ruleId)) {
                 ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
                     + "'. Removed by an SecRuleRemove directive.");

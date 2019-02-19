@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace variables {
 
 void Time::evaluate(Transaction *transaction,
-    Rule *rule,
+    RuleWithOperator *rule,
     std::vector<const VariableValue *> *l) {
 
     char tstr[200];

@@ -20,7 +20,7 @@
 #include "modsecurity/audit_log.h"
 
 using modsecurity::audit_log::AuditLog;
-using modsecurity::Rule;
+using modsecurity::RuleWithOperator;
 
 namespace modsecurity {
 namespace Parser {
@@ -53,7 +53,7 @@ int Driver::addSecMarker(std::string marker, std::unique_ptr<std::string> fileNa
 }
 
 
-int Driver::addSecAction(std::unique_ptr<Rule> rule) {
+int Driver::addSecAction(std::unique_ptr<RuleWithOperator> rule) {
     if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(rule->getPhase());
         m_parserError << std::endl;
@@ -72,7 +72,7 @@ int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
 }
 
 
-int Driver::addSecRule(std::unique_ptr<Rule> r) {
+int Driver::addSecRule(std::unique_ptr<RuleWithOperator> r) {
     if (r->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(r->getPhase());
         m_parserError << std::endl;
@@ -93,7 +93,7 @@ int Driver::addSecRule(std::unique_ptr<Rule> r) {
         return true;
     }
 
-    std::shared_ptr<Rule> rule(std::move(r));
+    std::shared_ptr<RuleWithOperator> rule(std::move(r));
     /*
      * Checking if the rule has an ID and also checking if this ID is not used
      * by other rule
@@ -108,7 +108,7 @@ int Driver::addSecRule(std::unique_ptr<Rule> r) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         Rules *rules = m_rulesSetPhases[i];
         for (int j = 0; j < rules->size(); j++) {
-            Rule *r = dynamic_cast<Rule *>(rules->at(j).get());
+            RuleWithOperator *r = dynamic_cast<RuleWithOperator *>(rules->at(j).get());
             if (r && r->m_ruleId == rule->m_ruleId) {
                 m_parserError << "Rule id: " << std::to_string(rule->m_ruleId) \
                     << " is duplicated" << std::endl;
