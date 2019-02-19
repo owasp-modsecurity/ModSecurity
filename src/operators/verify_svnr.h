@@ -32,7 +32,7 @@ class VerifySVNR : public Operator {
     bool operator=(const VerifySVNR &a) = delete;
     VerifySVNR(const VerifySVNR &a) = delete;
 
-    bool evaluate(Transaction *transaction, Rule *rule,
+    bool evaluate(Transaction *transaction, RuleWithOperator *rule,
         const std::string &input) override {
         return evaluate(transaction, NULL, input, NULL);
     }
@@ -40,7 +40,7 @@ class VerifySVNR : public Operator {
         const std::string &input) override {
         return evaluate(transaction, NULL, input);
     }
-    bool evaluate(Transaction *transaction, Rule *rule,
+    bool evaluate(Transaction *transaction, RuleWithOperator *rule,
         const std::string& input,
         std::shared_ptr<RuleMessage> ruleMessage) override;
 

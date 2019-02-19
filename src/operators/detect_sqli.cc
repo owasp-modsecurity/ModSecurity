@@ -25,7 +25,7 @@ namespace modsecurity {
 namespace operators {
 
 
-bool DetectSQLi::evaluate(Transaction *t, Rule *rule,
+bool DetectSQLi::evaluate(Transaction *t, RuleWithOperator *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     char fingerprint[8];
     int issqli;

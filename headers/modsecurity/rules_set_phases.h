@@ -34,7 +34,10 @@
 #ifdef __cplusplus
 
 namespace modsecurity {
-class Rule;
+class RuleWithOperator;
+namespace Parser {
+class Driver;
+}
 
 /** @ingroup ModSecurity_CPP_API */
 class RulesSetPhases {

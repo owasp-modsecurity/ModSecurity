@@ -34,7 +34,7 @@
 #include "src/parser/seclang-parser.hh"
 #endif
 
-using modsecurity::Rule;
+using modsecurity::RuleWithOperator;
 using modsecurity::RulesSet;
 
 
@@ -66,8 +66,8 @@ class Driver : public RulesSetProperties {
     Driver();
     virtual ~Driver();
 
-    int addSecRule(std::unique_ptr<Rule> rule);
-    int addSecAction(std::unique_ptr<Rule> rule);
+    int addSecRule(std::unique_ptr<RuleWithOperator> rule);
+    int addSecAction(std::unique_ptr<RuleWithOperator> rule);
     int addSecMarker(std::string marker, std::unique_ptr<std::string> fileName, int lineNumber);
     int addSecRuleScript(std::unique_ptr<RuleScript> rule);
 
@@ -89,7 +89,7 @@ class Driver : public RulesSetProperties {
     std::list<yy::location *> loc;
 
     std::string buffer;
-    Rule *m_lastRule;
+    RuleWithOperator *m_lastRule;
 
     RulesSetPhases m_rulesSetPhases;
 };

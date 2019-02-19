@@ -22,7 +22,7 @@
 
 
 namespace modsecurity {
-class Rule;
+class RuleWithOperator;
 namespace actions {
 
 

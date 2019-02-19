@@ -257,7 +257,6 @@ class Driver;
 #include "src/variables/session.h"
 #include "src/variables/status.h"
 
-
 using namespace modsecurity;
 using namespace modsecurity::variables;
 using namespace modsecurity::Utils;
@@ -1081,7 +1080,7 @@ expression:
         }
 
         Operator *op = $3.release();
-        std::unique_ptr<Rule> rule(new Rule(
+        std::unique_ptr<RuleWithOperator> rule(new RuleWithOperator(
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
@@ -1101,7 +1100,7 @@ expression:
             v->push_back(i.release());
         }
 
-        std::unique_ptr<Rule> rule(new Rule(
+        std::unique_ptr<RuleWithOperator> rule(new RuleWithOperator(
             /* op */ $3.release(),
             /* variables */ v,
             /* actions */ NULL,
@@ -1124,7 +1123,7 @@ expression:
               a->push_back(i.release());
             }
         }
-        std::unique_ptr<Rule> rule(new Rule(
+        std::unique_ptr<RuleWithOperator> rule(new RuleWithOperator(
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
