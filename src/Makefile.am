@@ -43,6 +43,8 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
 	../headers/modsecurity/rule_marker.h \
+	../headers/modsecurity/rule_with_actions.h \
+	../headers/modsecurity/rule_with_operator.h \
 	../headers/modsecurity/rules.h \
 	../headers/modsecurity/rule_message.h \
 	../headers/modsecurity/rules_set.h \
@@ -282,6 +284,8 @@ libmodsecurity_la_SOURCES = \
 	debug_log/debug_log_writer.cc \
 	run_time_string.cc \
 	rule.cc \
+	rule_with_actions.cc \
+	rule_with_operator.cc \
 	rule_message.cc \
 	rule_script.cc \
 	unique_id.cc \
