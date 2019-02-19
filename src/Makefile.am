@@ -42,6 +42,7 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/intervention.h \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
+	../headers/modsecurity/rule_marker.h \
 	../headers/modsecurity/rules.h \
 	../headers/modsecurity/rule_message.h \
 	../headers/modsecurity/rules_set.h \

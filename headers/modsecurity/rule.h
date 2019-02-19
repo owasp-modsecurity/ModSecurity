@@ -29,7 +29,6 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/variable_value.h"
 
-
 #ifdef __cplusplus
 
 namespace modsecurity {
@@ -100,43 +99,6 @@ class Rule {
     int m_lineNumber;
     // FIXME: phase may not be neede to SecMarker.
     int m_phase;
-};
-
-
-class RuleMarker : public Rule {
- public:
-    RuleMarker(
-        std::string name,
-        std::unique_ptr<std::string> fileName,
-        int lineNumber)
-        : Rule(std::move(fileName), lineNumber),
-        m_name(std::make_shared<std::string>(name)) { }
-
-
-    virtual bool evaluate(Transaction *transaction,
-        std::shared_ptr<RuleMessage> rm) override {
-
-        if (transaction->isInsideAMarker()) {
-            if (*transaction->getCurrentMarker() == *m_name) {
-                transaction->removeMarker();
-                // FIXME: Move this to .cc
-                //        ms_dbg_a(transaction, 4, "Out of a SecMarker " + *m_name);
-            }
-        }
-
-        return true;
-    };
-
-
-    std::shared_ptr<std::string> getName() {
-        return m_name;
-    }
-
-    bool isMarker() override { return true; }
-
- private:
-    std::shared_ptr<std::string> m_name;
-    int m_secmarker_skipped;
 };
 
 
