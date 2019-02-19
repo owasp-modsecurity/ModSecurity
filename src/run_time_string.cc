@@ -51,7 +51,7 @@ std::string RunTimeString::evaluate(Transaction *t) {
 }
 
 
-std::string RunTimeString::evaluate(Transaction *t, RuleBase *r) {
+std::string RunTimeString::evaluate(Transaction *t, Rule *r) {
     std::string s;
     for (auto &z : m_elements) {
         if (z->m_string.size() > 0) {

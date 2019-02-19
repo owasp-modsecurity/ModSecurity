@@ -66,9 +66,9 @@ using Tags = std::vector<actions::Tag *>;
 using SetVars = std::vector<actions::SetVar *>;
 using MatchActions = std::vector<actions::Action *>;
 
-class RuleBase {
+class Rule {
  public:
-    RuleBase(std::unique_ptr<std::string> fileName, int lineNumber)
+    Rule(std::unique_ptr<std::string> fileName, int lineNumber)
         : m_fileName(std::move(fileName)),
         m_lineNumber(lineNumber),
         m_phase(modsecurity::Phases::RequestHeadersPhase) {
@@ -103,13 +103,13 @@ class RuleBase {
 };
 
 
-class RuleMarker : public RuleBase {
+class RuleMarker : public Rule {
  public:
     RuleMarker(
         std::string name,
         std::unique_ptr<std::string> fileName,
         int lineNumber)
-        : RuleBase(std::move(fileName), lineNumber),
+        : Rule(std::move(fileName), lineNumber),
         m_name(std::make_shared<std::string>(name)) { }
 
 
@@ -140,7 +140,7 @@ class RuleMarker : public RuleBase {
 };
 
 
-class RuleWithActions : public RuleBase {
+class RuleWithActions : public Rule {
  public:
     RuleWithActions(
         Actions *a,
