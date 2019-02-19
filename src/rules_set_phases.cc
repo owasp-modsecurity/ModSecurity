@@ -29,7 +29,7 @@
 namespace modsecurity {
 
 
-bool RulesSetPhases::insert(std::shared_ptr<RuleBase> rule) {
+bool RulesSetPhases::insert(std::shared_ptr<Rule> rule) {
     if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
         return false;
     }

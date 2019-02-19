@@ -61,11 +61,11 @@ class Rules {
          return j;
     }
 
-    bool insert(std::shared_ptr<RuleBase> rule) {
+    bool insert(std::shared_ptr<Rule> rule) {
         return insert(rule, nullptr, nullptr);
     }
 
-    bool insert(std::shared_ptr<RuleBase> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
+    bool insert(std::shared_ptr<Rule> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
         RuleWithOperator *r = dynamic_cast<RuleWithOperator *>(rule.get());
         if (r && ids != nullptr && std::binary_search(ids->begin(), ids->end(), r->m_ruleId)) {
             if (err != nullptr) {
@@ -79,10 +79,10 @@ class Rules {
     }
 
     size_t size() const { return m_rules.size(); }
-    std::shared_ptr<RuleBase> operator[](int index) const { return m_rules[index]; }
-    std::shared_ptr<RuleBase> at(int index) const { return m_rules[index]; }
+    std::shared_ptr<Rule> operator[](int index) const { return m_rules[index]; }
+    std::shared_ptr<Rule> at(int index) const { return m_rules[index]; }
 
-    std::vector<std::shared_ptr<RuleBase> > m_rules;
+    std::vector<std::shared_ptr<Rule> > m_rules;
 };
 
 
