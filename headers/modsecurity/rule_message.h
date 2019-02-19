@@ -26,6 +26,7 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_with_operator.h"
 
 
 #ifdef __cplusplus

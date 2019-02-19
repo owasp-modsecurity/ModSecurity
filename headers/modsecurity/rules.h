@@ -27,6 +27,8 @@
 #endif
 
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_with_operator.h"
+#include "modsecurity/rule_with_actions.h"
 
 #ifndef HEADERS_MODSECURITY_RULES_H_
 #define HEADERS_MODSECURITY_RULES_H_
