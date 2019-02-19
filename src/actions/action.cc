@@ -51,7 +51,7 @@ std::string Action::evaluate(const std::string &value,
 }
 
 
-bool Action::evaluate(Rule *rule, Transaction *transaction) {
+bool Action::evaluate(RuleWithActions *rule, Transaction *transaction) {
     return true;
 }
 

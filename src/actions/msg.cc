@@ -46,7 +46,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Msg::evaluate(Rule *rule, Transaction *transaction,
+bool Msg::evaluate(RuleWithActions *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
     std::string msg = data(transaction);
     rm->m_message = msg;

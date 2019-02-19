@@ -48,7 +48,7 @@ bool RuleId::init(std::string *error) {
 }
 
 
-bool RuleId::evaluate(Rule *rule, Transaction *transaction) {
+bool RuleId::evaluate(RuleWithActions *rule, Transaction *transaction) {
     rule->m_ruleId = m_ruleId;
     return true;
 }
