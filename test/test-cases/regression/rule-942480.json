@@ -14,7 +14,7 @@
     "request":{
       "headers":{
         "Host":"localhost",
-        "Cookie": "'msdasql'"
+        "Cookie": "'msdasql'; key1=val1;  key2=val2=val2a;  key3 =  val3 "
       },
       "uri":"/",
       "method":"GET"
@@ -30,7 +30,8 @@
       ]
     },
     "expected":{
-      "http_code":400
+      "http_code":400,
+      "debug_log":"'msdasql' with value: 'msdasql'"
     },
     "rules":[
       "SecRuleEngine On",
