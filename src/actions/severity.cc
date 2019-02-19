@@ -71,7 +71,7 @@ bool Severity::init(std::string *error) {
 }
 
 
-bool Severity::evaluate(Rule *rule, Transaction *transaction,
+bool Severity::evaluate(RuleWithActions *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
     ms_dbg_a(transaction, 9, "This rule severity is: " + \
         std::to_string(this->m_severity) + " current transaction is: " + \

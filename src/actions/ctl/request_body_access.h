@@ -34,7 +34,7 @@ class RequestBodyAccess : public Action {
         m_request_body_access(false) { }
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
 
     bool m_request_body_access;
 };

@@ -35,7 +35,7 @@ class RuleRemoveTargetById : public Action {
         m_target("") { }
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
 
     int m_id;
     std::string m_target;

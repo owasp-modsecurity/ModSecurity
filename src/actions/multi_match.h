@@ -35,7 +35,7 @@ class MultiMatch : public Action {
     explicit MultiMatch(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
 };
 
 }  // namespace actions

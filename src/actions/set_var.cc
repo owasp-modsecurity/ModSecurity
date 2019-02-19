@@ -40,7 +40,7 @@ bool SetVar::init(std::string *error) {
 }
 
 
-bool SetVar::evaluate(Rule *rule, Transaction *t) {
+bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
     std::string targetValue;
     std::string resolvedPre;
 
@@ -113,7 +113,8 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
 
         try {
             std::vector<const VariableValue *> l;
-            m_variable->evaluate(t, rule, &l);
+            Rule *rr = dynamic_cast<Rule *>(rule);
+            m_variable->evaluate(t, rr, &l);
             if (l.size() == 0) {
                 value = 0;
             } else {

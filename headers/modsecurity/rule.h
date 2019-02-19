@@ -60,6 +60,8 @@ using TransformationResults = std::list<TransformationResult>;
 using Transformation = actions::transformations::Transformation;
 using Transformations = std::vector<Transformation *>;
 
+using Actions = std::vector<actions::Action *>;
+
 using Tags = std::vector<actions::Tag *>;
 using SetVars = std::vector<actions::SetVar *>;
 using MatchActions = std::vector<actions::Action *>;
@@ -138,47 +140,21 @@ class RuleMarker : public RuleBase {
 };
 
 
-class Rule : public RuleBase {
+class RuleWithActions : public RuleBase {
  public:
-    Rule(operators::Operator *_op,
-            variables::Variables *_variables,
-            std::vector<actions::Action *> *_actions,
-            Transformations *transformations,
-            std::unique_ptr<std::string> fileName,
-            int lineNumber);
-    explicit Rule(std::string marker,
-            std::unique_ptr<std::string> fileName,
-            int lineNumber);
-    virtual ~Rule();
+    RuleWithActions(
+        Actions *a,
+        Transformations *t,
+        std::unique_ptr<std::string> fileName,
+        int lineNumber);
 
-    virtual bool evaluate(Transaction *transaction,
-        std::shared_ptr<RuleMessage> rm);
+    ~RuleWithActions();
 
-    void organizeActions(std::vector<actions::Action *> *actions);
-    void cleanUpActions();
     void executeAction(Transaction *trans,
-    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
-        actions::Action *a, bool context);
-
-    void getVariablesExceptions(Transaction *t,
-        variables::Variables *exclusion, variables::Variables *addition);
-    inline void getFinalVars(variables::Variables *vars,
-        variables::Variables *eclusion, Transaction *trans);
-    void executeActionsAfterFullMatch(Transaction *trasn,
-        bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage);
-
-    bool executeOperatorAt(Transaction *trasn, std::string key,
-        std::string value, std::shared_ptr<RuleMessage> rm);
-    void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
-        bool *b, std::shared_ptr<RuleMessage> ruleMessage);
-    inline void updateMatchedVars(Transaction *trasn, const std::string &key,
-        const std::string &value);
-    inline void cleanMatchedVars(Transaction *trasn);
-
-    std::vector<actions::Action *> getActionsByName(const std::string& name,
-        Transaction *t);
-    bool containsTag(const std::string& name, Transaction *t);
-    bool containsMsg(const std::string& name, Transaction *t);
+        bool containsBlock,
+        std::shared_ptr<RuleMessage> ruleMessage,
+        actions::Action *a,
+        bool context);
 
 
     void executeTransformations(
@@ -191,16 +167,23 @@ class Rule : public RuleBase {
         std::string *path,
         int *nth);
 
+    void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
+        bool *b, std::shared_ptr<RuleMessage> ruleMessage);
+    void executeActionsAfterFullMatch(Transaction *trasn,
+        bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage);
 
-    inline bool isUnconditional() { return m_operator == NULL; }
-
-    virtual bool isMarker() { return m_isSecMarker; }
+    std::vector<actions::Action *> getActionsByName(const std::string& name,
+        Transaction *t);
+    bool containsTag(const std::string& name, Transaction *t);
+    bool containsMsg(const std::string& name, Transaction *t);
 
     inline bool isChained() { return m_isChained == true; }
     inline bool hasCaptureAction() { return m_containsCaptureAction == true; }
     inline void setChained(bool b) { m_isChained = b; }
     inline bool hasDisruptiveAction() { return m_disruptiveAction != NULL; }
-
+    inline bool hasBlockAction() { return m_containsStaticBlockAction == true; }
+    inline bool hasMultimatch() { return m_containsMultiMatchAction == true; }
+    inline bool hasBlock() { return m_containsStaticBlockAction == true; }
 
     inline bool hasLogData() { return m_logData != NULL; }
     std::string logData(Transaction *t);
@@ -209,19 +192,6 @@ class Rule : public RuleBase {
     inline bool hasSeverity() { return m_severity != NULL; }
     int severity();
 
-    std::string getOperatorName();
-
-    
-    int64_t m_ruleId;
-    std::shared_ptr<std::string> m_fileName;
-
-    virtual std::string getReference() override {
-        return std::to_string(m_ruleId);
-    }
-
-    std::unique_ptr<Rule> m_chainedRuleChild;
-    Rule *m_chainedRuleParent;
-
     std::string m_marker;
     std::string m_rev;
     std::string m_ver;
@@ -229,10 +199,9 @@ class Rule : public RuleBase {
     int m_maturity;
     int m_lineNumber;
 
- private:
-    modsecurity::variables::Variables *m_variables;
-    operators::Operator *m_operator;
+    int64_t m_ruleId;
 
+ private:
     /* actions */
     actions::Action *m_disruptiveAction;
     actions::LogData *m_logData;
@@ -249,11 +218,50 @@ class Rule : public RuleBase {
     bool m_containsMultiMatchAction:1;
     bool m_containsStaticBlockAction:1;
     bool m_isChained:1;
-    bool m_isSecMarker:1;
+};
+
+
+class Rule : public RuleWithActions {
+ public:
+    Rule(operators::Operator *_op,
+            variables::Variables *_variables,
+            std::vector<actions::Action *> *_actions,
+            Transformations *transformations,
+            std::unique_ptr<std::string> fileName,
+            int lineNumber);
+    virtual ~Rule();
+
+    bool evaluate(Transaction *transaction,
+        std::shared_ptr<RuleMessage> rm) override;
+
+    void getVariablesExceptions(Transaction *t,
+        variables::Variables *exclusion, variables::Variables *addition);
+    inline void getFinalVars(variables::Variables *vars,
+        variables::Variables *eclusion, Transaction *trans);
+
+    bool executeOperatorAt(Transaction *trasn, std::string key,
+        std::string value, std::shared_ptr<RuleMessage> rm);
+
+    inline void updateMatchedVars(Transaction *trasn, const std::string &key,
+        const std::string &value);
+    inline void cleanMatchedVars(Transaction *trasn);
+
+    inline bool isUnconditional() { return m_operator == NULL; }
+
+    std::string getOperatorName();
+
+    virtual std::string getReference() override {
+        return std::to_string(m_ruleId);
+    }
+
+    std::unique_ptr<Rule> m_chainedRuleChild;
+    Rule *m_chainedRuleParent;
+
+ private:
+    modsecurity::variables::Variables *m_variables;
+    operators::Operator *m_operator;
+
     bool m_unconditional:1;
-
-
-
 };
 
 }  // namespace modsecurity

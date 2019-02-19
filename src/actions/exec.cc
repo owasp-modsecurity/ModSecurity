@@ -49,7 +49,7 @@ bool Exec::init(std::string *error) {
 }
 
 
-bool Exec::evaluate(Rule *rule, Transaction *t) {
+bool Exec::evaluate(RuleWithActions *rule, Transaction *t) {
     ms_dbg_a(t, 8, "Running script... " + m_script);
     m_lua.run(t);
     return true;

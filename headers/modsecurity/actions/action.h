@@ -32,6 +32,7 @@
 namespace modsecurity {
 class Transaction;
 class Rule;
+class RuleWithActions;
 
 namespace actions {
 
@@ -59,8 +60,8 @@ class Action {
 
     virtual std::string evaluate(const std::string &exp,
         Transaction *transaction);
-    virtual bool evaluate(Rule *rule, Transaction *transaction);
-    virtual bool evaluate(Rule *rule, Transaction *transaction,
+    virtual bool evaluate(RuleWithActions *rule, Transaction *transaction);
+    virtual bool evaluate(RuleWithActions *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> ruleMessage) {
         return evaluate(rule, transaction);
     }

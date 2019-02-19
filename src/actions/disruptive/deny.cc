@@ -28,7 +28,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Deny::evaluate(Rule *rule, Transaction *transaction,
+bool Deny::evaluate(RuleWithActions *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
     ms_dbg_a(transaction, 8, "Running action deny");
 
