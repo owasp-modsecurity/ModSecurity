@@ -32,7 +32,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Capture::evaluate(Rule *rule, Transaction *transaction) {
+bool Capture::evaluate(RuleWithActions *rule, Transaction *transaction) {
     return true;
 }
 

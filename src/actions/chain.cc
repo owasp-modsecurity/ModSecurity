@@ -25,7 +25,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Chain::evaluate(Rule *rule, Transaction *transaction) {
+bool Chain::evaluate(RuleWithActions *rule, Transaction *transaction) {
     rule->setChained(true);
     return true;
 }

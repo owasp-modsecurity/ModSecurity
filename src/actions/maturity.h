@@ -33,7 +33,7 @@ class Maturity : public Action {
         : Action(action, ConfigurationKind),
         m_maturity(0) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
  private:
