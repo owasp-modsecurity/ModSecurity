@@ -58,12 +58,8 @@ RuleWithOperator::RuleWithOperator(Operator *op,
     std::unique_ptr<std::string> fileName,
     int lineNumber)
     : RuleWithActions(actions, transformations, std::move(fileName), lineNumber),
-    m_chainedRuleChild(nullptr),
-    m_chainedRuleParent(NULL),
-
     m_operator(op),
-    m_variables(_variables),
-    m_unconditional(false)  { /* */ }
+    m_variables(_variables) { /* */ }
 
 
 RuleWithOperator::~RuleWithOperator() {
@@ -118,6 +114,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &
         + "\" (Variable: " + key + ")");
 
     ret = this->m_operator->evaluateInternal(trans, this, value, ruleMessage);
+
     if (ret == false) {
         return false;
     }
@@ -216,35 +213,6 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
 }
 
 
-
-void RuleWithActions::executeAction(Transaction *trans,
-    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
-    Action *a, bool defaultContext) {
-    if (a->isDisruptive() == false && *a->m_name.get() != "block") {
-        ms_dbg_a(trans, 9, "Running " \
-            "action: " + *a->m_name.get());
-        a->evaluate(this, trans, ruleMessage);
-        return;
-    }
-
-    if (defaultContext && !containsBlock) {
-        ms_dbg_a(trans, 4, "Ignoring action: " + *a->m_name.get() + \
-            " (rule does not cotains block)");
-        return;
-    }
-
-    if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
-        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
-            ".");
-        a->evaluate(this, trans, ruleMessage);
-        return;
-    }
-
-    ms_dbg_a(trans, 4, "Not running any disruptive action (or block): " \
-        + *a->m_name.get() + ". SecRuleEngine is not On.");
-}
-
-
 bool RuleWithOperator::evaluate(Transaction *trans,
     std::shared_ptr<RuleMessage> ruleMessage) {
     bool globalRet = false;
@@ -256,25 +224,10 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     vars.reserve(4);
     variables::Variables exclusion;
 
-    if (ruleMessage == NULL) {
-        ruleMessage = std::shared_ptr<RuleMessage>(
-            new RuleMessage(this, trans));
-    }
+    RuleWithActions::evaluate(trans, ruleMessage);
 
-    trans->m_matched.clear();
 
-    if (isMarker() == true) {
-        return true;
-    }
-
-    if (isUnconditional() == true) {
-        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
-            + ") Executing unconditional rule...");
-        executeActionsIndependentOfChainedRuleResult(trans,
-            &containsBlock, ruleMessage);
-        goto end_exec;
-    }
-
+    // FIXME: Make a class runTimeException to handle this cases.
     for (auto &i : trans->m_ruleRemoveById) {
         if (m_ruleId != i) {
             continue;
@@ -313,6 +266,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             + " against " \
             + variables + ".");
     }
+
 
     getFinalVars(&vars, &exclusion, trans);
 
@@ -439,43 +393,6 @@ end_exec:
         }
 	}
     return true;
-}
-
-
-std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::string& name,
-    Transaction *trans) {
-    std::vector<actions::Action *> ret;
-    for (auto &z : m_actionsRuntimePos) {
-        if (*z->m_name.get() == name) {
-            ret.push_back(z);
-        }
-    }
-    for (auto &z : m_transformations) {
-        if (*z->m_name.get() == name) {
-            ret.push_back(z);
-        }
-    }
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
-        if (*z->m_name.get() == name) {
-            ret.push_back(z);
-        }
-    }
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
-        if (*z->m_name.get() == name) {
-            ret.push_back(z);
-        }
-    }
-    return ret;
 }
 
 

@@ -36,7 +36,7 @@ bool Rx::init(const std::string &arg, std::string *error) {
 }
 
 
-bool Rx::evaluate(Transaction *transaction, RuleWithOperator *rule,
+bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     std::list<SMatch> matches;
     Regex *re;

@@ -62,7 +62,6 @@ class RuleWithOperator : public RuleWithActions {
         const std::string &value);
     static void cleanMatchedVars(Transaction *trasn);
 
-    inline bool isUnconditional() const { return m_operator == NULL; }
 
     std::string getOperatorName() const;
 
@@ -70,15 +69,9 @@ class RuleWithOperator : public RuleWithActions {
         return std::to_string(m_ruleId);
     }
 
-    std::unique_ptr<RuleWithOperator> m_chainedRuleChild;
-    RuleWithOperator *m_chainedRuleParent;
-
  private:
     modsecurity::variables::Variables *m_variables;
     operators::Operator *m_operator;
-
-
-    bool m_unconditional:1;
 };
 
 

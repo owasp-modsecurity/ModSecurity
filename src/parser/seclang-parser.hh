@@ -55,6 +55,7 @@ class Driver;
 }
 }
 
+#include "modsecurity/rule_unconditional.h"
 #include "src/rule_script.h"
 
 #include "src/actions/accuracy.h"
@@ -347,7 +348,7 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 351 "seclang-parser.hh"
+#line 352 "seclang-parser.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -481,7 +482,7 @@ using namespace modsecurity::operators;
 #endif
 
 namespace yy {
-#line 485 "seclang-parser.hh"
+#line 486 "seclang-parser.hh"
 
 
 
@@ -8111,7 +8112,7 @@ switch (yytype)
   }
 
 } // yy
-#line 8115 "seclang-parser.hh"
+#line 8116 "seclang-parser.hh"
 
 
 

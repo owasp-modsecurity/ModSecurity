@@ -73,6 +73,8 @@ class Rule {
         m_phase(modsecurity::Phases::RequestHeadersPhase) {
         }
 
+    virtual bool evaluate(Transaction *transaction) = 0;
+
     virtual bool evaluate(Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) = 0;
 

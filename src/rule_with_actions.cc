@@ -65,6 +65,8 @@ RuleWithActions::RuleWithActions(
     m_accuracy(0),
     m_maturity(0),
     m_ruleId(0),
+    m_chainedRuleChild(nullptr),
+    m_chainedRuleParent(nullptr),
     m_disruptiveAction(nullptr),
     m_logData(nullptr),
     m_msg(nullptr),
@@ -77,6 +79,7 @@ RuleWithActions::RuleWithActions(
     m_containsMultiMatchAction(false),
     m_containsStaticBlockAction(false),
     m_isChained(false) {
+
     if (actions) {
         for (Action *a : *actions) {
             if (a->action_kind == Action::ConfigurationKind) {
@@ -163,6 +166,29 @@ RuleWithActions::~RuleWithActions() {
     }
 }
 
+
+bool RuleWithActions::evaluate(Transaction *transaction) {
+    RuleMessage rm(this, transaction);
+    std::shared_ptr<RuleMessage> rm2 = std::make_shared<RuleMessage>(&rm);
+    return evaluate(transaction, rm2);
+}
+
+
+bool RuleWithActions::evaluate(Transaction *transaction,
+    std::shared_ptr<RuleMessage> ruleMessage) {
+
+    /* Rule evaluate is pure virtual.
+     *
+     * Rule::evaluate(transaction, ruleMessage);
+     */
+
+    /* Matched vars needs to be clear at every new rule execution */
+    transaction->m_matched.clear();
+
+    return true;
+}
+
+
 void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     bool *containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
 
@@ -200,6 +226,76 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
     if (m_msg) {
         m_msg->evaluate(this, trans, ruleMessage);
     }
+}
+
+
+void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
+    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
+    bool disruptiveAlreadyExecuted = false;
+
+    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
+        if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
+            continue;
+        }
+        if (!a.get()->isDisruptive()) {
+            executeAction(trans, containsBlock, ruleMessage, a.get(), true);
+        }
+    }
+
+    for (actions::Tag *a : this->m_actionsTag) {
+        ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
+            + *a->m_name.get());
+        a->evaluate(this, trans, ruleMessage);
+    }
+
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        executeAction(trans, containsBlock, ruleMessage, a, false);
+        disruptiveAlreadyExecuted = true;
+    }
+    for (Action *a : this->m_actionsRuntimePos) {
+        if (!a->isDisruptive()
+                && !(disruptiveAlreadyExecuted
+                && dynamic_cast<actions::Block *>(a))) {
+            executeAction(trans, containsBlock, ruleMessage, a, false);
+        }
+    }
+    if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
+        executeAction(trans, containsBlock, ruleMessage,
+            m_disruptiveAction, false);
+    }
+}
+
+
+void RuleWithActions::executeAction(Transaction *trans,
+    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
+    Action *a, bool defaultContext) {
+    if (a->isDisruptive() == false && *a->m_name.get() != "block") {
+        ms_dbg_a(trans, 9, "Running " \
+            "action: " + *a->m_name.get());
+        a->evaluate(this, trans, ruleMessage);
+        return;
+    }
+
+    if (defaultContext && !containsBlock) {
+        ms_dbg_a(trans, 4, "Ignoring action: " + *a->m_name.get() + \
+            " (rule does not cotains block)");
+        return;
+    }
+
+    if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
+        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
+            ".");
+        a->evaluate(this, trans, ruleMessage);
+        return;
+    }
+
+    ms_dbg_a(trans, 4, "Not running any disruptive action (or block): " \
+        + *a->m_name.get() + ". SecRuleEngine is not On.");
 }
 
 
@@ -326,46 +422,6 @@ void RuleWithActions::executeTransformations(
     }
 }
 
-void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
-    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
-    bool disruptiveAlreadyExecuted = false;
-
-    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
-        if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
-            continue;
-        }
-        if (!a.get()->isDisruptive()) {
-            executeAction(trans, containsBlock, ruleMessage, a.get(), true);
-        }
-    }
-
-    for (actions::Tag *a : this->m_actionsTag) {
-        ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
-            + *a->m_name.get());
-        a->evaluate(this, trans, ruleMessage);
-    }
-
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        executeAction(trans, containsBlock, ruleMessage, a, false);
-        disruptiveAlreadyExecuted = true;
-    }
-    for (Action *a : this->m_actionsRuntimePos) {
-        if (!a->isDisruptive()
-                && !(disruptiveAlreadyExecuted
-                && dynamic_cast<actions::Block *>(a))) {
-            executeAction(trans, containsBlock, ruleMessage, a, false);
-        }
-    }
-    if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
-        executeAction(trans, containsBlock, ruleMessage,
-            m_disruptiveAction, false);
-    }
-}
 
 bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
     for (auto &tag : m_actionsTag) {
@@ -380,6 +436,44 @@ bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
 bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
     return m_msg && m_msg->data(t) == name;
 }
+
+
+std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::string& name,
+    Transaction *trans) {
+    std::vector<actions::Action *> ret;
+    for (auto &z : m_actionsRuntimePos) {
+        if (*z->m_name.get() == name) {
+            ret.push_back(z);
+        }
+    }
+    for (auto &z : m_transformations) {
+        if (*z->m_name.get() == name) {
+            ret.push_back(z);
+        }
+    }
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+        if (*z->m_name.get() == name) {
+            ret.push_back(z);
+        }
+    }
+    for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+        if (*z->m_name.get() == name) {
+            ret.push_back(z);
+        }
+    }
+    return ret;
+}
+
 
 std::string RuleWithActions::logData(Transaction *t) { return m_logData->data(t); }
 std::string RuleWithActions::msg(Transaction *t) { return m_msg->data(t); }
