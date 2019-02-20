@@ -17,6 +17,7 @@ class Driver;
 }
 }
 
+#include "modsecurity/rule_unconditional.h"
 #include "src/rule_script.h"
 
 #include "src/actions/accuracy.h"
@@ -1122,9 +1123,7 @@ expression:
               a->push_back(i.release());
             }
         }
-        std::unique_ptr<RuleWithOperator> rule(new RuleWithOperator(
-            /* op */ NULL,
-            /* variables */ NULL,
+        std::unique_ptr<RuleUnconditional> rule(new RuleUnconditional(
             /* actions */ a,
             /* transformations */ t,
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),

@@ -134,13 +134,13 @@ int RulesSet::evaluate(int phase, Transaction *t) {
     for (int i = 0; i < rules->size(); i++) {
         // FIXME: This is not meant to be here. At the end of this refactoring,
         //        the shared pointer won't be used.
-        std::shared_ptr<Rule> rule = rules->at(i);
+        auto rule = rules->at(i);
         if (t->isInsideAMarker() && !rule->isMarker()) {
             ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
                 + "' due to a SecMarker: " + *t->getCurrentMarker());
 
         } else if (rule->isMarker()) {
-            rule->evaluate(t, NULL);
+            rule->evaluate(t);
         } else if (t->m_skip_next > 0) {
             t->m_skip_next--;
             ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
@@ -152,18 +152,19 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 + "' as request trough the utilization of an `allow' action.");
         } else {
             Rule *base = rule.get();
-            RuleWithOperator *ruleWithOperator = dynamic_cast<RuleWithOperator *>(base);
-            if (m_exceptions.contains(ruleWithOperator->m_ruleId)) {
+            RuleWithActions *ruleWithActions = dynamic_cast<RuleWithActions *>(base);
+            // FIXME: Those should be treated inside the rule itself
+            if (ruleWithActions && m_exceptions.contains(ruleWithActions->m_ruleId)) {
                 ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
                     + "'. Removed by an SecRuleRemove directive.");
                 continue;
             }
             bool remove_rule = false;
-            if (m_exceptions.m_remove_rule_by_msg.empty() == false) {
+            if (ruleWithActions && m_exceptions.m_remove_rule_by_msg.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_msg) {
-                    if (ruleWithOperator->containsMsg(z, t) == true) {
+                    if (ruleWithActions->containsMsg(z, t) == true) {
                         ms_dbg_a(t, 9, "Skipped rule id '" \
-                            + ruleWithOperator->getReference() \
+                            + ruleWithActions->getReference() \
                             + "'. Removed by a SecRuleRemoveByMsg directive.");
                         remove_rule = true;
                         break;
@@ -174,11 +175,11 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 }
             }
 
-            if (m_exceptions.m_remove_rule_by_tag.empty() == false) {
+            if (ruleWithActions && m_exceptions.m_remove_rule_by_tag.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_tag) {
-                    if (ruleWithOperator->containsTag(z, t) == true) {
+                    if (ruleWithActions->containsTag(z, t) == true) {
                         ms_dbg_a(t, 9, "Skipped rule id '" \
-                            + ruleWithOperator->getReference() \
+                            + ruleWithActions->getReference() \
                             + "'. Removed by a SecRuleRemoveByTag directive.");
                         remove_rule = true;
                         break;
@@ -189,11 +190,12 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 }
             }
 
-            if (t->m_ruleRemoveByTag.empty() == false) {
+
+            if (ruleWithActions) {
                 for (auto &z : t->m_ruleRemoveByTag) {
-                    if (ruleWithOperator->containsTag(z, t) == true) {
+                    if (ruleWithActions->containsTag(z, t) == true) {
                         ms_dbg_a(t, 9, "Skipped rule id '" \
-                            + ruleWithOperator->getReference() \
+                            + ruleWithActions->getReference() \
                             + "'. Skipped due to a ruleRemoveByTag action.");
                         remove_rule = true;
                         break;
@@ -204,7 +206,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 }
             }
 
-            rule->evaluate(t, NULL);
+            rule->evaluate(t);
             if (t->m_it.disruptive == true) {
                 ms_dbg_a(t, 8, "Skipping this phase as this " \
                     "request was already intercepted.");

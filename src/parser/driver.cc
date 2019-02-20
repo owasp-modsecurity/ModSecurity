@@ -54,7 +54,7 @@ int Driver::addSecMarker(std::string marker, std::unique_ptr<std::string> fileNa
 }
 
 
-int Driver::addSecAction(std::unique_ptr<RuleWithOperator> rule) {
+int Driver::addSecAction(std::unique_ptr<RuleWithActions> rule) {
     if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(rule->getPhase());
         m_parserError << std::endl;
@@ -73,7 +73,7 @@ int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
 }
 
 
-int Driver::addSecRule(std::unique_ptr<RuleWithOperator> r) {
+int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
     if (r->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(r->getPhase());
         m_parserError << std::endl;
@@ -94,7 +94,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithOperator> r) {
         return true;
     }
 
-    std::shared_ptr<RuleWithOperator> rule(std::move(r));
+    std::shared_ptr<RuleWithActions> rule(std::move(r));
     /*
      * Checking if the rule has an ID and also checking if this ID is not used
      * by other rule

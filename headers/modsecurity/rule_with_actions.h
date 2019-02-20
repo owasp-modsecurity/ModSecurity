@@ -45,6 +45,21 @@ class RuleWithActions : public Rule {
 
     ~RuleWithActions();
 
+    bool evaluate(Transaction *transaction, std::shared_ptr<RuleMessage> ruleMessage) override;
+
+    virtual bool evaluate(Transaction *transaction) override;
+
+
+    void executeActionsIndependentOfChainedRuleResult(
+        Transaction *trasn,
+        bool *containsDisruptive,
+        std::shared_ptr<RuleMessage> ruleMessage);
+
+    void executeActionsAfterFullMatch(
+        Transaction *trasn,
+        bool containsDisruptive,
+        std::shared_ptr<RuleMessage> ruleMessage);
+
     void executeAction(Transaction *trans,
         bool containsBlock,
         std::shared_ptr<RuleMessage> ruleMessage,
@@ -62,10 +77,6 @@ class RuleWithActions : public Rule {
         std::string *path,
         int *nth);
 
-    void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
-        bool *b, std::shared_ptr<RuleMessage> ruleMessage);
-    void executeActionsAfterFullMatch(Transaction *trasn,
-        bool containsDisruptive, std::shared_ptr<RuleMessage> ruleMessage);
 
     std::vector<actions::Action *> getActionsByName(const std::string& name,
         Transaction *t);
@@ -95,6 +106,9 @@ class RuleWithActions : public Rule {
 
 
     int64_t m_ruleId;
+
+    std::unique_ptr<RuleWithActions> m_chainedRuleChild;
+    RuleWithActions *m_chainedRuleParent;
 
  private:
     /* actions */

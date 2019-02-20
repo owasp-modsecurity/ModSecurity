@@ -58,12 +58,8 @@ RuleWithOperator::RuleWithOperator(Operator *op,
     std::unique_ptr<std::string> fileName,
     int lineNumber)
     : RuleWithActions(actions, transformations, std::move(fileName), lineNumber),
-    m_chainedRuleChild(nullptr),
-    m_chainedRuleParent(NULL),
-
     m_operator(op),
-    m_variables(_variables),
-    m_unconditional(false)  { /* */ }
+    m_variables(_variables) { /* */ }
 
 
 RuleWithOperator::~RuleWithOperator() {
@@ -117,6 +113,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, std::string key,
         + "\" (Variable: " + key + ")");
 
     ret = this->m_operator->evaluateInternal(trans, this, value, ruleMessage);
+
     if (ret == false) {
         return false;
     }
@@ -223,32 +220,17 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     bool globalRet = false;
     variables::Variables *variables = this->m_variables;
     bool recursiveGlobalRet;
-    bool containsBlock = hasBlockAction();
+    bool containsBlock = false;
     std::vector<std::unique_ptr<VariableValue>> finalVars;
     std::string eparam;
     variables::Variables vars;
     vars.reserve(4);
     variables::Variables exclusion;
 
-    if (ruleMessage == NULL) {
-        ruleMessage = std::shared_ptr<RuleMessage>(
-            new RuleMessage(this, trans));
-    }
+    RuleWithActions::evaluate(trans, ruleMessage);
 
-    trans->m_matched.clear();
 
-    if (isMarker() == true) {
-        return true;
-    }
-
-    if (isUnconditional() == true) {
-        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
-            + ") Executing unconditional rule...");
-        executeActionsIndependentOfChainedRuleResult(trans,
-            &containsBlock, ruleMessage);
-        goto end_exec;
-    }
-
+    // FIXME: Make a class runTimeException to handle this cases.
     for (auto &i : trans->m_ruleRemoveById) {
         if (m_ruleId != i) {
             continue;
@@ -287,6 +269,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             + " against " \
             + variables + ".");
     }
+
 
     getFinalVars(&vars, &exclusion, trans);
 

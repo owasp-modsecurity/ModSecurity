@@ -49,7 +49,7 @@ class n ## _DictElementRegexp : public VariableRegex { \
         : VariableRegex(#N, regex) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithOperator *rule, \
+        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolveRegularExpression(&m_r, l, \
             m_keyExclusion); \
@@ -64,7 +64,7 @@ class n ## _DictElement : public VariableDictElement { \
         : VariableDictElement(#N, dictElement) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithOperator *rule, \
+        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolve(m_dictElement, l); \
     } \
@@ -78,7 +78,7 @@ class n ## _NoDictElement : public Variable { \
         : Variable(#N) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithOperator *rule, \
+        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolve(l, m_keyExclusion); \
     } \
@@ -92,7 +92,7 @@ class n : public Variable { \
         : Variable(#N) { } \
     \
     void evaluate(Transaction *transaction, \
-        RuleWithOperator *rule, \
+        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .evaluate(l); \
     } \
@@ -545,7 +545,7 @@ class Variable : public VariableMonkeyResolution {
 
 
     virtual void evaluate(Transaction *t,
-        RuleWithOperator *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) = 0;
 
 
@@ -624,7 +624,7 @@ class VariableModificatorExclusion : public Variable {
         : m_base(std::move(var)), Variable(var.get()) { }
 
     void evaluate(Transaction *t,
-        RuleWithOperator *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
         m_base->evaluate(t, rule, l);
     }
@@ -642,7 +642,7 @@ class VariableModificatorCount : public Variable {
         }
 
     void evaluate(Transaction *t,
-        RuleWithOperator *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
         std::vector<const VariableValue *> reslIn;
         VariableValue *val = NULL;
