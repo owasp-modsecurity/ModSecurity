@@ -48,15 +48,7 @@ class Rx : public Operator {
         }
     }
 
-    bool evaluate(Transaction *transaction, RuleWithOperator *rule,
-        const std::string &input) override {
-        return evaluate(transaction, NULL, input, NULL);
-    }
-    bool evaluate(Transaction *transaction,
-        const std::string &input) override {
-        return evaluate(transaction, NULL, input);
-    }
-    bool evaluate(Transaction *transaction, RuleWithOperator *rule,
+    bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string& input,
         std::shared_ptr<RuleMessage> ruleMessage) override;
 

@@ -42,7 +42,13 @@ class RuleMessage {
         ClientLogMessageInfo = 4
     };
 
-    explicit RuleMessage(RuleWithOperator *rule, Transaction *trans) :
+    /**
+     *
+     * FIXME: RuleMessage is currently too big, doing a lot of
+     * unnecessary data duplication. Needs to be shrink down.
+     *
+     */
+    RuleMessage(RuleWithActions *rule, Transaction *trans) :
         m_accuracy(rule->m_accuracy),
         m_clientIpAddress(trans->m_clientIpAddress),
         m_data(""),
@@ -66,6 +72,38 @@ class RuleMessage {
         m_ver(rule->m_ver)
     { }
 
+    RuleMessage(RuleMessage *rule) :
+        m_accuracy(rule->m_accuracy),
+        m_clientIpAddress(rule->m_clientIpAddress),
+        m_data(rule->m_data),
+        m_id(rule->m_id),
+        m_isDisruptive(rule->m_isDisruptive),
+        m_match(rule->m_match),
+        m_maturity(rule->m_maturity),
+        m_message(rule->m_message),
+        m_noAuditLog(rule->m_noAuditLog),
+        m_phase(rule->m_phase),
+        m_reference(rule->m_reference),
+        m_rev(rule->m_rev),
+        m_rule(rule->m_rule),
+        m_ruleFile(rule->m_ruleFile),
+        m_ruleId(rule->m_ruleId),
+        m_ruleLine(rule->m_ruleLine),
+        m_saveMessage(rule->m_saveMessage),
+        m_serverIpAddress(rule->m_serverIpAddress),
+        m_severity(rule->m_severity),
+        m_uriNoQueryStringDecoded(rule->m_uriNoQueryStringDecoded),
+        m_ver(rule->m_ver)
+    { }
+
+    void clean() {
+        m_data = "";
+        m_match = "";
+        m_isDisruptive = false;
+        m_reference = "";
+        m_severity = 0;
+        m_ver = "";
+    }
 
     std::string log() {
         return RuleMessage::log(this, 0);
@@ -104,7 +142,7 @@ class RuleMessage {
     int m_phase;
     std::string m_reference;
     std::string m_rev;
-    RuleWithOperator *m_rule;
+    RuleWithActions *m_rule;
     std::shared_ptr<std::string> m_ruleFile;
     int m_ruleId;
     int m_ruleLine;

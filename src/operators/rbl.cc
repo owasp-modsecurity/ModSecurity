@@ -196,7 +196,7 @@ void Rbl::furtherInfo(struct sockaddr_in *sin, std::string ipStr,
 }
 
 
-bool Rbl::evaluate(Transaction *t, RuleWithOperator *rule,
+bool Rbl::evaluate(Transaction *t, RuleWithActions *rule,
         const std::string& ipStr,
         std::shared_ptr<RuleMessage> ruleMessage) {
     struct addrinfo *info = NULL;

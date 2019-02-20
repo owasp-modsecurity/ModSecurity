@@ -37,7 +37,7 @@ namespace variables {
 
 
 void RemoteUser::evaluate(Transaction *transaction,
-    RuleWithOperator *rule,
+    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
     size_t pos;
     std::string base64;

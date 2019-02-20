@@ -37,7 +37,7 @@ class RemoteUser : public Variable {
         m_retName("REMOTE_USER") { }
 
     void evaluate(Transaction *transaction,
-        RuleWithOperator *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override;
     std::string m_retName;
 };
