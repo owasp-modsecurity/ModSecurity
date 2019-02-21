@@ -50,76 +50,20 @@ RequestRecPtr MakeRequestRec(conn_rec* c, directory_config* config)
     return {modsecNewRequest(c, config), modsecFinishRequest};
 }
 
-class RequestStoredContext
-    : public IHttpStoredContext
+struct RequestStoredContext
+    : IHttpStoredContext
 {
-public:
-    RequestStoredContext(directory_config* config,
-            IHttpContext* httpContext, IHttpEventProvider* provider)
-        : connRec(MakeConnReq())
-        , requestRec(MakeRequestRec(connRec.get(), config))
-        , httpContext(httpContext)
-        , provider(provider)
-    {}
-
-    RequestStoredContext(const RequestStoredContext&) = delete;
-    RequestStoredContext& operator=(const RequestStoredContext&) = delete;
-
-    // NB: these could have been defaulted with '= default' but VS2013 doesn't support it...
-    RequestStoredContext(RequestStoredContext&& rhs)
-        : connRec(std::move(rhs.connRec))
-        , requestRec(std::move(rhs.requestRec))
-        , httpContext(rhs.httpContext)
-        , provider(rhs.provider)
-    {}
-
-    RequestStoredContext& operator=(RequestStoredContext&& rhs)
-    {
-        connRec = std::move(rhs.connRec);
-        requestRec = std::move(rhs.requestRec);
-        httpContext = rhs.httpContext;
-        provider = rhs.provider;
-        return *this;
-    }
+    ConnRecPtr connRec;
+    RequestRecPtr requestRec;
+    IHttpContext* httpContext;
+    IHttpEventProvider* provider;
+    char* responseBuffer = nullptr;
+    ULONGLONG responseLength = 0;
+    ULONGLONG responsePosition = 0;
 
     void CleanupStoredContext() override
     {
         delete this;
-    }
-
-    conn_rec* Connection() const
-    {
-        return connRec.get();
-    }
-
-    request_rec* Request() const
-    {
-        return requestRec.get();
-    }
-
-    IHttpContext* HttpContext() const
-    {
-        return httpContext;
-    }
-
-    IHttpEventProvider* Provider() const
-    {
-        return provider;
-    }
-
-    char*& ResponseBuffer()
-    {
-        return responseBuffer;
-    }
-
-    ULONGLONG& ResponseLength()
-    {
-        return responseLength;
-    }
-
-    ULONGLONG& ResponsePosition()
-    {
-        return responsePosition;
     }
 
     void FinishRequest()
@@ -127,15 +71,6 @@ public:
         requestRec.reset();
         connRec.reset();
     }
-
-private:
-	ConnRecPtr connRec;
-	RequestRecPtr requestRec;
-	IHttpContext* httpContext;
-	IHttpEventProvider* provider;
-    char* responseBuffer = nullptr;
-    ULONGLONG responseLength = 0;
-    ULONGLONG responsePosition = 0;
 };
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
@@ -475,7 +410,7 @@ CMyHttpModule::OnSendResponse(
     CriticalSectionLock lock{cs};
 	// here we must check if response body processing is enabled
 	//
-	if(rsc == nullptr || rsc->Request() == nullptr || rsc->ResponseBuffer() != nullptr || !modsecIsResponseBodyAccessEnabled(rsc->Request()))
+	if(!rsc || !rsc->requestRec || rsc->responseBuffer != nullptr || !modsecIsResponseBodyAccessEnabled(rsc->requestRec.get()))
 	{
 		goto Exit;
 	}
@@ -489,7 +424,7 @@ CMyHttpModule::OnSendResponse(
     REQUEST_NOTIFICATION_STATUS ret = RQ_NOTIFICATION_CONTINUE;
 	ULONGLONG ulTotalLength = 0;
 	DWORD c;
-    request_rec *r = rsc->Request();
+    request_rec *r = rsc->requestRec.get();
 
 	pHttpResponse = pHttpContext->GetResponse();
 	pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
@@ -631,7 +566,7 @@ CMyHttpModule::OnSendResponse(
         }
     }
 
-	rsc->ResponseBuffer() = (char *)apr_palloc(rsc->Request()->pool, ulTotalLength);
+	rsc->responseBuffer = (char *)apr_palloc(rsc->requestRec->pool, ulTotalLength);
 
 	ulTotalLength = 0;
 
@@ -642,13 +577,13 @@ CMyHttpModule::OnSendResponse(
         switch( pSourceDataChunk->DataChunkType )
         {
             case HttpDataChunkFromMemory:
-				memcpy(rsc->ResponseBuffer() + ulTotalLength, pSourceDataChunk->FromMemory.pBuffer, pSourceDataChunk->FromMemory.BufferLength);
+				memcpy(rsc->responseBuffer + ulTotalLength, pSourceDataChunk->FromMemory.pBuffer, pSourceDataChunk->FromMemory.BufferLength);
                 ulTotalLength += pSourceDataChunk->FromMemory.BufferLength;
                 break;
             case HttpDataChunkFromFileHandle:
                 pFileByteRange = &pSourceDataChunk->FromFileHandle.ByteRange;
 
-				if(ReadFileChunk(pSourceDataChunk, rsc->ResponseBuffer() + ulTotalLength) != S_OK)
+				if(ReadFileChunk(pSourceDataChunk, rsc->responseBuffer + ulTotalLength) != S_OK)
 				{
 			        DWORD dwErr = GetLastError();
 
@@ -666,7 +601,7 @@ CMyHttpModule::OnSendResponse(
         }
     }
 
-	rsc->ResponseLength() = ulTotalLength;
+	rsc->responseLength = ulTotalLength;
 
 	//
     // If there's no content-length set, we need to set it to avoid chunked transfer mode
@@ -707,7 +642,7 @@ CMyHttpModule::OnSendResponse(
 
 Finished:
 
-	int status = modsecProcessResponse(rsc->Request());
+	int status = modsecProcessResponse(r);
 
 	// the logic here is temporary, needs clarification
 	//
@@ -740,7 +675,7 @@ CMyHttpModule::OnPostEndRequest(
 
 	// only finish request if OnSendResponse have been called already
 	//
-	if(rsc != nullptr && rsc->ResponseBuffer() != nullptr)
+	if(rsc != nullptr && rsc->responseBuffer != nullptr)
     {
         CriticalSectionLock lock{cs};
 		rsc->FinishRequest();
@@ -820,9 +755,16 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
         delete path;
     }
 
-    auto rsc = std::make_unique<RequestStoredContext>(config->config, httpContext, provider);
-    conn_rec* c = rsc->Connection();
-    request_rec* r = rsc->Request();
+    ConnRecPtr connRec = MakeConnReq();
+    conn_rec* c = connRec.get();
+    RequestRecPtr requestRec = MakeRequestRec(c, config->config);
+    request_rec* r = requestRec.get();
+
+    auto rsc = std::make_unique<RequestStoredContext>();
+    rsc->connRec = connRec;
+    rsc->requestRec = requestRec;
+    rsc->httpContext = httpContext;
+    rsc->provider = provider;
 
     // on IIS we force input stream inspection flag, because its absence does not add any performance gain
     // it's because on IIS request body must be restored each time it was read
@@ -1087,7 +1029,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
         return APR_SUCCESS;
     }
 
-    IHttpContext *pHttpContext = rsc->HttpContext();
+    IHttpContext *pHttpContext = rsc->httpContext;
     IHttpRequest *pRequest = pHttpContext->GetRequest();
 
     if (pRequest->GetRemainingEntityBytes() == 0)
@@ -1104,7 +1046,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
         if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
         {
             // Set the error status.
-            rsc->Provider()->SetErrorStatus(hr);
+            rsc->provider->SetErrorStatus(hr);
         }
 
         *is_eos = 1;
@@ -1117,10 +1059,10 @@ apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
 {
 	RequestStoredContext *rsc = RetrieveIISContext(r);
 
-	if(rsc == NULL || rsc->Request() == NULL)
+	if(!rsc || !rsc->requestRec)
 		return APR_SUCCESS;
 
-	IHttpContext *pHttpContext = rsc->HttpContext();
+	IHttpContext *pHttpContext = rsc->httpContext;
 	IHttpRequest *pHttpRequest = pHttpContext->GetRequest();
 
     CHAR szLength[21]; //Max length for a 64 bit int is 20
@@ -1182,7 +1124,7 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 
 	*readcnt = 0;
 
-	if(rsc == nullptr || rsc->ResponseBuffer() == nullptr)
+	if(rsc == nullptr || rsc->responseBuffer == nullptr)
 	{
 		*is_eos = 1;
 		return APR_SUCCESS;
@@ -1190,15 +1132,15 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 
 	unsigned int size = length;
 
-	if(size > rsc->ResponseLength() - rsc->ResponsePosition())
-		size = rsc->ResponseLength() - rsc->ResponsePosition();
+	if(size > rsc->responseLength - rsc->responsePosition)
+		size = rsc->responseLength - rsc->responsePosition;
 
-	memcpy(buf, rsc->ResponseBuffer() + rsc->ResponsePosition(), size);
+	memcpy(buf, rsc->responseBuffer + rsc->responsePosition, size);
 
 	*readcnt = size;
-	rsc->ResponsePosition() += size;
+	rsc->responsePosition += size;
 
-	if(rsc->ResponsePosition() >= rsc->ResponseLength())
+	if(rsc->responsePosition >= rsc->responseLength)
 		*is_eos = 1;
 
 	return APR_SUCCESS;
@@ -1208,13 +1150,13 @@ apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int lengt
 {
 	RequestStoredContext* rsc = RetrieveIISContext(r);
 
-	if(rsc == nullptr || rsc->Request() == nullptr || rsc->ResponseBuffer() == nullptr)
+	if(!rsc || !rsc->requestRec || rsc->responseBuffer == nullptr)
 		return APR_SUCCESS;
 
-	IHttpContext *pHttpContext = rsc->HttpContext();
+	IHttpContext *pHttpContext = rsc->httpContext;
 	IHttpResponse *pHttpResponse = pHttpContext->GetResponse();
 	HTTP_RESPONSE *pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
-	HTTP_DATA_CHUNK *pDataChunk = (HTTP_DATA_CHUNK *)apr_palloc(rsc->Request()->pool, sizeof(HTTP_DATA_CHUNK));
+	HTTP_DATA_CHUNK *pDataChunk = (HTTP_DATA_CHUNK *)apr_palloc(rsc->requestRec->pool, sizeof(HTTP_DATA_CHUNK));
 
 	pRawHttpResponse->EntityChunkCount = 0;
 
