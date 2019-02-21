@@ -1327,7 +1327,9 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
             it->url = strdup(m_it.url);
         }
         it->disruptive = m_it.disruptive;
-        it->status = m_it.status;
+        if (getRuleEngineState() != RulesProperties::DetectionOnlyRuleEngine) {
+            it->status = m_it.status;
+        }
 
         if (m_it.log != NULL) {
             std::string log("");

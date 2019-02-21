@@ -1,0 +1,120 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar :: SecRuleEngine DetectionOnly test",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host": "localhost"
+      },
+      "uri":"/?a=exec(/bin/bash);",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine DetectionOnly",
+      "SecDefaultAction \"phase:1,log,auditlog,deny,status:403\"",
+      "SecDefaultAction \"phase:2,log,auditlog,deny,status:403\"",
+      "SecRule ARGS \"@rx exec(?:\\s|)\\(\" \"id:1,phase:1,log,t:none,t:lowercase,t:cmdLine,block,msg:'PHP exec function call'\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar :: SecRuleEngine DetectionOnly against test",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host": "localhost"
+      },
+      "uri":"/?a=exec(/bin/bash);",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine on",
+      "SecDefaultAction \"phase:1,log,auditlog,deny,status:403\"",
+      "SecDefaultAction \"phase:2,log,auditlog,deny,status:403\"",
+      "SecRule ARGS \"@rx exec(?:\\s|)\\(\" \"id:1,phase:1,log,t:none,t:lowercase,t:cmdLine,block,msg:'PHP exec function call'\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar :: SecRuleEngine off test",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host": "localhost"
+      },
+      "uri":"/?a=exec(/bin/bash);",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine off",
+      "SecDefaultAction \"phase:1,log,auditlog,deny,status:403\"",
+      "SecDefaultAction \"phase:2,log,auditlog,deny,status:403\"",
+      "SecRule ARGS \"@rx exec(?:\\s|)\\(\" \"id:1,phase:1,log,t:none,t:lowercase,t:cmdLine,block,msg:'PHP exec function call'\""
+    ]
+  }
+]
+
