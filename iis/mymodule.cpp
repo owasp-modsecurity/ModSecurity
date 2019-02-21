@@ -16,6 +16,8 @@
 
 #undef inline
 
+#include <string>
+#include <cctype>
 #include <memory>
 
 //  IIS7 Server API header file
@@ -397,6 +399,101 @@ Done:
 	}
 
 	return hr;
+}
+
+/*
+ * Read request body from IIS structures, copy it over into
+ * Apache buckets and then assign back the entire flatten body
+ * to IHttpRequest.
+ * If the request body is chunked, it will be transformed into fixed-length.
+*/
+static HRESULT SaveRequestBodyToRequestRec(RequestStoredContext* rsc)
+{
+    request_rec* aprRequest = rsc->requestRec.get();
+    conn_rec* conn = rsc->connRec.get();
+    IHttpRequest* iisRequest = rsc->httpContext->GetRequest();
+    apr_bucket_brigade* brigade = apr_brigade_create(conn->pool, conn->bucket_alloc);
+    if (brigade == nullptr)
+    {
+        return E_OUTOFMEMORY;
+    }
+
+    while (iisRequest->GetRemainingEntityBytes() > 0)
+    {
+        DWORD bytesRead = 0;
+        char* buf = static_cast<char*>(apr_palloc(aprRequest->pool, HUGE_STRING_LEN));
+        HRESULT hr = iisRequest->ReadEntityBody(buf, HUGE_STRING_LEN, false, &bytesRead, nullptr);
+        if (FAILED(hr))
+        {
+            // End of data is okay.
+            if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
+            {
+                return hr;
+            }
+
+            break;
+        }
+
+        apr_bucket* bucket = apr_bucket_pool_create(buf, bytesRead, aprRequest->pool, conn->bucket_alloc);
+        if (bucket == nullptr)
+        {
+            return E_OUTOFMEMORY;
+        }
+        APR_BRIGADE_INSERT_TAIL(brigade, bucket);
+    }
+
+    apr_bucket* e = apr_bucket_eos_create(conn->bucket_alloc);
+    if (e == nullptr)
+    {
+        return E_OUTOFMEMORY;
+    }
+    APR_BRIGADE_INSERT_TAIL(brigade, e);
+
+    modsecSetBodyBrigade(aprRequest, brigade);
+
+    apr_off_t contentLength = 0;
+    apr_status_t status = apr_brigade_length(brigade, FALSE, &contentLength);
+    if (status != APR_SUCCESS)
+    {
+        return E_FAIL;
+    }
+
+    // Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
+    // This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
+    static const std::string CHUNKED = "chunked";
+    USHORT encodingLength = 0;
+    const char* transferEncoding = iisRequest->GetHeader(HttpHeaderTransferEncoding, &encodingLength);
+    if (transferEncoding)
+    {
+        if (CHUNKED.size() == encodingLength &&
+            std::equal(CHUNKED.cbegin(), CHUNKED.cend(), transferEncoding,
+                [](char lhs, char rhs) { return std::tolower(lhs) == std::tolower(rhs); }))
+        {
+            iisRequest->DeleteHeader(HttpHeaderTransferEncoding);
+        }
+    }
+
+    auto contentLengthStr = std::to_string(contentLength);
+    HRESULT hr = iisRequest->SetHeader(
+        HttpHeaderContentLength,
+        contentLengthStr.c_str(),
+        contentLengthStr.size(),
+        TRUE);
+
+    if (FAILED(hr))
+    {
+        return hr;
+    }
+
+    // since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
+    //
+    char* requestBuffer = static_cast<char*>(rsc->httpContext->AllocateRequestMemory(contentLength));
+    status = apr_brigade_flatten(brigade, requestBuffer, reinterpret_cast<apr_size_t*>(&contentLength));
+    if (status != APR_SUCCESS)
+    {
+        return E_FAIL;
+    }
+    return iisRequest->InsertEntityBody(requestBuffer, contentLength);
 }
 
 REQUEST_NOTIFICATION_STATUS
