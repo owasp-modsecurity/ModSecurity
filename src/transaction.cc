@@ -1330,6 +1330,9 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
         if (getRuleEngineState() != RulesProperties::DetectionOnlyRuleEngine) {
             it->status = m_it.status;
         }
+        else {
+            it->status = 200;
+        }
 
         if (m_it.log != NULL) {
             std::string log("");
