@@ -198,7 +198,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
             Rule *base = rule.get();
             RuleWithActions *ruleWithActions = dynamic_cast<RuleWithActions *>(base);
             // FIXME: Those should be treated inside the rule itself
-            if (ruleWithActions && m_exceptions.contains(ruleWithActions->m_ruleId)) {
+            if (ruleWithActions && m_exceptions.contains(ruleWithActions->getId())) {
                 ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
                     + "'. Removed by an SecRuleRemove directive.");
                 continue;
