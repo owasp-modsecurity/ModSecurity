@@ -62,8 +62,6 @@ class RuleMarker : public Rule {
         return m_name;
     }
 
-    bool isMarker() override { return true; }
-
  private:
     std::shared_ptr<std::string> m_name;
     int m_secmarker_skipped;
