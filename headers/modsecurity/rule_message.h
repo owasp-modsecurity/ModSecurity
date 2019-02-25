@@ -113,7 +113,7 @@ class RuleMessage {
 
     int getRuleId() const {
         if (m_rule) {
-            return m_rule->m_ruleId;
+            return m_rule->getId();
         }
         return -1;
     }
@@ -148,7 +148,7 @@ class RuleMessage {
 
     std::string getVer() const {
         if (m_rule) {
-            return m_rule->getRevision();
+            return m_rule->getVersion();
         }
         return "";
     }
