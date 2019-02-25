@@ -70,7 +70,7 @@ class RuleWithOperator : public RuleWithActions {
     std::string getOperatorName() const;
 
     virtual std::string getReference() override {
-        return std::to_string(m_ruleId);
+        return std::to_string(getId());
     }
 
  private:

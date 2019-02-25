@@ -88,77 +88,79 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
             m_parserError << " chain starter rules.";
             return false;
         }
-        m_lastRule->m_chainedRuleChild = std::move(r);
-        m_lastRule->m_chainedRuleChild->m_chainedRuleParent = m_lastRule;
-        m_lastRule = m_lastRule->m_chainedRuleChild.get();
+
+        m_lastRule->setChainedNext(std::move(r));
+        m_lastRule->getChainedNext()->setChainedParent(m_lastRule);
+        m_lastRule = m_lastRule->getChainedNext();
 
         /* Lets set all meta-data to the first rule */
         RuleWithActions *firstRule = m_lastRule;
         if (!firstRule->hasChainAction()) {
-            while (firstRule->m_chainedRuleParent != nullptr) {
+            while (firstRule->getChainedParent() != nullptr) {
                 if (firstRule->hasMessageAction()) {
-                    firstRule->m_chainedRuleParent->setMessageAction(
+                    firstRule->getChainedParent()->setMessageAction(
                         firstRule->getMessageAction()
                     );
                     firstRule->setMessageAction(nullptr);
                 }
                 if (firstRule->hasLogDataAction()) {
-                    firstRule->m_chainedRuleParent->setLogDataAction(
+                    firstRule->getChainedParent()->setLogDataAction(
                         firstRule->getLogDataAction()
                     );
                     firstRule->setLogDataAction(nullptr);
                 }
                 if (firstRule->hasSeverityAction()) {
-                    firstRule->m_chainedRuleParent->setSeverity(
+                    firstRule->getChainedParent()->setSeverity(
                         firstRule->getSeverity()
                     );
                 }
                 if (firstRule->hasRevisionAction()) {
-                    firstRule->m_chainedRuleParent->setRevision(
+                    firstRule->getChainedParent()->setRevision(
                         firstRule->getRevision()
                     );
                 }
                 if (firstRule->hasVersionAction()) {
-                    firstRule->m_chainedRuleParent->setVersion(
+                    firstRule->getChainedParent()->setVersion(
                         firstRule->getVersion()
                     );
                 }
                 if (firstRule->hasAccuracyAction()) {
-                    firstRule->m_chainedRuleParent->setAccuracy(
+                    firstRule->getChainedParent()->setAccuracy(
                         firstRule->getAccuracy()
                     );
                 }
                 if (firstRule->hasMaturityAction()) {
-                    firstRule->m_chainedRuleParent->setMaturity(
+                    firstRule->getChainedParent()->setMaturity(
                         firstRule->getMaturity()
                     );
                 }
 
                 if (firstRule->hasTagAction()) {
-                    firstRule->m_chainedRuleParent->setTags(
+                    firstRule->getChainedParent()->setTags(
                         firstRule->getTagsAction()
                     );
                     firstRule->cleanTags();
                 }
 
                 if (firstRule->hasDisruptiveAction()) {
-                    firstRule->m_chainedRuleParent->setDisruptiveAction(
+                    firstRule->getChainedParent()->setDisruptiveAction(
                         firstRule->getDisruptiveAction()
                     );
                     firstRule->setDisruptiveAction(nullptr);
                 }
-                firstRule->m_chainedRuleParent->setHasBlockAction(
+                firstRule->getChainedParent()->setHasBlockAction(
                     firstRule->hasBlockAction()
                 );
-                firstRule->m_chainedRuleParent->setHasLogAction(
+                firstRule->getChainedParent()->setHasLogAction(
                     firstRule->hasLogAction()
                 );
-                firstRule->m_chainedRuleParent->setHasLogAction(
+                firstRule->getChainedParent()->setHasLogAction(
                     firstRule->hasNoLogAction()
                 );
-                firstRule = firstRule->m_chainedRuleParent;
+                firstRule = firstRule->getChainedParent();
             }
         }
+
         return true;
     }
 
@@ -167,7 +169,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
      * Checking if the rule has an ID and also checking if this ID is not used
      * by other rule
      */
-    if (rule->m_ruleId == 0) {
+    if (rule->getId() == 0) {
         m_parserError << "Rules must have an ID. File: ";
         m_parserError << rule->getFileName() << " at line: ";
         m_parserError << std::to_string(rule->getLineNumber()) << std::endl;
@@ -178,8 +180,8 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         Rules *rules = m_rulesSetPhases[i];
         for (int j = 0; j < rules->size(); j++) {
             RuleWithOperator *lr = dynamic_cast<RuleWithOperator *>(rules->at(j).get());
-            if (lr && lr->m_ruleId == rule->m_ruleId) {
-                m_parserError << "Rule id: " << std::to_string(rule->m_ruleId) \
+            if (lr && lr->getId() == rule->getId()) {
+                m_parserError << "Rule id: " << std::to_string(rule->getId()) \
                     << " is duplicated" << std::endl;
                 return false;
             }

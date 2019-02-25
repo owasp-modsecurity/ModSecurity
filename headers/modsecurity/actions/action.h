@@ -39,15 +39,7 @@ namespace actions {
 
 class Action {
  public:
-    explicit Action(const std::string& _action)
-        : m_isNone(false),
-        temporaryAction(false),
-        action_kind(2),
-        m_name(nullptr),
-        m_parser_payload("") {
-            set_name_and_payload(_action);
-        }
-    explicit Action(const std::string& _action, int kind)
+    Action(const std::string& _action, int kind = RunTimeOnlyIfMatchKind)
         : m_isNone(false),
         temporaryAction(false),
         action_kind(kind),

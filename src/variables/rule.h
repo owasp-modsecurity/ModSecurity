@@ -42,11 +42,11 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         RuleWithActions *r = rule;
 
-        if (!r || r->m_ruleId == 0) {
+        if (!r || r->getId() == 0) {
             return;
         }
         std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-        std::string *a = new std::string(std::to_string(r->m_ruleId));
+        std::string *a = new std::string(std::to_string(r->getId()));
         VariableValue *var = new VariableValue(&m_rule, &m_rule_id,
             a
         );

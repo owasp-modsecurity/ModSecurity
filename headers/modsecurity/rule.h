@@ -36,38 +36,10 @@ namespace variables {
 class Variable;
 class Variables;
 }
-namespace actions {
-class Action;
-class Severity;
-class LogData;
-class Msg;
-class Rev;
-class SetVar;
-class Tag;
-namespace transformations {
-class Transformation;
-}
-}
 namespace operators {
 class Operator;
 }
 
-using TransformationResult = std::pair<std::shared_ptr<std::string>,
-    std::shared_ptr<std::string>>;
-using TransformationResults = std::list<TransformationResult>;
-
-using Transformation = actions::transformations::Transformation;
-using Transformations = std::vector<std::shared_ptr<Transformation> >;
-using TransformationsPtr = std::vector<Transformation *>;
-
-using Actions = std::vector<actions::Action *>;
-
-using Tags = std::vector<std::shared_ptr<actions::Tag> >;
-using TagsPtr = std::vector<actions::Tag *>;
-using SetVars = std::vector<std::shared_ptr<actions::SetVar> >;
-using SetVarsPtr = std::vector<actions::SetVar *>;
-using MatchActions = std::vector<std::shared_ptr<actions::Action > >;
-using MatchActionsPtr = std::vector<actions::Action *>;
 
 class Rule {
  public:

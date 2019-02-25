@@ -35,6 +35,9 @@ class Block : public Action {
  public:
     explicit Block(const std::string &action) : Action(action) { }
 
+    Block(const Block &a) = delete;
+    Block &operator=(const Block &a) = delete;
+
     bool evaluate(RuleWithActions *rule, Transaction *transaction,
         RuleMessage &rm) override;
 };
