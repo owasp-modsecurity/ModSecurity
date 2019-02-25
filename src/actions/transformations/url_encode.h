@@ -36,7 +36,7 @@ class UrlEncode : public Transformation {
     std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 
-    std::string url_enc(const char *input,
+    static std::string url_enc(const char *input,
         unsigned int input_len, int *changed);
 };
 
