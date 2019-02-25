@@ -18,40 +18,32 @@
 #include <stdio.h>
 
 #include <algorithm>
-#include <iostream>
-#include <string>
 #include <cstring>
+#include <iostream>
 #include <list>
-#include <utility>
 #include <memory>
+#include <string>
+#include <utility>
 
-#include "modsecurity/rules_set.h"
-#include "src/operators/operator.h"
 #include "modsecurity/actions/action.h"
 #include "modsecurity/modsecurity.h"
-#include "src/actions/transformations/none.h"
-#include "src/actions/tag.h"
-#include "src/utils/string.h"
 #include "modsecurity/rule_message.h"
+#include "modsecurity/rules_set.h"
 #include "modsecurity/rule_with_actions.h"
-#include "src/actions/msg.h"
-#include "src/actions/log_data.h"
-#include "src/actions/severity.h"
+#include "src/actions/block.h"
 #include "src/actions/capture.h"
+#include "src/actions/log_data.h"
+#include "src/actions/msg.h"
 #include "src/actions/multi_match.h"
 #include "src/actions/set_var.h"
-#include "src/actions/block.h"
-#include "src/variables/variable.h"
+#include "src/actions/severity.h"
+#include "src/actions/tag.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/actions/xmlns.h"
+#include "src/utils/string.h"
 
 
 namespace modsecurity {
-
-using operators::Operator;
-using actions::Action;
-using variables::Variable;
-using actions::transformations::None;
-
-
 
 RuleWithActions::RuleWithActions(
     Actions *actions,
@@ -66,11 +58,11 @@ RuleWithActions::RuleWithActions(
     m_actionsTag(),
     m_isChained(false),
     m_maturity(0),
-    m_rev(""),
+    m_revision(""),
     m_ruleId(0),
-    m_ver(""),
+    m_version(""),
     m_disruptiveAction(nullptr),
-    m_containsStaticBlockAction(false),
+    m_containsBlockAction(false),
     m_containsCaptureAction(false),
     m_containsMultiMatchAction(false),
     m_severity(nullptr),
@@ -103,7 +95,14 @@ RuleWithActions::RuleWithActions(
                     m_actionsTag.push_back(dynamic_cast<actions::Tag *>(a));
                 } else if (dynamic_cast<actions::Block *>(a)) {
                     m_actionsRuntimePos.push_back(a);
-                    m_containsStaticBlockAction = true;
+                    m_containsBlockAction = true;
+                    RuleWithActions *parent = m_chainedRuleParent;
+                    while (parent) {
+                        parent->setBlockAction(true);
+                        parent = parent->m_chainedRuleParent;
+                    }
+                } else if (dynamic_cast<actions::XmlNS *>(a)) {
+                    m_XmlNSs.push_back(dynamic_cast<actions::XmlNS *>(a));
                 } else if (a->isDisruptive() == true) {
                     if (m_disruptiveAction != nullptr) {
                         delete m_disruptiveAction;
@@ -124,10 +123,11 @@ RuleWithActions::RuleWithActions(
     }
 }
 
+
 RuleWithActions::~RuleWithActions() {
-    if (m_severity) {
-        delete m_severity;
-        m_severity = nullptr;
+    if (m_disruptiveAction != nullptr) {
+        delete m_disruptiveAction;
+        m_disruptiveAction = nullptr;
     }
     if (m_logData) {
         delete m_logData;
@@ -137,11 +137,11 @@ RuleWithActions::~RuleWithActions() {
         delete m_msg;
         m_msg = nullptr;
     }
-    while (m_transformations.empty() == false) {
-        auto *a = m_transformations.back();
-        m_transformations.pop_back();
-        delete a;
+    if (m_severity) {
+        delete m_severity;
+        m_severity = nullptr;
     }
+
     while (m_actionsRuntimePos.empty() == false) {
         auto *a = m_actionsRuntimePos.back();
         m_actionsRuntimePos.pop_back();
@@ -157,20 +157,20 @@ RuleWithActions::~RuleWithActions() {
         m_actionsTag.pop_back();
         delete a;
     }
-    if (m_disruptiveAction != nullptr) {
-        delete m_disruptiveAction;
-        m_disruptiveAction = nullptr;
+    while (m_XmlNSs.empty() == false) {
+        auto *a = m_XmlNSs.back();
+        m_XmlNSs.pop_back();
+        delete a;
+    }
+    while (m_transformations.empty() == false) {
+        auto *a = m_transformations.back();
+        m_transformations.pop_back();
+        delete a;
     }
 }
 
 
 bool RuleWithActions::evaluate(Transaction *transaction) {
-
-    /* Rule evaluate is pure virtual.
-     *
-     * Rule::evaluate(transaction);
-     */
-
     /* Matched vars needs to be clear at every new rule execution */
     transaction->m_matched.clear();
 
@@ -178,30 +178,17 @@ bool RuleWithActions::evaluate(Transaction *transaction) {
 }
 
 
-void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
-    bool *containsBlock) {
-
+void RuleWithActions::executeActionsIndependentOfChainedRuleResult(
+    Transaction *trans) {
+    /**
+     * FIXME: this is not conteplating SecRuleUpdateActionBy*.
+     *
+     */
     for (actions::SetVar *a : m_actionsSetVar) {
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
             "action: " + *a->m_name.get());
 
         a->evaluate(this, trans);
-    }
-
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        if (a->isDisruptive() == true && *a->m_name.get() == "block") {
-            ms_dbg_a(trans, 9, "Rule contains a `block' action");
-                *containsBlock = true;
-        } else if (*a->m_name.get() == "setvar") {
-            ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
-                "action: " + *a->m_name.get());
-            a->evaluate(this, trans, *trans->messageGetLast());
-        }
     }
 
     if (m_severity) {
@@ -218,67 +205,78 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
 }
 
 
-void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
-    bool containsBlock) {
+void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
     bool disruptiveAlreadyExecuted = false;
 
+    /* Default Actions */
+    /**
+     * FIXME (transaction.cc): there should be a:
+     *       getDefaultActionlFor(phase, kind)
+     *       in transaction.
+     * 
+     */
     for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
         if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
         if (!a.get()->isDisruptive()) {
-            executeAction(trans, containsBlock, a.get(), true);
+            executeAction(trans, a.get(), true);
+
         }
     }
 
-    for (actions::Tag *a : this->m_actionsTag) {
+    for (actions::Tag *a : m_actionsTag) {
         ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
             + *a->m_name.get());
         a->evaluate(this, trans, *trans->messageGetLast());
     }
 
+    /**
+     * 
+     * FIXME: SecRuleUpdateActionBy should be runtime
+     * 
+     */
     for (auto &b :
         trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        executeAction(trans, containsBlock, a, false);
+        executeAction(trans, a, false);
         disruptiveAlreadyExecuted = true;
     }
-    for (Action *a : this->m_actionsRuntimePos) {
+
+    for (Action *a : m_actionsRuntimePos) {
         if (!a->isDisruptive()
                 && !(disruptiveAlreadyExecuted
                 && dynamic_cast<actions::Block *>(a))) {
-            executeAction(trans, containsBlock, a, false);
+            executeAction(trans, a, false);
         }
     }
+
     if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
-        executeAction(trans, containsBlock,
-            m_disruptiveAction, false);
+        executeAction(trans, m_disruptiveAction, false);
     }
 }
 
 
 void RuleWithActions::executeAction(Transaction *trans,
-    bool containsBlock,
     Action *a, bool defaultContext) {
     if (a->isDisruptive() == false) {
-        ms_dbg_a(trans, 9, "Running " \
-            "action: " + *a->m_name.get());
+        ms_dbg_a(trans, 9, "Running action: " + *a->m_name.get());
         a->evaluate(this, trans, *trans->messageGetLast());
         return;
     }
 
-    if (defaultContext && !containsBlock) {
+    if (defaultContext && !hasBlockAction()) {
         ms_dbg_a(trans, 4, "Ignoring action: " + *a->m_name.get() + \
             " (rule does not cotains block)");
         return;
     }
 
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
-        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
-            ".");
+        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + 
+            *a->m_name.get() + ".");
         a->evaluate(this, trans, *trans->messageGetLast());
         return;
     }
@@ -288,42 +286,11 @@ void RuleWithActions::executeAction(Transaction *trans,
 }
 
 
-inline void RuleWithActions::executeTransformation(
-    actions::transformations::Transformation *a,
-    std::shared_ptr<std::string> *value,
-    Transaction *trans,
-    TransformationResults *ret,
-    std::string *path,
-    int *nth) {
-
-    std::string *oldValue = (*value).get();
-    std::string newValue = a->evaluate(*oldValue, trans);
-
-    if (newValue != *oldValue) {
-        std::shared_ptr<std::string> u(new std::string(newValue));
-        if (m_containsMultiMatchAction) {
-            ret->push_back(std::make_pair(u, a->m_name));
-            (*nth)++;
-        }
-        *value = u;
-    }
-
-    if (path->empty()) {
-        path->append(*a->m_name.get());
-    } else {
-        path->append("," + *a->m_name.get());
-    }
-
-    ms_dbg_a(trans, 9, " T (" + \
-        std::to_string(*nth) + ") " + \
-        *a->m_name.get() + ": \"" + \
-        utils::string::limitTo(80, newValue) +"\"");
-}
-
 void RuleWithActions::executeTransformations(
-    Transaction *trans, const std::string &in, TransformationResults &ret) {
+    Transaction *trans,
+    const std::string &in,
+    TransformationResults &ret) {
     int none = 0;
-    int transformations = 0;
     std::string path("");
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
@@ -353,15 +320,13 @@ void RuleWithActions::executeTransformations(
 
             // FIXME: here the object needs to be a transformation already.
             Transformation *t = dynamic_cast<Transformation *>(a.get());
-            executeTransformation(t, &value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(trans, &value, &ret, t, &path);
         }
     }
 
     for (Transformation *a : m_transformations) {
         if (none == 0) {
-            executeTransformation(a, &value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(trans, &value, &ret, a, &path);
         }
         if (a->m_isNone) {
             none--;
@@ -388,8 +353,7 @@ void RuleWithActions::executeTransformations(
         }
         Transformation *a = dynamic_cast<Transformation*>(b.second.get());
         if (none == 0) {
-            executeTransformation(a, &value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(trans, &value, &ret, a, &path);
         }
         if (a->m_isNone) {
             none--;
@@ -410,6 +374,36 @@ void RuleWithActions::executeTransformations(
 }
 
 
+inline void RuleWithActions::executeTransformation(
+    Transaction *trans,
+    std::shared_ptr<std::string> *value,
+    TransformationResults *ret,
+    actions::transformations::Transformation *a,
+    std::string *path) {
+
+    std::string *oldValue = (*value).get();
+    std::string newValue = a->evaluate(*oldValue, trans);
+
+    if (newValue != *oldValue) {
+        std::shared_ptr<std::string> u(new std::string(newValue));
+        if (m_containsMultiMatchAction) {
+            ret->push_back(std::make_pair(u, a->m_name));
+        }
+        *value = u;
+    }
+
+    if (path->empty()) {
+        path->append(*a->m_name.get());
+    } else {
+        path->append("," + *a->m_name.get());
+    }
+
+    ms_dbg_a(trans, 9, "Transformation " + \
+        *a->m_name.get() + ": \"" + \
+        utils::string::limitTo(80, newValue) +"\"");
+}
+
+
 bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
     for (auto &tag : m_actionsTag) {
         if (tag != NULL && tag->getName(t) == name) {
@@ -425,44 +419,7 @@ bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
 }
 
 
-std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::string& name,
-    Transaction *trans) {
-    std::vector<actions::Action *> ret;
-    for (auto &z : m_actionsRuntimePos) {
-        if (*z->m_name.get() == name) {
-            ret.push_back(z);
-        }
-    }
-    for (auto &z : m_transformations) {
-        if (*z->m_name.get() == name) {
-            ret.push_back(z);
-        }
-    }
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
-        if (*z->m_name.get() == name) {
-            ret.push_back(z);
-        }
-    }
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
-        if (*z->m_name.get() == name) {
-            ret.push_back(z);
-        }
-    }
-    return ret;
-}
-
-void RuleWithActions::performLogging(Transaction *trans,
-    bool lastLog) {
+void RuleWithActions::performLogging(Transaction *trans, bool lastLog) {
     RuleMessage *rm = trans->messageGetLast();
     /* last rule in the chain. */
     bool isItToBeLogged = rm->m_saveMessage;
@@ -489,7 +446,7 @@ void RuleWithActions::performLogging(Transaction *trans,
                 trans->serverLog(rm);
             }
         }
-        else if (hasBlock() && !hasMultimatch()) {
+        else if (hasBlockAction() && !hasMultimatch()) {
             /* warn */
             trans->messageLog(this);
 
@@ -513,9 +470,9 @@ void RuleWithActions::performLogging(Transaction *trans,
     }
 }
 
-std::string RuleWithActions::logData(Transaction *t) { return m_logData->data(t); }
-std::string RuleWithActions::msg(Transaction *t) { return m_msg->data(t); }
-int RuleWithActions::severity() { return m_severity->m_severity; }
+std::string RuleWithActions::getLogData(Transaction *t) { return m_logData->data(t); }
+std::string RuleWithActions::getMsg(Transaction *t) { return m_msg->data(t); }
+int RuleWithActions::getSeverity() { return m_severity->m_severity; }
 
 
 }  // namespace modsecurity

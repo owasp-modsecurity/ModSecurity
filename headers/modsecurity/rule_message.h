@@ -42,7 +42,6 @@ class RuleMessage {
         ClientLogMessageInfo = 4
     };
 
-
     RuleMessage(const RuleMessage *rule) :
         m_data(rule->m_data),
         m_isDisruptive(rule->m_isDisruptive),
@@ -113,7 +112,7 @@ class RuleMessage {
 
     int getRuleId() {
         if (m_rule) {
-            return m_rule->m_ruleId;
+            return m_rule->getId();
         }
         return 0;
     }
@@ -141,28 +140,28 @@ class RuleMessage {
 
     std::string getRev() {
         if (m_rule) {
-            return m_rule->m_rev;
+            return *m_rule->getRevision();
         }
         return "";
     }
 
     std::string getVer() {
         if (m_rule) {
-            return m_rule->m_rev;
+            return *m_rule->getVersion();
         }
         return "";
     }
 
     int getMaturity() {
         if (m_rule) {
-            return m_rule->m_maturity;
+            return m_rule->getMaturity();
         }
         return 0;
     }
 
     int getAccuracy() {
         if (m_rule) {
-            return m_rule->m_accuracy;
+            return m_rule->getAccuracy();
         }
         return 0;
     }

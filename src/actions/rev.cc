@@ -34,7 +34,7 @@ bool Rev::init(std::string *error) {
 
 
 bool Rev::evaluate(RuleWithActions *rule, Transaction *transaction) {
-    rule->m_rev = m_rev;
+    rule->setRevision(m_rev);
     return true;
 }
 
