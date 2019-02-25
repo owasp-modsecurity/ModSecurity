@@ -31,7 +31,7 @@
       ]
     },
     "expected":{
-      "debug_log":"T \\(0\\) t:trim: \"no need.\""
+      "debug_log":"Transformation t:trim: \"no need.\""
     },
     "rules":[
       "SecRuleEngine On",
