@@ -22,16 +22,12 @@ namespace modsecurity {
 bool RuleUnconditional::evaluate(Transaction *trans) {
     RuleWithActions::evaluate(trans);
 
-    // FIXME: This needs to be romeved on the runtime exeption review.
-    bool containsBlock = false;
-
-    ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
+    ms_dbg_a(trans, 4, "(Rule: " + std::to_string(getId()) \
         + ") Executing unconditional rule...");
 
-    executeActionsIndependentOfChainedRuleResult(trans,
-        &containsBlock);
+    executeActionsIndependentOfChainedRuleResult(trans);
 
-    executeActionsAfterFullMatch(trans, containsBlock);
+    executeActionsAfterFullMatch(trans);
 
     trans->logMatchLastRuleOnTheChain(this);
 
