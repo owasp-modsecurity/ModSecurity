@@ -50,7 +50,7 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
             if (!rule_ckc) {
                 continue;
             }
-            v.push_back(rule_ckc->m_ruleId);
+            v.push_back(rule_ckc->getId());
         }
     }
     std::sort (v.begin(), v.end());

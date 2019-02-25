@@ -49,7 +49,7 @@ bool RuleId::init(std::string *error) {
 
 
 bool RuleId::evaluate(RuleWithActions *rule, Transaction *transaction) {
-    rule->m_ruleId = m_ruleId;
+    rule->setId(m_ruleId);
     return true;
 }
 

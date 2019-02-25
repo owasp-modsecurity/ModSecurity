@@ -35,7 +35,7 @@ class EscapeSeqDecode : public Transformation {
 
     std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
-    int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len);
+    static int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len);
 };
 
 }  // namespace transformations

@@ -30,9 +30,42 @@
 #include "modsecurity/variable_value.h"
 #include "modsecurity/rule.h"
 
+
 #ifdef __cplusplus
 
 namespace modsecurity {
+
+namespace actions {
+class Action;
+class Severity;
+class LogData;
+class Msg;
+class Rev;
+class SetVar;
+class Tag;
+class XmlNS;
+namespace transformations {
+class Transformation;
+}
+}
+
+using TransformationResult = std::pair<std::shared_ptr<std::string>,
+    std::shared_ptr<std::string>>;
+using TransformationResults = std::list<TransformationResult>;
+using Transformation = actions::transformations::Transformation;
+using Transformations = std::vector<std::shared_ptr<Transformation> >;
+using TransformationsPtr = std::vector<Transformation *>;
+using Action = actions::Action;
+using Actions = std::vector<actions::Action *>;
+using Tags = std::vector<std::shared_ptr<actions::Tag> >;
+using TagsPtr = std::vector<actions::Tag *>;
+using SetVars = std::vector<std::shared_ptr<actions::SetVar> >;
+using SetVarsPtr = std::vector<actions::SetVar *>;
+using MatchActions = std::vector<std::shared_ptr<actions::Action > >;
+using MatchActionsPtr = std::vector<actions::Action *>;
+
+using XmlNSs = std::vector<std::shared_ptr<actions::XmlNS> >;
+using XmlNSsPtr = std::vector<actions::XmlNS *>;
 
 
 class RuleWithActions : public Rule {
@@ -41,12 +74,12 @@ class RuleWithActions : public Rule {
     int ACCURACY_NOT_SET = 10;
     int MATURITY_NOT_SET = 10;
 
+
     RuleWithActions(
         Actions *a,
         Transformations *t,
         std::unique_ptr<std::string> fileName,
         int lineNumber);
-
     ~RuleWithActions();
 
     RuleWithActions(const RuleWithActions &r)
@@ -60,6 +93,7 @@ class RuleWithActions : public Rule {
         m_actionsRuntimePos(r.m_actionsRuntimePos),
         m_actionsSetVar(r.m_actionsSetVar),
         m_actionsTag(r.m_actionsTag),
+        m_XmlNSs(r.m_XmlNSs),
         m_defaultActionDisruptiveAction(r.m_defaultActionDisruptiveAction),
         m_defaultActionLogData(r.m_defaultActionLogData),
         m_defaultActionMsg(r.m_defaultActionMsg),
@@ -123,29 +157,27 @@ class RuleWithActions : public Rule {
 
 
     void executeActionsIndependentOfChainedRuleResult(
-        Transaction *trasn,
-        bool *containsDisruptive);
+        Transaction *trasn);
 
     void executeActionsAfterFullMatch(
-        Transaction *trasn,
-        bool containsDisruptive);
+        Transaction *trasn);
 
     void executeAction(Transaction *trans,
-        bool containsBlock,
-        actions::Action *a,
+        Action *a,
         bool context);
 
 
     void executeTransformations(
-        Transaction *trasn, const std::string &value, TransformationResults &ret);
+        Transaction *transaction,
+        const std::string &value,
+        TransformationResults &ret);
 
     inline void executeTransformation(
         actions::transformations::Transformation *a,
         std::shared_ptr<std::string> *value,
         Transaction *trans,
         TransformationResults *ret,
-        std::string *path,
-        int *nth) const;
+        std::string *path) const;
 
 
     void addAction(actions::Action *a);
@@ -336,13 +368,46 @@ class RuleWithActions : public Rule {
         return dst;
     }
 
+    inline int64_t getId() const { return m_ruleId; }
+    void setId(int id) {
+        m_ruleId = id;
+    }
 
+    void setChainedNext(std::unique_ptr<RuleWithActions> r) {
+        m_chainedRuleChild = std::move(r);
+    }
+
+    inline RuleWithActions *getChainedNext() const {
+        return m_chainedRuleChild.get();
+    }
+
+    void setChainedParent(RuleWithActions *r) {
+        m_chainedRuleParent = r;
+    }
+
+    inline RuleWithActions *getChainedParent() {
+        return m_chainedRuleParent;
+    }
+
+    XmlNSsPtr getXmlNSsPtr() const {
+        /**
+         * FIXME: this is not conteplating SecRuleUpdateActionBy* yet.
+         *
+         */
+        XmlNSsPtr dst;
+        for (auto &a : m_XmlNSs) {
+            dst.push_back(a.get());
+        }
+        
+        return dst;
+    }
+
+ private:
     int64_t m_ruleId;
 
     std::shared_ptr<RuleWithActions> m_chainedRuleChild;
     RuleWithActions *m_chainedRuleParent;
 
- private:
     /* actions */
     std::shared_ptr<actions::Action> m_disruptiveAction;
     std::shared_ptr<actions::LogData> m_logData;
@@ -350,6 +415,7 @@ class RuleWithActions : public Rule {
     MatchActions m_actionsRuntimePos;
     SetVars m_actionsSetVar;
     Tags m_actionsTag;
+    XmlNSs m_XmlNSs;
 
     /* actions || SecDefaultAction */
     std::shared_ptr<actions::Action> m_defaultActionDisruptiveAction;
