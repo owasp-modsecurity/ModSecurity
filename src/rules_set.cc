@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "modsecurity/rules_set.h"
+#include "modsecurity/rule_marker.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/parser/driver.h"
@@ -176,12 +177,14 @@ int RulesSet::evaluate(int phase, Transaction *t) {
         // FIXME: This is not meant to be here. At the end of this refactoring,
         //        the shared pointer won't be used.
         auto rule = rules->at(i);
-        if (t->isInsideAMarker() && !rule->isMarker()) {
-            ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
-                + "' due to a SecMarker: " + *t->getCurrentMarker());
-
-        } else if (rule->isMarker()) {
-            rule->evaluate(t);
+        if (t->isInsideAMarker()) {
+            RuleMarker *ruleMarker = dynamic_cast<RuleMarker *>(rule.get());
+            if (!ruleMarker) {
+                ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
+                    + "' due to a SecMarker: " + *t->getCurrentMarker());
+            } else {
+                rule->evaluate(t);
+            }
         } else if (t->m_skip_next > 0) {
             t->m_skip_next--;
             ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
