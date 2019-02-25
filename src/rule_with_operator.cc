@@ -150,7 +150,7 @@ void RuleWithOperator::getVariablesExceptions(Transaction *t,
     }
 
     for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
-        if (m_ruleId != a.first) {
+        if (getId() != a.first) {
             continue;
         }
         Variable *b = a.second.get();
@@ -178,7 +178,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
         if (std::find_if(trans->m_ruleRemoveTargetById.begin(),
                 trans->m_ruleRemoveTargetById.end(),
                 [&, variable, this](std::pair<int, std::string> &m) -> bool {
-                    return m.first == m_ruleId
+                    return m.first == getId()
                         && m.second == *variable->m_fullName.get();
                 }) != trans->m_ruleRemoveTargetById.end()) {
             continue;
@@ -216,18 +216,18 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
 
     // FIXME: Make a class runTimeException to handle this cases.
     for (auto &i : trans->m_ruleRemoveById) {
-        if (m_ruleId != i) {
+        if (getId() != i) {
             continue;
         }
-        ms_dbg_a(trans, 9, "Rule id: " + std::to_string(m_ruleId) +
+        ms_dbg_a(trans, 9, "Rule id: " + std::to_string(getId()) +
             " was skipped due to a ruleRemoveById action...");
         return true;
     }
     for (auto &i : trans->m_ruleRemoveByIdRange) {
-        if (!(i.first <= m_ruleId && i.second >= m_ruleId)) {
+        if (!(i.first <= getId() && i.second >= getId())) {
             continue;
         }
-        ms_dbg_a(trans, 9, "Rule id: " + std::to_string(m_ruleId) +
+        ms_dbg_a(trans, 9, "Rule id: " + std::to_string(getId()) +
             " was skipped due to a ruleRemoveById action...");
         return true;
     }
@@ -241,14 +241,15 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
         } else {
             eparam = "\"" + eparam + "\"";
         }
-    ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
+    ms_dbg_a(trans, 4, "(Rule: " + std::to_string(getId()) \
         + ") Executing operator \"" + getOperatorName() \
         + "\" with param " \
         + eparam \
         + " against " \
         + variables + ".");
     } else {
-        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
+        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(getId()
+) \
             + ") Executing operator \"" + getOperatorName() \
             + " against " \
             + variables + ".");
@@ -271,7 +272,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
                 std::find_if(trans->m_ruleRemoveTargetById.begin(),
                     trans->m_ruleRemoveTargetById.end(),
                     [&, v, this](std::pair<int, std::string> &m) -> bool {
-                        return m.first == m_ruleId && m.second == v->getKeyWithCollection();
+                        return m.first == getId() && m.second == v->getKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetById.end()
             ) {
                 delete v;
@@ -311,8 +312,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
                     trans->messageGetLast()->m_reference.append(*valueTemp.second);
 
                     updateMatchedVars(trans, key, valueAfterTrans);
-                    executeActionsIndependentOfChainedRuleResult(trans,
-                        &containsBlock);
+                    executeActionsIndependentOfChainedRuleResult(trans);
 
                     globalRet = true;
                 }
@@ -336,14 +336,14 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
     }
 
     /* FIXME: this check should happens on the parser. */
-    if (this->m_chainedRuleChild == nullptr) {
+    if (getChainedNext() == nullptr) {
         ms_dbg_a(trans, 4, "Rule is marked as chained but there " \
             "isn't a subsequent rule.");
         goto end_clean;
     }
 
     ms_dbg_a(trans, 4, "Executing chained rule.");
-    recursiveGlobalRet = m_chainedRuleChild->evaluate(trans);
+    recursiveGlobalRet = getChainedNext()->evaluate(trans);
 
     if (recursiveGlobalRet == true) {
         goto end_exec;
@@ -353,7 +353,7 @@ end_clean:
     return false;
 
 end_exec:
-    executeActionsAfterFullMatch(trans, containsBlock);
+    executeActionsAfterFullMatch(trans);
 
     /* last rule in the chain. */
     trans->logMatchLastRuleOnTheChain(this);
