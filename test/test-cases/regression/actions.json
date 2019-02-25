@@ -49,7 +49,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "debug_log": "\\[9\\] Transformation t:trim: \"test",
       "error_log": "",
       "http_code": 403
     },
@@ -109,7 +109,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "debug_log": "\\[9\\] Transformation t:trim: \"test",
       "error_log": "",
       "http_code": 302,
       "redirect_url": "http://www.google.com"
@@ -169,7 +169,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "debug_log": "\\[9\\] Transformation t:trim: \"test",
       "error_log": "",
       "http_code": 306,
       "redirect_url": "http://www.google.com"
@@ -229,7 +229,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "debug_log": "\\[9\\] Transformation t:trim: \"test",
       "error_log": "",
       "http_code": 500
     },
@@ -288,7 +288,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "debug_log": "\\[9\\] Transformation t:trim: \"test",
       "error_log": "",
       "http_code": 500
     },
@@ -347,7 +347,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "debug_log": "\\[9\\] Transformation t:trim: \"test",
       "error_log": "",
       "http_code": 500
     },
