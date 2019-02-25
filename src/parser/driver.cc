@@ -88,9 +88,9 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
             m_parserError << " chain starter rules.";
             return false;
         }
-        m_lastRule->m_chainedRuleChild = std::move(r);
-        m_lastRule->m_chainedRuleChild->m_chainedRuleParent = m_lastRule;
-        m_lastRule = m_lastRule->m_chainedRuleChild.get();
+        m_lastRule->setChainedNext(std::move(r));
+        m_lastRule->getChainedNext()->setChainedParent(m_lastRule);
+        m_lastRule = m_lastRule->getChainedNext();
         return true;
     }
 
@@ -99,7 +99,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
      * Checking if the rule has an ID and also checking if this ID is not used
      * by other rule
      */
-    if (rule->m_ruleId == 0) {
+    if (rule->getId() == 0) {
         m_parserError << "Rules must have an ID. File: ";
         m_parserError << rule->getFileName() << " at line: ";
         m_parserError << std::to_string(rule->getLineNumber()) << std::endl;
@@ -110,8 +110,8 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         Rules *rules = m_rulesSetPhases[i];
         for (int j = 0; j < rules->size(); j++) {
             RuleWithOperator *r = dynamic_cast<RuleWithOperator *>(rules->at(j).get());
-            if (r && r->m_ruleId == rule->m_ruleId) {
-                m_parserError << "Rule id: " << std::to_string(rule->m_ruleId) \
+            if (r && r->getId() == rule->getId()) {
+                m_parserError << "Rule id: " << std::to_string(rule->getId()) \
                     << " is duplicated" << std::endl;
                 return false;
             }

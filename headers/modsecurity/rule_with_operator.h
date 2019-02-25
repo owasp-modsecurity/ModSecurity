@@ -65,7 +65,7 @@ class RuleWithOperator : public RuleWithActions {
 
 
     virtual std::string getReference() override {
-        return std::to_string(m_ruleId);
+        return std::to_string(getId());
     }
 
  private:
