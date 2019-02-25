@@ -101,9 +101,6 @@ class Rule {
         return *m_fileName + ":" + std::to_string(m_lineNumber);
     }
 
-
-    virtual bool isMarker() { return false; }
-
  private:
     std::shared_ptr<std::string> m_fileName;
     int m_lineNumber;
