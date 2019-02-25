@@ -68,11 +68,9 @@ class RuleMarker : public Rule {
     };
 
 
-    std::shared_ptr<std::string> getName() {
+    std::shared_ptr<std::string> getName() const {
         return m_name;
     }
-
-    bool isMarker() override { return true; }
 
  private:
     std::shared_ptr<std::string> m_name;
