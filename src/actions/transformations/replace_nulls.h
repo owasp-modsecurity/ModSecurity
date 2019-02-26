@@ -30,10 +30,12 @@ namespace transformations {
 
 class ReplaceNulls : public Transformation {
  public:
-    explicit ReplaceNulls(const std::string &action) ;
+    explicit ReplaceNulls(const std::string &action)
+        : Transformation(action) { };
 
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 };
 
 }  // namespace transformations
