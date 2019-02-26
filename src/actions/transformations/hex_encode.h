@@ -30,9 +30,12 @@ namespace transformations {
 
 class HexEncode : public Transformation {
  public:
-    explicit HexEncode(std::string action);
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    explicit HexEncode(std::string action) : Transformation(action) { }
+
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
+
 };
 
 }  // namespace transformations

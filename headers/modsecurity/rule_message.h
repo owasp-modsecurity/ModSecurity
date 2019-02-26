@@ -26,14 +26,15 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-#include "modsecurity/rule_with_operator.h"
 
 
 #ifdef __cplusplus
 
 namespace modsecurity {
-
-
+namespace actions {
+class Tag;
+};
+class RuleWithActions;
 
 class RuleMessage {
  public:
@@ -65,6 +66,7 @@ class RuleMessage {
         m_saveMessage(true),
         m_severity(0)
     { }
+
 
     void clean() {
         m_data = "";
@@ -110,91 +112,20 @@ class RuleMessage {
         return m_rule != nullptr;
     }
 
-    int getRuleId() {
-        if (m_rule) {
-            return m_rule->getId();
-        }
-        return 0;
-    }
+    int getRuleId();
+    int getPhase();
+    std::string getFileName();
+    int getLineNumber();
+    std::string getRev();
+    std::string getVer();
+    int getMaturity();
+    int getAccuracy();
+    std::vector<actions::Tag *> /* RuleWithActions::Tags */ getTags();
 
-    int getPhase() {
-        if (m_rule) {
-            return m_rule->getPhase();
-        }
-        return 0;
-    }
-
-    std::string getFileName() {
-        if (m_rule) {
-            return *m_rule->getFileName().get();
-        }
-        return "";
-    }
-
-    int getLineNumber() {
-        if (m_rule) {
-            return m_rule->getLineNumber();
-        }
-        return 0;
-    }
-
-    std::string getRev() {
-        if (m_rule) {
-            return *m_rule->getRevision();
-        }
-        return "";
-    }
-
-    std::string getVer() {
-        if (m_rule) {
-            return *m_rule->getVersion();
-        }
-        return "";
-    }
-
-    int getMaturity() {
-        if (m_rule) {
-            return m_rule->getMaturity();
-        }
-        return 0;
-    }
-
-    int getAccuracy() {
-        if (m_rule) {
-            return m_rule->getAccuracy();
-        }
-        return 0;
-    }
-
-    RuleWithActions::Tags getTags();
-
-    std::string getClientIpAddress() {
-        if (m_transaction) {
-            return *m_transaction->m_clientIpAddress.get();
-        }
-        return "";
-    }
-
-    std::string getServerIpAddress() {
-        if (m_transaction) {
-            return *m_transaction->m_serverIpAddress.get();
-        }
-        return "";
-    }
-
-    std::string getRequestId() {
-        if (m_transaction) {
-            return *m_transaction->m_id.get();
-        }
-        return "";
-    }
-
-    std::string getUri() {
-        if (m_transaction) {
-            return *m_transaction->m_uri_no_query_string_decoded.get();
-        }
-        return "";
-    }
+    std::string getClientIpAddress();
+    std::string getServerIpAddress();
+    std::string getRequestId();
+    std::string getUri();
 
     // Rule
     bool m_isDisruptive;

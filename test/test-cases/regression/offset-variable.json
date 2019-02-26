@@ -1511,7 +1511,7 @@
       ]
     },
     "expected":{
-      "error_log":"o0,8o0,8v491,8t:trimo0,16o0,16v709,16t:trim"
+      "error_log":"o0,8o0,8v491,8t:trim"
     },
     "rules":[
       "SecRequestBodyAccess On",

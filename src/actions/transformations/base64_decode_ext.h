@@ -32,8 +32,9 @@ class Base64DecodeExt : public Transformation {
  public:
     explicit Base64DecodeExt(std::string action) : Transformation(action) { }
 
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 };
 
 }  // namespace transformations

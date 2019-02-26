@@ -32,11 +32,10 @@ class Transformation : public Action {
     explicit Transformation(const std::string& _action)
         : Action(_action, RunTimeBeforeMatchAttemptKind) { }
 
-    Transformation(const std::string& _action, int kind)
-        : Action(_action, kind) { }
-
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) {
+    };
 
     static Transformation* instantiate(std::string a);
 };

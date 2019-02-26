@@ -33,8 +33,10 @@ class JsDecode : public Transformation {
     explicit JsDecode(std::string action)
         : Transformation(action) { }
 
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
+
     static int inplace(unsigned char *input, uint64_t input_len);
 };
 

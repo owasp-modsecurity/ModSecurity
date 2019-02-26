@@ -32,11 +32,12 @@ namespace actions {
 namespace transformations {
 
 
-std::string Base64Encode::execute(const std::string &value,
-    Transaction *transaction) {
-    std::string ret = Utils::Base64::encode(value);
-
-    return ret;
+void Base64Encode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+    std::string ret = Utils::Base64::encode(
+        std::string(in.c_str(), in.size()));
+    out.assign(ret.c_str(), ret.size());
 }
 
 
