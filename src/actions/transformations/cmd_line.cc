@@ -31,12 +31,12 @@ namespace actions {
 namespace transformations {
 
 
-std::string CmdLine::execute(const std::string &value,
-    Transaction *transaction) {
-    std::string ret;
+void CmdLine::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     int space = 0;
 
-    for (auto& a : value) {
+    for (auto& a : in) {
         switch (a) {
             /* remove some characters */
             case '"':
@@ -53,7 +53,7 @@ std::string CmdLine::execute(const std::string &value,
             case '\r':
             case '\n':
                 if (space == 0) {
-                    ret.append(" ");
+                    out.append(" ");
                     space++;
                 }
                 break;
@@ -62,22 +62,20 @@ std::string CmdLine::execute(const std::string &value,
             case '/':
             case '(':
                 if (space) {
-                    ret.pop_back();
+                    out.pop_back();
                 }
                 space = 0;
-                ret.append(&a, 1);
+                out.append(&a, 1);
                 break;
 
             /* copy normal characters */
             default :
                 char b = std::tolower(a);
-                ret.append(&b, 1);
+                out.append(&b, 1);
                 space = 0;
                 break;
         }
     }
-
-    return ret;
 }
 
 
