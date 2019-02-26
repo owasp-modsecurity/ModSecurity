@@ -37,7 +37,7 @@ UrlDecode::UrlDecode(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string UrlDecode::evaluate(const std::string &value,
+std::string UrlDecode::execute(const std::string &value,
     Transaction *transaction) {
     unsigned char *val(NULL);
     int invalid_count = 0;

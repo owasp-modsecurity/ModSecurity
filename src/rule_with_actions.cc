@@ -105,7 +105,7 @@ RuleWithActions::RuleWithActions(
 
 void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
     if (a->action_kind == Action::ConfigurationKind) {
-        a->evaluate(this, NULL);
+        a->execute(this, NULL);
         return;
     }
 
@@ -117,7 +117,7 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
             actions::Rev *rev = dynamic_cast<actions::Rev *>(a.get());
             m_defaultRevision = rev->getRevision();
         } else {
-            a->evaluate(this, NULL);
+            a->execute(this, NULL);
         }
         return;
     }
@@ -171,7 +171,7 @@ void RuleWithActions::addAction(actions::Action *a) {
             actions::Rev *rev = dynamic_cast<actions::Rev *>(a);
             m_revision = rev->getRevision();
         } else {
-            a->evaluate(this, NULL);
+            a->execute(this, NULL);
         }
         delete a;
         return;
@@ -244,7 +244,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
             "action: " + *a->m_name.get());
 
-        a->evaluate(this, trans);
+        a->execute(this, trans);
     }
 
     for (auto &b :
@@ -258,7 +258,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         } else if (*a->m_name.get() == "setvar") {
             ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
                 "action: " + *a->m_name.get());
-            a->evaluate(this, trans, *trans->messageGetLast());
+            a->execute(this, trans, *trans->messageGetLast());
         }
     }
 }
@@ -282,7 +282,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
     for (actions::Tag *a : getTagsActionPtr()) {
         ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
             + *a->m_name.get());
-        a->evaluate(this, trans, *trans->messageGetLast());
+        a->execute(this, trans, *trans->messageGetLast());
     }
 
     /**
@@ -301,16 +301,17 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
     }
 
     if (m_logData) {
-        m_logData->evaluate(this, trans, *trans->messageGetLast());
+        m_logData->execute(this, trans, *trans->messageGetLast());
     } else if (m_defaultActionLogData) {
-        m_defaultActionLogData->evaluate(this, trans, *trans->messageGetLast());
+        m_defaultActionLogData->execute(this, trans, *trans->messageGetLast());
     }
 
     if (m_msg) {
-        m_msg->evaluate(this, trans, *trans->messageGetLast());
+        m_msg->execute(this, trans, *trans->messageGetLast());
     } else if (m_defaultActionMsg) {
-        m_defaultActionMsg->evaluate(this, trans, *trans->messageGetLast());
+        m_defaultActionMsg->execute(this, trans, *trans->messageGetLast());
     }
+
 
     for (auto &a : getMatchActionsPtr()) {
         if (!a->isDisruptive()
@@ -333,10 +334,11 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
 
 void RuleWithActions::executeAction(Transaction *trans,
     Action *a, bool defaultContext) {
+
     if (a->isDisruptive() == false && *a->m_name.get() != "block") {
         ms_dbg_a(trans, 9, "Running " \
             "action: " + *a->m_name.get());
-        a->evaluate(this, trans, *trans->messageGetLast());
+        a->execute(this, trans, *trans->messageGetLast());
         return;
     }
 
@@ -349,7 +351,7 @@ void RuleWithActions::executeAction(Transaction *trans,
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + 
             *a->m_name.get() + ".");
-        a->evaluate(this, trans, *trans->messageGetLast());
+        a->execute(this, trans, *trans->messageGetLast());
         return;
     }
 
@@ -366,7 +368,7 @@ inline void RuleWithActions::executeTransformation(
     std::string *path) const {
 
     std::string *oldValue = (*value).get();
-    std::string newValue = a->evaluate(*oldValue, trans);
+    std::string newValue = a->execute(*oldValue, trans);
 
     if (newValue != *oldValue) {
         std::shared_ptr<std::string> u(new std::string(newValue));

@@ -31,7 +31,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string CmdLine::evaluate(const std::string &value,
+std::string CmdLine::execute(const std::string &value,
     Transaction *transaction) {
     std::string ret;
     int space = 0;

@@ -35,7 +35,7 @@ class Block : public Action {
  public:
     explicit Block(const std::string &action) : Action(action) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction,
+    bool execute(RuleWithActions *rule, Transaction *transaction,
         RuleMessage &rm) override;
 };
 

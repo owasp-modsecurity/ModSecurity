@@ -35,7 +35,7 @@ class Chain : public Action {
     explicit Chain(const std::string &action) 
         : Action(action, ConfigurationKind) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 };
 
 }  // namespace actions

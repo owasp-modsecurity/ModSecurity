@@ -31,7 +31,7 @@ class Rev : public Action {
  public:
     explicit Rev(const std::string &action) : Action(action, ConfigurationKind) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
    std::string getRevision() const { return m_rev; }
 

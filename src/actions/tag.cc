@@ -57,7 +57,7 @@ std::string Tag::getName(Transaction *transaction) {
 }
 
 
-bool Tag::evaluate(RuleWithActions *rule, Transaction *transaction,
+bool Tag::execute(RuleWithActions *rule, Transaction *transaction,
     RuleMessage &rm) {
     std::string tag = getName(transaction);
     ms_dbg_a(transaction, 9, "Rule tag: " + tag);

@@ -32,7 +32,7 @@ class Md5 : public Transformation {
  public:
     explicit Md5(const std::string &action)  : Transformation(action) { }
 
-    std::string evaluate(const std::string &exp,
+    std::string execute(const std::string &exp,
         Transaction *transaction) override;
 };
 

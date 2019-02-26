@@ -319,7 +319,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
         t = modsecurity::actions::transformations::Transformation::instantiate(
             trans.back().str().c_str());
-        varValueRes = t->evaluate(varValue, NULL);
+        varValueRes = t->execute(varValue, NULL);
         varValue.assign(varValueRes);
         trans.pop_back();
 
