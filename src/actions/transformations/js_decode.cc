@@ -34,26 +34,24 @@ namespace actions {
 namespace transformations {
 
 
-std::string JsDecode::execute(const std::string &value,
-    Transaction *transaction) {
-    std::string ret;
+void JsDecode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
+        (malloc(sizeof(char) * in.length()+1));
 
     if (input == NULL) {
-        return "";
+        return;
     }
 
-    memcpy(input, value.c_str(), value.length()+1);
+    memcpy(input, in.c_str(), in.length()+1);
 
-    size_t i = inplace(input, value.length());
+    size_t i = inplace(input, in.length());
 
-    ret.assign(reinterpret_cast<char *>(input), i);
+    out.assign(reinterpret_cast<char *>(input), i);
     free(input);
-
-    return ret;
 }
 
 

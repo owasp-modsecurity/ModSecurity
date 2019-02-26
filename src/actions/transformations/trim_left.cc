@@ -32,17 +32,13 @@ namespace actions {
 namespace transformations {
 
 
+void TrimLeft::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+    out = in;
+    ltrim(&out);
+};
 
-TrimLeft::TrimLeft(const std::string &action) 
-    : Trim(action) {
-    this->action_kind = 1;
-}
-
-std::string TrimLeft::execute(const std::string &val,
-    Transaction *transaction) {
-        std::string value(val);
-    return *ltrim(&value);
-}
 
 }  // namespace transformations
 }  // namespace actions

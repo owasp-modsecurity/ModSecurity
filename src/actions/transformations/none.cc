@@ -31,10 +31,9 @@ namespace actions {
 namespace transformations {
 
 
-std::string None::execute(const std::string &value,
-    Transaction *transaction) {
-    return value;
-}
+void None::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) { }
 
 
 }  // namespace transformations

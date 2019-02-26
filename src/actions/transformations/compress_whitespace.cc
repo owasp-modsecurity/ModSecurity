@@ -30,36 +30,31 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-CompressWhitespace::CompressWhitespace(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
-std::string CompressWhitespace::execute(const std::string &value,
-    Transaction *transaction) {
-
-    std::string a;
+void CompressWhitespace::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     int inWhiteSpace = 0;
-    int i = 0;
+    size_t i = 0;
+    out.reserve(in.size());
 
-    while (i < value.size()) {
-        if (isspace(value[i])) {
+    while (i < in.size()) {
+        if (isspace(in[i])) {
             if (inWhiteSpace) {
                 i++;
                 continue;
             } else {
                 inWhiteSpace = 1;
-                a.append(" ", 1);
+                out.append(" ", 1);
             }
         } else {
             inWhiteSpace = 0;
-            a.append(&value.at(i), 1);
+            out.append(&in.at(i), 1);
         }
         i++;
     }
-
-    return a;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

@@ -32,30 +32,22 @@ namespace actions {
 namespace transformations {
 
 
-UrlDecode::UrlDecode(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
-std::string UrlDecode::execute(const std::string &value,
-    Transaction *transaction) {
+void UrlDecode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     unsigned char *val(NULL);
     int invalid_count = 0;
     int changed;
 
-    val = (unsigned char *) malloc(sizeof(char) * value.size() + 1);
-    memcpy(val, value.c_str(), value.size() + 1);
-    val[value.size()] = '\0';
+    val = (unsigned char *) malloc(sizeof(char) * in.size() + 1);
+    memcpy(val, in.c_str(), in.size() + 1);
+    val[in.size()] = '\0';
 
-    int size = utils::urldecode_nonstrict_inplace(val, value.size(),
+    int size = utils::urldecode_nonstrict_inplace(val, in.size(),
         &invalid_count, &changed);
-    std::string out;
-
     out.append((const char *)val, size);
 
     free(val);
-
-    return out;
 }
 
 

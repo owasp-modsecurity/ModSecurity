@@ -33,31 +33,31 @@ namespace actions {
 namespace transformations {
 
 
-std::string Utf8ToUnicode::execute(const std::string &value,
-    Transaction *transaction) {
-    std::string ret;
+void Utf8ToUnicode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+
     unsigned char *input;
     int changed = 0;
-    char *out;
+    char *out2;
 
     input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
+        (malloc(sizeof(char) * in.length()+1));
 
     if (input == NULL) {
-        return "";
+        return;
     }
 
-    memcpy(input, value.c_str(), value.length()+1);
+    memset(input, '\0', in.length()+1);
+    memcpy(input, in.c_str(), in.length()+1);
 
-    out = inplace(input, value.size() + 1, &changed);
+    out2 = inplace(input, in.size() + 1, &changed);
+    if (out2 != NULL) {
+        out.assign(reinterpret_cast<char *>(out2),
+            strlen(reinterpret_cast<char *>(out2)));
+        free(out2);
+    }
     free(input);
-    if (out != NULL) {
-        ret.assign(reinterpret_cast<char *>(out),
-            strlen(reinterpret_cast<char *>(out)));
-        free(out);
-    }
-
-    return ret;
 }
 
 

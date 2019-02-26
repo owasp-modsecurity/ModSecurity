@@ -39,7 +39,8 @@ namespace actions {
 
 class Action {
  public:
-    Action(const std::string& _action, int kind = RunTimeOnlyIfMatchKind)
+    
+    explicit Action(const std::string& _action, int kind = RunTimeOnlyIfMatchKind)
         : m_isNone(false),
         temporaryAction(false),
         action_kind(kind),
@@ -73,6 +74,17 @@ class Action {
         RuleMessage &ruleMessage) {
         return execute(rule, transaction);
     }
+
+    /**
+     * This method is meant to be used by transformations — a particular
+     * type of action.
+     *
+     */
+    virtual void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) {
+    };
+
     virtual bool init(std::string *error) { return true; }
     virtual bool isDisruptive() { return false; }
 

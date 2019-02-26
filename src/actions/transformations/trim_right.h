@@ -31,10 +31,12 @@ namespace transformations {
 
 class TrimRight : public Trim {
  public:
-    explicit TrimRight(const std::string &action) ;
+    explicit TrimRight(const std::string &action)
+        : Trim(action) { };
 
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 };
 
 }  // namespace transformations

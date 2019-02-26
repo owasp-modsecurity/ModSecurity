@@ -30,9 +30,13 @@ namespace transformations {
 
 class EscapeSeqDecode : public Transformation {
  public:
-    explicit EscapeSeqDecode(const std::string &action) ;
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    explicit EscapeSeqDecode(const std::string &action)
+        : Transformation(action) { }
+
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
+
     static int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len);
 };
 

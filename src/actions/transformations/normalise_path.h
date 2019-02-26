@@ -30,10 +30,12 @@ namespace transformations {
 
 class NormalisePath : public Transformation {
  public:
-    explicit NormalisePath(const std::string &action);
+    explicit NormalisePath(const std::string &action)
+        : Transformation(action) { };
 
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 
     static int normalize_path_inplace(unsigned char *input, int input_len,
         int win, int *changed);

@@ -30,15 +30,11 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-Length::Length(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
-std::string Length::execute(const std::string &value,
-    Transaction *transaction) {
-
-    return std::to_string(value.size());
+void Length::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+    out.assign(std::to_string(in.size()).c_str());
 }
 
 }  // namespace transformations
