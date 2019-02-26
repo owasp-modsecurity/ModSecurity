@@ -48,7 +48,7 @@
     },
     "expected":{  
       "audit_log":"",
-      "debug_log":"Transformation t:lowercase: \"test2\"",
+      "debug_log":"T \\(0\\) t:lowercase: \"test2\"",
       "error_log":""
     },
     "rules":[  

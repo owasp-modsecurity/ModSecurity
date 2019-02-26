@@ -33,21 +33,20 @@ namespace actions {
 namespace transformations {
 
 
-std::string RemoveNulls::execute(const std::string &val,
-    Transaction *transaction) {
+void RemoveNulls::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     int64_t i;
-    std::string value(val);
+    out = in;
 
     i = 0;
-    while (i < value.size()) {
-        if (value.at(i) == '\0') {
-            value.erase(i, 1);
+    while (i < out.size()) {
+        if (out.at(i) == '\0') {
+            out.erase(i, 1);
         } else {
             i++;
         }
     }
-
-    return value;
 }
 
 

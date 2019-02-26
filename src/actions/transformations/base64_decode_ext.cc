@@ -32,11 +32,11 @@ namespace actions {
 namespace transformations {
 
 
-std::string Base64DecodeExt::execute(const std::string &value,
-    Transaction *transaction) {
-    std::string ret = Utils::Base64::decode_forgiven(value);
-
-    return ret;
+void Base64DecodeExt::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+    std::string ret = Utils::Base64::decode_forgiven(in.c_str());
+    out.assign(ret.c_str(), ret.size());
 }
 
 
