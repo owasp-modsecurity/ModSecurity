@@ -32,7 +32,7 @@ class Base64Encode : public Transformation {
  public:
     explicit Base64Encode(const std::string &action)  : Transformation(action) { }
 
-    std::string evaluate(const std::string &exp,
+    std::string execute(const std::string &exp,
         Transaction *transaction) override;
 };
 

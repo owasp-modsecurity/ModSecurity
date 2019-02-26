@@ -140,7 +140,7 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 }
 
 
-std::string EscapeSeqDecode::evaluate(const std::string &value,
+std::string EscapeSeqDecode::execute(const std::string &value,
     Transaction *transaction) {
 
     unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
