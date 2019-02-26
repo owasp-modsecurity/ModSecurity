@@ -31,24 +31,21 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-ReplaceComments::ReplaceComments(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
-std::string ReplaceComments::execute(const std::string &value,
-    Transaction *transaction) {
+void ReplaceComments::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     uint64_t i, j, incomment;
 
     char *input = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(input, value.c_str(), value.size() + 1);
-    input[value.size()] = '\0';
+        malloc(sizeof(char) * in.size() + 1));
+    memcpy(input, in.c_str(), in.size() + 1);
+    input[in.size()] = '\0';
 
     i = j = incomment = 0;
-    while (i < value.size()) {
+    while (i < in.size()) {
         if (incomment == 0) {
-            if ((input[i] == '/') && (i + 1 < value.size())
+            if ((input[i] == '/') && (i + 1 < in.size())
                 && (input[i + 1] == '*')) {
                 incomment = 1;
                 i += 2;
@@ -58,7 +55,7 @@ std::string ReplaceComments::execute(const std::string &value,
                 j++;
             }
         } else {
-            if ((input[i] == '*') && (i + 1 < value.size())
+            if ((input[i] == '*') && (i + 1 < in.size())
                 && (input[i + 1] == '/')) {
                 incomment = 0;
                 i += 2;
@@ -74,13 +71,9 @@ std::string ReplaceComments::execute(const std::string &value,
         input[j++] = ' ';
     }
 
-
-    std::string resp;
-    resp.append(reinterpret_cast<char *>(input), j);
+    out.append(reinterpret_cast<char *>(input), j);
 
     free(input);
-
-    return resp;
 }
 
 }  // namespace transformations

@@ -31,22 +31,19 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-HexEncode::HexEncode(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
-std::string HexEncode::execute(const std::string &value,
-    Transaction *transaction) {
-
+void HexEncode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     std::stringstream result;
-    for (std::size_t i=0; i < value.length(); i++) {
-        unsigned int ii = (unsigned char)(value[i]);
+    for (std::size_t i=0; i < in.length(); i++) {
+        int ii = reinterpret_cast<char>(in[i]);
         result << std::setw(2) << std::setfill('0') << std::hex << ii;
     }
 
-    return result.str();
+    out.assign(result.str().c_str());
 }
+
 
 }  // namespace transformations
 }  // namespace actions
