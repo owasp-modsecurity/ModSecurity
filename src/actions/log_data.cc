@@ -29,7 +29,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool LogData::evaluate(RuleWithActions *rule, Transaction *transaction,
+bool LogData::execute(RuleWithActions *rule, Transaction *transaction,
     RuleMessage &rm) {
     rm.m_data = data(transaction);
 

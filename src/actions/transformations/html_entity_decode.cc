@@ -33,7 +33,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string HtmlEntityDecode::evaluate(const std::string &value,
+std::string HtmlEntityDecode::execute(const std::string &value,
     Transaction *transaction) {
     std::string ret;
     unsigned char *input;
