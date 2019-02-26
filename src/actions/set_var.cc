@@ -40,7 +40,7 @@ bool SetVar::init(std::string *error) {
 }
 
 
-bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
+bool SetVar::execute(RuleWithActions *rule, Transaction *t) {
     std::string targetValue;
     std::string resolvedPre;
 

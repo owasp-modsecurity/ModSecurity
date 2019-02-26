@@ -83,7 +83,7 @@ bool RuleRemoveById::init(std::string *error) {
     return false;
 }
 
-bool RuleRemoveById::evaluate(RuleWithActions *rule, Transaction *transaction) {
+bool RuleRemoveById::execute(RuleWithActions *rule, Transaction *transaction) {
     for (auto &i : m_ids) {
         transaction->m_ruleRemoveById.push_back(i);
     }

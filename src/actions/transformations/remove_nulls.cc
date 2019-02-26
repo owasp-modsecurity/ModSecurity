@@ -33,7 +33,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string RemoveNulls::evaluate(const std::string &val,
+std::string RemoveNulls::execute(const std::string &val,
     Transaction *transaction) {
     int64_t i;
     std::string value(val);

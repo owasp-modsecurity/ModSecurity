@@ -59,7 +59,7 @@ class Allow : public Action {
 
 
     bool init(std::string *error) override;
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool isDisruptive() override { return true; }
 
     AllowType m_allowType;

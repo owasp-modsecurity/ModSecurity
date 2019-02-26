@@ -34,7 +34,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string CssDecode::evaluate(const std::string &value,
+std::string CssDecode::execute(const std::string &value,
     Transaction *transaction) {
 
     char *tmp = reinterpret_cast<char *>(

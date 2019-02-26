@@ -38,7 +38,7 @@ bool Skip::init(std::string *error) {
 }
 
 
-bool Skip::evaluate(RuleWithActions *rule, Transaction *transaction) {
+bool Skip::execute(RuleWithActions *rule, Transaction *transaction) {
     ms_dbg_a(transaction, 5, "Skipping the next " + \
         std::to_string(m_skip_next) + " rules.");
 

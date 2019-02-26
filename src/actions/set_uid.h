@@ -39,7 +39,7 @@ class SetUID : public Action {
         : Action("setuid", RunTimeOnlyIfMatchKind),
             m_string(std::move(z)) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
  private:

@@ -72,7 +72,7 @@ bool Phase::init(std::string *error) {
 }
 
 
-bool Phase::evaluate(RuleWithActions *rule, Transaction *transaction) {
+bool Phase::execute(RuleWithActions *rule, Transaction *transaction) {
     rule->setPhase(m_phase);
     return true;
 }

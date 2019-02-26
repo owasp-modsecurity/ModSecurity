@@ -28,7 +28,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Log::evaluate(RuleWithActions *rule, Transaction *transaction,
+bool Log::execute(RuleWithActions *rule, Transaction *transaction,
     RuleMessage &rm) {
     ms_dbg_a(transaction, 9, "Saving transaction to logs");
     rm.m_saveMessage = true;

@@ -31,7 +31,7 @@ class RequestBodyProcessorURLENCODED : public Action {
     explicit RequestBodyProcessorURLENCODED(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 };
 
 
