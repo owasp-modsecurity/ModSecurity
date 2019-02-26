@@ -32,7 +32,10 @@ class ParityZero7bit : public Transformation {
  public:
     explicit ParityZero7bit(std::string action) : Transformation(action) { }
 
-    std::string execute(const std::string &exp, Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
+
     static bool inplace(unsigned char *input, uint64_t input_len);
 };
 

@@ -49,12 +49,36 @@ class Transformation;
 }
 }
 
+using ModSecStackString = std::basic_string<char, std::char_traits<char>, std::allocator<char> >;
+
+class TransformationResult {
+ public:
+    TransformationResult(
+        ModSecStackString *after,
+        std::string *transformation = nullptr)
+        : m_transformation(transformation),
+        m_after(*after) { };
+
+    TransformationResult(const TransformationResult &t2) {
+            m_after = t2.m_after;
+            m_transformation = t2.m_transformation;
+        };
+
+    ModSecStackString *getAfter() {
+        return &m_after;
+    }
+
+    std::string *getTransformationName() {
+        return m_transformation;
+    }
+ private:
+    ModSecStackString m_after;
+    std::string *m_transformation;
+};
+using TransformationsResults = std::list<TransformationResult>;
 
 class RuleWithActions : public Rule {
  public:
-    using TransformationResult = std::pair<std::shared_ptr<std::string>,
-        std::shared_ptr<std::string>>;
-    using TransformationResults = std::list<TransformationResult>;
 
     using Transformation = actions::transformations::Transformation;
     using Transformations = std::vector<Transformation *>;
@@ -89,17 +113,21 @@ class RuleWithActions : public Rule {
         bool context);
 
 
-    void executeTransformations(
+    inline void executeTransformation(
         Transaction *transaction,
-        const std::string &value,
-        TransformationResults &ret);
+        TransformationsResults *ret,
+        Transformation *transformation);
 
     inline void executeTransformation(
         Transaction *transaction,
-        std::shared_ptr<std::string> *value,
-        TransformationResults *ret,
-        actions::transformations::Transformation *a,
-        std::string *path);
+        ModSecStackString in,
+        TransformationsResults *ret,
+        Transformation *transformation);
+
+    void executeTransformations(
+        Transaction *transaction,
+        const std::string &value,
+        TransformationsResults &results);
 
 
     void performLogging(Transaction *trans, bool lastLog = true);

@@ -30,9 +30,11 @@ namespace transformations {
 
 class Sha1 : public Transformation {
  public:
-    explicit Sha1(std::string action);
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    explicit Sha1(std::string action) : Transformation(action) { };
+
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 };
 
 }  // namespace transformations

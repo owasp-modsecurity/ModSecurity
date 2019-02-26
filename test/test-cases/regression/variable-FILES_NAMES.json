@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Transformation t:trim: \"filedata"
+      "debug_log":"T \\(0\\) t:trim: \"filedata"
     },
     "rules":[  
       "SecRuleEngine On",

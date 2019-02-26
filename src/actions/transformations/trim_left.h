@@ -31,9 +31,11 @@ namespace transformations {
 
 class TrimLeft : public Trim {
  public:
-    explicit TrimLeft(std::string action);
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    explicit TrimLeft(std::string action) : Trim(action) { };
+
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 };
 
 }  // namespace transformations

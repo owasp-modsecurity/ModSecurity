@@ -305,15 +305,18 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
                 continue;
             }
 
-            TransformationResults values;
+            TransformationsResults transformationsResults;
 
-            executeTransformations(trans, value, values);
+            executeTransformations(trans, value, transformationsResults);
 
-            for (const auto &valueTemp : values) {
+            auto iter = transformationsResults.begin();
+            while (iter != transformationsResults.end()) {
                 bool ret;
-                std::string valueAfterTrans = std::move(*valueTemp.first);
+                auto &valueTemp = *iter;
+                // FIXME: this copy is not necessary.
+                std::string *valueAfterTrans = new std::string(valueTemp.getAfter()->c_str());
 
-                ret = executeOperatorAt(trans, key, valueAfterTrans);
+                ret = executeOperatorAt(trans, key, *valueAfterTrans);
 
                 if (ret == true) {
                     trans->messageGetLast()->m_match = m_operator->resolveMatchMessage(trans,
@@ -322,16 +325,28 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
                     for (auto &i : v->getOrigin()) {
                         trans->messageGetLast()->m_reference.append(i->toText());
                     }
+                    auto iter2 = transformationsResults.begin();
+                    while (iter2 != transformationsResults.end()) {
+                        if (iter2->getTransformationName()) {
+                            trans->messageGetLast()->m_reference.append(*iter2->getTransformationName());
+                        }
+                        if (iter == iter2) {
+                            break;
+                        } else {
+                            trans->messageGetLast()->m_reference.append(",");
+                        }
+                        iter2++;
+                    }
 
-                    trans->messageGetLast()->m_reference.append(*valueTemp.second);
-                    updateMatchedVars(trans, v->getKeyWithCollection(), valueAfterTrans);
-
+                    updateMatchedVars(trans, v->getKeyWithCollection(), *valueAfterTrans);
                     executeActionsIndependentOfChainedRuleResult(trans);
 
                     performLogging(trans, false);
 
                     globalRet = true;
                 }
+                delete valueAfterTrans;
+                iter++;
             }
             delete v;
             v = NULL;

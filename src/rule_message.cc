@@ -20,6 +20,8 @@
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"
 #include "src/actions/tag.h"
+#include "modsecurity/rule_with_actions.h"
+
 
 namespace modsecurity {
 
@@ -100,6 +102,103 @@ RuleWithActions::Tags RuleMessage::getTags() {
     }
     RuleWithActions::Tags a;
     return a;
+}
+
+
+int RuleMessage::getRuleId() {
+    if (m_rule) {
+        return m_rule->getId();
+    }
+    return 0;
+}
+
+
+int RuleMessage::getPhase() {
+    if (m_rule) {
+        return m_rule->getPhase();
+    }
+    return 0;
+}
+
+
+std::string RuleMessage::getFileName() {
+    if (m_rule) {
+        return *m_rule->getFileName().get();
+    }
+    return "";
+}
+
+
+int RuleMessage::getLineNumber() {
+    if (m_rule) {
+        return m_rule->getLineNumber();
+    }
+    return 0;
+}
+
+
+std::string RuleMessage::getRev() {
+    if (m_rule) {
+        return *m_rule->getRevision();
+    }
+    return "";
+}
+
+
+std::string RuleMessage::getVer() {
+    if (m_rule) {
+        return *m_rule->getVersion();
+    }
+    return "";
+}
+
+
+int RuleMessage::getMaturity() {
+    if (m_rule) {
+        return m_rule->getMaturity();
+    }
+    return 0;
+}
+
+
+int RuleMessage::getAccuracy() {
+    if (m_rule) {
+        return m_rule->getAccuracy();
+    }
+    return 0;
+}
+
+
+
+std::string RuleMessage::getClientIpAddress() {
+    if (m_transaction) {
+        return *m_transaction->m_clientIpAddress.get();
+    }
+    return "";
+}
+
+
+std::string RuleMessage::getServerIpAddress() {
+    if (m_transaction) {
+        return *m_transaction->m_serverIpAddress.get();
+    }
+    return "";
+}
+
+
+std::string RuleMessage::getRequestId() {
+    if (m_transaction) {
+        return *m_transaction->m_id.get();
+    }
+    return "";
+}
+
+
+std::string RuleMessage::getUri() {
+    if (m_transaction) {
+        return *m_transaction->m_uri_no_query_string_decoded.get();
+    }
+    return "";
 }
 
 

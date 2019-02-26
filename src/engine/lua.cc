@@ -440,7 +440,11 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
                     "t:" + std::string(name));
             // FIXME: transformation is not yet returning null.
             if (tfn) {
-                newVar = tfn->execute(newVar, t);
+                ModSecStackString in;
+                ModSecStackString out;
+                in.assign(newVar.c_str(), newVar.size());
+                tfn->execute(t, in, out);
+                newVar.assign(out.c_str(), out.size());
             } else {
                 ms_dbg_a(t, 1,
                     "SecRuleScript: Invalid transformation function: " \
@@ -462,7 +466,11 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
 
         // FIXME: transformation is not yet returning null.
         if (tfn) {
-            newVar = tfn->execute(newVar, t);
+            ModSecStackString in;
+            ModSecStackString out;
+            in.assign(newVar.c_str(), newVar.size());
+            tfn->execute(t, in, out);
+            newVar.assign(out.c_str(), out.size());
             delete tfn;
         } else {
             ms_dbg_a(t, 1, "SecRuleScript: Invalid transformation function: " \

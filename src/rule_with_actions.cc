@@ -292,18 +292,19 @@ void RuleWithActions::executeAction(Transaction *trans,
 void RuleWithActions::executeTransformations(
     Transaction *trans,
     const std::string &in,
-    TransformationResults &ret) {
+    TransformationsResults &results) {
     int none = 0;
+
+    ModSecStackString ssin;
+    ssin.assign(in.c_str());
+
+    TransformationResult a = TransformationResult(&ssin);
+    results.push_back(a);
+
+
     std::string path("");
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
-
-    if (m_containsMultiMatchAction == true) {
-        /* keep the original value */
-        ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(new std::string(*value)),
-            std::shared_ptr<std::string>(new std::string(path))));
-    }
 
     for (Action *a : m_transformations) {
         if (a->m_isNone) {
@@ -323,13 +324,13 @@ void RuleWithActions::executeTransformations(
 
             // FIXME: here the object needs to be a transformation already.
             Transformation *t = dynamic_cast<Transformation *>(a.get());
-            executeTransformation(trans, &value, &ret, t, &path);
+            executeTransformation(trans, &results, t);
         }
     }
 
     for (Transformation *a : m_transformations) {
         if (none == 0) {
-            executeTransformation(trans, &value, &ret, a, &path);
+            executeTransformation(trans, &results, a);
         }
         if (a->m_isNone) {
             none--;
@@ -356,7 +357,7 @@ void RuleWithActions::executeTransformations(
         }
         Transformation *a = dynamic_cast<Transformation*>(b.second.get());
         if (none == 0) {
-            executeTransformation(trans, &value, &ret, a, &path);
+            executeTransformation(trans, &results, a);
         }
         if (a->m_isNone) {
             none--;
@@ -365,45 +366,47 @@ void RuleWithActions::executeTransformations(
 
     if (m_containsMultiMatchAction == true) {
         ms_dbg_a(trans, 9, "multiMatch is enabled. " \
-            + std::to_string(ret.size()) + \
+            + std::to_string(results.size()) + \
             " values to be tested.");
-    }
-
-    if (!m_containsMultiMatchAction) {
-        ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(new std::string(*value)),
-            std::shared_ptr<std::string>(new std::string(path))));
+    } else {
+        results.pop_front();
+        results.push_back(TransformationResult(&ssin));
     }
 }
 
 
 inline void RuleWithActions::executeTransformation(
-    Transaction *trans,
-    std::shared_ptr<std::string> *value,
-    TransformationResults *ret,
-    actions::transformations::Transformation *a,
-    std::string *path) {
+    Transaction *transaction,
+    TransformationsResults *ret,
+    Transformation *transformation) {
+    executeTransformation(
+        transaction,
+        *ret->back().getAfter(),
+        ret,
+        transformation
+    );
+}
 
-    std::string *oldValue = (*value).get();
-    std::string newValue = a->execute(*oldValue, trans);
 
-    if (newValue != *oldValue) {
-        std::shared_ptr<std::string> u(new std::string(newValue));
-        if (m_containsMultiMatchAction) {
-            ret->push_back(std::make_pair(u, a->m_name));
-        }
-        *value = u;
-    }
+inline void RuleWithActions::executeTransformation(
+    Transaction *transaction,
+    ModSecStackString in,
+    TransformationsResults *ret,
+    Transformation *transformation) {
 
-    if (path->empty()) {
-        path->append(*a->m_name.get());
-    } else {
-        path->append("," + *a->m_name.get());
-    }
+    ModSecStackString out;
+    transformation->execute(transaction, in, out);
 
-    ms_dbg_a(trans, 9, "Transformation " + \
-        *a->m_name.get() + ": \"" + \
-        utils::string::limitTo(80, newValue) +"\"");
+    ms_dbg_a(transaction, 9, " T (" + std::to_string(ret->size() - 1) + ") " + \
+        *transformation->m_name.get() + ": \"" + \
+        utils::string::limitTo(80, out.c_str()) + "\"");
+
+    ret->push_back(
+        TransformationResult(
+            &out,
+            transformation->m_name.get()
+        )
+    );
 }
 
 
