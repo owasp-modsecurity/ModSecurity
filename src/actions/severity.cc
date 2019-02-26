@@ -71,7 +71,7 @@ bool Severity::init(std::string *error) {
 }
 
 
-bool Severity::evaluate(RuleWithActions *rule, Transaction *transaction,
+bool Severity::execute(RuleWithActions *rule, Transaction *transaction,
     RuleMessage &rm) {
     return true;
 }

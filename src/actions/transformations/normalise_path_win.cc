@@ -34,7 +34,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string NormalisePathWin::evaluate(const std::string &value,
+std::string NormalisePathWin::execute(const std::string &value,
     Transaction *transaction) {
     int changed;
 

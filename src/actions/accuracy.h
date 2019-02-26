@@ -33,7 +33,7 @@ class Accuracy : public Action {
         : Action(action, ConfigurationKind),
         m_accuracy(0) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
     int getAccuracy() const { return m_accuracy; }
 
