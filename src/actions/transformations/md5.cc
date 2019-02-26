@@ -31,11 +31,12 @@ namespace actions {
 namespace transformations {
 
 
-std::string Md5::execute(const std::string &value,
-    Transaction *transaction) {
-    std::string ret = Utils::Md5::digest(value);
+void Md5::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+    std::string ret = Utils::Md5::digest(std::string(in.c_str(), in.size()));
 
-    return ret;
+    out.assign(ret.c_str(), ret.size());
 }
 
 
