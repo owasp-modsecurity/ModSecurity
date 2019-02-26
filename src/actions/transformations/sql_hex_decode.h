@@ -30,10 +30,12 @@ namespace transformations {
 
 class SqlHexDecode : public Transformation {
  public:
-    explicit SqlHexDecode(const std::string &action)  : Transformation(action) { }
+    explicit SqlHexDecode(const std::string &action)
+        : Transformation(action) { }
 
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 
     static int inplace(unsigned char *data, int len);
 
