@@ -34,20 +34,19 @@ namespace actions {
 namespace transformations {
 
 
-std::string CssDecode::execute(const std::string &value,
-    Transaction *transaction) {
-
+void CssDecode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
+        malloc(sizeof(char) * in.size() + 1));
+    memcpy(tmp, in.c_str(), in.size() + 1);
+    tmp[in.size()] = '\0';
 
     CssDecode::css_decode_inplace(reinterpret_cast<unsigned char *>(tmp),
-        value.size());
+        in.size());
 
-    std::string ret(tmp, 0, value.size());
+    out.assign(tmp, 0, in.size());
     free(tmp);
-    return ret;
 }
 
 

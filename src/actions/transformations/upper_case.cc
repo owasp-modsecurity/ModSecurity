@@ -27,21 +27,16 @@ namespace actions {
 namespace transformations {
 
 
-UpperCase::UpperCase(const std::string &a)
-    : Transformation(a) {
-}
-
-std::string UpperCase::execute(const std::string &val,
-    Transaction *transaction) {
-    std::string value(val);
+void UpperCase::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     std::locale loc;
-
-    for (std::string::size_type i=0; i < value.length(); ++i) {
-        value[i] = std::toupper(value[i], loc);
+    out.reserve(in.size());
+    for (std::string::size_type i=0; i < in.size(); ++i) {
+        out += std::toupper(in[i], loc);
     }
-
-    return value;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

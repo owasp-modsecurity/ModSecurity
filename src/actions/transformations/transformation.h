@@ -32,11 +32,12 @@ class Transformation : public Action {
     explicit Transformation(const std::string& _action)
         : Action(_action, RunTimeBeforeMatchAttemptKind) { }
 
-    Transformation(const std::string& _action, int kind)
-        : Action(_action, kind) { }
-
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override {
+            // FIXME: this should be remove as soon as #1974 got fixed.
+            out.assign(in.c_str(), in.length());
+    }
 
     static Transformation* instantiate(std::string a);
 };

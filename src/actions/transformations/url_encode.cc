@@ -31,12 +31,6 @@ namespace actions {
 namespace transformations {
 
 
-UrlEncode::UrlEncode(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
-
 std::string UrlEncode::url_enc(const char *input,
     unsigned int input_len, int *changed) {
     char *rval, *d;
@@ -87,13 +81,13 @@ std::string UrlEncode::url_enc(const char *input,
 }
 
 
-std::string UrlEncode::execute(const std::string &value,
-    Transaction *transaction) {
+void UrlEncode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     int changed;
 
-    std::string ret = url_enc(value.c_str(), value.size(), &changed);
-
-    return ret;
+    std::string ret = url_enc(in.c_str(), in.size(), &changed);
+    out.assign(ret.c_str(), ret.size());
 }
 
 
