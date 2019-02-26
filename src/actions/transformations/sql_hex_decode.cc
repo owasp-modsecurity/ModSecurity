@@ -41,7 +41,7 @@ namespace transformations {
 #define ISODIGIT(X) ((X >= '0') && (X <= '7'))
 #endif
 
-std::string SqlHexDecode::evaluate(const std::string &value,
+std::string SqlHexDecode::execute(const std::string &value,
     Transaction *transaction) {
     std::string ret;
     unsigned char *input;

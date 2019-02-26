@@ -35,7 +35,7 @@ ReplaceNulls::ReplaceNulls(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string ReplaceNulls::evaluate(const std::string &val,
+std::string ReplaceNulls::execute(const std::string &val,
     Transaction *transaction) {
     int64_t i;
     std::string value(val);
