@@ -34,7 +34,7 @@ class None : public Transformation {
         : Transformation(action)
         { m_isNone = true; }
 
-    std::string evaluate(const std::string &exp,
+    std::string execute(const std::string &exp,
         Transaction *transaction) override;
 };
 

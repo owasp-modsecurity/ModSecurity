@@ -34,7 +34,7 @@ class SkipAfter : public Action {
         : Action(action, RunTimeOnlyIfMatchKind),
         m_skipName(std::make_shared<std::string>(m_parser_payload)) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
  private:
      std::shared_ptr<std::string> m_skipName;
 };
