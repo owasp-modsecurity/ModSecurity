@@ -33,7 +33,7 @@ class Deny : public Action {
  public:
     explicit Deny(const std::string &action) : Action(action) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction,
+    bool execute(RuleWithActions *rule, Transaction *transaction,
         RuleMessage &rm) override;
     bool isDisruptive() override { return true; }
 };

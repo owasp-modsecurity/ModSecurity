@@ -38,7 +38,7 @@ TrimLeft::TrimLeft(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string TrimLeft::evaluate(const std::string &val,
+std::string TrimLeft::execute(const std::string &val,
     Transaction *transaction) {
         std::string value(val);
     return *ltrim(&value);
