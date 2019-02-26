@@ -54,7 +54,7 @@ bool InitCol::init(std::string *error) {
 }
 
 
-bool InitCol::evaluate(RuleWithActions *rule, Transaction *t) {
+bool InitCol::execute(RuleWithActions *rule, Transaction *t) {
     std::string collectionName(m_string->evaluate(t));
 
     if (m_collection_key == "ip") {

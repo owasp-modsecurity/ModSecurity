@@ -35,7 +35,7 @@ Length::Length(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string Length::evaluate(const std::string &value,
+std::string Length::execute(const std::string &value,
     Transaction *transaction) {
 
     return std::to_string(value.size());

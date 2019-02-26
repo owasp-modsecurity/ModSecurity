@@ -32,7 +32,8 @@ PhpArgsNames::PhpArgsNames(const std::string &a)
     : Transformation(a) {
 }
 
-std::string PhpArgsNames::evaluate(const std::string &val,
+
+std::string PhpArgsNames::execute(const std::string &val,
     Transaction *transaction) {
     //Took the logic from php src code:
     //https://github.com/php/php-src/blob/master/main/php_variables.c

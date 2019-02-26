@@ -35,7 +35,7 @@ CompressWhitespace::CompressWhitespace(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string CompressWhitespace::evaluate(const std::string &value,
+std::string CompressWhitespace::execute(const std::string &value,
     Transaction *transaction) {
 
     std::string a;

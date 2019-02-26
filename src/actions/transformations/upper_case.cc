@@ -31,7 +31,7 @@ UpperCase::UpperCase(const std::string &a)
     : Transformation(a) {
 }
 
-std::string UpperCase::evaluate(const std::string &val,
+std::string UpperCase::execute(const std::string &val,
     Transaction *transaction) {
     std::string value(val);
     std::locale loc;

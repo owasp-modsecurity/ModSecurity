@@ -29,7 +29,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool NoLog::evaluate(RuleWithActions *rule, Transaction *transaction,
+bool NoLog::execute(RuleWithActions *rule, Transaction *transaction,
     RuleMessage &rm) {
     return true;
 }
