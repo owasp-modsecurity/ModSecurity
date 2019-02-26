@@ -36,7 +36,7 @@ ReplaceComments::ReplaceComments(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string ReplaceComments::evaluate(const std::string &value,
+std::string ReplaceComments::execute(const std::string &value,
     Transaction *transaction) {
     uint64_t i, j, incomment;
 

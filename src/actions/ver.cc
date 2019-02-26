@@ -27,7 +27,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Ver::evaluate(RuleWithActions *rule, Transaction *transaction) {
+bool Ver::execute(RuleWithActions *rule, Transaction *transaction) {
     return true;
 }
 

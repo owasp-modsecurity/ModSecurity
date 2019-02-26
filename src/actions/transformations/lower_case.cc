@@ -31,7 +31,7 @@ LowerCase::LowerCase(const std::string &a)
     : Transformation(a) {
 }
 
-std::string LowerCase::evaluate(const std::string &val,
+std::string LowerCase::execute(const std::string &val,
     Transaction *transaction) {
     std::locale loc;
     std::string value(val);

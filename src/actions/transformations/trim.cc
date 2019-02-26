@@ -67,7 +67,7 @@ Trim::Trim(const std::string &action)
 
 
 std::string
-Trim::evaluate(const std::string &val,
+Trim::execute(const std::string &val,
     Transaction *transaction) {
     std::string value(val);
     return *this->trim(&value);

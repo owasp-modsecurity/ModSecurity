@@ -33,7 +33,7 @@ class UrlDecodeUni : public Transformation {
  public:
     explicit UrlDecodeUni(const std::string &action)  : Transformation(action) { }
 
-    std::string evaluate(const std::string &exp, Transaction *transaction) override;
+    std::string execute(const std::string &exp, Transaction *transaction) override;
     static int inplace(unsigned char *input, uint64_t input_len,
         Transaction *transaction);
 };

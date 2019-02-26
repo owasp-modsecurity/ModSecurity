@@ -66,12 +66,12 @@ class Action {
 
     virtual ~Action() { }
 
-    virtual std::string evaluate(const std::string &exp,
+    virtual std::string execute(const std::string &exp,
         Transaction *transaction);
-    virtual bool evaluate(RuleWithActions *rule, Transaction *transaction);
-    virtual bool evaluate(RuleWithActions *rule, Transaction *transaction,
+    virtual bool execute(RuleWithActions *rule, Transaction *transaction);
+    virtual bool execute(RuleWithActions *rule, Transaction *transaction,
         RuleMessage &ruleMessage) {
-        return evaluate(rule, transaction);
+        return execute(rule, transaction);
     }
     virtual bool init(std::string *error) { return true; }
     virtual bool isDisruptive() { return false; }

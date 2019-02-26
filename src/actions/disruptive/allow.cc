@@ -49,7 +49,7 @@ bool Allow::init(std::string *error) {
 }
 
 
-bool Allow::evaluate(RuleWithActions *rule, Transaction *transaction) {
+bool Allow::execute(RuleWithActions *rule, Transaction *transaction) {
     ms_dbg_a(transaction, 4, "Dropping the evaluation of upcoming rules " \
         "in favor of an `allow' action of type: " \
         + allowTypeToName(m_allowType));

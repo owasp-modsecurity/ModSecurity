@@ -36,7 +36,7 @@ HexEncode::HexEncode(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string HexEncode::evaluate(const std::string &value,
+std::string HexEncode::execute(const std::string &value,
     Transaction *transaction) {
 
     std::stringstream result;

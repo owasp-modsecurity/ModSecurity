@@ -36,7 +36,7 @@ class Exec : public Action {
 
     ~Exec() { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
  private:

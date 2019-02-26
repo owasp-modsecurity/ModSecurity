@@ -31,7 +31,7 @@ class RequestBodyProcessorXML : public Action {
     explicit RequestBodyProcessorXML(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 };
 
 

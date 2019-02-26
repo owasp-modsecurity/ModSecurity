@@ -38,7 +38,7 @@ class Block : public Action {
     Block(const Block &a) = delete;
     Block &operator=(const Block &a) = delete;
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction,
+    bool execute(RuleWithActions *rule, Transaction *transaction,
         RuleMessage &rm) override;
 };
 

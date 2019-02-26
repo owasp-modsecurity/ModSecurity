@@ -32,7 +32,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string HexDecode::evaluate(const std::string &value,
+std::string HexDecode::execute(const std::string &value,
     Transaction *transaction) {
     std::string ret;
     unsigned char *input;

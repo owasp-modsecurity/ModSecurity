@@ -33,7 +33,7 @@ class JsDecode : public Transformation {
     explicit JsDecode(const std::string &action) 
         : Transformation(action) { }
 
-    std::string evaluate(const std::string &exp,
+    std::string execute(const std::string &exp,
         Transaction *transaction) override;
     static int inplace(unsigned char *input, uint64_t input_len);
 };

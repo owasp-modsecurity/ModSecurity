@@ -33,7 +33,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string Utf8ToUnicode::evaluate(const std::string &value,
+std::string Utf8ToUnicode::execute(const std::string &value,
     Transaction *transaction) {
     std::string ret;
     unsigned char *input;
