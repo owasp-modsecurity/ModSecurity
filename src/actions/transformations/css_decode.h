@@ -33,7 +33,7 @@ class CssDecode : public Transformation {
  public:
     explicit CssDecode(const std::string &action) 
         : Transformation(action) { }
-    std::string evaluate(const std::string &exp,
+    std::string execute(const std::string &exp,
         Transaction *transaction) override;
 
     static int css_decode_inplace(unsigned char *input, int64_t input_len);
