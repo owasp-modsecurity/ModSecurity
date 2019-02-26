@@ -37,7 +37,9 @@ bool Block::evaluate(Rule *rule, Transaction *transaction,
         if (a->isDisruptive() == false) {
             continue;
         }
-        a->evaluate(rule, transaction, rm);
+        if (transaction->getRuleEngineState() != RulesProperties::DetectionOnlyRuleEngine) {
+            a->evaluate(rule, transaction, rm);
+        }
     }
 
     return true;
