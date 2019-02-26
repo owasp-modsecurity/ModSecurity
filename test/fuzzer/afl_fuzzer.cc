@@ -146,42 +146,42 @@ int main(int argc, char** argv) {
         * for i in $(grep "class " -Ri src/actions/transformations/* | grep " :" | grep -v "InstantCache" | awk {'print $2'}); do echo $i *$(echo $i | awk '{print tolower($0)}') = new $i\(\"$i\"\)\; $(echo $i | awk '{print tolower($0)}')-\>evaluate\(s, NULL\)\; delete $(echo $i | awk '{print tolower($0)}')\;; done;
         *
         */
-Base64DecodeExt *base64decodeext = new Base64DecodeExt("Base64DecodeExt"); base64decodeext->evaluate(s, NULL); delete base64decodeext;
-Base64Decode *base64decode = new Base64Decode("Base64Decode"); base64decode->evaluate(s, NULL); delete base64decode;
-Base64Encode *base64encode = new Base64Encode("Base64Encode"); base64encode->evaluate(s, NULL); delete base64encode;
-CmdLine *cmdline = new CmdLine("CmdLine"); cmdline->evaluate(s, NULL); delete cmdline;
-CompressWhitespace *compresswhitespace = new CompressWhitespace("CompressWhitespace"); compresswhitespace->evaluate(s, NULL); delete compresswhitespace;
-CssDecode *cssdecode = new CssDecode("CssDecode"); cssdecode->evaluate(s, NULL); delete cssdecode;
-EscapeSeqDecode *escapeseqdecode = new EscapeSeqDecode("EscapeSeqDecode"); escapeseqdecode->evaluate(s, NULL); delete escapeseqdecode;
-HexDecode *hexdecode = new HexDecode("HexDecode"); hexdecode->evaluate(s, NULL); delete hexdecode;
-HexEncode *hexencode = new HexEncode("HexEncode"); hexencode->evaluate(s, NULL); delete hexencode;
-HtmlEntityDecode *htmlentitydecode = new HtmlEntityDecode("HtmlEntityDecode"); htmlentitydecode->evaluate(s, NULL); delete htmlentitydecode;
-JsDecode *jsdecode = new JsDecode("JsDecode"); jsdecode->evaluate(s, NULL); delete jsdecode;
-Length *length = new Length("Length"); length->evaluate(s, NULL); delete length;
-LowerCase *lowercase = new LowerCase("LowerCase"); lowercase->evaluate(s, NULL); delete lowercase;
-Md5 *md5 = new Md5("Md5"); md5->evaluate(s, NULL); delete md5;
-None *none = new None("None"); none->evaluate(s, NULL); delete none;
-NormalisePath *normalisepath = new NormalisePath("NormalisePath"); normalisepath->evaluate(s, NULL); delete normalisepath;
-NormalisePathWin *normalisepathwin = new NormalisePathWin("NormalisePathWin"); normalisepathwin->evaluate(s, NULL); delete normalisepathwin;
-ParityEven7bit *parityeven7bit = new ParityEven7bit("ParityEven7bit"); parityeven7bit->evaluate(s, NULL); delete parityeven7bit;
-ParityOdd7bit *parityodd7bit = new ParityOdd7bit("ParityOdd7bit"); parityodd7bit->evaluate(s, NULL); delete parityodd7bit;
-ParityZero7bit *parityzero7bit = new ParityZero7bit("ParityZero7bit"); parityzero7bit->evaluate(s, NULL); delete parityzero7bit;
-RemoveCommentsChar *removecommentschar = new RemoveCommentsChar("RemoveCommentsChar"); removecommentschar->evaluate(s, NULL); delete removecommentschar;
-RemoveComments *removecomments = new RemoveComments("RemoveComments"); removecomments->evaluate(s, NULL); delete removecomments;
-RemoveNulls *removenulls = new RemoveNulls("RemoveNulls"); removenulls->evaluate(s, NULL); delete removenulls;
-RemoveWhitespace *removewhitespace = new RemoveWhitespace("RemoveWhitespace"); removewhitespace->evaluate(s, NULL); delete removewhitespace;
-ReplaceComments *replacecomments = new ReplaceComments("ReplaceComments"); replacecomments->evaluate(s, NULL); delete replacecomments;
-ReplaceNulls *replacenulls = new ReplaceNulls("ReplaceNulls"); replacenulls->evaluate(s, NULL); delete replacenulls;
-Sha1 *sha1 = new Sha1("Sha1"); sha1->evaluate(s, NULL); delete sha1;
-SqlHexDecode *sqlhexdecode = new SqlHexDecode("SqlHexDecode"); sqlhexdecode->evaluate(s, NULL); delete sqlhexdecode;
-Transformation *transformation = new Transformation("Transformation"); transformation->evaluate(s, NULL); delete transformation;
-Trim *trim = new Trim("Trim"); trim->evaluate(s, NULL); delete trim;
-TrimLeft *trimleft = new TrimLeft("TrimLeft"); trimleft->evaluate(s, NULL); delete trimleft;
-TrimRight *trimright = new TrimRight("TrimRight"); trimright->evaluate(s, NULL); delete trimright;
-UrlDecode *urldecode = new UrlDecode("UrlDecode"); urldecode->evaluate(s, NULL); delete urldecode;
-UrlDecodeUni *urldecodeuni = new UrlDecodeUni("UrlDecodeUni"); urldecodeuni->evaluate(s, NULL); delete urldecodeuni;
-UrlEncode *urlencode = new UrlEncode("UrlEncode"); urlencode->evaluate(s, NULL); delete urlencode;
-Utf8ToUnicode *utf8tounicode = new Utf8ToUnicode("Utf8ToUnicode"); utf8tounicode->evaluate(s, NULL); delete utf8tounicode;
+Base64DecodeExt *base64decodeext = new Base64DecodeExt("Base64DecodeExt"); base64decodeext->execute(s, NULL); delete base64decodeext;
+Base64Decode *base64decode = new Base64Decode("Base64Decode"); base64decode->execute(s, NULL); delete base64decode;
+Base64Encode *base64encode = new Base64Encode("Base64Encode"); base64encode->execute(s, NULL); delete base64encode;
+CmdLine *cmdline = new CmdLine("CmdLine"); cmdline->execute(s, NULL); delete cmdline;
+CompressWhitespace *compresswhitespace = new CompressWhitespace("CompressWhitespace"); compresswhitespace->execute(s, NULL); delete compresswhitespace;
+CssDecode *cssdecode = new CssDecode("CssDecode"); cssdecode->execute(s, NULL); delete cssdecode;
+EscapeSeqDecode *escapeseqdecode = new EscapeSeqDecode("EscapeSeqDecode"); escapeseqdecode->execute(s, NULL); delete escapeseqdecode;
+HexDecode *hexdecode = new HexDecode("HexDecode"); hexdecode->execute(s, NULL); delete hexdecode;
+HexEncode *hexencode = new HexEncode("HexEncode"); hexencode->execute(s, NULL); delete hexencode;
+HtmlEntityDecode *htmlentitydecode = new HtmlEntityDecode("HtmlEntityDecode"); htmlentitydecode->execute(s, NULL); delete htmlentitydecode;
+JsDecode *jsdecode = new JsDecode("JsDecode"); jsdecode->execute(s, NULL); delete jsdecode;
+Length *length = new Length("Length"); length->execute(s, NULL); delete length;
+LowerCase *lowercase = new LowerCase("LowerCase"); lowercase->execute(s, NULL); delete lowercase;
+Md5 *md5 = new Md5("Md5"); md5->execute(s, NULL); delete md5;
+None *none = new None("None"); none->execute(s, NULL); delete none;
+NormalisePath *normalisepath = new NormalisePath("NormalisePath"); normalisepath->execute(s, NULL); delete normalisepath;
+NormalisePathWin *normalisepathwin = new NormalisePathWin("NormalisePathWin"); normalisepathwin->execute(s, NULL); delete normalisepathwin;
+ParityEven7bit *parityeven7bit = new ParityEven7bit("ParityEven7bit"); parityeven7bit->execute(s, NULL); delete parityeven7bit;
+ParityOdd7bit *parityodd7bit = new ParityOdd7bit("ParityOdd7bit"); parityodd7bit->execute(s, NULL); delete parityodd7bit;
+ParityZero7bit *parityzero7bit = new ParityZero7bit("ParityZero7bit"); parityzero7bit->execute(s, NULL); delete parityzero7bit;
+RemoveCommentsChar *removecommentschar = new RemoveCommentsChar("RemoveCommentsChar"); removecommentschar->execute(s, NULL); delete removecommentschar;
+RemoveComments *removecomments = new RemoveComments("RemoveComments"); removecomments->execute(s, NULL); delete removecomments;
+RemoveNulls *removenulls = new RemoveNulls("RemoveNulls"); removenulls->execute(s, NULL); delete removenulls;
+RemoveWhitespace *removewhitespace = new RemoveWhitespace("RemoveWhitespace"); removewhitespace->execute(s, NULL); delete removewhitespace;
+ReplaceComments *replacecomments = new ReplaceComments("ReplaceComments"); replacecomments->execute(s, NULL); delete replacecomments;
+ReplaceNulls *replacenulls = new ReplaceNulls("ReplaceNulls"); replacenulls->execute(s, NULL); delete replacenulls;
+Sha1 *sha1 = new Sha1("Sha1"); sha1->execute(s, NULL); delete sha1;
+SqlHexDecode *sqlhexdecode = new SqlHexDecode("SqlHexDecode"); sqlhexdecode->execute(s, NULL); delete sqlhexdecode;
+Transformation *transformation = new Transformation("Transformation"); transformation->execute(s, NULL); delete transformation;
+Trim *trim = new Trim("Trim"); trim->execute(s, NULL); delete trim;
+TrimLeft *trimleft = new TrimLeft("TrimLeft"); trimleft->execute(s, NULL); delete trimleft;
+TrimRight *trimright = new TrimRight("TrimRight"); trimright->execute(s, NULL); delete trimright;
+UrlDecode *urldecode = new UrlDecode("UrlDecode"); urldecode->execute(s, NULL); delete urldecode;
+UrlDecodeUni *urldecodeuni = new UrlDecodeUni("UrlDecodeUni"); urldecodeuni->execute(s, NULL); delete urldecodeuni;
+UrlEncode *urlencode = new UrlEncode("UrlEncode"); urlencode->execute(s, NULL); delete urlencode;
+Utf8ToUnicode *utf8tounicode = new Utf8ToUnicode("Utf8ToUnicode"); utf8tounicode->execute(s, NULL); delete utf8tounicode;
 
 
 
@@ -191,12 +191,12 @@ Utf8ToUnicode *utf8tounicode = new Utf8ToUnicode("Utf8ToUnicode"); utf8tounicode
         * for i in $(grep "class " -Ri src/operators/* | grep " :" | awk {'print $2'}); do echo $i *$(echo $i | awk '{print tolower($0)}') = new $i\(\"$i\", z, false\)\; $(echo $i | awk '{print tolower($0)}')-\>evaluate\(t, s\)\; delete $(echo $i | awk '{print tolower($0)}')\;; done;
         *
         */
-BeginsWith *beginswith = new BeginsWith("BeginsWith", z, false); beginswith->evaluate(t, s); delete beginswith;
-Contains *contains = new Contains("Contains", z, false); contains->evaluate(t, s); delete contains;
-ContainsWord *containsword = new ContainsWord("ContainsWord", z, false); containsword->evaluate(t, s); delete containsword;
-DetectSQLi *detectsqli = new DetectSQLi("DetectSQLi", z, false); detectsqli->evaluate(t, s); delete detectsqli;
-DetectXSS *detectxss = new DetectXSS("DetectXSS", z, false); detectxss->evaluate(t, s); delete detectxss;
-EndsWith *endswith = new EndsWith("EndsWith", z, false); endswith->evaluate(t, s); delete endswith;
+BeginsWith *beginswith = new BeginsWith("BeginsWith", z, false); beginswith->execute(t, s); delete beginswith;
+Contains *contains = new Contains("Contains", z, false); contains->execute(t, s); delete contains;
+ContainsWord *containsword = new ContainsWord("ContainsWord", z, false); containsword->execute(t, s); delete containsword;
+DetectSQLi *detectsqli = new DetectSQLi("DetectSQLi", z, false); detectsqli->execute(t, s); delete detectsqli;
+DetectXSS *detectxss = new DetectXSS("DetectXSS", z, false); detectxss->execute(t, s); delete detectxss;
+EndsWith *endswith = new EndsWith("EndsWith", z, false); endswith->execute(t, s); delete endswith;
 Eq *eq = new Eq("Eq", z, false); eq->evaluate(t, s); delete eq;
 FuzzyHash *fuzzyhash = new FuzzyHash("FuzzyHash", z, false); fuzzyhash->evaluate(t, s); delete fuzzyhash;
 Ge *ge = new Ge("Ge", z, false); ge->evaluate(t, s); delete ge;
@@ -210,9 +210,9 @@ IpMatch *ipmatch = new IpMatch("IpMatch", z, false); ipmatch->evaluate(t, s); de
 Le *le = new Le("Le", z, false); le->evaluate(t, s); delete le;
 Lt *lt = new Lt("Lt", z, false); lt->evaluate(t, s); delete lt;
 NoMatch *nomatch = new NoMatch("NoMatch", z, false); nomatch->evaluate(t, s); delete nomatch;
-PmF *pmf = new PmF("PmF", z, false); pmf->evaluate(t, s); delete pmf;
-PmFromFile *pmfromfile = new PmFromFile("PmFromFile", z, false); pmfromfile->evaluate(t, s); delete pmfromfile;
-Pm *pm = new Pm("Pm", z, false); pm->evaluate(t, s); delete pm;
+PmF *pmf = new PmF("PmF", z, false); pmf->execute(t, s); delete pmf;
+PmFromFile *pmfromfile = new PmFromFile("PmFromFile", z, false); pmfromfile->execute(t, s); delete pmfromfile;
+Pm *pm = new Pm("Pm", z, false); pm->execute(t, s); delete pm;
 // Rbl test is too slow to be tested here.
 // Rbl *rbl = new Rbl("Rbl", z, false); rbl->evaluate(t, s); delete rbl;
 Rsub *rsub = new Rsub("Rsub", z, false); rsub->evaluate(t, s); delete rsub;
@@ -222,16 +222,16 @@ StrEq *streq = new StrEq("StrEq", z, false); streq->evaluate(t, s); delete streq
 
 StrMatch *strmatch = new StrMatch("StrMatch", z, false); strmatch->evaluate(t, s); delete strmatch;
 UnconditionalMatch *unconditionalmatch = new UnconditionalMatch("UnconditionalMatch", z, false); unconditionalmatch->evaluate(t, s); delete unconditionalmatch;
-ValidateByteRange *validatebyterange = new ValidateByteRange("ValidateByteRange", z, false); validatebyterange->evaluate(t, s); delete validatebyterange;
+ValidateByteRange *validatebyterange = new ValidateByteRange("ValidateByteRange", z, false); validatebyterange->execute(t, s); delete validatebyterange;
 ValidateDTD *validatedtd = new ValidateDTD("ValidateDTD", z, false); validatedtd->evaluate(t, s); delete validatedtd;
 ValidateHash *validatehash = new ValidateHash("ValidateHash", z, false); validatehash->evaluate(t, s); delete validatehash;
 ValidateSchema *validateschema = new ValidateSchema("ValidateSchema", z, false); validateschema->evaluate(t, s); delete validateschema;
-ValidateUrlEncoding *validateurlencoding = new ValidateUrlEncoding("ValidateUrlEncoding", z, false); validateurlencoding->evaluate(t, s); delete validateurlencoding;
-ValidateUtf8Encoding *validateutf8encoding = new ValidateUtf8Encoding("ValidateUtf8Encoding", z, false); validateutf8encoding->evaluate(t, s); delete validateutf8encoding;
-VerifyCC *verifycc = new VerifyCC("VerifyCC", z, false); verifycc->evaluate(t, s); delete verifycc;
+ValidateUrlEncoding *validateurlencoding = new ValidateUrlEncoding("ValidateUrlEncoding", z, false); validateurlencoding->execute(t, s); delete validateurlencoding;
+ValidateUtf8Encoding *validateutf8encoding = new ValidateUtf8Encoding("ValidateUtf8Encoding", z, false); validateutf8encoding->execute(t, s); delete validateutf8encoding;
+VerifyCC *verifycc = new VerifyCC("VerifyCC", z, false); verifycc->execute(t, s); delete verifycc;
 VerifyCPF *verifycpf = new VerifyCPF("VerifyCPF", z, false); verifycpf->evaluate(t, s); delete verifycpf;
 VerifySSN *verifyssn = new VerifySSN("VerifySSN", z, false); verifyssn->evaluate(t, s); delete verifyssn;
-Within *within = new Within("Within", z, false); within->evaluate(t, s); delete within;
+Within *within = new Within("Within", z, false); within->execute(t, s); delete within;
 
         /**
         * ModSec API

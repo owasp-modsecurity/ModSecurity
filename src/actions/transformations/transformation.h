@@ -32,10 +32,10 @@ class Transformation : public Action {
     explicit Transformation(const std::string& _action)
         : Action(_action, RunTimeBeforeMatchAttemptKind) { }
 
-    explicit Transformation(const std::string& _action, int kind)
+    Transformation(const std::string& _action, int kind)
         : Action(_action, kind) { }
 
-    std::string evaluate(const std::string &exp,
+    std::string execute(const std::string &exp,
         Transaction *transaction) override;
 
     static Transformation* instantiate(std::string a);

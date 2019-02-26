@@ -33,7 +33,7 @@ class RuleRemoveTargetByTag : public Action {
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool init(std::string *error) override;
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
     std::string m_tag;
     std::string m_target;

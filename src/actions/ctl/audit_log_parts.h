@@ -33,7 +33,7 @@ class AuditLogParts : public Action {
         mPartsAction(0),
         mParts("") { }
 
-    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
  protected:

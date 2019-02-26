@@ -38,7 +38,7 @@ bool Status::init(std::string *error) {
 }
 
 
-bool Status::evaluate(RuleWithActions *rule, Transaction *transaction,
+bool Status::execute(RuleWithActions *rule, Transaction *transaction,
     RuleMessage &rm) {
     transaction->m_it.status = m_status;
     return true;

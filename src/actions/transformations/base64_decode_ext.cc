@@ -32,7 +32,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string Base64DecodeExt::evaluate(const std::string &value,
+std::string Base64DecodeExt::execute(const std::string &value,
     Transaction *transaction) {
     std::string ret = Utils::Base64::decode_forgiven(value);
 

@@ -35,7 +35,7 @@ RemoveCommentsChar::RemoveCommentsChar(std::string action)
     this->action_kind = 1;
 }
 
-std::string RemoveCommentsChar::evaluate(const std::string &val,
+std::string RemoveCommentsChar::execute(const std::string &val,
     Transaction *transaction) {
     int64_t i;
     std::string value(val);

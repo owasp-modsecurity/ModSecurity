@@ -32,7 +32,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string RemoveComments::evaluate(const std::string &value,
+std::string RemoveComments::execute(const std::string &value,
     Transaction *transaction) {
     std::string ret;
     unsigned char *input;

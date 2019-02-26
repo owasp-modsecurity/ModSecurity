@@ -27,7 +27,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SkipAfter::evaluate(RuleWithActions *rule, Transaction *transaction) {
+bool SkipAfter::execute(RuleWithActions *rule, Transaction *transaction) {
     ms_dbg_a(transaction, 5, "Setting skipAfter for: " + *m_name);
     transaction->addMarker(m_name);
     return true;

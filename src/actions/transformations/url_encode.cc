@@ -87,7 +87,7 @@ std::string UrlEncode::url_enc(const char *input,
 }
 
 
-std::string UrlEncode::evaluate(const std::string &value,
+std::string UrlEncode::execute(const std::string &value,
     Transaction *transaction) {
     int changed;
 

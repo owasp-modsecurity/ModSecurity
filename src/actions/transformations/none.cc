@@ -31,7 +31,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string None::evaluate(const std::string &value,
+std::string None::execute(const std::string &value,
     Transaction *transaction) {
     return value;
 }
