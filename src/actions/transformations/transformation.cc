@@ -70,11 +70,6 @@ namespace actions {
 namespace transformations {
 
 
-std::string Transformation::execute(const std::string &value,
-    Transaction *transaction) {
-    return value;
-}
-
 Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(base64DecodeExt) { return new Base64DecodeExt(a); }
     IF_MATCH(base64Decode) { return new Base64Decode(a); }

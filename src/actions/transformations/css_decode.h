@@ -31,10 +31,12 @@ namespace transformations {
 
 class CssDecode : public Transformation {
  public:
-    explicit CssDecode(const std::string &action) 
+    explicit CssDecode(const std::string &action)
         : Transformation(action) { }
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 
     static int css_decode_inplace(unsigned char *input, int64_t input_len);
 };

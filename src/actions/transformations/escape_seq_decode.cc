@@ -31,11 +31,6 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-EscapeSeqDecode::EscapeSeqDecode(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
 
 int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
     int input_len) {
@@ -140,21 +135,17 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 }
 
 
-std::string EscapeSeqDecode::execute(const std::string &value,
-    Transaction *transaction) {
-
+void EscapeSeqDecode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
-        * value.size() + 1);
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
+        * in.size() + 1);
+    memcpy(tmp, in.c_str(), in.size() + 1);
+    tmp[in.size()] = '\0';
 
-    int size = ansi_c_sequences_decode_inplace(tmp, value.size());
-
-    std::string ret("");
-    ret.assign(reinterpret_cast<char *>(tmp), size);
+    int size = ansi_c_sequences_decode_inplace(tmp, in.size());
+    out.assign(reinterpret_cast<char *>(tmp), size);
     free(tmp);
-
-    return ret;
 }
 
 }  // namespace transformations

@@ -32,27 +32,25 @@ namespace actions {
 namespace transformations {
 
 
-std::string HexDecode::execute(const std::string &value,
-    Transaction *transaction) {
-    std::string ret;
+void HexDecode::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     unsigned char *input;
     int size = 0;
 
     input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
+        (malloc(sizeof(char) * in.length()+1));
 
     if (input == NULL) {
-        return "";
+        return;
     }
 
-    memcpy(input, value.c_str(), value.length()+1);
+    memcpy(input, in.c_str(), in.length()+1);
 
-    size = inplace(input, value.length());
+    size = inplace(input, in.length());
 
-    ret.assign(reinterpret_cast<char *>(input), size);
+    out.assign(reinterpret_cast<char *>(input), size);
     free(input);
-
-    return ret;
 }
 
 

@@ -31,23 +31,19 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-RemoveWhitespace::RemoveWhitespace(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
-std::string RemoveWhitespace::execute(const std::string &val,
-    Transaction *transaction) {
-    std::string value(val);
-
+void RemoveWhitespace::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+    out = in;
     int64_t i = 0;
     char nonBreakingSpaces = 0xa0;
 
     // loop through all the chars
-    while (i < value.size()) {
+    while (i < out.size()) {
         // remove whitespaces and non breaking spaces (NBSP)
-        if (isspace(value[i]) || (value[i] == nonBreakingSpaces)) {
-            value.erase(i, 1);
+        if (isspace(out[i]) || (out[i] == nonBreakingSpaces)) {
+            out.erase(i, 1);
         } else {
           /* if the space is not a whitespace char, increment counter
            counter should not be incremented if a character is erased because
@@ -55,9 +51,8 @@ std::string RemoveWhitespace::execute(const std::string &val,
           i++;
         }
     }
-
-    return value;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

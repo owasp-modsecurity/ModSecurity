@@ -32,28 +32,22 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-NormalisePath::NormalisePath(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
-std::string NormalisePath::execute(const std::string &value,
-    Transaction *transaction) {
+void NormalisePath::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     int changed = 0;
 
     char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
+        malloc(sizeof(char) * in.size() + 1));
+    memcpy(tmp, in.c_str(), in.size() + 1);
+    tmp[in.size()] = '\0';
 
     int i = normalize_path_inplace((unsigned char *)tmp,
-        value.size(), 0, &changed);
+        in.size(), 0, &changed);
 
-    std::string ret("");
-    ret.assign(tmp, i);
+    out.assign(tmp, i);
     free(tmp);
-
-    return ret;
 }
 
 

@@ -33,15 +33,17 @@ PhpArgsNames::PhpArgsNames(const std::string &a)
 }
 
 
-std::string PhpArgsNames::execute(const std::string &val,
-    Transaction *transaction) {
+void PhpArgsNames::execute(Transaction *t,
+    ModSecStackString &val,
+    ModSecStackString &out) {
     //Took the logic from php src code:
     //https://github.com/php/php-src/blob/master/main/php_variables.c
     //Function call PHPAPI void php_register_variable_ex(const char *var_name, zval *val, zval *track_vars_array)
     std::string value(val);
     std::string ret = "";
     if(value[0] == '[' || value[0] == '=') {
-	return ret;
+		out.assign(ret);
+		return;
     }
     std::string::size_type i = 0;
     while(value[i] == ' ') {
@@ -74,7 +76,8 @@ std::string PhpArgsNames::execute(const std::string &val,
 		char *tmp = &value[i];
 		char *close_bra = strchr(tmp, ']');
 		if(close_bra == NULL) {
-			return ret;
+			out.assign(ret);
+			return;
 		}
 		int array_size = (int)(close_bra - start) + 1;
 		if(array_size - i == 3 && value[i+1] == ' ') {
@@ -85,11 +88,13 @@ std::string PhpArgsNames::execute(const std::string &val,
 			ret += value[i];
 		}
 		if(i >= val_size || value[i] != '[') {
-			return ret;
+			out.assign(ret);
+			return;
 		}
 	    }
     }
-    return ret;
+	out.assign(ret);
+	return;
 
 }
 

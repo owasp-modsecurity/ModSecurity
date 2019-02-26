@@ -31,47 +31,38 @@ namespace actions {
 namespace transformations {
 
 
-std::string *Trim::ltrim(std::string *s) {
+void Trim::ltrim(ModSecStackString *s) {
     s->erase(
         s->begin(),
         std::find_if(s->begin(), s->end(), [](unsigned char c) {
             return !std::isspace(c);
         })
     );
-
-    return s;
 }
 
 
-std::string *Trim::rtrim(std::string *s) {
+void Trim::rtrim(ModSecStackString *s) {
     s->erase(
         std::find_if(s->rbegin(), s->rend(), [](unsigned char c) {
             return !std::isspace(c);
         }).base(),
         s->end()
     );
-
-    return s;
 }
 
 
-std::string *Trim::trim(std::string *s) {
-    return ltrim(rtrim(s));
+void Trim::trim(ModSecStackString *s) {
+    rtrim(s);
+    ltrim(s);
 }
 
 
-Trim::Trim(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
-
-std::string
-Trim::execute(const std::string &val,
-    Transaction *transaction) {
-    std::string value(val);
-    return *this->trim(&value);
-}
+void Trim::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+    out = in;
+    trim(&out);
+};
 
 
 }  // namespace transformations

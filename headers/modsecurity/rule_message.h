@@ -26,14 +26,15 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-#include "modsecurity/rule_with_operator.h"
 
 
 #ifdef __cplusplus
 
 namespace modsecurity {
-
-
+namespace actions {
+class Tag;
+};
+class RuleWithActions;
 
 class RuleMessage {
  public:
@@ -110,108 +111,22 @@ class RuleMessage {
     static std::string _details(const RuleMessage *rm);
     static std::string _errorLogTail(const RuleMessage *rm);
 
-    RuleWithActions *getRule() const {
-        return m_rule;
-    }
-
-    void setRule(RuleWithActions *rule) {
-        m_rule = rule;
-    }
-
-    bool isSettle() const {
-        return m_rule != nullptr;
-    }
-
-    int getRuleId() const {
-        if (m_rule) {
-            return m_rule->getId();
-        }
-        return -1;
-    }
-
-    int getPhase() const {
-        if (m_rule) {
-            return m_rule->getPhase();
-        }
-        return 0;
-    }
-
-    std::string getFileName() const {
-        if (m_rule) {
-            return *m_rule->getFileName().get();
-        }
-        return "";
-    }
-
-    int getLineNumber() const {
-        if (m_rule) {
-            return m_rule->getLineNumber();
-        }
-        return 0;
-    }
-
-    std::string getRev() const {
-        if (m_rule) {
-            return m_rule->getRevision();
-        }
-        return "";
-    }
-
-    std::string getVer() const {
-        if (m_rule) {
-            return m_rule->getVersion();
-        }
-        return "";
-    }
-
-    int getMaturity() const {
-        if (m_rule) {
-            return m_rule->getMaturity();
-        }
-        return 0;
-    }
-
-    int getAccuracy() const {
-        if (m_rule) {
-            return m_rule->getAccuracy();
-        }
-        return 0;
-    }
-
-    std::string getClientIpAddress() const {
-        if (m_transaction) {
-            return *m_transaction->m_clientIpAddress.get();
-        }
-        return "";
-    }
-
-    std::string getServerIpAddress() const {
-        if (m_transaction) {
-            return *m_transaction->m_serverIpAddress.get();
-        }
-        return "";
-    }
-
-    std::string getRequestId() const {
-        if (m_transaction) {
-            return *m_transaction->m_id.get();
-        }
-        return "";
-    }
-
-    std::string getUri() const {
-        if (m_transaction) {
-            return *m_transaction->m_uri_no_query_string_decoded.get();
-        }
-        return "";
-    }
-
-    bool isDisruptive() const {
-        if (m_rule) {
-            return m_rule->hasDisruptiveAction();
-        }
-        return 0;
-    }
+    RuleWithActions *getRule() const;
+    void setRule(RuleWithActions *rule);
+    bool isSettle() const;
+    int getRuleId() const;
+    int getPhase() const;
+    std::string getFileName() const;
+    int getLineNumber() const;
+    std::string getRev() const;
+    std::string getVer() const;
+    int getMaturity() const;
+    int getAccuracy() const;
+    std::string getClientIpAddress() const;
+    std::string getServerIpAddress() const;
+    std::string getRequestId() const;
+    std::string getUri() const;
+    bool isDisruptive() const;
 
     int m_severity;
     std::list<std::string> m_tags;

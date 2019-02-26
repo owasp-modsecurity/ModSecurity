@@ -360,62 +360,35 @@ void RuleWithActions::executeAction(Transaction *trans,
 }
 
 
-inline void RuleWithActions::executeTransformation(
-    actions::transformations::Transformation *a,
-    std::shared_ptr<std::string> *value,
-    Transaction *trans,
-    TransformationResults *ret,
-    std::string *path) const {
-
-    std::string *oldValue = (*value).get();
-    std::string newValue = a->execute(*oldValue, trans);
-
-    if (newValue != *oldValue) {
-        std::shared_ptr<std::string> u(new std::string(newValue));
-        if (m_containsMultiMatchAction) {
-            ret->push_back(std::make_pair(u, a->m_name));
-        }
-        *value = u;
-    }
-
-    if (path->empty()) {
-        path->append(*a->m_name.get());
-    } else {
-        path->append("," + *a->m_name.get());
-    }
-
-    ms_dbg_a(trans, 9, "Transformation " + \
-        *a->m_name.get() + ": \"" + \
-        utils::string::limitTo(80, newValue) + "\"");
-}
-
 void RuleWithActions::executeTransformations(
     Transaction *trans,
     const std::string &in,
-    TransformationResults &ret) {
+    TransformationsResults &results) {
     int none = 0;
+
+    ModSecStackString ssin;
+    ssin.assign(in.c_str());
+
+    TransformationResult a = TransformationResult(&ssin);
+    results.push_back(a);
+
+
     std::string path("");
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
 
-    if (hasMultimatchAction()) {
-        /* keep the original value */
-        ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(new std::string(*value)),
-            std::shared_ptr<std::string>(new std::string(path))));
-    }
 
-    for (Action *a : getTransformationPtr()) {
-        if (a->m_isNone) {
+    for (Action *action : getTransformationPtr()) {
+        if (action->m_isNone) {
             none++;
         }
     }
 
-    for (Transformation *a : getTransformationPtr()) {
+    for (Transformation *t : getTransformationPtr()) {
         if (none == 0) {
-            executeTransformation(a, &value, trans, &ret, &path);
+            executeTransformation(trans, &results, t);
         }
-        if (a->m_isNone) {
+        if (t->m_isNone) {
             none--;
         }
     }
@@ -427,8 +400,8 @@ void RuleWithActions::executeTransformations(
         if (m_ruleId != b.first) {
             continue;
         }
-        Transformation *a = dynamic_cast<Transformation*>(b.second.get());
-        if (a->m_isNone) {
+        Transformation *t = dynamic_cast<Transformation*>(b.second.get());
+        if (t->m_isNone) {
             none++;
         }
     }
@@ -438,26 +411,61 @@ void RuleWithActions::executeTransformations(
         if (m_ruleId != b.first) {
             continue;
         }
-        Transformation *a = dynamic_cast<Transformation*>(b.second.get());
+        Transformation *t = dynamic_cast<Transformation*>(b.second.get());
         if (none == 0) {
-            executeTransformation(a, &value, trans, &ret, &path);
+            executeTransformation(trans, &results, t);
         }
-        if (a->m_isNone) {
+        if (t->m_isNone) {
             none--;
         }
     }
 
-    if (m_containsMultiMatchAction == true) {
+/*
+    if (hasMultimatchAction() == true) {
         ms_dbg_a(trans, 9, "multiMatch is enabled. " \
-            + std::to_string(ret.size()) + \
+            + std::to_string(results.size()) + \
             " values to be tested.");
+    } else {
+        results.pop_front();
+        results.push_back(TransformationResult(&ssin));
     }
+*/
+}
 
-    if (!m_containsMultiMatchAction) {
-        ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(new std::string(*value)),
-            std::shared_ptr<std::string>(new std::string(path))));
-    }
+
+
+void RuleWithActions::executeTransformation(
+    Transaction *transaction,
+    TransformationsResults *ret,
+    Transformation *transformation) {
+    executeTransformation(
+        transaction,
+        *ret->back().getAfter(),
+        ret,
+        transformation
+    );
+}
+
+
+void RuleWithActions::executeTransformation(
+    Transaction *transaction,
+    ModSecStackString in,
+    TransformationsResults *ret,
+    Transformation *transformation) {
+
+    ModSecStackString out;
+    transformation->execute(transaction, in, out);
+
+    ms_dbg_a(transaction, 9, " T (" + std::to_string(ret->size() - 1) + ") " + \
+        *transformation->m_name.get() + ": \"" + \
+        utils::string::limitTo(80, out.c_str()) + "\"");
+
+    ret->push_back(
+        TransformationResult(
+            &out,
+            transformation->m_name.get()
+        )
+    );
 }
 
 

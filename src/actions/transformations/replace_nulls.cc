@@ -30,28 +30,24 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-ReplaceNulls::ReplaceNulls(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
-std::string ReplaceNulls::execute(const std::string &val,
-    Transaction *transaction) {
+void ReplaceNulls::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     int64_t i;
-    std::string value(val);
+    out = in;
 
     i = 0;
-    while (i < value.size()) {
-        if (value.at(i) == '\0') {
-            value.erase(i, 1);
-            value.insert(i, " ", 1);
+    while (i < out.size()) {
+        if (out.at(i) == '\0') {
+            out.erase(i, 1);
+            out.insert(i, " ", 1);
         } else {
             i++;
         }
     }
-
-    return value;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

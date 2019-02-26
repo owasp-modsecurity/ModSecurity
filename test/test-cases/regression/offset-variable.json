@@ -933,7 +933,7 @@
       ]
     },
     "expected":{
-      "error_log":"o0,1v228,1t:lowercase,t:trim",
+      "error_log":"o0,1v228,1t:lowercaset:trim",
       "http_code": 403
     },
     "rules":[

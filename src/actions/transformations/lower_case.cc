@@ -27,21 +27,16 @@ namespace actions {
 namespace transformations {
 
 
-LowerCase::LowerCase(const std::string &a)
-    : Transformation(a) {
-}
-
-std::string LowerCase::execute(const std::string &val,
-    Transaction *transaction) {
+void LowerCase::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     std::locale loc;
-    std::string value(val);
-
-    for (std::string::size_type i=0; i < value.length(); ++i) {
-        value[i] = std::tolower(value[i], loc);
+    out.resize(in.size());
+    for (std::string::size_type i=0; i < in.size(); ++i) {
+        out[i] = std::tolower(in[i], loc);
     }
-
-    return value;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

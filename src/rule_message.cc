@@ -19,6 +19,9 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"
+#include "src/actions/tag.h"
+#include "modsecurity/rule_with_actions.h"
+
 
 namespace modsecurity {
 
@@ -94,4 +97,123 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
 }
 
 
-}  // namespace modsecurity
+RuleWithActions *RuleMessage::getRule() const {
+    return m_rule;
+}
+
+
+void RuleMessage::setRule(RuleWithActions *rule) {
+    m_rule = rule;
+}
+
+
+bool RuleMessage::isSettle() const {
+    return m_rule != nullptr;
+}
+
+
+int RuleMessage::getRuleId() const {
+    if (m_rule) {
+        return m_rule->getId();
+    }
+    return -1;
+}
+
+
+int RuleMessage::getPhase() const {
+    if (m_rule) {
+        return m_rule->getPhase();
+    }
+    return 0;
+}
+
+
+std::string RuleMessage::getFileName() const {
+    if (m_rule) {
+        return *m_rule->getFileName().get();
+    }
+    return "";
+}
+
+
+int RuleMessage::getLineNumber() const {
+    if (m_rule) {
+        return m_rule->getLineNumber();
+    }
+    return 0;
+}
+
+
+std::string RuleMessage::getRev() const {
+    if (m_rule) {
+        return m_rule->getRevision();
+    }
+    return "";
+}
+
+
+std::string RuleMessage::getVer() const {
+    if (m_rule) {
+        return m_rule->getVersion();
+    }
+    return "";
+}
+
+
+int RuleMessage::getMaturity() const {
+    if (m_rule) {
+        return m_rule->getMaturity();
+    }
+    return 0;
+}
+
+
+int RuleMessage::getAccuracy() const {
+    if (m_rule) {
+        return m_rule->getAccuracy();
+    }
+    return 0;
+}
+
+
+std::string RuleMessage::getClientIpAddress() const {
+    if (m_transaction) {
+        return *m_transaction->m_clientIpAddress.get();
+    }
+    return "";
+}
+
+
+std::string RuleMessage::getServerIpAddress() const {
+    if (m_transaction) {
+        return *m_transaction->m_serverIpAddress.get();
+    }
+    return "";
+}
+
+
+std::string RuleMessage::getRequestId() const {
+    if (m_transaction) {
+        return *m_transaction->m_id.get();
+    }
+    return "";
+}
+
+
+std::string RuleMessage::getUri() const {
+    if (m_transaction) {
+        return *m_transaction->m_uri_no_query_string_decoded.get();
+    }
+    return "";
+}
+
+
+bool RuleMessage::isDisruptive() const {
+    if (m_rule) {
+        return m_rule->hasDisruptiveAction();
+    }
+    return 0;
+}
+
+
+} // namespace modsecurity

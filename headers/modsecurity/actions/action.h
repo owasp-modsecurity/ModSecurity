@@ -39,6 +39,7 @@ namespace actions {
 
 class Action {
  public:
+
     explicit Action(const std::string& _action)
         : m_isNone(false),
         temporaryAction(false),
@@ -81,6 +82,17 @@ class Action {
         RuleMessage &ruleMessage) {
         return execute(rule, transaction);
     }
+
+    /**
+     * This method is meant to be used by transformations — a particular
+     * type of action.
+     *
+     */
+    virtual void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) {
+    };
+
     virtual bool init(std::string *error) { return true; }
     virtual bool isDisruptive() { return false; }
 

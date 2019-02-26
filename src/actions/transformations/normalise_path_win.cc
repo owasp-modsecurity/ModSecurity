@@ -34,24 +34,22 @@ namespace actions {
 namespace transformations {
 
 
-std::string NormalisePathWin::execute(const std::string &value,
-    Transaction *transaction) {
+void NormalisePathWin::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     int changed;
 
     char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
+        malloc(sizeof(char) * in.size() + 1));
+    memcpy(tmp, in.c_str(), in.size() + 1);
+    tmp[in.size()] = '\0';
 
     int i = NormalisePath::normalize_path_inplace(
         reinterpret_cast<unsigned char *>(tmp),
-        value.size(), 1, &changed);
+        in.size(), 1, &changed);
 
-    std::string ret("");
-    ret.assign(tmp, i);
+    out.assign(tmp, i);
     free(tmp);
-
-    return ret;
 }
 
 

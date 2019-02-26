@@ -49,9 +49,6 @@ class Transformation;
 }
 }
 
-using TransformationResult = std::pair<std::shared_ptr<std::string>,
-    std::shared_ptr<std::string>>;
-using TransformationResults = std::list<TransformationResult>;
 using Transformation = actions::transformations::Transformation;
 using Transformations = std::vector<std::shared_ptr<Transformation> >;
 using TransformationsPtr = std::vector<Transformation *>;
@@ -66,6 +63,43 @@ using MatchActionsPtr = std::vector<actions::Action *>;
 
 using XmlNSs = std::vector<std::shared_ptr<actions::XmlNS> >;
 using XmlNSsPtr = std::vector<actions::XmlNS *>;
+
+using ModSecStackString = std::basic_string<char, std::char_traits<char>, std::allocator<char> >;
+
+class TransformationResult {
+ public:
+    TransformationResult(
+        ModSecStackString *after,
+        std::string *transformation)
+        : m_after(*after),
+        m_transformation(transformation) { };
+
+    explicit TransformationResult(
+        ModSecStackString *after)
+        : m_after(*after),
+        m_transformation(nullptr) { };
+
+    TransformationResult(const TransformationResult &t2)
+        : m_after(t2.m_after),
+        m_transformation(t2.m_transformation) { };
+
+
+    ModSecStackString *getAfter() {
+        return &m_after;
+    }
+
+
+    std::string *getTransformationName() {
+        return m_transformation;
+    }
+
+
+ private:
+    ModSecStackString m_after;
+    std::string *m_transformation;
+};
+
+using TransformationsResults = std::list<TransformationResult>;
 
 
 class RuleWithActions : public Rule {
@@ -167,18 +201,21 @@ class RuleWithActions : public Rule {
         bool context);
 
 
+    static void executeTransformation(
+        Transaction *transaction,
+        TransformationsResults *ret,
+        Transformation *transformation);
+
+    static void executeTransformation(
+        Transaction *transaction,
+        ModSecStackString in,
+        TransformationsResults *ret,
+        Transformation *transformation);
+
     void executeTransformations(
         Transaction *transaction,
         const std::string &value,
-        TransformationResults &ret);
-
-    inline void executeTransformation(
-        actions::transformations::Transformation *a,
-        std::shared_ptr<std::string> *value,
-        Transaction *trans,
-        TransformationResults *ret,
-        std::string *path) const;
-
+        TransformationsResults &results);
 
     void addAction(actions::Action *a);
     void addTransformation(std::shared_ptr<actions::transformations::Transformation> t) {

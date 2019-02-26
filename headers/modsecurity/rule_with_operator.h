@@ -35,6 +35,7 @@
 
 namespace modsecurity {
 
+using TransformationsResults = std::list<TransformationResult>;
 
 class RuleWithOperator : public RuleWithActions {
  public:

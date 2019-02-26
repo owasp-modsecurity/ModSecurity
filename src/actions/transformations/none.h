@@ -34,8 +34,9 @@ class None : public Transformation {
         : Transformation(action)
         { m_isNone = true; }
 
-    std::string execute(const std::string &exp,
-        Transaction *transaction) override;
+    void execute(Transaction *t,
+        ModSecStackString &in,
+        ModSecStackString &out) override;
 };
 
 }  // namespace transformations
