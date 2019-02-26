@@ -32,7 +32,7 @@ class ParityEven7bit : public Transformation {
  public:
     explicit ParityEven7bit(const std::string &action)  : Transformation(action) { }
 
-    std::string evaluate(const std::string &exp, Transaction *transaction) override;
+    std::string execute(const std::string &exp, Transaction *transaction) override;
     static bool inplace(unsigned char *input, uint64_t input_len);
 };
 

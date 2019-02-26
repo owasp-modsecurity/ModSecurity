@@ -33,7 +33,7 @@ bool Rev::init(std::string *error) {
 }
 
 
-bool Rev::evaluate(RuleWithActions *rule, Transaction *transaction) {
+bool Rev::execute(RuleWithActions *rule, Transaction *transaction) {
     return true;
 }
 
