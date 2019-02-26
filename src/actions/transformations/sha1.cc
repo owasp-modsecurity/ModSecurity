@@ -31,16 +31,18 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-Sha1::Sha1(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
+
+void Sha1::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
+
+    auto a = Utils::Sha1::digest(
+            std::string(in.c_str(), in.size())
+        );
+
+    out.assign(a.c_str(), a.size());
 }
 
-std::string Sha1::execute(const std::string &value,
-    Transaction *transaction) {
-
-    return Utils::Sha1::digest(value);
-}
 
 }  // namespace transformations
 }  // namespace actions

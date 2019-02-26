@@ -32,26 +32,24 @@ namespace actions {
 namespace transformations {
 
 
-std::string ParityZero7bit::execute(const std::string &value,
-    Transaction *transaction) {
-    std::string ret;
+void ParityZero7bit::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
+        (malloc(sizeof(char) * in.length()+1));
 
     if (input == NULL) {
-        return "";
+        return;
     }
 
-    memcpy(input, value.c_str(), value.length()+1);
+    memcpy(input, in.c_str(), in.length()+1);
 
-    inplace(input, value.length());
+    inplace(input, in.length());
 
-    ret.assign(reinterpret_cast<char *>(input), value.length());
+    out.assign(reinterpret_cast<char *>(input), in.length());
     free(input);
-
-    return ret;
 }
 
 
