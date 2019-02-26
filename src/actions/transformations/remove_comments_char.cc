@@ -30,47 +30,44 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-RemoveCommentsChar::RemoveCommentsChar(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
-std::string RemoveCommentsChar::execute(const std::string &val,
-    Transaction *transaction) {
+void RemoveCommentsChar::execute(Transaction *t,
+    ModSecStackString &in,
+    ModSecStackString &out) {
     int64_t i;
-    std::string value(val);
+    out = in;
 
     i = 0;
-    while (i < value.size()) {
-        if (value.at(i) == '/'
-            && (i+1 < value.size()) && value.at(i+1) == '*') {
-            value.erase(i, 2);
-        } else if (value.at(i) == '*'
-            && (i+1 < value.size()) && value.at(i+1) == '/') {
-            value.erase(i, 2);
-        } else if (value.at(i) == '<'
-            && (i+1 < value.size())
-            && value.at(i+1) == '!'
-            && (i+2 < value.size())
-            && value.at(i+2) == '-'
-            && (i+3 < value.size())
-            && value.at(i+3) == '-') {
-            value.erase(i, 4);
-        } else if (value.at(i) == '-'
-            && (i+1 < value.size()) && value.at(i+1) == '-'
-            && (i+2 < value.size()) && value.at(i+2) == '>') {
-            value.erase(i, 3);
-        } else if (value.at(i) == '-'
-            && (i+1 < value.size()) && value.at(i+1) == '-') {
-            value.erase(i, 2);
-        } else if (value.at(i) == '#') {
-            value.erase(i, 1);
+    while (i < out.size()) {
+        if (out.at(i) == '/'
+            && (i+1 < out.size()) && out.at(i+1) == '*') {
+            out.erase(i, 2);
+        } else if (out.at(i) == '*'
+            && (i+1 < out.size()) && out.at(i+1) == '/') {
+            out.erase(i, 2);
+        } else if (out.at(i) == '<'
+            && (i+1 < out.size())
+            && out.at(i+1) == '!'
+            && (i+2 < out.size())
+            && out.at(i+2) == '-'
+            && (i+3 < out.size())
+            && out.at(i+3) == '-') {
+            out.erase(i, 4);
+        } else if (out.at(i) == '-'
+            && (i+1 < out.size()) && out.at(i+1) == '-'
+            && (i+2 < out.size()) && out.at(i+2) == '>') {
+            out.erase(i, 3);
+        } else if (out.at(i) == '-'
+            && (i+1 < out.size()) && out.at(i+1) == '-') {
+            out.erase(i, 2);
+        } else if (out.at(i) == '#') {
+            out.erase(i, 1);
         } else {
             i++;
         }
     }
-    return value;
 }
+
 
 }  // namespace transformations
 }  // namespace actions
