@@ -32,7 +32,7 @@ namespace actions {
 namespace transformations {
 
 
-std::string ParityOdd7bit::evaluate(const std::string &value,
+std::string ParityOdd7bit::execute(const std::string &value,
     Transaction *transaction) {
     std::string ret;
     unsigned char *input;

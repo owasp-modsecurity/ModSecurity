@@ -36,7 +36,7 @@ Sha1::Sha1(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string Sha1::evaluate(const std::string &value,
+std::string Sha1::execute(const std::string &value,
     Transaction *transaction) {
 
     return Utils::Sha1::digest(value);
