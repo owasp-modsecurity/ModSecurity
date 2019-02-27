@@ -41,6 +41,7 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/debug_log.h \
 	../headers/modsecurity/intervention.h \
 	../headers/modsecurity/modsecurity.h \
+        ../headers/modsecurity/modsec_stack_allocator.h \
 	../headers/modsecurity/rule.h \
 	../headers/modsecurity/rules.h \
 	../headers/modsecurity/rule_message.h \

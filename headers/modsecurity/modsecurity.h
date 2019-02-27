@@ -89,7 +89,6 @@
 typedef struct ModSecurity_t modsecurity;
 #else
 namespace modsecurity {
-    using ModSecStackString = std::basic_string<char, std::char_traits<char>, std::allocator<std::string>>;
 
     /**
      *

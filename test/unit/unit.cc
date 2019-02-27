@@ -57,6 +57,7 @@ void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
     ModSecurityTestResults<UnitTest>* res) {
     std::string error;
     bool found = true;
+    modsecurity::ModSecStackString::allocator_type::arena_type stackAllocator;
 
     if (test->m_automake_output) {
         std::cout << ":test-result: ";
@@ -90,8 +91,8 @@ void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
         }
         delete op;
     } else if (t->type == "tfn") {
-        modsecurity::ModSecStackString in;
-        modsecurity::ModSecStackString out;
+        modsecurity::ModSecStackString in{stackAllocator};
+        modsecurity::ModSecStackString out{stackAllocator};
         std::string ret;
         in.assign(t->input.c_str(), t->input.size());
         Transformation *tfn = Transformation::instantiate("t:" + t->name);
