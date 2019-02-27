@@ -13,17 +13,8 @@
  *
  */
 
-#include <ctime>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-
 #include "modsecurity/rules_set_phases.h"
-#include "modsecurity/rule.h"
-#include "modsecurity/rules.h"
-#include "modsecurity/modsecurity.h"
-
+#include "src/rule_with_operator.h"
 
 
 namespace modsecurity {
@@ -47,6 +38,7 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
         v.reserve(m_rulesAtPhase[i].size());
         for (size_t z = 0; z < m_rulesAtPhase[i].size(); z++) {
             RuleWithOperator *rule_ckc = dynamic_cast<RuleWithOperator *>(m_rulesAtPhase[i].at(z).get());
+            //RuleWithOperator *rule_ckc = dynamic_cast<RuleWithOperator *>(m_rulesAtPhase->at(i).get());
             if (!rule_ckc) {
                 continue;
             }
@@ -61,7 +53,6 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
             return res;
         }
         amount_of_rules = amount_of_rules + res;
-
 
         /**
          * An action set in a child will overwrite an action set on a parent.
@@ -91,6 +82,7 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
 
 void RulesSetPhases::dump() const {
     for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+        const Rules *rules = &m_rulesAtPhase[i];
         std::cout << "Phase: " << std::to_string(i);
         std::cout << " (" << std::to_string(m_rulesAtPhase[i].size());
         std::cout << " rules)" << std::endl;
@@ -99,5 +91,14 @@ void RulesSetPhases::dump() const {
 }
 
 
-}  // namespace modsecurity
+Rules *RulesSetPhases::operator[](int index) {
+    return &m_rulesAtPhase[index];
+}
 
+
+Rules *RulesSetPhases::at(int index) {
+    return &m_rulesAtPhase[index];
+}
+
+
+}  // namespace modsecurity

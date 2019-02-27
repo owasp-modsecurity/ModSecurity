@@ -29,7 +29,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rule_message.h"
 #include "modsecurity/rules_set.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
 #include "src/actions/accuracy.h"
 #include "src/actions/block.h"
 #include "src/actions/capture.h"
@@ -360,10 +360,8 @@ void RuleWithActions::executeTransformations(
     int none = 0;
 
     ModSecString ssin;
-    ssin.assign(in.c_str());
-
-    TransformationResult a = TransformationResult(&ssin);
-    results.push_back(a);
+    ssin.assign(in.c_str(), in.size());
+    results.push_back(TransformationResult(&ssin));
 
 
     std::string path("");
@@ -418,8 +416,8 @@ void RuleWithActions::executeTransformations(
             + std::to_string(results.size()) + \
             " values to be tested.");
     } else {
-        results.pop_front();
-        results.push_back(TransformationResult(&ssin));
+        //results.push_back(TransformationResult(nullptr, ssin));
+        //results.pop_front();
     }
 */
 }
@@ -441,7 +439,7 @@ void RuleWithActions::executeTransformation(
 
 void RuleWithActions::executeTransformation(
     Transaction *transaction,
-    ModSecString in,
+    ModSecString &in,
     TransformationsResults *ret,
     Transformation *transformation) {
 
