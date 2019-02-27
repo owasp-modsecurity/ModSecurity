@@ -9,7 +9,7 @@
 #include "modsecurity/rule_message.h"
 #include "modsecurity/rules_set_properties.h"
 
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
 
 namespace modsecurity {
 namespace operators {
