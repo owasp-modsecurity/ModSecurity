@@ -22,15 +22,15 @@
 #include <utility>
 #endif
 
-#ifndef HEADERS_MODSECURITY_RULE_UNCONDITIONAL_H_
-#define HEADERS_MODSECURITY_RULE_UNCONDITIONAL_H_
+#ifndef SRC_RULE_UNCONDITIONAL_H_
+#define SRC_RULE_UNCONDITIONAL_H_
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/variable_value.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rules_set.h"
-#include "modsecurity/rule_with_actions.h"
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
 #ifdef __cplusplus
 
@@ -60,4 +60,4 @@ class RuleUnconditional : public RuleWithActions {
 
 #endif
 
-#endif  // HEADERS_MODSECURITY_RULE_UNCONDITIONAL_H_
+#endif  // SRC_RULE_UNCONDITIONAL_H_

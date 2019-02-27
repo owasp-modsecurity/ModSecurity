@@ -56,7 +56,9 @@ class Driver;
 }
 }
 
-#include "modsecurity/rule_unconditional.h"
+#include "src/rule_unconditional.h"
+#include "src/rule_with_operator.h"
+#include "src/rule_with_actions.h"
 #include "src/rule_script.h"
 
 #include "src/actions/accuracy.h"
@@ -351,7 +353,11 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
+<<<<<<< HEAD
 #line 355 "seclang-parser.hh"
+=======
+#line 356 "seclang-parser.hh"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -485,7 +491,11 @@ using namespace modsecurity::operators;
 #endif
 
 namespace yy {
+<<<<<<< HEAD
 #line 489 "seclang-parser.hh"
+=======
+#line 490 "seclang-parser.hh"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
 
 
 
@@ -8626,7 +8636,11 @@ switch (yykind)
   }
 
 } // yy
+<<<<<<< HEAD
 #line 8630 "seclang-parser.hh"
+=======
+#line 8609 "seclang-parser.hh"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
 
 
 
