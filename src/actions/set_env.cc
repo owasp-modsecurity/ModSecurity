@@ -21,7 +21,7 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "src/utils/string.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
