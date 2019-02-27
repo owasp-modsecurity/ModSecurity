@@ -22,8 +22,8 @@
 #include <utility>
 #endif
 
-#ifndef HEADERS_MODSECURITY_RULE_WITH_ACTIONS_H_
-#define HEADERS_MODSECURITY_RULE_WITH_ACTIONS_H_
+#ifndef SRC_RULE_WITH_ACTIONS_H_
+#define SRC_RULE_WITH_ACTIONS_H_
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/modsecurity.h"
@@ -223,7 +223,7 @@ class RuleWithActions : public Rule {
 
     static void executeTransformation(
         Transaction *transaction,
-        ModSecString in,
+        ModSecString &in,
         TransformationsResults *ret,
         Transformation *transformation);
 
@@ -545,4 +545,5 @@ class RuleWithActions : public Rule {
 #endif
 
 
-#endif  // HEADERS_MODSECURITY_RULE_WITH_ACTIONS_H_
+#endif  // SRC_RULE_WITH_ACTIONS_H_
+

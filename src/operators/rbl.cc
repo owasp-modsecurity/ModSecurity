@@ -25,7 +25,7 @@
 
 #include "modsecurity/rules_set.h"
 #include "src/operators/operator.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {

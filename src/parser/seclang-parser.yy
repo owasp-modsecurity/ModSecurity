@@ -17,9 +17,9 @@ class Driver;
 }
 }
 
-#include "modsecurity/rule_unconditional.h"
-#include "modsecurity/rule_with_operator.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_unconditional.h"
+#include "src/rule_with_operator.h"
+#include "src/rule_with_actions.h"
 #include "src/rule_script.h"
 
 #include "src/actions/accuracy.h"

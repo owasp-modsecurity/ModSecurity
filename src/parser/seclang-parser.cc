@@ -42,7 +42,11 @@
 
 
 // Unqualified %code blocks.
+<<<<<<< HEAD
 #line 326 "seclang-parser.yy"
+=======
+#line 327 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
 
 #include "src/parser/driver.h"
 
@@ -1318,7 +1322,11 @@ namespace yy {
 
 
     // User initialization code.
+<<<<<<< HEAD
 #line 319 "seclang-parser.yy"
+=======
+#line 320 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
 {
   // Initialize the initial location.
   yyla.location.begin.filename = yyla.location.end.filename = new std::string(driver.file);
@@ -5399,6 +5407,7 @@ namespace yy {
 #line 5400 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 410: // act: "ACTION_TRANSFORMATION_PHP_ARGS_NAMES"
 #line 2920 "seclang-parser.yy"
       {
@@ -5409,222 +5418,361 @@ namespace yy {
 
   case 411: // act: "ACTION_TRANSFORMATION_UPPERCASE"
 #line 2924 "seclang-parser.yy"
+=======
+  case 410: // act: "ACTION_TRANSFORMATION_UPPERCASE"
+#line 2920 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::UpperCase(yystack_[0].value.as < std::string > ()));
       }
 #line 5416 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 412: // act: "ACTION_TRANSFORMATION_URL_DECODE_UNI"
 #line 2928 "seclang-parser.yy"
+=======
+  case 411: // act: "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+#line 2924 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecodeUni(yystack_[0].value.as < std::string > ()));
       }
 #line 5424 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 413: // act: "ACTION_TRANSFORMATION_URL_DECODE"
 #line 2932 "seclang-parser.yy"
+=======
+  case 412: // act: "ACTION_TRANSFORMATION_URL_DECODE"
+#line 2928 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecode(yystack_[0].value.as < std::string > ()));
       }
 #line 5432 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 414: // act: "ACTION_TRANSFORMATION_URL_ENCODE"
 #line 2936 "seclang-parser.yy"
+=======
+  case 413: // act: "ACTION_TRANSFORMATION_URL_ENCODE"
+#line 2932 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::UrlEncode(yystack_[0].value.as < std::string > ()));
       }
 #line 5440 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 415: // act: "ACTION_TRANSFORMATION_NONE"
 #line 2940 "seclang-parser.yy"
+=======
+  case 414: // act: "ACTION_TRANSFORMATION_NONE"
+#line 2936 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::None(yystack_[0].value.as < std::string > ()));
       }
 #line 5448 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 416: // act: "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
 #line 2944 "seclang-parser.yy"
+=======
+  case 415: // act: "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+#line 2940 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::CompressWhitespace(yystack_[0].value.as < std::string > ()));
       }
 #line 5456 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 417: // act: "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
 #line 2948 "seclang-parser.yy"
+=======
+  case 416: // act: "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+#line 2944 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveWhitespace(yystack_[0].value.as < std::string > ()));
       }
 #line 5464 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 418: // act: "ACTION_TRANSFORMATION_REPLACE_NULLS"
 #line 2952 "seclang-parser.yy"
+=======
+  case 417: // act: "ACTION_TRANSFORMATION_REPLACE_NULLS"
+#line 2948 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceNulls(yystack_[0].value.as < std::string > ()));
       }
 #line 5472 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 419: // act: "ACTION_TRANSFORMATION_REMOVE_NULLS"
 #line 2956 "seclang-parser.yy"
+=======
+  case 418: // act: "ACTION_TRANSFORMATION_REMOVE_NULLS"
+#line 2952 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveNulls(yystack_[0].value.as < std::string > ()));
       }
 #line 5480 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 420: // act: "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
 #line 2960 "seclang-parser.yy"
+=======
+  case 419: // act: "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+#line 2956 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::HtmlEntityDecode(yystack_[0].value.as < std::string > ()));
       }
 #line 5488 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 421: // act: "ACTION_TRANSFORMATION_JS_DECODE"
 #line 2964 "seclang-parser.yy"
+=======
+  case 420: // act: "ACTION_TRANSFORMATION_JS_DECODE"
+#line 2960 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::JsDecode(yystack_[0].value.as < std::string > ()));
       }
 #line 5496 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 422: // act: "ACTION_TRANSFORMATION_CSS_DECODE"
 #line 2968 "seclang-parser.yy"
+=======
+  case 421: // act: "ACTION_TRANSFORMATION_CSS_DECODE"
+#line 2964 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::CssDecode(yystack_[0].value.as < std::string > ()));
       }
 #line 5504 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 423: // act: "ACTION_TRANSFORMATION_TRIM"
 #line 2972 "seclang-parser.yy"
+=======
+  case 422: // act: "ACTION_TRANSFORMATION_TRIM"
+#line 2968 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Trim(yystack_[0].value.as < std::string > ()));
       }
 #line 5512 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 424: // act: "ACTION_TRANSFORMATION_TRIM_LEFT"
 #line 2976 "seclang-parser.yy"
+=======
+  case 423: // act: "ACTION_TRANSFORMATION_TRIM_LEFT"
+#line 2972 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::TrimLeft(yystack_[0].value.as < std::string > ()));
       }
 #line 5520 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 425: // act: "ACTION_TRANSFORMATION_TRIM_RIGHT"
 #line 2980 "seclang-parser.yy"
+=======
+  case 424: // act: "ACTION_TRANSFORMATION_TRIM_RIGHT"
+#line 2976 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::TrimRight(yystack_[0].value.as < std::string > ()));
       }
 #line 5528 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 426: // act: "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
 #line 2984 "seclang-parser.yy"
+=======
+  case 425: // act: "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+#line 2980 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePathWin(yystack_[0].value.as < std::string > ()));
       }
 #line 5536 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 427: // act: "ACTION_TRANSFORMATION_NORMALISE_PATH"
 #line 2988 "seclang-parser.yy"
+=======
+  case 426: // act: "ACTION_TRANSFORMATION_NORMALISE_PATH"
+#line 2984 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePath(yystack_[0].value.as < std::string > ()));
       }
 #line 5544 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 428: // act: "ACTION_TRANSFORMATION_LENGTH"
 #line 2992 "seclang-parser.yy"
+=======
+  case 427: // act: "ACTION_TRANSFORMATION_LENGTH"
+#line 2988 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Length(yystack_[0].value.as < std::string > ()));
       }
 #line 5552 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 429: // act: "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
 #line 2996 "seclang-parser.yy"
+=======
+  case 428: // act: "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+#line 2992 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Utf8ToUnicode(yystack_[0].value.as < std::string > ()));
       }
 #line 5560 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 430: // act: "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
 #line 3000 "seclang-parser.yy"
+=======
+  case 429: // act: "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+#line 2996 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveCommentsChar(yystack_[0].value.as < std::string > ()));
       }
 #line 5568 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 431: // act: "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
 #line 3004 "seclang-parser.yy"
+=======
+  case 430: // act: "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+#line 3000 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveComments(yystack_[0].value.as < std::string > ()));
       }
 #line 5576 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 432: // act: "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
 #line 3008 "seclang-parser.yy"
+=======
+  case 431: // act: "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+#line 3004 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceComments(yystack_[0].value.as < std::string > ()));
       }
 #line 5584 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 433: // setvar_action: "NOT" var
 #line 3015 "seclang-parser.yy"
+=======
+  case 432: // setvar_action: "NOT" var
+#line 3011 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::unsetOperation, std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ())));
       }
 #line 5592 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 434: // setvar_action: var
 #line 3019 "seclang-parser.yy"
+=======
+  case 433: // setvar_action: var
+#line 3015 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setToOneOperation, std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ())));
       }
 #line 5600 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 435: // setvar_action: var SETVAR_OPERATION_EQUALS run_time_string
 #line 3023 "seclang-parser.yy"
+=======
+  case 434: // setvar_action: var SETVAR_OPERATION_EQUALS run_time_string
+#line 3019 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setOperation, std::move(yystack_[2].value.as < std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
 #line 5608 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 436: // setvar_action: var SETVAR_OPERATION_EQUALS_PLUS run_time_string
 #line 3027 "seclang-parser.yy"
+=======
+  case 435: // setvar_action: var SETVAR_OPERATION_EQUALS_PLUS run_time_string
+#line 3023 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, std::move(yystack_[2].value.as < std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
 #line 5616 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 437: // setvar_action: var SETVAR_OPERATION_EQUALS_MINUS run_time_string
 #line 3031 "seclang-parser.yy"
+=======
+  case 436: // setvar_action: var SETVAR_OPERATION_EQUALS_MINUS run_time_string
+#line 3027 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, std::move(yystack_[2].value.as < std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
 #line 5624 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 438: // run_time_string: run_time_string "FREE_TEXT_QUOTE_MACRO_EXPANSION"
 #line 3038 "seclang-parser.yy"
+=======
+  case 437: // run_time_string: run_time_string "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+#line 3034 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         yystack_[1].value.as < std::unique_ptr<RunTimeString> > ()->appendText(yystack_[0].value.as < std::string > ());
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(yystack_[1].value.as < std::unique_ptr<RunTimeString> > ());
@@ -5632,8 +5780,13 @@ namespace yy {
 #line 5633 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 439: // run_time_string: run_time_string var
 #line 3043 "seclang-parser.yy"
+=======
+  case 438: // run_time_string: run_time_string var
+#line 3039 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         yystack_[1].value.as < std::unique_ptr<RunTimeString> > ()->appendVar(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(yystack_[1].value.as < std::unique_ptr<RunTimeString> > ());
@@ -5641,8 +5794,13 @@ namespace yy {
 #line 5642 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 440: // run_time_string: "FREE_TEXT_QUOTE_MACRO_EXPANSION"
 #line 3048 "seclang-parser.yy"
+=======
+  case 439: // run_time_string: "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+#line 3044 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
         r->appendText(yystack_[0].value.as < std::string > ());
@@ -5651,8 +5809,13 @@ namespace yy {
 #line 5652 "seclang-parser.cc"
     break;
 
+<<<<<<< HEAD
   case 441: // run_time_string: var
 #line 3054 "seclang-parser.yy"
+=======
+  case 440: // run_time_string: var
+#line 3050 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
         r->appendVar(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
@@ -7201,8 +7364,13 @@ namespace yy {
     2879,  2883,  2887,  2891,  2895,  2899,  2903,  2907,  2911,  2915,
     2919,  2923,  2927,  2931,  2935,  2939,  2943,  2947,  2951,  2955,
     2959,  2963,  2967,  2971,  2975,  2979,  2983,  2987,  2991,  2995,
+<<<<<<< HEAD
     2999,  3003,  3007,  3014,  3018,  3022,  3026,  3030,  3037,  3042,
     3047,  3053
+=======
+    2999,  3003,  3010,  3014,  3018,  3022,  3026,  3033,  3038,  3043,
+    3049
+>>>>>>> 3e285811 (Moves rule* headers to src/)
   };
 
   void
@@ -7236,7 +7404,11 @@ namespace yy {
 } // yy
 #line 7238 "seclang-parser.cc"
 
+<<<<<<< HEAD
 #line 3060 "seclang-parser.yy"
+=======
+#line 3056 "seclang-parser.yy"
+>>>>>>> 3e285811 (Moves rule* headers to src/)
 
 
 void yy::seclang_parser::error (const location_type& l, const std::string& m) {
