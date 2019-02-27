@@ -227,6 +227,8 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     std::string opValue;
     const unsigned char *buf;
     size_t jsonSize;
+    ModSecStackString::allocator_type::arena_type stackAllocator;
+
 
     std::list<Utils::SMatch> vars = variables.searchAll(matchString);
     std::list<Utils::SMatch> ops = operators.searchAll(matchString);
@@ -304,8 +306,8 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
     while (trans.size() > 0) {
         modsecurity::actions::transformations::Transformation *t;
-        ModSecStackString in;
-        ModSecStackString out;
+        ModSecStackString in{stackAllocator};
+        ModSecStackString out{stackAllocator};
 
         yajl_gen_map_open(g);
         yajl_gen_string(g,

@@ -30,7 +30,6 @@
 #include "modsecurity/variable_value.h"
 #include "modsecurity/rule.h"
 
-
 #ifdef __cplusplus
 
 namespace modsecurity {
@@ -52,16 +51,16 @@ class Transformation;
 class TransformationResult {
  public:
     TransformationResult(
-        ModSecStackString *after,
+        ModSecStackString &after,
         std::string *transformation = nullptr)
         : m_transformation(transformation),
-        m_after(*after) { };
-
+        m_after(std::move(after)) { };
+/*
     TransformationResult(const TransformationResult &t2) {
             m_after = t2.m_after;
             m_transformation = t2.m_transformation;
         };
-
+*/
     ModSecStackString *getAfter() {
         return &m_after;
     }

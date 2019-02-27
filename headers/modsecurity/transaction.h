@@ -48,6 +48,8 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
+#include "modsecurity/modsec_stack_allocator.h"
+
 
 #ifndef NO_LOGS
 #define ms_dbg(b, c) \
@@ -96,6 +98,8 @@ typedef struct Rules_t RulesSet;
 #ifdef __cplusplus
 
 namespace modsecurity {
+
+using ModSecStackString = std::basic_string<char, std::char_traits<char>, short_alloc<char, 20000u, alignof(char)>>;
 
 class ModSecurity;
 class Transaction;
@@ -638,6 +642,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     std::string m_variableTimeWDay;
     std::string m_variableTimeYear;
 
+    ModSecStackString::allocator_type::arena_type m_transformationStackAllocator;
  private:
     /**
      * Pointer to the callback function that will be called to fill

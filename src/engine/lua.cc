@@ -440,8 +440,8 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
                     "t:" + std::string(name));
             // FIXME: transformation is not yet returning null.
             if (tfn) {
-                ModSecStackString in;
-                ModSecStackString out;
+                ModSecStackString in{t->m_transformationStackAllocator};
+                ModSecStackString out{t->m_transformationStackAllocator};
                 in.assign(newVar.c_str(), newVar.size());
                 tfn->execute(t, in, out);
                 newVar.assign(out.c_str(), out.size());
@@ -466,8 +466,8 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
 
         // FIXME: transformation is not yet returning null.
         if (tfn) {
-            ModSecStackString in;
-            ModSecStackString out;
+            ModSecStackString in{t->m_transformationStackAllocator};
+            ModSecStackString out{t->m_transformationStackAllocator};
             in.assign(newVar.c_str(), newVar.size());
             tfn->execute(t, in, out);
             newVar.assign(out.c_str(), out.size());
