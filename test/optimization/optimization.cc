@@ -27,8 +27,8 @@
 #include "src/parser/driver.h"
 #include "src/utils/https_client.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule_unconditional.h"
-#include "modsecurity/rule_with_operator.h"
+#include "src/rule_unconditional.h"
+#include "src/rule_with_operator.h"
 
 
 void print_help() {

@@ -48,8 +48,8 @@ class RulesSetPhases {
     int append(RulesSetPhases *from, std::ostringstream *err);
     void dump() const;
 
-    Rules *operator[](int index) { return &m_rulesAtPhase[index]; }
-    Rules *at(int index) { return &m_rulesAtPhase[index]; }
+    Rules *operator[](int index);
+    Rules *at(int index);
 
  private:
     Rules m_rulesAtPhase[8];

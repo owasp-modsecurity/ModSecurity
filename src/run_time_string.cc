@@ -25,7 +25,7 @@
 #include "src/variables/highest_severity.h"
 #include "src/utils/string.h"
 #include "src/variables/variable.h"
-#include "modsecurity/rule_with_operator.h"
+#include "src/rule_with_operator.h"
 
 
 namespace modsecurity {

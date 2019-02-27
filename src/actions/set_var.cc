@@ -30,7 +30,8 @@
 #include "src/variables/tx.h"
 #include "src/variables/user.h"
 #include "src/variables/variable.h"
-#include "modsecurity/rule_with_operator.h"
+#include "src/rule_with_operator.h"
+
 
 namespace modsecurity {
 namespace actions {

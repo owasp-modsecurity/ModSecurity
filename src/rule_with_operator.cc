@@ -13,7 +13,6 @@
  *
  */
 
-#include "modsecurity/rule_with_operator.h"
 
 #include <stdio.h>
 
@@ -41,6 +40,7 @@
 #include "src/actions/set_var.h"
 #include "src/actions/block.h"
 #include "src/variables/variable.h"
+#include "src/rule_with_operator.h"
 
 
 namespace modsecurity {
@@ -265,6 +265,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
         }
         var->evaluate(trans, this, &e);
         for (const VariableValue *v : e) {
+            TransformationsResults transformationsResults;
             const std::string &value = v->getValue();
             const std::string &key = v->getKeyWithCollection();
 
@@ -291,8 +292,6 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
                 continue;
             }
 
-            TransformationsResults transformationsResults;
-
             executeTransformations(trans, value, transformationsResults);
 
             auto iter = transformationsResults.begin();
@@ -303,8 +302,8 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
             while (iter != transformationsResults.end()) {
                 bool ret;
                 auto &valueTemp = *iter;
-                // FIXME: this copy is not necessary.
-                std::string *valueAfterTrans = new std::string(valueTemp.getAfter()->c_str());
+                // FIXME: this copy is not necessary.                
+                std::string *valueAfterTrans = new std::string(valueTemp.getAfter()->c_str(), valueTemp.getAfter()->size());
 
                 ret = executeOperatorAt(trans, key, *valueAfterTrans);
 
@@ -315,6 +314,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
                     for (auto &i : v->getOrigin()) {
                         trans->messageGetLast()->m_reference.append(i->toText());
                     }
+
                     auto iter2 = transformationsResults.begin();
                     while (iter2 != transformationsResults.end()) {
                         if (iter2->getTransformationName()) {
@@ -323,8 +323,8 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
                         /*
                         if (iter == iter2) {
                             break;
-                        } else {
-                            trans->messageGetLast()->m_reference.append("--");
+                        } else if (iter2->getTransformationName()) {
+                            trans->messageGetLast()->m_reference.append(",");
                         }
                         */
                         iter2++;
