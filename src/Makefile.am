@@ -42,10 +42,6 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/intervention.h \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
-	../headers/modsecurity/rule_marker.h \
-	../headers/modsecurity/rule_unconditional.h \
-	../headers/modsecurity/rule_with_actions.h \
-	../headers/modsecurity/rule_with_operator.h \
 	../headers/modsecurity/rules.h \
 	../headers/modsecurity/rule_message.h \
 	../headers/modsecurity/rules_set.h \
@@ -280,11 +276,13 @@ libmodsecurity_la_SOURCES = \
 	audit_log/writer/parallel.cc \
 	modsecurity.cc \
 	rules_set.cc \
+	rules_set_phases.cc \
 	rules_set_properties.cc \
 	debug_log/debug_log.cc \
 	debug_log/debug_log_writer.cc \
 	run_time_string.cc \
 	rule.cc \
+	rules.cc \
 	rule_unconditional.cc \
 	rule_with_actions.cc \
 	rule_with_operator.cc \
