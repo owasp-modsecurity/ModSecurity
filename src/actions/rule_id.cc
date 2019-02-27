@@ -20,6 +20,8 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "src/rule_with_actions.h"
+
 
 namespace modsecurity {
 namespace actions {

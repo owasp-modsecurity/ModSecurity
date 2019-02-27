@@ -18,7 +18,7 @@
 #include "modsecurity/rules_set_properties.h"
 #include "src/parser/seclang-parser.hh"
 #include "modsecurity/audit_log.h"
-#include "modsecurity/rule_marker.h"
+#include "src/rule_marker.h"
 
 using modsecurity::audit_log::AuditLog;
 using modsecurity::RuleWithOperator;

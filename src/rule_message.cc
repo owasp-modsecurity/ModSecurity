@@ -20,7 +20,7 @@
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"
 #include "src/actions/tag.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {

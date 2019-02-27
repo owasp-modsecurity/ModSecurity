@@ -42,6 +42,8 @@
 #include "src/request_body_processor/xml.h"
 #include "modsecurity/actions/action.h"
 #include "src/actions/xmlns.h"
+#include "src/rule_with_actions.h"
+
 
 namespace modsecurity {
 namespace variables {

@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "modsecurity/rules_set.h"
-#include "modsecurity/rule_marker.h"
+#include "src/rule_marker.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/parser/driver.h"

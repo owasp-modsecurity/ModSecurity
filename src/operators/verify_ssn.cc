@@ -20,6 +20,8 @@
 #include <list>
 
 #include "src/operators/operator.h"
+#include "src/rule_with_actions.h"
+
 
 namespace modsecurity {
 namespace operators {

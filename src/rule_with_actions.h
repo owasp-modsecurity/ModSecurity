@@ -22,8 +22,8 @@
 #include <utility>
 #endif
 
-#ifndef HEADERS_MODSECURITY_RULE_WITH_ACTIONS_H_
-#define HEADERS_MODSECURITY_RULE_WITH_ACTIONS_H_
+#ifndef SRC_RULE_WITH_ACTIONS_H_
+#define SRC_RULE_WITH_ACTIONS_H_
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/modsecurity.h"
@@ -48,8 +48,6 @@ namespace transformations {
 class Transformation;
 }
 }
-
-using ModSecStackString = std::basic_string<char, std::char_traits<char>, std::allocator<char> >;
 
 class TransformationResult {
  public:
@@ -120,7 +118,7 @@ class RuleWithActions : public Rule {
 
     inline void executeTransformation(
         Transaction *transaction,
-        ModSecStackString in,
+        ModSecStackString &in,
         TransformationsResults *ret,
         Transformation *transformation);
 
@@ -212,8 +210,8 @@ class RuleWithActions : public Rule {
     Tags getTags() {
         Tags tags = m_actionsTag;
         if (getChainedParent()) {
-	    auto parent = getChainedParent()->getTags();
-	    if (parent.size() > 0) {
+            auto parent = getChainedParent()->getTags();
+            if (parent.size() > 1) {
                 tags.insert( tags.end(), parent.begin(), parent.end() );
             }
         }
@@ -254,4 +252,5 @@ class RuleWithActions : public Rule {
 #endif
 
 
-#endif  // HEADERS_MODSECURITY_RULE_WITH_ACTIONS_H_
+#endif  // SRC_RULE_WITH_ACTIONS_H_
+
