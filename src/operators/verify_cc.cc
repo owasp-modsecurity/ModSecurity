@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "src/operators/operator.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
 
 
 #if PCRE_HAVE_JIT
