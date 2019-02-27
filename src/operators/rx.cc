@@ -22,7 +22,7 @@
 #include "src/operators/operator.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
