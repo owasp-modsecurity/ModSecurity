@@ -28,7 +28,7 @@
 #include "src/operators/operator.h"
 #include "src/utils/acmp.h"
 #include "src/utils/string.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
