@@ -52,6 +52,7 @@
 #include "modsecurity/rules_set_properties.h"
 #include "src/actions/disruptive/allow.h"
 #include "src/variables/remote_user.h"
+#include "src/rule_with_actions.h"
 
 
 

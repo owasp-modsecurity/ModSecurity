@@ -24,7 +24,8 @@
 #include "src/actions/severity.h"
 #include "src/actions/log_data.h"
 #include "src/actions/msg.h"
-#include "modsecurity/rule_with_actions.h"
+#include "src/rule_with_actions.h"
+
 
 namespace modsecurity {
 
