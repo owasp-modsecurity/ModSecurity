@@ -4,6 +4,7 @@ services:
     - iis                 # start IIS
 
 install:
+    - git submodule update --init --recursive
     - "python --version"
     - ps: cd iis; .\getModSecurityPkgs.ps1 https://modsecurity.blob.core.windows.net/windows-artifacts
 

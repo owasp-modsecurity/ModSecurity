@@ -16,7 +16,10 @@
 
 #undef inline
 
+#include <string>
+#include <cctype>
 #include <memory>
+#include <future>
 
 //  IIS7 Server API header file
 #include <Windows.h>
@@ -33,13 +36,13 @@
 
 #include "winsock2.h"
 
+#include "asio/packaged_task.hpp"
+#include "asio/post.hpp"
+
 // These helpers make sure that the underlying structures
 // are correctly released on any exit path due to RAII.
-using ConnRecPtr =
-    std::unique_ptr<conn_rec, decltype(modsecFinishConnection)*>;
-
-using RequestRecPtr =
-    std::unique_ptr<request_rec, decltype(modsecFinishRequest)*>;
+using ConnRecPtr = std::shared_ptr<conn_rec>;
+using RequestRecPtr = std::shared_ptr<request_rec>;
 
 ConnRecPtr MakeConnReq()
 {
@@ -53,76 +56,22 @@ RequestRecPtr MakeRequestRec(conn_rec* c, directory_config* config)
     return {modsecNewRequest(c, config), modsecFinishRequest};
 }
 
-class RequestStoredContext
-    : public IHttpStoredContext
+struct RequestStoredContext
+    : IHttpStoredContext
 {
-public:
-    RequestStoredContext(directory_config* config,
-            IHttpContext* httpContext, IHttpEventProvider* provider)
-        : connRec(MakeConnReq())
-        , requestRec(MakeRequestRec(connRec.get(), config))
-        , httpContext(httpContext)
-        , provider(provider)
-    {}
-
-    RequestStoredContext(const RequestStoredContext&) = delete;
-    RequestStoredContext& operator=(const RequestStoredContext&) = delete;
-
-    // NB: these could have been defaulted with '= default' but VS2013 doesn't support it...
-    RequestStoredContext(RequestStoredContext&& rhs)
-        : connRec(std::move(rhs.connRec))
-        , requestRec(std::move(rhs.requestRec))
-        , httpContext(rhs.httpContext)
-        , provider(rhs.provider)
-    {}
-
-    RequestStoredContext& operator=(RequestStoredContext&& rhs)
-    {
-        connRec = std::move(rhs.connRec);
-        requestRec = std::move(rhs.requestRec);
-        httpContext = rhs.httpContext;
-        provider = rhs.provider;
-        return *this;
-    }
+    ConnRecPtr connRec;
+    RequestRecPtr requestRec;
+    IHttpContext* httpContext;
+    IHttpEventProvider* provider;
+    char* responseBuffer = nullptr;
+    ULONGLONG responseLength = 0;
+    ULONGLONG responsePosition = 0;
+    bool responseProcessingEnabled = false;
+    std::future<int> detectionProcessing;
 
     void CleanupStoredContext() override
     {
         delete this;
-    }
-
-    conn_rec* Connection() const
-    {
-        return connRec.get();
-    }
-
-    request_rec* Request() const
-    {
-        return requestRec.get();
-    }
-
-    IHttpContext* HttpContext() const
-    {
-        return httpContext;
-    }
-
-    IHttpEventProvider* Provider() const
-    {
-        return provider;
-    }
-
-    char*& ResponseBuffer()
-    {
-        return responseBuffer;
-    }
-
-    ULONGLONG& ResponseLength()
-    {
-        return responseLength;
-    }
-
-    ULONGLONG& ResponsePosition()
-    {
-        return responsePosition;
     }
 
     void FinishRequest()
@@ -130,15 +79,6 @@ public:
         requestRec.reset();
         connRec.reset();
     }
-
-private:
-	ConnRecPtr connRec;
-	RequestRecPtr requestRec;
-	IHttpContext* httpContext;
-	IHttpEventProvider* provider;
-    char* responseBuffer = nullptr;
-    ULONGLONG responseLength = 0;
-    ULONGLONG responsePosition = 0;
 };
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
@@ -467,6 +407,192 @@ Done:
 	return hr;
 }
 
+/*
+ * Read request body from IIS structures, copy it over into
+ * Apache buckets and then assign back the entire flatten body
+ * to IHttpRequest.
+ * If the request body is chunked, it will be transformed into fixed-length.
+*/
+static HRESULT SaveRequestBodyToRequestRec(RequestStoredContext* rsc)
+{
+    request_rec* aprRequest = rsc->requestRec.get();
+    conn_rec* conn = rsc->connRec.get();
+    IHttpRequest* iisRequest = rsc->httpContext->GetRequest();
+    apr_bucket_brigade* brigade = apr_brigade_create(conn->pool, conn->bucket_alloc);
+    if (brigade == nullptr)
+    {
+        return E_OUTOFMEMORY;
+    }
+
+    while (iisRequest->GetRemainingEntityBytes() > 0)
+    {
+        DWORD bytesRead = 0;
+        char* buf = static_cast<char*>(apr_palloc(aprRequest->pool, HUGE_STRING_LEN));
+        HRESULT hr = iisRequest->ReadEntityBody(buf, HUGE_STRING_LEN, false, &bytesRead, nullptr);
+        if (FAILED(hr))
+        {
+            // End of data is okay.
+            if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
+            {
+                return hr;
+            }
+
+            break;
+        }
+
+        apr_bucket* bucket = apr_bucket_pool_create(buf, bytesRead, aprRequest->pool, conn->bucket_alloc);
+        if (bucket == nullptr)
+        {
+            return E_OUTOFMEMORY;
+        }
+        APR_BRIGADE_INSERT_TAIL(brigade, bucket);
+    }
+
+    apr_bucket* e = apr_bucket_eos_create(conn->bucket_alloc);
+    if (e == nullptr)
+    {
+        return E_OUTOFMEMORY;
+    }
+    APR_BRIGADE_INSERT_TAIL(brigade, e);
+
+    modsecSetBodyBrigade(aprRequest, brigade);
+
+    apr_off_t contentLength = 0;
+    apr_status_t status = apr_brigade_length(brigade, FALSE, &contentLength);
+    if (status != APR_SUCCESS)
+    {
+        return E_FAIL;
+    }
+
+    // Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
+    // This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
+    static const std::string CHUNKED = "chunked";
+    USHORT encodingLength = 0;
+    const char* transferEncoding = iisRequest->GetHeader(HttpHeaderTransferEncoding, &encodingLength);
+    if (transferEncoding)
+    {
+        if (CHUNKED.size() == encodingLength &&
+            std::equal(CHUNKED.cbegin(), CHUNKED.cend(), transferEncoding,
+                [](char lhs, char rhs) { return std::tolower(lhs) == std::tolower(rhs); }))
+        {
+            iisRequest->DeleteHeader(HttpHeaderTransferEncoding);
+        }
+    }
+
+    auto contentLengthStr = std::to_string(contentLength);
+    HRESULT hr = iisRequest->SetHeader(
+        HttpHeaderContentLength,
+        contentLengthStr.c_str(),
+        contentLengthStr.size(),
+        TRUE);
+
+    if (FAILED(hr))
+    {
+        return hr;
+    }
+
+    // since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
+    //
+    char* requestBuffer = static_cast<char*>(rsc->httpContext->AllocateRequestMemory(contentLength));
+    status = apr_brigade_flatten(brigade, requestBuffer, reinterpret_cast<apr_size_t*>(&contentLength));
+    if (status != APR_SUCCESS)
+    {
+        return E_FAIL;
+    }
+    return iisRequest->InsertEntityBody(requestBuffer, contentLength);
+}
+
+
+static apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
+{
+    RequestStoredContext *rsc = RetrieveIISContext(r);
+
+    *readcnt = 0;
+
+    if (rsc == NULL)
+    {
+        *is_eos = 1;
+        return APR_SUCCESS;
+    }
+
+    IHttpContext *pHttpContext = rsc->httpContext;
+    IHttpRequest *pRequest = pHttpContext->GetRequest();
+
+    if (pRequest->GetRemainingEntityBytes() == 0)
+    {
+        *is_eos = 1;
+        return APR_SUCCESS;
+    }
+
+    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, (DWORD *)readcnt, NULL);
+
+    if (FAILED(hr))
+    {
+        // End of data is okay.
+        if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
+        {
+            // Set the error status.
+            rsc->provider->SetErrorStatus(hr);
+        }
+
+        *is_eos = 1;
+    }
+
+    return APR_SUCCESS;
+}
+
+static apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
+{
+    RequestStoredContext *rsc = RetrieveIISContext(r);
+
+    if (!rsc || !rsc->requestRec)
+        return APR_SUCCESS;
+
+    IHttpContext *pHttpContext = rsc->httpContext;
+    IHttpRequest *pHttpRequest = pHttpContext->GetRequest();
+
+    auto lengthStr = std::to_string(length);
+
+    // Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
+    // This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
+
+    USHORT ctcch = 0;
+    char *ct = (char *)pHttpRequest->GetHeader(HttpHeaderTransferEncoding, &ctcch);
+    if (ct)
+    {
+        char *ctz = ZeroTerminate(ct, ctcch, r->pool);
+        if (ctcch != 0)
+        {
+            if (0 == stricmp(ctz, "chunked"))
+            {
+                pHttpRequest->DeleteHeader(HttpHeaderTransferEncoding);
+            }
+        }
+    }
+
+    HRESULT hr = pHttpRequest->SetHeader(
+        HttpHeaderContentLength,
+        lengthStr.c_str(),
+        (USHORT)lengthStr.size(),
+        TRUE);
+
+    if (FAILED(hr))
+    {
+        // possible, but there's nothing we can do
+    }
+
+    // since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
+    //
+    void *reqbuf = pHttpContext->AllocateRequestMemory(length);
+
+    memcpy(reqbuf, buf, length);
+
+    pHttpRequest->InsertEntityBody(reqbuf, length);
+
+    return APR_SUCCESS;
+}
+
+
 REQUEST_NOTIFICATION_STATUS
 CMyHttpModule::OnSendResponse(
     IN IHttpContext * pHttpContext,
@@ -476,12 +602,18 @@ CMyHttpModule::OnSendResponse(
     RequestStoredContext* rsc = dynamic_cast<RequestStoredContext*>(pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext));
 
     CriticalSectionLock lock{cs};
-	// here we must check if response body processing is enabled
-	//
-	if(rsc == nullptr || rsc->Request() == nullptr || rsc->ResponseBuffer() != nullptr || !modsecIsResponseBodyAccessEnabled(rsc->Request()))
-	{
-		goto Exit;
-	}
+    // here we must check if response body processing is enabled
+    //
+    if (!rsc || !rsc->requestRec || rsc->responseBuffer != nullptr || !rsc->responseProcessingEnabled)
+    {
+        goto Exit;
+    }
+
+    // If we have offloaded request processing to the thread pool
+    // we need to wait for its completion before we can proceed
+    if (rsc->detectionProcessing.valid()) {
+        rsc->detectionProcessing.get();
+    }
 
     HRESULT hr = S_OK;
 	IHttpResponse *pHttpResponse = NULL;
@@ -492,7 +624,7 @@ CMyHttpModule::OnSendResponse(
     REQUEST_NOTIFICATION_STATUS ret = RQ_NOTIFICATION_CONTINUE;
 	ULONGLONG ulTotalLength = 0;
 	DWORD c;
-    request_rec *r = rsc->Request();
+    request_rec *r = rsc->requestRec.get();
 
 	pHttpResponse = pHttpContext->GetResponse();
 	pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
@@ -634,7 +766,7 @@ CMyHttpModule::OnSendResponse(
         }
     }
 
-	rsc->ResponseBuffer() = (char *)apr_palloc(rsc->Request()->pool, ulTotalLength);
+	rsc->responseBuffer = (char *)apr_palloc(rsc->requestRec->pool, ulTotalLength);
 
 	ulTotalLength = 0;
 
@@ -645,13 +777,13 @@ CMyHttpModule::OnSendResponse(
         switch( pSourceDataChunk->DataChunkType )
         {
             case HttpDataChunkFromMemory:
-				memcpy(rsc->ResponseBuffer() + ulTotalLength, pSourceDataChunk->FromMemory.pBuffer, pSourceDataChunk->FromMemory.BufferLength);
+				memcpy(rsc->responseBuffer + ulTotalLength, pSourceDataChunk->FromMemory.pBuffer, pSourceDataChunk->FromMemory.BufferLength);
                 ulTotalLength += pSourceDataChunk->FromMemory.BufferLength;
                 break;
             case HttpDataChunkFromFileHandle:
                 pFileByteRange = &pSourceDataChunk->FromFileHandle.ByteRange;
 
-				if(ReadFileChunk(pSourceDataChunk, rsc->ResponseBuffer() + ulTotalLength) != S_OK)
+				if(ReadFileChunk(pSourceDataChunk, rsc->responseBuffer + ulTotalLength) != S_OK)
 				{
 			        DWORD dwErr = GetLastError();
 
@@ -669,7 +801,7 @@ CMyHttpModule::OnSendResponse(
         }
     }
 
-	rsc->ResponseLength() = ulTotalLength;
+	rsc->responseLength = ulTotalLength;
 
 	//
     // If there's no content-length set, we need to set it to avoid chunked transfer mode
@@ -710,7 +842,7 @@ CMyHttpModule::OnSendResponse(
 
 Finished:
 
-	int status = modsecProcessResponse(rsc->Request());
+	int status = modsecProcessResponse(r);
 
 	// the logic here is temporary, needs clarification
 	//
@@ -743,7 +875,7 @@ CMyHttpModule::OnPostEndRequest(
 
 	// only finish request if OnSendResponse have been called already
 	//
-	if(rsc != nullptr && rsc->ResponseBuffer() != nullptr)
+	if(rsc != nullptr && rsc->responseBuffer != nullptr)
     {
         CriticalSectionLock lock{cs};
 		rsc->FinishRequest();
@@ -821,11 +953,31 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 
         delete apppath;
         delete path;
+
+        if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
+        {
+            modsecSetReadBody(nullptr);
+            modsecSetWriteBody(nullptr);
+        }
+        else
+        {
+            modsecSetReadBody(ReadBodyCallback);
+            modsecSetWriteBody(WriteBodyCallback);
+        }
     }
 
-    auto rsc = std::make_unique<RequestStoredContext>(config->config, httpContext, provider);
-    conn_rec* c = rsc->Connection();
-    request_rec* r = rsc->Request();
+    ConnRecPtr connRec = MakeConnReq();
+    conn_rec* c = connRec.get();
+    RequestRecPtr requestRec = MakeRequestRec(c, config->config);
+    request_rec* r = requestRec.get();
+
+    auto rsc = std::make_unique<RequestStoredContext>();
+    rsc->connRec = connRec;
+    rsc->requestRec = requestRec;
+    rsc->httpContext = httpContext;
+    rsc->provider = provider;
+    rsc->responseProcessingEnabled = (config->config->resbody_access == 1);
+    RequestStoredContext* context = rsc.get();
 
     // on IIS we force input stream inspection flag, because its absence does not add any performance gain
     // it's because on IIS request body must be restored each time it was read
@@ -1062,121 +1214,40 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 #endif
 	c->remote_host = NULL;
 
-    lock.unlock();
-    int status = modsecProcessRequest(r);
-    lock.lock();
+    if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
+    {
+        hr = SaveRequestBodyToRequestRec(context);
+        if (FAILED(hr)) {
+            context->provider->SetErrorStatus(hr);
+            return RQ_NOTIFICATION_FINISH_REQUEST;
+        }
+        // We post the processing task to the thread pool to happen in the background.
+        // We store the future to track and wait for this processing in case if we also
+        // need to process the response because we need request processing to finish
+        // before we can start with the response.
+        context->detectionProcessing = asio::post(threadPool,
+            std::packaged_task<int()> {
+            [connRec, requestRec] {
+                return modsecProcessRequest(requestRec.get());
+            }
+        });
+    }
+    else
+    {
+        lock.unlock();
+        int status = modsecProcessRequest(r);
+        lock.lock();
 
-	if(status != DECLINED)
-	{
-		httpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
-		httpContext->SetRequestHandled();
+        if (status != DECLINED)
+        {
+            httpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
+            httpContext->SetRequestHandled();
 
-        return RQ_NOTIFICATION_FINISH_REQUEST;
-	}
+            return RQ_NOTIFICATION_FINISH_REQUEST;
+        }
+    }
 
 	return RQ_NOTIFICATION_CONTINUE;
-}
-
-
-apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
-{
-    RequestStoredContext *rsc = RetrieveIISContext(r);
-
-    *readcnt = 0;
-
-    if (rsc == NULL)
-    {
-        *is_eos = 1;
-        return APR_SUCCESS;
-    }
-
-    IHttpContext *pHttpContext = rsc->HttpContext();
-    IHttpRequest *pRequest = pHttpContext->GetRequest();
-
-    if (pRequest->GetRemainingEntityBytes() == 0)
-    {
-        *is_eos = 1;
-        return APR_SUCCESS;
-    }
-
-    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, (DWORD *)readcnt, NULL);
-
-    if (FAILED(hr))
-    {
-        // End of data is okay.
-        if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
-        {
-            // Set the error status.
-            rsc->Provider()->SetErrorStatus(hr);
-        }
-
-        *is_eos = 1;
-    }
-
-    return APR_SUCCESS;
-}
-
-apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
-{
-	RequestStoredContext *rsc = RetrieveIISContext(r);
-
-	if(rsc == NULL || rsc->Request() == NULL)
-		return APR_SUCCESS;
-
-	IHttpContext *pHttpContext = rsc->HttpContext();
-	IHttpRequest *pHttpRequest = pHttpContext->GetRequest();
-
-    CHAR szLength[21]; //Max length for a 64 bit int is 20
-
-    ZeroMemory(szLength, sizeof(szLength));
-
-    HRESULT hr = StringCchPrintfA(
-            szLength, 
-            sizeof(szLength) / sizeof(CHAR) - 1, "%d", 
-            length);
-
-    if(FAILED(hr))
-    {
-		// not possible
-    }
-
-	// Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
-	// This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
-
-	USHORT ctcch = 0;
-	char *ct = (char *)pHttpRequest->GetHeader(HttpHeaderTransferEncoding, &ctcch);
-	if (ct)
-	{
-		char *ctz = ZeroTerminate(ct, ctcch, r->pool);
-		if (ctcch != 0)
-		{
-			if (0 == stricmp(ctz, "chunked"))
-			{
-				pHttpRequest->DeleteHeader(HttpHeaderTransferEncoding);
-			}
-		}
-	}
-	
-    hr = pHttpRequest->SetHeader(
-            HttpHeaderContentLength, 
-            szLength, 
-            (USHORT)strlen(szLength),
-            TRUE);
-
-    if(FAILED(hr))
-    {
-		// possible, but there's nothing we can do
-    }
-
-	// since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
-	//
-	void *reqbuf = pHttpContext->AllocateRequestMemory(length);
-
-	memcpy(reqbuf, buf, length);
-
-	pHttpRequest->InsertEntityBody(reqbuf, length);
-
-	return APR_SUCCESS;
 }
 
 apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
@@ -1185,7 +1256,7 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 
 	*readcnt = 0;
 
-	if(rsc == nullptr || rsc->ResponseBuffer() == nullptr)
+	if(rsc == nullptr || rsc->responseBuffer == nullptr)
 	{
 		*is_eos = 1;
 		return APR_SUCCESS;
@@ -1193,15 +1264,15 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 
 	unsigned int size = length;
 
-	if(size > rsc->ResponseLength() - rsc->ResponsePosition())
-		size = rsc->ResponseLength() - rsc->ResponsePosition();
+	if(size > rsc->responseLength - rsc->responsePosition)
+		size = rsc->responseLength - rsc->responsePosition;
 
-	memcpy(buf, rsc->ResponseBuffer() + rsc->ResponsePosition(), size);
+	memcpy(buf, rsc->responseBuffer + rsc->responsePosition, size);
 
 	*readcnt = size;
-	rsc->ResponsePosition() += size;
+	rsc->responsePosition += size;
 
-	if(rsc->ResponsePosition() >= rsc->ResponseLength())
+	if(rsc->responsePosition >= rsc->responseLength)
 		*is_eos = 1;
 
 	return APR_SUCCESS;
@@ -1211,13 +1282,13 @@ apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int lengt
 {
 	RequestStoredContext* rsc = RetrieveIISContext(r);
 
-	if(rsc == nullptr || rsc->Request() == nullptr || rsc->ResponseBuffer() == nullptr)
+	if(!rsc || !rsc->requestRec || rsc->responseBuffer == nullptr)
 		return APR_SUCCESS;
 
-	IHttpContext *pHttpContext = rsc->HttpContext();
+	IHttpContext *pHttpContext = rsc->httpContext;
 	IHttpResponse *pHttpResponse = pHttpContext->GetResponse();
 	HTTP_RESPONSE *pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
-	HTTP_DATA_CHUNK *pDataChunk = (HTTP_DATA_CHUNK *)apr_palloc(rsc->Request()->pool, sizeof(HTTP_DATA_CHUNK));
+	HTTP_DATA_CHUNK *pDataChunk = (HTTP_DATA_CHUNK *)apr_palloc(rsc->requestRec->pool, sizeof(HTTP_DATA_CHUNK));
 
 	pRawHttpResponse->EntityChunkCount = 0;
 
@@ -1264,9 +1335,7 @@ apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int lengt
 CMyHttpModule::CMyHttpModule()
 {
     modsecSetLogHook(this, Log);
-    modsecSetReadBody(ReadBodyCallback);
     modsecSetReadResponse(ReadResponseCallback);
-    modsecSetWriteBody(WriteBodyCallback);
     modsecSetWriteResponse(WriteResponseCallback);
 
     server_rec* s = modsecInit();

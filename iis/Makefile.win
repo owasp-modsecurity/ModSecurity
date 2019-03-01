@@ -37,7 +37,8 @@ INCLUDES = -I. -I.. \
            -I..\apache2 \
            -I..\standalone \
            -I..\apache2\ag_mdb \
-           -I..\apache2\waf_lock
+           -I..\apache2\waf_lock \
+           -Iasio\asio\include
 
 # Enables support for SecRemoteRules and external resources.
 DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
