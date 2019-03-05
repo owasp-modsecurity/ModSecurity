@@ -202,11 +202,12 @@ void Rbl::furtherInfo(struct sockaddr_in *sin, const std::string &ipStr,
 }
 
 
-bool Rbl::evaluate(Transaction *t, RuleWithActions *rule,
-        const std::string& ipStr,
-        RuleMessage *ruleMessage) {
+bool Rbl::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     struct addrinfo *info = NULL;
-    std::string host = Rbl::mapIpToAddress(ipStr, t);
+    std::string host = Rbl::mapIpToAddress(str.c_str(), transaction);
     int rc = 0;
 
     if (host.empty()) {
@@ -219,20 +220,20 @@ bool Rbl::evaluate(Transaction *t, RuleWithActions *rule,
         if (info != NULL) {
             freeaddrinfo(info);
         }
-        ms_dbg_a(t, 5, "RBL lookup of " + ipStr + " failed.");
+        ms_dbg_a(transaction, 5, "RBL lookup of " + str.to_string() + " failed.");
         return false;
     }
 
     struct sockaddr *addr = info->ai_addr;
     struct sockaddr_in *sin = (struct sockaddr_in *) addr;
-    furtherInfo(sin, ipStr, t, m_provider);
+    furtherInfo(sin, str.c_str(), transaction, m_provider);
 
     freeaddrinfo(info);
-    if (rule && t && rule->hasCaptureAction()) {
-        t->m_collections.m_tx_collection->storeOrUpdateFirst(
-        "0", std::string(ipStr));
-        ms_dbg_a(t, 7, "Added RXL match TX.0: " + \
-            std::string(ipStr));
+    if (rule && transaction && rule->hasCaptureAction()) {
+        transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
+        "0", std::string(str));
+        ms_dbg_a(transaction, 7, "Added RXL match TX.0: " + \
+            std::string(str));
     }
 
     return true;
