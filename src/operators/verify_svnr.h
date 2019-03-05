@@ -32,8 +32,9 @@ class VerifySVNR : public Operator {
     bool operator=(const VerifySVNR &a) = delete;
     VerifySVNR(const VerifySVNR &a) = delete;
 
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string& input,
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 
     bool verify(const char *ssnumber, int len);

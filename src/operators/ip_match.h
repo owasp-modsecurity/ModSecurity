@@ -34,7 +34,10 @@ class IpMatch : public Operator {
     IpMatch(const std::string &n, std::unique_ptr<RunTimeString> param)
         : Operator(n, std::move(param)) { }
 
-    bool evaluate(Transaction *transaction, const std::string &input) override;
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 
     bool init(const std::string &file, std::string *error) override;
 

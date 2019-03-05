@@ -46,8 +46,9 @@ class VerifyCPF : public Operator {
     bool operator=(const VerifyCPF &a) = delete;
     VerifyCPF(const VerifyCPF &a) = delete;
 
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string& input,
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 
     bool verify(const char *ssnumber, int len);
