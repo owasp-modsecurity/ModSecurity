@@ -78,8 +78,10 @@ bool VerifySVNR::verify(const char *svnrnumber, int len) {
 }
 
 
-bool VerifySVNR::evaluate(Transaction *t, RuleWithActions *rule,
-    const std::string& input, RuleMessage* ruleMessage) {
+bool VerifySVNR::evaluate(Transaction *t,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage* ruleMessage) {
     std::list<SMatch> matches;
     bool is_svnr = false;
     int i;
@@ -89,7 +91,7 @@ bool VerifySVNR::evaluate(Transaction *t, RuleWithActions *rule,
     }
 
     for (i = 0; i < input.size() - 1 && is_svnr == false; i++) {
-        matches = m_re->searchAll(input.substr(i, input.size()));
+        matches = m_re->searchAll(input.substr(i, input.size()).to_string());
 
         for (const auto & j : matches) {
             is_svnr = verify(j.str().c_str(), j.str().size());
