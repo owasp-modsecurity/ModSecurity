@@ -32,6 +32,7 @@
 #include "src/rule_with_actions.h"
 #include "src/variables/variable.h"
 #include "src/operators/operator.h"
+#include "modsecurity/string_view.hpp"
 
 #ifdef __cplusplus
 
@@ -68,11 +69,14 @@ class RuleWithOperator : public RuleWithActions {
     inline void getFinalVars(variables::Variables *vars,
         variables::Variables *eclusion, Transaction *trans);
 
-    bool executeOperatorAt(Transaction *trasn, const std::string &key,
-        std::string value);
+    bool executeOperatorAt(Transaction *transaction,
+        const std::string &key,
+        const bpstd::string_view &value);
 
-    static void updateMatchedVars(Transaction *trasn, const std::string &key,
-        const std::string &value);
+    static void updateMatchedVars(Transaction *transaction,
+        const std::string &key,
+        const bpstd::string_view &value);
+
     static void cleanMatchedVars(Transaction *trasn);
 
 
