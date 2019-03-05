@@ -24,8 +24,10 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Within::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &str, RuleMessage *ruleMessage) {
+bool Within::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     bool res = false;
     size_t pos = 0;
     std::string paramTarget(m_string->evaluate(transaction));
@@ -34,7 +36,7 @@ bool Within::evaluate(Transaction *transaction, RuleWithActions *rule,
         return true;
     }
 
-    pos = paramTarget.find(str);
+    pos = paramTarget.find(str.c_str());
     res = pos != std::string::npos;
     if (res) {
         logOffset(ruleMessage, pos, str.size());

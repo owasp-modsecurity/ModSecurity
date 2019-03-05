@@ -32,12 +32,13 @@ class ContainsWord : public Operator {
     explicit ContainsWord(std::unique_ptr<RunTimeString> param)
         : Operator("ContainsWord", std::move(param)) { }
 
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string &str,
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 
  private:
-    static bool acceptableChar(const std::string& a, size_t pos);
+    static bool acceptableChar(const bpstd::string_view &a, size_t pos);
 };
 
 }  // namespace operators
