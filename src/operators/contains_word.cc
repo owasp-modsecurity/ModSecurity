@@ -23,7 +23,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {
+bool ContainsWord::acceptableChar(const bpstd::string_view &a, size_t pos) {
     if (a.size() - 1 < pos) {
         return false;
     }
@@ -36,37 +36,40 @@ bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {
     return true;
 }
 
-bool ContainsWord::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &str, RuleMessage *ruleMessage) {
+bool ContainsWord::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &inputView,
+    RuleMessage *ruleMessage) {
     std::string paramTarget(m_string->evaluate(transaction));
+    std::string input = inputView.to_string();
 
     if (paramTarget.empty()) {
         return true;
     }
-    if (str.empty()) {
+    if (input.empty()) {
         return false;
     }
-    if (str == paramTarget) {
+    if (input == paramTarget) {
         return true;
     }
 
-    size_t pos = str.find(paramTarget);
+    size_t pos = input.find(paramTarget);
     while (pos != std::string::npos) {
-        if (pos == 0 && acceptableChar(str, paramTarget.size())) {
+        if (pos == 0 && acceptableChar(input, paramTarget.size())) {
             logOffset(ruleMessage, 0, paramTarget.size());
             return true;
         }
-        if (pos + paramTarget.size() == str.size() &&
-            acceptableChar(str, pos - 1)) {
+        if (pos + paramTarget.size() == input.size() &&
+            acceptableChar(input, pos - 1)) {
             logOffset(ruleMessage, pos, paramTarget.size());
             return true;
         }
-        if (acceptableChar(str, pos - 1) &&
-            acceptableChar(str, pos + paramTarget.size())) {
+        if (acceptableChar(input, pos - 1) &&
+            acceptableChar(input, pos + paramTarget.size())) {
             logOffset(ruleMessage, pos, paramTarget.size());
             return true;
         }
-        pos = str.find(paramTarget, pos + 1);
+        pos = input.find(paramTarget, pos + 1);
     }
 
     return false;

@@ -22,7 +22,10 @@
 namespace modsecurity {
 namespace operators {
 
-bool ValidateHash::evaluate(Transaction *transaction, const std::string &str) {
+bool ValidateHash::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     /**
      * @todo Implement the operator ValidateHash.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#validateHash
