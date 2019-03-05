@@ -23,6 +23,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/regex.h"
+#include "modsecurity/string_view.hpp"
 
 namespace modsecurity {
 
@@ -71,6 +72,29 @@ void AnchoredVariable::set(const std::string &a, size_t offset) {
     m_value.assign(a.c_str(), a.size());
     origin->m_offset = offset;
     origin->m_length = m_value.size();
+    m_var->addOrigin(std::move(origin));
+}
+
+
+void AnchoredVariable::set(const char *a, size_t offset) {
+    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+
+    m_offset = offset;
+    m_value.assign(a, strlen(a));
+    origin->m_offset = offset;
+    origin->m_length = m_value.size();
+    m_var->addOrigin(std::move(origin));
+}
+
+
+void AnchoredVariable::set(const bpstd::string_view &a, size_t offset) {
+    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+
+    m_offset = offset;
+    m_value.assign(a.c_str(), a.size());
+    origin->m_offset = offset;
+    origin->m_length = m_value.size();
+
     m_var->addOrigin(std::move(origin));
 }
 

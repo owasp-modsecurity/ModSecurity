@@ -31,7 +31,10 @@ class UnconditionalMatch : public Operator {
     UnconditionalMatch()
         : Operator("UnconditionalMatch") { }
 
-    bool evaluate(Transaction *transaction, const std::string &exp) override;
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 };
 
 }  // namespace operators

@@ -84,8 +84,10 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
 }
 
 
-bool Pm::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &input, RuleMessage *ruleMessage) {
+bool Pm::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     int rc = -1;
     ACMPT pt;
     pt.parser = m_p;
@@ -94,7 +96,7 @@ bool Pm::evaluate(Transaction *transaction, RuleWithActions *rule,
 #ifdef MODSEC_MUTEX_ON_PM
     pthread_mutex_lock(&m_lock);
 #endif
-    rc = acmp_process_quick(&pt, &match, input.c_str(), input.length());
+    rc = acmp_process_quick(&pt, &match, str.c_str(), str.length());
 #ifdef MODSEC_MUTEX_ON_PM
     pthread_mutex_unlock(&m_lock);
 #endif

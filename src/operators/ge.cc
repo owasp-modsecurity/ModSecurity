@@ -23,11 +23,13 @@
 namespace modsecurity {
 namespace operators {
 
-bool Ge::evaluate(Transaction *transaction, const std::string &input) {
+bool Ge::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     std::string p(m_string->evaluate(transaction));
-    std::string i = input;
 
-    bool ge = atoll(i.c_str()) >= atoll(p.c_str());
+    bool ge = atoll(str.c_str()) >= atoll(p.c_str());
 
     return ge;
 }

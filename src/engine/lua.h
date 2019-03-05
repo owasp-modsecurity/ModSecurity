@@ -69,7 +69,7 @@ class Lua {
     Lua() { }
 
     bool load(std::string script, std::string *err);
-    int run(Transaction *t, const std::string &str="");
+    int run(Transaction *t, const std::string &str_param = "");
     static bool isCompatible(std::string script, Lua *l, std::string *error);
 
 #ifdef WITH_LUA

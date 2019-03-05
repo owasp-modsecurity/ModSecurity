@@ -41,6 +41,7 @@
 #include "src/actions/block.h"
 #include "src/variables/variable.h"
 #include "src/rule_with_operator.h"
+#include "modsecurity/string_view.hpp"
 
 
 namespace modsecurity {
@@ -79,8 +80,9 @@ RuleWithOperator::~RuleWithOperator() {
 }
 
 
-inline void RuleWithOperator::updateMatchedVars(Transaction *trans, const std::string &key,
-    const std::string &value) {
+inline void RuleWithOperator::updateMatchedVars(Transaction *trans,
+    const std::string &key,
+    const bpstd::string_view &value) {
     ms_dbg_a(trans, 9, "Matched vars updated.");
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
     trans->m_variableMatchedVarName.set(key, trans->m_variableOffset);
@@ -99,8 +101,9 @@ inline void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
 }
 
 
-bool RuleWithOperator::executeOperatorAt(Transaction *trans, std::string key,
-    std::string value) {
+bool RuleWithOperator::executeOperatorAt(Transaction *trans,
+    const std::string &key,
+    const bpstd::string_view &value) {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
     clock_t end;
@@ -108,15 +111,13 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, std::string key,
 #endif
     bool ret;
 
-    ms_dbg_a(trans, 9, "Target value: \"" + utils::string::limitTo(80,
-        utils::string::toHexIfNeeded(value)) \
+    ms_dbg_a(trans, 9, "Target value: \"" \
+        + utils::string::limitTo(80,
+            utils::string::toHexIfNeeded(value.to_string())) \
         + "\" (Variable: " + key + ")");
 
-    ret = this->m_operator->evaluateInternal(trans, this, value, trans->messageGetLast());
 
-    if (ret == false) {
-        return false;
-    }
+    ret = m_operator->evaluateInternal(trans, this, value, trans->messageGetLast());
 
 #if MSC_EXEC_CLOCK_ENABLED
     end = clock();
@@ -312,10 +313,9 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
             while (iter != transformationsResults.end()) {
                 bool ret;
                 auto &valueTemp = *iter;
-                // FIXME: this copy is not necessary.                
-                std::string *valueAfterTrans = new std::string(valueTemp.getAfter()->c_str(), valueTemp.getAfter()->size());
+                bpstd::string_view view = *valueTemp.getAfter();
 
-                ret = executeOperatorAt(trans, key, *valueAfterTrans);
+                ret = executeOperatorAt(trans, key, view);
 
                 if (ret == true) {
                     trans->messageGetLast()->m_match = m_operator->resolveMatchMessage(trans,
@@ -338,14 +338,14 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
                         iter2++;
                     }
 
-                    updateMatchedVars(trans, v->getKeyWithCollection(), *valueAfterTrans);
+                    updateMatchedVars(trans, v->getKeyWithCollection(), view);
                     executeActionsIndependentOfChainedRuleResult(trans);
 
                     performLogging(trans, false);
 
                     globalRet = true;
                 }
-                delete valueAfterTrans;
+
                 iter++;
             }
             delete v;

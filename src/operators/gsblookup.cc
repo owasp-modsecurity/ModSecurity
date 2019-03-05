@@ -23,7 +23,10 @@ namespace modsecurity {
 namespace operators {
 
 
-bool GsbLookup::evaluate(Transaction *transaction, const std::string &str) {
+bool GsbLookup::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     /**
      * @todo Implement the operator GeoLookup.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#gsblookup

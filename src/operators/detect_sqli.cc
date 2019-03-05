@@ -27,30 +27,32 @@ namespace modsecurity {
 namespace operators {
 
 
-bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
-    const std::string& input, RuleMessage *ruleMessage) {
+bool DetectSQLi::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage *ruleMessage) {
     char fingerprint[8];
     int issqli;
 
     issqli = libinjection_sqli(input.c_str(), input.length(), fingerprint);
 
     if (issqli) {
-        if (t) {
-            t->m_matched.push_back(fingerprint);
-            ms_dbg_a(t, 4, "detected SQLi using libinjection with " \
+        if (transaction) {
+            transaction->m_matched.push_back(fingerprint);
+            ms_dbg_a(transaction, 4, "detected SQLi using libinjection with " \
                 "fingerprint '" + std::string(fingerprint) + "' at: '" +
-                input + "'");
-            if (rule && t && rule->hasCaptureAction()) {
-                t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                input.to_string() + "'");
+            if (rule && transaction && rule->hasCaptureAction()) {
+                transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                     "0", std::string(fingerprint));
-                ms_dbg_a(t, 7, "Added DetectSQLi match TX.0: " + \
+                ms_dbg_a(transaction, 7, "Added DetectSQLi match TX.0: " + \
                     std::string(fingerprint));
                 }
         }
     } else {
-        if (t) {
-            ms_dbg_a(t, 9, "detected SQLi: not able to find an " \
-                "inject on '" + input + "'");
+        if (transaction) {
+            ms_dbg_a(transaction, 9, "detected SQLi: not able to find an " \
+                "inject on '" + input.to_string() + "'");
         }
     }
 

@@ -21,10 +21,12 @@
 namespace modsecurity {
 namespace operators {
 
-bool Contains::evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string &input, RuleMessage *ruleMessage) {
+bool Contains::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage *ruleMessage) {
     std::string p(m_string->evaluate(transaction));
-    size_t offset = input.find(p);
+    size_t offset = input.to_string().find(p);
 
     bool contains = offset != std::string::npos;
 

@@ -29,8 +29,9 @@ class VerifySVNR : public Operator {
         delete m_re;
     }
 
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string& input,
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 
     int convert_to_int(const char c);

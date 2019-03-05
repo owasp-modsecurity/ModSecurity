@@ -23,7 +23,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {
+bool ContainsWord::acceptableChar(const bpstd::string_view &a, size_t pos) {
     if (a.size() - 1 < pos) {
         return false;
     }
@@ -36,9 +36,12 @@ bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {
     return true;
 }
 
-bool ContainsWord::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &input, RuleMessage *ruleMessage) {
+bool ContainsWord::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &inputView,
+    RuleMessage *ruleMessage) {
     std::string paramTarget(m_string->evaluate(transaction));
+    std::string input = inputView.to_string();
 
     if (paramTarget.empty()) {
         return true;

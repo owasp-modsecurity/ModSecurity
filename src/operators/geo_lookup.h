@@ -29,10 +29,14 @@ class GeoLookup : public Operator {
     /** @ingroup ModSecurity_Operator */
     GeoLookup()
         : Operator("GeoLookup") { }
-    bool evaluate(Transaction *transaction, const std::string &exp) override;
+
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 
  protected:
-    bool debug(Transaction *transaction, int x, std::string a);
+    bool debug(Transaction *transaction, int x, const bpstd::string_view &str);
 };
 
 }  // namespace operators

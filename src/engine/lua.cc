@@ -412,6 +412,7 @@ int Lua::setvar(lua_State *L) {
 std::string Lua::applyTransformations(lua_State *L, Transaction *t,
     int idx, std::string var) {
     std::string newVar = var;
+    ModSecStackString::allocator_type::arena_type ss;
 
     if (lua_isuserdata(L, idx) || lua_isnoneornil(L, idx)) {
         return var;
@@ -440,17 +441,17 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
                     "t:" + std::string(name));
             // FIXME: transformation is not yet returning null.
             if (tfn) {
-                ModSecStackString in{t->m_transformationStackAllocator};
-                ModSecStackString out{t->m_transformationStackAllocator};
+                ModSecStackString in{ss};
+                ModSecStackString out{ss};
                 in.assign(newVar.c_str(), newVar.size());
                 tfn->execute(t, in, out);
                 newVar.assign(out.c_str(), out.size());
+                delete tfn;
             } else {
                 ms_dbg_a(t, 1,
                     "SecRuleScript: Invalid transformation function: " \
                     + std::string(name));
             }
-            delete tfn;
         }
 
         return newVar;
@@ -466,8 +467,8 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
 
         // FIXME: transformation is not yet returning null.
         if (tfn) {
-            ModSecStackString in{t->m_transformationStackAllocator};
-            ModSecStackString out{t->m_transformationStackAllocator};
+            ModSecStackString in{ss};
+            ModSecStackString out{ss};
             in.assign(newVar.c_str(), newVar.size());
             tfn->execute(t, in, out);
             newVar.assign(out.c_str(), out.size());

@@ -293,7 +293,7 @@ void RuleWithActions::executeTransformations(
     TransformationsResults &results) {
     int none = 0;
 
-    ModSecStackString ssin{trans->m_transformationStackAllocator};
+    ModSecStackString ssin{results.m_stackAllocator};
     ssin.assign(in.c_str(), in.size());
     results.push_back(TransformationResult(ssin));
 
@@ -390,7 +390,7 @@ inline void RuleWithActions::executeTransformation(
     TransformationsResults *ret,
     Transformation *transformation) {
 
-    ModSecStackString out{transaction->m_transformationStackAllocator};
+    ModSecStackString out{ret->m_stackAllocator};
     transformation->execute(transaction, in, out);
 
     ms_dbg_a(transaction, 9, " T (" + std::to_string(ret->size() - 1) + ") " + \
