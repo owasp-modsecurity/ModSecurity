@@ -70,30 +70,8 @@ namespace operators {
 
 
 bool Operator::evaluateInternal(Transaction *transaction,
-    RuleWithActions *rule, const std::string& a, RuleMessage *rm) {
+    RuleWithActions *rule, const bpstd::string_view &a, RuleMessage *rm) {
     bool res = evaluate(transaction, rule, a, rm);
-
-    if (m_negation) {
-        return !res;
-    }
-
-    return res;
-}
-
-bool Operator::evaluateInternal(Transaction *transaction,
-    RuleWithActions *rule, const std::string& a) {
-    bool res = evaluate(transaction, rule, a);
-
-    if (m_negation) {
-        return !res;
-    }
-
-    return res;
-}
-
-bool Operator::evaluateInternal(Transaction *transaction,
-    const std::string& a) {
-    bool res = evaluate(transaction, a);
 
     if (m_negation) {
         return !res;
@@ -131,7 +109,10 @@ std::string Operator::resolveMatchMessage(Transaction *t,
 }
 
 
-bool Operator::evaluate(Transaction *transaction, const std::string& a) {
+bool Operator::evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) {
     ms_dbg_a(transaction, 2, "Operator: " + m_op + \
         " is not implemented or malfunctioning.");
     return true;
