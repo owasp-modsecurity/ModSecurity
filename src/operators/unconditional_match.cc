@@ -19,7 +19,9 @@ namespace modsecurity {
 namespace operators {
 
 bool UnconditionalMatch::evaluate(Transaction *transaction,
-    const std::string &input) {
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     return true;
 }
 

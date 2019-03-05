@@ -20,7 +20,10 @@
 namespace modsecurity {
 namespace operators {
 
-bool NoMatch::evaluate(Transaction *transaction, const std::string &str) {
+bool NoMatch::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     return false;
 }
 
