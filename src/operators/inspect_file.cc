@@ -49,9 +49,12 @@ bool InspectFile::init(const std::string &param2, std::string *error) {
 }
 
 
-bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
+bool InspectFile::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     if (m_isScript) {
-        return m_lua.run(transaction, str);
+        return m_lua.run(transaction, str.c_str());
     } else {
         FILE *in;
         char buff[512];
@@ -61,7 +64,7 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
         openstr.append(m_param);
         openstr.append(" ");
-        openstr.append(str);
+        openstr.append(str.c_str());
         if (!(in = popen(openstr.c_str(), "r"))) {
             return false;
         }
