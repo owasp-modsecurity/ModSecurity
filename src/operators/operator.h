@@ -24,6 +24,7 @@
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
 #include "src/run_time_string.h"
+#include "modsecurity/string_view.hpp"
 
 namespace modsecurity {
 namespace operators {
@@ -107,25 +108,16 @@ class Operator {
         return true;
     }
 
-    virtual std::string resolveMatchMessage(Transaction *t,
-        std::string key, std::string value);
+    bool evaluateInternal(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view& a,
+        RuleMessage *ruleMessage);
 
-    bool evaluateInternal(Transaction *t, const std::string& a);
-    bool evaluateInternal(Transaction *t, RuleWithActions *rule,
-        const std::string& a);
-    bool evaluateInternal(Transaction *t, RuleWithActions *rule,
-        const std::string& a, RuleMessage *ruleMessage);
+    virtual bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &str,
+        RuleMessage *ruleMessage);
 
-
-    virtual bool evaluate(Transaction *transaction, const std::string &str);
-    virtual bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string &str) {
-        return evaluate(transaction, str);
-    }
-    virtual bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string &str, RuleMessage *ruleMessage) {
-        return evaluate(transaction, str);
-    }
 
     static void logOffset(RuleMessage *ruleMessage, int offset, int len) {
         if (ruleMessage) {
@@ -134,6 +126,10 @@ class Operator {
                 + std::to_string(len));
         }
     }
+
+    virtual std::string resolveMatchMessage(Transaction *t,
+        std::string key, std::string value);
+
 
     std::string m_match_message;
     bool m_negation;

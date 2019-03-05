@@ -46,8 +46,9 @@ class VerifySSN : public Operator {
     bool operator=(const VerifySSN &a) = delete;
     VerifySSN(const VerifySSN &a) = delete;
 
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string& input,
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 
 
