@@ -444,12 +444,12 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
                 in.assign(newVar.c_str(), newVar.size());
                 tfn->execute(t, in, out);
                 newVar.assign(out.c_str(), out.size());
+                delete tfn;
             } else {
                 ms_dbg_a(t, 1,
                     "SecRuleScript: Invalid transformation function: " \
                     + std::string(name));
             }
-            delete tfn;
         }
 
         return newVar;

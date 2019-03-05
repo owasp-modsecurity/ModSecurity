@@ -27,9 +27,12 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
+
+#include "modsecurity/string_view.hpp"
 #endif
 
 #include "modsecurity/variable_value.h"
+
 
 #ifndef HEADERS_MODSECURITY_ANCHORED_SET_VARIABLE_H_
 #define HEADERS_MODSECURITY_ANCHORED_SET_VARIABLE_H_
@@ -77,6 +80,12 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
     void unset();
 
     void set(const std::string &key, const std::string &value,
+        size_t offset);
+
+    void set(const std::string &key, const bpstd::string_view &value,
+        size_t offset);
+
+    void set(const std::string &key, const char *value,
         size_t offset);
 
     void set(const std::string &key, const std::string &value,

@@ -20,6 +20,12 @@
 
 
 //
+// 3rd party string view
+//
+*:headers/modsecurity/string_view.hpp
+
+
+//
 // Code imported from ModSecurity v2...
 //
 shiftNegative:src/utils/msc_tree.cc
@@ -30,11 +36,10 @@ invalidScanfArgType_int:src/rules_set_properties.cc:102
 redundantAssignment:src/operators/pm.cc:94
 
 
-
 // 
 // ModSecurity v3 code...
 // 
-unmatchedSuppression:src/utils/geo_lookup.cc:82
+functionStatic:src/operators/geo_lookup.h:39
 useInitializationList:src/utils/shared_files.h:87
 unmatchedSuppression:src/utils/msc_tree.cc
 functionStatic:headers/modsecurity/transaction.h:452
@@ -53,8 +58,8 @@ duplicateBranch:src/request_body_processor/multipart.cc:91
 syntaxError:src/transaction.cc:62
 noConstructor:src/variables/variable.h:152
 duplicateBranch:src/request_body_processor/multipart.cc:93
-knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
-knownConditionTrueFalse:src/operators/verify_svnr.cc:88
+knownConditionTrueFalse:src/operators/validate_url_encoding.cc:79
+knownConditionTrueFalse:src/operators/verify_svnr.cc:90
 noConstructor:src/actions/rule_id.h:33
 functionStatic:src/actions/rule_id.h:35
 
