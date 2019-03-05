@@ -23,7 +23,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
+bool ValidateByteRange::getRange(const bpstd::string_view &rangeRepresentation,
     std::string *error) {
     size_t pos = rangeRepresentation.find_first_of("-");
     int start;
@@ -31,9 +31,10 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
 
     if (pos == std::string::npos) {
         try {
-            start = std::stoi(rangeRepresentation);
+            start = std::stoi(rangeRepresentation.c_str());
         } catch(...) {
-            error->assign("Not able to convert '" + rangeRepresentation +
+            error->assign("Not able to convert '" + \
+                rangeRepresentation.to_string() +
                 "' into a number");
             return false;
         }
@@ -42,19 +43,19 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
     }
 
     try {
-        start = std::stoi(std::string(rangeRepresentation, 0, pos));
+        start = std::stoi(std::string(rangeRepresentation.c_str(), 0, pos));
     } catch (...) {
         error->assign("Not able to convert '" +
-            std::string(rangeRepresentation, 0, pos) +
+            std::string(rangeRepresentation.c_str(), 0, pos) +
             "' into a number");
         return false;
     }
 
     try {
-        end = std::stoi(std::string(rangeRepresentation, pos + 1,
+        end = std::stoi(std::string(rangeRepresentation.c_str(), pos + 1,
             rangeRepresentation.length() - (pos + 1)));
     } catch (...) {
-        error->assign("Not able to convert '" + std::string(rangeRepresentation,
+        error->assign("Not able to convert '" + std::string(rangeRepresentation.c_str(),
             pos + 1, rangeRepresentation.length() - (pos + 1)) +
             "' into a number");
         return false;
@@ -110,16 +111,18 @@ bool ValidateByteRange::init(const std::string &file,
 }
 
 
-bool ValidateByteRange::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &input, RuleMessage *ruleMessage) {
+bool ValidateByteRange::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     bool ret = true;
 
     size_t count = 0;
-    for (int i = 0; i < input.length(); i++) {
-        int x = (unsigned char) input.at(i);
+    for (int i = 0; i < str.length(); i++) {
+        int x = (unsigned char) str.at(i);
         if (!(table[x >> 3] & (1 << (x & 0x7)))) {
             // debug(9, "Value " + std::to_string(x) + " in " +
-            //     input + " ouside range: " + param);
+            //     str + " ouside range: " + param);
             logOffset(ruleMessage, i, 1);
             count++;
         }

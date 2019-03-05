@@ -44,9 +44,12 @@ class FuzzyHash : public Operator {
         m_head(NULL) { }
     ~FuzzyHash();
 
-    bool evaluate(Transaction *transaction, const std::string &std) override;
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 
-    bool init(const std::string &param, std::string *error) override;
+    bool init(const std::string &file, std::string *error) override;
  private:
     int m_threshold;
     struct fuzzy_hash_chunk *m_head;

@@ -58,7 +58,11 @@ class ValidateSchema : public Operator {
         }
     }
 
-    bool evaluate(Transaction *transaction, const std::string  &str) override;
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
+
     bool init(const std::string &file, std::string *error) override;
 
 

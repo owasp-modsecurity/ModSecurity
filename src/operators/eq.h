@@ -31,7 +31,11 @@ class Eq : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit Eq(std::unique_ptr<RunTimeString> param)
         : Operator("Eq", std::move(param)) { }
-    bool evaluate(Transaction *transaction, const std::string &input) override;
+
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 };
 
 }  // namespace operators

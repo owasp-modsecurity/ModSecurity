@@ -24,7 +24,10 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Eq::evaluate(Transaction *transaction, const std::string &input) {
+bool Eq::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage *ruleMessage) {
     int p = 0;
     int i = 0;
     std::string pt(m_string->evaluate(transaction));
@@ -35,7 +38,7 @@ bool Eq::evaluate(Transaction *transaction, const std::string &input) {
         p = 0;
     }
     try {
-        i = std::stoi(input);
+        i = std::stoi(input.c_str());
     } catch (...) {
         i = 0;
     }

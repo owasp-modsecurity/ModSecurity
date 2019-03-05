@@ -113,8 +113,10 @@ int ValidateUtf8Encoding::detect_utf8_character(
     return unicode_len;
 }
 
-bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &str, RuleMessage *ruleMessage) {
+bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     unsigned int i, bytes_left;
 
     const char *str_c = str.c_str();
@@ -128,7 +130,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Invalid UTF-8 encoding: "
                         "not enough bytes in character "
-                        "at " + str + ". [offset \"" +
+                        "at " + str.to_string() + ". [offset \"" +
                         std::to_string(i) + "\"]");
                 }
                 return true;
@@ -137,7 +139,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Invalid UTF-8 encoding: "
                         "invalid byte value in character "
-                        "at " + str + ". [offset \"" +
+                        "at " + str.to_string() + ". [offset \"" +
                         std::to_string(i) + "\"]");
                     logOffset(ruleMessage, i, str.size());
                 }
@@ -147,7 +149,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Invalid UTF-8 encoding: "
                         "overlong character detected "
-                        "at " + str + ". [offset \"" +
+                        "at " + str.to_string() + ". [offset \"" +
                         std::to_string(i) + "\"]");
                     logOffset(ruleMessage, i, str.size());
                 }
@@ -157,7 +159,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Invalid UTF-8 encoding: "
                         "use of restricted character "
-                        "at " + str + ". [offset \"" +
+                        "at " + str.to_string() + ". [offset \"" +
                         std::to_string(i) + "\"]");
                     logOffset(ruleMessage, i, str.size());
                 }
@@ -166,7 +168,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
             case UNICODE_ERROR_DECODING_ERROR :
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Error validating UTF-8 decoding "
-                        "at " + str + ". [offset \"" +
+                        "at " + str.to_string() + ". [offset \"" +
                         std::to_string(i) + "\"]");
                     logOffset(ruleMessage, i, str.size());
                 }
@@ -177,7 +179,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
         if (rc <= 0) {
             if (transaction) {
                 ms_dbg_a(transaction, 8, "Internal error during UTF-8 validation "
-                    "at " + str + ". [offset \"" +
+                    "at " + str.to_string() + ". [offset \"" +
                     std::to_string(i) + "\"]");
                 logOffset(ruleMessage, i, str.size());
             }

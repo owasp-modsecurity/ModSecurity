@@ -23,16 +23,18 @@ namespace modsecurity {
 namespace operators {
 
 
-bool EndsWith::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &str, RuleMessage *ruleMessage) {
+bool EndsWith::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage *ruleMessage) {
     bool ret = false;
     std::string p(m_string->evaluate(transaction));
 
-    if (str.length() >= p.length()) {
-        ret = (0 == str.compare(str.length() - p.length(),
+    if (input.length() >= p.length()) {
+        ret = (0 == input.compare(input.length() - p.length(),
             p.length(), p));
         if (ret) {
-            logOffset(ruleMessage, str.length() - p.length(),
+            logOffset(ruleMessage, input.length() - p.length(),
                       p.size());
         }
     }

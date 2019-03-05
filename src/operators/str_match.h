@@ -34,7 +34,10 @@ class StrMatch : public Operator {
             m_couldContainsMacro = true;
         }
 
-    bool evaluate(Transaction *transaction, const std::string &input) override;
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 };
 
 }  // namespace operators

@@ -68,8 +68,10 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
 }
 
 
-bool ValidateUrlEncoding::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &input, RuleMessage *ruleMessage) {
+bool ValidateUrlEncoding::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage *ruleMessage) {
     size_t offset = 0;
     bool res = false;
 
@@ -82,14 +84,15 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction, RuleWithActions *ru
         case 1 :
             /* Encoding is valid */
             if (transaction) {
-                ms_dbg_a(transaction, 7, "Valid URL Encoding at '" +input + "'");
+                ms_dbg_a(transaction, 7, "Valid URL Encoding at '" + \
+                input.to_string() + "'");
             }
             res = false;
             break;
         case -2 :
             if (transaction) {
                 ms_dbg_a(transaction, 7, "Invalid URL Encoding: Non-hexadecimal "
-                    "digits used at '" + input + "'");
+                    "digits used at '" + input.to_string() + "'");
                 logOffset(ruleMessage, offset, input.size());
             }
             res = true; /* Invalid match. */
@@ -97,7 +100,7 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction, RuleWithActions *ru
         case -3 :
             if (transaction) {
                 ms_dbg_a(transaction, 7, "Invalid URL Encoding: Not enough " \
-                "characters at the end of input at '" + input + "'");
+                "characters at the end of input at '" + input.to_string() + "'");
                 logOffset(ruleMessage, offset, input.size());
             }
             res = true; /* Invalid match. */
@@ -107,7 +110,7 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction, RuleWithActions *ru
             if (transaction) {
                 ms_dbg_a(transaction, 7, "Invalid URL Encoding: Internal " \
                     "Error (rc = " + std::to_string(rc) + ") at '" +
-                    input + "'");
+                    input.to_string() + "'");
                 logOffset(ruleMessage, offset, input.size());
             }
             res = true;

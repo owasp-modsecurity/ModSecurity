@@ -119,8 +119,10 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
 }
 
 
-bool VerifyCC::evaluate(Transaction *t, RuleWithActions *rule,
-    const std::string& i, RuleMessage *ruleMessage) {
+bool VerifyCC::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &i,
+    RuleMessage *ruleMessage) {
     int offset = 0;
     int target_length = i.length();
 
@@ -139,18 +141,18 @@ bool VerifyCC::evaluate(Transaction *t, RuleWithActions *rule,
             return false;
         }
         if (ret > 0) {
-            match = std::string(i, ovector[0], ovector[1] - ovector[0]);
+            match = std::string(i.to_string(), ovector[0], ovector[1] - ovector[0]);
             int is_cc = luhnVerify(match.c_str(), match.size());
             if (is_cc) {
-                if (t) {
+                if (transaction) {
                     if (rule && rule->hasCaptureAction()) {
-                        t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                        transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                             "0", std::string(match));
-                        ms_dbg_a(t, 7, "Added VerifyCC match TX.0: " + \
+                        ms_dbg_a(transaction, 7, "Added VerifyCC match TX.0: " + \
                             std::string(match));
                     }
-                    ms_dbg_a(t, 9, "CC# match \"" + m_param +
-                        "\" at " + i + ". [offset " +
+                    ms_dbg_a(transaction, 9, "CC# match \"" + m_param +
+                        "\" at " + i.to_string() + ". [offset " +
                         std::to_string(offset) + "]");
                 }
                 return true;

@@ -24,9 +24,12 @@ namespace modsecurity {
 namespace operators {
 
 
-bool StrMatch::evaluate(Transaction *transaction, const std::string &input) {
+bool StrMatch::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     std::string p(m_string->evaluate(transaction));
-    bool ret = input.find(p) != std::string::npos;
+    bool ret = str.find(p) != std::string::npos;
 
     return ret;
 }

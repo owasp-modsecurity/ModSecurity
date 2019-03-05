@@ -50,7 +50,7 @@ class RxGlobal : public Operator {
     }
 
     bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string& input,
+        const bpstd::string_view& input,
         RuleMessage *ruleMessage) override;
 
     bool init(const std::string &arg, std::string *error) override;

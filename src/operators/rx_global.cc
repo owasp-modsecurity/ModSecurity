@@ -37,7 +37,7 @@ bool RxGlobal::init(const std::string &arg, std::string *error) {
 
 
 bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string& input, RuleMessage *ruleMessage) {
+    const bpstd::string_view& input, RuleMessage *ruleMessage) {
     Regex *re;
 
     if (m_param.empty() && !m_string->m_containsMacro) {
@@ -52,7 +52,7 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
     }
 
     std::vector<Utils::SMatchCapture> captures;
-    re->searchGlobal(input, captures);
+    re->searchGlobal(input.c_str(), captures);
 
     if (rule && rule->hasCaptureAction() && transaction) {
         for (const Utils::SMatchCapture& capture : captures) {

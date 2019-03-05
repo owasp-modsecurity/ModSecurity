@@ -29,7 +29,7 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Rx::init(const std::string &arg, std::string *error) {
+bool Rx::init(const std::string &file, std::string *error) {
     if (m_string->m_containsMacro == false) {
         m_re = new Regex(m_param);
     }
@@ -38,8 +38,10 @@ bool Rx::init(const std::string &arg, std::string *error) {
 }
 
 
-bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string& input, RuleMessage *ruleMessage) {
+bool Rx::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage *ruleMessage) {
     Regex *re;
 
     if (m_param.empty() && !m_string->m_containsMacro) {
@@ -54,8 +56,8 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     }
 
     std::vector<Utils::SMatchCapture> captures;
-    re->searchOneMatch(input, captures);
-
+    // FIXME: searchOneMatch should accept string_view.
+    re->searchOneMatch(input.c_str(), captures);
     if (rule && rule->hasCaptureAction() && transaction) {
         for (const Utils::SMatchCapture& capture : captures) {
             const std::string capture_substring(input.substr(capture.m_offset,capture.m_length));

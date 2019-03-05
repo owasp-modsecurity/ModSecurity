@@ -26,9 +26,13 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include <cstring>
+
+#include "modsecurity/string_view.hpp"
 #endif
 
 #include "modsecurity/variable_value.h"
+
 
 #ifndef HEADERS_MODSECURITY_ANCHORED_VARIABLE_H_
 #define HEADERS_MODSECURITY_ANCHORED_VARIABLE_H_
@@ -59,6 +63,8 @@ class AnchoredVariable {
 
     void unset();
     void set(const std::string &a, size_t offset);
+    void set(const bpstd::string_view &a, size_t offset);
+    void set(const char *a, size_t offset);
     void set(const std::string &a, size_t offset, size_t offsetLen);
     void append(const std::string &a, size_t offset,
         bool spaceSeparator = false);

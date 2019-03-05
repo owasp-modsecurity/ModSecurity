@@ -32,7 +32,10 @@ class NoMatch : public Operator {
     NoMatch()
         : Operator("NoMatch") { }
 
-    bool evaluate(Transaction *transaction, const std::string &str) override;
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 };
 
 }  // namespace operators

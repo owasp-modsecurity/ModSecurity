@@ -33,8 +33,10 @@ class EndsWith : public Operator {
         : Operator("EndsWith", std::move(param)) {
             m_couldContainsMacro = true;
         }
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string &str,
+
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 };
 

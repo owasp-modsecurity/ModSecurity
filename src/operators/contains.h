@@ -33,9 +33,11 @@ class Contains : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit Contains(std::unique_ptr<RunTimeString> param)
-        : Operator("Contains", std::move(param)) { }
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string &str,
+        : Operator("Contains", std::move(param)) { };
+
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 };
 

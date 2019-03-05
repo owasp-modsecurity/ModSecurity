@@ -49,11 +49,12 @@ class Rx : public Operator {
         }
     }
 
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
-        const std::string& input,
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 
-    bool init(const std::string &arg, std::string *error) override;
+    bool init(const std::string &file, std::string *error) override;
 
  private:
     Regex *m_re;
