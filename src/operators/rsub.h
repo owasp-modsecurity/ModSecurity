@@ -32,7 +32,11 @@ class Rsub : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit Rsub(std::unique_ptr<RunTimeString> param)
         : Operator("Rsub", std::move(param)) { }
-    bool evaluate(Transaction *transaction, const std::string  &str) override;
+
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 };
 
 

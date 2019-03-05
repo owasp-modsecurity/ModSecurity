@@ -23,8 +23,10 @@ namespace modsecurity {
 namespace operators {
 
 
-bool EndsWith::evaluate(Transaction *transaction, RuleWithActions *rule,
-    const std::string &input, RuleMessage *ruleMessage) {
+bool EndsWith::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage *ruleMessage) {
     bool ret = false;
     std::string p(m_string->evaluate(transaction));
 

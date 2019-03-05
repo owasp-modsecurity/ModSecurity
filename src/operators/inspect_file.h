@@ -35,8 +35,13 @@ class InspectFile : public Operator {
         m_file(""),
         m_isScript(false) { }
 
-    bool init(const std::string &param, std::string *error) override;
-    bool evaluate(Transaction *transaction, const std::string &str) override;
+    bool init(const std::string &file, std::string *error) override;
+
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
+
  private:
     std::string m_file;
     bool m_isScript;

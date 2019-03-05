@@ -43,25 +43,28 @@ bool ValidateDTD::init(const std::string &file, std::string *error) {
 }
 
 
-bool ValidateDTD::evaluate(Transaction *t, const std::string &str) {
+bool ValidateDTD::evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) {
     xmlValidCtxtPtr cvp;
 
     m_dtd = xmlParseDTD(NULL, (const xmlChar *)m_resource.c_str());
     if (m_dtd == NULL) {
         std::string err = std::string("XML: Failed to load DTD: ") \
             + m_resource;
-        ms_dbg_a(t, 4, err);
+        ms_dbg_a(transaction, 4, err);
         return true;
     }
 
-    if (t->m_xml->m_data.doc == NULL) {
-        ms_dbg_a(t, 4, "XML document tree could not "\
+    if (transaction->m_xml->m_data.doc == NULL) {
+        ms_dbg_a(transaction, 4, "XML document tree could not "\
             "be found for DTD validation.");
         return true;
     }
 
-    if (t->m_xml->m_data.well_formed != 1) {
-        ms_dbg_a(t, 4, "XML: DTD validation failed because " \
+    if (transaction->m_xml->m_data.well_formed != 1) {
+        ms_dbg_a(transaction, 4, "XML: DTD validation failed because " \
             "content is not well formed.");
         return true;
     }
@@ -78,22 +81,23 @@ bool ValidateDTD::evaluate(Transaction *t, const std::string &str) {
 
     cvp = xmlNewValidCtxt();
     if (cvp == NULL) {
-        ms_dbg_a(t, 4, "XML: Failed to create a validation context.");
+        ms_dbg_a(transaction, 4,
+            "XML: Failed to create a validation context.");
         return true;
     }
 
     /* Send validator errors/warnings to msr_log */
     cvp->error = (xmlSchemaValidityErrorFunc)error_runtime;
     cvp->warning = (xmlSchemaValidityErrorFunc)warn_runtime;
-    cvp->userData = t;
+    cvp->userData = transaction;
 
-    if (!xmlValidateDtd(cvp, t->m_xml->m_data.doc, m_dtd)) {
-        ms_dbg_a(t, 4, "XML: DTD validation failed.");
+    if (!xmlValidateDtd(cvp, transaction->m_xml->m_data.doc, m_dtd)) {
+        ms_dbg_a(transaction, 4, "XML: DTD validation failed.");
         xmlFreeValidCtxt(cvp);
         return true;
     }
 
-    ms_dbg_a(t, 4, std::string("XML: Successfully validated " \
+    ms_dbg_a(transaction, 4, std::string("XML: Successfully validated " \
         "payload against DTD: ") + m_resource);
 
     xmlFreeValidCtxt(cvp);

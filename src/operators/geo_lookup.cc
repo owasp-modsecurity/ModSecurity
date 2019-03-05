@@ -33,22 +33,25 @@
 namespace modsecurity {
 namespace operators {
 
-bool GeoLookup::debug(Transaction *transaction, int x, std::string a) {
-    ms_dbg_a(transaction, x, a);
+bool GeoLookup::debug(Transaction *transaction, int x, const bpstd::string_view &a) {
+    ms_dbg_a(transaction, x, a.c_str());
     return true;
 }
 
 
-bool GeoLookup::evaluate(Transaction *trans, const std::string &exp) {
+bool GeoLookup::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &str,
+    RuleMessage *ruleMessage) {
     using std::placeholders::_1;
     using std::placeholders::_2;
     bool ret = true;
 
-    if (trans) {
-        ret = Utils::GeoLookup::getInstance().lookup(exp, trans,
-            std::bind(&GeoLookup::debug, this, trans, _1, _2));
+    if (transaction) {
+        ret = Utils::GeoLookup::getInstance().lookup(str.c_str(), transaction,
+            std::bind(&GeoLookup::debug, this, transaction, _1, _2));
     } else {
-        ret = Utils::GeoLookup::getInstance().lookup(exp, NULL,
+        ret = Utils::GeoLookup::getInstance().lookup(str.c_str(), NULL,
             nullptr);
     }
 

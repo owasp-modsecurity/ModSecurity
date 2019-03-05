@@ -34,7 +34,10 @@ class StrEq : public Operator {
     explicit StrEq(std::unique_ptr<RunTimeString> param)
         : Operator("StrEq", std::move(param)) { }
 
-    bool evaluate(Transaction *transaction, const std::string &str) override;
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) override;
 };
 
 }  // namespace operators

@@ -119,8 +119,10 @@ bool VerifyCPF::verify(const char *cpfnumber, int len) {
 }
 
 
-bool VerifyCPF::evaluate(Transaction *t, RuleWithActions *rule,
-    const std::string& input, RuleMessage *ruleMessage) {
+bool VerifyCPF::evaluate(Transaction *transaction,
+    RuleWithActions *rule,
+    const bpstd::string_view &input,
+    RuleMessage *ruleMessage) {
     std::list<SMatch> matches;
     bool is_cpf = false;
     int i;
@@ -130,15 +132,15 @@ bool VerifyCPF::evaluate(Transaction *t, RuleWithActions *rule,
     }
 
     for (i = 0; i < input.size() - 1 && is_cpf == false; i++) {
-        matches = m_re->searchAll(input.substr(i, input.size()));
+        matches = m_re->searchAll(input.substr(i, input.size()).to_string());
         for (const auto & i : matches) {
             is_cpf = verify(i.str().c_str(), i.str().size());
             if (is_cpf) {
                 logOffset(ruleMessage, i.offset(), i.str().size());
-                if (rule && t && rule->hasCaptureAction()) {
-                    t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                if (rule && transaction && rule->hasCaptureAction()) {
+                    transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", i.str());
-                    ms_dbg_a(t, 7, "Added VerifyCPF match TX.0: " + \
+                    ms_dbg_a(transaction, 7, "Added VerifyCPF match TX.0: " + \
                         i.str());
                 }
 

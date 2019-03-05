@@ -23,7 +23,10 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Rsub::evaluate(Transaction *transaction, const std::string &str) {
+bool Rsub::evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        const bpstd::string_view &input,
+        RuleMessage *ruleMessage) {
     /**
      * @todo Implement the operator Rsub.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#rsub

@@ -72,7 +72,12 @@ class TransformationResult {
     ModSecStackString m_after;
     std::string *m_transformation;
 };
-using TransformationsResults = std::list<TransformationResult>;
+
+class TransformationsResults : public std::list<TransformationResult> {
+ public:
+    ModSecStackString::allocator_type::arena_type m_stackAllocator;
+};
+
 
 class RuleWithActions : public Rule {
  public:
