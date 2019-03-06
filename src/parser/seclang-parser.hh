@@ -296,7 +296,7 @@ class Driver;
 
 
 using namespace modsecurity;
-using namespace modsecurity::Variables;
+using namespace modsecurity::variables;
 using namespace modsecurity::Utils;
 using namespace modsecurity::operators;
 

@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(MultipartBoundaryWhiteSpace, MULTIPART_BOUNDARY_WHITESPACE,
     m_variableMultipartBoundaryWhiteSpace)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MULTIPART_BOUNDARY_WHITESPACE_H_

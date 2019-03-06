@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(MultipartFileLimitExceeded, MULTIPART_FILE_LIMIT_EXCEEDED,
     m_variableMultipartFileLimitExceeded)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MULTIPART_FILE_LIMIT_EXCEEDED_H_

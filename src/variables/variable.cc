@@ -25,7 +25,7 @@
 
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 
 Variable::Variable(std::string name)
@@ -95,5 +95,5 @@ std::string operator+(std::string a, Variables *v) {
 }
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

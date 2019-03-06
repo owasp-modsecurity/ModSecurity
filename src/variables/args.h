@@ -27,12 +27,12 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 DEFINE_VARIABLE_DICT(Args, ARGS, m_variableArgs)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_ARGS_H_

@@ -38,7 +38,7 @@ class RunTimeElementHolder {
         m_string("") {
             m_var.reset(NULL);
         }
-    std::unique_ptr<modsecurity::Variables::Variable> m_var;
+    std::unique_ptr<modsecurity::variables::Variable> m_var;
     std::string m_string;
 };
 
@@ -47,7 +47,7 @@ class RunTimeString {
     RunTimeString() :
         m_containsMacro(false) { }
     void appendText(std::string text);
-    void appendVar(std::unique_ptr<modsecurity::Variables::Variable> var);
+    void appendVar(std::unique_ptr<modsecurity::variables::Variable> var);
     std::string evaluate(Transaction *t);
     std::string evaluate(Transaction *t, Rule *r);
     std::string evaluate() {

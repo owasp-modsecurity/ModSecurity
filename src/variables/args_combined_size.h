@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(ArgsCombinedSize, ARGS_COMBINED_SIZE,
     m_variableARGScombinedSize)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_ARGS_COMBINED_SIZE_H_

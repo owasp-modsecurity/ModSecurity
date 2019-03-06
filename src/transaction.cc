@@ -1359,7 +1359,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
         << " ";
     ss << utils::string::dash_if_empty(this->m_clientIpAddress.c_str()) << " ";
     /** TODO: Check variable */
-    Variables::RemoteUser *r = new Variables::RemoteUser("REMOTE_USER");
+    variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
     std::vector<const VariableValue *> l;
     r->evaluate(this, NULL, &l);
     delete r;

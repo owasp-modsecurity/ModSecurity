@@ -26,7 +26,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class Duration : public Variable {
  public:
@@ -41,7 +41,7 @@ class Duration : public Variable {
 };
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_DURATION_H_

@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(MultipartMissingSemicolon, MULTIPART_MISSING_SEMICOLON,
     m_variableMultipartMissingSemicolon)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MULTIPART_MISSING_SEMICOLON_H_
