@@ -256,50 +256,11 @@ class Driver;
 #include "src/variables/session.h"
 #include "src/variables/status.h"
 
-using modsecurity::ModSecurity;
-using modsecurity::Rule;
-using modsecurity::Utils::GeoLookup;
-using modsecurity::Variables::Duration;
-using modsecurity::Variables::Env;
-using modsecurity::Variables::HighestSeverity;
-using modsecurity::Variables::ModsecBuild;
-using modsecurity::Variables::RemoteUser;
-using modsecurity::Variables::TimeDay;
-using modsecurity::Variables::TimeEpoch;
-using modsecurity::Variables::TimeHour;
-using modsecurity::Variables::TimeMin;
-using modsecurity::Variables::TimeMon;
-using modsecurity::Variables::TimeSec;
-using modsecurity::Variables::TimeWDay;
-using modsecurity::Variables::TimeYear;
-using modsecurity::Variables::Time;
-using modsecurity::Variables::Tx_DictElement;
-using modsecurity::Variables::Tx_NoDictElement;
-using modsecurity::Variables::Tx_DictElementRegexp;
-
-using modsecurity::Variables::Ip_DictElement;
-using modsecurity::Variables::Ip_NoDictElement;
-using modsecurity::Variables::Ip_DictElementRegexp;
-
-using modsecurity::Variables::Global_DictElement;
-using modsecurity::Variables::Global_NoDictElement;
-using modsecurity::Variables::Global_DictElementRegexp;
-
-using modsecurity::Variables::Session_DictElement;
-using modsecurity::Variables::Session_NoDictElement;
-using modsecurity::Variables::Session_DictElementRegexp;
-
-
-
-using modsecurity::Variables::Variable;
-using modsecurity::Variables::VariableModificatorExclusion;
-using modsecurity::Variables::VariableModificatorCount;
-using modsecurity::Variables::XML;
 
 using namespace modsecurity;
-
-using modsecurity::operators::Operator;
-
+using namespace modsecurity::Variables;
+using namespace modsecurity::Utils;
+using namespace modsecurity::operators;
 
 
 #define CHECK_VARIATION_DECL \
@@ -1572,7 +1533,7 @@ expression:
             driver.error(@0, ss.str());
             YYERROR;
         }
-        if (GeoLookup::getInstance().setDataBase(file, &err) == false) {
+        if (Utils::GeoLookup::getInstance().setDataBase(file, &err) == false) {
             std::stringstream ss;
             ss << "Failed to load the GeoDB from: ";
             ss << file << ". " << err;
