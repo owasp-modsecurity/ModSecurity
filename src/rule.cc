@@ -728,39 +728,49 @@ bool Rule::evaluate(Transaction *trans,
             values = executeDefaultTransformations(trans, value);
 
             for (const auto &valueTemp : values) {
-                bool ret;
+                bool ret = false;
                 std::string valueAfterTrans = std::move(*valueTemp.first);
 
-                ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
+                // REQUEST_BBODY available only in RequestBodyProcessor
+                // https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-(v2.x)#REQUEST_BODY
+                // "This variable is available only if the URLENCODED request body processor was used"
+                // assume that the current operator couldn't has any effect
+                if (key != "REQUEST_BODY" ||
+                   (key == "REQUEST_BODY" &&
+                    trans->m_requestBodyType != Transaction::MultiPartRequestBody &&
+                    trans->m_requestBodyType != Transaction::JSONRequestBody &&
+                    trans->m_requestBodyType != Transaction::XMLRequestBody)) {
+                    ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
 
-                if (ret == true) {
-                    ruleMessage->m_match = m_op->resolveMatchMessage(trans,
-                        key, value);
-                    for (auto &i : v->m_orign) {
-                        ruleMessage->m_reference.append(i->toText());
-                    }
-
-                    ruleMessage->m_reference.append(*valueTemp.second);
-                    updateMatchedVars(trans, key, valueAfterTrans);
-                    executeActionsIndependentOfChainedRuleResult(trans,
-                        &containsBlock, ruleMessage);
-
-                    bool isItToBeLogged = ruleMessage->m_saveMessage;
-                    if (m_containsMultiMatchAction && isItToBeLogged) {
-                        /* warn */
-                        trans->m_rulesMessages.push_back(*ruleMessage);
-
-                        /* error */
-                        if (!ruleMessage->m_isDisruptive) {
-                            trans->serverLog(ruleMessage);
+                    if (ret == true) {
+                        ruleMessage->m_match = m_op->resolveMatchMessage(trans,
+                            key, value);
+                        for (auto &i : v->m_orign) {
+                            ruleMessage->m_reference.append(i->toText());
                         }
 
-                        RuleMessage *rm = new RuleMessage(this, trans);
-                        rm->m_saveMessage = ruleMessage->m_saveMessage;
-                        ruleMessage.reset(rm);
-                    }
+                        ruleMessage->m_reference.append(*valueTemp.second);
+                        updateMatchedVars(trans, key, valueAfterTrans);
+                        executeActionsIndependentOfChainedRuleResult(trans,
+                            &containsBlock, ruleMessage);
 
-                    globalRet = true;
+                        bool isItToBeLogged = ruleMessage->m_saveMessage;
+                        if (m_containsMultiMatchAction && isItToBeLogged) {
+                            /* warn */
+                            trans->m_rulesMessages.push_back(*ruleMessage);
+
+                            /* error */
+                            if (!ruleMessage->m_isDisruptive) {
+                                trans->serverLog(ruleMessage);
+                            }
+
+                            RuleMessage *rm = new RuleMessage(this, trans);
+                            rm->m_saveMessage = ruleMessage->m_saveMessage;
+                            ruleMessage.reset(rm);
+                        }
+
+                        globalRet = true;
+                    }
                 }
             }
             delete v;
