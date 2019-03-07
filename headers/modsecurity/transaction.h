@@ -99,7 +99,7 @@ typedef struct Rules_t RulesSet;
 
 namespace modsecurity {
 
-using ModSecStackString = std::basic_string<char, std::char_traits<char>, short_alloc<char, 20000u, alignof(char)>>;
+using ModSecStackString = std::basic_string<char, std::char_traits<char>, short_alloc<char, 8000u, alignof(char)>>;
 
 class ModSecurity;
 class Transaction;
