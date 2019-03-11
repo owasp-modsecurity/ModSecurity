@@ -114,9 +114,6 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     /* Misc */
     dcfg->data_dir = NOT_SET_P;
-#ifdef WAF_JSON_LOGGING_ENABLE
-    dcfg->wafjsonlog_fd = NOT_SET_P;
-#endif
     dcfg->webappid = NOT_SET_P;
     dcfg->sensor_id = NOT_SET_P;
     dcfg->httpBlkey = NOT_SET_P;
@@ -554,10 +551,6 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     /* Misc */
     merged->data_dir = (child->data_dir == NOT_SET_P
         ? parent->data_dir : child->data_dir);
-#ifdef WAF_JSON_LOGGING_ENABLE
-    merged->wafjsonlog_fd = (child->wafjsonlog_fd == NOT_SET_P
-        ? parent->wafjsonlog_fd : child->wafjsonlog_fd);
-#endif
     merged->webappid = (child->webappid == NOT_SET_P
         ? parent->webappid : child->webappid);
     merged->sensor_id = (child->sensor_id == NOT_SET_P
@@ -726,9 +719,6 @@ void init_directory_config(directory_config *dcfg)
 
     /* Misc */
     if (dcfg->data_dir == NOT_SET_P) dcfg->data_dir = NULL;
-#ifdef WAF_JSON_LOGGING_ENABLE
-    if (dcfg->wafjsonlog_fd == NOT_SET_P) dcfg->wafjsonlog_fd = NULL;
-#endif
     if (dcfg->webappid == NOT_SET_P) dcfg->webappid = "default";
     if (dcfg->sensor_id == NOT_SET_P) dcfg->sensor_id = "default";
     if (dcfg->httpBlkey == NOT_SET_P) dcfg->httpBlkey = NULL;
@@ -1544,7 +1534,7 @@ static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
 #ifdef WAF_JSON_LOGGING_ENABLE
     int rc;
-    char wafjsonlog_path[1024]; 
+    char wafjsonlog_path[WAF_LOG_PATH_LENGTH]; 
 #endif
     directory_config *dcfg = (directory_config *)_dcfg;
 
@@ -1557,7 +1547,7 @@ static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 #ifdef WAF_JSON_LOGGING_ENABLE
     strcpy( wafjsonlog_path, dcfg->data_dir );
     strcat( wafjsonlog_path, WAF_LOG_UTIL_FILE );
-    rc = apr_file_open(&dcfg->wafjsonlog_fd, wafjsonlog_path,
+    rc = apr_file_open(&msc_waf_log_fd, wafjsonlog_path,
                    APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
                    CREATEMODE | APR_WREAD, cmd->pool);
 
@@ -1565,9 +1555,14 @@ static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
         return apr_psprintf(cmd->pool, "ModSecurity: Failed to open wafjson log file: %s",
             wafjsonlog_path);
     }
+    
+    // Global variable to share between threads
+    strncpy( msc_waf_log_path, wafjsonlog_path, WAF_LOG_PATH_LENGTH );
+    msc_waf_log_cmd = cmd;
 #endif
     return NULL;
 }
+
 
 static const char *cmd_debug_log(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
