@@ -226,7 +226,8 @@ OPERATORS = \
 	operators/verify_cpf.cc \
 	operators/verify_ssn.cc \
 	operators/within.cc \
-	operators/unconditional_match.cc
+	operators/unconditional_match.cc \
+	operators/yara.cc
 
 
 UTILS = \
@@ -311,7 +312,8 @@ libmodsecurity_la_CPPFLAGS = \
 	$(SSDEEP_CFLAGS) \
 	$(MAXMIND_CFLAGS) \
 	$(LUA_CFLAGS) \
-	$(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(YARA_CFLAGS)
 
 
 libmodsecurity_la_LDFLAGS = \
@@ -326,6 +328,7 @@ libmodsecurity_la_LDFLAGS = \
 	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
 	$(YAJL_LDFLAGS) \
+	$(YARA_LDFLAGS) \
 	-version-info @MSC_VERSION_INFO@
 
 
@@ -341,5 +344,6 @@ libmodsecurity_la_LIBADD = \
 	$(PCRE_LDADD) \
 	$(MAXMIND_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(YARA_LDADD)
 

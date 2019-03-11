@@ -315,6 +315,7 @@ OPERATOR_VERIFY_CC                      (?i:@verifyCC)
 OPERATOR_VERIFY_CPF                     (?i:@verifyCPF)
 OPERATOR_VERIFY_SSN                     (?i:@verifySSN)
 OPERATOR_WITHIN                         (?i:@within)
+OPERATOR_YARA                           (?i:@yara)
 
 
 AUDIT_PARTS                             [ABCDEFGHJKIZ]+
@@ -1112,6 +1113,7 @@ EQUALS_MINUS                            (?i:=\-)
 {OPERATOR_VERIFY_SSN}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SSN(*driver.loc.back()); }
 {OPERATOR_GSB_LOOKUP}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_GSB_LOOKUP(*driver.loc.back()); }
 {OPERATOR_RSUB}                         { BEGIN_PARAMETER(); return p::make_OPERATOR_RSUB(*driver.loc.back()); }
+{OPERATOR_YARA}                         { BEGIN_PARAMETER(); return p::make_OPERATOR_YARA(*driver.loc.back()); }
 
 {NOT}                                   { return p::make_NOT(*driver.loc.back()); }
 .                                       { BEGIN_NO_OP_INFORMED(); yyless(0); }

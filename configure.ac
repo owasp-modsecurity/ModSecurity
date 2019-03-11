@@ -105,6 +105,9 @@ AM_CONDITIONAL([SSDEEP_CFLAGS], [test "SSDEEP_CFLAGS" != ""])
 CHECK_LUA
 AM_CONDITIONAL([LUA_CFLAGS], [test "LUA_CFLAGS" != ""])
 
+# Check for YARA
+CHECK_YARA
+AM_CONDITIONAL([YARA_CFLAGS], [test "YARA_CFLAGS" != ""])
 
 #
 # Check for curl
@@ -548,6 +551,22 @@ if test "x$LUA_FOUND" = "x2"; then
     echo "   + LUA                                           ....disabled"
 fi
 
+## YARA
+if test "x$YARA_FOUND" = "x0"; then
+    echo "   + YARA                                        ....not found"
+fi
+if test "x$YARA_FOUND" = "x1"; then
+    echo -n "   + YARA                                        ....found "
+    if ! test "x$YARA_VERSION" = "x"; then
+        echo "v${YARA_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${YARA_DISPLAY}"
+fi
+if test "x$YARA_FOUND" = "x2"; then
+    echo "   + YARA                                        ....disabled"
+fi
 
 echo " "
 echo " Other Options"

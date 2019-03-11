@@ -60,6 +60,7 @@
 #include "src/operators/verify_ssn.h"
 #include "src/operators/within.h"
 #include "src/operators/unconditional_match.h"
+#include "src/operators/yara.h"
 
 #define IF_MATCH(a) \
     if (op_ == #a)
@@ -190,6 +191,7 @@ Operator *Operator::instantiate(std::string op, std::string param_str) {
     IF_MATCH(unconditionalmatch) {
         return new UnconditionalMatch();
     }
+    IF_MATCH(yara) { return new Yara(std::move(param)); }
 
     std::invalid_argument("Operator not found.");
 }

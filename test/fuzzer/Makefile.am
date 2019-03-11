@@ -24,6 +24,7 @@ afl_fuzzer_LDADD = \
 	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
 	$(LUA_LDFLAGS) $(LUA_LDADD) \
 	$(LIBXML2_LDADD) \
+	$(YARA_LDFLAGS) $(YARA_LDADD) \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(top_builddir)/others/libinjection.la \
 	$(top_builddir)/others/libmbedtls.la

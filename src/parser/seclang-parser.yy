@@ -144,6 +144,7 @@ class Driver;
 #include "src/operators/verify_cpf.h"
 #include "src/operators/verify_ssn.h"
 #include "src/operators/within.h"
+#include "src/operators/yara.h"
 
 
 #include "modsecurity/audit_log.h"
@@ -506,6 +507,7 @@ using modsecurity::operators::Operator;
   OPERATOR_VERIFY_CPF                          "OPERATOR_VERIFY_CPF"
   OPERATOR_VERIFY_SSN                          "OPERATOR_VERIFY_SSN"
   OPERATOR_WITHIN                              "OPERATOR_WITHIN"
+  OPERATOR_YARA                                "OPERATOR_YARA"
 
   CONFIG_DIR_AUDIT_LOG_FMT
   JSON
@@ -1091,6 +1093,10 @@ op_before_init:
             driver.error(@0, ss.str());
             YYERROR;
 #endif  // WITH_GEOIP
+      }
+    | OPERATOR_YARA run_time_string
+      {
+        OPERATOR_CONTAINER($$, new operators::Yara(std::move($2)));
       }
     ;
 

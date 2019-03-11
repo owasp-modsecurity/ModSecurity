@@ -16,7 +16,8 @@ read_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(YARA_LDADD)
 
 read_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
@@ -24,7 +25,8 @@ read_LDFLAGS = \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(YAJL_LDFLAGS) \
+	$(YARA_LDFLAGS)
 
 read_CPPFLAGS = \
 	$(GLOBAL_CFLAGS) \

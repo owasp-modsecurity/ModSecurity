@@ -8,7 +8,8 @@ test_SOURCES = \
 test_LDADD = \
 	$(GLOBAL_LDADD) \
 	$(LUA_LDADD) \
-	$(SSDEEP_LDADD)
+	$(SSDEEP_LDADD) \
+	$(YARA_LDADD)
 
 test_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
@@ -18,7 +19,8 @@ test_LDFLAGS = \
 	-lstdc++ \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(YAJL_LDFLAGS) \
+	$(YARA_LDFLAGS)
 
 test_CFLAGS = \
 	-I$(top_builddir)/headers \

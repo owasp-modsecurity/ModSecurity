@@ -16,6 +16,7 @@ benchmark_LDADD = \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
 	$(LIBXML2_LDADD) \
+	$(YARA_LDADD) \
 	$(GLOBAL_LDADD)
 
 benchmark_LDFLAGS = \
@@ -25,7 +26,8 @@ benchmark_LDFLAGS = \
 	$(YAJL_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(LUA_LDFLAGS)
+	$(LUA_LDFLAGS) \
+	$(YARA_LDFLAGS)
 
 benchmark_CPPFLAGS = \
 	-std=c++11 \

@@ -21,7 +21,8 @@ multi_LDFLAGS = \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(YAJL_LDFLAGS) \
+	$(YARA_LDFLAGS)	
 
 multi_CFLAGS = \
 	-I$(top_builddir)/headers \

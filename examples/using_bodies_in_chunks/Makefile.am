@@ -16,7 +16,8 @@ simple_request_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(YARA_LDADD)
 
 simple_request_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
@@ -25,7 +26,8 @@ simple_request_LDFLAGS = \
 	-lpthread \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(YAJL_LDFLAGS) \
+	$(YARA_LDFLAGS)
 
 simple_request_CPPFLAGS = \
 	$(GLOBAL_CFLAGS) \
