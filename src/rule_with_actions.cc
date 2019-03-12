@@ -165,18 +165,10 @@ RuleWithActions::~RuleWithActions() {
 
 
 bool RuleWithActions::evaluate(Transaction *transaction) {
-    RuleMessage rm(this, transaction);
-    std::shared_ptr<RuleMessage> rm2 = std::make_shared<RuleMessage>(&rm);
-    return evaluate(transaction, rm2);
-}
-
-
-bool RuleWithActions::evaluate(Transaction *transaction,
-    std::shared_ptr<RuleMessage> ruleMessage) {
 
     /* Rule evaluate is pure virtual.
      *
-     * Rule::evaluate(transaction, ruleMessage);
+     * Rule::evaluate(transaction);
      */
 
     /* Matched vars needs to be clear at every new rule execution */
@@ -187,7 +179,7 @@ bool RuleWithActions::evaluate(Transaction *transaction,
 
 
 void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
-    bool *containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
+    bool *containsBlock) {
 
     for (actions::SetVar *a : m_actionsSetVar) {
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
@@ -208,26 +200,26 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         } else if (*a->m_name.get() == "setvar") {
             ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
                 "action: " + *a->m_name.get());
-            a->evaluate(this, trans, ruleMessage);
+            a->evaluate(this, trans, *trans->messageGetLast());
         }
     }
 
     if (m_severity) {
-        m_severity->evaluate(this, trans, ruleMessage);
+        m_severity->evaluate(this, trans, *trans->messageGetLast());
     }
 
     if (m_logData) {
-        m_logData->evaluate(this, trans, ruleMessage);
+        m_logData->evaluate(this, trans, *trans->messageGetLast());
     }
 
     if (m_msg) {
-        m_msg->evaluate(this, trans, ruleMessage);
+        m_msg->evaluate(this, trans, *trans->messageGetLast());
     }
 }
 
 
 void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
-    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
+    bool containsBlock) {
     bool disruptiveAlreadyExecuted = false;
 
     for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
@@ -235,14 +227,14 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
             continue;
         }
         if (!a.get()->isDisruptive()) {
-            executeAction(trans, containsBlock, ruleMessage, a.get(), true);
+            executeAction(trans, containsBlock, a.get(), true);
         }
     }
 
     for (actions::Tag *a : this->m_actionsTag) {
         ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
             + *a->m_name.get());
-        a->evaluate(this, trans, ruleMessage);
+        a->evaluate(this, trans, *trans->messageGetLast());
     }
 
     for (auto &b :
@@ -251,30 +243,30 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
             continue;
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        executeAction(trans, containsBlock, ruleMessage, a, false);
+        executeAction(trans, containsBlock, a, false);
         disruptiveAlreadyExecuted = true;
     }
     for (Action *a : this->m_actionsRuntimePos) {
         if (!a->isDisruptive()
                 && !(disruptiveAlreadyExecuted
                 && dynamic_cast<actions::Block *>(a))) {
-            executeAction(trans, containsBlock, ruleMessage, a, false);
+            executeAction(trans, containsBlock, a, false);
         }
     }
     if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
-        executeAction(trans, containsBlock, ruleMessage,
+        executeAction(trans, containsBlock,
             m_disruptiveAction, false);
     }
 }
 
 
 void RuleWithActions::executeAction(Transaction *trans,
-    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
+    bool containsBlock,
     Action *a, bool defaultContext) {
     if (a->isDisruptive() == false) {
         ms_dbg_a(trans, 9, "Running " \
             "action: " + *a->m_name.get());
-        a->evaluate(this, trans, ruleMessage);
+        a->evaluate(this, trans, *trans->messageGetLast());
         return;
     }
 
@@ -287,7 +279,7 @@ void RuleWithActions::executeAction(Transaction *trans,
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
             ".");
-        a->evaluate(this, trans, ruleMessage);
+        a->evaluate(this, trans, *trans->messageGetLast());
         return;
     }
 
@@ -469,11 +461,11 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
     return ret;
 }
 
-void RuleWithActions::performLogging(Transaction *trans, std::shared_ptr<RuleMessage> ruleMessage,
+void RuleWithActions::performLogging(Transaction *trans,
     bool lastLog) {
-
+    RuleMessage *rm = trans->messageGetLast();
     /* last rule in the chain. */
-    bool isItToBeLogged = ruleMessage->m_saveMessage;
+    bool isItToBeLogged = rm->m_saveMessage;
 
     /**
     *
@@ -488,37 +480,35 @@ void RuleWithActions::performLogging(Transaction *trans, std::shared_ptr<RuleMes
     **/
     if (lastLog) {
         if (isItToBeLogged && !hasMultimatch()
-            && !ruleMessage->m_message.empty()) {
-
+            && ! rm->m_message.empty()) {
             /* warn */
-            trans->m_rulesMessages.push_back(*ruleMessage);
+            trans->messageLog(this);
 
             /* error */
-            if (!ruleMessage->m_isDisruptive) {
-                trans->serverLog(ruleMessage);
+            if (!rm->m_isDisruptive) {
+                trans->serverLog(rm);
             }
         }
         else if (hasBlock() && !hasMultimatch()) {
             /* warn */
-            trans->m_rulesMessages.push_back(*ruleMessage);
+            trans->messageLog(this);
+
             /* error */
-            if (!ruleMessage->m_isDisruptive) {
-                trans->serverLog(ruleMessage);
+            if (!rm->m_isDisruptive) {
+                trans->serverLog(rm);
             }
         }
     } else {
         if (hasMultimatch() && isItToBeLogged) {
             /* warn */
-            trans->m_rulesMessages.push_back(*ruleMessage.get());
+            trans->messageLog(this);
 
             /* error */
-            if (!ruleMessage->m_isDisruptive) {
-                trans->serverLog(ruleMessage);
+            if (!rm->m_isDisruptive) {
+                trans->serverLog(rm);
             }
 
-            RuleMessage *rm = new RuleMessage(this, trans);
-            rm->m_saveMessage = ruleMessage->m_saveMessage;
-            ruleMessage.reset(rm);
+            //ruleMessage.clean();
         }
     }
 }

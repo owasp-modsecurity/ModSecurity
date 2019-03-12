@@ -30,7 +30,7 @@ namespace actions {
 
 
 bool Block::evaluate(RuleWithActions *rule, Transaction *transaction,
-    std::shared_ptr<RuleMessage> rm) {
+    RuleMessage &rm) {
     ms_dbg_a(transaction, 8, "Marking request as disruptive.");
 
     for (auto &a : transaction->m_rules->m_defaultActions[rule->getPhase()]) {

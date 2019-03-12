@@ -42,58 +42,29 @@ class RuleMessage {
         ClientLogMessageInfo = 4
     };
 
-    /**
-     *
-     * FIXME: RuleMessage is currently too big, doing a lot of
-     * unnecessary data duplication. Needs to be shrink down.
-     *
-     */
-    RuleMessage(RuleWithActions *rule, Transaction *trans) :
-        m_accuracy(rule->m_accuracy),
-        m_clientIpAddress(trans->m_clientIpAddress),
-        m_data(""),
-        m_id(trans->m_id),
-        m_isDisruptive(false),
-        m_match(""),
-        m_maturity(rule->m_maturity),
-        m_message(""),
-        m_noAuditLog(false),
-        m_phase(rule->getPhase() - 1),
-        m_reference(""),
-        m_rev(rule->m_rev),
-        m_rule(rule),
-        m_ruleFile(rule->getFileName()),
-        m_ruleId(rule->m_ruleId),
-        m_ruleLine(rule->getLineNumber()),
-        m_saveMessage(true),
-        m_serverIpAddress(trans->m_serverIpAddress),
-        m_severity(0),
-        m_uriNoQueryStringDecoded(trans->m_uri_no_query_string_decoded),
-        m_ver(rule->m_ver)
-    { }
 
-    RuleMessage(RuleMessage *rule) :
-        m_accuracy(rule->m_accuracy),
-        m_clientIpAddress(rule->m_clientIpAddress),
+    RuleMessage(const RuleMessage *rule) :
         m_data(rule->m_data),
-        m_id(rule->m_id),
         m_isDisruptive(rule->m_isDisruptive),
         m_match(rule->m_match),
-        m_maturity(rule->m_maturity),
         m_message(rule->m_message),
-        m_noAuditLog(rule->m_noAuditLog),
-        m_phase(rule->m_phase),
         m_reference(rule->m_reference),
-        m_rev(rule->m_rev),
         m_rule(rule->m_rule),
-        m_ruleFile(rule->m_ruleFile),
-        m_ruleId(rule->m_ruleId),
-        m_ruleLine(rule->m_ruleLine),
         m_saveMessage(rule->m_saveMessage),
-        m_serverIpAddress(rule->m_serverIpAddress),
-        m_severity(rule->m_severity),
-        m_uriNoQueryStringDecoded(rule->m_uriNoQueryStringDecoded),
-        m_ver(rule->m_ver)
+        m_transaction(rule->m_transaction)
+    { }
+
+
+    RuleMessage(Transaction *transaction) :
+        m_transaction(transaction),
+        m_rule(nullptr),
+        m_data(""),
+        m_isDisruptive(false),
+        m_match(""),
+        m_message(""),
+        m_reference(""),
+        m_saveMessage(true),
+        m_severity(0)
     { }
 
     void clean() {
@@ -102,7 +73,6 @@ class RuleMessage {
         m_isDisruptive = false;
         m_reference = "";
         m_severity = 0;
-        m_ver = "";
     }
 
     std::string log() {
@@ -119,40 +89,128 @@ class RuleMessage {
 		ClientLogMessageInfo | ErrorLogTailLogMessageInfo);
     }
 
-    static std::string log(const RuleMessage *rm, int props, int code);
-    static std::string log(const RuleMessage *rm, int props) {
+    static std::string log(RuleMessage *rm, int props, int code);
+    static std::string log(RuleMessage *rm, int props) {
         return RuleMessage::log(rm, props, -1);
     }
-    static std::string log(const RuleMessage *rm) {
+    static std::string log(RuleMessage *rm) {
         return RuleMessage::log(rm, 0);
     }
 
-    static std::string _details(const RuleMessage *rm);
-    static std::string _errorLogTail(const RuleMessage *rm);
+    static std::string _details(RuleMessage *rm);
+    static std::string _errorLogTail(RuleMessage *rm);
 
-    int m_accuracy;
-    std::shared_ptr<std::string> m_clientIpAddress;
-    std::string m_data;
-    std::shared_ptr<std::string> m_id;
+    RuleWithActions *getRule() {
+        return m_rule;
+    }
+    void setRule(RuleWithActions *rule) {
+        m_rule = rule;
+    }
+
+    bool isSettle() {
+        return m_rule != nullptr;
+    }
+
+    int getRuleId() {
+        if (m_rule) {
+            return m_rule->m_ruleId;
+        }
+        return 0;
+    }
+
+    int getPhase() {
+        if (m_rule) {
+            return m_rule->getPhase();
+        }
+        return 0;
+    }
+
+    std::string getFileName() {
+        if (m_rule) {
+            return *m_rule->getFileName().get();
+        }
+        return "";
+    }
+
+    int getLineNumber() {
+        if (m_rule) {
+            return m_rule->getLineNumber();
+        }
+        return 0;
+    }
+
+    std::string getRev() {
+        if (m_rule) {
+            return m_rule->m_rev;
+        }
+        return "";
+    }
+
+    std::string getVer() {
+        if (m_rule) {
+            return m_rule->m_rev;
+        }
+        return "";
+    }
+
+    int getMaturity() {
+        if (m_rule) {
+            return m_rule->m_maturity;
+        }
+        return 0;
+    }
+
+    int getAccuracy() {
+        if (m_rule) {
+            return m_rule->m_accuracy;
+        }
+        return 0;
+    }
+
+    std::string getClientIpAddress() {
+        if (m_transaction) {
+            return *m_transaction->m_clientIpAddress.get();
+        }
+        return "";
+    }
+
+    std::string getServerIpAddress() {
+        if (m_transaction) {
+            return *m_transaction->m_serverIpAddress.get();
+        }
+        return "";
+    }
+
+    std::string getRequestId() {
+        if (m_transaction) {
+            return *m_transaction->m_id.get();
+        }
+        return "";
+    }
+
+    std::string getUri() {
+        if (m_transaction) {
+            return *m_transaction->m_uri_no_query_string_decoded.get();
+        }
+        return "";
+    }
+
+    // Rule
     bool m_isDisruptive;
-    std::string m_match;
-    int m_maturity;
-    std::string m_message;
-    bool m_noAuditLog;
-    int m_phase;
-    std::string m_reference;
-    std::string m_rev;
-    RuleWithActions *m_rule;
-    std::shared_ptr<std::string> m_ruleFile;
-    int m_ruleId;
-    int m_ruleLine;
     bool m_saveMessage;
-    std::shared_ptr<std::string> m_serverIpAddress;
     int m_severity;
-    std::shared_ptr<std::string> m_uriNoQueryStringDecoded;
-    std::string m_ver;
-
     std::list<std::string> m_tags;
+
+    // Transaction
+    std::string m_data;
+    std::string m_match;
+
+    std::string m_message;
+    std::string m_reference;
+
+ private:
+    Transaction *m_transaction;
+    RuleWithActions *m_rule;
 };
 
 

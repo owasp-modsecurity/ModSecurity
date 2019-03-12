@@ -47,9 +47,9 @@ namespace actions {
 
 
 bool Msg::evaluate(RuleWithActions *rule, Transaction *transaction,
-    std::shared_ptr<RuleMessage> rm) {
+    RuleMessage &rm) {
     std::string msg = data(transaction);
-    rm->m_message = msg;
+    rm.m_message = msg;
     ms_dbg_a(transaction, 9, "Saving msg: " + msg);
 
     return true;

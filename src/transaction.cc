@@ -61,6 +61,22 @@ using modsecurity::RequestBodyProcessor::XML;
 
 namespace modsecurity {
 
+
+RuleMessage *TransactionRuleMessageManagement::messageGetLast() {
+    if (m_rulesMessages.size() == 0 || m_rulesMessages.back()->isSettle()) {
+        messageNew();
+    }
+    return m_rulesMessages.back().get();
+}
+
+void TransactionRuleMessageManagement::messageNew() {
+    m_rulesMessages.push_back(std::make_shared<RuleMessage>(m_transaction));
+}
+
+void TransactionRuleMessageManagement::messageLog(RuleWithActions *rule) {
+     m_rulesMessages.back()->setRule(rule);
+}
+
 /**
  * @name    Transaction
  * @brief   Represents the inspection on an entire request.
@@ -130,7 +146,8 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
 #else
     m_xml(NULL),
 #endif
-    TransactionAnchoredVariables(this) {
+    TransactionAnchoredVariables(this),
+    TransactionRuleMessageManagement(this) {
     m_id = std::unique_ptr<std::string>(
         new std::string(
             std::to_string(m_timeStamp)));
@@ -173,7 +190,8 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
 #else
     m_xml(NULL),
 #endif
-    TransactionAnchoredVariables(this) {
+    TransactionAnchoredVariables(this),
+    TransactionRuleMessageManagement(this) {
     m_id = std::unique_ptr<std::string>(new std::string(id));
 
     m_variableUrlEncodedError.set("0", 0);
@@ -1656,13 +1674,13 @@ std::string Transaction::toJSON(int parts) {
             yajl_gen_map_open(g);
             LOGFY_ADD("match", a.m_match.c_str());
             LOGFY_ADD("reference", a.m_reference.c_str());
-            LOGFY_ADD("ruleId", std::to_string(a.m_ruleId).c_str());
-            LOGFY_ADD("file", a.m_ruleFile->c_str());
-            LOGFY_ADD("lineNumber", std::to_string(a.m_ruleLine).c_str());
+            LOGFY_ADD("ruleId", std::to_string(a.getRuleId()).c_str());
+            LOGFY_ADD("file", a.getFileName().c_str());
+            LOGFY_ADD("lineNumber", std::to_string(a.getLineNumber()).c_str());
             LOGFY_ADD("data", a.m_data.c_str());
             LOGFY_ADD("severity", std::to_string(a.m_severity).c_str());
-            LOGFY_ADD("ver", a.m_ver.c_str());
-            LOGFY_ADD("rev", a.m_rev.c_str());
+            LOGFY_ADD("ver", a.getVer().c_str());
+            LOGFY_ADD("rev", a.getRev().c_str());
 
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>("tags"),
@@ -1675,8 +1693,8 @@ std::string Transaction::toJSON(int parts) {
             }
             yajl_gen_array_close(g);
 
-            LOGFY_ADD("maturity", std::to_string(a.m_maturity).c_str());
-            LOGFY_ADD("accuracy", std::to_string(a.m_accuracy).c_str());
+            LOGFY_ADD("maturity", std::to_string(a.getMaturity()).c_str());
+            LOGFY_ADD("accuracy", std::to_string(a.getAccuracy()).c_str());
             yajl_gen_map_close(g);
             yajl_gen_map_close(g);
         }
@@ -1705,7 +1723,7 @@ std::string Transaction::toJSON(int parts) {
 }
 
 
-void Transaction::serverLog(std::shared_ptr<RuleMessage> rm) {
+void Transaction::serverLog(RuleMessage *rm) {
     m_ms->serverLog(m_logCbData, rm);
 }
 

@@ -101,7 +101,7 @@ inline void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
 
 
 bool RuleWithOperator::executeOperatorAt(Transaction *trans, std::string key,
-    std::string value, std::shared_ptr<RuleMessage> ruleMessage) {
+    std::string value) {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
     clock_t end;
@@ -113,7 +113,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, std::string key,
         utils::string::toHexIfNeeded(value)) \
         + "\" (Variable: " + key + ")");
 
-    ret = this->m_operator->evaluateInternal(trans, this, value, ruleMessage);
+    ret = this->m_operator->evaluateInternal(trans, this, value, trans->messageGetLast());
 
     if (ret == false) {
         return false;
@@ -217,8 +217,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
 }
 
 
-bool RuleWithOperator::evaluate(Transaction *trans,
-    std::shared_ptr<RuleMessage> ruleMessage) {
+bool RuleWithOperator::evaluate(Transaction *trans) {
     bool globalRet = false;
     variables::Variables *variables = this->m_variables;
     bool recursiveGlobalRet;
@@ -229,7 +228,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     vars.reserve(4);
     variables::Variables exclusion;
 
-    RuleWithActions::evaluate(trans, ruleMessage);
+    RuleWithActions::evaluate(trans);
 
 
     // FIXME: Make a class runTimeException to handle this cases.
@@ -316,21 +315,21 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 bool ret;
                 std::string valueAfterTrans = std::move(*valueTemp.first);
 
-                ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
+                ret = executeOperatorAt(trans, key, valueAfterTrans);
 
                 if (ret == true) {
-                    ruleMessage->m_match = m_operator->resolveMatchMessage(trans,
+                    trans->messageGetLast()->m_match = m_operator->resolveMatchMessage(trans,
                         key, value);
                     for (auto &i : v->m_orign) {
-                        ruleMessage->m_reference.append(i->toText());
+                        trans->messageGetLast()->m_reference.append(i->toText());
                     }
 
-                    ruleMessage->m_reference.append(*valueTemp.second);
+                    trans->messageGetLast()->m_reference.append(*valueTemp.second);
                     updateMatchedVars(trans, key, valueAfterTrans);
                     executeActionsIndependentOfChainedRuleResult(trans,
-                        &containsBlock, ruleMessage);
+                        &containsBlock);
 
-                    performLogging(trans, ruleMessage, false);
+                    performLogging(trans, false);
 
                     globalRet = true;
                 }
@@ -361,7 +360,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     }
 
     ms_dbg_a(trans, 4, "Executing chained rule.");
-    recursiveGlobalRet = m_chainedRuleChild->evaluate(trans, ruleMessage);
+    recursiveGlobalRet = m_chainedRuleChild->evaluate(trans);
 
     if (recursiveGlobalRet == true) {
         goto end_exec;
@@ -371,10 +370,10 @@ end_clean:
     return false;
 
 end_exec:
-    executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
+    executeActionsAfterFullMatch(trans, containsBlock);
 
     /* last rule in the chain. */
-    performLogging(trans, ruleMessage, true);
+    performLogging(trans, true);
 
     return true;
 }

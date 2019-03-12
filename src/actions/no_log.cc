@@ -30,8 +30,8 @@ namespace actions {
 
 
 bool NoLog::evaluate(RuleWithActions *rule, Transaction *transaction,
-    std::shared_ptr<RuleMessage> rm) {
-    rm->m_saveMessage = false;
+    RuleMessage &rm) {
+    rm.m_saveMessage = false;
     return true;
 }
 

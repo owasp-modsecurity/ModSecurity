@@ -289,7 +289,7 @@ class ModSecurity {
      */
     void setServerLogCb(ModSecLogCb cb, int properties);
 
-    void serverLog(void *data, std::shared_ptr<RuleMessage> rm);
+    void serverLog(void *data, RuleMessage *rm);
 
     const std::string& getConnectorInformation();
 
