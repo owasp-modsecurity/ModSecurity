@@ -234,16 +234,20 @@ static char *construct_auditlog_filename(apr_pool_t *mp, const char *uniqueid) {
      * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
      * It also changes the return statement.
      */
-    char *username;
+    char *userinfo;
+    apr_status_t rc;
     apr_uid_t uid;
     apr_gid_t gid;
     apr_uid_current(&uid, &gid, mp);
-    apr_uid_name_get(&username, uid, mp);
+    rc = apr_uid_name_get(&userinfo, uid, mp);
+    if (rc != APR_SUCCESS) {
+      userinfo = apr_psprintf(mp, "%u", uid);
+    }
 
     apr_time_exp_lt(&t, apr_time_now());
 
     apr_strftime(tstr, &len, 299, "/%Y%m%d/%Y%m%d-%H%M/%Y%m%d-%H%M%S", &t);
-    return apr_psprintf(mp, "/%s%s-%s", username, tstr, uniqueid);
+    return apr_psprintf(mp, "/%s%s-%s", userinfo, tstr, uniqueid);
 }
 
 /**
