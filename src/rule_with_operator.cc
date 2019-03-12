@@ -328,20 +328,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
 
-                    bool isItToBeLogged = ruleMessage->m_saveMessage;
-                    if (hasMultimatch() && isItToBeLogged) {
-                        /* warn */
-                        trans->m_rulesMessages.push_back(*ruleMessage);
-
-                        /* error */
-                        if (!ruleMessage->m_isDisruptive) {
-                            trans->serverLog(ruleMessage);
-                        }
-
-                        RuleMessage *rm = new RuleMessage(this, trans);
-                        rm->m_saveMessage = ruleMessage->m_saveMessage;
-                        ruleMessage.reset(rm);
-                    }
+                    performLogging(trans, ruleMessage, false);
 
                     globalRet = true;
                 }
@@ -385,16 +372,7 @@ end_exec:
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
 
     /* last rule in the chain. */
-    bool isItToBeLogged = (ruleMessage->m_saveMessage && (m_chainedRuleParent == nullptr));
-    if (isItToBeLogged && !hasMultimatch()) {
-        /* warn */
-        trans->m_rulesMessages.push_back(*ruleMessage);
-
-        /* error */
-        if (!ruleMessage->m_isDisruptive) {
-            trans->serverLog(ruleMessage);
-        }
-	}
+    performLogging(trans, ruleMessage, true);
     return true;
 }
 
