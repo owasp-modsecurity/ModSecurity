@@ -577,17 +577,17 @@ MODSECURITY_STORED_CONTEXT::GetConfig(
     HRESULT                          hr                 = S_OK;
     MODSECURITY_STORED_CONTEXT * pModuleConfig      = NULL;
     IHttpModuleContextContainer *    pMetadataContainer = NULL;
-	IAppHostConfigException *        pException         = NULL;
+    IAppHostConfigException *        pException         = NULL;
 
     pMetadataContainer = pContext->GetMetadata()->GetModuleContextContainer();
 
-	if ( pMetadataContainer == NULL )
-	{
+    if ( pMetadataContainer == NULL )
+    {
         hr = E_UNEXPECTED;
         return hr;
-	}
+    }
 
-    pModuleConfig = (MODSECURITY_STORED_CONTEXT *)pMetadataContainer->GetModuleContext( g_pModuleContext );	
+    pModuleConfig = (MODSECURITY_STORED_CONTEXT *)pMetadataContainer->GetModuleContext( g_pModuleContext );    
     if ( pModuleConfig != NULL )
     {
         //

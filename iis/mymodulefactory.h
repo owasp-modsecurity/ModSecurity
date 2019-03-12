@@ -27,7 +27,7 @@ public:
 
     HRESULT GetHttpModule(CHttpModule** ppModule, IModuleAllocator*) override
     {
-	    if (ppModule == nullptr)
+        if (ppModule == nullptr)
         {
             return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
         }

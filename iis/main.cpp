@@ -44,7 +44,7 @@ RegisterModule(DWORD, IHttpModuleRegistrationInfo* moduleInfo, IHttpServer * htt
     }
 
     // step 1: save the IHttpServer and the module context id for future use
-	//
+    //
     g_pModuleContext = moduleInfo->GetId();
     g_pHttpServer = httpServer;
 
