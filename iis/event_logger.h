@@ -16,12 +16,14 @@
 
 #include <Windows.h>
 
+// A simple class to use to write messages to common Windows event log.
+// The class is Moveable but non-Copyable.
 class EventLogger
 {
 public:
     EventLogger() /* noexcept */
+        : handle{RegisterEventSource(nullptr, "ModSecurity")}
     {
-        handle = RegisterEventSource(nullptr, "ModSecurity");
     }
 
     BOOL Log(const char* message, DWORD category)
@@ -36,9 +38,27 @@ public:
         return FALSE;
     }
 
+    EventLogger(const EventLogger&) = delete;
+    EventLogger& operator=(const EventLogger&) = delete;
+
+    EventLogger(EventLogger&& rhs) /* noexcept */
+        : handle(rhs.handle)
+    {
+        rhs.handle = nullptr;
+    }
+
+    EventLogger& operator=(EventLogger&& rhs) /* noexcept */
+    {
+        handle = rhs.handle;
+        rhs.handle = nullptr;
+        return *this;
+    }
+
     ~EventLogger()
     {
-        DeregisterEventSource(handle);
+        if (handle) {
+            DeregisterEventSource(handle);
+        }
     }
 
 private:
