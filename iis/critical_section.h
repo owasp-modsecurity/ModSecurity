@@ -21,20 +21,26 @@
 // Implements BasicLockable requirements:
 //      https://en.cppreference.com/w/cpp/named_req/BasicLockable
 //
+// Like std::mutex, CriticalSection is neither Copyable nor Moveable.
 class CriticalSection
 {
 public:
-    CriticalSection()
+    CriticalSection() /* noexcept */
     {
         InitializeCriticalSection(&cs);
     }
 
-    void lock()
+    CriticalSection(const CriticalSection&) = delete;
+    CriticalSection(CriticalSection&&) = delete;
+    CriticalSection& operator=(const CriticalSection&) = delete;
+    CriticalSection& operator=(CriticalSection&&) = delete;
+
+    void lock() /* noexcept */
     {
         EnterCriticalSection(&cs);
     }
 
-    void unlock()
+    void unlock() /* noexcept */
     {
         LeaveCriticalSection(&cs);
     }
