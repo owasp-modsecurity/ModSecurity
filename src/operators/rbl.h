@@ -77,7 +77,7 @@ class Rbl : public Operator {
         }
     bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string& input,
-        std::shared_ptr<RuleMessage> ruleMessage) override;
+        RuleMessage *ruleMessage) override;
 
     std::string mapIpToAddress(std::string ipStr, Transaction *trans);
 

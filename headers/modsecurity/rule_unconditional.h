@@ -46,7 +46,7 @@ class RuleUnconditional : public RuleWithActions {
         int lineNumber)
         : RuleWithActions(actions, transformations, std::move(fileName), lineNumber) { }
 
-    virtual bool evaluate(Transaction *transaction, std::shared_ptr<RuleMessage> ruleMessage) override;
+    virtual bool evaluate(Transaction *transaction) override;
 
  private:
 };

@@ -22,20 +22,19 @@ bool RuleScript::init(std::string *err) {
     return m_lua.load(m_name, err);
 }
 
-bool RuleScript::evaluate(Transaction *trans,
-    std::shared_ptr<RuleMessage> ruleMessage) {
+bool RuleScript::evaluate(Transaction *trans) {
 
     ms_dbg_a(trans, 4, " Executing script: " + m_name + ".");
 
     bool containsDisruptive = false;
 
     executeActionsIndependentOfChainedRuleResult(trans,
-        &containsDisruptive, ruleMessage);
+        &containsDisruptive);
 
     bool ret = m_lua.run(trans);
 
     if (ret) {
-        executeActionsAfterFullMatch(trans, containsDisruptive, ruleMessage);
+        executeActionsAfterFullMatch(trans, containsDisruptive);
     }
 
     return ret;
