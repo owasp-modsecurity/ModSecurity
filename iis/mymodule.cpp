@@ -972,11 +972,6 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     rsc->responseProcessingEnabled = (config->config->resbody_access == 1);
     RequestStoredContext* context = rsc.get();
 
-    // on IIS we force input stream inspection flag, because its absence does not add any performance gain
-    // it's because on IIS request body must be restored each time it was read
-    //
-    modsecSetConfigForIISRequestBody(r);
-
     StoreIISContext(r, rsc.get());
 
     httpContext->GetModuleContextContainer()->SetModuleContext(rsc.release(), g_pModuleContext);
