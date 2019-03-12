@@ -957,17 +957,6 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 
         delete apppath;
         delete path;
-
-        if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
-        {
-            modsecSetReadBody(nullptr);
-            modsecSetWriteBody(nullptr);
-        }
-        else
-        {
-            modsecSetReadBody(ReadBodyCallback);
-            modsecSetWriteBody(WriteBodyCallback);
-        }
     }
 
     ConnRecPtr connRec = MakeConnReq();
@@ -1218,13 +1207,14 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 #endif
     c->remote_host = NULL;
 
+    hr = SaveRequestBodyToRequestRec(context);
+    if (FAILED(hr)) {
+        context->provider->SetErrorStatus(hr);
+        return RQ_NOTIFICATION_FINISH_REQUEST;
+    }
+
     if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
     {
-        hr = SaveRequestBodyToRequestRec(context);
-        if (FAILED(hr)) {
-            context->provider->SetErrorStatus(hr);
-            return RQ_NOTIFICATION_FINISH_REQUEST;
-        }
         // We post the processing task to the thread pool to happen in the background.
         // We store the future to track and wait for this processing in case if we also
         // need to process the response because we need request processing to finish
