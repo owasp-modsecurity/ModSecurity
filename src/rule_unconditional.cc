@@ -14,7 +14,7 @@
  */
 
 #include "modsecurity/rule_unconditional.h"
-#include "modsecurity/rule_message.h"
+
 
 namespace modsecurity {
 
@@ -34,26 +34,7 @@ bool RuleUnconditional::evaluate(Transaction *trans,
 
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
 
-    /* last rule in the chain. */
-    bool isItToBeLogged = ruleMessage->m_saveMessage;
-    if (isItToBeLogged && !hasMultimatch()
-        && !ruleMessage->m_message.empty()) {
-        /* warn */
-        trans->m_rulesMessages.push_back(*ruleMessage);
-
-        /* error */
-        if (!ruleMessage->m_isDisruptive) {
-            trans->serverLog(ruleMessage);
-       }
-    }
-    else if (hasBlock() && !hasMultimatch()) {
-        /* warn */
-        trans->m_rulesMessages.push_back(*ruleMessage);
-        /* error */
-        if (!ruleMessage->m_isDisruptive) {
-            trans->serverLog(ruleMessage);
-        }
-    }
+    performLogging(trans, ruleMessage);
 
     return true;
 }

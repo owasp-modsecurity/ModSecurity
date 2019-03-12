@@ -469,6 +469,59 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
     return ret;
 }
 
+void RuleWithActions::performLogging(Transaction *trans, std::shared_ptr<RuleMessage> ruleMessage,
+    bool lastLog) {
+
+    /* last rule in the chain. */
+    bool isItToBeLogged = ruleMessage->m_saveMessage;
+
+    /**
+    *
+    * RuleMessage is stacked allocated for the rule execution,
+    * anything beyond this may lead to invalid pointer access.
+    *
+    * In case of a warning, o set of messages is saved to be read
+    * at audit log generation. Therefore demands a copy here.
+    *
+    * FIXME: Study an way to avoid the copy.
+    *
+    **/
+    if (lastLog) {
+        if (isItToBeLogged && !hasMultimatch()
+            && !ruleMessage->m_message.empty()) {
+
+            /* warn */
+            trans->m_rulesMessages.push_back(*ruleMessage);
+
+            /* error */
+            if (!ruleMessage->m_isDisruptive) {
+                trans->serverLog(ruleMessage);
+            }
+        }
+        else if (hasBlock() && !hasMultimatch()) {
+            /* warn */
+            trans->m_rulesMessages.push_back(*ruleMessage);
+            /* error */
+            if (!ruleMessage->m_isDisruptive) {
+                trans->serverLog(ruleMessage);
+            }
+        }
+    } else {
+        if (hasMultimatch() && isItToBeLogged) {
+            /* warn */
+            trans->m_rulesMessages.push_back(*ruleMessage.get());
+
+            /* error */
+            if (!ruleMessage->m_isDisruptive) {
+                trans->serverLog(ruleMessage);
+            }
+
+            RuleMessage *rm = new RuleMessage(this, trans);
+            rm->m_saveMessage = ruleMessage->m_saveMessage;
+            ruleMessage.reset(rm);
+        }
+    }
+}
 
 std::string RuleWithActions::logData(Transaction *t) { return m_logData->data(t); }
 std::string RuleWithActions::msg(Transaction *t) { return m_msg->data(t); }
