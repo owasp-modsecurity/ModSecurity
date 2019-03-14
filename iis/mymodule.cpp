@@ -448,58 +448,62 @@ static HRESULT SaveRequestBodyToRequestRec(RequestStoredContext* rsc)
         APR_BRIGADE_INSERT_TAIL(brigade, bucket);
     }
 
-    apr_bucket* e = apr_bucket_eos_create(conn->bucket_alloc);
-    if (e == nullptr)
-    {
-        return E_OUTOFMEMORY;
-    }
-    APR_BRIGADE_INSERT_TAIL(brigade, e);
-
-    modsecSetBodyBrigade(aprRequest, brigade);
-
-    apr_off_t contentLength = 0;
-    apr_status_t status = apr_brigade_length(brigade, FALSE, &contentLength);
-    if (status != APR_SUCCESS)
-    {
-        return E_FAIL;
-    }
-
-    // Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
-    // This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
-    static const std::string CHUNKED = "chunked";
-    USHORT encodingLength = 0;
-    const char* transferEncoding = iisRequest->GetHeader(HttpHeaderTransferEncoding, &encodingLength);
-    if (transferEncoding)
-    {
-        if (CHUNKED.size() == encodingLength &&
-            std::equal(CHUNKED.cbegin(), CHUNKED.cend(), transferEncoding,
-                [](char lhs, char rhs) { return std::tolower(lhs) == std::tolower(rhs); }))
+    if (!APR_BRIGADE_EMPTY(brigade)) {
+        apr_bucket* e = apr_bucket_eos_create(conn->bucket_alloc);
+        if (e == nullptr)
         {
-            iisRequest->DeleteHeader(HttpHeaderTransferEncoding);
+            return E_OUTOFMEMORY;
         }
+        APR_BRIGADE_INSERT_TAIL(brigade, e);
+
+        modsecSetBodyBrigade(aprRequest, brigade);
+
+        apr_off_t contentLength = 0;
+        apr_status_t status = apr_brigade_length(brigade, FALSE, &contentLength);
+        if (status != APR_SUCCESS)
+        {
+            return E_FAIL;
+        }
+
+        // Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
+        // This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
+        static const std::string CHUNKED = "chunked";
+        USHORT encodingLength = 0;
+        const char* transferEncoding = iisRequest->GetHeader(HttpHeaderTransferEncoding, &encodingLength);
+        if (transferEncoding)
+        {
+            if (encodingLength == CHUNKED.size() &&
+                std::equal(CHUNKED.cbegin(), CHUNKED.cend(), transferEncoding,
+                [](char lhs, char rhs) { return std::tolower(lhs) == std::tolower(rhs); }))
+            {
+                iisRequest->DeleteHeader(HttpHeaderTransferEncoding);
+            }
+        }
+
+        auto contentLengthStr = std::to_string(contentLength);
+        HRESULT hr = iisRequest->SetHeader(
+            HttpHeaderContentLength,
+            contentLengthStr.c_str(),
+            contentLengthStr.size(),
+            TRUE);
+
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+
+        // since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
+        //
+        char* requestBuffer = static_cast<char*>(rsc->httpContext->AllocateRequestMemory(contentLength));
+        status = apr_brigade_flatten(brigade, requestBuffer, reinterpret_cast<apr_size_t*>(&contentLength));
+        if (status != APR_SUCCESS)
+        {
+            return E_FAIL;
+        }
+        return iisRequest->InsertEntityBody(requestBuffer, contentLength);
     }
 
-    auto contentLengthStr = std::to_string(contentLength);
-    HRESULT hr = iisRequest->SetHeader(
-        HttpHeaderContentLength,
-        contentLengthStr.c_str(),
-        contentLengthStr.size(),
-        TRUE);
-
-    if (FAILED(hr))
-    {
-        return hr;
-    }
-
-    // since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
-    //
-    char* requestBuffer = static_cast<char*>(rsc->httpContext->AllocateRequestMemory(contentLength));
-    status = apr_brigade_flatten(brigade, requestBuffer, reinterpret_cast<apr_size_t*>(&contentLength));
-    if (status != APR_SUCCESS)
-    {
-        return E_FAIL;
-    }
-    return iisRequest->InsertEntityBody(requestBuffer, contentLength);
+    return S_OK;
 }
 
 
@@ -953,17 +957,6 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 
         delete apppath;
         delete path;
-
-        if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
-        {
-            modsecSetReadBody(nullptr);
-            modsecSetWriteBody(nullptr);
-        }
-        else
-        {
-            modsecSetReadBody(ReadBodyCallback);
-            modsecSetWriteBody(WriteBodyCallback);
-        }
     }
 
     ConnRecPtr connRec = MakeConnReq();
@@ -978,11 +971,6 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     rsc->provider = provider;
     rsc->responseProcessingEnabled = (config->config->resbody_access == 1);
     RequestStoredContext* context = rsc.get();
-
-    // on IIS we force input stream inspection flag, because its absence does not add any performance gain
-    // it's because on IIS request body must be restored each time it was read
-    //
-    modsecSetConfigForIISRequestBody(r);
 
     StoreIISContext(r, rsc.get());
 
@@ -1214,13 +1202,14 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 #endif
     c->remote_host = NULL;
 
+    hr = SaveRequestBodyToRequestRec(context);
+    if (FAILED(hr)) {
+        context->provider->SetErrorStatus(hr);
+        return RQ_NOTIFICATION_FINISH_REQUEST;
+    }
+
     if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
     {
-        hr = SaveRequestBodyToRequestRec(context);
-        if (FAILED(hr)) {
-            context->provider->SetErrorStatus(hr);
-            return RQ_NOTIFICATION_FINISH_REQUEST;
-        }
         // We post the processing task to the thread pool to happen in the background.
         // We store the future to track and wait for this processing in case if we also
         // need to process the response because we need request processing to finish
