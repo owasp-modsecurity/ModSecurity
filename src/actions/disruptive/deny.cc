@@ -28,8 +28,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Deny::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
+bool Deny::execute(RuleWithActions *rule, Transaction *transaction) {
     ms_dbg_a(transaction, 8, "Running action deny");
 
     if (transaction->m_it.status == 200) {
@@ -38,9 +37,9 @@ bool Deny::execute(RuleWithActions *rule, Transaction *transaction,
 
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
-    rm.setRule(rule);
+    transaction->messageGetLast()->setRule(rule);
     transaction->m_it.log = strdup(
-        rm.log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
+        transaction->messageGetLast()->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
 
     return true;
 }
