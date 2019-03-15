@@ -72,10 +72,10 @@ RuleWithActions::RuleWithActions(
     m_msg(nullptr) {
     if (actions) {
         for (Action *a : *actions) {
-            if (a->action_kind == Action::ConfigurationKind) {
+            if (a->m_actionKind == Action::ConfigurationKind) {
                 a->execute(this, NULL);
                 delete a;
-            } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
+            } else if (a->m_actionKind == Action::RunTimeOnlyIfMatchKind) {
                 if (dynamic_cast<actions::Capture *>(a)) {
                     m_containsCaptureAction = true;
                     delete a;
@@ -216,7 +216,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
      * 
      */
     for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
-        if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
+        if (a.get()->m_actionKind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
         if (!a.get()->isDisruptive()) {
@@ -304,8 +304,8 @@ void RuleWithActions::executeTransformations(
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
 
-    for (Action *a : m_transformations) {
-        if (a->m_isNone) {
+    for (Transformation *a : m_transformations) {
+        if (a->isNone()) {
             none++;
         }
     }
@@ -315,7 +315,7 @@ void RuleWithActions::executeTransformations(
     // on the target rule.
     if (none == 0) {
         for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
-            if (a->action_kind \
+            if (a->m_actionKind \
                 != actions::Action::RunTimeBeforeMatchAttemptKind) {
                 continue;
             }
@@ -330,7 +330,7 @@ void RuleWithActions::executeTransformations(
         if (none == 0) {
             executeTransformation(trans, &results, a);
         }
-        if (a->m_isNone) {
+        if (a->isNone()) {
             none--;
         }
     }
@@ -343,7 +343,7 @@ void RuleWithActions::executeTransformations(
             continue;
         }
         Transformation *a = dynamic_cast<Transformation*>(b.second.get());
-        if (a->m_isNone) {
+        if (a->isNone()) {
             none++;
         }
     }
@@ -357,7 +357,7 @@ void RuleWithActions::executeTransformations(
         if (none == 0) {
             executeTransformation(trans, &results, a);
         }
-        if (a->m_isNone) {
+        if (a->isNone()) {
             none--;
         }
     }

@@ -89,6 +89,7 @@
 typedef struct ModSecurity_t modsecurity;
 #else
 namespace modsecurity {
+
     /**
      *
      * The Phases enumerator consists in mapping the different stages of a

@@ -34,10 +34,12 @@ class Transformation : public Action {
 
     void execute(Transaction *t,
         ModSecStackString &in,
-        ModSecStackString &out) {
+        ModSecStackString &out) override {
             // FIXME: this should be remove as soon as #1974 got fixed.
             out.assign(in.c_str(), in.length());
     };
+
+    virtual bool isNone() { return false; }
 
     static Transformation* instantiate(std::string a);
 };
