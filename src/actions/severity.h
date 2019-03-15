@@ -35,8 +35,7 @@ class Severity : public Action {
         : Action(action),
         m_severity(0) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction,
-        RuleMessage &rm) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
     int m_severity;
