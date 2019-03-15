@@ -33,8 +33,8 @@ namespace transformations {
 
 
 void TrimLeft::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     out = in;
     ltrim(&out);
 };
