@@ -29,9 +29,8 @@ namespace modsecurity {
 namespace actions {
 
 
-bool LogData::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
-    rm.m_data = data(transaction);
+bool LogData::execute(RuleWithActions *rule, Transaction *transaction) {
+    transaction->messageGetLast()->m_data = data(transaction);
 
     return true;
 }

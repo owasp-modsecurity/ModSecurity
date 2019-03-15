@@ -26,8 +26,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool NoAuditLog::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
+bool NoAuditLog::execute(RuleWithActions *rule, Transaction *transaction) {
     transaction->messageSetNoAuditLog(true);
     return true;
 }

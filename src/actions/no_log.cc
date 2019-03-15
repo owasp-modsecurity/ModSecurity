@@ -29,9 +29,8 @@ namespace modsecurity {
 namespace actions {
 
 
-bool NoLog::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
-    rm.m_saveMessage = false;
+bool NoLog::execute(RuleWithActions *rule, Transaction *transaction) {
+    transaction->messageGetLast()->m_saveMessage = false;
     return true;
 }
 
