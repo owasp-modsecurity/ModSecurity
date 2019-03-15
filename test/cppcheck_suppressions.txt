@@ -37,7 +37,7 @@ redundantAssignment:src/operators/pm.cc:94
 unmatchedSuppression:src/utils/geo_lookup.cc:82
 useInitializationList:src/utils/shared_files.h:87
 unmatchedSuppression:src/utils/msc_tree.cc
-functionStatic:headers/modsecurity/transaction.h:453
+functionStatic:headers/modsecurity/transaction.h:452
 duplicateBranch:src/audit_log/audit_log.cc:223
 unreadVariable:src/request_body_processor/multipart.cc:435
 stlcstrParam:src/audit_log/writer/parallel.cc:145
@@ -54,7 +54,7 @@ syntaxError:src/transaction.cc:62
 noConstructor:src/variables/variable.h:152
 duplicateBranch:src/request_body_processor/multipart.cc:93
 knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
-knownConditionTrueFalse:src/operators/verify_svnr.cc:87
+knownConditionTrueFalse:src/operators/verify_svnr.cc:88
 
 
 noExplicitConstructor:seclang-parser.hh

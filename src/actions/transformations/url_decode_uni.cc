@@ -39,8 +39,8 @@ namespace transformations {
 
 
 void UrlDecodeUni::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>

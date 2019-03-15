@@ -49,7 +49,6 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
 
-
 #ifndef NO_LOGS
 #define ms_dbg(b, c) \
   do { \

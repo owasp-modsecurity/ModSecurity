@@ -18,6 +18,8 @@ class Driver;
 }
 
 #include "modsecurity/rule_unconditional.h"
+#include "modsecurity/rule_with_operator.h"
+#include "modsecurity/rule_with_actions.h"
 #include "src/rule_script.h"
 
 #include "src/actions/accuracy.h"
@@ -1185,8 +1187,8 @@ expression:
                 definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
                 delete phase;
-            } else if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind ||
-                a->action_kind == actions::Action::RunTimeBeforeMatchAttemptKind) {
+            } else if (a->m_actionKind == actions::Action::RunTimeOnlyIfMatchKind ||
+                a->m_actionKind == actions::Action::RunTimeBeforeMatchAttemptKind) {
                                 actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
                 if (none != NULL) {
                     driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");

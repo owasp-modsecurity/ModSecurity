@@ -33,8 +33,8 @@ namespace transformations {
 
 
 void HexEncode::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     std::stringstream result;
     for (std::size_t i=0; i < in.length(); i++) {
         int ii = reinterpret_cast<char>(in[i]);

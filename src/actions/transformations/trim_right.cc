@@ -32,8 +32,8 @@ namespace transformations {
 
 
 void TrimRight::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     out = in;
     rtrim(&out);
 };
