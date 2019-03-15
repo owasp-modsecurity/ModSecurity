@@ -812,7 +812,7 @@ end_exec:
             trans->serverLog(ruleMessage);
 	}
     }
-    else if (m_containsStaticBlockAction && !m_containsMultiMatchAction) {
+    else if (!m_containsMultiMatchAction) {
         /* warn */
         trans->m_rulesMessages.push_back(*ruleMessage);
         /* error */
