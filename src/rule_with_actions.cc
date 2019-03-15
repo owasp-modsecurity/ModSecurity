@@ -104,12 +104,7 @@ RuleWithActions::RuleWithActions(
 }
 
 void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
-    if (a->action_kind == Action::ConfigurationKind) {
-        a->execute(this, NULL);
-        return;
-    }
-
-    if (a->action_kind == Action::ConfigurationKind) {
+    if (a->m_actionKind == Action::ConfigurationKind) {
         if (dynamic_cast<actions::Accuracy *>(a.get())) {
             actions::Accuracy *accuracy = dynamic_cast<actions::Accuracy *>(a.get());
             m_defaultAccuracy = accuracy->getAccuracy();
@@ -122,7 +117,7 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
         return;
     }
 
-    if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
+    if (a->m_actionKind == Action::RunTimeOnlyIfMatchKind) {
         if (dynamic_cast<actions::Capture *>(a.get())) {
             m_defaultContainsCaptureAction = true;
         } else if (dynamic_cast<actions::MultiMatch *>(a.get())) {
@@ -163,7 +158,7 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
 }
 
 void RuleWithActions::addAction(actions::Action *a) {
-    if (a->action_kind == Action::ConfigurationKind) {
+    if (a->m_actionKind == Action::ConfigurationKind) {
         if (dynamic_cast<actions::Accuracy *>(a)) {
             actions::Accuracy *accuracy = dynamic_cast<actions::Accuracy *>(a);
             m_accuracy = accuracy->getAccuracy();
@@ -177,7 +172,7 @@ void RuleWithActions::addAction(actions::Action *a) {
         return;
     }
 
-    if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
+    if (a->m_actionKind == Action::RunTimeOnlyIfMatchKind) {
         if (dynamic_cast<actions::Capture *>(a)) {
             m_containsCaptureAction = true;
             delete a;
@@ -281,7 +276,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
 
 #if 0
     for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
-        if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
+        if (a.get()->m_actionKind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
         if (!a.get()->isDisruptive()) {
@@ -363,7 +358,7 @@ void RuleWithActions::executeTransformations(
     TransformationsResults &results) {
     int none = 0;
 
-    ModSecStackString ssin;
+    ModSecString ssin;
     ssin.assign(in.c_str());
 
     TransformationResult a = TransformationResult(&ssin);
@@ -374,9 +369,8 @@ void RuleWithActions::executeTransformations(
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
 
-
-    for (Action *action : getTransformationPtr()) {
-        if (action->m_isNone) {
+    for (Transformation *action : getTransformationPtr()) {
+        if (action->isNone()) {
             none++;
         }
     }
@@ -385,7 +379,7 @@ void RuleWithActions::executeTransformations(
         if (none == 0) {
             executeTransformation(trans, &results, t);
         }
-        if (t->m_isNone) {
+        if (t->isNone()) {
             none--;
         }
     }
@@ -398,7 +392,7 @@ void RuleWithActions::executeTransformations(
             continue;
         }
         Transformation *t = dynamic_cast<Transformation*>(b.second.get());
-        if (t->m_isNone) {
+        if (t->isNone()) {
             none++;
         }
     }
@@ -412,7 +406,7 @@ void RuleWithActions::executeTransformations(
         if (none == 0) {
             executeTransformation(trans, &results, t);
         }
-        if (t->m_isNone) {
+        if (t->isNone()) {
             none--;
         }
     }
@@ -446,11 +440,11 @@ void RuleWithActions::executeTransformation(
 
 void RuleWithActions::executeTransformation(
     Transaction *transaction,
-    ModSecStackString in,
+    ModSecString in,
     TransformationsResults *ret,
     Transformation *transformation) {
 
-    ModSecStackString out;
+    ModSecString out;
     transformation->execute(transaction, in, out);
 
     ms_dbg_a(transaction, 9, " T (" + std::to_string(ret->size() - 1) + ") " + \
