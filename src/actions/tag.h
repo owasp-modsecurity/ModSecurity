@@ -38,8 +38,7 @@ class Tag : public Action {
 
     std::string getName(Transaction *transaction);
 
-    bool execute(RuleWithActions *rule, Transaction *transaction,
-        RuleMessage &rm) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
  protected:
     std::shared_ptr<RunTimeString> m_string;
