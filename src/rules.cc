@@ -14,7 +14,7 @@
  */
 
 #include "modsecurity/rules.h"
-#include "src/rule_with_actions.h"
+#include "modsecurity/rule_with_actions.h"
 
 
 namespace modsecurity {
@@ -37,14 +37,14 @@ int Rules::append(Rules *from, const std::vector<int64_t> &ids, std::ostringstre
 }
 
 
-bool Rules::insert(std::shared_ptr<Rule> rule) {
+bool Rules::insert(const std::shared_ptr<Rule> &rule) {
     return insert(rule, nullptr, nullptr);
 }
 
 
 bool Rules::insert(std::shared_ptr<Rule> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
     RuleWithActions*r = dynamic_cast<RuleWithActions*>(rule.get());
-    if (r && ids != nullptr && err != nullptr
+    if (r && ids != nullptr
         && std::binary_search(ids->begin(), ids->end(), r->getId())) {
         if (err != NULL) {
             *err << "Rule id: " << std::to_string(r->getId()) \
@@ -57,22 +57,22 @@ bool Rules::insert(std::shared_ptr<Rule> rule, const std::vector<int64_t> *ids, 
 }
 
 
-size_t Rules::size() {
+size_t Rules::size() const {
     return m_rules.size();
 }
 
 
-std::shared_ptr<Rule> Rules::operator[](int index) {
+std::shared_ptr<Rule> Rules::operator[](int index) const {
     return m_rules[index];
 }
 
 
-std::shared_ptr<Rule> Rules::at(int index) {
+std::shared_ptr<Rule> Rules::at(int index) const {
     return m_rules[index];
 }
 
 
-void Rules::dump() {
+void Rules::dump() const {
     for (int j = 0; j < m_rules.size(); j++) {
         std::cout << "    Rule ID: " << m_rules.at(j)->getReference();
         std::cout << "--" << m_rules.at(j) << std::endl;
