@@ -39,8 +39,7 @@ class LogData : public Action {
         : Action("logdata", RunTimeOnlyIfMatchKind),
             m_string(std::move(z)) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction,
-       RuleMessage &rm) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
     std::string data(Transaction *Transaction);
 
