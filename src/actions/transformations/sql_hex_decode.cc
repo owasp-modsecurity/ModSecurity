@@ -42,8 +42,8 @@ namespace transformations {
 #endif
 
 void SqlHexDecode::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     unsigned char *input;
     int size = 0;
 
