@@ -28,8 +28,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Log::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
+bool Log::execute(RuleWithActions *rule, Transaction *transaction) {
     return true;
 }
 
