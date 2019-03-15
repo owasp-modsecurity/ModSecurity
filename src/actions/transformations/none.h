@@ -32,11 +32,15 @@ class None : public Transformation {
  public:
     explicit None(std::string action)
         : Transformation(action)
-        { m_isNone = true; }
+        {  }
 
     void execute(Transaction *t,
         ModSecStackString &in,
         ModSecStackString &out) override;
+
+    bool isNone() override {
+        return true;
+    }
 };
 
 }  // namespace transformations

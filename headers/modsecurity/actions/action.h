@@ -39,19 +39,8 @@ namespace actions {
 
 class Action {
  public:
-
-    explicit Action(const std::string& _action)
-        : m_isNone(false),
-        temporaryAction(false),
-        action_kind(2),
-        m_name(nullptr),
-        m_parser_payload("") {
-            set_name_and_payload(_action);
-        }
-    Action(const std::string& _action, int kind)
-        : m_isNone(false),
-        temporaryAction(false),
-        action_kind(kind),
+    Action(const std::string& _action, int kind = 2)
+        : m_actionKind(kind),
         m_name(nullptr),
         m_parser_payload("") {
             set_name_and_payload(_action);
@@ -59,10 +48,12 @@ class Action {
 
     virtual ~Action() { }
 
+    virtual bool init(std::string *error) { return true; }
+
     virtual std::string execute(const std::string &exp,
         Transaction *transaction);
-    virtual bool execute(RuleWithActions *rule, Transaction *transaction);
-
+    virtual bool execute(RuleWithActions *rule,
+        Transaction *transaction);
     /**
      * This method is meant to be used by transformations — a particular
      * type of action.
@@ -73,37 +64,7 @@ class Action {
         ModSecStackString &out) {
     };
 
-    virtual bool init(std::string *error) { return true; }
     virtual bool isDisruptive() { return false; }
-
-
-    void set_name_and_payload(const std::string& data) {
-        size_t pos = data.find(":");
-        std::string t = "t:";
-
-        if (data.compare(0, t.length(), t) == 0) {
-            pos = data.find(":", 2);
-        }
-
-        if (pos == std::string::npos) {
-            m_name = std::shared_ptr<std::string>(new std::string(data));
-            return;
-        }
-
-        m_name = std::shared_ptr<std::string>(new std::string(data, 0, pos));
-        m_parser_payload = std::string(data, pos + 1, data.length());
-
-        if (m_parser_payload.at(0) == '\'' && m_parser_payload.size() > 2) {
-            m_parser_payload.erase(0, 1);
-            m_parser_payload.pop_back();
-        }
-    }
-
-    bool m_isNone;
-    bool temporaryAction;
-    int action_kind;
-    std::shared_ptr<std::string> m_name;
-    std::string m_parser_payload;
 
     /**
      *
@@ -136,7 +97,35 @@ class Action {
      */
      RunTimeOnlyIfMatchKind,
     };
- };
+
+    int m_actionKind;
+    std::shared_ptr<std::string> m_name;
+    std::string m_parser_payload;
+
+ private:
+
+    void set_name_and_payload(const std::string& data) {
+        size_t pos = data.find(":");
+        std::string t = "t:";
+
+        if (data.compare(0, t.length(), t) == 0) {
+            pos = data.find(":", 2);
+        }
+
+        if (pos == std::string::npos) {
+            m_name = std::shared_ptr<std::string>(new std::string(data));
+            return;
+        }
+
+        m_name = std::shared_ptr<std::string>(new std::string(data, 0, pos));
+        m_parser_payload = std::string(data, pos + 1, data.length());
+
+        if (m_parser_payload.at(0) == '\'' && m_parser_payload.size() > 2) {
+            m_parser_payload.erase(0, 1);
+            m_parser_payload.pop_back();
+        }
+    }
+};
 
 
 }  // namespace actions

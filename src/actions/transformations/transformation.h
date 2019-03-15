@@ -34,8 +34,10 @@ class Transformation : public Action {
 
     void execute(Transaction *t,
         ModSecStackString &in,
-        ModSecStackString &out) {
+        ModSecStackString &out) override {
     };
+
+    virtual bool isNone() { return false; }
 
     static Transformation* instantiate(std::string a);
 };
