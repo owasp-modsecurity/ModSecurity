@@ -305,8 +305,8 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
     while (!trans.empty()) {
         modsecurity::actions::transformations::Transformation *t;
-        ModSecStackString in;
-        ModSecStackString out;
+        ModSecString in;
+        ModSecString out;
 
         yajl_gen_map_open(g);
         yajl_gen_string(g,

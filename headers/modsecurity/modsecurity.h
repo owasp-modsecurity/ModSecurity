@@ -90,6 +90,12 @@ typedef struct ModSecurity_t modsecurity;
 #else
 namespace modsecurity {
     /**
+     *  Further that will be changed to be a stack-based string,
+     * for the benefit of performance.
+     */
+    using ModSecString = std::string;
+
+    /**
      *
      * The Phases enumerator consists in mapping the different stages of a
      * given request. ModSecurity is expected to inspect data based on those

@@ -32,8 +32,8 @@ namespace transformations {
 
 
 void CmdLine::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     int space = 0;
 
     for (auto& a : in) {
