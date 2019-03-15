@@ -258,20 +258,20 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         } else if (*a->m_name.get() == "setvar") {
             ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
                 "action: " + *a->m_name.get());
-            a->execute(this, trans, *trans->messageGetLast());
+            a->execute(this, trans);
         }
     }
 
     if (m_logData) {
-        m_logData->execute(this, trans, *trans->messageGetLast());
+        m_logData->execute(this, trans);
     } else if (m_defaultActionLogData) {
-        m_defaultActionLogData->execute(this, trans, *trans->messageGetLast());
+        m_defaultActionLogData->execute(this, trans);
     }
 
     if (m_msg) {
-        m_msg->execute(this, trans, *trans->messageGetLast());
+        m_msg->execute(this, trans);
     } else if (m_defaultActionMsg) {
-        m_defaultActionMsg->execute(this, trans, *trans->messageGetLast());
+        m_defaultActionMsg->execute(this, trans);
     }
 }
 
@@ -294,7 +294,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
     for (actions::Tag *a : getTagsActionPtr()) {
         ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
             + *a->m_name.get());
-        a->execute(this, trans, *trans->messageGetLast());
+        a->execute(this, trans);
     }
 
     /**
@@ -332,11 +332,10 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
 
 void RuleWithActions::executeAction(Transaction *trans,
     Action *a, bool defaultContext) {
-
     if (a->isDisruptive() == false && *a->m_name.get() != "block") {
         ms_dbg_a(trans, 9, "Running " \
             "action: " + *a->m_name.get());
-        a->execute(this, trans, *trans->messageGetLast());
+        a->execute(this, trans);
         return;
     }
 
@@ -349,7 +348,7 @@ void RuleWithActions::executeAction(Transaction *trans,
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + 
             *a->m_name.get() + ".");
-        a->execute(this, trans, *trans->messageGetLast());
+        a->execute(this, trans);
         return;
     }
 
