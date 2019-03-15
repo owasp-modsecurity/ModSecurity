@@ -35,8 +35,8 @@ namespace transformations {
 
 
 void NormalisePathWin::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     int changed;
 
     char *tmp = reinterpret_cast<char *>(

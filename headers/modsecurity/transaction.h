@@ -50,7 +50,6 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/variable_origin.h"
 #include "modsecurity/anchored_set_variable_translation_proxy.h"
 
-
 #ifndef NO_LOGS
 #define ms_dbg(b, c) \
   do { \

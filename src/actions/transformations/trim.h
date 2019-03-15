@@ -34,12 +34,12 @@ class Trim : public Transformation {
         : Transformation(action) { };
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
-    static void ltrim(ModSecStackString *s);
-    static void rtrim(ModSecStackString *s);
-    static void trim(ModSecStackString *s);
+    static void ltrim(ModSecString *s);
+    static void rtrim(ModSecString *s);
+    static void trim(ModSecString *s);
 };
 
 }  // namespace transformations

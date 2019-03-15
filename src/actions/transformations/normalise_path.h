@@ -34,8 +34,8 @@ class NormalisePath : public Transformation {
         : Transformation(action) { };
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
     static int normalize_path_inplace(unsigned char *input, int input_len,
         int win, int *changed);

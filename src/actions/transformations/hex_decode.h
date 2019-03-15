@@ -34,8 +34,8 @@ class HexDecode : public Transformation {
         : Transformation(action) { }
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
     static int inplace(unsigned char *data, int len);
 };

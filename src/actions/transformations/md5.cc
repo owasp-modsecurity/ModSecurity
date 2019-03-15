@@ -32,8 +32,8 @@ namespace transformations {
 
 
 void Md5::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     std::string ret = Utils::Md5::digest(std::string(in.c_str(), in.size()));
 
     out.assign(ret.c_str(), ret.size());

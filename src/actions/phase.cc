@@ -22,6 +22,7 @@
 #include "modsecurity/rule.h"
 #include "modsecurity/modsecurity.h"
 #include "src/utils/string.h"
+#include "modsecurity/rule_with_actions.h"
 
 
 namespace modsecurity {

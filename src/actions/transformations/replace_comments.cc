@@ -33,8 +33,8 @@ namespace transformations {
 
 
 void ReplaceComments::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     uint64_t i, j, incomment;
 
     char *input = reinterpret_cast<char *>(

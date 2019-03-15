@@ -82,8 +82,8 @@ std::string UrlEncode::url_enc(const char *input,
 
 
 void UrlEncode::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     int changed;
 
     std::string ret = url_enc(in.c_str(), in.size(), &changed);

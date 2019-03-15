@@ -20,6 +20,8 @@
 
 #include "src/operators/operator.h"
 #include "others/libinjection/src/libinjection.h"
+#include "modsecurity/rule_with_actions.h"
+
 
 namespace modsecurity {
 namespace operators {

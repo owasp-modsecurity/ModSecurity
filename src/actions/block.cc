@@ -24,6 +24,7 @@
 #include "modsecurity/rule.h"
 #include "modsecurity/intervention.h"
 #include "src/actions/data/status.h"
+#include "modsecurity/rule_with_actions.h"
 
 namespace modsecurity {
 namespace actions {

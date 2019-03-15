@@ -32,8 +32,8 @@ namespace transformations {
 
 
 void RemoveWhitespace::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     out = in;
     int64_t i = 0;
     const char nonBreakingSpaces = 0xa0;

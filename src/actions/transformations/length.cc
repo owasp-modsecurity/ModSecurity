@@ -32,8 +32,8 @@ namespace transformations {
 
 
 void Length::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     out.assign(std::to_string(in.size()).c_str());
 }
 
