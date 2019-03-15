@@ -34,8 +34,8 @@ class EscapeSeqDecode : public Transformation {
         : Transformation(action) { }
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
     static int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len);
 };

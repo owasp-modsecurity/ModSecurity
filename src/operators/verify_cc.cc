@@ -21,6 +21,8 @@
 #include <vector>
 
 #include "src/operators/operator.h"
+#include "modsecurity/rule_with_actions.h"
+
 
 #if PCRE_HAVE_JIT
 #define pcre_study_opt PCRE_STUDY_JIT_COMPILE

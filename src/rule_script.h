@@ -32,6 +32,8 @@
 #include "src/actions/log_data.h"
 #include "src/actions/severity.h"
 #include "src/variables/variable.h"
+#include "modsecurity/rule_with_actions.h"
+
 
 #ifndef SRC_RULE_SCRIPT_H_
 #define SRC_RULE_SCRIPT_H_

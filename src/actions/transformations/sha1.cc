@@ -33,8 +33,8 @@ namespace transformations {
 
 
 void Sha1::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
 
     auto a = Utils::Sha1::digest(
             std::string(in.c_str(), in.size())

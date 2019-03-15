@@ -32,8 +32,8 @@ namespace transformations {
 
 
 void None::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) { }
+    ModSecString &in,
+    ModSecString &out) { }
 
 
 }  // namespace transformations

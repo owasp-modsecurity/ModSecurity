@@ -33,8 +33,8 @@ namespace transformations {
 
 
 void ParityZero7bit::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>

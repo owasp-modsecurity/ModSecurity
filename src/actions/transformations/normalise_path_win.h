@@ -34,8 +34,8 @@ class NormalisePathWin : public Transformation {
         : Transformation(action) { }
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 };
 
 }  // namespace transformations

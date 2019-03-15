@@ -34,8 +34,8 @@ class ParityEven7bit : public Transformation {
         : Transformation(action) { }
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
     static bool inplace(unsigned char *input, uint64_t input_len);
 };

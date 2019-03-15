@@ -40,8 +40,8 @@ class Utf8ToUnicode : public Transformation {
 
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
     static char *inplace(unsigned char *input, uint64_t input_len,
         int *changed);

@@ -32,8 +32,8 @@ namespace transformations {
 
 
 void CompressWhitespace::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     int inWhiteSpace = 0;
     size_t i = 0;
     out.reserve(in.size());

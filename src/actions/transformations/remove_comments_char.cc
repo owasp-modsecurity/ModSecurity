@@ -32,8 +32,8 @@ namespace transformations {
 
 
 void RemoveCommentsChar::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     int64_t i;
     out = in;
 

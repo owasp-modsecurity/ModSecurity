@@ -33,8 +33,8 @@ namespace transformations {
 
 
 void UrlDecode::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     unsigned char *val(NULL);
     int invalid_count = 0;
     int changed;

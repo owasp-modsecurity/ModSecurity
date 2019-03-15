@@ -34,8 +34,8 @@ PhpArgsNames::PhpArgsNames(const std::string &a)
 
 
 void PhpArgsNames::execute(Transaction *t,
-    ModSecStackString &val,
-    ModSecStackString &out) {
+    ModSecString &val,
+    ModSecString &out) {
     //Took the logic from php src code:
     //https://github.com/php/php-src/blob/master/main/php_variables.c
     //Function call PHPAPI void php_register_variable_ex(const char *var_name, zval *val, zval *track_vars_array)

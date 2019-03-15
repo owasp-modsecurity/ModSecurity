@@ -35,8 +35,8 @@ class TrimRight : public Trim {
         : Trim(action) { };
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 };
 
 }  // namespace transformations

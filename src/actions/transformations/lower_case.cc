@@ -28,8 +28,8 @@ namespace transformations {
 
 
 void LowerCase::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     std::locale loc;
     out.resize(in.size());
     for (std::string::size_type i=0; i < in.size(); ++i) {

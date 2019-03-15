@@ -35,8 +35,8 @@ class CssDecode : public Transformation {
         : Transformation(action) { }
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
     static int css_decode_inplace(unsigned char *input, int64_t input_len);
 };
