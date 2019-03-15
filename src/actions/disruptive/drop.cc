@@ -32,8 +32,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Drop::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
+bool Drop::execute(RuleWithActions *rule, Transaction *transaction) {
     ms_dbg_a(transaction, 8, "Running action drop " \
         "[executing deny instead of drop.]");
 
@@ -43,9 +42,9 @@ bool Drop::execute(RuleWithActions *rule, Transaction *transaction,
 
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
-    rm.setRule(rule);
+    transaction->messageGetLast()->setRule(rule);
     transaction->m_it.log = strdup(
-        rm.log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
+        transaction->messageGetLast()->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
 
     return true;
 }

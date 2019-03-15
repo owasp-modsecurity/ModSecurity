@@ -29,8 +29,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Block::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
+bool Block::execute(RuleWithActions *rule, Transaction *transaction) {
     ms_dbg_a(transaction, 8, "Marking request as disruptive.");
     return true;
 }
