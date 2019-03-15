@@ -52,7 +52,7 @@
 #include "modsecurity/rules_set_properties.h"
 #include "src/actions/disruptive/allow.h"
 #include "src/variables/remote_user.h"
-
+#include "src/actions/tag.h"
 
 
 using modsecurity::actions::Action;
@@ -1686,10 +1686,11 @@ std::string Transaction::toJSON(int parts) {
                 reinterpret_cast<const unsigned char*>("tags"),
                 strlen("tags"));
             yajl_gen_array_open(g);
-            for (auto b : a.m_tags) {
+            for (auto b : a.getTags()) {
+                std::string c = b->getName(this);
                 yajl_gen_string(g,
-                    reinterpret_cast<const unsigned char*>(b.c_str()),
-                    strlen(b.c_str()));
+                    reinterpret_cast<const unsigned char*>(c.c_str()),
+                    strlen(c.c_str()));
             }
             yajl_gen_array_close(g);
 
