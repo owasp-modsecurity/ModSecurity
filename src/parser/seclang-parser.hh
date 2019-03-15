@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.3.2.
+// A Bison parser, made by GNU Bison 3.4.2.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
@@ -44,7 +44,7 @@
 #ifndef YY_YY_SECLANG_PARSER_HH_INCLUDED
 # define YY_YY_SECLANG_PARSER_HH_INCLUDED
 // //                    "%code requires" blocks.
-#line 10 "seclang-parser.yy" // lalr1.cc:401
+#line 10 "seclang-parser.yy"
 
 #include <string>
 #include <iterator>
@@ -348,7 +348,7 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 352 "seclang-parser.hh" // lalr1.cc:401
+#line 352 "seclang-parser.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -462,9 +462,9 @@ using namespace modsecurity::operators;
 # define YYDEBUG 1
 #endif
 
-
 namespace yy {
-#line 468 "seclang-parser.hh" // lalr1.cc:401
+#line 467 "seclang-parser.hh"
+
 
 
 
@@ -8126,9 +8126,9 @@ switch (yytype)
     return token_type (yytoken_number_[type]);
   }
 
-
 } // yy
-#line 8132 "seclang-parser.hh" // lalr1.cc:401
+#line 8131 "seclang-parser.hh"
+
 
 
 

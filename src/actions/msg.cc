@@ -46,10 +46,9 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Msg::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
+bool Msg::execute(RuleWithActions *rule, Transaction *transaction) {
     std::string msg = data(transaction);
-    rm.m_message = msg;
+    transaction->messageGetLast()->m_message = msg;
     ms_dbg_a(transaction, 9, "Saving msg: " + msg);
 
     return true;

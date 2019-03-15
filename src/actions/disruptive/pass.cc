@@ -29,8 +29,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Pass::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
+bool Pass::execute(RuleWithActions *rule, Transaction *transaction) {
     intervention::free(&transaction->m_it);
     intervention::reset(&transaction->m_it);
 

@@ -71,13 +71,12 @@ bool Severity::init(std::string *error) {
 }
 
 
-bool Severity::execute(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &rm) {
+bool Severity::execute(RuleWithActions *rule, Transaction *transaction) {
     ms_dbg_a(transaction, 9, "This rule severity is: " + \
         std::to_string(this->m_severity) + " current transaction is: " + \
         std::to_string(transaction->m_highestSeverityAction));
 
-    rm.m_severity = m_severity;
+    transaction->messageGetLast()->m_severity = m_severity;
 
     if (transaction->m_highestSeverityAction > this->m_severity) {
         transaction->m_highestSeverityAction = this->m_severity;

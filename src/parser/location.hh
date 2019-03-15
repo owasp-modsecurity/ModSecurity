@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.3.2.
+// A Bison parser, made by GNU Bison 3.4.2.
 
 // Locations for Bison parsers in C++
 
@@ -54,9 +54,9 @@
 #  endif
 # endif
 
-
 namespace yy {
-#line 60 "location.hh" // location.cc:339
+#line 59 "location.hh"
+
   /// A point in a source file.
   class position
   {
@@ -316,7 +316,7 @@ namespace yy {
     return ostr;
   }
 
-
 } // yy
-#line 322 "location.hh" // location.cc:339
+#line 321 "location.hh"
+
 #endif // !YY_YY_LOCATION_HH_INCLUDED
