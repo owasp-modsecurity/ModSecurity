@@ -34,8 +34,8 @@ namespace transformations {
 
 
 void RemoveNulls::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     int64_t i;
     out = in;
 

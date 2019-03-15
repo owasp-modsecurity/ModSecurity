@@ -40,51 +40,19 @@ namespace modsecurity {
 
 class Rules {
  public:
-    void dump() const {
-        for (int j = 0; j < m_rules.size(); j++) {
-            std::cout << "    Rule ID: " << m_rules.at(j)->getReference();
-            std::cout << "--" << m_rules.at(j) << std::endl;
-        }
-    }
+    void dump() const;
 
-    int append(Rules *from, const std::vector<int64_t> &ids, std::ostringstream *err) {
-         size_t j = 0;
-         for (; j < from->size(); j++) {
-            RuleWithOperator *rule = dynamic_cast<RuleWithOperator *>(from->at(j).get());
-            if (rule && std::binary_search(ids.begin(), ids.end(), rule->getId())) {
-                 if (err != NULL) {
-                     *err << "Rule id: " << std::to_string(rule->getId()) \
-                        << " is duplicated" << std::endl;
-                 }
-                 return -1;
-             }
-         }
-         m_rules.insert(m_rules.end(), from->m_rules.begin(), from->m_rules.end());
-         return j;
-    }
+    int append(Rules *from, const std::vector<int64_t> &ids, std::ostringstream *err);
 
-    bool insert(const std::shared_ptr<Rule> &rule) {
-        return insert(rule, nullptr, nullptr);
-    }
+    bool insert(const std::shared_ptr<Rule> &rule);
 
-    bool insert(std::shared_ptr<Rule> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
-        RuleWithOperator *r = dynamic_cast<RuleWithOperator *>(rule.get());
-        if (r && ids != nullptr && std::binary_search(ids->begin(), ids->end(), r->getId())) {
-            if (err != nullptr) {
-                *err << "Rule id: " << std::to_string(r->getId()) \
-                    << " is duplicated" << std::endl;
-            }
-            return false;
-        }
-        m_rules.push_back(rule);
-        return true;
-    }
+    bool insert(std::shared_ptr<Rule> rule, const std::vector<int64_t> *ids, std::ostringstream *err);
+
+    size_t size() const;
+    std::shared_ptr<Rule> operator[](int index) const;
+    std::shared_ptr<Rule> at(int index) const;
 
     void fixDefaultActions();
-
-    size_t size() const { return m_rules.size(); }
-    std::shared_ptr<Rule> operator[](int index) const { return m_rules[index]; }
-    std::shared_ptr<Rule> at(int index) const { return m_rules[index]; }
 
     std::vector<std::shared_ptr<actions::Action> > m_defaultActions;
     std::vector<std::shared_ptr<actions::transformations::Transformation> > m_defaultTransformations;

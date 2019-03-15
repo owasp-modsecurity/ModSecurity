@@ -55,7 +55,7 @@ noConstructor:src/variables/variable.h:152
 duplicateBranch:src/request_body_processor/multipart.cc:93
 danglingTempReference:src/modsecurity.cc:204
 knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
-knownConditionTrueFalse:src/operators/verify_svnr.cc:87
+knownConditionTrueFalse:src/operators/verify_svnr.cc:88
 
 noExplicitConstructor:seclang-parser.hh
 
