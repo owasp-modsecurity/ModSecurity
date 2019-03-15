@@ -46,8 +46,7 @@ class Redirect : public Action {
             m_status(0),
             m_string(std::move(z)) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction,
-        RuleMessage &rm) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
     bool isDisruptive() override { return true; }
 
