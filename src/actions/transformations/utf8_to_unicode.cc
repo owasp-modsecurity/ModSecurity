@@ -34,8 +34,8 @@ namespace transformations {
 
 
 void Utf8ToUnicode::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
 
     unsigned char *input;
     int changed = 0;

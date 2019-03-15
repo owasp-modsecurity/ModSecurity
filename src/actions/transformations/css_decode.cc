@@ -35,17 +35,19 @@ namespace transformations {
 
 
 void CssDecode::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
+    size_t s = in.size();
+
     char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * in.size() + 1));
-    memcpy(tmp, in.c_str(), in.size() + 1);
-    tmp[in.size()] = '\0';
+        malloc(sizeof(char) * s + 1));
+    memcpy(tmp, in.c_str(), s + 1);
+    tmp[s] = '\0';
 
-    CssDecode::css_decode_inplace(reinterpret_cast<unsigned char *>(tmp),
-        in.size());
+    size_t r = CssDecode::css_decode_inplace(reinterpret_cast<unsigned char *>(tmp),
+        s);
 
-    out.assign(tmp, 0, in.size());
+    out.assign(tmp, r);
     free(tmp);
 }
 

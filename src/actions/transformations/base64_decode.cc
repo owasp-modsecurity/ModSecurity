@@ -33,8 +33,8 @@ namespace transformations {
 
 
 void Base64Decode::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     std::string value(in.c_str(), in.size());
     std::string ret = Utils::Base64::decode(value);
     out.assign(ret.c_str(), ret.size());
