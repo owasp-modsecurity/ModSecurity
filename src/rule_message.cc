@@ -19,6 +19,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"
+#include "src/actions/tag.h"
 
 namespace modsecurity {
 
@@ -38,8 +39,8 @@ std::string RuleMessage::_details(RuleMessage *rm) {
     msg.append(" [ver \"" + rm->getVer() + "\"]");
     msg.append(" [maturity \"" + std::to_string(rm->getMaturity()) + "\"]");
     msg.append(" [accuracy \"" + std::to_string(rm->getAccuracy()) + "\"]");
-    for (auto &a : rm->m_tags) {
-        msg.append(" [tag \"" + a + "\"]");
+    for (auto a : rm->getTags()) {
+        msg.append(" [tag \"" + a->getName(rm->m_transaction) + "\"]");
     }
     msg.append(" [hostname \"" + rm->getServerIpAddress() + "\"]");
     msg.append(" [uri \"" + utils::string::limitTo(200, rm->getUri()) + "\"]");
@@ -90,6 +91,15 @@ std::string RuleMessage::log(RuleMessage *rm, int props, int code) {
     }
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
+}
+
+
+RuleWithActions::Tags RuleMessage::getTags() {
+    if (m_rule) {
+        return m_rule->getTags();
+    }
+    RuleWithActions::Tags a;
+    return a;
 }
 
 

@@ -48,13 +48,13 @@
     },
     "expected":{
       "audit_log":"",
-      "debug_log":"Rule tag: teste",
-      "error_log":""
+      "debug_log":"",
+      "error_log":"tag \"teste\""
     },
     "rules":[
       "SecRuleEngine On",
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,tag:'teste',t:lowercase,t:none\"",
-      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
+      "SecRule ARGS \"@contains test\" \"id:2,t:lowercase,t:none,tag:'teste',block\""
     ]
   },
   {
@@ -106,13 +106,13 @@
     },
     "expected":{
       "audit_log":"",
-      "debug_log":"Rule tag: teste no-cache",
-      "error_log":""
+      "error_log":"tag \"teste no-cache\"",
+      "debug_log":""
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,tag:'teste %{REQUEST_HEADERS:Pragma}%',t:lowercase,t:none\"",
-      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,t:lowercase,t:none\"",
+      "SecRule ARGS \"@contains test\" \"id:2,t:lowercase,t:none,block,tag:'teste %{REQUEST_HEADERS:Pragma}%'\""
     ]
   }
 ]
