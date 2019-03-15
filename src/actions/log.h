@@ -33,8 +33,7 @@ class Log : public Action {
     explicit Log(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction,
-        RuleMessage &rm) override;
+    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 };
 
 }  // namespace actions
