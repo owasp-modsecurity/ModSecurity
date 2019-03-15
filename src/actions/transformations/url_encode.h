@@ -34,8 +34,8 @@ class UrlEncode : public Transformation {
         : Transformation(action) { };
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
     static std::string url_enc(const char *input,
         unsigned int input_len, int *changed);

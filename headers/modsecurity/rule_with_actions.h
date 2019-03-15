@@ -64,18 +64,17 @@ using MatchActionsPtr = std::vector<actions::Action *>;
 using XmlNSs = std::vector<std::shared_ptr<actions::XmlNS> >;
 using XmlNSsPtr = std::vector<actions::XmlNS *>;
 
-using ModSecStackString = std::basic_string<char, std::char_traits<char>, std::allocator<char> >;
 
 class TransformationResult {
  public:
     TransformationResult(
-        ModSecStackString *after,
+        ModSecString *after,
         std::string *transformation)
         : m_after(*after),
         m_transformation(transformation) { };
 
     explicit TransformationResult(
-        ModSecStackString *after)
+        ModSecString *after)
         : m_after(*after),
         m_transformation(nullptr) { };
 
@@ -84,7 +83,7 @@ class TransformationResult {
         m_transformation(t2.m_transformation) { };
 
 
-    ModSecStackString *getAfter() {
+    ModSecString *getAfter() {
         return &m_after;
     }
 
@@ -95,7 +94,7 @@ class TransformationResult {
 
 
  private:
-    ModSecStackString m_after;
+    ModSecString m_after;
     std::string *m_transformation;
 };
 
@@ -224,7 +223,7 @@ class RuleWithActions : public Rule {
 
     static void executeTransformation(
         Transaction *transaction,
-        ModSecStackString in,
+        ModSecString in,
         TransformationsResults *ret,
         Transformation *transformation);
 

@@ -31,27 +31,27 @@ namespace actions {
 namespace transformations {
 
 
-void Trim::ltrim(ModSecStackString *s) {
+void Trim::ltrim(ModSecString *s) {
     s->erase(s->begin(), std::find_if(s->begin(), s->end(),
         std::not1(std::ptr_fun<int, int>(std::isspace))));
 }
 
 
-void Trim::rtrim(ModSecStackString *s) {
+void Trim::rtrim(ModSecString *s) {
     s->erase(std::find_if(s->rbegin(), s->rend(),
         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s->end());
 }
 
 
-void Trim::trim(ModSecStackString *s) {
+void Trim::trim(ModSecString *s) {
     rtrim(s);
     ltrim(s);
 }
 
 
 void Trim::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     out = in;
     trim(&out);
 };
