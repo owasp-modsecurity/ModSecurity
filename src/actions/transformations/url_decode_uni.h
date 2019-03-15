@@ -35,8 +35,8 @@ class UrlDecodeUni : public Transformation {
         : Transformation(action) { }
 
     void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) override;
+        ModSecString &in,
+        ModSecString &out) override;
 
     static int inplace(unsigned char *input, uint64_t input_len,
         Transaction *transaction);

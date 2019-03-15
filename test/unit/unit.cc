@@ -90,8 +90,8 @@ void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
         }
         delete op;
     } else if (t->type == "tfn") {
-        modsecurity::ModSecStackString in;
-        modsecurity::ModSecStackString out;
+        modsecurity::ModSecString in;
+        modsecurity::ModSecString out;
         std::string ret;
         in.assign(t->input.c_str(), t->input.size());
         Transformation *tfn = Transformation::instantiate("t:" + t->name);
