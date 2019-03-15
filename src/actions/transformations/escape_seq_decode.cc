@@ -136,8 +136,8 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 
 
 void EscapeSeqDecode::execute(Transaction *t,
-    ModSecStackString &in,
-    ModSecStackString &out) {
+    ModSecString &in,
+    ModSecString &out) {
     unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
         * in.size() + 1);
     memcpy(tmp, in.c_str(), in.size() + 1);
