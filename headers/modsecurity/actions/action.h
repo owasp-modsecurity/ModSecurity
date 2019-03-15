@@ -78,10 +78,6 @@ class Action {
     virtual std::string execute(const std::string &exp,
         Transaction *transaction);
     virtual bool execute(RuleWithActions *rule, Transaction *transaction);
-    virtual bool execute(RuleWithActions *rule, Transaction *transaction,
-        RuleMessage &ruleMessage) {
-        return execute(rule, transaction);
-    }
 
     /**
      * This method is meant to be used by transformations — a particular
