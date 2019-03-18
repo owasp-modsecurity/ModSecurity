@@ -33,15 +33,7 @@ public:
     REQUEST_NOTIFICATION_STATUS
     OnBeginRequest(IHttpContext*, IHttpEventProvider*) override;
 
-    REQUEST_NOTIFICATION_STATUS
-    OnSendResponse(IHttpContext*, ISendResponseProvider*) override;
-
-    REQUEST_NOTIFICATION_STATUS
-    OnPostEndRequest(IHttpContext*, IHttpEventProvider*) override;
-
     void Dispose() override;
-
-    HRESULT ReadFileChunk(HTTP_DATA_CHUNK* chunk, char* buf);
 
     BOOL WriteEventViewerLog(LPCSTR szNotification, WORD category = EVENTLOG_INFORMATION_TYPE);
 
