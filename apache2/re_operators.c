@@ -1684,7 +1684,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
         return 0;
     }
 
-    data = apr_pcalloc(rule->ruleset->mp, var->value_len+1);
+    data = apr_pcalloc(msr->mp, var->value_len+1);
 
     if(data == NULL)    {
         *error_msg = "Internal Error: cannot allocate memory for data.";
@@ -1699,18 +1699,18 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     {
         for(i = 0; i < rv; ++i)
         {
-            match = apr_psprintf(rule->ruleset->mp, "%.*s", ovector[2*i+1] - ovector[2*i], data + ovector[2*i]);
+            match = apr_psprintf(msr->mp, "%.*s", ovector[2*i+1] - ovector[2*i], data + ovector[2*i]);
 
             if (match == NULL)  {
                 *error_msg = "Internal Error: cannot allocate memory for match.";
                 return -1;
             }
 
-            match = remove_escape(rule->ruleset->mp, match, strlen(match));
+            match = remove_escape(msr->mp, match, strlen(match));
 
-            match = gsb_replace_tpath(rule->ruleset->mp, match, strlen(match));
+            match = gsb_replace_tpath(msr->mp, match, strlen(match));
 
-            match = gsb_reduce_char(rule->ruleset->mp, match);
+            match = gsb_reduce_char(msr->mp, match);
 
             match_length = strlen(match);
 
@@ -1732,7 +1732,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                 log_escape_nq(msr->mp, match));
                     }
 
-                    str = apr_pstrdup(rule->ruleset->mp,match);
+                    str = apr_pstrdup(msr->mp,match);
 
                     base = apr_strtok(str,"/",&savedptr);
                     if(base != NULL)
@@ -1744,7 +1744,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                 /* append / in the end of full url */
                 if ((match[match_length -1] != '/') && (strchr(match,'?') == NULL))    {
 
-                    canon = apr_psprintf(rule->ruleset->mp, "%s/", match);
+                    canon = apr_psprintf(msr->mp, "%s/", match);
                     if (canon != NULL)  {
 
                         canon_length = strlen(canon);
@@ -1757,7 +1757,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                         log_escape_nq(msr->mp, canon));
                             }
 
-                            str = apr_pstrdup(rule->ruleset->mp,match);
+                            str = apr_pstrdup(msr->mp,match);
 
                             base = apr_strtok(str,"/",&savedptr);
                             if(base != NULL)
@@ -1770,7 +1770,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                 /* Parsing full url */
 
-                domain = apr_pstrdup(rule->ruleset->mp, match);
+                domain = apr_pstrdup(msr->mp, match);
 
                 domain_len = strlen(domain);
 
@@ -1785,7 +1785,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                     dot = strchr(domain,'.');
                     if(dot != NULL) {
-                        canon = apr_pstrdup(rule->ruleset->mp, domain);
+                        canon = apr_pstrdup(msr->mp, domain);
 
                         ret = verify_gsb(gsb, msr, canon, strlen(canon));
 
@@ -1796,7 +1796,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                         log_escape_nq(msr->mp, canon));
                             }
 
-                            str = apr_pstrdup(rule->ruleset->mp,match);
+                            str = apr_pstrdup(msr->mp,match);
 
                             base = apr_strtok(str,"/",&savedptr);
                             if(base != NULL)
@@ -1818,7 +1818,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                             log_escape_nq(msr->mp, base));
                                 }
 
-                                str = apr_pstrdup(rule->ruleset->mp,match);
+                                str = apr_pstrdup(msr->mp,match);
 
                                 base = apr_strtok(str,"/",&savedptr);
                                 if(base != NULL)
@@ -1829,13 +1829,13 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                         }
 
-                        url = apr_palloc(rule->ruleset->mp, strlen(canon));
+                        url = apr_palloc(msr->mp, strlen(canon));
                         count_slash = 0;
 
                         while(*canon != '\0') {
                             switch (*canon)   {
                                 case '/':
-                                    ptr = apr_psprintf(rule->ruleset->mp,"%s/",url);
+                                    ptr = apr_psprintf(msr->mp,"%s/",url);
                                     ret = verify_gsb(gsb, msr, ptr, strlen(ptr));
                                     if(ret > 0) {
                                         set_match_to_tx(msr, capture, ptr, 0);
@@ -1844,7 +1844,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                                     log_escape_nq(msr->mp, ptr));
                                         }
 
-                                        str = apr_pstrdup(rule->ruleset->mp,match);
+                                        str = apr_pstrdup(msr->mp,match);
 
                                         base = apr_strtok(str,"/",&savedptr);
                                         if(base != NULL)
@@ -1871,7 +1871,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                 }
 
 
-                str = apr_pstrdup(rule->ruleset->mp, match);
+                str = apr_pstrdup(msr->mp, match);
 
                 while (*str != '\0')   {
 
@@ -1896,7 +1896,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                                 dot = strchr(domain,'.');
                                 if(dot != NULL) {
-                                    canon = apr_pstrdup(rule->ruleset->mp, domain);
+                                    canon = apr_pstrdup(msr->mp, domain);
 
                                     ret = verify_gsb(gsb, msr, canon, strlen(canon));
 
@@ -1906,7 +1906,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                             *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                                     log_escape_nq(msr->mp, canon));
                                         }
-                                        str = apr_pstrdup(rule->ruleset->mp,match);
+                                        str = apr_pstrdup(msr->mp,match);
 
                                         base = apr_strtok(str,"/",&savedptr);
                                         if(base != NULL)
@@ -1926,7 +1926,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                                 *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                                         log_escape_nq(msr->mp, base));
                                             }
-                                            str = apr_pstrdup(rule->ruleset->mp,match);
+                                            str = apr_pstrdup(msr->mp,match);
 
                                             base = apr_strtok(str,"/",&savedptr);
                                             if(base != NULL)
@@ -1936,13 +1936,13 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                                     }
 
-                                    url = apr_palloc(rule->ruleset->mp, strlen(canon));
+                                    url = apr_palloc(msr->mp, strlen(canon));
                                     count_slash = 0;
 
                                     while(*canon != '\0') {
                                         switch (*canon)   {
                                             case '/':
-                                                ptr = apr_psprintf(rule->ruleset->mp,"%s/",url);
+                                                ptr = apr_psprintf(msr->mp,"%s/",url);
                                                 ret = verify_gsb(gsb, msr, ptr, strlen(ptr));
                                                 if(ret > 0) {
                                                     set_match_to_tx(msr, capture, ptr, 0);
@@ -1950,7 +1950,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                                         *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                                                 log_escape_nq(msr->mp, ptr));
                                                     }
-                                                    str = apr_pstrdup(rule->ruleset->mp,match);
+                                                    str = apr_pstrdup(msr->mp,match);
 
                                                     base = apr_strtok(str,"/",&savedptr);
                                                     if(base != NULL)
@@ -2781,7 +2781,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     if (msr->txcfg->debuglog_level >= 4) {
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
         if ((rc != 0) || (jit != 1)) {
-            *error_msg = apr_psprintf(rule->ruleset->mp,
+            *error_msg = apr_psprintf(msr->mp,
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                     "Execution error - "
                     "Does not support JIT (%d)",
@@ -3092,7 +3092,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     if (msr->txcfg->debuglog_level >= 4) {
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
         if ((rc != 0) || (jit != 1)) {
-            *error_msg = apr_psprintf(rule->ruleset->mp,
+            *error_msg = apr_psprintf(msr->mp,
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                     "Execution error - "
                     "Does not support JIT (%d)",
@@ -3386,7 +3386,7 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     if (msr->txcfg->debuglog_level >= 4) {
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
         if ((rc != 0) || (jit != 1)) {
-            *error_msg = apr_psprintf(rule->ruleset->mp,
+            *error_msg = apr_psprintf(msr->mp,
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                     "Execution error - "
                     "Does not support JIT (%d)",
@@ -3967,7 +3967,7 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
 #ifdef WITH_SSDEEP
     if (fuzzy_hash_buf(var->value, var->value_len, result))
     {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Problems generating " \
+        *error_msg = apr_psprintf(msr->mp, "Problems generating " \
             "fuzzy hash.");
 
         return -1;
@@ -3987,7 +3987,7 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
         chunk = chunk->next;
     }
 #else
-    *error_msg = apr_psprintf(rule->ruleset->mp, "ModSecurity was not " \
+    *error_msg = apr_psprintf(msr->mp, "ModSecurity was not " \
         "compiled with ssdeep support.");
 
     return -1;
