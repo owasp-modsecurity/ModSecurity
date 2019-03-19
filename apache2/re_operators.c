@@ -784,10 +784,10 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
                 msr_log(msr, 6, "Escaping pattern [%s]",pattern);
             }
 
-            regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, 
+            regex = msc_pregcomp_ex(msr->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr,
                     &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
             if (regex == NULL) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
+                *error_msg = apr_psprintf(msr->mp, "Error compiling pattern (offset %d): %s",
                         erroffset, errptr);
                 return 0;
             }
@@ -797,7 +797,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             if (msr->txcfg->debuglog_level >= 4) {
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
                 if ((rc != 0) || (jit != 1)) {
-                    *error_msg = apr_psprintf(rule->ruleset->mp,
+                    *error_msg = apr_psprintf(msr->mp,
                             "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                             "Execution error - "
                             "Does not support JIT (%d)",
@@ -1018,9 +1018,9 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                 msr_log(msr, 6, "Escaping pattern [%s]",pattern);
             }
 
-            regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+            regex = msc_pregcomp_ex(msr->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
             if (regex == NULL) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
+                *error_msg = apr_psprintf(msr->mp, "Error compiling pattern (offset %d): %s",
                         erroffset, errptr);
                 return 0;
             }
@@ -1030,7 +1030,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             if (msr->txcfg->debuglog_level >= 4) {
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
                 if ((rc != 0) || (jit != 1)) {
-                    *error_msg = apr_psprintf(rule->ruleset->mp,
+                    *error_msg = apr_psprintf(msr->mp,
                             "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                             "Execution error - "
                             "Does not support JIT (%d)",
