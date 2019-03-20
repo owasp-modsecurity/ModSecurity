@@ -90,6 +90,8 @@ typedef struct ModSecurity_t modsecurity;
 #else
 namespace modsecurity {
 
+    using RuleId = int64_t;
+
     /**
      *
      * The Phases enumerator consists in mapping the different stages of a

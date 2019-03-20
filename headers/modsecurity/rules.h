@@ -41,13 +41,13 @@ namespace modsecurity {
 class Rules {
  public:
     int append(Rules *from,
-        const std::vector<int64_t> &ids,
+        const std::vector<RuleId> &ids,
         std::ostringstream *err);
 
     bool insert(std::shared_ptr<Rule> rule);
 
     bool insert(std::shared_ptr<Rule> rule,
-        const std::vector<int64_t> *ids,
+        const std::vector<RuleId> *ids,
         std::ostringstream *err);
 
     size_t size();
