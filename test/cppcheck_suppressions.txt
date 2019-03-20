@@ -55,7 +55,8 @@ noConstructor:src/variables/variable.h:152
 duplicateBranch:src/request_body_processor/multipart.cc:93
 knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
 knownConditionTrueFalse:src/operators/verify_svnr.cc:88
-
+noConstructor:src/actions/rule_id.h:33
+functionStatic:src/actions/rule_id.h:35
 
 noExplicitConstructor:seclang-parser.hh
 
