@@ -95,6 +95,8 @@ namespace modsecurity {
      */
     using ModSecString = std::string;
 
+    using RuleId = int64_t;
+
     /**
      *
      * The Phases enumerator consists in mapping the different stages of a
