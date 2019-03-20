@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I build
 
 
 SUBDIRS = \
+	configuration_reload \
 	multiprocess_c \
 	reading_logs_with_offset \
 	reading_logs_via_rule_message \
