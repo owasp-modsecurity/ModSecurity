@@ -45,13 +45,13 @@ class Rules {
     void dump() const;
 
     int append(Rules *from,
-        const std::vector<int64_t> &ids,
+        const std::vector<RuleId> &ids,
         std::ostringstream *err);
 
     bool insert(const std::shared_ptr<Rule> &rule);
 
     bool insert(std::shared_ptr<Rule> rule,
-        const std::vector<int64_t> *ids,
+        const std::vector<RuleId> *ids,
         std::ostringstream *err);
 
     size_t size() const;

@@ -20,7 +20,7 @@
 namespace modsecurity {
 
 
-int Rules::append(Rules *from, const std::vector<int64_t> &ids, std::ostringstream *err) {
+int Rules::append(Rules *from, const std::vector<RuleId> &ids, std::ostringstream *err) {
     size_t j = 0;
     for (; j < from->size(); j++) {
         RuleWithActions *rule = dynamic_cast<RuleWithActions*>(from->at(j).get());
@@ -42,7 +42,7 @@ bool Rules::insert(const std::shared_ptr<Rule> &rule) {
 }
 
 
-bool Rules::insert(std::shared_ptr<Rule> rule, const std::vector<int64_t> *ids, std::ostringstream *err) {
+bool Rules::insert(std::shared_ptr<Rule> rule, const std::vector<RuleId> *ids, std::ostringstream *err) {
     RuleWithActions*r = dynamic_cast<RuleWithActions*>(rule.get());
     if (r && ids != nullptr
         && std::binary_search(ids->begin(), ids->end(), r->getId())) {
