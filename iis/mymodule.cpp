@@ -19,7 +19,6 @@
 #include <string>
 #include <cctype>
 #include <memory>
-#include <future>
 
 //  IIS7 Server API header file
 #include <Windows.h>
@@ -36,7 +35,6 @@
 
 #include "winsock2.h"
 
-#include "asio/packaged_task.hpp"
 #include "asio/post.hpp"
 
 // These helpers make sure that the underlying structures
@@ -57,28 +55,11 @@ RequestRecPtr MakeRequestRec(conn_rec* c, directory_config* config)
 }
 
 struct RequestStoredContext
-    : IHttpStoredContext
 {
     ConnRecPtr connRec;
     RequestRecPtr requestRec;
     IHttpContext* httpContext;
     IHttpEventProvider* provider;
-    char* responseBuffer = nullptr;
-    ULONGLONG responseLength = 0;
-    ULONGLONG responsePosition = 0;
-    bool responseProcessingEnabled = false;
-    std::future<int> detectionProcessing;
-
-    void CleanupStoredContext() override
-    {
-        delete this;
-    }
-
-    void FinishRequest()
-    {
-        requestRec.reset();
-        connRec.reset();
-    }
 };
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
@@ -237,48 +218,6 @@ static void Log(void *obj, int level, char *str)
         logcat = EVENTLOG_WARNING_TYPE;
 
     mod->WriteEventViewerLog(str, logcat);
-}
-
-#define NOTE_IIS "iis-tx-context"
-
-void StoreIISContext(request_rec *r, RequestStoredContext *rsc)
-{
-    apr_table_setn(r->notes, NOTE_IIS, (const char *)rsc);
-}
-
-RequestStoredContext *RetrieveIISContext(request_rec *r)
-{
-    RequestStoredContext *msr = NULL;
-    request_rec *rx = NULL;
-
-    /* Look in the current request first. */
-    msr = (RequestStoredContext *)apr_table_get(r->notes, NOTE_IIS);
-    if (msr != NULL) {
-        //msr->r = r;
-        return msr;
-    }
-
-    /* If this is a subrequest then look in the main request. */
-    if (r->main != NULL) {
-        msr = (RequestStoredContext *)apr_table_get(r->main->notes, NOTE_IIS);
-        if (msr != NULL) {
-            //msr->r = r;
-            return msr;
-        }
-    }
-
-    /* If the request was redirected then look in the previous requests. */
-    rx = r->prev;
-    while(rx != NULL) {
-        msr = (RequestStoredContext *)apr_table_get(rx->notes, NOTE_IIS);
-        if (msr != NULL) {
-            //msr->r = r;
-            return msr;
-        }
-        rx = rx->prev;
-    }
-
-    return NULL;
 }
 
 /*
@@ -476,12 +415,6 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     rsc->requestRec = requestRec;
     rsc->httpContext = httpContext;
     rsc->provider = provider;
-    rsc->responseProcessingEnabled = (config->config->resbody_access == 1);
-    RequestStoredContext* context = rsc.get();
-
-    StoreIISContext(r, rsc.get());
-
-    httpContext->GetModuleContextContainer()->SetModuleContext(rsc.release(), g_pModuleContext);
 
     HTTP_REQUEST *req = httpContext->GetRequest()->GetRawHttpRequest();
 
@@ -710,9 +643,9 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     c->remote_host = NULL;
 
     if (config->config->reqbody_access) {
-        hr = SaveRequestBodyToRequestRec(context);
+        hr = SaveRequestBodyToRequestRec(rsc.get());
         if (FAILED(hr)) {
-            context->provider->SetErrorStatus(hr);
+            rsc->provider->SetErrorStatus(hr);
             return RQ_NOTIFICATION_FINISH_REQUEST;
         }
     }
@@ -720,14 +653,8 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
     {
         // We post the processing task to the thread pool to happen in the background.
-        // We store the future to track and wait for this processing in case if we also
-        // need to process the response because we need request processing to finish
-        // before we can start with the response.
-        context->detectionProcessing = asio::post(threadPool,
-            std::packaged_task<int()> {
-            [connRec, requestRec] {
-                return modsecProcessRequest(requestRec.get());
-            }
+        asio::post(threadPool, [connRec, requestRec] {
+            return modsecProcessRequest(requestRec.get());
         });
     }
     else
