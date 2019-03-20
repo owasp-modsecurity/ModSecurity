@@ -30,11 +30,8 @@ namespace transformations {
 void LowerCase::execute(Transaction *t,
     ModSecString &in,
     ModSecString &out) {
-    std::locale loc;
     out.resize(in.size());
-    for (std::string::size_type i=0; i < in.size(); ++i) {
-        out[i] = std::tolower(in[i], loc);
-    }
+    std::transform(in.begin(), in.end(), out.begin(), ::tolower);
 }
 
 
