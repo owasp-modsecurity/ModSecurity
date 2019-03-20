@@ -420,7 +420,7 @@ class RuleWithActions : public Rule {
         return dst;
     }
 
-    inline int64_t getId() const { return m_ruleId; }
+    inline RuleId getId() const { return m_ruleId; }
     void setId(int id) {
         m_ruleId = id;
     }
@@ -455,7 +455,7 @@ class RuleWithActions : public Rule {
     }
 
  private:
-    int64_t m_ruleId;
+    RuleId m_ruleId;
 
     std::shared_ptr<RuleWithActions> m_chainedRuleChild;
     RuleWithActions *m_chainedRuleParent;
