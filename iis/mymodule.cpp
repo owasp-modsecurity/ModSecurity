@@ -39,27 +39,57 @@
 
 // These helpers make sure that the underlying structures
 // are correctly released on any exit path due to RAII.
-using ConnRecPtr = std::shared_ptr<conn_rec>;
-using RequestRecPtr = std::shared_ptr<request_rec>;
+using ConnRecPtr = std::unique_ptr<conn_rec, decltype(modsecFinishConnection)*>;
+using RequestRecPtr = std::unique_ptr<request_rec, decltype(modsecFinishRequest)*>;
 
-ConnRecPtr MakeConnReq()
+static ConnRecPtr MakeConnReq()
 {
     ConnRecPtr c{modsecNewConnection(), modsecFinishConnection};
     modsecProcessConnection(c.get());
     return c;
 }
 
-RequestRecPtr MakeRequestRec(conn_rec* c, directory_config* config)
+static RequestRecPtr MakeRequestRec(conn_rec* c, directory_config* config)
 {
     return {modsecNewRequest(c, config), modsecFinishRequest};
 }
 
-struct RequestStoredContext
+class AprRequestContext
 {
+private:
     ConnRecPtr connRec;
     RequestRecPtr requestRec;
-    IHttpContext* httpContext;
-    IHttpEventProvider* provider;
+
+public:
+    explicit AprRequestContext(directory_config* config)
+        : connRec{MakeConnReq()}
+        , requestRec{MakeRequestRec(connRec.get(), config)}
+    {}
+
+    AprRequestContext(const AprRequestContext&) = delete;
+    AprRequestContext& operator=(const AprRequestContext&) = delete;
+
+    AprRequestContext(AprRequestContext&& rhs)
+        : connRec(std::move(rhs.connRec))
+        , requestRec(std::move(rhs.requestRec))
+    {}
+
+    AprRequestContext& operator=(AprRequestContext&& rhs)
+    {
+        connRec = std::move(rhs.connRec);
+        requestRec = std::move(rhs.requestRec);
+        return *this;
+    }
+
+    conn_rec* GetConnection() const
+    {
+        return connRec.get();
+    }
+
+    request_rec* GetRequest() const
+    {
+        return requestRec.get();
+    }
 };
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
@@ -226,11 +256,11 @@ static void Log(void *obj, int level, char *str)
  * to IHttpRequest.
  * If the request body is chunked, it will be transformed into fixed-length.
 */
-static HRESULT SaveRequestBodyToRequestRec(RequestStoredContext* rsc)
+static HRESULT SaveRequestBodyToRequestRec(IHttpContext* httpContext, const AprRequestContext& aprContext)
 {
-    request_rec* aprRequest = rsc->requestRec.get();
-    conn_rec* conn = rsc->connRec.get();
-    IHttpRequest* iisRequest = rsc->httpContext->GetRequest();
+    request_rec* aprRequest = aprContext.GetRequest();
+    conn_rec* conn = aprContext.GetConnection();
+    IHttpRequest* iisRequest = httpContext->GetRequest();
     apr_bucket_brigade* brigade = apr_brigade_create(conn->pool, conn->bucket_alloc);
     if (brigade == nullptr)
     {
@@ -307,7 +337,7 @@ static HRESULT SaveRequestBodyToRequestRec(RequestStoredContext* rsc)
 
         // since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
         //
-        char* requestBuffer = static_cast<char*>(rsc->httpContext->AllocateRequestMemory(contentLength));
+        char* requestBuffer = static_cast<char*>(httpContext->AllocateRequestMemory(contentLength));
         status = apr_brigade_flatten(brigade, requestBuffer, reinterpret_cast<apr_size_t*>(&contentLength));
         if (status != APR_SUCCESS)
         {
@@ -405,16 +435,9 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
         delete path;
     }
 
-    ConnRecPtr connRec = MakeConnReq();
-    conn_rec* c = connRec.get();
-    RequestRecPtr requestRec = MakeRequestRec(c, config->config);
-    request_rec* r = requestRec.get();
-
-    auto rsc = std::make_unique<RequestStoredContext>();
-    rsc->connRec = connRec;
-    rsc->requestRec = requestRec;
-    rsc->httpContext = httpContext;
-    rsc->provider = provider;
+    AprRequestContext aprContext{config->config};
+    conn_rec* c = aprContext.GetConnection();
+    request_rec* r = aprContext.GetRequest();
 
     HTTP_REQUEST *req = httpContext->GetRequest()->GetRawHttpRequest();
 
@@ -643,19 +666,47 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     c->remote_host = NULL;
 
     if (config->config->reqbody_access) {
-        hr = SaveRequestBodyToRequestRec(rsc.get());
+        hr = SaveRequestBodyToRequestRec(httpContext, aprContext);
         if (FAILED(hr)) {
-            rsc->provider->SetErrorStatus(hr);
+            provider->SetErrorStatus(hr);
             return RQ_NOTIFICATION_FINISH_REQUEST;
         }
     }
 
     if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
     {
+        // This could have been a simple lambda with generalized capture but C++11 doesn't support it yet.
+        // Can be replaced/simplified in C++14.
+        class BackgroundRequestProcessingTask
+        {
+        private:
+            AprRequestContext ctx;
+        public:
+            explicit BackgroundRequestProcessingTask(AprRequestContext&& ctx)
+                : ctx(std::move(ctx))
+            {}
+
+            BackgroundRequestProcessingTask(const BackgroundRequestProcessingTask&) = delete;
+            BackgroundRequestProcessingTask& operator=(const BackgroundRequestProcessingTask&) = delete;
+
+            BackgroundRequestProcessingTask(BackgroundRequestProcessingTask&& rhs)
+                : ctx(std::move(rhs.ctx))
+            {
+            }
+
+            BackgroundRequestProcessingTask& operator=(BackgroundRequestProcessingTask&& rhs)
+            {
+                ctx = std::move(rhs.ctx);
+                return *this;
+            }
+
+            int operator()() const {
+                return modsecProcessRequest(ctx.GetRequest());
+            }
+        };
+
         // We post the processing task to the thread pool to happen in the background.
-        asio::post(threadPool, [connRec, requestRec] {
-            return modsecProcessRequest(requestRec.get());
-        });
+        asio::post(threadPool, BackgroundRequestProcessingTask{ std::move(aprContext) });
     }
     else
     {
