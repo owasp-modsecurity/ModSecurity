@@ -43,7 +43,7 @@
     "version_min":300000,
     "title":"Include - duplicate id",
     "expected":{
-      "parser_error": "Rule id: 40 is duplicated"
+      "parser_error": "There are multiple rules defined with same id. The ID 40 is defined at"
     },
     "rules":[
       "SecRuleEngine On",

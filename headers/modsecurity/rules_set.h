@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <memory>
 #endif
 
 
@@ -45,6 +46,8 @@ class Driver;
 
 /** @ingroup ModSecurity_CPP_API */
 class RulesSet : public RulesSetProperties {
+    using Errors = std::list<std::unique_ptr<std::string>>;
+    using Warnings = std::list<std::unique_ptr<std::string>>;
  public:
     RulesSet()
         : RulesSetProperties(new DebugLog()),
@@ -67,13 +70,16 @@ class RulesSet : public RulesSetProperties {
     int load(const char *rules);
     int load(const char *rules, const std::string &ref);
 
-    void dump();
-
     int merge(Parser::Driver *driver);
     int merge(RulesSet *rules);
 
-    int evaluate(int phase, Transaction *transaction);
+    int check(Warnings *warnings, Errors *errors);
+
     std::string getParserError();
+
+    void dump();
+
+    int evaluate(int phase, Transaction *transaction);
 
     void debug(int level, const std::string &id, const std::string &uri,
         const std::string &msg);
@@ -82,6 +88,7 @@ class RulesSet : public RulesSetProperties {
 
     RulesSetPhases m_rulesSetPhases;
  private:
+    bool containsDuplicatedIds(Warnings *warnings, Errors *errors);
 #ifndef NO_LOGS
     uint8_t m_secmarker_skipped;
 #endif
