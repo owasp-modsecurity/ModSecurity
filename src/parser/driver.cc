@@ -176,18 +176,6 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         return false;
     }
 
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        Rules *rules = m_rulesSetPhases[i];
-        for (int j = 0; j < rules->size(); j++) {
-            RuleWithOperator *lr = dynamic_cast<RuleWithOperator *>(rules->at(j).get());
-            if (lr && lr->getId() == rule->getId()) {
-                m_parserError << "Rule id: " << std::to_string(rule->getId()) \
-                    << " is duplicated" << std::endl;
-                return false;
-            }
-        }
-    }
-
     m_lastRule = rule.get();
 
     m_rulesSetPhases.insert(rule);
