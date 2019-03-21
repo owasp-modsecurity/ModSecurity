@@ -40,24 +40,28 @@ namespace modsecurity {
 
 class Rules {
  public:
-    int append(Rules *from,
-        const std::vector<RuleId> &ids,
-        std::ostringstream *err);
+    using container=std::vector<std::shared_ptr<Rule>>;
+    using iterator=typename container::iterator;
+    using const_iterator=typename container::const_iterator;
+
+    int append(Rules *from);
 
     bool insert(std::shared_ptr<Rule> rule);
-
-    bool insert(std::shared_ptr<Rule> rule,
-        const std::vector<RuleId> *ids,
-        std::ostringstream *err);
 
     size_t size();
 
     std::shared_ptr<Rule> operator[](int index);
     std::shared_ptr<Rule> at(int index);
 
-    std::vector<std::shared_ptr<Rule> > m_rules;
     void dump();
 
+
+    inline iterator begin() noexcept { return m_rules.begin(); }
+    inline const_iterator cbegin() const noexcept { return m_rules.cbegin(); }
+    inline iterator end() noexcept { return m_rules.end(); }
+    inline const_iterator cend() const noexcept { return m_rules.cend(); }
+ private:
+     container m_rules;
 };
 
 

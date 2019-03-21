@@ -15,55 +15,34 @@
 
 #include "modsecurity/rules_set_phases.h"
 #include "src/rule_with_operator.h"
-
+#include <iterator>
 
 namespace modsecurity {
 
 
-bool RulesSetPhases::insert(std::shared_ptr<Rule> rule) {
-    if (rule->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
-        return false;
+void RulesSetPhases::insert(std::shared_ptr<Rule> rule) {
+    if (rule->getPhase() >= size()) {
+        return;
     }
     m_rulesAtPhase[rule->getPhase()].insert(rule);
-
-    return true;
 }
 
 
-int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
-    int amount_of_rules = 0;
-    std::vector<int64_t> v;
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        v.reserve(m_rulesAtPhase[i].size());
-        for (size_t z = 0; z < m_rulesAtPhase[i].size(); z++) {
-            RuleWithOperator *rule_ckc = dynamic_cast<RuleWithOperator *>(m_rulesAtPhase->at(i).get());
-            if (!rule_ckc) {
-                continue;
-            }
-            v.push_back(rule_ckc->getId());
-        }
+void RulesSetPhases::append(RulesSetPhases *from) {
+    int phase = 0;
+    for (auto &a : *from) {
+         m_rulesAtPhase[phase++].append(&a);
     }
-    std::sort (v.begin(), v.end());
-
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        int res = m_rulesAtPhase[i].append(from->at(i), v, err);
-        if (res < 0) {
-            return res;
-        }
-        amount_of_rules = amount_of_rules + res;
-    }
-
-    return amount_of_rules;
 }
 
 
 void RulesSetPhases::dump() {
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        Rules *rules = &m_rulesAtPhase[i];
-        std::cout << "Phase: " << std::to_string(i);
-        std::cout << " (" << std::to_string(rules->size());
+    int phase = 0;
+    for (auto &rules : m_rulesAtPhase) {
+        std::cout << "Phase: " << std::to_string(phase++);
+        std::cout << " (" << std::to_string(rules.size());
         std::cout << " rules)" << std::endl;
-        rules->dump();
+        rules.dump();
     }
 }
 

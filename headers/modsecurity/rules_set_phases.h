@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <array>
 #endif
 
 
@@ -31,15 +32,26 @@ class Driver;
 /** @ingroup ModSecurity_CPP_API */
 class RulesSetPhases {
  public:
-    bool insert(std::shared_ptr<Rule> rule);
-    int append(RulesSetPhases *from, std::ostringstream *err);
+    using container = std::array<Rules, modsecurity::Phases::NUMBER_OF_PHASES>;
+    using iterator = typename container::iterator;
+    using const_iterator = typename container::const_iterator;
+
+    void insert(std::shared_ptr<Rule> rule);
+    void append(RulesSetPhases *from);
+
     void dump();
 
     Rules *operator[](int index);
     Rules *at(int index);
+    size_t size() { return modsecurity::Phases::NUMBER_OF_PHASES; }
+
+    inline iterator begin() noexcept { return m_rulesAtPhase.begin(); }
+    inline const_iterator cbegin() const noexcept { return m_rulesAtPhase.cbegin(); }
+    inline iterator end() noexcept { return m_rulesAtPhase.end(); }
+    inline const_iterator cend() const noexcept { return m_rulesAtPhase.cend(); }
 
  private:
-    Rules m_rulesAtPhase[8];
+    container m_rulesAtPhase;
 };
 
 }  // namespace modsecurity

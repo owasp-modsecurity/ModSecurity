@@ -20,17 +20,10 @@
 namespace modsecurity {
 
 
-int Rules::append(Rules *from, const std::vector<RuleId> &ids, std::ostringstream *err) {
+int Rules::append(Rules *from) {
     size_t j = 0;
     for (; j < from->size(); j++) {
         RuleWithActions *rule = dynamic_cast<RuleWithActions*>(from->at(j).get());
-        if (rule && std::binary_search(ids.begin(), ids.end(), rule->getId())) {
-            if (err != NULL) {
-                *err << "Rule id: " << std::to_string(rule->getId()) \
-                     << " is duplicated" << std::endl;
-            }
-            return -1;
-        }
     }
     m_rules.insert(m_rules.end(), from->m_rules.begin(), from->m_rules.end());
     return j;
@@ -38,20 +31,7 @@ int Rules::append(Rules *from, const std::vector<RuleId> &ids, std::ostringstrea
 
 
 bool Rules::insert(std::shared_ptr<Rule> rule) {
-    return insert(rule, nullptr, nullptr);
-}
-
-
-bool Rules::insert(std::shared_ptr<Rule> rule, const std::vector<RuleId> *ids, std::ostringstream *err) {
     RuleWithActions*r = dynamic_cast<RuleWithActions*>(rule.get());
-    if (r && ids != nullptr && err != nullptr
-        && std::binary_search(ids->begin(), ids->end(), r->getId())) {
-        if (err != NULL) {
-            *err << "Rule id: " << std::to_string(r->getId()) \
-                << " is duplicated" << std::endl;
-        }
-        return false;
-    }
     m_rules.push_back(rule);
     return true;
 }

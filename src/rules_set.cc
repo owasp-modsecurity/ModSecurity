@@ -18,6 +18,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "modsecurity/rules_set.h"
 #include "src/rule_marker.h"
@@ -99,6 +100,64 @@ int RulesSet::loadRemote(const char *key, const char *uri) {
 int RulesSet::load(const char *plainRules) {
     return this->load(plainRules, "");
 }
+
+
+int RulesSet::check(Warnings *warnings, Errors *errors) {
+    bool ret = 0;
+
+    ret = containsDuplicatedIds(warnings, errors);
+    if (ret) {
+        return -1;
+    }
+
+    return ret;
+}
+
+
+bool RulesSet::containsDuplicatedIds(Warnings *warning, Errors *error) {
+    std::multimap<RuleId, Rule *> allIds;
+    std::set<RuleId> duplicatedIds;
+    for (auto &rules : m_rulesSetPhases) {
+        for (auto &j : rules) {
+            RuleWithActions *rule = dynamic_cast<RuleWithActions *>(j.get());
+            if (rule) {
+                allIds.insert(std::pair<RuleId, Rule *>(rule->getId(), rule));
+            }
+        }
+    }
+
+    auto id = allIds.begin();
+    auto next = id;
+    if (id != allIds.end()) {
+        next++;
+    }
+    while (id != allIds.end() && next != allIds.end()) {
+        if (id->first == next->first) {
+            duplicatedIds.insert(id->first);
+        }
+        id++;
+        next++;
+    }
+
+    for (auto i : duplicatedIds) {
+        auto ret = allIds.equal_range(i);
+        std::stringstream ss;
+
+        ss << "There are multiple rules defined with ";
+        ss << "same id. The ID " << i << " is defined at: " << std::endl;
+        for (auto it = ret.first; it != ret.second; ++it) {
+            auto rule = it->second;
+            ss << "  " << *rule->getFileName() << ":";
+            ss << rule->getLineNumber() << std::endl;
+        }
+
+        std::unique_ptr<std::string> e(new std::string(ss.str()));
+        error->push_back(std::move(e));
+    }
+
+    return duplicatedIds.size() > 0;
+}
+
 
 
 std::string RulesSet::getParserError() {
@@ -224,12 +283,20 @@ int RulesSet::evaluate(int phase, Transaction *t) {
 int RulesSet::merge(Driver *from) {
     int amount_of_rules = 0;
 
-    amount_of_rules = m_rulesSetPhases.append(&from->m_rulesSetPhases,
-        &m_parserError);
+    m_rulesSetPhases.append(&from->m_rulesSetPhases);
     mergeProperties(
         dynamic_cast<RulesSetProperties *>(from),
         dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
+
+    Errors errors;
+    Warnings warnings;
+    if (check(&warnings, &errors)) {
+        for (auto &i : errors) {
+            m_parserError << "*** Error: " << *i << std::endl;
+        }
+        return -1;
+    }
 
     return amount_of_rules;
 }
@@ -238,12 +305,20 @@ int RulesSet::merge(Driver *from) {
 int RulesSet::merge(RulesSet *from) {
     int amount_of_rules = 0;
 
-    amount_of_rules = m_rulesSetPhases.append(&from->m_rulesSetPhases,
-        &m_parserError);
+    m_rulesSetPhases.append(&from->m_rulesSetPhases);
     mergeProperties(
         dynamic_cast<RulesSetProperties *>(from),
         dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
+
+    Errors errors;
+    Warnings warnings;
+    if (check(&warnings, &errors)) {
+        for (auto &i : errors) {
+            m_parserError << "*** Error: " << *i << std::endl;
+        }
+        return -1;
+    }
 
     return amount_of_rules;
 }
