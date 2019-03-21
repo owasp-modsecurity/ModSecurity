@@ -1,6 +1,9 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 ------------------------------------- 
  
+  - Added the basics for supporting better error/warning handling while
+    loading configurations.
+    [@zimmerle]
   - IMPORTANT: SecDefaultAction behaves changing: SecDefaultAction specified
     on a child configuration will overwrite the ones specified on the parent;
     Previously it was concatenating.
