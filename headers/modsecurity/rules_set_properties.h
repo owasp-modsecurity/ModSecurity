@@ -330,7 +330,9 @@ class RulesSetProperties {
 
 
     static int mergeProperties(RulesSetProperties *from,
-        RulesSetProperties *to, std::ostringstream *err) {
+        RulesSetProperties *to,
+        RulesWarnings *warning,
+        RulesErrors *error) {
 
         merge_ruleengine_value(to->m_secRuleEngine, from->m_secRuleEngine,
                                PropertyNotSetRuleEngine);
@@ -401,10 +403,10 @@ class RulesSetProperties {
         }
 
         if (to->m_auditLog) {
-            std::string error;
-            to->m_auditLog->merge(from->m_auditLog, &error);
-            if (error.size() > 0) {
-                *err << error;
+            std::string error_;
+            to->m_auditLog->merge(from->m_auditLog, &error_);
+            if (error_.size() > 0) {
+                    error->push_back(std::unique_ptr<std::string>(new std::string(error_)));
                 return -1;
             }
         }
@@ -412,12 +414,12 @@ class RulesSetProperties {
         if (from->m_debugLog && to->m_debugLog &&
             from->m_debugLog->isLogFileSet()) {
             if (to->m_debugLog->isLogFileSet() == false) {
-                std::string error;
+                std::string error_;
                 to->m_debugLog->setDebugLogFile(
                     from->m_debugLog->getDebugLogFile(),
-                    &error);
-                if (error.size() > 0) {
-                    *err << error;
+                    &error_);
+                if (error_.size() > 0) {
+                    error->push_back(std::unique_ptr<std::string>(new std::string(error_)));
                     return -1;
                 }
             }

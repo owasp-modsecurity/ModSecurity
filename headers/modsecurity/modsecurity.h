@@ -78,6 +78,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <vector>
 #endif
 
 
@@ -94,6 +95,10 @@ namespace modsecurity {
      * for the benefit of performance.
      */
     using ModSecString = std::string;
+
+    using RulesErrors = std::vector<std::unique_ptr<std::string>>;
+    using RulesWarnings = std::vector<std::unique_ptr<std::string>>;
+
 
     using RuleId = int64_t;
 
