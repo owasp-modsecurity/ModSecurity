@@ -20,38 +20,23 @@
 namespace modsecurity {
 
 
-int Rules::append(Rules *from, const std::vector<RuleId> &ids, std::ostringstream *err) {
-    size_t j = 0;
-    for (; j < from->size(); j++) {
-        RuleWithActions *rule = dynamic_cast<RuleWithActions*>(from->at(j).get());
-        if (rule && std::binary_search(ids.begin(), ids.end(), rule->getId())) {
-            if (err != NULL) {
-                *err << "Rule id: " << std::to_string(rule->getId()) \
-                     << " is duplicated" << std::endl;
-            }
-            return -1;
+int Rules::append(Rules *from) {
+    m_rules.insert(m_rules.end(), from->m_rules.begin(), from->m_rules.end());
+    if (!from->m_defaultActions.empty() || !from->m_defaultTransformations.empty()) {
+        m_defaultActions.clear();
+        m_defaultTransformations.clear();
+        for (auto &a : from->m_defaultActions) {
+            m_defaultActions.push_back(a);
+        }
+        for (auto &a : from->m_defaultTransformations) {
+            m_defaultTransformations.push_back(a);
         }
     }
-    m_rules.insert(m_rules.end(), from->m_rules.begin(), from->m_rules.end());
-    return j;
+    return from->size();
 }
 
 
 bool Rules::insert(const std::shared_ptr<Rule> &rule) {
-    return insert(rule, nullptr, nullptr);
-}
-
-
-bool Rules::insert(std::shared_ptr<Rule> rule, const std::vector<RuleId> *ids, std::ostringstream *err) {
-    RuleWithActions*r = dynamic_cast<RuleWithActions*>(rule.get());
-    if (r && ids != nullptr
-        && std::binary_search(ids->begin(), ids->end(), r->getId())) {
-        if (err != NULL) {
-            *err << "Rule id: " << std::to_string(r->getId()) \
-                << " is duplicated" << std::endl;
-        }
-        return false;
-    }
     m_rules.push_back(rule);
     return true;
 }
@@ -72,7 +57,7 @@ std::shared_ptr<Rule> Rules::at(int index) const {
 }
 
 
-void Rules::dump() const {
+void Rules::dump() {
     for (int j = 0; j < m_rules.size(); j++) {
         std::cout << "    Rule ID: " << m_rules.at(j)->getReference();
         std::cout << "--" << m_rules.at(j) << std::endl;
