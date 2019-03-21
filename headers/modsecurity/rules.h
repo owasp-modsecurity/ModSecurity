@@ -40,33 +40,37 @@ class Transformation;
 }
 }
 
+using RulesErrors = std::list<std::unique_ptr<std::string>>;
+using RulesWarnings = std::list<std::unique_ptr<std::string>>;
+
 class Rules {
  public:
-    void dump() const;
+    using container=std::vector<std::shared_ptr<Rule>>;
+    using iterator=typename container::iterator;
+    using const_iterator=typename container::const_iterator;
 
-    int append(Rules *from,
-        const std::vector<RuleId> &ids,
-        std::ostringstream *err);
+    int append(Rules *from);
 
     bool insert(const std::shared_ptr<Rule> &rule);
-
-    bool insert(std::shared_ptr<Rule> rule,
-        const std::vector<RuleId> *ids,
-        std::ostringstream *err);
 
     size_t size() const;
 
     std::shared_ptr<Rule> operator[](int index) const;
     std::shared_ptr<Rule> at(int index) const;
 
-    void fixDefaultActions();
+    void fixDefaultActions(RulesWarnings *warnings, RulesErrors *errors);
 
     std::vector<std::shared_ptr<actions::Action> > m_defaultActions;
     std::vector<std::shared_ptr<actions::transformations::Transformation> > m_defaultTransformations;
 
-    std::vector<std::shared_ptr<Rule> > m_rules;
     void dump();
 
+    inline iterator begin() noexcept { return m_rules.begin(); }
+    inline const_iterator cbegin() const noexcept { return m_rules.cbegin(); }
+    inline iterator end() noexcept { return m_rules.end(); }
+    inline const_iterator cend() const noexcept { return m_rules.cend(); }
+ private:
+     container m_rules;
 };
 
 

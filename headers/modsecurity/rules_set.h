@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <memory>
 #endif
 
 
@@ -41,8 +42,6 @@ class RuleWithOperator;
 namespace Parser {
 class Driver;
 }
-
-
 
 /** @ingroup ModSecurity_CPP_API */
 class RulesSet : public RulesSetProperties {
@@ -68,12 +67,13 @@ class RulesSet : public RulesSetProperties {
     int load(const char *rules);
     int load(const char *rules, const std::string &ref);
 
-    void dump() const;
+    void dump();
 
     int merge(Parser::Driver *driver);
     int merge(RulesSet *rules);
 
     int evaluate(int phase, Transaction *transaction);
+
     std::string getParserError();
 
     void debug(int level, const std::string &id, const std::string &uri,
@@ -81,6 +81,7 @@ class RulesSet : public RulesSetProperties {
 
     RulesSetPhases m_rulesSetPhases;
  private:
+    bool containsDuplicatedIds(RulesWarnings *warnings, RulesErrors *errors);
 #ifndef NO_LOGS
     uint8_t m_secmarker_skipped;
 #endif
