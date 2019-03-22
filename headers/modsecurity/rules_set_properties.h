@@ -63,6 +63,8 @@ class Driver;
 using modsecurity::debug_log::DebugLog;
 using modsecurity::audit_log::AuditLog;
 
+using ConfigurationFiles = std::set<std::string>;
+
 /** @ingroup ModSecurity_CPP_API */
 class ConfigInt {
  public:
@@ -448,7 +450,11 @@ class RulesSetProperties {
             }
         }
 
-        return 1;
+        for (auto &i : from->m_configurationFiles) {
+            to->m_configurationFiles.insert(i);
+        }
+
+        return 0;
     }
 
 
@@ -471,6 +477,7 @@ class RulesSetProperties {
     RulesExceptions m_exceptions;
     std::list<std::string> m_components;
     std::ostringstream m_parserError;
+
     ConfigSet m_responseBodyTypeToBeInspected;
     ConfigString m_httpblKey;
     ConfigString m_uploadDirectory;
@@ -480,6 +487,7 @@ class RulesSetProperties {
     std::vector<std::shared_ptr<actions::Action> > \
         m_defaultActions[modsecurity::Phases::NUMBER_OF_PHASES];
     ConfigUnicodeMap m_unicodeMapTable;
+    ConfigurationFiles m_configurationFiles;
 };
 
 

@@ -70,6 +70,8 @@ class RulesSet : public RulesSetProperties {
     int load(const char *rules);
     int load(const char *rules, const std::string &ref);
 
+    int reload();
+
     int merge(Parser::Driver *driver);
     int merge(RulesSet *rules);
 
@@ -88,6 +90,7 @@ class RulesSet : public RulesSetProperties {
 
     RulesSetPhases m_rulesSetPhases;
  private:
+    std::string m_source;
     bool containsDuplicatedIds(Warnings *warnings, Errors *errors);
 #ifndef NO_LOGS
     uint8_t m_secmarker_skipped;
@@ -108,6 +111,8 @@ int msc_rules_add_remote(RulesSet *rules, const char *key, const char *uri,
 int msc_rules_add_file(RulesSet *rules, const char *file, const char **error);
 int msc_rules_add(RulesSet *rules, const char *plain_rules, const char **error);
 int msc_rules_cleanup(RulesSet *rules);
+int msc_rules_files_to_watch(RulesSet *rules, char ***files);
+int msc_rules_reload(RulesSet *rules);
 
 #ifdef __cplusplus
 }

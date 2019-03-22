@@ -167,6 +167,8 @@ int Driver::parseFile(const std::string &f) {
         return false;
     }
 
+    m_configurationFiles.insert(f);
+
     t.seekg(0, std::ios::end);
     str.reserve(t.tellg());
     t.seekg(0, std::ios::beg);

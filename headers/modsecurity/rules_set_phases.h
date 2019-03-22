@@ -44,6 +44,7 @@ class RulesSetPhases {
     Rules *operator[](int index);
     Rules *at(int index);
     size_t size() { return modsecurity::Phases::NUMBER_OF_PHASES; }
+    void clean();
 
     inline iterator begin() noexcept { return m_rulesAtPhase.begin(); }
     inline const_iterator cbegin() const noexcept { return m_rulesAtPhase.cbegin(); }
