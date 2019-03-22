@@ -54,7 +54,7 @@ class Rules {
     std::shared_ptr<Rule> at(int index);
 
     void dump();
-
+    void clean();
 
     inline iterator begin() noexcept { return m_rules.begin(); }
     inline const_iterator cbegin() const noexcept { return m_rules.cbegin(); }

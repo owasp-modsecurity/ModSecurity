@@ -42,6 +42,11 @@ size_t Rules::size() {
 }
 
 
+void Rules::clean() {
+    m_rules.clear();
+}
+
+
 std::shared_ptr<Rule> Rules::operator[](int index) {
     return m_rules[index];
 }

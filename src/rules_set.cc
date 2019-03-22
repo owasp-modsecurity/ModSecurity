@@ -59,6 +59,7 @@ int RulesSet::loadFromUri(const char *uri) {
 
     int rules = this->merge(driver);
     delete driver;
+    m_source = uri;
 
     return rules;
 }
@@ -78,6 +79,7 @@ int RulesSet::load(const char *file, const std::string &ref) {
         delete driver;
         return -1;
     }
+
     delete driver;
 
     return rules;
@@ -105,10 +107,13 @@ int RulesSet::load(const char *plainRules) {
 int RulesSet::check(Warnings *warnings, Errors *errors) {
     bool ret = 0;
 
+    /* Sanity check > duplicated ids */
     ret = containsDuplicatedIds(warnings, errors);
     if (ret) {
         return -1;
     }
+
+    /* config reload > Monitor files */
 
     return ret;
 }
@@ -281,13 +286,17 @@ int RulesSet::evaluate(int phase, Transaction *t) {
 
 
 int RulesSet::merge(Driver *from) {
+    int ret = 0;
     int amount_of_rules = 0;
 
     m_rulesSetPhases.append(&from->m_rulesSetPhases);
-    mergeProperties(
+    ret = mergeProperties(
         dynamic_cast<RulesSetProperties *>(from),
         dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
+    if (ret) {
+        return -1;
+    }
 
     Errors errors;
     Warnings warnings;
@@ -303,13 +312,17 @@ int RulesSet::merge(Driver *from) {
 
 
 int RulesSet::merge(RulesSet *from) {
+    int ret = 0;
     int amount_of_rules = 0;
 
     m_rulesSetPhases.append(&from->m_rulesSetPhases);
-    mergeProperties(
+    ret = mergeProperties(
         dynamic_cast<RulesSetProperties *>(from),
         dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
+    if (ret) {
+        return -1;
+    }
 
     Errors errors;
     Warnings warnings;
@@ -332,9 +345,35 @@ void RulesSet::debug(int level, const std::string &id,
 }
 
 
+int RulesSet::reload() {
+    Driver *driver = new Driver();
+
+    if (driver->parseFile(m_source) == false) {
+        m_parserError << driver->m_parserError.str();
+        std::cout << "Can't reload: " << m_parserError.str() << std::endl;
+        delete driver;
+        return -1;
+    }
+
+    // global lock. This needs to be an atomic operation.
+    /* cleanRules(); */
+    for (auto &i : m_rulesSetPhases) {
+        i.clean();
+    }
+
+    merge(driver);
+    delete driver;
+    return 0;
+}
+
+
 void RulesSet::dump() {
     std::cout << "Rules: " << std::endl;
     m_rulesSetPhases.dump();
+    std::cout << "Files to monitor: " << std::endl;
+    for (auto &i : m_configurationFiles) {
+        std::cout << " - " << i << std::endl;
+    }
 }
 
 
@@ -391,6 +430,22 @@ extern "C" int msc_rules_add(RulesSet *rules, const char *plain_rules,
 extern "C" int msc_rules_cleanup(RulesSet *rules) {
     delete rules;
     return true;
+}
+
+extern "C" int msc_rules_files_to_watch(RulesSet *rules, char ***files) {
+    char **array = (char **)malloc(sizeof(char *) * rules->m_configurationFiles.size());
+    int j = 0;
+    for (auto &i : rules->m_configurationFiles) {
+        array[j] = strdup(i.c_str());
+        j++;
+    }
+    *files = array;
+    return rules->m_configurationFiles.size();
+}
+
+
+extern "C" int msc_rules_reload(RulesSet *rules) {
+    return rules->reload();
 }
 
 

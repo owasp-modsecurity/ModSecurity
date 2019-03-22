@@ -47,6 +47,13 @@ void RulesSetPhases::dump() {
 }
 
 
+void RulesSetPhases::clean() {
+    for (auto &rules : m_rulesAtPhase) {
+        rules.clean();
+    }
+}
+
+
 Rules *RulesSetPhases::operator[](int index) {
     return &m_rulesAtPhase[index];
 }
