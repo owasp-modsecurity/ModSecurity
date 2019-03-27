@@ -58,6 +58,7 @@
 #include "src/operators/verify_cc.h"
 #include "src/operators/verify_cpf.h"
 #include "src/operators/verify_ssn.h"
+#include "src/operators/verify_svnr.h"
 #include "src/operators/within.h"
 #include "src/operators/unconditional_match.h"
 
