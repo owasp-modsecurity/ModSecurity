@@ -314,6 +314,7 @@ OPERATOR_VALIDATE_UTF8_ENCODING         (?i:@validateUtf8Encoding)
 OPERATOR_VERIFY_CC                      (?i:@verifyCC)
 OPERATOR_VERIFY_CPF                     (?i:@verifyCPF)
 OPERATOR_VERIFY_SSN                     (?i:@verifySSN)
+OPERATOR_VERIFY_SVNR                    (?i:@verifySVNR)
 OPERATOR_WITHIN                         (?i:@within)
 
 
@@ -1110,6 +1111,7 @@ EQUALS_MINUS                            (?i:=\-)
 {OPERATOR_VERIFY_CC}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CC(*driver.loc.back()); }
 {OPERATOR_VERIFY_CPF}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CPF(*driver.loc.back()); }
 {OPERATOR_VERIFY_SSN}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SSN(*driver.loc.back()); }
+{OPERATOR_VERIFY_SVNR}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SVNR(*driver.loc.back()); }
 {OPERATOR_GSB_LOOKUP}                   { BEGIN_PARAMETER(); return p::make_OPERATOR_GSB_LOOKUP(*driver.loc.back()); }
 {OPERATOR_RSUB}                         { BEGIN_PARAMETER(); return p::make_OPERATOR_RSUB(*driver.loc.back()); }
 

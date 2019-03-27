@@ -166,6 +166,7 @@ TESTS+=test/test-cases/regression/operator-validate-byte-range.json
 TESTS+=test/test-cases/regression/operator-verifycc.json
 TESTS+=test/test-cases/regression/operator-verifycpf.json
 TESTS+=test/test-cases/regression/operator-verifyssn.json
+TESTS+=test/test-cases/regression/operator-verifysvnr.json
 TESTS+=test/test-cases/regression/request-body-parser-json.json
 TESTS+=test/test-cases/regression/request-body-parser-multipart-crlf.json
 TESTS+=test/test-cases/regression/request-body-parser-multipart.json
