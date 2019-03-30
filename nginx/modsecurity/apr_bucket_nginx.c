@@ -22,6 +22,7 @@ typedef struct apr_bucket_nginx {
 
 /* ngx_buf_t to apr_bucket */
 apr_bucket * apr_bucket_nginx_create(ngx_buf_t *buf,
+                                     apr_pool_t *p,
                                      apr_bucket_alloc_t *list)
 {
 
@@ -30,10 +31,11 @@ apr_bucket * apr_bucket_nginx_create(ngx_buf_t *buf,
     APR_BUCKET_INIT(b); /* link */
     b->free = apr_bucket_free;
     b->list = list;
-    return apr_bucket_nginx_make(b, buf);
+    return apr_bucket_nginx_make(b, buf, p);
 }
 
-apr_bucket * apr_bucket_nginx_make(apr_bucket *b, ngx_buf_t *buf)
+apr_bucket * apr_bucket_nginx_make(apr_bucket *b, ngx_buf_t *buf,
+                                   apr_pool_t *pool)
 {
     apr_bucket_nginx *n;
 
@@ -91,11 +93,11 @@ static void nginx_bucket_destroy(void *data)
 
 
 ngx_int_t
-copy_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_int_t last_buf) {
+copy_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf) {
     apr_bucket         *e;
 
     while (chain) {
-        e = ngx_buf_to_apr_bucket(chain->buf, bb->bucket_alloc);
+        e = ngx_buf_to_apr_bucket(chain->buf, bb->p, bb->bucket_alloc);
         if (e == NULL) {
             return NGX_ERROR;
         }

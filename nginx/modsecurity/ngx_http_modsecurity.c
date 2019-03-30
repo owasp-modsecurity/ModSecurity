@@ -52,14 +52,8 @@ typedef struct {
 
 typedef struct {
     ngx_http_request_t *r;
-} ngx_http_modsecurity_prevention_thread_ctx_t;
+} ngx_http_modsecurity_thread_ctx_t;
 
-typedef struct {
-    conn_rec            *connection;
-    request_rec         *req;
-
-    apr_bucket_brigade  *brigade;
-} ngx_http_modsecurity_detection_thread_ctx_t;
 
 /*
 ** Module's registred function/handlers.
@@ -138,31 +132,22 @@ ngx_module_t ngx_http_modsecurity = {
 
 static ngx_http_upstream_t ngx_http_modsecurity_upstream;
 
-static inline char *
-dup_ngx_str_to_apr(apr_pool_t *pool, ngx_str_t *src)
+static inline u_char *
+ngx_pstrdup0(ngx_pool_t *pool, ngx_str_t *src)
 {
-    return apr_pstrmemdup(pool, (char *)src->data, src->len);
-}
+    u_char  *dst;
 
-/*
- * Helper to allocate a thread task using an Apache pool.
- * This is useful when the background task can outlive the Nginx request
- * it is initiated for.
- */
-ngx_thread_task_t *
-apr_thread_task_alloc(apr_pool_t *pool, size_t size)
-{
-    ngx_thread_task_t  *task;
-
-    task = apr_palloc(pool, sizeof(ngx_thread_task_t) + size);
-    if (task == NULL) {
+    dst = ngx_pnalloc(pool, src->len + 1);
+    if (dst == NULL) {
         return NULL;
     }
 
-    task->ctx = task + 1;
+    ngx_memcpy(dst, src->data, src->len);
+    dst[src->len] = '\0';
 
-    return task;
+    return dst;
 }
+
 
 static inline int
 ngx_http_modsecurity_method_number(unsigned int nginx)
@@ -208,11 +193,6 @@ ngx_http_modsecurity_method_number(unsigned int nginx)
     return MultiplyDeBruijnBitPosition[((uint32_t)((nginx & -nginx) * 0x077CB531U)) >> 27];
 }
 
-/*
- * Use APR pool for all allocations because they should not depend on Nginx request pool.
- * In case of detection mode, processing will take place entirely in background and may last
- * longer than the original request lives.
- */
 static ngx_inline ngx_int_t
 ngx_http_modsecurity_load_request(ngx_http_request_t *r)
 {
@@ -230,7 +210,7 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     req = ctx->req;
 
     /* request line */
-    req->method = dup_ngx_str_to_apr(req->pool, &r->method_name);
+    req->method = (char *)ngx_pstrdup0(r->pool, &r->method_name);
 
     /* TODO: how to use ap_method_number_of ?
      * req->method_number = ap_method_number_of(req->method);
@@ -243,18 +223,18 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
         return NGX_ERROR;
     }
 
-    req->filename = dup_ngx_str_to_apr(req->pool, &path);
+    req->filename = (char *) path.data;
     req->path_info = req->filename;
 
-    req->args = dup_ngx_str_to_apr(req->pool, &r->args);
+    req->args = (char *)ngx_pstrdup0(r->pool, &r->args);
 
     req->proto_num = r->http_major *1000 + r->http_minor;
-    req->protocol = dup_ngx_str_to_apr(req->pool, &r->http_protocol);
+    req->protocol = (char *)ngx_pstrdup0(r->pool, &r->http_protocol);
     req->request_time = apr_time_make(r->start_sec, r->start_msec);
-    req->the_request = dup_ngx_str_to_apr(req->pool, &r->request_line);
+    req->the_request = (char *)ngx_pstrdup0(r->pool, &r->request_line);
 
-    req->unparsed_uri = dup_ngx_str_to_apr(req->pool, &r->unparsed_uri);
-    req->uri = dup_ngx_str_to_apr(req->pool, &r->uri);
+    req->unparsed_uri = (char *)ngx_pstrdup0(r->pool, &r->unparsed_uri);
+    req->uri = (char *)ngx_pstrdup0(r->pool, &r->uri);
 
     req->parsed_uri.scheme = "http";
 
@@ -264,7 +244,7 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     }
 #endif
 
-    req->parsed_uri.path = dup_ngx_str_to_apr(req->pool, &r->uri);
+    req->parsed_uri.path = (char *)ngx_pstrdup0(r->pool, &r->uri);
     req->parsed_uri.is_initialized = 1;
 
     switch (r->connection->local_sockaddr->sa_family) {
@@ -289,16 +269,18 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     }
 
     req->parsed_uri.port = port;
-    req->parsed_uri.port_str = apr_palloc(req->pool, sizeof("65535"));
+    req->parsed_uri.port_str = ngx_pnalloc(r->pool, sizeof("65535"));
     (void) ngx_sprintf((u_char *)req->parsed_uri.port_str, "%ui%c", port, '\0');
 
     req->parsed_uri.query = r->args.len ? req->args : NULL;
     req->parsed_uri.dns_looked_up = 0;
     req->parsed_uri.dns_resolved = 0;
 
-    req->parsed_uri.fragment = dup_ngx_str_to_apr(req->pool, &r->exten);
+    // req->parsed_uri.password = (char *)ngx_pstrdup0(r->pool, &r->headers_in.passwd);
+    // req->parsed_uri.user = (char *)ngx_pstrdup0(r->pool, &r->headers_in.user);
+    req->parsed_uri.fragment = (char *)ngx_pstrdup0(r->pool, &r->exten);
 
-    req->hostname = dup_ngx_str_to_apr(req->pool, (ngx_str_t *)&ngx_cycle->hostname);
+    req->hostname = (char *)ngx_pstrdup0(r->pool, (ngx_str_t *)&ngx_cycle->hostname);
 
     req->header_only = r->header_only ? r->header_only : (r->method == NGX_HTTP_HEAD);
 
@@ -337,15 +319,7 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
             i = 0;
         }
 
-        const char *key = dup_ngx_str_to_apr(req->pool, &h[i].key);
-        if (key == NULL) {
-            return NGX_ERROR;
-        }
-        const char *value = dup_ngx_str_to_apr(req->pool, &h[i].value);
-        if (value == NULL) {
-            return NGX_ERROR;
-        }
-        apr_table_setn(req->headers_in, key, value);
+        apr_table_setn(req->headers_in, (char *)h[i].key.data, (char *)h[i].value.data);
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                        "ModSecurity: load headers in: \"%V: %V\"",
                        &h[i].key, &h[i].value);
@@ -361,14 +335,14 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
     lang = apr_table_get(ctx->req->headers_in, "Content-Languages");
     if(lang != NULL)
     {
-        ctx->req->content_languages = apr_array_make(req->pool, 1, sizeof(const char *));
+        ctx->req->content_languages = apr_array_make(ctx->req->pool, 1, sizeof(const char *));
 
-        *(const char **)apr_array_push(req->content_languages) = lang;
+        *(const char **)apr_array_push(ctx->req->content_languages) = lang;
     }
 
     req->ap_auth_type = (char *)apr_table_get(req->headers_in, "Authorization");
 
-    req->user = dup_ngx_str_to_apr(req->pool, &r->headers_in.user);
+    req->user = (char *)ngx_pstrdup0(r->pool, &r->headers_in.user);
 
 
 
@@ -389,10 +363,10 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
 
     if (r->request_body == NULL || r->request_body->bufs == NULL) {
 
-        return copy_chain_to_brigade(NULL, ctx->brigade, 1);
+        return copy_chain_to_brigade(NULL, ctx->brigade, r->pool, 1);
     }
 
-    if (copy_chain_to_brigade(r->request_body->bufs, ctx->brigade, 1) != NGX_OK) {
+    if (copy_chain_to_brigade(r->request_body->bufs, ctx->brigade, r->pool, 1) != NGX_OK) {
         return NGX_ERROR;
     }
 
@@ -400,8 +374,10 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
 }
 
 static ngx_inline ngx_int_t
-ngx_http_modsecurity_status(int status)
+ngx_http_modsecurity_status(ngx_http_request_t *r, int status)
 {
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: status %d", status);
+
     if (status == DECLINED || status == APR_SUCCESS) {
         return NGX_DECLINED;
     }
@@ -582,11 +558,11 @@ ngx_http_modsecurity_init_process(ngx_cycle_t *cycle)
 
 
 static void
-ngx_http_modsecurity_prevention_thread_func(void *data, ngx_log_t *log)
+ngx_http_modsecurity_thread_func(void *data, ngx_log_t *log)
 {
     // Executed in a separate thread
 
-    ngx_http_modsecurity_prevention_thread_ctx_t *thread_ctx = data;
+    ngx_http_modsecurity_thread_ctx_t *thread_ctx = data;
     ngx_http_request_t *r = thread_ctx->r;
 
     ngx_http_modsecurity_ctx_t* mod_ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
@@ -600,9 +576,7 @@ ngx_http_modsecurity_prevention_thread_func(void *data, ngx_log_t *log)
     }
 
     // Processing request headers
-    ngx_int_t rc = modsecProcessRequestHeaders(mod_ctx->req);
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity process headers: status %d", rc);
-    rc = ngx_http_modsecurity_status(rc);
+    ngx_int_t rc = ngx_http_modsecurity_status(r, modsecProcessRequestHeaders(mod_ctx->req));
 
     if (rc != NGX_DECLINED) {
         mod_ctx->status_code = rc;
@@ -622,14 +596,13 @@ ngx_http_modsecurity_prevention_thread_func(void *data, ngx_log_t *log)
     }
 
     // The name of modsecProcessRequestBody is a bit misleading. This function call is needed even to just process GET args.
-    rc = modsecProcessRequestBody(mod_ctx->req);
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity process body: status %d", rc);
-    mod_ctx->status_code = ngx_http_modsecurity_status(rc);
+    rc = ngx_http_modsecurity_status(r, modsecProcessRequestBody(mod_ctx->req));
+    mod_ctx->status_code = rc;
 }
 
 
 static void
-ngx_http_modsecurity_prevention_thread_completion(ngx_event_t *ev)
+ngx_http_modsecurity_thread_completion(ngx_event_t *ev)
 {
     // executed in nginx event loop after thread task is done, in order to pick up and continue processing request
 
@@ -646,52 +619,13 @@ ngx_http_modsecurity_prevention_thread_completion(ngx_event_t *ev)
 }
 
 
-static void
-ngx_http_modsecurity_detection_thread_func(void *data, ngx_log_t *log)
-{
-    // Executed in a separate thread
-    ngx_http_modsecurity_detection_thread_ctx_t *thread_ctx = data;
-
-    // Processing request headers
-    ngx_int_t rc = ngx_http_modsecurity_status(modsecProcessRequestHeaders(thread_ctx->req));
-    if (rc != NGX_DECLINED) {
-        return;
-    }
-
-    if (modsecContextState(thread_ctx->req) == MODSEC_DISABLED) {
-        return;
-    }
-
-    // The name of modsecProcessRequestBody is a bit misleading. This function call is needed even to just process GET args.
-    modsecProcessRequestBody(thread_ctx->req);
-}
-
-
-static void
-ngx_http_modsecurity_detection_thread_completion(ngx_event_t *ev)
-{
-    // executed in nginx event loop after thread task is done, in order to pick up and continue processing request
-    ngx_http_modsecurity_detection_thread_ctx_t *ctx = ev->data;
-
-    request_rec *req = ctx->req;
-    conn_rec *connection = ctx->connection;
-
-    if (req != NULL) {
-        modsecFinishRequest(req);
-    }
-    if (connection != NULL) {
-        modsecFinishConnection(connection);
-    }
-}
-
-
 static ngx_int_t
-ngx_http_modsecurity_prevention_task_offload(ngx_http_request_t *r)
+ngx_http_modsecurity_task_offload(ngx_http_request_t *r)
 {
-    ngx_http_modsecurity_prevention_thread_ctx_t *thread_ctx;
+    ngx_http_modsecurity_thread_ctx_t *thread_ctx;
     ngx_thread_task_t *task;
 
-    task = ngx_thread_task_alloc(r->pool, sizeof(ngx_http_modsecurity_prevention_thread_ctx_t));
+    task = ngx_thread_task_alloc(r->pool, sizeof(ngx_http_modsecurity_thread_ctx_t));
     if (task == NULL) {
         return NGX_ERROR;
     }
@@ -699,8 +633,8 @@ ngx_http_modsecurity_prevention_task_offload(ngx_http_request_t *r)
     thread_ctx = task->ctx;
     thread_ctx->r = r;
 
-    task->handler = ngx_http_modsecurity_prevention_thread_func;
-    task->event.handler = ngx_http_modsecurity_prevention_thread_completion;
+    task->handler = ngx_http_modsecurity_thread_func;
+    task->event.handler = ngx_http_modsecurity_thread_completion;
     task->event.data = r;
 
     ngx_thread_pool_t* thread_pool = ngx_thread_pool_get((ngx_cycle_t *)ngx_cycle, &thread_pool_name);
@@ -714,48 +648,6 @@ ngx_http_modsecurity_prevention_task_offload(ngx_http_request_t *r)
     return NGX_OK;
 }
 
-static ngx_int_t
-ngx_http_modsecurity_detection_task_offload(ngx_http_request_t *r)
-{
-    ngx_http_modsecurity_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
-    request_rec *req = ctx->req;
-
-    // Load request to request rec
-    if (ngx_http_modsecurity_load_request(r) != NGX_OK ||
-            ngx_http_modsecurity_load_headers_in(r) != NGX_OK) {
-        return NGX_ERROR;
-    }
-
-    if (modsecIsRequestBodyAccessEnabled(req) && (r->headers_in.content_length || r->headers_in.chunked)) {
-        if (ngx_http_modsecurity_load_request_body(r) != NGX_OK) {
-            return NGX_ERROR;
-        }
-    }
-
-    ngx_thread_task_t *task = apr_thread_task_alloc(req->pool, sizeof(ngx_http_modsecurity_detection_thread_ctx_t));
-    if (task == NULL) {
-        return NGX_ERROR;
-    }
-
-    ngx_http_modsecurity_detection_thread_ctx_t *thread_ctx = task->ctx;
-    thread_ctx->connection = ctx->connection;
-    ctx->connection = NULL;
-    thread_ctx->req = ctx->req;
-    ctx->req = NULL;
-    thread_ctx->brigade = ctx->brigade;
-    ctx->brigade = NULL;
-
-    task->handler = ngx_http_modsecurity_detection_thread_func;
-    task->event.handler = ngx_http_modsecurity_detection_thread_completion;
-    task->event.data = thread_ctx;
-
-    ngx_thread_pool_t* thread_pool = ngx_thread_pool_get((ngx_cycle_t *)ngx_cycle, &thread_pool_name);
-    if (ngx_thread_task_post(thread_pool, task) != NGX_OK) {
-        return NGX_ERROR;
-    }
-
-    return NGX_OK;
-}
 
 static void
 ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
@@ -820,17 +712,8 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
-    /* When in detection mode, don't wait for background task to complete because it won't affect the request status */
-    if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
-        if (ngx_http_modsecurity_detection_task_offload(r) != NGX_OK) {
-            return NGX_ERROR;
-        }
-
-        return NGX_DECLINED;
-    }
-
     ctx->thread_running = 1;
-    if (ngx_http_modsecurity_prevention_task_offload(r) != NGX_OK) {
+    if (ngx_http_modsecurity_task_offload(r) != NGX_OK) {
         return NGX_ERROR;
     }
 
@@ -877,9 +760,9 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
         ctx->connection = modsecNewConnection();
 
         /* fill apr_sockaddr_t */
-        asa = apr_palloc(ctx->connection->pool, sizeof(apr_sockaddr_t));
+        asa = ngx_palloc(r->pool, sizeof(apr_sockaddr_t));
         asa->pool = ctx->connection->pool;
-        asa->hostname = dup_ngx_str_to_apr(asa->pool, &r->connection->addr_text);
+        asa->hostname = (char *)ngx_pstrdup0(r->pool, &r->connection->addr_text);
         asa->servname = asa->hostname;
         asa->next = NULL;
         asa->salen = r->connection->socklen;
@@ -923,9 +806,7 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
 
     ctx->req = modsecNewRequest(ctx->connection, cf->config);
 
-    if (cf->config->is_enabled != MODSEC_DETECTION_ONLY) {
-        apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *)ctx);
-    }
+    apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *) ctx);
     apr_generate_random_bytes(salt, TXID_SIZE);
 
     txid = apr_pcalloc (ctx->req->pool, TXID_SIZE);
