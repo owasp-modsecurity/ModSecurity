@@ -2,7 +2,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Operator :: @verifycpf (1/2)",
+    "title":"Testing Operator :: @verifyssn (1/2)",
     "client":{
       "ip":"200.249.12.31",
       "port":123

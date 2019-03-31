@@ -186,6 +186,7 @@ Operator *Operator::instantiate(std::string op, std::string param_str) {
     IF_MATCH(verifycc) { return new VerifyCC(std::move(param)); }
     IF_MATCH(verifycpf) { return new VerifyCPF(std::move(param)); }
     IF_MATCH(verifyssn) { return new VerifySSN(std::move(param)); }
+    IF_MATCH(verifysvnr) { return new VerifySVNR(std::move(param)); }
     IF_MATCH(within) { return new Within(std::move(param)); }
 
     IF_MATCH(unconditionalmatch) {

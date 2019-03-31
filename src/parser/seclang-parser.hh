@@ -181,6 +181,7 @@ class Driver;
 #include "src/operators/verify_cc.h"
 #include "src/operators/verify_cpf.h"
 #include "src/operators/verify_ssn.h"
+#include "src/operators/verify_svnr.h"
 #include "src/operators/within.h"
 
 
@@ -1394,7 +1395,8 @@ namespace yy {
         TOK_RUN_TIME_VAR_TIME_YEAR = 591,
         TOK_VARIABLE = 592,
         TOK_DICT_ELEMENT = 593,
-        TOK_DICT_ELEMENT_REGEXP = 594
+        TOK_DICT_ELEMENT_REGEXP = 594,
+        TOK_OPERATOR_VERIFY_SVNR = 595
       };
     };
 
@@ -2084,6 +2086,10 @@ namespace yy {
     static
     symbol_type
     make_OPERATOR_VERIFY_SSN (YY_COPY (location_type) l);
+
+    static
+    symbol_type
+    make_OPERATOR_VERIFY_SVNR (YY_COPY (location_type) l);
 
     static
     symbol_type
@@ -3153,7 +3159,7 @@ namespace yy {
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
      335,   336,   337,   338,   339
     };
-    const unsigned user_token_number_max_ = 594;
+    const unsigned user_token_number_max_ = 595;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int> (t) <= yyeof_)
@@ -4066,7 +4072,8 @@ namespace yy {
      555,   556,   557,   558,   559,   560,   561,   562,   563,   564,
      565,   566,   567,   568,   569,   570,   571,   572,   573,   574,
      575,   576,   577,   578,   579,   580,   581,   582,   583,   584,
-     585,   586,   587,   588,   589,   590,   591,   592,   593,   594
+     585,   586,   587,   588,   589,   590,   591,   592,   593,   594,
+     595
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -5029,6 +5036,13 @@ namespace yy {
   seclang_parser::make_OPERATOR_VERIFY_SSN (YY_COPY (location_type) l)
   {
     return symbol_type (token::TOK_OPERATOR_VERIFY_SSN, YY_MOVE (l));
+  }
+
+  inline
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VERIFY_SVNR (YY_COPY (location_type) l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VERIFY_SVNR, YY_MOVE (l));
   }
 
   inline

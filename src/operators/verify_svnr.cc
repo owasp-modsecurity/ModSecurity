@@ -5,6 +5,9 @@
 
 #include "src/operators/operator.h"
 
+#include "modsecurity/rule.h"
+#include "modsecurity/rule_message.h"
+#include "modsecurity/rules_properties.h"
 namespace modsecurity {
 namespace operators {
 
@@ -13,31 +16,29 @@ int VerifySVNR::convert_to_int(const char c)
     int n;
     if ((c>='0') && (c<='9'))
         n = c - '0';
-    else if ((c>='A') && (c<='F'))
-        n = c - 'A' + 10;
-    else if ((c>='a') && (c<='f'))
-        n = c - 'a' + 10;
     else
         n = 0;
     return n;
 }
 
 bool VerifySVNR::verify(const char *svnrnumber, int len) {
-    int factor, part_1, part_2, var_len = len;
-    unsigned int sum = 0, i = 0, svnr_len = 11, c;
+    int var_len = len;
+    int sum = 0;
+    unsigned int i = 0, svnr_len = 10;
     int svnr[11];
     char s_svnr[11];
-    char bad_svnr[12][12] = { "00000000000",
-        "01234567890",
-        "11111111111",
-        "22222222222",
-        "33333333333",
-        "44444444444",
-        "55555555555",
-        "66666666666",
-        "77777777777",
-        "88888888888",
-        "99999999999"};
+    char bad_svnr[12][11] = { "0000000000",
+        "0123456789",
+        "1234567890",
+        "1111111111",
+        "2222222222",
+        "3333333333",
+        "4444444444",
+        "5555555555",
+        "6666666666",
+        "7777777777",
+        "8888888888",
+        "9999999999"};
 
     while ((*svnrnumber != '\0') && ( var_len > 0))
     {
@@ -73,17 +74,18 @@ bool VerifySVNR::verify(const char *svnrnumber, int len) {
     //Geburtsdatum mit 5, 8, 4, 2, 1, 6
     sum = svnr[0] * 3 + svnr[1] * 7 + svnr[2] * 9 + svnr[4] * 5 + svnr[5] * 8 + svnr[6] * 4 + svnr[7] * 2 + svnr[8] * 1 + svnr[9] * 6;
     sum %= 11;
-
+    if(sum == 10){
+    	sum = 0;
+    }
     if (sum == svnr[3])
     {
         return true;
     }
-
     return false;
 }
 
 
-bool VerifySVNR::evaluate(Transaction *transaction, Rule *rule,
+bool VerifySVNR::evaluate(Transaction *t, Rule *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     std::list<SMatch> matches;
     bool is_svnr = false;
@@ -93,19 +95,26 @@ bool VerifySVNR::evaluate(Transaction *transaction, Rule *rule,
         return is_svnr;
     }
 
-    for (i = 0; i < input.size() - 1; i++) {
-        printf ("Decimal i: %d\n", i);
+    for (i = 0; i < input.size() - 1 && is_svnr == false; i++) {
         matches = m_re->searchAll(input.substr(i, input.size()));
-
 
         for (const auto & i : matches) {
             is_svnr = verify(i.str().c_str(), i.str().size());
             if (is_svnr) {
-	           logOffset(ruleMessage, i.offset(), i.str().size());
-               break;
+                logOffset(ruleMessage, i.offset(), i.str().size());
+                if (rule && t && rule->m_containsCaptureAction) {
+                    t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                        "0", i.str());
+                    ms_dbg_a(t, 7, "Added VerifySVNR match TX.0: " + \
+                        i.str());
+                }
+
+                goto out;
             }
         }
     }
+
+out:
     return is_svnr;
 }
 

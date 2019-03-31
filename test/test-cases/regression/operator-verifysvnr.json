@@ -16,13 +16,13 @@
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
-        "Content-Length": "27",
+        "Content-Length": "32",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=1237 010180&param2=value2"
+        "param1=1237%20010180&param2=value2"
       ]
     },
     "response":{
@@ -40,7 +40,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule ARGS \"@verifysvnr ^([0-9]{4} ?[0-9]{8}$\" \"id:1,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@verifysvnr \\d{4} ?\\d{6}\" \"id:1,phase:2,capture,pass,t:trim\""
     ]
   }
 ]

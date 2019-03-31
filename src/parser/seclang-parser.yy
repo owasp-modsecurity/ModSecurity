@@ -143,6 +143,7 @@ class Driver;
 #include "src/operators/verify_cc.h"
 #include "src/operators/verify_cpf.h"
 #include "src/operators/verify_ssn.h"
+#include "src/operators/verify_svnr.h"
 #include "src/operators/within.h"
 
 
@@ -505,6 +506,7 @@ using modsecurity::operators::Operator;
   OPERATOR_VERIFY_CC                           "OPERATOR_VERIFY_CC"
   OPERATOR_VERIFY_CPF                          "OPERATOR_VERIFY_CPF"
   OPERATOR_VERIFY_SSN                          "OPERATOR_VERIFY_SSN"
+  OPERATOR_VERIFY_SVNR                          "OPERATOR_VERIFY_SVNR"
   OPERATOR_WITHIN                              "OPERATOR_WITHIN"
 
   CONFIG_DIR_AUDIT_LOG_FMT
@@ -998,6 +1000,10 @@ op_before_init:
     | OPERATOR_VERIFY_SSN run_time_string
       {
         OPERATOR_CONTAINER($$, new operators::VerifySSN(std::move($2)));
+      }
+    | OPERATOR_VERIFY_SVNR run_time_string
+      {
+        OPERATOR_CONTAINER($$, new operators::VerifySVNR(std::move($2)));
       }
     | OPERATOR_GSB_LOOKUP run_time_string
       {
