@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds a new operator verifySVNR that checks for Austrian social security numbers
+   [@Rufus125]
  - Allow empty anchored variable
    [Issue #2024 - @airween]
  - Fixed FILES_NAMES collection after the end of multipart parsing
