@@ -55,6 +55,7 @@ script:
 #
   - make check
   - make check-static
+  - make check-TESTS
 
 
 
