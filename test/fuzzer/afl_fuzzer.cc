@@ -105,6 +105,7 @@
 #include "src/operators/verify_cc.h"
 #include "src/operators/verify_cpf.h"
 #include "src/operators/verify_ssn.h"
+#include "src/operators/verify_svnr.h"
 #include "src/operators/within.h"
 
 
@@ -232,6 +233,7 @@ ValidateUtf8Encoding *validateutf8encoding = new ValidateUtf8Encoding("ValidateU
 VerifyCC *verifycc = new VerifyCC("VerifyCC", z, false); verifycc->evaluate(t, s); delete verifycc;
 VerifyCPF *verifycpf = new VerifyCPF("VerifyCPF", z, false); verifycpf->evaluate(t, s); delete verifycpf;
 VerifySSN *verifyssn = new VerifySSN("VerifySSN", z, false); verifyssn->evaluate(t, s); delete verifyssn;
+VerifySVNR *verifysvnr = new VerifySVNR("VerifySVNR", z, false); verifysvnr->evaluate(t, s); delete verifysvnr;
 Within *within = new Within("Within", z, false); within->evaluate(t, s); delete within;
 
         /**
