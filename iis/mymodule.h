@@ -12,10 +12,8 @@
 * directly using the email address security@modsecurity.org.
 */
 
-#pragma once
-
-#define ASIO_STANDALONE
-#include "asio/thread_pool.hpp"
+#ifndef __MY_MODULE_H__
+#define __MY_MODULE_H__
 
 #include "critical_section.h"
 #include "event_logger.h"
@@ -48,8 +46,8 @@ public:
 private:
     CriticalSection cs;
     EventLogger logger;
-    asio::thread_pool threadPool;
     DWORD pageSize = 0;
     bool statusCallAlreadySent = false;
 };
 
+#endif

@@ -19,7 +19,6 @@
 #include <string>
 #include <cctype>
 #include <memory>
-#include <future>
 
 //  IIS7 Server API header file
 #include <Windows.h>
@@ -35,9 +34,6 @@
 #include "moduleconfig.h"
 
 #include "winsock2.h"
-
-#include "asio/packaged_task.hpp"
-#include "asio/post.hpp"
 
 // These helpers make sure that the underlying structures
 // are correctly released on any exit path due to RAII.
@@ -66,8 +62,6 @@ struct RequestStoredContext
     char* responseBuffer = nullptr;
     ULONGLONG responseLength = 0;
     ULONGLONG responsePosition = 0;
-    bool responseProcessingEnabled = false;
-    std::future<int> detectionProcessing;
 
     void CleanupStoredContext() override
     {
@@ -506,97 +500,6 @@ static HRESULT SaveRequestBodyToRequestRec(RequestStoredContext* rsc)
     return S_OK;
 }
 
-
-static apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
-{
-    RequestStoredContext *rsc = RetrieveIISContext(r);
-
-    *readcnt = 0;
-
-    if (rsc == NULL)
-    {
-        *is_eos = 1;
-        return APR_SUCCESS;
-    }
-
-    IHttpContext *pHttpContext = rsc->httpContext;
-    IHttpRequest *pRequest = pHttpContext->GetRequest();
-
-    if (pRequest->GetRemainingEntityBytes() == 0)
-    {
-        *is_eos = 1;
-        return APR_SUCCESS;
-    }
-
-    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, (DWORD *)readcnt, NULL);
-
-    if (FAILED(hr))
-    {
-        // End of data is okay.
-        if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
-        {
-            // Set the error status.
-            rsc->provider->SetErrorStatus(hr);
-        }
-
-        *is_eos = 1;
-    }
-
-    return APR_SUCCESS;
-}
-
-static apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
-{
-    RequestStoredContext *rsc = RetrieveIISContext(r);
-
-    if (!rsc || !rsc->requestRec)
-        return APR_SUCCESS;
-
-    IHttpContext *pHttpContext = rsc->httpContext;
-    IHttpRequest *pHttpRequest = pHttpContext->GetRequest();
-
-    auto lengthStr = std::to_string(length);
-
-    // Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
-    // This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
-
-    USHORT ctcch = 0;
-    char *ct = (char *)pHttpRequest->GetHeader(HttpHeaderTransferEncoding, &ctcch);
-    if (ct)
-    {
-        char *ctz = ZeroTerminate(ct, ctcch, r->pool);
-        if (ctcch != 0)
-        {
-            if (0 == stricmp(ctz, "chunked"))
-            {
-                pHttpRequest->DeleteHeader(HttpHeaderTransferEncoding);
-            }
-        }
-    }
-
-    HRESULT hr = pHttpRequest->SetHeader(
-        HttpHeaderContentLength,
-        lengthStr.c_str(),
-        (USHORT)lengthStr.size(),
-        TRUE);
-
-    if (FAILED(hr))
-    {
-        // possible, but there's nothing we can do
-    }
-
-    // since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
-    //
-    void *reqbuf = pHttpContext->AllocateRequestMemory(length);
-
-    memcpy(reqbuf, buf, length);
-
-    pHttpRequest->InsertEntityBody(reqbuf, length);
-
-    return APR_SUCCESS;
-}
-
-
 REQUEST_NOTIFICATION_STATUS
 CMyHttpModule::OnSendResponse(
     IN IHttpContext * pHttpContext,
@@ -606,18 +509,12 @@ CMyHttpModule::OnSendResponse(
     RequestStoredContext* rsc = dynamic_cast<RequestStoredContext*>(pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext));
 
     CriticalSectionLock lock{cs};
-    // here we must check if response body processing is enabled
-    //
-    if (!rsc || !rsc->requestRec || rsc->responseBuffer != nullptr || !rsc->responseProcessingEnabled)
-    {
-        goto Exit;
-    }
-
-    // If we have offloaded request processing to the thread pool
-    // we need to wait for its completion before we can proceed
-    if (rsc->detectionProcessing.valid()) {
-        rsc->detectionProcessing.get();
-    }
+	// here we must check if response body processing is enabled
+	//
+	if(!rsc || !rsc->requestRec || rsc->responseBuffer != nullptr || !modsecIsResponseBodyAccessEnabled(rsc->requestRec.get()))
+	{
+		goto Exit;
+	}
 
     HRESULT hr = S_OK;
     IHttpResponse *pHttpResponse = NULL;
@@ -968,8 +865,7 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     rsc->connRec = connRec;
     rsc->requestRec = requestRec;
     rsc->httpContext = httpContext;
-    rsc->provider = provider;
-    rsc->responseProcessingEnabled = (config->config->resbody_access == 1);
+    rsc->provider = provider;	
     RequestStoredContext* context = rsc.get();
 
     StoreIISContext(r, rsc.get());
@@ -1208,35 +1104,19 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
         return RQ_NOTIFICATION_FINISH_REQUEST;
     }
 
-    if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
-    {
-        // We post the processing task to the thread pool to happen in the background.
-        // We store the future to track and wait for this processing in case if we also
-        // need to process the response because we need request processing to finish
-        // before we can start with the response.
-        context->detectionProcessing = asio::post(threadPool,
-            std::packaged_task<int()> {
-            [connRec, requestRec] {
-                return modsecProcessRequest(requestRec.get());
-            }
-        });
-    }
-    else
-    {
-        lock.unlock();
-        int status = modsecProcessRequest(r);
-        lock.lock();
+    lock.unlock();
+    int status = modsecProcessRequest(r);
+    lock.lock();
 
-        if (status != DECLINED)
-        {
-            httpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
-            httpContext->SetRequestHandled();
+	if(status != DECLINED)
+	{
+		httpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
+		httpContext->SetRequestHandled();
 
-            return RQ_NOTIFICATION_FINISH_REQUEST;
-        }
-    }
+        return RQ_NOTIFICATION_FINISH_REQUEST;
+	}
 
-    return RQ_NOTIFICATION_CONTINUE;
+	return RQ_NOTIFICATION_CONTINUE;
 }
 
 apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
