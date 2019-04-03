@@ -32,7 +32,7 @@ class ValidateByteRange : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit ValidateByteRange(std::unique_ptr<RunTimeString> param)
-        : Operator("ValidadeByteRange", std::move(param)) {
+        : Operator("ValidateByteRange", std::move(param)) {
             std::memset(table, '\0', sizeof(char) * 32);
         }
     ~ValidateByteRange() override { }
