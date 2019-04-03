@@ -77,7 +77,7 @@ void Variable::addsKeyExclusion(Variable *v) {
 
 
 std::string operator+(std::string a, Variable *v) {
-    return *v->m_fullName.get();
+    return a + *v->m_fullName.get();
 }
 
 
