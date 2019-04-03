@@ -142,7 +142,7 @@ int JSON::addArgument(const std::string& value) {
     }
 
 
-    m_transaction->addArgument("JSON", path + data, value, 0);
+    m_transaction->addArgument("POST", path + data, value, 0);
 
     return 1;
 }
