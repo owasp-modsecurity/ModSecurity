@@ -638,6 +638,7 @@ using modsecurity::operators::Operator;
   CONFIG_SEC_CONN_R_STATE_LIMIT                "CONFIG_SEC_CONN_R_STATE_LIMIT"
   CONFIG_SEC_CONN_W_STATE_LIMIT                "CONFIG_SEC_CONN_W_STATE_LIMIT"
   CONFIG_SEC_SENSOR_ID                         "CONFIG_SEC_SENSOR_ID"
+  CONFIG_DIR_ARGS_LIMIT                        "CONFIG_DIR_ARGS_LIMIT"
   CONFIG_DIR_REQ_BODY                          "CONFIG_DIR_REQ_BODY"
   CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT          "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
   CONFIG_DIR_REQ_BODY_LIMIT                    "CONFIG_DIR_REQ_BODY_LIMIT"
@@ -1585,6 +1586,11 @@ expression:
         driver.error(@0, ss.str());
         YYERROR;
 #endif  // WITH_GEOIP
+      }
+    | CONFIG_DIR_ARGS_LIMIT
+      {
+        driver.m_argumentsLimit.m_set = true;
+        driver.m_argumentsLimit.m_value = atoi($1.c_str());
       }
     /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT

@@ -342,6 +342,12 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
     ms_dbg(4, "Adding request argument (" + orig + "): name \"" + \
                 key + "\", value \"" + value + "\"");
 
+    if (m_rules->m_argumentsLimit.m_set
+            && m_variableArgs.size() >= m_rules->m_argumentsLimit.m_value) {
+        ms_dbg(4, "Skipping request argument, over limit (" + std::to_string(m_rules->m_argumentsLimit.m_value) + ")")
+        return false;
+    }
+
     size_t k_offset = offset;
     offset = offset + key.size() + 1;
     m_variableArgs.set(key, value, offset);
