@@ -32,11 +32,11 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"PmFromFile\" with param \"https://www.modsecurity.org/modsecurity-regression-test.txt\" against REQUEST_FILENAME"
+      "debug_log":"Executing operator \"PmFromFile\" with param \".*\" against REQUEST_FILENAME"
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRemoteRules key https://www.modsecurity.org/modsecurity-regression-test-secremoterules.txt",
+      "SecRemoteRules key https://gist.githubusercontent.com/zimmerle/a4c1ec028999f7df71d0cc80f4f271ca/raw/4c74363bf4eae974180f1a82007196e58729dd16/modsecurity-regression-test-secremoterules.txt",
       "SecRule ARGS \"@contains somethingelse\" \"id:9,pass,t:trim\""
     ]
   },
@@ -51,7 +51,7 @@
     "rules":[
       "SecRuleEngine On",
       "SecRemoteRulesFailAction Abort",
-      "SecRemoteRules key https://www.modsecurity.org/modsecurity-regression-test-secremoterules-bonga.txt"
+      "SecRemoteRules key https://gist.githubusercontent.com/zimmerle/a4c1ec028999f7df71d0cc80f4f271ca/raw/4c74363bf4eae974180f1a82007196e58729dd16/modsecurity-regression-test-secremoterules-bonga.txt"
     ]
   },
   {
@@ -92,7 +92,7 @@
     "rules":[
       "SecRuleEngine On",
       "SecRemoteRulesFailAction Warn",
-      "SecRemoteRules key https://www.modsecurity.org/modsecurity-regression-test-secremoterules-bonga.txt",
+      "SecRemoteRules key https://gist.githubusercontent.com/zimmerle/a4c1ec028999f7df71d0cc80f4f271ca/raw/4c74363bf4eae974180f1a82007196e58729dd16/modsecurity-regression-test-secremoterules-bonga.txt",
       "SecRule ARGS \"@contains somethingelse\" \"id:9,pass,t:trim\""
     ]
   }

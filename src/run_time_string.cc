@@ -38,7 +38,7 @@ void RunTimeString::appendText(std::string text) {
 
 
 void RunTimeString::appendVar(
-    std::unique_ptr<modsecurity::Variables::Variable> var) {
+    std::unique_ptr<modsecurity::variables::Variable> var) {
     std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
     r->m_var = std::move(var);
     m_elements.push_back(std::move(r));

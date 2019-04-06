@@ -27,13 +27,13 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(RemoteHost, REMOTE_HOST, m_variableRemoteHost)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_REMOTE_HOST_H_

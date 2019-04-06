@@ -22,7 +22,7 @@
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 void ModsecBuild::evaluate(Transaction *transaction,
     Rule *rule,
@@ -32,5 +32,5 @@ void ModsecBuild::evaluate(Transaction *transaction,
 }
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

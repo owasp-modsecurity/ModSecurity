@@ -29,7 +29,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 class Rule_DictElement : public VariableDictElement { \
@@ -241,7 +241,7 @@ class Rule_NoDictElement : public Variable {
 // DEFINE_VARIABLE_DICT(Rule, RULE, m_variableRule)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_RULE_H_

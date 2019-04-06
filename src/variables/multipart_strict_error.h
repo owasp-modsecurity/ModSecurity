@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(MultipartStrictError, MULTIPART_STRICT_ERROR,
     m_variableMultipartStrictError)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MULTIPART_STRICT_ERROR_H_

@@ -27,13 +27,13 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE_DICT(RequestCookies, REQUEST_COOKIES, m_variableRequestCookies)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_REQUEST_COOKIES_H_

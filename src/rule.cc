@@ -47,7 +47,7 @@ namespace modsecurity {
 
 using operators::Operator;
 using actions::Action;
-using Variables::Variable;
+using variables::Variable;
 using actions::transformations::None;
 
 
@@ -82,7 +82,7 @@ Rule::Rule(std::string marker)
 
 
 Rule::Rule(Operator *_op,
-    Variables::Variables *_variables,
+    variables::Variables *_variables,
     std::vector<Action *> *actions,
     std::string fileName,
     int lineNumber)
@@ -459,15 +459,15 @@ std::list<std::pair<std::shared_ptr<std::string>,
 
 
 void Rule::getVariablesExceptions(Transaction *t,
-    Variables::Variables *exclusion, Variables::Variables *addition) {
+    variables::Variables *exclusion, variables::Variables *addition) {
     for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) {
         if (containsTag(*a.first.get(), t) == false) {
             continue;
         }
         Variable *b = a.second.get();
-        if (dynamic_cast<Variables::VariableModificatorExclusion*>(b)) {
+        if (dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
             exclusion->push_back(
-                dynamic_cast<Variables::VariableModificatorExclusion*>(
+                dynamic_cast<variables::VariableModificatorExclusion*>(
                     b)->m_base.get());
         } else {
             addition->push_back(b);
@@ -479,9 +479,9 @@ void Rule::getVariablesExceptions(Transaction *t,
             continue;
         }
         Variable *b = a.second.get();
-        if (dynamic_cast<Variables::VariableModificatorExclusion*>(b)) {
+        if (dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
             exclusion->push_back(
-                dynamic_cast<Variables::VariableModificatorExclusion*>(
+                dynamic_cast<variables::VariableModificatorExclusion*>(
                     b)->m_base.get());
         } else {
             addition->push_back(b);
@@ -493,9 +493,9 @@ void Rule::getVariablesExceptions(Transaction *t,
             continue;
         }
         Variable *b = a.second.get();
-        if (dynamic_cast<Variables::VariableModificatorExclusion*>(b)) {
+        if (dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
             exclusion->push_back(
-                dynamic_cast<Variables::VariableModificatorExclusion*>(
+                dynamic_cast<variables::VariableModificatorExclusion*>(
                     b)->m_base.get());
         } else {
             addition->push_back(b);
@@ -504,9 +504,9 @@ void Rule::getVariablesExceptions(Transaction *t,
 }
 
 
-inline void Rule::getFinalVars(Variables::Variables *vars,
-    Variables::Variables *exclusion, Transaction *trans) {
-    Variables::Variables addition;
+inline void Rule::getFinalVars(variables::Variables *vars,
+    variables::Variables *exclusion, Transaction *trans) {
+    variables::Variables addition;
 
     getVariablesExceptions(trans, exclusion, &addition);
 
@@ -620,14 +620,14 @@ void Rule::executeActionsAfterFullMatch(Transaction *trans,
 bool Rule::evaluate(Transaction *trans,
     std::shared_ptr<RuleMessage> ruleMessage) {
     bool globalRet = false;
-    Variables::Variables *variables = this->m_variables;
+    variables::Variables *variables = this->m_variables;
     bool recursiveGlobalRet;
     bool containsBlock = m_containsStaticBlockAction;
     std::vector<std::unique_ptr<VariableValue>> finalVars;
     std::string eparam;
-    Variables::Variables vars;
+    variables::Variables vars;
     vars.reserve(4);
-    Variables::Variables exclusion;
+    variables::Variables exclusion;
 
     if (ruleMessage == NULL) {
         ruleMessage = std::shared_ptr<RuleMessage>(

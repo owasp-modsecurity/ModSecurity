@@ -295,50 +295,11 @@ class Driver;
 #include "src/variables/session.h"
 #include "src/variables/status.h"
 
-using modsecurity::ModSecurity;
-using modsecurity::Rule;
-using modsecurity::Utils::GeoLookup;
-using modsecurity::Variables::Duration;
-using modsecurity::Variables::Env;
-using modsecurity::Variables::HighestSeverity;
-using modsecurity::Variables::ModsecBuild;
-using modsecurity::Variables::RemoteUser;
-using modsecurity::Variables::TimeDay;
-using modsecurity::Variables::TimeEpoch;
-using modsecurity::Variables::TimeHour;
-using modsecurity::Variables::TimeMin;
-using modsecurity::Variables::TimeMon;
-using modsecurity::Variables::TimeSec;
-using modsecurity::Variables::TimeWDay;
-using modsecurity::Variables::TimeYear;
-using modsecurity::Variables::Time;
-using modsecurity::Variables::Tx_DictElement;
-using modsecurity::Variables::Tx_NoDictElement;
-using modsecurity::Variables::Tx_DictElementRegexp;
-
-using modsecurity::Variables::Ip_DictElement;
-using modsecurity::Variables::Ip_NoDictElement;
-using modsecurity::Variables::Ip_DictElementRegexp;
-
-using modsecurity::Variables::Global_DictElement;
-using modsecurity::Variables::Global_NoDictElement;
-using modsecurity::Variables::Global_DictElementRegexp;
-
-using modsecurity::Variables::Session_DictElement;
-using modsecurity::Variables::Session_NoDictElement;
-using modsecurity::Variables::Session_DictElementRegexp;
-
-
-
-using modsecurity::Variables::Variable;
-using modsecurity::Variables::VariableModificatorExclusion;
-using modsecurity::Variables::VariableModificatorCount;
-using modsecurity::Variables::XML;
 
 using namespace modsecurity;
-
-using modsecurity::operators::Operator;
-
+using namespace modsecurity::variables;
+using namespace modsecurity::Utils;
+using namespace modsecurity::operators;
 
 
 #define CHECK_VARIATION_DECL \
@@ -387,7 +348,7 @@ using modsecurity::operators::Operator;
     a = std::move(c);
 
 
-#line 390 "seclang-parser.hh" // lalr1.cc:403
+#line 351 "seclang-parser.hh" // lalr1.cc:403
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -481,7 +442,7 @@ using modsecurity::operators::Operator;
 
 
 namespace yy {
-#line 484 "seclang-parser.hh" // lalr1.cc:403
+#line 445 "seclang-parser.hh" // lalr1.cc:403
 
   /// A stack with random access from its top.
   template <typename T, typename S = std::vector<T> >
@@ -6455,7 +6416,7 @@ namespace yy {
 
 
 } // yy
-#line 6445 "seclang-parser.hh" // lalr1.cc:403
+#line 6406 "seclang-parser.hh" // lalr1.cc:403
 
 
 

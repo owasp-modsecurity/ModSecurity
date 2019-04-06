@@ -27,7 +27,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 class RemoteUser : public Variable {
@@ -43,7 +43,7 @@ class RemoteUser : public Variable {
 };
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_REMOTE_USER_H_
