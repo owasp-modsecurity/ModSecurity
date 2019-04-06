@@ -314,7 +314,7 @@ OPERATOR_VALIDATE_UTF8_ENCODING         (?i:@validateUtf8Encoding)
 OPERATOR_VERIFY_CC                      (?i:@verifyCC)
 OPERATOR_VERIFY_CPF                     (?i:@verifyCPF)
 OPERATOR_VERIFY_SSN                     (?i:@verifySSN)
-OPERATOR_VERIFY_SVNR                     (?i:@verifySVNR)
+OPERATOR_VERIFY_SVNR                    (?i:@verifySVNR)
 OPERATOR_WITHIN                         (?i:@within)
 
 
