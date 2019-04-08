@@ -39,10 +39,11 @@ class RuleMarker : public Rule {
  public:
     RuleMarker(
         std::string name,
-        std::unique_ptr<std::string> fileName,
+        std::shared_ptr<std::string> fileName,
         int lineNumber)
         : Rule(std::move(fileName), lineNumber),
-        m_name(std::make_shared<std::string>(name)) { }
+        m_name(std::make_shared<std::string>(name))
+    { };
 
 
     virtual bool evaluate(Transaction *transaction) override {
