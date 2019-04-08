@@ -605,12 +605,27 @@ class Variables : public std::vector<Variable *> {
         return std::find_if(begin(), end(),
             [v](Variable *m) -> bool { return *v == *m; }) != end();
     };
+
+
     bool contains(const std::string &v) {
         return std::find_if(begin(), end(),
             [v](Variable *m) -> bool {
                 return v == *m->m_fullName.get();
             }) != end();
     };
+
+
+    std::string getVariableNames(std::string sep = ",") {
+        std::string names;
+        for (auto a : *this) {
+            if (names.length() > 0) {
+                names = names + sep + *a->m_fullName;
+            } else {
+                names = *a->m_fullName;
+            }
+        }
+        return names;
+    }
 };
 
 
