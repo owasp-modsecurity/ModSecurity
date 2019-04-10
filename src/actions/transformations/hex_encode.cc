@@ -41,7 +41,7 @@ std::string HexEncode::evaluate(std::string value,
 
     std::stringstream result;
     for (std::size_t i=0; i < value.length(); i++) {
-        int ii = reinterpret_cast<char>(value[i]);
+        unsigned int ii = (unsigned char)(value[i]);
         result << std::setw(2) << std::setfill('0') << std::hex << ii;
     }
 
