@@ -44,6 +44,15 @@ class RuleMarker : public Rule {
         : Rule(std::move(fileName), lineNumber),
         m_name(std::make_shared<std::string>(name)) { }
 
+    RuleMarker(RuleMarker &&r) :
+        Rule(r),
+        m_name(std::move(r.m_name))
+    { };
+
+    RuleMarker(const RuleMarker &r) :
+        Rule(r),
+        m_name(std::move(r.m_name))
+    { };
 
     virtual bool evaluate(Transaction *transaction) override {
         if (transaction->isInsideAMarker()) {
@@ -60,6 +69,11 @@ class RuleMarker : public Rule {
 
     std::shared_ptr<std::string> getName() const {
         return m_name;
+    }
+
+    virtual void dump(std::stringstream &out) override {
+        Rule::dump(out);
+        out << "SecMarker \"" << *getName() << "\"" << std::endl;
     }
 
  private:

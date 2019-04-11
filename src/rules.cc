@@ -57,13 +57,11 @@ std::shared_ptr<Rule> Rules::at(int index) const {
 }
 
 
-void Rules::dump() {
-    for (int j = 0; j < m_rules.size(); j++) {
-        std::cout << "    Rule ID: " << m_rules.at(j)->getReference();
-        std::cout << "--" << m_rules.at(j) << std::endl;
+void Rules::dump(std::stringstream &out) {
+    for (auto &r : m_rules) {
+        r->dump(out);
     }
 }
-
 
 }  // namespace modsecurity
 
