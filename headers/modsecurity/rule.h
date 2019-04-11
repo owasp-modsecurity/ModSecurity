@@ -46,15 +46,14 @@ class Rule {
     Rule(std::unique_ptr<std::string> fileName, int lineNumber)
         : m_fileName(std::move(fileName)),
         m_lineNumber(lineNumber),
-        m_phase(modsecurity::Phases::RequestHeadersPhase) {
-        }
+        m_phase(modsecurity::Phases::RequestHeadersPhase)
+    { }
 
     Rule(const Rule &r)
         : m_fileName(r.m_fileName),
         m_lineNumber(r.m_lineNumber),
-        m_phase(r.m_phase) {
-
-    }
+        m_phase(r.m_phase)
+    { }
 
     Rule &operator=(const Rule& other) {
         m_fileName = other.m_fileName;
@@ -78,6 +77,18 @@ class Rule {
 
     virtual std::string getReference() {
         return *m_fileName + ":" + std::to_string(m_lineNumber);
+    }
+
+    virtual void dump(std::stringstream &out) {
+        out << getOriginInTextFormat() << std::endl;
+    }
+
+ protected:
+    std::string getOriginInTextFormat() const {
+        std::stringstream ss;
+        ss << "# File name: " << *getFileName() << std::endl;
+        ss << "# Line number: " << getLineNumber();
+        return ss.str();
     }
 
  private:
