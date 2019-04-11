@@ -454,6 +454,11 @@ class RuleWithActions : public Rule {
         return dst;
     }
 
+
+    virtual void dump(std::stringstream &out) override {
+        out << "RuleWithActions" << std::endl;
+    }
+
  private:
     RuleId m_ruleId;
 
