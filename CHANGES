@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 ------------------------------------- 
  
+  - More structured rules dump. Better supporting debugging.
+    [@zimmerle]
   - Added the basics for supporting better error/warning handling while
     loading configurations.
     [@zimmerle]
