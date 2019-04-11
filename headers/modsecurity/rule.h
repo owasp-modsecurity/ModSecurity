@@ -46,8 +46,8 @@ class Rule {
     Rule(std::unique_ptr<std::string> fileName, int lineNumber)
         : m_fileName(std::make_shared<std::string>(*fileName)),
         m_lineNumber(lineNumber),
-        m_phase(modsecurity::Phases::RequestHeadersPhase) {
-        }
+        m_phase(modsecurity::Phases::RequestHeadersPhase)
+    { }
 
     Rule(const Rule &other) :
         m_fileName(other.m_fileName),
@@ -80,6 +80,18 @@ class Rule {
             return *m_fileName + ":" + std::to_string(m_lineNumber);
         }
         return "<<no file>>:" + std::to_string(m_lineNumber);
+    }
+
+    virtual void dump(std::stringstream &out) {
+        out << getOriginInTextFormat() << std::endl;
+    }
+
+ protected:
+    std::string getOriginInTextFormat() const {
+        std::stringstream ss;
+        ss << "# File name: " << *getFileName() << std::endl;
+        ss << "# Line number: " << getLineNumber();
+        return ss.str();
     }
 
  private:

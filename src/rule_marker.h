@@ -47,7 +47,12 @@ class RuleMarker : public Rule {
     RuleMarker(const RuleMarker& r) :
         Rule(r),
         m_name(r.m_name)
-    { }
+    { };
+
+    RuleMarker(RuleMarker &&r) :
+        Rule(r),
+        m_name(std::move(r.m_name))
+    { };
 
     RuleMarker &operator =(const RuleMarker& r) {
         Rule::operator = (r);
@@ -70,6 +75,11 @@ class RuleMarker : public Rule {
 
     std::shared_ptr<std::string> getName() const {
         return m_name;
+    }
+
+    virtual void dump(std::stringstream &out) override {
+        Rule::dump(out);
+        out << "SecMarker \"" << *getName() << "\"" << std::endl;
     }
 
  private:
