@@ -63,7 +63,12 @@ class Rules {
     std::vector<std::shared_ptr<actions::Action> > m_defaultActions;
     std::vector<std::shared_ptr<actions::transformations::Transformation> > m_defaultTransformations;
 
-    void dump();
+    virtual void dump() {
+        std::stringstream ss;
+        dump(ss);
+        std::cout << ss.str();
+    };
+    virtual void dump(std::stringstream &out);
 
     inline iterator begin() noexcept { return m_rules.begin(); }
     inline const_iterator cbegin() const noexcept { return m_rules.cbegin(); }
