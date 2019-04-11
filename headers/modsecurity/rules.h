@@ -53,7 +53,13 @@ class Rules {
     std::shared_ptr<Rule> operator[](int index);
     std::shared_ptr<Rule> at(int index);
 
-    void dump();
+    virtual void dump() {
+        std::stringstream ss;
+        dump(ss);
+        std::cout << ss.str();
+    };
+    virtual void dump(std::stringstream &out);
+
     void clean();
 
     inline iterator begin() noexcept { return m_rules.begin(); }
