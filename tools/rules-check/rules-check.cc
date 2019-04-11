@@ -91,6 +91,7 @@ int main(int argc, char **argv) {
         if (err.empty() == false) {
             std::cerr << "    " << err << std::endl;
         }
+        rules->dump();
 next:
         args++;
     }

@@ -222,6 +222,11 @@ class RuleWithActions : public Rule {
         return tags;
     }
 
+
+    virtual void dump(std::stringstream &out) override {
+        out << "RuleWithActions" << std::endl;
+    }
+
  private:
     /* actions */
     actions::Action *m_disruptiveAction;

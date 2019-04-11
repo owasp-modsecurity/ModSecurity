@@ -31,6 +31,8 @@
 #include "modsecurity/rule.h"
 #include "src/rule_with_actions.h"
 #include "modsecurity/string_view.hpp"
+#include "src/variables/variable.h"
+#include "src/operators/operator.h"
 
 #ifdef __cplusplus
 
@@ -70,6 +72,15 @@ class RuleWithOperator : public RuleWithActions {
 
     virtual std::string getReference() override {
         return std::to_string(getId());
+    }
+
+    virtual void dump(std::stringstream &out) override {
+        Rule::dump(out);
+        out << "# RuleWithOperator" << std::endl;
+        out << "SecRule ";
+        out << m_variables->getVariableNames() << " ";
+        out << "\"" << "@" << m_operator->m_op << " " << m_operator->m_param << "\"";
+        out << std::endl;
     }
 
  private:
