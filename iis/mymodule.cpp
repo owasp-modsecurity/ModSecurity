@@ -798,7 +798,9 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     HRESULT hr = MODSECURITY_STORED_CONTEXT::GetConfig(httpContext, &config);
     if (FAILED(hr))
     {
-        return RQ_NOTIFICATION_CONTINUE;
+        httpContext->GetResponse()->SetStatus(500, "WAF internal error. Unable to get config.");
+        httpContext->SetRequestHandled();
+        return RQ_NOTIFICATION_FINISH_REQUEST;
     }
 
     // If module is disabled, don't go any further
@@ -806,6 +808,19 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
     if (!config->GetIsEnabled())
     {
         return RQ_NOTIFICATION_CONTINUE;
+    }
+
+    auto reportConfigurationError = [config, httpContext] {
+        config->configLoadingFailed = true;
+        httpContext->GetResponse()->SetStatus(500, "WAF internal error. Invalid configuration.");
+        httpContext->SetRequestHandled();
+        return RQ_NOTIFICATION_FINISH_REQUEST;
+    };
+
+    // If we previously failed to load the config, don't spam the event log by trying and failing again
+    if (config->configLoadingFailed)
+    {
+        return reportConfigurationError();
     }
 
     if (config->config == nullptr)
@@ -816,7 +831,7 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
         hr = config->GlobalWideCharToMultiByte(config->GetPath(), wcslen(config->GetPath()), &path, &pathlen);
         if (FAILED(hr))
         {
-            return RQ_NOTIFICATION_FINISH_REQUEST;
+            return reportConfigurationError();
         }
 
         config->config = modsecGetDefaultConfig();
@@ -829,7 +844,7 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
         if (FAILED(hr))
         {
             delete path;
-            return RQ_NOTIFICATION_FINISH_REQUEST;
+            return reportConfigurationError();
         }
 
         if (path[0] != 0)
@@ -841,7 +856,7 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
                 WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
                 delete apppath;
                 delete path;
-                return RQ_NOTIFICATION_CONTINUE;
+                return reportConfigurationError();
             }
 
             modsecReportRemoteLoadedRules();
