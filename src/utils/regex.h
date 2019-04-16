@@ -28,6 +28,8 @@ namespace modsecurity {
 namespace Utils {
 
 #define OVECCOUNT 900
+#define MODSEC_PCRE_MATCH_LIMIT 1500
+#define MODSEC_PCRE_MATCH_LIMIT_RECURSION 1500
 
 class SMatch {
  public:

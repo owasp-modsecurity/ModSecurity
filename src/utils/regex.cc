@@ -47,6 +47,10 @@ Regex::Regex(const std::string& pattern_)
         &errptr, &erroffset, NULL);
 
     m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
+    m_pce->match_limit = MODSEC_PCRE_MATCH_LIMIT;
+    m_pce->match_limit_recursion = MODSEC_PCRE_MATCH_LIMIT_RECURSION;
+    m_pce->flags |= PCRE_EXTRA_MATCH_LIMIT;
+    m_pce->flags |= PCRE_EXTRA_MATCH_LIMIT_RECURSION;
 }
 
 
