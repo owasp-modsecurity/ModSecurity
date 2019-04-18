@@ -9,14 +9,11 @@ RUN apt-get install -y  \
     m4 \
     libtool
 
-# Install google protobuf 3.5.1
-RUN mkdir -p /tmp/protobuf/
-RUN curl -o /tmp/protobuf/protobuf-3.5.1.zip -OL https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.zip
-RUN unzip /tmp/protobuf/protobuf-3.5.1.zip -d /tmp/protobuf/
-WORKDIR /tmp/protobuf/protobuf-3.5.1
-RUN ./autogen.sh
-RUN ./configure --prefix=/usr
-RUN  make && make install
+# Install jsoncons 
+RUN mkdir -p /tmp/jsoncons/
+RUN curl -o /tmp/jsoncons/jsoncons-0.122.0.zip -OL https://github.com/danielaparker/jsoncons/archive/v0.122.0.zip
+RUN unzip /tmp/jsoncons/jsoncons-0.122.0.zip -d /tmp/jsoncons
+RUN cp -r /tmp/jsoncons/jsoncons-0.122.0/include/jsoncons /usr/include/
 
 RUN apt-get install -y \
         apache2-dev \

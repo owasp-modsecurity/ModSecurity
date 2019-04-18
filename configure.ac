@@ -580,22 +580,6 @@ AC_ARG_ENABLE(collection-memory-database,
   collection_memory_database="-I"`pwd`"/apache2/ag_mdb -DMEMORY_DATABASE_ENABLE"
 ])
 
-# ProtoBuf compiler.
-# First, specify with --with-protoc=/path/of/protoc.
-# Or, specify with env variable PROTOC.
-# If neither of the above, find it in the path.
-#AC_MSG_CHECKING([for ProtoBuf compiler protoc])
-AC_ARG_WITH([protoc],
-    [AS_HELP_STRING([--with-protoc=/path/of/protoc],
-        [Location of the protocol buffers compiler protoc. Defaults to looking on path.])],
-    [PROTOC="$withval"],
-    [ AS_IF([test "x${PROTOC}" == "x"],
-        [AC_PATH_PROG([PROTOC], [protoc], [no])])
-    ]
-)
-#AC_MSG_RESULT([${PROTOC}])
-AS_IF([test "${PROTOC}" == "no"], [AC_MSG_ERROR([ProtoBuf compiler "protoc" not found.])])
-
 # Enable json waf logging support
 AC_ARG_ENABLE(waf_json_logging,
               AS_HELP_STRING([--enable-waf_json_logging],

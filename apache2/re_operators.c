@@ -1178,8 +1178,11 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
         /* We no longer escape the pattern here as it is done when logging */
+#ifdef WAF_JSON_LOGGING_ENABLE
+        char *pattern = apr_pstrdup(msr->mp, regex->pattern ? regex->pattern : "<Unknown Match>");
+#else
         char *pattern = apr_pstrdup(msr->mp, log_escape(msr->mp, regex->pattern ? regex->pattern : "<Unknown Match>"));
-
+#endif
         /* This message will be logged. */
         if (strlen(pattern) > 252) {
             *error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s ...\" at %s.",

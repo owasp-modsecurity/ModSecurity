@@ -1,17 +1,9 @@
 pkglibdir = $(prefix)/lib
 pkglib_LTLIBRARIES = mod_security2.la
 
-PROTOS         = $(waf_logging/waf_format.proto)
-PROTO_OBJS     = $(PROTOS:.proto=.pb.o)
-
-PBSRCS   = $(waf_logging/waf_format.proto)
-PBOBJS   = $(PROTOS:.proto=.pb.o)
-PBGENS   = $(PROTOS:.proto=.pb.cc) $(PROTOS:.proto=.pb.h)
-
 mod_security2_la_SOURCES = acmp.c \
     ag_mdb/murmur3.c \
     ag_mdb/ag_mdb.cpp \
-    waf_logging/waf_format.pb.cc \
     waf_logging/waf_log_util.cc \
     waf_lock/waf_lock.cpp \
     apache2_config.c \
@@ -203,8 +195,3 @@ install-exec-hook: $(pkglib_LTLIBRARIES)
 	done
 endif
 
-%.pb.cc: %.proto
-	protoc --cpp_out=. $<
-
-%.pb.o : %.pb.cc
-	$(CXX) $(CXX_FLAGS) -c -o $@ $<
