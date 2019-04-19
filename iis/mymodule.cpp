@@ -1113,10 +1113,12 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 #endif
     c->remote_host = NULL;
 
-    hr = SaveRequestBodyToRequestRec(context);
-    if (FAILED(hr)) {
-        context->provider->SetErrorStatus(hr);
-        return RQ_NOTIFICATION_FINISH_REQUEST;
+    if (config->config->reqbody_access) {
+        hr = SaveRequestBodyToRequestRec(context);
+        if (FAILED(hr)) {
+            context->provider->SetErrorStatus(hr);
+            return RQ_NOTIFICATION_FINISH_REQUEST;
+        }
     }
 
     lock.unlock();
