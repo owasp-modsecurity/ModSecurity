@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - parser: fix parsed file names
+   [@zimmerle]
  - Allow empty anchored variable
    [Issue #2024 - @airween]
  - Fixed FILES_NAMES collection after the end of multipart parsing

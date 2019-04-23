@@ -21,6 +21,7 @@
 #include <list>
 #endif
 
+
 #ifndef SRC_PARSER_DRIVER_H_
 #define SRC_PARSER_DRIVER_H_
 
@@ -50,6 +51,14 @@ typedef struct Driver_t Driver;
 #endif
 
 
+/**
+ *
+ * FIXME: There is a memory leak in the filename at yy::location.
+ *        The filename should be converted into a shared string to
+ *        save memory or be associated with the life cycle of the
+ *        driver class.
+ *
+ **/
 class Driver : public RulesProperties {
  public:
     Driver();
@@ -77,7 +86,6 @@ class Driver : public RulesProperties {
 
     std::list<yy::location *> loc;
 
-    std::list<std::string> ref;
     std::string buffer;
     Rule *lastRule;
 };

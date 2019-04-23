@@ -1116,7 +1116,7 @@ namespace yy {
 #line 316 "seclang-parser.yy" // lalr1.cc:788
 {
   // Initialize the initial location.
-  yyla.location.begin.filename = yyla.location.end.filename = &driver.file;
+  yyla.location.begin.filename = yyla.location.end.filename = new std::string(driver.file);
 }
 
 #line 1123 "seclang-parser.cc" // lalr1.cc:788
@@ -1707,7 +1707,7 @@ namespace yy {
     {
         yylhs.value.as < std::unique_ptr<Operator> > () = std::move(yystack_[0].value.as < std::unique_ptr<Operator> > ());
         std::string error;
-        if (yylhs.value.as < std::unique_ptr<Operator> > ()->init(driver.ref.back(), &error) == false) {
+        if (yylhs.value.as < std::unique_ptr<Operator> > ()->init(*yystack_[0].location.end.filename, &error) == false) {
             driver.error(yystack_[1].location, error);
             YYERROR;
         }
@@ -1721,7 +1721,7 @@ namespace yy {
         yylhs.value.as < std::unique_ptr<Operator> > () = std::move(yystack_[0].value.as < std::unique_ptr<Operator> > ());
         yylhs.value.as < std::unique_ptr<Operator> > ()->m_negation = true;
         std::string error;
-        if (yylhs.value.as < std::unique_ptr<Operator> > ()->init(driver.ref.back(), &error) == false) {
+        if (yylhs.value.as < std::unique_ptr<Operator> > ()->init(*yystack_[1].location.end.filename, &error) == false) {
             driver.error(yystack_[2].location, error);
             YYERROR;
         }
@@ -1734,7 +1734,7 @@ namespace yy {
     {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
         std::string error;
-        if (yylhs.value.as < std::unique_ptr<Operator> > ()->init(driver.ref.back(), &error) == false) {
+        if (yylhs.value.as < std::unique_ptr<Operator> > ()->init(*yystack_[0].location.end.filename, &error) == false) {
             driver.error(yystack_[1].location, error);
             YYERROR;
         }
@@ -1748,7 +1748,7 @@ namespace yy {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
         yylhs.value.as < std::unique_ptr<Operator> > ()->m_negation = true;
         std::string error;
-        if (yylhs.value.as < std::unique_ptr<Operator> > ()->init(driver.ref.back(), &error) == false) {
+        if (yylhs.value.as < std::unique_ptr<Operator> > ()->init(*yystack_[1].location.end.filename, &error) == false) {
             driver.error(yystack_[2].location, error);
             YYERROR;
         }
@@ -2063,7 +2063,7 @@ namespace yy {
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ *yystack_[3].location.end.filename,
             /* line number */ yystack_[3].location.end.line
             );
 
@@ -2087,7 +2087,7 @@ namespace yy {
             /* op */ yystack_[0].value.as < std::unique_ptr<Operator> > ().release(),
             /* variables */ v,
             /* actions */ NULL,
-            /* file name */ driver.ref.back(),
+            /* file name */ *yystack_[2].location.end.filename,
             /* line number */ yystack_[2].location.end.line
             );
         if (driver.addSecRule(rule) == false) {
@@ -2109,7 +2109,7 @@ namespace yy {
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ *yystack_[1].location.end.filename,
             /* line number */ yystack_[1].location.end.line
             );
         driver.addSecAction(rule);
@@ -2128,7 +2128,7 @@ namespace yy {
         RuleScript *r = new RuleScript(
             /* path to script */ yystack_[1].value.as < std::string > (),
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ *yystack_[1].location.end.filename,
             /* line number */ yystack_[1].location.end.line
             );
 
@@ -2721,7 +2721,7 @@ namespace yy {
 #if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         std::string err;
         std::string file = modsecurity::utils::find_resource(yystack_[0].value.as < std::string > (),
-            driver.ref.back(), &err);
+            *yystack_[0].location.end.filename, &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to load locate the GeoDB file from: " << yystack_[0].value.as < std::string > () << " ";
@@ -2949,7 +2949,7 @@ namespace yy {
             param.pop_back();
         }
 
-        file = modsecurity::utils::find_resource(f, driver.ref.back(), &err);
+        file = modsecurity::utils::find_resource(f, *yystack_[0].location.end.filename, &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to locate the unicode map file from: " << f << " ";
