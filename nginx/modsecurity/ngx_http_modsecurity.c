@@ -13,6 +13,7 @@
 */
 
 #include <ngx_http.h>
+#include <ngx_http_modsecurity_config_cache.h>
 #include <apr_bucket_nginx.h>
 
 #include <apr_base64.h>
@@ -511,6 +512,7 @@ modsec_pcre_free(void *ptr)
 }
 
 static server_rec *modsec_server = NULL;
+static ngx_http_modsecurity_config_cache_t *config_cache = NULL;
 
 static ngx_int_t
 ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
@@ -537,6 +539,12 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
     modsec_server->server_hostname[ ngx_cycle->hostname.len] = '\0';
 
     modsecStartConfig();
+
+    config_cache = ngx_http_modsecurity_config_cache_init(cf);
+    if (config_cache == NULL) {
+        return NGX_ERROR;
+    }
+
     return NGX_OK;
 }
 
@@ -548,6 +556,9 @@ ngx_http_modsecurity_terminate(ngx_cycle_t *cycle)
         modsecTerminate();
         modsec_server = NULL;
     }
+
+    /* Configuration cache is allocated from a pool and does not need explicit freeing */
+    config_cache = NULL;
 }
 
 
@@ -1012,6 +1023,11 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return NGX_CONF_ERROR;
     }
 
+    mscf->config = ngx_http_modsecurity_config_cache_lookup(config_cache, &value[1]);
+    if (mscf->config != NULL) {
+        return NGX_CONF_OK;
+    }
+
     mscf->config = modsecGetDefaultConfig();
 
     if (mscf->config == NULL) {
@@ -1023,6 +1039,12 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         ngx_log_error(NGX_LOG_EMERG, cf->log, 0, "ModSecurityConfig in %s:%ui: %s",
                 cf->conf_file->file.name.data, cf->conf_file->line, msg);
         return NGX_CONF_ERROR;
+    }
+
+    ngx_int_t result = ngx_http_modsecurity_config_cache_insert(config_cache, cf, &value[1], mscf->config);
+    if (result != NGX_OK) {
+        ngx_log_error(NGX_LOG_WARN, cf->log, 0, "Couldn't cache config in %s:%ui: %s",
+                cf->conf_file->file.name.data, cf->conf_file->line, msg);
     }
 
     return NGX_CONF_OK;
