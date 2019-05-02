@@ -13,9 +13,10 @@
  *
  */
 
+
 #include <string>
 
-#include "src/actions/action_type_configure.h"
+#include "src/actions/action_type_rule_metadata.h"
 
 
 #ifndef SRC_ACTIONS_MATURITY_H_
@@ -28,15 +29,15 @@ class Transaction;
 namespace actions {
 
 
-class Maturity : public ActionTypeConfigure {
+class Maturity : public ActionTypeRuleMetaData {
  public:
-    explicit Maturity(const std::string &action) 
-        : ActionTypeConfigure(action),
+    explicit Maturity(const std::string &action)
+        : Action(action),
         m_maturity(0) { }
 
     bool init(std::string *error) override;
 
-    virtual void configure(RuleWithActions *rule) override {
+    void configure(RuleWithActions *rule) override {
         rule->setMaturity(m_maturity);
     }
 
