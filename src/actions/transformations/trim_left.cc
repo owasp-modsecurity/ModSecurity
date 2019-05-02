@@ -13,28 +13,24 @@
  *
  */
 
+
 #include "src/actions/transformations/trim_left.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/actions/transformations/trim.h"
-#include "modsecurity/actions/action.h"
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
-void TrimLeft::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void TrimLeft::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     out = in;
     ltrim(&out);
 };

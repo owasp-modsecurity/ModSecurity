@@ -831,13 +831,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,4v64,13t:lowercase",
+      "error_log":"o0,4v64,13t:lowerCase",
       "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecRuleEngine On",
-      "SecRule REQUEST_HEADERS_NAMES \"auth\" \"id:1,phase:2,pass,t:lowercase,msg:'ops',deny\""
+      "SecRule REQUEST_HEADERS_NAMES \"auth\" \"id:1,phase:2,pass,t:lowerCase,msg:'ops',deny\""
     ]
     },
     {
@@ -865,13 +865,13 @@
       ]
     },
     "expected":{
-      "error_log":"o1,2v216,3t:lowercase",
+      "error_log":"o1,2v216,3t:lowerCase",
       "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecRuleEngine On",
-      "SecRule REQUEST_COOKIES \"es\" \"id:1,phase:2,pass,t:lowercase,msg:'ops',deny\""
+      "SecRule REQUEST_COOKIES \"es\" \"id:1,phase:2,pass,t:lowerCase,msg:'ops',deny\""
     ]
     },
     {
@@ -899,13 +899,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,1v223,1t:lowercase",
+      "error_log":"o0,1v223,1t:lowerCase",
       "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecRuleEngine On",
-      "SecRule REQUEST_COOKIES \"z\" \"id:1,phase:2,pass,t:lowercase,msg:'ops',deny\""
+      "SecRule REQUEST_COOKIES \"z\" \"id:1,phase:2,pass,t:lowerCase,msg:'ops',deny\""
     ]
     },
     {
@@ -933,13 +933,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,1v228,1t:lowercase",
+      "error_log":"o0,1v228,1t:lowerCase",
       "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecRuleEngine On",
-      "SecRule REQUEST_COOKIES \"b\" \"id:1,phase:2,pass,t:lowercase,msg:'ops',deny\""
+      "SecRule REQUEST_COOKIES \"b\" \"id:1,phase:2,pass,t:lowerCase,msg:'ops',deny\""
     ]
     },
     {

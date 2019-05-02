@@ -19,6 +19,8 @@
 
 #include "src/utils/string.h"
 #include "src/variables/variable.h"
+#include "src/actions/action_type_rule_metadata.h"
+#include "src/actions/transformations/transformation.h"
 
 namespace modsecurity {
 
@@ -36,21 +38,26 @@ bool RulesExceptions::loadUpdateActionById(double id,
     std::string *error) {
 
     for (auto &a : *actions) {
-        if (a->m_actionKind == actions::Action::ConfigurationKind) {
-            std::cout << "General failure, action: " << a->m_name;
+        if (dynamic_cast<actions::ActionTypeRuleMetaData *>(a.get())) {
+            std::cout << "General failure, action: " << *a->getName();
             std::cout << " has not expected to be used with UpdateActionByID.";
             std::cout << std::endl;
-        } else if (a->m_actionKind
-            == actions::Action::RunTimeBeforeMatchAttemptKind) {
-            m_action_pre_update_target_by_id.emplace(std::pair<double,
-                std::unique_ptr<actions::Action>>(id , std::move(a)));
-        } else if (a->m_actionKind == actions::Action::RunTimeOnlyIfMatchKind) {
-            m_action_pos_update_target_by_id.emplace(std::pair<double,
-                std::unique_ptr<actions::Action>>(id , std::move(a)));
-        } else {
-            std::cout << "General failure, action: " << a->m_name;
-            std::cout << " has an unknown type." << std::endl;
+            continue;
         }
+
+        if (dynamic_cast<actions::transformations::Transformation *>(a.get())) {
+            actions::transformations::Transformation *t = dynamic_cast<actions::transformations::Transformation *>(a.get());
+            m_action_transformation_update_target_by_id.emplace(
+                std::pair<double,
+                std::unique_ptr<actions::transformations::Transformation>>(id, std::unique_ptr<actions::transformations::Transformation>(t))
+            );
+            continue;
+        }
+
+        m_action_pos_update_target_by_id.emplace(
+            std::pair<double,
+            std::unique_ptr<actions::Action>>(id , std::move(a))
+        );
     }
 
     return true;
@@ -247,10 +254,10 @@ bool RulesExceptions::merge(RulesExceptions *from) {
                     p.second));
     }
 
-    for (auto &p : from->m_action_pre_update_target_by_id) {
-        m_action_pre_update_target_by_id.emplace(
+    for (auto &p : from->m_action_transformation_update_target_by_id) {
+        m_action_transformation_update_target_by_id.emplace(
             std::pair<double,
-                std::shared_ptr<actions::Action>>(p.first,
+                std::shared_ptr<actions::transformations::Transformation>>(p.first,
                     p.second));
     }
 

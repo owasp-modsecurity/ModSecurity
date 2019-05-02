@@ -1073,7 +1073,7 @@ expression:
         for (auto &i : *$4.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               std::shared_ptr<actions::Action> at = std::move(i);
-              std::shared_ptr<actions::transformations::Transformation> t2 = std::static_pointer_cast<actions::transformations::Transformation>(std::move(at));
+              std::shared_ptr<actions::transformations::Transformation> t2 = std::dynamic_pointer_cast<actions::transformations::Transformation>(std::move(at));
               t->push_back(std::move(t2));
             } else {
               a->push_back(i.release());
@@ -1124,7 +1124,7 @@ expression:
         for (auto &i : *$2.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               std::shared_ptr<actions::Action> at = std::move(i);
-              std::shared_ptr<actions::transformations::Transformation> t2 = std::static_pointer_cast<actions::transformations::Transformation>(std::move(at));
+              std::shared_ptr<actions::transformations::Transformation> t2 = std::dynamic_pointer_cast<actions::transformations::Transformation>(std::move(at));
               t->push_back(std::move(t2));
             } else {
               a->push_back(i.release());
@@ -1146,7 +1146,7 @@ expression:
         for (auto &i : *$2.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               std::shared_ptr<actions::Action> at = std::move(i);
-              std::shared_ptr<actions::transformations::Transformation> t2 = std::static_pointer_cast<actions::transformations::Transformation>(std::move(at));
+              std::shared_ptr<actions::transformations::Transformation> t2 = std::dynamic_pointer_cast<actions::transformations::Transformation>(std::move(at));
               t->push_back(std::move(t2));
             } else {
               a->push_back(i.release());
@@ -1184,19 +1184,14 @@ expression:
                 hasDisruptive = true;
             }
             if (phase != NULL) {
-                definedPhase = phase->m_phase;
-                secRuleDefinedPhase = phase->m_secRulesPhase;
+                definedPhase = phase->getPhase();
+                secRuleDefinedPhase = phase->getSecRulePhase();
                 delete phase;
-            } else if (a->m_actionKind == actions::Action::RunTimeOnlyIfMatchKind ||
-                a->m_actionKind == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
-                if (none != NULL) {
-                    driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");
-                    YYERROR;
-                }
+            } else if (dynamic_cast<actions::ActionAllowedAsSecDefaultAction *>(a)
+              && !dynamic_cast<actions::transformations::None *>(a)) {
                 checkedActions.push_back(a);
             } else {
-                driver.error(@0, "The action '" + *a->m_name.get() + "' is not suitable to be part of the SecDefaultActions");
+                driver.error(@0, "The action '" + *a->getName() + "' is not suitable to be part of the SecDefaultActions");
                 YYERROR;
             }
         }
@@ -2610,19 +2605,19 @@ act:
       }
     | ACTION_AUDIT_LOG
       {
-        ACTION_CONTAINER($$, new actions::AuditLog($1));
+        ACTION_CONTAINER($$, new actions::AuditLog());
       }
     | ACTION_BLOCK
       {
-        ACTION_CONTAINER($$, new actions::Block($1));
+        ACTION_CONTAINER($$, new actions::Block());
       }
     | ACTION_CAPTURE
       {
-        ACTION_CONTAINER($$, new actions::Capture($1));
+        ACTION_CONTAINER($$, new actions::Capture());
       }
     | ACTION_CHAIN
       {
-        ACTION_CONTAINER($$, new actions::Chain($1));
+        ACTION_CONTAINER($$, new actions::Chain());
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
       {
@@ -2703,7 +2698,7 @@ act:
       }
     | ACTION_DENY
       {
-        ACTION_CONTAINER($$, new actions::disruptive::Deny($1));
+        ACTION_CONTAINER($$, new actions::disruptive::Deny());
       }
     | ACTION_DEPRECATE_VAR
       {
@@ -2711,7 +2706,7 @@ act:
       }
     | ACTION_DROP
       {
-        ACTION_CONTAINER($$, new actions::disruptive::Drop($1));
+        ACTION_CONTAINER($$, new actions::disruptive::Drop());
       }
     | ACTION_EXEC
       {
@@ -2736,7 +2731,7 @@ act:
       }
     | ACTION_LOG
       {
-        ACTION_CONTAINER($$, new actions::Log($1));
+        ACTION_CONTAINER($$, new actions::Log());
       }
     | ACTION_MATURITY
       {
@@ -2748,19 +2743,19 @@ act:
       }
     | ACTION_MULTI_MATCH
       {
-        ACTION_CONTAINER($$, new actions::MultiMatch($1));
+        ACTION_CONTAINER($$, new actions::MultiMatch());
       }
     | ACTION_NO_AUDIT_LOG
       {
-        ACTION_CONTAINER($$, new actions::NoAuditLog($1));
+        ACTION_CONTAINER($$, new actions::NoAuditLog());
       }
     | ACTION_NO_LOG
       {
-        ACTION_CONTAINER($$, new actions::NoLog($1));
+        ACTION_CONTAINER($$, new actions::NoLog());
       }
     | ACTION_PASS
       {
-        ACTION_CONTAINER($$, new actions::disruptive::Pass($1));
+        ACTION_CONTAINER($$, new actions::disruptive::Pass());
       }
     | ACTION_PAUSE
       {
@@ -2856,147 +2851,147 @@ act:
       }
     | ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT
       {
-        ACTION_CONTAINER($$, new actions::transformations::ParityZero7bit($1));
+        ACTION_CONTAINER($$, new actions::transformations::ParityZero7bit());
       }
     | ACTION_TRANSFORMATION_PARITY_ODD_7_BIT
       {
-        ACTION_CONTAINER($$, new actions::transformations::ParityOdd7bit($1));
+        ACTION_CONTAINER($$, new actions::transformations::ParityOdd7bit());
       }
     | ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT
       {
-        ACTION_CONTAINER($$, new actions::transformations::ParityEven7bit($1));
+        ACTION_CONTAINER($$, new actions::transformations::ParityEven7bit());
       }
     | ACTION_TRANSFORMATION_SQL_HEX_DECODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::SqlHexDecode($1));
+        ACTION_CONTAINER($$, new actions::transformations::SqlHexDecode());
       }
       | ACTION_TRANSFORMATION_BASE_64_ENCODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::Base64Encode($1));
+        ACTION_CONTAINER($$, new actions::transformations::Base64Encode());
       }
     | ACTION_TRANSFORMATION_BASE_64_DECODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::Base64Decode($1));
+        ACTION_CONTAINER($$, new actions::transformations::Base64Decode());
       }
    | ACTION_TRANSFORMATION_BASE_64_DECODE_EXT
       {
-        ACTION_CONTAINER($$, new actions::transformations::Base64DecodeExt($1));
+        ACTION_CONTAINER($$, new actions::transformations::Base64DecodeExt());
       }
     | ACTION_TRANSFORMATION_CMD_LINE
       {
-        ACTION_CONTAINER($$, new actions::transformations::CmdLine($1));
+        ACTION_CONTAINER($$, new actions::transformations::CmdLine());
       }
     | ACTION_TRANSFORMATION_SHA1
       {
-        ACTION_CONTAINER($$, new actions::transformations::Sha1($1));
+        ACTION_CONTAINER($$, new actions::transformations::Sha1());
       }
     | ACTION_TRANSFORMATION_MD5
       {
-        ACTION_CONTAINER($$, new actions::transformations::Md5($1));
+        ACTION_CONTAINER($$, new actions::transformations::Md5());
       }
     | ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE 
       {
-        ACTION_CONTAINER($$, new actions::transformations::EscapeSeqDecode($1));
+        ACTION_CONTAINER($$, new actions::transformations::EscapeSeqDecode());
       }
     | ACTION_TRANSFORMATION_HEX_ENCODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::HexEncode($1));
+        ACTION_CONTAINER($$, new actions::transformations::HexEncode());
       }
     | ACTION_TRANSFORMATION_HEX_DECODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::HexDecode($1));
+        ACTION_CONTAINER($$, new actions::transformations::HexDecode());
       }
     | ACTION_TRANSFORMATION_LOWERCASE
       {
-        ACTION_CONTAINER($$, new actions::transformations::LowerCase($1));
+        ACTION_CONTAINER($$, new actions::transformations::LowerCase());
       }
     | ACTION_TRANSFORMATION_UPPERCASE
       {
-        ACTION_CONTAINER($$, new actions::transformations::UpperCase($1));
+        ACTION_CONTAINER($$, new actions::transformations::UpperCase());
       }
     | ACTION_TRANSFORMATION_URL_DECODE_UNI
       {
-        ACTION_CONTAINER($$, new actions::transformations::UrlDecodeUni($1));
+        ACTION_CONTAINER($$, new actions::transformations::UrlDecodeUni());
       }
     | ACTION_TRANSFORMATION_URL_DECODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::UrlDecode($1));
+        ACTION_CONTAINER($$, new actions::transformations::UrlDecode());
       }
     | ACTION_TRANSFORMATION_URL_ENCODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::UrlEncode($1));
+        ACTION_CONTAINER($$, new actions::transformations::UrlEncode());
       }
     | ACTION_TRANSFORMATION_NONE
       {
-        ACTION_CONTAINER($$, new actions::transformations::None($1));
+        ACTION_CONTAINER($$, new actions::transformations::None());
       }
     | ACTION_TRANSFORMATION_COMPRESS_WHITESPACE
       {
-        ACTION_CONTAINER($$, new actions::transformations::CompressWhitespace($1));
+        ACTION_CONTAINER($$, new actions::transformations::CompressWhitespace());
       }
     | ACTION_TRANSFORMATION_REMOVE_WHITESPACE
       {
-        ACTION_CONTAINER($$, new actions::transformations::RemoveWhitespace($1));
+        ACTION_CONTAINER($$, new actions::transformations::RemoveWhitespace());
       }
     | ACTION_TRANSFORMATION_REPLACE_NULLS
       {
-        ACTION_CONTAINER($$, new actions::transformations::ReplaceNulls($1));
+        ACTION_CONTAINER($$, new actions::transformations::ReplaceNulls());
       }
     | ACTION_TRANSFORMATION_REMOVE_NULLS
       {
-        ACTION_CONTAINER($$, new actions::transformations::RemoveNulls($1));
+        ACTION_CONTAINER($$, new actions::transformations::RemoveNulls());
       }
     | ACTION_TRANSFORMATION_HTML_ENTITY_DECODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::HtmlEntityDecode($1));
+        ACTION_CONTAINER($$, new actions::transformations::HtmlEntityDecode());
       }
     | ACTION_TRANSFORMATION_JS_DECODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::JsDecode($1));
+        ACTION_CONTAINER($$, new actions::transformations::JsDecode());
       }
     | ACTION_TRANSFORMATION_CSS_DECODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::CssDecode($1));
+        ACTION_CONTAINER($$, new actions::transformations::CssDecode());
       }
     | ACTION_TRANSFORMATION_TRIM
       {
-        ACTION_CONTAINER($$, new actions::transformations::Trim($1));
+        ACTION_CONTAINER($$, new actions::transformations::Trim());
       }
     | ACTION_TRANSFORMATION_TRIM_LEFT
       {
-        ACTION_CONTAINER($$, new actions::transformations::TrimLeft($1));
+        ACTION_CONTAINER($$, new actions::transformations::TrimLeft());
       }
     | ACTION_TRANSFORMATION_TRIM_RIGHT
       {
-        ACTION_CONTAINER($$, new actions::transformations::TrimRight($1));
+        ACTION_CONTAINER($$, new actions::transformations::TrimRight());
       }
     | ACTION_TRANSFORMATION_NORMALISE_PATH_WIN
       {
-        ACTION_CONTAINER($$, new actions::transformations::NormalisePathWin($1));
+        ACTION_CONTAINER($$, new actions::transformations::NormalisePathWin());
       }
     | ACTION_TRANSFORMATION_NORMALISE_PATH
       {
-        ACTION_CONTAINER($$, new actions::transformations::NormalisePath($1));
+        ACTION_CONTAINER($$, new actions::transformations::NormalisePath());
       }
     | ACTION_TRANSFORMATION_LENGTH
       {
-        ACTION_CONTAINER($$, new actions::transformations::Length($1));
+        ACTION_CONTAINER($$, new actions::transformations::Length());
       }
     | ACTION_TRANSFORMATION_UTF8_TO_UNICODE
       {
-        ACTION_CONTAINER($$, new actions::transformations::Utf8ToUnicode($1));
+        ACTION_CONTAINER($$, new actions::transformations::Utf8ToUnicode());
       }
     | ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR
       {
-        ACTION_CONTAINER($$, new actions::transformations::RemoveCommentsChar($1));
+        ACTION_CONTAINER($$, new actions::transformations::RemoveCommentsChar());
       }
     | ACTION_TRANSFORMATION_REMOVE_COMMENTS
       {
-        ACTION_CONTAINER($$, new actions::transformations::RemoveComments($1));
+        ACTION_CONTAINER($$, new actions::transformations::RemoveComments());
       }
     | ACTION_TRANSFORMATION_REPLACE_COMMENTS
       {
-        ACTION_CONTAINER($$, new actions::transformations::ReplaceComments($1));
+        ACTION_CONTAINER($$, new actions::transformations::ReplaceComments());
       }
     ;
 

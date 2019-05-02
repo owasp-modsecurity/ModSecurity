@@ -13,32 +13,31 @@
  *
  */
 
+
 #include "src/actions/disruptive/redirect.h"
 
-#include <string.h>
-#include <iostream>
 #include <string>
-#include <memory>
 
 #include "modsecurity/transaction.h"
-#include "src/utils/string.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+#include "modsecurity/rule_message.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace disruptive {
 
 
-bool Redirect::init(std::string *error) {
-    m_status = 302;
-    return true;
-}
-
-
-bool Redirect::execute(Transaction *transaction) {
+bool Redirect::execute(Transaction *transaction) noexcept {
     std::string m_urlExpanded(getEvaluatedRunTimeString(transaction));
     /* if it was changed before, lets keep it. */
     if (transaction->m_it.status == 200
-        || (!(transaction->m_it.status <= 307 && transaction->m_it.status >= 301))) {
+        || (!(transaction->m_it.status <= 307
+            && transaction->m_it.status >= 301))) {
         transaction->m_it.status = m_status;
     }
 
@@ -48,7 +47,9 @@ bool Redirect::execute(Transaction *transaction) {
     intervention::freeLog(&transaction->m_it);
 
     transaction->m_it.log = strdup(
-        transaction->messageGetLast()->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
+        transaction->messageGetLast()->log(
+            RuleMessage::LogMessageInfo::ClientLogMessageInfo)
+                .c_str());
 
     return true;
 }

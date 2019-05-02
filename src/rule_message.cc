@@ -41,7 +41,7 @@ std::string RuleMessage::_details(const RuleMessage *rm) {
     msg.append(" [ver \"" + rm->getVer() + "\"]");
     msg.append(" [maturity \"" + std::to_string(rm->getMaturity()) + "\"]");
     msg.append(" [accuracy \"" + std::to_string(rm->getAccuracy()) + "\"]");
-    for (auto &a : rm->m_tags) {
+    for (auto a : rm->m_tags) {
         msg.append(" [tag \"" + a + "\"]");
     }
     msg.append(" [hostname \"" + rm->getServerIpAddress() + "\"]");

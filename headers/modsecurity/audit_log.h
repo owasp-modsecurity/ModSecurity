@@ -61,7 +61,7 @@ class AuditLog {
      NativeAuditLogFormat
     };
 
-    enum AuditLogParts {
+    enum AuditLogPartsEnum {
      /**
       * Audit log header (mandatory).
       * 

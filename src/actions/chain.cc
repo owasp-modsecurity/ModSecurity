@@ -13,14 +13,8 @@
  *
  */
 
+
 #include "src/actions/chain.h"
-
-#include <iostream>
-#include <string>
-
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {

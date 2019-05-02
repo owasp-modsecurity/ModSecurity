@@ -13,13 +13,13 @@
  *
  */
 
+
 #include "src/actions/xmlns.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
+
 
 namespace modsecurity {
 namespace actions {
@@ -29,13 +29,13 @@ bool XmlNS::init(std::string *error) {
     size_t pos;
     std::string http = "http://";
 
-    pos = m_parser_payload.find("=");
+    pos = m_parserPayload.find("=");
     if (pos == std::string::npos) {
         error->assign("XMLS: Bad format, missing equals sign.");
         return false;
     }
-    m_scope = std::string(m_parser_payload, 0, pos);
-    m_href = std::string(m_parser_payload, pos+1, m_parser_payload.size());
+    m_scope = std::string(m_parserPayload, 0, pos);
+    m_href = std::string(m_parserPayload, pos+1, m_parserPayload.size());
 
     if (m_href.empty() || m_scope.empty()) {
         error->assign("XMLS: XMLNS is invalid. Expecting a " \

@@ -13,15 +13,10 @@
  *
  */
 
+
 #include "src/actions/accuracy.h"
 
-#include <iostream>
 #include <string>
-
-#include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
@@ -30,9 +25,9 @@ namespace actions {
 
 bool Accuracy::init(std::string *error) {
     try {
-        m_accuracy = std::stoi(m_parser_payload);
+        m_accuracy = std::stoi(m_parserPayload);
     }  catch (...) {
-        error->assign("Accuracy: The input \"" + m_parser_payload + "\" is " \
+        error->assign("Accuracy: The input \"" + m_parserPayload + "\" is " \
             "not a number.");
         return false;
     }

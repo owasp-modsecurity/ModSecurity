@@ -13,29 +13,28 @@
  *
  */
 
+
 #include <string>
 
-#include "src/actions/action_type_configure.h"
+#include "src/actions/action_type_rule_metadata.h"
 
 
 #ifndef SRC_ACTIONS_VER_H_
 #define SRC_ACTIONS_VER_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
-class Ver : public ActionTypeConfigure {
+class Ver : public ActionTypeRuleMetaData {
  public:
     explicit Ver(const std::string &action)
-        : ActionTypeConfigure(action),
+        : Action(action),
         m_version("")
     { };
 
-    virtual void configure(RuleWithActions *rule) override {
+    void configure(RuleWithActions *rule) override {
         rule->setVersion(m_version);
     }
 
