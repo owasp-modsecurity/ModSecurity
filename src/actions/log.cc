@@ -28,7 +28,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Log::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Log::execute(Transaction *transaction) {
     ms_dbg_a(transaction, 9, "Saving transaction to logs");
     transaction->messageGetLast()->m_saveMessage = true;
     return true;

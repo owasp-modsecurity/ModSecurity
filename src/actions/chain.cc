@@ -27,11 +27,6 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Chain::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setChained(true);
-    return true;
-}
-
 
 }  // namespace actions
 }  // namespace modsecurity

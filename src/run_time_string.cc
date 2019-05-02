@@ -48,20 +48,13 @@ void RunTimeString::appendVar(
 
 
 std::string RunTimeString::evaluate(Transaction *t) {
-    return evaluate(t, NULL);
-}
-
-
-std::string RunTimeString::evaluate(Transaction *t, Rule *r) {
     std::string s;
     for (auto &z : m_elements) {
         if (z->m_string.size() > 0) {
             s.append(z->m_string);
         } else if (z->m_var != NULL && t != NULL) {
             std::vector<const VariableValue *> l;
-            // FIXME: This cast should be removed.
-            RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(r);
-            z->m_var->evaluate(t, rr, &l);
+            z->m_var->evaluate(t, &l);
             if (l.size() > 0) {
                 s.append(l[0]->getValue());
             }

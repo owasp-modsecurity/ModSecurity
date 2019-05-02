@@ -28,11 +28,5 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Ver::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setVersion(m_parser_payload);
-    return true;
-}
-
-
 }  // namespace actions
 }  // namespace modsecurity

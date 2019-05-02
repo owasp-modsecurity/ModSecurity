@@ -37,7 +37,8 @@ class Status : public Action {
     m_status(0) { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
+    bool isAllowedInSecDefaultActions() override { return true; }
 
     int m_status;
 };

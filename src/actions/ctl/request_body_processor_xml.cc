@@ -25,8 +25,7 @@ namespace actions {
 namespace ctl {
 
 
-bool RequestBodyProcessorXML::execute(RuleWithActions *rule,
-    Transaction *transaction) {
+bool RequestBodyProcessorXML::execute(Transaction *transaction) {
     transaction->m_requestBodyProcessor = Transaction::XMLRequestBody;
     transaction->m_variableReqbodyProcessor.set("XML",
         transaction->m_variableOffset);

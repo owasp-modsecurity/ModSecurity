@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
 #ifndef SRC_ACTIONS_PHASE_H_
 #define SRC_ACTIONS_PHASE_H_
@@ -37,7 +38,13 @@ class Phase : public Action {
         m_secRulesPhase(0) { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        r->setPhase(m_phase);
+    };
+
+    bool isAllowedInSecDefaultActions() override { return true; }
 
     int m_phase;
     int m_secRulesPhase;

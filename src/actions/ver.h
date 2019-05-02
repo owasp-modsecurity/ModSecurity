@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
 #ifndef SRC_ACTIONS_VER_H_
 #define SRC_ACTIONS_VER_H_
@@ -31,10 +32,10 @@ class Ver : public Action {
  public:
     explicit Ver(std::string action) : Action(action, ConfigurationKind) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
-
- private:
-    std::string m_ver;
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        r->setVersion(m_parser_payload);
+    };
 };
 
 

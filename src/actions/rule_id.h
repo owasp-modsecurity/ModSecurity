@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
 #ifndef SRC_ACTIONS_RULE_ID_H_
 #define SRC_ACTIONS_RULE_ID_H_
@@ -37,7 +38,11 @@ class RuleId : public Action {
         m_ruleId(0) { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        r->setId(m_ruleId);
+    };
 
  private:
     double m_ruleId;

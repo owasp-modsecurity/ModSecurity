@@ -41,6 +41,9 @@ class None : public Transformation {
     bool isNone() override {
         return true;
     }
+
+    bool isAllowedInSecDefaultActions() override { return false; }
+
 };
 
 }  // namespace transformations

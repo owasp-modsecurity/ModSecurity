@@ -60,7 +60,10 @@ RuleWithOperator::RuleWithOperator(Operator *op,
     int lineNumber)
     : RuleWithActions(actions, transformations, std::move(fileName), lineNumber),
     m_operator(op),
-    m_variables(_variables) { /* */ }
+    m_variables(_variables) {
+        m_operator->ruleInit(this);
+        m_variables->ruleInit(this);
+    }
 
 
 RuleWithOperator::~RuleWithOperator() {
@@ -278,7 +281,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
         if (!var) {
             continue;
         }
-        var->evaluate(trans, this, &e);
+        var->evaluate(trans, &e);
         for (const VariableValue *v : e) {
             TransformationsResults transformationsResults;
             const std::string &value = v->getValue();

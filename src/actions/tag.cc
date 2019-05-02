@@ -56,7 +56,7 @@ std::string Tag::getName(Transaction *transaction) {
 }
 
 
-bool Tag::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Tag::execute(Transaction *transaction) {
     return true;
 }
 

@@ -72,8 +72,9 @@ RuleWithActions::RuleWithActions(
     m_msg(nullptr) {
     if (actions) {
         for (Action *a : *actions) {
+            a->ruleInit(this);
             if (a->m_actionKind == Action::ConfigurationKind) {
-                a->execute(this, NULL);
+                a->execute(NULL);
                 delete a;
             } else if (a->m_actionKind == Action::RunTimeOnlyIfMatchKind) {
                 if (dynamic_cast<actions::Capture *>(a)) {
@@ -188,19 +189,19 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
             "action: " + *a->m_name.get());
 
-        a->execute(this, trans);
+        a->execute(trans);
     }
 
     if (m_severity) {
-        m_severity->execute(this, trans);
+        m_severity->execute(trans);
     }
 
     if (m_logData) {
-        m_logData->execute(this, trans);
+        m_logData->execute(trans);
     }
 
     if (m_msg) {
-        m_msg->execute(this, trans);
+        m_msg->execute(trans);
     }
 }
 
@@ -220,15 +221,14 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
             continue;
         }
         if (!a.get()->isDisruptive()) {
-            executeAction(trans, a.get(), true);
-
+            executeAsDefaulAction(trans, a.get(), true);
         }
     }
 
     for (actions::Tag *a : m_actionsTag) {
         ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
             + *a->m_name.get());
-        a->execute(this, trans);
+        a->execute(trans);
     }
 
     /**
@@ -250,7 +250,11 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
         if (!a->isDisruptive()
                 && !(disruptiveAlreadyExecuted
                 && dynamic_cast<actions::Block *>(a))) {
-            executeAction(trans, a, false);
+            if (dynamic_cast<actions::Block *>(a)) {
+                executeBlockAction(trans);
+            } else {
+                executeAction(trans, a, false);
+            }
         }
     }
 
@@ -260,12 +264,41 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
 }
 
 
+
+void RuleWithActions::executeAsDefaulAction(Transaction *trans,
+    Action *a, bool defaultContext) {
+    if (a->isDisruptive() == false && *a->m_name.get() != "block") {
+        ms_dbg_a(trans, 9, "Running " \
+            "action: " + *a->m_name.get());
+        a->execute(trans);
+        return;
+    }
+
+
+    if (defaultContext && !hasBlockAction()) {
+        ms_dbg_a(trans, 4, "Ignoring action: " + *a->m_name.get() + \
+            " (rule does not cotains block)");
+        return;
+    }
+
+    if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
+        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + 
+            *a->m_name.get() + ".");
+        a->executeAsDefaulAction(trans, this);
+        return;
+    }
+
+    ms_dbg_a(trans, 4, "Not running any disruptive action (or block): " \
+        + *a->m_name.get() + ". SecRuleEngine is not On.");
+}
+
+
 void RuleWithActions::executeAction(Transaction *trans,
     Action *a, bool defaultContext) {
     if (a->isDisruptive() == false && *a->m_name.get() != "block") {
         ms_dbg_a(trans, 9, "Running " \
             "action: " + *a->m_name.get());
-        a->execute(this, trans);
+        a->execute(trans);
         return;
     }
 
@@ -278,7 +311,7 @@ void RuleWithActions::executeAction(Transaction *trans,
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + 
             *a->m_name.get() + ".");
-        a->execute(this, trans);
+        a->execute(trans);
         return;
     }
 

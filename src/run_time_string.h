@@ -49,15 +49,25 @@ class RunTimeString {
     void appendText(std::string text);
     void appendVar(std::unique_ptr<modsecurity::variables::Variable> var);
     std::string evaluate(Transaction *t);
-    std::string evaluate(Transaction *t, Rule *r);
     std::string evaluate() {
         return evaluate(NULL);
     }
+    void ruleInit(RuleWithActions *r) {
+        m_rule = r;
+        for (auto &z : m_elements) {
+            if (z->m_var != NULL) {
+                z->m_var->ruleInit(r);
+            }
+        }
+    }
+
     inline bool containsMacro() { return m_containsMacro; }
     bool m_containsMacro;
 
  protected:
     std::list<std::unique_ptr<RunTimeElementHolder>> m_elements;
+ private:
+    RuleWithActions *m_rule;
 };
 
 

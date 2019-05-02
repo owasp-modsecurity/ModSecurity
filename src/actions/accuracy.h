@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
 #ifndef SRC_ACTIONS_ACCURACY_H_
 #define SRC_ACTIONS_ACCURACY_H_
@@ -33,8 +34,12 @@ class Accuracy : public Action {
         : Action(action, ConfigurationKind),
         m_accuracy(0) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
+
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        r->setAccuracy(m_accuracy);
+    }
 
  private:
     int m_accuracy;

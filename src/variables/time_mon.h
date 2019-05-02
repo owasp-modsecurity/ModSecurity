@@ -35,7 +35,6 @@ class TimeMon : public Variable {
         m_retName("TIME_MON") { }
 
     void evaluate(Transaction *transaction,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override;
     std::string m_retName;
 };

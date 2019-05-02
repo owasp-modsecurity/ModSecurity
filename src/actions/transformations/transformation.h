@@ -41,6 +41,8 @@ class Transformation : public Action {
 
     virtual bool isNone() { return false; }
 
+    bool isAllowedInSecDefaultActions() override { return true; }
+
     static Transformation* instantiate(std::string a);
 };
 

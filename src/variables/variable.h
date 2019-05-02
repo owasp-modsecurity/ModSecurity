@@ -49,7 +49,6 @@ class n ## _DictElementRegexp : public VariableRegex { \
         : VariableRegex(#N, regex) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolveRegularExpression(&m_r, l, \
             m_keyExclusion); \
@@ -64,7 +63,6 @@ class n ## _DictElement : public VariableDictElement { \
         : VariableDictElement(#N, dictElement) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolve(m_dictElement, l); \
     } \
@@ -78,7 +76,6 @@ class n ## _NoDictElement : public Variable { \
         : Variable(#N) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolve(l, m_keyExclusion); \
     } \
@@ -92,7 +89,6 @@ class n : public Variable { \
         : Variable(#N) { } \
     \
     void evaluate(Transaction *transaction, \
-        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .evaluate(l); \
     } \
@@ -545,9 +541,11 @@ class Variable : public VariableMonkeyResolution {
 
 
     virtual void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) = 0;
 
+    void ruleInit(RuleWithActions *r) {
+        m_rule = r;
+    }
 
     bool inline belongsToCollection(Variable *var) {
         return m_collectionName.size() == var->m_collectionName.size()
@@ -576,6 +574,9 @@ class Variable : public VariableMonkeyResolution {
     std::string m_collectionName;
     std::shared_ptr<std::string> m_fullName;
     KeyExclusions m_keyExclusion;
+
+ protected:
+    RuleWithActions *m_rule;
 };
 
 class VariableDictElement : public Variable {
@@ -630,6 +631,13 @@ class Variables : public std::vector<Variable *> {
         }
         return names;
     }
+
+
+    void ruleInit(RuleWithActions *r) {
+        for (auto a : *this) {
+            a->ruleInit(r);
+        }
+    }
 };
 
 
@@ -639,9 +647,8 @@ class VariableModificatorExclusion : public Variable {
         : m_base(std::move(var)), Variable(var.get()) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        m_base->evaluate(t, rule, l);
+        m_base->evaluate(t, l);
     }
 
     std::unique_ptr<Variable> m_base;
@@ -657,13 +664,12 @@ class VariableModificatorCount : public Variable {
         }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
         std::vector<const VariableValue *> reslIn;
         VariableValue *val = NULL;
         int count = 0;
 
-        m_base->evaluate(t, rule, &reslIn);
+        m_base->evaluate(t, &reslIn);
 
         for (const VariableValue *a : reslIn) {
             count++;

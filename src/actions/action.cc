@@ -45,13 +45,7 @@ namespace modsecurity {
 namespace actions {
 
 
-std::string Action::execute(const std::string &value,
-    Transaction *transaction) {
-    return value;
-}
-
-
-bool Action::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Action::execute(Transaction *transaction) {
     return true;
 }
 

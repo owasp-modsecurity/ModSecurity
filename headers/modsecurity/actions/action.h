@@ -43,6 +43,7 @@ class Action {
     Action(const std::string& _action, int kind = 2)
         : m_actionKind(kind),
         m_name(nullptr),
+        m_rule(nullptr),
         m_parser_payload("") {
             set_name_and_payload(_action);
         }
@@ -51,10 +52,12 @@ class Action {
 
     virtual bool init(std::string *error) { return true; }
 
-    virtual std::string execute(const std::string &exp,
-        Transaction *transaction);
-    virtual bool execute(RuleWithActions *rule,
-        Transaction *transaction);
+    virtual bool execute(Transaction *transaction);
+
+    virtual inline bool executeAsDefaulAction(Transaction *transaction, RuleWithActions *r) noexcept {
+        return execute(transaction);
+    };
+
     /**
      * This method is meant to be used by transformations — a particular
      * type of action.
@@ -65,7 +68,12 @@ class Action {
         ModSecStackString &out) {
     };
 
+    virtual void ruleInit(RuleWithActions *r) {
+        m_rule = r;
+    }
+
     virtual bool isDisruptive() { return false; }
+    virtual bool isAllowedInSecDefaultActions() { return false; }
 
     /**
      *
@@ -103,8 +111,12 @@ class Action {
     std::shared_ptr<std::string> m_name;
     std::string m_parser_payload;
 
- private:
 
+ protected:
+    const RuleWithActions *m_rule;
+
+
+ private:
     void set_name_and_payload(const std::string& data) {
         size_t pos = data.find(":");
         std::string t = "t:";

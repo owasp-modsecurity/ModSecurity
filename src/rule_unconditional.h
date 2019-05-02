@@ -44,7 +44,8 @@ class RuleUnconditional : public RuleWithActions {
         Transformations *transformations,
         std::unique_ptr<std::string> fileName,
         int lineNumber)
-        : RuleWithActions(actions, transformations, std::move(fileName), lineNumber) { }
+        : RuleWithActions(actions, transformations, std::move(fileName), lineNumber)
+    { };
 
     virtual bool evaluate(Transaction *transaction) override;
 

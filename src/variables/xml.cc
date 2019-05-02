@@ -50,12 +50,10 @@ namespace variables {
 
 #ifndef WITH_LIBXML2
 void XML::evaluate(Transaction *t,
-    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) { }
 #else
 
 void XML::evaluate(Transaction *t,
-    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
@@ -88,10 +86,10 @@ void XML::evaluate(Transaction *t,
         return;
     }
 
-    if (rule == NULL) {
+    if (m_rule == NULL) {
         ms_dbg_a(t, 2, "XML: Can't look for xmlns, internal error.");
     } else {
-        std::vector<actions::XmlNS *> acts = rule->getXmlNSs();
+        std::vector<actions::XmlNS *> acts = m_rule->getXmlNSs();
         for (auto &z : acts) {
             if (xmlXPathRegisterNs(xpathCtx, (const xmlChar*)z->m_scope.c_str(),
                     (const xmlChar*)z->m_href.c_str()) != 0) {

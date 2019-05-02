@@ -31,8 +31,9 @@ class Pass : public Action {
  public:
     explicit Pass(std::string action) : Action(action) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
     bool isDisruptive() override { return true; }
+    bool isAllowedInSecDefaultActions() override { return true; }
 };
 
 

@@ -34,11 +34,5 @@ bool Rev::init(std::string *error) {
 }
 
 
-bool Rev::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setRevision(m_rev);
-    return true;
-}
-
-
 }  // namespace actions
 }  // namespace modsecurity

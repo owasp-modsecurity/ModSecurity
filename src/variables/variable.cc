@@ -30,7 +30,8 @@ namespace variables {
 
 Variable::Variable(std::string name)
     : m_name(name),
-    m_collectionName("") {
+    m_collectionName(""),
+    m_rule(nullptr) {
     size_t a = m_name.find(":");
     if (a == std::string::npos) {
         a = m_name.find(".");

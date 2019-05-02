@@ -32,7 +32,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Drop::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Drop::execute(Transaction *transaction) {
     ms_dbg_a(transaction, 8, "Running action drop " \
         "[executing deny instead of drop.]");
 

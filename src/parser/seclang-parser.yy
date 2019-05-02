@@ -1180,13 +1180,9 @@ expression:
                 definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
                 delete phase;
-            } else if (a->m_actionKind == actions::Action::RunTimeOnlyIfMatchKind ||
-                a->m_actionKind == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
-                if (none != NULL) {
-                    driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");
-                    YYERROR;
-                }
+            } else if ((a->m_actionKind == actions::Action::RunTimeOnlyIfMatchKind ||
+                a->m_actionKind == actions::Action::RunTimeBeforeMatchAttemptKind)
+                  && a->isAllowedInSecDefaultActions()) {
                 checkedActions.push_back(a);
             } else {
                 driver.error(@0, "The action '" + *a->m_name.get() + "' is not suitable to be part of the SecDefaultActions");

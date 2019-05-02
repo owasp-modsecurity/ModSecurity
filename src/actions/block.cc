@@ -30,19 +30,5 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Block::execute(RuleWithActions *rule, Transaction *transaction) {
-    ms_dbg_a(transaction, 8, "Marking request as disruptive.");
-
-    for (auto &a : transaction->m_rules->m_defaultActions[rule->getPhase()]) {
-        if (a->isDisruptive() == false) {
-            continue;
-        }
-        a->execute(rule, transaction);
-    }
-
-    return true;
-}
-
-
 }  // namespace actions
 }  // namespace modsecurity

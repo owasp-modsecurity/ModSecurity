@@ -28,7 +28,6 @@ namespace modsecurity {
 namespace variables {
 
 void Duration::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
     double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
 

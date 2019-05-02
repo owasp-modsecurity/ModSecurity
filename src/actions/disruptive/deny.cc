@@ -28,7 +28,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Deny::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Deny::execute(Transaction *transaction) {
     ms_dbg_a(transaction, 8, "Running action deny");
 
     if (transaction->m_it.status == 200) {

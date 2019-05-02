@@ -38,7 +38,13 @@ class Tag : public Action {
 
     std::string getName(Transaction *transaction);
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
+
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        if (m_string) {  m_string->ruleInit(r); }
+    }
+    bool isAllowedInSecDefaultActions() override { return true; }
 
  protected:
     std::unique_ptr<RunTimeString> m_string;

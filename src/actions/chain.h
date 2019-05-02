@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
 #ifndef SRC_ACTIONS_CHAIN_H_
 #define SRC_ACTIONS_CHAIN_H_
@@ -35,7 +36,11 @@ class Chain : public Action {
     explicit Chain(std::string action)
         : Action(action, ConfigurationKind) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        r->setChained(true);
+    };
+
 };
 
 }  // namespace actions

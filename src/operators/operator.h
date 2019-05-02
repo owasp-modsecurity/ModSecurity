@@ -37,6 +37,7 @@ class Operator {
         m_negation(false),
         m_op(""),
         m_param(""),
+        m_rule(nullptr),
         m_couldContainsMacro(false) {
             if (m_couldContainsMacro == false && m_string) {
                 m_param = m_string->evaluate();
@@ -48,6 +49,7 @@ class Operator {
         m_negation(negation),
         m_op(opName),
         m_param(param),
+        m_rule(nullptr),
         m_couldContainsMacro(false) {
             if (m_couldContainsMacro == false && m_string) {
                 m_param = m_string->evaluate();
@@ -60,6 +62,7 @@ class Operator {
         m_negation(negation),
         m_op(opName),
         m_param(""),
+        m_rule(nullptr),
         m_string(std::move(param)),
         m_couldContainsMacro(false) {
             if (m_couldContainsMacro == false && m_string) {
@@ -72,6 +75,7 @@ class Operator {
         m_negation(false),
         m_op(opName),
         m_param(param),
+        m_rule(nullptr),
         m_couldContainsMacro(false) {
             if (m_couldContainsMacro == false && m_string) {
                 m_param = m_string->evaluate();
@@ -83,6 +87,7 @@ class Operator {
         m_negation(false),
         m_op(opName),
         m_param(""),
+        m_rule(nullptr),
         m_string(std::move(param)),
         m_couldContainsMacro(false) {
             if (m_couldContainsMacro == false && m_string) {
@@ -95,6 +100,7 @@ class Operator {
         m_negation(false),
         m_op(opName),
         m_param(),
+        m_rule(nullptr),
         m_couldContainsMacro(false) {
             if (m_couldContainsMacro == false && m_string) {
                 m_param = m_string->evaluate();
@@ -106,6 +112,13 @@ class Operator {
 
     virtual bool init(const std::string &arg, std::string *error) {
         return true;
+    }
+
+    void ruleInit(RuleWithActions *r) {
+        m_rule = r;
+        if (m_string) {
+            m_string->ruleInit(m_rule);
+        }
     }
 
     bool evaluateInternal(Transaction *transaction,
@@ -137,6 +150,8 @@ class Operator {
     std::string m_param;
     std::unique_ptr<RunTimeString> m_string;
     bool m_couldContainsMacro;
+ private:
+    RuleWithActions *m_rule;
 };
 
 }  // namespace operators

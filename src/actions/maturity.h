@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
 #ifndef SRC_ACTIONS_MATURITY_H_
 #define SRC_ACTIONS_MATURITY_H_
@@ -33,8 +34,12 @@ class Maturity : public Action {
         : Action(action, ConfigurationKind),
         m_maturity(0) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
+
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        r->setMaturity(m_maturity);
+    };
 
  private:
     int m_maturity;

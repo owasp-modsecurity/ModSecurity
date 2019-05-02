@@ -20,7 +20,7 @@ namespace modsecurity {
 namespace variables {
 
 
-const std::string Rule_DictElement::m_rule("RULE");
+const std::string Rule_DictElement::m_rule_name("RULE");
 const std::string Rule_DictElement::m_rule_id("id");
 const std::string Rule_DictElement::m_rule_rev("rev");
 const std::string Rule_DictElement::m_rule_severity("severity");

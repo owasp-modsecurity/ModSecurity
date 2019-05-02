@@ -34,8 +34,7 @@ namespace actions {
 class Block : public Action {
  public:
     explicit Block(std::string action) : Action(action) { }
-
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool isAllowedInSecDefaultActions() override { return true; }
 };
 
 

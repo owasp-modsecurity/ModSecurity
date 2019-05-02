@@ -31,7 +31,7 @@ class XmlNS : public Action {
  public:
     explicit XmlNS(std::string action) : Action(action) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override {
+    bool execute(Transaction *transaction) override {
         return true;
     }
 

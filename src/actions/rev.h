@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
 #ifndef SRC_ACTIONS_REV_H_
 #define SRC_ACTIONS_REV_H_
@@ -31,8 +32,12 @@ class Rev : public Action {
  public:
     explicit Rev(std::string action) : Action(action, ConfigurationKind) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
+
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        r->setRevision(m_rev);
+    };
 
  private:
     std::string m_rev;

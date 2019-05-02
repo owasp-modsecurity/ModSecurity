@@ -58,8 +58,14 @@ class SetVar : public Action {
         m_operation(operation),
         m_variable(std::move(variable)) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
     bool init(std::string *error) override;
+
+    void ruleInit(RuleWithActions *r) override {
+        Action::ruleInit(r);
+        if (m_string) { m_string->ruleInit(r); }
+        m_variable->ruleInit(r);
+    }
 
  private:
     SetVarOperation m_operation;
