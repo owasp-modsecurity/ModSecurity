@@ -44,7 +44,7 @@ class Redirect : public Action {
         : Action("redirert", RunTimeOnlyIfMatchKind),
             m_string(std::move(z)) { }
 
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
     bool init(std::string *error) override;
     bool isDisruptive() override { return true; }
     bool isAllowedInSecDefaultActions() override { return true; }

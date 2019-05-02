@@ -29,11 +29,11 @@ namespace modsecurity {
 namespace actions {
 
 bool Phase::init(std::string *error) {
-    std::string a = utils::string::tolower(m_parser_payload);
+    std::string a = utils::string::tolower(m_parserPayload);
     m_phase = -1;
 
     try {
-        m_phase = std::stoi(m_parser_payload);
+        m_phase = std::stoi(m_parserPayload);
         if (m_phase == 0) {
             m_phase = modsecurity::Phases::ConnectionPhase;
             m_secRulesPhase = 0;
@@ -53,7 +53,7 @@ bool Phase::init(std::string *error) {
             m_phase = modsecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
         } else {
-            error->assign("Unknown phase: " + m_parser_payload);
+            error->assign("Unknown phase: " + m_parserPayload);
             return false;
         }
     } catch (...) {

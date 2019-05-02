@@ -27,7 +27,7 @@ namespace ctl {
 
 
 bool RuleRemoveById::init(std::string *error) {
-    std::string what(m_parser_payload, 15, m_parser_payload.size() - 15);
+    std::string what(m_parserPayload, 15, m_parserPayload.size() - 15);
     bool added = false;
     std::vector<std::string> toRemove = utils::string::ssplit(what, ' ');
     for (std::string &a : toRemove) {
@@ -83,7 +83,7 @@ bool RuleRemoveById::init(std::string *error) {
     return false;
 }
 
-bool RuleRemoveById::execute(Transaction *transaction) {
+bool RuleRemoveById::execute(Transaction *transaction) noexcept {
     for (auto &i : m_ids) {
         transaction->m_ruleRemoveById.push_back(i);
     }

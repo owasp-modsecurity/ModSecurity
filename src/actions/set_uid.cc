@@ -31,7 +31,7 @@ bool SetUID::init(std::string *error) {
 }
 
 
-bool SetUID::execute(Transaction *t) {
+bool SetUID::execute(Transaction *t) noexcept {
     std::string colNameExpanded(m_string->evaluate(t));
     ms_dbg_a(t, 8, "User collection initiated with value: \'"
         + colNameExpanded + "\'.");

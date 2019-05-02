@@ -34,7 +34,7 @@ bool Redirect::init(std::string *error) {
 }
 
 
-bool Redirect::execute(Transaction *transaction) {
+bool Redirect::execute(Transaction *transaction) noexcept {
     std::string m_urlExpanded(m_string->evaluate(transaction));
     /* if it was changed before, lets keep it. */
     if (transaction->m_it.status == 200

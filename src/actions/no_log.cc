@@ -29,7 +29,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool NoLog::execute(Transaction *transaction) {
+bool NoLog::execute(Transaction *transaction) noexcept {
     transaction->messageGetLast()->m_saveMessage = false;
     return true;
 }

@@ -53,7 +53,7 @@ class TransformationResult {
  public:
     TransformationResult(
         ModSecStackString &after,
-        std::string *transformation = nullptr)
+        const std::string *transformation = nullptr)
         : m_transformation(transformation),
         m_after(std::move(after)) { };
 /*
@@ -66,12 +66,13 @@ class TransformationResult {
         return &m_after;
     }
 
-    std::string *getTransformationName() {
+    const std::string *getTransformationName() {
         return m_transformation;
     }
+
  private:
     ModSecStackString m_after;
-    std::string *m_transformation;
+    const std::string *m_transformation;
 };
 
 class TransformationsResults : public std::list<TransformationResult> {
@@ -126,7 +127,7 @@ class RuleWithActions : public Rule {
             }
             if (transaction->getRuleEngineState() != RulesSet::EnabledRuleEngine) {
                 ms_dbg_a(transaction, 4, "Not running any disruptive action (or block): " \
-                    + *a->m_name.get() + ". SecRuleEngine is not On.");
+                    + *a->getName() + ". SecRuleEngine is not On.");
                 continue;
             }
 

@@ -25,7 +25,7 @@ namespace actions {
 namespace ctl {
 
 
-bool RequestBodyProcessorJSON::execute(Transaction *transaction) {
+bool RequestBodyProcessorJSON::execute(Transaction *transaction) noexcept {
     transaction->m_requestBodyProcessor = Transaction::JSONRequestBody;
     transaction->m_variableReqbodyProcessor.set("JSON",
         transaction->m_variableOffset);

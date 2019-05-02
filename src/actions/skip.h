@@ -34,7 +34,7 @@ class Skip : public Action {
         m_skip_next(0) { }
 
     bool init(std::string *error) override;
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
     int m_skip_next;
 };

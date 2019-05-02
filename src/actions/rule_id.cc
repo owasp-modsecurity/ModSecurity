@@ -28,7 +28,7 @@ namespace actions {
 
 
 bool RuleId::init(std::string *error) {
-    std::string a = m_parser_payload;
+    std::string a = m_parserPayload;
 
     try {
         m_ruleId = std::stod(a);

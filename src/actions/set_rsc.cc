@@ -31,7 +31,7 @@ bool SetRSC::init(std::string *error) {
 }
 
 
-bool SetRSC::execute(Transaction *t) {
+bool SetRSC::execute(Transaction *t) noexcept {
     std::string colNameExpanded(m_string->evaluate(t));
     ms_dbg_a(t, 8, "RESOURCE initiated with value: \'"
         + colNameExpanded + "\'.");

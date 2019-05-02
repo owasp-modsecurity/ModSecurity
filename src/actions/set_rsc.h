@@ -39,7 +39,7 @@ class SetRSC : public Action {
         : Action("setsrc", RunTimeOnlyIfMatchKind),
             m_string(std::move(z)) { }
 
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
     bool init(std::string *error) override;
 
     void ruleInit(RuleWithActions *r) override {

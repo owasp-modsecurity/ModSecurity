@@ -33,11 +33,11 @@ namespace data {
 
 class Status : public Action {
  public:
-    explicit Status(std::string action) : Action(action, 2),
+    explicit Status(std::string action) : Action(action, RunTimeOnlyIfMatchKind),
     m_status(0) { }
 
     bool init(std::string *error) override;
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
     bool isAllowedInSecDefaultActions() override { return true; }
 
     int m_status;

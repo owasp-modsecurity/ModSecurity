@@ -29,7 +29,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Pass::execute(Transaction *transaction) {
+bool Pass::execute(Transaction *transaction) noexcept {
     intervention::free(&transaction->m_it);
     intervention::reset(&transaction->m_it);
 

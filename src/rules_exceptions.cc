@@ -36,19 +36,19 @@ bool RulesExceptions::loadUpdateActionById(double id,
     std::string *error) {
 
     for (auto &a : *actions) {
-        if (a->m_actionKind == actions::Action::ConfigurationKind) {
-            std::cout << "General failure, action: " << a->m_name;
+        if (a->getActionKind() == actions::ActionKind::ConfigurationKind) {
+            std::cout << "General failure, action: " << *a->getName();
             std::cout << " has not expected to be used with UpdateActionByID.";
             std::cout << std::endl;
-        } else if (a->m_actionKind
-            == actions::Action::RunTimeBeforeMatchAttemptKind) {
+        } else if (a->getActionKind()
+            == actions::ActionKind::RunTimeBeforeMatchAttemptKind) {
             m_action_pre_update_target_by_id.emplace(std::pair<double,
                 std::unique_ptr<actions::Action>>(id , std::move(a)));
-        } else if (a->m_actionKind == actions::Action::RunTimeOnlyIfMatchKind) {
+        } else if (a->getActionKind() == actions::ActionKind::RunTimeOnlyIfMatchKind) {
             m_action_pos_update_target_by_id.emplace(std::pair<double,
                 std::unique_ptr<actions::Action>>(id , std::move(a)));
         } else {
-            std::cout << "General failure, action: " << a->m_name;
+            std::cout << "General failure, action: " << *a->getName();
             std::cout << " has an unknown type." << std::endl;
         }
     }

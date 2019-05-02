@@ -33,7 +33,7 @@ class RuleRemoveById : public Action {
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool init(std::string *error) override;
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
     std::list<std::pair<int, int> > m_ranges;
     std::list<int> m_ids;

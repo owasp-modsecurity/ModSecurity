@@ -35,7 +35,7 @@ class RuleEngine : public Action {
         m_ruleEngine(RulesSetProperties::PropertyNotSetRuleEngine) { }
 
     bool init(std::string *error) override;
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
     RulesSetProperties::RuleEngine m_ruleEngine;
 };

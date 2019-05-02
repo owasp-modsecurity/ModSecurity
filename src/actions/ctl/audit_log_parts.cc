@@ -27,8 +27,8 @@ namespace ctl {
 
 
 bool AuditLogParts::init(std::string *error) {
-    std::string what(m_parser_payload, 14, 1);
-    mParts = std::string(m_parser_payload, 15, m_parser_payload.length()-15);
+    std::string what(m_parserPayload, 14, 1);
+    mParts = std::string(m_parserPayload, 15, m_parserPayload.length()-15);
     if (what == "+") {
         mPartsAction = 0;
     } else {
@@ -38,7 +38,7 @@ bool AuditLogParts::init(std::string *error) {
     return true;
 }
 
-bool AuditLogParts::execute(Transaction *transaction) {
+bool AuditLogParts::execute(Transaction *transaction) noexcept {
     transaction->m_auditLogModifier.push_back(
         std::make_pair(mPartsAction, mParts));
     return true;

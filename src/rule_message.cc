@@ -42,7 +42,7 @@ std::string RuleMessage::_details(RuleMessage *rm) {
     msg.append(" [maturity \"" + std::to_string(rm->getMaturity()) + "\"]");
     msg.append(" [accuracy \"" + std::to_string(rm->getAccuracy()) + "\"]");
     for (auto a : rm->getTags()) {
-        msg.append(" [tag \"" + a->getName(rm->m_transaction) + "\"]");
+        msg.append(" [tag \"" + a->getTagName(rm->m_transaction) + "\"]");
     }
     msg.append(" [hostname \"" + rm->getServerIpAddress() + "\"]");
     msg.append(" [uri \"" + utils::string::limitTo(200, rm->getUri()) + "\"]");

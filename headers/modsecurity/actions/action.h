@@ -37,87 +37,82 @@ class RuleWithActions;
 
 namespace actions {
 
+/**
+ *
+ * Define the action kind regarding to the execution time.
+ *
+ *
+ */
+enum ActionKind {
+/**
+ *
+ * Action that are executed while loading the configuration. For instance
+ * the rule ID or the rule phase.
+ *
+ */
+ ConfigurationKind,
+/**
+ *
+ * Those are actions that demands to be executed before call the operator.
+ * For instance the tranformations.
+ *
+ *
+ */
+ RunTimeBeforeMatchAttemptKind,
+/**
+ *
+ * Actions that are executed after the execution of the operator, only if
+ * the operator returned Match (or True). For instance the disruptive
+ * actions.
+ *
+ */
+ RunTimeOnlyIfMatchKind,
+};
 
 class Action {
  public:
-    Action(const std::string& _action, int kind = 2)
+    Action(const std::string& action,
+        ActionKind kind = RunTimeOnlyIfMatchKind)
         : m_actionKind(kind),
-        m_name(nullptr),
+        m_name(sort_name(action)),
         m_rule(nullptr),
-        m_parser_payload("") {
-            set_name_and_payload(_action);
-        }
+        m_parserPayload(sort_payload(action))
+    { };
 
     virtual ~Action() { }
 
     virtual bool init(std::string *error) { return true; }
-
-    virtual bool execute(Transaction *transaction);
-
-    virtual inline bool executeAsDefaulAction(Transaction *transaction, RuleWithActions *r) noexcept {
-        return execute(transaction);
-    };
-
-    /**
-     * This method is meant to be used by transformations — a particular
-     * type of action.
-     *
-     */
-    virtual void execute(Transaction *t,
-        ModSecStackString &in,
-        ModSecStackString &out) {
-    };
-
     virtual void ruleInit(RuleWithActions *r) {
         m_rule = r;
     }
 
+    virtual bool execute(Transaction *transaction) noexcept { return true; };
+    inline virtual bool executeAsDefaulAction(Transaction *transaction, RuleWithActions *r) noexcept {
+        return execute(transaction);
+    };
+
     virtual bool isDisruptive() { return false; }
     virtual bool isAllowedInSecDefaultActions() { return false; }
 
-    /**
-     *
-     * Define the action kind regarding to the execution time.
-     * 
-     * 
-     */
-    enum Kind {
-    /**
-     *
-     * Action that are executed while loading the configuration. For instance
-     * the rule ID or the rule phase.
-     *
-     */
-     ConfigurationKind,
-    /**
-     *
-     * Those are actions that demands to be executed before call the operator.
-     * For instance the tranformations.
-     *
-     *
-     */
-     RunTimeBeforeMatchAttemptKind,
-    /**
-     *
-     * Actions that are executed after the execution of the operator, only if
-     * the operator returned Match (or True). For instance the disruptive
-     * actions.
-     *
-     */
-     RunTimeOnlyIfMatchKind,
-    };
+    const ActionKind getActionKind() {
+        return m_actionKind;
+    }
 
-    int m_actionKind;
-    std::shared_ptr<std::string> m_name;
-    std::string m_parser_payload;
-
+    const std::string *getName() {
+        return &m_name;
+    }
 
  protected:
     const RuleWithActions *m_rule;
+    const std::string m_parserPayload;
 
 
  private:
-    void set_name_and_payload(const std::string& data) {
+    const ActionKind m_actionKind;
+    const std::string m_name;
+
+
+    static size_t get_payload_pos(const std::string& data) {
         size_t pos = data.find(":");
         std::string t = "t:";
 
@@ -125,18 +120,32 @@ class Action {
             pos = data.find(":", 2);
         }
 
+        return pos;
+    }
+
+    static std::string sort_name(const std::string& data) {
+        size_t pos = get_payload_pos(data);
         if (pos == std::string::npos) {
-            m_name = std::shared_ptr<std::string>(new std::string(data));
-            return;
+            return data;
         }
 
-        m_name = std::shared_ptr<std::string>(new std::string(data, 0, pos));
-        m_parser_payload = std::string(data, pos + 1, data.length());
+        std::string ret(data, 0, pos);
+        return ret;
+    }
 
-        if (m_parser_payload.at(0) == '\'' && m_parser_payload.size() > 2) {
-            m_parser_payload.erase(0, 1);
-            m_parser_payload.pop_back();
+    static std::string sort_payload(const std::string& data) {
+        size_t pos = get_payload_pos(data);
+        std::string ret("");
+        if (pos != std::string::npos) {
+            ret = std::string(data, pos + 1, data.length());
+
+            if (ret.at(0) == '\'' && ret.size() > 2) {
+                ret.erase(0, 1);
+                ret.pop_back();
+            }
         }
+
+        return ret;
     }
 };
 

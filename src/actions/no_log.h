@@ -33,7 +33,7 @@ class NoLog : public Action {
     explicit NoLog(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
     bool isAllowedInSecDefaultActions() override { return true; }
 
 };

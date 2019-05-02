@@ -35,7 +35,7 @@ class Severity : public Action {
         : Action(action),
         m_severity(0) { }
 
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
     bool init(std::string *error) override;
 
     int m_severity;

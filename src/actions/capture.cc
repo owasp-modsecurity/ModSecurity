@@ -32,7 +32,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Capture::execute(Transaction *transaction) {
+bool Capture::execute(Transaction *transaction) noexcept {
     return true;
 }
 

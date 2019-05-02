@@ -41,7 +41,7 @@ bool SetVar::init(std::string *error) {
 }
 
 
-bool SetVar::execute(Transaction *t) {
+bool SetVar::execute(Transaction *t) noexcept {
     std::string targetValue;
     std::string resolvedPre;
 

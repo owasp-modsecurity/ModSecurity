@@ -29,7 +29,7 @@ namespace actions {
 
 
 bool Rev::init(std::string *error) {
-    m_rev = m_parser_payload;
+    m_rev = m_parserPayload;
     return true;
 }
 

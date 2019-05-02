@@ -32,11 +32,9 @@ class Transformation : public Action {
     explicit Transformation(const std::string& _action)
         : Action(_action, RunTimeBeforeMatchAttemptKind) { }
 
-    void execute(Transaction *t,
+    virtual void execute(Transaction *t,
         ModSecStackString &in,
-        ModSecStackString &out) override {
-            // FIXME: this should be remove as soon as #1974 got fixed.
-            out.assign(in.c_str(), in.length());
+        ModSecStackString &out) {
     };
 
     virtual bool isNone() { return false; }

@@ -30,7 +30,7 @@ namespace ctl {
 
 
 bool RuleRemoveTargetByTag::init(std::string *error) {
-    std::string what(m_parser_payload, 22, m_parser_payload.size() - 22);
+    std::string what(m_parserPayload, 22, m_parserPayload.size() - 22);
     std::vector<std::string> param = utils::string::split(what, ';');
 
     if (param.size() < 2) {
@@ -44,7 +44,7 @@ bool RuleRemoveTargetByTag::init(std::string *error) {
     return true;
 }
 
-bool RuleRemoveTargetByTag::execute(Transaction *transaction) {
+bool RuleRemoveTargetByTag::execute(Transaction *transaction) noexcept {
     transaction->m_ruleRemoveTargetByTag.push_back(
         std::make_pair(m_tag, m_target));
     return true;

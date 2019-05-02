@@ -34,7 +34,7 @@ class RuleRemoveByTag : public Action {
         m_tag("") { }
 
     bool init(std::string *error) override;
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
     std::string m_tag;
 };

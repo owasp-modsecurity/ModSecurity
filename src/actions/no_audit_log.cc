@@ -26,7 +26,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool NoAuditLog::execute(Transaction *transaction) {
+bool NoAuditLog::execute(Transaction *transaction) noexcept {
     transaction->messageSetNoAuditLog(true);
     return true;
 }

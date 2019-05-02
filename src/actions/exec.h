@@ -36,7 +36,7 @@ class Exec : public Action {
 
     ~Exec() { }
 
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
     bool init(std::string *error) override;
 
  private:

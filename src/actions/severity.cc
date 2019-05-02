@@ -32,7 +32,7 @@ namespace actions {
 
 
 bool Severity::init(std::string *error) {
-    std::string a = utils::string::tolower(m_parser_payload);
+    std::string a = utils::string::tolower(m_parserPayload);
     if (a == "emergency") {
         m_severity = 0;
         return true;
@@ -71,7 +71,7 @@ bool Severity::init(std::string *error) {
 }
 
 
-bool Severity::execute(Transaction *transaction) {
+bool Severity::execute(Transaction *transaction) noexcept {
     ms_dbg_a(transaction, 9, "This rule severity is: " + \
         std::to_string(this->m_severity) + " current transaction is: " + \
         std::to_string(transaction->m_highestSeverityAction));

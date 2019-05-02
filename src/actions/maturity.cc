@@ -29,9 +29,9 @@ namespace actions {
 
 bool Maturity::init(std::string *error) {
     try {
-        m_maturity = std::stoi(m_parser_payload);
+        m_maturity = std::stoi(m_parserPayload);
     }  catch (...) {
-        error->assign("Maturity: The input \"" + m_parser_payload + "\" is " \
+        error->assign("Maturity: The input \"" + m_parserPayload + "\" is " \
             "not a number.");
         return false;
     }

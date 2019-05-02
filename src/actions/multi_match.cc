@@ -25,7 +25,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool MultiMatch::execute(Transaction *transaction) {
+bool MultiMatch::execute(Transaction *transaction) noexcept {
     return true;
 }
 

@@ -36,9 +36,7 @@ class Tag : public Action {
         : Action("tag", RunTimeOnlyIfMatchKind),
         m_string(std::move(z)) { }
 
-    std::string getName(Transaction *transaction);
-
-    bool execute(Transaction *transaction) override;
+    std::string getTagName(Transaction *transaction);
 
     void ruleInit(RuleWithActions *r) override {
         Action::ruleInit(r);

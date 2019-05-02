@@ -50,14 +50,9 @@ namespace modsecurity {
 namespace actions {
 
 
-std::string Tag::getName(Transaction *transaction) {
+std::string Tag::getTagName(Transaction *transaction) {
     std::string tag(m_string->evaluate(transaction));
     return tag;
-}
-
-
-bool Tag::execute(Transaction *transaction) {
-    return true;
 }
 
 

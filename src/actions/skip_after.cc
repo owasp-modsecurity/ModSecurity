@@ -27,7 +27,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SkipAfter::execute(Transaction *transaction) {
+bool SkipAfter::execute(Transaction *transaction) noexcept {
     ms_dbg_a(transaction, 5, "Setting skipAfter for: " + *m_name);
     transaction->addMarker(m_name);
     return true;

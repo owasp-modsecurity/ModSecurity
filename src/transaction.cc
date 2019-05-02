@@ -1728,7 +1728,7 @@ std::string Transaction::toJSON(int parts) {
                 strlen("tags"));
             yajl_gen_array_open(g);
             for (auto b : a.getTags()) {
-                std::string c = b->getName(this);
+                std::string c = b->getTagName(this);
                 yajl_gen_string(g,
                     reinterpret_cast<const unsigned char*>(c.c_str()),
                     strlen(c.c_str()));

@@ -33,7 +33,7 @@ bool SetENV::init(std::string *error) {
 }
 
 
-bool SetENV::execute(Transaction *t) {
+bool SetENV::execute(Transaction *t) noexcept {
     std::string colNameExpanded(m_string->evaluate(t));
 
     ms_dbg_a(t, 8, "Setting envoriment variable: "

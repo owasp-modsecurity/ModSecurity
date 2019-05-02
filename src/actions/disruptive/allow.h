@@ -59,7 +59,7 @@ class Allow : public Action {
 
 
     bool init(std::string *error) override;
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
     bool isDisruptive() override { return true; }
     bool isAllowedInSecDefaultActions() override { return true; }
 

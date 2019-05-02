@@ -31,7 +31,7 @@ bool SetSID::init(std::string *error) {
 }
 
 
-bool SetSID::execute(Transaction *t) {
+bool SetSID::execute(Transaction *t) noexcept {
     std::string colNameExpanded(m_string->evaluate(t));
     ms_dbg_a(t, 8, "Session ID initiated with value: \'"
         + colNameExpanded + "\'.");

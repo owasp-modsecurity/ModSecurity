@@ -34,7 +34,7 @@ class Ver : public Action {
 
     void ruleInit(RuleWithActions *r) override {
         Action::ruleInit(r);
-        r->setVersion(m_parser_payload);
+        r->setVersion(m_parserPayload);
     };
 };
 

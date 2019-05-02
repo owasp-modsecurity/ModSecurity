@@ -2184,12 +2184,12 @@ namespace yy {
                 definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
                 delete phase;
-            } else if ((a->m_actionKind == actions::Action::RunTimeOnlyIfMatchKind ||
-                a->m_actionKind == actions::Action::RunTimeBeforeMatchAttemptKind)
+            } else if ((a->getActionKind() == actions::ActionKind::RunTimeOnlyIfMatchKind ||
+                a->getActionKind() == actions::ActionKind::RunTimeBeforeMatchAttemptKind)
                   && a->isAllowedInSecDefaultActions()) {
                 checkedActions.push_back(a);
             } else {
-                driver.error(yystack_[2].location, "The action '" + *a->m_name.get() + "' is not suitable to be part of the SecDefaultActions");
+                driver.error(yystack_[2].location, "The action '" + *a->getName() + "' is not suitable to be part of the SecDefaultActions");
                 YYERROR;
             }
         }

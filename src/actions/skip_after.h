@@ -32,9 +32,9 @@ class SkipAfter : public Action {
  public:
     explicit SkipAfter(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind),
-        m_name(std::make_shared<std::string>(m_parser_payload)) { }
+        m_name(std::make_shared<std::string>(m_parserPayload)) { }
 
-    bool execute(Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
  private:
      std::shared_ptr<std::string> m_name;
 };

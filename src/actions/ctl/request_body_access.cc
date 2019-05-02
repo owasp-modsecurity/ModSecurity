@@ -27,7 +27,7 @@ namespace ctl {
 
 
 bool RequestBodyAccess::init(std::string *error) {
-    std::string what(m_parser_payload, 18, m_parser_payload.size() - 18);
+    std::string what(m_parserPayload, 18, m_parserPayload.size() - 18);
 
     if (what == "true") {
         m_request_body_access = true;
@@ -35,14 +35,14 @@ bool RequestBodyAccess::init(std::string *error) {
         m_request_body_access = false;
     } else {
         error->assign("Internal error. Expected: true or false, got: " \
-            + m_parser_payload);
+            + m_parserPayload);
         return false;
     }
 
     return true;
 }
 
-bool RequestBodyAccess::execute(Transaction *transaction) {
+bool RequestBodyAccess::execute(Transaction *transaction) noexcept {
     if (m_request_body_access) {
         transaction->m_requestBodyAccess = RulesSetProperties::TrueConfigBoolean;
     } else {
