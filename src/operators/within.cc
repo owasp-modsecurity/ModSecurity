@@ -25,7 +25,7 @@ namespace operators {
 
 
 bool Within::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     bool res = false;

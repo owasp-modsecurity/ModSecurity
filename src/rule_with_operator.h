@@ -70,16 +70,16 @@ class RuleWithOperator : public RuleWithActions {
 
     virtual ~RuleWithOperator();
 
-    bool evaluate(Transaction *transaction) override;
+    bool evaluate(Transaction *transaction) const override;
 
     void getVariablesExceptions(Transaction *t,
-        variables::Variables *exclusion, variables::Variables *addition);
+        variables::Variables *exclusion, variables::Variables *addition) const;
     inline void getFinalVars(variables::Variables *vars,
-        variables::Variables *eclusion, Transaction *trans);
+        variables::Variables *eclusion, Transaction *trans) const;
 
     bool executeOperatorAt(Transaction *transaction,
         const std::string &key,
-        const bpstd::string_view &value);
+        const bpstd::string_view &value) const;
 
     static void updateMatchedVars(Transaction *transaction,
         const std::string &key,
@@ -87,14 +87,13 @@ class RuleWithOperator : public RuleWithActions {
 
     static void cleanMatchedVars(Transaction *trasn);
 
-
     std::string getOperatorName() const;
 
-    virtual std::string getReference() override {
+    virtual std::string getReference() const override {
         return std::to_string(getId());
     }
 
-    virtual void dump(std::stringstream &out) override {
+    virtual void dump(std::stringstream &out) const override {
         Rule::dump(out);
         out << "# RuleWithOperator" << std::endl;
         out << "SecRule ";

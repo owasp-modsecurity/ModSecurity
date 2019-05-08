@@ -47,7 +47,7 @@ class VerifyCPF : public Operator {
     VerifyCPF(const VerifyCPF &a) = delete;
 
     bool evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 

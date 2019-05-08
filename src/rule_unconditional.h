@@ -50,7 +50,7 @@ class RuleUnconditional : public RuleWithActions {
         : RuleWithActions(r)
         { }
 
-    virtual bool evaluate(Transaction *transaction) override;
+    virtual bool evaluate(Transaction *transaction) const override;
 
  private:
 };
