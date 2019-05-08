@@ -63,7 +63,7 @@ class Rule {
         return *this;
     }
 
-    virtual bool evaluate(Transaction *transaction) = 0;
+    virtual bool evaluate(Transaction *transaction) const = 0;
 
     std::shared_ptr<std::string> getFileName() const {
         return m_fileName;
@@ -76,11 +76,11 @@ class Rule {
     int getPhase() const { return m_phase; }
     void setPhase(int phase) { m_phase = phase; }
 
-    virtual std::string getReference() {
+    virtual std::string getReference() const {
         return *m_fileName + ":" + std::to_string(m_lineNumber);
     }
 
-    virtual void dump(std::stringstream &out) {
+    virtual void dump(std::stringstream &out) const {
         out << getOriginInTextFormat() << std::endl;
     }
 
