@@ -34,7 +34,8 @@ class LuaScriptBlob {
  public:
     LuaScriptBlob() :
         m_data(NULL),
-        m_len(0) { }
+        m_len(0)
+    { }
 
     ~LuaScriptBlob() {
         if (m_data) {

@@ -67,7 +67,7 @@ RuleMessage *TransactionRuleMessageManagement::messageGetLast() {
     return m_rulesMessages.back();
 }
 
-void TransactionRuleMessageManagement::logMatchLastRuleOnTheChain(RuleWithActions *rule) {
+void TransactionRuleMessageManagement::logMatchLastRuleOnTheChain(const RuleWithActions *rule) {
     RuleMessage *rm = m_rulesMessages.back();
 
     rm->setRule(rule);
