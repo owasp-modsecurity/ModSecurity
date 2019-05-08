@@ -71,7 +71,7 @@ namespace operators {
 
 
 bool Operator::evaluateInternal(Transaction *transaction,
-    RuleWithActions *rule, const bpstd::string_view &a, RuleMessage *rm) {
+    const RuleWithActions *rule, const bpstd::string_view &a, RuleMessage *rm) {
     bool res = evaluate(transaction, rule, a, rm);
 
     if (m_negation) {
@@ -111,7 +111,7 @@ std::string Operator::resolveMatchMessage(Transaction *t,
 
 
 bool Operator::evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) {
     ms_dbg_a(transaction, 2, "Operator: " + m_op + \

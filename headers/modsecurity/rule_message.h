@@ -113,8 +113,8 @@ class RuleMessage {
     static std::string _details(const RuleMessage *rm);
     static std::string _errorLogTail(const RuleMessage *rm);
 
-    RuleWithActions *getRule() const;
-    void setRule(RuleWithActions *rule);
+    const RuleWithActions *getRule() const;
+    void setRule(const RuleWithActions *rule);
     bool isSettle() const;
     int getRuleId() const;
     int getPhase() const;
@@ -144,7 +144,7 @@ class RuleMessage {
 
  private:
     Transaction *m_transaction;
-    RuleWithActions *m_rule;
+    const RuleWithActions *m_rule;
 };
 
 

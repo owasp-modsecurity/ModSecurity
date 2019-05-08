@@ -114,7 +114,7 @@ int ValidateUtf8Encoding::detect_utf8_character(
 }
 
 bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     unsigned int i, bytes_left;

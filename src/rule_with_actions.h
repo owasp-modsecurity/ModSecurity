@@ -222,22 +222,22 @@ class RuleWithActions : public Rule {
     }
 
 
-    virtual bool evaluate(Transaction *transaction) override;
+    virtual bool evaluate(Transaction *transaction) const override;
 
 
     void executeActionsIndependentOfChainedRuleResult(
-        Transaction *trasn);
+        Transaction *trasn) const;
 
     void executeActionsAfterFullMatch(
-        Transaction *trasn);
+        Transaction *trasn) const;
 
-    void executeAction(Transaction *trans,
+    static void executeAction(Transaction *trans,
         ActionWithExecution *a,
         bool context);
 
     void executeAction(Transaction *trans,
         ActionDisruptive *a,
-        bool context);
+        bool context) const;
 
     static void executeTransformation(
         Transaction *transaction,
@@ -253,7 +253,7 @@ class RuleWithActions : public Rule {
     void executeTransformations(
         Transaction *transaction,
         const std::string &value,
-        TransformationsResults &results);
+        TransformationsResults &results) const;
 
     void addAction(actions::Action *a);
     void addTransformation(std::shared_ptr<actions::transformations::Transformation> t) {
@@ -268,7 +268,7 @@ class RuleWithActions : public Rule {
     std::vector<actions::Action *> getActionsByName(const std::string& name,
         Transaction *t);
     bool containsTag(const std::string& name, Transaction *t) const;
-    bool containsMsg(const std::string& name, Transaction *t);
+    bool containsMsg(const std::string& name, Transaction *t) const;
 
 
     void clearDefaultActions() {
@@ -525,7 +525,7 @@ class RuleWithActions : public Rule {
     }
 
 
-    virtual void dump(std::stringstream &out) override {
+    virtual void dump(std::stringstream &out) const override {
         out << "RuleWithActions" << std::endl;
     }
 
