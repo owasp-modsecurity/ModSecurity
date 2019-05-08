@@ -39,7 +39,7 @@ bool Rx::init(const std::string &file, std::string *error) {
 
 
 bool Rx::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &input,
     RuleMessage *ruleMessage) {
     Regex *re;

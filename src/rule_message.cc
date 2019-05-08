@@ -97,12 +97,12 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
 }
 
 
-RuleWithActions *RuleMessage::getRule() const {
+const RuleWithActions *RuleMessage::getRule() const {
     return m_rule;
 }
 
 
-void RuleMessage::setRule(RuleWithActions *rule) {
+void RuleMessage::setRule(const RuleWithActions *rule) {
     m_rule = rule;
 }
 
