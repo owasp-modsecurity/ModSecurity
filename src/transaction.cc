@@ -73,7 +73,7 @@ void TransactionRuleMessageManagement::messageNew() {
     m_rulesMessages.push_back(std::make_shared<RuleMessage>(m_transaction));
 }
 
-void TransactionRuleMessageManagement::messageLog(RuleWithActions *rule) {
+void TransactionRuleMessageManagement::messageLog(const RuleWithActions *rule) {
      m_rulesMessages.back()->setRule(rule);
 }
 

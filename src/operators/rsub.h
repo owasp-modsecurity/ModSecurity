@@ -34,7 +34,7 @@ class Rsub : public Operator {
         : Operator("Rsub", std::move(param)) { }
 
     bool evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 };

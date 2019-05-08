@@ -38,7 +38,7 @@ bool IpMatch::init(const std::string &file, std::string *error) {
 
 
 bool IpMatch::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     return m_tree.contains(str.c_str());

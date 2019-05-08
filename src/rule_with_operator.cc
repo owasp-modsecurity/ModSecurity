@@ -85,7 +85,7 @@ RuleWithOperator::~RuleWithOperator() {
 
 inline void RuleWithOperator::updateMatchedVars(Transaction *trans,
     const std::string &key,
-    const bpstd::string_view &value) {
+    const bpstd::string_view &value) const {
     ms_dbg_a(trans, 9, "Matched vars updated.");
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
     trans->m_variableMatchedVarName.set(key, trans->m_variableOffset);
@@ -95,7 +95,7 @@ inline void RuleWithOperator::updateMatchedVars(Transaction *trans,
 }
 
 
-inline void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
+inline void RuleWithOperator::cleanMatchedVars(Transaction *trans) const {
     ms_dbg_a(trans, 9, "Matched vars cleaned.");
     trans->m_variableMatchedVar.unset();
     trans->m_variableMatchedVars.unset();
@@ -106,7 +106,7 @@ inline void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
 
 bool RuleWithOperator::executeOperatorAt(Transaction *trans,
     const std::string &key,
-    const bpstd::string_view &value) {
+    const bpstd::string_view &value) const {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
     clock_t end;
@@ -134,7 +134,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans,
 
 
 void RuleWithOperator::getVariablesExceptions(Transaction *t,
-    variables::Variables *exclusion, variables::Variables *addition) {
+    variables::Variables *exclusion, variables::Variables *addition) const {
     for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) {
         if (containsTag(*a.first.get(), t) == false) {
             continue;
@@ -180,7 +180,7 @@ void RuleWithOperator::getVariablesExceptions(Transaction *t,
 
 
 inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
-    variables::Variables *exclusion, Transaction *trans) {
+    variables::Variables *exclusion, Transaction *trans) const {
     variables::Variables addition;
     getVariablesExceptions(trans, exclusion, &addition);
 
@@ -219,7 +219,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
 }
 
 
-bool RuleWithOperator::evaluate(Transaction *trans) {
+bool RuleWithOperator::evaluate(Transaction *trans) const {
     bool globalRet = false;
     variables::Variables *variables = this->m_variables;
     bool recursiveGlobalRet;
@@ -396,7 +396,7 @@ end_exec:
 }
 
 
-std::string RuleWithOperator::getOperatorName() { return m_operator->m_op; }
+std::string RuleWithOperator::getOperatorName() const { return m_operator->m_op; }
 
 
 }  // namespace modsecurity

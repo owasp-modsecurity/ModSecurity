@@ -171,7 +171,7 @@ RuleWithActions::~RuleWithActions() {
 }
 
 
-bool RuleWithActions::evaluate(Transaction *transaction) {
+bool RuleWithActions::evaluate(Transaction *transaction) const {
     /* Matched vars needs to be clear at every new rule execution */
     transaction->m_matched.clear();
 
@@ -180,7 +180,7 @@ bool RuleWithActions::evaluate(Transaction *transaction) {
 
 
 void RuleWithActions::executeActionsIndependentOfChainedRuleResult(
-    Transaction *trans) {
+    Transaction *trans) const {
     /**
      * FIXME: this is not conteplating SecRuleUpdateActionBy*.
      *
@@ -206,7 +206,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(
 }
 
 
-void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
+void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) const {
     bool disruptiveAlreadyExecuted = false;
 
     /* Default Actions */
@@ -266,7 +266,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
 
 
 void RuleWithActions::executeAsDefaulAction(Transaction *trans,
-    Action *a, bool defaultContext) {
+    Action *a, bool defaultContext) const {
     if (a->isDisruptive() == false) {
         ms_dbg_a(trans, 9, "Running action: " + *a->getName());
         a->executeAsDefaulAction(trans, this);
@@ -293,7 +293,7 @@ void RuleWithActions::executeAsDefaulAction(Transaction *trans,
 
 
 void RuleWithActions::executeAction(Transaction *trans,
-    Action *a, bool defaultContext) {
+    Action *a, bool defaultContext) const {
     if (a->isDisruptive() == false) {
         ms_dbg_a(trans, 9, "Running action: " + *a->getName());
         a->execute(trans);
@@ -321,7 +321,7 @@ void RuleWithActions::executeAction(Transaction *trans,
 void RuleWithActions::executeTransformations(
     Transaction *trans,
     const std::string &in,
-    TransformationsResults &results) {
+    TransformationsResults &results) const {
     int none = 0;
 
     ModSecStackString ssin{results.m_stackAllocator};
@@ -405,7 +405,7 @@ void RuleWithActions::executeTransformations(
 inline void RuleWithActions::executeTransformation(
     Transaction *transaction,
     TransformationsResults *ret,
-    Transformation *transformation) {
+    Transformation *transformation) const {
     executeTransformation(
         transaction,
         *ret->back().getAfter(),
@@ -419,7 +419,7 @@ inline void RuleWithActions::executeTransformation(
     Transaction *transaction,
     ModSecStackString &in,
     TransformationsResults *ret,
-    Transformation *transformation) {
+    Transformation *transformation) const {
 
     ModSecStackString out{ret->m_stackAllocator};
     transformation->execute(transaction, in, out);
@@ -437,7 +437,7 @@ inline void RuleWithActions::executeTransformation(
 }
 
 
-bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
+bool RuleWithActions::containsTag(const std::string& name, Transaction *t) const {
     for (auto &tag : m_actionsTag) {
         if (tag != NULL && tag->getTagName(t) == name) {
             return true;
@@ -447,12 +447,12 @@ bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
 }
 
 
-bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
+bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) const {
     return m_msg && m_msg->data(t) == name;
 }
 
 
-void RuleWithActions::performLogging(Transaction *trans, bool lastLog) {
+void RuleWithActions::performLogging(Transaction *trans, bool lastLog) const {
     RuleMessage *rm = trans->messageGetLast();
     /* last rule in the chain. */
     bool isItToBeLogged = rm->m_saveMessage;
@@ -503,9 +503,9 @@ void RuleWithActions::performLogging(Transaction *trans, bool lastLog) {
     }
 }
 
-std::string RuleWithActions::getLogData(Transaction *t) { return m_logData->data(t); }
-std::string RuleWithActions::getMsg(Transaction *t) { return m_msg->data(t); }
-int RuleWithActions::getSeverity() { return m_severity->m_severity; }
+std::string RuleWithActions::getLogData(Transaction *t) const { return m_logData->data(t); }
+std::string RuleWithActions::getMsg(Transaction *t) const { return m_msg->data(t); }
+int RuleWithActions::getSeverity() const { return m_severity->m_severity; }
 
 
 }  // namespace modsecurity

@@ -22,7 +22,7 @@ namespace modsecurity {
 namespace operators {
 
 bool Contains::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &input,
     RuleMessage *ruleMessage) {
     std::string p(m_string->evaluate(transaction));

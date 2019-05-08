@@ -33,7 +33,7 @@ class Eq : public Operator {
         : Operator("Eq", std::move(param)) { }
 
     bool evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 };

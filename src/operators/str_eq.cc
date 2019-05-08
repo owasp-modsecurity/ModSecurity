@@ -21,7 +21,7 @@ namespace modsecurity {
 namespace operators {
 
 bool StrEq::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     std::string pt(m_string->evaluate(transaction));

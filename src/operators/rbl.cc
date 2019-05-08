@@ -199,7 +199,7 @@ void Rbl::furtherInfo(struct sockaddr_in *sin, std::string ipStr,
 
 
 bool Rbl::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     struct addrinfo *info = NULL;

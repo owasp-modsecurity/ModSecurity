@@ -122,8 +122,9 @@ const char *Lua::blob_reader(lua_State *L, void *ud, size_t *size) {
 #endif
 
 
-int Lua::run(Transaction *t, const std::string &str) {
+int Lua::run(Transaction *t, const std::string &str) const {
 #ifdef WITH_LUA
+    LuaScriptBlob blob = m_blob;
     std::string luaRet;
     const char *a = NULL;
     int ret = true;
@@ -140,9 +141,9 @@ int Lua::run(Transaction *t, const std::string &str) {
     lua_setglobal(L, "m");
 
 #ifdef WITH_LUA_5_1
-    int rc = lua_load(L, Lua::blob_reader, &m_blob, m_scriptName.c_str());
+    int rc = lua_load(L, Lua::blob_reader, &blob, m_scriptName.c_str());
 #else
-    int rc = lua_load(L, Lua::blob_reader, &m_blob, m_scriptName.c_str(),
+    int rc = lua_load(L, Lua::blob_reader, &blob, m_scriptName.c_str(),
         NULL);
 #endif
     if (rc != LUA_OK) {

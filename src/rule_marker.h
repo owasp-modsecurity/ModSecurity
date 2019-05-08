@@ -55,7 +55,7 @@ class RuleMarker : public Rule {
         m_name(std::move(r.m_name))
     { };
 
-    virtual bool evaluate(Transaction *transaction) override {
+    virtual bool evaluate(Transaction *transaction) const override {
         if (transaction->isInsideAMarker()) {
             if (*transaction->getCurrentMarker() == *m_name) {
                 transaction->removeMarker();
@@ -68,11 +68,11 @@ class RuleMarker : public Rule {
     };
 
 
-    std::shared_ptr<std::string> getName() {
+    std::shared_ptr<std::string> getName() const {
         return m_name;
     }
 
-    virtual void dump(std::stringstream &out) override {
+    virtual void dump(std::stringstream &out) const override {
         Rule::dump(out);
         out << "SecMarker \"" << *getName() << "\"" << std::endl;
     }

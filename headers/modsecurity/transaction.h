@@ -328,7 +328,7 @@ class TransactionRuleMessageManagement {
 
     RuleMessage *messageGetLast();
     void messageNew();
-    void messageLog(RuleWithActions *rule);
+    void messageLog(const RuleWithActions *rule);
 
     void messageSetNoAuditLog(bool a) {
         m_noAuditLog = a;

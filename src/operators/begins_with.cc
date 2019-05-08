@@ -25,7 +25,7 @@ namespace operators {
 
 
 bool BeginsWith::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     std::string p(m_string->evaluate(transaction));

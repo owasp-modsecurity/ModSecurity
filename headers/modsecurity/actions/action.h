@@ -87,7 +87,7 @@ class Action {
     }
 
     virtual bool execute(Transaction *transaction) noexcept { return true; };
-    inline virtual bool executeAsDefaulAction(Transaction *transaction, RuleWithActions *r) noexcept {
+    inline virtual bool executeAsDefaulAction(Transaction *transaction, const RuleWithActions *r) noexcept {
         return execute(transaction);
     };
 

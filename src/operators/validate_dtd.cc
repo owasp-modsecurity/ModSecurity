@@ -44,7 +44,7 @@ bool ValidateDTD::init(const std::string &file, std::string *error) {
 
 
 bool ValidateDTD::evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) {
     xmlValidCtxtPtr cvp;

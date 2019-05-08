@@ -27,6 +27,7 @@
 #include "src/utils/string.h"
 #include "src/utils/regex.h"
 #include "src/variables/variable_run_time_resolution.h"
+#include "src/rule_with_actions.h"
 
 #ifndef SRC_VARIABLES_VARIABLE_H_
 #define SRC_VARIABLES_VARIABLE_H_
@@ -168,7 +169,8 @@ class Variable : public VariableRunTimeResolution {
     virtual void evaluate(Transaction *t,
         std::vector<const VariableValue *> *l) = 0;
 
-    void ruleInit(RuleWithActions *r) {
+
+    void ruleInit(const RuleWithActions *r) {
         m_rule = r;
     }
 
@@ -201,7 +203,7 @@ class Variable : public VariableRunTimeResolution {
     KeyExclusions m_keyExclusion;
 
  protected:
-    RuleWithActions *m_rule;
+    const RuleWithActions *m_rule;
 };
 
 class VariableDictElement : public Variable {
@@ -258,7 +260,7 @@ class Variables : public std::vector<Variable *> {
     }
 
 
-    void ruleInit(RuleWithActions *r) {
+    void ruleInit(const RuleWithActions *r) {
         for (auto a : *this) {
             a->ruleInit(r);
         }

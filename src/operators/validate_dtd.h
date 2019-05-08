@@ -47,7 +47,7 @@ class ValidateDTD : public Operator {
     }
 
     bool evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 

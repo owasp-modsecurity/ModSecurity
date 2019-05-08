@@ -19,7 +19,7 @@
 namespace modsecurity {
 
 
-bool RuleUnconditional::evaluate(Transaction *trans) {
+bool RuleUnconditional::evaluate(Transaction *trans) const {
     RuleWithActions::evaluate(trans);
 
     ms_dbg_a(trans, 4, "(Rule: " + std::to_string(getId()) \

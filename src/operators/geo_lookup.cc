@@ -40,7 +40,7 @@ bool GeoLookup::debug(Transaction *transaction, int x, const bpstd::string_view 
 
 
 bool GeoLookup::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     using std::placeholders::_1;

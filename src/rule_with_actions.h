@@ -104,23 +104,23 @@ class RuleWithActions : public Rule {
     ~RuleWithActions();
 
 
-    virtual bool evaluate(Transaction *transaction) override;
+    virtual bool evaluate(Transaction *transaction) const override;
 
     void executeActionsIndependentOfChainedRuleResult(
-        Transaction *trasn);
+        Transaction *trasn) const;
 
     void executeActionsAfterFullMatch(
-        Transaction *trasn);
+        Transaction *trasn) const;
 
     void executeAction(Transaction *trans,
         Action *a,
-        bool context);
+        bool context) const;
 
     void executeAsDefaulAction(Transaction *trans,
         Action *a,
-        bool context);
+        bool context) const;
 
-    inline void executeBlockAction(Transaction *transaction) noexcept {
+    inline void executeBlockAction(Transaction *transaction) const noexcept {
         for (auto &a : transaction->m_rules->m_defaultActions[getPhase()]) {
             if (a->isDisruptive() == false) {
                 continue;
@@ -138,71 +138,71 @@ class RuleWithActions : public Rule {
     inline void executeTransformation(
         Transaction *transaction,
         TransformationsResults *ret,
-        Transformation *transformation);
+        Transformation *transformation) const;
 
     inline void executeTransformation(
         Transaction *transaction,
         ModSecStackString &in,
         TransformationsResults *ret,
-        Transformation *transformation);
+        Transformation *transformation) const;
 
     void executeTransformations(
         Transaction *transaction,
         const std::string &value,
-        TransformationsResults &results);
+        TransformationsResults &results) const;
 
 
-    void performLogging(Transaction *trans, bool lastLog = true);
+    void performLogging(Transaction *trans, bool lastLog = true) const;
 
-    bool containsTag(const std::string& name, Transaction *t);
-    bool containsMsg(const std::string& name, Transaction *t);
+    bool containsTag(const std::string& name, Transaction *t) const;
+    bool containsMsg(const std::string& name, Transaction *t) const;
 
 
     void performLogging(Transaction *trans,
         RuleMessage &ruleMessage,
-        bool lastLog = true);
+        bool lastLog = true) const;
 
 
-    inline bool isChained() { return m_isChained == true; }
+    inline const bool isChained() const { return m_isChained == true; }
     inline void setChained(bool b) { m_isChained = b; }
 
-    inline bool hasCaptureAction() { return m_containsCaptureAction == true; }
-    inline bool hasDisruptiveAction() { return m_disruptiveAction != NULL; }
-    inline bool hasMultimatch() { return m_containsMultiMatchAction == true; }
+    inline bool hasCaptureAction() const { return m_containsCaptureAction == true; }
+    inline bool hasDisruptiveAction() const { return m_disruptiveAction != NULL; }
+    inline bool hasMultimatch() const { return m_containsMultiMatchAction == true; }
 
     void setBlockAction(bool a) { m_containsBlockAction = a; }
-    inline bool hasBlockAction() { return m_containsBlockAction == true; }
+    inline bool hasBlockAction() const { return m_containsBlockAction == true; }
 
-    inline bool hasLogData() { return m_logData != NULL; }
-    std::string getLogData(Transaction *t);
+    inline bool hasLogData() const { return m_logData != NULL; }
+    std::string getLogData(Transaction *t) const;
 
-    inline bool hasMsg() { return m_msg != NULL; }
-    std::string getMsg(Transaction *t);
+    inline bool hasMsg() const { return m_msg != NULL; }
+    std::string getMsg(Transaction *t) const;
 
-    inline bool hasSeverity() { return m_severity != NULL; }
-    int getSeverity();
+    inline bool hasSeverity() const { return m_severity != NULL; }
+    int getSeverity() const;
 
-    inline std::string *getRevision() { return &m_revision; }
+    inline const std::string *getRevision() const { return &m_revision; }
     void setRevision(const std::string &revision) {
         m_revision.assign(revision);
     }
 
-    inline std::string *getVersion() { return &m_version; }
+    inline const std::string *getVersion() const { return &m_version; }
     void setVersion(const std::string &version) {
         m_version.assign(version);
     }
 
-    inline int getAccuracy() { return m_accuracy; }
+    inline int getAccuracy() const { return m_accuracy; }
     void setAccuracy(int accuracy) {
         m_accuracy = accuracy;
     }
 
-    inline int getMaturity() { return m_maturity; }
+    inline int getMaturity() const { return m_maturity; }
     void setMaturity(int maturity) {
         m_maturity = maturity;
     }
 
-    inline RuleId getId() { return m_ruleId; }
+    inline RuleId getId() const { return m_ruleId; }
     void setId(int id) {
         m_ruleId = id;
     }
@@ -211,7 +211,11 @@ class RuleWithActions : public Rule {
         m_chainedRuleChild = std::move(r);
     }
 
-    inline RuleWithActions *getChainedNext() {
+    inline const RuleWithActions *getChainedNext() const {
+        return m_chainedRuleChild.get();
+    }
+
+    inline RuleWithActions *getChainedNextReference() {
         return m_chainedRuleChild.get();
     }
 
@@ -219,11 +223,11 @@ class RuleWithActions : public Rule {
         m_chainedRuleParent = r;
     }
 
-    inline RuleWithActions *getChainedParent() {
+    inline const RuleWithActions *getChainedParent() const {
         return m_chainedRuleParent;
     }
 
-    XmlNSs getXmlNSs() {
+    XmlNSs getXmlNSs() const {
         /**
          * FIXME: this is not conteplating SecRuleUpdateActionBy* yet.
          *
@@ -231,7 +235,7 @@ class RuleWithActions : public Rule {
         return m_XmlNSs;
     }
 
-    Tags getTags() {
+    Tags getTags() const {
         Tags tags = m_actionsTag;
         if (getChainedParent()) {
             auto parent = getChainedParent()->getTags();
@@ -243,7 +247,7 @@ class RuleWithActions : public Rule {
     }
 
 
-    virtual void dump(std::stringstream &out) override {
+    virtual void dump(std::stringstream &out) const override {
         out << "RuleWithActions" << std::endl;
     }
 

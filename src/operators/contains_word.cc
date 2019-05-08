@@ -37,7 +37,7 @@ bool ContainsWord::acceptableChar(const bpstd::string_view &a, size_t pos) {
 }
 
 bool ContainsWord::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &inputView,
     RuleMessage *ruleMessage) {
     std::string paramTarget(m_string->evaluate(transaction));

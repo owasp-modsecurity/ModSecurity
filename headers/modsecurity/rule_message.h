@@ -101,10 +101,10 @@ class RuleMessage {
     static std::string _details(RuleMessage *rm);
     static std::string _errorLogTail(RuleMessage *rm);
 
-    RuleWithActions *getRule() {
+    const RuleWithActions *getRule() {
         return m_rule;
     }
-    void setRule(RuleWithActions *rule) {
+    void setRule(const RuleWithActions *rule) {
         m_rule = rule;
     }
 
@@ -141,7 +141,7 @@ class RuleMessage {
 
  private:
     Transaction *m_transaction;
-    RuleWithActions *m_rule;
+    const RuleWithActions *m_rule;
 };
 
 

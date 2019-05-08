@@ -34,15 +34,21 @@ class LuaScriptBlob {
  public:
     LuaScriptBlob() :
         m_data(NULL),
-        m_len(0) { }
+        m_len(0)
+    { };
 
     ~LuaScriptBlob() {
         if (m_data) {
             free(m_data);
             m_data = NULL;
         }
-    }
+    };
 
+    LuaScriptBlob(const LuaScriptBlob &lua) {
+        m_data = reinterpret_cast<unsigned char *>(std::malloc(lua.m_len));
+        std::memcpy(m_data, lua.m_data, lua.m_len);
+        m_len = lua.m_len;
+    };
 
     void write(const void *data, size_t len) {
         unsigned char *d = NULL;
@@ -69,7 +75,8 @@ class Lua {
     Lua() { }
 
     bool load(std::string script, std::string *err);
-    int run(Transaction *t, const std::string &str_param = "");
+
+    int run(Transaction *t, const std::string &str_param = "") const;
     static bool isCompatible(std::string script, Lua *l, std::string *error);
 
 #ifdef WITH_LUA

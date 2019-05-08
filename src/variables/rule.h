@@ -38,9 +38,9 @@ class Rule_DictElement : public VariableDictElement { \
         : VariableDictElement(std::string("RULE"), dictElement) { }
 
     static void id(Transaction *t,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        RuleWithActions *r = rule;
+        const RuleWithActions *r = rule;
 
         while (r && r->getId() == 0) {
             r = r->getChainedParent();
@@ -63,9 +63,9 @@ class Rule_DictElement : public VariableDictElement { \
 
 
     static void rev(Transaction *t,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        RuleWithActions *r = rule;
+        const RuleWithActions *r = rule;
 
         while (r && r->getRevision()->empty()) {
             r = r->getChainedParent();
@@ -89,9 +89,9 @@ class Rule_DictElement : public VariableDictElement { \
 
 
     static void severity(Transaction *t,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        RuleWithActions *r = rule;
+        const RuleWithActions *r = rule;
 
         while (r && !r->hasSeverity()) {
             r = r->getChainedParent();
@@ -113,9 +113,9 @@ class Rule_DictElement : public VariableDictElement { \
 
 
     static void logData(Transaction *t,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        RuleWithActions *r = rule;
+        const RuleWithActions *r = rule;
 
         while (r && !r->hasLogData()) {
             r = r->getChainedParent();
@@ -136,9 +136,9 @@ class Rule_DictElement : public VariableDictElement { \
     }
 
     static void msg(Transaction *t,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        RuleWithActions *r = rule;
+        const RuleWithActions *r = rule;
 
         while (r && !r->hasMsg()) {
             r = r->getChainedParent();

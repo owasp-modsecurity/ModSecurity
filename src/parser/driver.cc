@@ -90,8 +90,8 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
             return false;
         }
         m_lastRule->setChainedNext(std::move(r));
-        m_lastRule->getChainedNext()->setChainedParent(m_lastRule);
-        m_lastRule = m_lastRule->getChainedNext();
+        m_lastRule->getChainedNextReference()->setChainedParent(m_lastRule);
+        m_lastRule = m_lastRule->getChainedNextReference();
         return true;
     }
 

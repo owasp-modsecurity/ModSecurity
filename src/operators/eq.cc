@@ -25,7 +25,7 @@ namespace operators {
 
 
 bool Eq::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &input,
     RuleMessage *ruleMessage) {
     int p = 0;
