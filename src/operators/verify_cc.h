@@ -38,7 +38,7 @@ class VerifyCC : public Operator {
     bool init(const std::string &param, std::string *error) override;
 
     bool evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 

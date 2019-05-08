@@ -84,7 +84,7 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
 
 
 bool Pm::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     int rc = -1;

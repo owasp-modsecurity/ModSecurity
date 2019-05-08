@@ -69,7 +69,7 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
 
 
 bool ValidateUrlEncoding::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &input,
     RuleMessage *ruleMessage) {
     size_t offset = 0;

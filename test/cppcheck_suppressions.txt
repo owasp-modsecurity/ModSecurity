@@ -46,8 +46,8 @@ functionStatic:headers/modsecurity/transaction.h:437
 duplicateBranch:src/audit_log/audit_log.cc:223
 unreadVariable:src/request_body_processor/multipart.cc:435
 stlcstrParam:src/audit_log/writer/parallel.cc:145
-functionStatic:src/engine/lua.h:78
 functionStatic:src/engine/lua.h:79
+functionStatic:src/engine/lua.h:80
 functionConst:src/utils/geo_lookup.h:49
 useInitializationList:src/operators/rbl.h:69
 constStatement:test/common/modsecurity_test.cc:82
