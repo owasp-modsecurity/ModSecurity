@@ -27,7 +27,7 @@ namespace operators {
 
 
 bool DetectXSS::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &input,
     RuleMessage *ruleMessage) {
     int is_xss;

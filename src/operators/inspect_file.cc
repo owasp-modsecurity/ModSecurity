@@ -50,7 +50,7 @@ bool InspectFile::init(const std::string &param2, std::string *error) {
 
 
 bool InspectFile::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     if (m_isScript) {
