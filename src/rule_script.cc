@@ -22,7 +22,7 @@ bool RuleScript::init(std::string *err) {
     return m_lua->load(m_name, err);
 }
 
-bool RuleScript::evaluate(Transaction *trans) {
+bool RuleScript::evaluate(Transaction *trans) const {
 
     ms_dbg_a(trans, 4, " Executing script: " + m_name + ".");
 

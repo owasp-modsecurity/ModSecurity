@@ -109,12 +109,12 @@ class Operator {
     }
 
     bool evaluateInternal(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view& a,
         RuleMessage *ruleMessage);
 
     virtual bool evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &str,
         RuleMessage *ruleMessage);
 
