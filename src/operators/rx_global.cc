@@ -36,7 +36,7 @@ bool RxGlobal::init(const std::string &arg, std::string *error) {
 }
 
 
-bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
+bool RxGlobal::evaluate(Transaction *transaction, const RuleWithActions *rule,
     const bpstd::string_view& input, RuleMessage *ruleMessage) {
     Regex *re;
 
