@@ -328,7 +328,7 @@ class TransactionRuleMessageManagement {
     RuleMessage *messageGetLast();
     void messageNew();
 
-    void logMatchLastRuleOnTheChain(RuleWithActions *rule);
+    void logMatchLastRuleOnTheChain(const RuleWithActions *rule);
 
     std::list<RuleMessage *> messageGetAll();
 

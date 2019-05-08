@@ -190,7 +190,7 @@ void RuleWithActions::addAction(actions::Action *a) {
 RuleWithActions::~RuleWithActions() { }
 
 
-bool RuleWithActions::evaluate(Transaction *transaction) {
+bool RuleWithActions::evaluate(Transaction *transaction) const {
     /* Matched vars needs to be clear at every new rule execution */
     transaction->m_matched.clear();
 
@@ -198,7 +198,7 @@ bool RuleWithActions::evaluate(Transaction *transaction) {
 }
 
 
-void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans) {
+void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans) const {
 
     for (actions::SetVar *a : getSetVarsActionsPtr()) {
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
@@ -221,7 +221,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
 }
 
 
-void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
+void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) const {
     bool disruptiveAlreadyExecuted = false;
 
     for (actions::Tag *a : getTagsActionPtr()) {
@@ -275,7 +275,7 @@ void RuleWithActions::executeAction(Transaction *trans,
 
 
 void RuleWithActions::executeAction(Transaction *trans,
-    ActionDisruptive *a, bool defaultContext) {
+    ActionDisruptive *a, bool defaultContext) const {
     if (defaultContext && !hasBlockAction()) {
         ms_dbg_a(trans, 4, "Ignoring action: " + *a->getName() + \
             " (rule does not cotains block)");
@@ -298,7 +298,7 @@ void RuleWithActions::executeAction(Transaction *trans,
 void RuleWithActions::executeTransformations(
     Transaction *trans,
     const std::string &in,
-    TransformationsResults &results) {
+    TransformationsResults &results) const {
     int none = 0;
 
     ModSecString ssin;
@@ -400,7 +400,7 @@ bool RuleWithActions::containsTag(const std::string& name, Transaction *t) const
 }
 
 
-bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
+bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) const {
     return m_msg && m_msg->getEvaluatedRunTimeString(t) == name;
 }
 
