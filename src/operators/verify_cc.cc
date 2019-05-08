@@ -120,7 +120,7 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
 
 
 bool VerifyCC::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &i,
     RuleMessage *ruleMessage) {
     int offset = 0;
