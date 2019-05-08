@@ -111,7 +111,7 @@ bool VerifyCPF::verify(const char *cpfnumber, int len) {
 
 
 bool VerifyCPF::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &input,
     RuleMessage *ruleMessage) {
     std::list<SMatch> matches;

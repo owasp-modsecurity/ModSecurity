@@ -36,7 +36,7 @@ class Contains : public Operator {
         : Operator("Contains", std::move(param)) { };
 
     bool evaluate(Transaction *transaction,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 };

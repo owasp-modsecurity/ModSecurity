@@ -28,7 +28,7 @@ namespace operators {
 
 
 bool DetectSQLi::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
+    const RuleWithActions *rule,
     const bpstd::string_view &input,
     RuleMessage *ruleMessage) {
     char fingerprint[8];
