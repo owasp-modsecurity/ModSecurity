@@ -1,4 +1,4 @@
 [submodule "iis/asio"]
 	path = iis/asio
 	url = https://github.com/chriskohlhoff/asio.git
-	branch = tags/asio-1-12-2
+	branch = tags/asio-1-13-0
