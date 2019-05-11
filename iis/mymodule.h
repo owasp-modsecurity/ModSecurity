@@ -40,7 +40,7 @@ public:
 private:
     CriticalSection cs;
     EventLogger logger;
-    asio::thread_pool threadPool;
+    asio::thread_pool threadPool{12};
     DWORD pageSize = 0;
     bool statusCallAlreadySent = false;
 };

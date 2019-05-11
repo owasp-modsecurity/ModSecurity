@@ -701,6 +701,27 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
             }
 
             int operator()() const {
+                // We put the entire thread into background mode for the time of processing.
+                // According to https://docs.microsoft.com/en-us/windows/desktop/api/processthreadsapi/nf-processthreadsapi-setthreadpriority :
+                //
+                // The THREAD_PRIORITY_* values affect the CPU scheduling priority of the thread.
+                // For threads that perform background work such as file I/O, network I/O, or data processing,
+                // it is not sufficient to adjust the CPU scheduling priority; even an idle CPU priority thread
+                // can easily interfere with system responsiveness when it uses the disk and memory.
+                // Threads that perform background work should use the THREAD_MODE_BACKGROUND_BEGIN
+                // and THREAD_MODE_BACKGROUND_END values to adjust their resource scheduling priorities;
+                // threads that interact with the user should not use THREAD_MODE_BACKGROUND_BEGIN.
+                struct BackgroundThreadMode
+                {
+                    BackgroundThreadMode() {
+                        SetThreadPriority(GetCurrentThread(), THREAD_MODE_BACKGROUND_BEGIN);
+                    }
+                    ~BackgroundThreadMode() {
+                        SetThreadPriority(GetCurrentThread(), THREAD_MODE_BACKGROUND_END);
+                    }
+                };
+
+                BackgroundThreadMode backgroundMode;
                 return modsecProcessRequest(ctx.GetRequest());
             }
         };
