@@ -690,7 +690,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
         }
         // TODO: All these below need to be registered in the same way as above
         else if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
-            if (multipart_complete(msr, &my_error_msg) < 0 && msr->if_seen_eos) {
+            if (multipart_complete(msr, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
@@ -710,7 +710,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
         }
         else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
 #ifdef WITH_YAJL
-            if (json_complete(msr, &my_error_msg) < 0 && msr->msc_reqbody_length > 0 && msr->if_seen_eos) {
+            if (json_complete(msr, &my_error_msg) < 0 && msr->msc_reqbody_length > 0) {
                 *error_msg = apr_psprintf(msr->mp, "JSON parser error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
@@ -730,7 +730,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
             return modsecurity_request_body_end_urlencoded(msr, error_msg);
         }
         else if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
-            if (xml_complete(msr, &my_error_msg) < 0 && msr->if_seen_eos) {
+            if (xml_complete(msr, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "XML parser error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
