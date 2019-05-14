@@ -36,6 +36,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
     msc_data_chunk *chunk = NULL;
     apr_bucket *bucket;
     apr_status_t rc;
+    int no_data = 1;
     char *my_error_msg = NULL;
 
     if (msr == NULL) {
@@ -110,6 +111,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
             if (bucket == NULL) return APR_EGENERAL;
             APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
+            no_data = 0;
 
             if (msr->txcfg->debuglog_level >= 4) {
                 msr_log(msr, 4, "Input filter: Forwarded %" APR_SIZE_T_FMT " bytes.", chunk->length);
@@ -130,6 +132,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
             if (bucket == NULL) return APR_EGENERAL;
             APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
+            no_data = 0;
 
             if (msr->txcfg->debuglog_level >= 4) {
                 msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->stream_input_length);
@@ -145,6 +148,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
             bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
             if (bucket == NULL) return APR_EGENERAL;
             APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
+            no_data = 0;
 
             if (msr->txcfg->debuglog_level >= 4) {
                 msr_log(msr, 4, "Input filter: Sent EOS.");
@@ -157,6 +161,10 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input filter: Input forwarding complete.");
+        }
+
+        if (no_data) {
+            return ap_get_brigade(f->next, bb_out, mode, block, nbytes);
         }
     }
 
