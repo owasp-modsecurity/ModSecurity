@@ -44,7 +44,7 @@ before_test:
         & "$env:SystemRoot\System32\inetsrv\appcmd.exe" set config /section:"system.webServer/ModSecurity" /"enabled:true" /"configFile:$modsec_iis_conf"
         #setup the crs repo and the modsec config
         $crs_path = "C:\projects\owasp-modsecurity-crs"
-        git clone -q https://github.com/SpiderLabs/owasp-modsecurity-crs.git $crs_path
+        git clone -b "v3.1.0" -q https://github.com/SpiderLabs/owasp-modsecurity-crs.git $crs_path
         cd "$modsec_repo\tests"
         Rename-Item -Path "$crs_path\crs-setup.conf.example" -NewName "crs-setup.conf"
         Copy-Item "$crs_path\util\regression-tests\requirements.txt" -Destination "$modsec_repo\tests" -Force
