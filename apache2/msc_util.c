@@ -1129,10 +1129,12 @@ char *current_logtime(apr_pool_t *mp) {
     char tstr[100];
     apr_size_t len;
 
-    apr_time_exp_lt(&t, apr_time_now());
+    apr_time_t now = apr_time_now();
+    apr_time_exp_lt(&t, now);
 
-    apr_strftime(tstr, &len, 80, "%d/%b/%Y:%H:%M:%S ", &t);
-    apr_snprintf(tstr + strlen(tstr), 80 - strlen(tstr), "%c%.2d%.2d",
+    apr_strftime(tstr, &len, 80, "%d/%b/%Y:%H:%M:%S.", &t);
+    apr_snprintf(tstr + strlen(tstr), 80 - strlen(tstr), "%06ld %c%.2d%.2d",
+            ((long)now) % 1000000L,
             t.tm_gmtoff < 0 ? '-' : '+',
             t.tm_gmtoff / (60 * 60), (t.tm_gmtoff / 60) % 60);
     return apr_pstrdup(mp, tstr);
