@@ -992,6 +992,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
 
                         /* Write the sanitized chunk to the log
                          * and advance to the next chunk. */
+                        chunk->data[chunk->length] = 0;
                         yajl_string(g, chunk->data);
                         chunk_offset += chunk->length;
                     }
