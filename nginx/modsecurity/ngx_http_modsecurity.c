@@ -377,6 +377,10 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
     req->range = apr_table_get(req->headers_in, "Range");
     req->content_type = apr_table_get(req->headers_in, "Content-Type");
     req->content_encoding = apr_table_get(req->headers_in, "Content-Encoding");
+    req->hostname = apr_table_get(req->headers_in, "Host");
+    if (req->hostname == NULL) {
+        req->hostname = "<undefined>";
+    }
 
     lang = apr_table_get(ctx->req->headers_in, "Content-Languages");
     if(lang != NULL)

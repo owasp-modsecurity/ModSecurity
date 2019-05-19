@@ -476,11 +476,11 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
                             "ModSecurity not able to reopen %s file", WAF_LOG_UTIL_FILE);
                 #endif
             }
-            
+
             msc_waf_log_reopened = 0;
         }
 
-        send_waf_log(msr->modsecurity->wafjsonlog_lock, msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), dcfg->is_enabled, (char*)msr->hostname, unique_id, r);
+        send_waf_log(msr->modsecurity->wafjsonlog_lock, msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), dcfg->is_enabled, r->hostname, unique_id, r);
 #endif
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
