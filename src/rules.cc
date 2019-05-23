@@ -239,13 +239,18 @@ int Rules::evaluate(int phase, Transaction *t) {
                 }
             }
 
-            for (auto &z : t->m_ruleRemoveByTag) {
-                if (rule->containsTag(z, t) == true) {
-                    ms_dbg_a(t, 9, "Skipped rule id '" \
-                        + std::to_string(rule->m_ruleId) \
-                        + "'. Skipped due to a ruleRemoveByTag action.");
-                    remove_rule = true;
-                    break;
+            if (t->m_ruleRemoveByTag.empty() == false) {
+                for (auto &z : t->m_ruleRemoveByTag) {
+                    if (rule->containsTag(z, t) == true) {
+                        ms_dbg_a(t, 9, "Skipped rule id '" \
+                            + std::to_string(rule->m_ruleId) \
+                            + "'. Skipped due to a ruleRemoveByTag action.");
+                        remove_rule = true;
+                        break;
+                    }
+                }
+                if (remove_rule) {
+                    continue;
                 }
             }
 
