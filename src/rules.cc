@@ -248,6 +248,9 @@ int Rules::evaluate(int phase, Transaction *t) {
                     break;
                 }
             }
+            if (remove_rule) {
+                continue;
+            }
 
             rule->evaluate(t, NULL);
             if (t->m_it.disruptive == true) {
