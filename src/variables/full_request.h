@@ -27,13 +27,13 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(FullRequest, FULL_REQUEST, m_variableFullRequest)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_FULL_REQUEST_H_

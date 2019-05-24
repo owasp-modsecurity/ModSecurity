@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.2.
+// A Bison parser, made by GNU Bison 3.3.2.
 
 // Locations for Bison parsers in C++
 
-// Copyright (C) 2002-2015, 2018 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015, 2018-2019 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@
 
 namespace yy {
 #line 60 "location.hh" // location.cc:339
-  /// Abstract a position.
+  /// A point in a source file.
   class position
   {
   public:
@@ -176,7 +176,7 @@ namespace yy {
     return ostr << pos.line << '.' << pos.column;
   }
 
-  /// Abstract a location.
+  /// Two points in a source file.
   class location
   {
   public:

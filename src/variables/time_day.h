@@ -26,7 +26,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class TimeDay : public Variable {
  public:
@@ -40,7 +40,7 @@ class TimeDay : public Variable {
     std::string m_retName;
 };
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_TIME_DAY_H_

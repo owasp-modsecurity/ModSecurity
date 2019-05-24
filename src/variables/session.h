@@ -29,7 +29,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 class Session_DictElement : public Variable {
@@ -117,7 +117,7 @@ class Session_DynamicElement : public Variable {
 };
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_SESSION_H_

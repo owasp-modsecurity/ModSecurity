@@ -27,7 +27,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class Time : public Variable {
  public:
@@ -41,7 +41,7 @@ class Time : public Variable {
     std::string m_retName;
 };
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_TIME_H_

@@ -31,9 +31,9 @@
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

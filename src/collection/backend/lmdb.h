@@ -69,10 +69,10 @@ class LMDB :
         std::vector<const VariableValue *> *l) override;
     void resolveMultiMatches(const std::string& var,
         std::vector<const VariableValue *> *l,
-        Variables::KeyExclusions &ke) override;
+        variables::KeyExclusions &ke) override;
     void resolveRegularExpression(const std::string& var,
         std::vector<const VariableValue *> *l,
-        Variables::KeyExclusions &ke) override;
+        variables::KeyExclusions &ke) override;
 
  private:
     void string2val(const std::string& str, MDB_val *val);

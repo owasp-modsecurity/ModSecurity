@@ -27,12 +27,12 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 DEFINE_VARIABLE(SessionID, SESSIONID, m_variableSessionID)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_SESSION_ID_H_

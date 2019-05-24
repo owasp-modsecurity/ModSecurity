@@ -5053,7 +5053,7 @@ static const flex_int16_t yy_rule_linenum[536] =
      1156, 1161, 1163, 1164, 1165, 1166, 1168, 1169, 1170, 1171,
      1173, 1174, 1175, 1176, 1178, 1180, 1181, 1183, 1184, 1185,
      1186, 1188, 1193, 1194, 1195, 1199, 1200, 1201, 1206, 1208,
-     1209, 1210, 1235, 1261, 1289
+     1209, 1210, 1229, 1256, 1286
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -8419,16 +8419,6 @@ case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_OPERATION):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_CONTENT):
 #line 1213 "seclang-scanner.ll"
 {
-    if (driver.ref.size() > 1) {
-        driver.ref.pop_back();
-    }
-
-    if (driver.loc.size() > 1) {
-        yy::location *l = driver.loc.back();
-        driver.loc.pop_back();
-        delete l;
-    }
-
     if (yyin) {
         fclose(yyin);
     }
@@ -8437,15 +8427,19 @@ case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_CONTENT):
     if (!YY_CURRENT_BUFFER) {
         return p::make_END(*driver.loc.back());
     }
+
+    yy::location *l = driver.loc.back();
+    driver.loc.pop_back();
+    delete l;
 }
 	YY_BREAK
 case 533:
 YY_RULE_SETUP
-#line 1235 "seclang-scanner.ll"
+#line 1229 "seclang-scanner.ll"
 {
     std::string err;
     const char *file = strchr(yytext, ' ') + 1;
-    std::string fi = modsecurity::utils::find_resource(file, driver.ref.back(), &err);
+    std::string fi = modsecurity::utils::find_resource(file, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
         driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
@@ -8455,28 +8449,29 @@ YY_RULE_SETUP
     files.reverse();
     for (auto& s: files) {
         std::string err;
-        std::string f = modsecurity::utils::find_resource(s, driver.ref.back(), &err);
+        std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
+        driver.loc.push_back(new yy::location());
+        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(f);
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
+            driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
             throw p::syntax_error(*driver.loc.back(), "");
         }
-        driver.ref.push_back(f);
-        driver.loc.push_back(new yy::location());
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
 }
 	YY_BREAK
 case 534:
 YY_RULE_SETUP
-#line 1261 "seclang-scanner.ll"
+#line 1256 "seclang-scanner.ll"
 {
     std::string err;
     const char *file = strchr(yytext, ' ') + 1;
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
-    std::string fi = modsecurity::utils::find_resource(f, driver.ref.back(), &err);
+    std::string fi = modsecurity::utils::find_resource(f, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
         driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
@@ -8485,15 +8480,17 @@ YY_RULE_SETUP
     std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
     files.reverse();
     for (auto& s: files) {
-        std::string f = modsecurity::utils::find_resource(s, driver.ref.back(), &err);
+        std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
+        driver.loc.push_back(new yy::location());
+        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(f);
+
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
+            driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
             throw p::syntax_error(*driver.loc.back(), "");
         }
-        driver.ref.push_back(f.c_str());
-        driver.loc.push_back(new yy::location());
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
     free(f);
@@ -8502,7 +8499,7 @@ YY_RULE_SETUP
 case 535:
 /* rule 535 can match eol */
 YY_RULE_SETUP
-#line 1289 "seclang-scanner.ll"
+#line 1286 "seclang-scanner.ll"
 {
     HttpsClient c;
     std::string key;
@@ -8517,8 +8514,8 @@ YY_RULE_SETUP
     url = conf[2];
     c.setKey(key);
 
-    driver.ref.push_back(url);
     driver.loc.push_back(new yy::location());
+    driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(url);
     YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
     yypush_buffer_state(temp);
 
@@ -8540,10 +8537,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 536:
 YY_RULE_SETUP
-#line 1325 "seclang-scanner.ll"
+#line 1322 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 8546 "seclang-scanner.cc"
+#line 8543 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -9648,7 +9645,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 1325 "seclang-scanner.ll"
+#line 1322 "seclang-scanner.ll"
 
 
 namespace modsecurity {

@@ -138,9 +138,9 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     lastRule = NULL;
     loc.push_back(new yy::location());
     if (ref.empty()) {
-        this->ref.push_back("<<reference missing or not informed>>");
+        loc.back()->begin.filename = loc.back()->end.filename = new std::string("<<reference missing or not informed>>");
     } else {
-        this->ref.push_back(ref);
+        loc.back()->begin.filename = loc.back()->end.filename = new std::string(ref);
     }
 
     if (f.empty()) {
@@ -195,9 +195,7 @@ void Driver::error(const yy::location& l, const std::string& m,
     const std::string& c) {
     if (m_parserError.tellp() == 0) {
         m_parserError << "Rules error. ";
-        if (ref.empty() == false) {
-            m_parserError << "File: " << ref.back() << ". ";
-        }
+        m_parserError << "File: " << *l.end.filename << ". ";
         m_parserError << "Line: " << l.end.line << ". ";
         m_parserError << "Column: " << l.end.column - 1 << ". ";
     }

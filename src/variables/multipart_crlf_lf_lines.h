@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(MultipartCrlfLFLines, MULTIPART_CRLF_LF_LINES,
     m_variableMultipartCrlfLFLines)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MULTIPART_CRLF_LF_LINES_H_

@@ -1210,16 +1210,6 @@ EQUALS_MINUS                            (?i:=\-)
 
 
 <<EOF>> {
-    if (driver.ref.size() > 1) {
-        driver.ref.pop_back();
-    }
-
-    if (driver.loc.size() > 1) {
-        yy::location *l = driver.loc.back();
-        driver.loc.pop_back();
-        delete l;
-    }
-
     if (yyin) {
         fclose(yyin);
     }
@@ -1228,13 +1218,17 @@ EQUALS_MINUS                            (?i:=\-)
     if (!YY_CURRENT_BUFFER) {
         return p::make_END(*driver.loc.back());
     }
+
+    yy::location *l = driver.loc.back();
+    driver.loc.pop_back();
+    delete l;
 }
 
 
 {CONFIG_INCLUDE}[ \t]+{CONFIG_VALUE_PATH} {
     std::string err;
     const char *file = strchr(yytext, ' ') + 1;
-    std::string fi = modsecurity::utils::find_resource(file, driver.ref.back(), &err);
+    std::string fi = modsecurity::utils::find_resource(file, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
         driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
@@ -1244,15 +1238,16 @@ EQUALS_MINUS                            (?i:=\-)
     files.reverse();
     for (auto& s: files) {
         std::string err;
-        std::string f = modsecurity::utils::find_resource(s, driver.ref.back(), &err);
+        std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
+        driver.loc.push_back(new yy::location());
+        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(f);
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
+            driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
             throw p::syntax_error(*driver.loc.back(), "");
         }
-        driver.ref.push_back(f);
-        driver.loc.push_back(new yy::location());
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
 }
@@ -1262,7 +1257,7 @@ EQUALS_MINUS                            (?i:=\-)
     const char *file = strchr(yytext, ' ') + 1;
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
-    std::string fi = modsecurity::utils::find_resource(f, driver.ref.back(), &err);
+    std::string fi = modsecurity::utils::find_resource(f, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
         driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
@@ -1271,15 +1266,17 @@ EQUALS_MINUS                            (?i:=\-)
     std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
     files.reverse();
     for (auto& s: files) {
-        std::string f = modsecurity::utils::find_resource(s, driver.ref.back(), &err);
+        std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
+        driver.loc.push_back(new yy::location());
+        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(f);
+
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
+            driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
             throw p::syntax_error(*driver.loc.back(), "");
         }
-        driver.ref.push_back(f.c_str());
-        driver.loc.push_back(new yy::location());
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
     free(f);
@@ -1299,8 +1296,8 @@ EQUALS_MINUS                            (?i:=\-)
     url = conf[2];
     c.setKey(key);
 
-    driver.ref.push_back(url);
     driver.loc.push_back(new yy::location());
+    driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(url);
     YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
     yypush_buffer_state(temp);
 

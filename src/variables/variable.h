@@ -102,7 +102,7 @@ class n : public Variable { \
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class KeyExclusion {
  public:
@@ -665,11 +665,11 @@ class VariableModificatorCount : public Variable {
 };
 
 
-std::string operator+(std::string a, modsecurity::Variables::Variable *v);
-std::string operator+(std::string a, modsecurity::Variables::Variables *v);
+std::string operator+(std::string a, modsecurity::variables::Variable *v);
+std::string operator+(std::string a, modsecurity::variables::Variables *v);
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_VARIABLE_H_

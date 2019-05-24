@@ -467,7 +467,7 @@ end_txn:
 
 void LMDB::resolveMultiMatches(const std::string& var,
     std::vector<const VariableValue *> *l,
-    Variables::KeyExclusions &ke) {
+    variables::KeyExclusions &ke) {
     MDB_val key, data;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
@@ -529,7 +529,7 @@ end_txn:
 
 void LMDB::resolveRegularExpression(const std::string& var,
     std::vector<const VariableValue *> *l,
-    Variables::KeyExclusions &ke) {
+    variables::KeyExclusions &ke) {
     MDB_val key, data;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
