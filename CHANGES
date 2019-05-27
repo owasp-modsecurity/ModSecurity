@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Correct typo validade in log output
+   [Issue #2059 - @nerrehmit]
  - fix/minor: Error encoding hexa decimal.
    [Issue #2068 - @tech-ozon-io]
  - Limit more log variables to 200 characters.
