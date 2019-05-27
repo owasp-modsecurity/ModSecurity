@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 ------------------------------------
 
+ * When the input filter finishes, check whether we returned data
+   [Issue #2091, #2092 - @rainerjung]
  * fix: care non-null terminated chunk data
    [Issue #2097 - @orisano]
  * Fix for apr_global_mutex_create() crashes with mod_security
