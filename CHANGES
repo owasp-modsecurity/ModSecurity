@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Limit more log variables to 200 characters.
+   [@zimmerle - @jleproust]
  - parser: fix parsed file names
    [@zimmerle]
  - Allow empty anchored variable
