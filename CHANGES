@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix variables output in debug logs
+   [Issue #2057 - @jleproust]
  - Correct typo validade in log output
    [Issue #2059 - @nerrehmit]
  - fix/minor: Error encoding hexa decimal.
