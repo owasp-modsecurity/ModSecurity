@@ -1,8 +1,10 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - fix/minor: Error encoding hexa decimal.
+   [Issue #2068 - @tech-ozon-io]
  - Limit more log variables to 200 characters.
-   [@zimmerle - @jleproust]
+   [Issue #2073 - @jleproust]
  - parser: fix parsed file names
    [@zimmerle]
  - Allow empty anchored variable
