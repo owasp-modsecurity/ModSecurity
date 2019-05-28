@@ -257,7 +257,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 }
             }
 
-            if (ruleWithActions) {
+            if (ruleWithActions && t->m_ruleRemoveByTag.empty() == false) {
                 for (auto &z : t->m_ruleRemoveByTag) {
                     if (ruleWithActions->containsTag(z, t) == true) {
                         ms_dbg_a(t, 9, "Skipped rule id '" \
@@ -266,6 +266,9 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                         remove_rule = true;
                         break;
                     }
+                }
+                if (remove_rule) {
+                    continue;
                 }
             }
 
