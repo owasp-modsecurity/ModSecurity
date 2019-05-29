@@ -865,13 +865,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
         char *hmac = NULL, *valid = NULL;
         char *hash_link = NULL, *nlink = NULL;
 
-        if (strlen(pattern) > 252) {
-            *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %s.",
+        *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %.252s.",
                     pattern, var->name);
-        } else {
-            *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%s\" at %s.",
-                    pattern, var->name);
-        }
 
         valid = strstr(target, msr->txcfg->crypto_param_name);
 
@@ -880,13 +875,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             if (msr->txcfg->debuglog_level >= 9)
                 msr_log(msr, 9, "Request URI without hash parameter [%s]", target);
 
-            if (strlen(pattern) > 252) {
-                *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %s. No Hash parameter",
+            *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %.252s. No Hash parameter",
                         pattern, var->name);
-            } else {
-                *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%s\" at %s. No Hash parameter",
-                        pattern, var->name);
-            }
             return 1;
         }   else    {
 
@@ -902,14 +892,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             hash_link = do_hash_link(msr, (char *)nlink, HASH_ONLY);
 
             if(strcmp(hmac, hash_link) != 0)    {
-
-                if (strlen(pattern) > 252) {
-                    *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %s. Hash parameter hash value = [%s] Requested URI hash value = [%s]",
+                *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %.252s. Hash parameter hash value = [%s] Requested URI hash value = [%s]",
                             pattern, var->name, hmac, hash_link);
-                } else {
-                    *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%s\" at %s. Hash parameter hash value = [%s] Requested URI hash value = [%s]",
-                            pattern, var->name, hmac, hash_link);
-                }
                 return 1;
             }
         }
@@ -1183,14 +1167,9 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 #else
         char *pattern = apr_pstrdup(msr->mp, log_escape(msr->mp, regex->pattern ? regex->pattern : "<Unknown Match>"));
 #endif
-        /* This message will be logged. */
-        if (strlen(pattern) > 252) {
-            *error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s ...\" at %s.",
-                    pattern, var->name);
-        } else {
-            *error_msg = apr_psprintf(msr->mp, "Pattern match \"%s\" at %s.",
-                    pattern, var->name);
-        }
+        /* This message will be logged. only the first 252 from the Pattern & the match */
+		*error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s\" at %.252s ....",
+			pattern, var->name);
 
         return 1;
     }
@@ -1428,13 +1407,8 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         char *match_escaped = log_escape(msr->mp, match ? match : "<Unknown Match>");
 
         /* This message will be logged. */
-        if (strlen(match_escaped) > 252) {
-            *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%.252s ...\" at %s.",
+        *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%.252s ...\" at %.252s.",
                     match_escaped, var->name);
-        } else {
-            *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%s\" at %s.",
-                    match_escaped, var->name);
-        }
 
         /* Handle capture as tx.0=match */
         if (capture) {
