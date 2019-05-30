@@ -1,6 +1,9 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds a new operator verifySVNR that checks for Austrian social
+   security numbers.
+   [Issue #2063 - @Rufus125]
  - Fix variables output in debug logs
    [Issue #2057 - @jleproust]
  - Correct typo validade in log output
