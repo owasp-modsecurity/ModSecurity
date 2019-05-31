@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix SecRuleUpdateTargetById does not match regular expressions
+   [Issue #1872 - @zimmerle, @anush-cr, @victorhora, @j0k2r]  
  - Adds missing check for runtime ctl:ruleRemoveByTag
    [Issue #2102, #2099 - @airween]
  - Adds a new operator verifySVNR that checks for Austrian social
