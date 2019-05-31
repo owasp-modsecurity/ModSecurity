@@ -155,7 +155,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRuleUpdateTargetByTag test !ARGS:'/ke/'",
+      "SecRuleUpdateTargetByTag test !ARGS:/ke/",
       "SecRule ARGS \"@contains value\" \"id:1,pass,t:trim,tag:'test',deny\""
     ]
   }

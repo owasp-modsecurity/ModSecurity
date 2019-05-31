@@ -433,8 +433,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 /* %% [3.0] code to copy yytext_ptr to yytext[] goes here, if %array \ */\
 	(yy_c_buf_p) = yy_cp;
 /* %% [4.0] data tables for the DFA and the user's section 1 definitions go here */
-#define YY_NUM_RULES 537
-#define YY_END_OF_BUFFER 538
+#define YY_NUM_RULES 538
+#define YY_END_OF_BUFFER 539
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -451,108 +451,108 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,  282,  282,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,  538,  530,  524,  263,  267,  268,
-      266,  269,  530,  530,  530,  530,  530,  530,  530,  530,
-      530,  530,  530,  530,  530,  286,  286,  537,  286,  286,
+        0,    0,    0,    0,  539,  531,  525,  263,  267,  268,
+      266,  269,  531,  531,  531,  531,  531,  531,  531,  531,
+      531,  531,  531,  531,  531,  286,  286,  538,  286,  286,
 
       286,  286,  286,  286,  286,  286,  286,  286,  286,  286,
       286,  286,  286,  286,  286,  286,  125,  270,  276,  278,
-      280,  274,  273,  275,  272,  278,  271,  488,  488,  487,
-      488,  488,  488,  120,  119,  118,  127,  127,  127,  134,
+      280,  274,  273,  275,  272,  278,  271,  489,  489,  488,
+      489,  489,  489,  120,  119,  118,  127,  127,  127,  134,
       126,  127,  129,  129,  129,  128,  134,  129,  132,  132,
-      132,  131,  134,  130,  132,  529,  529,  529,  537,  490,
-      489,  440,  443,  537,  443,  440,  440,  440,  430,  430,
-      430,  433,  435,  430,  434,  430,  424,  430,  498,  498,
-      498,  497,  502,  498,  500,  500,  500,  499,  502,  500,
+      132,  131,  134,  130,  132,  530,  530,  530,  538,  491,
+      490,  441,  444,  538,  444,  441,  441,  441,  430,  430,
+      430,  433,  435,  430,  434,  430,  424,  430,  499,  499,
+      499,  498,  503,  499,  501,  501,  501,  500,  503,  501,
       117,  117,  109,  117,  114,  108,  117,  117,  117,  117,
 
       117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
-      117,  117,  117,  117,  112,  117,  111,  537,  507,  537,
-      503,  516,  537,  282,  283,  537,  494,  494,  493,  496,
-      494,  492,  492,  491,  496,  492,  149,  531,  532,  533,
+      117,  117,  117,  117,  112,  117,  111,  538,  508,  538,
+      504,  517,  538,  282,  283,  538,  495,  495,  494,  497,
+      495,  493,  493,  492,  497,  493,  149,  532,  533,  534,
       136,  135,  136,  136,  136,  136,  136,  136,  140,  139,
       144,  145,  145,  144,  142,  141,  139,  147,  148,  148,
-      146,  147,  524,  263,    0,  266,  266,  266,    0,    0,
+      146,  147,  525,  263,    0,  266,  266,  266,    0,    0,
         0,    0,    0,    0,    0,    0,  215,    0,    0,    0,
-        0,    0,  525,    0,    0,    0,    0,    0,    0,    0,
+        0,    0,  526,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,  409,    0,    0,    0,
 
         0,    0,    0,    0,    0,    0,    0,    0,  414,    0,
         0,    0,    0,    0,  121,    0,  124,  270,  276,  278,
-      280,  277,  278,  279,  280,  281,  524,    0,    0,    0,
+      280,  277,  278,  279,  280,  281,  525,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,  127,    0,  127,  127,  127,
         0,  133,  121,  127,  127,  129,    0,    0,  129,  129,
       129,    0,  129,  121,  129,  132,    0,    0,  132,  132,
-      132,    0,  132,  121,  132,  529,  529,  529,    0,  527,
-      529,  440,    0,  440,    0,  440,  440,    0,  440,  440,
-      430,    0,    0,  429,  430,  430,  430,    0,  430,  501,
+      132,    0,  132,  121,  132,  530,  530,  530,    0,  528,
+      530,  441,    0,  441,    0,  441,  441,    0,  441,  441,
+      430,    0,    0,  429,  430,  430,  430,    0,  430,  502,
 
       430,  430,    0,  429,    0,  430,  422,  423,  430,  430,
-      498,    0,    0,  498,  498,  498,    0,  498,  121,  498,
-      500,    0,  500,  500,    0,  500,    0,    0,  121,  500,
-      500,    0,  109,    0,  108,    0,  110,  114,  115,    0,
+      499,    0,    0,  499,  499,  499,    0,  499,  121,  499,
+      501,    0,  501,  501,    0,  501,    0,    0,  121,  501,
+      501,    0,  109,    0,  108,    0,  110,  114,  115,    0,
       108,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
       105,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,  106,    0,    0,  112,    0,  113,  111,
-      111,    0,  507,    0,  516,    0,  507,  505,  515,    0,
-      503,  516,    0,    0,  523,    0,  506,    0,  282,  283,
+      111,    0,  508,    0,  517,    0,  508,  506,  516,    0,
+      504,  517,    0,    0,  524,    0,  507,    0,  282,  283,
 
-        0,  283,    0,    0,  494,    0,  494,    0,  495,  494,
-      492,    0,    0,  492,    0,  492,  531,  532,  533,    0,
+        0,  283,    0,    0,  495,    0,  495,    0,  496,  495,
+      493,    0,    0,  493,    0,  493,  532,  533,  534,    0,
         0,    0,    0,    0,    0,  137,  138,  144,    0,    0,
       144,    0,  144,  143,  147,    0,    0,  147,    0,  147,
       266,    0,    0,    0,    0,    0,    0,    0,  214,    0,
-        0,    0,    0,    0,    0,    0,  525,  526,    0,    0,
+        0,    0,    0,    0,    0,    0,  526,  527,    0,    0,
         0,  392,    0,    0,  382,    0,    0,    0,  417,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,  420,    0,    0,    0,    0,  390,  121,
-      122,  123,    0,    0,    0,    0,  461,    0,  462,    0,
+      122,  123,    0,    0,    0,    0,  462,    0,  463,    0,
 
-      463,    0,    0,  466,  467,  469,    0,    0,  471,    0,
-        0,    0,    0,    0,    0,  462,    0,    0,    0,  127,
+      464,    0,    0,  467,  468,  470,    0,    0,  472,    0,
+        0,    0,    0,    0,    0,  463,    0,    0,    0,  127,
         0,    0,  121,  122,    0,  129,    0,    0,  121,  122,
-        0,  132,    0,    0,  121,  122,  527,  528,  440,    0,
-      440,    0,  440,    0,    0,    0,  440,    0,  430,    0,
+        0,  132,    0,    0,  121,  122,  528,  529,  441,    0,
+      441,    0,  436,    0,  436,    0,  441,    0,  430,    0,
         0,  430,    0,  429,    0,  430,  430,  430,  430,  430,
-        0,    0,    0,    0,  430,  430,  430,    0,  498,    0,
-        0,  121,  122,    0,  500,    0,    0,  121,  121,  122,
+        0,    0,    0,    0,  430,  430,  430,    0,  499,    0,
+        0,  121,  122,    0,  501,    0,    0,  121,  121,  122,
       116,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    9,    0,    0,
 
         0,    0,    0,  104,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,  106,  107,  505,  515,  511,  514,    0,  518,
-        0,    0,  523,    0,    0,  506,  504,  513,    0,    0,
-      284,    0,    0,  494,    0,    0,    0,  492,    0,    0,
+        0,    0,  106,  107,  506,  516,  512,  515,    0,  519,
+        0,    0,  524,    0,    0,  507,  505,  514,    0,    0,
+      284,    0,    0,  495,    0,    0,    0,  493,    0,    0,
         0,    0,    0,    0,    0,  144,    0,    0,    0,  147,
         0,    0,  266,    0,    0,    0,    0,    0,  168,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,  221,
 
-      526,  358,    0,    0,  393,    0,    0,  383,    0,    0,
+      527,  358,    0,    0,  393,    0,    0,  383,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,  386,    0,    0,    0,  405,    0,    0,  415,
         0,    0,  391,  122,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,  468,  470,    0,    0,    0,    0,    0,
+        0,    0,    0,  469,  471,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,  127,    0,  122,  129,    0,
-      122,  132,    0,  122,  528,  440,    0,    0,    0,    0,
-      440,    0,    0,  436,  441,  437,  436,  441,  437,  430,
+      122,  132,    0,  122,  529,  441,    0,    0,    0,    0,
+      441,    0,    0,  437,  442,  438,  437,  442,  438,  430,
         0,  430,  430,  430,    0,  430,    0,    0,    0,    0,
       430,    0,  429,    0,  430,  430,  425,  431,  426,  425,
 
-      431,  426,    0,    0,  430,  430,  498,    0,  122,  500,
+      431,  426,    0,    0,  430,  430,  499,    0,  122,  501,
         0,  122,  122,    0,    0,    0,    0,    0,    0,    0,
         0,    5,    0,    0,    7,    0,    0,    0,    8,    0,
         0,    0,   49,    0,    0,    0,   13,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,   63,    0,    0,  107,  511,  514,  510,  518,
-        0,  521,    0,    0,  517,    0,    0,  504,  513,  509,
-      512,  284,    0,  285,  494,    0,  492,    0,    0,    0,
+        0,    0,   63,    0,    0,  107,  512,  515,  511,  519,
+        0,  522,    0,    0,  518,    0,    0,  505,  514,  510,
+      513,  284,    0,  285,  495,    0,  493,    0,    0,    0,
 
         0,    0,  144,    0,  147,    0,  266,  266,  211,    0,
         0,  213,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -562,10 +562,10 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,  387,    0,    0,    0,    0,
         0,    0,  421,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,  486,    0,    0,    0,
+        0,    0,    0,    0,    0,    0,  487,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 
-        0,    0,    0,  438,  438,  438,    0,    0,  427,  427,
+        0,    0,    0,  439,  439,  439,    0,    0,  427,  427,
         0,    0,    0,  430,  430,    0,  427,    0,  430,    0,
         0,    0,    0,    0,    0,    0,   26,    0,    0,    2,
         0,    4,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -573,8 +573,8 @@ static const flex_int16_t yy_accept[3914] =
         0,   53,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,   75,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,  510,  521,    0,
-      522,  517,    0,  519,    0,  509,  512,  508,  285,    0,
+        0,    0,    0,    0,    0,    0,    0,  511,  522,    0,
+      523,  518,    0,  520,    0,  510,  513,  509,  285,    0,
 
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
       266,  266,    0,    0,    0,  169,    0,    0,  218,    0,
@@ -587,16 +587,16 @@ static const flex_int16_t yy_accept[3914] =
       412,    0,    0,    0,    0,    0,    0,    0,    0,    0,
       356,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 
-        0,    0,    0,  472,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,  442,  439,  442,  439,  432,  428,  432,
+        0,    0,    0,  473,    0,    0,    0,    0,    0,    0,
+        0,    0,    0,  443,  440,  443,  440,  432,  428,  432,
       428,    0,  427,    0,    0,    0,  430,    0,    0,    0,
         1,    0,    0,    0,    0,    0,    0,    0,    0,   41,
        41,    0,    8,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,   62,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,   84,    0,    0,    0,    0,   74,    0,
-       92,    0,    0,    0,    0,    0,    0,    0,    0,  522,
-      519,    0,  520,  508,    0,    0,    0,  266,  266,    0,
+       92,    0,    0,    0,    0,    0,    0,    0,    0,  523,
+      520,    0,  521,  509,    0,    0,    0,  266,  266,    0,
 
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -607,7 +607,7 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,    0,  411,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,  457,    0,    0,    0,    0,
+        0,    0,    0,    0,    0,  458,    0,    0,    0,    0,
 
         0,    0,    0,    0,    0,    0,    0,    3,    0,    0,
         0,    0,    0,    0,   41,    0,   41,   41,    0,    0,
@@ -615,7 +615,7 @@ static const flex_int16_t yy_accept[3914] =
        52,    0,   54,   22,   55,   56,   58,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,   64,    0,    0,   65,  520,    0,    0,  266,
+        0,    0,   64,    0,    0,   65,  521,    0,    0,  266,
       266,    0,    0,    0,  216,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -627,7 +627,7 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,    0,    0,  410,    0,
         0,    0,    0,  419,    0,    0,  398,    0,    0,  401,
       402,  403,    0,    0,    0,    0,  357,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,  465,    0,    0,
+        0,    0,    0,    0,    0,    0,    0,  466,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,   27,    0,    0,    0,    0,    0,    0,
 
@@ -636,7 +636,7 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,   23,    0,    0,    0,    0,    0,    0,    0,
         0,    0,   97,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,   64,    0,  266,  266,    0,
-        0,    0,    0,  534,    0,    0,  259,    0,    0,    0,
+        0,    0,    0,  535,    0,    0,  259,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -647,8 +647,8 @@ static const flex_int16_t yy_accept[3914] =
       322,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,  418,    0,    0,    0,
         0,  353,    0,    0,  400,  406,  404,  354,    0,    0,
-        0,  459,    0,    0,  460,    0,    0,    0,    0,  464,
-        0,  473,    0,    0,  481,    0,    0,    0,    0,    0,
+        0,  460,    0,    0,  461,    0,    0,    0,    0,  465,
+        0,  474,    0,    0,  482,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,   40,    0,   40,    0,    0,    0,    0,
         0,    0,   50,    0,    0,    0,    0,    0,    0,   51,
@@ -668,8 +668,8 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,  399,    0,    0,    0,    0,    0,    0,
-      476,    0,  485,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,  482,  483,    0,    0,    0,    0,    0,    0,
+      477,    0,  486,    0,    0,    0,    0,    0,    0,    0,
+        0,    0,  483,  484,    0,    0,    0,    0,    0,    0,
        25,    0,   25,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,   46,   48,    0,   48,   10,   11,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -678,7 +678,7 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,    0,    0,   90,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,   93,    0,    0,    0,    0,    0,  266,    0,  264,
-      264,  264,  264,  264,    0,  535,    0,    0,    0,    0,
+      264,  264,  264,  264,    0,  536,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,  190,    0,    0,    0,    0,    0,    0,
@@ -690,9 +690,9 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,  324,  325,  326,  397,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
       342,    0,    0,    0,    0,    0,  350,  351,  352,  413,
-        0,    0,  474,    0,    0,  448,  445,    0,    0,  468,
-        0,    0,    0,    0,    0,    0,    0,  484,    0,    0,
-      454,    0,  451,    0,    0,    0,    0,   25,    0,    0,
+        0,    0,  475,    0,    0,  449,  446,    0,    0,  469,
+        0,    0,    0,    0,    0,    0,    0,  485,    0,    0,
+      455,    0,  452,    0,    0,    0,    0,   25,    0,    0,
         0,   26,    0,    0,    0,    0,    0,    0,    0,    0,
         0,   44,   44,    0,    0,   48,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,   17,    0,    0,    0,
@@ -713,8 +713,8 @@ static const flex_int16_t yy_accept[3914] =
       394,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,  323,    0,    0,    0,  334,    0,
         0,    0,  338,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,  447,  475,    0,    0,    0,  478,
-        0,    0,    0,    0,    0,  453,    0,    0,    0,    0,
+        0,    0,    0,    0,  448,  476,    0,    0,    0,  479,
+        0,    0,    0,    0,    0,  454,    0,    0,    0,    0,
        24,    0,    0,   24,    0,    0,    0,    0,    0,    0,
         0,    0,    6,    0,   44,   44,    0,   44,    0,   44,
        44,    0,    0,   47,    0,    0,   47,    0,    0,    0,
@@ -735,7 +735,7 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,  328,    0,    0,    0,    0,
         0,    0,    0,    0,    0,  343,    0,    0,    0,    0,
-        0,    0,  458,    0,    0,    0,  479,    0,    0,    0,
+        0,    0,  459,    0,    0,    0,  480,    0,    0,    0,
         0,    0,    0,   24,   25,   26,    0,    0,    0,    0,
         0,    0,  103,   44,   43,   44,   44,   43,    0,    0,
        44,   43,    0,    0,   44,   43,   44,   44,   45,   47,
@@ -775,7 +775,7 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,    0,  376,    0,  378,
 
         0,  341,    0,    0,    0,  349,    0,    0,    0,    0,
-        0,  480,    0,    0,    0,    0,    0,    0,    0,    0,
+        0,  481,    0,    0,    0,    0,    0,    0,    0,    0,
         0,   35,    0,    0,   42,   44,   42,    0,   44,   42,
         0,    0,   42,   44,    0,   42,    0,   42,   45,   45,
        42,   45,   26,    0,   18,    0,    0,    0,    0,    0,
@@ -791,7 +791,7 @@ static const flex_int16_t yy_accept[3914] =
       396,    0,    0,  299,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
       332,    0,  377,    0,  335,  379,    0,  340,    0,  380,
-        0,  355,    0,  464,    0,    0,    0,    0,    0,    0,
+        0,  355,    0,  465,    0,    0,    0,    0,    0,    0,
         0,   28,    0,    0,    0,    0,    0,    0,   42,   42,
         0,   42,    0,   44,    0,   42,   45,   43,   45,   45,
         0,    0,    0,    0,    0,    0,    0,    0,    0,   60,
@@ -811,12 +811,12 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,   60,    0,   72,    0,   76,
         0,    0,    0,    0,    0,  101,    0,    0,    0,    0,
       164,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-      176,    0,  246,    0,    0,    0,  536,    0,    0,    0,
+      176,    0,  246,    0,    0,    0,  537,    0,    0,    0,
         0,    0,    0,    0,    0,  252,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,  205,    0,
       287,    0,  369,    0,  298,  370,    0,    0,    0,    0,
       308,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,  477,    0,
+        0,    0,    0,    0,    0,    0,    0,    0,  478,    0,
 
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,   43,    0,    0,    0,    0,    0,   60,    0,   89,
@@ -835,8 +835,8 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,  193,  193,    0,  195,  195,    0,    0,
         0,    0,    0,    0,    0,    0,    0,  209,  222,    0,
         0,    0,  304,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,  446,
-        0,    0,    0,  452,    0,    0,   29,    0,    0,    0,
+        0,    0,    0,    0,    0,    0,    0,    0,    0,  447,
+        0,    0,    0,  453,    0,    0,   29,    0,    0,    0,
        36,    0,    0,   19,    0,    0,   85,   99,    0,    0,
       162,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 
@@ -844,14 +844,14 @@ static const flex_int16_t yy_accept[3914] =
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
       191,    0,    0,    0,  305,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,  384,  336,    0,  345,    0,
-      449,    0,    0,  455,    0,    0,    0,    0,   37,    0,
+      450,    0,    0,  456,    0,    0,    0,    0,   37,    0,
        20,    0,  160,  225,  225,    0,  160,  156,    0,    0,
         0,  261,    0,  249,    0,  228,    0,    0,    0,    0,
         0,    0,    0,  186,    0,    0,  194,  196,    0,    0,
         0,    0,  151,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,  312,    0,    0,    0,  319,    0,
 
-        0,  385,  337,    0,  346,  450,    0,  456,    0,   34,
+        0,  385,  337,    0,  346,  451,    0,  457,    0,   34,
         0,    0,   21,    0,    0,    0,  157,    0,    0,  250,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,  151,    0,    0,  206,    0,    0,  303,
@@ -4994,7 +4994,7 @@ static char *yy_last_accepting_cpos;
 extern int yy_flex_debug;
 int yy_flex_debug = 1;
 
-static const flex_int16_t yy_rule_linenum[537] =
+static const flex_int16_t yy_rule_linenum[538] =
     {   0,
       503,  504,  505,  506,  507,  508,  509,  510,  511,  512,
       513,  514,  515,  516,  517,  518,  519,  520,  521,  522,
@@ -5044,17 +5044,17 @@ static const flex_int16_t yy_rule_linenum[537] =
      1018, 1019, 1020, 1021, 1022, 1026, 1027, 1028, 1029, 1030,
      1031, 1036, 1037, 1038, 1039, 1040, 1041, 1042, 1043, 1044,
      1046, 1047, 1048, 1049, 1050, 1055, 1056, 1057, 1058, 1059,
-     1061, 1062, 1064, 1065, 1071, 1072, 1073, 1074, 1075, 1076,
-     1079, 1080, 1081, 1082, 1083, 1084, 1088, 1089, 1090, 1091,
+     1060, 1062, 1063, 1065, 1066, 1072, 1073, 1074, 1075, 1076,
+     1077, 1080, 1081, 1082, 1083, 1084, 1085, 1089, 1090, 1091,
      1092, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 1101,
      1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110, 1111,
-     1112, 1113, 1114, 1115, 1116, 1117, 1119, 1120, 1125, 1129,
-     1133, 1134, 1138, 1139, 1142, 1143, 1147, 1148, 1152, 1153,
+     1112, 1113, 1114, 1115, 1116, 1117, 1118, 1120, 1121, 1126,
+     1130, 1134, 1135, 1139, 1140, 1143, 1144, 1148, 1149, 1153,
 
-     1157, 1158, 1163, 1165, 1166, 1167, 1168, 1170, 1171, 1172,
-     1173, 1175, 1176, 1177, 1178, 1180, 1182, 1183, 1185, 1186,
-     1187, 1188, 1190, 1195, 1196, 1197, 1201, 1202, 1203, 1208,
-     1210, 1211, 1212, 1231, 1258, 1288
+     1154, 1158, 1159, 1164, 1166, 1167, 1168, 1169, 1171, 1172,
+     1173, 1174, 1176, 1177, 1178, 1179, 1181, 1183, 1184, 1186,
+     1187, 1188, 1189, 1191, 1196, 1197, 1198, 1202, 1203, 1204,
+     1209, 1211, 1212, 1213, 1232, 1259, 1289
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -5524,13 +5524,13 @@ do_action:	/* This label is used only to access EOF actions. */
 			{
 			if ( yy_act == 0 )
 				fprintf( stderr, "--scanner backing up\n" );
-			else if ( yy_act < 537 )
+			else if ( yy_act < 538 )
 				fprintf( stderr, "--accepting rule at line %ld (\"%s\")\n",
 				         (long)yy_rule_linenum[yy_act], yytext );
-			else if ( yy_act == 537 )
+			else if ( yy_act == 538 )
 				fprintf( stderr, "--accepting default rule (\"%s\")\n",
 				         yytext );
-			else if ( yy_act == 538 )
+			else if ( yy_act == 539 )
 				fprintf( stderr, "--(end of buffer or a NUL)\n" );
 			else
 				fprintf( stderr, "--EOF (start condition %d)\n", YY_START );
@@ -7838,7 +7838,7 @@ case 436:
 /* rule 436 can match eol */
 YY_RULE_SETUP
 #line 1055 "seclang-scanner.ll"
-{ BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
+{ BEGIN_PREVIOUS(); yyless(yyleng); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 437:
 /* rule 437 can match eol */
@@ -7850,370 +7850,370 @@ case 438:
 /* rule 438 can match eol */
 YY_RULE_SETUP
 #line 1057 "seclang-scanner.ll"
-{ BEGIN_PREVIOUS(); yyless(yyleng - 0); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
+{ BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 439:
 /* rule 439 can match eol */
 YY_RULE_SETUP
 #line 1058 "seclang-scanner.ll"
-{ BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
+{ BEGIN_PREVIOUS(); yyless(yyleng - 0); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 440:
 /* rule 440 can match eol */
 YY_RULE_SETUP
 #line 1059 "seclang-scanner.ll"
-{ BEGIN_PREVIOUS(); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
+{ BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 441:
 /* rule 441 can match eol */
 YY_RULE_SETUP
-#line 1061 "seclang-scanner.ll"
-{ BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
+#line 1060 "seclang-scanner.ll"
+{ BEGIN_PREVIOUS(); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 442:
 /* rule 442 can match eol */
 YY_RULE_SETUP
 #line 1062 "seclang-scanner.ll"
-{ BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
+{ BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 443:
+/* rule 443 can match eol */
 YY_RULE_SETUP
-#line 1064 "seclang-scanner.ll"
-{ BEGINX(LEXING_ERROR_ACTION); yyless(0); }
+#line 1063 "seclang-scanner.ll"
+{ BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 444:
 YY_RULE_SETUP
 #line 1065 "seclang-scanner.ll"
+{ BEGINX(LEXING_ERROR_ACTION); yyless(0); }
+	YY_BREAK
+case 445:
+YY_RULE_SETUP
+#line 1066 "seclang-scanner.ll"
 { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
-case 445:
-YY_RULE_SETUP
-#line 1071 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(*driver.loc.back()); }
-	YY_BREAK
 case 446:
 YY_RULE_SETUP
 #line 1072 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(*driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(*driver.loc.back()); }
 	YY_BREAK
 case 447:
 YY_RULE_SETUP
 #line 1073 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(*driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(*driver.loc.back()); }
 	YY_BREAK
 case 448:
 YY_RULE_SETUP
 #line 1074 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(*driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(*driver.loc.back()); }
 	YY_BREAK
 case 449:
 YY_RULE_SETUP
 #line 1075 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(*driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(*driver.loc.back()); }
 	YY_BREAK
 case 450:
 YY_RULE_SETUP
 #line 1076 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(*driver.loc.back()); }
+	YY_BREAK
+case 451:
+YY_RULE_SETUP
+#line 1077 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(*driver.loc.back()); }
 	YY_BREAK
 
 
-case 451:
-YY_RULE_SETUP
-#line 1079 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(*driver.loc.back()); }
-	YY_BREAK
 case 452:
 YY_RULE_SETUP
 #line 1080 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(*driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(*driver.loc.back()); }
 	YY_BREAK
 case 453:
 YY_RULE_SETUP
 #line 1081 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(*driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(*driver.loc.back()); }
 	YY_BREAK
 case 454:
 YY_RULE_SETUP
 #line 1082 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(*driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(*driver.loc.back()); }
 	YY_BREAK
 case 455:
 YY_RULE_SETUP
 #line 1083 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(*driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(*driver.loc.back()); }
 	YY_BREAK
 case 456:
 YY_RULE_SETUP
 #line 1084 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(*driver.loc.back()); }
+	YY_BREAK
+case 457:
+YY_RULE_SETUP
+#line 1085 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(*driver.loc.back()); }
 	YY_BREAK
 
 
-case 457:
-YY_RULE_SETUP
-#line 1088 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_WITHIN(*driver.loc.back()); }
-	YY_BREAK
 case 458:
 YY_RULE_SETUP
 #line 1089 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS_WORD(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_WITHIN(*driver.loc.back()); }
 	YY_BREAK
 case 459:
 YY_RULE_SETUP
 #line 1090 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS_WORD(*driver.loc.back()); }
 	YY_BREAK
 case 460:
 YY_RULE_SETUP
 #line 1091 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_ENDS_WITH(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS(*driver.loc.back()); }
 	YY_BREAK
 case 461:
 YY_RULE_SETUP
 #line 1092 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_EQ(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_ENDS_WITH(*driver.loc.back()); }
 	YY_BREAK
 case 462:
 YY_RULE_SETUP
 #line 1093 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_GE(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_EQ(*driver.loc.back()); }
 	YY_BREAK
 case 463:
 YY_RULE_SETUP
 #line 1094 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_GT(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_GE(*driver.loc.back()); }
 	YY_BREAK
 case 464:
 YY_RULE_SETUP
 #line 1095 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH_FROM_FILE(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_GT(*driver.loc.back()); }
 	YY_BREAK
 case 465:
 YY_RULE_SETUP
 #line 1096 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH_FROM_FILE(*driver.loc.back()); }
 	YY_BREAK
 case 466:
 YY_RULE_SETUP
 #line 1097 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_LE(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH(*driver.loc.back()); }
 	YY_BREAK
 case 467:
 YY_RULE_SETUP
 #line 1098 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_LT(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_LE(*driver.loc.back()); }
 	YY_BREAK
 case 468:
 YY_RULE_SETUP
 #line 1099 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_PM_FROM_FILE(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_LT(*driver.loc.back()); }
 	YY_BREAK
 case 469:
 YY_RULE_SETUP
 #line 1100 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_PM(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_PM_FROM_FILE(*driver.loc.back()); }
 	YY_BREAK
 case 470:
 YY_RULE_SETUP
 #line 1101 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_RBL( *driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_PM(*driver.loc.back()); }
 	YY_BREAK
 case 471:
 YY_RULE_SETUP
 #line 1102 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_RX(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_RBL( *driver.loc.back()); }
 	YY_BREAK
 case 472:
 YY_RULE_SETUP
 #line 1103 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_STR_EQ(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_RX(*driver.loc.back()); }
 	YY_BREAK
 case 473:
 YY_RULE_SETUP
 #line 1104 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_STR_MATCH(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_STR_EQ(*driver.loc.back()); }
 	YY_BREAK
 case 474:
 YY_RULE_SETUP
 #line 1105 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_BEGINS_WITH(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_STR_MATCH(*driver.loc.back()); }
 	YY_BREAK
 case 475:
 YY_RULE_SETUP
 #line 1106 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_INSPECT_FILE(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_BEGINS_WITH(*driver.loc.back()); }
 	YY_BREAK
 case 476:
 YY_RULE_SETUP
 #line 1107 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_FUZZY_HASH(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_INSPECT_FILE(*driver.loc.back()); }
 	YY_BREAK
 case 477:
 YY_RULE_SETUP
 #line 1108 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_BYTE_RANGE(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_FUZZY_HASH(*driver.loc.back()); }
 	YY_BREAK
 case 478:
 YY_RULE_SETUP
 #line 1109 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_DTD(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_BYTE_RANGE(*driver.loc.back()); }
 	YY_BREAK
 case 479:
 YY_RULE_SETUP
 #line 1110 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_HASH(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_DTD(*driver.loc.back()); }
 	YY_BREAK
 case 480:
 YY_RULE_SETUP
 #line 1111 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_SCHEMA(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_HASH(*driver.loc.back()); }
 	YY_BREAK
 case 481:
 YY_RULE_SETUP
 #line 1112 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CC(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_SCHEMA(*driver.loc.back()); }
 	YY_BREAK
 case 482:
 YY_RULE_SETUP
 #line 1113 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CPF(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CC(*driver.loc.back()); }
 	YY_BREAK
 case 483:
 YY_RULE_SETUP
 #line 1114 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SSN(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CPF(*driver.loc.back()); }
 	YY_BREAK
 case 484:
 YY_RULE_SETUP
 #line 1115 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SVNR(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SSN(*driver.loc.back()); }
 	YY_BREAK
 case 485:
 YY_RULE_SETUP
 #line 1116 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_GSB_LOOKUP(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SVNR(*driver.loc.back()); }
 	YY_BREAK
 case 486:
 YY_RULE_SETUP
 #line 1117 "seclang-scanner.ll"
-{ BEGIN_PARAMETER(); return p::make_OPERATOR_RSUB(*driver.loc.back()); }
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_GSB_LOOKUP(*driver.loc.back()); }
 	YY_BREAK
 case 487:
 YY_RULE_SETUP
-#line 1119 "seclang-scanner.ll"
-{ return p::make_NOT(*driver.loc.back()); }
+#line 1118 "seclang-scanner.ll"
+{ BEGIN_PARAMETER(); return p::make_OPERATOR_RSUB(*driver.loc.back()); }
 	YY_BREAK
 case 488:
 YY_RULE_SETUP
 #line 1120 "seclang-scanner.ll"
-{ BEGIN_NO_OP_INFORMED(); yyless(0); }
+{ return p::make_NOT(*driver.loc.back()); }
 	YY_BREAK
-
-
 case 489:
 YY_RULE_SETUP
-#line 1125 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_PARAMETER_ENDS_WITH_SPACE); }
+#line 1121 "seclang-scanner.ll"
+{ BEGIN_NO_OP_INFORMED(); yyless(0); }
 	YY_BREAK
 
 
 case 490:
 YY_RULE_SETUP
-#line 1129 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_PARAMETER_ENDS_WITH_QUOTE); }
+#line 1126 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_PARAMETER_ENDS_WITH_SPACE); }
 	YY_BREAK
 
 
 case 491:
 YY_RULE_SETUP
-#line 1133 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
+#line 1130 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_PARAMETER_ENDS_WITH_QUOTE); }
 	YY_BREAK
+
+
 case 492:
-/* rule 492 can match eol */
 YY_RULE_SETUP
 #line 1134 "seclang-scanner.ll"
-{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
-	YY_BREAK
-
-
-case 493:
-YY_RULE_SETUP
-#line 1138 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
-case 494:
-/* rule 494 can match eol */
+case 493:
+/* rule 493 can match eol */
 YY_RULE_SETUP
-#line 1139 "seclang-scanner.ll"
+#line 1135 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
-case 495:
+case 494:
 YY_RULE_SETUP
-#line 1142 "seclang-scanner.ll"
-{ BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+#line 1139 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
+case 495:
+/* rule 495 can match eol */
+YY_RULE_SETUP
+#line 1140 "seclang-scanner.ll"
+{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+	YY_BREAK
+
+
 case 496:
 YY_RULE_SETUP
 #line 1143 "seclang-scanner.ll"
+{ BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+	YY_BREAK
+case 497:
+YY_RULE_SETUP
+#line 1144 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR); yyless(0); }
 	YY_BREAK
 
 
-case 497:
-YY_RULE_SETUP
-#line 1147 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-	YY_BREAK
 case 498:
-/* rule 498 can match eol */
 YY_RULE_SETUP
 #line 1148 "seclang-scanner.ll"
-{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
-	YY_BREAK
-
-
-case 499:
-YY_RULE_SETUP
-#line 1152 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
-case 500:
-/* rule 500 can match eol */
+case 499:
+/* rule 499 can match eol */
 YY_RULE_SETUP
-#line 1153 "seclang-scanner.ll"
+#line 1149 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
-case 501:
+case 500:
 YY_RULE_SETUP
-#line 1157 "seclang-scanner.ll"
-{ BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+#line 1153 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
+case 501:
+/* rule 501 can match eol */
+YY_RULE_SETUP
+#line 1154 "seclang-scanner.ll"
+{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+	YY_BREAK
+
+
 case 502:
 YY_RULE_SETUP
 #line 1158 "seclang-scanner.ll"
+{ BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+	YY_BREAK
+case 503:
+YY_RULE_SETUP
+#line 1159 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR_VARIABLE); yyless(0); }
 	YY_BREAK
 
 
-case 503:
-YY_RULE_SETUP
-#line 1163 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
-	YY_BREAK
 case 504:
-/* rule 504 can match eol */
 YY_RULE_SETUP
-#line 1165 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+#line 1164 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 505:
 /* rule 505 can match eol */
@@ -8225,7 +8225,7 @@ case 506:
 /* rule 506 can match eol */
 YY_RULE_SETUP
 #line 1167 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 507:
 /* rule 507 can match eol */
@@ -8236,8 +8236,8 @@ YY_RULE_SETUP
 case 508:
 /* rule 508 can match eol */
 YY_RULE_SETUP
-#line 1170 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+#line 1169 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 509:
 /* rule 509 can match eol */
@@ -8260,8 +8260,8 @@ YY_RULE_SETUP
 case 512:
 /* rule 512 can match eol */
 YY_RULE_SETUP
-#line 1175 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+#line 1174 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 513:
 /* rule 513 can match eol */
@@ -8282,15 +8282,15 @@ YY_RULE_SETUP
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 516:
+/* rule 516 can match eol */
 YY_RULE_SETUP
-#line 1180 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+#line 1179 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 517:
-/* rule 517 can match eol */
 YY_RULE_SETUP
-#line 1182 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+#line 1181 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 518:
 /* rule 518 can match eol */
@@ -8301,7 +8301,7 @@ YY_RULE_SETUP
 case 519:
 /* rule 519 can match eol */
 YY_RULE_SETUP
-#line 1185 "seclang-scanner.ll"
+#line 1184 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 520:
@@ -8323,22 +8323,22 @@ YY_RULE_SETUP
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 523:
+/* rule 523 can match eol */
 YY_RULE_SETUP
-#line 1190 "seclang-scanner.ll"
+#line 1189 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+	YY_BREAK
+case 524:
+YY_RULE_SETUP
+#line 1191 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 
 
-case 524:
-YY_RULE_SETUP
-#line 1195 "seclang-scanner.ll"
-{  }
-	YY_BREAK
 case 525:
-/* rule 525 can match eol */
 YY_RULE_SETUP
 #line 1196 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); }
+{  }
 	YY_BREAK
 case 526:
 /* rule 526 can match eol */
@@ -8346,14 +8346,14 @@ YY_RULE_SETUP
 #line 1197 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
-
-
 case 527:
 /* rule 527 can match eol */
 YY_RULE_SETUP
-#line 1201 "seclang-scanner.ll"
+#line 1198 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
+
+
 case 528:
 /* rule 528 can match eol */
 YY_RULE_SETUP
@@ -8364,27 +8364,33 @@ case 529:
 /* rule 529 can match eol */
 YY_RULE_SETUP
 #line 1203 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); }
+	YY_BREAK
+case 530:
+/* rule 530 can match eol */
+YY_RULE_SETUP
+#line 1204 "seclang-scanner.ll"
 { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
-case 530:
-YY_RULE_SETUP
-#line 1208 "seclang-scanner.ll"
-{ BEGIN(LEXING_ERROR); yyless(0); }
-	YY_BREAK
 case 531:
 YY_RULE_SETUP
-#line 1210 "seclang-scanner.ll"
-{ driver.error (*driver.loc.back(), "Invalid input: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+#line 1209 "seclang-scanner.ll"
+{ BEGIN(LEXING_ERROR); yyless(0); }
 	YY_BREAK
 case 532:
 YY_RULE_SETUP
 #line 1211 "seclang-scanner.ll"
-{ driver.error (*driver.loc.back(), "Expecting an action, got: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+{ driver.error (*driver.loc.back(), "Invalid input: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
 	YY_BREAK
 case 533:
 YY_RULE_SETUP
 #line 1212 "seclang-scanner.ll"
+{ driver.error (*driver.loc.back(), "Expecting an action, got: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+	YY_BREAK
+case 534:
+YY_RULE_SETUP
+#line 1213 "seclang-scanner.ll"
 { driver.error (*driver.loc.back(), "Expecting a variable, got:  : ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
@@ -8423,7 +8429,7 @@ case YY_STATE_EOF(SETVAR_ACTION_QUOTED):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_COLLECTION_ELEM):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_OPERATION):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_CONTENT):
-#line 1215 "seclang-scanner.ll"
+#line 1216 "seclang-scanner.ll"
 {
     if (yyin) {
         fclose(yyin);
@@ -8439,9 +8445,9 @@ case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_CONTENT):
     delete l;
 }
 	YY_BREAK
-case 534:
+case 535:
 YY_RULE_SETUP
-#line 1231 "seclang-scanner.ll"
+#line 1232 "seclang-scanner.ll"
 {
     std::string err;
     const char *file = strchr(yytext, ' ') + 1;
@@ -8469,9 +8475,9 @@ YY_RULE_SETUP
     }
 }
 	YY_BREAK
-case 535:
+case 536:
 YY_RULE_SETUP
-#line 1258 "seclang-scanner.ll"
+#line 1259 "seclang-scanner.ll"
 {
     std::string err;
     const char *file = strchr(yytext, ' ') + 1;
@@ -8502,10 +8508,10 @@ YY_RULE_SETUP
     free(f);
 }
 	YY_BREAK
-case 536:
-/* rule 536 can match eol */
+case 537:
+/* rule 537 can match eol */
 YY_RULE_SETUP
-#line 1288 "seclang-scanner.ll"
+#line 1289 "seclang-scanner.ll"
 {
     HttpsClient c;
     std::string key;
@@ -8541,12 +8547,12 @@ YY_RULE_SETUP
     yy_scan_string(c.content.c_str());
 }
 	YY_BREAK
-case 537:
+case 538:
 YY_RULE_SETUP
-#line 1324 "seclang-scanner.ll"
+#line 1325 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 8549 "seclang-scanner.cc"
+#line 8555 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -9651,7 +9657,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 1324 "seclang-scanner.ll"
+#line 1325 "seclang-scanner.ll"
 
 
 namespace modsecurity {
