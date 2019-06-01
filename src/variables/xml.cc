@@ -44,7 +44,7 @@
 #include "src/actions/xmlns.h"
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 #ifndef WITH_LIBXML2
 void XML::evaluate(Transaction *t,
@@ -140,5 +140,5 @@ void XML::evaluate(Transaction *t,
 
 #endif
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

@@ -74,12 +74,12 @@ bool RulesExceptions::loadRemoveRuleByTag(const std::string &msg,
 
 
 bool RulesExceptions::loadUpdateTargetByMsg(const std::string &msg,
-    std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
+    std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > var,
     std::string *error) {
     for (auto &i : *var) {
         m_variable_update_target_by_msg.emplace(
             std::pair<std::shared_ptr<std::string>,
-            std::unique_ptr<Variables::Variable>>(
+            std::unique_ptr<variables::Variable>>(
                 std::make_shared<std::string>(msg),
                 std::move(i)));
     }
@@ -89,13 +89,13 @@ bool RulesExceptions::loadUpdateTargetByMsg(const std::string &msg,
 
 
 bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
-    std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
+    std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > var,
     std::string *error) {
 
     for (auto &i : *var) {
         m_variable_update_target_by_tag.emplace(
             std::pair<std::shared_ptr<std::string>,
-                std::unique_ptr<Variables::Variable>>(
+                std::unique_ptr<variables::Variable>>(
                     std::make_shared<std::string>(tag),
                     std::move(i)));
     }
@@ -105,13 +105,13 @@ bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
 
 
 bool RulesExceptions::loadUpdateTargetById(double id,
-    std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > var,
+    std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > var,
     std::string *error) {
 
     for (auto &i : *var) {
         m_variable_update_target_by_id.emplace(
             std::pair<double,
-                std::unique_ptr<Variables::Variable>>(id,
+                std::unique_ptr<variables::Variable>>(id,
                 std::move(i)));
     }
 
@@ -222,21 +222,21 @@ bool RulesExceptions::merge(RulesExceptions *from) {
     for (auto &p : from->m_variable_update_target_by_tag) {
         m_variable_update_target_by_tag.emplace(
             std::pair<std::shared_ptr<std::string>,
-            std::shared_ptr<Variables::Variable>>(p.first,
+            std::shared_ptr<variables::Variable>>(p.first,
                 p.second));
     }
 
     for (auto &p : from->m_variable_update_target_by_msg) {
         m_variable_update_target_by_msg.emplace(
             std::pair<std::shared_ptr<std::string>,
-            std::shared_ptr<Variables::Variable>>(p.first,
+            std::shared_ptr<variables::Variable>>(p.first,
                 p.second));
     }
 
     for (auto &p : from->m_variable_update_target_by_id) {
         m_variable_update_target_by_id.emplace(
             std::pair<double,
-                std::shared_ptr<Variables::Variable>>(p.first,
+                std::shared_ptr<variables::Variable>>(p.first,
                     p.second));
     }
 

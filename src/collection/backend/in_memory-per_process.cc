@@ -96,7 +96,7 @@ void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
 
 
 void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
-    std::vector<const VariableValue *> *l, Variables::KeyExclusions &ke) {
+    std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
     size_t keySize = var.size();
     l->reserve(15);
 
@@ -122,7 +122,7 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
 
 
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
-    std::vector<const VariableValue *> *l, Variables::KeyExclusions &ke) {
+    std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
 
     //if (var.find(":") == std::string::npos) {
     //    return;

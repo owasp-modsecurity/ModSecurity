@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(MultipartInvalidQuoting, MULTIPART_INVALID_QUOTING,
     m_variableMultipartInvalidQuoting)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MULTIPART_INVALID_QUOTING_H_

@@ -51,11 +51,11 @@
       ]
     },
     "expected":{  
-      "debug_log":"T \\(0\\) t:trim: \"small_text"
+      "debug_log":"T \\(0\\) t:trim: \"filedata"
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecRule FILES_NAMES \"@contains small_text_file.txt\" \"id:1,phase:3,pass,t:trim\""
+      "SecRule FILES_NAMES \"@contains filedata\" \"id:1,phase:3,pass,t:trim\""
     ]
   }
 ]

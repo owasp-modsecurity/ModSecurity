@@ -29,7 +29,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 class Resource_DictElement : public Variable {
@@ -116,7 +116,7 @@ class Resource_DynamicElement : public Variable {
 };
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_RESOURCE_H_

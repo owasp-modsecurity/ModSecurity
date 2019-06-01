@@ -26,7 +26,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class Env : public Variable {
  public:
@@ -38,7 +38,7 @@ class Env : public Variable {
         std::vector<const VariableValue *> *l) override;
 };
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_ENV_H_

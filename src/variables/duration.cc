@@ -25,7 +25,7 @@
 #include "src/utils/system.h"
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 void Duration::evaluate(Transaction *transaction,
     Rule *rule,
@@ -39,5 +39,5 @@ void Duration::evaluate(Transaction *transaction,
 }
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

@@ -143,6 +143,7 @@ class Driver;
 #include "src/operators/verify_cc.h"
 #include "src/operators/verify_cpf.h"
 #include "src/operators/verify_ssn.h"
+#include "src/operators/verify_svnr.h"
 #include "src/operators/within.h"
 
 
@@ -256,50 +257,11 @@ class Driver;
 #include "src/variables/session.h"
 #include "src/variables/status.h"
 
-using modsecurity::ModSecurity;
-using modsecurity::Rule;
-using modsecurity::Utils::GeoLookup;
-using modsecurity::Variables::Duration;
-using modsecurity::Variables::Env;
-using modsecurity::Variables::HighestSeverity;
-using modsecurity::Variables::ModsecBuild;
-using modsecurity::Variables::RemoteUser;
-using modsecurity::Variables::TimeDay;
-using modsecurity::Variables::TimeEpoch;
-using modsecurity::Variables::TimeHour;
-using modsecurity::Variables::TimeMin;
-using modsecurity::Variables::TimeMon;
-using modsecurity::Variables::TimeSec;
-using modsecurity::Variables::TimeWDay;
-using modsecurity::Variables::TimeYear;
-using modsecurity::Variables::Time;
-using modsecurity::Variables::Tx_DictElement;
-using modsecurity::Variables::Tx_NoDictElement;
-using modsecurity::Variables::Tx_DictElementRegexp;
-
-using modsecurity::Variables::Ip_DictElement;
-using modsecurity::Variables::Ip_NoDictElement;
-using modsecurity::Variables::Ip_DictElementRegexp;
-
-using modsecurity::Variables::Global_DictElement;
-using modsecurity::Variables::Global_NoDictElement;
-using modsecurity::Variables::Global_DictElementRegexp;
-
-using modsecurity::Variables::Session_DictElement;
-using modsecurity::Variables::Session_NoDictElement;
-using modsecurity::Variables::Session_DictElementRegexp;
-
-
-
-using modsecurity::Variables::Variable;
-using modsecurity::Variables::VariableModificatorExclusion;
-using modsecurity::Variables::VariableModificatorCount;
-using modsecurity::Variables::XML;
 
 using namespace modsecurity;
-
-using modsecurity::operators::Operator;
-
+using namespace modsecurity::variables;
+using namespace modsecurity::Utils;
+using namespace modsecurity::operators;
 
 
 #define CHECK_VARIATION_DECL \
@@ -354,7 +316,7 @@ using modsecurity::operators::Operator;
 %initial-action
 {
   // Initialize the initial location.
-  @$.begin.filename = @$.end.filename = &driver.file;
+  @$.begin.filename = @$.end.filename = new std::string(driver.file);
 };
 %define parse.trace
 %define parse.error verbose
@@ -505,6 +467,7 @@ using modsecurity::operators::Operator;
   OPERATOR_VERIFY_CC                           "OPERATOR_VERIFY_CC"
   OPERATOR_VERIFY_CPF                          "OPERATOR_VERIFY_CPF"
   OPERATOR_VERIFY_SSN                          "OPERATOR_VERIFY_SSN"
+  OPERATOR_VERIFY_SVNR                          "OPERATOR_VERIFY_SVNR"
   OPERATOR_WITHIN                              "OPERATOR_WITHIN"
 
   CONFIG_DIR_AUDIT_LOG_FMT
@@ -905,7 +868,7 @@ op:
       {
         $$ = std::move($1);
         std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
+        if ($$->init(*@1.end.filename, &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -915,7 +878,7 @@ op:
         $$ = std::move($2);
         $$->m_negation = true;
         std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
+        if ($$->init(*@1.end.filename, &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -924,7 +887,7 @@ op:
       {
         OPERATOR_CONTAINER($$, new operators::Rx(std::move($1)));
         std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
+        if ($$->init(*@1.end.filename, &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -934,7 +897,7 @@ op:
         OPERATOR_CONTAINER($$, new operators::Rx(std::move($2)));
         $$->m_negation = true;
         std::string error;
-        if ($$->init(driver.ref.back(), &error) == false) {
+        if ($$->init(*@1.end.filename, &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -998,6 +961,10 @@ op_before_init:
     | OPERATOR_VERIFY_SSN run_time_string
       {
         OPERATOR_CONTAINER($$, new operators::VerifySSN(std::move($2)));
+      }
+    | OPERATOR_VERIFY_SVNR run_time_string
+      {
+        OPERATOR_CONTAINER($$, new operators::VerifySVNR(std::move($2)));
       }
     | OPERATOR_GSB_LOOKUP run_time_string
       {
@@ -1102,7 +1069,7 @@ expression:
         for (auto &i : *$4.get()) {
             a->push_back(i.release());
         }
-        Variables::Variables *v = new Variables::Variables();
+        variables::Variables *v = new variables::Variables();
         for (auto &i : *$2.get()) {
             v->push_back(i.release());
         }
@@ -1112,7 +1079,7 @@ expression:
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ *@1.end.filename,
             /* line number */ @1.end.line
             );
 
@@ -1123,7 +1090,7 @@ expression:
       }
     | DIRECTIVE variables op
       {
-        Variables::Variables *v = new Variables::Variables();
+        variables::Variables *v = new variables::Variables();
         for (auto &i : *$2.get()) {
             v->push_back(i.release());
         }
@@ -1132,7 +1099,7 @@ expression:
             /* op */ $3.release(),
             /* variables */ v,
             /* actions */ NULL,
-            /* file name */ driver.ref.back(),
+            /* file name */ *@1.end.filename,
             /* line number */ @1.end.line
             );
         if (driver.addSecRule(rule) == false) {
@@ -1150,7 +1117,7 @@ expression:
             /* op */ NULL,
             /* variables */ NULL,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ *@1.end.filename,
             /* line number */ @1.end.line
             );
         driver.addSecAction(rule);
@@ -1165,7 +1132,7 @@ expression:
         RuleScript *r = new RuleScript(
             /* path to script */ $1,
             /* actions */ a,
-            /* file name */ driver.ref.back(),
+            /* file name */ *@1.end.filename,
             /* line number */ @1.end.line
             );
 
@@ -1564,7 +1531,7 @@ expression:
 #if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         std::string err;
         std::string file = modsecurity::utils::find_resource($1,
-            driver.ref.back(), &err);
+            *@1.end.filename, &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to load locate the GeoDB file from: " << $1 << " ";
@@ -1572,7 +1539,7 @@ expression:
             driver.error(@0, ss.str());
             YYERROR;
         }
-        if (GeoLookup::getInstance().setDataBase(file, &err) == false) {
+        if (Utils::GeoLookup::getInstance().setDataBase(file, &err) == false) {
             std::stringstream ss;
             ss << "Failed to load the GeoDB from: ";
             ss << file << ". " << err;
@@ -1746,7 +1713,7 @@ expression:
             param.pop_back();
         }
 
-        file = modsecurity::utils::find_resource(f, driver.ref.back(), &err);
+        file = modsecurity::utils::find_resource(f, *@1.end.filename, &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to locate the unicode map file from: " << f << " ";
@@ -1868,635 +1835,635 @@ variables_may_be_quoted:
 var:
     VARIABLE_ARGS DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Args_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Args_DictElement($2));
       }
     | VARIABLE_ARGS DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Args_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Args_DictElementRegexp($2));
       }
     | VARIABLE_ARGS
       {
-        VARIABLE_CONTAINER($$, new Variables::Args_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Args_NoDictElement());
       }
     | VARIABLE_ARGS_POST DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsPost_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsPost_DictElement($2));
       }
     | VARIABLE_ARGS_POST DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsPost_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsPost_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_POST
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsPost_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::ArgsPost_NoDictElement());
       }
     | VARIABLE_ARGS_GET DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsGet_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsGet_DictElement($2));
       }
     | VARIABLE_ARGS_GET DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsGet_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsGet_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_GET
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsGet_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::ArgsGet_NoDictElement());
       }
     | VARIABLE_FILES_SIZES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesSizes_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::FilesSizes_DictElement($2));
       }
     | VARIABLE_FILES_SIZES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesSizes_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::FilesSizes_DictElementRegexp($2));
       }
     | VARIABLE_FILES_SIZES
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesSizes_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::FilesSizes_NoDictElement());
       }
     | VARIABLE_FILES_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::FilesNames_DictElement($2));
       }
     | VARIABLE_FILES_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::FilesNames_DictElementRegexp($2));
       }
     | VARIABLE_FILES_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::FilesNames_NoDictElement());
       }
     | VARIABLE_FILES_TMP_CONTENT DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesTmpContent_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::FilesTmpContent_DictElement($2));
       }
     | VARIABLE_FILES_TMP_CONTENT DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesTmpContent_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::FilesTmpContent_DictElementRegexp($2));
       }
     | VARIABLE_FILES_TMP_CONTENT
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesTmpContent_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::FilesTmpContent_NoDictElement());
       }
     | VARIABLE_MULTIPART_FILENAME DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::MultiPartFileName_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::MultiPartFileName_DictElement($2));
       }
     | VARIABLE_MULTIPART_FILENAME DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::MultiPartFileName_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::MultiPartFileName_DictElementRegexp($2));
       }
     | VARIABLE_MULTIPART_FILENAME
       {
-        VARIABLE_CONTAINER($$, new Variables::MultiPartFileName_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::MultiPartFileName_NoDictElement());
       }
     | VARIABLE_MULTIPART_NAME DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::MultiPartName_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::MultiPartName_DictElement($2));
       }
     | VARIABLE_MULTIPART_NAME DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::MultiPartName_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::MultiPartName_DictElementRegexp($2));
       }
     | VARIABLE_MULTIPART_NAME
       {
-        VARIABLE_CONTAINER($$, new Variables::MultiPartName_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::MultiPartName_NoDictElement());
       }
     | VARIABLE_MATCHED_VARS_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::MatchedVarsNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::MatchedVarsNames_DictElement($2));
       }
     | VARIABLE_MATCHED_VARS_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::MatchedVarsNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::MatchedVarsNames_DictElementRegexp($2));
       }
     | VARIABLE_MATCHED_VARS_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::MatchedVarsNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::MatchedVarsNames_NoDictElement());
       }
     | VARIABLE_MATCHED_VARS DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::MatchedVars_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::MatchedVars_DictElement($2));
       }
     | VARIABLE_MATCHED_VARS DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::MatchedVars_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::MatchedVars_DictElementRegexp($2));
       }
     | VARIABLE_MATCHED_VARS
       {
-        VARIABLE_CONTAINER($$, new Variables::MatchedVars_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::MatchedVars_NoDictElement());
       }
     | VARIABLE_FILES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Files_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Files_DictElement($2));
       }
     | VARIABLE_FILES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Files_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Files_DictElementRegexp($2));
       }
     | VARIABLE_FILES
       {
-        VARIABLE_CONTAINER($$, new Variables::Files_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Files_NoDictElement());
       }
     | VARIABLE_REQUEST_COOKIES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestCookies_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::RequestCookies_DictElement($2));
       }
     | VARIABLE_REQUEST_COOKIES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestCookies_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::RequestCookies_DictElementRegexp($2));
       }
     | VARIABLE_REQUEST_COOKIES
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestCookies_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::RequestCookies_NoDictElement());
       }
     | VARIABLE_REQUEST_HEADERS DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestHeaders_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::RequestHeaders_DictElement($2));
       }
     | VARIABLE_REQUEST_HEADERS DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestHeaders_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::RequestHeaders_DictElementRegexp($2));
       }
     | VARIABLE_REQUEST_HEADERS
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestHeaders_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::RequestHeaders_NoDictElement());
       }
     | VARIABLE_RESPONSE_HEADERS DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseHeaders_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::ResponseHeaders_DictElement($2));
       }
     | VARIABLE_RESPONSE_HEADERS DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseHeaders_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::ResponseHeaders_DictElementRegexp($2));
       }
     | VARIABLE_RESPONSE_HEADERS
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseHeaders_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::ResponseHeaders_NoDictElement());
       }
     | VARIABLE_GEO DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Geo_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Geo_DictElement($2));
       }
     | VARIABLE_GEO DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Geo_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Geo_DictElementRegexp($2));
       }
     | VARIABLE_GEO
       {
-        VARIABLE_CONTAINER($$, new Variables::Geo_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Geo_NoDictElement());
       }
     | VARIABLE_REQUEST_COOKIES_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestCookiesNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::RequestCookiesNames_DictElement($2));
       }
     | VARIABLE_REQUEST_COOKIES_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestCookiesNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::RequestCookiesNames_DictElementRegexp($2));
       }
     | VARIABLE_REQUEST_COOKIES_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestCookiesNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::RequestCookiesNames_NoDictElement());
       }
     | VARIABLE_RULE DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Rule_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Rule_DictElement($2));
       }
     | VARIABLE_RULE DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Rule_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Rule_DictElementRegexp($2));
       }
     | VARIABLE_RULE
       {
-        VARIABLE_CONTAINER($$, new Variables::Rule_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Rule_NoDictElement());
       }
     | RUN_TIME_VAR_ENV DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Env("ENV:" + $2));
+        VARIABLE_CONTAINER($$, new variables::Env("ENV:" + $2));
       }
     | RUN_TIME_VAR_ENV DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Env("ENV:" + $2));
+        VARIABLE_CONTAINER($$, new variables::Env("ENV:" + $2));
       }
     | RUN_TIME_VAR_ENV
       {
-        VARIABLE_CONTAINER($$, new Variables::Env("ENV"));
+        VARIABLE_CONTAINER($$, new variables::Env("ENV"));
       }
     | RUN_TIME_VAR_XML DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::XML("XML:" + $2));
+        VARIABLE_CONTAINER($$, new variables::XML("XML:" + $2));
       }
     | RUN_TIME_VAR_XML DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::XML("XML:" + $2));
+        VARIABLE_CONTAINER($$, new variables::XML("XML:" + $2));
       }
     | RUN_TIME_VAR_XML
       {
-        VARIABLE_CONTAINER($$, new Variables::XML_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::XML_NoDictElement());
       }
     | VARIABLE_FILES_TMP_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesTmpNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::FilesTmpNames_DictElement($2));
       }
     | VARIABLE_FILES_TMP_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesTmpNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::FilesTmpNames_DictElementRegexp($2));
       }
     | VARIABLE_FILES_TMP_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesTmpNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::FilesTmpNames_NoDictElement());
       }
     | VARIABLE_RESOURCE run_time_string
       {
-        VARIABLE_CONTAINER($$, new Variables::Resource_DynamicElement(std::move($2)));
+        VARIABLE_CONTAINER($$, new variables::Resource_DynamicElement(std::move($2)));
       }
     | VARIABLE_RESOURCE DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Resource_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Resource_DictElement($2));
       }
     | VARIABLE_RESOURCE DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Resource_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Resource_DictElementRegexp($2));
       }
     | VARIABLE_RESOURCE
       {
-        VARIABLE_CONTAINER($$, new Variables::Resource_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Resource_NoDictElement());
       }
     | VARIABLE_IP run_time_string
       {
-        VARIABLE_CONTAINER($$, new Variables::Ip_DynamicElement(std::move($2)));
+        VARIABLE_CONTAINER($$, new variables::Ip_DynamicElement(std::move($2)));
       }
     | VARIABLE_IP DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Ip_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Ip_DictElement($2));
       }
     | VARIABLE_IP DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Ip_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Ip_DictElementRegexp($2));
       }
     | VARIABLE_IP
       {
-        VARIABLE_CONTAINER($$, new Variables::Ip_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Ip_NoDictElement());
       }
     | VARIABLE_GLOBAL run_time_string
       {
-        VARIABLE_CONTAINER($$, new Variables::Global_DynamicElement(std::move($2)));
+        VARIABLE_CONTAINER($$, new variables::Global_DynamicElement(std::move($2)));
       }
     | VARIABLE_GLOBAL DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Global_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Global_DictElement($2));
       }
     | VARIABLE_GLOBAL DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Global_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Global_DictElementRegexp($2));
       }
     | VARIABLE_GLOBAL
       {
-        VARIABLE_CONTAINER($$, new Variables::Global_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Global_NoDictElement());
       }
     | VARIABLE_USER run_time_string
       {
-        VARIABLE_CONTAINER($$, new Variables::User_DynamicElement(std::move($2)));
+        VARIABLE_CONTAINER($$, new variables::User_DynamicElement(std::move($2)));
       }
     | VARIABLE_USER DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::User_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::User_DictElement($2));
       }
     | VARIABLE_USER DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::User_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::User_DictElementRegexp($2));
       }
     | VARIABLE_USER
       {
-        VARIABLE_CONTAINER($$, new Variables::User_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::User_NoDictElement());
       }
     | VARIABLE_TX run_time_string
       {
-        VARIABLE_CONTAINER($$, new Variables::Tx_DynamicElement(std::move($2)));
+        VARIABLE_CONTAINER($$, new variables::Tx_DynamicElement(std::move($2)));
       }
     | VARIABLE_TX DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Tx_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Tx_DictElement($2));
       }
     | VARIABLE_TX DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Tx_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Tx_DictElementRegexp($2));
       }
     | VARIABLE_TX
       {
-        VARIABLE_CONTAINER($$, new Variables::Tx_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Tx_NoDictElement());
       }
     | VARIABLE_SESSION run_time_string
       {
-        VARIABLE_CONTAINER($$, new Variables::Session_DynamicElement(std::move($2)));
+        VARIABLE_CONTAINER($$, new variables::Session_DynamicElement(std::move($2)));
       }
     | VARIABLE_SESSION DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::Session_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::Session_DictElement($2));
       }
     | VARIABLE_SESSION DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::Session_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::Session_DictElementRegexp($2));
       }
     | VARIABLE_SESSION
       {
-        VARIABLE_CONTAINER($$, new Variables::Session_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::Session_NoDictElement());
       }
     | VARIABLE_ARGS_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsNames_DictElement($2));
       }
     | VARIABLE_ARGS_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsNames_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::ArgsNames_NoDictElement());
       }
     | VARIABLE_ARGS_GET_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsGetNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsGetNames_DictElement($2));
       }
     | VARIABLE_ARGS_GET_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsGetNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsGetNames_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_GET_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsGetNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::ArgsGetNames_NoDictElement());
       }
 
     | VARIABLE_ARGS_POST_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsPostNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsPostNames_DictElement($2));
       }
     | VARIABLE_ARGS_POST_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsPostNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::ArgsPostNames_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_POST_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsPostNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::ArgsPostNames_NoDictElement());
       }
 
     | VARIABLE_REQUEST_HEADERS_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestHeadersNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::RequestHeadersNames_DictElement($2));
       }
     | VARIABLE_REQUEST_HEADERS_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestHeadersNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::RequestHeadersNames_DictElementRegexp($2));
       }
     | VARIABLE_REQUEST_HEADERS_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestHeadersNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::RequestHeadersNames_NoDictElement());
       }
 
     | VARIABLE_RESPONSE_CONTENT_TYPE
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseContentType());
+        VARIABLE_CONTAINER($$, new variables::ResponseContentType());
       }
 
     | VARIABLE_RESPONSE_HEADERS_NAMES DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseHeadersNames_DictElement($2));
+        VARIABLE_CONTAINER($$, new variables::ResponseHeadersNames_DictElement($2));
       }
     | VARIABLE_RESPONSE_HEADERS_NAMES DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseHeadersNames_DictElementRegexp($2));
+        VARIABLE_CONTAINER($$, new variables::ResponseHeadersNames_DictElementRegexp($2));
       }
     | VARIABLE_RESPONSE_HEADERS_NAMES
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseHeadersNames_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::ResponseHeadersNames_NoDictElement());
       }
     | VARIABLE_ARGS_COMBINED_SIZE
       {
-        VARIABLE_CONTAINER($$, new Variables::ArgsCombinedSize());
+        VARIABLE_CONTAINER($$, new variables::ArgsCombinedSize());
       }
    | VARIABLE_AUTH_TYPE
       {
-        VARIABLE_CONTAINER($$, new Variables::AuthType());
+        VARIABLE_CONTAINER($$, new variables::AuthType());
       }
     | VARIABLE_FILES_COMBINED_SIZE
       {
-        VARIABLE_CONTAINER($$, new Variables::FilesCombinedSize());
+        VARIABLE_CONTAINER($$, new variables::FilesCombinedSize());
       }
     | VARIABLE_FULL_REQUEST
       {
-        VARIABLE_CONTAINER($$, new Variables::FullRequest());
+        VARIABLE_CONTAINER($$, new variables::FullRequest());
       }
     | VARIABLE_FULL_REQUEST_LENGTH
       {
-        VARIABLE_CONTAINER($$, new Variables::FullRequestLength());
+        VARIABLE_CONTAINER($$, new variables::FullRequestLength());
       }
     | VARIABLE_INBOUND_DATA_ERROR
       {
-        VARIABLE_CONTAINER($$, new Variables::InboundDataError());
+        VARIABLE_CONTAINER($$, new variables::InboundDataError());
       }
     | VARIABLE_MATCHED_VAR
       {
-        VARIABLE_CONTAINER($$, new Variables::MatchedVar());
+        VARIABLE_CONTAINER($$, new variables::MatchedVar());
       }
     | VARIABLE_MATCHED_VAR_NAME
       {
-        VARIABLE_CONTAINER($$, new Variables::MatchedVarName());
+        VARIABLE_CONTAINER($$, new variables::MatchedVarName());
       }
     | VARIABLE_MULTIPART_BOUNDARY_QUOTED
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartBoundaryQuoted());
+        VARIABLE_CONTAINER($$, new variables::MultipartBoundaryQuoted());
       }
     | VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartBoundaryWhiteSpace());
+        VARIABLE_CONTAINER($$, new variables::MultipartBoundaryWhiteSpace());
       }
     | VARIABLE_MULTIPART_CRLF_LF_LINES
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartCrlfLFLines());
+        VARIABLE_CONTAINER($$, new variables::MultipartCrlfLFLines());
       }
     | VARIABLE_MULTIPART_DATA_AFTER
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartDateAfter());
+        VARIABLE_CONTAINER($$, new variables::MultipartDateAfter());
       }
     | VARIABLE_MULTIPART_DATA_BEFORE
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartDateBefore());
+        VARIABLE_CONTAINER($$, new variables::MultipartDateBefore());
       }
     | VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartFileLimitExceeded());
+        VARIABLE_CONTAINER($$, new variables::MultipartFileLimitExceeded());
       }
     | VARIABLE_MULTIPART_HEADER_FOLDING
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartHeaderFolding());
+        VARIABLE_CONTAINER($$, new variables::MultipartHeaderFolding());
       }
     | VARIABLE_MULTIPART_INVALID_HEADER_FOLDING
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartInvalidHeaderFolding());
+        VARIABLE_CONTAINER($$, new variables::MultipartInvalidHeaderFolding());
       }
     | VARIABLE_MULTIPART_INVALID_PART
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartInvalidPart());
+        VARIABLE_CONTAINER($$, new variables::MultipartInvalidPart());
       }
     | VARIABLE_MULTIPART_INVALID_QUOTING
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartInvalidQuoting());
+        VARIABLE_CONTAINER($$, new variables::MultipartInvalidQuoting());
       }
     | VARIABLE_MULTIPART_LF_LINE
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartLFLine());
+        VARIABLE_CONTAINER($$, new variables::MultipartLFLine());
       }
     | VARIABLE_MULTIPART_MISSING_SEMICOLON
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartMissingSemicolon());
+        VARIABLE_CONTAINER($$, new variables::MultipartMissingSemicolon());
       }
     | VARIABLE_MULTIPART_SEMICOLON_MISSING
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartMissingSemicolon());
+        VARIABLE_CONTAINER($$, new variables::MultipartMissingSemicolon());
       }
     | VARIABLE_MULTIPART_STRICT_ERROR
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartStrictError());
+        VARIABLE_CONTAINER($$, new variables::MultipartStrictError());
       }
     | VARIABLE_MULTIPART_UNMATCHED_BOUNDARY
       {
-        VARIABLE_CONTAINER($$, new Variables::MultipartUnmatchedBoundary());
+        VARIABLE_CONTAINER($$, new variables::MultipartUnmatchedBoundary());
       }
     | VARIABLE_OUTBOUND_DATA_ERROR
       {
-        VARIABLE_CONTAINER($$, new Variables::OutboundDataError());
+        VARIABLE_CONTAINER($$, new variables::OutboundDataError());
       }
     | VARIABLE_PATH_INFO
       {
-        VARIABLE_CONTAINER($$, new Variables::PathInfo());
+        VARIABLE_CONTAINER($$, new variables::PathInfo());
       }
     | VARIABLE_QUERY_STRING
       {
-        VARIABLE_CONTAINER($$, new Variables::QueryString());
+        VARIABLE_CONTAINER($$, new variables::QueryString());
       }
     | VARIABLE_REMOTE_ADDR
       {
-        VARIABLE_CONTAINER($$, new Variables::RemoteAddr());
+        VARIABLE_CONTAINER($$, new variables::RemoteAddr());
       }
     | VARIABLE_REMOTE_HOST
       {
-        VARIABLE_CONTAINER($$, new Variables::RemoteHost());
+        VARIABLE_CONTAINER($$, new variables::RemoteHost());
       }
     | VARIABLE_REMOTE_PORT
       {
-        VARIABLE_CONTAINER($$, new Variables::RemotePort());
+        VARIABLE_CONTAINER($$, new variables::RemotePort());
       }
     | VARIABLE_REQBODY_ERROR
       {
-        VARIABLE_CONTAINER($$, new Variables::ReqbodyError());
+        VARIABLE_CONTAINER($$, new variables::ReqbodyError());
       }
     | VARIABLE_REQBODY_ERROR_MSG
       {
-        VARIABLE_CONTAINER($$, new Variables::ReqbodyErrorMsg());
+        VARIABLE_CONTAINER($$, new variables::ReqbodyErrorMsg());
       }
     | VARIABLE_REQBODY_PROCESSOR
       {
-        VARIABLE_CONTAINER($$, new Variables::ReqbodyProcessor());
+        VARIABLE_CONTAINER($$, new variables::ReqbodyProcessor());
       }
     | VARIABLE_REQBODY_PROCESSOR_ERROR
       {
-        VARIABLE_CONTAINER($$, new Variables::ReqbodyProcessorError());
+        VARIABLE_CONTAINER($$, new variables::ReqbodyProcessorError());
       }
     | VARIABLE_REQBODY_PROCESSOR_ERROR_MSG
       {
-        VARIABLE_CONTAINER($$, new Variables::ReqbodyProcessorErrorMsg());
+        VARIABLE_CONTAINER($$, new variables::ReqbodyProcessorErrorMsg());
       }
     | VARIABLE_REQUEST_BASENAME
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestBasename());
+        VARIABLE_CONTAINER($$, new variables::RequestBasename());
       }
     | VARIABLE_REQUEST_BODY
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestBody());
+        VARIABLE_CONTAINER($$, new variables::RequestBody());
       }
     | VARIABLE_REQUEST_BODY_LENGTH
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestBodyLength());
+        VARIABLE_CONTAINER($$, new variables::RequestBodyLength());
       }
     | VARIABLE_REQUEST_FILE_NAME
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestFilename());
+        VARIABLE_CONTAINER($$, new variables::RequestFilename());
       }
     | VARIABLE_REQUEST_LINE
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestLine());
+        VARIABLE_CONTAINER($$, new variables::RequestLine());
       }
     | VARIABLE_REQUEST_METHOD
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestMethod());
+        VARIABLE_CONTAINER($$, new variables::RequestMethod());
       }
     | VARIABLE_REQUEST_PROTOCOL
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestProtocol());
+        VARIABLE_CONTAINER($$, new variables::RequestProtocol());
       }
     | VARIABLE_REQUEST_URI
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestURI());
+        VARIABLE_CONTAINER($$, new variables::RequestURI());
       }
     | VARIABLE_REQUEST_URI_RAW
       {
-        VARIABLE_CONTAINER($$, new Variables::RequestURIRaw());
+        VARIABLE_CONTAINER($$, new variables::RequestURIRaw());
       }
     | VARIABLE_RESPONSE_BODY
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseBody());
+        VARIABLE_CONTAINER($$, new variables::ResponseBody());
       }
     | VARIABLE_RESPONSE_CONTENT_LENGTH
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseContentLength());
+        VARIABLE_CONTAINER($$, new variables::ResponseContentLength());
       }
     | VARIABLE_RESPONSE_PROTOCOL
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseProtocol());
+        VARIABLE_CONTAINER($$, new variables::ResponseProtocol());
       }
     | VARIABLE_RESPONSE_STATUS
       {
-        VARIABLE_CONTAINER($$, new Variables::ResponseStatus());
+        VARIABLE_CONTAINER($$, new variables::ResponseStatus());
       }
     | VARIABLE_SERVER_ADDR
       {
-        VARIABLE_CONTAINER($$, new Variables::ServerAddr());
+        VARIABLE_CONTAINER($$, new variables::ServerAddr());
       }
     | VARIABLE_SERVER_NAME
       {
-        VARIABLE_CONTAINER($$, new Variables::ServerName());
+        VARIABLE_CONTAINER($$, new variables::ServerName());
       }
     | VARIABLE_SERVER_PORT
       {
-        VARIABLE_CONTAINER($$, new Variables::ServerPort());
+        VARIABLE_CONTAINER($$, new variables::ServerPort());
       }
     | VARIABLE_SESSION_ID
       {
-        VARIABLE_CONTAINER($$, new Variables::SessionID());
+        VARIABLE_CONTAINER($$, new variables::SessionID());
       }
     | VARIABLE_UNIQUE_ID
       {
-        VARIABLE_CONTAINER($$, new Variables::UniqueID());
+        VARIABLE_CONTAINER($$, new variables::UniqueID());
       }
     | VARIABLE_URL_ENCODED_ERROR
       {
-        VARIABLE_CONTAINER($$, new Variables::UrlEncodedError());
+        VARIABLE_CONTAINER($$, new variables::UrlEncodedError());
       }
     | VARIABLE_USER_ID
       {
-        VARIABLE_CONTAINER($$, new Variables::UserID());
+        VARIABLE_CONTAINER($$, new variables::UserID());
       }
     | VARIABLE_STATUS
       {
-        VARIABLE_CONTAINER($$, new Variables::Status());
+        VARIABLE_CONTAINER($$, new variables::Status());
       }
     | VARIABLE_STATUS_LINE
       {
-        VARIABLE_CONTAINER($$, new Variables::Status());
+        VARIABLE_CONTAINER($$, new variables::Status());
       }
     | VARIABLE_WEB_APP_ID
       {
-        VARIABLE_CONTAINER($$, new Variables::WebAppId());
+        VARIABLE_CONTAINER($$, new variables::WebAppId());
       }
     | RUN_TIME_VAR_DUR
       {

@@ -27,13 +27,13 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(MultipartInvalidHeaderFolding, MULTIPART_INVALID_HEADER_FOLDING, m_variableMultipartInvalidHeaderFolding)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MULTIPART_INVALID_HEADER_FOLDING_H_

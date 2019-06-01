@@ -102,11 +102,11 @@ class n : public Variable { \
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class KeyExclusion {
  public:
-    virtual bool match(std::string &a) = 0;
+    virtual bool match(const std::string &a) = 0;
     virtual ~KeyExclusion() { }
 };
 
@@ -121,7 +121,7 @@ class KeyExclusionRegex : public KeyExclusion {
 
     ~KeyExclusionRegex() override { }
 
-    bool match(std::string &a) override {
+    bool match(const std::string &a) override {
         return m_re.searchAll(a).size() > 0;
     }
 
@@ -136,7 +136,7 @@ class KeyExclusionString : public KeyExclusion {
 
     ~KeyExclusionString() override { }
 
-    bool match(std::string &a) override {
+    bool match(const std::string &a) override {
         return a.size() == m_key.size() && std::equal(a.begin(), a.end(),
             m_key.begin(),
             [](char aa, char bb) {
@@ -608,6 +608,10 @@ class Variables : public std::vector<Variable *> {
     bool contains(const std::string &v) {
         return std::find_if(begin(), end(),
             [v](Variable *m) -> bool {
+                VariableRegex *r = dynamic_cast<VariableRegex *>(m);
+                if (r) {
+                    return r->m_r.searchAll(v).size() > 0;
+                }
                 return v == *m->m_fullName.get();
             }) != end();
     };
@@ -665,11 +669,11 @@ class VariableModificatorCount : public Variable {
 };
 
 
-std::string operator+(std::string a, modsecurity::Variables::Variable *v);
-std::string operator+(std::string a, modsecurity::Variables::Variables *v);
+std::string operator+(std::string a, modsecurity::variables::Variable *v);
+std::string operator+(std::string a, modsecurity::variables::Variables *v);
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_VARIABLE_H_

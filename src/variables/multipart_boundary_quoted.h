@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(MultipartBoundaryQuoted, MULTIPART_BOUNDARY_QUOTED,
     m_variableMultipartBoundaryQuoted)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MULTIPART_BOUNDARY_QUOTED_H_

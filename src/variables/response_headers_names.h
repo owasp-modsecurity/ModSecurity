@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE_DICT(ResponseHeadersNames, RESPONSE_HEADERS_NAMES,
     m_variableResponseHeadersNames)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_RESPONSE_HEADERS_NAMES_H_

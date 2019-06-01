@@ -1,6 +1,31 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix SecRuleUpdateTargetById does not match regular expressions
+   [Issue #1872 - @zimmerle, @anush-cr, @victorhora, @j0k2r]  
+ - Adds missing check for runtime ctl:ruleRemoveByTag
+   [Issue #2102, #2099 - @airween]
+ - Adds a new operator verifySVNR that checks for Austrian social
+   security numbers.
+   [Issue #2063 - @Rufus125]
+ - Fix variables output in debug logs
+   [Issue #2057 - @jleproust]
+ - Correct typo validade in log output
+   [Issue #2059 - @nerrehmit]
+ - fix/minor: Error encoding hexa decimal.
+   [Issue #2068 - @tech-ozon-io]
+ - Limit more log variables to 200 characters.
+   [Issue #2073 - @jleproust]
+ - parser: fix parsed file names
+   [@zimmerle]
+ - Allow empty anchored variable
+   [Issue #2024 - @airween]
+ - Fixed FILES_NAMES collection after the end of multipart parsing
+   [Issue #2016 - @airween]
+ - Fixed validateByteRange parsing method
+   [Issue #2017 - @airween]
+ - Removes a memory leak on the JSON parser
+   [@zimmerle]
  - Enables LMDB on the regression tests.
    [Issue #2011, #2008 - @WGH-, @mdunc]
  - Fix: Extra whitespace in some configuration directives causing error

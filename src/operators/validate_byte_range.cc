@@ -101,7 +101,7 @@ bool ValidateByteRange::init(const std::string &file,
             getRange(std::string(m_param, pos + 1, m_param.length() -
                 (pos + 1)), error);
         } else {
-            getRange(std::string(m_param, pos + 1, next_pos), error);
+            getRange(std::string(m_param, pos + 1, next_pos - (pos + 1)), error);
         }
         pos = next_pos;
     }
