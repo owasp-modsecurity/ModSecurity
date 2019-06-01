@@ -33,7 +33,7 @@
 #include "src/utils/base64.h"
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 
 void RemoteUser::evaluate(Transaction *transaction,
@@ -86,5 +86,5 @@ clear:
 }
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

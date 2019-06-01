@@ -110,7 +110,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
 
 
 void AnchoredVariable::evaluate(std::vector<const VariableValue *> *l) {
-    if (m_name.empty() || m_value.empty()) {
+    if (m_name.empty()) {
         return;
     }
 
@@ -121,9 +121,6 @@ void AnchoredVariable::evaluate(std::vector<const VariableValue *> *l) {
 
 
 std::string * AnchoredVariable::evaluate() {
-    if (m_value.empty() == true) {
-        return NULL;
-    }
     return &m_value;
 }
 

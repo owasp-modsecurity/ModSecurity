@@ -87,10 +87,11 @@ bool JSON::processChunk(const char *buf, unsigned int size, std::string *err) {
     m_status = yajl_parse(m_handle,
         (const unsigned char *)buf, size);
     if (m_status != yajl_status_ok) {
-        const unsigned char *e = yajl_get_error(m_handle, 0,
+        unsigned char *e = yajl_get_error(m_handle, 0,
             (const unsigned char *)buf, size);
         /* We need to free the yajl error message later, how to do this? */
         err->assign((const char *)e);
+        yajl_free_error(m_handle, e);
         return false;
     }
 
@@ -102,9 +103,10 @@ bool JSON::complete(std::string *err) {
     /* Wrap up the parsing process */
     m_status = yajl_complete_parse(m_handle);
     if (m_status  != yajl_status_ok) {
-        const unsigned char *e = yajl_get_error(m_handle, 0, NULL, 0);
+        unsigned char *e = yajl_get_error(m_handle, 0, NULL, 0);
         /* We need to free the yajl error message later, how to do this? */
         err->assign((const char *)e);
+        yajl_free_error(m_handle, e);
         return false;
     }
 

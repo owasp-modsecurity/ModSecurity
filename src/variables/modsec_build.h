@@ -28,7 +28,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class ModsecBuild : public Variable {
  public:
@@ -52,7 +52,7 @@ class ModsecBuild : public Variable {
 };
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_MODSEC_BUILD_H_

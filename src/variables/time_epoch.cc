@@ -31,7 +31,7 @@
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 void TimeEpoch::evaluate(Transaction *transaction,
     Rule *rule,
@@ -43,5 +43,5 @@ void TimeEpoch::evaluate(Transaction *transaction,
 }
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

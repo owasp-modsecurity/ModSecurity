@@ -210,7 +210,7 @@ the utilities, follow the commands listed below:
 ```shell
 $ cd /path/to/your/ModSecurity
 $ git submodule foreach git pull
-$ cd tests
+$ cd test
 $ ./regression-tests
 $ ./unit-tests
  ```

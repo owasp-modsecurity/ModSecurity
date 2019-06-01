@@ -32,7 +32,7 @@ std::string RuleMessage::_details(const RuleMessage *rm) {
     msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
     msg.append(" [rev \"" + rm->m_rev + "\"]");
     msg.append(" [msg \"" + rm->m_message + "\"]");
-    msg.append(" [data \"" + rm->m_data + "\"]");
+    msg.append(" [data \"" + utils::string::limitTo(200, rm->m_data) + "\"]");
     msg.append(" [severity \"" +
         std::to_string(rm->m_severity) + "\"]");
     msg.append(" [ver \"" + rm->m_ver + "\"]");
@@ -43,9 +43,9 @@ std::string RuleMessage::_details(const RuleMessage *rm) {
     }
     msg.append(" [hostname \"" + std::string(rm->m_serverIpAddress) \
         + "\"]");
-    msg.append(" [uri \"" + rm->m_uriNoQueryStringDecoded + "\"]");
+    msg.append(" [uri \"" + utils::string::limitTo(200, rm->m_uriNoQueryStringDecoded) + "\"]");
     msg.append(" [unique_id \"" + rm->m_id + "\"]");
-    msg.append(" [ref \"" + rm->m_reference + "\"]");
+    msg.append(" [ref \"" + utils::string::limitTo(200, rm->m_reference) + "\"]");
 
     return msg;
 }
@@ -55,7 +55,7 @@ std::string RuleMessage::_errorLogTail(const RuleMessage *rm) {
     std::string msg;
 
     msg.append("[hostname \"" + std::string(rm->m_serverIpAddress) + "\"]");
-    msg.append(" [uri \"" + rm->m_uriNoQueryStringDecoded + "\"]");
+    msg.append(" [uri \"" + utils::string::limitTo(200, rm->m_uriNoQueryStringDecoded) + "\"]");
     msg.append(" [unique_id \"" + rm->m_id + "\"]");
 
     return msg;

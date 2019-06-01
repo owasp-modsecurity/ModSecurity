@@ -26,7 +26,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class HighestSeverity : public Variable {
  public:
@@ -41,7 +41,7 @@ class HighestSeverity : public Variable {
 };
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_HIGHEST_SEVERITY_H_

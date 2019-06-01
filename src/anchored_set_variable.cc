@@ -91,7 +91,7 @@ void AnchoredSetVariable::resolve(
 
 void AnchoredSetVariable::resolve(
     std::vector<const VariableValue *> *l,
-    Variables::KeyExclusions &ke) {
+    variables::KeyExclusions &ke) {
     for (const auto& x : *this) {
         if (!ke.toOmit(x.first)) {
             l->insert(l->begin(), new VariableValue(x.second));
@@ -138,7 +138,7 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
 
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     std::vector<const VariableValue *> *l,
-    Variables::KeyExclusions &ke) {
+    variables::KeyExclusions &ke) {
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {

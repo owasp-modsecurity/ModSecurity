@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(OutboundDataError, OUTBOUND_DATA_ERROR,
     m_variableOutboundDataError)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_OUTBOUND_DATA_ERROR_H_

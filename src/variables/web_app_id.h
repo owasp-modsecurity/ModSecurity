@@ -28,7 +28,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 class WebAppId : public Variable {
  public:
@@ -44,7 +44,7 @@ class WebAppId : public Variable {
     }
 };
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_WEB_APP_ID_H_

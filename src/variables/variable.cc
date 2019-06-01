@@ -25,7 +25,7 @@
 
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 
 Variable::Variable(std::string name)
@@ -77,7 +77,7 @@ void Variable::addsKeyExclusion(Variable *v) {
 
 
 std::string operator+(std::string a, Variable *v) {
-    return *v->m_fullName.get();
+    return a + *v->m_fullName.get();
 }
 
 
@@ -95,5 +95,5 @@ std::string operator+(std::string a, Variables *v) {
 }
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

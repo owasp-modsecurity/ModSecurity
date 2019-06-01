@@ -27,14 +27,14 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 DEFINE_VARIABLE(ReqbodyProcessorError, REQBODY_PROCESSOR_ERROR,
     m_variableReqbodyProcessorError)
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_REQBODY_PROCESSOR_ERROR_H_

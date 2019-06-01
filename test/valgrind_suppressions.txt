@@ -3822,4 +3822,11 @@
    fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
    fun:main
 }
-
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:strdup
+   fun:main
+}

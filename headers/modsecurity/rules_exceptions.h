@@ -38,7 +38,7 @@ namespace modsecurity {
 namespace actions {
 class Action;
 }
-namespace Variables {
+namespace variables {
 class Variable;
 }
 
@@ -57,15 +57,15 @@ class RulesExceptions {
     bool loadRemoveRuleByTag(const std::string &msg, std::string *error);
 
     bool loadUpdateTargetByMsg(const std::string &msg,
-        std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > v,
+        std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > v,
         std::string *error);
 
     bool loadUpdateTargetByTag(const std::string &tag,
-        std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > v,
+        std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > v,
         std::string *error);
 
     bool loadUpdateTargetById(double id,
-        std::unique_ptr<std::vector<std::unique_ptr<Variables::Variable> > > v,
+        std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > v,
         std::string *error);
 
     bool loadUpdateActionById(double id,
@@ -73,11 +73,11 @@ class RulesExceptions {
         std::string *error);
 
     std::unordered_multimap<std::shared_ptr<std::string>,
-        std::shared_ptr<Variables::Variable>> m_variable_update_target_by_tag;
+        std::shared_ptr<variables::Variable>> m_variable_update_target_by_tag;
     std::unordered_multimap<std::shared_ptr<std::string>,
-        std::shared_ptr<Variables::Variable>> m_variable_update_target_by_msg;
+        std::shared_ptr<variables::Variable>> m_variable_update_target_by_msg;
     std::unordered_multimap<double,
-        std::shared_ptr<Variables::Variable>> m_variable_update_target_by_id;
+        std::shared_ptr<variables::Variable>> m_variable_update_target_by_id;
     std::unordered_multimap<double,
         std::shared_ptr<actions::Action>> m_action_pre_update_target_by_id;
     std::unordered_multimap<double,

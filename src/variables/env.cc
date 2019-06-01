@@ -30,7 +30,7 @@
 extern char **environ;
 
 namespace modsecurity {
-namespace Variables {
+namespace variables {
 
 void Env::evaluate(Transaction *transaction,
     Rule *rule,
@@ -59,5 +59,5 @@ void Env::evaluate(Transaction *transaction,
 }
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity

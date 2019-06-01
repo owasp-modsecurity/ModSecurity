@@ -258,7 +258,7 @@ int Lua::getvar(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
-    std::string var = Variables::Variable::stringMatchResolve(t, varname);
+    std::string var = variables::Variable::stringMatchResolve(t, varname);
     var = applyTransformations(L, t, 2, var);
 
     if (var.size() == 0) {
@@ -286,7 +286,7 @@ int Lua::getvars(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
-    Variables::Variable::stringMatchResolveMulti(t, varname, &l);
+    variables::Variable::stringMatchResolveMulti(t, varname, &l);
 
     lua_newtable(L);
     for (auto i : l) {

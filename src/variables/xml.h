@@ -28,7 +28,7 @@
 namespace modsecurity {
 
 class Transaction;
-namespace Variables {
+namespace variables {
 
 
 /* Invocation without an XPath expression makes sense
@@ -64,7 +64,7 @@ class XML : public Variable {
 };
 
 
-}  // namespace Variables
+}  // namespace variables
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_XML_H_

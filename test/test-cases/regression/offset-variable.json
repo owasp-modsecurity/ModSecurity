@@ -1511,11 +1511,11 @@
       ]
     },
     "expected":{
-      "error_log":"o0,15v512,20t:trim"
+      "error_log":"o0,8o0,8v491,8t:trimo0,16o0,16v709,16t:trim"
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule FILES_NAMES \"small_text_file\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRule FILES_NAMES \"(fiasdfasdfledata|filedata)\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
     ]
   },
   {
