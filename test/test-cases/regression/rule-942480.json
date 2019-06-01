@@ -2,7 +2,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing setvar :: OWASP CRS id:942480",
+    "title":"Testing cookie parser :: OWASP CRS id:942480",
     "client":{
       "ip":"200.249.12.31",
       "port":123
