@@ -923,11 +923,16 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
                 Rules::BodyLimitAction::RejectBodyLimitAction) {
                 ms_dbg(5, "Request body limit is marked to reject the " \
                     "request");
-                intervention::free(&m_it);
-                m_it.log = strdup("Request body limit is marked to " \
-                        "reject the request");
-                m_it.status = 403;
-                m_it.disruptive = true;
+                if (getRuleEngineState() == Rules::EnabledRuleEngine) {
+                    intervention::free(&m_it);
+                    m_it.log = strdup("Request body limit is marked to " \
+                            "reject the request");
+                    m_it.status = 403;
+                    m_it.disruptive = true;
+                } else {
+                    ms_dbg(5, "Not rejecting the request as the engine is " \
+                        "not Enabled");
+                }
             }
             return true;
         }
@@ -1177,11 +1182,16 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
                 Rules::BodyLimitAction::RejectBodyLimitAction) {
                 ms_dbg(5, "Response body limit is marked to reject the " \
                     "request");
-                intervention::free(&m_it);
-                m_it.log = strdup("Response body limit is marked to reject " \
-                    "the request");
-                m_it.status = 403;
-                m_it.disruptive = true;
+                if (getRuleEngineState() == Rules::EnabledRuleEngine) {
+                    intervention::free(&m_it);
+                    m_it.log = strdup("Response body limit is marked to reject " \
+                        "the request");
+                    m_it.status = 403;
+                    m_it.disruptive = true;
+                } else {
+                    ms_dbg(5, "Not rejecting the request as the engine is " \
+                        "not Enabled");
+                }
             }
             return true;
         }
