@@ -549,7 +549,7 @@ inline void Rule::getFinalVars(variables::Variables *vars,
 void Rule::executeAction(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
     Action *a, bool defaultContext) {
-    if (a->isDisruptive() == false) {
+    if (a->isDisruptive() == false && a->m_name != "block") {
         ms_dbg_a(trans, 9, "Running " \
             "action: " + a->m_name);
         a->evaluate(this, trans, ruleMessage);
@@ -569,7 +569,7 @@ void Rule::executeAction(Transaction *trans,
         return;
     }
 
-    ms_dbg_a(trans, 4, "Not running disruptive action: " \
+    ms_dbg_a(trans, 4, "Not running any disruptive action (or block): " \
         + a->m_name + ". SecRuleEngine is not On.");
 }
 

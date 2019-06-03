@@ -73,6 +73,7 @@
       "http_code": 418
     },
   "rules": [
+    "SecRuleEngine On",
     "SecDefaultAction \"phase:1,log,deny,status:418,tag:'Host: %{request_headers.host}'\"",
     "SecDefaultAction \"phase:2,log,deny,status:418,tag:'Host: %{request_headers.host}'\"",
     "SecAction \"id:'900012',phase:request,nolog,pass,t:none,setvar:'tx.allowed_methods=GET HEAD POST OPTIONS'\"",
@@ -113,6 +114,7 @@
       "http_code": 418
     },
   "rules": [
+    "SecRuleEngine On",
     "SecDefaultAction \"phase:1,log,deny,status:418,tag:'Host: %{request_headers.host}'\"",
     "SecDefaultAction \"phase:2,log,deny,status:418,tag:'Host: %{request_headers.host}'\"",
     "SecAction \"id:'900012',phase:request,nolog,pass,t:none,setvar:'tx.allowed_methods=HEAD POST OPTIONS'\"",
