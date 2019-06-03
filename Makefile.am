@@ -139,6 +139,7 @@ TESTS+=test/test-cases/regression/issue-1528.json
 TESTS+=test/test-cases/regression/issue-1565.json
 TESTS+=test/test-cases/regression/issue-1576.json
 TESTS+=test/test-cases/regression/issue-1591.json
+TESTS+=test/test-cases/regression/issue-1960.json
 TESTS+=test/test-cases/regression/issue-1725.json
 TESTS+=test/test-cases/regression/issue-1743.json
 TESTS+=test/test-cases/regression/issue-1785.json
