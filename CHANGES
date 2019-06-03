@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Making block action execution dependent of the SecEngine status
+   [Issue #1960 - @theMiddleBlue, @zimmerle, @airween, @victorhora]
  - Having body limits to respect the rule engine state
    [@zimmerle]
  - Fix SecRuleUpdateTargetById does not match regular expressions
