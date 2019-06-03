@@ -583,6 +583,8 @@ int Transaction::addRequestHeader(const std::string& key,
     if (keyl == "content-type") {
         std::string multipart("multipart/form-data");
         std::string urlencoded("application/x-www-form-urlencoded");
+        std::string xml("application/xml");
+        std::string json("application/json");
         std::string l = utils::string::tolower(value);
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
@@ -592,6 +594,18 @@ int Transaction::addRequestHeader(const std::string& key,
         if (l.compare(0, urlencoded.length(), urlencoded) == 0) {
             this->m_requestBodyType = WWWFormUrlEncoded;
             m_variableReqbodyProcessor.set("URLENCODED", m_variableOffset);
+        }
+
+        if (l.compare(0, xml.length(), xml) == 0) {
+            this->m_requestBodyType = XMLRequestBody;
+            m_variableReqbodyProcessor.set("XML", m_variableOffset);
+            m_requestBodyProcessor = XMLRequestBody;
+        }
+
+        if (l.compare(0, json.length(), json) == 0) {
+            this->m_requestBodyType = JSONRequestBody;
+            m_variableReqbodyProcessor.set("JSON", m_variableOffset);
+            m_requestBodyProcessor = JSONRequestBody;
         }
     }
 

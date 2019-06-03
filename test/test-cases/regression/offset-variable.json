@@ -964,7 +964,7 @@
     ]
   },
   {
-    "enabled":1,
+    "enabled":0,
     "version_min":300000,
     "title":"Testing Variables :: REQUEST_BODY",
     "client":{
@@ -1013,7 +1013,7 @@
     ]
   },
   {
-    "enabled":1,
+    "enabled":0,
     "version_min":300000,
     "title":"Testing Variables :: REQUEST_BODY",
     "client":{
