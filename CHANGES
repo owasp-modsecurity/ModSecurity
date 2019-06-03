@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Having body limits to respect the rule engine state
+   [@zimmerle]
  - Fix SecRuleUpdateTargetById does not match regular expressions
    [Issue #1872 - @zimmerle, @anush-cr, @victorhora, @j0k2r]  
  - Adds missing check for runtime ctl:ruleRemoveByTag
