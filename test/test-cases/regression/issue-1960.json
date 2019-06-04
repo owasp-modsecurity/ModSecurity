@@ -29,8 +29,7 @@
       ]
     },
     "expected":{
-      "http_code":200,
-      "debug_log": "aoeuaoeu"
+      "http_code":200
     },
     "rules":[
       "SecRuleEngine DetectionOnly",
