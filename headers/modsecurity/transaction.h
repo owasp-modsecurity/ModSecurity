@@ -477,6 +477,7 @@ class Transaction : public TransactionAnchoredVariables {
      *
      */
     std::list< std::pair<int, std::string> > m_ruleRemoveTargetById;
+    std::list< std::pair<std::pair<int, int>, std::string> > m_ruleRemoveTargetByIdRange;
 
     /**
      *

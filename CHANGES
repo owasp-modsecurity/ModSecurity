@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds support to multiple ranges in ctl:ruleRemoveTargetById
+   [Issue #2110 - @theMiddleBlue, @zimmerle]
  - Making block action execution dependent of the SecEngine status
    [Issue #2113, #2111 - @theMiddleBlue, @airween]
  - Making block action execution dependent of the SecEngine status

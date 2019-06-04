@@ -134,6 +134,7 @@ TESTS+=test/test-cases/regression/config-update-target-by-tag.json
 TESTS+=test/test-cases/regression/config-xml_external_entity.json
 TESTS+=test/test-cases/regression/debug_log.json
 TESTS+=test/test-cases/regression/directive-sec_rule_script.json
+TESTS+=test/test-cases/regression/issue-2110.json
 TESTS+=test/test-cases/regression/issue-1152.json
 TESTS+=test/test-cases/regression/issue-1528.json
 TESTS+=test/test-cases/regression/issue-1565.json

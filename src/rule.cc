@@ -710,6 +710,23 @@ bool Rule::evaluate(Transaction *trans,
                 v = NULL;
                 continue;
             }
+
+	    if (exclusion.contains(v->m_key) ||
+                std::find_if(trans->m_ruleRemoveTargetByIdRange.begin(),
+                    trans->m_ruleRemoveTargetByIdRange.end(),
+                    [&, v, this](std::pair<std::pair<int, int>, std::string> &m) -> bool {
+                      if (m.first.first <= m_ruleId && m.first.second >= m_ruleId) {
+                        return m.second == v->m_key;
+                      }
+
+		      return false;
+                    }) != trans->m_ruleRemoveTargetByIdRange.end()
+            ) {
+                delete v;
+                v = NULL;
+                continue;
+            }
+
             if (exclusion.contains(v->m_key) ||
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),

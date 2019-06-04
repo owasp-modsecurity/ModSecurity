@@ -33,28 +33,73 @@ bool RuleRemoveTargetById::init(std::string *error) {
     std::string what(m_parser_payload, 21, m_parser_payload.size() - 21);
     std::vector<std::string> param = utils::string::split(what, ';');
 
+    bool added = false;
+
     if (param.size() < 2) {
         error->assign(what + " is not a valid `ID;VARIABLE'");
         return false;
     }
 
-    try {
-        m_id = std::stoi(param[0]);
-    } catch(...) {
-        error->assign("Not able to convert '" + param[0] +
-            "' into a number");
-        return false;
+    size_t dash = param[0].find('-');
+    if (dash != std::string::npos) {
+        std::string n1s = std::string(param[0], 0, dash);
+        std::string n2s = std::string(param[0], dash + 1, param[0].size() - (dash + 1));
+        int n1n = 0;
+        int n2n = 0;
+        try {
+            n1n = std::stoi(n1s);
+            added = true;
+        } catch (...) {
+            error->assign("Not a number: " + n1s);
+            return false;
+        }
+        try {
+            n2n = std::stoi(n2s);
+            added = true;
+        } catch (...) {
+            error->assign("Not a number: " + n2s);
+            return false;
+        }
+
+        if (n1n > n2n) {
+            error->assign("Invalid range: " + param[0]);
+            return false;
+        }
+        m_ranges.push_back(std::make_pair(n1n, n2n));
+        added = true;
+    } else {
+        try {
+            int num = std::stoi(param[0]);
+            m_ids.push_back(num);
+            added = true;
+        } catch (...) {
+            error->assign("Not able to convert '" + param[0] +
+              "' into a number");
+            return false;
+        }
     }
 
-    m_target = param[1];
+    if (added) {
+      m_target = param[1];
+      return true;
+    }
 
-    return true;
+    error->assign("Not a number or range: " + what);
+    return false;
 }
 
 bool RuleRemoveTargetById::evaluate(Rule *rule, Transaction *transaction) {
+  for (auto &i : m_ids) {
     transaction->m_ruleRemoveTargetById.push_back(
-        std::make_pair(m_id, m_target));
-    return true;
+      std::make_pair(i, m_target));
+  }
+
+  for (auto &i : m_ranges) {
+      transaction->m_ruleRemoveTargetByIdRange.push_back(
+        std::make_pair(i, m_target));
+  }
+
+  return true;
 }
 
 
