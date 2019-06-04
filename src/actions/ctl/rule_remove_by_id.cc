@@ -57,7 +57,7 @@ bool RuleRemoveById::init(std::string *error) {
                 return false;
             }
 
-            if (n1s > n2s) {
+            if (n1n > n2n) {
                 error->assign("Invalid range: " + b);
                 return false;
             }
