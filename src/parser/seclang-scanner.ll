@@ -172,6 +172,7 @@ ACTION_TRANSFORMATION_URL_DECODE                (?i:t:urlDecode)
 ACTION_TRANSFORMATION_URL_DECODE_UNI            (?i:t:urlDecodeUni)
 ACTION_TRANSFORMATION_UTF8_TO_UNICODE           (?i:t:utf8toUnicode)
 ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC       (?i:t:neutralizeSafeEncoding)
+ACTION_TRANSFORMATION_UTF8_TO_CHAR              (?i:t:utf8toChar)
 
 
 VARIABLE_ARGS_COMBINED_SIZE               (?i:ARGS_COMBINED_SIZE)
@@ -604,6 +605,7 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_TRANSFORMATION_LENGTH}                                          { return p::make_ACTION_TRANSFORMATION_LENGTH(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_UTF8_TO_UNICODE}                                 { return p::make_ACTION_TRANSFORMATION_UTF8_TO_UNICODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC}                             { return p::make_ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_UTF8_TO_CHAR}                                    { return p::make_ACTION_TRANSFORMATION_UTF8_TO_CHAR(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR}                            { return p::make_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_REMOVE_COMMENTS}                                 { return p::make_ACTION_TRANSFORMATION_REMOVE_COMMENTS(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_REPLACE_COMMENTS}                                { return p::make_ACTION_TRANSFORMATION_REPLACE_COMMENTS(yytext, *driver.loc.back()); }
