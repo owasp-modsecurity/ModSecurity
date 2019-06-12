@@ -24,7 +24,7 @@
 
 #include "api.h"
 #ifdef WAF_JSON_LOGGING_ENABLE
-#include <waf_log_util_external.h>
+#include <waf_log_util.h>
 #endif
 
 #define NOTE_NGINX_REQUEST_CTX "nginx-ctx"

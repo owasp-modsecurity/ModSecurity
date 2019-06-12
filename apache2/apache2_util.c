@@ -18,7 +18,7 @@
 #include "util_script.h"
 
 #ifdef WAF_JSON_LOGGING_ENABLE
-#include "waf_log_util_external.h"
+#include "waf_log_util.h"
 #include "waf_lock_external.h"
 #include "string.h"
 #endif
