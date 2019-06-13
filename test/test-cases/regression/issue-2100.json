@@ -1,0 +1,61 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing wrong UTF8 encoding transformation with OWASP CRS 3.1 (941120) - issue 2100",
+    "expected":{
+      "http_code":403
+    },
+    "client":{
+      "ip":"127.0.0.1",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/index.php?param=test+%D1%8F%D0%B2%D0%BB%D1%8F%D1%8E%D1%82%D1%81%D1%8F+%D0%BD%D0%B5",
+      "method":"GET",
+      "body": ""
+    },
+    "server":{
+      "ip":"127.0.0.1",
+      "port":80
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRule ARGS:param \"@rx (?i)[\\s\\\"'`;\\/0-9=\\x0B\\x09\\x0C\\x3B\\x2C\\x28\\x3B]+on[a-zA-Z]+[\\s\\x0B\\x09\\x0C\\x3B\\x2C\\x28\\x3B]*?=\" \"id:100,phase:2,t:none,t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls,deny,status:403\""
+    ]
+  }, {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing utf8toChar transformation with OWASP CRS 3.1 (941120) - issue 2100",
+    "expected":{
+      "http_code":200
+    },
+    "client":{
+      "ip":"127.0.0.1",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/index.php?param=test+%D1%8F%D0%B2%D0%BB%D1%8F%D1%8E%D1%82%D1%81%D1%8F+%D0%BD%D0%B5",
+      "method":"GET",
+      "body": ""
+    },
+    "server":{
+      "ip":"127.0.0.1",
+      "port":80
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRule ARGS:param \"@rx (?i)[\\s\\\"'`;\\/0-9=\\x0B\\x09\\x0C\\x3B\\x2C\\x28\\x3B]+on[a-zA-Z]+[\\s\\x0B\\x09\\x0C\\x3B\\x2C\\x28\\x3B]*?=\" \"id:100,phase:2,t:none,t:utf8toChar,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls,deny,status:403\""
+    ]
+  }
+]
