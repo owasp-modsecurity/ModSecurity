@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Adds neutralizeSafeEncoding and utf8toChar transformations
+   [Issue #2100 - @tech-ozon-io, @j0k2r]
  - Making block action execution dependent of the SecEngine status
    [Issue #2113, #2111 - @theMiddleBlue, @airween]
  - Making block action execution dependent of the SecEngine status

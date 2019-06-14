@@ -171,6 +171,8 @@ ACTION_TRANSFORMATION_URL_ENCODE                (?i:t:urlEncode)
 ACTION_TRANSFORMATION_URL_DECODE                (?i:t:urlDecode)
 ACTION_TRANSFORMATION_URL_DECODE_UNI            (?i:t:urlDecodeUni)
 ACTION_TRANSFORMATION_UTF8_TO_UNICODE           (?i:t:utf8toUnicode)
+ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC       (?i:t:neutralizeSafeEncoding)
+ACTION_TRANSFORMATION_UTF8_TO_CHAR              (?i:t:utf8toChar)
 
 
 VARIABLE_ARGS_COMBINED_SIZE               (?i:ARGS_COMBINED_SIZE)
@@ -602,6 +604,8 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_TRANSFORMATION_NORMALISE_PATH}                                  { return p::make_ACTION_TRANSFORMATION_NORMALISE_PATH(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_LENGTH}                                          { return p::make_ACTION_TRANSFORMATION_LENGTH(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_UTF8_TO_UNICODE}                                 { return p::make_ACTION_TRANSFORMATION_UTF8_TO_UNICODE(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC}                             { return p::make_ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_UTF8_TO_CHAR}                                    { return p::make_ACTION_TRANSFORMATION_UTF8_TO_CHAR(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR}                            { return p::make_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_REMOVE_COMMENTS}                                 { return p::make_ACTION_TRANSFORMATION_REMOVE_COMMENTS(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_REPLACE_COMMENTS}                                { return p::make_ACTION_TRANSFORMATION_REPLACE_COMMENTS(yytext, *driver.loc.back()); }
@@ -910,7 +914,6 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED}    { return p::make_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED(*driver.loc.back()); }
 {VARIABLE_MULTIPART_FILENAME}[:.]           { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
 {VARIABLE_MULTIPART_FILENAME}               { return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
-{VARIABLE_MULTIPART_HEADER_FOLDING}         { return p::make_VARIABLE_MULTIPART_HEADER_FOLDING(*driver.loc.back()); }
 {VARIABLE_MULTIPART_HEADER_FOLDING}         { return p::make_VARIABLE_MULTIPART_HEADER_FOLDING(*driver.loc.back()); }
 {VARIABLE_MULTIPART_INVALID_HEADER_FOLDING} { return p::make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING(*driver.loc.back()); }
 {VARIABLE_MULTIPART_INVALID_PART}           { return p::make_VARIABLE_MULTIPART_INVALID_PART(*driver.loc.back()); }

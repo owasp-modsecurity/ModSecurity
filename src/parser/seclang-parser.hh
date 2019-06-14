@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.3.2.
+// A Bison parser, made by GNU Bison 3.0.2.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2015, 2018-2019 Free Software Foundation, Inc.
+// Copyright (C) 2002-2013 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@
 // This special exception was added by the Free Software Foundation in
 // version 2.2 of Bison.
 
-
 /**
  ** \file y.tab.h
  ** Define the yy::parser class.
@@ -38,13 +37,10 @@
 
 // C++ LALR(1) parser skeleton written by Akim Demaille.
 
-// Undocumented macros, especially those whose name start with YY_,
-// are private implementation details.  Do not rely on them.
-
 #ifndef YY_YY_SECLANG_PARSER_HH_INCLUDED
 # define YY_YY_SECLANG_PARSER_HH_INCLUDED
 // //                    "%code requires" blocks.
-#line 10 "seclang-parser.yy" // lalr1.cc:401
+#line 10 "seclang-parser.yy" // lalr1.cc:372
 
 #include <string>
 #include <iterator>
@@ -142,6 +138,8 @@ class Driver;
 #include "src/actions/transformations/base64_encode.h"
 #include "src/actions/transformations/remove_whitespace.h"
 #include "src/actions/transformations/css_decode.h"
+#include "src/actions/transformations/neutralize.h"
+#include "src/actions/transformations/utf8_to_char.h"
 
 #include "src/operators/begins_with.h"
 #include "src/operators/contains.h"
@@ -348,51 +346,14 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 352 "seclang-parser.hh" // lalr1.cc:401
+#line 350 "seclang-parser.hh" // lalr1.cc:372
 
 # include <cassert>
-# include <cstdlib> // std::abort
+# include <vector>
 # include <iostream>
 # include <stdexcept>
 # include <string>
-# include <vector>
-
-#if defined __cplusplus
-# define YY_CPLUSPLUS __cplusplus
-#else
-# define YY_CPLUSPLUS 199711L
-#endif
-
-// Support move semantics when possible.
-#if 201103L <= YY_CPLUSPLUS
-# define YY_MOVE           std::move
-# define YY_MOVE_OR_COPY   move
-# define YY_MOVE_REF(Type) Type&&
-# define YY_RVREF(Type)    Type&&
-# define YY_COPY(Type)     Type
-#else
-# define YY_MOVE
-# define YY_MOVE_OR_COPY   copy
-# define YY_MOVE_REF(Type) Type&
-# define YY_RVREF(Type)    const Type&
-# define YY_COPY(Type)     const Type&
-#endif
-
-// Support noexcept when possible.
-#if 201103L <= YY_CPLUSPLUS
-# define YY_NOEXCEPT noexcept
-# define YY_NOTHROW
-#else
-# define YY_NOEXCEPT
-# define YY_NOTHROW throw ()
-#endif
-
-// Support constexpr when possible.
-#if 201703 <= YY_CPLUSPLUS
-# define YY_CONSTEXPR constexpr
-#else
-# define YY_CONSTEXPR
-#endif
+# include "stack.hh"
 # include "location.hh"
 #include <typeinfo>
 #ifndef YYASSERT
@@ -419,6 +380,15 @@ using namespace modsecurity::operators;
 # define YY_ATTRIBUTE_UNUSED YY_ATTRIBUTE ((__unused__))
 #endif
 
+#if !defined _Noreturn \
+     && (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112)
+# if defined _MSC_VER && 1200 <= _MSC_VER
+#  define _Noreturn __declspec (noreturn)
+# else
+#  define _Noreturn YY_ATTRIBUTE ((__noreturn__))
+# endif
+#endif
+
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
 # define YYUSE(E) ((void) (E))
@@ -426,7 +396,7 @@ using namespace modsecurity::operators;
 # define YYUSE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
+#if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
 # define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
     _Pragma ("GCC diagnostic push") \
@@ -445,18 +415,6 @@ using namespace modsecurity::operators;
 # define YY_INITIAL_VALUE(Value) /* Nothing. */
 #endif
 
-# ifndef YY_NULLPTR
-#  if defined __cplusplus
-#   if 201103L <= __cplusplus
-#    define YY_NULLPTR nullptr
-#   else
-#    define YY_NULLPTR 0
-#   endif
-#  else
-#   define YY_NULLPTR ((void*)0)
-#  endif
-# endif
-
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
@@ -464,172 +422,118 @@ using namespace modsecurity::operators;
 
 
 namespace yy {
-#line 468 "seclang-parser.hh" // lalr1.cc:401
+#line 426 "seclang-parser.hh" // lalr1.cc:372
 
 
 
-  /// A Bison parser.
-  class seclang_parser
-  {
-  public:
-#ifndef YYSTYPE
-  /// A buffer to store and retrieve objects.
+  /// A char[S] buffer to store and retrieve objects.
   ///
   /// Sort of a variant, but does not keep track of the nature
   /// of the stored data, since that knowledge is available
-  /// via the current parser state.
-  class semantic_type
+  /// via the current state.
+  template <size_t S>
+  struct variant
   {
-  public:
     /// Type of *this.
-    typedef semantic_type self_type;
+    typedef variant<S> self_type;
 
     /// Empty construction.
-    semantic_type () YY_NOEXCEPT
-      : yybuffer_ ()
-      , yytypeid_ (YY_NULLPTR)
+    variant ()
+      : yytname_ (YY_NULLPTR)
     {}
 
     /// Construct and fill.
     template <typename T>
-    semantic_type (YY_RVREF (T) t)
-      : yytypeid_ (&typeid (T))
+    variant (const T& t)
+      : yytname_ (typeid (T).name ())
     {
-      YYASSERT (sizeof (T) <= size);
-      new (yyas_<T> ()) T (YY_MOVE (t));
+      YYASSERT (sizeof (T) <= S);
+      new (yyas_<T> ()) T (t);
     }
 
     /// Destruction, allowed only if empty.
-    ~semantic_type () YY_NOEXCEPT
+    ~variant ()
     {
-      YYASSERT (!yytypeid_);
+      YYASSERT (!yytname_);
     }
-
-# if 201103L <= YY_CPLUSPLUS
-    /// Instantiate a \a T in here from \a t.
-    template <typename T, typename... U>
-    T&
-    emplace (U&&... u)
-    {
-      YYASSERT (!yytypeid_);
-      YYASSERT (sizeof (T) <= size);
-      yytypeid_ = & typeid (T);
-      return *new (yyas_<T> ()) T (std::forward <U>(u)...);
-    }
-# else
-    /// Instantiate an empty \a T in here.
-    template <typename T>
-    T&
-    emplace ()
-    {
-      YYASSERT (!yytypeid_);
-      YYASSERT (sizeof (T) <= size);
-      yytypeid_ = & typeid (T);
-      return *new (yyas_<T> ()) T ();
-    }
-
-    /// Instantiate a \a T in here from \a t.
-    template <typename T>
-    T&
-    emplace (const T& t)
-    {
-      YYASSERT (!yytypeid_);
-      YYASSERT (sizeof (T) <= size);
-      yytypeid_ = & typeid (T);
-      return *new (yyas_<T> ()) T (std::move((T&)t));
-    }
-# endif
 
     /// Instantiate an empty \a T in here.
-    /// Obsolete, use emplace.
     template <typename T>
     T&
     build ()
     {
-      return emplace<T> ();
+      YYASSERT (!yytname_);
+      YYASSERT (sizeof (T) <= S);
+      yytname_ = typeid (T).name ();
+      return *new (yyas_<T> ()) T;
     }
 
     /// Instantiate a \a T in here from \a t.
-    /// Obsolete, use emplace.
     template <typename T>
     T&
     build (const T& t)
     {
-      return emplace<T> (t);
+      YYASSERT (!yytname_);
+      YYASSERT (sizeof (T) <= S);
+      yytname_ = typeid (T).name ();
+      return *new (yyas_<T> ()) T (std::move((T&)t));
     }
 
     /// Accessor to a built \a T.
     template <typename T>
     T&
-    as () YY_NOEXCEPT
+    as ()
     {
-      YYASSERT (yytypeid_);
-      YYASSERT (*yytypeid_ == typeid (T));
-      YYASSERT (sizeof (T) <= size);
+      YYASSERT (yytname_ == typeid (T).name ());
+      YYASSERT (sizeof (T) <= S);
       return *yyas_<T> ();
     }
 
     /// Const accessor to a built \a T (for %printer).
     template <typename T>
     const T&
-    as () const YY_NOEXCEPT
+    as () const
     {
-      YYASSERT (yytypeid_);
-      YYASSERT (*yytypeid_ == typeid (T));
-      YYASSERT (sizeof (T) <= size);
+      YYASSERT (yytname_ == typeid (T).name ());
+      YYASSERT (sizeof (T) <= S);
       return *yyas_<T> ();
     }
 
-    /// Swap the content with \a that, of same type.
+    /// Swap the content with \a other, of same type.
     ///
     /// Both variants must be built beforehand, because swapping the actual
     /// data requires reading it (with as()), and this is not possible on
     /// unconstructed variants: it would require some dynamic testing, which
-    /// should not be the variant's responsibility.
+    /// should not be the variant's responsability.
     /// Swapping between built and (possibly) non-built is done with
-    /// self_type::move ().
+    /// variant::move ().
     template <typename T>
     void
-    swap (self_type& that) YY_NOEXCEPT
+    swap (self_type& other)
     {
-      YYASSERT (yytypeid_);
-      YYASSERT (*yytypeid_ == *that.yytypeid_);
-      std::swap (as<T> (), that.as<T> ());
+      YYASSERT (yytname_);
+      YYASSERT (yytname_ == other.yytname_);
+      std::swap (as<T> (), other.as<T> ());
     }
 
-    /// Move the content of \a that to this.
+    /// Move the content of \a other to this.
     ///
-    /// Destroys \a that.
+    /// Destroys \a other.
     template <typename T>
     void
-    move (self_type& that)
+    move (self_type& other)
     {
-# if 201103L <= YY_CPLUSPLUS
-      emplace<T> (std::move (that.as<T> ()));
-# else
-      emplace<T> ();
-      swap<T> (that);
-# endif
-      that.destroy<T> ();
+      build<T> ();
+      swap<T> (other);
+      other.destroy<T> ();
     }
 
-# if 201103L <= YY_CPLUSPLUS
-    /// Move the content of \a that to this.
+    /// Copy the content of \a other to this.
     template <typename T>
     void
-    move (self_type&& that)
+    copy (const self_type& other)
     {
-      emplace<T> (std::move (that.as<T> ()));
-      that.destroy<T> ();
-    }
-#endif
-
-    /// Copy the content of \a that to this.
-    template <typename T>
-    void
-    copy (const self_type& that)
-    {
-      emplace<T> (that.as<T> ());
+      build<T> (other.as<T> ());
     }
 
     /// Destroy the stored \a T.
@@ -638,18 +542,18 @@ namespace yy {
     destroy ()
     {
       as<T> ().~T ();
-      yytypeid_ = YY_NULLPTR;
+      yytname_ = YY_NULLPTR;
     }
 
   private:
     /// Prohibit blind copies.
-    self_type& operator= (const self_type&);
-    semantic_type (const self_type&);
+    self_type& operator=(const self_type&);
+    variant (const self_type&);
 
     /// Accessor to raw memory as \a T.
     template <typename T>
     T*
-    yyas_ () YY_NOEXCEPT
+    yyas_ ()
     {
       void *yyp = yybuffer_.yyraw;
       return static_cast<T*> (yyp);
@@ -658,12 +562,30 @@ namespace yy {
     /// Const accessor to raw memory as \a T.
     template <typename T>
     const T*
-    yyas_ () const YY_NOEXCEPT
+    yyas_ () const
     {
       const void *yyp = yybuffer_.yyraw;
       return static_cast<const T*> (yyp);
      }
 
+    union
+    {
+      /// Strongest alignment constraints.
+      long double yyalign_me;
+      /// A buffer large enough to store any of the semantic values.
+      char yyraw[S];
+    } yybuffer_;
+
+    /// Whether the content is built: if defined, the name of the stored type.
+    const char *yytname_;
+  };
+
+
+  /// A Bison parser.
+  class seclang_parser
+  {
+  public:
+#ifndef YYSTYPE
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
@@ -756,6 +678,8 @@ namespace yy {
       // "ACTION_TRANSFORMATION_URL_DECODE"
       // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
       // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      // "ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC"
+      // "ACTION_TRANSFORMATION_UTF8_TO_CHAR"
       // "Ver"
       // "xmlns"
       // "CONFIG_COMPONENT_SIG"
@@ -863,48 +787,34 @@ namespace yy {
       // "VARIABLE"
       // "Dictionary element"
       // "Dictionary element, selected by regexp"
-      char dummy1[sizeof (std::string)];
+      char dummy1[sizeof(std::string)];
 
       // op
       // op_before_init
-      char dummy2[sizeof (std::unique_ptr<Operator>)];
+      char dummy2[sizeof(std::unique_ptr<Operator>)];
 
       // run_time_string
-      char dummy3[sizeof (std::unique_ptr<RunTimeString>)];
+      char dummy3[sizeof(std::unique_ptr<RunTimeString>)];
 
       // var
-      char dummy4[sizeof (std::unique_ptr<Variable>)];
+      char dummy4[sizeof(std::unique_ptr<Variable>)];
 
       // act
       // setvar_action
-      char dummy5[sizeof (std::unique_ptr<actions::Action>)];
+      char dummy5[sizeof(std::unique_ptr<actions::Action>)];
 
       // variables
       // variables_pre_process
       // variables_may_be_quoted
-      char dummy6[sizeof (std::unique_ptr<std::vector<std::unique_ptr<Variable> > > )];
+      char dummy6[sizeof(std::unique_ptr<std::vector<std::unique_ptr<Variable> > > )];
 
       // actions
       // actions_may_quoted
-      char dummy7[sizeof (std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > )];
-    };
+      char dummy7[sizeof(std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > )];
+};
 
-    /// The size of the largest semantic type.
-    enum { size = sizeof (union_type) };
-
-    /// A buffer to store semantic values.
-    union
-    {
-      /// Strongest alignment constraints.
-      long double yyalign_me;
-      /// A buffer large enough to store any of the semantic values.
-      char yyraw[size];
-    } yybuffer_;
-
-    /// Whether the content is built: if defined, the name of the stored type.
-    const std::type_info *yytypeid_;
-  };
-
+    /// Symbol semantic values.
+    typedef variant<sizeof(union_type)> semantic_type;
 #else
     typedef YYSTYPE semantic_type;
 #endif
@@ -914,18 +824,7 @@ namespace yy {
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error
     {
-      syntax_error (const location_type& l, const std::string& m)
-        : std::runtime_error (m)
-        , location (l)
-      {}
-
-      syntax_error (const syntax_error& s)
-        : std::runtime_error (s.what ())
-        , location (s.location)
-      {}
-
-      ~syntax_error () YY_NOEXCEPT YY_NOTHROW;
-
+      syntax_error (const location_type& l, const std::string& m);
       location_type location;
     };
 
@@ -1166,132 +1065,131 @@ namespace yy {
         TOK_ACTION_TRANSFORMATION_URL_DECODE = 486,
         TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI = 487,
         TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE = 488,
-        TOK_ACTION_VER = 489,
-        TOK_ACTION_XMLNS = 490,
-        TOK_CONFIG_COMPONENT_SIG = 491,
-        TOK_CONFIG_CONN_ENGINE = 492,
-        TOK_CONFIG_SEC_ARGUMENT_SEPARATOR = 493,
-        TOK_CONFIG_SEC_WEB_APP_ID = 494,
-        TOK_CONFIG_SEC_SERVER_SIG = 495,
-        TOK_CONFIG_DIR_AUDIT_DIR = 496,
-        TOK_CONFIG_DIR_AUDIT_DIR_MOD = 497,
-        TOK_CONFIG_DIR_AUDIT_ENG = 498,
-        TOK_CONFIG_DIR_AUDIT_FLE_MOD = 499,
-        TOK_CONFIG_DIR_AUDIT_LOG = 500,
-        TOK_CONFIG_DIR_AUDIT_LOG2 = 501,
-        TOK_CONFIG_DIR_AUDIT_LOG_P = 502,
-        TOK_CONFIG_DIR_AUDIT_STS = 503,
-        TOK_CONFIG_DIR_AUDIT_TPE = 504,
-        TOK_CONFIG_DIR_DEBUG_LOG = 505,
-        TOK_CONFIG_DIR_DEBUG_LVL = 506,
-        TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS = 507,
-        TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS = 508,
-        TOK_CONFIG_SEC_HASH_ENGINE = 509,
-        TOK_CONFIG_SEC_HASH_KEY = 510,
-        TOK_CONFIG_SEC_HASH_PARAM = 511,
-        TOK_CONFIG_SEC_HASH_METHOD_RX = 512,
-        TOK_CONFIG_SEC_HASH_METHOD_PM = 513,
-        TOK_CONFIG_SEC_CHROOT_DIR = 514,
-        TOK_CONFIG_DIR_GEO_DB = 515,
-        TOK_CONFIG_DIR_GSB_DB = 516,
-        TOK_CONFIG_SEC_GUARDIAN_LOG = 517,
-        TOK_CONFIG_DIR_PCRE_MATCH_LIMIT = 518,
-        TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION = 519,
-        TOK_CONFIG_SEC_CONN_R_STATE_LIMIT = 520,
-        TOK_CONFIG_SEC_CONN_W_STATE_LIMIT = 521,
-        TOK_CONFIG_SEC_SENSOR_ID = 522,
-        TOK_CONFIG_DIR_REQ_BODY = 523,
-        TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT = 524,
-        TOK_CONFIG_DIR_REQ_BODY_LIMIT = 525,
-        TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION = 526,
-        TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT = 527,
-        TOK_CONFIG_DIR_RES_BODY = 528,
-        TOK_CONFIG_DIR_RES_BODY_LIMIT = 529,
-        TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION = 530,
-        TOK_CONFIG_SEC_RULE_INHERITANCE = 531,
-        TOK_CONFIG_SEC_RULE_PERF_TIME = 532,
-        TOK_CONFIG_DIR_RULE_ENG = 533,
-        TOK_CONFIG_DIR_SEC_ACTION = 534,
-        TOK_CONFIG_DIR_SEC_DEFAULT_ACTION = 535,
-        TOK_CONFIG_DIR_SEC_MARKER = 536,
-        TOK_CONFIG_DIR_UNICODE_MAP_FILE = 537,
-        TOK_CONFIG_DIR_UNICODE_CODE_PAGE = 538,
-        TOK_CONFIG_SEC_COLLECTION_TIMEOUT = 539,
-        TOK_CONFIG_SEC_HTTP_BLKEY = 540,
-        TOK_CONFIG_SEC_INTERCEPT_ON_ERROR = 541,
-        TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION = 542,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_ID = 543,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG = 544,
-        TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG = 545,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG = 546,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG = 547,
-        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID = 548,
-        TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID = 549,
-        TOK_CONFIG_UPDLOAD_KEEP_FILES = 550,
-        TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES = 551,
-        TOK_CONFIG_UPLOAD_DIR = 552,
-        TOK_CONFIG_UPLOAD_FILE_LIMIT = 553,
-        TOK_CONFIG_UPLOAD_FILE_MODE = 554,
-        TOK_CONFIG_VALUE_ABORT = 555,
-        TOK_CONFIG_VALUE_DETC = 556,
-        TOK_CONFIG_VALUE_HTTPS = 557,
-        TOK_CONFIG_VALUE_OFF = 558,
-        TOK_CONFIG_VALUE_ON = 559,
-        TOK_CONFIG_VALUE_PARALLEL = 560,
-        TOK_CONFIG_VALUE_PROCESS_PARTIAL = 561,
-        TOK_CONFIG_VALUE_REJECT = 562,
-        TOK_CONFIG_VALUE_RELEVANT_ONLY = 563,
-        TOK_CONFIG_VALUE_SERIAL = 564,
-        TOK_CONFIG_VALUE_WARN = 565,
-        TOK_CONFIG_XML_EXTERNAL_ENTITY = 566,
-        TOK_CONGIG_DIR_RESPONSE_BODY_MP = 567,
-        TOK_CONGIG_DIR_SEC_ARG_SEP = 568,
-        TOK_CONGIG_DIR_SEC_COOKIE_FORMAT = 569,
-        TOK_CONFIG_SEC_COOKIEV0_SEPARATOR = 570,
-        TOK_CONGIG_DIR_SEC_DATA_DIR = 571,
-        TOK_CONGIG_DIR_SEC_STATUS_ENGINE = 572,
-        TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION = 573,
-        TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION = 574,
-        TOK_CONGIG_DIR_SEC_TMP_DIR = 575,
-        TOK_DIRECTIVE = 576,
-        TOK_DIRECTIVE_SECRULESCRIPT = 577,
-        TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION = 578,
-        TOK_QUOTATION_MARK = 579,
-        TOK_RUN_TIME_VAR_BLD = 580,
-        TOK_RUN_TIME_VAR_DUR = 581,
-        TOK_RUN_TIME_VAR_HSV = 582,
-        TOK_RUN_TIME_VAR_REMOTE_USER = 583,
-        TOK_RUN_TIME_VAR_TIME = 584,
-        TOK_RUN_TIME_VAR_TIME_DAY = 585,
-        TOK_RUN_TIME_VAR_TIME_EPOCH = 586,
-        TOK_RUN_TIME_VAR_TIME_HOUR = 587,
-        TOK_RUN_TIME_VAR_TIME_MIN = 588,
-        TOK_RUN_TIME_VAR_TIME_MON = 589,
-        TOK_RUN_TIME_VAR_TIME_SEC = 590,
-        TOK_RUN_TIME_VAR_TIME_WDAY = 591,
-        TOK_RUN_TIME_VAR_TIME_YEAR = 592,
-        TOK_VARIABLE = 593,
-        TOK_DICT_ELEMENT = 594,
-        TOK_DICT_ELEMENT_REGEXP = 595
+        TOK_ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC = 489,
+        TOK_ACTION_TRANSFORMATION_UTF8_TO_CHAR = 490,
+        TOK_ACTION_VER = 491,
+        TOK_ACTION_XMLNS = 492,
+        TOK_CONFIG_COMPONENT_SIG = 493,
+        TOK_CONFIG_CONN_ENGINE = 494,
+        TOK_CONFIG_SEC_ARGUMENT_SEPARATOR = 495,
+        TOK_CONFIG_SEC_WEB_APP_ID = 496,
+        TOK_CONFIG_SEC_SERVER_SIG = 497,
+        TOK_CONFIG_DIR_AUDIT_DIR = 498,
+        TOK_CONFIG_DIR_AUDIT_DIR_MOD = 499,
+        TOK_CONFIG_DIR_AUDIT_ENG = 500,
+        TOK_CONFIG_DIR_AUDIT_FLE_MOD = 501,
+        TOK_CONFIG_DIR_AUDIT_LOG = 502,
+        TOK_CONFIG_DIR_AUDIT_LOG2 = 503,
+        TOK_CONFIG_DIR_AUDIT_LOG_P = 504,
+        TOK_CONFIG_DIR_AUDIT_STS = 505,
+        TOK_CONFIG_DIR_AUDIT_TPE = 506,
+        TOK_CONFIG_DIR_DEBUG_LOG = 507,
+        TOK_CONFIG_DIR_DEBUG_LVL = 508,
+        TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS = 509,
+        TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS = 510,
+        TOK_CONFIG_SEC_HASH_ENGINE = 511,
+        TOK_CONFIG_SEC_HASH_KEY = 512,
+        TOK_CONFIG_SEC_HASH_PARAM = 513,
+        TOK_CONFIG_SEC_HASH_METHOD_RX = 514,
+        TOK_CONFIG_SEC_HASH_METHOD_PM = 515,
+        TOK_CONFIG_SEC_CHROOT_DIR = 516,
+        TOK_CONFIG_DIR_GEO_DB = 517,
+        TOK_CONFIG_DIR_GSB_DB = 518,
+        TOK_CONFIG_SEC_GUARDIAN_LOG = 519,
+        TOK_CONFIG_DIR_PCRE_MATCH_LIMIT = 520,
+        TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION = 521,
+        TOK_CONFIG_SEC_CONN_R_STATE_LIMIT = 522,
+        TOK_CONFIG_SEC_CONN_W_STATE_LIMIT = 523,
+        TOK_CONFIG_SEC_SENSOR_ID = 524,
+        TOK_CONFIG_DIR_REQ_BODY = 525,
+        TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT = 526,
+        TOK_CONFIG_DIR_REQ_BODY_LIMIT = 527,
+        TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION = 528,
+        TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT = 529,
+        TOK_CONFIG_DIR_RES_BODY = 530,
+        TOK_CONFIG_DIR_RES_BODY_LIMIT = 531,
+        TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION = 532,
+        TOK_CONFIG_SEC_RULE_INHERITANCE = 533,
+        TOK_CONFIG_SEC_RULE_PERF_TIME = 534,
+        TOK_CONFIG_DIR_RULE_ENG = 535,
+        TOK_CONFIG_DIR_SEC_ACTION = 536,
+        TOK_CONFIG_DIR_SEC_DEFAULT_ACTION = 537,
+        TOK_CONFIG_DIR_SEC_MARKER = 538,
+        TOK_CONFIG_DIR_UNICODE_MAP_FILE = 539,
+        TOK_CONFIG_DIR_UNICODE_CODE_PAGE = 540,
+        TOK_CONFIG_SEC_COLLECTION_TIMEOUT = 541,
+        TOK_CONFIG_SEC_HTTP_BLKEY = 542,
+        TOK_CONFIG_SEC_INTERCEPT_ON_ERROR = 543,
+        TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION = 544,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_ID = 545,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG = 546,
+        TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG = 547,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG = 548,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG = 549,
+        TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID = 550,
+        TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID = 551,
+        TOK_CONFIG_UPDLOAD_KEEP_FILES = 552,
+        TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES = 553,
+        TOK_CONFIG_UPLOAD_DIR = 554,
+        TOK_CONFIG_UPLOAD_FILE_LIMIT = 555,
+        TOK_CONFIG_UPLOAD_FILE_MODE = 556,
+        TOK_CONFIG_VALUE_ABORT = 557,
+        TOK_CONFIG_VALUE_DETC = 558,
+        TOK_CONFIG_VALUE_HTTPS = 559,
+        TOK_CONFIG_VALUE_OFF = 560,
+        TOK_CONFIG_VALUE_ON = 561,
+        TOK_CONFIG_VALUE_PARALLEL = 562,
+        TOK_CONFIG_VALUE_PROCESS_PARTIAL = 563,
+        TOK_CONFIG_VALUE_REJECT = 564,
+        TOK_CONFIG_VALUE_RELEVANT_ONLY = 565,
+        TOK_CONFIG_VALUE_SERIAL = 566,
+        TOK_CONFIG_VALUE_WARN = 567,
+        TOK_CONFIG_XML_EXTERNAL_ENTITY = 568,
+        TOK_CONGIG_DIR_RESPONSE_BODY_MP = 569,
+        TOK_CONGIG_DIR_SEC_ARG_SEP = 570,
+        TOK_CONGIG_DIR_SEC_COOKIE_FORMAT = 571,
+        TOK_CONFIG_SEC_COOKIEV0_SEPARATOR = 572,
+        TOK_CONGIG_DIR_SEC_DATA_DIR = 573,
+        TOK_CONGIG_DIR_SEC_STATUS_ENGINE = 574,
+        TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION = 575,
+        TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION = 576,
+        TOK_CONGIG_DIR_SEC_TMP_DIR = 577,
+        TOK_DIRECTIVE = 578,
+        TOK_DIRECTIVE_SECRULESCRIPT = 579,
+        TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION = 580,
+        TOK_QUOTATION_MARK = 581,
+        TOK_RUN_TIME_VAR_BLD = 582,
+        TOK_RUN_TIME_VAR_DUR = 583,
+        TOK_RUN_TIME_VAR_HSV = 584,
+        TOK_RUN_TIME_VAR_REMOTE_USER = 585,
+        TOK_RUN_TIME_VAR_TIME = 586,
+        TOK_RUN_TIME_VAR_TIME_DAY = 587,
+        TOK_RUN_TIME_VAR_TIME_EPOCH = 588,
+        TOK_RUN_TIME_VAR_TIME_HOUR = 589,
+        TOK_RUN_TIME_VAR_TIME_MIN = 590,
+        TOK_RUN_TIME_VAR_TIME_MON = 591,
+        TOK_RUN_TIME_VAR_TIME_SEC = 592,
+        TOK_RUN_TIME_VAR_TIME_WDAY = 593,
+        TOK_RUN_TIME_VAR_TIME_YEAR = 594,
+        TOK_VARIABLE = 595,
+        TOK_DICT_ELEMENT = 596,
+        TOK_DICT_ELEMENT_REGEXP = 597
       };
     };
 
     /// (External) token type, as returned by yylex.
     typedef token::yytokentype token_type;
 
-    /// Symbol type: an internal symbol number.
+    /// Internal symbol number.
     typedef int symbol_number_type;
 
-    /// The symbol type number to denote an empty symbol.
-    enum { empty_symbol = -2 };
-
     /// Internal symbol number for tokens (subsumed by symbol_number_type).
-    typedef unsigned short token_number_type;
+    typedef unsigned short int token_number_type;
 
     /// A complete symbol.
     ///
     /// Expects its Base type to provide access to the symbol type
-    /// via type_get ().
+    /// via type_get().
     ///
     /// Provide access to semantic value and location.
     template <typename Base>
@@ -1301,382 +1199,36 @@ namespace yy {
       typedef Base super_type;
 
       /// Default constructor.
-      basic_symbol ()
-        : value ()
-        , location ()
-      {}
-
-#if 201103L <= YY_CPLUSPLUS
-      /// Move constructor.
-      basic_symbol (basic_symbol&& that);
-#endif
+      basic_symbol ();
 
       /// Copy constructor.
-      basic_symbol (const basic_symbol& that);
+      basic_symbol (const basic_symbol& other);
 
       /// Constructor for valueless symbols, and symbols from each type.
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, location_type&& l)
-        : Base (t)
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const location_type& l)
-        : Base (t)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::string&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::string& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::unique_ptr<Operator>&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator>& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::unique_ptr<RunTimeString>&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString>& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::unique_ptr<Variable>&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::unique_ptr<Variable>& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::unique_ptr<actions::Action>&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::unique_ptr<actions::Action>& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::unique_ptr<std::vector<std::unique_ptr<Variable> > > && v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<Variable> > > & v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > && v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > & v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
 
-      /// Destroy the symbol.
-      ~basic_symbol ()
-      {
-        clear ();
-      }
+  basic_symbol (typename Base::kind_type t, const location_type& l);
 
-      /// Destroy contents, and record that is empty.
-      void clear ()
-      {
-        // User destructor.
-        symbol_number_type yytype = this->type_get ();
-        basic_symbol<Base>& yysym = *this;
-        (void) yysym;
-        switch (yytype)
-        {
-       default:
-          break;
-        }
+  basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l);
 
-        // Type destructor.
-switch (yytype)
-    {
-      case 145: // "Accuracy"
-      case 146: // "Allow"
-      case 147: // "Append"
-      case 148: // "AuditLog"
-      case 149: // "Block"
-      case 150: // "Capture"
-      case 151: // "Chain"
-      case 152: // "ACTION_CTL_AUDIT_ENGINE"
-      case 153: // "ACTION_CTL_AUDIT_LOG_PARTS"
-      case 154: // "ACTION_CTL_BDY_JSON"
-      case 155: // "ACTION_CTL_BDY_XML"
-      case 156: // "ACTION_CTL_BDY_URLENCODED"
-      case 157: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
-      case 158: // "ACTION_CTL_REQUEST_BODY_ACCESS"
-      case 159: // "ACTION_CTL_RULE_REMOVE_BY_ID"
-      case 160: // "ACTION_CTL_RULE_REMOVE_BY_TAG"
-      case 161: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
-      case 162: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
-      case 163: // "Deny"
-      case 164: // "DeprecateVar"
-      case 165: // "Drop"
-      case 166: // "Exec"
-      case 167: // "ExpireVar"
-      case 168: // "Id"
-      case 169: // "InitCol"
-      case 170: // "Log"
-      case 171: // "LogData"
-      case 172: // "Maturity"
-      case 173: // "Msg"
-      case 174: // "MultiMatch"
-      case 175: // "NoAuditLog"
-      case 176: // "NoLog"
-      case 177: // "Pass"
-      case 178: // "Pause"
-      case 179: // "Phase"
-      case 180: // "Prepend"
-      case 181: // "Proxy"
-      case 182: // "Redirect"
-      case 183: // "Rev"
-      case 184: // "SanitiseArg"
-      case 185: // "SanitiseMatched"
-      case 186: // "SanitiseMatchedBytes"
-      case 187: // "SanitiseRequestHeader"
-      case 188: // "SanitiseResponseHeader"
-      case 189: // "SetEnv"
-      case 190: // "SetRsc"
-      case 191: // "SetSid"
-      case 192: // "SetUID"
-      case 193: // "Severity"
-      case 194: // "Skip"
-      case 195: // "SkipAfter"
-      case 196: // "Status"
-      case 197: // "Tag"
-      case 198: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
-      case 199: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
-      case 200: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
-      case 201: // "ACTION_TRANSFORMATION_CMD_LINE"
-      case 202: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-      case 203: // "ACTION_TRANSFORMATION_CSS_DECODE"
-      case 204: // "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
-      case 205: // "ACTION_TRANSFORMATION_HEX_ENCODE"
-      case 206: // "ACTION_TRANSFORMATION_HEX_DECODE"
-      case 207: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-      case 208: // "ACTION_TRANSFORMATION_JS_DECODE"
-      case 209: // "ACTION_TRANSFORMATION_LENGTH"
-      case 210: // "ACTION_TRANSFORMATION_LOWERCASE"
-      case 211: // "ACTION_TRANSFORMATION_MD5"
-      case 212: // "ACTION_TRANSFORMATION_NONE"
-      case 213: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
-      case 214: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-      case 215: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-      case 216: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-      case 217: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-      case 218: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-      case 219: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-      case 220: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
-      case 221: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-      case 222: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-      case 223: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
-      case 224: // "ACTION_TRANSFORMATION_SHA1"
-      case 225: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-      case 226: // "ACTION_TRANSFORMATION_TRIM"
-      case 227: // "ACTION_TRANSFORMATION_TRIM_LEFT"
-      case 228: // "ACTION_TRANSFORMATION_TRIM_RIGHT"
-      case 229: // "ACTION_TRANSFORMATION_UPPERCASE"
-      case 230: // "ACTION_TRANSFORMATION_URL_ENCODE"
-      case 231: // "ACTION_TRANSFORMATION_URL_DECODE"
-      case 232: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-      case 233: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 234: // "Ver"
-      case 235: // "xmlns"
-      case 236: // "CONFIG_COMPONENT_SIG"
-      case 237: // "CONFIG_CONN_ENGINE"
-      case 238: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 239: // "CONFIG_SEC_WEB_APP_ID"
-      case 240: // "CONFIG_SEC_SERVER_SIG"
-      case 241: // "CONFIG_DIR_AUDIT_DIR"
-      case 242: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 243: // "CONFIG_DIR_AUDIT_ENG"
-      case 244: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 245: // "CONFIG_DIR_AUDIT_LOG"
-      case 246: // "CONFIG_DIR_AUDIT_LOG2"
-      case 247: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 248: // "CONFIG_DIR_AUDIT_STS"
-      case 249: // "CONFIG_DIR_AUDIT_TPE"
-      case 250: // "CONFIG_DIR_DEBUG_LOG"
-      case 251: // "CONFIG_DIR_DEBUG_LVL"
-      case 252: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 253: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
-      case 254: // "CONFIG_SEC_HASH_ENGINE"
-      case 255: // "CONFIG_SEC_HASH_KEY"
-      case 256: // "CONFIG_SEC_HASH_PARAM"
-      case 257: // "CONFIG_SEC_HASH_METHOD_RX"
-      case 258: // "CONFIG_SEC_HASH_METHOD_PM"
-      case 259: // "CONFIG_SEC_CHROOT_DIR"
-      case 260: // "CONFIG_DIR_GEO_DB"
-      case 261: // "CONFIG_DIR_GSB_DB"
-      case 262: // "CONFIG_SEC_GUARDIAN_LOG"
-      case 263: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 264: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 265: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
-      case 266: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
-      case 267: // "CONFIG_SEC_SENSOR_ID"
-      case 268: // "CONFIG_DIR_REQ_BODY"
-      case 269: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 270: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 271: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 272: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 273: // "CONFIG_DIR_RES_BODY"
-      case 274: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 275: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 276: // "CONFIG_SEC_RULE_INHERITANCE"
-      case 277: // "CONFIG_SEC_RULE_PERF_TIME"
-      case 278: // "CONFIG_DIR_RULE_ENG"
-      case 279: // "CONFIG_DIR_SEC_ACTION"
-      case 280: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 281: // "CONFIG_DIR_SEC_MARKER"
-      case 282: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 283: // "CONFIG_DIR_UNICODE_CODE_PAGE"
-      case 284: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 285: // "CONFIG_SEC_HTTP_BLKEY"
-      case 286: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 287: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 289: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 290: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 292: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 293: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 294: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 295: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 296: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 297: // "CONFIG_UPLOAD_DIR"
-      case 298: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 299: // "CONFIG_UPLOAD_FILE_MODE"
-      case 300: // "CONFIG_VALUE_ABORT"
-      case 301: // "CONFIG_VALUE_DETC"
-      case 302: // "CONFIG_VALUE_HTTPS"
-      case 303: // "CONFIG_VALUE_OFF"
-      case 304: // "CONFIG_VALUE_ON"
-      case 305: // "CONFIG_VALUE_PARALLEL"
-      case 306: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 307: // "CONFIG_VALUE_REJECT"
-      case 308: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 309: // "CONFIG_VALUE_SERIAL"
-      case 310: // "CONFIG_VALUE_WARN"
-      case 311: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 312: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 313: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 314: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 315: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 316: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 317: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 318: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 319: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 320: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 321: // "DIRECTIVE"
-      case 322: // "DIRECTIVE_SECRULESCRIPT"
-      case 323: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 324: // "QUOTATION_MARK"
-      case 325: // "RUN_TIME_VAR_BLD"
-      case 326: // "RUN_TIME_VAR_DUR"
-      case 327: // "RUN_TIME_VAR_HSV"
-      case 328: // "RUN_TIME_VAR_REMOTE_USER"
-      case 329: // "RUN_TIME_VAR_TIME"
-      case 330: // "RUN_TIME_VAR_TIME_DAY"
-      case 331: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 332: // "RUN_TIME_VAR_TIME_HOUR"
-      case 333: // "RUN_TIME_VAR_TIME_MIN"
-      case 334: // "RUN_TIME_VAR_TIME_MON"
-      case 335: // "RUN_TIME_VAR_TIME_SEC"
-      case 336: // "RUN_TIME_VAR_TIME_WDAY"
-      case 337: // "RUN_TIME_VAR_TIME_YEAR"
-      case 338: // "VARIABLE"
-      case 339: // "Dictionary element"
-      case 340: // "Dictionary element, selected by regexp"
-        value.template destroy< std::string > ();
-        break;
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator> v, const location_type& l);
 
-      case 347: // op
-      case 348: // op_before_init
-        value.template destroy< std::unique_ptr<Operator> > ();
-        break;
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString> v, const location_type& l);
 
-      case 356: // run_time_string
-        value.template destroy< std::unique_ptr<RunTimeString> > ();
-        break;
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<Variable> v, const location_type& l);
 
-      case 353: // var
-        value.template destroy< std::unique_ptr<Variable> > ();
-        break;
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<actions::Action> v, const location_type& l);
 
-      case 354: // act
-      case 355: // setvar_action
-        value.template destroy< std::unique_ptr<actions::Action> > ();
-        break;
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  v, const location_type& l);
 
-      case 350: // variables
-      case 351: // variables_pre_process
-      case 352: // variables_may_be_quoted
-        value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
-        break;
+  basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  v, const location_type& l);
 
-      case 345: // actions
-      case 346: // actions_may_quoted
-        value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ();
-        break;
 
-      default:
-        break;
-    }
+      /// Constructor for symbols with semantic value.
+      basic_symbol (typename Base::kind_type t,
+                    const semantic_type& v,
+                    const location_type& l);
 
-        Base::clear ();
-      }
-
-      /// Whether empty.
-      bool empty () const YY_NOEXCEPT;
+      ~basic_symbol ();
 
       /// Destructive move, \a s is emptied into this.
       void move (basic_symbol& s);
@@ -1688,10 +1240,8 @@ switch (yytype)
       location_type location;
 
     private:
-#if YY_CPLUSPLUS < 201103L
       /// Assignment operator.
-      basic_symbol& operator= (const basic_symbol& that);
-#endif
+      basic_symbol& operator= (const basic_symbol& other);
     };
 
     /// Type access provider for token (enum) based symbols.
@@ -1700,13 +1250,8 @@ switch (yytype)
       /// Default constructor.
       by_type ();
 
-#if 201103L <= YY_CPLUSPLUS
-      /// Move constructor.
-      by_type (by_type&& that);
-#endif
-
       /// Copy constructor.
-      by_type (const by_type& that);
+      by_type (const by_type& other);
 
       /// The symbol type as needed by the constructor.
       typedef token_type kind_type;
@@ -1714,70 +1259,1395 @@ switch (yytype)
       /// Constructor from (external) token numbers.
       by_type (kind_type t);
 
-      /// Record that this symbol is empty.
-      void clear ();
-
       /// Steal the symbol type from \a that.
       void move (by_type& that);
 
       /// The (internal) type number (corresponding to \a type).
-      /// \a empty when empty.
-      symbol_number_type type_get () const YY_NOEXCEPT;
+      /// -1 when this symbol is empty.
+      symbol_number_type type_get () const;
 
       /// The token.
-      token_type token () const YY_NOEXCEPT;
+      token_type token () const;
+
+      enum { empty = 0 };
 
       /// The symbol type.
-      /// \a empty_symbol when empty.
-      /// An int, not token_number_type, to be able to store empty_symbol.
-      int type;
+      /// -1 when this symbol is empty.
+      token_number_type type;
     };
 
     /// "External" symbols: returned by the scanner.
-    struct symbol_type : basic_symbol<by_type>
-    {
-      /// Superclass.
-      typedef basic_symbol<by_type> super_type;
+    typedef basic_symbol<by_type> symbol_type;
 
-      /// Empty symbol.
-      symbol_type () {}
+    // Symbol constructors declarations.
+    static inline
+    symbol_type
+    make_END (const location_type& l);
 
-      /// Constructor for valueless symbols, and symbols from each type.
-#if 201103L <= YY_CPLUSPLUS
-      symbol_type (int tok, location_type l)
-        : super_type(token_type (tok), std::move (l))
-      {
-        YYASSERT (tok == token::TOK_END || tok == token::TOK_COMMA || tok == token::TOK_CONFIG_CONTENT_INJECTION || tok == token::TOK_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR || tok == token::TOK_PIPE || tok == token::TOK_NEW_LINE || tok == token::TOK_VAR_COUNT || tok == token::TOK_VAR_EXCLUSION || tok == token::TOK_VARIABLE_ARGS || tok == token::TOK_VARIABLE_ARGS_POST || tok == token::TOK_VARIABLE_ARGS_GET || tok == token::TOK_VARIABLE_FILES_SIZES || tok == token::TOK_VARIABLE_FILES_NAMES || tok == token::TOK_VARIABLE_FILES_TMP_CONTENT || tok == token::TOK_VARIABLE_MULTIPART_FILENAME || tok == token::TOK_VARIABLE_MULTIPART_NAME || tok == token::TOK_VARIABLE_MATCHED_VARS_NAMES || tok == token::TOK_VARIABLE_MATCHED_VARS || tok == token::TOK_VARIABLE_FILES || tok == token::TOK_VARIABLE_REQUEST_COOKIES || tok == token::TOK_VARIABLE_REQUEST_HEADERS || tok == token::TOK_VARIABLE_RESPONSE_HEADERS || tok == token::TOK_VARIABLE_GEO || tok == token::TOK_VARIABLE_REQUEST_COOKIES_NAMES || tok == token::TOK_VARIABLE_ARGS_COMBINED_SIZE || tok == token::TOK_VARIABLE_ARGS_GET_NAMES || tok == token::TOK_VARIABLE_RULE || tok == token::TOK_VARIABLE_ARGS_NAMES || tok == token::TOK_VARIABLE_ARGS_POST_NAMES || tok == token::TOK_VARIABLE_AUTH_TYPE || tok == token::TOK_VARIABLE_FILES_COMBINED_SIZE || tok == token::TOK_VARIABLE_FILES_TMP_NAMES || tok == token::TOK_VARIABLE_FULL_REQUEST || tok == token::TOK_VARIABLE_FULL_REQUEST_LENGTH || tok == token::TOK_VARIABLE_INBOUND_DATA_ERROR || tok == token::TOK_VARIABLE_MATCHED_VAR || tok == token::TOK_VARIABLE_MATCHED_VAR_NAME || tok == token::TOK_VARIABLE_MULTIPART_BOUNDARY_QUOTED || tok == token::TOK_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE || tok == token::TOK_VARIABLE_MULTIPART_CRLF_LF_LINES || tok == token::TOK_VARIABLE_MULTIPART_DATA_AFTER || tok == token::TOK_VARIABLE_MULTIPART_DATA_BEFORE || tok == token::TOK_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED || tok == token::TOK_VARIABLE_MULTIPART_HEADER_FOLDING || tok == token::TOK_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING || tok == token::TOK_VARIABLE_MULTIPART_INVALID_PART || tok == token::TOK_VARIABLE_MULTIPART_INVALID_QUOTING || tok == token::TOK_VARIABLE_MULTIPART_LF_LINE || tok == token::TOK_VARIABLE_MULTIPART_MISSING_SEMICOLON || tok == token::TOK_VARIABLE_MULTIPART_SEMICOLON_MISSING || tok == token::TOK_VARIABLE_MULTIPART_STRICT_ERROR || tok == token::TOK_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY || tok == token::TOK_VARIABLE_OUTBOUND_DATA_ERROR || tok == token::TOK_VARIABLE_PATH_INFO || tok == token::TOK_VARIABLE_QUERY_STRING || tok == token::TOK_VARIABLE_REMOTE_ADDR || tok == token::TOK_VARIABLE_REMOTE_HOST || tok == token::TOK_VARIABLE_REMOTE_PORT || tok == token::TOK_VARIABLE_REQBODY_ERROR_MSG || tok == token::TOK_VARIABLE_REQBODY_ERROR || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR || tok == token::TOK_VARIABLE_REQUEST_BASENAME || tok == token::TOK_VARIABLE_REQUEST_BODY_LENGTH || tok == token::TOK_VARIABLE_REQUEST_BODY || tok == token::TOK_VARIABLE_REQUEST_FILE_NAME || tok == token::TOK_VARIABLE_REQUEST_HEADERS_NAMES || tok == token::TOK_VARIABLE_REQUEST_LINE || tok == token::TOK_VARIABLE_REQUEST_METHOD || tok == token::TOK_VARIABLE_REQUEST_PROTOCOL || tok == token::TOK_VARIABLE_REQUEST_URI_RAW || tok == token::TOK_VARIABLE_REQUEST_URI || tok == token::TOK_VARIABLE_RESOURCE || tok == token::TOK_VARIABLE_RESPONSE_BODY || tok == token::TOK_VARIABLE_RESPONSE_CONTENT_LENGTH || tok == token::TOK_VARIABLE_RESPONSE_CONTENT_TYPE || tok == token::TOK_VARIABLE_RESPONSE_HEADERS_NAMES || tok == token::TOK_VARIABLE_RESPONSE_PROTOCOL || tok == token::TOK_VARIABLE_RESPONSE_STATUS || tok == token::TOK_VARIABLE_SERVER_ADDR || tok == token::TOK_VARIABLE_SERVER_NAME || tok == token::TOK_VARIABLE_SERVER_PORT || tok == token::TOK_VARIABLE_SESSION_ID || tok == token::TOK_VARIABLE_UNIQUE_ID || tok == token::TOK_VARIABLE_URL_ENCODED_ERROR || tok == token::TOK_VARIABLE_USER_ID || tok == token::TOK_VARIABLE_WEB_APP_ID || tok == token::TOK_VARIABLE_STATUS || tok == token::TOK_VARIABLE_STATUS_LINE || tok == token::TOK_VARIABLE_IP || tok == token::TOK_VARIABLE_GLOBAL || tok == token::TOK_VARIABLE_TX || tok == token::TOK_VARIABLE_SESSION || tok == token::TOK_VARIABLE_USER || tok == token::TOK_RUN_TIME_VAR_ENV || tok == token::TOK_RUN_TIME_VAR_XML || tok == token::TOK_ACTION_SETVAR || tok == token::TOK_SETVAR_OPERATION_EQUALS || tok == token::TOK_SETVAR_OPERATION_EQUALS_PLUS || tok == token::TOK_SETVAR_OPERATION_EQUALS_MINUS || tok == token::TOK_NOT || tok == token::TOK_OPERATOR_BEGINS_WITH || tok == token::TOK_OPERATOR_CONTAINS || tok == token::TOK_OPERATOR_CONTAINS_WORD || tok == token::TOK_OPERATOR_DETECT_SQLI || tok == token::TOK_OPERATOR_DETECT_XSS || tok == token::TOK_OPERATOR_ENDS_WITH || tok == token::TOK_OPERATOR_EQ || tok == token::TOK_OPERATOR_FUZZY_HASH || tok == token::TOK_OPERATOR_GEOLOOKUP || tok == token::TOK_OPERATOR_GE || tok == token::TOK_OPERATOR_GSB_LOOKUP || tok == token::TOK_OPERATOR_GT || tok == token::TOK_OPERATOR_INSPECT_FILE || tok == token::TOK_OPERATOR_IP_MATCH_FROM_FILE || tok == token::TOK_OPERATOR_IP_MATCH || tok == token::TOK_OPERATOR_LE || tok == token::TOK_OPERATOR_LT || tok == token::TOK_OPERATOR_PM_FROM_FILE || tok == token::TOK_OPERATOR_PM || tok == token::TOK_OPERATOR_RBL || tok == token::TOK_OPERATOR_RSUB || tok == token::TOK_OPERATOR_RX_CONTENT_ONLY || tok == token::TOK_OPERATOR_RX || tok == token::TOK_OPERATOR_STR_EQ || tok == token::TOK_OPERATOR_STR_MATCH || tok == token::TOK_OPERATOR_UNCONDITIONAL_MATCH || tok == token::TOK_OPERATOR_VALIDATE_BYTE_RANGE || tok == token::TOK_OPERATOR_VALIDATE_DTD || tok == token::TOK_OPERATOR_VALIDATE_HASH || tok == token::TOK_OPERATOR_VALIDATE_SCHEMA || tok == token::TOK_OPERATOR_VALIDATE_URL_ENCODING || tok == token::TOK_OPERATOR_VALIDATE_UTF8_ENCODING || tok == token::TOK_OPERATOR_VERIFY_CC || tok == token::TOK_OPERATOR_VERIFY_CPF || tok == token::TOK_OPERATOR_VERIFY_SSN || tok == token::TOK_OPERATOR_VERIFY_SVNR || tok == token::TOK_OPERATOR_WITHIN || tok == token::TOK_CONFIG_DIR_AUDIT_LOG_FMT || tok == token::TOK_JSON || tok == token::TOK_NATIVE || tok == token::TOK_ACTION_CTL_RULE_ENGINE);
-      }
-#else
-      symbol_type (int tok, const location_type& l)
-        : super_type(token_type (tok), l)
-      {
-        YYASSERT (tok == token::TOK_END || tok == token::TOK_COMMA || tok == token::TOK_CONFIG_CONTENT_INJECTION || tok == token::TOK_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR || tok == token::TOK_PIPE || tok == token::TOK_NEW_LINE || tok == token::TOK_VAR_COUNT || tok == token::TOK_VAR_EXCLUSION || tok == token::TOK_VARIABLE_ARGS || tok == token::TOK_VARIABLE_ARGS_POST || tok == token::TOK_VARIABLE_ARGS_GET || tok == token::TOK_VARIABLE_FILES_SIZES || tok == token::TOK_VARIABLE_FILES_NAMES || tok == token::TOK_VARIABLE_FILES_TMP_CONTENT || tok == token::TOK_VARIABLE_MULTIPART_FILENAME || tok == token::TOK_VARIABLE_MULTIPART_NAME || tok == token::TOK_VARIABLE_MATCHED_VARS_NAMES || tok == token::TOK_VARIABLE_MATCHED_VARS || tok == token::TOK_VARIABLE_FILES || tok == token::TOK_VARIABLE_REQUEST_COOKIES || tok == token::TOK_VARIABLE_REQUEST_HEADERS || tok == token::TOK_VARIABLE_RESPONSE_HEADERS || tok == token::TOK_VARIABLE_GEO || tok == token::TOK_VARIABLE_REQUEST_COOKIES_NAMES || tok == token::TOK_VARIABLE_ARGS_COMBINED_SIZE || tok == token::TOK_VARIABLE_ARGS_GET_NAMES || tok == token::TOK_VARIABLE_RULE || tok == token::TOK_VARIABLE_ARGS_NAMES || tok == token::TOK_VARIABLE_ARGS_POST_NAMES || tok == token::TOK_VARIABLE_AUTH_TYPE || tok == token::TOK_VARIABLE_FILES_COMBINED_SIZE || tok == token::TOK_VARIABLE_FILES_TMP_NAMES || tok == token::TOK_VARIABLE_FULL_REQUEST || tok == token::TOK_VARIABLE_FULL_REQUEST_LENGTH || tok == token::TOK_VARIABLE_INBOUND_DATA_ERROR || tok == token::TOK_VARIABLE_MATCHED_VAR || tok == token::TOK_VARIABLE_MATCHED_VAR_NAME || tok == token::TOK_VARIABLE_MULTIPART_BOUNDARY_QUOTED || tok == token::TOK_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE || tok == token::TOK_VARIABLE_MULTIPART_CRLF_LF_LINES || tok == token::TOK_VARIABLE_MULTIPART_DATA_AFTER || tok == token::TOK_VARIABLE_MULTIPART_DATA_BEFORE || tok == token::TOK_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED || tok == token::TOK_VARIABLE_MULTIPART_HEADER_FOLDING || tok == token::TOK_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING || tok == token::TOK_VARIABLE_MULTIPART_INVALID_PART || tok == token::TOK_VARIABLE_MULTIPART_INVALID_QUOTING || tok == token::TOK_VARIABLE_MULTIPART_LF_LINE || tok == token::TOK_VARIABLE_MULTIPART_MISSING_SEMICOLON || tok == token::TOK_VARIABLE_MULTIPART_SEMICOLON_MISSING || tok == token::TOK_VARIABLE_MULTIPART_STRICT_ERROR || tok == token::TOK_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY || tok == token::TOK_VARIABLE_OUTBOUND_DATA_ERROR || tok == token::TOK_VARIABLE_PATH_INFO || tok == token::TOK_VARIABLE_QUERY_STRING || tok == token::TOK_VARIABLE_REMOTE_ADDR || tok == token::TOK_VARIABLE_REMOTE_HOST || tok == token::TOK_VARIABLE_REMOTE_PORT || tok == token::TOK_VARIABLE_REQBODY_ERROR_MSG || tok == token::TOK_VARIABLE_REQBODY_ERROR || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR || tok == token::TOK_VARIABLE_REQUEST_BASENAME || tok == token::TOK_VARIABLE_REQUEST_BODY_LENGTH || tok == token::TOK_VARIABLE_REQUEST_BODY || tok == token::TOK_VARIABLE_REQUEST_FILE_NAME || tok == token::TOK_VARIABLE_REQUEST_HEADERS_NAMES || tok == token::TOK_VARIABLE_REQUEST_LINE || tok == token::TOK_VARIABLE_REQUEST_METHOD || tok == token::TOK_VARIABLE_REQUEST_PROTOCOL || tok == token::TOK_VARIABLE_REQUEST_URI_RAW || tok == token::TOK_VARIABLE_REQUEST_URI || tok == token::TOK_VARIABLE_RESOURCE || tok == token::TOK_VARIABLE_RESPONSE_BODY || tok == token::TOK_VARIABLE_RESPONSE_CONTENT_LENGTH || tok == token::TOK_VARIABLE_RESPONSE_CONTENT_TYPE || tok == token::TOK_VARIABLE_RESPONSE_HEADERS_NAMES || tok == token::TOK_VARIABLE_RESPONSE_PROTOCOL || tok == token::TOK_VARIABLE_RESPONSE_STATUS || tok == token::TOK_VARIABLE_SERVER_ADDR || tok == token::TOK_VARIABLE_SERVER_NAME || tok == token::TOK_VARIABLE_SERVER_PORT || tok == token::TOK_VARIABLE_SESSION_ID || tok == token::TOK_VARIABLE_UNIQUE_ID || tok == token::TOK_VARIABLE_URL_ENCODED_ERROR || tok == token::TOK_VARIABLE_USER_ID || tok == token::TOK_VARIABLE_WEB_APP_ID || tok == token::TOK_VARIABLE_STATUS || tok == token::TOK_VARIABLE_STATUS_LINE || tok == token::TOK_VARIABLE_IP || tok == token::TOK_VARIABLE_GLOBAL || tok == token::TOK_VARIABLE_TX || tok == token::TOK_VARIABLE_SESSION || tok == token::TOK_VARIABLE_USER || tok == token::TOK_RUN_TIME_VAR_ENV || tok == token::TOK_RUN_TIME_VAR_XML || tok == token::TOK_ACTION_SETVAR || tok == token::TOK_SETVAR_OPERATION_EQUALS || tok == token::TOK_SETVAR_OPERATION_EQUALS_PLUS || tok == token::TOK_SETVAR_OPERATION_EQUALS_MINUS || tok == token::TOK_NOT || tok == token::TOK_OPERATOR_BEGINS_WITH || tok == token::TOK_OPERATOR_CONTAINS || tok == token::TOK_OPERATOR_CONTAINS_WORD || tok == token::TOK_OPERATOR_DETECT_SQLI || tok == token::TOK_OPERATOR_DETECT_XSS || tok == token::TOK_OPERATOR_ENDS_WITH || tok == token::TOK_OPERATOR_EQ || tok == token::TOK_OPERATOR_FUZZY_HASH || tok == token::TOK_OPERATOR_GEOLOOKUP || tok == token::TOK_OPERATOR_GE || tok == token::TOK_OPERATOR_GSB_LOOKUP || tok == token::TOK_OPERATOR_GT || tok == token::TOK_OPERATOR_INSPECT_FILE || tok == token::TOK_OPERATOR_IP_MATCH_FROM_FILE || tok == token::TOK_OPERATOR_IP_MATCH || tok == token::TOK_OPERATOR_LE || tok == token::TOK_OPERATOR_LT || tok == token::TOK_OPERATOR_PM_FROM_FILE || tok == token::TOK_OPERATOR_PM || tok == token::TOK_OPERATOR_RBL || tok == token::TOK_OPERATOR_RSUB || tok == token::TOK_OPERATOR_RX_CONTENT_ONLY || tok == token::TOK_OPERATOR_RX || tok == token::TOK_OPERATOR_STR_EQ || tok == token::TOK_OPERATOR_STR_MATCH || tok == token::TOK_OPERATOR_UNCONDITIONAL_MATCH || tok == token::TOK_OPERATOR_VALIDATE_BYTE_RANGE || tok == token::TOK_OPERATOR_VALIDATE_DTD || tok == token::TOK_OPERATOR_VALIDATE_HASH || tok == token::TOK_OPERATOR_VALIDATE_SCHEMA || tok == token::TOK_OPERATOR_VALIDATE_URL_ENCODING || tok == token::TOK_OPERATOR_VALIDATE_UTF8_ENCODING || tok == token::TOK_OPERATOR_VERIFY_CC || tok == token::TOK_OPERATOR_VERIFY_CPF || tok == token::TOK_OPERATOR_VERIFY_SSN || tok == token::TOK_OPERATOR_VERIFY_SVNR || tok == token::TOK_OPERATOR_WITHIN || tok == token::TOK_CONFIG_DIR_AUDIT_LOG_FMT || tok == token::TOK_JSON || tok == token::TOK_NATIVE || tok == token::TOK_ACTION_CTL_RULE_ENGINE);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      symbol_type (int tok, std::string v, location_type l)
-        : super_type(token_type (tok), std::move (v), std::move (l))
-      {
-        YYASSERT (tok == token::TOK_ACTION_ACCURACY || tok == token::TOK_ACTION_ALLOW || tok == token::TOK_ACTION_APPEND || tok == token::TOK_ACTION_AUDIT_LOG || tok == token::TOK_ACTION_BLOCK || tok == token::TOK_ACTION_CAPTURE || tok == token::TOK_ACTION_CHAIN || tok == token::TOK_ACTION_CTL_AUDIT_ENGINE || tok == token::TOK_ACTION_CTL_AUDIT_LOG_PARTS || tok == token::TOK_ACTION_CTL_BDY_JSON || tok == token::TOK_ACTION_CTL_BDY_XML || tok == token::TOK_ACTION_CTL_BDY_URLENCODED || tok == token::TOK_ACTION_CTL_FORCE_REQ_BODY_VAR || tok == token::TOK_ACTION_CTL_REQUEST_BODY_ACCESS || tok == token::TOK_ACTION_CTL_RULE_REMOVE_BY_ID || tok == token::TOK_ACTION_CTL_RULE_REMOVE_BY_TAG || tok == token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID || tok == token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG || tok == token::TOK_ACTION_DENY || tok == token::TOK_ACTION_DEPRECATE_VAR || tok == token::TOK_ACTION_DROP || tok == token::TOK_ACTION_EXEC || tok == token::TOK_ACTION_EXPIRE_VAR || tok == token::TOK_ACTION_ID || tok == token::TOK_ACTION_INITCOL || tok == token::TOK_ACTION_LOG || tok == token::TOK_ACTION_LOG_DATA || tok == token::TOK_ACTION_MATURITY || tok == token::TOK_ACTION_MSG || tok == token::TOK_ACTION_MULTI_MATCH || tok == token::TOK_ACTION_NO_AUDIT_LOG || tok == token::TOK_ACTION_NO_LOG || tok == token::TOK_ACTION_PASS || tok == token::TOK_ACTION_PAUSE || tok == token::TOK_ACTION_PHASE || tok == token::TOK_ACTION_PREPEND || tok == token::TOK_ACTION_PROXY || tok == token::TOK_ACTION_REDIRECT || tok == token::TOK_ACTION_REV || tok == token::TOK_ACTION_SANITISE_ARG || tok == token::TOK_ACTION_SANITISE_MATCHED || tok == token::TOK_ACTION_SANITISE_MATCHED_BYTES || tok == token::TOK_ACTION_SANITISE_REQUEST_HEADER || tok == token::TOK_ACTION_SANITISE_RESPONSE_HEADER || tok == token::TOK_ACTION_SETENV || tok == token::TOK_ACTION_SETRSC || tok == token::TOK_ACTION_SETSID || tok == token::TOK_ACTION_SETUID || tok == token::TOK_ACTION_SEVERITY || tok == token::TOK_ACTION_SKIP || tok == token::TOK_ACTION_SKIP_AFTER || tok == token::TOK_ACTION_STATUS || tok == token::TOK_ACTION_TAG || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT || tok == token::TOK_ACTION_TRANSFORMATION_CMD_LINE || tok == token::TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE || tok == token::TOK_ACTION_TRANSFORMATION_CSS_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_HEX_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_HEX_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_JS_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_LENGTH || tok == token::TOK_ACTION_TRANSFORMATION_LOWERCASE || tok == token::TOK_ACTION_TRANSFORMATION_MD5 || tok == token::TOK_ACTION_TRANSFORMATION_NONE || tok == token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH || tok == token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_NULLS || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE || tok == token::TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS || tok == token::TOK_ACTION_TRANSFORMATION_REPLACE_NULLS || tok == token::TOK_ACTION_TRANSFORMATION_SHA1 || tok == token::TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_TRIM || tok == token::TOK_ACTION_TRANSFORMATION_TRIM_LEFT || tok == token::TOK_ACTION_TRANSFORMATION_TRIM_RIGHT || tok == token::TOK_ACTION_TRANSFORMATION_UPPERCASE || tok == token::TOK_ACTION_TRANSFORMATION_URL_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_URL_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI || tok == token::TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE || tok == token::TOK_ACTION_VER || tok == token::TOK_ACTION_XMLNS || tok == token::TOK_CONFIG_COMPONENT_SIG || tok == token::TOK_CONFIG_CONN_ENGINE || tok == token::TOK_CONFIG_SEC_ARGUMENT_SEPARATOR || tok == token::TOK_CONFIG_SEC_WEB_APP_ID || tok == token::TOK_CONFIG_SEC_SERVER_SIG || tok == token::TOK_CONFIG_DIR_AUDIT_DIR || tok == token::TOK_CONFIG_DIR_AUDIT_DIR_MOD || tok == token::TOK_CONFIG_DIR_AUDIT_ENG || tok == token::TOK_CONFIG_DIR_AUDIT_FLE_MOD || tok == token::TOK_CONFIG_DIR_AUDIT_LOG || tok == token::TOK_CONFIG_DIR_AUDIT_LOG2 || tok == token::TOK_CONFIG_DIR_AUDIT_LOG_P || tok == token::TOK_CONFIG_DIR_AUDIT_STS || tok == token::TOK_CONFIG_DIR_AUDIT_TPE || tok == token::TOK_CONFIG_DIR_DEBUG_LOG || tok == token::TOK_CONFIG_DIR_DEBUG_LVL || tok == token::TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS || tok == token::TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS || tok == token::TOK_CONFIG_SEC_HASH_ENGINE || tok == token::TOK_CONFIG_SEC_HASH_KEY || tok == token::TOK_CONFIG_SEC_HASH_PARAM || tok == token::TOK_CONFIG_SEC_HASH_METHOD_RX || tok == token::TOK_CONFIG_SEC_HASH_METHOD_PM || tok == token::TOK_CONFIG_SEC_CHROOT_DIR || tok == token::TOK_CONFIG_DIR_GEO_DB || tok == token::TOK_CONFIG_DIR_GSB_DB || tok == token::TOK_CONFIG_SEC_GUARDIAN_LOG || tok == token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT || tok == token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION || tok == token::TOK_CONFIG_SEC_CONN_R_STATE_LIMIT || tok == token::TOK_CONFIG_SEC_CONN_W_STATE_LIMIT || tok == token::TOK_CONFIG_SEC_SENSOR_ID || tok == token::TOK_CONFIG_DIR_REQ_BODY || tok == token::TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION || tok == token::TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT || tok == token::TOK_CONFIG_DIR_RES_BODY || tok == token::TOK_CONFIG_DIR_RES_BODY_LIMIT || tok == token::TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION || tok == token::TOK_CONFIG_SEC_RULE_INHERITANCE || tok == token::TOK_CONFIG_SEC_RULE_PERF_TIME || tok == token::TOK_CONFIG_DIR_RULE_ENG || tok == token::TOK_CONFIG_DIR_SEC_ACTION || tok == token::TOK_CONFIG_DIR_SEC_DEFAULT_ACTION || tok == token::TOK_CONFIG_DIR_SEC_MARKER || tok == token::TOK_CONFIG_DIR_UNICODE_MAP_FILE || tok == token::TOK_CONFIG_DIR_UNICODE_CODE_PAGE || tok == token::TOK_CONFIG_SEC_COLLECTION_TIMEOUT || tok == token::TOK_CONFIG_SEC_HTTP_BLKEY || tok == token::TOK_CONFIG_SEC_INTERCEPT_ON_ERROR || tok == token::TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_ID || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID || tok == token::TOK_CONFIG_UPDLOAD_KEEP_FILES || tok == token::TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES || tok == token::TOK_CONFIG_UPLOAD_DIR || tok == token::TOK_CONFIG_UPLOAD_FILE_LIMIT || tok == token::TOK_CONFIG_UPLOAD_FILE_MODE || tok == token::TOK_CONFIG_VALUE_ABORT || tok == token::TOK_CONFIG_VALUE_DETC || tok == token::TOK_CONFIG_VALUE_HTTPS || tok == token::TOK_CONFIG_VALUE_OFF || tok == token::TOK_CONFIG_VALUE_ON || tok == token::TOK_CONFIG_VALUE_PARALLEL || tok == token::TOK_CONFIG_VALUE_PROCESS_PARTIAL || tok == token::TOK_CONFIG_VALUE_REJECT || tok == token::TOK_CONFIG_VALUE_RELEVANT_ONLY || tok == token::TOK_CONFIG_VALUE_SERIAL || tok == token::TOK_CONFIG_VALUE_WARN || tok == token::TOK_CONFIG_XML_EXTERNAL_ENTITY || tok == token::TOK_CONGIG_DIR_RESPONSE_BODY_MP || tok == token::TOK_CONGIG_DIR_SEC_ARG_SEP || tok == token::TOK_CONGIG_DIR_SEC_COOKIE_FORMAT || tok == token::TOK_CONFIG_SEC_COOKIEV0_SEPARATOR || tok == token::TOK_CONGIG_DIR_SEC_DATA_DIR || tok == token::TOK_CONGIG_DIR_SEC_STATUS_ENGINE || tok == token::TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION || tok == token::TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION || tok == token::TOK_CONGIG_DIR_SEC_TMP_DIR || tok == token::TOK_DIRECTIVE || tok == token::TOK_DIRECTIVE_SECRULESCRIPT || tok == token::TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION || tok == token::TOK_QUOTATION_MARK || tok == token::TOK_RUN_TIME_VAR_BLD || tok == token::TOK_RUN_TIME_VAR_DUR || tok == token::TOK_RUN_TIME_VAR_HSV || tok == token::TOK_RUN_TIME_VAR_REMOTE_USER || tok == token::TOK_RUN_TIME_VAR_TIME || tok == token::TOK_RUN_TIME_VAR_TIME_DAY || tok == token::TOK_RUN_TIME_VAR_TIME_EPOCH || tok == token::TOK_RUN_TIME_VAR_TIME_HOUR || tok == token::TOK_RUN_TIME_VAR_TIME_MIN || tok == token::TOK_RUN_TIME_VAR_TIME_MON || tok == token::TOK_RUN_TIME_VAR_TIME_SEC || tok == token::TOK_RUN_TIME_VAR_TIME_WDAY || tok == token::TOK_RUN_TIME_VAR_TIME_YEAR || tok == token::TOK_VARIABLE || tok == token::TOK_DICT_ELEMENT || tok == token::TOK_DICT_ELEMENT_REGEXP);
-      }
-#else
-      symbol_type (int tok, const std::string& v, const location_type& l)
-        : super_type(token_type (tok), v, l)
-      {
-        YYASSERT (tok == token::TOK_ACTION_ACCURACY || tok == token::TOK_ACTION_ALLOW || tok == token::TOK_ACTION_APPEND || tok == token::TOK_ACTION_AUDIT_LOG || tok == token::TOK_ACTION_BLOCK || tok == token::TOK_ACTION_CAPTURE || tok == token::TOK_ACTION_CHAIN || tok == token::TOK_ACTION_CTL_AUDIT_ENGINE || tok == token::TOK_ACTION_CTL_AUDIT_LOG_PARTS || tok == token::TOK_ACTION_CTL_BDY_JSON || tok == token::TOK_ACTION_CTL_BDY_XML || tok == token::TOK_ACTION_CTL_BDY_URLENCODED || tok == token::TOK_ACTION_CTL_FORCE_REQ_BODY_VAR || tok == token::TOK_ACTION_CTL_REQUEST_BODY_ACCESS || tok == token::TOK_ACTION_CTL_RULE_REMOVE_BY_ID || tok == token::TOK_ACTION_CTL_RULE_REMOVE_BY_TAG || tok == token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID || tok == token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG || tok == token::TOK_ACTION_DENY || tok == token::TOK_ACTION_DEPRECATE_VAR || tok == token::TOK_ACTION_DROP || tok == token::TOK_ACTION_EXEC || tok == token::TOK_ACTION_EXPIRE_VAR || tok == token::TOK_ACTION_ID || tok == token::TOK_ACTION_INITCOL || tok == token::TOK_ACTION_LOG || tok == token::TOK_ACTION_LOG_DATA || tok == token::TOK_ACTION_MATURITY || tok == token::TOK_ACTION_MSG || tok == token::TOK_ACTION_MULTI_MATCH || tok == token::TOK_ACTION_NO_AUDIT_LOG || tok == token::TOK_ACTION_NO_LOG || tok == token::TOK_ACTION_PASS || tok == token::TOK_ACTION_PAUSE || tok == token::TOK_ACTION_PHASE || tok == token::TOK_ACTION_PREPEND || tok == token::TOK_ACTION_PROXY || tok == token::TOK_ACTION_REDIRECT || tok == token::TOK_ACTION_REV || tok == token::TOK_ACTION_SANITISE_ARG || tok == token::TOK_ACTION_SANITISE_MATCHED || tok == token::TOK_ACTION_SANITISE_MATCHED_BYTES || tok == token::TOK_ACTION_SANITISE_REQUEST_HEADER || tok == token::TOK_ACTION_SANITISE_RESPONSE_HEADER || tok == token::TOK_ACTION_SETENV || tok == token::TOK_ACTION_SETRSC || tok == token::TOK_ACTION_SETSID || tok == token::TOK_ACTION_SETUID || tok == token::TOK_ACTION_SEVERITY || tok == token::TOK_ACTION_SKIP || tok == token::TOK_ACTION_SKIP_AFTER || tok == token::TOK_ACTION_STATUS || tok == token::TOK_ACTION_TAG || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT || tok == token::TOK_ACTION_TRANSFORMATION_CMD_LINE || tok == token::TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE || tok == token::TOK_ACTION_TRANSFORMATION_CSS_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_HEX_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_HEX_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_JS_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_LENGTH || tok == token::TOK_ACTION_TRANSFORMATION_LOWERCASE || tok == token::TOK_ACTION_TRANSFORMATION_MD5 || tok == token::TOK_ACTION_TRANSFORMATION_NONE || tok == token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH || tok == token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_NULLS || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE || tok == token::TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS || tok == token::TOK_ACTION_TRANSFORMATION_REPLACE_NULLS || tok == token::TOK_ACTION_TRANSFORMATION_SHA1 || tok == token::TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_TRIM || tok == token::TOK_ACTION_TRANSFORMATION_TRIM_LEFT || tok == token::TOK_ACTION_TRANSFORMATION_TRIM_RIGHT || tok == token::TOK_ACTION_TRANSFORMATION_UPPERCASE || tok == token::TOK_ACTION_TRANSFORMATION_URL_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_URL_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI || tok == token::TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE || tok == token::TOK_ACTION_VER || tok == token::TOK_ACTION_XMLNS || tok == token::TOK_CONFIG_COMPONENT_SIG || tok == token::TOK_CONFIG_CONN_ENGINE || tok == token::TOK_CONFIG_SEC_ARGUMENT_SEPARATOR || tok == token::TOK_CONFIG_SEC_WEB_APP_ID || tok == token::TOK_CONFIG_SEC_SERVER_SIG || tok == token::TOK_CONFIG_DIR_AUDIT_DIR || tok == token::TOK_CONFIG_DIR_AUDIT_DIR_MOD || tok == token::TOK_CONFIG_DIR_AUDIT_ENG || tok == token::TOK_CONFIG_DIR_AUDIT_FLE_MOD || tok == token::TOK_CONFIG_DIR_AUDIT_LOG || tok == token::TOK_CONFIG_DIR_AUDIT_LOG2 || tok == token::TOK_CONFIG_DIR_AUDIT_LOG_P || tok == token::TOK_CONFIG_DIR_AUDIT_STS || tok == token::TOK_CONFIG_DIR_AUDIT_TPE || tok == token::TOK_CONFIG_DIR_DEBUG_LOG || tok == token::TOK_CONFIG_DIR_DEBUG_LVL || tok == token::TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS || tok == token::TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS || tok == token::TOK_CONFIG_SEC_HASH_ENGINE || tok == token::TOK_CONFIG_SEC_HASH_KEY || tok == token::TOK_CONFIG_SEC_HASH_PARAM || tok == token::TOK_CONFIG_SEC_HASH_METHOD_RX || tok == token::TOK_CONFIG_SEC_HASH_METHOD_PM || tok == token::TOK_CONFIG_SEC_CHROOT_DIR || tok == token::TOK_CONFIG_DIR_GEO_DB || tok == token::TOK_CONFIG_DIR_GSB_DB || tok == token::TOK_CONFIG_SEC_GUARDIAN_LOG || tok == token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT || tok == token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION || tok == token::TOK_CONFIG_SEC_CONN_R_STATE_LIMIT || tok == token::TOK_CONFIG_SEC_CONN_W_STATE_LIMIT || tok == token::TOK_CONFIG_SEC_SENSOR_ID || tok == token::TOK_CONFIG_DIR_REQ_BODY || tok == token::TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION || tok == token::TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT || tok == token::TOK_CONFIG_DIR_RES_BODY || tok == token::TOK_CONFIG_DIR_RES_BODY_LIMIT || tok == token::TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION || tok == token::TOK_CONFIG_SEC_RULE_INHERITANCE || tok == token::TOK_CONFIG_SEC_RULE_PERF_TIME || tok == token::TOK_CONFIG_DIR_RULE_ENG || tok == token::TOK_CONFIG_DIR_SEC_ACTION || tok == token::TOK_CONFIG_DIR_SEC_DEFAULT_ACTION || tok == token::TOK_CONFIG_DIR_SEC_MARKER || tok == token::TOK_CONFIG_DIR_UNICODE_MAP_FILE || tok == token::TOK_CONFIG_DIR_UNICODE_CODE_PAGE || tok == token::TOK_CONFIG_SEC_COLLECTION_TIMEOUT || tok == token::TOK_CONFIG_SEC_HTTP_BLKEY || tok == token::TOK_CONFIG_SEC_INTERCEPT_ON_ERROR || tok == token::TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_ID || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID || tok == token::TOK_CONFIG_UPDLOAD_KEEP_FILES || tok == token::TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES || tok == token::TOK_CONFIG_UPLOAD_DIR || tok == token::TOK_CONFIG_UPLOAD_FILE_LIMIT || tok == token::TOK_CONFIG_UPLOAD_FILE_MODE || tok == token::TOK_CONFIG_VALUE_ABORT || tok == token::TOK_CONFIG_VALUE_DETC || tok == token::TOK_CONFIG_VALUE_HTTPS || tok == token::TOK_CONFIG_VALUE_OFF || tok == token::TOK_CONFIG_VALUE_ON || tok == token::TOK_CONFIG_VALUE_PARALLEL || tok == token::TOK_CONFIG_VALUE_PROCESS_PARTIAL || tok == token::TOK_CONFIG_VALUE_REJECT || tok == token::TOK_CONFIG_VALUE_RELEVANT_ONLY || tok == token::TOK_CONFIG_VALUE_SERIAL || tok == token::TOK_CONFIG_VALUE_WARN || tok == token::TOK_CONFIG_XML_EXTERNAL_ENTITY || tok == token::TOK_CONGIG_DIR_RESPONSE_BODY_MP || tok == token::TOK_CONGIG_DIR_SEC_ARG_SEP || tok == token::TOK_CONGIG_DIR_SEC_COOKIE_FORMAT || tok == token::TOK_CONFIG_SEC_COOKIEV0_SEPARATOR || tok == token::TOK_CONGIG_DIR_SEC_DATA_DIR || tok == token::TOK_CONGIG_DIR_SEC_STATUS_ENGINE || tok == token::TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION || tok == token::TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION || tok == token::TOK_CONGIG_DIR_SEC_TMP_DIR || tok == token::TOK_DIRECTIVE || tok == token::TOK_DIRECTIVE_SECRULESCRIPT || tok == token::TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION || tok == token::TOK_QUOTATION_MARK || tok == token::TOK_RUN_TIME_VAR_BLD || tok == token::TOK_RUN_TIME_VAR_DUR || tok == token::TOK_RUN_TIME_VAR_HSV || tok == token::TOK_RUN_TIME_VAR_REMOTE_USER || tok == token::TOK_RUN_TIME_VAR_TIME || tok == token::TOK_RUN_TIME_VAR_TIME_DAY || tok == token::TOK_RUN_TIME_VAR_TIME_EPOCH || tok == token::TOK_RUN_TIME_VAR_TIME_HOUR || tok == token::TOK_RUN_TIME_VAR_TIME_MIN || tok == token::TOK_RUN_TIME_VAR_TIME_MON || tok == token::TOK_RUN_TIME_VAR_TIME_SEC || tok == token::TOK_RUN_TIME_VAR_TIME_WDAY || tok == token::TOK_RUN_TIME_VAR_TIME_YEAR || tok == token::TOK_VARIABLE || tok == token::TOK_DICT_ELEMENT || tok == token::TOK_DICT_ELEMENT_REGEXP);
-      }
-#endif
-    };
+    static inline
+    symbol_type
+    make_COMMA (const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_CONTENT_INJECTION (const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_PIPE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_NEW_LINE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VAR_COUNT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VAR_EXCLUSION (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_ARGS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_ARGS_POST (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_ARGS_GET (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_FILES_SIZES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_FILES_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_FILES_TMP_CONTENT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_FILENAME (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_NAME (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MATCHED_VARS_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MATCHED_VARS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_FILES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_COOKIES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_HEADERS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RESPONSE_HEADERS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_GEO (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_COOKIES_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_ARGS_COMBINED_SIZE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_ARGS_GET_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RULE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_ARGS_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_ARGS_POST_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_AUTH_TYPE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_FILES_COMBINED_SIZE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_FILES_TMP_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_FULL_REQUEST (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_FULL_REQUEST_LENGTH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_INBOUND_DATA_ERROR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MATCHED_VAR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MATCHED_VAR_NAME (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_BOUNDARY_QUOTED (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_CRLF_LF_LINES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_DATA_AFTER (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_DATA_BEFORE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_HEADER_FOLDING (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_INVALID_PART (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_INVALID_QUOTING (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_LF_LINE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_MISSING_SEMICOLON (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_SEMICOLON_MISSING (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_STRICT_ERROR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_OUTBOUND_DATA_ERROR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_PATH_INFO (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_QUERY_STRING (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REMOTE_ADDR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REMOTE_HOST (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REMOTE_PORT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQBODY_ERROR_MSG (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQBODY_ERROR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQBODY_PROCESSOR_ERROR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQBODY_PROCESSOR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_BASENAME (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_BODY_LENGTH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_BODY (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_FILE_NAME (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_HEADERS_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_LINE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_METHOD (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_PROTOCOL (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_URI_RAW (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_REQUEST_URI (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RESOURCE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RESPONSE_BODY (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RESPONSE_CONTENT_LENGTH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RESPONSE_CONTENT_TYPE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RESPONSE_HEADERS_NAMES (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RESPONSE_PROTOCOL (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_RESPONSE_STATUS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_SERVER_ADDR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_SERVER_NAME (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_SERVER_PORT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_SESSION_ID (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_UNIQUE_ID (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_URL_ENCODED_ERROR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_USER_ID (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_WEB_APP_ID (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_STATUS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_STATUS_LINE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_IP (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_GLOBAL (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_TX (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_SESSION (const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE_USER (const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_ENV (const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_XML (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SETVAR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_SETVAR_OPERATION_EQUALS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_SETVAR_OPERATION_EQUALS_PLUS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_SETVAR_OPERATION_EQUALS_MINUS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_NOT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_BEGINS_WITH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_CONTAINS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_CONTAINS_WORD (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_DETECT_SQLI (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_DETECT_XSS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_ENDS_WITH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_EQ (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_FUZZY_HASH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_GEOLOOKUP (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_GE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_GSB_LOOKUP (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_GT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_INSPECT_FILE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_IP_MATCH_FROM_FILE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_IP_MATCH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_LE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_LT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_PM_FROM_FILE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_PM (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_RBL (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_RSUB (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_RX_CONTENT_ONLY (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_RX (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_STR_EQ (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_STR_MATCH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_UNCONDITIONAL_MATCH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VALIDATE_BYTE_RANGE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VALIDATE_DTD (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VALIDATE_HASH (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VALIDATE_SCHEMA (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VALIDATE_URL_ENCODING (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VALIDATE_UTF8_ENCODING (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VERIFY_CC (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VERIFY_CPF (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VERIFY_SSN (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_VERIFY_SVNR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_OPERATOR_WITHIN (const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_LOG_FMT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_JSON (const location_type& l);
+
+    static inline
+    symbol_type
+    make_NATIVE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_RULE_ENGINE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_ACCURACY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_ALLOW (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_APPEND (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_AUDIT_LOG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_BLOCK (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CAPTURE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CHAIN (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_AUDIT_ENGINE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_AUDIT_LOG_PARTS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_BDY_JSON (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_BDY_XML (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_BDY_URLENCODED (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_FORCE_REQ_BODY_VAR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_REQUEST_BODY_ACCESS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_RULE_REMOVE_BY_ID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_RULE_REMOVE_BY_TAG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_DENY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_DEPRECATE_VAR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_DROP (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_EXEC (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_EXPIRE_VAR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_ID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_INITCOL (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_LOG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_LOG_DATA (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_MATURITY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_MSG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_MULTI_MATCH (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_NO_AUDIT_LOG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_NO_LOG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_PASS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_PAUSE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_PHASE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_PREPEND (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_PROXY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_REDIRECT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_REV (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SANITISE_ARG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SANITISE_MATCHED (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SANITISE_MATCHED_BYTES (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SANITISE_REQUEST_HEADER (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SANITISE_RESPONSE_HEADER (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SETENV (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SETRSC (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SETSID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SETUID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SEVERITY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SKIP (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_SKIP_AFTER (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_STATUS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TAG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_BASE_64_ENCODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_BASE_64_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_CMD_LINE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_CSS_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_HEX_ENCODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_HEX_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_JS_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_LENGTH (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_LOWERCASE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_MD5 (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_NONE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_NORMALISE_PATH (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_REMOVE_COMMENTS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_REMOVE_NULLS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_REMOVE_WHITESPACE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_REPLACE_COMMENTS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_REPLACE_NULLS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_SHA1 (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_SQL_HEX_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_TRIM (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_TRIM_LEFT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_TRIM_RIGHT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_UPPERCASE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_URL_ENCODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_URL_DECODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_URL_DECODE_UNI (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_UTF8_TO_UNICODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_TRANSFORMATION_UTF8_TO_CHAR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_VER (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ACTION_XMLNS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_COMPONENT_SIG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_CONN_ENGINE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_ARGUMENT_SEPARATOR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_WEB_APP_ID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_SERVER_SIG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_DIR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_DIR_MOD (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_ENG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_FLE_MOD (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_LOG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_LOG2 (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_LOG_P (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_STS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_AUDIT_TPE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_DEBUG_LOG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_DEBUG_LVL (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_CACHE_TRANSFORMATIONS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_DISABLE_BACKEND_COMPRESS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_HASH_ENGINE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_HASH_KEY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_HASH_PARAM (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_HASH_METHOD_RX (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_HASH_METHOD_PM (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_CHROOT_DIR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_GEO_DB (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_GSB_DB (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_GUARDIAN_LOG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_PCRE_MATCH_LIMIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_CONN_R_STATE_LIMIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_CONN_W_STATE_LIMIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_SENSOR_ID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_REQ_BODY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_REQ_BODY_LIMIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_RES_BODY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_RES_BODY_LIMIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_RES_BODY_LIMIT_ACTION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_INHERITANCE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_PERF_TIME (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_RULE_ENG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_SEC_ACTION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_SEC_DEFAULT_ACTION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_SEC_MARKER (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_UNICODE_MAP_FILE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_DIR_UNICODE_CODE_PAGE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_COLLECTION_TIMEOUT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_HTTP_BLKEY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_INTERCEPT_ON_ERROR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_REMOVE_BY_ID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_REMOVE_BY_MSG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_REMOVE_BY_TAG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_UPDLOAD_KEEP_FILES (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_UPDLOAD_SAVE_TMP_FILES (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_UPLOAD_DIR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_UPLOAD_FILE_LIMIT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_UPLOAD_FILE_MODE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_ABORT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_DETC (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_HTTPS (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_OFF (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_ON (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_PARALLEL (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_PROCESS_PARTIAL (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_REJECT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_RELEVANT_ONLY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_SERIAL (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_VALUE_WARN (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_XML_EXTERNAL_ENTITY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONGIG_DIR_RESPONSE_BODY_MP (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONGIG_DIR_SEC_ARG_SEP (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONGIG_DIR_SEC_COOKIE_FORMAT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_COOKIEV0_SEPARATOR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONGIG_DIR_SEC_DATA_DIR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONGIG_DIR_SEC_STATUS_ENGINE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_STREAM_IN_BODY_INSPECTION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_CONGIG_DIR_SEC_TMP_DIR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_DIRECTIVE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_DIRECTIVE_SECRULESCRIPT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_FREE_TEXT_QUOTE_MACRO_EXPANSION (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_QUOTATION_MARK (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_BLD (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_DUR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_HSV (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_REMOTE_USER (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME_DAY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME_EPOCH (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME_HOUR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME_MIN (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME_MON (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME_SEC (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME_WDAY (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RUN_TIME_VAR_TIME_YEAR (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_VARIABLE (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_DICT_ELEMENT (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_DICT_ELEMENT_REGEXP (const std::string& v, const location_type& l);
+
 
     /// Build a parser object.
     seclang_parser (modsecurity::Parser::Driver& driver_yyarg);
     virtual ~seclang_parser ();
-
-    /// Parse.  An alias for parse ().
-    /// \returns  0 iff parsing succeeded.
-    int operator() ();
 
     /// Parse.
     /// \returns  0 iff parsing succeeded.
@@ -1805,5094 +2675,6 @@ switch (yytype)
     /// Report a syntax error.
     void error (const syntax_error& err);
 
-    // Implementation of make_symbol for each symbol type.
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_END (location_type l)
-      {
-        return symbol_type (token::TOK_END, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_END (const location_type& l)
-      {
-        return symbol_type (token::TOK_END, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_COMMA (location_type l)
-      {
-        return symbol_type (token::TOK_COMMA, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_COMMA (const location_type& l)
-      {
-        return symbol_type (token::TOK_COMMA, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_CONTENT_INJECTION (location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_CONTENT_INJECTION, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_CONTENT_INJECTION (const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_CONTENT_INJECTION, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR (location_type l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR (const location_type& l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_PIPE (location_type l)
-      {
-        return symbol_type (token::TOK_PIPE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_PIPE (const location_type& l)
-      {
-        return symbol_type (token::TOK_PIPE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_NEW_LINE (location_type l)
-      {
-        return symbol_type (token::TOK_NEW_LINE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_NEW_LINE (const location_type& l)
-      {
-        return symbol_type (token::TOK_NEW_LINE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VAR_COUNT (location_type l)
-      {
-        return symbol_type (token::TOK_VAR_COUNT, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VAR_COUNT (const location_type& l)
-      {
-        return symbol_type (token::TOK_VAR_COUNT, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VAR_EXCLUSION (location_type l)
-      {
-        return symbol_type (token::TOK_VAR_EXCLUSION, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VAR_EXCLUSION (const location_type& l)
-      {
-        return symbol_type (token::TOK_VAR_EXCLUSION, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_ARGS (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_ARGS (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_ARGS_POST (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_POST, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_ARGS_POST (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_POST, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_ARGS_GET (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_GET, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_ARGS_GET (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_GET, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_FILES_SIZES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_SIZES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_FILES_SIZES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_SIZES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_FILES_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_FILES_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_FILES_TMP_CONTENT (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_TMP_CONTENT, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_FILES_TMP_CONTENT (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_TMP_CONTENT, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_FILENAME (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_FILENAME, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_FILENAME (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_FILENAME, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_NAME (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_NAME, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_NAME (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_NAME, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MATCHED_VARS_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MATCHED_VARS_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MATCHED_VARS_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MATCHED_VARS_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MATCHED_VARS (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MATCHED_VARS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MATCHED_VARS (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MATCHED_VARS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_FILES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_FILES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_COOKIES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_COOKIES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_COOKIES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_COOKIES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_HEADERS (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_HEADERS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_HEADERS (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_HEADERS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_HEADERS (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_HEADERS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_HEADERS (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_HEADERS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_GEO (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_GEO, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_GEO (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_GEO, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_COOKIES_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_COOKIES_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_COOKIES_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_COOKIES_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_ARGS_COMBINED_SIZE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_COMBINED_SIZE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_ARGS_COMBINED_SIZE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_COMBINED_SIZE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_ARGS_GET_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_GET_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_ARGS_GET_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_GET_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RULE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RULE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RULE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RULE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_ARGS_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_ARGS_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_ARGS_POST_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_POST_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_ARGS_POST_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_ARGS_POST_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_AUTH_TYPE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_AUTH_TYPE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_AUTH_TYPE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_AUTH_TYPE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_FILES_COMBINED_SIZE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_COMBINED_SIZE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_FILES_COMBINED_SIZE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_COMBINED_SIZE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_FILES_TMP_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_TMP_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_FILES_TMP_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FILES_TMP_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_FULL_REQUEST (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FULL_REQUEST, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_FULL_REQUEST (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FULL_REQUEST, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_FULL_REQUEST_LENGTH (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FULL_REQUEST_LENGTH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_FULL_REQUEST_LENGTH (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_FULL_REQUEST_LENGTH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_INBOUND_DATA_ERROR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_INBOUND_DATA_ERROR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_INBOUND_DATA_ERROR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_INBOUND_DATA_ERROR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MATCHED_VAR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MATCHED_VAR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MATCHED_VAR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MATCHED_VAR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MATCHED_VAR_NAME (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MATCHED_VAR_NAME, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MATCHED_VAR_NAME (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MATCHED_VAR_NAME, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_BOUNDARY_QUOTED (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_BOUNDARY_QUOTED, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_BOUNDARY_QUOTED (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_BOUNDARY_QUOTED, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_CRLF_LF_LINES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_CRLF_LF_LINES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_CRLF_LF_LINES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_CRLF_LF_LINES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_DATA_AFTER (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_DATA_AFTER, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_DATA_AFTER (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_DATA_AFTER, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_DATA_BEFORE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_DATA_BEFORE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_DATA_BEFORE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_DATA_BEFORE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_HEADER_FOLDING (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_HEADER_FOLDING, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_HEADER_FOLDING (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_HEADER_FOLDING, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_INVALID_PART (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_PART, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_INVALID_PART (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_PART, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_INVALID_QUOTING (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_QUOTING, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_INVALID_QUOTING (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_QUOTING, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_LF_LINE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_LF_LINE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_LF_LINE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_LF_LINE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_MISSING_SEMICOLON (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_MISSING_SEMICOLON, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_MISSING_SEMICOLON (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_MISSING_SEMICOLON, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_SEMICOLON_MISSING (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_SEMICOLON_MISSING, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_SEMICOLON_MISSING (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_SEMICOLON_MISSING, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_STRICT_ERROR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_STRICT_ERROR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_STRICT_ERROR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_STRICT_ERROR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_OUTBOUND_DATA_ERROR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_OUTBOUND_DATA_ERROR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_OUTBOUND_DATA_ERROR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_OUTBOUND_DATA_ERROR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_PATH_INFO (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_PATH_INFO, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_PATH_INFO (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_PATH_INFO, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_QUERY_STRING (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_QUERY_STRING, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_QUERY_STRING (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_QUERY_STRING, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REMOTE_ADDR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REMOTE_ADDR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REMOTE_ADDR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REMOTE_ADDR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REMOTE_HOST (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REMOTE_HOST, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REMOTE_HOST (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REMOTE_HOST, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REMOTE_PORT (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REMOTE_PORT, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REMOTE_PORT (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REMOTE_PORT, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_ERROR_MSG (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_ERROR_MSG, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_ERROR_MSG (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_ERROR_MSG, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_ERROR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_ERROR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_ERROR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_ERROR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_PROCESSOR_ERROR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_PROCESSOR_ERROR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_PROCESSOR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQBODY_PROCESSOR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_BASENAME (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_BASENAME, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_BASENAME (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_BASENAME, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_BODY_LENGTH (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_BODY_LENGTH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_BODY_LENGTH (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_BODY_LENGTH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_BODY (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_BODY, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_BODY (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_BODY, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_FILE_NAME (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_FILE_NAME, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_FILE_NAME (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_FILE_NAME, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_HEADERS_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_HEADERS_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_HEADERS_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_HEADERS_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_LINE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_LINE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_LINE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_LINE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_METHOD (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_METHOD, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_METHOD (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_METHOD, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_PROTOCOL (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_PROTOCOL, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_PROTOCOL (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_PROTOCOL, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_URI_RAW (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_URI_RAW, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_URI_RAW (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_URI_RAW, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_URI (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_URI, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_REQUEST_URI (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_REQUEST_URI, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RESOURCE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESOURCE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RESOURCE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESOURCE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_BODY (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_BODY, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_BODY (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_BODY, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_CONTENT_LENGTH (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_CONTENT_LENGTH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_CONTENT_LENGTH (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_CONTENT_LENGTH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_CONTENT_TYPE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_CONTENT_TYPE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_CONTENT_TYPE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_CONTENT_TYPE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_HEADERS_NAMES (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_HEADERS_NAMES, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_HEADERS_NAMES (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_HEADERS_NAMES, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_PROTOCOL (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_PROTOCOL, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_PROTOCOL (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_PROTOCOL, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_STATUS (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_STATUS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_RESPONSE_STATUS (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_RESPONSE_STATUS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_SERVER_ADDR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SERVER_ADDR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_SERVER_ADDR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SERVER_ADDR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_SERVER_NAME (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SERVER_NAME, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_SERVER_NAME (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SERVER_NAME, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_SERVER_PORT (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SERVER_PORT, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_SERVER_PORT (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SERVER_PORT, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_SESSION_ID (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SESSION_ID, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_SESSION_ID (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SESSION_ID, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_UNIQUE_ID (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_UNIQUE_ID, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_UNIQUE_ID (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_UNIQUE_ID, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_URL_ENCODED_ERROR (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_URL_ENCODED_ERROR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_URL_ENCODED_ERROR (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_URL_ENCODED_ERROR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_USER_ID (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_USER_ID, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_USER_ID (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_USER_ID, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_WEB_APP_ID (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_WEB_APP_ID, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_WEB_APP_ID (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_WEB_APP_ID, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_STATUS (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_STATUS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_STATUS (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_STATUS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_STATUS_LINE (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_STATUS_LINE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_STATUS_LINE (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_STATUS_LINE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_IP (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_IP, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_IP (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_IP, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_GLOBAL (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_GLOBAL, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_GLOBAL (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_GLOBAL, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_TX (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_TX, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_TX (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_TX, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_SESSION (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SESSION, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_SESSION (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_SESSION, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE_USER (location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE_USER, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE_USER (const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE_USER, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_ENV (location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_ENV, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_ENV (const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_ENV, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_XML (location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_XML, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_XML (const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_XML, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SETVAR (location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SETVAR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SETVAR (const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SETVAR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_SETVAR_OPERATION_EQUALS (location_type l)
-      {
-        return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_SETVAR_OPERATION_EQUALS (const location_type& l)
-      {
-        return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_SETVAR_OPERATION_EQUALS_PLUS (location_type l)
-      {
-        return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS_PLUS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_SETVAR_OPERATION_EQUALS_PLUS (const location_type& l)
-      {
-        return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS_PLUS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_SETVAR_OPERATION_EQUALS_MINUS (location_type l)
-      {
-        return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS_MINUS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_SETVAR_OPERATION_EQUALS_MINUS (const location_type& l)
-      {
-        return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS_MINUS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_NOT (location_type l)
-      {
-        return symbol_type (token::TOK_NOT, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_NOT (const location_type& l)
-      {
-        return symbol_type (token::TOK_NOT, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_BEGINS_WITH (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_BEGINS_WITH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_BEGINS_WITH (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_BEGINS_WITH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_CONTAINS (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_CONTAINS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_CONTAINS (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_CONTAINS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_CONTAINS_WORD (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_CONTAINS_WORD, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_CONTAINS_WORD (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_CONTAINS_WORD, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_DETECT_SQLI (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_DETECT_SQLI, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_DETECT_SQLI (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_DETECT_SQLI, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_DETECT_XSS (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_DETECT_XSS, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_DETECT_XSS (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_DETECT_XSS, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_ENDS_WITH (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_ENDS_WITH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_ENDS_WITH (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_ENDS_WITH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_EQ (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_EQ, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_EQ (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_EQ, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_FUZZY_HASH (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_FUZZY_HASH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_FUZZY_HASH (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_FUZZY_HASH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_GEOLOOKUP (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_GEOLOOKUP, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_GEOLOOKUP (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_GEOLOOKUP, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_GE (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_GE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_GE (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_GE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_GSB_LOOKUP (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_GSB_LOOKUP, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_GSB_LOOKUP (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_GSB_LOOKUP, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_GT (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_GT, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_GT (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_GT, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_INSPECT_FILE (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_INSPECT_FILE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_INSPECT_FILE (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_INSPECT_FILE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_IP_MATCH_FROM_FILE (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_IP_MATCH_FROM_FILE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_IP_MATCH_FROM_FILE (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_IP_MATCH_FROM_FILE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_IP_MATCH (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_IP_MATCH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_IP_MATCH (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_IP_MATCH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_LE (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_LE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_LE (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_LE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_LT (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_LT, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_LT (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_LT, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_PM_FROM_FILE (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_PM_FROM_FILE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_PM_FROM_FILE (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_PM_FROM_FILE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_PM (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_PM, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_PM (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_PM, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_RBL (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_RBL, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_RBL (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_RBL, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_RSUB (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_RSUB, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_RSUB (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_RSUB, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_RX_CONTENT_ONLY (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_RX_CONTENT_ONLY, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_RX_CONTENT_ONLY (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_RX_CONTENT_ONLY, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_RX (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_RX, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_RX (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_RX, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_STR_EQ (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_STR_EQ, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_STR_EQ (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_STR_EQ, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_STR_MATCH (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_STR_MATCH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_STR_MATCH (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_STR_MATCH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_UNCONDITIONAL_MATCH (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_UNCONDITIONAL_MATCH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_UNCONDITIONAL_MATCH (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_UNCONDITIONAL_MATCH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_BYTE_RANGE (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_BYTE_RANGE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_BYTE_RANGE (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_BYTE_RANGE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_DTD (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_DTD, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_DTD (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_DTD, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_HASH (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_HASH, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_HASH (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_HASH, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_SCHEMA (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_SCHEMA, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_SCHEMA (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_SCHEMA, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_URL_ENCODING (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_URL_ENCODING, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_URL_ENCODING (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_URL_ENCODING, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_UTF8_ENCODING (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_UTF8_ENCODING, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VALIDATE_UTF8_ENCODING (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VALIDATE_UTF8_ENCODING, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VERIFY_CC (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VERIFY_CC, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VERIFY_CC (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VERIFY_CC, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VERIFY_CPF (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VERIFY_CPF, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VERIFY_CPF (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VERIFY_CPF, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VERIFY_SSN (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VERIFY_SSN, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VERIFY_SSN (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VERIFY_SSN, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_VERIFY_SVNR (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VERIFY_SVNR, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_VERIFY_SVNR (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_VERIFY_SVNR, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_OPERATOR_WITHIN (location_type l)
-      {
-        return symbol_type (token::TOK_OPERATOR_WITHIN, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_OPERATOR_WITHIN (const location_type& l)
-      {
-        return symbol_type (token::TOK_OPERATOR_WITHIN, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_LOG_FMT (location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG_FMT, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_LOG_FMT (const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG_FMT, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_JSON (location_type l)
-      {
-        return symbol_type (token::TOK_JSON, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_JSON (const location_type& l)
-      {
-        return symbol_type (token::TOK_JSON, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_NATIVE (location_type l)
-      {
-        return symbol_type (token::TOK_NATIVE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_NATIVE (const location_type& l)
-      {
-        return symbol_type (token::TOK_NATIVE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_ENGINE (location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_ENGINE, std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_ENGINE (const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_ENGINE, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_ACCURACY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_ACCURACY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_ACCURACY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_ACCURACY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_ALLOW (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_ALLOW, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_ALLOW (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_ALLOW, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_APPEND (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_APPEND, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_APPEND (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_APPEND, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_AUDIT_LOG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_AUDIT_LOG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_AUDIT_LOG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_AUDIT_LOG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_BLOCK (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_BLOCK, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_BLOCK (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_BLOCK, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CAPTURE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CAPTURE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CAPTURE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CAPTURE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CHAIN (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CHAIN, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CHAIN (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CHAIN, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_AUDIT_ENGINE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_AUDIT_ENGINE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_AUDIT_ENGINE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_AUDIT_ENGINE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_AUDIT_LOG_PARTS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_AUDIT_LOG_PARTS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_AUDIT_LOG_PARTS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_AUDIT_LOG_PARTS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_BDY_JSON (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_BDY_JSON, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_BDY_JSON (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_BDY_JSON, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_BDY_XML (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_BDY_XML, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_BDY_XML (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_BDY_XML, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_BDY_URLENCODED (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_BDY_URLENCODED, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_BDY_URLENCODED (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_BDY_URLENCODED, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_FORCE_REQ_BODY_VAR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_FORCE_REQ_BODY_VAR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_FORCE_REQ_BODY_VAR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_FORCE_REQ_BODY_VAR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_REQUEST_BODY_ACCESS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_REQUEST_BODY_ACCESS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_REQUEST_BODY_ACCESS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_REQUEST_BODY_ACCESS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_REMOVE_BY_ID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_BY_ID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_REMOVE_BY_ID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_BY_ID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_REMOVE_BY_TAG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_BY_TAG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_REMOVE_BY_TAG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_BY_TAG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_DENY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_DENY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_DENY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_DENY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_DEPRECATE_VAR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_DEPRECATE_VAR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_DEPRECATE_VAR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_DEPRECATE_VAR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_DROP (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_DROP, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_DROP (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_DROP, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_EXEC (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_EXEC, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_EXEC (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_EXEC, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_EXPIRE_VAR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_EXPIRE_VAR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_EXPIRE_VAR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_EXPIRE_VAR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_ID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_ID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_ID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_ID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_INITCOL (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_INITCOL, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_INITCOL (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_INITCOL, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_LOG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_LOG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_LOG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_LOG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_LOG_DATA (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_LOG_DATA, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_LOG_DATA (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_LOG_DATA, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_MATURITY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_MATURITY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_MATURITY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_MATURITY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_MSG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_MSG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_MSG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_MSG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_MULTI_MATCH (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_MULTI_MATCH, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_MULTI_MATCH (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_MULTI_MATCH, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_NO_AUDIT_LOG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_NO_AUDIT_LOG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_NO_AUDIT_LOG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_NO_AUDIT_LOG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_NO_LOG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_NO_LOG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_NO_LOG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_NO_LOG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_PASS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_PASS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_PASS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_PASS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_PAUSE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_PAUSE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_PAUSE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_PAUSE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_PHASE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_PHASE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_PHASE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_PHASE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_PREPEND (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_PREPEND, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_PREPEND (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_PREPEND, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_PROXY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_PROXY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_PROXY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_PROXY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_REDIRECT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_REDIRECT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_REDIRECT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_REDIRECT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_REV (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_REV, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_REV (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_REV, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SANITISE_ARG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_ARG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SANITISE_ARG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_ARG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SANITISE_MATCHED (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_MATCHED, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SANITISE_MATCHED (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_MATCHED, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SANITISE_MATCHED_BYTES (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_MATCHED_BYTES, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SANITISE_MATCHED_BYTES (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_MATCHED_BYTES, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SANITISE_REQUEST_HEADER (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_REQUEST_HEADER, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SANITISE_REQUEST_HEADER (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_REQUEST_HEADER, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SANITISE_RESPONSE_HEADER (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_RESPONSE_HEADER, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SANITISE_RESPONSE_HEADER (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SANITISE_RESPONSE_HEADER, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SETENV (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SETENV, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SETENV (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SETENV, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SETRSC (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SETRSC, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SETRSC (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SETRSC, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SETSID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SETSID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SETSID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SETSID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SETUID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SETUID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SETUID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SETUID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SEVERITY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SEVERITY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SEVERITY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SEVERITY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SKIP (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SKIP, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SKIP (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SKIP, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_SKIP_AFTER (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_SKIP_AFTER, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_SKIP_AFTER (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_SKIP_AFTER, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_STATUS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_STATUS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_STATUS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_STATUS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TAG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TAG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TAG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TAG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_BASE_64_ENCODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_BASE_64_ENCODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_BASE_64_DECODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_BASE_64_DECODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_CMD_LINE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_CMD_LINE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_CMD_LINE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_CMD_LINE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_CSS_DECODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_CSS_DECODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_CSS_DECODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_CSS_DECODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_HEX_ENCODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_HEX_ENCODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_HEX_ENCODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_HEX_ENCODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_HEX_DECODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_HEX_DECODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_HEX_DECODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_HEX_DECODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_JS_DECODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_JS_DECODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_JS_DECODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_JS_DECODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_LENGTH (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_LENGTH, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_LENGTH (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_LENGTH, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_LOWERCASE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_LOWERCASE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_LOWERCASE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_LOWERCASE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_MD5 (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_MD5, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_MD5 (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_MD5, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_NONE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_NONE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_NONE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_NONE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_NORMALISE_PATH (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_NORMALISE_PATH (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REMOVE_COMMENTS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REMOVE_COMMENTS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REMOVE_NULLS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_NULLS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REMOVE_NULLS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_NULLS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REMOVE_WHITESPACE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REMOVE_WHITESPACE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REPLACE_COMMENTS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REPLACE_COMMENTS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REPLACE_NULLS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REPLACE_NULLS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_REPLACE_NULLS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_REPLACE_NULLS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_SHA1 (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_SHA1, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_SHA1 (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_SHA1, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_SQL_HEX_DECODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_SQL_HEX_DECODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_TRIM (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_TRIM (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_TRIM_LEFT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM_LEFT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_TRIM_LEFT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM_LEFT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_TRIM_RIGHT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM_RIGHT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_TRIM_RIGHT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM_RIGHT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_UPPERCASE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_UPPERCASE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_UPPERCASE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_UPPERCASE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_URL_ENCODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_ENCODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_URL_ENCODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_ENCODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_URL_DECODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_DECODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_URL_DECODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_DECODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_URL_DECODE_UNI (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_URL_DECODE_UNI (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_UTF8_TO_UNICODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_TRANSFORMATION_UTF8_TO_UNICODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_VER (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_VER, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_VER (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_VER, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_ACTION_XMLNS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_ACTION_XMLNS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_ACTION_XMLNS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_ACTION_XMLNS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_COMPONENT_SIG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_COMPONENT_SIG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_COMPONENT_SIG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_COMPONENT_SIG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_CONN_ENGINE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_CONN_ENGINE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_CONN_ENGINE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_CONN_ENGINE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_ARGUMENT_SEPARATOR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_ARGUMENT_SEPARATOR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_ARGUMENT_SEPARATOR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_ARGUMENT_SEPARATOR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_WEB_APP_ID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_WEB_APP_ID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_WEB_APP_ID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_WEB_APP_ID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_SERVER_SIG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_SERVER_SIG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_SERVER_SIG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_SERVER_SIG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_DIR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_DIR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_DIR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_DIR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_DIR_MOD (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_DIR_MOD, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_DIR_MOD (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_DIR_MOD, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_ENG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_ENG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_ENG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_ENG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_FLE_MOD (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_FLE_MOD, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_FLE_MOD (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_FLE_MOD, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_LOG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_LOG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_LOG2 (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG2, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_LOG2 (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG2, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_LOG_P (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG_P, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_LOG_P (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG_P, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_STS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_STS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_STS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_STS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_TPE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_TPE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_AUDIT_TPE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_AUDIT_TPE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_DEBUG_LOG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_DEBUG_LOG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_DEBUG_LOG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_DEBUG_LOG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_DEBUG_LVL (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_DEBUG_LVL, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_DEBUG_LVL (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_DEBUG_LVL, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_CACHE_TRANSFORMATIONS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_CACHE_TRANSFORMATIONS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_DISABLE_BACKEND_COMPRESS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_DISABLE_BACKEND_COMPRESS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_ENGINE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_ENGINE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_ENGINE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_ENGINE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_KEY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_KEY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_KEY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_KEY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_PARAM (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_PARAM, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_PARAM (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_PARAM, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_METHOD_RX (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_METHOD_RX, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_METHOD_RX (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_METHOD_RX, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_METHOD_PM (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_METHOD_PM, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_HASH_METHOD_PM (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HASH_METHOD_PM, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_CHROOT_DIR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_CHROOT_DIR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_CHROOT_DIR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_CHROOT_DIR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_GEO_DB (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_GEO_DB, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_GEO_DB (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_GEO_DB, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_GSB_DB (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_GSB_DB, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_GSB_DB (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_GSB_DB, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_GUARDIAN_LOG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_GUARDIAN_LOG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_GUARDIAN_LOG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_GUARDIAN_LOG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_PCRE_MATCH_LIMIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_PCRE_MATCH_LIMIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_CONN_R_STATE_LIMIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_CONN_R_STATE_LIMIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_CONN_R_STATE_LIMIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_CONN_R_STATE_LIMIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_CONN_W_STATE_LIMIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_CONN_W_STATE_LIMIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_CONN_W_STATE_LIMIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_CONN_W_STATE_LIMIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_SENSOR_ID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_SENSOR_ID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_SENSOR_ID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_SENSOR_ID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY_LIMIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_LIMIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY_LIMIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_LIMIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_RES_BODY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_RES_BODY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_RES_BODY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_RES_BODY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_RES_BODY_LIMIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_RES_BODY_LIMIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_RES_BODY_LIMIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_RES_BODY_LIMIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_RES_BODY_LIMIT_ACTION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_RES_BODY_LIMIT_ACTION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_INHERITANCE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_INHERITANCE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_INHERITANCE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_INHERITANCE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_PERF_TIME (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_PERF_TIME, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_PERF_TIME (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_PERF_TIME, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_RULE_ENG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_RULE_ENG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_RULE_ENG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_RULE_ENG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_SEC_ACTION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_SEC_ACTION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_SEC_ACTION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_SEC_ACTION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_SEC_DEFAULT_ACTION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_SEC_DEFAULT_ACTION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_SEC_DEFAULT_ACTION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_SEC_DEFAULT_ACTION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_SEC_MARKER (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_SEC_MARKER, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_SEC_MARKER (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_SEC_MARKER, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_UNICODE_MAP_FILE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_UNICODE_MAP_FILE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_UNICODE_MAP_FILE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_UNICODE_MAP_FILE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_DIR_UNICODE_CODE_PAGE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_UNICODE_CODE_PAGE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_DIR_UNICODE_CODE_PAGE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_DIR_UNICODE_CODE_PAGE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_COLLECTION_TIMEOUT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_COLLECTION_TIMEOUT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_COLLECTION_TIMEOUT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_COLLECTION_TIMEOUT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_HTTP_BLKEY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HTTP_BLKEY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_HTTP_BLKEY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_HTTP_BLKEY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_INTERCEPT_ON_ERROR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_INTERCEPT_ON_ERROR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_INTERCEPT_ON_ERROR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_INTERCEPT_ON_ERROR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_REMOVE_BY_ID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_ID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_REMOVE_BY_ID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_ID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_REMOVE_BY_MSG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_REMOVE_BY_MSG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_REMOVE_BY_TAG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_REMOVE_BY_TAG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_UPDLOAD_KEEP_FILES (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPDLOAD_KEEP_FILES, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_UPDLOAD_KEEP_FILES (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPDLOAD_KEEP_FILES, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_UPDLOAD_SAVE_TMP_FILES (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_UPDLOAD_SAVE_TMP_FILES (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_UPLOAD_DIR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPLOAD_DIR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_UPLOAD_DIR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPLOAD_DIR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_UPLOAD_FILE_LIMIT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPLOAD_FILE_LIMIT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_UPLOAD_FILE_LIMIT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPLOAD_FILE_LIMIT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_UPLOAD_FILE_MODE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPLOAD_FILE_MODE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_UPLOAD_FILE_MODE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_UPLOAD_FILE_MODE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_ABORT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_ABORT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_ABORT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_ABORT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_DETC (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_DETC, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_DETC (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_DETC, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_HTTPS (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_HTTPS, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_HTTPS (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_HTTPS, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_OFF (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_OFF, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_OFF (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_OFF, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_ON (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_ON, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_ON (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_ON, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_PARALLEL (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_PARALLEL, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_PARALLEL (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_PARALLEL, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_PROCESS_PARTIAL (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_PROCESS_PARTIAL, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_PROCESS_PARTIAL (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_PROCESS_PARTIAL, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_REJECT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_REJECT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_REJECT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_REJECT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_RELEVANT_ONLY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_RELEVANT_ONLY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_RELEVANT_ONLY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_RELEVANT_ONLY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_SERIAL (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_SERIAL, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_SERIAL (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_SERIAL, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_VALUE_WARN (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_WARN, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_VALUE_WARN (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_VALUE_WARN, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_XML_EXTERNAL_ENTITY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_XML_EXTERNAL_ENTITY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_XML_EXTERNAL_ENTITY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_XML_EXTERNAL_ENTITY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONGIG_DIR_RESPONSE_BODY_MP (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_RESPONSE_BODY_MP, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONGIG_DIR_RESPONSE_BODY_MP (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_RESPONSE_BODY_MP, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_ARG_SEP (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_ARG_SEP, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_ARG_SEP (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_ARG_SEP, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_COOKIE_FORMAT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_COOKIE_FORMAT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_COOKIE_FORMAT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_COOKIE_FORMAT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_COOKIEV0_SEPARATOR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_COOKIEV0_SEPARATOR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_COOKIEV0_SEPARATOR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_COOKIEV0_SEPARATOR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_DATA_DIR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_DATA_DIR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_DATA_DIR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_DATA_DIR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_STATUS_ENGINE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_STATUS_ENGINE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_STATUS_ENGINE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_STATUS_ENGINE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_STREAM_IN_BODY_INSPECTION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_STREAM_IN_BODY_INSPECTION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_TMP_DIR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_TMP_DIR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_CONGIG_DIR_SEC_TMP_DIR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_CONGIG_DIR_SEC_TMP_DIR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_DIRECTIVE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_DIRECTIVE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_DIRECTIVE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_DIRECTIVE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_DIRECTIVE_SECRULESCRIPT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_DIRECTIVE_SECRULESCRIPT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_DIRECTIVE_SECRULESCRIPT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_DIRECTIVE_SECRULESCRIPT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_FREE_TEXT_QUOTE_MACRO_EXPANSION (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_FREE_TEXT_QUOTE_MACRO_EXPANSION (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_QUOTATION_MARK (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_QUOTATION_MARK, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_QUOTATION_MARK (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_QUOTATION_MARK, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_BLD (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_BLD, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_BLD (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_BLD, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_DUR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_DUR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_DUR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_DUR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_HSV (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_HSV, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_HSV (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_HSV, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_REMOTE_USER (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_REMOTE_USER, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_REMOTE_USER (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_REMOTE_USER, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_DAY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_DAY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_DAY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_DAY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_EPOCH (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_EPOCH, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_EPOCH (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_EPOCH, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_HOUR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_HOUR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_HOUR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_HOUR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_MIN (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_MIN, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_MIN (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_MIN, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_MON (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_MON, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_MON (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_MON, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_SEC (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_SEC, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_SEC (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_SEC, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_WDAY (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_WDAY, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_WDAY (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_WDAY, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_YEAR (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_YEAR, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_RUN_TIME_VAR_TIME_YEAR (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_RUN_TIME_VAR_TIME_YEAR, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_VARIABLE (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_VARIABLE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_VARIABLE (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_VARIABLE, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_DICT_ELEMENT (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_DICT_ELEMENT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_DICT_ELEMENT (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_DICT_ELEMENT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_DICT_ELEMENT_REGEXP (std::string v, location_type l)
-      {
-        return symbol_type (token::TOK_DICT_ELEMENT_REGEXP, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_DICT_ELEMENT_REGEXP (const std::string& v, const location_type& l)
-      {
-        return symbol_type (token::TOK_DICT_ELEMENT_REGEXP, v, l);
-      }
-#endif
-
-
   private:
     /// This class is not copyable.
     seclang_parser (const seclang_parser&);
@@ -6903,9 +2685,9 @@ switch (yytype)
 
     /// Generate an error message.
     /// \param yystate   the state where the error occurred.
-    /// \param yyla      the lookahead token.
+    /// \param yytoken   the lookahead token type, or yyempty_.
     virtual std::string yysyntax_error_ (state_type yystate,
-                                         const symbol_type& yyla) const;
+                                         symbol_number_type yytoken) const;
 
     /// Compute post-reduction state.
     /// \param yystate   the current state
@@ -6920,7 +2702,7 @@ switch (yytype)
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const short yypact_ninf_;
+    static const short int yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
@@ -6929,32 +2711,32 @@ switch (yytype)
     // Tables.
   // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
   // STATE-NUM.
-  static const short yypact_[];
+  static const short int yypact_[];
 
   // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
   // Performed when YYTABLE does not specify something else to do.  Zero
   // means the default is an error.
-  static const unsigned short yydefact_[];
+  static const unsigned short int yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const short yypgoto_[];
+  static const short int yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
-  static const short yydefgoto_[];
+  static const short int yydefgoto_[];
 
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const unsigned short yytable_[];
+  static const unsigned short int yytable_[];
 
-  static const short yycheck_[];
+  static const short int yycheck_[];
 
   // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
   // symbol of state STATE-NUM.
-  static const unsigned short yystos_[];
+  static const unsigned short int yystos_[];
 
   // YYR1[YYN] -- Symbol number of symbol that rule YYN derives.
-  static const unsigned short yyr1_[];
+  static const unsigned short int yyr1_[];
 
   // YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.
   static const unsigned char yyr2_[];
@@ -6968,15 +2750,14 @@ switch (yytype)
     static const char* const yytname_[];
 #if YYDEBUG
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-  static const unsigned short yyrline_[];
+  static const unsigned short int yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
     virtual void yy_reduce_print_ (int r);
     /// Print the state stack on the debug stream.
     virtual void yystack_print_ ();
 
-    /// Debugging level.
+    // Debugging.
     int yydebug_;
-    /// Debug stream.
     std::ostream* yycdebug_;
 
     /// \brief Display a symbol type, value and location.
@@ -6998,32 +2779,27 @@ switch (yytype)
     struct by_state
     {
       /// Default constructor.
-      by_state () YY_NOEXCEPT;
+      by_state ();
 
       /// The symbol type as needed by the constructor.
       typedef state_type kind_type;
 
       /// Constructor.
-      by_state (kind_type s) YY_NOEXCEPT;
+      by_state (kind_type s);
 
       /// Copy constructor.
-      by_state (const by_state& that) YY_NOEXCEPT;
-
-      /// Record that this symbol is empty.
-      void clear () YY_NOEXCEPT;
+      by_state (const by_state& other);
 
       /// Steal the symbol type from \a that.
       void move (by_state& that);
 
       /// The (internal) type number (corresponding to \a state).
-      /// \a empty_symbol when empty.
-      symbol_number_type type_get () const YY_NOEXCEPT;
+      /// "empty" when empty.
+      symbol_number_type type_get () const;
 
-      /// The state number used to denote an empty symbol.
-      enum { empty_state = -1 };
+      enum { empty = 0 };
 
       /// The state.
-      /// \a empty when empty.
       state_type state;
     };
 
@@ -7034,140 +2810,11 @@ switch (yytype)
       typedef basic_symbol<by_state> super_type;
       /// Construct an empty symbol.
       stack_symbol_type ();
-      /// Move or copy construction.
-      stack_symbol_type (YY_RVREF (stack_symbol_type) that);
       /// Steal the contents from \a sym to build this.
-      stack_symbol_type (state_type s, YY_MOVE_REF (symbol_type) sym);
-#if YY_CPLUSPLUS < 201103L
-      /// Assignment, needed by push_back by some old implementations.
-      /// Moves the contents of that.
-      stack_symbol_type& operator= (stack_symbol_type& that);
-#endif
+      stack_symbol_type (state_type s, symbol_type& sym);
+      /// Assignment, needed by push_back.
+      stack_symbol_type& operator= (const stack_symbol_type& that);
     };
-
-    /// A stack with random access from its top.
-    template <typename T, typename S = std::vector<T> >
-    class stack
-    {
-    public:
-      // Hide our reversed order.
-      typedef typename S::reverse_iterator iterator;
-      typedef typename S::const_reverse_iterator const_iterator;
-      typedef typename S::size_type size_type;
-
-      stack (size_type n = 200)
-        : seq_ (n)
-      {}
-
-      /// Random access.
-      ///
-      /// Index 0 returns the topmost element.
-      T&
-      operator[] (size_type i)
-      {
-        return seq_[size () - 1 - i];
-      }
-
-      /// Random access.
-      ///
-      /// Index 0 returns the topmost element.
-      T&
-      operator[] (int i)
-      {
-        return operator[] (size_type (i));
-      }
-
-      /// Random access.
-      ///
-      /// Index 0 returns the topmost element.
-      const T&
-      operator[] (size_type i) const
-      {
-        return seq_[size () - 1 - i];
-      }
-
-      /// Random access.
-      ///
-      /// Index 0 returns the topmost element.
-      const T&
-      operator[] (int i) const
-      {
-        return operator[] (size_type (i));
-      }
-
-      /// Steal the contents of \a t.
-      ///
-      /// Close to move-semantics.
-      void
-      push (YY_MOVE_REF (T) t)
-      {
-        seq_.push_back (T ());
-        operator[] (0).move (t);
-      }
-
-      /// Pop elements from the stack.
-      void
-      pop (int n = 1) YY_NOEXCEPT
-      {
-        for (; 0 < n; --n)
-          seq_.pop_back ();
-      }
-
-      /// Pop all elements from the stack.
-      void
-      clear () YY_NOEXCEPT
-      {
-        seq_.clear ();
-      }
-
-      /// Number of elements on the stack.
-      size_type
-      size () const YY_NOEXCEPT
-      {
-        return seq_.size ();
-      }
-
-      /// Iterator on top of the stack (going downwards).
-      const_iterator
-      begin () const YY_NOEXCEPT
-      {
-        return seq_.rbegin ();
-      }
-
-      /// Bottom of the stack.
-      const_iterator
-      end () const YY_NOEXCEPT
-      {
-        return seq_.rend ();
-      }
-
-      /// Present a slice of the top of a stack.
-      class slice
-      {
-      public:
-        slice (const stack& stack, int range)
-          : stack_ (stack)
-          , range_ (range)
-        {}
-
-        const T&
-        operator[] (int i) const
-        {
-          return stack_[range_ - i];
-        }
-
-      private:
-        const stack& stack_;
-        int range_;
-      };
-
-    private:
-      stack (const stack&);
-      stack& operator= (const stack&);
-      /// The wrapped container.
-      S seq_;
-    };
-
 
     /// Stack type.
     typedef stack<stack_symbol_type> stack_type;
@@ -7178,31 +2825,32 @@ switch (yytype)
     /// Push a new state on the stack.
     /// \param m    a debug message to display
     ///             if null, no trace is output.
-    /// \param sym  the symbol
+    /// \param s    the symbol
     /// \warning the contents of \a s.value is stolen.
-    void yypush_ (const char* m, YY_MOVE_REF (stack_symbol_type) sym);
+    void yypush_ (const char* m, stack_symbol_type& s);
 
     /// Push a new look ahead token on the state on the stack.
     /// \param m    a debug message to display
     ///             if null, no trace is output.
     /// \param s    the state
     /// \param sym  the symbol (for its value and location).
-    /// \warning the contents of \a sym.value is stolen.
-    void yypush_ (const char* m, state_type s, YY_MOVE_REF (symbol_type) sym);
+    /// \warning the contents of \a s.value is stolen.
+    void yypush_ (const char* m, state_type s, symbol_type& sym);
 
-    /// Pop \a n symbols from the stack.
-    void yypop_ (int n = 1);
+    /// Pop \a n symbols the three stacks.
+    void yypop_ (unsigned int n = 1);
 
-    /// Constants.
+    // Constants.
     enum
     {
       yyeof_ = 0,
-      yylast_ = 3304,     ///< Last index in yytable_.
+      yylast_ = 3270,     ///< Last index in yytable_.
       yynnts_ = 16,  ///< Number of nonterminal symbols.
-      yyfinal_ = 336, ///< Termination state number.
+      yyempty_ = -2,
+      yyfinal_ = 338, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 341  ///< Number of tokens.
+      yyntokens_ = 343  ///< Number of tokens.
     };
 
 
@@ -7210,17 +2858,16 @@ switch (yytype)
     modsecurity::Parser::Driver& driver;
   };
 
+  // Symbol number corresponding to token number t.
   inline
   seclang_parser::token_number_type
   seclang_parser::yytranslate_ (token_type t)
   {
-    // YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to
-    // TOKEN-NUM as returned by yylex.
     static
     const token_number_type
     translate_table[] =
     {
-       0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -7279,28 +2926,40 @@ switch (yytype)
      305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
      315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-     335,   336,   337,   338,   339,   340
+     335,   336,   337,   338,   339,   340,   341,   342
     };
-    const unsigned user_token_number_max_ = 595;
+    const unsigned int user_token_number_max_ = 597;
     const token_number_type undef_token_ = 2;
 
-    if (static_cast<int> (t) <= yyeof_)
+    if (static_cast<int>(t) <= yyeof_)
       return yyeof_;
-    else if (static_cast<unsigned> (t) <= user_token_number_max_)
+    else if (static_cast<unsigned int> (t) <= user_token_number_max_)
       return translate_table[t];
     else
       return undef_token_;
   }
 
+  inline
+  seclang_parser::syntax_error::syntax_error (const location_type& l, const std::string& m)
+    : std::runtime_error (m)
+    , location (l)
+  {}
+
   // basic_symbol.
-#if 201103L <= YY_CPLUSPLUS
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (basic_symbol&& that)
-    : Base (std::move (that))
+  inline
+  seclang_parser::basic_symbol<Base>::basic_symbol ()
+    : value ()
+  {}
+
+  template <typename Base>
+  inline
+  seclang_parser::basic_symbol<Base>::basic_symbol (const basic_symbol& other)
+    : Base (other)
     , value ()
-    , location (std::move (that.location))
+    , location (other.location)
   {
-    switch (this->type_get ())
+      switch (other.type_get ())
     {
       case 145: // "Accuracy"
       case 146: // "Allow"
@@ -7391,143 +3050,145 @@ switch (yytype)
       case 231: // "ACTION_TRANSFORMATION_URL_DECODE"
       case 232: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
       case 233: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 234: // "Ver"
-      case 235: // "xmlns"
-      case 236: // "CONFIG_COMPONENT_SIG"
-      case 237: // "CONFIG_CONN_ENGINE"
-      case 238: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 239: // "CONFIG_SEC_WEB_APP_ID"
-      case 240: // "CONFIG_SEC_SERVER_SIG"
-      case 241: // "CONFIG_DIR_AUDIT_DIR"
-      case 242: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 243: // "CONFIG_DIR_AUDIT_ENG"
-      case 244: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 245: // "CONFIG_DIR_AUDIT_LOG"
-      case 246: // "CONFIG_DIR_AUDIT_LOG2"
-      case 247: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 248: // "CONFIG_DIR_AUDIT_STS"
-      case 249: // "CONFIG_DIR_AUDIT_TPE"
-      case 250: // "CONFIG_DIR_DEBUG_LOG"
-      case 251: // "CONFIG_DIR_DEBUG_LVL"
-      case 252: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 253: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
-      case 254: // "CONFIG_SEC_HASH_ENGINE"
-      case 255: // "CONFIG_SEC_HASH_KEY"
-      case 256: // "CONFIG_SEC_HASH_PARAM"
-      case 257: // "CONFIG_SEC_HASH_METHOD_RX"
-      case 258: // "CONFIG_SEC_HASH_METHOD_PM"
-      case 259: // "CONFIG_SEC_CHROOT_DIR"
-      case 260: // "CONFIG_DIR_GEO_DB"
-      case 261: // "CONFIG_DIR_GSB_DB"
-      case 262: // "CONFIG_SEC_GUARDIAN_LOG"
-      case 263: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 264: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 265: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
-      case 266: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
-      case 267: // "CONFIG_SEC_SENSOR_ID"
-      case 268: // "CONFIG_DIR_REQ_BODY"
-      case 269: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 270: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 271: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 272: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 273: // "CONFIG_DIR_RES_BODY"
-      case 274: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 275: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 276: // "CONFIG_SEC_RULE_INHERITANCE"
-      case 277: // "CONFIG_SEC_RULE_PERF_TIME"
-      case 278: // "CONFIG_DIR_RULE_ENG"
-      case 279: // "CONFIG_DIR_SEC_ACTION"
-      case 280: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 281: // "CONFIG_DIR_SEC_MARKER"
-      case 282: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 283: // "CONFIG_DIR_UNICODE_CODE_PAGE"
-      case 284: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 285: // "CONFIG_SEC_HTTP_BLKEY"
-      case 286: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 287: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 289: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 290: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 292: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 293: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 294: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 295: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 296: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 297: // "CONFIG_UPLOAD_DIR"
-      case 298: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 299: // "CONFIG_UPLOAD_FILE_MODE"
-      case 300: // "CONFIG_VALUE_ABORT"
-      case 301: // "CONFIG_VALUE_DETC"
-      case 302: // "CONFIG_VALUE_HTTPS"
-      case 303: // "CONFIG_VALUE_OFF"
-      case 304: // "CONFIG_VALUE_ON"
-      case 305: // "CONFIG_VALUE_PARALLEL"
-      case 306: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 307: // "CONFIG_VALUE_REJECT"
-      case 308: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 309: // "CONFIG_VALUE_SERIAL"
-      case 310: // "CONFIG_VALUE_WARN"
-      case 311: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 312: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 313: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 314: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 315: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 316: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 317: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 318: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 319: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 320: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 321: // "DIRECTIVE"
-      case 322: // "DIRECTIVE_SECRULESCRIPT"
-      case 323: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 324: // "QUOTATION_MARK"
-      case 325: // "RUN_TIME_VAR_BLD"
-      case 326: // "RUN_TIME_VAR_DUR"
-      case 327: // "RUN_TIME_VAR_HSV"
-      case 328: // "RUN_TIME_VAR_REMOTE_USER"
-      case 329: // "RUN_TIME_VAR_TIME"
-      case 330: // "RUN_TIME_VAR_TIME_DAY"
-      case 331: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 332: // "RUN_TIME_VAR_TIME_HOUR"
-      case 333: // "RUN_TIME_VAR_TIME_MIN"
-      case 334: // "RUN_TIME_VAR_TIME_MON"
-      case 335: // "RUN_TIME_VAR_TIME_SEC"
-      case 336: // "RUN_TIME_VAR_TIME_WDAY"
-      case 337: // "RUN_TIME_VAR_TIME_YEAR"
-      case 338: // "VARIABLE"
-      case 339: // "Dictionary element"
-      case 340: // "Dictionary element, selected by regexp"
-        value.move< std::string > (std::move (that.value));
+      case 234: // "ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC"
+      case 235: // "ACTION_TRANSFORMATION_UTF8_TO_CHAR"
+      case 236: // "Ver"
+      case 237: // "xmlns"
+      case 238: // "CONFIG_COMPONENT_SIG"
+      case 239: // "CONFIG_CONN_ENGINE"
+      case 240: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 241: // "CONFIG_SEC_WEB_APP_ID"
+      case 242: // "CONFIG_SEC_SERVER_SIG"
+      case 243: // "CONFIG_DIR_AUDIT_DIR"
+      case 244: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 245: // "CONFIG_DIR_AUDIT_ENG"
+      case 246: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 247: // "CONFIG_DIR_AUDIT_LOG"
+      case 248: // "CONFIG_DIR_AUDIT_LOG2"
+      case 249: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 250: // "CONFIG_DIR_AUDIT_STS"
+      case 251: // "CONFIG_DIR_AUDIT_TPE"
+      case 252: // "CONFIG_DIR_DEBUG_LOG"
+      case 253: // "CONFIG_DIR_DEBUG_LVL"
+      case 254: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 255: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
+      case 256: // "CONFIG_SEC_HASH_ENGINE"
+      case 257: // "CONFIG_SEC_HASH_KEY"
+      case 258: // "CONFIG_SEC_HASH_PARAM"
+      case 259: // "CONFIG_SEC_HASH_METHOD_RX"
+      case 260: // "CONFIG_SEC_HASH_METHOD_PM"
+      case 261: // "CONFIG_SEC_CHROOT_DIR"
+      case 262: // "CONFIG_DIR_GEO_DB"
+      case 263: // "CONFIG_DIR_GSB_DB"
+      case 264: // "CONFIG_SEC_GUARDIAN_LOG"
+      case 265: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 266: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 267: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
+      case 268: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
+      case 269: // "CONFIG_SEC_SENSOR_ID"
+      case 270: // "CONFIG_DIR_REQ_BODY"
+      case 271: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 272: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 273: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 274: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 275: // "CONFIG_DIR_RES_BODY"
+      case 276: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 277: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 278: // "CONFIG_SEC_RULE_INHERITANCE"
+      case 279: // "CONFIG_SEC_RULE_PERF_TIME"
+      case 280: // "CONFIG_DIR_RULE_ENG"
+      case 281: // "CONFIG_DIR_SEC_ACTION"
+      case 282: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 283: // "CONFIG_DIR_SEC_MARKER"
+      case 284: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 285: // "CONFIG_DIR_UNICODE_CODE_PAGE"
+      case 286: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 287: // "CONFIG_SEC_HTTP_BLKEY"
+      case 288: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 289: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 290: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 291: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 292: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 293: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 294: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 295: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 296: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 297: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 298: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 299: // "CONFIG_UPLOAD_DIR"
+      case 300: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 301: // "CONFIG_UPLOAD_FILE_MODE"
+      case 302: // "CONFIG_VALUE_ABORT"
+      case 303: // "CONFIG_VALUE_DETC"
+      case 304: // "CONFIG_VALUE_HTTPS"
+      case 305: // "CONFIG_VALUE_OFF"
+      case 306: // "CONFIG_VALUE_ON"
+      case 307: // "CONFIG_VALUE_PARALLEL"
+      case 308: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 309: // "CONFIG_VALUE_REJECT"
+      case 310: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 311: // "CONFIG_VALUE_SERIAL"
+      case 312: // "CONFIG_VALUE_WARN"
+      case 313: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 314: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 315: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 316: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 317: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 318: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 319: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 320: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 321: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 322: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 323: // "DIRECTIVE"
+      case 324: // "DIRECTIVE_SECRULESCRIPT"
+      case 325: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 326: // "QUOTATION_MARK"
+      case 327: // "RUN_TIME_VAR_BLD"
+      case 328: // "RUN_TIME_VAR_DUR"
+      case 329: // "RUN_TIME_VAR_HSV"
+      case 330: // "RUN_TIME_VAR_REMOTE_USER"
+      case 331: // "RUN_TIME_VAR_TIME"
+      case 332: // "RUN_TIME_VAR_TIME_DAY"
+      case 333: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 334: // "RUN_TIME_VAR_TIME_HOUR"
+      case 335: // "RUN_TIME_VAR_TIME_MIN"
+      case 336: // "RUN_TIME_VAR_TIME_MON"
+      case 337: // "RUN_TIME_VAR_TIME_SEC"
+      case 338: // "RUN_TIME_VAR_TIME_WDAY"
+      case 339: // "RUN_TIME_VAR_TIME_YEAR"
+      case 340: // "VARIABLE"
+      case 341: // "Dictionary element"
+      case 342: // "Dictionary element, selected by regexp"
+        value.copy< std::string > (other.value);
         break;
 
-      case 347: // op
-      case 348: // op_before_init
-        value.move< std::unique_ptr<Operator> > (std::move (that.value));
+      case 349: // op
+      case 350: // op_before_init
+        value.copy< std::unique_ptr<Operator> > (other.value);
         break;
 
-      case 356: // run_time_string
-        value.move< std::unique_ptr<RunTimeString> > (std::move (that.value));
+      case 358: // run_time_string
+        value.copy< std::unique_ptr<RunTimeString> > (other.value);
         break;
 
-      case 353: // var
-        value.move< std::unique_ptr<Variable> > (std::move (that.value));
+      case 355: // var
+        value.copy< std::unique_ptr<Variable> > (other.value);
         break;
 
-      case 354: // act
-      case 355: // setvar_action
-        value.move< std::unique_ptr<actions::Action> > (std::move (that.value));
+      case 356: // act
+      case 357: // setvar_action
+        value.copy< std::unique_ptr<actions::Action> > (other.value);
         break;
 
-      case 350: // variables
-      case 351: // variables_pre_process
-      case 352: // variables_may_be_quoted
-        value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (std::move (that.value));
+      case 352: // variables
+      case 353: // variables_pre_process
+      case 354: // variables_may_be_quoted
+        value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (other.value);
         break;
 
-      case 345: // actions
-      case 346: // actions_may_quoted
-        value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (std::move (that.value));
+      case 347: // actions
+      case 348: // actions_may_quoted
+        value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (other.value);
         break;
 
       default:
@@ -7535,15 +3196,17 @@ switch (yytype)
     }
 
   }
-#endif
+
 
   template <typename Base>
-  seclang_parser::basic_symbol<Base>::basic_symbol (const basic_symbol& that)
-    : Base (that)
+  inline
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const semantic_type& v, const location_type& l)
+    : Base (t)
     , value ()
-    , location (that.location)
+    , location (l)
   {
-    switch (this->type_get ())
+    (void) v;
+      switch (this->type_get ())
     {
       case 145: // "Accuracy"
       case 146: // "Allow"
@@ -7634,143 +3297,455 @@ switch (yytype)
       case 231: // "ACTION_TRANSFORMATION_URL_DECODE"
       case 232: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
       case 233: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 234: // "Ver"
-      case 235: // "xmlns"
-      case 236: // "CONFIG_COMPONENT_SIG"
-      case 237: // "CONFIG_CONN_ENGINE"
-      case 238: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 239: // "CONFIG_SEC_WEB_APP_ID"
-      case 240: // "CONFIG_SEC_SERVER_SIG"
-      case 241: // "CONFIG_DIR_AUDIT_DIR"
-      case 242: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 243: // "CONFIG_DIR_AUDIT_ENG"
-      case 244: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 245: // "CONFIG_DIR_AUDIT_LOG"
-      case 246: // "CONFIG_DIR_AUDIT_LOG2"
-      case 247: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 248: // "CONFIG_DIR_AUDIT_STS"
-      case 249: // "CONFIG_DIR_AUDIT_TPE"
-      case 250: // "CONFIG_DIR_DEBUG_LOG"
-      case 251: // "CONFIG_DIR_DEBUG_LVL"
-      case 252: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 253: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
-      case 254: // "CONFIG_SEC_HASH_ENGINE"
-      case 255: // "CONFIG_SEC_HASH_KEY"
-      case 256: // "CONFIG_SEC_HASH_PARAM"
-      case 257: // "CONFIG_SEC_HASH_METHOD_RX"
-      case 258: // "CONFIG_SEC_HASH_METHOD_PM"
-      case 259: // "CONFIG_SEC_CHROOT_DIR"
-      case 260: // "CONFIG_DIR_GEO_DB"
-      case 261: // "CONFIG_DIR_GSB_DB"
-      case 262: // "CONFIG_SEC_GUARDIAN_LOG"
-      case 263: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 264: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 265: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
-      case 266: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
-      case 267: // "CONFIG_SEC_SENSOR_ID"
-      case 268: // "CONFIG_DIR_REQ_BODY"
-      case 269: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 270: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 271: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 272: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 273: // "CONFIG_DIR_RES_BODY"
-      case 274: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 275: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 276: // "CONFIG_SEC_RULE_INHERITANCE"
-      case 277: // "CONFIG_SEC_RULE_PERF_TIME"
-      case 278: // "CONFIG_DIR_RULE_ENG"
-      case 279: // "CONFIG_DIR_SEC_ACTION"
-      case 280: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 281: // "CONFIG_DIR_SEC_MARKER"
-      case 282: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 283: // "CONFIG_DIR_UNICODE_CODE_PAGE"
-      case 284: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 285: // "CONFIG_SEC_HTTP_BLKEY"
-      case 286: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 287: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 289: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 290: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 292: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 293: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 294: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 295: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 296: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 297: // "CONFIG_UPLOAD_DIR"
-      case 298: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 299: // "CONFIG_UPLOAD_FILE_MODE"
-      case 300: // "CONFIG_VALUE_ABORT"
-      case 301: // "CONFIG_VALUE_DETC"
-      case 302: // "CONFIG_VALUE_HTTPS"
-      case 303: // "CONFIG_VALUE_OFF"
-      case 304: // "CONFIG_VALUE_ON"
-      case 305: // "CONFIG_VALUE_PARALLEL"
-      case 306: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 307: // "CONFIG_VALUE_REJECT"
-      case 308: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 309: // "CONFIG_VALUE_SERIAL"
-      case 310: // "CONFIG_VALUE_WARN"
-      case 311: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 312: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 313: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 314: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 315: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 316: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 317: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 318: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 319: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 320: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 321: // "DIRECTIVE"
-      case 322: // "DIRECTIVE_SECRULESCRIPT"
-      case 323: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 324: // "QUOTATION_MARK"
-      case 325: // "RUN_TIME_VAR_BLD"
-      case 326: // "RUN_TIME_VAR_DUR"
-      case 327: // "RUN_TIME_VAR_HSV"
-      case 328: // "RUN_TIME_VAR_REMOTE_USER"
-      case 329: // "RUN_TIME_VAR_TIME"
-      case 330: // "RUN_TIME_VAR_TIME_DAY"
-      case 331: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 332: // "RUN_TIME_VAR_TIME_HOUR"
-      case 333: // "RUN_TIME_VAR_TIME_MIN"
-      case 334: // "RUN_TIME_VAR_TIME_MON"
-      case 335: // "RUN_TIME_VAR_TIME_SEC"
-      case 336: // "RUN_TIME_VAR_TIME_WDAY"
-      case 337: // "RUN_TIME_VAR_TIME_YEAR"
-      case 338: // "VARIABLE"
-      case 339: // "Dictionary element"
-      case 340: // "Dictionary element, selected by regexp"
-        value.copy< std::string > (YY_MOVE (that.value));
+      case 234: // "ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC"
+      case 235: // "ACTION_TRANSFORMATION_UTF8_TO_CHAR"
+      case 236: // "Ver"
+      case 237: // "xmlns"
+      case 238: // "CONFIG_COMPONENT_SIG"
+      case 239: // "CONFIG_CONN_ENGINE"
+      case 240: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 241: // "CONFIG_SEC_WEB_APP_ID"
+      case 242: // "CONFIG_SEC_SERVER_SIG"
+      case 243: // "CONFIG_DIR_AUDIT_DIR"
+      case 244: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 245: // "CONFIG_DIR_AUDIT_ENG"
+      case 246: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 247: // "CONFIG_DIR_AUDIT_LOG"
+      case 248: // "CONFIG_DIR_AUDIT_LOG2"
+      case 249: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 250: // "CONFIG_DIR_AUDIT_STS"
+      case 251: // "CONFIG_DIR_AUDIT_TPE"
+      case 252: // "CONFIG_DIR_DEBUG_LOG"
+      case 253: // "CONFIG_DIR_DEBUG_LVL"
+      case 254: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 255: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
+      case 256: // "CONFIG_SEC_HASH_ENGINE"
+      case 257: // "CONFIG_SEC_HASH_KEY"
+      case 258: // "CONFIG_SEC_HASH_PARAM"
+      case 259: // "CONFIG_SEC_HASH_METHOD_RX"
+      case 260: // "CONFIG_SEC_HASH_METHOD_PM"
+      case 261: // "CONFIG_SEC_CHROOT_DIR"
+      case 262: // "CONFIG_DIR_GEO_DB"
+      case 263: // "CONFIG_DIR_GSB_DB"
+      case 264: // "CONFIG_SEC_GUARDIAN_LOG"
+      case 265: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 266: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 267: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
+      case 268: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
+      case 269: // "CONFIG_SEC_SENSOR_ID"
+      case 270: // "CONFIG_DIR_REQ_BODY"
+      case 271: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 272: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 273: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 274: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 275: // "CONFIG_DIR_RES_BODY"
+      case 276: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 277: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 278: // "CONFIG_SEC_RULE_INHERITANCE"
+      case 279: // "CONFIG_SEC_RULE_PERF_TIME"
+      case 280: // "CONFIG_DIR_RULE_ENG"
+      case 281: // "CONFIG_DIR_SEC_ACTION"
+      case 282: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 283: // "CONFIG_DIR_SEC_MARKER"
+      case 284: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 285: // "CONFIG_DIR_UNICODE_CODE_PAGE"
+      case 286: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 287: // "CONFIG_SEC_HTTP_BLKEY"
+      case 288: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 289: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 290: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 291: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 292: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 293: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 294: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 295: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 296: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 297: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 298: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 299: // "CONFIG_UPLOAD_DIR"
+      case 300: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 301: // "CONFIG_UPLOAD_FILE_MODE"
+      case 302: // "CONFIG_VALUE_ABORT"
+      case 303: // "CONFIG_VALUE_DETC"
+      case 304: // "CONFIG_VALUE_HTTPS"
+      case 305: // "CONFIG_VALUE_OFF"
+      case 306: // "CONFIG_VALUE_ON"
+      case 307: // "CONFIG_VALUE_PARALLEL"
+      case 308: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 309: // "CONFIG_VALUE_REJECT"
+      case 310: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 311: // "CONFIG_VALUE_SERIAL"
+      case 312: // "CONFIG_VALUE_WARN"
+      case 313: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 314: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 315: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 316: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 317: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 318: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 319: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 320: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 321: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 322: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 323: // "DIRECTIVE"
+      case 324: // "DIRECTIVE_SECRULESCRIPT"
+      case 325: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 326: // "QUOTATION_MARK"
+      case 327: // "RUN_TIME_VAR_BLD"
+      case 328: // "RUN_TIME_VAR_DUR"
+      case 329: // "RUN_TIME_VAR_HSV"
+      case 330: // "RUN_TIME_VAR_REMOTE_USER"
+      case 331: // "RUN_TIME_VAR_TIME"
+      case 332: // "RUN_TIME_VAR_TIME_DAY"
+      case 333: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 334: // "RUN_TIME_VAR_TIME_HOUR"
+      case 335: // "RUN_TIME_VAR_TIME_MIN"
+      case 336: // "RUN_TIME_VAR_TIME_MON"
+      case 337: // "RUN_TIME_VAR_TIME_SEC"
+      case 338: // "RUN_TIME_VAR_TIME_WDAY"
+      case 339: // "RUN_TIME_VAR_TIME_YEAR"
+      case 340: // "VARIABLE"
+      case 341: // "Dictionary element"
+      case 342: // "Dictionary element, selected by regexp"
+        value.copy< std::string > (v);
         break;
 
-      case 347: // op
-      case 348: // op_before_init
-        value.copy< std::unique_ptr<Operator> > (YY_MOVE (that.value));
+      case 349: // op
+      case 350: // op_before_init
+        value.copy< std::unique_ptr<Operator> > (v);
         break;
 
-      case 356: // run_time_string
-        value.copy< std::unique_ptr<RunTimeString> > (YY_MOVE (that.value));
+      case 358: // run_time_string
+        value.copy< std::unique_ptr<RunTimeString> > (v);
         break;
 
-      case 353: // var
-        value.copy< std::unique_ptr<Variable> > (YY_MOVE (that.value));
+      case 355: // var
+        value.copy< std::unique_ptr<Variable> > (v);
         break;
 
-      case 354: // act
-      case 355: // setvar_action
-        value.copy< std::unique_ptr<actions::Action> > (YY_MOVE (that.value));
+      case 356: // act
+      case 357: // setvar_action
+        value.copy< std::unique_ptr<actions::Action> > (v);
         break;
 
-      case 350: // variables
-      case 351: // variables_pre_process
-      case 352: // variables_may_be_quoted
-        value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (YY_MOVE (that.value));
+      case 352: // variables
+      case 353: // variables_pre_process
+      case 354: // variables_may_be_quoted
+        value.copy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (v);
         break;
 
-      case 345: // actions
-      case 346: // actions_may_quoted
-        value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (YY_MOVE (that.value));
+      case 347: // actions
+      case 348: // actions_may_quoted
+        value.copy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (v);
+        break;
+
+      default:
+        break;
+    }
+}
+
+
+  // Implementation of basic_symbol constructor for each type.
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const location_type& l)
+    : Base (t)
+    , value ()
+    , location (l)
+  {}
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<Operator> v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<RunTimeString> v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<Variable> v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<actions::Action> v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  seclang_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+
+  template <typename Base>
+  inline
+  seclang_parser::basic_symbol<Base>::~basic_symbol ()
+  {
+    // User destructor.
+    symbol_number_type yytype = this->type_get ();
+    switch (yytype)
+    {
+   default:
+      break;
+    }
+
+    // Type destructor.
+    switch (yytype)
+    {
+      case 145: // "Accuracy"
+      case 146: // "Allow"
+      case 147: // "Append"
+      case 148: // "AuditLog"
+      case 149: // "Block"
+      case 150: // "Capture"
+      case 151: // "Chain"
+      case 152: // "ACTION_CTL_AUDIT_ENGINE"
+      case 153: // "ACTION_CTL_AUDIT_LOG_PARTS"
+      case 154: // "ACTION_CTL_BDY_JSON"
+      case 155: // "ACTION_CTL_BDY_XML"
+      case 156: // "ACTION_CTL_BDY_URLENCODED"
+      case 157: // "ACTION_CTL_FORCE_REQ_BODY_VAR"
+      case 158: // "ACTION_CTL_REQUEST_BODY_ACCESS"
+      case 159: // "ACTION_CTL_RULE_REMOVE_BY_ID"
+      case 160: // "ACTION_CTL_RULE_REMOVE_BY_TAG"
+      case 161: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
+      case 162: // "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
+      case 163: // "Deny"
+      case 164: // "DeprecateVar"
+      case 165: // "Drop"
+      case 166: // "Exec"
+      case 167: // "ExpireVar"
+      case 168: // "Id"
+      case 169: // "InitCol"
+      case 170: // "Log"
+      case 171: // "LogData"
+      case 172: // "Maturity"
+      case 173: // "Msg"
+      case 174: // "MultiMatch"
+      case 175: // "NoAuditLog"
+      case 176: // "NoLog"
+      case 177: // "Pass"
+      case 178: // "Pause"
+      case 179: // "Phase"
+      case 180: // "Prepend"
+      case 181: // "Proxy"
+      case 182: // "Redirect"
+      case 183: // "Rev"
+      case 184: // "SanitiseArg"
+      case 185: // "SanitiseMatched"
+      case 186: // "SanitiseMatchedBytes"
+      case 187: // "SanitiseRequestHeader"
+      case 188: // "SanitiseResponseHeader"
+      case 189: // "SetEnv"
+      case 190: // "SetRsc"
+      case 191: // "SetSid"
+      case 192: // "SetUID"
+      case 193: // "Severity"
+      case 194: // "Skip"
+      case 195: // "SkipAfter"
+      case 196: // "Status"
+      case 197: // "Tag"
+      case 198: // "ACTION_TRANSFORMATION_BASE_64_ENCODE"
+      case 199: // "ACTION_TRANSFORMATION_BASE_64_DECODE"
+      case 200: // "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
+      case 201: // "ACTION_TRANSFORMATION_CMD_LINE"
+      case 202: // "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
+      case 203: // "ACTION_TRANSFORMATION_CSS_DECODE"
+      case 204: // "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
+      case 205: // "ACTION_TRANSFORMATION_HEX_ENCODE"
+      case 206: // "ACTION_TRANSFORMATION_HEX_DECODE"
+      case 207: // "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
+      case 208: // "ACTION_TRANSFORMATION_JS_DECODE"
+      case 209: // "ACTION_TRANSFORMATION_LENGTH"
+      case 210: // "ACTION_TRANSFORMATION_LOWERCASE"
+      case 211: // "ACTION_TRANSFORMATION_MD5"
+      case 212: // "ACTION_TRANSFORMATION_NONE"
+      case 213: // "ACTION_TRANSFORMATION_NORMALISE_PATH"
+      case 214: // "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
+      case 215: // "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
+      case 216: // "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
+      case 217: // "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
+      case 218: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
+      case 219: // "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
+      case 220: // "ACTION_TRANSFORMATION_REMOVE_NULLS"
+      case 221: // "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
+      case 222: // "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
+      case 223: // "ACTION_TRANSFORMATION_REPLACE_NULLS"
+      case 224: // "ACTION_TRANSFORMATION_SHA1"
+      case 225: // "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
+      case 226: // "ACTION_TRANSFORMATION_TRIM"
+      case 227: // "ACTION_TRANSFORMATION_TRIM_LEFT"
+      case 228: // "ACTION_TRANSFORMATION_TRIM_RIGHT"
+      case 229: // "ACTION_TRANSFORMATION_UPPERCASE"
+      case 230: // "ACTION_TRANSFORMATION_URL_ENCODE"
+      case 231: // "ACTION_TRANSFORMATION_URL_DECODE"
+      case 232: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
+      case 233: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+      case 234: // "ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC"
+      case 235: // "ACTION_TRANSFORMATION_UTF8_TO_CHAR"
+      case 236: // "Ver"
+      case 237: // "xmlns"
+      case 238: // "CONFIG_COMPONENT_SIG"
+      case 239: // "CONFIG_CONN_ENGINE"
+      case 240: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 241: // "CONFIG_SEC_WEB_APP_ID"
+      case 242: // "CONFIG_SEC_SERVER_SIG"
+      case 243: // "CONFIG_DIR_AUDIT_DIR"
+      case 244: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 245: // "CONFIG_DIR_AUDIT_ENG"
+      case 246: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 247: // "CONFIG_DIR_AUDIT_LOG"
+      case 248: // "CONFIG_DIR_AUDIT_LOG2"
+      case 249: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 250: // "CONFIG_DIR_AUDIT_STS"
+      case 251: // "CONFIG_DIR_AUDIT_TPE"
+      case 252: // "CONFIG_DIR_DEBUG_LOG"
+      case 253: // "CONFIG_DIR_DEBUG_LVL"
+      case 254: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 255: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
+      case 256: // "CONFIG_SEC_HASH_ENGINE"
+      case 257: // "CONFIG_SEC_HASH_KEY"
+      case 258: // "CONFIG_SEC_HASH_PARAM"
+      case 259: // "CONFIG_SEC_HASH_METHOD_RX"
+      case 260: // "CONFIG_SEC_HASH_METHOD_PM"
+      case 261: // "CONFIG_SEC_CHROOT_DIR"
+      case 262: // "CONFIG_DIR_GEO_DB"
+      case 263: // "CONFIG_DIR_GSB_DB"
+      case 264: // "CONFIG_SEC_GUARDIAN_LOG"
+      case 265: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 266: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 267: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
+      case 268: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
+      case 269: // "CONFIG_SEC_SENSOR_ID"
+      case 270: // "CONFIG_DIR_REQ_BODY"
+      case 271: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 272: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 273: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 274: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 275: // "CONFIG_DIR_RES_BODY"
+      case 276: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 277: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 278: // "CONFIG_SEC_RULE_INHERITANCE"
+      case 279: // "CONFIG_SEC_RULE_PERF_TIME"
+      case 280: // "CONFIG_DIR_RULE_ENG"
+      case 281: // "CONFIG_DIR_SEC_ACTION"
+      case 282: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 283: // "CONFIG_DIR_SEC_MARKER"
+      case 284: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 285: // "CONFIG_DIR_UNICODE_CODE_PAGE"
+      case 286: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 287: // "CONFIG_SEC_HTTP_BLKEY"
+      case 288: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 289: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 290: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 291: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 292: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 293: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 294: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 295: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 296: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 297: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 298: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 299: // "CONFIG_UPLOAD_DIR"
+      case 300: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 301: // "CONFIG_UPLOAD_FILE_MODE"
+      case 302: // "CONFIG_VALUE_ABORT"
+      case 303: // "CONFIG_VALUE_DETC"
+      case 304: // "CONFIG_VALUE_HTTPS"
+      case 305: // "CONFIG_VALUE_OFF"
+      case 306: // "CONFIG_VALUE_ON"
+      case 307: // "CONFIG_VALUE_PARALLEL"
+      case 308: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 309: // "CONFIG_VALUE_REJECT"
+      case 310: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 311: // "CONFIG_VALUE_SERIAL"
+      case 312: // "CONFIG_VALUE_WARN"
+      case 313: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 314: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 315: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 316: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 317: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 318: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 319: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 320: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 321: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 322: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 323: // "DIRECTIVE"
+      case 324: // "DIRECTIVE_SECRULESCRIPT"
+      case 325: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 326: // "QUOTATION_MARK"
+      case 327: // "RUN_TIME_VAR_BLD"
+      case 328: // "RUN_TIME_VAR_DUR"
+      case 329: // "RUN_TIME_VAR_HSV"
+      case 330: // "RUN_TIME_VAR_REMOTE_USER"
+      case 331: // "RUN_TIME_VAR_TIME"
+      case 332: // "RUN_TIME_VAR_TIME_DAY"
+      case 333: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 334: // "RUN_TIME_VAR_TIME_HOUR"
+      case 335: // "RUN_TIME_VAR_TIME_MIN"
+      case 336: // "RUN_TIME_VAR_TIME_MON"
+      case 337: // "RUN_TIME_VAR_TIME_SEC"
+      case 338: // "RUN_TIME_VAR_TIME_WDAY"
+      case 339: // "RUN_TIME_VAR_TIME_YEAR"
+      case 340: // "VARIABLE"
+      case 341: // "Dictionary element"
+      case 342: // "Dictionary element, selected by regexp"
+        value.template destroy< std::string > ();
+        break;
+
+      case 349: // op
+      case 350: // op_before_init
+        value.template destroy< std::unique_ptr<Operator> > ();
+        break;
+
+      case 358: // run_time_string
+        value.template destroy< std::unique_ptr<RunTimeString> > ();
+        break;
+
+      case 355: // var
+        value.template destroy< std::unique_ptr<Variable> > ();
+        break;
+
+      case 356: // act
+      case 357: // setvar_action
+        value.template destroy< std::unique_ptr<actions::Action> > ();
+        break;
+
+      case 352: // variables
+      case 353: // variables_pre_process
+      case 354: // variables_may_be_quoted
+        value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ();
+        break;
+
+      case 347: // actions
+      case 348: // actions_may_quoted
+        value.template destroy< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ();
         break;
 
       default:
@@ -7779,21 +3754,13 @@ switch (yytype)
 
   }
 
-
-
   template <typename Base>
-  bool
-  seclang_parser::basic_symbol<Base>::empty () const YY_NOEXCEPT
-  {
-    return Base::type_get () == empty_symbol;
-  }
-
-  template <typename Base>
+  inline
   void
   seclang_parser::basic_symbol<Base>::move (basic_symbol& s)
   {
-    super_type::move (s);
-    switch (this->type_get ())
+    super_type::move(s);
+      switch (this->type_get ())
     {
       case 145: // "Accuracy"
       case 146: // "Allow"
@@ -7884,170 +3851,163 @@ switch (yytype)
       case 231: // "ACTION_TRANSFORMATION_URL_DECODE"
       case 232: // "ACTION_TRANSFORMATION_URL_DECODE_UNI"
       case 233: // "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-      case 234: // "Ver"
-      case 235: // "xmlns"
-      case 236: // "CONFIG_COMPONENT_SIG"
-      case 237: // "CONFIG_CONN_ENGINE"
-      case 238: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
-      case 239: // "CONFIG_SEC_WEB_APP_ID"
-      case 240: // "CONFIG_SEC_SERVER_SIG"
-      case 241: // "CONFIG_DIR_AUDIT_DIR"
-      case 242: // "CONFIG_DIR_AUDIT_DIR_MOD"
-      case 243: // "CONFIG_DIR_AUDIT_ENG"
-      case 244: // "CONFIG_DIR_AUDIT_FLE_MOD"
-      case 245: // "CONFIG_DIR_AUDIT_LOG"
-      case 246: // "CONFIG_DIR_AUDIT_LOG2"
-      case 247: // "CONFIG_DIR_AUDIT_LOG_P"
-      case 248: // "CONFIG_DIR_AUDIT_STS"
-      case 249: // "CONFIG_DIR_AUDIT_TPE"
-      case 250: // "CONFIG_DIR_DEBUG_LOG"
-      case 251: // "CONFIG_DIR_DEBUG_LVL"
-      case 252: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-      case 253: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
-      case 254: // "CONFIG_SEC_HASH_ENGINE"
-      case 255: // "CONFIG_SEC_HASH_KEY"
-      case 256: // "CONFIG_SEC_HASH_PARAM"
-      case 257: // "CONFIG_SEC_HASH_METHOD_RX"
-      case 258: // "CONFIG_SEC_HASH_METHOD_PM"
-      case 259: // "CONFIG_SEC_CHROOT_DIR"
-      case 260: // "CONFIG_DIR_GEO_DB"
-      case 261: // "CONFIG_DIR_GSB_DB"
-      case 262: // "CONFIG_SEC_GUARDIAN_LOG"
-      case 263: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
-      case 264: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
-      case 265: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
-      case 266: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
-      case 267: // "CONFIG_SEC_SENSOR_ID"
-      case 268: // "CONFIG_DIR_REQ_BODY"
-      case 269: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-      case 270: // "CONFIG_DIR_REQ_BODY_LIMIT"
-      case 271: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
-      case 272: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-      case 273: // "CONFIG_DIR_RES_BODY"
-      case 274: // "CONFIG_DIR_RES_BODY_LIMIT"
-      case 275: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
-      case 276: // "CONFIG_SEC_RULE_INHERITANCE"
-      case 277: // "CONFIG_SEC_RULE_PERF_TIME"
-      case 278: // "CONFIG_DIR_RULE_ENG"
-      case 279: // "CONFIG_DIR_SEC_ACTION"
-      case 280: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
-      case 281: // "CONFIG_DIR_SEC_MARKER"
-      case 282: // "CONFIG_DIR_UNICODE_MAP_FILE"
-      case 283: // "CONFIG_DIR_UNICODE_CODE_PAGE"
-      case 284: // "CONFIG_SEC_COLLECTION_TIMEOUT"
-      case 285: // "CONFIG_SEC_HTTP_BLKEY"
-      case 286: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
-      case 287: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
-      case 288: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
-      case 289: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-      case 290: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-      case 291: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
-      case 292: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
-      case 293: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
-      case 294: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
-      case 295: // "CONFIG_UPDLOAD_KEEP_FILES"
-      case 296: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
-      case 297: // "CONFIG_UPLOAD_DIR"
-      case 298: // "CONFIG_UPLOAD_FILE_LIMIT"
-      case 299: // "CONFIG_UPLOAD_FILE_MODE"
-      case 300: // "CONFIG_VALUE_ABORT"
-      case 301: // "CONFIG_VALUE_DETC"
-      case 302: // "CONFIG_VALUE_HTTPS"
-      case 303: // "CONFIG_VALUE_OFF"
-      case 304: // "CONFIG_VALUE_ON"
-      case 305: // "CONFIG_VALUE_PARALLEL"
-      case 306: // "CONFIG_VALUE_PROCESS_PARTIAL"
-      case 307: // "CONFIG_VALUE_REJECT"
-      case 308: // "CONFIG_VALUE_RELEVANT_ONLY"
-      case 309: // "CONFIG_VALUE_SERIAL"
-      case 310: // "CONFIG_VALUE_WARN"
-      case 311: // "CONFIG_XML_EXTERNAL_ENTITY"
-      case 312: // "CONGIG_DIR_RESPONSE_BODY_MP"
-      case 313: // "CONGIG_DIR_SEC_ARG_SEP"
-      case 314: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
-      case 315: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
-      case 316: // "CONGIG_DIR_SEC_DATA_DIR"
-      case 317: // "CONGIG_DIR_SEC_STATUS_ENGINE"
-      case 318: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-      case 319: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-      case 320: // "CONGIG_DIR_SEC_TMP_DIR"
-      case 321: // "DIRECTIVE"
-      case 322: // "DIRECTIVE_SECRULESCRIPT"
-      case 323: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-      case 324: // "QUOTATION_MARK"
-      case 325: // "RUN_TIME_VAR_BLD"
-      case 326: // "RUN_TIME_VAR_DUR"
-      case 327: // "RUN_TIME_VAR_HSV"
-      case 328: // "RUN_TIME_VAR_REMOTE_USER"
-      case 329: // "RUN_TIME_VAR_TIME"
-      case 330: // "RUN_TIME_VAR_TIME_DAY"
-      case 331: // "RUN_TIME_VAR_TIME_EPOCH"
-      case 332: // "RUN_TIME_VAR_TIME_HOUR"
-      case 333: // "RUN_TIME_VAR_TIME_MIN"
-      case 334: // "RUN_TIME_VAR_TIME_MON"
-      case 335: // "RUN_TIME_VAR_TIME_SEC"
-      case 336: // "RUN_TIME_VAR_TIME_WDAY"
-      case 337: // "RUN_TIME_VAR_TIME_YEAR"
-      case 338: // "VARIABLE"
-      case 339: // "Dictionary element"
-      case 340: // "Dictionary element, selected by regexp"
-        value.move< std::string > (YY_MOVE (s.value));
+      case 234: // "ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC"
+      case 235: // "ACTION_TRANSFORMATION_UTF8_TO_CHAR"
+      case 236: // "Ver"
+      case 237: // "xmlns"
+      case 238: // "CONFIG_COMPONENT_SIG"
+      case 239: // "CONFIG_CONN_ENGINE"
+      case 240: // "CONFIG_SEC_ARGUMENT_SEPARATOR"
+      case 241: // "CONFIG_SEC_WEB_APP_ID"
+      case 242: // "CONFIG_SEC_SERVER_SIG"
+      case 243: // "CONFIG_DIR_AUDIT_DIR"
+      case 244: // "CONFIG_DIR_AUDIT_DIR_MOD"
+      case 245: // "CONFIG_DIR_AUDIT_ENG"
+      case 246: // "CONFIG_DIR_AUDIT_FLE_MOD"
+      case 247: // "CONFIG_DIR_AUDIT_LOG"
+      case 248: // "CONFIG_DIR_AUDIT_LOG2"
+      case 249: // "CONFIG_DIR_AUDIT_LOG_P"
+      case 250: // "CONFIG_DIR_AUDIT_STS"
+      case 251: // "CONFIG_DIR_AUDIT_TPE"
+      case 252: // "CONFIG_DIR_DEBUG_LOG"
+      case 253: // "CONFIG_DIR_DEBUG_LVL"
+      case 254: // "CONFIG_SEC_CACHE_TRANSFORMATIONS"
+      case 255: // "CONFIG_SEC_DISABLE_BACKEND_COMPRESS"
+      case 256: // "CONFIG_SEC_HASH_ENGINE"
+      case 257: // "CONFIG_SEC_HASH_KEY"
+      case 258: // "CONFIG_SEC_HASH_PARAM"
+      case 259: // "CONFIG_SEC_HASH_METHOD_RX"
+      case 260: // "CONFIG_SEC_HASH_METHOD_PM"
+      case 261: // "CONFIG_SEC_CHROOT_DIR"
+      case 262: // "CONFIG_DIR_GEO_DB"
+      case 263: // "CONFIG_DIR_GSB_DB"
+      case 264: // "CONFIG_SEC_GUARDIAN_LOG"
+      case 265: // "CONFIG_DIR_PCRE_MATCH_LIMIT"
+      case 266: // "CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION"
+      case 267: // "CONFIG_SEC_CONN_R_STATE_LIMIT"
+      case 268: // "CONFIG_SEC_CONN_W_STATE_LIMIT"
+      case 269: // "CONFIG_SEC_SENSOR_ID"
+      case 270: // "CONFIG_DIR_REQ_BODY"
+      case 271: // "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
+      case 272: // "CONFIG_DIR_REQ_BODY_LIMIT"
+      case 273: // "CONFIG_DIR_REQ_BODY_LIMIT_ACTION"
+      case 274: // "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
+      case 275: // "CONFIG_DIR_RES_BODY"
+      case 276: // "CONFIG_DIR_RES_BODY_LIMIT"
+      case 277: // "CONFIG_DIR_RES_BODY_LIMIT_ACTION"
+      case 278: // "CONFIG_SEC_RULE_INHERITANCE"
+      case 279: // "CONFIG_SEC_RULE_PERF_TIME"
+      case 280: // "CONFIG_DIR_RULE_ENG"
+      case 281: // "CONFIG_DIR_SEC_ACTION"
+      case 282: // "CONFIG_DIR_SEC_DEFAULT_ACTION"
+      case 283: // "CONFIG_DIR_SEC_MARKER"
+      case 284: // "CONFIG_DIR_UNICODE_MAP_FILE"
+      case 285: // "CONFIG_DIR_UNICODE_CODE_PAGE"
+      case 286: // "CONFIG_SEC_COLLECTION_TIMEOUT"
+      case 287: // "CONFIG_SEC_HTTP_BLKEY"
+      case 288: // "CONFIG_SEC_INTERCEPT_ON_ERROR"
+      case 289: // "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION"
+      case 290: // "CONFIG_SEC_RULE_REMOVE_BY_ID"
+      case 291: // "CONFIG_SEC_RULE_REMOVE_BY_MSG"
+      case 292: // "CONFIG_SEC_RULE_REMOVE_BY_TAG"
+      case 293: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG"
+      case 294: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG"
+      case 295: // "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID"
+      case 296: // "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID"
+      case 297: // "CONFIG_UPDLOAD_KEEP_FILES"
+      case 298: // "CONFIG_UPDLOAD_SAVE_TMP_FILES"
+      case 299: // "CONFIG_UPLOAD_DIR"
+      case 300: // "CONFIG_UPLOAD_FILE_LIMIT"
+      case 301: // "CONFIG_UPLOAD_FILE_MODE"
+      case 302: // "CONFIG_VALUE_ABORT"
+      case 303: // "CONFIG_VALUE_DETC"
+      case 304: // "CONFIG_VALUE_HTTPS"
+      case 305: // "CONFIG_VALUE_OFF"
+      case 306: // "CONFIG_VALUE_ON"
+      case 307: // "CONFIG_VALUE_PARALLEL"
+      case 308: // "CONFIG_VALUE_PROCESS_PARTIAL"
+      case 309: // "CONFIG_VALUE_REJECT"
+      case 310: // "CONFIG_VALUE_RELEVANT_ONLY"
+      case 311: // "CONFIG_VALUE_SERIAL"
+      case 312: // "CONFIG_VALUE_WARN"
+      case 313: // "CONFIG_XML_EXTERNAL_ENTITY"
+      case 314: // "CONGIG_DIR_RESPONSE_BODY_MP"
+      case 315: // "CONGIG_DIR_SEC_ARG_SEP"
+      case 316: // "CONGIG_DIR_SEC_COOKIE_FORMAT"
+      case 317: // "CONFIG_SEC_COOKIEV0_SEPARATOR"
+      case 318: // "CONGIG_DIR_SEC_DATA_DIR"
+      case 319: // "CONGIG_DIR_SEC_STATUS_ENGINE"
+      case 320: // "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
+      case 321: // "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
+      case 322: // "CONGIG_DIR_SEC_TMP_DIR"
+      case 323: // "DIRECTIVE"
+      case 324: // "DIRECTIVE_SECRULESCRIPT"
+      case 325: // "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+      case 326: // "QUOTATION_MARK"
+      case 327: // "RUN_TIME_VAR_BLD"
+      case 328: // "RUN_TIME_VAR_DUR"
+      case 329: // "RUN_TIME_VAR_HSV"
+      case 330: // "RUN_TIME_VAR_REMOTE_USER"
+      case 331: // "RUN_TIME_VAR_TIME"
+      case 332: // "RUN_TIME_VAR_TIME_DAY"
+      case 333: // "RUN_TIME_VAR_TIME_EPOCH"
+      case 334: // "RUN_TIME_VAR_TIME_HOUR"
+      case 335: // "RUN_TIME_VAR_TIME_MIN"
+      case 336: // "RUN_TIME_VAR_TIME_MON"
+      case 337: // "RUN_TIME_VAR_TIME_SEC"
+      case 338: // "RUN_TIME_VAR_TIME_WDAY"
+      case 339: // "RUN_TIME_VAR_TIME_YEAR"
+      case 340: // "VARIABLE"
+      case 341: // "Dictionary element"
+      case 342: // "Dictionary element, selected by regexp"
+        value.move< std::string > (s.value);
         break;
 
-      case 347: // op
-      case 348: // op_before_init
-        value.move< std::unique_ptr<Operator> > (YY_MOVE (s.value));
+      case 349: // op
+      case 350: // op_before_init
+        value.move< std::unique_ptr<Operator> > (s.value);
         break;
 
-      case 356: // run_time_string
-        value.move< std::unique_ptr<RunTimeString> > (YY_MOVE (s.value));
+      case 358: // run_time_string
+        value.move< std::unique_ptr<RunTimeString> > (s.value);
         break;
 
-      case 353: // var
-        value.move< std::unique_ptr<Variable> > (YY_MOVE (s.value));
+      case 355: // var
+        value.move< std::unique_ptr<Variable> > (s.value);
         break;
 
-      case 354: // act
-      case 355: // setvar_action
-        value.move< std::unique_ptr<actions::Action> > (YY_MOVE (s.value));
+      case 356: // act
+      case 357: // setvar_action
+        value.move< std::unique_ptr<actions::Action> > (s.value);
         break;
 
-      case 350: // variables
-      case 351: // variables_pre_process
-      case 352: // variables_may_be_quoted
-        value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (YY_MOVE (s.value));
+      case 352: // variables
+      case 353: // variables_pre_process
+      case 354: // variables_may_be_quoted
+        value.move< std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > (s.value);
         break;
 
-      case 345: // actions
-      case 346: // actions_may_quoted
-        value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (YY_MOVE (s.value));
+      case 347: // actions
+      case 348: // actions_may_quoted
+        value.move< std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > (s.value);
         break;
 
       default:
         break;
     }
 
-    location = YY_MOVE (s.location);
+    location = s.location;
   }
 
   // by_type.
   inline
   seclang_parser::by_type::by_type ()
-    : type (empty_symbol)
+     : type (empty)
   {}
 
-#if 201103L <= YY_CPLUSPLUS
   inline
-  seclang_parser::by_type::by_type (by_type&& that)
-    : type (that.type)
-  {
-    that.clear ();
-  }
-#endif
-
-  inline
-  seclang_parser::by_type::by_type (const by_type& that)
-    : type (that.type)
+  seclang_parser::by_type::by_type (const by_type& other)
+    : type (other.type)
   {}
 
   inline
@@ -8057,34 +4017,27 @@ switch (yytype)
 
   inline
   void
-  seclang_parser::by_type::clear ()
-  {
-    type = empty_symbol;
-  }
-
-  inline
-  void
   seclang_parser::by_type::move (by_type& that)
   {
     type = that.type;
-    that.clear ();
+    that.type = empty;
   }
 
   inline
   int
-  seclang_parser::by_type::type_get () const YY_NOEXCEPT
+  seclang_parser::by_type::type_get () const
   {
     return type;
   }
 
   inline
   seclang_parser::token_type
-  seclang_parser::by_type::token () const YY_NOEXCEPT
+  seclang_parser::by_type::token () const
   {
     // YYTOKNUM[NUM] -- (External) token number corresponding to the
     // (internal) symbol number NUM (which must be that of a token).  */
     static
-    const unsigned short
+    const unsigned short int
     yytoken_number_[] =
     {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
@@ -8121,14 +4074,2061 @@ switch (yytype)
      565,   566,   567,   568,   569,   570,   571,   572,   573,   574,
      575,   576,   577,   578,   579,   580,   581,   582,   583,   584,
      585,   586,   587,   588,   589,   590,   591,   592,   593,   594,
-     595
+     595,   596,   597
     };
-    return token_type (yytoken_number_[type]);
+    return static_cast<token_type> (yytoken_number_[type]);
+  }
+  // Implementation of make_symbol for each symbol type.
+  seclang_parser::symbol_type
+  seclang_parser::make_END (const location_type& l)
+  {
+    return symbol_type (token::TOK_END, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_COMMA (const location_type& l)
+  {
+    return symbol_type (token::TOK_COMMA, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_CONTENT_INJECTION (const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_CONTENT_INJECTION, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR (const location_type& l)
+  {
+    return symbol_type (token::TOK_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_PIPE (const location_type& l)
+  {
+    return symbol_type (token::TOK_PIPE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_NEW_LINE (const location_type& l)
+  {
+    return symbol_type (token::TOK_NEW_LINE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VAR_COUNT (const location_type& l)
+  {
+    return symbol_type (token::TOK_VAR_COUNT, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VAR_EXCLUSION (const location_type& l)
+  {
+    return symbol_type (token::TOK_VAR_EXCLUSION, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_ARGS (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_ARGS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_ARGS_POST (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_ARGS_POST, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_ARGS_GET (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_ARGS_GET, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_FILES_SIZES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_FILES_SIZES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_FILES_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_FILES_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_FILES_TMP_CONTENT (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_FILES_TMP_CONTENT, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_FILENAME (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_FILENAME, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_NAME (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_NAME, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MATCHED_VARS_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MATCHED_VARS_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MATCHED_VARS (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MATCHED_VARS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_FILES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_FILES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_COOKIES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_COOKIES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_HEADERS (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_HEADERS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RESPONSE_HEADERS (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RESPONSE_HEADERS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_GEO (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_GEO, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_COOKIES_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_COOKIES_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_ARGS_COMBINED_SIZE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_ARGS_COMBINED_SIZE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_ARGS_GET_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_ARGS_GET_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RULE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RULE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_ARGS_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_ARGS_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_ARGS_POST_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_ARGS_POST_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_AUTH_TYPE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_AUTH_TYPE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_FILES_COMBINED_SIZE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_FILES_COMBINED_SIZE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_FILES_TMP_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_FILES_TMP_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_FULL_REQUEST (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_FULL_REQUEST, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_FULL_REQUEST_LENGTH (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_FULL_REQUEST_LENGTH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_INBOUND_DATA_ERROR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_INBOUND_DATA_ERROR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MATCHED_VAR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MATCHED_VAR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MATCHED_VAR_NAME (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MATCHED_VAR_NAME, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_BOUNDARY_QUOTED (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_BOUNDARY_QUOTED, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_CRLF_LF_LINES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_CRLF_LF_LINES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_DATA_AFTER (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_DATA_AFTER, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_DATA_BEFORE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_DATA_BEFORE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_HEADER_FOLDING (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_HEADER_FOLDING, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_INVALID_PART (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_PART, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_INVALID_QUOTING (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_INVALID_QUOTING, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_LF_LINE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_LF_LINE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_MISSING_SEMICOLON (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_MISSING_SEMICOLON, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_SEMICOLON_MISSING (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_SEMICOLON_MISSING, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_STRICT_ERROR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_STRICT_ERROR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_OUTBOUND_DATA_ERROR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_OUTBOUND_DATA_ERROR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_PATH_INFO (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_PATH_INFO, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_QUERY_STRING (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_QUERY_STRING, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REMOTE_ADDR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REMOTE_ADDR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REMOTE_HOST (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REMOTE_HOST, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REMOTE_PORT (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REMOTE_PORT, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQBODY_ERROR_MSG (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQBODY_ERROR_MSG, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQBODY_ERROR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQBODY_ERROR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQBODY_PROCESSOR_ERROR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQBODY_PROCESSOR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQBODY_PROCESSOR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_BASENAME (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_BASENAME, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_BODY_LENGTH (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_BODY_LENGTH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_BODY (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_BODY, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_FILE_NAME (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_FILE_NAME, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_HEADERS_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_HEADERS_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_LINE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_LINE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_METHOD (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_METHOD, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_PROTOCOL (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_PROTOCOL, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_URI_RAW (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_URI_RAW, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_REQUEST_URI (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_REQUEST_URI, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RESOURCE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RESOURCE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RESPONSE_BODY (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RESPONSE_BODY, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RESPONSE_CONTENT_LENGTH (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RESPONSE_CONTENT_LENGTH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RESPONSE_CONTENT_TYPE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RESPONSE_CONTENT_TYPE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RESPONSE_HEADERS_NAMES (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RESPONSE_HEADERS_NAMES, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RESPONSE_PROTOCOL (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RESPONSE_PROTOCOL, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_RESPONSE_STATUS (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_RESPONSE_STATUS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_SERVER_ADDR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_SERVER_ADDR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_SERVER_NAME (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_SERVER_NAME, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_SERVER_PORT (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_SERVER_PORT, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_SESSION_ID (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_SESSION_ID, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_UNIQUE_ID (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_UNIQUE_ID, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_URL_ENCODED_ERROR (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_URL_ENCODED_ERROR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_USER_ID (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_USER_ID, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_WEB_APP_ID (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_WEB_APP_ID, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_STATUS (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_STATUS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_STATUS_LINE (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_STATUS_LINE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_IP (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_IP, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_GLOBAL (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_GLOBAL, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_TX (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_TX, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_SESSION (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_SESSION, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE_USER (const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE_USER, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_ENV (const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_ENV, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_XML (const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_XML, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SETVAR (const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SETVAR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_SETVAR_OPERATION_EQUALS (const location_type& l)
+  {
+    return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_SETVAR_OPERATION_EQUALS_PLUS (const location_type& l)
+  {
+    return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS_PLUS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_SETVAR_OPERATION_EQUALS_MINUS (const location_type& l)
+  {
+    return symbol_type (token::TOK_SETVAR_OPERATION_EQUALS_MINUS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_NOT (const location_type& l)
+  {
+    return symbol_type (token::TOK_NOT, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_BEGINS_WITH (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_BEGINS_WITH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_CONTAINS (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_CONTAINS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_CONTAINS_WORD (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_CONTAINS_WORD, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_DETECT_SQLI (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_DETECT_SQLI, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_DETECT_XSS (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_DETECT_XSS, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_ENDS_WITH (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_ENDS_WITH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_EQ (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_EQ, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_FUZZY_HASH (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_FUZZY_HASH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_GEOLOOKUP (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_GEOLOOKUP, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_GE (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_GE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_GSB_LOOKUP (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_GSB_LOOKUP, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_GT (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_GT, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_INSPECT_FILE (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_INSPECT_FILE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_IP_MATCH_FROM_FILE (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_IP_MATCH_FROM_FILE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_IP_MATCH (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_IP_MATCH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_LE (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_LE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_LT (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_LT, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_PM_FROM_FILE (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_PM_FROM_FILE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_PM (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_PM, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_RBL (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_RBL, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_RSUB (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_RSUB, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_RX_CONTENT_ONLY (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_RX_CONTENT_ONLY, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_RX (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_RX, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_STR_EQ (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_STR_EQ, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_STR_MATCH (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_STR_MATCH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_UNCONDITIONAL_MATCH (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_UNCONDITIONAL_MATCH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VALIDATE_BYTE_RANGE (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VALIDATE_BYTE_RANGE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VALIDATE_DTD (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VALIDATE_DTD, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VALIDATE_HASH (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VALIDATE_HASH, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VALIDATE_SCHEMA (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VALIDATE_SCHEMA, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VALIDATE_URL_ENCODING (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VALIDATE_URL_ENCODING, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VALIDATE_UTF8_ENCODING (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VALIDATE_UTF8_ENCODING, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VERIFY_CC (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VERIFY_CC, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VERIFY_CPF (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VERIFY_CPF, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VERIFY_SSN (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VERIFY_SSN, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_VERIFY_SVNR (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_VERIFY_SVNR, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_OPERATOR_WITHIN (const location_type& l)
+  {
+    return symbol_type (token::TOK_OPERATOR_WITHIN, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_LOG_FMT (const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG_FMT, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_JSON (const location_type& l)
+  {
+    return symbol_type (token::TOK_JSON, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_NATIVE (const location_type& l)
+  {
+    return symbol_type (token::TOK_NATIVE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_RULE_ENGINE (const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_RULE_ENGINE, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_ACCURACY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_ACCURACY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_ALLOW (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_ALLOW, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_APPEND (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_APPEND, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_AUDIT_LOG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_AUDIT_LOG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_BLOCK (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_BLOCK, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CAPTURE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CAPTURE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CHAIN (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CHAIN, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_AUDIT_ENGINE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_AUDIT_ENGINE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_AUDIT_LOG_PARTS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_AUDIT_LOG_PARTS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_BDY_JSON (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_BDY_JSON, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_BDY_XML (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_BDY_XML, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_BDY_URLENCODED (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_BDY_URLENCODED, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_FORCE_REQ_BODY_VAR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_FORCE_REQ_BODY_VAR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_REQUEST_BODY_ACCESS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_REQUEST_BODY_ACCESS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_RULE_REMOVE_BY_ID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_BY_ID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_RULE_REMOVE_BY_TAG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_BY_TAG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_DENY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_DENY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_DEPRECATE_VAR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_DEPRECATE_VAR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_DROP (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_DROP, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_EXEC (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_EXEC, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_EXPIRE_VAR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_EXPIRE_VAR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_ID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_ID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_INITCOL (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_INITCOL, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_LOG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_LOG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_LOG_DATA (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_LOG_DATA, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_MATURITY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_MATURITY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_MSG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_MSG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_MULTI_MATCH (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_MULTI_MATCH, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_NO_AUDIT_LOG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_NO_AUDIT_LOG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_NO_LOG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_NO_LOG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_PASS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_PASS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_PAUSE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_PAUSE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_PHASE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_PHASE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_PREPEND (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_PREPEND, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_PROXY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_PROXY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_REDIRECT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_REDIRECT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_REV (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_REV, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SANITISE_ARG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SANITISE_ARG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SANITISE_MATCHED (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SANITISE_MATCHED, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SANITISE_MATCHED_BYTES (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SANITISE_MATCHED_BYTES, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SANITISE_REQUEST_HEADER (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SANITISE_REQUEST_HEADER, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SANITISE_RESPONSE_HEADER (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SANITISE_RESPONSE_HEADER, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SETENV (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SETENV, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SETRSC (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SETRSC, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SETSID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SETSID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SETUID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SETUID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SEVERITY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SEVERITY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SKIP (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SKIP, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_SKIP_AFTER (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_SKIP_AFTER, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_STATUS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_STATUS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TAG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TAG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_BASE_64_ENCODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_BASE_64_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_CMD_LINE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_CMD_LINE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_CSS_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_CSS_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_HEX_ENCODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_HEX_ENCODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_HEX_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_HEX_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_JS_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_JS_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_LENGTH (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_LENGTH, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_LOWERCASE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_LOWERCASE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_MD5 (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_MD5, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_NONE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_NONE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_NORMALISE_PATH (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_REMOVE_COMMENTS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_REMOVE_NULLS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_NULLS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_REMOVE_WHITESPACE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_REPLACE_COMMENTS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_REPLACE_NULLS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_REPLACE_NULLS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_SHA1 (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_SHA1, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_SQL_HEX_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_TRIM (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_TRIM_LEFT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM_LEFT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_TRIM_RIGHT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_TRIM_RIGHT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_UPPERCASE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_UPPERCASE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_URL_ENCODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_ENCODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_URL_DECODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_DECODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_URL_DECODE_UNI (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_UTF8_TO_UNICODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_TRANSFORMATION_UTF8_TO_CHAR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_TRANSFORMATION_UTF8_TO_CHAR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_VER (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_VER, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_ACTION_XMLNS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_ACTION_XMLNS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_COMPONENT_SIG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_COMPONENT_SIG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_CONN_ENGINE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_CONN_ENGINE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_ARGUMENT_SEPARATOR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_ARGUMENT_SEPARATOR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_WEB_APP_ID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_WEB_APP_ID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_SERVER_SIG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_SERVER_SIG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_DIR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_DIR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_DIR_MOD (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_DIR_MOD, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_ENG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_ENG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_FLE_MOD (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_FLE_MOD, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_LOG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_LOG2 (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG2, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_LOG_P (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_LOG_P, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_STS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_STS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_AUDIT_TPE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_AUDIT_TPE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_DEBUG_LOG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_DEBUG_LOG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_DEBUG_LVL (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_DEBUG_LVL, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_CACHE_TRANSFORMATIONS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_DISABLE_BACKEND_COMPRESS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_HASH_ENGINE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_HASH_ENGINE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_HASH_KEY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_HASH_KEY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_HASH_PARAM (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_HASH_PARAM, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_HASH_METHOD_RX (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_HASH_METHOD_RX, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_HASH_METHOD_PM (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_HASH_METHOD_PM, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_CHROOT_DIR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_CHROOT_DIR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_GEO_DB (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_GEO_DB, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_GSB_DB (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_GSB_DB, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_GUARDIAN_LOG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_GUARDIAN_LOG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_PCRE_MATCH_LIMIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_CONN_R_STATE_LIMIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_CONN_R_STATE_LIMIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_CONN_W_STATE_LIMIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_CONN_W_STATE_LIMIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_SENSOR_ID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_SENSOR_ID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_REQ_BODY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_LIMIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_RES_BODY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_RES_BODY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_RES_BODY_LIMIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT_ACTION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_INHERITANCE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_INHERITANCE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_PERF_TIME (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_PERF_TIME, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_RULE_ENG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_RULE_ENG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_SEC_ACTION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_SEC_ACTION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_SEC_DEFAULT_ACTION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_SEC_DEFAULT_ACTION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_SEC_MARKER (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_SEC_MARKER, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_UNICODE_MAP_FILE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_UNICODE_MAP_FILE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_DIR_UNICODE_CODE_PAGE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_DIR_UNICODE_CODE_PAGE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_COLLECTION_TIMEOUT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_COLLECTION_TIMEOUT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_HTTP_BLKEY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_HTTP_BLKEY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_INTERCEPT_ON_ERROR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_INTERCEPT_ON_ERROR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_REMOVE_BY_ID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_ID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_REMOVE_BY_MSG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_REMOVE_BY_TAG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_UPDLOAD_KEEP_FILES (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_UPDLOAD_KEEP_FILES, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_UPDLOAD_SAVE_TMP_FILES (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_UPLOAD_DIR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_UPLOAD_DIR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_UPLOAD_FILE_LIMIT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_UPLOAD_FILE_LIMIT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_UPLOAD_FILE_MODE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_UPLOAD_FILE_MODE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_ABORT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_ABORT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_DETC (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_DETC, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_HTTPS (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_HTTPS, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_OFF (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_OFF, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_ON (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_ON, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_PARALLEL (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_PARALLEL, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_PROCESS_PARTIAL (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_PROCESS_PARTIAL, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_REJECT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_REJECT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_RELEVANT_ONLY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_RELEVANT_ONLY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_SERIAL (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_SERIAL, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_VALUE_WARN (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_VALUE_WARN, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_XML_EXTERNAL_ENTITY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_XML_EXTERNAL_ENTITY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONGIG_DIR_RESPONSE_BODY_MP (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONGIG_DIR_RESPONSE_BODY_MP, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONGIG_DIR_SEC_ARG_SEP (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONGIG_DIR_SEC_ARG_SEP, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONGIG_DIR_SEC_COOKIE_FORMAT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONGIG_DIR_SEC_COOKIE_FORMAT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_COOKIEV0_SEPARATOR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_COOKIEV0_SEPARATOR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONGIG_DIR_SEC_DATA_DIR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONGIG_DIR_SEC_DATA_DIR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONGIG_DIR_SEC_STATUS_ENGINE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONGIG_DIR_SEC_STATUS_ENGINE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_STREAM_IN_BODY_INSPECTION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_CONGIG_DIR_SEC_TMP_DIR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_CONGIG_DIR_SEC_TMP_DIR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_DIRECTIVE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_DIRECTIVE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_DIRECTIVE_SECRULESCRIPT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_DIRECTIVE_SECRULESCRIPT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_FREE_TEXT_QUOTE_MACRO_EXPANSION (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_QUOTATION_MARK (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_QUOTATION_MARK, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_BLD (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_BLD, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_DUR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_DUR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_HSV (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_HSV, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_REMOTE_USER (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_REMOTE_USER, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME_DAY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME_DAY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME_EPOCH (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME_EPOCH, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME_HOUR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME_HOUR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME_MIN (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME_MIN, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME_MON (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME_MON, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME_SEC (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME_SEC, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME_WDAY (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME_WDAY, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_RUN_TIME_VAR_TIME_YEAR (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_RUN_TIME_VAR_TIME_YEAR, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_VARIABLE (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_VARIABLE, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_DICT_ELEMENT (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_DICT_ELEMENT, v, l);
+  }
+
+  seclang_parser::symbol_type
+  seclang_parser::make_DICT_ELEMENT_REGEXP (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::TOK_DICT_ELEMENT_REGEXP, v, l);
   }
 
 
+
 } // yy
-#line 8132 "seclang-parser.hh" // lalr1.cc:401
+#line 6132 "seclang-parser.hh" // lalr1.cc:372
 
 
 

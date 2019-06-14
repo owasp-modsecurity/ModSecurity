@@ -104,6 +104,8 @@ class Driver;
 #include "src/actions/transformations/base64_encode.h"
 #include "src/actions/transformations/remove_whitespace.h"
 #include "src/actions/transformations/css_decode.h"
+#include "src/actions/transformations/neutralize.h"
+#include "src/actions/transformations/utf8_to_char.h"
 
 #include "src/operators/begins_with.h"
 #include "src/operators/contains.h"
@@ -567,6 +569,8 @@ using namespace modsecurity::operators;
   ACTION_TRANSFORMATION_URL_DECODE             "ACTION_TRANSFORMATION_URL_DECODE"
   ACTION_TRANSFORMATION_URL_DECODE_UNI         "ACTION_TRANSFORMATION_URL_DECODE_UNI"
   ACTION_TRANSFORMATION_UTF8_TO_UNICODE        "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
+  ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC    "ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC"
+  ACTION_TRANSFORMATION_UTF8_TO_CHAR           "ACTION_TRANSFORMATION_UTF8_TO_CHAR"
   ACTION_VER                                   "Ver"
   ACTION_XMLNS                                 "xmlns"
   CONFIG_COMPONENT_SIG                         "CONFIG_COMPONENT_SIG"
@@ -2949,6 +2953,14 @@ act:
     | ACTION_TRANSFORMATION_UTF8_TO_UNICODE
       {
         ACTION_CONTAINER($$, new actions::transformations::Utf8ToUnicode($1));
+      }
+    | ACTION_TRANSFORMATION_NEUTRALIZE_SAFE_ENC
+      {
+        ACTION_CONTAINER($$, new actions::transformations::NeutralizeSafeEnc($1));
+      }
+    | ACTION_TRANSFORMATION_UTF8_TO_CHAR
+      {
+        ACTION_CONTAINER($$, new actions::transformations::Utf8ToChar($1));
       }
     | ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR
       {
