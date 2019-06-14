@@ -17,7 +17,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int generate_json(char** result, char* resourceId, char* operationName, char* category, char* instanceId, char* clientIP, char* clientPort, const char* requestUri, char* ruleSetType, char* ruleSetVersion, char* ruleId, char* messages, int action, int site, char* details_messages, char* details_data, char* details_file, char* details_line, const char* hostname, char* waf_unique_id);
+char* generate_json(const char* resourceId, const char* operationName, const char* category, const char* instanceId, const char* clientIP, const char* clientPort, const char* requestUri, const char* ruleSetType, const char* ruleSetVersion, const char* ruleId, const char* messages, const int action, const int site, const char* details_messages, const char* details_data, const char* details_file, const char* details_line, const char* hostname, const char* waf_unique_id);
 void free_json(char* str);
 void init_appgw_rules_id_hash();
 #ifdef __cplusplus
