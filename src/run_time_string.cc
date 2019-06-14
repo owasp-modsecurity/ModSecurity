@@ -60,7 +60,7 @@ std::string RunTimeString::evaluate(Transaction *t, Rule *r) {
             std::vector<const VariableValue *> l;
             z->m_var->evaluate(t, r, &l);
             if (l.size() > 0) {
-                s.append(l[0]->m_value);
+                s.append(l[0]->getValue());
             }
             for (auto &i : l) {
                 delete i;

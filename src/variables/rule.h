@@ -35,7 +35,7 @@ namespace variables {
 class Rule_DictElement : public VariableDictElement { \
  public:
     explicit Rule_DictElement(std::string dictElement)
-        : VariableDictElement("RULE", dictElement) { }
+        : VariableDictElement(std::string("RULE"), dictElement) { }
 
     static void id(Transaction *t,
         Rule *rule,
@@ -51,14 +51,13 @@ class Rule_DictElement : public VariableDictElement { \
         }
         std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
         std::string *a = new std::string(std::to_string(r->m_ruleId));
-        VariableValue *var = new VariableValue(
-            std::make_shared<std::string>("RULE:id"),
+        VariableValue *var = new VariableValue(&m_rule, &m_rule_id,
             a
         );
         delete a;
         origin->m_offset = 0;
         origin->m_length = 0;
-        var->m_orign.push_back(std::move(origin));
+        var->addOrigin(std::move(origin));
         l->push_back(var);
     }
 
@@ -78,14 +77,13 @@ class Rule_DictElement : public VariableDictElement { \
 
         std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
         std::string *a = new std::string(r->m_rev);
-        VariableValue *var = new VariableValue(
-            std::make_shared<std::string>("RULE:rev"),
+        VariableValue *var = new VariableValue(&m_rule, &m_rule_rev,
             a
         );
         delete a;
         origin->m_offset = 0;
         origin->m_length = 0;
-        var->m_orign.push_back(std::move(origin));
+        var->addOrigin(std::move(origin));
         l->push_back(var);
     }
 
@@ -102,14 +100,13 @@ class Rule_DictElement : public VariableDictElement { \
         if (r && r->m_severity) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             std::string *a = new std::string(std::to_string(r->m_severity->m_severity));
-            VariableValue *var = new VariableValue(
-                std::make_shared<std::string>("RULE:severity"),
+            VariableValue *var = new VariableValue(&m_rule, &m_rule_severity,
                 a
             );
             delete a;
             origin->m_offset = 0;
             origin->m_length = 0;
-            var->m_orign.push_back(std::move(origin));
+            var->addOrigin(std::move(origin));
             l->push_back(var);
         }
     }
@@ -127,14 +124,13 @@ class Rule_DictElement : public VariableDictElement { \
         if (r && r->m_logData) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             std::string *a = new std::string(r->m_logData->data(t));
-            VariableValue *var = new VariableValue(
-                std::make_shared<std::string>("RULE:logdata"),
+            VariableValue *var = new VariableValue(&m_rule, &m_rule_logdata,
                 a
             );
             delete a;
             origin->m_offset = 0;
             origin->m_length = 0;
-            var->m_orign.push_back(std::move(origin));
+            var->addOrigin(std::move(origin));
             l->push_back(var);
         }
     }
@@ -151,14 +147,13 @@ class Rule_DictElement : public VariableDictElement { \
         if (r && r->m_msg) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             std::string *a = new std::string(r->m_msg->data(t));
-            VariableValue *var = new VariableValue(
-                std::make_shared<std::string>("RULE:msg"),
+            VariableValue *var = new VariableValue(&m_rule, &m_rule_msg,
                 a
             );
             delete a;
             origin->m_offset = 0;
             origin->m_length = 0;
-            var->m_orign.push_back(std::move(origin));
+            var->addOrigin(std::move(origin));
             l->push_back(var);
         }
     }
@@ -187,6 +182,13 @@ class Rule_DictElement : public VariableDictElement { \
             return;
         }
     }
+
+    static const std::string m_rule;
+    static const std::string m_rule_id;
+    static const std::string m_rule_rev;
+    static const std::string m_rule_severity;
+    static const std::string m_rule_logdata;
+    static const std::string m_rule_msg;
 };
 
 

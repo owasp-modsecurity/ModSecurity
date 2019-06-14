@@ -117,7 +117,7 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
             if (l.size() == 0) {
                 value = 0;
             } else {
-                value = stoi(l[0]->m_value);
+                value = stoi(l[0]->getValue());
                 for (auto &i : l) {
                     delete i;
                 }

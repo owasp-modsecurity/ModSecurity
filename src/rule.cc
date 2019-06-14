@@ -696,25 +696,25 @@ bool Rule::evaluate(Transaction *trans,
         }
         var->evaluate(trans, this, &e);
         for (const VariableValue *v : e) {
-            const std::string &value = v->m_value;
-            const std::string &key = v->m_key;
+            const std::string &value = v->getValue();
+            const std::string &key = v->getKeyWithCollection();
 
-            if (exclusion.contains(v->m_key) ||
+            if (exclusion.contains(v->getKeyWithCollection()) ||
                 std::find_if(trans->m_ruleRemoveTargetById.begin(),
                     trans->m_ruleRemoveTargetById.end(),
                     [&, v, this](std::pair<int, std::string> &m) -> bool {
-                        return m.first == m_ruleId && m.second == v->m_key;
+                        return m.first == m_ruleId && m.second == v->getKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetById.end()
             ) {
                 delete v;
                 v = NULL;
                 continue;
             }
-            if (exclusion.contains(v->m_key) ||
+            if (exclusion.contains(v->getKeyWithCollection()) ||
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, v, trans, this](std::pair<std::string, std::string> &m) -> bool {
-                        return containsTag(m.first, trans) && m.second == v->m_key;
+                        return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
                 delete v;
@@ -736,7 +736,7 @@ bool Rule::evaluate(Transaction *trans,
                 if (ret == true) {
                     ruleMessage->m_match = m_op->resolveMatchMessage(trans,
                         key, value);
-                    for (auto &i : v->m_orign) {
+                    for (auto &i : v->getOrigin()) {
                         ruleMessage->m_reference.append(i->toText());
                     }
 

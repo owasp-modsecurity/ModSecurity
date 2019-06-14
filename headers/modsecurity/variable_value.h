@@ -37,59 +37,31 @@ namespace modsecurity {
 class Collection;
 class VariableValue {
  public:
-    explicit VariableValue(const std::string *key)
-        : m_key(""),
-        m_value("") {
-            m_key.assign(*key);
-            m_keyWithCollection = std::make_shared<std::string>(*key);
-        }
+    using Origins = std::list<std::unique_ptr<VariableOrigin>>;
 
-    VariableValue(const std::string *key, const std::string *value)
-        : m_key(""),
-        m_value("") {
-            m_key.assign(*key);
-            m_value.assign(*value);
-            m_keyWithCollection = std::make_shared<std::string>(*key);
-        }
+    VariableValue(const std::string *key,
+        const std::string *value = nullptr)
+        : m_key(*key),
+        m_keyWithCollection(*key),
+        m_collection(""),
+        m_value(value != nullptr?*value:"")
+    { }
 
-    VariableValue()
-        : m_key(""),
-        m_value("") {
-            m_keyWithCollection = std::make_shared<std::string>(m_key);
-        }
-
-    VariableValue(const std::string *a, const std::string *b,
-        const std::string *c)
-        : m_key(*a + ":" + *b),
-        m_value(*c) {
-            m_keyWithCollection = std::make_shared<std::string>(*a + ":" + *b);
-        }
-
-    explicit VariableValue(std::shared_ptr<std::string> fullName)
-        : m_key(""),
-        m_value("") {
-            m_keyWithCollection = fullName;
-            m_key.assign(*fullName.get());
-        }
-
-    VariableValue(std::shared_ptr<std::string> fullName,
+    VariableValue(const std::string *collection,
+        const std::string *key,
         const std::string *value)
-        : m_key(""),
-        m_value("") {
-            m_value.assign(*value);
-            m_keyWithCollection = fullName;
-            m_key.assign(*fullName.get());
-        }
-
+        : m_key(*key),
+        m_keyWithCollection(*collection + ":" + *key),
+        m_collection(*collection),
+        m_value(*value)
+    { }
 
     explicit VariableValue(const VariableValue *o) :
-        m_key(""),
-        m_value("") {
-        m_key.assign(o->m_key);
-        m_value.assign(o->m_value);
-        m_col.assign(o->m_col);
-        m_keyWithCollection = o->m_keyWithCollection;
-
+        m_key(o->m_key),
+        m_value(o->m_value),
+        m_collection(o->m_collection),
+        m_keyWithCollection(o->m_keyWithCollection)
+    {
         for (auto &i : o->m_orign) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             origin->m_offset = i->m_offset;
@@ -98,11 +70,47 @@ class VariableValue {
         }
     }
 
+
+    const std::string& getKey() const {
+        return m_key;
+    }
+
+
+    const std::string& getKeyWithCollection() const {
+        return m_keyWithCollection;
+    }
+
+
+    const std::string& getCollection() const {
+        return m_collection;
+    }
+
+
+    const std::string& getValue() const {
+        return m_value;
+    }
+
+
+    void setValue(const std::string &value) {
+        m_value = value;
+    }
+
+
+    void addOrigin(std::unique_ptr<VariableOrigin> origin) {
+        m_orign.push_back(std::move(origin));
+    }
+
+
+    const Origins& getOrigin() const {
+        return m_orign;
+    }
+
+ private:
+    Origins m_orign;
+    std::string m_collection;
     std::string m_key;
+    std::string m_keyWithCollection;
     std::string m_value;
-    std::string m_col;
-    std::shared_ptr<std::string> m_keyWithCollection;
-    std::list<std::unique_ptr<VariableOrigin>> m_orign;
 };
 
 }  // namespace modsecurity

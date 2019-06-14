@@ -820,9 +820,7 @@ int Transaction::processRequestBody() {
     std::vector<const VariableValue *> l;
     m_variableRequestHeaders.resolve(&l);
     for (auto &a : l) {
-        std::string z(a->m_key, 16, a->m_key.length() - 16);
-        z = z + ": " + a->m_value;
-        fullRequest = fullRequest + z + "\n";
+        fullRequest = fullRequest + a->getKey() + ": " + a->getValue() + "\n";
         delete a;
     }
 
@@ -1443,8 +1441,8 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         m_variableRequestHeaders.resolve(&l);
         for (auto &h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
-            audit_log << h->m_key.c_str() + pos << ": ";
-            audit_log << h->m_value.c_str() << std::endl;
+            audit_log << h->getKeyWithCollection().c_str() + pos << ": ";
+            audit_log << h->getValue().c_str() << std::endl;
             delete h;
         }
         audit_log << std::endl;
@@ -1480,9 +1478,8 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << this->m_httpCodeReturned << std::endl;
         m_variableResponseHeaders.resolve(&l);
         for (auto &h : l) {
-            size_t pos = strlen("RESPONSE_HEADERS:");
-            audit_log << h->m_key.c_str() + pos << ": ";
-            audit_log << h->m_value.c_str() << std::endl;
+            audit_log << h->getKey().c_str() << ": ";
+            audit_log << h->getValue().c_str() << std::endl;
             delete h;
         }
     }
@@ -1580,8 +1577,7 @@ std::string Transaction::toJSON(int parts) {
 
         m_variableRequestHeaders.resolve(&l);
         for (auto &h : l) {
-            size_t pos = strlen("REQUEST_HEADERS:");
-            LOGFY_ADD(h->m_key.c_str() + pos, h->m_value.c_str());
+            LOGFY_ADD(h->getKey().c_str(), h->getValue().c_str());
             delete h;
         }
 
@@ -1611,8 +1607,7 @@ std::string Transaction::toJSON(int parts) {
 
         m_variableResponseHeaders.resolve(&l);
         for (auto &h : l) {
-            size_t pos = strlen("RESPONSE_HEADERS:");
-            LOGFY_ADD(h->m_key.c_str() + pos, h->m_value.c_str());
+            LOGFY_ADD(h->getKey().c_str(), h->getValue().c_str());
             delete h;
         }
 

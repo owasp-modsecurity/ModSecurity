@@ -52,7 +52,7 @@ void RemoteUser::evaluate(Transaction *transaction,
         goto clear;
     }
 
-    header = std::string(l2->at(0)->m_value);
+    header = std::string(l2->at(0)->getValue());
 
     if (header.compare(0, 6, "Basic ") == 0) {
         base64 = std::string(header, 6, header.length());
@@ -66,14 +66,14 @@ void RemoteUser::evaluate(Transaction *transaction,
     }
     transaction->m_variableRemoteUser.assign(std::string(base64, 0, pos));
 
-    var = new VariableValue(&l2->at(0)->m_key,
+    var = new VariableValue(&l2->at(0)->getKeyWithCollection(),
         &transaction->m_variableRemoteUser);
 
-    for (auto &i : l2->at(0)->m_orign) {
+    for (auto &i : l2->at(0)->getOrigin()) {
         std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
         origin->m_offset = i->m_offset;
         origin->m_length = i->m_length;
-        var->m_orign.push_back(std::move(origin));
+        var->addOrigin(std::move(origin));
     }
     l->push_back(var);
 

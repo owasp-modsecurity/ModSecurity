@@ -13,34 +13,20 @@
  *
  */
 
-#include <vector>
-#include <string>
-#include <list>
-#include <utility>
+#include "src/variables/rule.h"
 
-#ifndef SRC_VARIABLES_HIGHEST_SEVERITY_H_
-#define SRC_VARIABLES_HIGHEST_SEVERITY_H_
-
-#include "src/variables/variable.h"
 
 namespace modsecurity {
-
-class Transaction;
 namespace variables {
 
-class HighestSeverity : public Variable {
- public:
-    explicit HighestSeverity(std::string _name)
-        : Variable(_name)
-    { }
 
-    void evaluate(Transaction *transaction,
-        Rule *rule,
-        std::vector<const VariableValue *> *l) override;
-};
+const std::string Rule_DictElement::m_rule("RULE");
+const std::string Rule_DictElement::m_rule_id("id");
+const std::string Rule_DictElement::m_rule_rev("rev");
+const std::string Rule_DictElement::m_rule_severity("severity");
+const std::string Rule_DictElement::m_rule_logdata("logdata");
+const std::string Rule_DictElement::m_rule_msg("msg");
 
 
 }  // namespace variables
 }  // namespace modsecurity
-
-#endif  // SRC_VARIABLES_HIGHEST_SEVERITY_H_

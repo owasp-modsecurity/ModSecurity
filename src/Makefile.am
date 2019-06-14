@@ -88,6 +88,7 @@ VARIABLES = \
 	variables/highest_severity.cc \
 	variables/modsec_build.cc \
 	variables/remote_user.cc \
+	variables/rule.cc \
 	variables/time.cc \
 	variables/time_day.cc \
 	variables/time_epoch.cc \

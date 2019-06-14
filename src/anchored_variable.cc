@@ -60,7 +60,7 @@ void AnchoredVariable::set(const std::string &a, size_t offset,
     m_value.assign(a.c_str(), a.size());
     origin->m_offset = offset;
     origin->m_length = offsetLen;
-    m_var->m_orign.push_back(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -71,7 +71,7 @@ void AnchoredVariable::set(const std::string &a, size_t offset) {
     m_value.assign(a.c_str(), a.size());
     origin->m_offset = offset;
     origin->m_length = m_value.size();
-    m_var->m_orign.push_back(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -88,7 +88,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
     m_offset = offset;
     origin->m_offset = offset;
     origin->m_length = a.size();
-    m_var->m_orign.push_back(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -105,7 +105,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
     m_offset = offset;
     origin->m_offset = offset;
     origin->m_length = size;
-    m_var->m_orign.push_back(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -114,7 +114,7 @@ void AnchoredVariable::evaluate(std::vector<const VariableValue *> *l) {
         return;
     }
 
-    m_var->m_value.assign(m_value);
+    m_var->setValue(m_value);
     VariableValue *m_var2 = new VariableValue(m_var);
     l->push_back(m_var2);
 }
