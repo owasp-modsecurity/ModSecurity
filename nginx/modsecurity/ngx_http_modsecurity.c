@@ -598,7 +598,10 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     pthread_mutex_init(&msc_pregcomp_ex_mtx, NULL);
 
 #ifdef WAF_JSON_LOGGING_ENABLE
-    init_appgw_rules_id_hash();
+    int result = init_appgw_rules_id_hash();
+    if (result) {
+        ngx_log_error(NGX_LOG_INFO, cf->log, 0, "ModSecurity: could not load application gateway rules IDs.");
+    }
 #endif    
 
     return NGX_OK;
