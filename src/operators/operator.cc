@@ -193,7 +193,7 @@ Operator *Operator::instantiate(std::string op, std::string param_str) {
         return new UnconditionalMatch();
     }
 
-    std::invalid_argument("Operator not found.");
+    throw std::invalid_argument("Operator not found.");
 }
 
 }  // namespace operators
