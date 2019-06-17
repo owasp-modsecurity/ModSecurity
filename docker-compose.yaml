@@ -21,7 +21,7 @@ services:
     working_dir: /microsoft/modsecurity
     entrypoint: 
       - ./configure
-      - CXXFLAGS=-std=c++11
+      - CXXFLAGS=-std=c++14
       - CFLAGS=-fPIC
       - --enable-standalone-module
       - --disable-mlogc

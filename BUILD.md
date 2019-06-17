@@ -93,6 +93,6 @@ The steps below are for Ubuntu 16.04 LTS.
  5.  Configure and build ModSecurity:
 	 ```bash
 	 ./autogen.sh
-	 ./configure LDFLAGS=-g  CXXFLAGS="-std=c++11 " CFLAGS="-fPIC " --enable-standalone-module --disable-mlogc --enable-waf_json_logging
+	 ./configure LDFLAGS=-g  CXXFLAGS="-std=c++14 " CFLAGS="-fPIC " --enable-standalone-module --disable-mlogc --enable-waf_json_logging
 	 make
 	 ```
