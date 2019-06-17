@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Missing throw in Operator::instantiate
+   [Issue #2106 - @marduone]
  - Making block action execution dependent of the SecEngine status
    [Issue #2113, #2111 - @theMiddleBlue, @airween]
  - Making block action execution dependent of the SecEngine status
