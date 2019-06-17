@@ -699,7 +699,7 @@ bool Rule::evaluate(Transaction *trans,
             const std::string &value = v->getValue();
             const std::string &key = v->getKeyWithCollection();
 
-            if (exclusion.contains(v->getKeyWithCollection()) ||
+            if (exclusion.contains(v->getKey()) ||
                 std::find_if(trans->m_ruleRemoveTargetById.begin(),
                     trans->m_ruleRemoveTargetById.end(),
                     [&, v, this](std::pair<int, std::string> &m) -> bool {
@@ -710,7 +710,7 @@ bool Rule::evaluate(Transaction *trans,
                 v = NULL;
                 continue;
             }
-            if (exclusion.contains(v->getKeyWithCollection()) ||
+            if (exclusion.contains(v->getKey()) ||
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, v, trans, this](std::pair<std::string, std::string> &m) -> bool {
