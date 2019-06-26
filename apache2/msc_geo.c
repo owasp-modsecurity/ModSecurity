@@ -43,7 +43,8 @@ static const char geo_country_code[GEO_COUNTRY_LAST + 1][4] = {
     "TJ","TK","TM","TN","TO","TL","TR","TT","TV","TW",
     "TZ","UA","UG","UM","US","UY","UZ","VA","VC","VE",
     "VG","VI","VN","VU","WF","WS","YE","YT","RS","ZA",
-    "ZM","ME","ZW","A1","A2","O1","AX","GG","IM","JE"
+    "ZM","ME","ZW","A1","A2","O1","AX","GG","IM","JE",
+    "BL","BQ","CW","MF","SS","SX"
 };
 
 static const char geo_country_code3[GEO_COUNTRY_LAST + 1][4] = {
@@ -72,7 +73,8 @@ static const char geo_country_code3[GEO_COUNTRY_LAST + 1][4] = {
     "TJK","TKL","TKM","TUN","TON","TLS","TUR","TTO","TUV","TWN",
     "TZA","UKR","UGA","UM","USA","URY","UZB","VAT","VCT","VEN",
     "VGB","VIR","VNM","VUT","WLF","WSM","YEM","YT","SRB","ZAF",
-    "ZMB","MNE","ZWE","A1","A2","O1","ALA","GGY","IMN","JEY"
+    "ZMB","MNE","ZWE","A1","A2","O1","ALA","GGY","IMN","JEY",
+    "BLM","BES","CUW","MAF","SSD","SXM"
 };
 
 static const char *const geo_country_name[GEO_COUNTRY_LAST + 1] = {
@@ -101,7 +103,8 @@ static const char *const geo_country_name[GEO_COUNTRY_LAST + 1] = {
     "Tajikistan","Tokelau","Turkmenistan","Tunisia","Tonga","Timor-Leste","Turkey","Trinidad and Tobago","Tuvalu","Taiwan",
     "Tanzania, United Republic of","Ukraine","Uganda","United States Minor Outlying Islands","United States","Uruguay","Uzbekistan","Holy See (Vatican City State)","Saint Vincent and the Grenadines","Venezuela",
     "Virgin Islands, British","Virgin Islands, U.S.","Vietnam","Vanuatu","Wallis and Futuna","Samoa","Yemen","Mayotte","Serbia","South Africa",
-    "Zambia","Montenegro","Zimbabwe","Anonymous Proxy","Satellite Provider","Other","Aland Islands","Guernsey","Isle of Man","Jersey"
+    "Zambia","Montenegro","Zimbabwe","Anonymous Proxy","Satellite Provider","Other","Aland Islands","Guernsey","Isle of Man","Jersey",
+    "Saint Barthélemy","Bonaire, Sint Eustatius and Saba","Curaçao","Saint Martin (French part)","South Sudan","Sint Maarten (Dutch part)"
 };
 
 static const char geo_country_continent[GEO_COUNTRY_LAST + 1][4] = {
@@ -130,7 +133,8 @@ static const char geo_country_continent[GEO_COUNTRY_LAST + 1][4] = {
     "AS","OC","AS","AF","OC","AS","AS","SA","OC","AS",
     "AF","EU","AF","OC","NA","SA","AS","EU","SA","SA",
     "SA","SA","AS","OC","OC","OC","AS","AF","EU","AF",
-    "AF","EU","AF","--","--","--","EU","EU","EU","EU"
+    "AF","EU","AF","--","--","--","EU","EU","EU","EU",
+    "--","--","--","--","AF","--"
 };
 
 typedef enum {
