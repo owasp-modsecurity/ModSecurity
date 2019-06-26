@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Regex lookup on the key name instead of COLLECTION:key
+   [@rdiperri-yottaa, @danbiagini-work, @mmelo-yottaa, @zimmerle]
  - Missing throw in Operator::instantiate
    [Issue #2106 - @marduone]
  - Making block action execution dependent of the SecEngine status
