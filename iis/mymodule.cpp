@@ -35,8 +35,6 @@
 
 #include "winsock2.h"
 
-#include "asio/post.hpp"
-
 // These helpers make sure that the underlying structures
 // are correctly released on any exit path due to RAII.
 using ConnRecPtr = std::unique_ptr<conn_rec, decltype(modsecFinishConnection)*>;
@@ -673,75 +671,16 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
         }
     }
 
-    if (config->config->is_enabled == MODSEC_DETECTION_ONLY)
+    lock.unlock();
+    int status = modsecProcessRequest(r);
+    lock.lock();
+
+    if (status != DECLINED)
     {
-        // This could have been a simple lambda with generalized capture but C++11 doesn't support it yet.
-        // Can be replaced/simplified in C++14.
-        class BackgroundRequestProcessingTask
-        {
-        private:
-            AprRequestContext ctx;
-        public:
-            explicit BackgroundRequestProcessingTask(AprRequestContext&& ctx)
-                : ctx(std::move(ctx))
-            {}
+        httpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
+        httpContext->SetRequestHandled();
 
-            BackgroundRequestProcessingTask(const BackgroundRequestProcessingTask&) = delete;
-            BackgroundRequestProcessingTask& operator=(const BackgroundRequestProcessingTask&) = delete;
-
-            BackgroundRequestProcessingTask(BackgroundRequestProcessingTask&& rhs)
-                : ctx(std::move(rhs.ctx))
-            {
-            }
-
-            BackgroundRequestProcessingTask& operator=(BackgroundRequestProcessingTask&& rhs)
-            {
-                ctx = std::move(rhs.ctx);
-                return *this;
-            }
-
-            int operator()() const {
-                // We put the entire thread into background mode for the time of processing.
-                // According to https://docs.microsoft.com/en-us/windows/desktop/api/processthreadsapi/nf-processthreadsapi-setthreadpriority :
-                //
-                // The THREAD_PRIORITY_* values affect the CPU scheduling priority of the thread.
-                // For threads that perform background work such as file I/O, network I/O, or data processing,
-                // it is not sufficient to adjust the CPU scheduling priority; even an idle CPU priority thread
-                // can easily interfere with system responsiveness when it uses the disk and memory.
-                // Threads that perform background work should use the THREAD_MODE_BACKGROUND_BEGIN
-                // and THREAD_MODE_BACKGROUND_END values to adjust their resource scheduling priorities;
-                // threads that interact with the user should not use THREAD_MODE_BACKGROUND_BEGIN.
-                struct BackgroundThreadMode
-                {
-                    BackgroundThreadMode() {
-                        SetThreadPriority(GetCurrentThread(), THREAD_MODE_BACKGROUND_BEGIN);
-                    }
-                    ~BackgroundThreadMode() {
-                        SetThreadPriority(GetCurrentThread(), THREAD_MODE_BACKGROUND_END);
-                    }
-                };
-
-                BackgroundThreadMode backgroundMode;
-                return modsecProcessRequest(ctx.GetRequest());
-            }
-        };
-
-        // We post the processing task to the thread pool to happen in the background.
-        asio::post(threadPool, BackgroundRequestProcessingTask{ std::move(aprContext) });
-    }
-    else
-    {
-        lock.unlock();
-        int status = modsecProcessRequest(r);
-        lock.lock();
-
-        if (status != DECLINED)
-        {
-            httpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
-            httpContext->SetRequestHandled();
-
-            return RQ_NOTIFICATION_FINISH_REQUEST;
-        }
+        return RQ_NOTIFICATION_FINISH_REQUEST;
     }
 
     return RQ_NOTIFICATION_CONTINUE;
