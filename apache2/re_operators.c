@@ -1993,6 +1993,9 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     unsigned int target_length = 0;
     unsigned int i, i_max;
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
     str->value = (char *)rule->op_param;
 
     if (str->value == NULL) {
@@ -2001,9 +2004,6 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     }
 
     str->value_len = strlen(str->value);
-
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
 
     expand_macros(msr, str, rule, msr->mp);
 

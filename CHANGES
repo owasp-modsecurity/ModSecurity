@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 ------------------------------------
 
+ * Fix the order of error_msg validation
+   [Issue #2128 - @marcstern, @zimmerle]
  * Added missing Geo Countries
    [Issue #2123, #2124 - @emphazer]
  * When the input filter finishes, check whether we returned data
