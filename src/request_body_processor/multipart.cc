@@ -70,7 +70,7 @@ Multipart::Multipart(std:: string header, Transaction *transaction)
 
 Multipart::~Multipart() {
     ms_dbg_a(m_transaction, 4,
-        "Multipart: Cleanup started (remove files " \
+        "Multipart: Cleanup started (keep files set to " \
         + RulesProperties::configBooleanString(
             m_transaction->m_rules->m_uploadKeepFiles) \
         + ")");
@@ -96,7 +96,7 @@ Multipart::~Multipart() {
                             + strerror(errno) + ")");
                     } else {
                         ms_dbg_a(m_transaction, 4,
-                            "Multipart: Failed to delete file (part) \"" \
+                            "Multipart: file deleted successfully (part) \"" \
                             + m->m_tmp_file_name + "\"");
                     }
 
@@ -516,7 +516,7 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
 
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Created temporary file " \
-                    + std::to_string(m_nfiles) + " (mode 04o): " \
+                    + std::to_string(m_nfiles) + " (mode o" + std::to_string(m_transaction->m_rules->m_uploadFileMode.m_value) + "): " \
                     + m_mpp->m_tmp_file_name);
             }
 
