@@ -15,7 +15,7 @@ AC_REQUIRE([PKG_PROG_PKG_CONFIG])
 
 
 # Possible names for the maxmind library/package (pkg-config)
-MAXMIND_POSSIBLE_LIB_NAMES="libmaxminddb maxminddb maxmind"
+MAXMIND_POSSIBLE_LIB_NAMES="maxminddb maxmind"
 
 # Possible extensions for the library
 MAXMIND_POSSIBLE_EXTENSIONS="so la sl dll dylib"
