@@ -4418,7 +4418,7 @@ static int msre_op_eq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
     msc_string str;
-    int left, right;
+    long long left, right;
     char *target = NULL;
 
     if (error_msg == NULL) return -1;
@@ -4436,15 +4436,15 @@ static int msre_op_eq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
-    left = atoi(target);
-    right = atoi(str.value);
+    left = atoll(target);
+    right = atoll(str.value);
 
     if (left != right) {
         /* No match. */
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator EQ matched %d at %s.", right, var->name);
+        *error_msg = apr_psprintf(msr->mp, "Operator EQ matched %s at %s.", str.value, var->name);
         /* Match. */
         return 1;
     }
@@ -4456,7 +4456,7 @@ static int msre_op_gt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
     msc_string str;
-    int left, right;
+    long long left, right;
     char *target = NULL;
 
     if ((var->value == NULL)||(rule->op_param == NULL)) {
@@ -4479,15 +4479,15 @@ static int msre_op_gt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
-    left = atoi(target);
-    right = atoi(str.value);
+    left = atoll(target);
+    right = atoll(str.value);
 
     if (left <= right) {
         /* No match. */
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator GT matched %d at %s.", right, var->name);
+        *error_msg = apr_psprintf(msr->mp, "Operator GT matched %s at %s.", str.value, var->name);
         /* Match. */
         return 1;
     }
@@ -4499,7 +4499,7 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
     msc_string str;
-    int left, right;
+    long long left, right;
     char *target = NULL;
 
     if ((var->value == NULL)||(rule->op_param == NULL)) {
@@ -4522,15 +4522,15 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
-    left = atoi(target);
-    right = atoi(str.value);
+    left = atoll(target);
+    right = atoll(str.value);
 
     if (left >= right) {
         /* No match. */
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator LT matched %d at %s.", right, var->name);
+        *error_msg = apr_psprintf(msr->mp, "Operator LT matched %s at %s.", str.value, var->name);
         /* Match. */
         return 1;
     }
@@ -4542,7 +4542,7 @@ static int msre_op_ge_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
     msc_string str;
-    int left, right;
+    long long left, right;
     char *target = NULL;
 
     if ((var->value == NULL)||(rule->op_param == NULL)) {
@@ -4565,15 +4565,15 @@ static int msre_op_ge_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
-    left = atoi(target);
-    right = atoi(str.value);
+    left = atoll(target);
+    right = atoll(str.value);
 
     if (left < right) {
         /* No match. */
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator GE matched %d at %s.", right, var->name);
+        *error_msg = apr_psprintf(msr->mp, "Operator GE matched %s at %s.", str.value, var->name);
         /* Match. */
         return 1;
     }
@@ -4585,7 +4585,7 @@ static int msre_op_le_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
     msc_string str;
-    int left, right;
+    long long left, right;
     char *target = NULL;
 
     if ((var->value == NULL)||(rule->op_param == NULL)) {
@@ -4608,15 +4608,15 @@ static int msre_op_le_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
-    left = atoi(target);
-    right = atoi(str.value);
+    left = atoll(target);
+    right = atoll(str.value);
 
     if (left > right) {
         /* No match. */
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator LE matched %d at %s.", right, var->name);
+        *error_msg = apr_psprintf(msr->mp, "Operator LE matched %s at %s.", str.value, var->name);
         /* Match. */
         return 1;
     }

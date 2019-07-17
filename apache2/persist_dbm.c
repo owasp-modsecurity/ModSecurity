@@ -528,22 +528,34 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
             if (orig_var != NULL) {
                 const msc_string *stored_var = (const msc_string *)apr_table_get(stored_col, var->name);
                 if (stored_var != NULL) {
-                    int origval = atoi(orig_var->value);
-                    int ourval = atoi(var->value);
-                    int storedval = atoi(stored_var->value);
-                    int delta = ourval - origval;
-                    int newval = storedval + delta;
+                    long long origval = atoll(orig_var->value);
+                    long long ourval = atoll(var->value);
+                    long long storedval = atoll(stored_var->value);
+                    long long delta = ourval - origval;
+                    long long newval = storedval + delta;
 
                     if (newval < 0) newval = 0; /* Counters never go below zero. */
 
-                    var->value = apr_psprintf(msr->mp, "%d", newval);
+                    /* The printf functions provided by Apache do not understand the %lld format.
+                     * Therefore, we convert value to a string first. */
+                    char newval_str[23] =  {'\0'};
+                    sprintf(newval_str, "%lld", newval);
+                    var->value = apr_psprintf(msr->mp, "%s", newval_str);
                     var->value_len = strlen(var->value);
 
                     if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "collection_store: Delta applied for %s.%s %d->%d (%d): %d + (%d) = %d [%s,%d]",
+                        char origval_str[23] =  {'\0'};
+                        sprintf(origval_str, "%lld", origval);
+                        char ourval_str[23] =  {'\0'};
+                        sprintf(ourval_str, "%lld", ourval);
+                        char delta_str[23] =  {'\0'};
+                        sprintf(delta_str, "%lld", delta);
+                        char storedval_str[23] =  {'\0'};
+                        sprintf(storedval_str, "%lld", storedval);
+                        msr_log(msr, 9, "collection_store: Delta applied for %s.%s %s->%s (%s): %s + (%s) = %s [%s,%d]",
                         log_escape_ex(msr->mp, var_name->value, var_name->value_len),
                         log_escape_ex(msr->mp, var->name, var->name_len),
-                        origval, ourval, delta, storedval, delta, newval, var->value, var->value_len);
+                        origval_str, ourval_str, delta_str, storedval_str, delta_str, newval_str, var->value, var->value_len);
                     }
                 }
             }
