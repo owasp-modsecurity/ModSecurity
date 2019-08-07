@@ -12,32 +12,47 @@
 * directly using the email address security@modsecurity.org.
 */
 
-#pragma once
-
-#include "critical_section.h"
-#include "event_logger.h"
+#ifndef __MY_MODULE_H__
+#define __MY_MODULE_H__
 
 //  The module implementation.
 //  This class is responsible for implementing the 
 //  module functionality for each of the server events
 //  that it registers for.
-class CMyHttpModule 
-    : public CHttpModule
+class CMyHttpModule : public CHttpModule
 {
 public:
-    CMyHttpModule();
+    HANDLE				m_hEventLog;
+    DWORD				m_dwPageSize;
+	CRITICAL_SECTION	m_csLock;
 
     REQUEST_NOTIFICATION_STATUS
-    OnBeginRequest(IHttpContext*, IHttpEventProvider*) override;
+    OnBeginRequest(
+        IN IHttpContext * pHttpContext,
+        IN IHttpEventProvider * pProvider
+    );
 
-    void Dispose() override;
+    REQUEST_NOTIFICATION_STATUS
+    OnSendResponse(
+    IN IHttpContext * pHttpContext,
+        IN ISendResponseProvider * pProvider
+    );
+
+    REQUEST_NOTIFICATION_STATUS
+    OnPostEndRequest(
+    IN IHttpContext * pHttpContext,
+    IN IHttpEventProvider * pProvider
+    );
+
+    HRESULT ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf);
+
+    CMyHttpModule();
+    ~CMyHttpModule();
+
+    void Dispose();
 
     BOOL WriteEventViewerLog(LPCSTR szNotification, WORD category = EVENTLOG_INFORMATION_TYPE);
-
-private:
-    CriticalSection cs;
-    EventLogger logger;
-    DWORD pageSize = 0;
-    bool statusCallAlreadySent = false;
+    BOOL status_call_already_sent;
 };
 
+#endif

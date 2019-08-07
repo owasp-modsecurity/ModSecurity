@@ -735,7 +735,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
 
     /* Lock the mutex, but only if we are using serial format. */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-        rc = waf_get_exclusive_lock(msr->modsecurity->auditlog_lock);
+	    rc = waf_get_exclusive_lock(msr->modsecurity->auditlog_lock);
         if (waf_lock_is_error(rc)) {
             msr_log(msr, 1, "Audit log: Failed to lock global mutex: %s",
                 get_apr_error(msr->mp, rc));
@@ -1279,7 +1279,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
             yajl_gen_map_close(g); // sanitized args map is finished
         }
 #ifdef LOG_NO_SERVER_CONTEXT
-    }
+	}
 #endif
 
         /* Web application info. */
@@ -1447,7 +1447,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
 
         /* Unlock the mutex we used to serialise access to the audit log file. */
-        rc = waf_free_exclusive_lock(msr->modsecurity->auditlog_lock);
+	    rc = waf_free_exclusive_lock(msr->modsecurity->auditlog_lock);
         if (waf_lock_is_error(rc)) {
             msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s",
                     get_apr_error(msr->mp, rc));
@@ -1622,7 +1622,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
 
     /* Lock the mutex, but only if we are using serial format. */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-        rc = waf_get_exclusive_lock(msr->modsecurity->auditlog_lock);
+	    rc = waf_get_exclusive_lock(msr->modsecurity->auditlog_lock);
         if (waf_lock_is_error(rc)) {
             msr_log(msr, 1, "Audit log: Failed to lock global mutex: %s",
                 get_apr_error(msr->mp, rc));
@@ -1991,16 +1991,16 @@ void sec_audit_logger_native(modsec_rec *msr) {
 
         /* Apache-Handler */
 #ifdef LOG_NO_HANDLER
-    if (msr->txcfg->debuglog_level >= 9)
+	if (msr->txcfg->debuglog_level >= 9)
 #endif
-    if (msr->r->handler != NULL) {
+	if (msr->r->handler != NULL) {
             text = apr_psprintf(msr->mp, "Apache-Handler: %s\n", msr->r->handler);
             sec_auditlog_write(msr, text, strlen(text));
         }
 
         /* Stopwatch; left in for compatibility reasons */
 #ifdef LOG_NO_STOPWATCH
-    if (msr->txcfg->debuglog_level >= 9) {
+	if (msr->txcfg->debuglog_level >= 9) {
 #endif
         text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
             msr->request_time, (now - msr->request_time));
@@ -2022,7 +2022,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
 #ifdef LOG_NO_DECHUNK
-    if (msr->txcfg->debuglog_level >= 9)
+	if (msr->txcfg->debuglog_level >= 9)
 #endif
         if (wrote_response_body) {
             text = apr_psprintf(msr->mp, "Response-Body-Transformed: Dechunked\n");
@@ -2101,10 +2101,10 @@ void sec_audit_logger_native(modsec_rec *msr) {
             }
         }
 #ifdef LOG_NO_SERVER_CONTEXT
-    }
+	}
 #endif
 
-    /* Web application info. */
+	/* Web application info. */
         if ( ((msr->txcfg->webappid != NULL)&&(strcmp(msr->txcfg->webappid, "default") != 0))
             || (msr->sessionid != NULL) || (msr->userid != NULL))
         {
@@ -2227,7 +2227,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
         sec_auditlog_write(msr, "\n", 1);
 
         /* Unlock the mutex we used to serialise access to the audit log file. */
-        rc = waf_free_exclusive_lock(msr->modsecurity->auditlog_lock);
+	    rc = waf_free_exclusive_lock(msr->modsecurity->auditlog_lock);
         if (waf_lock_is_error(rc)) {
             msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s",
                     get_apr_error(msr->mp, rc));

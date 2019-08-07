@@ -1,4 +1,4 @@
-LIBRARY    "ModSecurityIIS"
+LIBRARY	"ModSecurityIIS"
 
 EXPORTS
     RegisterModule

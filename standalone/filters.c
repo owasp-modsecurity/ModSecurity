@@ -37,7 +37,7 @@
 #include "ap_config.h"
 #include "http_config.h"
 
-#define    FILTER_POOL    apr_hook_global_pool
+#define	FILTER_POOL	apr_hook_global_pool
 #include "apr_hooks.h"
 
 /*
@@ -56,11 +56,11 @@ apr_table_t *ms_output_filters = NULL;
 
 void init_filter_tables()
 {
-    if(ms_input_filters == NULL)
-    {
-        ms_input_filters = apr_table_make(FILTER_POOL, 10);
-        ms_output_filters = apr_table_make(FILTER_POOL, 10);
-    }
+	if(ms_input_filters == NULL)
+	{
+		ms_input_filters = apr_table_make(FILTER_POOL, 10);
+		ms_output_filters = apr_table_make(FILTER_POOL, 10);
+	}
 }
 
 AP_DECLARE(ap_filter_rec_t *) ap_register_input_filter(const char *name,
@@ -68,20 +68,20 @@ AP_DECLARE(ap_filter_rec_t *) ap_register_input_filter(const char *name,
                                           ap_init_filter_func filter_init,
                                           ap_filter_type ftype)
 {
-    ap_filter_rec_t *f;
+	ap_filter_rec_t *f;
 
-    init_filter_tables();
-    
-    f = apr_palloc(FILTER_POOL, sizeof(ap_filter_rec_t));
+	init_filter_tables();
+	
+	f = apr_palloc(FILTER_POOL, sizeof(ap_filter_rec_t));
 
-    f->filter_func.in_func = filter_func;
-    f->filter_init_func = filter_init;
-    f->ftype = ftype;
-    f->name = name;
+	f->filter_func.in_func = filter_func;
+	f->filter_init_func = filter_init;
+	f->ftype = ftype;
+	f->name = name;
 
-    apr_table_setn(ms_input_filters, name, (const char *)f);
+	apr_table_setn(ms_input_filters, name, (const char *)f);
 
-    return f;
+	return f;
 }
 
 AP_DECLARE(ap_filter_rec_t *) ap_register_output_filter(const char *name,
@@ -89,20 +89,20 @@ AP_DECLARE(ap_filter_rec_t *) ap_register_output_filter(const char *name,
                                             ap_init_filter_func filter_init,
                                             ap_filter_type ftype)
 {
-    ap_filter_rec_t *f;
-    
-    init_filter_tables();
-    
-    f = apr_palloc(FILTER_POOL, sizeof(ap_filter_rec_t));
+	ap_filter_rec_t *f;
+	
+	init_filter_tables();
+	
+	f = apr_palloc(FILTER_POOL, sizeof(ap_filter_rec_t));
 
-    f->filter_func.out_func = filter_func;
-    f->filter_init_func = filter_init;
-    f->ftype = ftype;
-    f->name = name;
+	f->filter_func.out_func = filter_func;
+	f->filter_init_func = filter_init;
+	f->ftype = ftype;
+	f->name = name;
 
-    apr_table_setn(ms_output_filters, name, (const char *)f);
+	apr_table_setn(ms_output_filters, name, (const char *)f);
 
-    return f;
+	return f;
 }
 
 static ap_filter_t *add_any_filter_handle(ap_filter_rec_t *frec, void *ctx,
@@ -187,12 +187,12 @@ static ap_filter_t *add_any_filter_handle(ap_filter_rec_t *frec, void *ctx,
 AP_DECLARE(ap_filter_t *) ap_add_input_filter(const char *name, void *ctx,
                                               request_rec *r, conn_rec *c)
 {
-    ap_filter_rec_t *f = (ap_filter_rec_t *)apr_table_get(ms_input_filters, name);
+	ap_filter_rec_t *f = (ap_filter_rec_t *)apr_table_get(ms_input_filters, name);
 
-    if(f == NULL)
-        return NULL;
+	if(f == NULL)
+		return NULL;
 
-    return add_any_filter_handle(f, ctx, r, c,
+	return add_any_filter_handle(f, ctx, r, c,
                           r ? &r->input_filters : NULL,
                           r ? &r->proto_input_filters : NULL, &c->input_filters);
 }
@@ -200,10 +200,10 @@ AP_DECLARE(ap_filter_t *) ap_add_input_filter(const char *name, void *ctx,
 AP_DECLARE(ap_filter_t *) ap_add_output_filter(const char *name, void *ctx, 
                                                request_rec *r, conn_rec *c)
 {
-    ap_filter_rec_t *f = (ap_filter_rec_t *)apr_table_get(ms_output_filters, name);
+	ap_filter_rec_t *f = (ap_filter_rec_t *)apr_table_get(ms_output_filters, name);
 
-    if(f == NULL)
-        return NULL;
+	if(f == NULL)
+		return NULL;
 
     return add_any_filter_handle(f, ctx, r, c,
                           r ? &r->output_filters : NULL,

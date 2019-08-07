@@ -1253,10 +1253,10 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: ruleRemoveTargetByTag tag=%s targets=%s", p1, p2);
         }
-    if (p2 == NULL) {
+	if (p2 == NULL) {
             msr_log(msr, 1, "ModSecurity: Missing target for tag \"%s\"", p1);
-        return -1;
-    }
+	    return -1;
+	}
 
     re = apr_pcalloc(msr->mp, sizeof(rule_exception));
     re->type = RULE_EXCEPTION_REMOVE_TAG;
@@ -1568,7 +1568,7 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
     if (strcasecmp(col_name,"USER") == 0 || strcasecmp(col_name,"SESSION") == 0
         || strcasecmp(col_name, "RESOURCE") == 0) {
-    real_col_name = apr_psprintf(mptmp, "%s_%s", msr->txcfg->webappid, col_name);
+	real_col_name = apr_psprintf(mptmp, "%s_%s", msr->txcfg->webappid, col_name);
     }
 
     /* Locate the collection. */
@@ -1581,8 +1581,8 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
     if (target_col == NULL) {
         if (msr->txcfg->debuglog_level >= 3) {
-        msr_log(msr, 3, "Could not set variable \"%s.%s\" as the collection does not exist.",
-            log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+	    msr_log(msr, 3, "Could not set variable \"%s.%s\" as the collection does not exist.",
+	        log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
         }
 
         return 0;

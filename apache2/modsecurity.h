@@ -231,8 +231,8 @@ extern DSOLOCAL char *msc_waf_lock_group;
 #define STATUS_ENGINE_ENABLED           1
 #define STATUS_ENGINE_DISABLED          0
 
-#define REMOTE_RULES_ABORT_ON_FAIL    0
-#define REMOTE_RULES_WARN_ON_FAIL    1
+#define REMOTE_RULES_ABORT_ON_FAIL	0
+#define REMOTE_RULES_WARN_ON_FAIL	1
 
 #define HASH_DISABLED             0
 #define HASH_ENABLED              1
@@ -412,8 +412,8 @@ struct modsec_rec {
 
     apr_size_t           msc_reqbody_no_files_length;
 
-    char        *msc_full_request_buffer;
-    int            msc_full_request_length;
+    char		*msc_full_request_buffer;
+    int			msc_full_request_length;
 
     char                *multipart_filename;
     char                *multipart_name;
@@ -439,15 +439,15 @@ struct modsec_rec {
 
     /* performance measurement */
     apr_time_t       request_time;
-    apr_time_t         time_phase1;
-    apr_time_t         time_phase2;
-    apr_time_t         time_phase3;
-    apr_time_t         time_phase4;
-    apr_time_t         time_phase5;
-    apr_time_t         time_storage_read;
-    apr_time_t         time_storage_write;
-    apr_time_t         time_logging;
-    apr_time_t         time_gc;
+    apr_time_t		 time_phase1;
+    apr_time_t		 time_phase2;
+    apr_time_t		 time_phase3;
+    apr_time_t		 time_phase4;
+    apr_time_t		 time_phase5;
+    apr_time_t		 time_storage_read;
+    apr_time_t		 time_storage_write;
+    apr_time_t		 time_logging;
+    apr_time_t		 time_gc;
     apr_table_t      *perf_rules;
 
     apr_array_header_t  *matched_rules;
@@ -670,7 +670,7 @@ struct directory_config {
     int                 xml_external_entity;
 #ifdef MEMORY_DATABASE_ENABLE
     /* AGMDB */
-    directory_config    *root_config;
+    directory_config	*root_config;
     int                 db_option;
     void                *agmdb_handles;    
 #endif

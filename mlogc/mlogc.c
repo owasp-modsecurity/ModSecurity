@@ -815,20 +815,20 @@ static void init_configuration(void)
     /* TLS Protocol - TLSv1(0) TLSv1.1(1) TLSv1.2(2) (SSLv3 not supported) */
     s = apr_table_get(conf, "TLSProtocol");
     if (s != NULL) {
-        int num = atoi(s);
-        switch (num) {
-        case 0:
-            tlsprotocol = 0;
-            break;
-        case 1:
-            tlsprotocol = 1;
-            break;
-        case 2:
-            tlsprotocol = 2;
-            break;
-        default:
-            tlsprotocol = 2; /* Default is TLSv1.2 */
-        }
+    	int num = atoi(s);
+    	switch (num) {
+    	case 0:
+    		tlsprotocol = 0;
+    		break;
+    	case 1:
+    		tlsprotocol = 1;
+    		break;
+    	case 2:
+    		tlsprotocol = 2;
+    		break;
+    	default:
+    		tlsprotocol = 2; /* Default is TLSv1.2 */
+    	}
     }
     curlversion = curl_version_info(CURLVERSION_NOW);
 
@@ -1278,24 +1278,24 @@ static void logc_init(void)
          */
         switch (tlsprotocol) {
         case 0:
-            curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_0);
-            break;
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_0);
+        	break;
         case 1:
-            curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_1);
-            break;
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_1);
+        	break;
         case 2:
-            curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-            break;
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+        	break;
         default:
-            curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-            break;
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+        	break;
         }
         cmaj = curlversion->version_num >> 16;
         cmin = (curlversion->version_num & 0x00ff00) >> 8;
         cpat = (curlversion->version_num & 0x0000ff);
         /* If cURL version < v7.34.0, use TLS v1.x */
         if (cmaj <= 7 && cmin < 34) {
-            curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
         }
 
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 15);
@@ -1308,7 +1308,7 @@ static void logc_init(void)
     }
 
     if (cmaj <= 7 && cmin < 34) {
-        error_log(LOG_DEBUG2, NULL, "TLSv1.2 is unsupported in cURL %d.%d.%d",  cmaj, cmin, cpat);
+    	error_log(LOG_DEBUG2, NULL, "TLSv1.2 is unsupported in cURL %d.%d.%d",  cmaj, cmin, cpat);
     }
 
     logline_regex = pcre_compile(logline_pattern, PCRE_CASELESS,
@@ -2322,12 +2322,12 @@ int main(int argc, const char * const argv[]) {
     logc_pid = getpid();
     apr_pool_create(&pool, NULL);
     apr_pool_create(&recv_pool, NULL);
-    
+	
 #ifndef WIN32
     apr_setup_signal_thread();
 #else
-    apr_signal(SIGINT, handle_signals);
-    apr_signal(SIGTERM, handle_signals);
+	apr_signal(SIGINT, handle_signals);
+	apr_signal(SIGTERM, handle_signals);
 #endif /* WIN32 */
 
     if (argc < 2) {

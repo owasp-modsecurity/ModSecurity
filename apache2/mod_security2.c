@@ -294,7 +294,7 @@ int perform_interception(modsec_rec *msr) {
                     csd = ap_get_module_config(msr->r->connection->conn_config, &core_module);
                 }
 #else
-        csd = ap_get_module_config(msr->r->connection->conn_config, &core_module);
+		csd = ap_get_module_config(msr->r->connection->conn_config, &core_module);
 #endif
                 if (csd) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {

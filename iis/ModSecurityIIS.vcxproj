@@ -120,7 +120,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;.\asio\asio\include;dependencies\build_dir\apache24\include;..\apache2;..\standalone;.\asio\asio\include;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;dependencies\build_dir\apache24\include;..\apache2;..\standalone;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_IIS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
@@ -140,7 +140,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Custom Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;.\asio\asio\include;dependencies\build_dir\apache24\include;..\apache2;..\standalone;.\asio\asio\include;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;dependencies\build_dir\apache24\include;..\apache2;..\standalone;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_IIS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
@@ -217,7 +217,7 @@ net start W3SVC /y</Command>
     <ClCompile>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_IIS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;.\asio\asio\include;..\apache2;..\standalone;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
@@ -325,8 +325,6 @@ net start W3SVC /y</Command>
     <ClInclude Include="..\apache2\re.h" />
     <ClInclude Include="..\apache2\utf8tables.h" />
     <ClInclude Include="..\standalone\api.h" />
-    <ClInclude Include="critical_section.h" />
-    <ClInclude Include="event_logger.h" />
     <ClInclude Include="moduleconfig.h" />
     <ClInclude Include="mymodule.h" />
     <ClInclude Include="mymodulefactory.h" />

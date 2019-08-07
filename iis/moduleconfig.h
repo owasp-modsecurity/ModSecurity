@@ -16,13 +16,11 @@
 
 #define MODSECURITY_SECTION                        L"system.webServer/ModSecurity"
 #define MODSECURITY_SECTION_ENABLED                L"enabled"
-#define MODSECURITY_SECTION_CONFIGFILE               L"configFile"
+#define MODSECURITY_SECTION_CONFIGFILE			   L"configFile"
 
 extern IHttpServer *                       g_pHttpServer;
 
 extern PVOID                               g_pModuleContext;
-
-struct directory_config; // forward declaration
 
 class MODSECURITY_STORED_CONTEXT : public IHttpStoredContext
 {
@@ -30,7 +28,7 @@ class MODSECURITY_STORED_CONTEXT : public IHttpStoredContext
     MODSECURITY_STORED_CONTEXT();
     ~MODSECURITY_STORED_CONTEXT();
     
-    static
+	static
     HRESULT
     GetConfig(
         IHttpContext *   pContext,
@@ -69,7 +67,7 @@ class MODSECURITY_STORED_CONTEXT : public IHttpStoredContext
             CHAR**  ppszDestination,
             USHORT*  pdwLengthDestination );
 
-    directory_config* config = nullptr;
+	void*			  m_Config;
 
     bool configLoadingFailed = false;
 

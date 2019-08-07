@@ -1444,7 +1444,7 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
                 )
             {
                 if (pos > LIBINJECTION_SQLI_MAX_TOKENS) {
-            st_copy(&(sf->tokenvec[1]), &(sf->tokenvec[LIBINJECTION_SQLI_MAX_TOKENS]));
+		    st_copy(&(sf->tokenvec[1]), &(sf->tokenvec[LIBINJECTION_SQLI_MAX_TOKENS]));
                     pos = 2;
                     left = 0;
                 } else {
@@ -1521,9 +1521,9 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
             continue;
         } else if (sf->tokenvec[left].type == TYPE_SEMICOLON &&
                    sf->tokenvec[left+1].type == TYPE_FUNCTION &&
-           (sf->tokenvec[left+1].val[0] == 'I' ||
-            sf->tokenvec[left+1].val[0] == 'i' ) &&
-           (sf->tokenvec[left+1].val[1] == 'F' ||
+		   (sf->tokenvec[left+1].val[0] == 'I' ||
+		    sf->tokenvec[left+1].val[0] == 'i' ) &&
+		   (sf->tokenvec[left+1].val[1] == 'F' ||
                     sf->tokenvec[left+1].val[1] == 'f' )) {
             /* IF is normally a function, except in Transact-SQL where it can be used as a
              * standalone control flow operator, e.g. ; IF 1=1 ...

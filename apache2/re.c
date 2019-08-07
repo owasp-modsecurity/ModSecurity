@@ -1265,7 +1265,7 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, apr_pool_t *mp, msre_a
 
     if (inherit_by_default == 0) {
         /* There is nothing to merge in this case. */
-        return msre_actionset_copy(mp, child);
+	    return msre_actionset_copy(mp, child);
     }
 
     /* Start with a copy of the parent configuration. */

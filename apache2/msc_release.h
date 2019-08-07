@@ -49,13 +49,13 @@
   MODSEC_VERSION_SUFFIX
 
 /* Apache Module Defines */
-#ifdef    VERSION_IIS
+#ifdef	VERSION_IIS
 #define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
 #else
-#ifdef    VERSION_NGINX
+#ifdef	VERSION_NGINX
 #define MODSEC_MODULE_NAME "ModSecurity for nginx (STABLE)"
 #else
-#ifdef    VERSION_STANDALONE
+#ifdef	VERSION_STANDALONE
 #define MODSEC_MODULE_NAME "ModSecurity Standalone (STABLE)"
 #else
 #define MODSEC_MODULE_NAME "ModSecurity for Apache"

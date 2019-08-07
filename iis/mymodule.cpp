@@ -15,10 +15,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #undef inline
-
-#include <string>
-#include <cctype>
-#include <memory>
+#define inline inline
 
 //  IIS7 Server API header file
 #include <Windows.h>
@@ -35,103 +32,104 @@
 
 #include "winsock2.h"
 
-// These helpers make sure that the underlying structures
-// are correctly released on any exit path due to RAII.
-using ConnRecPtr = std::unique_ptr<conn_rec, decltype(modsecFinishConnection)*>;
-using RequestRecPtr = std::unique_ptr<request_rec, decltype(modsecFinishRequest)*>;
 
-static ConnRecPtr MakeConnReq()
+class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 {
-    ConnRecPtr c{modsecNewConnection(), modsecFinishConnection};
-    modsecProcessConnection(c.get());
-    return c;
-}
+ public:
+    REQUEST_STORED_CONTEXT()
+	{
+		m_pConnRec = NULL;
+		m_pRequestRec = NULL;
+		m_pHttpContext = NULL;
+		m_pProvider = NULL;
+		m_pResponseBuffer = NULL;
+		m_pResponseLength = 0;
+		m_pResponsePosition = 0;
+	}
 
-static RequestRecPtr MakeRequestRec(conn_rec* c, directory_config* config)
-{
-    return {modsecNewRequest(c, config), modsecFinishRequest};
-}
-
-class AprRequestContext
-{
-private:
-    ConnRecPtr connRec;
-    RequestRecPtr requestRec;
-
-public:
-    explicit AprRequestContext(directory_config* config)
-        : connRec{MakeConnReq()}
-        , requestRec{MakeRequestRec(connRec.get(), config)}
-    {}
-
-    AprRequestContext(const AprRequestContext&) = delete;
-    AprRequestContext& operator=(const AprRequestContext&) = delete;
-
-    AprRequestContext(AprRequestContext&& rhs)
-        : connRec(std::move(rhs.connRec))
-        , requestRec(std::move(rhs.requestRec))
-    {}
-
-    AprRequestContext& operator=(AprRequestContext&& rhs)
+    ~REQUEST_STORED_CONTEXT()
+	{
+		FinishRequest();
+	}
+    
+    // virtual
+    VOID
+    CleanupStoredContext(
+        VOID
+    )
     {
-        connRec = std::move(rhs.connRec);
-        requestRec = std::move(rhs.requestRec);
-        return *this;
+		FinishRequest();
+        delete this;
     }
 
-    conn_rec* GetConnection() const
-    {
-        return connRec.get();
-    }
+	void FinishRequest()
+	{
+		if(m_pRequestRec != NULL)
+		{
+			modsecFinishRequest(m_pRequestRec);
+			m_pRequestRec = NULL;
+		}
+		if(m_pConnRec != NULL)
+		{
+			modsecFinishConnection(m_pConnRec);
+			m_pConnRec = NULL;
+		}
+	}
 
-    request_rec* GetRequest() const
-    {
-        return requestRec.get();
-    }
+	conn_rec			*m_pConnRec;
+	request_rec			*m_pRequestRec;
+	IHttpContext		*m_pHttpContext;
+	IHttpEventProvider	*m_pProvider;
+	char				*m_pResponseBuffer;
+	ULONGLONG			m_pResponseLength;
+	ULONGLONG			m_pResponsePosition;
 };
+
+
+//----------------------------------------------------------------------------
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 {
-    const char *format = "%15[0-9.]:%5[0-9]";
-    char ip[16] = { 0 };  // ip4 addresses have max len 15
-    char port[6] = { 0 }; // port numbers are 16bit, ie 5 digits max
+	const char *format = "%15[0-9.]:%5[0-9]";
+	char ip[16] = { 0 };  // ip4 addresses have max len 15
+	char port[6] = { 0 }; // port numbers are 16bit, ie 5 digits max
 
-    DWORD len = 50;
-    char *buf = (char *)apr_palloc(pool, len);
+	DWORD len = 50;
+	char *buf = (char *)apr_palloc(pool, len);
 
-    if(buf == NULL)
-        return "";
+	if(buf == NULL)
+		return "";
 
-    buf[0] = 0;
+	buf[0] = 0;
 
-    WSAAddressToString(pAddr, sizeof(SOCKADDR), NULL, buf, &len);
+	WSAAddressToString(pAddr, sizeof(SOCKADDR), NULL, buf, &len);
 
-    // test for IPV4 with port on the end
-    if (sscanf(buf, format, ip, port) == 2) {
-        // IPV4 but with port - remove the port
-        char* input = ":";
-        char* ipv4 = strtok(buf, input);
-        return ipv4;
-    }
+	// test for IPV4 with port on the end
+	if (sscanf(buf, format, ip, port) == 2) {
+		// IPV4 but with port - remove the port
+		char* input = ":";
+		char* ipv4 = strtok(buf, input);
+		return ipv4;
+	}
 
-    return buf;
+	return buf;
 }
 
 apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 {
     apr_sockaddr_t *addr = (apr_sockaddr_t *)apr_palloc(pool, sizeof(apr_sockaddr_t));
-    int adrlen = 16, iplen = 4;
+	int adrlen = 16, iplen = 4;
 
-    if(pAddr->sa_family == AF_INET6)
-    {
-        adrlen = 46;
-        iplen = 16;
-    }
+	if(pAddr->sa_family == AF_INET6)
+	{
+		adrlen = 46;
+		iplen = 16;
+	}
 
-    addr->addr_str_len = adrlen;
-    addr->family = pAddr->sa_family;
+	addr->addr_str_len = adrlen;
+	addr->family = pAddr->sa_family;
 
-    addr->hostname = "unknown";
+	addr->hostname = "unknown";
 #ifdef WIN32
     addr->ipaddr_len = sizeof(IN_ADDR);
 #else
@@ -141,29 +139,29 @@ apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
     addr->pool = pool;
     addr->port = 80;
 #ifdef WIN32
-    memcpy(&addr->sa.sin.sin_addr.S_un.S_addr, pAddr->sa_data, iplen);
+	memcpy(&addr->sa.sin.sin_addr.S_un.S_addr, pAddr->sa_data, iplen);
 #else
     memcpy(&addr->sa.sin.sin_addr.s_addr, pAddr->sa_data, iplen);
 #endif
-    addr->sa.sin.sin_family = pAddr->sa_family;
+	addr->sa.sin.sin_family = pAddr->sa_family;
     addr->sa.sin.sin_port = 80;
     addr->salen = sizeof(addr->sa);
-    addr->servname = addr->hostname;
+	addr->servname = addr->hostname;
 
-    return addr;
+	return addr;
 }
 
 //----------------------------------------------------------------------------
 
 char *ZeroTerminate(const char *str, size_t len, apr_pool_t *pool)
 {
-    char *_n = (char *)apr_palloc(pool, len + 1);
+	char *_n = (char *)apr_palloc(pool, len + 1);
 
-    memcpy(_n, str, len);
+	memcpy(_n, str, len);
 
-    _n[len] = 0;
+	_n[len] = 0;
 
-    return _n;
+	return _n;
 }
 
 //----------------------------------------------------------------------------
@@ -197,7 +195,7 @@ char *ConvertUTF16ToUTF8( __in const WCHAR * pszTextUTF16, size_t cchUTF16, apr_
 
     if ( cbUTF8 == 0 )
     {
-        return "";
+		return "";
     }
 
     //
@@ -224,258 +222,665 @@ char *ConvertUTF16ToUTF8( __in const WCHAR * pszTextUTF16, size_t cchUTF16, apr_
 
     if ( result == 0 )
     {
-        return "";
+		return "";
     }
 
-    pszUTF8[cchUTF8] =  0;
+	pszUTF8[cchUTF8] =  0;
 
     return pszUTF8;
 }
  
-static void Log(void *obj, int level, char *str)
+void Log(void *obj, int level, char *str)
 {
-    CMyHttpModule *mod = (CMyHttpModule *)obj;
-    WORD logcat = EVENTLOG_INFORMATION_TYPE;
+	CMyHttpModule *mod = (CMyHttpModule *)obj;
+	WORD logcat = EVENTLOG_INFORMATION_TYPE;
 
-    level &= APLOG_LEVELMASK;
+	level &= APLOG_LEVELMASK;
 
-    if(level <= APLOG_ERR)
-        logcat = EVENTLOG_ERROR_TYPE;
+	if(level <= APLOG_ERR)
+		logcat = EVENTLOG_ERROR_TYPE;
 
-    if(level == APLOG_WARNING || strstr(str, "Warning.") != NULL)
-        logcat = EVENTLOG_WARNING_TYPE;
+	if(level == APLOG_WARNING || strstr(str, "Warning.") != NULL)
+		logcat = EVENTLOG_WARNING_TYPE;
 
-    mod->WriteEventViewerLog(str, logcat);
+	mod->WriteEventViewerLog(str, logcat);
 }
 
-/*
- * Read request body from IIS structures, copy it over into
- * Apache buckets and then assign back the entire flatten body
- * to IHttpRequest.
- * If the request body is chunked, it will be transformed into fixed-length.
-*/
-static HRESULT SaveRequestBodyToRequestRec(IHttpContext* httpContext, const AprRequestContext& aprContext)
+#define NOTE_IIS "iis-tx-context"
+
+void StoreIISContext(request_rec *r, REQUEST_STORED_CONTEXT *rsc)
 {
-    request_rec* aprRequest = aprContext.GetRequest();
-    conn_rec* conn = aprContext.GetConnection();
-    IHttpRequest* iisRequest = httpContext->GetRequest();
-    apr_bucket_brigade* brigade = apr_brigade_create(conn->pool, conn->bucket_alloc);
-    if (brigade == nullptr)
+    apr_table_setn(r->notes, NOTE_IIS, (const char *)rsc);
+}
+
+REQUEST_STORED_CONTEXT *RetrieveIISContext(request_rec *r)
+{
+    REQUEST_STORED_CONTEXT *msr = NULL;
+    request_rec *rx = NULL;
+
+    /* Look in the current request first. */
+    msr = (REQUEST_STORED_CONTEXT *)apr_table_get(r->notes, NOTE_IIS);
+    if (msr != NULL) {
+        //msr->r = r;
+        return msr;
+    }
+
+    /* If this is a subrequest then look in the main request. */
+    if (r->main != NULL) {
+        msr = (REQUEST_STORED_CONTEXT *)apr_table_get(r->main->notes, NOTE_IIS);
+        if (msr != NULL) {
+            //msr->r = r;
+            return msr;
+        }
+    }
+
+    /* If the request was redirected then look in the previous requests. */
+    rx = r->prev;
+    while(rx != NULL) {
+        msr = (REQUEST_STORED_CONTEXT *)apr_table_get(rx->notes, NOTE_IIS);
+        if (msr != NULL) {
+            //msr->r = r;
+            return msr;
+        }
+        rx = rx->prev;
+    }
+
+    return NULL;
+}
+
+
+HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
+{
+    OVERLAPPED ovl;
+    DWORD dwDataStartOffset;
+    ULONGLONG bytesTotal = 0;
+	BYTE *	pIoBuffer = NULL;
+	HANDLE	hIoEvent = INVALID_HANDLE_VALUE;
+	HRESULT hr = S_OK;
+
+    pIoBuffer = (BYTE *)VirtualAlloc(NULL,
+                                        1,
+                                        MEM_COMMIT | MEM_RESERVE,
+                                        PAGE_READWRITE);
+    if (pIoBuffer == NULL)
     {
-        return E_OUTOFMEMORY;
+        hr = HRESULT_FROM_WIN32(GetLastError());
+		goto Done;
     }
 
-    while (iisRequest->GetRemainingEntityBytes() > 0)
+    hIoEvent = CreateEvent(NULL,  // security attr
+                                FALSE, // manual reset
+                                FALSE, // initial state
+                                NULL); // name
+    if (hIoEvent == NULL)
     {
-        DWORD bytesRead = 0;
-        char* buf = static_cast<char*>(apr_palloc(aprRequest->pool, HUGE_STRING_LEN));
-        HRESULT hr = iisRequest->ReadEntityBody(buf, HUGE_STRING_LEN, false, &bytesRead, nullptr);
-        if (FAILED(hr))
-        {
-            // End of data is okay.
-            if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
-            {
-                return hr;
-            }
-
-            break;
-        }
-
-        apr_bucket* bucket = apr_bucket_pool_create(buf, bytesRead, aprRequest->pool, conn->bucket_alloc);
-        if (bucket == nullptr)
-        {
-            return E_OUTOFMEMORY;
-        }
-        APR_BRIGADE_INSERT_TAIL(brigade, bucket);
+        hr = HRESULT_FROM_WIN32(GetLastError());
+		goto Done;
     }
 
-    if (!APR_BRIGADE_EMPTY(brigade)) {
-        apr_bucket* e = apr_bucket_eos_create(conn->bucket_alloc);
-        if (e == nullptr)
-        {
-            return E_OUTOFMEMORY;
-        }
-        APR_BRIGADE_INSERT_TAIL(brigade, e);
+	while(bytesTotal < chunk->FromFileHandle.ByteRange.Length.QuadPart)
+	{
+		DWORD bytesRead = 0;
+		int was_eof = 0;
+		ULONGLONG offset = chunk->FromFileHandle.ByteRange.StartingOffset.QuadPart + bytesTotal;
 
-        modsecSetBodyBrigade(aprRequest, brigade);
+		ZeroMemory(&ovl, sizeof ovl);
+		ovl.hEvent     = hIoEvent;
+		ovl.Offset = (DWORD)offset;
+		dwDataStartOffset = ovl.Offset & (m_dwPageSize - 1);
+		ovl.Offset &= ~(m_dwPageSize - 1);
+		ovl.OffsetHigh = offset >> 32;
 
-        apr_off_t contentLength = 0;
-        apr_status_t status = apr_brigade_length(brigade, FALSE, &contentLength);
-        if (status != APR_SUCCESS)
-        {
-            return E_FAIL;
-        }
+		if (!ReadFile(chunk->FromFileHandle.FileHandle,
+					  pIoBuffer,
+					  m_dwPageSize,
+					  &bytesRead,
+					  &ovl))
+		{
+			DWORD dwErr = GetLastError();
 
-        // Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
-        // This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
-        static const std::string CHUNKED = "chunked";
-        USHORT encodingLength = 0;
-        const char* transferEncoding = iisRequest->GetHeader(HttpHeaderTransferEncoding, &encodingLength);
-        if (transferEncoding)
-        {
-            if (encodingLength == CHUNKED.size() &&
-                std::equal(CHUNKED.cbegin(), CHUNKED.cend(), transferEncoding,
-                [](char lhs, char rhs) { return std::tolower(lhs) == std::tolower(rhs); }))
-            {
-                iisRequest->DeleteHeader(HttpHeaderTransferEncoding);
-            }
-        }
+			switch (dwErr)
+			{
+			case ERROR_IO_PENDING:
+				//
+				// GetOverlappedResult can return without waiting for the
+				// event thus leaving it signalled and causing problems
+				// with future use of that event handle, so just wait ourselves
+				//
+				WaitForSingleObject(ovl.hEvent, INFINITE); // == WAIT_OBJECT_0);
 
-        auto contentLengthStr = std::to_string(contentLength);
-        HRESULT hr = iisRequest->SetHeader(
-            HttpHeaderContentLength,
-            contentLengthStr.c_str(),
-            contentLengthStr.size(),
-            TRUE);
+				if (!GetOverlappedResult(
+						 chunk->FromFileHandle.FileHandle,
+						 &ovl,
+						 &bytesRead,
+						 TRUE))
+				{
+					dwErr = GetLastError();
 
-        if (FAILED(hr))
-        {
-            return hr;
-        }
+					switch(dwErr)
+					{
+					case ERROR_HANDLE_EOF:
+						was_eof = 1;
+						break;
 
-        // since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
-        //
-        char* requestBuffer = static_cast<char*>(httpContext->AllocateRequestMemory(contentLength));
-        status = apr_brigade_flatten(brigade, requestBuffer, reinterpret_cast<apr_size_t*>(&contentLength));
-        if (status != APR_SUCCESS)
-        {
-            return E_FAIL;
-        }
-        return iisRequest->InsertEntityBody(requestBuffer, contentLength);
-    }
+					default:
+						hr = HRESULT_FROM_WIN32(dwErr);
+						goto Done;
+					}
+				}
+				break;
 
-    return S_OK;
+			case ERROR_HANDLE_EOF:
+				was_eof = 1;
+				break;
+
+			default:
+				hr = HRESULT_FROM_WIN32(dwErr);
+				goto Done;
+			}
+		}
+
+		bytesRead -= dwDataStartOffset;
+
+		if (bytesRead > chunk->FromFileHandle.ByteRange.Length.QuadPart)
+		{
+			bytesRead = (DWORD)chunk->FromFileHandle.ByteRange.Length.QuadPart;
+		}
+		if ((bytesTotal + bytesRead) > chunk->FromFileHandle.ByteRange.Length.QuadPart)
+		{ 
+			bytesRead = chunk->FromFileHandle.ByteRange.Length.QuadPart - bytesTotal; 
+		}
+
+		memcpy(buf, pIoBuffer + dwDataStartOffset, bytesRead);
+
+		buf += bytesRead;
+		bytesTotal += bytesRead;
+
+		if(was_eof != 0)
+			chunk->FromFileHandle.ByteRange.Length.QuadPart = bytesTotal;
+	}
+
+Done:
+	if(NULL != pIoBuffer)
+	{
+		VirtualFree(pIoBuffer, 0, MEM_RELEASE);
+	}
+
+	if(INVALID_HANDLE_VALUE != hIoEvent)
+	{
+		CloseHandle(hIoEvent);
+	}
+
+	return hr;
 }
 
 REQUEST_NOTIFICATION_STATUS
-CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* provider)
+CMyHttpModule::OnSendResponse(
+    IN IHttpContext * pHttpContext,
+    IN ISendResponseProvider * pResponseProvider
+)
 {
-    if (httpContext == nullptr || httpContext->GetRequest() == nullptr)
+	REQUEST_STORED_CONTEXT *rsc = NULL;
+
+	rsc = (REQUEST_STORED_CONTEXT *)pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext);
+
+	EnterCriticalSection(&m_csLock);
+
+	// here we must check if response body processing is enabled
+	//
+	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer != NULL || !modsecIsResponseBodyAccessEnabled(rsc->m_pRequestRec))
+	{
+		goto Exit;
+	}
+
+    HRESULT hr = S_OK;
+	IHttpResponse *pHttpResponse = NULL;
+    HTTP_RESPONSE *pRawHttpResponse = NULL;
+    HTTP_BYTE_RANGE *pFileByteRange = NULL;
+    HTTP_DATA_CHUNK *pSourceDataChunk = NULL;
+    LARGE_INTEGER  lFileSize;
+    REQUEST_NOTIFICATION_STATUS ret = RQ_NOTIFICATION_CONTINUE;
+	ULONGLONG ulTotalLength = 0;
+	DWORD c;
+	request_rec *r = rsc->m_pRequestRec;
+
+	pHttpResponse = pHttpContext->GetResponse();
+	pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
+
+	// here we must add handling of chunked response
+	// apparently IIS 7 calls this handler once per chunk
+	// see: http://stackoverflow.com/questions/4385249/how-to-buffer-and-process-chunked-data-before-sending-headers-in-iis7-native-mod
+
+	if(pRawHttpResponse->EntityChunkCount == 0)
+		goto Exit;
+
+	// here we must transfer response headers
+	//
+	USHORT ctcch = 0;
+	char *ct = (char *)pHttpResponse->GetHeader(HttpHeaderContentType, &ctcch);
+	char *ctz = ZeroTerminate(ct, ctcch, r->pool);
+
+	// assume HTML if content type not set
+	// without this output filter would not buffer response and processing would hang
+	//
+	if(ctz[0] == 0)
+		ctz = "text/html";
+
+	r->content_type = ctz;
+
+#define _TRANSHEADER(id,str) if(pRawHttpResponse->Headers.KnownHeaders[id].pRawValue != NULL) \
+	{\
+		apr_table_setn(r->headers_out, str, \
+			ZeroTerminate(pRawHttpResponse->Headers.KnownHeaders[id].pRawValue, pRawHttpResponse->Headers.KnownHeaders[id].RawValueLength, r->pool)); \
+	}
+
+    _TRANSHEADER(HttpHeaderCacheControl, "Cache-Control");
+    _TRANSHEADER(HttpHeaderConnection, "Connection");
+    _TRANSHEADER(HttpHeaderDate, "Date");
+    _TRANSHEADER(HttpHeaderKeepAlive, "Keep-Alive");             
+    _TRANSHEADER(HttpHeaderPragma, "Pragma");                
+    _TRANSHEADER(HttpHeaderTrailer, "Trailer");               
+    _TRANSHEADER(HttpHeaderTransferEncoding, "Transfer-Encoding");      
+    _TRANSHEADER(HttpHeaderUpgrade, "Upgrade");               
+    _TRANSHEADER(HttpHeaderVia, "Via");                   
+    _TRANSHEADER(HttpHeaderWarning, "Warning");               
+    _TRANSHEADER(HttpHeaderAllow, "Allow");                 
+    _TRANSHEADER(HttpHeaderContentLength, "Content-Length");         
+    _TRANSHEADER(HttpHeaderContentType, "Content-Type");           
+    _TRANSHEADER(HttpHeaderContentEncoding, "Content-Encoding");       
+    _TRANSHEADER(HttpHeaderContentLanguage, "Content-Language");       
+    _TRANSHEADER(HttpHeaderContentLocation, "Content-Location");       
+    _TRANSHEADER(HttpHeaderContentMd5, "Content-Md5");            
+    _TRANSHEADER(HttpHeaderContentRange, "Content-Range");          
+    _TRANSHEADER(HttpHeaderExpires, "Expires");               
+    _TRANSHEADER(HttpHeaderLastModified, "Last-Modified");          
+	_TRANSHEADER(HttpHeaderAcceptRanges, "Accept-Ranges");
+    _TRANSHEADER(HttpHeaderAge, "Age");                   
+    _TRANSHEADER(HttpHeaderEtag, "Etag");                  
+    _TRANSHEADER(HttpHeaderLocation, "Location");              
+    _TRANSHEADER(HttpHeaderProxyAuthenticate, "Proxy-Authenticate");     
+    _TRANSHEADER(HttpHeaderRetryAfter, "Retry-After");            
+    _TRANSHEADER(HttpHeaderServer, "Server");                
+    _TRANSHEADER(HttpHeaderSetCookie, "Set-Cookie");             
+    _TRANSHEADER(HttpHeaderVary, "Vary");                  
+    _TRANSHEADER(HttpHeaderWwwAuthenticate, "Www-Authenticate");
+
+#undef	_TRANSHEADER
+
+	for(int i = 0; i < pRawHttpResponse->Headers.UnknownHeaderCount; i++)
+	{
+		apr_table_setn(r->headers_out, 
+			ZeroTerminate(pRawHttpResponse->Headers.pUnknownHeaders[i].pName, pRawHttpResponse->Headers.pUnknownHeaders[i].NameLength, r->pool), 
+			ZeroTerminate(pRawHttpResponse->Headers.pUnknownHeaders[i].pRawValue, pRawHttpResponse->Headers.pUnknownHeaders[i].RawValueLength, r->pool));
+	}
+
+	r->content_encoding = apr_table_get(r->headers_out, "Content-Encoding");
+	//r->content_type = apr_table_get(r->headers_out, "Content-Type");		-- already set above
+
+	const char *lng = apr_table_get(r->headers_out, "Content-Languages");
+
+	if(lng != NULL)
+	{
+		r->content_languages = apr_array_make(r->pool, 1, sizeof(const char *));
+
+		*(const char **)apr_array_push(r->content_languages) = lng;
+	}
+
+	// Disable kernel caching for this response
+	// Probably we don't have to do it for ModSecurity
+
+    //pHttpContext->GetResponse()->DisableKernelCache(
+    //        IISCacheEvents::HTTPSYS_CACHEABLE::HANDLER_HTTPSYS_UNFRIENDLY);
+
+    for(c = 0; c < pRawHttpResponse->EntityChunkCount; c++ )
     {
-        return RQ_NOTIFICATION_FINISH_REQUEST;
+        pSourceDataChunk = &pRawHttpResponse->pEntityChunks[ c ];
+
+        switch( pSourceDataChunk->DataChunkType )
+        {
+            case HttpDataChunkFromMemory:
+                ulTotalLength += pSourceDataChunk->FromMemory.BufferLength;
+                break;
+            case HttpDataChunkFromFileHandle:
+                pFileByteRange = &pSourceDataChunk->FromFileHandle.ByteRange;
+                //
+                // File chunks may contain by ranges with unspecified length 
+                // (HTTP_BYTE_RANGE_TO_EOF).  In order to send parts of such a chunk, 
+                // its necessary to know when the chunk is finished, and
+                // we need to move to the next chunk.
+                //              
+                if ( pFileByteRange->Length.QuadPart == HTTP_BYTE_RANGE_TO_EOF)
+                {
+                    if ( GetFileType( pSourceDataChunk->FromFileHandle.FileHandle ) == 
+                                    FILE_TYPE_DISK )
+                    {
+                        if ( !GetFileSizeEx( pSourceDataChunk->FromFileHandle.FileHandle,
+                                             &lFileSize ) )
+                        {
+                            DWORD dwError = GetLastError();
+                            hr = HRESULT_FROM_WIN32(dwError);
+                            goto Finished;
+                        }
+
+                        // put the resolved file length in the chunk, replacing 
+                        // HTTP_BYTE_RANGE_TO_EOF
+                        pFileByteRange->Length.QuadPart = 
+                              lFileSize.QuadPart - pFileByteRange->StartingOffset.QuadPart;
+                    }
+                    else
+                    {
+                        hr = HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+                        goto Finished;                        
+                    }
+                }  
+
+                ulTotalLength += pFileByteRange->Length.QuadPart;
+                break;
+            default:
+                // TBD: consider implementing HttpDataChunkFromFragmentCache, 
+                // and HttpDataChunkFromFragmentCacheEx
+                hr = HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+                goto Finished;                        
+        }
     }
 
-    CriticalSectionLock lock{cs};
-    MODSECURITY_STORED_CONTEXT* config = nullptr;
-    HRESULT hr = MODSECURITY_STORED_CONTEXT::GetConfig(httpContext, &config);
-    if (FAILED(hr))
+	rsc->m_pResponseBuffer = (char *)apr_palloc(rsc->m_pRequestRec->pool, ulTotalLength);
+
+	ulTotalLength = 0;
+
+    for(c = 0; c < pRawHttpResponse->EntityChunkCount; c++ )
     {
-        httpContext->GetResponse()->SetStatus(500, "WAF internal error. Unable to get config.");
-        httpContext->SetRequestHandled();
-        return RQ_NOTIFICATION_FINISH_REQUEST;
+        pSourceDataChunk = &pRawHttpResponse->pEntityChunks[ c ];
+
+        switch( pSourceDataChunk->DataChunkType )
+        {
+            case HttpDataChunkFromMemory:
+				memcpy(rsc->m_pResponseBuffer + ulTotalLength, pSourceDataChunk->FromMemory.pBuffer, pSourceDataChunk->FromMemory.BufferLength);
+                ulTotalLength += pSourceDataChunk->FromMemory.BufferLength;
+                break;
+            case HttpDataChunkFromFileHandle:
+                pFileByteRange = &pSourceDataChunk->FromFileHandle.ByteRange;
+
+				if(ReadFileChunk(pSourceDataChunk, rsc->m_pResponseBuffer + ulTotalLength) != S_OK)
+				{
+			        DWORD dwErr = GetLastError();
+
+					hr = HRESULT_FROM_WIN32(dwErr);
+	                goto Finished;
+				}
+
+                ulTotalLength += pFileByteRange->Length.QuadPart;
+                break;
+            default:
+                // TBD: consider implementing HttpDataChunkFromFragmentCache, 
+                // and HttpDataChunkFromFragmentCacheEx
+                hr = HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+                goto Finished;                        
+        }
     }
 
-    // If module is disabled, don't go any further
+	rsc->m_pResponseLength = ulTotalLength;
+
+	//
+    // If there's no content-length set, we need to set it to avoid chunked transfer mode
+    // We can only do it if there is it's the only response to be sent.
     //
-    if (!config->GetIsEnabled())
+
+    DWORD dwFlags = pResponseProvider->GetFlags();
+
+	if (pResponseProvider->GetHeadersBeingSent() && 
+         (dwFlags & HTTP_SEND_RESPONSE_FLAG_MORE_DATA) == 0 &&
+         pHttpContext->GetResponse()->GetHeader(HttpHeaderContentLength) == NULL)    
     {
-        return RQ_NOTIFICATION_CONTINUE;
+        CHAR szLength[21]; //Max length for a 64 bit int is 20
+
+         ZeroMemory(szLength, sizeof(szLength));
+
+         hr = StringCchPrintfA(
+                    szLength, 
+                    sizeof(szLength) / sizeof(CHAR) - 1, "%d", 
+                    ulTotalLength);
+
+        if(FAILED(hr))
+        {
+            goto Finished;      
+        }
+
+         hr = pHttpContext->GetResponse()->SetHeader(
+                    HttpHeaderContentLength, 
+                    szLength, 
+                    (USHORT)strlen(szLength),
+                    TRUE);
+
+        if(FAILED(hr))
+        {
+            goto Finished;      
+        }
     }
 
-    auto reportConfigurationError = [config, httpContext] {
-        config->configLoadingFailed = true;
-        httpContext->GetResponse()->SetStatus(500, "WAF internal error. Invalid configuration.");
-        httpContext->SetRequestHandled();
+Finished:
+
+	int status = modsecProcessResponse(rsc->m_pRequestRec);
+
+	// the logic here is temporary, needs clarification
+	//
+	if(status != 0 && status != -1)
+	{
+		pHttpContext->GetResponse()->Clear();
+		pHttpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
+		pHttpContext->SetRequestHandled();
+
+		rsc->FinishRequest();
+
+		LeaveCriticalSection(&m_csLock);
+		
+		return RQ_NOTIFICATION_FINISH_REQUEST;
+	}
+Exit:
+	// temporary hack, in reality OnSendRequest theoretically could possibly come before OnEndRequest
+	//
+	if(rsc != NULL)
+		rsc->FinishRequest();
+
+	LeaveCriticalSection(&m_csLock);
+		
+	return RQ_NOTIFICATION_CONTINUE;
+}
+
+REQUEST_NOTIFICATION_STATUS
+CMyHttpModule::OnPostEndRequest(
+    IN IHttpContext * pHttpContext,
+    IN IHttpEventProvider * pProvider
+)
+{
+	REQUEST_STORED_CONTEXT *rsc = NULL;
+
+	rsc = (REQUEST_STORED_CONTEXT *)pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext);
+
+	// only finish request if OnSendResponse have been called already
+	//
+	if(rsc != NULL && rsc->m_pResponseBuffer != NULL)
+	{
+		EnterCriticalSection(&m_csLock);
+
+		rsc->FinishRequest();
+
+		LeaveCriticalSection(&m_csLock);
+	}
+
+	return RQ_NOTIFICATION_CONTINUE;
+}
+
+REQUEST_NOTIFICATION_STATUS
+CMyHttpModule::OnBeginRequest(
+    IN IHttpContext * pHttpContext,
+    IN IHttpEventProvider * pProvider
+)
+{
+    HRESULT                         hr                  = S_OK;
+    IHttpRequest*                   pRequest            = NULL;
+	MODSECURITY_STORED_CONTEXT*		pConfig = NULL;
+    
+    UNREFERENCED_PARAMETER ( pProvider );
+
+	EnterCriticalSection(&m_csLock);
+
+    if ( pHttpContext == NULL ) 
+    {
+        hr = E_UNEXPECTED;
+        goto Finished;
+    }
+
+    pRequest = pHttpContext->GetRequest();
+
+    if ( pRequest == NULL )
+    {
+        hr = E_UNEXPECTED;
+        goto Finished;
+    }
+
+    hr = MODSECURITY_STORED_CONTEXT::GetConfig(pHttpContext, &pConfig );
+    
+    if ( FAILED( hr ) )
+    {
+        pHttpContext->GetResponse()->SetStatus(500, "WAF internal error. Unable to get config.");
+        pHttpContext->SetRequestHandled();
+        return RQ_NOTIFICATION_FINISH_REQUEST;
+    }
+
+	// If module is disabled, dont go any further
+	//
+	if( pConfig->GetIsEnabled() == false )
+	{
+        goto Finished;
+	}
+
+    auto reportConfigurationError = [pConfig, pHttpContext] {
+        pConfig->configLoadingFailed = true;
+        pHttpContext->GetResponse()->SetStatus(500, "WAF internal error. Invalid configuration.");
+        pHttpContext->SetRequestHandled();
         return RQ_NOTIFICATION_FINISH_REQUEST;
     };
 
     // If we previously failed to load the config, don't spam the event log by trying and failing again
-    if (config->configLoadingFailed)
+    if (pConfig->configLoadingFailed)
     {
         return reportConfigurationError();
     }
 
-    if (config->config == nullptr)
-    {
-        char *path;
-        USHORT pathlen;
+	if(pConfig->m_Config == NULL)
+	{
+		char *path;
+		USHORT pathlen;
 
-        hr = config->GlobalWideCharToMultiByte(config->GetPath(), wcslen(config->GetPath()), &path, &pathlen);
-        if (FAILED(hr))
-        {
+		hr = pConfig->GlobalWideCharToMultiByte(pConfig->GetPath(), wcslen(pConfig->GetPath()), &path, &pathlen);
+
+		if ( FAILED( hr ) )
+		{
             return reportConfigurationError();
-        }
+		}
 
-        config->config = modsecGetDefaultConfig();
+		pConfig->m_Config = modsecGetDefaultConfig();
 
-        PCWSTR servpath = httpContext->GetApplication()->GetApplicationPhysicalPath();
-        char *apppath;
-        USHORT apppathlen;
+		PCWSTR servpath = pHttpContext->GetApplication()->GetApplicationPhysicalPath();
+		char *apppath;
+		USHORT apppathlen;
 
-        hr = config->GlobalWideCharToMultiByte((WCHAR *)servpath, wcslen(servpath), &apppath, &apppathlen);
-        if (FAILED(hr))
-        {
-            delete path;
+		hr = pConfig->GlobalWideCharToMultiByte((WCHAR *)servpath, wcslen(servpath), &apppath, &apppathlen);
+
+		if ( FAILED( hr ) )
+		{
+			delete path;
             return reportConfigurationError();
-        }
+		}
 
-        if (path[0] != 0)
-        {
-            const char * err = modsecProcessConfig(config->config, path, apppath);
+		if(path[0] != 0)
+		{
+			const char * err = modsecProcessConfig((directory_config *)pConfig->m_Config, path, apppath);
 
-            if (err != NULL)
-            {
-                WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
-                delete apppath;
-                delete path;
+			if(err != NULL)
+			{
+				WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
+				delete apppath;
+				delete path;
                 return reportConfigurationError();
-            }
+			}
 
-            modsecReportRemoteLoadedRules();
-            if (!statusCallAlreadySent)
-            {
-                statusCallAlreadySent = true;
-                modsecStatusEngineCall();
-            }
-        }
+			modsecReportRemoteLoadedRules();
+			if (this->status_call_already_sent == false)
+			{
+				this->status_call_already_sent = true;
+				modsecStatusEngineCall();
+			}
+		}
 
-        delete apppath;
-        delete path;
-    }
+		delete apppath;
+		delete path;
+	}
 
-    AprRequestContext aprContext{config->config};
-    conn_rec* c = aprContext.GetConnection();
-    request_rec* r = aprContext.GetRequest();
+	conn_rec *c;
+	request_rec *r;
 
-    HTTP_REQUEST *req = httpContext->GetRequest()->GetRawHttpRequest();
+	c = modsecNewConnection();
+	modsecProcessConnection(c);
 
-    r->hostname = ConvertUTF16ToUTF8(req->CookedUrl.pHost, req->CookedUrl.HostLength / sizeof(WCHAR), r->pool);
-    r->path_info = ConvertUTF16ToUTF8(req->CookedUrl.pAbsPath, req->CookedUrl.AbsPathLength / sizeof(WCHAR), r->pool);
+	r = modsecNewRequest(c, (directory_config *)pConfig->m_Config);
 
-    if(r->hostname == NULL)
-    {
-        if(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue != NULL)
-            r->hostname = ZeroTerminate(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue,
-                                        req->Headers.KnownHeaders[HttpHeaderHost].RawValueLength, r->pool);
-    }
+	// on IIS we force input stream inspection flag, because its absence does not add any performance gain
+	// it's because on IIS request body must be restored each time it was read
+	//
+	modsecSetConfigForIISRequestBody(r);
 
-    int port = 0;
-    char *port_str = NULL;
+	REQUEST_STORED_CONTEXT *rsc = new REQUEST_STORED_CONTEXT();
 
-    if(r->hostname != NULL)
-    {
-        int k = 0;
-        char *ptr = (char *)r->hostname;
+	rsc->m_pConnRec = c;
+	rsc->m_pRequestRec = r;
+	rsc->m_pHttpContext = pHttpContext;
+	rsc->m_pProvider = pProvider;
 
-        while(*ptr != 0 && *ptr != ':')
-            ptr++;
+	pHttpContext->GetModuleContextContainer()->SetModuleContext(rsc, g_pModuleContext);
 
-        if(*ptr == ':')
-        {
-            *ptr = 0;
-            port_str = ptr + 1;
-            port = atoi(port_str);
-        }
-    }
+	StoreIISContext(r, rsc);
 
-    if(req->CookedUrl.pQueryString != NULL && req->CookedUrl.QueryStringLength > 0)
-        r->args = ConvertUTF16ToUTF8(req->CookedUrl.pQueryString + 1, (req->CookedUrl.QueryStringLength / sizeof(WCHAR)) - 1, r->pool);
+	HTTP_REQUEST *req = pRequest->GetRawHttpRequest();
+
+	r->hostname = ConvertUTF16ToUTF8(req->CookedUrl.pHost, req->CookedUrl.HostLength / sizeof(WCHAR), r->pool);
+	r->path_info = ConvertUTF16ToUTF8(req->CookedUrl.pAbsPath, req->CookedUrl.AbsPathLength / sizeof(WCHAR), r->pool);
+
+	if(r->hostname == NULL)
+	{
+		if(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue != NULL)
+			r->hostname = ZeroTerminate(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue,
+										req->Headers.KnownHeaders[HttpHeaderHost].RawValueLength, r->pool);
+	}
+
+	int port = 0;
+	char *port_str = NULL;
+
+	if(r->hostname != NULL)
+	{
+		int k = 0;
+		char *ptr = (char *)r->hostname;
+
+		while(*ptr != 0 && *ptr != ':')
+			ptr++;
+
+		if(*ptr == ':')
+		{
+			*ptr = 0;
+			port_str = ptr + 1;
+			port = atoi(port_str);
+		}
+	}
+
+	if(req->CookedUrl.pQueryString != NULL && req->CookedUrl.QueryStringLength > 0)
+		r->args = ConvertUTF16ToUTF8(req->CookedUrl.pQueryString + 1, (req->CookedUrl.QueryStringLength / sizeof(WCHAR)) - 1, r->pool);
 
 #define _TRANSHEADER(id,str) if(req->Headers.KnownHeaders[id].pRawValue != NULL) \
-    {\
-        apr_table_setn(r->headers_in, str, \
-            ZeroTerminate(req->Headers.KnownHeaders[id].pRawValue, req->Headers.KnownHeaders[id].RawValueLength, r->pool)); \
-    }
+	{\
+		apr_table_setn(r->headers_in, str, \
+			ZeroTerminate(req->Headers.KnownHeaders[id].pRawValue, req->Headers.KnownHeaders[id].RawValueLength, r->pool)); \
+	}
 
     _TRANSHEADER(HttpHeaderCacheControl, "Cache-Control");
     _TRANSHEADER(HttpHeaderConnection, "Connection");
@@ -521,188 +926,410 @@ CMyHttpModule::OnBeginRequest(IHttpContext* httpContext, IHttpEventProvider* pro
 
 #undef _TRANSHEADER
 
-    for(int i = 0; i < req->Headers.UnknownHeaderCount; i++)
-    {
-        apr_table_setn(r->headers_in, 
-            ZeroTerminate(req->Headers.pUnknownHeaders[i].pName, req->Headers.pUnknownHeaders[i].NameLength, r->pool), 
-            ZeroTerminate(req->Headers.pUnknownHeaders[i].pRawValue, req->Headers.pUnknownHeaders[i].RawValueLength, r->pool));
-    }
+	for(int i = 0; i < req->Headers.UnknownHeaderCount; i++)
+	{
+		apr_table_setn(r->headers_in, 
+			ZeroTerminate(req->Headers.pUnknownHeaders[i].pName, req->Headers.pUnknownHeaders[i].NameLength, r->pool), 
+			ZeroTerminate(req->Headers.pUnknownHeaders[i].pRawValue, req->Headers.pUnknownHeaders[i].RawValueLength, r->pool));
+	}
 
-    r->content_encoding = apr_table_get(r->headers_in, "Content-Encoding");
-    r->content_type = apr_table_get(r->headers_in, "Content-Type");
+	r->content_encoding = apr_table_get(r->headers_in, "Content-Encoding");
+	r->content_type = apr_table_get(r->headers_in, "Content-Type");
 
-    const char *lng = apr_table_get(r->headers_in, "Content-Languages");
+	const char *lng = apr_table_get(r->headers_in, "Content-Languages");
 
-    if(lng != NULL)
-    {
-        r->content_languages = apr_array_make(r->pool, 1, sizeof(const char *));
+	if(lng != NULL)
+	{
+		r->content_languages = apr_array_make(r->pool, 1, sizeof(const char *));
 
-        *(const char **)apr_array_push(r->content_languages) = lng;
-    }
+		*(const char **)apr_array_push(r->content_languages) = lng;
+	}
 
-    switch(req->Verb)
-    {
-    case HttpVerbUnparsed:
-    case HttpVerbUnknown:
-    case HttpVerbInvalid:
+	switch(req->Verb)
+	{
+	case HttpVerbUnparsed:
+	case HttpVerbUnknown:
+	case HttpVerbInvalid:
     case HttpVerbTRACK:  // used by Microsoft Cluster Server for a non-logged trace
     case HttpVerbSEARCH:
-    default:
-        r->method = "INVALID";
-        r->method_number = M_INVALID;
-        break;
-    case HttpVerbOPTIONS:
-        r->method = "OPTIONS";
-        r->method_number = M_OPTIONS;
-        break;
-    case HttpVerbGET:
-    case HttpVerbHEAD:
-        r->method = "GET";
-        r->method_number = M_GET;
-        break;
-    case HttpVerbPOST:
-        r->method = "POST";
-        r->method_number = M_POST;
-        break;
+	default:
+		r->method = "INVALID";
+		r->method_number = M_INVALID;
+		break;
+	case HttpVerbOPTIONS:
+		r->method = "OPTIONS";
+		r->method_number = M_OPTIONS;
+		break;
+	case HttpVerbGET:
+	case HttpVerbHEAD:
+		r->method = "GET";
+		r->method_number = M_GET;
+		break;
+	case HttpVerbPOST:
+		r->method = "POST";
+		r->method_number = M_POST;
+		break;
     case HttpVerbPUT:
-        r->method = "PUT";
-        r->method_number = M_PUT;
-        break;
+		r->method = "PUT";
+		r->method_number = M_PUT;
+		break;
     case HttpVerbDELETE:
-        r->method = "DELETE";
-        r->method_number = M_DELETE;
-        break;
+		r->method = "DELETE";
+		r->method_number = M_DELETE;
+		break;
     case HttpVerbTRACE:
-        r->method = "TRACE";
-        r->method_number = M_TRACE;
-        break;
+		r->method = "TRACE";
+		r->method_number = M_TRACE;
+		break;
     case HttpVerbCONNECT:
-        r->method = "CONNECT";
-        r->method_number = M_CONNECT;
-        break;
+		r->method = "CONNECT";
+		r->method_number = M_CONNECT;
+		break;
     case HttpVerbMOVE:
-        r->method = "MOVE";
-        r->method_number = M_MOVE;
-        break;
+		r->method = "MOVE";
+		r->method_number = M_MOVE;
+		break;
     case HttpVerbCOPY:
-        r->method = "COPY";
-        r->method_number = M_COPY;
-        break;
+		r->method = "COPY";
+		r->method_number = M_COPY;
+		break;
     case HttpVerbPROPFIND:
-        r->method = "PROPFIND";
-        r->method_number = M_PROPFIND;
-        break;
+		r->method = "PROPFIND";
+		r->method_number = M_PROPFIND;
+		break;
     case HttpVerbPROPPATCH:
-        r->method = "PROPPATCH";
-        r->method_number = M_PROPPATCH;
-        break;
+		r->method = "PROPPATCH";
+		r->method_number = M_PROPPATCH;
+		break;
     case HttpVerbMKCOL:
-        r->method = "MKCOL";
-        r->method_number = M_MKCOL;
-        break;
+		r->method = "MKCOL";
+		r->method_number = M_MKCOL;
+		break;
     case HttpVerbLOCK:
-        r->method = "LOCK";
-        r->method_number = M_LOCK;
-        break;
+		r->method = "LOCK";
+		r->method_number = M_LOCK;
+		break;
     case HttpVerbUNLOCK:
-        r->method = "UNLOCK";
-        r->method_number = M_UNLOCK;
-        break;
-    }
+		r->method = "UNLOCK";
+		r->method_number = M_UNLOCK;
+		break;
+	}
 
-    if(HTTP_EQUAL_VERSION(req->Version, 0, 9))
-        r->protocol = "HTTP/0.9";
-    else if(HTTP_EQUAL_VERSION(req->Version, 1, 0))
-        r->protocol = "HTTP/1.0";
-    else
-        r->protocol = "HTTP/1.1";
+	if(HTTP_EQUAL_VERSION(req->Version, 0, 9))
+		r->protocol = "HTTP/0.9";
+	else if(HTTP_EQUAL_VERSION(req->Version, 1, 0))
+		r->protocol = "HTTP/1.0";
+	else
+		r->protocol = "HTTP/1.1";
 
-    r->request_time = apr_time_now();
+	r->request_time = apr_time_now();
 
-    r->parsed_uri.scheme = "http";
-    r->parsed_uri.path = r->path_info;
-    r->parsed_uri.hostname = (char *)r->hostname;
-    r->parsed_uri.is_initialized = 1;
-    r->parsed_uri.port = port;
-    r->parsed_uri.port_str = port_str;
-    r->parsed_uri.query = r->args;
-    r->parsed_uri.dns_looked_up = 0;
-    r->parsed_uri.dns_resolved = 0;
-    r->parsed_uri.password = NULL;
-    r->parsed_uri.user = NULL;
-    r->parsed_uri.fragment = NULL;
+	r->parsed_uri.scheme = "http";
+	r->parsed_uri.path = r->path_info;
+	r->parsed_uri.hostname = (char *)r->hostname;
+	r->parsed_uri.is_initialized = 1;
+	r->parsed_uri.port = port;
+	r->parsed_uri.port_str = port_str;
+	r->parsed_uri.query = r->args;
+	r->parsed_uri.dns_looked_up = 0;
+	r->parsed_uri.dns_resolved = 0;
+	r->parsed_uri.password = NULL;
+	r->parsed_uri.user = NULL;
+	r->parsed_uri.fragment = NULL;
 
-    r->unparsed_uri = ZeroTerminate(req->pRawUrl, req->RawUrlLength, r->pool);
-    r->uri = r->unparsed_uri;
+	r->unparsed_uri = ZeroTerminate(req->pRawUrl, req->RawUrlLength, r->pool);
+	r->uri = r->unparsed_uri;
 
-    r->the_request = (char *)apr_palloc(r->pool, strlen(r->method) + 1 + req->RawUrlLength + 1 + strlen(r->protocol) + 1);
+	r->the_request = (char *)apr_palloc(r->pool, strlen(r->method) + 1 + req->RawUrlLength + 1 + strlen(r->protocol) + 1);
 
-    strcpy(r->the_request, r->method);
-    strcat(r->the_request, " ");
-    strcat(r->the_request, r->uri);
-    strcat(r->the_request, " ");
-    strcat(r->the_request, r->protocol);
+	strcpy(r->the_request, r->method);
+	strcat(r->the_request, " ");
+	strcat(r->the_request, r->uri);
+	strcat(r->the_request, " ");
+	strcat(r->the_request, r->protocol);
 
-    HTTP_REQUEST_ID httpRequestID;
-    char *pszValue = (char *)apr_palloc(r->pool, 24);
+	HTTP_REQUEST_ID httpRequestID;
+	char *pszValue = (char *)apr_palloc(r->pool, 24);
 
-    httpRequestID = httpContext->GetRequest()->GetRawHttpRequest()->RequestId;
+	httpRequestID = pRequest->GetRawHttpRequest()->RequestId;
 
-    _ui64toa(httpRequestID, pszValue, 10);
+	_ui64toa(httpRequestID, pszValue, 10);
 
-    apr_table_setn(r->subprocess_env, "UNIQUE_ID", pszValue);
+	apr_table_setn(r->subprocess_env, "UNIQUE_ID", pszValue);
 
-    PSOCKADDR pAddr = httpContext->GetRequest()->GetRemoteAddress();
+	PSOCKADDR pAddr = pRequest->GetRemoteAddress();
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     c->remote_addr = CopySockAddr(r->pool, pAddr);
     c->remote_ip = GetIpAddr(r->pool, pAddr);
 #else
     c->client_addr = CopySockAddr(r->pool, pAddr);
-    c->client_ip = GetIpAddr(r->pool, pAddr);
+	c->client_ip = GetIpAddr(r->pool, pAddr);
 #endif
-    c->remote_host = NULL;
+	c->remote_host = NULL;
 
-    if (config->config->reqbody_access) {
-        hr = SaveRequestBodyToRequestRec(httpContext, aprContext);
-        if (FAILED(hr)) {
-            provider->SetErrorStatus(hr);
-            return RQ_NOTIFICATION_FINISH_REQUEST;
-        }
-    }
+    LeaveCriticalSection(&m_csLock);
+	int status = modsecProcessRequest(r);
+    EnterCriticalSection(&m_csLock);
 
-    lock.unlock();
-    int status = modsecProcessRequest(r);
-    lock.lock();
+	if(status != DECLINED)
+	{
+		pHttpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
+		pHttpContext->SetRequestHandled();
 
-    if (status != DECLINED)
+		hr = E_FAIL;
+		goto Finished;
+	}
+
+Finished:
+	LeaveCriticalSection(&m_csLock);
+
+    if ( FAILED( hr )  )
     {
-        httpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
-        httpContext->SetRequestHandled();
-
         return RQ_NOTIFICATION_FINISH_REQUEST;
     }
-
-    return RQ_NOTIFICATION_CONTINUE;
+	return RQ_NOTIFICATION_CONTINUE;
 }
+
+
+apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
+{
+    REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
+
+    *readcnt = 0;
+
+    if (rsc == NULL)
+    {
+        *is_eos = 1;
+        return APR_SUCCESS;
+    }
+
+    IHttpContext *pHttpContext = rsc->m_pHttpContext;
+    IHttpRequest *pRequest = pHttpContext->GetRequest();
+
+    if (pRequest->GetRemainingEntityBytes() == 0)
+    {
+        *is_eos = 1;
+        return APR_SUCCESS;
+    }
+
+    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, (DWORD *)readcnt, NULL);
+
+    if (FAILED(hr))
+    {
+        // End of data is okay.
+        if (ERROR_HANDLE_EOF != (hr & 0x0000FFFF))
+        {
+            // Set the error status.
+            rsc->m_pProvider->SetErrorStatus(hr);
+        }
+
+        *is_eos = 1;
+    }
+
+    return APR_SUCCESS;
+}
+
+apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
+{
+	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
+
+	if(rsc == NULL || rsc->m_pRequestRec == NULL)
+		return APR_SUCCESS;
+
+	IHttpContext *pHttpContext = rsc->m_pHttpContext;
+	IHttpRequest *pHttpRequest = pHttpContext->GetRequest();
+
+    CHAR szLength[21]; //Max length for a 64 bit int is 20
+
+    ZeroMemory(szLength, sizeof(szLength));
+
+    HRESULT hr = StringCchPrintfA(
+            szLength, 
+            sizeof(szLength) / sizeof(CHAR) - 1, "%d", 
+            length);
+
+    if(FAILED(hr))
+    {
+		// not possible
+    }
+
+	// Remove/Modify Transfer-Encoding header if "chunked" Encoding is set in the request. 
+	// This is to avoid sending both Content-Length and Chunked Transfer-Encoding in the request header.
+
+	USHORT ctcch = 0;
+	char *ct = (char *)pHttpRequest->GetHeader(HttpHeaderTransferEncoding, &ctcch);
+	if (ct)
+	{
+		char *ctz = ZeroTerminate(ct, ctcch, r->pool);
+		if (ctcch != 0)
+		{
+			if (0 == stricmp(ctz, "chunked"))
+			{
+				pHttpRequest->DeleteHeader(HttpHeaderTransferEncoding);
+			}
+		}
+	}
+	
+    hr = pHttpRequest->SetHeader(
+            HttpHeaderContentLength, 
+            szLength, 
+            (USHORT)strlen(szLength),
+            TRUE);
+
+    if(FAILED(hr))
+    {
+		// possible, but there's nothing we can do
+    }
+
+	// since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
+	//
+	void *reqbuf = pHttpContext->AllocateRequestMemory(length);
+
+	memcpy(reqbuf, buf, length);
+
+	pHttpRequest->InsertEntityBody(reqbuf, length);
+
+	return APR_SUCCESS;
+}
+
+apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
+{
+	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
+
+	*readcnt = 0;
+
+	if(rsc == NULL || rsc->m_pResponseBuffer == NULL)
+	{
+		*is_eos = 1;
+		return APR_SUCCESS;
+	}
+
+	unsigned int size = length;
+
+	if(size > rsc->m_pResponseLength - rsc->m_pResponsePosition)
+		size = rsc->m_pResponseLength - rsc->m_pResponsePosition;
+
+	memcpy(buf, rsc->m_pResponseBuffer + rsc->m_pResponsePosition, size);
+
+	*readcnt = size;
+	rsc->m_pResponsePosition += size;
+
+	if(rsc->m_pResponsePosition >= rsc->m_pResponseLength)
+		*is_eos = 1;
+
+	return APR_SUCCESS;
+}
+
+apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int length)
+{
+	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
+
+	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer == NULL)
+		return APR_SUCCESS;
+
+	IHttpContext *pHttpContext = rsc->m_pHttpContext;
+	IHttpResponse *pHttpResponse = pHttpContext->GetResponse();
+	HTTP_RESPONSE *pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
+	HTTP_DATA_CHUNK *pDataChunk = (HTTP_DATA_CHUNK *)apr_palloc(rsc->m_pRequestRec->pool, sizeof(HTTP_DATA_CHUNK));
+
+	pRawHttpResponse->EntityChunkCount = 0;
+
+	// since we clean the APR pool at the end of OnSendRequest, we must get IIS-managed memory chunk
+	//
+	void *reqbuf = pHttpContext->AllocateRequestMemory(length);
+
+	memcpy(reqbuf, buf, length);
+
+	pDataChunk->DataChunkType = HttpDataChunkFromMemory;
+	pDataChunk->FromMemory.pBuffer = reqbuf;
+	pDataChunk->FromMemory.BufferLength = length;
+
+    CHAR szLength[21]; //Max length for a 64 bit int is 20
+
+    ZeroMemory(szLength, sizeof(szLength));
+
+    HRESULT hr = StringCchPrintfA(
+            szLength, 
+            sizeof(szLength) / sizeof(CHAR) - 1, "%d", 
+            length);
+
+    if(FAILED(hr))
+    {
+		// not possible
+    }
+
+    hr = pHttpResponse->SetHeader(
+            HttpHeaderContentLength, 
+            szLength, 
+            (USHORT)strlen(szLength),
+            TRUE);
+
+    if(FAILED(hr))
+    {
+		// possible, but there's nothing we can do
+    }
+
+	pHttpResponse->WriteEntityChunkByReference(pDataChunk);
+
+	return APR_SUCCESS;
+}
+
 
 CMyHttpModule::CMyHttpModule()
 {
-    modsecSetLogHook(this, Log);
+    // Open a handle to the Event Viewer.
+    m_hEventLog = RegisterEventSource( NULL, "ModSecurity" );
 
-    server_rec* s = modsecInit();
-    DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
-    char* compname = static_cast<char *>(malloc(size));
-    if (compname == nullptr)
+    SYSTEM_INFO         sysInfo;
+
+    GetSystemInfo(&sysInfo);
+    m_dwPageSize = sysInfo.dwPageSize;
+
+    this->status_call_already_sent = false;
+
+	InitializeCriticalSection(&m_csLock);
+
+	modsecSetLogHook(this, Log);
+
+	modsecSetReadBody(ReadBodyCallback);
+	modsecSetReadResponse(ReadResponseCallback);
+	modsecSetWriteBody(WriteBodyCallback);
+	modsecSetWriteResponse(WriteResponseCallback);
+
+	server_rec *s = modsecInit();
+	char *compname = (char *)malloc(128);
+	DWORD size = 128;
+
+	GetComputerName(compname, &size);
+
+	s->server_hostname = compname;
+
+	modsecStartConfig();
+
+	modsecFinalizeConfig();
+
+	modsecInitProcess();
+}
+
+CMyHttpModule::~CMyHttpModule()
+{
+	// ModSecurity registers APR pool cleanups, which interfere with APR pool tear down process
+	// this causes crashes and since we are exiting the process here, so this is a temporary solution
+	//
+	//modsecTerminate();
+
+	//WriteEventViewerLog("Module deleted.");
+
+	// Test whether the handle for the Event Viewer is open.
+    if (NULL != m_hEventLog)
     {
-        throw std::bad_alloc();
-    }
-    GetComputerName(compname, &size);
-    s->server_hostname = compname;
+        // Close the handle to the Event Viewer.
+        DeregisterEventSource( m_hEventLog );
+        m_hEventLog = NULL;
 
-    modsecStartConfig();
-    modsecFinalizeConfig();
-    modsecInitProcess();
+		DeleteCriticalSection(&m_csLock);
+    }
 }
 
 void CMyHttpModule::Dispose()
@@ -711,5 +1338,14 @@ void CMyHttpModule::Dispose()
 
 BOOL CMyHttpModule::WriteEventViewerLog(LPCSTR szNotification, WORD category)
 {
-    return logger.Log(szNotification, category);
+    // Test whether the handle for the Event Viewer is open.
+    if (NULL != m_hEventLog)
+    {
+        // Write any strings to the Event Viewer and return.
+        return ReportEvent(
+            m_hEventLog,
+            category, 0, 0x1,
+            NULL, 1, 0, &szNotification, NULL );
+    }
+    return FALSE;
 }

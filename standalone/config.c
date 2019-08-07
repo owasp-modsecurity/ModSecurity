@@ -348,12 +348,12 @@ static int cfg_trim_line(char *buf)
 }
 
 AP_DECLARE(apr_status_t) ap_cfg_getline(char *buf, apr_size_t bufsize,
-        ap_configfile_t *cfp)
+		ap_configfile_t *cfp)
 {
-    apr_status_t rc = ap_cfg_getline_core(buf, bufsize, cfp);
-    if (rc == APR_SUCCESS)
-        cfg_trim_line(buf);
-    return rc;
+	apr_status_t rc = ap_cfg_getline_core(buf, bufsize, cfp);
+	if (rc == APR_SUCCESS)
+		cfg_trim_line(buf);
+	return rc;
 }
 #endif
 
@@ -765,7 +765,7 @@ int fnmatch_test(const char *pattern)
             if (*++pattern == '\0') {
                 return 0;
             }
-            break;*/        // this breaks on Windows
+            break;*/		// this breaks on Windows
 
         case '[':         /* '[' is only a glob if it has a matching ']' */
             ++nesting;
@@ -785,7 +785,7 @@ AP_DECLARE(const char *) process_resource_config(const char *fname,
                                                     apr_array_header_t *ari,
                                                     apr_pool_t *ptemp)
 {
-    *(char **)apr_array_push(ari) = (char *)fname;
+	*(char **)apr_array_push(ari) = (char *)fname;
 
     return NULL;
 }
@@ -794,7 +794,7 @@ static const char *process_resource_config_nofnmatch(const char *fname,
                                                      apr_array_header_t *ari,
                                                      apr_pool_t *p,
                                                      apr_pool_t *ptemp,
-                                                     unsigned depth,
+													 unsigned depth,
                                                      int optional)
 {
     const char *error;
@@ -882,10 +882,10 @@ static const char *process_resource_config_fnmatch(const char *path,
     /* find the first part of the filename */
     rest = ap_strchr_c(fname, '/');
 
-    if(rest == NULL)
-        rest = ap_strchr_c(fname, '\\');
+	if(rest == NULL)
+		rest = ap_strchr_c(fname, '\\');
 
-    if (rest) {
+	if (rest) {
         fname = apr_pstrndup(ptemp, fname, rest - fname);
         rest++;
     }
@@ -1007,198 +1007,198 @@ AP_DECLARE(const char *) process_fnmatch_configs(apr_array_header_t *ari,
 
 const char *populate_include_files(apr_pool_t *p, apr_pool_t *ptemp, apr_array_header_t *ari, const char *fname, int optional)
 {
-    return process_fnmatch_configs(ari, fname, p, ptemp, optional);
+	return process_fnmatch_configs(ari, fname, p, ptemp, optional);
 }
 
 const char *process_command_config(server_rec *s,
                                           void *mconfig,
                                           apr_pool_t *p,
                                           apr_pool_t *ptemp,
-                                          const char *filename)
+										  const char *filename)
 {
     const char *errmsg;
     char *l = apr_palloc (ptemp, MAX_STRING_LEN);
     const char *args = l;
     char *cmd_name, *w;
-    const command_rec *cmd;
-    apr_array_header_t *arr = apr_array_make(p, 1, sizeof(cmd_parms));
-    apr_array_header_t *ari = apr_array_make(p, 1, sizeof(char *));
+	const command_rec *cmd;
+	apr_array_header_t *arr = apr_array_make(p, 1, sizeof(cmd_parms));
+	apr_array_header_t *ari = apr_array_make(p, 1, sizeof(char *));
     cmd_parms *parms;
-    apr_status_t status;
-    ap_directive_t *newdir;
-    int optional;
-    char *err = NULL;
-    char *rootpath, *incpath;
-    int li;
+	apr_status_t status;
+	ap_directive_t *newdir;
+	int optional;
+	char *err = NULL;
+	char *rootpath, *incpath;
+	int li;
 
-    errmsg = populate_include_files(p, ptemp, ari, filename, 0);
+	errmsg = populate_include_files(p, ptemp, ari, filename, 0);
 
-    if(errmsg != NULL)
-        goto Exit;
+	if(errmsg != NULL)
+		goto Exit;
 
-    while(ari->nelts != 0 || arr->nelts != 0)
-    {
-        if(ari->nelts > 0)
-        {
-            char *fn = *(char **)apr_array_pop(ari);
+	while(ari->nelts != 0 || arr->nelts != 0)
+	{
+		if(ari->nelts > 0)
+		{
+			char *fn = *(char **)apr_array_pop(ari);
 
-            parms = (cmd_parms *)apr_array_push(arr);
-            *parms = default_parms;
-            parms->pool = p;
-            parms->temp_pool = ptemp;
-            parms->server = s;
-            parms->override = (RSRC_CONF | OR_ALL) & ~(OR_AUTHCFG | OR_LIMIT);
-            parms->override_opts = OPT_ALL | OPT_SYM_OWNER | OPT_MULTI;
+			parms = (cmd_parms *)apr_array_push(arr);
+			*parms = default_parms;
+			parms->pool = p;
+			parms->temp_pool = ptemp;
+			parms->server = s;
+			parms->override = (RSRC_CONF | OR_ALL) & ~(OR_AUTHCFG | OR_LIMIT);
+			parms->override_opts = OPT_ALL | OPT_SYM_OWNER | OPT_MULTI;
 
-            status = ap_pcfg_openfile(&parms->config_file, p, fn);
+			status = ap_pcfg_openfile(&parms->config_file, p, fn);
 
-            if(status != APR_SUCCESS)
-            {
-                apr_array_pop(arr);
-                errmsg = apr_pstrcat(p, "Cannot open config file: ", fn, NULL);
-                goto Exit;
-            }
-        }
+			if(status != APR_SUCCESS)
+			{
+				apr_array_pop(arr);
+				errmsg = apr_pstrcat(p, "Cannot open config file: ", fn, NULL);
+				goto Exit;
+			}
+		}
 
-        if (arr->nelts > 1024) {
+		if (arr->nelts > 1024) {
             errmsg = "Exceeded the maximum include directory nesting level. You have "
                                 "probably a recursion somewhere.";
-            goto Exit;
+			goto Exit;
         }
 
-        parms = (cmd_parms *)apr_array_pop(arr);
+		parms = (cmd_parms *)apr_array_pop(arr);
 
-        if(parms == NULL)
-            break;
+		if(parms == NULL)
+			break;
 
-        while (!(ap_cfg_getline(l, MAX_STRING_LEN, parms->config_file))) {
-            if (*l == '#' || *l == '\0')
-                continue;
+		while (!(ap_cfg_getline(l, MAX_STRING_LEN, parms->config_file))) {
+			if (*l == '#' || *l == '\0')
+				continue;
 
-            args = l;
+			args = l;
 
-            cmd_name = ap_getword_conf(p, &args);
+			cmd_name = ap_getword_conf(p, &args);
 
-            if (*cmd_name == '\0')
-                continue;
+			if (*cmd_name == '\0')
+				continue;
 
-            if (!strcasecmp(cmd_name, "IncludeOptional"))
-            {
-                optional = 1;
-                goto ProcessInclude;
-            }
+			if (!strcasecmp(cmd_name, "IncludeOptional"))
+			{
+				optional = 1;
+				goto ProcessInclude;
+			}
 
-            if (!strcasecmp(cmd_name, "Include"))
-            {
-                optional = 0;
+			if (!strcasecmp(cmd_name, "Include"))
+			{
+				optional = 0;
 ProcessInclude:
-                w = ap_getword_conf(parms->pool, &args);
+				w = ap_getword_conf(parms->pool, &args);
 
-                if (*w == '\0' || *args != 0)
-                {
-                    ap_cfg_closefile(parms->config_file);
-                    errmsg = apr_pstrcat(parms->pool, "Include takes one argument", NULL);
-                    goto Exit;
-                }
+				if (*w == '\0' || *args != 0)
+				{
+					ap_cfg_closefile(parms->config_file);
+					errmsg = apr_pstrcat(parms->pool, "Include takes one argument", NULL);
+					goto Exit;
+				}
 
-                incpath = w;
+				incpath = w;
 
-                /* locate the start of the directories proper */
-                status = apr_filepath_root((const char **)&rootpath, (const char **)&incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, ptemp);
+				/* locate the start of the directories proper */
+				status = apr_filepath_root((const char **)&rootpath, (const char **)&incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, ptemp);
 
-                /* we allow APR_SUCCESS and APR_EINCOMPLETE */
-                if (APR_ERELATIVE == status) {
-                    rootpath = apr_pstrdup(ptemp, parms->config_file->name);
-                    li = strlen(rootpath) - 1;
+				/* we allow APR_SUCCESS and APR_EINCOMPLETE */
+				if (APR_ERELATIVE == status) {
+					rootpath = apr_pstrdup(ptemp, parms->config_file->name);
+					li = strlen(rootpath) - 1;
 
-                    while(li >= 0 && rootpath[li] != '/' && rootpath[li] != '\\')
-                        rootpath[li--] = 0;
+					while(li >= 0 && rootpath[li] != '/' && rootpath[li] != '\\')
+						rootpath[li--] = 0;
 
-                    w = apr_pstrcat(p, rootpath, w, NULL);
-                }
-                else if (APR_EBADPATH == status) {
-                    ap_cfg_closefile(parms->config_file);
-                    errmsg = apr_pstrcat(p, "Include file has a bad path, ", w, NULL);
-                    goto Exit;
-                }
+					w = apr_pstrcat(p, rootpath, w, NULL);
+				}
+				else if (APR_EBADPATH == status) {
+					ap_cfg_closefile(parms->config_file);
+					errmsg = apr_pstrcat(p, "Include file has a bad path, ", w, NULL);
+					goto Exit;
+				}
 
-                errmsg = populate_include_files(p, ptemp, ari, w, optional);
+				errmsg = populate_include_files(p, ptemp, ari, w, optional);
 
-                *(cmd_parms *)apr_array_push(arr) = *parms;
+				*(cmd_parms *)apr_array_push(arr) = *parms;
 
-                if(errmsg != NULL)
-                    goto Exit;
+				if(errmsg != NULL)
+					goto Exit;
 
-                // we don't want to close the current file yet
-                //
-                parms = NULL;
-                break;
-            }
+				// we don't want to close the current file yet
+				//
+				parms = NULL;
+				break;
+			}
 
-            cmd = ap_find_command(cmd_name, security2_module.cmds);
+			cmd = ap_find_command(cmd_name, security2_module.cmds);
 
-            if(cmd == NULL)
-            {
-                // unknown command, should error
-                //
-                ap_cfg_closefile(parms->config_file);
-                errmsg = apr_pstrcat(p, "Unknown command in config: ", cmd_name, NULL);
-                goto Exit;
-            }
+			if(cmd == NULL)
+			{
+				// unknown command, should error
+				//
+				ap_cfg_closefile(parms->config_file);
+				errmsg = apr_pstrcat(p, "Unknown command in config: ", cmd_name, NULL);
+				goto Exit;
+			}
 
-            newdir = apr_pcalloc(p, sizeof(ap_directive_t));
-            newdir->filename = parms->config_file->name;
-            newdir->line_num = parms->config_file->line_number;
-            newdir->directive = cmd_name;
-            newdir->args = apr_pstrdup(p, args);
+			newdir = apr_pcalloc(p, sizeof(ap_directive_t));
+			newdir->filename = parms->config_file->name;
+			newdir->line_num = parms->config_file->line_number;
+			newdir->directive = cmd_name;
+			newdir->args = apr_pstrdup(p, args);
 
-            parms->directive = newdir;
+			parms->directive = newdir;
 
 #ifdef WIN32
-            // some config commands fail in APR when there are file
-            // permission issues or other OS-specific problems
-            //
-            __try
-            {
+			// some config commands fail in APR when there are file
+			// permission issues or other OS-specific problems
+			//
+			__try
+			{
 #endif
-                errmsg = invoke_cmd(cmd, parms, mconfig, args);
+				errmsg = invoke_cmd(cmd, parms, mconfig, args);
 #ifdef WIN32
-            }
-            __except(EXCEPTION_EXECUTE_HANDLER)
-            {
-                errmsg = "Command failed to execute (check file/folder permissions, syntax, etc.).";
-            }
+			}
+			__except(EXCEPTION_EXECUTE_HANDLER)
+			{
+				errmsg = "Command failed to execute (check file/folder permissions, syntax, etc.).";
+			}
 #endif
 
-            if(errmsg != NULL)
-                break;
-        }
+			if(errmsg != NULL)
+				break;
+		}
 
-        if(parms != NULL)
-            ap_cfg_closefile(parms->config_file);
+		if(parms != NULL)
+			ap_cfg_closefile(parms->config_file);
 
-        if(errmsg != NULL)
-            break;
-    }
+		if(errmsg != NULL)
+			break;
+	}
 
     if (errmsg) {
-        err = (char *)apr_palloc(p, 1024);
+		err = (char *)apr_palloc(p, 1024);
 
-        if(parms != NULL)
-            apr_snprintf(err, 1024, "Syntax error in config file %s, line %d: %s", parms->config_file->name,
-                            parms->config_file->line_number, errmsg);
-        else
-            apr_snprintf(err, 1024, "Syntax error in config file: %s", errmsg);
+		if(parms != NULL)
+			apr_snprintf(err, 1024, "Syntax error in config file %s, line %d: %s", parms->config_file->name,
+							parms->config_file->line_number, errmsg);
+		else
+			apr_snprintf(err, 1024, "Syntax error in config file: %s", errmsg);
     }
 
     errmsg = err;
 
 Exit:
-    while((parms = (cmd_parms *)apr_array_pop(arr)) != NULL)
-    {
-        ap_cfg_closefile(parms->config_file);
-    }
+	while((parms = (cmd_parms *)apr_array_pop(arr)) != NULL)
+	{
+		ap_cfg_closefile(parms->config_file);
+	}
 
-    return errmsg;
+	return errmsg;
 }
 

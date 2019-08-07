@@ -15,6 +15,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #undef inline
+#define inline inline
 
 //  IIS7 Server API header file
 #include "httpserv.h"
@@ -464,7 +465,8 @@ MODSECURITY_STORED_CONTEXT::~MODSECURITY_STORED_CONTEXT()
 
 MODSECURITY_STORED_CONTEXT::MODSECURITY_STORED_CONTEXT():
     m_bIsEnabled ( FALSE ),
-    m_pszPath( NULL )
+    m_pszPath( NULL ),
+	m_Config( NULL )
 {
 }
 
@@ -577,17 +579,17 @@ MODSECURITY_STORED_CONTEXT::GetConfig(
     HRESULT                          hr                 = S_OK;
     MODSECURITY_STORED_CONTEXT * pModuleConfig      = NULL;
     IHttpModuleContextContainer *    pMetadataContainer = NULL;
-    IAppHostConfigException *        pException         = NULL;
+	IAppHostConfigException *        pException         = NULL;
 
     pMetadataContainer = pContext->GetMetadata()->GetModuleContextContainer();
 
-    if ( pMetadataContainer == NULL )
-    {
+	if ( pMetadataContainer == NULL )
+	{
         hr = E_UNEXPECTED;
         return hr;
-    }
+	}
 
-    pModuleConfig = (MODSECURITY_STORED_CONTEXT *)pMetadataContainer->GetModuleContext( g_pModuleContext );    
+    pModuleConfig = (MODSECURITY_STORED_CONTEXT *)pMetadataContainer->GetModuleContext( g_pModuleContext );	
     if ( pModuleConfig != NULL )
     {
         //

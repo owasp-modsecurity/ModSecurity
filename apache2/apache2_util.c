@@ -200,7 +200,7 @@ char *get_env_var(request_rec *r, char *name) {
 static void get_field_value(const char* from, const char* to, const char* text, char* output) {
     char* first = strstr(text, from);
     int first_index = first - text;
-    char backslash[] = "\\";
+	char backslash[] = "\\";
 
     if (first != NULL ) {
         if ((first_index > 0 && strncmp((first-1), backslash, 2) != 0) || (first_index == 0)) {
@@ -330,16 +330,16 @@ static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1
     char waf_ruleset_type[50] = "";
     char waf_ruleset_version[50] = "";
     char waf_detail_message[1024] = "";
-    char waf_unique_id[100] = "";
+	char waf_unique_id[100] = "";
 
     get_field_value("[file ", "]", str1, waf_filename);
     get_field_value("[id ", "]", str1, waf_id);
     get_field_value("[line ", "]", str1, waf_line);
     get_field_value("[msg ", "]", str1, waf_message);
     get_field_value("[data ", "]", str1, waf_data);
-    get_field_value("[ver ", "]", str1, waf_ruleset_info);
-    get_field_value("[unique_id ", "]", unique_id, waf_unique_id);
-    get_ip_port(ip_port, waf_ip, waf_port);
+	get_field_value("[ver ", "]", str1, waf_ruleset_info);
+	get_field_value("[unique_id ", "]", unique_id, waf_unique_id);
+	get_ip_port(ip_port, waf_ip, waf_port);
     get_detail_message(str1, waf_detail_message); 
     get_short_filename(waf_filename);
     get_ruleset_type_version(waf_ruleset_info, waf_ruleset_type, waf_ruleset_version); 
@@ -436,8 +436,8 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
 
     /* Send message levels 1-3 to the Apache error log and 
      * add it to the message list in the audit log. */
-    char *unique_id = (char *)get_env_var(r, "UNIQUE_ID");
-    if (level <= 3) {
+	char *unique_id = (char *)get_env_var(r, "UNIQUE_ID");
+	if (level <= 3) {
         char *hostname = (char *)msr->hostname;
         char *requestheaderhostname = (char *)r->hostname;
 
@@ -467,7 +467,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
 
             if (rc != APR_SUCCESS) {
                 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-                    ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
+                	ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
                             "ModSecurity not able to reopen %s file", WAF_LOG_UTIL_FILE);
                 #else
                         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
@@ -482,7 +482,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
 #endif
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
+	ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
             "[client %s] ModSecurity: %s%s [uri \"%s\"]%s%s", r->useragent_ip ? r->useragent_ip : r->connection->client_ip, str1,
             hostname, log_escape(msr->mp, r->uri), unique_id, requestheaderhostname);
 #else

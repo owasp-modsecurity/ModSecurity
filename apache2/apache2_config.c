@@ -820,7 +820,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     }
 
 #ifndef ALLOW_ID_NOT_UNIQUE
-    /* Rules must have uniq ID */
+	/* Rules must have uniq ID */
     type_rule = (dcfg->tmp_chain_starter == NULL);
 #if defined(WITH_LUA)
             type_rule = (type != RULE_TYPE_LUA && type_rule);

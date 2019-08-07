@@ -270,43 +270,43 @@ directory_config *modsecGetDefaultConfig()  {
 const char *modsecProcessConfig(directory_config *config, const char *file, const char *dir)  {
     apr_pool_t *ptemp = NULL;
     const char *err;
-    apr_status_t status;
-    const char *rootpath, *incpath;
+	apr_status_t status;
+	const char *rootpath, *incpath;
 
-    if(dir == NULL || strlen(dir) == 0)
-#ifdef    WIN32
-        dir = "\\";
+	if(dir == NULL || strlen(dir) == 0)
+#ifdef	WIN32
+		dir = "\\";
 #else
-        dir = "/";
+		dir = "/";
 #endif
 
-    incpath = file;
+	incpath = file;
 
-    /* locate the start of the directories proper */
-    status = apr_filepath_root(&rootpath, &incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, config->mp);
+	/* locate the start of the directories proper */
+	status = apr_filepath_root(&rootpath, &incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, config->mp);
 
-    /* we allow APR_SUCCESS and APR_EINCOMPLETE */
-    if (APR_ERELATIVE == status) {
-        int li = strlen(dir) - 1;
+	/* we allow APR_SUCCESS and APR_EINCOMPLETE */
+	if (APR_ERELATIVE == status) {
+		int li = strlen(dir) - 1;
 
-        if(dir[li] != '/' && dir[li] != '\\')
-#ifdef    WIN32
-            file = apr_pstrcat(config->mp, dir, "\\", file, NULL);
+		if(dir[li] != '/' && dir[li] != '\\')
+#ifdef	WIN32
+			file = apr_pstrcat(config->mp, dir, "\\", file, NULL);
 #else
-            file = apr_pstrcat(config->mp, dir, "/", file, NULL);
+			file = apr_pstrcat(config->mp, dir, "/", file, NULL);
 #endif
-        else
-            file = apr_pstrcat(config->mp, dir, file, NULL);
-    }
-    else if (APR_EBADPATH == status) {
-        return apr_pstrcat(config->mp, "Config file has a bad path, ", file, NULL);
-    }
+		else
+			file = apr_pstrcat(config->mp, dir, file, NULL);
+	}
+	else if (APR_EBADPATH == status) {
+		return apr_pstrcat(config->mp, "Config file has a bad path, ", file, NULL);
+	}
 
-    apr_pool_create(&ptemp, config->mp);
+	apr_pool_create(&ptemp, config->mp);
 
     err = process_command_config(server, config, config->mp, ptemp, file);
 #ifdef MEMORY_DATABASE_ENABLE
-    config->root_config = config;
+	config->root_config = config;
 #endif
     apr_pool_destroy(ptemp);
 
@@ -471,9 +471,9 @@ int modsecProcessRequestBody(request_rec *r) {
 
     ap_remove_input_filter(f);
 
-    if (status != DECLINED) {
-        return status;
-    }
+	if (status != DECLINED) {
+		return status;
+	}
 
     hookfn_insert_filter(r);
 

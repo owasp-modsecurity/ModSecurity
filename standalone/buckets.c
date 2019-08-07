@@ -50,7 +50,7 @@ AP_DECLARE(apr_status_t) ap_get_brigade(ap_filter_t *next,
                                                readbytes);
     }
 
-    return AP_NOBODY_READ;
+	return AP_NOBODY_READ;
 }
 
 AP_DECLARE(apr_status_t) ap_pass_brigade(ap_filter_t *next,

@@ -201,8 +201,6 @@
     <ClInclude Include="..\apache2\msc_status_engine.h">
       <Filter>ModSecurity</Filter>
     </ClInclude>
-    <ClInclude Include="event_logger.h" />
-    <ClInclude Include="critical_section.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ModSecurity.xml" />

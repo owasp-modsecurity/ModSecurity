@@ -250,17 +250,17 @@ AP_DECLARE(char *) ap_escape_html(apr_pool_t *p, const char *s)
 
 AP_DECLARE(const char *) ap_psignature(const char *prefix, request_rec *r)
 {
-    return prefix;
+	return prefix;
 }
 
 AP_DECLARE(const char *) ap_document_root(request_rec *r) /* Don't use this! */
 {
-    return "\\";
+	return "\\";
 }
 
 AP_DECLARE(apr_port_t) ap_get_server_port(const request_rec *r)
 {
-    return 80;
+	return 80;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,7 +269,7 @@ AP_DECLARE(apr_port_t) ap_get_server_port(const request_rec *r)
 AP_DECLARE(void) ap_log_error(const char *file, int line, int level, 
                              apr_status_t status, const server_rec *s, 
                              const char *fmt, ...)
-//                __attribute__((format(printf,6,7)))
+//			    __attribute__((format(printf,6,7)))
 #else
 AP_DECLARE(void) ap_log_error_(const char *file, int line, int module_index,
                                int level, apr_status_t status,
@@ -284,10 +284,10 @@ AP_DECLARE(void) ap_log_error_(const char *file, int line, int module_index,
 
     apr_vsnprintf(errstr, MAX_STRING_LEN, fmt, args);
 
-    va_end(args);
+	va_end(args);
 
-    if(modsecLogHook != NULL)
-        modsecLogHook(modsecLogObj, level, errstr);
+	if(modsecLogHook != NULL)
+		modsecLogHook(modsecLogObj, level, errstr);
 }
 
 
@@ -295,7 +295,7 @@ AP_DECLARE(void) ap_log_error_(const char *file, int line, int module_index,
 AP_DECLARE(void) ap_log_cerror(const char *file, int line, int level,
                              apr_status_t status, const conn_rec *r,
                              const char *fmt, ...)
-//                __attribute__((format(printf,6,7)))
+//			    __attribute__((format(printf,6,7)))
 #else
 AP_DECLARE(void) ap_log_cerror_(const char *file, int line, int module_index,
                                 int level, apr_status_t status,
@@ -310,10 +310,10 @@ AP_DECLARE(void) ap_log_cerror_(const char *file, int line, int module_index,
 
     apr_vsnprintf(errstr, MAX_STRING_LEN, fmt, args);
 
-    va_end(args);
+	va_end(args);
 
-    if(modsecLogHook != NULL)
-        modsecLogHook(modsecLogObj, level, errstr);
+	if(modsecLogHook != NULL)
+		modsecLogHook(modsecLogObj, level, errstr);
 }
 
 
@@ -321,7 +321,7 @@ AP_DECLARE(void) ap_log_cerror_(const char *file, int line, int module_index,
 AP_DECLARE(void) ap_log_rerror(const char *file, int line, int level,
                              apr_status_t status, const request_rec *r,
                              const char *fmt, ...)
-//                __attribute__((format(printf,6,7)))
+//			    __attribute__((format(printf,6,7)))
 #else
 AP_DECLARE(void) ap_log_rerror_(const char *file, int line, int module_index,
                                int level, apr_status_t status,
@@ -336,17 +336,17 @@ AP_DECLARE(void) ap_log_rerror_(const char *file, int line, int module_index,
 
     apr_vsnprintf(errstr, MAX_STRING_LEN, fmt, args);
 
-    va_end(args);
+	va_end(args);
 
-    if(modsecLogHook != NULL)
-        modsecLogHook(modsecLogObj, level, errstr);
+	if(modsecLogHook != NULL)
+		modsecLogHook(modsecLogObj, level, errstr);
 }
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 AP_DECLARE(void) ap_log_perror(const char *file, int line, int level, 
                              apr_status_t status, apr_pool_t *p, 
                              const char *fmt, ...)
-//                __attribute__((format(printf,6,7)))
+//			    __attribute__((format(printf,6,7)))
 #else
 AP_DECLARE(void) ap_log_perror_(const char *file, int line, int module_index,
                                 int level, apr_status_t status, apr_pool_t *p,
@@ -360,28 +360,28 @@ AP_DECLARE(void) ap_log_perror_(const char *file, int line, int module_index,
 
     apr_vsnprintf(errstr, MAX_STRING_LEN, fmt, args);
 
-    va_end(args);
+	va_end(args);
 
-    if(modsecLogHook != NULL)
-        modsecLogHook(modsecLogObj, level, errstr);
+	if(modsecLogHook != NULL)
+		modsecLogHook(modsecLogObj, level, errstr);
 }
 
 AP_DECLARE(module *) ap_find_linked_module(const char *name)
 {
-    // only used for ACTION_PROXY to find mod_proxy.c; see mod_security2.c, perform_interception()
-    //
-    return NULL;
+	// only used for ACTION_PROXY to find mod_proxy.c; see mod_security2.c, perform_interception()
+	//
+	return NULL;
 }
 
 AP_DECLARE(const char *) ap_get_server_name(request_rec *r)
 {
-    return r->server->server_hostname;
+	return r->server->server_hostname;
 }
 
 AP_DECLARE(void) ap_add_version_component(apr_pool_t *pconf, const char *component)
 {
-    // appends string to server description string
-    //
+	// appends string to server description string
+	//
 }
 
 AP_DECLARE(const char *) ap_get_status_line(int status)
@@ -467,7 +467,7 @@ AP_DECLARE(apr_status_t) ap_mpm_query(int query_code, int *result)
 
 AP_DECLARE(const char *) ap_get_server_banner(void)
 {
-    return "ModSecurity Standalone";
+	return "ModSecurity Standalone";
 }
 
 /* Code from Harald Hanche-Olsen <hanche@imf.unit.no> */
@@ -493,7 +493,7 @@ static APR_INLINE void do_double_reverse (conn_rec *conn)
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
             if (apr_sockaddr_equal(sa, conn->remote_addr)) {
 #else
-        if (apr_sockaddr_equal(sa, conn->client_addr)) {
+	    if (apr_sockaddr_equal(sa, conn->client_addr)) {
 #endif
                 conn->double_reverse = 1;
                 return;
@@ -507,10 +507,10 @@ static APR_INLINE void do_double_reverse (conn_rec *conn)
 }
 
 #ifndef HOSTNAME_LOOKUP_OFF
-#define HOSTNAME_LOOKUP_OFF    0
-#define HOSTNAME_LOOKUP_ON    1
-#define HOSTNAME_LOOKUP_DOUBLE    2
-#define HOSTNAME_LOOKUP_UNSET    3
+#define HOSTNAME_LOOKUP_OFF	0
+#define HOSTNAME_LOOKUP_ON	1
+#define HOSTNAME_LOOKUP_DOUBLE	2
+#define HOSTNAME_LOOKUP_UNSET	3
 #endif
 
 AP_DECLARE(void) ap_str_tolower(char *str)
@@ -593,7 +593,7 @@ AP_DECLARE(const char *) ap_get_remote_host(conn_rec *conn, void *dir_config, in
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
             return conn->remote_ip;
 #else
-        return conn->client_ip;
+	    return conn->client_ip;
 #endif
         }
     }
@@ -617,7 +617,7 @@ AP_DECLARE(char *) ap_server_root_relative(apr_pool_t *p, const char *file)
 
 AP_DECLARE(piped_log *) ap_open_piped_log(apr_pool_t *p, const char *program)
 {
-    return NULL;
+	return NULL;
 }
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3

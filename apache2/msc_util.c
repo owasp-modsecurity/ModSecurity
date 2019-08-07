@@ -1225,22 +1225,22 @@ char *log_escape(apr_pool_t *mp, const char *text) {
 
 char *log_escape_nq(apr_pool_t *mp, const char *text) {
 #ifdef VERSION_IIS
-    int l = 0;
+	int l = 0;
 
-    // this is a workaround for unknown bug that causes 'text' sometimes to lack zero-termination
-    //
-    __try
-    {
-        l = text ? strlen(text) : 0;
-    }
-    __except(EXCEPTION_EXECUTE_HANDLER)
-    {
-        l = -1;
-    }
-    if(l < 0)
-        return _log_escape(mp, "BUG: see log_escape_nq()", 24, 0, 0, 0);
+	// this is a workaround for unknown bug that causes 'text' sometimes to lack zero-termination
+	//
+	__try
+	{
+		l = text ? strlen(text) : 0;
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+		l = -1;
+	}
+	if(l < 0)
+	    return _log_escape(mp, "BUG: see log_escape_nq()", 24, 0, 0, 0);
 
-    return _log_escape(mp, (const unsigned char *)text, l, 0, 0, 0);
+	return _log_escape(mp, (const unsigned char *)text, l, 0, 0, 0);
 #else
     return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 0, 0);
 #endif

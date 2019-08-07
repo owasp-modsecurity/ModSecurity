@@ -44,7 +44,7 @@
 #define inline __inline
 #endif
 
-#ifdef    __cplusplus
+#ifdef	__cplusplus
 extern "C"
 {
 #endif

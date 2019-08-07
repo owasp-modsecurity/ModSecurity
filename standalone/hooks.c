@@ -44,11 +44,11 @@ link##_DECLARE(void) ns##_hook_##name(ns##_HOOK_##name##_t *pf, \
                                       const char * const *aszPre, \
                                       const char * const *aszSucc, int nOrder) \
 { \
-    hookfn_##name = pf; \
+	hookfn_##name = pf; \
 }
 
 #define DECLARE_HOOK(ret,name,args) \
-    DECLARE_EXTERNAL_HOOK(ap,AP,ret,name,args)
+	DECLARE_EXTERNAL_HOOK(ap,AP,ret,name,args)
 
 
 DECLARE_HOOK(int,pre_config,(apr_pool_t *pconf,apr_pool_t *plog, apr_pool_t *ptemp))

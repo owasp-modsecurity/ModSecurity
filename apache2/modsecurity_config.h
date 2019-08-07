@@ -2,7 +2,7 @@
  * so this is here to prevent that by removing them.
  */
 
-#ifndef    WIN32
+#ifndef	WIN32
 
 /* Undefine all these so there are no conflicts */
 #undef PACKAGE
