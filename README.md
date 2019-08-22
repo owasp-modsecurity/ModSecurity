@@ -38,7 +38,7 @@ As a result of this goal we have rearchitechted Libmodsecurity such that it is n
 
 ### It is no longer just a module.
 
-The 'ModSecurity' branch no longer contains the traditional module logic (for Nginx, Apache, and IIS) that has traditionally been packaged all togerher. Instead, this branch only contains the library portion (libmodsecurity) for this project. This library is consumed by what we have termed 'Connectors' these connectors will interface with your webserver and provide the library with a common format that it undersands. Each of these connectors is maintained as a seperate GitHub project. For instance, the Nginx connector is supplied by the ModSecurity-nginx project (https://github.com/SpiderLabs/ModSecurity-nginx).
+The 'ModSecurity' branch no longer contains the traditional module logic (for Nginx, Apache, and IIS) that has traditionally been packaged all together. Instead, this branch only contains the library portion (libmodsecurity) for this project. This library is consumed by what we have termed 'Connectors' these connectors will interface with your webserver and provide the library with a common format that it undersands. Each of these connectors is maintained as a seperate GitHub project. For instance, the Nginx connector is supplied by the ModSecurity-nginx project (https://github.com/SpiderLabs/ModSecurity-nginx).
 
 Keeping these connectors seperated allows each project to be have different release cycles, issues and development trees. Addtionally, it means that when you install ModSecurity v3 you only get exactly what you need, no extras you won't be using.
 
