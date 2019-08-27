@@ -125,6 +125,11 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->stream_inbody_inspection = NOT_SET;
     dcfg->stream_outbody_inspection = NOT_SET;
 
+    /* WAF policy identification information */
+    dcfg->waf_policy_id = NOT_SET_P;
+    dcfg->waf_policy_scope = NOT_SET_P;
+    dcfg->waf_policy_scope_name = NOT_SET_P;
+
     /* Geo Lookups */
     dcfg->geo = NOT_SET_P;
 
@@ -568,6 +573,14 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->stream_outbody_inspection = (child->stream_outbody_inspection == NOT_SET
         ? parent->stream_outbody_inspection : child->stream_outbody_inspection);
 
+    /* WAF policy identification information */
+    merged->waf_policy_id = (child->waf_policy_id == NOT_SET_P
+        ? parent->waf_policy_id : child->waf_policy_id);
+    merged->waf_policy_scope = (child->waf_policy_scope == NOT_SET_P
+        ? parent->waf_policy_scope : child->waf_policy_scope);
+    merged->waf_policy_scope_name = (child->waf_policy_scope_name == NOT_SET_P
+        ? parent->waf_policy_scope_name : child->waf_policy_scope_name);
+
     /* Geo Lookup */
     merged->geo = (child->geo == NOT_SET_P
         ? parent->geo : child->geo);
@@ -729,6 +742,11 @@ void init_directory_config(directory_config *dcfg)
     /* Stream inspection */
     if (dcfg->stream_inbody_inspection == NOT_SET) dcfg->stream_inbody_inspection = 0;
     if (dcfg->stream_outbody_inspection == NOT_SET) dcfg->stream_outbody_inspection = 0;
+
+    /* WAF policy identification information */
+    if (dcfg->waf_policy_id == NOT_SET_P) dcfg->waf_policy_id = "";
+    if (dcfg->waf_policy_scope == NOT_SET_P) dcfg->waf_policy_scope = "";
+    if (dcfg->waf_policy_scope_name == NOT_SET_P) dcfg->waf_policy_scope_name = "";
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
@@ -1788,6 +1806,79 @@ static const char *cmd_stream_outbody_inspection(cmd_parms *cmd, void *_dcfg, in
     dcfg->stream_outbody_inspection = flag;
     return NULL;
 }
+
+/**
+* \brief Add SecWafPolicyId configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On Success
+* \retval apr_psprintf On Failue
+*/
+static const char *cmd_waf_policy_id(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) {
+        return NULL;
+    }
+    if (p1 == NULL) {
+        return apr_psprintf(cmd->pool, "ModSecurity: No valid SecWafPolicyId specified.");
+    }
+
+    dcfg->waf_policy_id = p1;
+    return NULL;
+}
+
+/**
+* \brief Add SecWafPolicyScope configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On Success
+* \retval apr_psprintf On Failue
+*/
+static const char *cmd_waf_policy_scope(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) {
+        return NULL;
+    }
+    if (p1 == NULL) {
+        return apr_psprintf(cmd->pool, "ModSecurity: No valid SecWafPolicyScope specified.");
+    }
+
+    dcfg->waf_policy_scope = p1;
+    return NULL;
+}
+
+/**
+* \brief Add SecWafPolicyScopeName configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On Success
+* \retval apr_psprintf On Failue
+*/
+static const char *cmd_waf_policy_scope_name(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) {
+        return NULL;
+    }
+    if (p1 == NULL) {
+        return apr_psprintf(cmd->pool, "ModSecurity: No valid SecWafPolicyScopeName specified.");
+    }
+
+    dcfg->waf_policy_scope_name = p1;
+    return NULL;
+}
+
 /**
 * \brief Add SecRulePerfTime configuration option
 *
@@ -3446,6 +3537,30 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecWafPolicyId",
+        cmd_waf_policy_id,
+        NULL,
+        CMD_SCOPE_ANY,
+        "WAF policy identifier"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecWafPolicyScope",
+        cmd_waf_policy_scope,
+        NULL,
+        CMD_SCOPE_ANY,
+        "WAF policy application scope"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecWafPolicyScopeName",
+        cmd_waf_policy_scope_name,
+        NULL,
+        CMD_SCOPE_ANY,
+        "name of the scope the WAF policy is assigned to"
     ),
 
     AP_INIT_FLAG (

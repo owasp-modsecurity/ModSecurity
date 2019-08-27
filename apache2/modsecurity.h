@@ -615,6 +615,11 @@ struct directory_config {
     int                 stream_inbody_inspection;
     int                 stream_outbody_inspection;
 
+    /* WAF policy identification information */
+    const char          *waf_policy_id;
+    const char          *waf_policy_scope;
+    const char          *waf_policy_scope_name;
+
     /* Geo Lookup */
     geo_db              *geo;
 
