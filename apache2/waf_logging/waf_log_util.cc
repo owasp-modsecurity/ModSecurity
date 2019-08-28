@@ -33,6 +33,9 @@ struct property
     detail details;
     jsoncons::string_view hostname;
     jsoncons::string_view transactionId;
+    jsoncons::string_view policyId;
+    jsoncons::string_view policyScope;
+    jsoncons::string_view policyScopeName;
 };
 
 struct waf_log
@@ -46,7 +49,7 @@ struct waf_log
 }   // namespace waf_logging
 
 JSONCONS_TYPE_TRAITS_DECL(waf_logging::detail, message, data, file, line);
-JSONCONS_TYPE_TRAITS_DECL(waf_logging::property, instanceId, clientIp, clientPort, requestUri, ruleSetType, ruleSetVersion, ruleId, message, action, site, details, hostname, transactionId);
+JSONCONS_TYPE_TRAITS_DECL(waf_logging::property, instanceId, clientIp, clientPort, requestUri, ruleSetType, ruleSetVersion, ruleId, message, action, site, details, hostname, transactionId, policyId, policyScope, policyScopeName);
 JSONCONS_TYPE_TRAITS_DECL(waf_logging::waf_log, resourceId, operationName, category, properties);
 
 static std::string to_json_string(const waf_logging::waf_log& log) {
@@ -125,7 +128,8 @@ static std::string get_json_log_message(const char* resource_id, const char* ope
         const char* instance_id, const char* client_ip, const char* client_port, const char* request_uri,
         const char* rule_set_type, const char* rule_set_version, const char* rule_id, const char* messages,
         const int action, const int site, const char* details_messages, const char* details_data,
-        const char* details_file, const char* details_line, const char* hostname, const char* waf_unique_id) {
+        const char* details_file, const char* details_line, const char* hostname, const char* waf_unique_id,
+        const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name) {
 
     using str_view = jsoncons::string_view;
     const auto make_string_view_strip_quotes = [] (const char* str) -> str_view {
@@ -198,7 +202,10 @@ static std::string get_json_log_message(const char* resource_id, const char* ope
                     details_line_str
                 },
             hostname,
-            waf_unique_id_str
+            waf_unique_id_str,
+            waf_policy_id,
+            waf_policy_scope,
+            waf_policy_scope_name
         }
     });
 }
@@ -208,13 +215,14 @@ char* generate_json(const char* resource_id, const char* operation_name, const c
         const char* instance_id, const char* client_ip, const char* client_port, const char* request_uri,
         const char* rule_set_type, const char* rule_set_version, const char* rule_id, const char* messages,
         const int action, const int site, const char* details_messages, const char* details_data,
-        const char* details_file, const char* details_line, const char* hostname, const char* waf_unique_id) {
+        const char* details_file, const char* details_line, const char* hostname, const char* waf_unique_id,
+        const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name) {
     
     try {
         const std::string json_string = get_json_log_message(resource_id, operation_name, category,
                 instance_id, client_ip, client_port, request_uri, rule_set_type, rule_set_version,
                 rule_id, messages, action, site, details_messages, details_data, details_file,
-                details_line, hostname, waf_unique_id);
+                details_line, hostname, waf_unique_id, waf_policy_id, waf_policy_scope, waf_policy_scope_name);
         char* result = static_cast<char*>(std::malloc(json_string.length() + 2)); // Two extra bytes for \n and \0
         std::copy(json_string.begin(), json_string.end(), result);
         result[json_string.length()] = '\n';
