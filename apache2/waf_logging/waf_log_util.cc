@@ -173,6 +173,10 @@ static std::string get_json_log_message(const char* resource_id, const char* ope
         }
     }
 
+    /* For historical reasons, the "site" property is included in log messages.
+     * However, it does not carry any useful meaning.
+     * We keep it around for compatibility reasons but may consider removing it at some point in the future.
+     */
     const str_view site_str = (site == 0) ? "Global" : str_view{};
 
     const str_view details_file_str = details_file ? str_view {details_file, strlen(details_file) - 1} : str_view{};
