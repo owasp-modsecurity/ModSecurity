@@ -5,6 +5,12 @@
 #define WAF_LOG_UTIL_SUCCESS 0
 #define MODSEC_MODE_DETECT 1
 #define MODSEC_MODE_PREVENT 2
+
+// ACTION_ALLOW/ACTION_ALLOW_REQUEST/ACTION_ALLOW_PHASE are defined in the modsecurity.h and copied here
+#define ACTION_ALLOW 5
+#define ACTION_ALLOW_REQUEST 6
+#define ACTION_ALLOW_PHASE 7
+
 #define WAF_RULESET_PREFIX "/RuleSets/"
 #define WAF_LOG_UTIL_FILE "waf_json.log"
 #define WAF_LOG_UTIL_OPERATION_NAME "ApplicationGatewayFirewall"

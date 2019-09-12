@@ -111,6 +111,7 @@ static std::map<rule_set_info, rule_ids_vector> disableable_rule_ids_map;
 static const std::string WAF_ACTION_BLOCKED {"Blocked"};
 static const std::string WAF_ACTION_DETECTED {"Detected"};
 static const std::string WAF_ACTION_MATCHED {"Matched"};
+static const std::string WAF_ACTION_ALLOWED {"Allowed"};
 
 static bool is_mandatory_rule(const rule_set_types type, const rule_set_versions version, const int current_id) {
     const auto contains_current_id = [current_id] (const rule_ids_vector& rule_ids) {
@@ -150,9 +151,10 @@ static std::string get_json_log_message(const char* resource_id, const char* ope
     const bool is_mandatory = is_mandatory_rule(type, version, current_id);
 
     const str_view action_str =
-        (version != rule_set_versions::VERSION_2_2_9 && !is_mandatory)  ? WAF_ACTION_MATCHED :
-        action == MODSEC_MODE_DETECT                                    ? WAF_ACTION_DETECTED :
-        action == MODSEC_MODE_PREVENT                                   ? WAF_ACTION_BLOCKED :
+        (action == ACTION_ALLOW || action == ACTION_ALLOW_REQUEST || action == ACTION_ALLOW_PHASE) ? WAF_ACTION_ALLOWED :
+        (version != rule_set_versions::VERSION_2_2_9 && !is_mandatory)                             ? WAF_ACTION_MATCHED :
+        action == MODSEC_MODE_DETECT                                                               ? WAF_ACTION_DETECTED :
+        action == MODSEC_MODE_PREVENT                                                              ? WAF_ACTION_BLOCKED :
         str_view{};
 
     #define MANDATORY_RULE_MESSAGE ("Mandatory rule. Cannot be disabled. ")
