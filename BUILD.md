@@ -1,9 +1,14 @@
 # Building ModSecurity
 
 ## Branches
-Two branches currently used for ModSecurity development and sustaining are `v2/master` and `iis_maintenance`. 
-All new fixes go to `v2/master` and so pull requests should be opened for this branch. 
-General changes and changes that are specific to ModSecurity for IIS are merged from `v2/master` to `iis_maintenance`. Fixes specific to ModSecurity for Nginx are not propagated from `v2/master`.
+Two branches currently used for ModSecurity development and sustaining are `waf_nginx` (the default branch) and `waf_iis`. 
+They follow the following rules for code changes:
+
+ - All Nginx-specific fixes go to `waf_nginx` and so pull requests should be opened for this branch (happens by default)
+ - All IIS-specific fixes go to `waf_iis` and so pull requests should be opened for this branch. Make sure to change your branch for your PR is your changes apply to ModSecurity IIS only.
+ - All common fixes that apply to both Nginx and IIS should be merged to both branches. For these, you can create your PR against either of `waf_nginx` and `waf_iis` (typically, the one that you have worked on and tested with) and then cherry-picked into another one.
+
+NB: the `v2/master` and `iis_maintenance` branches that have been used for development before are now effectively deprecated. 
 
 ## Building ModSecurity For IIS
 
@@ -13,9 +18,9 @@ Open a `PowerShell` command line to follow the steps below.
     ```bash
     git clone --recursive https://github.com/Microsoft/ModSecurity
     ```
- 2. Switch to `iis_maintenance` branch:
+ 2. Switch to `waf_iis` branch:
      ```bash
-    git checkout --recurse-submodules iis_maintenance
+    git checkout --recurse-submodules waf_iis
     ```
  3.  Change to the `iis` subdirectory:
      ```bash
@@ -86,7 +91,7 @@ The steps below are for Ubuntu 16.04 LTS.
     ```bash
     git clone --recursive https://github.com/Microsoft/ModSecurity
     ```
- 4. Make sure you're in `v2/master` branch:
+ 4. Make sure you're in `waf_nginx` branch:
      ```bash
     git status
     ```
