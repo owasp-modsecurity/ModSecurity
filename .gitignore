@@ -92,4 +92,5 @@ tests/run-unit-tests.pl
 tools/Makefile
 tools/Makefile.in
 tools/rules-updater.pl
+validator/validator
 nginx/modsecurity/config

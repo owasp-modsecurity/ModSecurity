@@ -204,7 +204,7 @@ AC_ARG_ENABLE(standalone-module,
 ])
 AM_CONDITIONAL([BUILD_STANDALONE_MODULE], [test "$build_standalone_module" -eq 1])
 if test "$build_standalone_module" -eq 1; then
-  TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS standalone"
+  TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS standalone validator"
 fi
 
 
@@ -596,6 +596,8 @@ AC_ARG_ENABLE(waf_json_logging,
   waf_json_logging=""
 ])
 
+root_include="-I"`pwd`
+
 # Always Enable json waf logging support
 waf_lock="-I"`pwd`"/apache2/waf_lock"
 
@@ -865,7 +867,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input $collection_memory_database $waf_json_logging $waf_lock"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input $collection_memory_database $waf_json_logging $root_include $waf_lock"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
@@ -958,6 +960,7 @@ fi
 if test "$build_standalone_module" -ne 0; then
 AC_CONFIG_FILES([standalone/Makefile])
 AC_CONFIG_FILES([nginx/modsecurity/config])
+AC_CONFIG_FILES([validator/Makefile])
 fi
 if test "$build_extentions" -ne 0; then
 AC_CONFIG_FILES([ext/Makefile])
