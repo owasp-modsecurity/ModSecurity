@@ -44,7 +44,7 @@ std::string RemoveWhitespace::evaluate(std::string value,
     // loop through all the chars
     while (i < value.size()) {
         // remove whitespaces and non breaking spaces (NBSP)
-        if (isspace(value[i]) || (value[i] == NBSP)) {
+        if (isspace(value[i]) || (value[i] == static_cast<char>(NBSP))) {
             value.erase(i, 1);
         } else {
           /* if the space is not a whitespace char, increment counter
