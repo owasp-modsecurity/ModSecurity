@@ -478,7 +478,10 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
             msc_waf_log_reopened = 0;
         }
 
-        send_waf_log(msr->modsecurity->wafjsonlog_lock, msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), (!msr->allow_scope) ? dcfg->is_enabled : msr->allow_scope, r->hostname, unique_id, r, dcfg->waf_policy_id, dcfg->waf_policy_scope, dcfg->waf_policy_scope_name);
+        const char* scope = apr_table_get(r->notes, WAF_POLICY_SCOPE);
+        const char* scope_name = apr_table_get(r->notes, WAF_POLICY_SCOPE_NAME);
+
+        send_waf_log(msr->modsecurity->wafjsonlog_lock, msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), (!msr->allow_scope) ? dcfg->is_enabled : msr->allow_scope, r->hostname, unique_id, r, dcfg->waf_policy_id, scope ? scope : "", scope_name ? scope_name : "");
 #endif
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
