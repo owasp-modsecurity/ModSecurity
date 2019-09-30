@@ -33,6 +33,9 @@ typedef struct {
     ngx_flag_t                  enable;
     directory_config            *config;
 
+    ngx_str_t                   scope;
+    ngx_str_t                   scope_name;
+
     ngx_str_t                   *file;
     ngx_uint_t                   line;
 } ngx_http_modsecurity_loc_conf_t;
@@ -98,6 +101,20 @@ static ngx_command_t  ngx_http_modsecurity_commands[] =  {
     ngx_http_modsecurity_enable,
     NGX_HTTP_LOC_CONF_OFFSET,
     offsetof(ngx_http_modsecurity_loc_conf_t, enable),
+    NULL },
+  { ngx_string("ModSecurityScope"),
+    NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF
+        |NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
+    ngx_conf_set_str_slot,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    offsetof(ngx_http_modsecurity_loc_conf_t, scope),
+    NULL },
+  { ngx_string("ModSecurityScopeName"),
+    NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF
+        |NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
+    ngx_conf_set_str_slot,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    offsetof(ngx_http_modsecurity_loc_conf_t, scope_name),
     NULL },
   ngx_null_command
 };
@@ -394,7 +411,19 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
 
     req->user = dup_ngx_str_to_apr(req->pool, &r->headers_in.user);
 
+    /* Add scope and scope name for logging purposes */
+    ngx_http_modsecurity_loc_conf_t* cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
+    const char* scope = dup_ngx_str_to_apr(req->pool, &cf->scope);
+    if (scope == NULL) {
+        return NGX_ERROR;
+    }
+    apr_table_setn(req->notes, WAF_POLICY_SCOPE, scope);
 
+    const char* scope_name = dup_ngx_str_to_apr(req->pool, &cf->scope_name);
+    if (scope_name == NULL) {
+        return NGX_ERROR;
+    }
+    apr_table_setn(req->notes, WAF_POLICY_SCOPE_NAME, scope_name);
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSecurity: load headers in done");
@@ -447,12 +476,11 @@ ngx_http_modsecurity_status(int status)
 static void *
 ngx_http_modsecurity_create_loc_conf(ngx_conf_t *cf)
 {
-    ngx_http_modsecurity_loc_conf_t  *conf;
-
-    conf = (ngx_http_modsecurity_loc_conf_t  *)
-           ngx_palloc(cf->pool, sizeof(ngx_http_modsecurity_loc_conf_t));
-    if (conf == NULL)
+    ngx_http_modsecurity_loc_conf_t* conf = (ngx_http_modsecurity_loc_conf_t *)
+           ngx_pcalloc(cf->pool, sizeof(ngx_http_modsecurity_loc_conf_t));
+    if (conf == NULL) {
         return NULL;
+    }
 
     conf->config = NGX_CONF_UNSET_PTR;
     conf->enable = NGX_CONF_UNSET;
@@ -479,6 +507,9 @@ ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent,
                       conf->file, conf->line);
         return NGX_CONF_ERROR;
     }
+
+    ngx_conf_merge_str_value(conf->scope, prev->scope, "");
+    ngx_conf_merge_str_value(conf->scope_name, prev->scope_name, "");
 
     return NGX_CONF_OK;
 }

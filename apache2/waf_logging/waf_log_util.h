@@ -16,6 +16,10 @@
 #define WAF_LOG_UTIL_OPERATION_NAME "ApplicationGatewayFirewall"
 #define WAF_LOG_UTIL_CATEGORY "ApplicationGatewayFirewallLog"
 
+// WAF log values passed with request
+#define WAF_POLICY_SCOPE "WafPolicyScope"
+#define WAF_POLICY_SCOPE_NAME "WafPolicyScopeName"
+
 #define RULE_TYPE_OWASP_CRS "OWASP_CRS"
 
 #define RULE_HASH_SIZE 499
