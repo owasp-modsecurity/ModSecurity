@@ -27,7 +27,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-char* generate_json(const char* resourceId, const char* operationName, const char* category, const char* instanceId, const char* clientIP, const char* clientPort, const char* requestUri, const char* ruleSetType, const char* ruleSetVersion, const char* ruleId, const char* messages, const int action, const int site, const char* details_messages, const char* details_data, const char* details_file, const char* details_line, const char* hostname, const char* waf_unique_id,
+char* generate_json(const char* timestamp, const char* resourceId, const char* operationName, const char* category, const char* instanceId, const char* clientIP, const char* clientPort, const char* requestUri, const char* ruleSetType, const char* ruleSetVersion, const char* ruleId, const char* messages, const int action, const int site, const char* details_messages, const char* details_data, const char* details_file, const char* details_line, const char* hostname, const char* waf_unique_id,
 const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name);
 void free_json(char* str);
 // Returns 0 if succeeded, non-zero code otherwise

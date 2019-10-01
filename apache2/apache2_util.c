@@ -318,7 +318,7 @@ static int write_file_with_lock(struct waf_lock* lock, apr_file_t* fd, char* str
 /**
  * send all waf fields in json format to a file.
  */
-static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, char* unique_id, request_rec *r, const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name) {
+static void send_waf_log(const char* timestamp, struct waf_lock* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, char* unique_id, request_rec *r, const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name) {
     char waf_filename[1024] = "";
     char waf_line[1024] = "";
     char waf_id[1024] = "";
@@ -344,7 +344,7 @@ static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1
     get_short_filename(waf_filename);
     get_ruleset_type_version(waf_ruleset_info, waf_ruleset_type, waf_ruleset_version); 
 
-    char* json_str = generate_json(msc_waf_resourceId, WAF_LOG_UTIL_OPERATION_NAME, WAF_LOG_UTIL_CATEGORY, msc_waf_instanceId, waf_ip, waf_port, uri, waf_ruleset_type, waf_ruleset_version, waf_id, waf_message, mode, 0, waf_detail_message, waf_data, waf_filename, waf_line, hostname, waf_unique_id, waf_policy_id, waf_policy_scope, waf_policy_scope_name);
+    char* json_str = generate_json(timestamp, msc_waf_resourceId, WAF_LOG_UTIL_OPERATION_NAME, WAF_LOG_UTIL_CATEGORY, msc_waf_instanceId, waf_ip, waf_port, uri, waf_ruleset_type, waf_ruleset_version, waf_id, waf_message, mode, 0, waf_detail_message, waf_data, waf_filename, waf_line, hostname, waf_unique_id, waf_policy_id, waf_policy_scope, waf_policy_scope_name);
     if (!json_str) {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
        ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
@@ -481,7 +481,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
         const char* scope = apr_table_get(r->notes, WAF_POLICY_SCOPE);
         const char* scope_name = apr_table_get(r->notes, WAF_POLICY_SCOPE_NAME);
 
-        send_waf_log(msr->modsecurity->wafjsonlog_lock, msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), (!msr->allow_scope) ? dcfg->is_enabled : msr->allow_scope, r->hostname, unique_id, r, dcfg->waf_policy_id, scope ? scope : "", scope_name ? scope_name : "");
+        send_waf_log(current_logtime(msr->mp), msr->modsecurity->wafjsonlog_lock, msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), (!msr->allow_scope) ? dcfg->is_enabled : msr->allow_scope, r->hostname, unique_id, r, dcfg->waf_policy_id, scope ? scope : "", scope_name ? scope_name : "");
 #endif
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
