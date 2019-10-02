@@ -245,18 +245,24 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     char *opt = NULL, *param = NULL;
     char *target_list = NULL, *replace = NULL;
     int i, rc, match = 0, var_appended = 0;
+    apr_pool_t *local_pool = NULL;
 
     if(rule != NULL)    {
+        apr_status_t status = apr_pool_create(&local_pool, NULL);
+        if (status < 0) {
+            return apr_psprintf(ruleset->mp, "Error creating memory pool: %d", status);
+        }
 
-        target_list = strdup(p2);
-        if(target_list == NULL)
+        target_list = apr_pstrdup(local_pool, p2);
+        if(target_list == NULL) {
+            apr_pool_destroy(local_pool);
             return apr_psprintf(ruleset->mp, "Error to update target - memory allocation");;
+        }
 
         if(p3 != NULL)  {
-            replace = strdup(p3);
+            replace = apr_pstrdup(local_pool, p3);
             if(replace == NULL) {
-                free(target_list);
-                target_list = NULL;
+                apr_pool_destroy(local_pool);
                 return apr_psprintf(ruleset->mp, "Error to update target - memory allocation");;
             }
         }
@@ -288,10 +294,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             }
 
             if(apr_table_get(ruleset->engine->variables, name) == NULL)   {
-                if(target_list != NULL)
-                    free(target_list);
-                if(replace != NULL)
-                    free(replace);
+                apr_pool_destroy(local_pool);
                 if(msr) {
                     msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
                 }
@@ -380,10 +383,11 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     goto end;
                 }
             } else {
-
-                target = strdup(p);
-                if(target == NULL)
+                target = apr_pstrdup(local_pool, p);
+                if(target == NULL) {
+                    apr_pool_destroy(local_pool);
                     return NULL;
+                }
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
@@ -413,10 +417,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 }
 
                 if(apr_table_get(ruleset->engine->variables, name) == NULL)   {
-                    if(target_list != NULL)
-                        free(target_list);
-                    if(replace != NULL)
-                        free(replace);
+                    apr_pool_destroy(local_pool);
                     if(msr) {
                         msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
                     }
@@ -458,11 +459,6 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     }
                 }
 
-                if(target != NULL)  {
-                    free(target);
-                    target = NULL;
-                }
-
                 if(match == 0 ) {
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
@@ -493,7 +489,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
         }
 
         if(var_appended == 1)  {
-            current_targets = msre_generate_target_string(ruleset->mp, rule);
+            current_targets = msre_generate_target_string(local_pool, rule);
             rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, current_targets, NULL, NULL);
             rule->p1 = apr_pstrdup(ruleset->mp, current_targets);
             if(msr) {
@@ -508,18 +504,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if(target_list != NULL) {
-        free(target_list);
-        target_list = NULL;
-    }
-    if(replace != NULL) {
-        free(replace);
-        replace = NULL;
-    }
-    if(target != NULL)  {
-        free(target);
-        target = NULL;
-    }
+    apr_pool_destroy(local_pool);
     return NULL;
 }
 
