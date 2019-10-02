@@ -84,7 +84,7 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
 
 bool Pm::evaluate(Transaction *transaction, Rule *rule,
     const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
-    int rc = 0;
+    int rc = -1;
     ACMPT pt;
     pt.parser = m_p;
     pt.ptr = NULL;
@@ -97,7 +97,7 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
     pthread_mutex_unlock(&m_lock);
 #endif
 
-    if (rc > 0 && transaction) {
+    if (rc >= 0 && transaction) {
         std::string match_(match);
         logOffset(ruleMessage, rc - match_.size() + 1, match_.size());
         transaction->m_matched.push_back(match_);
@@ -110,7 +110,7 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
             std::string(match));
     }
 
-    return rc > 0;
+    return rc >= 0;
 }
 
 

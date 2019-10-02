@@ -585,7 +585,7 @@ int acmp_process_quick(ACMPT *acmpt, const char **match, const char *data, size_
         offset++;
     }
     acmpt->ptr = node;
-    return 0;
+    return -1;
 }
 
 }

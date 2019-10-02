@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix @pm lookup for possible matches on offset zero.
+   [@zimmerle, @afoxdavidi, @martinhsv, @marshal09]
  - Regex lookup on the key name instead of COLLECTION:key
    [@rdiperri-yottaa, @danbiagini-work, @mmelo-yottaa, @zimmerle]
  - Missing throw in Operator::instantiate
