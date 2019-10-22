@@ -12,6 +12,8 @@
 * directly using the email address security@modsecurity.org.
 */
 
+#include <sys/param.h>
+
 #include <ngx_http.h>
 #include <ngx_http_modsecurity_config_cache.h>
 #include <apr_bucket_nginx.h>
@@ -86,6 +88,17 @@ static ngx_str_t thread_pool_name = ngx_string("default");
 
 ngx_thread_mutex_t mtx;
 
+/*
+ * AzWAF processing occurs before ModSecurity and its outcome
+ * should be honoured
+ */
+static ngx_str_t azwaf_processing_result_var = ngx_string("azwaf_processing_result");
+static ngx_uint_t azwaf_processing_result_key;
+
+/*
+ * AzWAF processing result 'allow' value
+ */
+static ngx_str_t azwaf_action_allow = ngx_string("allow");
 
 /* command handled by the module */
 static ngx_command_t  ngx_http_modsecurity_commands[] =  {
@@ -635,6 +648,10 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     }
 #endif    
 
+    azwaf_processing_result_key = ngx_hash_key_lc(
+        azwaf_processing_result_var.data,
+        azwaf_processing_result_var.len);
+
     return NGX_OK;
 }
 
@@ -852,6 +869,20 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     /* Process only main request */
     if (r != r->main || !cf->enable) {
         return NGX_DECLINED;
+    }
+
+    /* See if the request has been allowed by AzWAF so we should not process it */
+    ngx_http_variable_value_t* azwaf_processing_result =
+        ngx_http_get_variable(r, &azwaf_processing_result_var, azwaf_processing_result_key);
+    if (azwaf_processing_result != NULL && !azwaf_processing_result->not_found) {
+        if (ngx_strncasecmp(
+                azwaf_processing_result->data,
+                azwaf_action_allow.data,
+                MIN(azwaf_processing_result->len ,azwaf_action_allow.len)) == 0) {
+
+            ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "The request is allowed by AzWAF, skip ModSecurity processing");
+            return NGX_DECLINED;
+        }
     }
 
     // Read body if not yet read
