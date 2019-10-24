@@ -1593,7 +1593,7 @@ std::string Transaction::toJSON(int parts) {
         strlen("response"));
     yajl_gen_map_open(g);
 
-    if (parts & audit_log::AuditLog::EAuditLogPart) {
+    if (parts & audit_log::AuditLog::GAuditLogPart) {
         LOGFY_ADD("body", this->m_responseBody.str().c_str());
     }
     LOGFY_ADD_NUM("http_code", m_httpCodeReturned);

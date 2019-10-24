@@ -1,8 +1,6 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
- - Fix: audit log part for response body for JSON format to be E
-   [Issue #2066 - @martinhsv, @zimmerle]
  - Make sure m_rulesMessages is filled after successfull match
    [Issue #2000, #2048 - @victorhora, @defanator]
  - Fix @pm lookup for possible matches on offset zero.
