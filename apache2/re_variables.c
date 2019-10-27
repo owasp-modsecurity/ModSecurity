@@ -1607,7 +1607,12 @@ static int var_multipart_unmatched_boundary_generate(modsec_rec *msr, msre_var *
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     if ((msr->mpd != NULL)&&(msr->mpd->flag_unmatched_boundary != 0)) {
-        return var_simple_generate(var, vartab, mptmp, "1");
+        if (msr->mpd->flag_unmatched_boundary > 0) {
+            return var_simple_generate(var, vartab, mptmp, apr_itoa(mptmp, msr->mpd->flag_unmatched_boundary));
+        }
+        else {
+            return var_simple_generate(var, vartab, mptmp, "1");
+        }
     } else {
         return var_simple_generate(var, vartab, mptmp, "0");
     }

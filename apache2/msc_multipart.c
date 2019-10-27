@@ -1070,6 +1070,17 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                 {
                     char *boundary_end = msr->mpd->buf + 2 + strlen(msr->mpd->boundary);
                     int is_final = 0;
+                    /* if it match, AND there was a matched boundary at least,
+                       set the flag_unmatched_boundary to 2
+                       this indicates that there were an opened boundary, which
+                       matches the reference, and here is the final boundary.
+                       The flag will differ from 0, so the previous rules ("!@eq 0")
+                       will catch all "errors", without any modification, but we can
+                       use the new, permission mode with "@eq 1"
+                    */
+                    if (msr->mpd->boundary_count > 0) {
+                        msr->mpd->flag_unmatched_boundary = 2;
+                    }
 
                     /* Is this the final boundary? */
                     if ((*boundary_end == '-') && (*(boundary_end + 1)== '-')) {
