@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 sudo: true
 
 addons:
@@ -9,7 +9,6 @@ addons:
     - libgeoip-dev
     - liblua5.2-dev
     - liblmdb-dev
-    - cppcheck
 
 language: cpp
 
@@ -38,9 +37,12 @@ before_script:
   - '[ "$TRAVIS_OS_NAME" != osx ] || brew install libmaxminddb'
   - '[ "$TRAVIS_OS_NAME" != osx ] || brew install lmdb'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo add-apt-repository --yes ppa:maxmind/ppa'
+  - '[ "$TRAVIS_OS_NAME" != linux ] || sudo add-apt-repository --yes ppa:grochefort/cppcheck'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-get update'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-cache search maxmind'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-get install -y libmaxminddb-dev'
+  - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-get install -y cppcheck'
+  - '[ "$TRAVIS_OS_NAME" != linux ] || cppcheck --version'
 
 script:
   - ./build.sh
