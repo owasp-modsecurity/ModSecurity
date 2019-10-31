@@ -64,7 +64,9 @@ cppcheck:
 		--template="warning: {file},{line},{severity},{id},{message}" \
 		-I headers -I . -I others -I src -I others/mbedtls -I src/parser \
 		--error-exitcode=1 \
-		-i "src/parser/seclang-parser.cc" -i "src/parser/seclang-scanner.cc" \
+		-i "src/parser/seclang-parser.cc" \
+		-i "src/parser/seclang-scanner.cc" \
+		-i "parser/driver.cc" \
 		--force --verbose .
 
 
