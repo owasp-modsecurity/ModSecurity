@@ -182,17 +182,26 @@ std::vector<std::string> ssplit(std::string str, char delimiter) {
     std::vector<std::string> internal;
     std::stringstream ss(str);  // Turn the string into a stream.
     std::string tok;
-    ssize_t n = str.length();
-    int i = 0;
 
     while (getline(ss, tok, delimiter)) {
-        n -= tok.length();
-        if (i > 0) n--;
-        internal.push_back(n == 1 ? tok + delimiter : tok);
-        i++;
+        internal.push_back(tok);
     }
 
     return internal;
+}
+
+
+std::pair<std::string, std::string> ssplit_pair(const std::string& str, char delimiter) {
+    std::stringstream ss(str);  // Turn the string into a stream.
+    std::string key;
+    std::string value;
+
+    getline(ss, key, delimiter);
+    if (key.length() < str.length()) {
+        value = str.substr(key.length()+1);
+    }
+
+    return std::make_pair(key, value);
 }
 
 
