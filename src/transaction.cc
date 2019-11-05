@@ -294,17 +294,9 @@ bool Transaction::extractArguments(const std::string &orig,
 
         std::string key;
         std::string value;
-        std::vector<std::string> key_value = utils::string::ssplit(t, sep2);
-        for (auto& a : key_value) {
-            if (i == 0) {
-                key = a;
-            } else if (i == 1) {
-                value = a;
-            } else {
-                value = value + "=" + a;
-            }
-            i++;
-        }
+	std::pair<std::string, std::string> key_value_pair = utils::string::ssplit_pair(t, sep2);
+	key = key_value_pair.first;
+	value = key_value_pair.second;
 
         key_s = (key.length() + 1);
         value_s = (value.length() + 1);
