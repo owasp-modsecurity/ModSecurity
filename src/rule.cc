@@ -802,8 +802,7 @@ end_exec:
 
     /* last rule in the chain. */
     bool isItToBeLogged = ruleMessage->m_saveMessage;
-    if (isItToBeLogged && !m_containsMultiMatchAction
-        && !ruleMessage->m_message.empty()) {
+    if (isItToBeLogged && !m_containsMultiMatchAction) {
         /* warn */
         trans->m_rulesMessages.push_back(*ruleMessage);
 
@@ -811,14 +810,6 @@ end_exec:
         if (!ruleMessage->m_isDisruptive) {
             trans->serverLog(ruleMessage);
 	}
-    }
-    else if (!m_containsMultiMatchAction) {
-        /* warn */
-        trans->m_rulesMessages.push_back(*ruleMessage);
-        /* error */
-        if (!ruleMessage->m_isDisruptive) {
-            trans->serverLog(ruleMessage);
-        }
     }
 
     return true;

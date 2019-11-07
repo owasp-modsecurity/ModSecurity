@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix rules with nolog are logging to part H
+   [Issue #2196 - @martinhsv]
  - Fix argument key-value pair parsing cases
    [Issue #1904 - @martinhsv]
  - Fix: audit log part for response body for JSON format to be E
