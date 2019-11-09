@@ -121,7 +121,8 @@ const char *Lua::blob_reader(lua_State *L, void *ud, size_t *size) {
 }
 #endif
 
-int Lua::run(Transaction *t) {
+
+int Lua::run(Transaction *t,const std::string &str) {
 #ifdef WITH_LUA
     std::string luaRet;
     const char *a = NULL;
@@ -184,7 +185,14 @@ int Lua::run(Transaction *t) {
     lua_setglobal(L, "modsec");
 
     lua_getglobal(L, "main");
-    if (lua_pcall(L, 0, 1, 0)) {
+
+        ms_dbg_a(t, 1, str);
+        /* Put the parameter on the stack. */
+    if (!str.empty() ) {
+        lua_pushlstring(L, str.c_str(), str.length());
+    }
+
+    if (lua_pcall(L, ((!str.empty()) ? 1 : 0), 1, 0)) {
         std::string e;
         const char *luaerr = lua_tostring(L, -1);
         e.assign("Failed to execute lua script: " + m_scriptName + " (main)");
