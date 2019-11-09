@@ -51,7 +51,7 @@ bool InspectFile::init(const std::string &param2, std::string *error) {
 
 bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
     if (m_isScript) {
-        return m_lua.run(transaction);
+        return m_lua.run(transaction, str);
     } else {
         FILE *in;
         char buff[512];

@@ -1,6 +1,9 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix: ModSecurity 3.x inspectFile operator does not pass
+   FILES_TMPNAMES parameter to lua engine
+   [Issue #2204, #2205 - @kadirerdogan]
  - XML: Remove error messages from stderr
    [Issue #2010 - @JaiHarpalani, @zimmerle]
  - Filter comment or blank line for pmFromFile operator
