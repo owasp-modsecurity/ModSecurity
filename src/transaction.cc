@@ -548,20 +548,53 @@ int Transaction::addRequestHeader(const std::string& key,
 
     if (keyl == "cookie") {
         size_t localOffset = m_variableOffset;
+        size_t pos;
         std::vector<std::string> cookies = utils::string::ssplit(value, ';');
         for (const std::string &c : cookies) {
-            std::vector<std::string> s = utils::string::split(c,
-               '=');
-            if (s.size() > 1) {
-                if (s[0].at(0) == ' ') {
-                    s[0].erase(0, 1);
-                }
-                m_variableRequestCookiesNames.set(s[0],
-                    s[0], localOffset);
+            // skip empty substring, eg "Cookie: ;;foo=bar"
+            if (c.empty() == true) {
+                localOffset++; // add length of ';'
+                continue;
+            }
 
-                localOffset = localOffset + s[0].size() + 1;
-                m_variableRequestCookies.set(s[0], s[1], localOffset);
-                localOffset = localOffset + s[1].size() + 2;
+            // find the first '='
+            pos = c.find_first_of("=", 0);
+            std::string ckey = "";
+            std::string cval = "";
+
+            // if the cookie doesn't contains '=', its just a key
+            if (pos == std::string::npos) {
+                ckey = c;
+            }
+            // else split to two substrings by first =
+            else {
+                ckey = c.substr(0, pos);
+                // value will contains the next '=' chars if exists
+                // eg. foo=bar=baz -> key: foo, value: bar=baz
+                cval = c.substr(pos+1);
+            }
+
+            // ltrim the key - following the modsec v2 way
+            while (ckey.empty() == false && ckey.at(0) == ' ') {
+                ckey.erase(0, 1);
+                localOffset++;
+            }
+
+            // if the key is empty (eg: "Cookie:   =bar;") skip it
+            if (ckey.empty() == true) {
+                localOffset = localOffset + c.length() + 1;
+                continue;
+            }
+            else {
+                // handle cookie only if the key is not empty                
+                // set cookie name
+                m_variableRequestCookiesNames.set(ckey,
+                        ckey, localOffset);
+                localOffset = localOffset + ckey.size() + 1;
+                // set cookie value
+                m_variableRequestCookies.set(ckey, cval,
+                        localOffset);
+                localOffset = localOffset + cval.size() + 1;
             }
         }
     }
