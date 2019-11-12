@@ -2,7 +2,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: REQUEST_COOKIES (1/3)",
+    "title":"Testing Variables :: REQUEST_COOKIES (1/5)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -42,7 +42,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: REQUEST_COOKIES (2/3)",
+    "title":"Testing Variables :: REQUEST_COOKIES (2/5)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -82,7 +82,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: REQUEST_COOKIES (3/3)",
+    "title":"Testing Variables :: REQUEST_COOKIES (3/5)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -113,6 +113,86 @@
     },
     "expected":{
       "debug_log":"Target value: \"b\" \\(Variable: REQUEST_COOKIES:t\\)"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_COOKIES \"@contains test \" \"id:1,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: REQUEST_COOKIES (4/5)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie":"USER_TOKEN=Yes; a=z; t=b;  foo= bar"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"Target value: \"bar\""
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_COOKIES \"@contains test \" \"id:1,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: REQUEST_COOKIES (5/5)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie":"USER_TOKEN=Yes; a=z; t=b;  foo= bar; = ; = = ; baz=value1=insert here something"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"Target value: \"value1=insert here something\""
     },
     "rules":[
       "SecRuleEngine On",
