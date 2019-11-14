@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix Cookie header parsing issues
+   [Issue #2201 - @airween, @martinhsv]
  - Fix rules with nolog are logging to part H
    [Issue #2196 - @martinhsv]
  - Fix argument key-value pair parsing cases

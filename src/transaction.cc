@@ -549,7 +549,18 @@ int Transaction::addRequestHeader(const std::string& key,
     if (keyl == "cookie") {
         size_t localOffset = m_variableOffset;
         size_t pos;
+
         std::vector<std::string> cookies = utils::string::ssplit(value, ';');
+
+        // Get rid of any optional whitespace after the cookie-string
+        // (i.e. after the end of the final cookie-pair)
+        if (!cookies.empty()) {
+            std::string& final_cookie_pair = cookies.back();
+            while (!final_cookie_pair.empty() && isspace(final_cookie_pair.back())) {
+                final_cookie_pair.pop_back();
+            }
+        }
+
         for (const std::string &c : cookies) {
             // skip empty substring, eg "Cookie: ;;foo=bar"
             if (c.empty() == true) {
