@@ -258,6 +258,24 @@ ngx_http_modsecurity_method_number(unsigned int nginx)
     return MultiplyDeBruijnBitPosition[((uint32_t)((nginx & -nginx) * 0x077CB531U)) >> 27];
 }
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+static ngx_uint_t request_id_index;
+
+static ngx_str_t get_request_id(ngx_http_request_t *r) {
+    ngx_str_t request_id_str;
+    request_id_str.data = NULL;
+    request_id_str.len = 0;
+
+    ngx_http_variable_value_t* request_id = ngx_http_get_indexed_variable(r, request_id_index);
+    if (request_id != NULL && !request_id->not_found) {
+        request_id_str.data = request_id->data;
+        request_id_str.len = request_id->len;
+    }
+
+    return request_id_str;
+}
+#endif
+
 /*
  * Use APR pool for all allocations because they should not depend on Nginx request pool.
  * In case of detection mode, processing will take place entirely in background and may last
@@ -351,6 +369,11 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     req->hostname = dup_ngx_str_to_apr(req->pool, (ngx_str_t *)&ngx_cycle->hostname);
 
     req->header_only = r->header_only ? r->header_only : (r->method == NGX_HTTP_HEAD);
+
+#ifdef WAF_JSON_LOGGING_ENABLE
+    ngx_str_t request_id = get_request_id(r);
+    req->log_id = dup_ngx_str_to_apr(req->pool, &request_id);
+#endif
 
     return NGX_OK;
 }
@@ -646,6 +669,9 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     if (result) {
         ngx_log_error(NGX_LOG_INFO, cf->log, 0, "ModSecurity: could not load application gateway rules IDs.");
     }
+
+    ngx_str_t request_id_varname = ngx_string("request_id");
+    request_id_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &request_id_varname);    
 #endif    
 
     azwaf_processing_result_key = ngx_hash_key_lc(
