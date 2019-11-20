@@ -552,9 +552,9 @@ int Transaction::addRequestHeader(const std::string& key,
 
         std::vector<std::string> cookies = utils::string::ssplit(value, ';');
 
-        // Get rid of any optional whitespace after the cookie-string
-        // (i.e. after the end of the final cookie-pair)
         if (!cookies.empty()) {
+            // Get rid of any optional whitespace after the cookie-string
+            // (i.e. after the end of the final cookie-pair)
             std::string& final_cookie_pair = cookies.back();
             while (!final_cookie_pair.empty() && isspace(final_cookie_pair.back())) {
                 final_cookie_pair.pop_back();
@@ -586,7 +586,7 @@ int Transaction::addRequestHeader(const std::string& key,
             }
 
             // ltrim the key - following the modsec v2 way
-            while (ckey.empty() == false && ckey.at(0) == ' ') {
+            while (ckey.empty() == false && isspace(ckey.at(0))) {
                 ckey.erase(0, 1);
                 localOffset++;
             }
