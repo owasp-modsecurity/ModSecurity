@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Additional adjustment to Cookie header parsing
+   [@martinhsv]
  - Restore chained rule part H logging to be more like 2.9 behaviour
    [Issue #2196 - @martinhsv]
  - Small fixes in log messages to help debugging the file upload
