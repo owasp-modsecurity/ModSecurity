@@ -866,11 +866,19 @@ static int hook_request_early(request_rec *r) {
         return DECLINED;
     }
 
-    /* Initialise transaction context and
-     * create the initial configuration.
+    /* Check if the transaction context
+     * has already been initialised.
      */
-    msr = create_tx_context(r);
-    if (msr == NULL) return DECLINED;
+
+    msr = retrieve_tx_context(r);
+    if (msr == NULL) {
+
+        /* Initialise transaction context and
+        * create the initial configuration.
+        */
+        msr = create_tx_context(r);
+        if (msr == NULL) return DECLINED;
+    }
 
 #ifdef REQUEST_EARLY
 
