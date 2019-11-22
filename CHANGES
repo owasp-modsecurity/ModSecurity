@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Filter comment or blank line for pmFromFile operator
+   [Issue #1645 - @LeeShan87, @victorhora, @tdoubley]
  - Additional adjustment to Cookie header parsing
    [@martinhsv]
  - Restore chained rule part H logging to be more like 2.9 behaviour
