@@ -483,7 +483,7 @@ static void store_tx_context(modsec_rec *msr, request_rec *r) {
 /**
  * Creates a new transaction context.
  */
-static modsec_rec *create_tx_context(request_rec *r) {
+modsec_rec *create_tx_context(request_rec *r) {
     apr_allocator_t *allocator = NULL;
     modsec_rec *msr = NULL;
 
