@@ -99,6 +99,9 @@ bool XML::processChunk(const char *buf, unsigned int size,
             error->assign("XML: Failed to create parsing context.");
             return false;
         }
+
+        xmlSetGenericErrorFunc(m_data.parsing_ctx, null_error);
+
         return true;
     }
 

@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - XML: Remove error messages from stderr
+   [Issue #2010 - @JaiHarpalani, @zimmerle]
  - Filter comment or blank line for pmFromFile operator
    [Issue #1645 - @LeeShan87, @victorhora, @tdoubley]
  - Additional adjustment to Cookie header parsing

@@ -53,6 +53,10 @@ class XML {
     static xmlParserInputBufferPtr unloadExternalEntity(const char *URI,
         xmlCharEncoding enc);
 
+    static void null_error(void *ctx, const char *msg, ...) {
+    }
+
+
     xml_data m_data;
 
  private:
