@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Multipart Content-Dispostion should allow field: filename*=
+    [@martinhsv]
   - Fix rule-update-target for non-regex
     [Issue 2251 - @martinhsv]
   - Fix configure script when packaging for Buildroot
