@@ -35,6 +35,8 @@
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
+static const char* mime_charset_special = "!#$%&+-^_`{}~";
+static const char* attr_char_special = "!#$&+-.^_`~";
 
 Multipart::Multipart(std:: string header, Transaction *transaction)
     : m_reqbody_no_files_length(0),
@@ -208,6 +210,7 @@ void Multipart::validate_quotes(const char *data)  {
 
 int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     const char *p = NULL;
+    std::string filenameStar;
 
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
@@ -276,13 +279,45 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             return -6;
         }
 
-        /* Accept both quotes as some backends will accept them, but
-         * technically "'" is invalid and so flag_invalid_quoting is
-         * set so the user can deal with it in the rules if they so wish.
-         */
+        if (name == "filename*") {
+            /* filename*=charset'[optional-language]'filename */
+            /* Read beyond the charset and the optional language*/
+            const char* start_of_charset = p;
+            while ((*p != '\0') && (isalnum(*p) || (strchr(mime_charset_special, *p)))) {
+                p++;
+            }
+            if ((*p != '\'') || (p == start_of_charset)) {
+                return -16; // Must be at least one legit char before ' for start of language
+            }
+            p++;
+            while ((*p != '\0') && (*p != '\'')) {
+                p++;
+            }
+            if (*p != '\'') {
+                return -17; // Single quote for end-of-language not found
+            }
+            p++;
 
-        if ((*p == '"') || (*p == '\'')) {
-            /* quoted */
+            /* Now read what should be the actual filename */
+            const char* start_of_filename = p;
+            while ((*p != '\0') && (*p != ';')) {
+                if (*p == '%') {
+                    if ((*(p+1) == '\0') || (!isxdigit(*(p+1))) || (!isxdigit(*p+2))) {
+                        return -18;
+                    }
+                    p += 3;
+                } else if (isalnum(*p) || strchr(attr_char_special, *p)) {
+                    p++;
+                } else {
+                    return -19;
+                }
+            }
+            value.assign(start_of_filename, p - start_of_filename);
+        } else if ((*p == '"') || (*p == '\'')) {
+            /* Accept both quotes as some backends will accept them, but
+             * technically "'" is invalid and so flag_invalid_quoting is
+             * set so the user can deal with it in the rules if they so wish.
+             */
             char quote = *p;
 
             if (quote == '\'') {
@@ -364,8 +399,17 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             m_mpp->m_filenameOffset = offset + ((p - c_d_value) - value.size());
 
             ms_dbg_a(m_transaction, 9,
-                "Multipart: Content-Disposition filename: " \
-                + value + ".");
+                "Multipart: Content-Disposition filename: " + value + ".");
+        } else if (name == "filename*") {
+            if (!filenameStar.empty()) {
+                ms_dbg_a(m_transaction, 4,
+                    "Multipart: Warning: Duplicate Content-Disposition " \
+                    "filename*: " + value + ".");
+                return -20;
+            }
+            filenameStar.assign(value);
+            ms_dbg_a(m_transaction, 9,
+                "Multipart: Content-Disposition filename*: " + value + ".");
         } else {
             return -11;
         }
@@ -377,24 +421,32 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
 
             /* the next character must be a zero or a semi-colon */
             if (*p == '\0') {
-                return 1; /* this is OK */
-            }
-            if (*p != ';') {
-                p--;
-                if (*p == '\'' || *p == '\"') {
-                    ms_dbg_a(m_transaction, 9,
-                        "Multipart: Invalid quoting detected: " \
-                        + std::string(p) + " length " \
-                        + std::to_string(strlen(p)) + " bytes");
-                    m_flag_invalid_quoting = 1;
+                // Just let the 'while' condition end the loop
+            } else {
+                if (*p != ';') {
+                    p--;
+                    if (*p == '\'' || *p == '\"') {
+                        ms_dbg_a(m_transaction, 9,
+                            "Multipart: Invalid quoting detected: " \
+                            + std::string(p) + " length " \
+                            + std::to_string(strlen(p)) + " bytes");
+                        m_flag_invalid_quoting = 1;
+                    }
+                    p++;
+                    return -12;
                 }
-                p++;
-                return -12;
+                p++; /* move over the semi-colon */
             }
-            p++; /* move over the semi-colon */
         }
 
         /* loop will stop when (*p == '\0') */
+    }
+
+    if (!filenameStar.empty() && m_mpp->m_filename.empty()) {
+        ms_dbg_a(m_transaction, 4,
+            "Multipart: Warning: no filename= but filename*:" \
+            + filenameStar + ".");
+        return -21;
     }
 
     return 1;
@@ -675,8 +727,14 @@ int Multipart::process_part_header(std::string *error, int offset) {
         }
         header_value = m_mpp->m_headers.at("Content-Disposition").second;
 
-        rc = parse_content_disposition(header_value.c_str(),
-            m_mpp->m_headers.at("Content-Disposition").first);
+        try {
+            rc = parse_content_disposition(header_value.c_str(),
+                m_mpp->m_headers.at("Content-Disposition").first);
+        } catch (...) {
+            ms_dbg_a(m_transaction, 1,
+                "Multipart: Unexpected error parsing Content-Disposition header.");
+            rc = -99;
+        }
         if (rc < 0) {
             ms_dbg_a(m_transaction, 1,
                 "Multipart: Invalid Content-Disposition header ("

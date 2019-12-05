@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Multipart Content-Dispostion should allow field: filename*=
+   [@martinhsv]
  - Fix: ModSecurity 3.x inspectFile operator does not pass
    FILES_TMPNAMES parameter to lua engine
    [Issue #2204, #2205 - @kadirerdogan]
