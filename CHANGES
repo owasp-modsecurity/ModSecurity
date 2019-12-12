@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 ------------------------------------
 
+ * Accepts JSON without key
+   [Issue #1576 - @marcstern]
  * Adds a sanity check before use ctl:ruleRemoveTargetById and ctl:ruleRemoveTargetByMsg.
    [Issue #2033 - @studersi]
  * Fix the order of error_msg validation
