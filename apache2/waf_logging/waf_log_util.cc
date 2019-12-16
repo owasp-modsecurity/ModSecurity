@@ -56,7 +56,7 @@ JSONCONS_TYPE_TRAITS_DECL(waf_logging::waf_log, timeStamp, resourceId, operation
 static std::string to_json_string(const waf_logging::waf_log& log) {
     jsoncons::json_options options;
     std::string json_output;
-    jsoncons::encode_json(jsoncons::ojson{}, log, json_output, options, jsoncons::indenting::indent);
+    jsoncons::encode_json(jsoncons::ojson{}, log, json_output, options);
     return json_output;
 };
 
