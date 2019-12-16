@@ -113,12 +113,6 @@ void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned
 void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length));
 void modsecSetDropAction(int (*func)(request_rec *r));
 
-/*
- * Creates internal request context if does not yet exist.
- * Must be called for a request_rec object that contains all request headers.
- */
-const char *modsecInitializeRequestContext(request_rec *r);
-
 int modsecIsResponseBodyAccessEnabled(request_rec *r);
 int modsecIsRequestBodyAccessEnabled(request_rec *r);
 

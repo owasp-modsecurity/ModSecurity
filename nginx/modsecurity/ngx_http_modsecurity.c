@@ -837,17 +837,6 @@ ngx_http_modsecurity_detection_task_offload(ngx_http_request_t *r)
         return NGX_ERROR;
     }
 
-    // ModSecurity only initializes the internal request context upon the call
-    // to modsecProcessRequestHeaders().
-    // In our case, we postpone this call so we need to initialize the context
-    // explicitly because predicates like modsecIsRequestBodyAccessEnabled()
-    // use it for the checks they perform.
-    const char *err = modsecInitializeRequestContext(req);
-    if (err) {
-        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, err);
-        return NGX_ERROR;
-    }
-
     if (modsecIsRequestBodyAccessEnabled(req) && (r->headers_in.content_length || r->headers_in.chunked)) {
         if (ngx_http_modsecurity_load_request_body(r) != NGX_OK) {
             return NGX_ERROR;

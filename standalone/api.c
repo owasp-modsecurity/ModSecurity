@@ -535,19 +535,6 @@ int modsecContextState(request_rec *r)
     return msr->txcfg->is_enabled;
 }
 
-const char* modsecInitializeRequestContext(request_rec *r)
-{
-    modsec_rec *msr = retrieve_msr(r);
-    if (msr == NULL) {
-        msr = create_tx_context(r);
-        if (msr == NULL) {
-            return "Failed to initialize request context";
-        }
-    }
-
-    return NULL;
-}
-
 int modsecIsRequestBodyAccessEnabled(request_rec *r)
 {
     modsec_rec *msr = retrieve_msr(r);
