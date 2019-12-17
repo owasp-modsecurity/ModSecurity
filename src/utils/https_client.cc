@@ -64,7 +64,7 @@ bool HttpsClient::download(const std::string &uri) {
     CURL *curl;
     CURLcode res;
     std::string uniqueId = "ModSec-unique-id: " + UniqueId::uniqueId();
-    std::string status = "ModSec-status: " MODSECURITY_VERSION_NUM;
+    std::string status = "ModSec-status: " + std::to_string(MODSECURITY_VERSION_NUM);
 
     curl = curl_easy_init();
     if (!curl) {
