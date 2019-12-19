@@ -162,12 +162,10 @@ ngx_module_t ngx_http_modsecurity = {
 
 static ngx_http_upstream_t ngx_http_modsecurity_upstream;
 
-static inline u_char *
+static inline char *
 ngx_pstrdup0(ngx_pool_t *pool, ngx_str_t *src)
 {
-    u_char  *dst;
-
-    dst = ngx_pnalloc(pool, src->len + 1);
+    char *dst = ngx_pnalloc(pool, src->len + 1);
     if (dst == NULL) {
         return NULL;
     }
@@ -176,13 +174,6 @@ ngx_pstrdup0(ngx_pool_t *pool, ngx_str_t *src)
     dst[src->len] = '\0';
 
     return dst;
-}
-
-
-static inline char *
-dup_ngx_str_to_apr(apr_pool_t *pool, ngx_str_t *src)
-{
-    return apr_pstrmemdup(pool, (char *)src->data, src->len);
 }
 
 static inline int
@@ -269,7 +260,7 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     req = ctx->req;
 
     /* request line */
-    req->method = dup_ngx_str_to_apr(req->pool, &r->method_name);
+    req->method = ngx_pstrdup0(r->pool, &r->method_name);
 
     /* TODO: how to use ap_method_number_of ?
      * req->method_number = ap_method_number_of(req->method);
@@ -282,18 +273,18 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
         return NGX_ERROR;
     }
 
-    req->filename = dup_ngx_str_to_apr(req->pool, &path);
+    req->filename = (char *) path.data;
     req->path_info = req->filename;
 
-    req->args = dup_ngx_str_to_apr(req->pool, &r->args);
+    req->args = ngx_pstrdup0(r->pool, &r->args);
 
     req->proto_num = r->http_major *1000 + r->http_minor;
-    req->protocol = dup_ngx_str_to_apr(req->pool, &r->http_protocol);
+    req->protocol = ngx_pstrdup0(r->pool, &r->http_protocol);
     req->request_time = apr_time_make(r->start_sec, r->start_msec);
-    req->the_request = dup_ngx_str_to_apr(req->pool, &r->request_line);
+    req->the_request = ngx_pstrdup0(r->pool, &r->request_line);
 
-    req->unparsed_uri = dup_ngx_str_to_apr(req->pool, &r->unparsed_uri);
-    req->uri = dup_ngx_str_to_apr(req->pool, &r->uri);
+    req->unparsed_uri = ngx_pstrdup0(r->pool, &r->unparsed_uri);
+    req->uri = ngx_pstrdup0(r->pool, &r->uri);
 
     req->parsed_uri.scheme = "http";
 
@@ -303,7 +294,7 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     }
 #endif
 
-    req->parsed_uri.path = dup_ngx_str_to_apr(req->pool, &r->uri);
+    req->parsed_uri.path = ngx_pstrdup0(r->pool, &r->uri);
     req->parsed_uri.is_initialized = 1;
 
     switch (r->connection->local_sockaddr->sa_family) {
@@ -328,22 +319,22 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     }
 
     req->parsed_uri.port = port;
-    req->parsed_uri.port_str = apr_palloc(req->pool, sizeof("65535"));
+    req->parsed_uri.port_str = ngx_pnalloc(r->pool, sizeof("65535"));
     (void) ngx_sprintf((u_char *)req->parsed_uri.port_str, "%ui%c", port, '\0');
 
     req->parsed_uri.query = r->args.len ? req->args : NULL;
     req->parsed_uri.dns_looked_up = 0;
     req->parsed_uri.dns_resolved = 0;
 
-    req->parsed_uri.fragment = dup_ngx_str_to_apr(req->pool, &r->exten);
+    req->parsed_uri.fragment = ngx_pstrdup0(r->pool, &r->exten);
 
-    req->hostname = dup_ngx_str_to_apr(req->pool, (ngx_str_t *)&ngx_cycle->hostname);
+    req->hostname = ngx_pstrdup0(r->pool, (ngx_str_t *)&ngx_cycle->hostname);
 
     req->header_only = r->header_only ? r->header_only : (r->method == NGX_HTTP_HEAD);
 
 #ifdef WAF_JSON_LOGGING_ENABLE
     ngx_str_t request_id = get_request_id(r);
-    req->log_id = dup_ngx_str_to_apr(req->pool, &request_id);
+    req->log_id = ngx_pstrdup0(r->pool, &request_id);
 #endif
 
     return NGX_OK;
@@ -381,15 +372,7 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
             i = 0;
         }
 
-        const char *key = dup_ngx_str_to_apr(req->pool, &h[i].key);
-        if (key == NULL) {
-            return NGX_ERROR;
-        }
-        const char *value = dup_ngx_str_to_apr(req->pool, &h[i].value);
-        if (value == NULL) {
-            return NGX_ERROR;
-        }
-        apr_table_setn(req->headers_in, key, value);
+        apr_table_setn(req->headers_in, (char *)h[i].key.data, (char *)h[i].value.data);
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                        "ModSecurity: load headers in: \"%V: %V\"",
                        &h[i].key, &h[i].value);
@@ -416,17 +399,17 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
 
     req->ap_auth_type = (char *)apr_table_get(req->headers_in, "Authorization");
 
-    req->user = dup_ngx_str_to_apr(req->pool, &r->headers_in.user);
+    req->user = ngx_pstrdup0(r->pool, &r->headers_in.user);
 
     /* Add scope and scope name for logging purposes */
     ngx_http_modsecurity_loc_conf_t* cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
-    const char* scope = dup_ngx_str_to_apr(req->pool, &cf->scope);
+    const char* scope = ngx_pstrdup0(r->pool, &cf->scope);
     if (scope == NULL) {
         return NGX_ERROR;
     }
     apr_table_setn(req->notes, WAF_POLICY_SCOPE, scope);
 
-    const char* scope_name = dup_ngx_str_to_apr(req->pool, &cf->scope_name);
+    const char* scope_name = ngx_pstrdup0(r->pool, &cf->scope_name);
     if (scope_name == NULL) {
         return NGX_ERROR;
     }
@@ -960,9 +943,9 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
         ctx->connection = modsecNewConnection();
 
         /* fill apr_sockaddr_t */
-        asa = apr_palloc(ctx->connection->pool, sizeof(apr_sockaddr_t));
+        asa = ngx_palloc(r->pool, sizeof(apr_sockaddr_t));
         asa->pool = ctx->connection->pool;
-        asa->hostname = dup_ngx_str_to_apr(asa->pool, &r->connection->addr_text);
+        asa->hostname = ngx_pstrdup0(r->pool, &r->connection->addr_text);
         asa->servname = asa->hostname;
         asa->next = NULL;
         asa->salen = r->connection->socklen;
@@ -1006,9 +989,7 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
 
     ctx->req = modsecNewRequest(ctx->connection, cf->config);
 
-    if (cf->config->is_enabled != MODSEC_DETECTION_ONLY) {
-        apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *)ctx);
-    }
+    apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *)ctx);
     apr_generate_random_bytes(salt, TXID_SIZE);
 
     txid = apr_pcalloc (ctx->req->pool, TXID_SIZE);
