@@ -1,6 +1,9 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Add support to test framework for audit log content verification
+   and add regression tests for issues #2000, #2196
+   [@martinhsv]
  - Fix: ModSecurity 3.x inspectFile operator does not pass
    FILES_TMPNAMES parameter to lua engine
    [Issue #2204, #2205 - @kadirerdogan]

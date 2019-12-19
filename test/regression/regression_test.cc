@@ -180,7 +180,7 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
                 yajl_val val2 = val->u.object.values[j];
 
                 if (strcmp(key2, "audit_log") == 0) {
-                    u->audit_log = yajl_array_to_str(val2);
+                    u->audit_log = YAJL_GET_STRING(val2);
                 }
                 if (strcmp(key2, "debug_log") == 0) {
                     u->debug_log = YAJL_GET_STRING(val2);
