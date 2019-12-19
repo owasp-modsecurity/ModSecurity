@@ -58,6 +58,30 @@ bool contains(const std::string &s, const std::string &pattern) {
     return ret;
 }
 
+void clearAuditLog(const std::string &filename) {
+    if (!filename.empty()) {
+        std::ifstream file;
+        file.open(filename.c_str(), std::ifstream::out | std::ifstream::trunc);
+        if (!file.is_open() || file.fail()) {
+            std::cout << std::endl << "Failed to clear previous contents of audit log: " \
+                << filename << std::endl;
+        }
+        file.close();
+    }
+}
+std::string getAuditLogContent(const std::string &filename) {
+    std::stringstream buffer;
+    if (!filename.empty()) {
+        try {
+           std::ifstream t(filename);
+           buffer << t.rdbuf();
+        } catch (...) {
+            std::cout << "Failed to read file:" << filename << std::endl;
+        }
+    }
+    return buffer.str();
+}
+
 
 void actions(ModSecurityTestResults<RegressionTest> *r,
     modsecurity::Transaction *a, std::stringstream *serverLog) {
@@ -278,6 +302,8 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         modsec_transaction = new modsecurity::Transaction(modsec, modsec_rules,
             &serverLog);
 
+        clearAuditLog(modsec_transaction->m_rules->m_auditLog->m_path1);
+
         modsec_transaction->processConnection(t->clientIp.c_str(),
             t->clientPort, t->serverIp.c_str(), t->serverPort);
 
@@ -393,6 +419,19 @@ end:
                 testRes->reason << KWHT << "Expecting: " << RESET \
                     << t->error_log + "";
                 testRes->passed = false;
+            } else if (!t->audit_log.empty()
+                && !contains(getAuditLogContent(modsec_transaction->m_rules->m_auditLog->m_path1), t->audit_log)) {
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: FAIL " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KRED << "failed!" << RESET << std::endl;
+                }
+                testRes->reason << "Audit log was not matching the " \
+                    << "expected results." << std::endl;
+                testRes->reason << KWHT << "Expecting: " << RESET \
+                    << t->audit_log + "";
+                testRes->passed = false;
             } else {
                 if (test->m_automake_output) {
                     std::cout << ":test-result: PASS " << filename \
@@ -410,6 +449,8 @@ end:
                 testRes->reason << d->log_messages() << std::endl;
                 testRes->reason << KWHT << "Error log:" << RESET << std::endl;
                 testRes->reason << serverLog.str() << std::endl;
+                testRes->reason << KWHT << "Audit log:" << RESET << std::endl;
+                testRes->reason << getAuditLogContent(modsec_transaction->m_rules->m_auditLog->m_path1) << std::endl;
             }
         }
 
