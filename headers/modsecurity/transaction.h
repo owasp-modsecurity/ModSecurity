@@ -557,13 +557,6 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     std::list< std::pair<int, std::string> > m_auditLogModifier;
 
     /**
-     * This variable holds all the messages asked to be save by the utilization
-     * of the actions: `log_data' and `msg'. These should be included on the
-     * auditlogs.
-     */
-    std::list<modsecurity::RuleMessage> m_rulesMessages;
-
-    /**
      * Holds the request body, in case of any.
      */
     std::ostringstream m_requestBody;

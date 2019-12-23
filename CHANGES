@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Fix audit log regression where part H unpopulated
+   [@martinhsv]
  - Add support to test framework for audit log content verification
    and add regression tests for issues #2000, #2196
    [@martinhsv]

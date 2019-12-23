@@ -34,7 +34,7 @@
       "SecAuditLogParts ABIJDEFHZ",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",
-      "SecAuditLog /tmp/test/modsec_audit.log",
+      "SecAuditLog /tmp/test/modsec_audit_issue-2196.log",
       "SecAuditLogDirMode 0766",
       "SecAuditLogFileMode 0666",
       "SecAuditLogType Serial",
