@@ -40,5 +40,6 @@ int main(int argc, char* argv[])
         exit_with_error(err);
     }
 
+    modsecTerminate();
     exit(EXIT_SUCCESS);
 }
