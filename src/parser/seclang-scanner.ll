@@ -359,6 +359,7 @@ CONFIG_SEC_STREAM_IN_BODY_INSPECTION    (?i:SecStreamInBodyInspection)
 CONFIG_SEC_STREAM_OUT_BODY_INSPECTION   (?i:SecStreamOutBodyInspection)
 CONFIG_DIR_PCRE_MATCH_LIMIT             (?i:SecPcreMatchLimit)
 CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION   (?i:SecPcreMatchLimitRecursion)
+CONFIG_DIR_ARGS_LIMIT                   (?i:SecArgumentsLimit)
 CONFIG_DIR_REQ_BODY                     (?i:SecRequestBodyAccess)
 CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT     (?i:SecRequestBodyInMemoryLimit)
 CONFIG_DIR_REQ_BODY_LIMIT               (?i:SecRequestBodyLimit)
@@ -758,13 +759,17 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_DIR_AUDIT_STS}[ \t]+{FREE_TEXT_NEW_LINE}                        { return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_STS}[ \t]+["]{NEW_LINE_FREE_TEXT}["]                  { return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_TPE}                                                  { return p::make_CONFIG_DIR_AUDIT_TPE(yytext, *driver.loc.back()); }
+
+
 {CONFIG_DIR_DEBUG_LOG}[ \t]+{CONFIG_VALUE_PATH}                         { return p::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_DEBUG_LOG}[ \t]+["]{CONFIG_VALUE_PATH}["]                   { return p::make_CONFIG_DIR_DEBUG_LOG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
 {CONFIG_DIR_DEBUG_LVL}[ \t]+{CONFIG_VALUE_NUMBER}                       { return p::make_CONFIG_DIR_DEBUG_LVL(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_GEO_DB}[ \t]+{FREE_TEXT_NEW_LINE}                           { return p::make_CONFIG_DIR_GEO_DB(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION}[ \t]+{CONFIG_VALUE_NUMBER}      { return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_PCRE_MATCH_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}                { return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_ARGS_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}                      { return p::make_CONFIG_DIR_ARGS_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}        { return p::make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+
 {CONFIG_DIR_REQ_BODY_LIMIT_ACTION}                                      { return p::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
 {CONFIG_DIR_REQ_BODY_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}                  { return p::make_CONFIG_DIR_REQ_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}         { return p::make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }

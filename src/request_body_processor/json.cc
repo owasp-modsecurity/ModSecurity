@@ -142,7 +142,10 @@ int JSON::addArgument(const std::string& value) {
     }
 
 
-    m_transaction->addArgument("JSON", path + data, value, 0);
+    if (!m_transaction->addArgument("JSON", path + data, value, 0)) {
+        // cancel parsing by returning false
+        return 0;
+    }
 
     return 1;
 }
