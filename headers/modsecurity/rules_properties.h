@@ -382,6 +382,7 @@ class RulesProperties {
                             from->m_tmpSaveUploadedFiles,
                             PropertyNotSetConfigBoolean);
 
+        to->m_argumentsLimit.merge(&from->m_argumentsLimit);
         to->m_requestBodyLimit.merge(&from->m_requestBodyLimit);
         to->m_responseBodyLimit.merge(&from->m_responseBodyLimit);
 
@@ -529,6 +530,7 @@ class RulesProperties {
     ConfigBoolean m_secXMLExternalEntity;
     ConfigBoolean m_tmpSaveUploadedFiles;
     ConfigBoolean m_uploadKeepFiles;
+    ConfigDouble m_argumentsLimit;
     ConfigDouble m_requestBodyLimit;
     ConfigDouble m_requestBodyNoFilesLimit;
     ConfigDouble m_responseBodyLimit;

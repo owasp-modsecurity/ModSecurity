@@ -1,6 +1,8 @@
 v3.0.4 - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+ - Support configurable limit on number of arguments processed
+   [@jleproust, @martinhsv]
  - Fix: audit log data omitted when nolog,auditlog
    [@martinhsv]
  - Fix: ModSecurity 3.x inspectFile operator does not pass
