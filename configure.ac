@@ -157,7 +157,7 @@ case $host in
     AC_DEFINE([MACOSX], [1], [Define if the operating system is Macintosh OSX])
     PLATFORM="MacOSX"
     ;;
-  *-*-linux*)
+  *-*-linux* | *-*uclinux*)
     echo "Checking platform... Identified as Linux"
     AC_DEFINE([LINUX], [1], [Define if the operating system is LINUX])
     PLATFORM="Linux"
