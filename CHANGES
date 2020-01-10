@@ -1,5 +1,5 @@
-v3.0.4 - YYYY-MMM-DD (to be released)
--------------------------------------
+v3.0.4 - 2020-Jan-13
+--------------------
 
  - Fix: audit log data omitted when nolog,auditlog
    [@martinhsv]
