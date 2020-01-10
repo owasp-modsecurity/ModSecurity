@@ -194,7 +194,7 @@ case $host in
     ;;
        *)
     echo "Unknown CANONICAL_HOST $host"
-    exit
+    exit 1
     ;;
 esac
 
