@@ -277,8 +277,9 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
     /* Feed our parser and catch any errors */
     msr->json->status = yajl_parse(msr->json->handle, buf, size);
     if (msr->json->status != yajl_status_ok) {
-        /* We need to free the yajl error message later, how to do this? */
-        *error_msg = yajl_get_error(msr->json->handle, 0, buf, size);
+        char *yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
+        *error_msg = apr_pstrdup(msr->mp, yajl_err);
+        yajl_free_error(msr->json->handle, yajl_err);
         return -1;
     }
 
@@ -297,8 +298,9 @@ int json_complete(modsec_rec *msr, char **error_msg) {
     /* Wrap up the parsing process */
     msr->json->status = yajl_complete_parse(msr->json->handle);
     if (msr->json->status != yajl_status_ok) {
-        /* We need to free the yajl error message later, how to do this? */
-        *error_msg = yajl_get_error(msr->json->handle, 0, NULL, 0);
+        char *yajl_err = yajl_get_error(msr->json->handle, 0, NULL, 0);
+        *error_msg = apr_pstrdup(msr->mp, yajl_err);
+        yajl_free_error(msr->json->handle, yajl_err);
         return -1;
     }
 
