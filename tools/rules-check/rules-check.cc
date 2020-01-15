@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
         }
 
         if (argFull.empty() == false) {
-            arg = argFull.c_str();
+            arg = strdup(argFull.c_str());
             argFull.clear();
         }
 

@@ -200,13 +200,13 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
             }
         }
         if (strcmp(key, "rules") == 0) {
-            std::stringstream i;
+            std::stringstream si;
             for (int j = 0; j < val->u.array.len; j++) {
                 yajl_val val2 = val->u.array.values[ j ];
-                const char *key = YAJL_GET_STRING(val2);
-                i << key << "\n";
+                const char *keyj = YAJL_GET_STRING(val2);
+                si << keyj << "\n";
             }
-            u->rules = i.str();
+            u->rules = si.str();
         }
     }
 

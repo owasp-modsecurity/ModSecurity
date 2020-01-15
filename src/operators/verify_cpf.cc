@@ -129,15 +129,15 @@ bool VerifyCPF::evaluate(Transaction *t, Rule *rule,
 
     for (i = 0; i < input.size() - 1 && is_cpf == false; i++) {
         matches = m_re->searchAll(input.substr(i, input.size()));
-        for (const auto & i : matches) {
-            is_cpf = verify(i.str().c_str(), i.str().size());
+        for (const auto & m : matches) {
+            is_cpf = verify(m.str().c_str(), m.str().size());
             if (is_cpf) {
-                logOffset(ruleMessage, i.offset(), i.str().size());
+                logOffset(ruleMessage, m.offset(), m.str().size());
                 if (rule && t && rule->m_containsCaptureAction) {
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
-                        "0", i.str());
+                        "0", m.str());
                     ms_dbg_a(t, 7, "Added VerifyCPF match TX.0: " + \
-                        i.str());
+                        m.str());
                 }
 
                 goto out;

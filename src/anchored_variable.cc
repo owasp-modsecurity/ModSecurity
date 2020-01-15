@@ -30,10 +30,10 @@ namespace modsecurity {
 AnchoredVariable::AnchoredVariable(Transaction *t,
     std::string name)
     : m_transaction(t),
-    m_var(NULL),
     m_offset(0),
     m_name(""),
-    m_value("") {
+    m_value(""),
+    m_var(NULL) {
         m_name.append(name);
         m_var = new VariableValue(&m_name);
 }

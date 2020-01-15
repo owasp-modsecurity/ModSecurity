@@ -34,7 +34,6 @@ namespace operators {
 
 Pm::~Pm() {
     acmp_node_t *root = m_p->root_node;
-    acmp_node_t *node = root;
 
     cleanup(root);
 

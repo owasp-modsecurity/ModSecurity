@@ -669,8 +669,8 @@ class VariableModificatorCount : public Variable {
 };
 
 
-std::string operator+(std::string a, modsecurity::variables::Variable *v);
-std::string operator+(std::string a, modsecurity::variables::Variables *v);
+std::string operator+(const std::string &a, modsecurity::variables::Variable *v);
+std::string operator+(const std::string &a, modsecurity::variables::Variables *v);
 
 
 }  // namespace variables

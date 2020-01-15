@@ -49,7 +49,6 @@ bool SetVar::evaluate(Rule *rule, Transaction *t) {
     }
 
     std::string m_variableNameExpanded;
-    std::vector<const VariableValue *> l;
 
     auto *v = m_variable.get();
     variables::Tx_DynamicElement *tx = dynamic_cast<

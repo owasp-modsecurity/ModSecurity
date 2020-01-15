@@ -145,7 +145,7 @@ void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
         i++;
         m_count_all = true;
     }
-    if (const char* env_p = std::getenv("AUTOMAKE_TESTS")) {
+    if (std::getenv("AUTOMAKE_TESTS")) {
         m_automake_output = true;
     }
 

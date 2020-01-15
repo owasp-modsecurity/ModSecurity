@@ -61,7 +61,7 @@ void XML::evaluate(Transaction *t,
     std::string param;
     const xmlChar* xpathExpr = NULL;
     int i;
-    size_t pos;
+    //size_t pos;
 
     param = m_name;
     /*

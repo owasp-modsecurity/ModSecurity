@@ -76,12 +76,12 @@ void Variable::addsKeyExclusion(Variable *v) {
 }
 
 
-std::string operator+(std::string a, Variable *v) {
+std::string operator+(const std::string &a, Variable *v) {
     return a + *v->m_fullName.get();
 }
 
 
-std::string operator+(std::string a, Variables *v) {
+std::string operator+(const std::string &a, Variables *v) {
     std::string test;
     for (auto &b : *v) {
         if (test.empty()) {

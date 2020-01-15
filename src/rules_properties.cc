@@ -35,7 +35,6 @@ void ConfigUnicodeMap::loadConfig(std::string f, double configCodePage,
     int length = 0;
     int Map = 0;
     int processing = 0;
-    unsigned int codepage = 0;
 
     driver->m_unicodeMapTable.m_set = true;
     driver->m_unicodeMapTable.m_unicodeCodePage = configCodePage;
@@ -88,7 +87,7 @@ void ConfigUnicodeMap::loadConfig(std::string f, double configCodePage,
     p = strtok_r(buf, CODEPAGE_SEPARATORS, &savedptr);
 
     while (p != NULL) {
-        codepage = atol(p);
+        unsigned int codepage = atol(p);
 
         if (codepage == configCodePage) {
             found = 1;

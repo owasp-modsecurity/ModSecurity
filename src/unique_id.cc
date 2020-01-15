@@ -159,7 +159,6 @@ std::string const UniqueId::ethernetMacAddress() {
         }
 
         if (ioctl(sock, SIOCGIFHWADDR, ifr) == 0) {
-            int i = 0;
             if (!ifr->ifr_addr.sa_data[0] && !ifr->ifr_addr.sa_data[1]
                 && !ifr->ifr_addr.sa_data[2]) {
                 continue;
@@ -223,7 +222,9 @@ std::string const UniqueId::ethernetMacAddress() {
     free(pAdapterInfo);
 #endif
 
+#if defined(__linux__) || defined(__gnu_linux__) || defined(DARWIN) || defined(WIN32)
 end:
+#endif
     return std::string(reinterpret_cast<const char *>(mac));
 #if defined(__linux__) || defined(__gnu_linux__) || defined(DARWIN) || defined(WIN32)
 failed:

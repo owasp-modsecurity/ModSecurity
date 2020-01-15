@@ -284,7 +284,7 @@ void LMDB::resolveSingleMatch(const std::string& var,
 
     string2val(var, &mdb_key);
 
-    rc = mdb_cursor_open(txn, dbi, &cursor);
+    mdb_cursor_open(txn, dbi, &cursor);
     while ((rc = mdb_cursor_get(cursor, &mdb_key,
             &mdb_value_ret, MDB_NEXT_DUP)) == 0) {
         std::string *a = new std::string(
@@ -536,7 +536,6 @@ void LMDB::resolveRegularExpression(const std::string& var,
     int rc;
     MDB_stat mst;
     MDB_cursor *cursor;
-    size_t pos;
 
     Utils::Regex r(var);
 

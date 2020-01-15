@@ -855,9 +855,9 @@ int Transaction::processRequestBody() {
     std::string fullRequest;
     std::vector<const VariableValue *> l;
     m_variableRequestHeaders.resolve(&l);
-    for (auto &a : l) {
-        fullRequest = fullRequest + a->getKey() + ": " + a->getValue() + "\n";
-        delete a;
+    for (auto &h : l) {
+        fullRequest = fullRequest + h->getKey() + ": " + h->getValue() + "\n";
+        delete h;
     }
 
     fullRequest = fullRequest + "\n\n";

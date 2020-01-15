@@ -120,7 +120,6 @@ bool GeoLookup::lookup(const std::string& target, Transaction *trans,
     if (m_version == VERSION_MAXMIND) {
         int gai_error, mmdb_error;
         MMDB_lookup_result_s r;
-        int status;
 
         r = MMDB_lookup_string(&mmdb, target.c_str(), &gai_error, &mmdb_error);
 
@@ -145,7 +144,7 @@ bool GeoLookup::lookup(const std::string& target, Transaction *trans,
         } else {
             MMDB_entry_data_s entry_data;
 
-            status = MMDB_get_value(&r.entry, &entry_data,
+            int status = MMDB_get_value(&r.entry, &entry_data,
                 "country", "iso_code", NULL);
             if (status == MMDB_SUCCESS && entry_data.has_data) {
                 trans->m_variableGeo.set("COUNTRY_CODE",

@@ -63,7 +63,6 @@ std::string Utf8ToUnicode::evaluate(std::string value,
 
 char *Utf8ToUnicode::inplace(unsigned char *input,
     uint64_t input_len, int *changed) {
-    int length = 0;
     unsigned int count = 0;
     char *data;
     char *data_orig;
@@ -120,6 +119,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
                 unicode_len = 2;
                 count+=6;
                 if (count <= len) {
+                    int length = 0;
                     /* compute character number */
                     d = ((c & 0x1F) << 6) | (*(utf + 1) & 0x3F);
                     *data++ = '%';
@@ -169,6 +169,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
                 unicode_len = 3;
                 count+=6;
                 if (count <= len) {
+                    int length = 0;
                     /* compute character number */
                     d = ((c & 0x0F) << 12)
                         | ((*(utf + 1) & 0x3F) << 6)
@@ -229,6 +230,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
                 unicode_len = 4;
                 count+=7;
                 if (count <= len) {
+                    int length = 0;
                     /* compute character number */
                     d = ((c & 0x07) << 18)
                         | ((*(utf + 1) & 0x3F) << 12)

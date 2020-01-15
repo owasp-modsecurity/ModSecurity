@@ -512,9 +512,6 @@ inline void Rule::getFinalVars(variables::Variables *vars,
 
     for (int i = 0; i < m_variables->size(); i++) {
         Variable *variable = m_variables->at(i);
-        std::vector<const VariableValue *> e;
-
-
         if (exclusion->contains(variable)) {
             continue;
         }
@@ -623,7 +620,6 @@ bool Rule::evaluate(Transaction *trans,
     variables::Variables *variables = this->m_variables;
     bool recursiveGlobalRet;
     bool containsBlock = m_containsStaticBlockAction;
-    std::vector<std::unique_ptr<VariableValue>> finalVars;
     std::string eparam;
     variables::Variables vars;
     vars.reserve(4);

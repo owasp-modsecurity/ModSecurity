@@ -75,7 +75,7 @@ inline std::string Parallel::logFilePath(time_t *t,
 
 
 bool Parallel::init(std::string *error) {
-    bool ret = true;
+    bool ret;
     if (!m_audit->m_path1.empty()) {
         ret = utils::SharedFiles::getInstance().open(m_audit->m_path1, error);
         if (!ret) {
