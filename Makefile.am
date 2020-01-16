@@ -56,13 +56,15 @@ parser:
 
 
 cppcheck:
-	@cppcheck \
-		--suppressions-list=./test/cppcheck_suppressions.txt \
-		--enable=all \
-		--inconclusive \
-		--template="warning: {file},{line},{severity},{id},{message}" \
-		--std=posix . 2> cppcheck.txt
-	cat cppcheck.txt | grep -v "/ lalr1.cc"
+	@cppcheck -U YYSTYPE \
+                --suppressions-list=./test/cppcheck_suppressions.txt \
+                --enable=all \
+                --inconclusive \
+                --template="warning: {file},{line},{severity},{id},{message}" \
+                -I headers -I . -I others -I src -I others/mbedtls -I src/parser \
+                --error-exitcode=0 \
+                -i "src/parser/seclang-parser.cc" -i "src/parser/seclang-scanner.cc" \
+                .
 
 check-static: cppcheck
 
