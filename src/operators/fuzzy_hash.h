@@ -40,8 +40,8 @@ class FuzzyHash : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit FuzzyHash(std::unique_ptr<RunTimeString> param)
         : Operator("FuzzyHash", std::move(param)),
-        m_head(NULL),
-        m_threshold(0) { }
+        m_threshold(0),
+        m_head(NULL) { }
     ~FuzzyHash();
 
     bool evaluate(Transaction *transaction, const std::string &std) override;

@@ -49,8 +49,8 @@ class GeoLookup {
     bool setDataBase(const std::string& filePath, std::string *err);
     void cleanUp();
 
-    bool lookup(const std::string& target, Transaction *t,
-        std::function<bool(int, std::string)> callback);
+    bool lookup(const std::string& target, Transaction *transaction,
+        std::function<bool(int, std::string)> debug) const;
 
  private:
     GeoLookup() :

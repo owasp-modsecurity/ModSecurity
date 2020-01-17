@@ -57,3 +57,14 @@ useStlAlgorithm:test/regression/regression.cc:493
 useStlAlgorithm:test/unit/unit.cc:174
 useStlAlgorithm:test/unit/unit.cc:209
 variableScope:src/operators/verify_cpf.cc:45
+unusedFunction
+funcArgNamesDifferent
+preprocessorErrorDirective
+useStlAlgorithm
+functionStatic:test/regression/regression_test.h:36
+missingInclude
+toomanyconfigs
+functionStatic:src/unique_id.h:49
+functionStatic:src/unique_id.h:50
+functionConst:src/utils/geo_lookup.h:49
+functionStatic:headers/modsecurity/transaction.h:374

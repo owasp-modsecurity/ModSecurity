@@ -293,6 +293,10 @@ class Transaction : public TransactionAnchoredVariables {
         void *logCbData);
     ~Transaction();
 
+    Transaction ( const Transaction & ) = delete;
+    bool operator ==(const Transaction &b) const { return false; };
+    Transaction operator =(const Transaction &b) const = delete;
+
     /** TODO: Should be an structure that fits an IP address */
     int processConnection(const char *client, int cPort,
         const char *server, int sPort);

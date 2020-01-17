@@ -58,7 +58,7 @@ class Regex {
     Regex& operator=(const Regex&) = delete;
 
     std::list<SMatch> searchAll(const std::string& s) const;
-    int search(const std::string &s, SMatch *m) const;
+    int search(const std::string &s, SMatch *match) const;
     int search(const std::string &s) const;
 
     const std::string pattern;

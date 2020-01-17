@@ -34,7 +34,7 @@ std::string Rbl::mapIpToAddress(std::string ipStr, Transaction *trans) {
     std::string addr;
     int h0, h1, h2, h3;
     std::string key;
-    if (trans->m_rules->m_httpblKey.m_set == true) {
+    if (trans && trans->m_rules->m_httpblKey.m_set == true) {
         key = trans->m_rules->m_httpblKey.m_value;
     }
 

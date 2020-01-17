@@ -539,7 +539,7 @@ class VariableMonkeyResolution {
 
 class Variable : public VariableMonkeyResolution {
  public:
-    explicit Variable(std::string _name);
+    explicit Variable(const std::string &name);
     explicit Variable(Variable *_name);
     virtual ~Variable() { }
 

@@ -27,7 +27,7 @@ namespace modsecurity_test {
 
 class UnitTest {
  public:
-    static UnitTest *from_yajl_node(yajl_val &);
+    static UnitTest *from_yajl_node(const yajl_val &);
 
     std::string print();
 

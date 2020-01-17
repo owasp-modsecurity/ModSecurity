@@ -56,7 +56,7 @@ class Rule {
             std::vector<actions::Action *> *_actions,
             std::string fileName,
             int lineNumber);
-    explicit Rule(std::string marker);
+    explicit Rule(const std::string &marker);
     virtual ~Rule();
 
     virtual bool evaluate(Transaction *transaction,
@@ -87,7 +87,7 @@ class Rule {
         std::shared_ptr<std::string>>> executeDefaultTransformations(
         Transaction *trasn, const std::string &value);
 
-    bool executeOperatorAt(Transaction *trasn, std::string key,
+    bool executeOperatorAt(Transaction *trasn, const std::string &key,
         std::string value, std::shared_ptr<RuleMessage> rm);
     void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
         bool *b, std::shared_ptr<RuleMessage> ruleMessage);

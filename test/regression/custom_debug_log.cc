@@ -36,13 +36,13 @@ void CustomDebugLog::write(int level, const std::string &id,
     m_log << msgf << std::endl;
 }
 
-bool CustomDebugLog::contains(const std::string& pattern) {
+bool const CustomDebugLog::contains(const std::string& pattern) const {
     modsecurity::Utils::Regex re(pattern);
     std::string s = m_log.str();
     return modsecurity::Utils::regex_search(s, re);
 }
 
-std::string CustomDebugLog::log_messages() {
+std::string const CustomDebugLog::log_messages() const {
     return m_log.str();
 }
 

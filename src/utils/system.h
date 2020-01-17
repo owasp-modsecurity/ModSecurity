@@ -29,7 +29,7 @@ namespace utils {
 
 
 double cpu_seconds(void);
-std::string find_resource(const std::string& file, const std::string& param,
+std::string find_resource(const std::string& file, const std::string& config,
     std::string *err);
 std::string get_path(const std::string& file);
 std::list<std::string> expandEnv(const std::string& var, int flags);

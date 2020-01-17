@@ -119,7 +119,7 @@ std::string UnitTest::print() {
 }
 
 
-UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
+UnitTest *UnitTest::from_yajl_node(const yajl_val &node) {
     size_t num_tests = node->u.object.len;
     UnitTest *u = new UnitTest();
 

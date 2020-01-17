@@ -24,15 +24,15 @@ namespace operators {
 
 
 bool EndsWith::evaluate(Transaction *transaction, Rule *rule,
-    const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
+    const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) {
     bool ret = false;
     std::string p(m_string->evaluate(transaction));
 
-    if (input.length() >= p.length()) {
-        ret = (0 == input.compare(input.length() - p.length(),
+    if (str.length() >= p.length()) {
+        ret = (0 == str.compare(str.length() - p.length(),
             p.length(), p));
         if (ret) {
-            logOffset(ruleMessage, input.length() - p.length(),
+            logOffset(ruleMessage, str.length() - p.length(),
                       p.size());
         }
     }

@@ -51,7 +51,7 @@ using variables::Variable;
 using actions::transformations::None;
 
 
-Rule::Rule(std::string marker)
+Rule::Rule(const std::string &marker)
     : m_accuracy(0),
     m_actionsRuntimePos(),
     m_actionsRuntimePre(),
@@ -303,7 +303,7 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
 }
 
 
-bool Rule::executeOperatorAt(Transaction *trans, std::string key,
+bool Rule::executeOperatorAt(Transaction *trans, const std::string &key,
     std::string value, std::shared_ptr<RuleMessage> ruleMessage) {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();

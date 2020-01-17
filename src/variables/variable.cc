@@ -28,7 +28,7 @@ namespace modsecurity {
 namespace variables {
 
 
-Variable::Variable(std::string name)
+Variable::Variable(const std::string &name)
     : m_name(name),
     m_collectionName("") {
     size_t a = m_name.find(":");
