@@ -60,7 +60,7 @@ int HtmlEntityDecode::inplace(unsigned char *input, uint64_t input_len) {
     unsigned char *d = input;
     int i, count;
 
-    if ((input == NULL) || (input_len <= 0)) {
+    if ((input == NULL) || (input_len == 0)) {
         return 0;
     }
 

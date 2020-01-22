@@ -32,7 +32,7 @@ namespace actions {
 
 class RuleId : public Action {
  public:
-    explicit RuleId(std::string action)
+    explicit RuleId(const std::string &action) 
         : Action(action, ConfigurationKind),
         m_ruleId(0) { }
 

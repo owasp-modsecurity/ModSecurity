@@ -32,7 +32,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-NormalisePath::NormalisePath(std::string action)
+NormalisePath::NormalisePath(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

@@ -31,7 +31,7 @@ namespace actions {
 namespace transformations {
 
 
-TrimRight::TrimRight(std::string action)
+TrimRight::TrimRight(const std::string &action) 
     : Trim(action) {
     this->action_kind = 1;
 }

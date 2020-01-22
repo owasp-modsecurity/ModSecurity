@@ -30,7 +30,7 @@ namespace actions {
 
 class Log : public Action {
  public:
-    explicit Log(std::string action)
+    explicit Log(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,

@@ -30,7 +30,7 @@ namespace ctl {
 
 class RuleEngine : public Action {
  public:
-    explicit RuleEngine(std::string action)
+    explicit RuleEngine(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind),
         m_ruleEngine(RulesProperties::PropertyNotSetRuleEngine) { }
 

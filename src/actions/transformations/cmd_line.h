@@ -30,7 +30,7 @@ namespace transformations {
 
 class CmdLine : public Transformation {
  public:
-    explicit CmdLine(std::string action)
+    explicit CmdLine(const std::string &action) 
         : Transformation(action) { }
 
     std::string evaluate(std::string exp,

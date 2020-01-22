@@ -31,7 +31,7 @@ namespace disruptive {
 
 class Drop : public Action {
  public:
-    explicit Drop(std::string action) : Action(action) { }
+    explicit Drop(const std::string &action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;

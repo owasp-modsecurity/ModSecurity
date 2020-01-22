@@ -30,7 +30,7 @@ namespace transformations {
 
 class ReplaceComments : public Transformation {
  public:
-    explicit ReplaceComments(std::string action);
+    explicit ReplaceComments(const std::string &action) ;
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
 };

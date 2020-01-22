@@ -30,7 +30,7 @@ namespace transformations {
 
 class Trim : public Transformation {
  public:
-    explicit Trim(std::string action);
+    explicit Trim(const std::string &action) ;
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
 

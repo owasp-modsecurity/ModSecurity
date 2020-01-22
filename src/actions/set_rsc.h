@@ -32,7 +32,7 @@ namespace actions {
 
 class SetRSC : public Action {
  public:
-    explicit SetRSC(std::string _action)
+    explicit SetRSC(const std::string &_action)
         : Action(_action) { }
 
     explicit SetRSC(std::unique_ptr<RunTimeString> z)

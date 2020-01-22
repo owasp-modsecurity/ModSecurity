@@ -50,7 +50,7 @@ std::string *Trim::trim(std::string *s) {
 }
 
 
-Trim::Trim(std::string action)
+Trim::Trim(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

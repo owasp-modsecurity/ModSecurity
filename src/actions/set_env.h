@@ -32,7 +32,7 @@ namespace actions {
 
 class SetENV : public Action {
  public:
-    explicit SetENV(std::string _action)
+    explicit SetENV(const std::string &_action)
         : Action(_action) { }
 
     explicit SetENV(std::unique_ptr<RunTimeString> z)

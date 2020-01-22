@@ -28,7 +28,7 @@ namespace ctl {
 
 class RequestBodyProcessorJSON : public Action {
  public:
-    explicit RequestBodyProcessorJSON(std::string action)
+    explicit RequestBodyProcessorJSON(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;

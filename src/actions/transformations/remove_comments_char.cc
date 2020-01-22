@@ -30,7 +30,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-RemoveCommentsChar::RemoveCommentsChar(std::string action)
+RemoveCommentsChar::RemoveCommentsChar(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

@@ -29,7 +29,7 @@ namespace actions {
 
 class Accuracy : public Action {
  public:
-    explicit Accuracy(std::string action)
+    explicit Accuracy(const std::string &action) 
         : Action(action, ConfigurationKind),
         m_accuracy(0) { }
 

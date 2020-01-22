@@ -31,7 +31,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-HexEncode::HexEncode(std::string action)
+HexEncode::HexEncode(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

@@ -29,7 +29,7 @@ namespace actions {
 
 class Maturity : public Action {
  public:
-    explicit Maturity(std::string action)
+    explicit Maturity(const std::string &action) 
         : Action(action, ConfigurationKind),
         m_maturity(0) { }
 

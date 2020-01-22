@@ -33,7 +33,7 @@ namespace transformations {
 
 class HtmlEntityDecode : public Transformation {
  public:
-    explicit HtmlEntityDecode(std::string action)
+    explicit HtmlEntityDecode(const std::string &action) 
         : Transformation(action) { }
 
     std::string evaluate(std::string exp,

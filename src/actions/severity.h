@@ -31,7 +31,7 @@ namespace actions {
 
 class Severity : public Action {
  public:
-    explicit Severity(std::string action)
+    explicit Severity(const std::string &action) 
         : Action(action),
         m_severity(0) { }
 

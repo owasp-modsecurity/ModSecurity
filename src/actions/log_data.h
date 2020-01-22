@@ -32,7 +32,7 @@ namespace actions {
 
 class LogData : public Action {
  public:
-    explicit LogData(std::string action)
+    explicit LogData(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     explicit LogData(std::unique_ptr<RunTimeString> z)

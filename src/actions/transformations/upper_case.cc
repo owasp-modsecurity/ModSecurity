@@ -27,7 +27,7 @@ namespace actions {
 namespace transformations {
 
 
-UpperCase::UpperCase(std::string a)
+UpperCase::UpperCase(const std::string &a)
     : Transformation(a) {
 }
 

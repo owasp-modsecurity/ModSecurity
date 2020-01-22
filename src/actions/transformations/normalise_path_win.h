@@ -30,7 +30,7 @@ namespace transformations {
 
 class NormalisePathWin : public Transformation {
  public:
-    explicit NormalisePathWin(std::string action)
+    explicit NormalisePathWin(const std::string &action) 
         : Transformation(action) { }
 
     std::string evaluate(std::string exp,

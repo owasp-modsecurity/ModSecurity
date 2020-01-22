@@ -30,7 +30,7 @@ namespace transformations {
 
 class RemoveWhitespace : public Transformation {
  public:
-    explicit RemoveWhitespace(std::string action);
+    explicit RemoveWhitespace(const std::string &action) ;
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
 };

@@ -33,7 +33,7 @@ namespace actions {
 
 class Msg : public Action {
  public:
-    explicit Msg(std::string action)
+    explicit Msg(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     explicit Msg(std::unique_ptr<RunTimeString> z)

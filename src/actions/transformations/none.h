@@ -30,7 +30,7 @@ namespace transformations {
 
 class None : public Transformation {
  public:
-    explicit None(std::string action)
+    explicit None(const std::string &action) 
         : Transformation(action)
         { m_isNone = true; }
 

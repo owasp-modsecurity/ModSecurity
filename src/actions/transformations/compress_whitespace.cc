@@ -30,7 +30,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-CompressWhitespace::CompressWhitespace(std::string action)
+CompressWhitespace::CompressWhitespace(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

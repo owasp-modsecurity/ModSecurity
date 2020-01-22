@@ -32,7 +32,7 @@ namespace actions {
 
 class SetUID : public Action {
  public:
-    explicit SetUID(std::string _action)
+    explicit SetUID(const std::string &_action)
         : Action(_action) { }
 
     explicit SetUID(std::unique_ptr<RunTimeString> z)

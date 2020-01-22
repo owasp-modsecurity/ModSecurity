@@ -31,7 +31,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-ReplaceComments::ReplaceComments(std::string action)
+ReplaceComments::ReplaceComments(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

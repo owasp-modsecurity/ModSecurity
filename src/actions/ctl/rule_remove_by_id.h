@@ -29,7 +29,7 @@ namespace ctl {
 
 class RuleRemoveById : public Action {
  public:
-    explicit RuleRemoveById(std::string action)
+    explicit RuleRemoveById(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool init(std::string *error) override;

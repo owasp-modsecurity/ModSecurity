@@ -29,7 +29,7 @@ namespace ctl {
 
 class RequestBodyAccess : public Action {
  public:
-    explicit RequestBodyAccess(std::string action)
+    explicit RequestBodyAccess(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind),
         m_request_body_access(false) { }
 

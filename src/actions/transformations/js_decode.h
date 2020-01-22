@@ -30,7 +30,7 @@ namespace transformations {
 
 class JsDecode : public Transformation {
  public:
-    explicit JsDecode(std::string action)
+    explicit JsDecode(const std::string &action) 
         : Transformation(action) { }
 
     std::string evaluate(std::string exp,

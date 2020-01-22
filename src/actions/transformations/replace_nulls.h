@@ -30,7 +30,7 @@ namespace transformations {
 
 class ReplaceNulls : public Transformation {
  public:
-    explicit ReplaceNulls(std::string action);
+    explicit ReplaceNulls(const std::string &action) ;
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
 };

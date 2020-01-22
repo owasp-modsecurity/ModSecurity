@@ -29,7 +29,7 @@ namespace actions {
 
 class XmlNS : public Action {
  public:
-    explicit XmlNS(std::string action) : Action(action) { }
+    explicit XmlNS(const std::string &action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override {
         return true;

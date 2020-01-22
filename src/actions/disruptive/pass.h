@@ -29,7 +29,7 @@ namespace disruptive {
 
 class Pass : public Action {
  public:
-    explicit Pass(std::string action) : Action(action) { }
+    explicit Pass(const std::string &action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;

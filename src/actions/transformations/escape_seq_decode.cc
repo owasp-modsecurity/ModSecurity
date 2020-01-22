@@ -31,7 +31,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-EscapeSeqDecode::EscapeSeqDecode(std::string action)
+EscapeSeqDecode::EscapeSeqDecode(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

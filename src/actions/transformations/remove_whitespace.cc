@@ -31,7 +31,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-RemoveWhitespace::RemoveWhitespace(std::string action)
+RemoveWhitespace::RemoveWhitespace(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

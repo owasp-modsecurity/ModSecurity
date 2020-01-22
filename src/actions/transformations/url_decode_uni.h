@@ -31,7 +31,7 @@ namespace transformations {
 
 class UrlDecodeUni : public Transformation {
  public:
-    explicit UrlDecodeUni(std::string action) : Transformation(action) { }
+    explicit UrlDecodeUni(const std::string &action)  : Transformation(action) { }
 
     std::string evaluate(std::string exp, Transaction *transaction) override;
     static int inplace(unsigned char *input, uint64_t input_len,

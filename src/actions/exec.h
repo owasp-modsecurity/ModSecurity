@@ -30,7 +30,7 @@ namespace actions {
 
 class Exec : public Action {
  public:
-    explicit Exec(std::string action)
+    explicit Exec(const std::string &action) 
         : Action(action),
         m_script("") { }
 

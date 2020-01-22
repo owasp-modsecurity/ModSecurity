@@ -31,7 +31,7 @@ namespace disruptive {
 
 class Deny : public Action {
  public:
-    explicit Deny(std::string action) : Action(action) { }
+    explicit Deny(const std::string &action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;

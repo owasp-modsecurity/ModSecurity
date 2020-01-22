@@ -31,7 +31,7 @@ namespace transformations {
 
 class CssDecode : public Transformation {
  public:
-    explicit CssDecode(std::string action)
+    explicit CssDecode(const std::string &action) 
         : Transformation(action) { }
     std::string evaluate(std::string exp,
         Transaction *transaction) override;

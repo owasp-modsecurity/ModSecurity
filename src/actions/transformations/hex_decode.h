@@ -30,7 +30,7 @@ namespace transformations {
 
 class HexDecode : public Transformation {
  public:
-    explicit HexDecode(std::string action) : Transformation(action) { }
+    explicit HexDecode(const std::string &action)  : Transformation(action) { }
 
     std::string evaluate(std::string exp,
         Transaction *transaction) override;

@@ -32,9 +32,9 @@ namespace actions {
 
 class InitCol : public Action {
  public:
-    explicit InitCol(std::string action) : Action(action) { }
+    explicit InitCol(const std::string &action) : Action(action) { }
 
-    InitCol(std::string action, std::unique_ptr<RunTimeString> z)
+    InitCol(const std::string &action, std::unique_ptr<RunTimeString> z)
         : Action(action, RunTimeOnlyIfMatchKind),
             m_string(std::move(z)) { }
 

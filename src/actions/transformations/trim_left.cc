@@ -33,7 +33,7 @@ namespace transformations {
 
 
 
-TrimLeft::TrimLeft(std::string action)
+TrimLeft::TrimLeft(const std::string &action) 
     : Trim(action) {
     this->action_kind = 1;
 }

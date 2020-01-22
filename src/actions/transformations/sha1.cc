@@ -31,7 +31,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-Sha1::Sha1(std::string action)
+Sha1::Sha1(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

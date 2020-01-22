@@ -38,10 +38,12 @@ class Redirect : public Action {
  public:
     explicit Redirect(const std::string &action)
         : Action(action, RunTimeOnlyIfMatchKind),
-        m_status(0) { }
+        m_status(0),
+        m_string(nullptr) { }
 
     explicit Redirect(std::unique_ptr<RunTimeString> z)
         : Action("redirert", RunTimeOnlyIfMatchKind),
+            m_status(0),
             m_string(std::move(z)) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,

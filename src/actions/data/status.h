@@ -33,7 +33,7 @@ namespace data {
 
 class Status : public Action {
  public:
-    explicit Status(std::string action) : Action(action, 2),
+    explicit Status(const std::string &action) : Action(action, 2),
     m_status(0) { }
 
     bool init(std::string *error) override;

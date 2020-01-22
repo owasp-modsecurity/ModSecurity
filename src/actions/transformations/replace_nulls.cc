@@ -30,7 +30,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-ReplaceNulls::ReplaceNulls(std::string action)
+ReplaceNulls::ReplaceNulls(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

@@ -30,7 +30,7 @@ namespace transformations {
 
 class CompressWhitespace : public Transformation {
  public:
-    explicit CompressWhitespace(std::string action);
+    explicit CompressWhitespace(const std::string &action) ;
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
 };

@@ -35,7 +35,7 @@ namespace transformations {
 
 class Utf8ToUnicode : public Transformation {
  public:
-    explicit Utf8ToUnicode(std::string action) : Transformation(action) { }
+    explicit Utf8ToUnicode(const std::string &action)  : Transformation(action) { }
 
     std::string evaluate(std::string exp,
         Transaction *transaction) override;

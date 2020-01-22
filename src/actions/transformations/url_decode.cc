@@ -32,7 +32,7 @@ namespace actions {
 namespace transformations {
 
 
-UrlDecode::UrlDecode(std::string action)
+UrlDecode::UrlDecode(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

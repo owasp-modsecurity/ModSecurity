@@ -30,7 +30,7 @@ namespace actions {
 
 class NoLog : public Action {
  public:
-    explicit NoLog(std::string action)
+    explicit NoLog(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,

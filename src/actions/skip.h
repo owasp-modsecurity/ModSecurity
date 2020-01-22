@@ -29,7 +29,7 @@ namespace actions {
 
 class Skip : public Action {
  public:
-    explicit Skip(std::string action)
+    explicit Skip(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind),
         m_skip_next(0) { }
 

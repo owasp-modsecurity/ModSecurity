@@ -28,7 +28,7 @@ namespace actions {
 
 class Capture : public Action {
  public:
-    explicit Capture(std::string action)
+    explicit Capture(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;

@@ -27,7 +27,7 @@ namespace actions {
 namespace transformations {
 
 
-LowerCase::LowerCase(std::string a)
+LowerCase::LowerCase(const std::string &a)
     : Transformation(a) {
 }
 

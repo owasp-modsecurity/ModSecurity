@@ -30,7 +30,7 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-Length::Length(std::string action)
+Length::Length(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }

@@ -30,7 +30,7 @@ namespace transformations {
 
 class SqlHexDecode : public Transformation {
  public:
-    explicit SqlHexDecode(std::string action) : Transformation(action) { }
+    explicit SqlHexDecode(const std::string &action)  : Transformation(action) { }
 
     std::string evaluate(std::string exp,
         Transaction *transaction) override;

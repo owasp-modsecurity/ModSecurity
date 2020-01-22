@@ -31,7 +31,7 @@ namespace actions {
 namespace transformations {
 
 
-UrlEncode::UrlEncode(std::string action)
+UrlEncode::UrlEncode(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }
