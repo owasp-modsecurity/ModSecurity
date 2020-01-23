@@ -31,7 +31,7 @@ class GsbLookup : public Operator {
     explicit GsbLookup(std::unique_ptr<RunTimeString> param)
         : Operator("GsbLookup", std::move(param)) { }
 
-    bool evaluate(Transaction *transaction, const std::string &str);
+    bool evaluate(Transaction *transaction, const std::string &str) override;
 };
 
 }  // namespace operators

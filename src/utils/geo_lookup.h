@@ -50,7 +50,7 @@ class GeoLookup {
     void cleanUp();
 
     bool lookup(const std::string& target, Transaction *transaction,
-        std::function<bool(int, std::string)> debug) const;
+        std::function<bool(int, const std::string &)> debug) const;
 
  private:
     GeoLookup() :

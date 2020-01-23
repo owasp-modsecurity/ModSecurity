@@ -120,7 +120,6 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
 bool VerifyCC::evaluate(Transaction *t, Rule *rule,
     const std::string& i, std::shared_ptr<RuleMessage> ruleMessage) {
     int offset = 0;
-    bool is_cc = false;
     int target_length = i.length();
 
     for (offset = 0; offset < target_length; offset++) {
@@ -139,7 +138,7 @@ bool VerifyCC::evaluate(Transaction *t, Rule *rule,
         }
         if (ret > 0) {
             match = std::string(i, ovector[0], ovector[1] - ovector[0]);
-            is_cc = luhnVerify(match.c_str(), match.size());
+            int is_cc = luhnVerify(match.c_str(), match.size());
             if (is_cc) {
                 if (t) {
                     if (rule && t && rule->m_containsCaptureAction) {

@@ -36,7 +36,8 @@ class ContainsWord : public Operator {
         const std::string &str,
         std::shared_ptr<RuleMessage> ruleMessage) override;
 
-    bool acceptableChar(const std::string& a, size_t pos);
+ private:
+    static bool acceptableChar(const std::string& a, size_t pos);
 };
 
 }  // namespace operators

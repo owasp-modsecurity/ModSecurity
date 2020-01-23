@@ -35,7 +35,6 @@ class VerifyCC : public Operator {
         m_pce(NULL) { }
     ~VerifyCC();
 
-    int luhnVerify(const char *ccnumber, int len);
     bool evaluate(Transaction *t, Rule *rule,
         const std::string& input,
         std::shared_ptr<RuleMessage> ruleMessage)  override;
@@ -43,6 +42,7 @@ class VerifyCC : public Operator {
  private:
     pcre *m_pc;
     pcre_extra *m_pce;
+    static int luhnVerify(const char *ccnumber, int len);
 };
 
 }  // namespace operators

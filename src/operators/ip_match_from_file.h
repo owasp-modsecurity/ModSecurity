@@ -29,7 +29,7 @@ class IpMatchFromFile : public IpMatch {
     /** @ingroup ModSecurity_Operator */
     explicit IpMatchFromFile(std::unique_ptr<RunTimeString> param)
         : IpMatch("IpMatchFromFile", std::move(param)) { }
-    IpMatchFromFile(std::string n, std::unique_ptr<RunTimeString> param)
+    IpMatchFromFile(const std::string &n, std::unique_ptr<RunTimeString> param)
         : IpMatch(n, std::move(param)) { }
     bool init(const std::string& file, std::string *error) override;
 };

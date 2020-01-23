@@ -36,7 +36,7 @@ class Pm : public Operator {
         : Operator("Pm", std::move(param)) {
         m_p = acmp_create(0);
     }
-    explicit Pm(std::string n, std::unique_ptr<RunTimeString> param)
+    explicit Pm(const std::string &n, std::unique_ptr<RunTimeString> param)
         : Operator(n, std::move(param)) {
         m_p = acmp_create(0);
     }

@@ -37,7 +37,8 @@ class Rx : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit Rx(std::unique_ptr<RunTimeString> param)
-        : Operator("Rx", std::move(param)) {
+        : m_re(nullptr),
+        Operator("Rx", std::move(param)) {
             m_couldContainsMacro = true;
         }
 

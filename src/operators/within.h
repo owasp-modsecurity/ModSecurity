@@ -34,7 +34,7 @@ class Within : public Operator {
             m_couldContainsMacro = true;
         }
     bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string &str, std::shared_ptr<RuleMessage> ruleMessage);
+        const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) override;
 };
 
 }  // namespace operators

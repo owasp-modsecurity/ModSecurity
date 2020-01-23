@@ -30,7 +30,7 @@ namespace modsecurity {
 namespace operators {
 
 
-std::string Rbl::mapIpToAddress(std::string ipStr, Transaction *trans) {
+std::string Rbl::mapIpToAddress(const std::string &ipStr, Transaction *trans) const {
     std::string addr;
     int h0, h1, h2, h3;
     std::string key;
@@ -67,11 +67,13 @@ std::string Rbl::mapIpToAddress(std::string ipStr, Transaction *trans) {
 }
 
 
-void Rbl::futherInfo_httpbl(struct sockaddr_in *sin, std::string ipStr,
+void Rbl::futherInfo_httpbl(struct sockaddr_in *sin, const std::string &ipStr,
     Transaction *trans) {
     char *respBl;
     int first, days, score, type;
+#ifndef NO_LOGS
     std::string ptype;
+#endif
 
     respBl = inet_ntoa(sin->sin_addr);
 
@@ -85,6 +87,7 @@ void Rbl::futherInfo_httpbl(struct sockaddr_in *sin, std::string ipStr,
         return;
     }
 
+#ifndef NO_LOGS
     switch (type) {
         case 0:
             ptype = "Search Engine";
@@ -113,6 +116,7 @@ void Rbl::futherInfo_httpbl(struct sockaddr_in *sin, std::string ipStr,
         default:
             ptype = " ";
     }
+#endif
 
     ms_dbg_a(trans, 4, "RBL lookup of " + ipStr + " succeeded. %s: " \
         + std::to_string(days) + " " \
@@ -121,7 +125,7 @@ void Rbl::futherInfo_httpbl(struct sockaddr_in *sin, std::string ipStr,
 }
 
 
-void Rbl::futherInfo_spamhaus(unsigned int high8bits, std::string ipStr,
+void Rbl::futherInfo_spamhaus(unsigned int high8bits, const std::string &ipStr,
     Transaction *trans) {
     switch (high8bits) {
         case 2:
@@ -148,7 +152,7 @@ void Rbl::futherInfo_spamhaus(unsigned int high8bits, std::string ipStr,
 }
 
 
-void Rbl::futherInfo_uribl(unsigned int high8bits, std::string ipStr,
+void Rbl::futherInfo_uribl(unsigned int high8bits, const std::string &ipStr,
     Transaction *trans) {
     switch (high8bits) {
         case 2:
@@ -175,11 +179,11 @@ void Rbl::futherInfo_uribl(unsigned int high8bits, std::string ipStr,
 }
 
 
-void Rbl::furtherInfo(struct sockaddr_in *sin, std::string ipStr,
-    Transaction *trans) {
+void Rbl::furtherInfo(struct sockaddr_in *sin, const std::string &ipStr,
+    Transaction *trans, RblProvider provider) {
     unsigned int high8bits = sin->sin_addr.s_addr >> 24;
 
-    switch (m_provider) {
+    switch (provider) {
         case RblProvider::UnknownProvider:
             ms_dbg_a(trans, 2, "RBL lookup of " + ipStr + " succeeded.");
             break;
@@ -200,7 +204,7 @@ bool Rbl::evaluate(Transaction *t, Rule *rule,
         const std::string& ipStr,
         std::shared_ptr<RuleMessage> ruleMessage) {
     struct addrinfo *info = NULL;
-    std::string host = mapIpToAddress(ipStr, t);
+    std::string host = Rbl::mapIpToAddress(ipStr, t);
     int rc = 0;
 
     if (host.empty()) {
@@ -219,7 +223,7 @@ bool Rbl::evaluate(Transaction *t, Rule *rule,
 
     struct sockaddr *addr = info->ai_addr;
     struct sockaddr_in *sin = (struct sockaddr_in *) addr;
-    furtherInfo(sin, ipStr, t);
+    furtherInfo(sin, ipStr, t, m_provider);
 
     freeaddrinfo(info);
     if (rule && t && rule->m_containsCaptureAction) {

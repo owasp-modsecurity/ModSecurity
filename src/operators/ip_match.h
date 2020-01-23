@@ -31,7 +31,7 @@ class IpMatch : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit IpMatch(std::unique_ptr<RunTimeString> param)
         : Operator("IpMatch", std::move(param)) { }
-    IpMatch(std::string n, std::unique_ptr<RunTimeString> param)
+    IpMatch(const std::string &n, std::unique_ptr<RunTimeString> param)
         : Operator(n, std::move(param)) { }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;

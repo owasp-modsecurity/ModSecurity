@@ -37,31 +37,22 @@ int VerifyCPF::convert_to_int(const char c) {
     return n;
 }
 
+
 bool VerifyCPF::verify(const char *cpfnumber, int len) {
     int factor, part_1, part_2, var_len = len;
     unsigned int sum = 0, i = 0, cpf_len = 11, c;
     int cpf[11];
     char s_cpf[11];
-    char bad_cpf[12][12] = { "00000000000",
-        "01234567890",
-        "11111111111",
-        "22222222222",
-        "33333333333",
-        "44444444444",
-        "55555555555",
-        "66666666666",
-        "77777777777",
-        "88888888888",
-        "99999999999"};
 
     while ((*cpfnumber != '\0') && (var_len > 0)) {
-        if (*cpfnumber != '-' || *cpfnumber != '.') {
+        // Always true.
+        //if (*cpfnumber != '-' || *cpfnumber != '.') {
             if (i < cpf_len && isdigit(*cpfnumber)) {
                 s_cpf[i] = *cpfnumber;
                 cpf[i] = convert_to_int(*cpfnumber);
                 i++;
             }
-        }
+        //}
         cpfnumber++;
         var_len--;
     }

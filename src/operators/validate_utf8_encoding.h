@@ -42,7 +42,7 @@ class ValidateUtf8Encoding : public Operator {
         const std::string &str,
         std::shared_ptr<RuleMessage> ruleMessage) override;
 
-    int detect_utf8_character(const unsigned char *p_read,
+    static int detect_utf8_character(const unsigned char *p_read,
         unsigned int length);
 };
 

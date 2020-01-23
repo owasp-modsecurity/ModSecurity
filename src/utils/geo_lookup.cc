@@ -106,7 +106,7 @@ bool GeoLookup::setDataBase(const std::string& filePath,
 
 
 bool GeoLookup::lookup(const std::string& target, Transaction *trans,
-    std::function<bool(int, std::string)> debug) const {
+    std::function<bool(int, const std::string &)> debug) const {
 
     if (m_version == NOT_LOADED) {
         if (debug) {

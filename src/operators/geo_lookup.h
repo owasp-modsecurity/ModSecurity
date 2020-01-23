@@ -32,7 +32,10 @@ class GeoLookup : public Operator {
     bool evaluate(Transaction *transaction, const std::string &exp) override;
 
  protected:
-    bool debug(Transaction *transaction, int x, std::string a);
+    bool debug(Transaction *transaction, int x, const std::string &a) {
+        ms_dbg_a(transaction, x, a);
+        return true;
+    }
 };
 
 }  // namespace operators

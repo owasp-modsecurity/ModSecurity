@@ -32,12 +32,13 @@ class PmFromFile : public Pm {
     /** @ingroup ModSecurity_Operator */
     explicit PmFromFile(std::unique_ptr<RunTimeString> param)
         : Pm("PmFromFile", std::move(param)) { }
-    explicit PmFromFile(std::string n, std::unique_ptr<RunTimeString> param)
+    explicit PmFromFile(const std::string &n, std::unique_ptr<RunTimeString> param)
         : Pm(n, std::move(param)) { }
 
     bool init(const std::string &file, std::string *error) override;
 
-    bool isComment(const std::string &s);
+private:
+    static bool isComment(const std::string &s);
 };
 
 
