@@ -75,12 +75,13 @@ class SharedFiles {
  private:
     SharedFiles()
 #ifdef MODSEC_USE_GENERAL_LOCK
-        : m_generalLock(NULL)
+        : m_generalLock(NULL),
+        m_memKeyStructure(0)
 #endif
     {
 #ifdef MODSEC_USE_GENERAL_LOCK
         int shm_id;
-        bool toBeCreated = true;
+        bool toBeCreated;
         bool err = false;
 
         m_memKeyStructure = ftok(".", 1);
@@ -122,7 +123,6 @@ err_shmget1:
 err_shmat1:
             std::cerr << "err_shmat1" << std::endl;
         }
-        toBeCreated = false;
 #endif
     }
     ~SharedFiles() {

@@ -54,10 +54,11 @@ class GeoLookup {
 
  private:
     GeoLookup() :
+        m_version(NOT_LOADED)
 #if WITH_GEOIP
-        m_gi(NULL),
+        ,m_gi(NULL)
 #endif
-        m_version(NOT_LOADED) { }
+        { }
     ~GeoLookup();
     GeoLookup(GeoLookup const&);
     void operator=(GeoLookup const&);

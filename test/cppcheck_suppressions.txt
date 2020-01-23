@@ -71,3 +71,7 @@ functionStatic:headers/modsecurity/transaction.h:374
 
 functionStatic:src/operators/geo_lookup.h:35
 useInitializationList:src/operators/rbl.h:69
+
+unmatchedSuppression:src/utils/geo_lookup.cc:82
+useInitializationList:src/utils/shared_files.h:87
+unmatchedSuppression:src/utils/msc_tree.cc
