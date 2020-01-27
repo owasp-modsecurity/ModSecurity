@@ -44,7 +44,7 @@ namespace collection {
 
 class Collection {
  public:
-    explicit Collection(std::string a) : m_name(a) { }
+    explicit Collection(const std::string &a) : m_name(a) { }
     virtual ~Collection() { }
     virtual void store(std::string key, std::string value) = 0;
 

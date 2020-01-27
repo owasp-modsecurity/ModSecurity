@@ -36,7 +36,7 @@ namespace RequestBodyProcessor {
 
 class JSONContainer {
  public:
-    explicit JSONContainer(std::string name) : m_name(name) { }
+    explicit JSONContainer(const std::string &name) : m_name(name) { }
     virtual ~JSONContainer() { }
     std::string m_name;
 };
@@ -44,7 +44,7 @@ class JSONContainer {
 
 class JSONContainerArray : public JSONContainer {
  public:
-    explicit JSONContainerArray(std::string name) : JSONContainer(name),
+    explicit JSONContainerArray(const std::string &name) : JSONContainer(name),
         m_elementCounter(0) { }
     size_t m_elementCounter;
 };
@@ -52,7 +52,7 @@ class JSONContainerArray : public JSONContainer {
 
 class JSONContainerMap : public JSONContainer {
  public:
-     explicit JSONContainerMap(std::string name) : JSONContainer(name) { }
+     explicit JSONContainerMap(const std::string &name) : JSONContainer(name) { }
 };
 
 
@@ -61,7 +61,7 @@ class JSON {
     explicit JSON(Transaction *transaction);
     ~JSON();
 
-    bool init();
+    static bool init();
     bool processChunk(const char *buf, unsigned int size, std::string *err);
     bool complete(std::string *err);
 
@@ -79,7 +79,7 @@ class JSON {
     static int yajl_start_array(void *ctx);
     static int yajl_end_array(void *ctx);
 
-    bool isPreviousArray() {
+    bool isPreviousArray() const {
         JSONContainerArray *prev = NULL;
         if (m_containers.size() < 1) {
             return false;

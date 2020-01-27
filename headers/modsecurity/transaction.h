@@ -295,7 +295,7 @@ class Transaction : public TransactionAnchoredVariables {
 
     Transaction ( const Transaction & ) = delete;
     bool operator ==(const Transaction &b) const { return false; };
-    Transaction operator =(const Transaction &b) const = delete;
+    Transaction &operator =(const Transaction &b) const = delete;
 
     /** TODO: Should be an structure that fits an IP address */
     int processConnection(const char *client, int cPort,
@@ -359,7 +359,7 @@ class Transaction : public TransactionAnchoredVariables {
     bool extractArguments(const std::string &orig, const std::string& buf,
         size_t offset);
 
-    const char *getResponseBody();
+    const char *getResponseBody() const;
     size_t getResponseBodyLength();
     size_t getRequestBodyLength();
 
@@ -368,7 +368,7 @@ class Transaction : public TransactionAnchoredVariables {
 #endif
     void serverLog(std::shared_ptr<RuleMessage> rm);
 
-    int getRuleEngineState();
+    int getRuleEngineState() const;
 
     std::string toJSON(int parts);
     std::string toOldAuditLogFormat(int parts, const std::string &trailer);

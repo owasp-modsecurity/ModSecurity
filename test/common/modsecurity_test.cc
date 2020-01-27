@@ -78,8 +78,8 @@ bool ModSecurityTest<T>::load_test_json(std::string file) {
         if (this->count(u->filename + ":" + u->name) == 0) {
             std::vector<T *> *vector = new std::vector<T *>;
             vector->push_back(u);
-            std::pair<std::string, std::vector<T *> *> a(u->filename + ":" +
-                u->name, vector);
+            std::string filename(u->filename + ":" + u->name);
+            std::pair<std::string, std::vector<T*>*> a(filename, vector);
             this->insert(a);
         } else {
             std::vector<T *> *vec = this->at(u->filename + ":" + u->name);

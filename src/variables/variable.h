@@ -106,6 +106,7 @@ namespace variables {
 
 class KeyExclusion {
  public:
+    KeyExclusion() { }
     virtual bool match(const std::string &a) = 0;
     virtual ~KeyExclusion() { }
 };
@@ -150,6 +151,9 @@ class KeyExclusionString : public KeyExclusion {
 
 class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
  public:
+    KeyExclusions() {
+    }
+
     bool toOmit(std::string a) {
         for (auto &z : *this) {
             if (z->match(a)) {
@@ -163,6 +167,7 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
 
 class VariableMonkeyResolution {
  public:
+    VariableMonkeyResolution () { }
     static inline bool comp(const std::string &a, const std::string &b) {
         return a.size() == b.size()
              && std::equal(a.begin(), a.end(), b.begin(),

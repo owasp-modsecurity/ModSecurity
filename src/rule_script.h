@@ -44,9 +44,9 @@ using actions::Action;
 /** @ingroup ModSecurity_CPP_API */
 class RuleScript : public Rule {
  public:
-    RuleScript(std::string name,
+    RuleScript(const std::string &name,
         std::vector<Action *> *actions,
-        std::string fileName,
+        const std::string &fileName,
         int lineNumber)
             : Rule(NULL, NULL, actions, fileName, lineNumber),
         m_name(name) { }

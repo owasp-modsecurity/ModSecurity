@@ -42,15 +42,18 @@ class Transaction;
 
 class AnchoredVariable {
  public:
-    AnchoredVariable(Transaction* t, std::string name);
+    AnchoredVariable(Transaction* t, const std::string &name);
 
-    AnchoredVariable(const AnchoredVariable &a) {
-        m_transaction = a.m_transaction;
-        m_offset = a.m_offset;
-        m_name = a.m_name;
-        m_value = a.m_value;
-        m_var = a.m_var;
-    }
+    AnchoredVariable(const AnchoredVariable &a) = delete;
+    AnchoredVariable &operator= (const AnchoredVariable &a) = delete;
+
+    /*
+        : m_transaction(a.m_transaction),
+        m_offset(a.m_offset),
+        m_name(a.m_name),
+        m_value(a.m_value),
+        m_var(a.m_var) { }
+    */
 
     ~AnchoredVariable();
 

@@ -126,7 +126,6 @@ int process_intervention(modsecurity::Transaction *transaction) {
 int main(int argc, char **argv) {
     modsecurity::ModSecurity *modsec;
     modsecurity::Rules *rules;
-    modsecurity::ModSecurityIntervention it;
 
     if (argc < 2) {
         std::cout << "Use " << *argv << " test-case-file.conf";

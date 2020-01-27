@@ -39,28 +39,28 @@ class VariableValue {
  public:
     using Origins = std::list<std::unique_ptr<VariableOrigin>>;
 
-    VariableValue(const std::string *key,
+    explicit VariableValue(const std::string *key,
         const std::string *value = nullptr)
-        : m_key(*key),
+        : m_collection(""),
+        m_key(*key),
         m_keyWithCollection(*key),
-        m_collection(""),
         m_value(value != nullptr?*value:"")
     { }
 
     VariableValue(const std::string *collection,
         const std::string *key,
         const std::string *value)
-        : m_key(*key),
+        : m_collection(*collection),
+        m_key(*key),
         m_keyWithCollection(*collection + ":" + *key),
-        m_collection(*collection),
         m_value(*value)
     { }
 
     explicit VariableValue(const VariableValue *o) :
-        m_key(o->m_key),
-        m_value(o->m_value),
         m_collection(o->m_collection),
-        m_keyWithCollection(o->m_keyWithCollection)
+        m_key(o->m_key),
+        m_keyWithCollection(o->m_keyWithCollection),
+        m_value(o->m_value)
     {
         for (auto &i : o->m_orign) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
@@ -69,6 +69,8 @@ class VariableValue {
             m_orign.push_back(std::move(origin));
         }
     }
+
+    VariableValue(const VariableValue &v) = delete;
 
 
     const std::string& getKey() const {

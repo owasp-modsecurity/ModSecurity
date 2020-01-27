@@ -70,7 +70,7 @@ class Rules : public RulesProperties {
     int load(const char *rules);
     int load(const char *rules, const std::string &ref);
 
-    void dump();
+    void dump() const;
 
     int merge(Parser::Driver *driver);
     int merge(Rules *rules);
@@ -84,10 +84,10 @@ class Rules : public RulesProperties {
     int64_t unicode_codepage;
 
  private:
-    int m_referenceCount;
 #ifndef NO_LOGS
     uint8_t m_secmarker_skipped;
 #endif
+    int m_referenceCount;
 };
 
 #endif

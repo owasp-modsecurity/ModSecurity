@@ -36,7 +36,7 @@ namespace collection {
 namespace backend {
 
 
-InMemoryPerProcess::InMemoryPerProcess(std::string name) :
+InMemoryPerProcess::InMemoryPerProcess(const std::string &name) :
     Collection(name) {
     this->reserve(1000);
     pthread_mutex_init(&m_lock, NULL);

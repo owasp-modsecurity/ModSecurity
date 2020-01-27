@@ -173,9 +173,9 @@ int Rules::evaluate(int phase, Transaction *t) {
             "through the utilization of an `allow' action.");
         return true;
     }
-    if (t->m_allowType != actions::disruptive::NoneAllowType) {
-        t->m_allowType = actions::disruptive::NoneAllowType;
-    }
+    //if (t->m_allowType != actions::disruptive::NoneAllowType) {
+    t->m_allowType = actions::disruptive::NoneAllowType;
+    //}
 
     for (int i = 0; i < rules.size(); i++) {
         Rule *rule = rules[i];
@@ -255,7 +255,7 @@ int Rules::evaluate(int phase, Transaction *t) {
             }
 
             rule->evaluate(t, NULL);
-            if (t->m_it.disruptive == true) {
+            if (t->m_it.disruptive > 0) {
                 ms_dbg_a(t, 8, "Skipping this phase as this " \
                     "request was already intercepted.");
                 break;
@@ -296,7 +296,7 @@ void Rules::debug(int level, const std::string &id,
 }
 
 
-void Rules::dump() {
+void Rules::dump() const {
     std::cout << "Rules: " << std::endl;
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = m_rules[i];

@@ -28,7 +28,8 @@
 namespace modsecurity {
 
 
-AnchoredSetVariable::AnchoredSetVariable(Transaction *t, std::string name)
+AnchoredSetVariable::AnchoredSetVariable(Transaction *t,
+    const std::string &name)
     : m_transaction(t),
     m_name(name) {
         reserve(10);

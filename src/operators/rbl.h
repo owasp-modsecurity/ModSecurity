@@ -62,7 +62,7 @@ class Rbl : public Operator {
 
     /** @ingroup ModSecurity_Operator */
     explicit Rbl(std::unique_ptr<RunTimeString> param)
-        : m_service(""),
+        : m_service(),
         m_demandsPassword(false),
         m_provider(RblProvider::UnknownProvider),
         Operator("Rbl", std::move(param)) {

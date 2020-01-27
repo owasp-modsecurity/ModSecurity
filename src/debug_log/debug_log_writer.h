@@ -40,9 +40,9 @@ class DebugLogWriter {
         return instance;
     }
 
-    void write_log(const std::string& file, const std::string& msg);
-    void close(const std::string& m_fileName);
-    int open(const std::string& m_fileName, std::string *error);
+    static void write_log(const std::string& file, const std::string& msg);
+    static void close(const std::string& m_fileName);
+    static int open(const std::string& m_fileName, std::string *error);
 
  private:
     DebugLogWriter() : m_first(NULL) { }

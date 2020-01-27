@@ -37,7 +37,9 @@ class Writer;
 class AuditLog {
  public:
     AuditLog();
-    ~AuditLog();
+    virtual ~AuditLog();
+
+    AuditLog(const AuditLog &a) = delete;
 
     enum AuditLogType {
      NotSetAuditLogType,
@@ -158,22 +160,22 @@ class AuditLog {
     bool setStorageDir(const std::basic_string<char>& path);
     bool setFormat(AuditLogFormat fmt);
 
-    int getDirectoryPermission();
-    int getFilePermission();
-    int getParts();
+    int getDirectoryPermission() const;
+    int getFilePermission() const;
+    int getParts() const;
 
     bool setParts(const std::basic_string<char>& new_parts);
     bool setType(AuditLogType audit_type);
 
     bool init(std::string *error);
-    bool close();
+    virtual bool close();
 
     bool saveIfRelevant(Transaction *transaction);
     bool saveIfRelevant(Transaction *transaction, int parts);
     bool isRelevant(int status);
 
-    int addParts(int parts, const std::string& new_parts);
-    int removeParts(int parts, const std::string& new_parts);
+    static int addParts(int parts, const std::string& new_parts);
+    static int removeParts(int parts, const std::string& new_parts);
 
     bool merge(AuditLog *from, std::string *error);
 

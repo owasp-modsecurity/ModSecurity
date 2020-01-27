@@ -278,8 +278,11 @@ class ModSecurity {
     ModSecurity();
     ~ModSecurity();
 
+    ModSecurity(const ModSecurity &m) = delete;
+    ModSecurity& operator= (const ModSecurity &m) = delete;
+
     const std::string& whoAmI();
-    void setConnectorInformation(std::string connector);
+    void setConnectorInformation(const std::string &connector);
     void setServerLogCb(ModSecLogCb cb);
     /**
      *
@@ -291,9 +294,9 @@ class ModSecurity {
 
     void serverLog(void *data, std::shared_ptr<RuleMessage> rm);
 
-    const std::string& getConnectorInformation();
+    const std::string& getConnectorInformation() const;
 
-    int processContentOffset(const char *content, size_t len,
+    static int processContentOffset(const char *content, size_t len,
         const char *matchString, std::string *json, const char **err);
 
     collection::Collection *m_global_collection;

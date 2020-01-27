@@ -36,7 +36,7 @@ namespace modsecurity {
 namespace RequestBodyProcessor {
 
 
-Multipart::Multipart(std:: string header, Transaction *transaction)
+Multipart::Multipart(const std::string &header, Transaction *transaction)
     : m_reqbody_no_files_length(0),
     m_nfiles(0),
     m_boundary_count(0),
@@ -1277,7 +1277,7 @@ bool Multipart::init(std::string *error) {
             /* Quoted. */
             m_boundary.assign(std::string(b + 1, len - 2));
             if (m_boundary.empty()) {
-                return -1;
+                return false;
             }
             m_flag_boundary_quoted = 1;
         } else {

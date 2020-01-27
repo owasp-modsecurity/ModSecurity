@@ -51,7 +51,7 @@ class Writer {
     virtual bool write(Transaction *transaction, int parts,
         std::string *error) = 0;
 
-    void generateBoundary(std::string *boundary);
+    static void generateBoundary(std::string *boundary);
 
     void refCountIncrease() {
         m_refereceCount++;

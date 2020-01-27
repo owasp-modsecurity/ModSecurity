@@ -43,11 +43,11 @@ class DebugLog {
     virtual void write(int level, const std::string &msg);
     virtual void write(int level, const std::string &id,
         const std::string &uri, const std::string &msg);
-    bool isLogFileSet();
-    bool isLogLevelSet();
-    void setDebugLogLevel(int level);
-    void setDebugLogFile(const std::string &fileName, std::string *error);
-    const std::string& getDebugLogFile();
+    virtual bool isLogFileSet();
+    virtual bool isLogLevelSet();
+    virtual void setDebugLogLevel(int level);
+    virtual void setDebugLogFile(const std::string &fileName, std::string *error);
+    virtual const std::string& getDebugLogFile();
     virtual int getDebugLogLevel();
 
     int m_debugLevel;

@@ -67,25 +67,25 @@ class RuleMessage {
 
 
     std::string log() {
-        return RuleMessage::log(this, 0);
+        return log(this, 0);
     }
     std::string log(int props) {
-        return RuleMessage::log(this, props);
+        return log(this, props);
     }
     std::string log(int props, int responseCode) {
-        return RuleMessage::log(this, props, responseCode);
+        return log(this, props, responseCode);
     }
     std::string errorLog() {
-        return RuleMessage::log(this,
+        return log(this,
 		ClientLogMessageInfo | ErrorLogTailLogMessageInfo);
     }
 
     static std::string log(const RuleMessage *rm, int props, int code);
     static std::string log(const RuleMessage *rm, int props) {
-        return RuleMessage::log(rm, props, -1);
+        return log(rm, props, -1);
     }
     static std::string log(const RuleMessage *rm) {
-        return RuleMessage::log(rm, 0);
+        return log(rm, 0);
     }
 
     static std::string _details(const RuleMessage *rm);

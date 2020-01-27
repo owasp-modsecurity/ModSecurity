@@ -122,8 +122,8 @@ bool RulesExceptions::loadUpdateTargetById(double id,
 bool RulesExceptions::load(const std::string &a, std::string *error) {
     bool added = false;
     std::vector<std::string> toRemove = utils::string::ssplit(a, ' ');
-    for (std::string &a : toRemove) {
-        std::string b = modsecurity::utils::string::parserSanitizer(a);
+    for (std::string &r : toRemove) {
+        std::string b = modsecurity::utils::string::parserSanitizer(r);
         if (b.size() == 0) {
             continue;
         }

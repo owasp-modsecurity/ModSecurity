@@ -115,7 +115,7 @@ class ReadingLogsViaRuleMessage {
         char *response_headers,
         char *response_body,
         char *ip,
-        std::string rules) :
+        const std::string &rules) :
             m_request_header(request_header),
             m_request_uri(request_uri),
             m_request_body(request_body),
@@ -133,7 +133,6 @@ class ReadingLogsViaRuleMessage {
 
         modsecurity::ModSecurity *modsec;
         modsecurity::Rules *rules;
-        modsecurity::ModSecurityIntervention it;
 
         modsec = new modsecurity::ModSecurity();
         modsec->setConnectorInformation("ModSecurity-test v0.0.1-alpha" \
@@ -168,8 +167,6 @@ class ReadingLogsViaRuleMessage {
         delete modsec;
         pthread_exit(NULL);
         return 0;
-end:
-        return -1;
     }
 
     static void logCb(void *data, const void *ruleMessagev) {

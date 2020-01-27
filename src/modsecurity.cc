@@ -60,8 +60,7 @@ namespace modsecurity {
  * @endcode
  */
 ModSecurity::ModSecurity()
-    : m_connector(""),
-    m_whoami(""),
+    :
 #ifdef WITH_LMDB
     m_global_collection(new collection::backend::LMDB("GLOBAL")),
     m_resource_collection(new collection::backend::LMDB("RESOURCE")),
@@ -70,14 +69,17 @@ ModSecurity::ModSecurity()
     m_user_collection(new collection::backend::LMDB("USER")),
 #else
     m_global_collection(new collection::backend::InMemoryPerProcess("GLOBAL")),
-    m_ip_collection(new collection::backend::InMemoryPerProcess("IP")),
     m_resource_collection(
         new collection::backend::InMemoryPerProcess("RESOURCE")),
+    m_ip_collection(new collection::backend::InMemoryPerProcess("IP")),
     m_session_collection(
         new collection::backend::InMemoryPerProcess("SESSION")),
     m_user_collection(new collection::backend::InMemoryPerProcess("USER")),
 #endif
-    m_logCb(NULL) {
+    m_connector(""),
+    m_whoami(""),
+    m_logCb(NULL),
+    m_logProperties(0) {
     UniqueId::uniqueId();
     srand(time(NULL));
 #ifdef MSC_WITH_CURL
@@ -167,7 +169,7 @@ const std::string& ModSecurity::whoAmI() {
  * @param connector Information about the connector.
  *
  */
-void ModSecurity::setConnectorInformation(std::string connector) {
+void ModSecurity::setConnectorInformation(const std::string &connector) {
     m_connector = connector;
 }
 
@@ -182,7 +184,7 @@ void ModSecurity::setConnectorInformation(std::string connector) {
  * @retval "" Nothing was informed about the connector.
  * @retval !="" Connector information.
  */
-const std::string& ModSecurity::getConnectorInformation() {
+const std::string& ModSecurity::getConnectorInformation() const {
     return m_connector;
 }
 
@@ -224,7 +226,6 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     Utils::Regex transformations("t:(?:(?!t:).)+");
     yajl_gen g;
     std::string varValue;
-    std::string opValue;
     const unsigned char *buf;
     size_t jsonSize;
 
@@ -391,11 +392,11 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     json->append("\n");
 
     yajl_gen_free(g);
+    return 0;
 #else
     *err = "Without YAJL support, we cannot generate JSON.";
     return -1;
 #endif
-    return 0;
 }
 
 

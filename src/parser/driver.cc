@@ -15,7 +15,6 @@
 
 #include "src/parser/driver.h"
 
-#include "src/parser/seclang-parser.hh"
 #include "modsecurity/audit_log.h"
 #include "modsecurity/rules_properties.h"
 

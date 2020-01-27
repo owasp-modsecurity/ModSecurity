@@ -33,7 +33,7 @@ class RegressionTest {
  public:
     static RegressionTest *from_yajl_node(const yajl_val &);
 
-    const std::string print();
+    static std::string print();
     std::string filename;
     std::string name;
     std::string title;

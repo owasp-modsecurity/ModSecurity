@@ -237,10 +237,10 @@ int JSON::yajl_end_array(void *ctx) {
     tthis->m_containers.pop_back();
     delete a;
     if (tthis->m_containers.size() > 0) {
-        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+        JSONContainerArray *ja = dynamic_cast<JSONContainerArray *>(
             tthis->m_containers.back());
-        if (a) {
-            a->m_elementCounter++;
+        if (ja) {
+            ja->m_elementCounter++;
         }
     }
 
@@ -272,10 +272,10 @@ int JSON::yajl_end_map(void *ctx) {
     delete a;
 
     if (tthis->m_containers.size() > 0) {
-        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+        JSONContainerArray *ja = dynamic_cast<JSONContainerArray *>(
             tthis->m_containers.back());
-        if (a) {
-            a->m_elementCounter++;
+        if (ja) {
+            ja->m_elementCounter++;
         }
     }
 

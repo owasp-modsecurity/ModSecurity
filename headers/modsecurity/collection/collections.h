@@ -49,6 +49,9 @@ class Collections {
         Collection *user, Collection *resource);
     ~Collections();
 
+    Collections(const Collections &c) = delete;
+    Collections& operator =(const Collections &c) = delete;
+
     std::string m_global_collection_key;
     std::string m_ip_collection_key;
     std::string m_session_collection_key;

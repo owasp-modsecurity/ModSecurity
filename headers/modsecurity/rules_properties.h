@@ -197,6 +197,8 @@ class RulesProperties {
         m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
         m_secRuleEngine(PropertyNotSetRuleEngine) { }
 
+    RulesProperties(const RulesProperties &r) = delete;
+    RulesProperties &operator =(const RulesProperties &r) = delete;
 
     ~RulesProperties() {
         int i = 0;

@@ -30,7 +30,7 @@
 namespace modsecurity {
 
 
-void RunTimeString::appendText(std::string text) {
+void RunTimeString::appendText(const std::string &text) {
     std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
     r->m_string = text;
     m_elements.push_back(std::move(r));

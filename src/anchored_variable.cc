@@ -28,7 +28,7 @@ namespace modsecurity {
 
 
 AnchoredVariable::AnchoredVariable(Transaction *t,
-    std::string name)
+    const std::string &name)
     : m_transaction(t),
     m_offset(0),
     m_name(""),

@@ -46,8 +46,8 @@ class UniqueId {
     }
 
     void fillUniqueId();
-    std::string const machineName();
-    std::string const ethernetMacAddress();
+    static std::string machineName();
+    static std::string ethernetMacAddress();
 
     std::string uniqueId_str;
 

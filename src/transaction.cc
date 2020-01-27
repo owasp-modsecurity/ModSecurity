@@ -100,37 +100,67 @@ namespace modsecurity {
  *
  */
 Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
-    : m_clientPort(0),
-    m_serverPort(0),
+    : m_creationTimeStamp(utils::cpu_seconds()),
+    m_clientIpAddress(""),
+    m_httpVersion(""),
+    m_serverIpAddress(""),
+    m_uri(""),
     m_uri_no_query_string_decoded(""),
-    m_rules(rules),
-    m_timeStamp(std::time(NULL)),
-    m_httpCodeReturned(200),
-    m_highestSeverityAction(255),
     m_ARGScombinedSizeDouble(0),
+    m_clientPort(0),
+    m_highestSeverityAction(255),
+    m_httpCodeReturned(200),
+    m_serverPort(0),
+    m_ms(ms),
     m_requestBodyType(UnknownFormat),
     m_requestBodyProcessor(UnknownFormat),
+    m_rules(rules),
+    m_ruleRemoveById(),
+    m_ruleRemoveByIdRange(),
+    m_ruleRemoveByTag(),
+    m_ruleRemoveTargetByTag(),
+    m_ruleRemoveTargetById(),
     m_requestBodyAccess(Rules::PropertyNotSetConfigBoolean),
+    m_auditLogModifier(),
+    m_rulesMessages(),
+    m_requestBody(),
+    m_responseBody(),
+    m_id(),
     m_marker(""),
-    m_allowType(modsecurity::actions::disruptive::NoneAllowType),
     m_skip_next(0),
-    m_creationTimeStamp(utils::cpu_seconds()),
-    m_logCbData(logCbData),
-    m_ms(ms),
-    m_secRuleEngine(RulesProperties::PropertyNotSetRuleEngine),
+    m_allowType(modsecurity::actions::disruptive::NoneAllowType),
+    m_uri_decoded(""),
+    m_actions(),
+    m_it(),
+    m_timeStamp(std::time(NULL)),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
-#ifdef WITH_YAJL
-    m_json(new RequestBodyProcessor::JSON(this)),
-#else
-    m_json(NULL),
-#endif
+    m_matched(),
 #ifdef WITH_LIBXML2
     m_xml(new RequestBodyProcessor::XML(this)),
 #else
     m_xml(NULL),
 #endif
+#ifdef WITH_YAJL
+    m_json(new RequestBodyProcessor::JSON(this)),
+#else
+    m_json(NULL),
+#endif
+    m_secRuleEngine(RulesProperties::PropertyNotSetRuleEngine),
+    m_variableDuration(""),
+    m_variableEnvs(),
+    m_variableHighestSeverityAction(""),
+    m_variableRemoteUser(""),
+    m_variableTime(""),
+    m_variableTimeDay(""),
+    m_variableTimeEpoch(""),
+    m_variableTimeHour(""),
+    m_variableTimeMin(""),
+    m_variableTimeSec(""),
+    m_variableTimeWDay(""),
+    m_variableTimeYear(""),
+    m_logCbData(logCbData),
     TransactionAnchoredVariables(this) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(modsecurity::utils::generate_transaction_unique_id());
@@ -144,39 +174,68 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
 }
 
 Transaction::Transaction(ModSecurity *ms, Rules *rules, char *id, void *logCbData)
-    : m_clientPort(0),
-    m_serverPort(0),
+    : m_creationTimeStamp(utils::cpu_seconds()),
+    m_clientIpAddress(""),
+    m_httpVersion(""),
+    m_serverIpAddress(""),
+    m_uri(""),
     m_uri_no_query_string_decoded(""),
-    m_rules(rules),
-    m_timeStamp(std::time(NULL)),
-    m_httpCodeReturned(200),
-    m_highestSeverityAction(255),
     m_ARGScombinedSizeDouble(0),
+    m_clientPort(0),
+    m_highestSeverityAction(255),
+    m_httpCodeReturned(200),
+    m_serverPort(0),
+    m_ms(ms),
     m_requestBodyType(UnknownFormat),
     m_requestBodyProcessor(UnknownFormat),
+    m_rules(rules),
+    m_ruleRemoveById(),
+    m_ruleRemoveByIdRange(),
+    m_ruleRemoveByTag(),
+    m_ruleRemoveTargetByTag(),
+    m_ruleRemoveTargetById(),
     m_requestBodyAccess(Rules::PropertyNotSetConfigBoolean),
+    m_auditLogModifier(),
+    m_rulesMessages(),
+    m_requestBody(),
+    m_responseBody(),
+    m_id(std::string(id)),
     m_marker(""),
-    m_allowType(modsecurity::actions::disruptive::NoneAllowType),
     m_skip_next(0),
-    m_creationTimeStamp(utils::cpu_seconds()),
-    m_logCbData(logCbData),
-    m_ms(ms),
-    m_secRuleEngine(RulesProperties::PropertyNotSetRuleEngine),
+    m_allowType(modsecurity::actions::disruptive::NoneAllowType),
+    m_uri_decoded(""),
+    m_actions(),
+    m_it(),
+    m_timeStamp(std::time(NULL)),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
-#ifdef WITH_YAJL
-    m_json(new RequestBodyProcessor::JSON(this)),
-#else
-    m_json(NULL),
-#endif
+    m_matched(),
 #ifdef WITH_LIBXML2
     m_xml(new RequestBodyProcessor::XML(this)),
 #else
     m_xml(NULL),
 #endif
+#ifdef WITH_YAJL
+    m_json(new RequestBodyProcessor::JSON(this)),
+#else
+    m_json(NULL),
+#endif
+    m_secRuleEngine(RulesProperties::PropertyNotSetRuleEngine),
+    m_variableDuration(""),
+    m_variableEnvs(),
+    m_variableHighestSeverityAction(""),
+    m_variableRemoteUser(""),
+    m_variableTime(""),
+    m_variableTimeDay(""),
+    m_variableTimeEpoch(""),
+    m_variableTimeHour(""),
+    m_variableTimeMin(""),
+    m_variableTimeSec(""),
+    m_variableTimeWDay(""),
+    m_variableTimeYear(""),
+    m_logCbData(logCbData),
     TransactionAnchoredVariables(this) {
-    m_id = std::string(id);
     m_rules->incrementReferenceCount();
 
     m_variableUrlEncodedError.set("0", 0);
@@ -1143,7 +1202,7 @@ int Transaction::processResponseBody() {
             + ". It is not marked to be inspected.");
         std::string validContetTypes("");
         for (std::set<std::string>::iterator i = bi.begin();
-             i != bi.end(); i++) {
+             i != bi.end(); ++i) {
             validContetTypes.append(*i + " ");
         }
         ms_dbg(8, "Content-Type(s) marked to be inspected: " \
@@ -1250,7 +1309,7 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
  * @retval NULL Nothing was updated.
  *
  */
-const char *Transaction::getResponseBody() {
+const char *Transaction::getResponseBody() const {
     // int there_is_update = this->rules->loadResponseBodyFromJS(this);
     return this->m_responseBody.str().c_str();
 }
@@ -1324,7 +1383,7 @@ int Transaction::processLogging() {
         ms_dbg(8, "Checking if this request is suitable to be " \
             "saved as an audit log.");
 
-        if (this->m_auditLogModifier.size() > 0) {
+        if (!this->m_auditLogModifier.empty()) {
             ms_dbg(4, "There was an audit log modifier for this transaction.");
             std::list<std::pair<int, std::string>>::iterator it;
             ms_dbg(7, "AuditLog parts before modification(s): " +
@@ -1754,7 +1813,7 @@ void Transaction::serverLog(std::shared_ptr<RuleMessage> rm) {
 }
 
 
-int Transaction::getRuleEngineState() {
+int Transaction::getRuleEngineState() const {
     if (m_secRuleEngine == RulesProperties::PropertyNotSetRuleEngine) {
         return m_rules->m_secRuleEngine;
     }

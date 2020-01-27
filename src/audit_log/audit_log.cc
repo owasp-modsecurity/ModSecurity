@@ -54,12 +54,12 @@ AuditLog::AuditLog()
     : m_path1(""),
     m_path2(""),
     m_storage_dir(""),
+    m_format(NotSetAuditLogFormat),
+    m_parts(-1),
     m_filePermission(-1),
     m_directoryPermission(-1),
-    m_parts(-1),
     m_status(NotSetLogStatus),
     m_type(NotSetAuditLogType),
-    m_format(NotSetAuditLogFormat),
     m_relevant(""),
     m_writer(NULL),
     m_refereceCount(1) { }
@@ -85,7 +85,7 @@ bool AuditLog::setFileMode(int permission) {
 }
 
 
-int AuditLog::getFilePermission() {
+int AuditLog::getFilePermission() const {
     if (m_filePermission == -1) {
         return m_defaultFilePermission;
     }
@@ -93,7 +93,7 @@ int AuditLog::getFilePermission() {
     return m_filePermission;
 }
 
-int AuditLog::getDirectoryPermission() {
+int AuditLog::getDirectoryPermission() const {
     if (m_directoryPermission == -1) {
         return m_defaultDirectoryPermission;
     }
@@ -192,7 +192,7 @@ bool AuditLog::setParts(const std::basic_string<char>& new_parts) {
 }
 
 
-int AuditLog::getParts() {
+int AuditLog::getParts() const {
     if (m_parts == -1) {
         return m_defaultParts;
     }

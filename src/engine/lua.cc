@@ -39,7 +39,7 @@ namespace modsecurity {
 namespace engine {
 
 
-bool Lua::isCompatible(std::string script, Lua *l, std::string *error) {
+bool Lua::isCompatible(const std::string &script, Lua *l, std::string *error) {
 #ifdef WITH_LUA
     std::string lua(".lua");
     std::string err;
@@ -63,7 +63,7 @@ bool Lua::isCompatible(std::string script, Lua *l, std::string *error) {
 }
 
 
-bool Lua::load(std::string script, std::string *err) {
+bool Lua::load(const std::string &script, std::string *err) {
 #ifdef WITH_LUA
     lua_State *L = NULL;
     L = luaL_newstate();

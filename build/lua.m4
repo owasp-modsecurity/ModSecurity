@@ -6,7 +6,7 @@ AC_DEFUN([CHECK_LUA],
 [dnl
 
 # Possible names for the lua library/package (pkg-config)
-LUA_POSSIBLE_LIB_NAMES="luajit luajit-5.1 lua53 lua5.3 lua-5.3 lua52 lua5.2 lua-5.2 lua51 lua5.1 lua-5.1 lua"
+LUA_POSSIBLE_LIB_NAMES="lua53 lua5.3 lua-5.3 lua52 lua5.2 lua-5.2 lua51 lua5.1 lua-5.1 lua"
 
 # Possible extensions for the library
 LUA_POSSIBLE_EXTENSIONS="so so0 la sl dll dylib so.0.0.0"

@@ -56,15 +56,17 @@ parser:
 
 
 cppcheck:
-	@cppcheck -U YYSTYPE \
-                --suppressions-list=./test/cppcheck_suppressions.txt \
-                --enable=all \
-                --inconclusive \
-                --template="warning: {file},{line},{severity},{id},{message}" \
-                -I headers -I . -I others -I src -I others/mbedtls -I src/parser \
-                --error-exitcode=0 \
-                -i "src/parser/seclang-parser.cc" -i "src/parser/seclang-scanner.cc" \
-                .
+	@cppcheck -U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
+		-D MS_CPPCHECK_DISABLED_FOR_PARSER \
+		--suppressions-list=./test/cppcheck_suppressions.txt \
+		--enable=all \
+		--inconclusive \
+		--template="warning: {file},{line},{severity},{id},{message}" \
+		-I headers -I . -I others -I src -I others/mbedtls -I src/parser \
+		--error-exitcode=1 \
+		-i "src/parser/seclang-parser.cc" -i "src/parser/seclang-scanner.cc" \
+		--force --verbose .
+
 
 check-static: cppcheck
 

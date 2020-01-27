@@ -74,7 +74,7 @@ class Rule {
         std::list<std::pair<std::shared_ptr<std::string>,
         std::shared_ptr<std::string>>> *ret,
         std::string *path,
-        int *nth);
+        int *nth) const;
 
     void getVariablesExceptions(Transaction *t,
         variables::Variables *exclusion, variables::Variables *addition);
@@ -91,9 +91,9 @@ class Rule {
         std::string value, std::shared_ptr<RuleMessage> rm);
     void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
         bool *b, std::shared_ptr<RuleMessage> ruleMessage);
-    inline void updateMatchedVars(Transaction *trasn, const std::string &key,
+    static inline void updateMatchedVars(Transaction *trasn, const std::string &key,
         const std::string &value);
-    inline void cleanMatchedVars(Transaction *trasn);
+    static inline void cleanMatchedVars(Transaction *trasn);
 
     std::vector<actions::Action *> getActionsByName(const std::string& name,
         Transaction *t);

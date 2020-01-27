@@ -66,7 +66,7 @@ void json2bin(std::string *str) {
         unsigned int p;
         std::string toBeReplaced = match.str();
         toBeReplaced.erase(0, 2);
-        sscanf(toBeReplaced.c_str(), "%x", &p);
+        sscanf(toBeReplaced.c_str(), "%3x", &p);
         replaceAll(str, match.str(), p);
     }
 

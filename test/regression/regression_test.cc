@@ -23,7 +23,7 @@
 
 namespace modsecurity_test {
 
-const std::string RegressionTest::print() {
+std::string RegressionTest::print() {
     std::stringstream i;
 
 #if 0
