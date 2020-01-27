@@ -55,7 +55,7 @@ class XML_NoDictElement : public Variable {
 
 class XML : public Variable {
  public:
-    explicit XML(std::string _name)
+    explicit XML(const std::string &_name)
         : Variable(_name) { }
 
     void evaluate(Transaction *transaction,

@@ -34,7 +34,7 @@ namespace variables {
 
 class Global_DictElement : public Variable {
  public:
-    explicit Global_DictElement(std::string dictElement)
+    explicit Global_DictElement(const std::string &dictElement)
         : Variable("GLOBAL:" + dictElement),
         m_dictElement("GLOBAL:" + dictElement) { }
 
@@ -67,7 +67,7 @@ class Global_NoDictElement : public Variable {
 
 class Global_DictElementRegexp : public VariableRegex {
  public:
-    explicit Global_DictElementRegexp(std::string dictElement)
+    explicit Global_DictElementRegexp(const std::string &dictElement)
         : VariableRegex("GLOBAL", dictElement),
         m_dictElement(dictElement) { }
 
@@ -100,13 +100,13 @@ class Global_DynamicElement : public Variable {
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
-    void del(Transaction *t, std::string k) {
+    static void del(Transaction *t, const std::string &k) {
         t->m_collections.m_global_collection->del(k,
             t->m_collections.m_global_collection_key,
             t->m_rules->m_secWebAppId.m_value);
     }
 
-    void storeOrUpdateFirst(Transaction *t, std::string var,
+    static void storeOrUpdateFirst(Transaction *t, std::string var,
         std::string value) {
         t->m_collections.m_global_collection->storeOrUpdateFirst(
             var, t->m_collections.m_global_collection_key,

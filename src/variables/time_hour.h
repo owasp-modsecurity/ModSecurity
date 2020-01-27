@@ -30,7 +30,7 @@ namespace variables {
 
 class TimeHour : public Variable {
  public:
-    explicit TimeHour(std::string _name)
+    explicit TimeHour(const std::string &_name)
         : Variable(_name),
         m_retName("TIME_HOUR") { }
 

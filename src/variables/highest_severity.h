@@ -30,7 +30,7 @@ namespace variables {
 
 class HighestSeverity : public Variable {
  public:
-    explicit HighestSeverity(std::string _name)
+    explicit HighestSeverity(const std::string &_name)
         : Variable(_name)
     { }
 

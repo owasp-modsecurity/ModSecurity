@@ -30,7 +30,7 @@ namespace variables {
 
 class TimeSec : public Variable {
  public:
-    explicit TimeSec(std::string _name)
+    explicit TimeSec(const std::string &_name)
         : Variable(_name),
         m_retName("TIME_SEC") { }
 

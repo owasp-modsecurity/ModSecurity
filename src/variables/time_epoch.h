@@ -30,7 +30,7 @@ namespace variables {
 
 class TimeEpoch : public Variable {
  public:
-    explicit TimeEpoch(std::string _name)
+    explicit TimeEpoch(const std::string &_name)
         : Variable(_name),
         m_retName("TIME_EPOCH") { }
 

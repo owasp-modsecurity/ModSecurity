@@ -30,7 +30,7 @@ namespace variables {
 
 class TimeDay : public Variable {
  public:
-    explicit TimeDay(std::string _name)
+    explicit TimeDay(const std::string &_name)
         : Variable(_name),
         m_retName("TIME_DAY") { }
 

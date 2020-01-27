@@ -34,7 +34,7 @@ namespace variables {
 
 class Session_DictElement : public Variable {
  public:
-    explicit Session_DictElement(std::string dictElement)
+    explicit Session_DictElement(const std::string &dictElement)
         : Variable("SESSION:" + dictElement),
         m_dictElement("SESSION:" + dictElement) { }
 
@@ -67,7 +67,7 @@ class Session_NoDictElement : public Variable {
 
 class Session_DictElementRegexp : public VariableRegex {
  public:
-    explicit Session_DictElementRegexp(std::string dictElement)
+    explicit Session_DictElementRegexp(const std::string &dictElement)
         : VariableRegex("SESSION", dictElement),
         m_dictElement(dictElement) { }
 
@@ -99,14 +99,14 @@ class Session_DynamicElement : public Variable {
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
-    void del(Transaction *t, std::string k) {
+    static void del(Transaction *t, const std::string &k) {
         t->m_collections.m_session_collection->del(k,
             t->m_collections.m_session_collection_key,
             t->m_collections.m_ip_collection_key);
     }
 
-    void storeOrUpdateFirst(Transaction *t, std::string var,
-        std::string value) {
+    static void storeOrUpdateFirst(Transaction *t, const std::string &var,
+        const std::string &value) {
         t->m_collections.m_session_collection->storeOrUpdateFirst(
             var, t->m_collections.m_session_collection_key,
             t->m_rules->m_secWebAppId.m_value,

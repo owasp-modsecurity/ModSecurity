@@ -30,7 +30,7 @@ namespace variables {
 
 class Env : public Variable {
  public:
-    explicit Env(std::string _name)
+    explicit Env(const std::string &_name)
         : Variable(_name) { }
 
     void evaluate(Transaction *transaction,

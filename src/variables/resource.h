@@ -34,7 +34,7 @@ namespace variables {
 
 class Resource_DictElement : public Variable {
  public:
-    explicit Resource_DictElement(std::string dictElement)
+    explicit Resource_DictElement(const std::string &dictElement)
         : Variable("RESOURCE:" + dictElement),
         m_dictElement("RESOURCE:" + dictElement) { }
 
@@ -67,7 +67,7 @@ class Resource_NoDictElement : public Variable {
 
 class Resource_DictElementRegexp : public VariableRegex {
  public:
-    explicit Resource_DictElementRegexp(std::string dictElement)
+    explicit Resource_DictElementRegexp(const std::string &dictElement)
         : VariableRegex("RESOURCE:", dictElement),
         m_dictElement(dictElement) { }
 
@@ -99,14 +99,14 @@ class Resource_DynamicElement : public Variable {
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
-    void del(Transaction *t, std::string k) {
+    static void del(Transaction *t, const std::string &k) {
         t->m_collections.m_resource_collection->del(k,
             t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value);
     }
 
-    void storeOrUpdateFirst(Transaction *t, std::string var,
-        std::string value) {
+    static void storeOrUpdateFirst(Transaction *t, const std::string &var,
+        const std::string &value) {
         t->m_collections.m_resource_collection->storeOrUpdateFirst(
             var, t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, value);

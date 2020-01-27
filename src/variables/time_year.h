@@ -30,7 +30,7 @@ namespace variables {
 
 class TimeYear : public Variable {
  public:
-    explicit TimeYear(std::string _name)
+    explicit TimeYear(const std::string &_name)
         : Variable(_name),
         m_retName("TIME_YEAR") { }
 

@@ -30,7 +30,7 @@ namespace variables {
 
 class TimeMin : public Variable {
  public:
-    explicit TimeMin(std::string _name)
+    explicit TimeMin(const std::string &_name)
         : Variable(_name),
         m_retName("TIME_MIN") { }
 

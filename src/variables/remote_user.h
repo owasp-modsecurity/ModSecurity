@@ -32,7 +32,7 @@ namespace variables {
 
 class RemoteUser : public Variable {
  public:
-    explicit RemoteUser(std::string _name)
+    explicit RemoteUser(const std::string &_name)
         : Variable(_name),
         m_retName("REMOTE_USER") { }
 

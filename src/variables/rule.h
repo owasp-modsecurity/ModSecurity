@@ -34,7 +34,7 @@ namespace variables {
 
 class Rule_DictElement : public VariableDictElement { \
  public:
-    explicit Rule_DictElement(std::string dictElement)
+    explicit Rule_DictElement(const std::string &dictElement)
         : VariableDictElement(std::string("RULE"), dictElement) { }
 
     static void id(Transaction *t,
@@ -194,7 +194,7 @@ class Rule_DictElement : public VariableDictElement { \
 
 class Rule_DictElementRegexp : public VariableRegex {
  public:
-    explicit Rule_DictElementRegexp(std::string regex)
+    explicit Rule_DictElementRegexp(const std::string &regex)
         : VariableRegex("RULE", regex) { }
 
     void evaluate(Transaction *t,

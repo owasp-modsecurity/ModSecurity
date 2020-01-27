@@ -32,7 +32,7 @@ namespace variables {
 
 class ModsecBuild : public Variable {
  public:
-    explicit ModsecBuild(std::string _name)
+    explicit ModsecBuild(const std::string &_name)
         : Variable(_name),
         m_retName("MODSEC_BUILD") {
         std::ostringstream ss;

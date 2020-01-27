@@ -45,7 +45,7 @@
 #define VAR_WITH_REGEX(n, N, e) \
 class n ## _DictElementRegexp : public VariableRegex { \
  public: \
-    explicit n ## _DictElementRegexp(std::string regex) \
+    explicit n ## _DictElementRegexp(const std::string &regex) \
         : VariableRegex(#N, regex) { } \
 \
     void evaluate(Transaction *transaction, \
@@ -60,7 +60,7 @@ class n ## _DictElementRegexp : public VariableRegex { \
 #define VAR_WITH_DICT_ELEMENT(n, N, e) \
 class n ## _DictElement : public VariableDictElement { \
  public: \
-    explicit n ## _DictElement(std::string dictElement) \
+    explicit n ## _DictElement(const std::string &dictElement) \
         : VariableDictElement(#N, dictElement) { } \
 \
     void evaluate(Transaction *transaction, \
@@ -114,9 +114,9 @@ class KeyExclusion {
 // FIXME: use pre built regex.
 class KeyExclusionRegex : public KeyExclusion {
  public:
-    explicit KeyExclusionRegex(Utils::Regex re)
+    explicit KeyExclusionRegex(const Utils::Regex &re)
         : m_re(re.pattern) { }
-    explicit KeyExclusionRegex(std::string re)
+    explicit KeyExclusionRegex(const std::string &re)
         : m_re(re) { }
 
     ~KeyExclusionRegex() override { }
@@ -131,7 +131,7 @@ class KeyExclusionRegex : public KeyExclusion {
 
 class KeyExclusionString : public KeyExclusion {
  public:
-    KeyExclusionString(std::string &a)
+    explicit KeyExclusionString(std::string &a)
         : m_key(utils::string::toupper(a)) { }
 
     ~KeyExclusionString() override { }
@@ -562,7 +562,7 @@ class Variable : public VariableMonkeyResolution {
     void addsKeyExclusion(Variable *v);
 
 
-    bool operator==(const Variable& b) {
+    bool operator==(const Variable& b) const {
         return m_collectionName == b.m_collectionName &&
             m_name == b.m_name &&
             *m_fullName == *b.m_fullName;
@@ -580,7 +580,7 @@ class Variable : public VariableMonkeyResolution {
 
 class VariableDictElement : public Variable {
  public:
-    VariableDictElement(std::string name, std::string dict_element)
+    VariableDictElement(const std::string &name, const std::string &dict_element)
         :  m_dictElement(dict_element), Variable(name + ":" + dict_element) { }
 
     std::string m_dictElement;
@@ -589,14 +589,14 @@ class VariableDictElement : public Variable {
 
 class VariableRegex : public Variable {
  public:
-    VariableRegex(std::string name, std::string regex)
+    VariableRegex(const std::string &name, const std::string &regex)
         :  m_r(regex),
         m_regex(regex),
         Variable(name + ":" + "regex(" + regex + ")") { }
 
+    Utils::Regex m_r;
     // FIXME: no need for that.
     std::string m_regex;
-    Utils::Regex m_r;
 };
 
 class Variables : public std::vector<Variable *> {
@@ -621,11 +621,12 @@ class Variables : public std::vector<Variable *> {
 class VariableModificatorExclusion : public Variable {
  public:
     explicit VariableModificatorExclusion(std::unique_ptr<Variable> var)
-        : m_base(std::move(var)), Variable(var.get()) { }
+        : Variable(var.get()),
+        m_base(std::move(var)) { }
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const VariableValue *> *l) {
+        std::vector<const VariableValue *> *l) override {
         m_base->evaluate(t, rule, l);
     }
 
@@ -643,7 +644,7 @@ class VariableModificatorCount : public Variable {
 
     void evaluate(Transaction *t,
         Rule *rule,
-        std::vector<const VariableValue *> *l) {
+        std::vector<const VariableValue *> *l) override {
         std::vector<const VariableValue *> reslIn;
         VariableValue *val = NULL;
         int count = 0;

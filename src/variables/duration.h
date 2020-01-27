@@ -30,7 +30,7 @@ namespace variables {
 
 class Duration : public Variable {
  public:
-    explicit Duration(std::string _name)
+    explicit Duration(const std::string &_name)
         : Variable(_name),
         m_retName("DURATION") { }
 
