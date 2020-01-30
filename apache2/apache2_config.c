@@ -1565,6 +1565,12 @@ static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
         return apr_psprintf(cmd->pool, "ModSecurity: Failed to open wafjson log file: %s",
             wafjsonlog_path);
     }
+
+    rc = apr_file_inherit_unset(msc_waf_log_fd);
+    if (rc != APR_SUCCESS) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Failed to set property for wafjson log file: %s",
+            wafjsonlog_path);
+    }
     
     // Global variable to share between threads
     strncpy( msc_waf_log_path, wafjsonlog_path, WAF_LOG_PATH_LENGTH );

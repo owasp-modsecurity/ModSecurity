@@ -243,7 +243,7 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
 #ifdef WAF_JSON_LOGGING_ENABLE
 void modsecurity_handle_signals_for_reopen(int signum)
 {
-    msc_waf_log_reopened = 1;
+    msc_waf_log_reopen_requested = 1;
 }
 #endif
 

@@ -68,6 +68,10 @@ request_rec *modsecNewRequest(conn_rec *connection, directory_config *config);
 int modsecProcessRequestBody(request_rec *r);
 int modsecProcessRequestHeaders(request_rec *r);
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+void modsecReopenLogfileIfNeeded(request_rec *r);
+#endif
+
 static inline int modsecProcessRequest(request_rec *r)    {
     int status;
     status = modsecProcessRequestHeaders(r);
