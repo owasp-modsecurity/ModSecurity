@@ -291,11 +291,11 @@ static void get_ruleset_type_version(char* waf_ruleset_info, char* waf_ruleset_t
     }
 }
 
-static int write_file_with_lock(struct waf_lock* lock, apr_file_t* fd, char* str) {
+static int write_file_with_lock(struct waf_lock* lock, apr_file_t** fd, char* str) {
     int rc;
     apr_size_t nbytes, nbytes_written;
 
-    if (lock == NULL || fd == NULL || str == NULL) {
+    if (lock == NULL || fd == NULL || *fd == NULL || str == NULL) {
         return WAF_LOG_UTIL_FAILED;
     }
 
@@ -305,7 +305,7 @@ static int write_file_with_lock(struct waf_lock* lock, apr_file_t* fd, char* str
     }
 
     nbytes = strlen(str);
-    apr_file_write_full(fd, str, nbytes, &nbytes_written);
+    apr_file_write_full(*fd, str, nbytes, &nbytes_written);
 
     rc = waf_free_exclusive_lock(lock);
     if (waf_lock_is_error(rc)) {
@@ -318,7 +318,7 @@ static int write_file_with_lock(struct waf_lock* lock, apr_file_t* fd, char* str
 /**
  * send all waf fields in json format to a file.
  */
-static void send_waf_log(struct waf_lock* lock, apr_file_t* fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, char* request_id, request_rec *r, const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name) {
+static void send_waf_log(struct waf_lock* lock, apr_file_t** fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, char* request_id, request_rec *r, const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name) {
     char waf_filename[1024] = "";
     char waf_line[1024] = "";
     char waf_id[1024] = "";
@@ -465,28 +465,10 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
         else requestheaderhostname = "";
 
 #ifdef WAF_JSON_LOGGING_ENABLE
-        if (msc_waf_log_reopened) {
-            rc = apr_file_open(&msc_waf_log_fd, msc_waf_log_path,
-                   APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
-                   CREATEMODE | APR_WREAD, msc_waf_log_cmd->pool);
-
-            if (rc != APR_SUCCESS) {
-                #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-                	ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
-                            "ModSecurity not able to reopen %s file", WAF_LOG_UTIL_FILE);
-                #else
-                        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-                            "ModSecurity not able to reopen %s file", WAF_LOG_UTIL_FILE);
-                #endif
-            }
-
-            msc_waf_log_reopened = 0;
-        }
-
         const char* scope = apr_table_get(r->notes, WAF_POLICY_SCOPE);
         const char* scope_name = apr_table_get(r->notes, WAF_POLICY_SCOPE_NAME);
 
-        send_waf_log(msr->modsecurity->wafjsonlog_lock, msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), (!msr->allow_scope) ? dcfg->is_enabled : msr->allow_scope, r->hostname, r->log_id, r, dcfg->waf_policy_id, scope ? scope : "", scope_name ? scope_name : "");
+        send_waf_log(msr->modsecurity->wafjsonlog_lock, &msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), (!msr->allow_scope) ? dcfg->is_enabled : msr->allow_scope, r->hostname, r->log_id, r, dcfg->waf_policy_id, scope ? scope : "", scope_name ? scope_name : "");
 #endif
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
