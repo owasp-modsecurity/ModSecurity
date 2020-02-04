@@ -1,7 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
-
+  - modsecurity.pc.in: add Libs.private
+    [Issue #1918, #2253 - @ffontaine, @Dridi, @victorhora]  
 
 v3.0.4 - 2020-Jan-13
 --------------------
