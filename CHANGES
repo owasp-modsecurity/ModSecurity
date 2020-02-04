@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
-
+ 
+  - Fix configure script when packaging for Buildroot
+    [Issue 2235 - @frankvanbever]
   - modsecurity.pc.in: add Libs.private
     [Issue #1918, #2253 - @ffontaine, @Dridi, @victorhora]  
 
