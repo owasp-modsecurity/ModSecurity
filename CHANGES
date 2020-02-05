@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Fix rule-update-target for non-regex
+    [Issue 2251 - @martinhsv]
   - Fix configure script when packaging for Buildroot
     [Issue 2235 - @frankvanbever]
   - modsecurity.pc.in: add Libs.private
