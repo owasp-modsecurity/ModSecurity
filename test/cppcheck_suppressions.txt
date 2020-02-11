@@ -37,7 +37,7 @@ useInitializationList:src/utils/shared_files.h:87
 unmatchedSuppression:src/utils/msc_tree.cc
 functionStatic:headers/modsecurity/transaction.h:373
 duplicateBranch:src/audit_log/audit_log.cc:224
-unreadVariable:src/request_body_processor/multipart.cc:391
+unreadVariable:src/request_body_processor/multipart.cc:435
 stlcstrParam:src/audit_log/writer/parallel.cc:145
 functionStatic:src/engine/lua.h:71
 functionStatic:src/engine/lua.h:72
