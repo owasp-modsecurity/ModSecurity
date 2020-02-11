@@ -785,6 +785,9 @@ int Transaction::processRequestBody() {
         m_variableInboundDataError.set("0", 0);
     }
 
+    // set the default reqBody length
+    // if CT *IS NOT* multipart, no_files value will the whole request length
+    size_t reqbodyNoFilesLength = m_requestBody.str().size();
     /*
      * Process the request body even if there is nothing to be done.
      * 
@@ -852,6 +855,9 @@ int Transaction::processRequestBody() {
             if (m.init(&error) == true) {
                 m.process(m_requestBody.str(), &error, m_variableOffset);
             }
+            // if CT *IS* multipart, no_files value will the m.m_reqbody_no_files_length
+            // calculated in request_body_processor/multipart.cc
+            reqbodyNoFilesLength = m.m_reqbody_no_files_length;
             m.multipart_complete(&error);
         }
         if (error.empty() == false) {
@@ -905,6 +911,16 @@ int Transaction::processRequestBody() {
                 "action");
             return true;
         }
+    }
+
+    // check the SecRequestBodyNoFilsLimit criteria
+    if (this->m_rules->m_requestBodyNoFilesLimit.m_value > 0
+        && this->m_rules->m_requestBodyNoFilesLimit.m_value < reqbodyNoFilesLength) {
+        m_variableInboundDataError.set("1", m_variableOffset);
+        ms_dbg(5, "Request body no files is bigger than the maximum expected.");
+        m_variableReqbodyError.set("1", m_variableOffset);
+        m_variableReqbodyErrorMsg.set("Request body no files is bigger than the maximum expected.",
+           m_variableOffset);
     }
 
     /**
