@@ -164,7 +164,6 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     TransactionAnchoredVariables(this) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(modsecurity::utils::generate_transaction_unique_id());
-    m_rules->incrementReferenceCount();
 
     m_variableUrlEncodedError.set("0", 0);
 
@@ -236,7 +235,6 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_variableTimeYear(""),
     m_logCbData(logCbData),
     TransactionAnchoredVariables(this) {
-    m_rules->incrementReferenceCount();
 
     m_variableUrlEncodedError.set("0", 0);
 
@@ -254,8 +252,6 @@ Transaction::~Transaction() {
     m_requestBody.clear();
 
     m_rulesMessages.clear();
-
-    m_rules->decrementReferenceCount();
 
     intervention::free(&m_it);
     intervention::clean(&m_it);

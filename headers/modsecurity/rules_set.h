@@ -46,7 +46,7 @@ class RulesSet : public RulesProperties {
  public:
     RulesSet()
         : RulesProperties(new DebugLog()),
-        unicode_codepage(0),
+        unicode_codepage(0)
 #ifndef NO_LOGS
         ,m_secmarker_skipped(0)
 #endif
