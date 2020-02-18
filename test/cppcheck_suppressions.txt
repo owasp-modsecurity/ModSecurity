@@ -25,8 +25,8 @@
 shiftNegative:src/utils/msc_tree.cc
 *:src/utils/acmp.cc
 *:src/utils/msc_tree.cc
-invalidScanfArgType_int:src/rules_properties.cc:102
-invalidScanfArgType_int:src/rules_properties.cc:103
+invalidScanfArgType_int:src/rules_set_properties.cc:101
+invalidScanfArgType_int:src/rules_set_properties.cc:102
 
 
 // 
@@ -52,6 +52,7 @@ syntaxError:src/transaction.cc:62
 noConstructor:src/variables/variable.h:152
 duplicateBranch:src/request_body_processor/multipart.cc:93
 
+noExplicitConstructor:seclang-parser.hh
 
 
 unusedFunction
