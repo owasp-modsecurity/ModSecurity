@@ -206,10 +206,10 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     /* Serial wafjson log mutext */
     set_lock_args(lock_args, WAFJSONLOG_LOCK_ID);
 
-    msce->wafjsonlog_lock = apr_pcalloc(mp, sizeof(struct waf_lock));
-    rc = waf_create_lock(msce->wafjsonlog_lock, lock_args);    
+    wafjsonlog_lock = apr_pcalloc(mp, sizeof(struct waf_lock));
+    rc = waf_create_lock(wafjsonlog_lock, lock_args);    
     if (waf_lock_is_error(rc)) {
-        //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_wafjsonlog_lock");
+        //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create wafjsonlog_lock");
         //return HTTP_INTERNAL_SERVER_ERROR;
         return -1;
     }
@@ -271,13 +271,13 @@ void modsecurity_child_init(msc_engine *msce) {
     waf_create_lock(msce->auditlog_lock, lock_args);    
 
 #ifdef WAF_JSON_LOGGING_ENABLE
-    if (msce->wafjsonlog_lock == NULL) {
-        msce->wafjsonlog_lock = apr_pcalloc(msce->mp, sizeof(struct waf_lock));
+    if (wafjsonlog_lock == NULL) {
+        wafjsonlog_lock = apr_pcalloc(msce->mp, sizeof(struct waf_lock));
     }
 
     set_lock_args(lock_args, WAFJSONLOG_LOCK_ID);
 
-    waf_create_lock(msce->wafjsonlog_lock, lock_args); 
+    waf_create_lock(wafjsonlog_lock, lock_args); 
 
     sigfillset (&block_mask);
     psa.sa_handler = modsecurity_handle_signals_for_reopen;

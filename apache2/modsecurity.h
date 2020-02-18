@@ -176,6 +176,7 @@ extern DSOLOCAL int *unicode_map_table;
 extern DSOLOCAL char *msc_waf_resourceId;
 extern DSOLOCAL char *msc_waf_instanceId;
 extern DSOLOCAL sig_atomic_t msc_waf_log_reopen_requested;
+extern DSOLOCAL struct waf_lock *wafjsonlog_lock;;
 extern DSOLOCAL apr_file_t *msc_waf_log_fd;
 extern DSOLOCAL char msc_waf_log_path[WAF_LOG_PATH_LENGTH];
 extern DSOLOCAL cmd_parms *msc_waf_log_cmd;
@@ -698,9 +699,6 @@ struct error_message_t {
 struct msc_engine {
     apr_pool_t              *mp;
     struct waf_lock         *auditlog_lock;
-#ifdef WAF_JSON_LOGGING_ENABLE
-    struct waf_lock         *wafjsonlog_lock;
-#endif
     struct waf_lock         *geo_lock;
 #ifdef GLOBAL_COLLECTION_LOCK
     struct waf_lock         *dbm_lock;

@@ -96,6 +96,7 @@ TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
 char DSOLOCAL *msc_waf_resourceId = NULL;
 char DSOLOCAL *msc_waf_instanceId = NULL;
 sig_atomic_t DSOLOCAL msc_waf_log_reopen_requested = 1;
+struct waf_lock DSOLOCAL *wafjsonlog_lock = NULL;
 apr_file_t DSOLOCAL *msc_waf_log_fd = NULL;
 char DSOLOCAL msc_waf_log_path[WAF_LOG_PATH_LENGTH] = ""; 
 cmd_parms DSOLOCAL *msc_waf_log_cmd = NULL;
