@@ -1820,7 +1820,7 @@ char *rfc5987_decode(apr_pool_t *mptmp, char *value)
     // The decode that we perform will be in place, hence lets allocate a new buffer for URL encoded value that we are processing.
     urlEncodedValue = apr_pstrdup(mptmp, urlEncodedValue);
 
-    if (strncmp(value, utf8, strlen(utf8)) == 0)
+    if (strncasecmp(value, utf8, strlen(utf8)) == 0)
     {
         // The value is an extended value with UTF-8 encoding.
         int invalid_count;
@@ -1830,7 +1830,7 @@ char *rfc5987_decode(apr_pool_t *mptmp, char *value)
             return urlEncodedValue;
         }
     }
-    else if (strncmp(value, iso88591, strlen(iso88591)) == 0)
+    else if (strncasecmp(value, iso88591, strlen(iso88591)) == 0)
     {
         // The value is an extended value with ISO-8859-1 encoding.
         int invalid_count;
