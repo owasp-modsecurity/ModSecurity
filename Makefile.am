@@ -125,7 +125,6 @@ TESTS+=test/test-cases/regression/config-body_limits.json
 TESTS+=test/test-cases/regression/config-calling_phases_by_name.json
 TESTS+=test/test-cases/regression/config-include-bad.json
 TESTS+=test/test-cases/regression/config-include.json
-TESTS+=test/test-cases/regression/config-phases.json
 TESTS+=test/test-cases/regression/config-remove_by_id.json
 TESTS+=test/test-cases/regression/config-remove_by_msg.json
 TESTS+=test/test-cases/regression/config-remove_by_tag.json
