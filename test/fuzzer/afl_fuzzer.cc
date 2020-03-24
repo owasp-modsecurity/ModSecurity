@@ -118,7 +118,7 @@ using namespace modsecurity;
 #include <signal.h>
 #include <string.h>
 
-inline void op_test(const std::string &opName, std::string &s) {
+inline void op_test(const std::string &opName, const std::string &s) {
     Operator *op = Operator::instantiate(opName, "");
     op->init("", nullptr);
     op->evaluate(nullptr, nullptr, s, nullptr);
