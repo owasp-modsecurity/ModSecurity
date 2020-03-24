@@ -23,8 +23,8 @@
  * for i in $(ls -l src/actions/transformations/*.h | awk {'print $9'}); do echo "#include \"$i\""; done;
  *
  */
-#include "src/actions/transformations/base64_decode_ext.h"
 #include "src/actions/transformations/base64_decode.h"
+#include "src/actions/transformations/base64_decode_ext.h"
 #include "src/actions/transformations/base64_encode.h"
 #include "src/actions/transformations/cmd_line.h"
 #include "src/actions/transformations/compress_whitespace.h"
@@ -43,8 +43,8 @@
 #include "src/actions/transformations/parity_even_7bit.h"
 #include "src/actions/transformations/parity_odd_7bit.h"
 #include "src/actions/transformations/parity_zero_7bit.h"
-#include "src/actions/transformations/remove_comments_char.h"
 #include "src/actions/transformations/remove_comments.h"
+#include "src/actions/transformations/remove_comments_char.h"
 #include "src/actions/transformations/remove_nulls.h"
 #include "src/actions/transformations/remove_whitespace.h"
 #include "src/actions/transformations/replace_comments.h"
@@ -55,6 +55,7 @@
 #include "src/actions/transformations/trim.h"
 #include "src/actions/transformations/trim_left.h"
 #include "src/actions/transformations/trim_right.h"
+#include "src/actions/transformations/upper_case.h"
 #include "src/actions/transformations/url_decode.h"
 #include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/transformations/url_encode.h"
@@ -146,8 +147,8 @@ int main(int argc, char** argv) {
         * for i in $(grep "class " -Ri src/actions/transformations/* | grep " :" | grep -v "InstantCache" | awk {'print $2'}); do echo $i *$(echo $i | awk '{print tolower($0)}') = new $i\(\"$i\"\)\; $(echo $i | awk '{print tolower($0)}')-\>evaluate\(s, NULL\)\; delete $(echo $i | awk '{print tolower($0)}')\;; done;
         *
         */
-Base64DecodeExt *base64decodeext = new Base64DecodeExt("Base64DecodeExt"); base64decodeext->evaluate(s, NULL); delete base64decodeext;
 Base64Decode *base64decode = new Base64Decode("Base64Decode"); base64decode->evaluate(s, NULL); delete base64decode;
+Base64DecodeExt *base64decodeext = new Base64DecodeExt("Base64DecodeExt"); base64decodeext->evaluate(s, NULL); delete base64decodeext;
 Base64Encode *base64encode = new Base64Encode("Base64Encode"); base64encode->evaluate(s, NULL); delete base64encode;
 CmdLine *cmdline = new CmdLine("CmdLine"); cmdline->evaluate(s, NULL); delete cmdline;
 CompressWhitespace *compresswhitespace = new CompressWhitespace("CompressWhitespace"); compresswhitespace->evaluate(s, NULL); delete compresswhitespace;
@@ -166,8 +167,8 @@ NormalisePathWin *normalisepathwin = new NormalisePathWin("NormalisePathWin"); n
 ParityEven7bit *parityeven7bit = new ParityEven7bit("ParityEven7bit"); parityeven7bit->evaluate(s, NULL); delete parityeven7bit;
 ParityOdd7bit *parityodd7bit = new ParityOdd7bit("ParityOdd7bit"); parityodd7bit->evaluate(s, NULL); delete parityodd7bit;
 ParityZero7bit *parityzero7bit = new ParityZero7bit("ParityZero7bit"); parityzero7bit->evaluate(s, NULL); delete parityzero7bit;
-RemoveCommentsChar *removecommentschar = new RemoveCommentsChar("RemoveCommentsChar"); removecommentschar->evaluate(s, NULL); delete removecommentschar;
 RemoveComments *removecomments = new RemoveComments("RemoveComments"); removecomments->evaluate(s, NULL); delete removecomments;
+RemoveCommentsChar *removecommentschar = new RemoveCommentsChar("RemoveCommentsChar"); removecommentschar->evaluate(s, NULL); delete removecommentschar;
 RemoveNulls *removenulls = new RemoveNulls("RemoveNulls"); removenulls->evaluate(s, NULL); delete removenulls;
 RemoveWhitespace *removewhitespace = new RemoveWhitespace("RemoveWhitespace"); removewhitespace->evaluate(s, NULL); delete removewhitespace;
 ReplaceComments *replacecomments = new ReplaceComments("ReplaceComments"); replacecomments->evaluate(s, NULL); delete replacecomments;
@@ -178,6 +179,7 @@ Transformation *transformation = new Transformation("Transformation"); transform
 Trim *trim = new Trim("Trim"); trim->evaluate(s, NULL); delete trim;
 TrimLeft *trimleft = new TrimLeft("TrimLeft"); trimleft->evaluate(s, NULL); delete trimleft;
 TrimRight *trimright = new TrimRight("TrimRight"); trimright->evaluate(s, NULL); delete trimright;
+UpperCase *uppercase = new UpperCase("UpperCase"); uppercase->evaluate(s, NULL); delete uppercase;
 UrlDecode *urldecode = new UrlDecode("UrlDecode"); urldecode->evaluate(s, NULL); delete urldecode;
 UrlDecodeUni *urldecodeuni = new UrlDecodeUni("UrlDecodeUni"); urldecodeuni->evaluate(s, NULL); delete urldecodeuni;
 UrlEncode *urlencode = new UrlEncode("UrlEncode"); urlencode->evaluate(s, NULL); delete urlencode;
@@ -191,6 +193,7 @@ Utf8ToUnicode *utf8tounicode = new Utf8ToUnicode("Utf8ToUnicode"); utf8tounicode
         * for i in $(grep "class " -Ri src/operators/* | grep " :" | awk {'print $2'}); do echo $i *$(echo $i | awk '{print tolower($0)}') = new $i\(\"$i\", z, false\)\; $(echo $i | awk '{print tolower($0)}')-\>evaluate\(t, s\)\; delete $(echo $i | awk '{print tolower($0)}')\;; done;
         *
         */
+#if 0
 BeginsWith *beginswith = new BeginsWith("BeginsWith", z, false); beginswith->evaluate(t, s); delete beginswith;
 Contains *contains = new Contains("Contains", z, false); contains->evaluate(t, s); delete contains;
 ContainsWord *containsword = new ContainsWord("ContainsWord", z, false); containsword->evaluate(t, s); delete containsword;
@@ -232,6 +235,7 @@ VerifyCC *verifycc = new VerifyCC("VerifyCC", z, false); verifycc->evaluate(t, s
 VerifyCPF *verifycpf = new VerifyCPF("VerifyCPF", z, false); verifycpf->evaluate(t, s); delete verifycpf;
 VerifySSN *verifyssn = new VerifySSN("VerifySSN", z, false); verifyssn->evaluate(t, s); delete verifyssn;
 Within *within = new Within("Within", z, false); within->evaluate(t, s); delete within;
+#endif
 
         /**
         * ModSec API
