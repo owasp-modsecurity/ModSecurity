@@ -128,6 +128,11 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* WAF policy identification information */
     dcfg->waf_policy_id = NOT_SET_P;
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+    /* WAF ruleset type/version information */
+    dcfg->waf_signature = NOT_SET_P;
+#endif
+
     /* Geo Lookups */
     dcfg->geo = NOT_SET_P;
 
@@ -575,6 +580,12 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->waf_policy_id = (child->waf_policy_id == NOT_SET_P
         ? parent->waf_policy_id : child->waf_policy_id);
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+    /* WAF ruleset type/version information */
+    merged->waf_signature = (child->waf_signature == NOT_SET_P
+        ? parent->waf_signature : child->waf_signature);
+#endif
+
     /* Geo Lookup */
     merged->geo = (child->geo == NOT_SET_P
         ? parent->geo : child->geo);
@@ -739,6 +750,11 @@ void init_directory_config(directory_config *dcfg)
 
     /* WAF policy identification information */
     if (dcfg->waf_policy_id == NOT_SET_P) dcfg->waf_policy_id = "";
+
+#ifdef WAF_JSON_LOGGING_ENABLE
+    /* WAF ruleset type version information */
+    if (dcfg->waf_signature == NOT_SET_P) dcfg->waf_signature = "";
+#endif
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
@@ -1528,6 +1544,10 @@ static const char *cmd_component_signature(cmd_parms *cmd, void *_dcfg,
 
     /* ENH Enforce "Name/VersionX.Y.Z (comment)" format. */
     *(char **)apr_array_push(dcfg->component_signatures) = (char *)p1;
+
+#ifdef WAF_JSON_LOGGING_ENABLE
+    dcfg->waf_signature = (char *)p1;
+#endif
 
     return NULL;
 }

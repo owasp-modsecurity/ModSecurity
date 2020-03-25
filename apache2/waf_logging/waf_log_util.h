@@ -24,6 +24,14 @@
 
 #define RULE_HASH_SIZE 499
 
+enum ERROR_ENUM {
+    none, pcre_limit_error,
+};
+
+static const char *ERROR_STRING[] = {
+    "", " Execution error - PCRE limits exceeded ",
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

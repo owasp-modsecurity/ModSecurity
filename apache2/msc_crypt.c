@@ -399,8 +399,11 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
+#ifdef WAF_JSON_LOGGING_ENABLE
+                                msr_log_with_errorcode(msr, 4, 1, "%s.", error_msg);
+#else
                                 msr_log(msr, 4, "%s.", error_msg);
-
+#endif
                             return 0; /* No match. */
                         }
                         else if (rc < -1) {
@@ -454,7 +457,11 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
+#ifdef WAF_JSON_LOGGING_ENABLE
+                                msr_log_with_errorcode(msr, 4, 1, "%s.", error_msg);
+#else
                                 msr_log(msr, 4, "%s.", error_msg);
+#endif                        
 
                             return 0; /* No match. */
                         }
@@ -509,7 +516,11 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
+#ifdef WAF_JSON_LOGGING_ENABLE
+                                msr_log_with_errorcode(msr, 4, 1, "%s.", error_msg);
+#else               
                                 msr_log(msr, 4, "%s.", error_msg);
+#endif                                
 
                             return 0; /* No match. */
                         }
@@ -564,7 +575,11 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
+#ifdef WAF_JSON_LOGGING_ENABLE
+                                msr_log_with_errorcode(msr, 4, 1, "%s.", error_msg);
+#else
                                 msr_log(msr, 4, "%s.", error_msg);
+#endif                                
 
                             return 0; /* No match. */
                         }
@@ -619,7 +634,11 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
+#ifdef WAF_JSON_LOGGING_ENABLE
+                                msr_log_with_errorcode(msr, 4, 1, "%s.", error_msg);
+#else
                                 msr_log(msr, 4, "%s.", error_msg);
+#endif
 
                             return 0; /* No match. */
                         }

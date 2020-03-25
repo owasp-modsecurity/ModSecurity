@@ -619,6 +619,11 @@ struct directory_config {
     /* WAF policy identification information */
     const char          *waf_policy_id;
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+    /* WAF rule set type/version information */
+    const char          *waf_signature;
+#endif
+
     /* Geo Lookup */
     geo_db              *geo;
 

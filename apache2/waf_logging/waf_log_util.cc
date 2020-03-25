@@ -162,7 +162,7 @@ static std::string get_json_log_message(const char* timestamp, const char* resou
     #define MANDATORY_RULE_MESSAGE_LENGTH (sizeof(MANDATORY_RULE_MESSAGE) - 1)
     std::array<char, 1024> mandatory_message {MANDATORY_RULE_MESSAGE};
     str_view message_str;
-    if (messages) {
+    if (messages && strlen(messages) != 0) {
         if (is_mandatory) {
             size_t truncated_length = std::min(strlen(messages) - 1, mandatory_message.size() - MANDATORY_RULE_MESSAGE_LENGTH);
             if (truncated_length > 1) {

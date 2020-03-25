@@ -271,23 +271,22 @@ static void get_short_filename(char* waf_filename) {
 }
 
 /**
- * get crs type and version.
+ * get crs type and version, format will be changed in waf_log_util.cc parse_rule_set_type/parse_rule_set_version
  */
-static void get_ruleset_type_version(char* waf_ruleset_info, char* waf_ruleset_type, char* waf_ruleset_version) {
-    char ruleset_info_no_quote[200] = "";
+static void get_ruleset_type_version(const char* waf_ruleset_info, char* waf_ruleset_type, char* waf_ruleset_version) {
     char *type_start = NULL;
     char *type_end = NULL;
 
-    get_field_value("\"", "\"", waf_ruleset_info, ruleset_info_no_quote);
-    type_start = ruleset_info_no_quote;
+    type_start = waf_ruleset_info;
+
+    if (type_start == NULL){
+        return;
+    }
 
     type_end = strstr(type_start, "/");
     if (type_end != NULL) {
         strncpy(waf_ruleset_type, type_start, type_end - type_start);
         strcpy(waf_ruleset_version, type_end + 1);
-    }
-    else {
-        strcpy(waf_ruleset_type, type_start + 1);
     }
 }
 
@@ -318,7 +317,7 @@ static int write_file_with_lock(struct waf_lock* lock, apr_file_t** fd, char* st
 /**
  * send all waf fields in json format to a file.
  */
-static void send_waf_log(struct waf_lock* lock, apr_file_t** fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, char* request_id, request_rec *r, const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name) {
+static void send_waf_log(struct waf_lock* lock, apr_file_t** fd, const char* str1, const char* ip_port, const char* uri, int mode, const char* hostname, char* request_id, request_rec *r, const char* waf_policy_id, const char* waf_policy_scope, const char* waf_policy_scope_name, const char* waf_signature, enum ERROR_ENUM error_code) {
     char waf_filename[1024] = "";
     char waf_line[1024] = "";
     char waf_id[1024] = "";
@@ -326,7 +325,6 @@ static void send_waf_log(struct waf_lock* lock, apr_file_t** fd, const char* str
     char waf_data[1024] = "";
     char waf_ip[50] = "";
     char waf_port[50] = "";
-    char waf_ruleset_info[200] = "";
     char waf_ruleset_type[50] = "";
     char waf_ruleset_version[50] = "";
     char waf_detail_message[1024] = "";
@@ -336,11 +334,17 @@ static void send_waf_log(struct waf_lock* lock, apr_file_t** fd, const char* str
     get_field_value("[line ", "]", str1, waf_line);
     get_field_value("[msg ", "]", str1, waf_message);
     get_field_value("[data ", "]", str1, waf_data);
-	get_field_value("[ver ", "]", str1, waf_ruleset_info);
 	get_ip_port(ip_port, waf_ip, waf_port);
     get_detail_message(str1, waf_detail_message); 
     get_short_filename(waf_filename);
-    get_ruleset_type_version(waf_ruleset_info, waf_ruleset_type, waf_ruleset_version); 
+    get_ruleset_type_version(waf_signature, waf_ruleset_type, waf_ruleset_version); 
+
+    // overwrite message with pcre limits exceeded message if the the orig_string contained a pcre limits exceeded message
+    if (error_code != none) {
+        // since message is preallocated as 1024, so don't need to check boundary here.
+        strcpy(waf_message, ERROR_STRING[error_code]);;
+    }
+
 
     // Format UTC timestamp
     time_t rawtime = time(NULL);
@@ -382,7 +386,11 @@ static void send_waf_log(struct waf_lock* lock, apr_file_t** fd, const char* str
  * required bytes will be escaped.
  */
 static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *msr,
+#ifdef WAF_JSON_LOGGING_ENABLE
+    int level, int fixup, enum ERROR_ENUM error_code, const char *text, va_list ap)
+#else
     int level, int fixup, const char *text, va_list ap)
+#endif
 {
     apr_size_t nbytes, nbytes_written;
     apr_file_t *debuglog_fd = NULL;
@@ -468,7 +476,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
         const char* scope = apr_table_get(r->notes, WAF_POLICY_SCOPE);
         const char* scope_name = apr_table_get(r->notes, WAF_POLICY_SCOPE_NAME);
 
-        send_waf_log(wafjsonlog_lock, &msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), (!msr->allow_scope) ? dcfg->is_enabled : msr->allow_scope, r->hostname, r->log_id, r, dcfg->waf_policy_id, scope ? scope : "", scope_name ? scope_name : "");
+        send_waf_log(wafjsonlog_lock, &msc_waf_log_fd, str1, r->useragent_ip ? r->useragent_ip : r->connection->client_ip, log_escape(msr->mp, r->uri), (!msr->allow_scope) ? dcfg->is_enabled : msr->allow_scope, r->hostname, r->log_id, r, dcfg->waf_policy_id, scope ? scope : "", scope_name ? scope_name : "", dcfg->waf_signature, error_code);
 #endif
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
@@ -501,10 +509,27 @@ void msr_log(modsec_rec *msr, int level, const char *text, ...) {
     va_list ap;
 
     va_start(ap, text);
+#ifdef WAF_JSON_LOGGING_ENABLE
+    internal_log_ex(msr->r, msr->txcfg, msr, level, 0, 0, text, ap);
+#else
     internal_log_ex(msr->r, msr->txcfg, msr, level, 0, text, ap);
+#endif
     va_end(ap);
 }
 
+#ifdef WAF_JSON_LOGGING_ENABLE
+/**
+ * Logs one message with error code at the given level to the debug log (and to the
+ * Apache error log if the message is important enough.
+ */
+void msr_log_with_errorcode(modsec_rec *msr, int level, enum ERROR_ENUM error_code, const char *text, ...) {
+    va_list ap;
+
+    va_start(ap, text);
+    internal_log_ex(msr->r, msr->txcfg, msr, level, 0, error_code, text, ap);
+    va_end(ap);
+}
+#endif
 
 /**
  * Logs one message at level 3 to the debug log and to the
@@ -514,7 +539,11 @@ void msr_log_error(modsec_rec *msr, const char *text, ...) {
     va_list ap;
 
     va_start(ap, text);
+#ifdef WAF_JSON_LOGGING_ENABLE
+    internal_log_ex(msr->r, msr->txcfg, msr, 3, 1, 0, text, ap);
+#else
     internal_log_ex(msr->r, msr->txcfg, msr, 3, 1, text, ap);
+#endif
     va_end(ap);
 }
 
@@ -528,7 +557,11 @@ void msr_log_warn(modsec_rec *msr, const char *text, ...) {
     va_list ap;
 
     va_start(ap, text);
+#ifdef WAF_JSON_LOGGING_ENABLE
+    internal_log_ex(msr->r, msr->txcfg, msr, 4, 1, 0, text, ap);
+#else
     internal_log_ex(msr->r, msr->txcfg, msr, 4, 1, text, ap);
+#endif
     va_end(ap);
 }
 
