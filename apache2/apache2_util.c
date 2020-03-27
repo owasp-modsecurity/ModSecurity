@@ -21,6 +21,9 @@
 #include "waf_log_util.h"
 #include "waf_lock_external.h"
 #include "string.h"
+static const char *ERROR_STRING[] = {
+    "", " Execution error - PCRE limits exceeded ",
+};
 #endif
 
 /**
