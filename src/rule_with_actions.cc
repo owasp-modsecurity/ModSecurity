@@ -222,7 +222,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
+    for (auto &a : trans->m_rules->m_rulesSetPhases[getPhase()]->m_defaultActions) {
         if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
@@ -356,7 +356,7 @@ void RuleWithActions::executeTransformations(
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
+        for (auto &a : trans->m_rules->m_rulesSetPhases[getPhase()]->m_defaultActions) {
             if (a->action_kind \
                 != actions::Action::RunTimeBeforeMatchAttemptKind) {
                 continue;
