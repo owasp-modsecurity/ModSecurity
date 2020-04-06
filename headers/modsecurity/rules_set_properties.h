@@ -201,16 +201,6 @@ class RulesSetProperties {
     RulesSetProperties &operator =(const RulesSetProperties &r) = delete;
 
     ~RulesSetProperties() {
-        int i = 0;
-
-        for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<std::shared_ptr<actions::Action> > *tmp = \
-                &m_defaultActions[i];
-            while (tmp->empty() == false) {
-                tmp->pop_back();
-            }
-        }
-
         delete m_debugLog;
         delete m_auditLog;
     }
@@ -410,16 +400,6 @@ class RulesSetProperties {
             to->m_responseBodyTypeToBeInspected.m_set = true;
         }
 
-        for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-            std::vector<std::shared_ptr<actions::Action> > *actions_from = \
-                &from->m_defaultActions[i];
-            std::vector<std::shared_ptr<actions::Action> > *actions_to = \
-                &to->m_defaultActions[i];
-            for (size_t j = 0; j < actions_from->size(); j++) {
-                actions_to->push_back(actions_from->at(j));
-            }
-        }
-
         if (to->m_auditLog) {
             std::string error;
             to->m_auditLog->merge(from->m_auditLog, &error);
@@ -481,8 +461,6 @@ class RulesSetProperties {
     ConfigString m_uploadTmpDirectory;
     ConfigString m_secArgumentSeparator;
     ConfigString m_secWebAppId;
-    std::vector<std::shared_ptr<actions::Action> > \
-        m_defaultActions[modsecurity::Phases::NUMBER_OF_PHASES];
     ConfigUnicodeMap m_unicodeMapTable;
 };
 

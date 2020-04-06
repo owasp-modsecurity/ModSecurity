@@ -1,6 +1,16 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Using std::shared_ptr instead of generates its own references counters
+    for Rules and related.
+    [@zimmerle]
+  - Better handle shared_pointers on messages aiming for better performance.
+    [@zimmerle]
+  - Better handle memory usage on transformations aiming for better
+    performance.
+    [@zimmerle]
+  - Coding refactoring on the Rule class. The Rule class is now refactored
+    into RuleWithOperator, RuleWithActions, and RuleUnconditional.
   - EXPERIMENTAL: Add new transformation call phpArgsNames
     [Issue #2387 - @marshal09]
   - Having ARGS_NAMES, variables proxied
