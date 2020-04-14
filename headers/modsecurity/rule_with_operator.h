@@ -45,10 +45,14 @@ class RuleWithOperator : public RuleWithActions {
         std::unique_ptr<std::string> fileName,
         int lineNumber);
 
+    RuleWithOperator(const RuleWithOperator &op)
+        : RuleWithActions(op),
+        m_variables(op.m_variables),
+        m_operator(op.m_operator) { };
+
     virtual ~RuleWithOperator();
 
-    bool evaluate(Transaction *transaction,
-        std::shared_ptr<RuleMessage> rm) override;
+    bool evaluate(Transaction *transaction) override;
 
     void getVariablesExceptions(Transaction *t,
         variables::Variables *exclusion, variables::Variables *addition);
@@ -56,7 +60,7 @@ class RuleWithOperator : public RuleWithActions {
         variables::Variables *eclusion, Transaction *trans);
 
     bool executeOperatorAt(Transaction *trasn, const std::string &key,
-        std::string value, std::shared_ptr<RuleMessage> rm);
+        std::string value);
 
     static void updateMatchedVars(Transaction *trasn, const std::string &key,
         const std::string &value);
@@ -70,8 +74,8 @@ class RuleWithOperator : public RuleWithActions {
     }
 
  private:
-    modsecurity::variables::Variables *m_variables;
-    operators::Operator *m_operator;
+    std::shared_ptr<modsecurity::variables::Variables> m_variables;
+    std::shared_ptr<operators::Operator> m_operator;
 };
 
 

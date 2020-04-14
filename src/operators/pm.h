@@ -43,7 +43,7 @@ class Pm : public Operator {
     ~Pm();
     bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string &str,
-        std::shared_ptr<RuleMessage> ruleMessage) override;
+        RuleMessage *ruleMessage) override;
 
 
     bool init(const std::string &file, std::string *error) override;

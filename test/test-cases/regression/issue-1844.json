@@ -37,10 +37,12 @@
       ]
     },
     "expected":{
-      "error_log":"line \"29\""
+      "error_log":"line \"29\"",
+      "http_code": 403
     },
     "rules":[
       "SecRuleEngine On",
+      "SecDefaultAction \"phase:request,deny\"",
       "SecRule WEBAPPID \"@contains test1\" \"id:1,phase:3,pass,t:trim\"",
       "Include test-cases/data/big-file.conf"
     ]
@@ -129,10 +131,12 @@
       ]
     },
     "expected":{
-      "error_log":"line \"84\""
+      "error_log":"line \"84\"",
+      "http_code": 403
     },
     "rules":[
       "SecRuleEngine On",
+      "SecDefaultAction \"phase:request,deny\"",
       "SecRule WEBAPPID \"@contains test3\" \"id:1,phase:3,pass,t:trim\"",
       "Include test-cases/data/big-file.conf"
     ]
@@ -175,11 +179,13 @@
       ]
     },
     "expected":{
-      "error_log":"line \"116\""
+      "error_log":"line \"116\"",
+      "http_code":403
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule WEBAPPID \"@contains test3\" \"id:1,phase:3,pass,t:trim\"",
+      "SecDefaultAction \"phase:request,deny\"",
+      "SecRule WEBAPPID \"@contains test3\" \"id:1,phase:3,deny,t:trim\"",
       "Include test-cases/data/big-file.conf"
     ]
   },
@@ -221,10 +227,12 @@
       ]
     },
     "expected":{
-      "error_log":"line \"174\""
+      "error_log":"line \"174\"",
+      "http_code":403
     },
     "rules":[
       "SecRuleEngine On",
+      "SecDefaultAction \"phase:request,deny\"",
       "SecRule WEBAPPID \"@contains test3\" \"id:1,phase:3,pass,t:trim\"",
       "Include test-cases/data/big-file.conf"
     ]
@@ -267,10 +275,12 @@
       ]
     },
     "expected":{
-      "error_log":"line \"174\""
+      "error_log":"line \"174\"",
+      "http_code":403
     },
     "rules":[
       "SecRuleEngine On",
+      "SecDefaultAction \"phase:request,deny\"",
       "SecRule WEBAPPID \"@contains test3\" \"id:1,phase:3,pass,t:trim\"",
       "Include test-cases/data/not-so-big-file.conf"
     ]
