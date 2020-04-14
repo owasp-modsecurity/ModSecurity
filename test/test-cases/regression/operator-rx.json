@@ -79,11 +79,12 @@
     },
     "expected":{
       "debug_log":"Executing operator \"Rx\" with param \"\\^0\\$\"",
-      "error_log":"Matched \"Operator `Rx' with parameter `\\^0\\$'"
+      "error_log":"Matched \"Operator `Rx' with parameter `\\^0\\$'",
+      "http_code": 403
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule REQUEST_HEADERS:Content-Length \"!^0$\" \"id:1,phase:2,pass,t:trim,block\""
+      "SecRule REQUEST_HEADERS:Content-Length \"!^0$\" \"id:1,phase:2,pass,t:trim,deny\""
     ]
   }
 ]

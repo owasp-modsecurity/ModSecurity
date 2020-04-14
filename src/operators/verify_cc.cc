@@ -118,7 +118,7 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
 
 
 bool VerifyCC::evaluate(Transaction *t, RuleWithActions *rule,
-    const std::string& i, std::shared_ptr<RuleMessage> ruleMessage) {
+    const std::string& i, RuleMessage *ruleMessage) {
     int offset = 0;
     int target_length = i.length();
 
