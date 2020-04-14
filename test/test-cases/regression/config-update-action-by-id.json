@@ -122,7 +122,7 @@
     },
     "expected":{
       "http_code": 200,
-      "debug_log": "Running action: log"
+      "debug_log": "Rule returned 1"
     },
     "rules":[
         "SecRuleEngine On",
@@ -167,7 +167,7 @@
     },
     "expected":{
       "http_code": 200,
-      "debug_log": "Running action: log"
+      "debug_log": "Rule returned 1"
     },
     "rules":[
         "SecRuleEngine On",

@@ -1067,10 +1067,12 @@ expression:
     | DIRECTIVE variables op actions
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        std::vector<std::shared_ptr<actions::transformations::Transformation> > *t = new std::vector<std::shared_ptr<actions::transformations::Transformation> >();
         for (auto &i : *$4.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
-              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+              std::shared_ptr<actions::Action> at = std::move(i);
+              std::shared_ptr<actions::transformations::Transformation> t2 = std::static_pointer_cast<actions::transformations::Transformation>(std::move(at));
+              t->push_back(std::move(t2));
             } else {
               a->push_back(i.release());
             }
@@ -1116,10 +1118,12 @@ expression:
     | CONFIG_DIR_SEC_ACTION actions
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        std::vector<std::shared_ptr<actions::transformations::Transformation> > *t = new std::vector<std::shared_ptr<actions::transformations::Transformation> >();
         for (auto &i : *$2.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
-              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+              std::shared_ptr<actions::Action> at = std::move(i);
+              std::shared_ptr<actions::transformations::Transformation> t2 = std::static_pointer_cast<actions::transformations::Transformation>(std::move(at));
+              t->push_back(std::move(t2));
             } else {
               a->push_back(i.release());
             }
@@ -1136,10 +1140,12 @@ expression:
       {
         std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        std::vector<std::shared_ptr<actions::transformations::Transformation> > *t = new std::vector<std::shared_ptr<actions::transformations::Transformation> >();
         for (auto &i : *$2.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
-              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+              std::shared_ptr<actions::Action> at = std::move(i);
+              std::shared_ptr<actions::transformations::Transformation> t2 = std::static_pointer_cast<actions::transformations::Transformation>(std::move(at));
+              t->push_back(std::move(t2));
             } else {
               a->push_back(i.release());
             }
@@ -1211,8 +1217,13 @@ expression:
         }
 
         for (actions::Action *a : checkedActions) {
-            driver.m_rulesSetPhases[definedPhase]->m_defaultActions.push_back(
-                std::unique_ptr<actions::Action>(a));
+            if (dynamic_cast<actions::transformations::Transformation *>(a)) {
+              driver.m_rulesSetPhases[definedPhase]->m_defaultTransformations.push_back(
+                std::shared_ptr<actions::transformations::Transformation>(
+                dynamic_cast<actions::transformations::Transformation *>(a)));
+            } else {
+              driver.m_rulesSetPhases[definedPhase]->m_defaultActions.push_back(std::unique_ptr<Action>(a));
+            }
         }
 
         delete actions;
