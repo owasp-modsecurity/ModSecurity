@@ -40,11 +40,11 @@ class LogData : public Action {
             m_string(std::move(z)) { }
 
     bool evaluate(RuleWithActions *rule, Transaction *transaction,
-       std::shared_ptr<RuleMessage> rm) override;
+       RuleMessage &rm) override;
 
     std::string data(Transaction *Transaction);
 
-    std::unique_ptr<RunTimeString> m_string;
+    std::shared_ptr<RunTimeString> m_string;
 };
 
 

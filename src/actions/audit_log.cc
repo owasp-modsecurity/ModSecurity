@@ -28,11 +28,8 @@ namespace actions {
 
 
 bool AuditLog::evaluate(RuleWithActions *rule, Transaction *transaction,
-    std::shared_ptr<RuleMessage> rm) {
-    rm->m_noAuditLog = false;
-    ms_dbg_a(transaction, 9, "Saving transaction to logs");
-    rm->m_saveMessage = true;
-
+    RuleMessage &rm) {
+    transaction->messageSetNoAuditLog(false);
     return true;
 }
 

@@ -62,11 +62,27 @@ int RulesSetPhases::append(RulesSetPhases *from, std::ostringstream *err) {
         }
         amount_of_rules = amount_of_rules + res;
 
-        std::vector<std::shared_ptr<actions::Action> > *actions_from = &from->at(phase)->m_defaultActions;
-        std::vector<std::shared_ptr<actions::Action> > *actions_to = &at(phase)->m_defaultActions;
 
-        for (size_t j = 0; j < actions_from->size(); j++) {
-            actions_to->push_back(actions_from->at(j));
+        /**
+         * An action set in a child will overwrite an action set on a parent.
+         *
+         */
+        std::vector<std::shared_ptr<actions::Action> > *actions_to = &at(phase)->m_defaultActions;
+        std::vector<std::shared_ptr<actions::transformations::Transformation> > *actions_t_to = &at(phase)->m_defaultTransformations;
+        if (actions_to->size() == 0 || actions_t_to->size() == 0) {
+            std::vector<std::shared_ptr<actions::Action> > *actions_from = &from->at(phase)->m_defaultActions;
+
+            actions_to->clear();
+            for (size_t j = 0; j < actions_from->size(); j++) {
+                actions_to->push_back(actions_from->at(j));
+            }
+
+            std::vector<std::shared_ptr<actions::transformations::Transformation> > *actions_t_from = &from->at(phase)->m_defaultTransformations;
+            actions_t_to->clear();
+            for (size_t j = 0; j < actions_t_from->size(); j++) {
+                actions_t_to->push_back(actions_t_from->at(j));
+            }
+            at(phase)->fixDefaultActions();
         }
     }
 

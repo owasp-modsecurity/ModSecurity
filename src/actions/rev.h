@@ -33,9 +33,10 @@ class Rev : public Action {
 
     bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
+   std::string getRevision() const { return m_rev; }
 
  private:
-    std::string m_rev;
+   std::string m_rev;
 };
 
 

@@ -78,7 +78,7 @@ class Action {
         Transaction *transaction);
     virtual bool evaluate(RuleWithActions *rule, Transaction *transaction);
     virtual bool evaluate(RuleWithActions *rule, Transaction *transaction,
-        std::shared_ptr<RuleMessage> ruleMessage) {
+        RuleMessage &ruleMessage) {
         return evaluate(rule, transaction);
     }
     virtual bool init(std::string *error) { return true; }

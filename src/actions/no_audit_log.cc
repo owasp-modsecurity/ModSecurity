@@ -27,10 +27,8 @@ namespace actions {
 
 
 bool NoAuditLog::evaluate(RuleWithActions *rule, Transaction *transaction,
-    std::shared_ptr<RuleMessage> rm) {
-    rm->m_noAuditLog = true;
-    rm->m_saveMessage = false;
-
+    RuleMessage &rm) {
+    transaction->messageSetNoAuditLog(true);
     return true;
 }
 

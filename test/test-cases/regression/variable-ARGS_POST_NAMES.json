@@ -183,12 +183,13 @@
       ]
     },
     "expected":{
+      "http_code": 403,
       "error_log":"o0,5v206,5t:trim"
     },
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
-        "SecRule ARGS_POST_NAMES \"@contains name1\" \"id:1,phase:3,pass,t:trim\""
+        "SecRule ARGS_POST_NAMES \"@contains name1\" \"id:1,phase:3,pass,t:trim,deny\""
     ]
   }
 ]

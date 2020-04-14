@@ -1,5 +1,5 @@
 
-#line 2 "seclang-scanner.cc"
+#line 3 "seclang-scanner.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -5160,15 +5160,15 @@ static std::stack<int> YY_PREVIOUS_STATE;
 #define BEGIN_PREVIOUS() { BEGIN(YY_PREVIOUS_STATE.top()); YY_PREVIOUS_STATE.pop(); }
 
 // The location of the current token.
-#line 5163 "seclang-scanner.cc"
+#line 5164 "seclang-scanner.cc"
 #define YY_NO_INPUT 1
 
 #line 493 "seclang-scanner.ll"
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  driver.loc.back()->columns (yyleng);
 
-#line 5170 "seclang-scanner.cc"
 #line 5171 "seclang-scanner.cc"
+#line 5172 "seclang-scanner.cc"
 
 #define INITIAL 0
 #define EXPECTING_ACTION_PREDICATE_VARIABLE 1
@@ -5490,7 +5490,7 @@ YY_DECL
   // Code run each time yylex is called.
   driver.loc.back()->step();
 
-#line 5493 "seclang-scanner.cc"
+#line 5494 "seclang-scanner.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -8587,7 +8587,7 @@ YY_RULE_SETUP
 #line 1334 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 8590 "seclang-scanner.cc"
+#line 8591 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{

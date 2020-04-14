@@ -19,9 +19,8 @@
 namespace modsecurity {
 
 
-bool RuleUnconditional::evaluate(Transaction *trans,
-    std::shared_ptr<RuleMessage> ruleMessage) {
-    RuleWithActions::evaluate(trans, ruleMessage);
+bool RuleUnconditional::evaluate(Transaction *trans) {
+    RuleWithActions::evaluate(trans);
 
     // FIXME: This needs to be romeved on the runtime exeption review.
     bool containsBlock = false;
@@ -30,11 +29,11 @@ bool RuleUnconditional::evaluate(Transaction *trans,
         + ") Executing unconditional rule...");
 
     executeActionsIndependentOfChainedRuleResult(trans,
-        &containsBlock, ruleMessage);
+        &containsBlock);
 
-    executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
+    executeActionsAfterFullMatch(trans, containsBlock);
 
-    performLogging(trans, ruleMessage);
+    trans->logMatchLastRuleOnTheChain(this);
 
     return true;
 }
