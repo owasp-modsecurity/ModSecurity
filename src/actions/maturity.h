@@ -35,6 +35,7 @@ class Maturity : public Action {
 
     bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
+    int getMaturity() const { return m_maturity; }
 
  private:
     int m_maturity;

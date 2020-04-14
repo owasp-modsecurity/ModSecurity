@@ -29,9 +29,7 @@ namespace actions {
 
 
 bool Log::evaluate(RuleWithActions *rule, Transaction *transaction,
-    std::shared_ptr<RuleMessage> rm) {
-    ms_dbg_a(transaction, 9, "Saving transaction to logs");
-    rm->m_saveMessage = true;
+    RuleMessage &rm) {
     return true;
 }
 
