@@ -33,13 +33,13 @@
       ]
     },
     "expected":{
-      "http_code":200,
+      "http_code":300,
       "debug_log":"Target value: \"is a simple test\"",
       "error_log":"Operator `Rx' with parameter `test' against variable `ARGS:THIS'"
     },
     "rules":[
         "SecRuleEngine On",
-        "SecRule ARGS:/^ThIs$/ \"test\" \"id:1\""
+        "SecRule ARGS:/^ThIs$/ \"test\" \"id:1,deny,status:300\""
     ]
   },
   {
@@ -119,13 +119,13 @@
       ]
     },
     "expected":{
-      "http_code":200,
+      "http_code":300,
       "debug_log":"Target value: \"is a simple test\"",
       "error_log":"msg \"Testing is a simple test\""
     },
     "rules":[
         "SecRuleEngine On",
-        "SecRule ARGS:/^ThIs$/ \"test\" \"id:1,msg:'Testing %{ARGS:/^ThIs$/}'\""
+        "SecRule ARGS:/^ThIs$/ \"test\" \"id:1,msg:'Testing %{ARGS:/^ThIs$/}',deny,status:300\""
     ]
   },
   {
@@ -162,13 +162,13 @@
       ]
     },
     "expected":{
-      "http_code":200,
+      "http_code":300,
       "debug_log":"Target value: \"is a simple test\"",
       "error_log":"msg \"Testing is a simple test\""
     },
     "rules":[
         "SecRuleEngine On",
-        "SecRule ARGS:/^ThIs$/ \"test\" \"id:1,msg:'Testing %{ARGS:/^ThIs$/}',chain\"",
+        "SecRule ARGS:/^ThIs$/ \"test\" \"id:1,msg:'Testing %{ARGS:/^ThIs$/}',chain,deny,status:300\"",
         "SecRule MATCHED_VARS:/thIs/ \"is a simple test\" \"log\""
     ]
   },

@@ -43,7 +43,7 @@ class SetENV : public Action {
     bool init(std::string *error) override;
 
  private:
-    std::unique_ptr<RunTimeString> m_string;
+    std::shared_ptr<RunTimeString> m_string;
 };
 
 

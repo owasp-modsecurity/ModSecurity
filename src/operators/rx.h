@@ -51,7 +51,7 @@ class Rx : public Operator {
 
     bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string& input,
-        std::shared_ptr<RuleMessage> ruleMessage) override;
+        RuleMessage *ruleMessage) override;
 
     bool init(const std::string &arg, std::string *error) override;
 
