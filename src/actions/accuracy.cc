@@ -40,7 +40,6 @@ bool Accuracy::init(std::string *error) {
 
 
 bool Accuracy::evaluate(RuleWithActions *rule, Transaction *transaction) {
-    rule->m_accuracy = m_accuracy;
     return true;
 }
 

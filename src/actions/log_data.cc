@@ -30,8 +30,8 @@ namespace actions {
 
 
 bool LogData::evaluate(RuleWithActions *rule, Transaction *transaction,
-    std::shared_ptr<RuleMessage> rm) {
-    rm->m_data = data(transaction);
+    RuleMessage &rm) {
+    rm.m_data = data(transaction);
 
     return true;
 }

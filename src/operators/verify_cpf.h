@@ -48,7 +48,7 @@ class VerifyCPF : public Operator {
 
     bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string& input,
-        std::shared_ptr<RuleMessage> ruleMessage) override;
+        RuleMessage *ruleMessage) override;
 
     bool verify(const char *ssnumber, int len);
 

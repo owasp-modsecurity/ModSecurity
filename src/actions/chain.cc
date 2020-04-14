@@ -26,7 +26,7 @@ namespace actions {
 
 
 bool Chain::evaluate(RuleWithActions *rule, Transaction *transaction) {
-    rule->setChained(true);
+    rule->setHasChainAction(true);
     return true;
 }
 
