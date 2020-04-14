@@ -35,6 +35,7 @@ class Accuracy : public Action {
 
     bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
+    int getAccuracy() const { return m_accuracy; }
 
  private:
     int m_accuracy;

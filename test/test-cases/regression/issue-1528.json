@@ -31,8 +31,8 @@
   },
   "rules": [
     "SecRuleEngine On",
-    "SecAction \"id:1, nolog, setvar:tx.bad_value=attack\"",
-    "SecRule ARGS:param \"@rx ^%{tx.bad_value}$\" \"id:2,block\""
+    "SecAction \"id:1, setvar:tx.bad_value=attack\"",
+    "SecRule ARGS:param \"@rx ^%{tx.bad_value}$\" \"id:2,log\""
   ]
 }
 ]
