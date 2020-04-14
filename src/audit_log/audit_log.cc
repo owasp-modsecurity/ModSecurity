@@ -295,12 +295,7 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
         return true;
     }
 
-    for (RuleMessage &i : transaction->m_rulesMessages) {
-        if (i.m_noAuditLog == false) {
-            saveAnyway = true;
-            break;
-        }
-    }
+    saveAnyway = transaction->messageSaveAuditLog();
 
     if ((m_status == RelevantOnlyAuditLogStatus
         && this->isRelevant(transaction->m_httpCodeReturned) == false)
