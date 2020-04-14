@@ -80,11 +80,14 @@ class Rules {
         return true;
     }
 
+    void fixDefaultActions();
+
     size_t size() const { return m_rules.size(); }
     std::shared_ptr<Rule> operator[](int index) const { return m_rules[index]; }
     std::shared_ptr<Rule> at(int index) const { return m_rules[index]; }
 
     std::vector<std::shared_ptr<actions::Action> > m_defaultActions;
+    std::vector<std::shared_ptr<actions::transformations::Transformation> > m_defaultTransformations;
 
     std::vector<std::shared_ptr<Rule> > m_rules;
 };

@@ -36,7 +36,7 @@ class Block : public Action {
     explicit Block(const std::string &action) : Action(action) { }
 
     bool evaluate(RuleWithActions *rule, Transaction *transaction,
-        std::shared_ptr<RuleMessage> rm) override;
+        RuleMessage &rm) override;
 };
 
 

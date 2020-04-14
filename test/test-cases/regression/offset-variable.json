@@ -22,10 +22,12 @@
       ]
     },
     "expected":{
-      "error_log":"o0,3v23,6t:trim"
+      "error_log":"o0,3v23,6t:trim",
+      "http_code": 403
     },
     "rules":[
-      "SecRule ARGS \"@rx val\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule ARGS \"@rx val\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny,log\""
     ]
   },
   {
@@ -51,10 +53,12 @@
       ]
     },
     "expected":{
-      "error_log":"o3,3v37,6t:trim"
+      "error_log":"o3,3v37,6t:trim",
+      "http_code":403
     },
     "rules":[
-      "SecRule ARGS_GET \"@rx ue2\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule ARGS_GET \"@rx ue2\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -83,11 +87,13 @@
       ]
     },
     "expected":{
-      "error_log":"o3,3v142,6t:trim"
+      "error_log":"o3,3v142,6t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_POST \"@rx ue1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule ARGS_POST \"@rx ue1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -116,11 +122,13 @@
       ]
     },
     "expected":{
-      "error_log":"o3,3v156,6t:trim"
+      "error_log":"o3,3v156,6t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_POST \"@rx ue2\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule ARGS_POST \"@rx ue2\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -149,11 +157,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,6v17,6t:trim"
+      "error_log":"o0,6v17,6t:trim",
+      "http_code":403
     },
     "rules":[
+      "SecRuleEngine On",
       "SecRequestBodyAccess On",
-      "SecRule ARGS_GET_NAMES \"@rx param1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRule ARGS_GET_NAMES \"@rx param1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -182,11 +192,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,6v31,6t:trim"
+      "error_log":"o0,6v31,6t:trim",
+      "http_code":403
     },
     "rules":[
+      "SecRuleEngine On",
       "SecRequestBodyAccess On",
-      "SecRule ARGS_GET_NAMES \"@rx param2\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRule ARGS_GET_NAMES \"@rx param2\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -219,7 +231,7 @@
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_GET_NAMES \"@rx am1 par\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRule ARGS_GET_NAMES \"@rx am1 par\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -252,7 +264,7 @@
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_GET_NAMES \"@rx am1 param2 par\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRule ARGS_GET_NAMES \"@rx am1 param2 par\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -281,11 +293,13 @@
       ]
     },
     "expected":{
-      "error_log": "0,6v149,6t:trim"
+      "error_log": "0,6v149,6t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_POST_NAMES \"@rx param1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule ARGS_POST_NAMES \"@rx param1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -314,11 +328,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,6v17,6t:trim"
+      "error_log":"o0,6v17,6t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_NAMES \"@rx param1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule ARGS_NAMES \"@rx param1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
     {
@@ -344,11 +360,13 @@
       ]
     },
     "expected":{
-      "error_log":"v16,6v23,6v30,6v37,6v44,6v51,6t:trim"
+      "error_log":"v16,6v23,6v30,6v37,6v44,6v51,6t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule ARGS_COMBINED_SIZE \"@gt 1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
     },
     {
@@ -374,11 +392,13 @@
       ]
     },
     "expected":{
-      "error_log":"v16,6v23,6v30,6v37,6v44,6v51,6t:trim"
+      "error_log":"v16,6v23,6v30,6v37,6v44,6v51,6t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule ARGS_COMBINED_SIZE \"@gt 1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
     {
@@ -405,11 +425,13 @@
       ]
     },
     "expected":{
-      "error_log":"o23,6v0,63t:trim"
+      "error_log":"o23,6v0,63t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_LINE \"value1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_LINE \"value1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
     {
@@ -437,11 +459,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,3v0,3t:trim"
+      "error_log":"o0,3v0,3t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_METHOD \"GET\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_METHOD \"GET\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -469,11 +493,13 @@
       ]
     },
     "expected":{
-      "error_log":"o5,3v58,8t:trim"
+      "error_log":"o5,3v58,8t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_PROTOCOL \"1.1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_PROTOCOL \"1.1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -501,11 +527,13 @@
       ]
     },
     "expected":{
-      "error_log":"o1,5v4,11t:trim"
+      "error_log":"o1,5v4,11t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule PATH_INFO \"index\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule PATH_INFO \"index\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -533,11 +561,13 @@
       ]
     },
     "expected":{
-      "error_log":"o7,6v16,41t:trim"
+      "error_log":"o7,6v16,41t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule QUERY_STRING \"value1\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule QUERY_STRING \"value1\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -565,11 +595,13 @@
       ]
     },
     "expected":{
-      "error_log":"o6,4v5,10t:trim"
+      "error_log":"o6,4v5,10t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_BASENAME \"html\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_BASENAME \"html\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -597,11 +629,13 @@
       ]
     },
     "expected":{
-      "error_log":"o7,4v4,59t:trim"
+      "error_log":"o7,4v4,59t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_URI \"html\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"html\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
   {
@@ -629,11 +663,14 @@
       ]
     },
     "expected":{
-      "error_log":"o7,4v4,59t:trim"
+      "error_log":"o7,4v4,59t:trim",
+      "http_code": 403
+
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_URI_RAW \"html\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI_RAW \"html\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
 
@@ -661,11 +698,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,9v89,9t:trim"
+      "error_log":"o0,9v89,9t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_HEADERS \"localhost\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"localhost\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
 
@@ -693,11 +732,13 @@
       ]
     },
     "expected":{
-      "error_log":"o14,3v163,33t:trim"
+      "error_log":"o14,3v163,33t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_HEADERS \"www\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"www\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
   },
       {
@@ -724,11 +765,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,5v162,5t:trim"
+      "error_log":"o0,5v162,5t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule AUTH_TYPE \"Basic\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule AUTH_TYPE \"Basic\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
     },
     {
@@ -755,11 +798,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,5v79,5t:trim"
+      "error_log":"o0,5v79,5t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule AUTH_TYPE \"Basic\" \"id:1,phase:2,pass,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule AUTH_TYPE \"Basic\" \"id:1,phase:2,pass,t:trim,msg:'ops',deny\""
     ]
     },
     {
@@ -786,11 +831,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,4v64,13t:lowercase"
+      "error_log":"o0,4v64,13t:lowercase",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_HEADERS_NAMES \"auth\" \"id:1,phase:2,pass,t:lowercase,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS_NAMES \"auth\" \"id:1,phase:2,pass,t:lowercase,msg:'ops',deny\""
     ]
     },
     {
@@ -818,11 +865,13 @@
       ]
     },
     "expected":{
-      "error_log":"o1,2v216,3t:lowercase"
+      "error_log":"o1,2v216,3t:lowercase",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_COOKIES \"es\" \"id:1,phase:2,pass,t:lowercase,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_COOKIES \"es\" \"id:1,phase:2,pass,t:lowercase,msg:'ops',deny\""
     ]
     },
     {
@@ -850,11 +899,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,1v223,1t:lowercase"
+      "error_log":"o0,1v223,1t:lowercase",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_COOKIES \"z\" \"id:1,phase:2,pass,t:lowercase,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_COOKIES \"z\" \"id:1,phase:2,pass,t:lowercase,msg:'ops',deny\""
     ]
     },
     {
@@ -882,11 +933,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,1v228,1t:lowercase,t:trim"
+      "error_log":"o0,1v228,1t:lowercase,t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_COOKIES \"b\" \"id:1,phase:2,pass,t:lowercase,t:trim,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_COOKIES \"b\" \"id:1,phase:2,pass,t:lowercase,t:trim,msg:'ops',deny\""
     ]
     },
     {
@@ -914,11 +967,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,1v226,1"
+      "error_log":"o0,1v226,1",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_COOKIES_NAMES \"t\" \"id:1,phase:2,pass,msg:'ops'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_COOKIES_NAMES \"t\" \"id:1,phase:2,pass,msg:'ops',deny\""
     ]
   },
   {
@@ -956,11 +1011,12 @@
       ]
     },
     "expected":{
-      "error_log":"o0,7v198,30t:trim"
+      "error_log":"o0,7v198,30t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule REMOTE_USER \"Aladdin\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRule REMOTE_USER \"Aladdin\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1005,11 +1061,13 @@
       ]
     },
     "expected":{
-      "error_log":"o45,30v193,516t:trim"
+      "error_log":"o45,30v193,516t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_BODY \"Content-Disposition: form-data\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_BODY \"Content-Disposition: form-data\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1054,11 +1112,13 @@
       ]
     },
     "expected":{
-      "error_log":"o45,30v193,516t:trim"
+      "error_log":"o45,30v193,516t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_BODY \"Content-Disposition: form-data\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_BODY \"Content-Disposition: form-data\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1103,11 +1163,13 @@
       ]
     },
     "expected":{
-      "error_log":"v193,516t:trim"
+      "error_log":"v193,516t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_BODY_LENGTH \"@gt 5\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_BODY_LENGTH \"@gt 5\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1152,11 +1214,13 @@
       ]
     },
     "expected":{
-      "error_log":"o6,5v5,11t:trim"
+      "error_log":"o6,5v5,11t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_FILENAME \"/file\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"/file\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1201,11 +1265,13 @@
       ]
     },
     "expected":{
-      "error_log":"o6,8v5,23t:trim"
+      "error_log":"o6,8v5,23t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_FILENAME \"/f i l e\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"/f i l e\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1250,11 +1316,13 @@
       ]
     },
     "expected":{
-      "error_log":"o6,8v5,23t:trim"
+      "error_log":"o6,8v5,23t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule REQUEST_FILENAME \"/f i l e\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"/f i l e\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1299,11 +1367,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,4v306,4t:trim"
+      "error_log":"o0,4v306,4t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS \"test\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule ARGS \"test\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1352,11 +1422,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,5v402,5t:trim"
+      "error_log":"o0,5v402,5t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule ARGS \"test2\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule ARGS \"test2\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1405,11 +1477,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,16v680,20t:trim"
+      "error_log":"o0,16v680,20t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule FILES \"small_text_file2\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule FILES \"small_text_file2\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1458,11 +1532,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,16v512,20t:trim"
+      "error_log":"o0,16v512,20t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule FILES \"small_text_file1\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule FILES \"small_text_file1\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1511,11 +1587,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,8o0,8v491,8t:trimo0,16o0,16v709,16t:trim"
+      "error_log":"o0,8o0,8v491,8t:trimo0,16o0,16v709,16t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule FILES_NAMES \"(fiasdfasdfledata|filedata)\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule FILES_NAMES \"(fiasdfasdfledata|filedata)\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1564,11 +1642,13 @@
       ]
     },
     "expected":{
-      "error_log":"v560,32t:trim"
+      "error_log":"v560,32t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule FILES_SIZES:filedata \"@gt 0\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule FILES_SIZES:filedata \"@gt 0\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1617,11 +1697,13 @@
       ]
     },
     "expected":{
-      "error_log":"v754,38t:trim"
+      "error_log":"v754,38t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule FILES_SIZES:fiasdfasdfledata \"@gt 0\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule FILES_SIZES:fiasdfasdfledata \"@gt 0\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1670,11 +1752,13 @@
       ]
     },
     "expected":{
-      "error_log":"v560,32v754,38t:trim"
+      "error_log":"v560,32v754,38t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
-      "SecRule FILES_COMBINED_SIZE \"@gt 0\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRuleEngine On",
+      "SecRule FILES_COMBINED_SIZE \"@gt 0\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1723,13 +1807,15 @@
       ]
     },
     "expected":{
-      "error_log":"o8,7v754,38t:trim"
+      "error_log":"o8,7v754,38t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecUploadKeepFiles On",
+      "SecRuleEngine On",
       "SecUploadDir /tmp",
-      "SecRule FILES_TMP_CONTENT \"another\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRule FILES_TMP_CONTENT \"another\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1778,13 +1864,15 @@
       ]
     },
     "expected":{
-      "error_log":"o15,5v560,32t:trim"
+      "error_log":"o15,5v560,32t:trim",
+      "http_code": 403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecUploadKeepFiles On",
+      "SecRuleEngine On",
       "SecUploadDir /tmp",
-      "SecRule FILES_TMP_CONTENT:small_text_file1.txt \"small\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRule FILES_TMP_CONTENT:small_text_file1.txt \"small\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1833,13 +1921,15 @@
       ]
     },
     "expected":{
-      "error_log":"o6,4v5,23t:trim"
+      "error_log":"o6,4v5,23t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecUploadKeepFiles On",
+      "SecRuleEngine On",
       "SecUploadDir /tmp",
-      "SecRule PATH_INFO \"/f i\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRule PATH_INFO \"/f i\" \"id:1,phase:3,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1888,13 +1978,15 @@
       ]
     },
     "expected":{
-      "error_log":"o0,20v680,20t:trim"
+      "error_log":"o0,20v680,20t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecUploadKeepFiles On",
+      "SecRuleEngine On",
       "SecUploadDir /tmp",
-      "SecRule MULTIPART_FILENAME \"small_text_file2.txt\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRule MULTIPART_FILENAME \"small_text_file2.txt\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {
@@ -1943,13 +2035,15 @@
       ]
     },
     "expected":{
-      "error_log":"o0,16v709,16t:trim"
+      "error_log":"o0,16v709,16t:trim",
+      "http_code":403
     },
     "rules":[
       "SecRequestBodyAccess On",
       "SecUploadKeepFiles On",
+      "SecRuleEngine On",
       "SecUploadDir /tmp",
-      "SecRule MULTIPART_NAME \"fiasdfasdfledata\" \"id:1,phase:3,pass,t:trim,msg:'s'\""
+      "SecRule MULTIPART_NAME \"fiasdfasdfledata\" \"id:1,phase:3,pass,t:trim,msg:'s',deny\""
     ]
   },
   {

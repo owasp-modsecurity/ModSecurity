@@ -42,7 +42,7 @@ class InitCol : public Action {
     bool init(std::string *error) override;
  private:
     std::string m_collection_key;
-    std::unique_ptr<RunTimeString> m_string;
+    std::shared_ptr<RunTimeString> m_string;
 };
 
 

@@ -63,8 +63,8 @@ class SetVar : public Action {
 
  private:
     SetVarOperation m_operation;
-    std::unique_ptr<modsecurity::variables::Variable> m_variable;
-    std::unique_ptr<RunTimeString> m_string;
+    std::shared_ptr<modsecurity::variables::Variable> m_variable;
+    std::shared_ptr<RunTimeString> m_string;
 };
 
 }  // namespace actions

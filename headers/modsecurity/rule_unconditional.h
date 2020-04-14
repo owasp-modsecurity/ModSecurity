@@ -55,7 +55,7 @@ class RuleUnconditional : public RuleWithActions {
         return *this;
     }
 
-    virtual bool evaluate(Transaction *transaction, std::shared_ptr<RuleMessage> ruleMessage) override;
+    virtual bool evaluate(Transaction *transaction) override;
 
  private:
 };

@@ -51,17 +51,18 @@ class RuleScript : public RuleWithActions {
         int lineNumber)
             : RuleWithActions(actions, t, std::move(fileName), lineNumber),
         m_name(name),
-        m_lua() { }
+        m_lua(std::unique_ptr<engine::Lua>(new engine::Lua())) { }
 
-    RuleScript(const RuleWithActions& r) = delete;
+    RuleScript(const RuleScript &rs)
+        : RuleWithActions(rs),
+        m_name(rs.m_name),
+        m_lua(rs.m_lua) { }
 
     bool init(std::string *err);
-    bool evaluate(Transaction *trans,
-        std::shared_ptr<RuleMessage> ruleMessage) override;
-
+    bool evaluate(Transaction *trans) override;
 
     std::string m_name;
-    engine::Lua m_lua;
+    std::shared_ptr<engine::Lua> m_lua;
 };
 
 }  // namespace modsecurity

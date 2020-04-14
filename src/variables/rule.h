@@ -42,10 +42,6 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         RuleWithActions *r = rule;
 
-        while (r && r->m_ruleId == 0) {
-            r = r->m_chainedRuleParent;
-        }
-
         if (!r || r->m_ruleId == 0) {
             return;
         }
@@ -67,24 +63,22 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         RuleWithActions *r = rule;
 
-        while (r && r->m_rev.empty()) {
-            r = r->m_chainedRuleParent;
-        }
-
         if (!r) {
             return;
         }
 
-        std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-        std::string *a = new std::string(r->m_rev);
-        VariableValue *var = new VariableValue(&m_rule, &m_rule_rev,
-            a
-        );
-        delete a;
-        origin->m_offset = 0;
-        origin->m_length = 0;
-        var->addOrigin(std::move(origin));
-        l->push_back(var);
+        if (r->hasRevisionAction()) {
+            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
+            std::string *a = new std::string(r->getRevision());
+            VariableValue *var = new VariableValue(&m_rule, &m_rule_rev,
+                a
+            );
+            delete a;
+            origin->m_offset = 0;
+            origin->m_length = 0;
+            var->addOrigin(std::move(origin));
+            l->push_back(var);
+        }
     }
 
 
@@ -93,13 +87,13 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         RuleWithActions *r = rule;
 
-        while (r && !r->hasSeverity()) {
-            r = r->m_chainedRuleParent;
+        if (!r) {
+            return;
         }
 
-        if (r && r->hasSeverity()) {
+        if (r->hasSeverityAction()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(std::to_string(r->severity()));
+            std::string *a = new std::string(std::to_string(r->getSeverity()));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_severity,
                 a
             );
@@ -117,13 +111,13 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         RuleWithActions *r = rule;
 
-        while (r && !r->hasLogData()) {
-            r = r->m_chainedRuleParent;
+        if (!r) {
+            return;
         }
 
-        if (r && r->hasLogData()) {
+        if (r->hasLogDataAction()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(r->logData(t));
+            std::string *a = new std::string(r->getLogData(t));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_logdata,
                 a
             );
@@ -140,13 +134,13 @@ class Rule_DictElement : public VariableDictElement { \
         std::vector<const VariableValue *> *l) {
         RuleWithActions *r = rule;
 
-        while (r && !r->hasMsg()) {
-            r = r->m_chainedRuleParent;
+        if (!r) {
+            return;
         }
 
-        if (r && r->hasMsg()) {
+        if (r->hasMessageAction()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(r->msg(t));
+            std::string *a = new std::string(r->getMessage(t));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_msg,
                 a
             );
@@ -165,11 +159,11 @@ class Rule_DictElement : public VariableDictElement { \
             id(t, rule, l);
             return;
         }
-        if (rule && m_dictElement == "rev") {
+        if (m_dictElement == "rev") {
             rev(t, rule, l);
             return;
         }
-        if (rule && m_dictElement == "severity") {
+        if (m_dictElement == "severity") {
             severity(t, rule, l);
             return;
         }

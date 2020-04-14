@@ -26,27 +26,25 @@ namespace modsecurity {
 std::string RuleMessage::_details(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append(" [file \"" + std::string(*rm->m_ruleFile.get()) + "\"]");
-    msg.append(" [line \"" + std::to_string(rm->m_ruleLine) + "\"]");
-    msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
-    msg.append(" [rev \"" + rm->m_rev + "\"]");
+    msg.append(" [file \"" + rm->getFileName() + "\"]");
+    msg.append(" [line \"" + std::to_string(rm->getLineNumber()) + "\"]");
+    msg.append(" [id \"" + std::to_string(rm->getRuleId()) + "\"]");
+    msg.append(" [rev \"" + rm->getRev() + "\"]");
     msg.append(" [msg \"" + rm->m_message + "\"]");
     msg.append(" [data \"" + utils::string::limitTo(200, rm->m_data) + "\"]");
     msg.append(" [severity \"" +
         std::to_string(rm->m_severity) + "\"]");
-    msg.append(" [ver \"" + rm->m_ver + "\"]");
-    msg.append(" [maturity \"" + std::to_string(rm->m_maturity) + "\"]");
-    msg.append(" [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]");
 
+    msg.append(" [ver \"" + rm->getVer() + "\"]");
+    msg.append(" [maturity \"" + std::to_string(rm->getMaturity()) + "\"]");
+    msg.append(" [accuracy \"" + std::to_string(rm->getAccuracy()) + "\"]");
     for (auto &a : rm->m_tags) {
         msg.append(" [tag \"" + a + "\"]");
     }
-
-    msg.append(" [hostname \"" + *rm->m_serverIpAddress.get() \
-        + "\"]");
-    msg.append(" [uri \"" + utils::string::limitTo(200, *rm->m_uriNoQueryStringDecoded.get()) + "\"]");
-    msg.append(" [unique_id \"" + *rm->m_id + "\"]");
-    msg.append(" [ref \"" + utils::string::limitTo(200, rm->m_reference) + "\"]");
+    msg.append(" [hostname \"" + rm->getServerIpAddress() + "\"]");
+    msg.append(" [uri \"" + utils::string::limitTo(200, rm->getUri()) + "\"]");
+    msg.append(" [unique_id \"" + rm->getRequestId() + "\"]");
+    msg.append(" [ref \"" + rm->m_reference + "\"]");
 
     return msg;
 }
@@ -55,9 +53,9 @@ std::string RuleMessage::_details(const RuleMessage *rm) {
 std::string RuleMessage::_errorLogTail(const RuleMessage *rm) {
     std::string msg;
 
-    msg.append("[hostname \"" + *rm->m_serverIpAddress.get() + "\"]");
-    msg.append(" [uri \"" + utils::string::limitTo(200, *rm->m_uriNoQueryStringDecoded.get()) + "\"]");
-    msg.append(" [unique_id \"" + *rm->m_id + "\"]");
+    msg.append("[hostname \"" + rm->getServerIpAddress() + "\"]");
+    msg.append(" [uri \"" + rm->getUri() + "\"]");
+    msg.append(" [unique_id \"" + rm->getRequestId() + "\"]");
 
     return msg;
 }
@@ -68,10 +66,11 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
     msg.reserve(2048);
 
     if (props & ClientLogMessageInfo) {
-        msg.append("[client " + std::string(*rm->m_clientIpAddress.get()) + "] ");
+        msg.append("[client " + rm->getClientIpAddress() + "] ");
     }
 
-    if (rm->m_isDisruptive) {
+    if (rm->isDisruptive()
+        && (rm->m_transaction->getRuleEngineState() == RulesSet::EnabledRuleEngine)) {
         msg.append("ModSecurity: Access denied with code ");
         if (code == -1) {
             msg.append("%d");
@@ -79,7 +78,7 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
             msg.append(std::to_string(code));
         }
         msg.append(" (phase ");
-        msg.append(std::to_string(rm->m_rule->getPhase() - 1) + "). ");
+        msg.append(std::to_string(rm->getPhase() - 1) + "). ");
     } else {
         msg.append("ModSecurity: Warning. ");
     }

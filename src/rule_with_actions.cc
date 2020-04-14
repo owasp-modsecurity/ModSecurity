@@ -34,8 +34,13 @@
 #include "src/utils/string.h"
 #include "modsecurity/rule_message.h"
 #include "modsecurity/rule_with_actions.h"
+#include "src/actions/accuracy.h"
+#include "src/actions/maturity.h"
 #include "src/actions/msg.h"
+#include "src/actions/log.h"
+#include "src/actions/no_log.h"
 #include "src/actions/log_data.h"
+#include "src/actions/rev.h"
 #include "src/actions/severity.h"
 #include "src/actions/capture.h"
 #include "src/actions/multi_match.h"
@@ -60,126 +65,182 @@ RuleWithActions::RuleWithActions(
     std::unique_ptr<std::string> fileName,
     int lineNumber)
     : Rule(std::move(fileName), lineNumber),
-    m_rev(""),
-    m_ver(""),
-    m_accuracy(0),
-    m_maturity(0),
     m_ruleId(0),
     m_chainedRuleChild(nullptr),
     m_chainedRuleParent(nullptr),
     m_disruptiveAction(nullptr),
     m_logData(nullptr),
     m_msg(nullptr),
-    m_severity(nullptr),
     m_actionsRuntimePos(),
     m_actionsSetVar(),
     m_actionsTag(),
-    m_transformations(transformations != NULL ? *transformations : Transformations()),
+    m_defaultActionDisruptiveAction(nullptr),
+    m_defaultActionLogData(nullptr),
+    m_defaultActionMsg(nullptr),
+    m_defaultActionActionsRuntimePos(),
+    m_defaultActionActionsSetVar(),
+    m_defaultActionActionsTag(),
+    m_transformations(transformations != nullptr ? *transformations : Transformations()),
+    m_defaultTransformations(),
+    m_severity(SEVERITY_NOT_SET),
+    m_revision(""),
+    m_version(""),
+    m_accuracy(ACCURACY_NOT_SET),
+    m_maturity(MATURITY_NOT_SET),
     m_containsCaptureAction(false),
+    m_containsLogAction(false),
+    m_containsNoLogAction(false),
     m_containsMultiMatchAction(false),
     m_containsStaticBlockAction(false),
+    m_defaultSeverity(SEVERITY_NOT_SET),
+    m_defaultRevision(""),
+    m_defaultVersion(""),
+    m_defaultAccuracy(ACCURACY_NOT_SET),
+    m_defaultMaturity(MATURITY_NOT_SET),
+    m_defaultContainsCaptureAction(false),
+    m_defaultContainsLogAction(false),
+    m_defaultContainsNoLogAction(false),
+    m_defaultContainsMultiMatchAction(false),
+    m_defaultContainsStaticBlockAction(false),
     m_isChained(false) {
 
     if (actions) {
-        for (Action *a : *actions) {
-            if (a->action_kind == Action::ConfigurationKind) {
-                a->evaluate(this, NULL);
-                delete a;
-
-            } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
-                if (dynamic_cast<actions::Capture *>(a)) {
-                    m_containsCaptureAction = true;
-                    delete a;
-                } else if (dynamic_cast<actions::MultiMatch *>(a)) {
-                    m_containsMultiMatchAction = true;
-                    delete a;
-                } else if (dynamic_cast<actions::Severity *>(a)) {
-                    m_severity = dynamic_cast<actions::Severity *>(a);
-                } else if (dynamic_cast<actions::LogData *>(a)) {
-                    m_logData = dynamic_cast<actions::LogData*>(a);
-                } else if (dynamic_cast<actions::Msg *>(a)) {
-                    m_msg = dynamic_cast<actions::Msg*>(a);
-                } else if (dynamic_cast<actions::SetVar *>(a)) {
-                    m_actionsSetVar.push_back(
-                        dynamic_cast<actions::SetVar *>(a));
-                } else if (dynamic_cast<actions::Tag *>(a)) {
-                    m_actionsTag.push_back(dynamic_cast<actions::Tag *>(a));
-                } else if (dynamic_cast<actions::Block *>(a)) {
-                    m_actionsRuntimePos.push_back(a);
-                    m_containsStaticBlockAction = true;
-                } else if (a->isDisruptive() == true) {
-                    if (m_disruptiveAction != nullptr) {
-                        delete m_disruptiveAction;
-                        m_disruptiveAction = nullptr;
-                    }
-                    m_disruptiveAction = a;
-                } else {
-                    m_actionsRuntimePos.push_back(a);
-                }
-            } else {
-                delete a;
-                std::cout << "General failure, action: " << a->m_name;
-                std::cout << " has an unknown type." << std::endl;
-                throw;
-            }
+        for (actions::Action *a : *actions) {
+            addAction(a);
         }
-        delete actions;
     }
 }
 
-RuleWithActions::~RuleWithActions() {
-    if (m_severity) {
-        delete m_severity;
-        m_severity = nullptr;
+void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
+    if (a->action_kind == Action::ConfigurationKind) {
+        a->evaluate(this, NULL);
+        return;
     }
-    if (m_logData) {
-        delete m_logData;
-        m_logData = nullptr;
+
+    if (a->action_kind == Action::ConfigurationKind) {
+        if (dynamic_cast<actions::Accuracy *>(a.get())) {
+            actions::Accuracy *accuracy = dynamic_cast<actions::Accuracy *>(a.get());
+            m_defaultAccuracy = accuracy->getAccuracy();
+        } else if (dynamic_cast<actions::Rev *>(a.get())) {
+            actions::Rev *rev = dynamic_cast<actions::Rev *>(a.get());
+            m_defaultRevision = rev->getRevision();
+        } else {
+            a->evaluate(this, NULL);
+        }
+        return;
     }
-    if (m_msg) {
-        delete m_msg;
-        m_msg = nullptr;
+
+    if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
+        if (dynamic_cast<actions::Capture *>(a.get())) {
+            m_defaultContainsCaptureAction = true;
+        } else if (dynamic_cast<actions::MultiMatch *>(a.get())) {
+            m_defaultContainsMultiMatchAction = true;
+        } else if (dynamic_cast<actions::Severity *>(a.get())) {
+            actions::Severity *severity = dynamic_cast<actions::Severity *>(a.get());
+            setDefaultActionSeverity(severity->m_severity);
+        } else if (dynamic_cast<actions::Maturity *>(a.get())) {
+            actions::Maturity *maturity = dynamic_cast<actions::Maturity *>(a.get());
+            setDefaultActionMaturity(maturity->getMaturity());
+        } else if (dynamic_cast<actions::LogData *>(a.get())) {
+            m_defaultActionLogData = std::static_pointer_cast<actions::LogData>(a);
+        } else if (dynamic_cast<actions::Msg *>(a.get())) {
+            m_defaultActionMsg = std::static_pointer_cast<actions::Msg>(a);
+        } else if (dynamic_cast<actions::SetVar *>(a.get())) {
+            m_defaultActionActionsSetVar.push_back(std::static_pointer_cast<actions::SetVar>(a));
+        } else if (dynamic_cast<actions::Tag *>(a.get())) {
+            m_defaultActionActionsTag.push_back(std::static_pointer_cast<actions::Tag>(a));
+        } else if (dynamic_cast<actions::Log *>(a.get())) {
+            m_defaultContainsLogAction = true;
+        } else if (dynamic_cast<actions::NoLog *>(a.get())) {
+            m_defaultContainsNoLogAction = true;
+        } else if (dynamic_cast<actions::Block *>(a.get())) {
+            m_defaultActionActionsRuntimePos.push_back(a);
+            m_defaultContainsStaticBlockAction = true;
+        } else if (a->isDisruptive() == true) {
+            m_defaultActionDisruptiveAction = a;
+        } else {
+            m_defaultActionActionsRuntimePos.push_back(a);
+        }
+        return;
     }
-    while (m_transformations.empty() == false) {
-        auto *a = m_transformations.back();
-        m_transformations.pop_back();
-        delete a;
-    }
-    while (m_actionsRuntimePos.empty() == false) {
-        auto *a = m_actionsRuntimePos.back();
-        m_actionsRuntimePos.pop_back();
-        delete a;
-    }
-    while (m_actionsSetVar.empty() == false) {
-        auto *a = m_actionsSetVar.back();
-        m_actionsSetVar.pop_back();
-        delete a;
-    }
-    while (m_actionsTag.empty() == false) {
-        auto *a = m_actionsTag.back();
-        m_actionsTag.pop_back();
-        delete a;
-    }
-    if (m_disruptiveAction != nullptr) {
-        delete m_disruptiveAction;
-        m_disruptiveAction = nullptr;
-    }
+
+    std::cout << "General failure, action: " << *a->m_name;
+    std::cout << " has an unknown type." << std::endl;
+    throw;
+
 }
+
+void RuleWithActions::addAction(actions::Action *a) {
+    if (a->action_kind == Action::ConfigurationKind) {
+        if (dynamic_cast<actions::Accuracy *>(a)) {
+            actions::Accuracy *accuracy = dynamic_cast<actions::Accuracy *>(a);
+            m_accuracy = accuracy->getAccuracy();
+        } else if (dynamic_cast<actions::Rev *>(a)) {
+            actions::Rev *rev = dynamic_cast<actions::Rev *>(a);
+            m_revision = rev->getRevision();
+        } else {
+            a->evaluate(this, NULL);
+        }
+        delete a;
+        return;
+    }
+
+    if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
+        if (dynamic_cast<actions::Capture *>(a)) {
+            m_containsCaptureAction = true;
+            delete a;
+        } else if (dynamic_cast<actions::MultiMatch *>(a)) {
+            m_containsMultiMatchAction = true;
+            delete a;
+        } else if (dynamic_cast<actions::Severity *>(a)) {
+            actions::Severity *severity = dynamic_cast<actions::Severity *>(a);
+            setSeverity(severity->m_severity);
+            delete a;
+        } else if (dynamic_cast<actions::LogData *>(a)) {
+            m_logData = std::unique_ptr<actions::LogData>(dynamic_cast<actions::LogData*>(a));
+        } else if (dynamic_cast<actions::Msg *>(a)) {
+            m_msg = std::unique_ptr<actions::Msg>(dynamic_cast<actions::Msg*>(a));
+        } else if (dynamic_cast<actions::SetVar *>(a)) {
+            m_actionsSetVar.push_back(std::unique_ptr<actions::SetVar>(dynamic_cast<actions::SetVar *>(a)));
+        } else if (dynamic_cast<actions::Maturity *>(a)) {
+            actions::Maturity *maturity = dynamic_cast<actions::Maturity *>(a);
+            m_maturity = maturity->getMaturity();
+            delete a;
+        } else if (dynamic_cast<actions::Log *>(a)) {
+            m_containsLogAction = true;
+            delete a;
+        } else if (dynamic_cast<actions::NoLog *>(a)) {
+            m_containsNoLogAction = true;
+            delete a;
+        } else if (dynamic_cast<actions::Tag *>(a)) {
+            m_actionsTag.push_back(std::unique_ptr<actions::Tag>(dynamic_cast<actions::Tag *>(a)));
+        } else if (dynamic_cast<actions::Block *>(a)) {
+            m_actionsRuntimePos.push_back(std::unique_ptr<actions::Block>(dynamic_cast<actions::Block*>(a)));
+            m_containsStaticBlockAction = true;
+        } else if (a->isDisruptive() == true) {
+            m_disruptiveAction = std::unique_ptr<Action>(a);
+        } else {
+            m_actionsRuntimePos.push_back(std::unique_ptr<Action>(a));
+        }
+        return;
+    }
+
+    std::cout << "General failure, action: " << *a->m_name;
+    std::cout << " has an unknown type." << std::endl;
+    delete a;
+    throw;
+
+}
+
+
+RuleWithActions::~RuleWithActions() { }
 
 
 bool RuleWithActions::evaluate(Transaction *transaction) {
-    RuleMessage rm(this, transaction);
-    std::shared_ptr<RuleMessage> rm2 = std::make_shared<RuleMessage>(&rm);
-    return evaluate(transaction, rm2);
-}
-
-
-bool RuleWithActions::evaluate(Transaction *transaction,
-    std::shared_ptr<RuleMessage> ruleMessage) {
 
     /* Rule evaluate is pure virtual.
      *
-     * Rule::evaluate(transaction, ruleMessage);
+     * Rule::evaluate(transaction);
      */
 
     /* Matched vars needs to be clear at every new rule execution */
@@ -190,9 +251,9 @@ bool RuleWithActions::evaluate(Transaction *transaction,
 
 
 void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
-    bool *containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
+    bool *containsBlock) {
 
-    for (actions::SetVar *a : m_actionsSetVar) {
+    for (actions::SetVar *a : getSetVarsActionsPtr()) {
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
             "action: " + *a->m_name.get());
 
@@ -211,30 +272,31 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         } else if (*a->m_name.get() == "setvar") {
             ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
                 "action: " + *a->m_name.get());
-            a->evaluate(this, trans, ruleMessage);
+            a->evaluate(this, trans, *trans->messageGetLast());
         }
     }
-
 }
 
 
 void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
-    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
+    bool containsBlock) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (auto &a : trans->m_rules->m_rulesSetPhases[getPhase()]->m_defaultActions) {
+#if 0
+    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
         if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
         if (!a.get()->isDisruptive()) {
-            executeAction(trans, containsBlock, ruleMessage, a.get(), true);
+            executeAction(trans, containsBlock, a.get(), true);
         }
     }
+#endif
 
-    for (actions::Tag *a : this->m_actionsTag) {
+    for (actions::Tag *a : getTagsActionPtr()) {
         ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
             + *a->m_name.get());
-        a->evaluate(this, trans, ruleMessage);
+        a->evaluate(this, trans, *trans->messageGetLast());
     }
 
     for (auto &b :
@@ -243,41 +305,47 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
             continue;
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        executeAction(trans, containsBlock, ruleMessage, a, false);
+        executeAction(trans, containsBlock, a, false);
         disruptiveAlreadyExecuted = true;
-    }
-    if (m_severity) {
-        m_severity->evaluate(this, trans, ruleMessage);
     }
 
     if (m_logData) {
-        m_logData->evaluate(this, trans, ruleMessage);
+        m_logData->evaluate(this, trans, *trans->messageGetLast());
+    } else if (m_defaultActionLogData) {
+        m_defaultActionLogData->evaluate(this, trans, *trans->messageGetLast());
     }
 
     if (m_msg) {
-        m_msg->evaluate(this, trans, ruleMessage);
+        m_msg->evaluate(this, trans, *trans->messageGetLast());
+    } else if (m_defaultActionMsg) {
+        m_defaultActionMsg->evaluate(this, trans, *trans->messageGetLast());
     }
-    for (Action *a : this->m_actionsRuntimePos) {
+
+    for (auto &a : getMatchActionsPtr()) {
         if (!a->isDisruptive()
                 && !(disruptiveAlreadyExecuted
                 && dynamic_cast<actions::Block *>(a))) {
-            executeAction(trans, containsBlock, ruleMessage, a, false);
+            executeAction(trans, containsBlock, a, false);
         }
     }
     if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
-        executeAction(trans, containsBlock, ruleMessage,
-            m_disruptiveAction, false);
+        executeAction(trans, containsBlock,
+            m_disruptiveAction.get(), false);
+    } else if  (!disruptiveAlreadyExecuted && hasBlockAction()
+        && m_defaultActionDisruptiveAction != nullptr) {
+        executeAction(trans, containsBlock,
+            m_defaultActionDisruptiveAction.get(), false);
     }
 }
 
 
 void RuleWithActions::executeAction(Transaction *trans,
-    bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage,
+    bool containsBlock,
     Action *a, bool defaultContext) {
     if (a->isDisruptive() == false && *a->m_name.get() != "block") {
         ms_dbg_a(trans, 9, "Running " \
             "action: " + *a->m_name.get());
-        a->evaluate(this, trans, ruleMessage);
+        a->evaluate(this, trans, *trans->messageGetLast());
         return;
     }
 
@@ -290,7 +358,7 @@ void RuleWithActions::executeAction(Transaction *trans,
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
             ".");
-        a->evaluate(this, trans, ruleMessage);
+        a->evaluate(this, trans, *trans->messageGetLast());
         return;
     }
 
@@ -339,37 +407,20 @@ void RuleWithActions::executeTransformations(
     std::shared_ptr<std::string> value =
         std::shared_ptr<std::string>(new std::string(in));
 
-    if (m_containsMultiMatchAction == true) {
+    if (hasMultimatchAction()) {
         /* keep the original value */
         ret.push_back(std::make_pair(
             std::shared_ptr<std::string>(new std::string(*value)),
             std::shared_ptr<std::string>(new std::string(path))));
     }
 
-    for (Action *a : m_transformations) {
+    for (Action *a : getTransformationPtr()) {
         if (a->m_isNone) {
             none++;
         }
     }
 
-    // Check for transformations on the SecDefaultAction
-    // Notice that first we make sure that won't be a t:none
-    // on the target rule.
-    if (none == 0) {
-        for (auto &a : trans->m_rules->m_rulesSetPhases[getPhase()]->m_defaultActions) {
-            if (a->action_kind \
-                != actions::Action::RunTimeBeforeMatchAttemptKind) {
-                continue;
-            }
-
-            // FIXME: here the object needs to be a transformation already.
-            Transformation *t = dynamic_cast<Transformation *>(a.get());
-            executeTransformation(t, &value, trans, &ret, &path,
-                &transformations);
-        }
-    }
-
-    for (Transformation *a : m_transformations) {
+    for (Transformation *a : getTransformationPtr()) {
         if (none == 0) {
             Transformation *t = dynamic_cast<Transformation *>(a);
             executeTransformation(t, &value, trans, &ret, &path,
@@ -423,8 +474,8 @@ void RuleWithActions::executeTransformations(
 }
 
 
-bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
-    for (auto &tag : m_actionsTag) {
+bool RuleWithActions::containsTag(const std::string& name, Transaction *t) const {
+    for (auto &tag : getTagsAction()) {
         if (tag != NULL && tag->getName(t) == name) {
             return true;
         }
@@ -441,12 +492,12 @@ bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
 std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::string& name,
     Transaction *trans) {
     std::vector<actions::Action *> ret;
-    for (auto &z : m_actionsRuntimePos) {
+    for (auto &z : getMatchActionsPtr()) {
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
     }
-    for (auto &z : m_transformations) {
+    for (auto &z : getTransformationPtr()) {
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
@@ -474,76 +525,9 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
     return ret;
 }
 
-void RuleWithActions::performLogging(Transaction *trans,
-    std::shared_ptr<RuleMessage> ruleMessage,
-    bool lastLog,
-    bool chainedParentNull) {
+std::string RuleWithActions::getLogData(Transaction *t) { return m_logData->data(t); }
+std::string RuleWithActions::getMessage(Transaction *t) { return m_msg->data(t); }
 
-    /* last rule in the chain. */
-    bool isItToBeLogged = ruleMessage->m_saveMessage;
-
-    /**
-    *
-    * RuleMessage is stacked allocated for the rule execution,
-    * anything beyond this may lead to invalid pointer access.
-    *
-    * In case of a warning, o set of messages is saved to be read
-    * at audit log generation. Therefore demands a copy here.
-    *
-    * FIXME: Study an way to avoid the copy.
-    *
-    **/
-    if (lastLog) {
-        if (chainedParentNull) {
-            isItToBeLogged = (ruleMessage->m_saveMessage && (m_chainedRuleParent == nullptr));
-            if (isItToBeLogged && !hasMultimatch()) {
-                /* warn */
-                trans->m_rulesMessages.push_back(*ruleMessage);
-
-                /* error */
-                if (!ruleMessage->m_isDisruptive) {
-                    trans->serverLog(ruleMessage);
-                }
-            }
-        } else if (hasBlockAction() && !hasMultimatch()) {
-            /* warn */
-            trans->m_rulesMessages.push_back(*ruleMessage);
-            /* error */
-            if (!ruleMessage->m_isDisruptive) {
-                trans->serverLog(ruleMessage);
-            }
-        } else {
-            if (isItToBeLogged && !hasMultimatch()
-                && !ruleMessage->m_message.empty()) {
-                /* warn */
-                trans->m_rulesMessages.push_back(*ruleMessage);
-
-                /* error */
-                if (!ruleMessage->m_isDisruptive) {
-                    trans->serverLog(ruleMessage);
-                }
-            }
-        }
-    } else {
-        if (hasMultimatch() && isItToBeLogged) {
-            /* warn */
-            trans->m_rulesMessages.push_back(*ruleMessage.get());
-
-            /* error */
-            if (!ruleMessage->m_isDisruptive) {
-                trans->serverLog(ruleMessage);
-            }
-
-            RuleMessage *rm = new RuleMessage(this, trans);
-            rm->m_saveMessage = ruleMessage->m_saveMessage;
-            ruleMessage.reset(rm);
-        }
-    }
-}
-
-std::string RuleWithActions::logData(Transaction *t) { return m_logData->data(t); }
-std::string RuleWithActions::msg(Transaction *t) { return m_msg->data(t); }
-int RuleWithActions::severity() const { return m_severity->m_severity; }
 
 
 }  // namespace modsecurity

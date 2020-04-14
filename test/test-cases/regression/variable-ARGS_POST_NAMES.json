@@ -80,11 +80,12 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"param2\""
+      "debug_log":"Target value: \"param2\"",
+      "http_code": 200
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule ARGS_POST_NAMES \"@contains test \" \"id:1,phase:3,pass,t:trim\""
+      "SecRule ARGS_POST_NAMES \"@contains test \" \"id:1,phase:3,pass,t:trim,deny\""
     ]
   },
   {
@@ -131,18 +132,19 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"name1\" \\(Variable: ARGS_POST_NAMES\\)"
+      "debug_log":"Target value: \"name1\" \\(Variable: ARGS_POST_NAMES\\)",
+      "http_code": 403
     },
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
-        "SecRule ARGS_POST_NAMES \"@contains test \" \"id:1,phase:3,pass,t:trim\""
+        "SecRule ARGS_POST_NAMES \"@contains name1\" \"id:1,phase:3,pass,t:trim,deny\""
     ]
   },
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: ARGS_POST_NAMES (3/x)",
+    "title":"Testing Variables :: ARGS_POST_NAMES (4/x)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -183,12 +185,13 @@
       ]
     },
     "expected":{
-      "error_log":"o0,5v206,5t:trim"
+      "error_log":"o0,5v206,5t:trim",
+      "http_code": 403
     },
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
-        "SecRule ARGS_POST_NAMES \"@contains name1\" \"id:1,phase:3,pass,t:trim\""
+        "SecRule ARGS_POST_NAMES \"@contains name1\" \"id:1,phase:3,pass,t:trim,deny\""
     ]
   }
 ]

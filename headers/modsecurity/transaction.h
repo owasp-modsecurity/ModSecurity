@@ -103,6 +103,7 @@ class ModSecurity;
 class Transaction;
 class RulesSet;
 class RuleMessage;
+class RuleWithActions;
 namespace actions {
 class Action;
 namespace disruptive {
@@ -319,8 +320,56 @@ class TransactionSecMarkerManagement {
     std::shared_ptr<std::string> m_marker;
 };
 
+class TransactionRuleMessageManagement {
+ public:
+    explicit TransactionRuleMessageManagement(Transaction *t)
+        : m_transaction(t),
+        m_noAuditLog(false) { 
+            messageNew();
+        };
+
+    RuleMessage *messageGetLast();
+    void messageNew();
+
+    void logMatchLastRuleOnTheChain(RuleWithActions *rule);
+
+    void messageSetNoAuditLog(bool a) {
+        m_noAuditLog = a;
+    }
+
+    bool messageSaveAuditLog() const {
+        return m_noAuditLog;
+    }
+
+    std::list<RuleMessage *> messageGetAll() {
+        std::list<RuleMessage *> messages;
+        for (RuleMessage *a : m_rulesMessages) {
+            messages.push_back(a);
+        }
+
+        return messages;
+    }
+
+    void messageClear() {
+        m_rulesMessages.clear();
+    }
+
+ private:
+    /**
+     * This variable holds all the messages asked to be save by the utilization
+     * of the actions: `log_data' and `msg'. These should be included on the
+     * auditlogs.
+     */
+    std::list<RuleMessage *> m_rulesMessages;
+
+    Transaction *m_transaction;
+    bool m_noAuditLog;
+};
+
+
 /** @ingroup ModSecurity_CPP_API */
-class Transaction : public TransactionAnchoredVariables, public TransactionSecMarkerManagement {
+class Transaction : public TransactionAnchoredVariables, public TransactionSecMarkerManagement, \
+    public TransactionRuleMessageManagement {
  public:
     Transaction(ModSecurity *transaction, RulesSet *rules, void *logCbData);
     Transaction(ModSecurity *transaction, RulesSet *rules, char *id,
@@ -400,7 +449,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 #ifndef NO_LOGS
     void debug(int, std::string) const;
 #endif
-    void serverLog(std::shared_ptr<RuleMessage> rm);
+    void serverLog(RuleMessage *rm);
 
     int getRuleEngineState() const;
 
@@ -528,13 +577,6 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      *
      */
     std::list< std::pair<int, std::string> > m_auditLogModifier;
-
-    /**
-     * This variable holds all the messages asked to be save by the utilization
-     * of the actions: `log_data' and `msg'. These should be included on the
-     * auditlogs.
-     */
-    std::list<modsecurity::RuleMessage> m_rulesMessages;
 
     /**
      * Holds the request body, in case of any.

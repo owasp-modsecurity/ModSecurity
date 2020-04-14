@@ -27,6 +27,8 @@ shiftNegative:src/utils/msc_tree.cc
 *:src/utils/msc_tree.cc
 invalidScanfArgType_int:src/rules_set_properties.cc:101
 invalidScanfArgType_int:src/rules_set_properties.cc:102
+redundantAssignment:src/operators/pm.cc:94
+
 
 
 // 
@@ -35,7 +37,7 @@ invalidScanfArgType_int:src/rules_set_properties.cc:102
 unmatchedSuppression:src/utils/geo_lookup.cc:82
 useInitializationList:src/utils/shared_files.h:87
 unmatchedSuppression:src/utils/msc_tree.cc
-functionStatic:headers/modsecurity/transaction.h:407
+functionStatic:headers/modsecurity/transaction.h:456
 duplicateBranch:src/audit_log/audit_log.cc:223
 unreadVariable:src/request_body_processor/multipart.cc:435
 stlcstrParam:src/audit_log/writer/parallel.cc:145

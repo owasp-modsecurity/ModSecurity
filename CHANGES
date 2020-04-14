@@ -1,6 +1,10 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
-
+ 
+  - IMPORTANT: SecDefaultAction behaves changing: SecDefaultAction specified
+    on a child configuration will overwrite the ones specified on the parent;
+    Previously it was concatenating.
+    [@zimmerle]
   - Using std::shared_ptr instead of generates its own references counters
     for Rules and related.
     [@zimmerle]

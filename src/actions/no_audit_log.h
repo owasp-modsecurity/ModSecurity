@@ -36,7 +36,7 @@ class NoAuditLog : public Action {
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(RuleWithActions *rule, Transaction *transaction,
-        std::shared_ptr<RuleMessage> rm) override;
+        RuleMessage &rm) override;
 };
 
 }  // namespace actions

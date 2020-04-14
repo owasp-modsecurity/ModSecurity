@@ -81,7 +81,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
     }
 
     /* is it a chained rule? */
-    if (m_lastRule != nullptr && m_lastRule->isChained()) {
+    if (m_lastRule != nullptr && m_lastRule->hasChainAction()) {
         r->setPhase(m_lastRule->getPhase());
         if (r->hasDisruptiveAction()) {
             m_parserError << "Disruptive actions can only be specified by";
@@ -91,6 +91,74 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         m_lastRule->m_chainedRuleChild = std::move(r);
         m_lastRule->m_chainedRuleChild->m_chainedRuleParent = m_lastRule;
         m_lastRule = m_lastRule->m_chainedRuleChild.get();
+
+        /* Lets set all meta-data to the first rule */
+        RuleWithActions *firstRule = m_lastRule;
+        if (!firstRule->hasChainAction()) {
+            while (firstRule->m_chainedRuleParent != nullptr) {
+                if (firstRule->hasMessageAction()) {
+                    firstRule->m_chainedRuleParent->setMessageAction(
+                        firstRule->getMessageAction()
+                    );
+                    firstRule->setMessageAction(nullptr);
+                }
+                if (firstRule->hasLogDataAction()) {
+                    firstRule->m_chainedRuleParent->setLogDataAction(
+                        firstRule->getLogDataAction()
+                    );
+                    firstRule->setLogDataAction(nullptr);
+                }
+                if (firstRule->hasSeverityAction()) {
+                    firstRule->m_chainedRuleParent->setSeverity(
+                        firstRule->getSeverity()
+                    );
+                }
+                if (firstRule->hasRevisionAction()) {
+                    firstRule->m_chainedRuleParent->setRevision(
+                        firstRule->getRevision()
+                    );
+                }
+                if (firstRule->hasVersionAction()) {
+                    firstRule->m_chainedRuleParent->setVersion(
+                        firstRule->getVersion()
+                    );
+                }
+                if (firstRule->hasAccuracyAction()) {
+                    firstRule->m_chainedRuleParent->setAccuracy(
+                        firstRule->getAccuracy()
+                    );
+                }
+                if (firstRule->hasMaturityAction()) {
+                    firstRule->m_chainedRuleParent->setMaturity(
+                        firstRule->getMaturity()
+                    );
+                }
+
+                if (firstRule->hasTagAction()) {
+                    firstRule->m_chainedRuleParent->setTags(
+                        firstRule->getTagsAction()
+                    );
+                    firstRule->cleanTags();
+                }
+
+                if (firstRule->hasDisruptiveAction()) {
+                    firstRule->m_chainedRuleParent->setDisruptiveAction(
+                        firstRule->getDisruptiveAction()
+                    );
+                    firstRule->setDisruptiveAction(nullptr);
+                }
+                firstRule->m_chainedRuleParent->setHasBlockAction(
+                    firstRule->hasBlockAction()
+                );
+                firstRule->m_chainedRuleParent->setHasLogAction(
+                    firstRule->hasLogAction()
+                );
+                firstRule->m_chainedRuleParent->setHasLogAction(
+                    firstRule->hasNoLogAction()
+                );
+                firstRule = firstRule->m_chainedRuleParent;
+            }
+        }
         return true;
     }
 
@@ -119,6 +187,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
     }
 
     m_lastRule = rule.get();
+
     m_rulesSetPhases.insert(rule);
 
     return true;
