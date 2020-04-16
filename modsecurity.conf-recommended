@@ -38,7 +38,7 @@ SecRule REQUEST_HEADERS:Content-Type "application/json" \
 SecRequestBodyLimit 13107200
 SecRequestBodyNoFilesLimit 131072
 
-# What do do if the request body size is above our configured limit.
+# What to do if the request body size is above our configured limit.
 # Keep in mind that this setting will automatically be set to ProcessPartial
 # when SecRuleEngine is set to DetectionOnly mode in order to minimize
 # disruptions when initially deploying ModSecurity.
