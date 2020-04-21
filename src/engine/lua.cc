@@ -409,6 +409,21 @@ int Lua::setvar(lua_State *L) {
 }
 
 
+int Lua::getTriggeredRules(lua_State *L) {
+
+    Transaction *t = NULL;
+    void *z = NULL;
+
+    lua_getglobal(L, "__transaction");
+    z = const_cast<void *>(lua_topointer(L, -1));
+    t = reinterpret_cast<Transaction *>(z);
+
+    ms_dbg_a(t, 1,
+            "m.getTriggeredRules: OK");
+    return 0;
+}
+
+
 std::string Lua::applyTransformations(lua_State *L, Transaction *t,
     int idx, std::string var) {
     std::string newVar = var;
@@ -476,6 +491,7 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
         + std::to_string(lua_type(L, idx)) + ")");
     return newVar;
 }
+
 #endif
 
 }  //  namespace engine

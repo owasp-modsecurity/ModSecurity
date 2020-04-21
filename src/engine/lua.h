@@ -80,6 +80,7 @@ class Lua {
     static int getvar(lua_State *L);
     static int getvars(lua_State *L);
     static int setvar(lua_State *L);
+    static int getTriggeredRules(lua_State *L);
     static std::string applyTransformations(lua_State *L, Transaction *t,
         int idx, std::string var);
 
@@ -94,6 +95,7 @@ static const struct luaL_Reg mscLuaLib[] = {
     { "getvar", Lua::getvar },
     { "getvars", Lua::getvars },
     { "setvar", Lua::setvar },
+    { "getTriggeredRules", Lua::getTriggeredRules },
     { NULL, NULL }
 };
 #endif
