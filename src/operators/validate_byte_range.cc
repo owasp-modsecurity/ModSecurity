@@ -110,7 +110,7 @@ bool ValidateByteRange::init(const std::string &file,
 }
 
 
-bool ValidateByteRange::evaluate(Transaction *transaction, Rule *rule,
+bool ValidateByteRange::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
     bool ret = true;
 

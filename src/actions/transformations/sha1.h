@@ -31,7 +31,7 @@ namespace transformations {
 class Sha1 : public Transformation {
  public:
     explicit Sha1(const std::string &action) ;
-    std::string evaluate(std::string exp,
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 };
 

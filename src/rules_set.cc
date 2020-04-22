@@ -24,6 +24,7 @@
 #include "modsecurity/transaction.h"
 #include "src/parser/driver.h"
 #include "src/utils/https_client.h"
+#include "modsecurity/rules.h"
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;
@@ -110,10 +111,10 @@ int RulesSet::evaluate(int phase, Transaction *t) {
        return 0;
     }
 
-    std::vector<Rule *> rules = m_rules[phase];
+    Rules *rules = m_rulesSetPhases[phase];
 
     ms_dbg_a(t, 9, "This phase consists of " \
-        + std::to_string(rules.size()) + " rule(s).");
+        + std::to_string(rules->size()) + " rule(s).");
 
     if (t->m_allowType == actions::disruptive::FromNowOnAllowType
         && phase != modsecurity::Phases::LoggingPhase) {
@@ -131,43 +132,40 @@ int RulesSet::evaluate(int phase, Transaction *t) {
     t->m_allowType = actions::disruptive::NoneAllowType;
     //}
 
-    for (int i = 0; i < rules.size(); i++) {
-        Rule *rule = rules[i];
-        if (t->m_marker.empty() == false) {
-            ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
-                + "' due to a SecMarker: " + t->m_marker);
-#ifndef NO_LOGS
-            m_secmarker_skipped++;
-#endif
-            ms_dbg_a(t, 9, "Rule: " + rule->m_marker);
+    for (int i = 0; i < rules->size(); i++) {
+        // FIXME: This is not meant to be here. At the end of this refactoring,
+        //        the shared pointer won't be used.
+        auto rule = rules->at(i);
+        if (t->isInsideAMarker() && !rule->isMarker()) {
+            ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
+                + "' due to a SecMarker: " + *t->getCurrentMarker());
 
-            if (rule->m_secMarker && rule->m_marker == t->m_marker) {
-                ms_dbg_a(t, 4, "Out of a SecMarker after skip " \
-                    + std::to_string(m_secmarker_skipped) + " rules.");
-                t->m_marker.clear();
-#ifndef NO_LOGS
-                m_secmarker_skipped = 0;
-#endif
-            }
+        } else if (rule->isMarker()) {
+            rule->evaluate(t);
         } else if (t->m_skip_next > 0) {
             t->m_skip_next--;
-            ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
+            ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
                 + "' due to a `skip' action. Still " + \
                 std::to_string(t->m_skip_next) + " to be skipped.");
         } else if (t->m_allowType
             != actions::disruptive::NoneAllowType) {
-            ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
+            ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
                 + "' as request trough the utilization of an `allow' action.");
-        } else if (m_exceptions.contains(rule->m_ruleId)) {
-            ms_dbg_a(t, 9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
-                + "'. Removed by an SecRuleRemove directive.");
         } else {
+            Rule *base = rule.get();
+            RuleWithActions *ruleWithActions = dynamic_cast<RuleWithActions *>(base);
+            // FIXME: Those should be treated inside the rule itself
+            if (ruleWithActions && m_exceptions.contains(ruleWithActions->m_ruleId)) {
+                ms_dbg_a(t, 9, "Skipped rule id '" + rule->getReference() \
+                    + "'. Removed by an SecRuleRemove directive.");
+                continue;
+            }
             bool remove_rule = false;
-            if (m_exceptions.m_remove_rule_by_msg.empty() == false) {
+            if (ruleWithActions && m_exceptions.m_remove_rule_by_msg.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_msg) {
-                    if (rule->containsMsg(z, t) == true) {
+                    if (ruleWithActions->containsMsg(z, t) == true) {
                         ms_dbg_a(t, 9, "Skipped rule id '" \
-                            + std::to_string(rule->m_ruleId) \
+                            + ruleWithActions->getReference() \
                             + "'. Removed by a SecRuleRemoveByMsg directive.");
                         remove_rule = true;
                         break;
@@ -178,11 +176,11 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 }
             }
 
-            if (m_exceptions.m_remove_rule_by_tag.empty() == false) {
+            if (ruleWithActions && m_exceptions.m_remove_rule_by_tag.empty() == false) {
                 for (auto &z : m_exceptions.m_remove_rule_by_tag) {
-                    if (rule->containsTag(z, t) == true) {
+                    if (ruleWithActions->containsTag(z, t) == true) {
                         ms_dbg_a(t, 9, "Skipped rule id '" \
-                            + std::to_string(rule->m_ruleId) \
+                            + ruleWithActions->getReference() \
                             + "'. Removed by a SecRuleRemoveByTag directive.");
                         remove_rule = true;
                         break;
@@ -193,11 +191,12 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 }
             }
 
-            if (t->m_ruleRemoveByTag.empty() == false) {
+
+            if (ruleWithActions) {
                 for (auto &z : t->m_ruleRemoveByTag) {
-                    if (rule->containsTag(z, t) == true) {
+                    if (ruleWithActions->containsTag(z, t) == true) {
                         ms_dbg_a(t, 9, "Skipped rule id '" \
-                            + std::to_string(rule->m_ruleId) \
+                            + ruleWithActions->getReference() \
                             + "'. Skipped due to a ruleRemoveByTag action.");
                         remove_rule = true;
                         break;
@@ -208,8 +207,9 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                 }
             }
 
-            rule->evaluate(t, NULL);
+            rule->evaluate(t);
             if (t->m_it.disruptive > 0) {
+
                 ms_dbg_a(t, 8, "Skipping this phase as this " \
                     "request was already intercepted.");
                 break;
@@ -222,7 +222,10 @@ int RulesSet::evaluate(int phase, Transaction *t) {
 
 int RulesSet::merge(Driver *from) {
     int amount_of_rules = 0;
-    amount_of_rules = mergeProperties(
+
+    amount_of_rules = m_rulesSetPhases.append(&from->m_rulesSetPhases,
+        &m_parserError);
+    mergeProperties(
         dynamic_cast<RulesSetProperties *>(from),
         dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
@@ -233,7 +236,10 @@ int RulesSet::merge(Driver *from) {
 
 int RulesSet::merge(RulesSet *from) {
     int amount_of_rules = 0;
-    amount_of_rules = mergeProperties(
+
+    amount_of_rules = m_rulesSetPhases.append(&from->m_rulesSetPhases,
+        &m_parserError);
+    mergeProperties(
         dynamic_cast<RulesSetProperties *>(from),
         dynamic_cast<RulesSetProperties *>(this),
         &m_parserError);
@@ -250,19 +256,8 @@ void RulesSet::debug(int level, const std::string &id,
 }
 
 
-
 void RulesSet::dump() const {
-    std::cout << "Rules: " << std::endl;
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = m_rules[i];
-        std::cout << "Phase: " << std::to_string(i);
-        std::cout << " (" << std::to_string(rules.size());
-        std::cout << " rules)" << std::endl;
-        for (int j = 0; j < rules.size(); j++) {
-            std::cout << "    Rule ID: " << std::to_string(rules[j]->m_ruleId);
-            std::cout << "--" << rules[j] << std::endl;
-        }
-    }
+    m_rulesSetPhases.dump();
 }
 
 

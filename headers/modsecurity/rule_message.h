@@ -26,6 +26,7 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_with_operator.h"
 
 
 #ifdef __cplusplus
@@ -41,7 +42,13 @@ class RuleMessage {
         ClientLogMessageInfo = 4
     };
 
-    explicit RuleMessage(Rule *rule, Transaction *trans) :
+    /**
+     *
+     * FIXME: RuleMessage is currently too big, doing a lot of
+     * unnecessary data duplication. Needs to be shrink down.
+     *
+     */
+    RuleMessage(RuleWithActions *rule, Transaction *trans) :
         m_accuracy(rule->m_accuracy),
         m_clientIpAddress(trans->m_clientIpAddress),
         m_data(""),
@@ -51,13 +58,13 @@ class RuleMessage {
         m_maturity(rule->m_maturity),
         m_message(""),
         m_noAuditLog(false),
-        m_phase(rule->m_phase - 1),
+        m_phase(rule->getPhase() - 1),
         m_reference(""),
         m_rev(rule->m_rev),
         m_rule(rule),
-        m_ruleFile(rule->m_fileName),
+        m_ruleFile(rule->getFileName()),
         m_ruleId(rule->m_ruleId),
-        m_ruleLine(rule->m_lineNumber),
+        m_ruleLine(rule->getLineNumber()),
         m_saveMessage(true),
         m_serverIpAddress(trans->m_serverIpAddress),
         m_severity(0),
@@ -65,6 +72,38 @@ class RuleMessage {
         m_ver(rule->m_ver)
     { }
 
+    explicit RuleMessage(RuleMessage *rule) :
+        m_accuracy(rule->m_accuracy),
+        m_clientIpAddress(rule->m_clientIpAddress),
+        m_data(rule->m_data),
+        m_id(rule->m_id),
+        m_isDisruptive(rule->m_isDisruptive),
+        m_match(rule->m_match),
+        m_maturity(rule->m_maturity),
+        m_message(rule->m_message),
+        m_noAuditLog(rule->m_noAuditLog),
+        m_phase(rule->m_phase),
+        m_reference(rule->m_reference),
+        m_rev(rule->m_rev),
+        m_rule(rule->m_rule),
+        m_ruleFile(rule->m_ruleFile),
+        m_ruleId(rule->m_ruleId),
+        m_ruleLine(rule->m_ruleLine),
+        m_saveMessage(rule->m_saveMessage),
+        m_serverIpAddress(rule->m_serverIpAddress),
+        m_severity(rule->m_severity),
+        m_uriNoQueryStringDecoded(rule->m_uriNoQueryStringDecoded),
+        m_ver(rule->m_ver)
+    { }
+
+    void clean() {
+        m_data = "";
+        m_match = "";
+        m_isDisruptive = false;
+        m_reference = "";
+        m_severity = 0;
+        m_ver = "";
+    }
 
     std::string log() {
         return log(this, 0);
@@ -92,9 +131,9 @@ class RuleMessage {
     static std::string _errorLogTail(const RuleMessage *rm);
 
     int m_accuracy;
-    std::string m_clientIpAddress;
+    std::shared_ptr<std::string> m_clientIpAddress;
     std::string m_data;
-    std::string m_id;
+    std::shared_ptr<std::string> m_id;
     bool m_isDisruptive;
     std::string m_match;
     int m_maturity;
@@ -103,14 +142,14 @@ class RuleMessage {
     int m_phase;
     std::string m_reference;
     std::string m_rev;
-    Rule *m_rule;
-    std::string m_ruleFile;
+    RuleWithActions *m_rule;
+    std::shared_ptr<std::string> m_ruleFile;
     int m_ruleId;
     int m_ruleLine;
     bool m_saveMessage;
-    std::string m_serverIpAddress;
+    std::shared_ptr<std::string> m_serverIpAddress;
     int m_severity;
-    std::string m_uriNoQueryStringDecoded;
+    std::shared_ptr<std::string> m_uriNoQueryStringDecoded;
     std::string m_ver;
 
     std::list<std::string> m_tags;

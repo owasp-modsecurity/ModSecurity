@@ -111,24 +111,23 @@ class Operator {
         std::string key, std::string value);
 
     bool evaluateInternal(Transaction *t, const std::string& a);
-    bool evaluateInternal(Transaction *t, Rule *rule,
+    bool evaluateInternal(Transaction *t, RuleWithActions *rule,
         const std::string& a);
-    bool evaluateInternal(Transaction *t, Rule *rule,
+    bool evaluateInternal(Transaction *t, RuleWithActions *rule,
         const std::string& a, std::shared_ptr<RuleMessage> ruleMessage);
 
 
     virtual bool evaluate(Transaction *transaction, const std::string &str);
-    virtual bool evaluate(Transaction *transaction, Rule *rule,
+    virtual bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string &str) {
         return evaluate(transaction, str);
     }
-    virtual bool evaluate(Transaction *transaction, Rule *rule,
+    virtual bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) {
         return evaluate(transaction, str);
     }
 
-    static void logOffset(std::shared_ptr<RuleMessage> ruleMessage,
-        int offset, int len) {
+    static void logOffset(std::shared_ptr<RuleMessage> ruleMessage, int offset, int len) {
         if (ruleMessage) {
             ruleMessage->m_reference.append("o"
                 + std::to_string(offset) + ","

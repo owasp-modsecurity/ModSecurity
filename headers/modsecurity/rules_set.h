@@ -1,6 +1,6 @@
 /*
  * ModSecurity, http://www.modsecurity.org/
- * Copyright (c) 2015 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ * Copyright (c) 2015 - 2020 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -25,36 +25,37 @@
 #endif
 
 
-#ifndef HEADERS_MODSECURITY_RULES_H_
-#define HEADERS_MODSECURITY_RULES_H_
+#ifndef HEADERS_MODSECURITY_RULES_SET_H_
+#define HEADERS_MODSECURITY_RULES_SET_H_
 
 #include "modsecurity/rules_set_properties.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule.h"
+#include "modsecurity/rules_set_phases.h"
 
 #ifdef __cplusplus
 
 namespace modsecurity {
-class Rule;
+class RuleWithOperator;
 namespace Parser {
 class Driver;
 }
+
 
 
 /** @ingroup ModSecurity_CPP_API */
 class RulesSet : public RulesSetProperties {
  public:
     RulesSet()
-        : RulesSetProperties(new DebugLog()),
-        unicode_codepage(0)
+        : RulesSetProperties(new DebugLog())
 #ifndef NO_LOGS
         ,m_secmarker_skipped(0)
 #endif
         { }
 
     explicit RulesSet(DebugLog *customLog)
-        : RulesSetProperties(customLog),
-        unicode_codepage(0)
+        : RulesSetProperties(customLog)
 #ifndef NO_LOGS
         ,m_secmarker_skipped(0)
 #endif
@@ -78,8 +79,7 @@ class RulesSet : public RulesSetProperties {
     void debug(int level, const std::string &id, const std::string &uri,
         const std::string &msg);
 
-    int64_t unicode_codepage;
-
+    RulesSetPhases m_rulesSetPhases;
  private:
 #ifndef NO_LOGS
     uint8_t m_secmarker_skipped;
@@ -106,4 +106,4 @@ int msc_rules_cleanup(RulesSet *rules);
 }  // namespace modsecurity
 #endif
 
-#endif  // HEADERS_MODSECURITY_RULES_H_
+#endif  // HEADERS_MODSECURITY_RULES_SET_H_

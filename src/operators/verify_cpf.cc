@@ -108,7 +108,7 @@ bool VerifyCPF::verify(const char *cpfnumber, int len) {
 }
 
 
-bool VerifyCPF::evaluate(Transaction *t, Rule *rule,
+bool VerifyCPF::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     std::list<SMatch> matches;
     bool is_cpf = false;
@@ -124,7 +124,7 @@ bool VerifyCPF::evaluate(Transaction *t, Rule *rule,
             is_cpf = verify(m.str().c_str(), m.str().size());
             if (is_cpf) {
                 logOffset(ruleMessage, m.offset(), m.str().size());
-                if (rule && t && rule->m_containsCaptureAction) {
+                if (rule && t && rule->hasCaptureAction()) {
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", m.str());
                     ms_dbg_a(t, 7, "Added VerifyCPF match TX.0: " + \

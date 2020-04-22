@@ -25,7 +25,7 @@
 
 namespace modsecurity {
 class Transaction;
-class Rule;
+class RuleWithOperator;
 
 namespace actions {
 
@@ -58,7 +58,7 @@ class SetVar : public Action {
         m_operation(operation),
         m_variable(std::move(variable)) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
  private:

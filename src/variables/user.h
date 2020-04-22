@@ -39,7 +39,7 @@ class User_DictElement : public Variable {
         m_dictElement("USER:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveMultiMatches(
             m_name, t->m_collections.m_user_collection_key,
@@ -56,7 +56,7 @@ class User_NoDictElement : public Variable {
         : Variable("USER") { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveMultiMatches(m_name,
             t->m_collections.m_user_collection_key,
@@ -72,7 +72,7 @@ class User_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_user_collection_key,
@@ -90,7 +90,7 @@ class User_DynamicElement : public Variable {
         m_string(std::move(dictElement)) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_user_collection->resolveMultiMatches(

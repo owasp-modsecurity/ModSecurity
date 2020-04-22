@@ -37,7 +37,7 @@ class ValidateByteRange : public Operator {
         }
     ~ValidateByteRange() override { }
 
-    bool evaluate(Transaction *transaction, Rule *rule,
+    bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string &input,
         std::shared_ptr<RuleMessage> ruleMessage) override;
     bool getRange(const std::string &rangeRepresentation, std::string *error);

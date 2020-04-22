@@ -30,8 +30,10 @@ namespace transformations {
 
 class UrlEncode : public Transformation {
  public:
+
     explicit UrlEncode(const std::string &action) ;
-    std::string evaluate(std::string exp,
+
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 
     std::string url_enc(const char *input,

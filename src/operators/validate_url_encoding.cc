@@ -68,7 +68,7 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
 }
 
 
-bool ValidateUrlEncoding::evaluate(Transaction *transaction, Rule *rule,
+bool ValidateUrlEncoding::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
     size_t offset = 0;
     bool res = false;

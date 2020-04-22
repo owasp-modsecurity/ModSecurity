@@ -25,7 +25,7 @@ class Transaction;
 
 namespace modsecurity {
 class Transaction;
-class Rule;
+class RuleWithOperator;
 
 namespace actions {
 namespace disruptive {
@@ -59,7 +59,7 @@ class Allow : public Action {
 
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
     bool isDisruptive() override { return true; }
 
     AllowType m_allowType;

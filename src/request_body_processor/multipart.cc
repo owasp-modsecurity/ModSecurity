@@ -469,7 +469,7 @@ int Multipart::tmp_file_name(std::string *filename) const {
 
     memset(tstr, '\0', 300);
     strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
-    path = path + tstr + "-" + m_transaction->m_id;
+    path = path + tstr + "-" + *m_transaction->m_id.get();
     path = path + "-file-XXXXXX";
 
     tmp = strdup(path.c_str());

@@ -31,9 +31,10 @@ LowerCase::LowerCase(const std::string &a)
     : Transformation(a) {
 }
 
-std::string LowerCase::evaluate(std::string value,
+std::string LowerCase::evaluate(const std::string &val,
     Transaction *transaction) {
     std::locale loc;
+    std::string value(val);
 
     for (std::string::size_type i=0; i < value.length(); ++i) {
         value[i] = std::tolower(value[i], loc);

@@ -35,7 +35,7 @@ class Transformation : public Action {
     explicit Transformation(const std::string& _action, int kind)
         : Action(_action, kind) { }
 
-    std::string evaluate(std::string exp,
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 
     static Transformation* instantiate(std::string a);

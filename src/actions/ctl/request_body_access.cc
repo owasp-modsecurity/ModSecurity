@@ -42,7 +42,7 @@ bool RequestBodyAccess::init(std::string *error) {
     return true;
 }
 
-bool RequestBodyAccess::evaluate(Rule *rule, Transaction *transaction) {
+bool RequestBodyAccess::evaluate(RuleWithActions *rule, Transaction *transaction) {
     if (m_request_body_access) {
         transaction->m_requestBodyAccess = RulesSetProperties::TrueConfigBoolean;
     } else {

@@ -35,7 +35,7 @@ class VerifyCC : public Operator {
         m_pce(NULL) { }
     ~VerifyCC();
 
-    bool evaluate(Transaction *t, Rule *rule,
+    bool evaluate(Transaction *t, RuleWithActions *rule,
         const std::string& input,
         std::shared_ptr<RuleMessage> ruleMessage)  override;
     bool init(const std::string &param, std::string *error) override;

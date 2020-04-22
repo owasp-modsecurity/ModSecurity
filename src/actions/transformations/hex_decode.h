@@ -32,7 +32,7 @@ class HexDecode : public Transformation {
  public:
     explicit HexDecode(const std::string &action)  : Transformation(action) { }
 
-    std::string evaluate(std::string exp,
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 
     static int inplace(unsigned char *data, int len);

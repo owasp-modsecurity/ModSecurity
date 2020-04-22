@@ -33,7 +33,7 @@ class Within : public Operator {
         : Operator("Within", std::move(param)) {
             m_couldContainsMacro = true;
         }
-    bool evaluate(Transaction *transaction, Rule *rule,
+    bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) override;
 };
 

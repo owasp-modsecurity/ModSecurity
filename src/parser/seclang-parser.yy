@@ -17,6 +17,7 @@ class Driver;
 }
 }
 
+#include "modsecurity/rule_unconditional.h"
 #include "src/rule_script.h"
 
 #include "src/actions/accuracy.h"
@@ -61,12 +62,12 @@ class Driver;
 #include "src/actions/skip_after.h"
 #include "src/actions/skip.h"
 #include "src/actions/tag.h"
-#include "src/actions/transformations/none.h"
-#include "src/actions/transformations/transformation.h"
-#include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/ver.h"
 #include "src/actions/xmlns.h"
 
+#include "src/actions/transformations/none.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/transformations/hex_encode.h"
 #include "src/actions/transformations/parity_even_7bit.h"
 #include "src/actions/transformations/utf8_to_unicode.h"
@@ -256,7 +257,6 @@ class Driver;
 #include "src/variables/global.h"
 #include "src/variables/session.h"
 #include "src/variables/status.h"
-
 
 using namespace modsecurity;
 using namespace modsecurity::variables;
@@ -1067,8 +1067,13 @@ expression:
     | DIRECTIVE variables op actions
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$4.get()) {
-            a->push_back(i.release());
+            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            } else {
+              a->push_back(i.release());
+            }
         }
         variables::Variables *v = new variables::Variables();
         for (auto &i : *$2.get()) {
@@ -1076,16 +1081,16 @@ expression:
         }
 
         Operator *op = $3.release();
-        Rule *rule = new Rule(
+        std::unique_ptr<RuleWithOperator> rule(new RuleWithOperator(
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* file name */ *@1.end.filename,
+            /* transformations */ t,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
-            );
+            ));
 
-        if (driver.addSecRule(rule) == false) {
-            delete rule;
+        if (driver.addSecRule(std::move(rule)) == false) {
             YYERROR;
         }
       }
@@ -1096,54 +1101,62 @@ expression:
             v->push_back(i.release());
         }
 
-        Rule *rule = new Rule(
+        std::unique_ptr<RuleWithOperator> rule(new RuleWithOperator(
             /* op */ $3.release(),
             /* variables */ v,
             /* actions */ NULL,
-            /* file name */ *@1.end.filename,
+            /* transformations */ NULL,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
-            );
-        if (driver.addSecRule(rule) == false) {
-            delete rule;
+            ));
+        if (driver.addSecRule(std::move(rule)) == false) {
             YYERROR;
         }
       }
     | CONFIG_DIR_SEC_ACTION actions
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$2.get()) {
-            a->push_back(i.release());
+            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            } else {
+              a->push_back(i.release());
+            }
         }
-        Rule *rule = new Rule(
-            /* op */ NULL,
-            /* variables */ NULL,
+        std::unique_ptr<RuleUnconditional> rule(new RuleUnconditional(
             /* actions */ a,
-            /* file name */ *@1.end.filename,
+            /* transformations */ t,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
-            );
-        driver.addSecAction(rule);
+            ));
+        driver.addSecAction(std::move(rule));
       }
     | DIRECTIVE_SECRULESCRIPT actions
       {
         std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$2.get()) {
-            a->push_back(i.release());
+            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            } else {
+              a->push_back(i.release());
+            }
         }
-        RuleScript *r = new RuleScript(
+        std::unique_ptr<RuleScript> r(new RuleScript(
             /* path to script */ $1,
             /* actions */ a,
-            /* file name */ *@1.end.filename,
+            /* transformations */ t,
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
-            );
+            ));
 
         if (r->init(&err) == false) {
             driver.error(@0, "Failed to load script: " + err);
-            delete r;
             YYERROR;
         }
-        if (driver.addSecRuleScript(r) == false) {
-            delete r;
+        if (driver.addSecRuleScript(std::move(r)) == false) {
             YYERROR;
         }
       }
@@ -1168,14 +1181,14 @@ expression:
                 delete phase;
             } else if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind ||
                 a->action_kind == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
+                                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
                 if (none != NULL) {
                     driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");
                     YYERROR;
                 }
                 checkedActions.push_back(a);
             } else {
-                driver.error(@0, "The action '" + a->m_name + "' is not suitable to be part of the SecDefaultActions");
+                driver.error(@0, "The action '" + *a->m_name.get() + "' is not suitable to be part of the SecDefaultActions");
                 YYERROR;
             }
         }
@@ -1198,14 +1211,18 @@ expression:
         }
 
         for (actions::Action *a : checkedActions) {
-            driver.m_defaultActions[definedPhase].push_back(a);
+            driver.m_defaultActions[definedPhase].push_back(
+                std::unique_ptr<actions::Action>(a));
         }
 
         delete actions;
       }
     | CONFIG_DIR_SEC_MARKER
       {
-        driver.addSecMarker(modsecurity::utils::string::removeBracketsIfNeeded($1));
+        driver.addSecMarker(modsecurity::utils::string::removeBracketsIfNeeded($1),
+            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
+            /* line number */ @1.end.line
+        );
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {

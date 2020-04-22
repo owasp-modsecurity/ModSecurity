@@ -113,7 +113,7 @@ int ValidateUtf8Encoding::detect_utf8_character(
     return unicode_len;
 }
 
-bool ValidateUtf8Encoding::evaluate(Transaction *transaction, Rule *rule,
+bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string &str, std::shared_ptr<RuleMessage> ruleMessage) {
     unsigned int i, bytes_left;
 

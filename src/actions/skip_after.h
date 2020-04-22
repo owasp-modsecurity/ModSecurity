@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #include "modsecurity/actions/action.h"
 
@@ -30,9 +31,12 @@ namespace actions {
 class SkipAfter : public Action {
  public:
     explicit SkipAfter(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+        : Action(action, RunTimeOnlyIfMatchKind),
+        m_skipName(std::make_shared<std::string>(m_parser_payload)) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
+ private:
+     std::shared_ptr<std::string> m_skipName;
 };
 
 

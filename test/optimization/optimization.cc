@@ -40,14 +40,14 @@ int main(int argc, char **argv) {
     std::list<std::string> files;
     int total = 0;
 
-    int i = 1;
-    while (i < argc) {
+    int p = 1;
+    while (p < argc) {
         std::list<std::string> tfiles = modsecurity::utils::expandEnv(
-            argv[i], 0);
+            argv[p], 0);
         for (const auto &file : tfiles) {
             files.insert(files.begin(), file);
         }
-        i++;
+        p++;
     }
 
 
@@ -68,24 +68,27 @@ int main(int argc, char **argv) {
 
     int nphases = modsecurity::Phases::NUMBER_OF_PHASES;
     for (int j = 0; j < nphases; j++) {
-        std::vector<Rule *> rules = modsecRules->m_rules[i];
-        if (rules.size() == 0) {
+        Rules *rules = modsecRules->m_rulesSetPhases[j];
+        if (rules->size() == 0) {
             continue;
         }
-        std::cout << "Phase: " << std::to_string(i);
-        std::cout << " (" << std::to_string(rules.size());
+        std::cout << "Phase: " << std::to_string(j);
+        std::cout << " (" << std::to_string(rules->size());
         std::cout << " rules)" << std::endl;
 
         std::unordered_map<std::string, int> operators;
         std::unordered_map<std::string, int> variables;
         std::unordered_map<std::string, int> op2var;
-        for (auto &z : rules) {
-            std::string key;
+
+        for (int i = 0; i < rules->size(); i++) {
+            auto z = rules->at(i);
+            //std::string key;
             if (z == NULL) {
                 continue;
             }
-            if (z->m_op != NULL) {
-                std::string op = z->m_op->m_op;
+            #if 0
+            if (z->isUnconditional() == false) {
+                std::string op = z->getOperatorName();
                 if (operators.count(op) > 0) {
                     operators[op] = 1 + operators[op];
                 } else {
@@ -93,6 +96,11 @@ int main(int argc, char **argv) {
                 }
                 key = op;
             }
+            #endif
+
+            #if 0
+            FIXME: This test may not be useful anymore. Disabling it for now.
+
             if (z->m_variables != NULL) {
                 std::string var = std::string("") + z->m_variables;
                 if (variables.count(var) > 0) {
@@ -109,6 +117,7 @@ int main(int argc, char **argv) {
                     op2var[key] = 1;
                 }
             }
+            #endif
         }
 
         if (operators.empty() && variables.empty() && op2var.empty()) {
@@ -138,7 +147,7 @@ int main(int argc, char **argv) {
             std::cout << std::endl;
         }
 
-        total += rules.size();
+        total += rules->size();
     }
     std::cout << std::endl;
 

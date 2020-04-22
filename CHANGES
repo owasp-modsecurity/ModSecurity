@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Add support to test framework for audit log content verification
+    and add regression tests for issues #2000, #2196
   - Multipart Content-Dispostion should allow field: filename*=
     [@martinhsv]
   - Fix rule-update-target for non-regex

@@ -44,7 +44,7 @@ class ModsecBuild : public Variable {
     }
 
     void evaluate(Transaction *transaction,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override;
 
     std::string m_build;

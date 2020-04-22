@@ -27,9 +27,9 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SkipAfter::evaluate(Rule *rule, Transaction *transaction) {
-    ms_dbg_a(transaction, 5, "Setting skipAfter for: " + m_parser_payload);
-    transaction->m_marker = m_parser_payload;
+bool SkipAfter::evaluate(RuleWithActions *rule, Transaction *transaction) {
+    ms_dbg_a(transaction, 5, "Setting skipAfter for: " + *m_skipName);
+    transaction->addMarker(m_skipName);
     return true;
 }
 

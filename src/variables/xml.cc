@@ -48,12 +48,12 @@ namespace variables {
 
 #ifndef WITH_LIBXML2
 void XML::evaluate(Transaction *t,
-    Rule *rule,
+    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) { }
 #else
 
 void XML::evaluate(Transaction *t,
-    Rule *rule,
+    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;

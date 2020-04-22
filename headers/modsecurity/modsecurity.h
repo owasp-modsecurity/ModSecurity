@@ -198,9 +198,9 @@ namespace modsecurity {
     MODSECURITY_MINOR "." MODSECURITY_PATCHLEVEL \
     MODSECURITY_TAG
 
-#define MODSECURITY_VERSION_NUM MODSECURITY_MAJOR \
-    MODSECURITY_MINOR MODSECURITY_PATCHLEVEL MODSECURITY_TAG_NUM
+#define MODSECURITY_VERSION_NUM 3040100
 
+#define MODSECURITY_CHECK_VERSION(a) (MODSECURITY_VERSION_NUM <= a)
 
 /*
  * @name    ModSecLogCb
@@ -229,7 +229,7 @@ namespace modsecurity {
 namespace actions {
 class Action;
 }
-class Rule;
+class RuleWithOperator;
 
 #ifdef __cplusplus
 extern "C" {

@@ -200,7 +200,7 @@ void Rbl::furtherInfo(struct sockaddr_in *sin, const std::string &ipStr,
 }
 
 
-bool Rbl::evaluate(Transaction *t, Rule *rule,
+bool Rbl::evaluate(Transaction *t, RuleWithActions *rule,
         const std::string& ipStr,
         std::shared_ptr<RuleMessage> ruleMessage) {
     struct addrinfo *info = NULL;
@@ -226,7 +226,7 @@ bool Rbl::evaluate(Transaction *t, Rule *rule,
     furtherInfo(sin, ipStr, t, m_provider);
 
     freeaddrinfo(info);
-    if (rule && t && rule->m_containsCaptureAction) {
+    if (rule && t && rule->hasCaptureAction()) {
         t->m_collections.m_tx_collection->storeOrUpdateFirst(
         "0", std::string(ipStr));
         ms_dbg_a(t, 7, "Added RXL match TX.0: " + \

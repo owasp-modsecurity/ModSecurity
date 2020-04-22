@@ -33,7 +33,7 @@ namespace modsecurity {
 namespace variables {
 
 void Env::evaluate(Transaction *transaction,
-    Rule *rule,
+    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);

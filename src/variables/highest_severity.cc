@@ -27,7 +27,7 @@ namespace modsecurity {
 namespace variables {
 
 void HighestSeverity::evaluate(Transaction *transaction,
-    Rule *rule,
+    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
     transaction->m_variableHighestSeverityAction.assign(
         std::to_string(transaction->m_highestSeverityAction));

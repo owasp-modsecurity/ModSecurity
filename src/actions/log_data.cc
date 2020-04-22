@@ -29,7 +29,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool LogData::evaluate(Rule *rule, Transaction *transaction,
+bool LogData::evaluate(RuleWithActions *rule, Transaction *transaction,
     std::shared_ptr<RuleMessage> rm) {
     rm->m_data = data(transaction);
 

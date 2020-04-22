@@ -39,7 +39,7 @@ class Tx_DictElement : public Variable {
         m_dictElement("TX:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveMultiMatches(
             m_name, l, m_keyExclusion);
@@ -55,7 +55,7 @@ class Tx_NoDictElement : public Variable {
         : Variable("TX") { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveMultiMatches("", l,
             m_keyExclusion);
@@ -70,7 +70,7 @@ class Tx_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveRegularExpression(
             m_dictElement, l, m_keyExclusion);
@@ -87,7 +87,7 @@ class Tx_DynamicElement : public Variable {
         m_string(std::move(dictElement)) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_tx_collection->resolveMultiMatches(string, l,

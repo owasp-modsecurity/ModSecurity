@@ -77,7 +77,7 @@ bool VerifySVNR::verify(const char *svnrnumber, int len) {
 }
 
 
-bool VerifySVNR::evaluate(Transaction *t, Rule *rule,
+bool VerifySVNR::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     std::list<SMatch> matches;
     bool is_svnr = false;
@@ -94,7 +94,7 @@ bool VerifySVNR::evaluate(Transaction *t, Rule *rule,
             is_svnr = verify(j.str().c_str(), j.str().size());
             if (is_svnr) {
                 logOffset(ruleMessage, j.offset(), j.str().size());
-                if (rule && t && rule->m_containsCaptureAction) {
+                if (rule && t && rule->hasCaptureAction()) {
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", j.str());
                     ms_dbg_a(t, 7, "Added VerifySVNR match TX.0: " + \

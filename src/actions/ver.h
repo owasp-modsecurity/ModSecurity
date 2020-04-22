@@ -31,7 +31,7 @@ class Ver : public Action {
  public:
     explicit Ver(const std::string &action) : Action(action, ConfigurationKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
 
  private:
     std::string m_ver;

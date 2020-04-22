@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include <stack>
 #endif
 
 #include <stdlib.h>
@@ -48,11 +49,12 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
 
+
 #ifndef NO_LOGS
 #define ms_dbg(b, c) \
   do { \
       if (m_rules && m_rules->m_debugLog && m_rules->m_debugLog->m_debugLevel >= b) { \
-          m_rules->debug(b, m_id, m_uri, c); \
+          m_rules->debug(b, *m_id.get(), m_uri, c); \
       } \
   } while (0);
 #else
@@ -284,9 +286,38 @@ class TransactionAnchoredVariables {
     int m_variableOffset;
 };
 
+class TransactionSecMarkerManagement {
+ public:
+    bool isInsideAMarker() const {
+        if (m_marker) {
+            return true;
+        }
+
+        return false;
+    }
+
+    std::shared_ptr<std::string> getCurrentMarker() const {
+        if (m_marker) {
+            return m_marker;
+        } else {
+            throw;
+        }
+    }
+
+    void removeMarker() {
+        m_marker.reset();
+    }
+
+    void addMarker(std::shared_ptr<std::string> name) {
+        m_marker = name;
+    }
+
+ private:
+    std::shared_ptr<std::string> m_marker;
+};
 
 /** @ingroup ModSecurity_CPP_API */
-class Transaction : public TransactionAnchoredVariables {
+class Transaction : public TransactionAnchoredVariables, public TransactionSecMarkerManagement {
  public:
     Transaction(ModSecurity *transaction, RulesSet *rules, void *logCbData);
     Transaction(ModSecurity *transaction, RulesSet *rules, char *id,
@@ -390,7 +421,7 @@ class Transaction : public TransactionAnchoredVariables {
     /**
      * Holds the client IP address.
      */
-    std::string m_clientIpAddress;
+    std::shared_ptr<std::string> m_clientIpAddress;
 
     /**
      * Holds the HTTP version: 1.2, 2.0, 3.0 and so on....
@@ -400,7 +431,7 @@ class Transaction : public TransactionAnchoredVariables {
     /**
      * Holds the server IP Address
      */
-    std::string m_serverIpAddress;
+    std::shared_ptr<std::string> m_serverIpAddress;
 
     /**
      * Holds the raw URI that was requested.
@@ -410,7 +441,7 @@ class Transaction : public TransactionAnchoredVariables {
     /**
      * Holds the URI that was requests (without the query string).
      */
-    std::string m_uri_no_query_string_decoded;
+    std::shared_ptr<std::string> m_uri_no_query_string_decoded;
 
     /**
      * Holds the combined size of all arguments, later used to fill the
@@ -516,13 +547,7 @@ class Transaction : public TransactionAnchoredVariables {
      * Contains the unique ID of the transaction. Use by the variable
 	 * `UNIQUE_ID'. This unique id is also saved as part of the AuditLog.
      */
-    std::string m_id;
-
-    /**
-     * Holds the SecMarker name that this transaction should wait to perform
-     * rules evaluation again.
-     */
-    std::string m_marker;
+    std::shared_ptr<std::string> m_id;
 
     /**
      * Holds the amount of rules that should be skipped. If bigger than 0 the

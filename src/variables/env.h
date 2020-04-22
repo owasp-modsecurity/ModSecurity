@@ -34,7 +34,7 @@ class Env : public Variable {
         : Variable(_name) { }
 
     void evaluate(Transaction *transaction,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override;
 };
 

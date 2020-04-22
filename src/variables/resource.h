@@ -39,7 +39,7 @@ class Resource_DictElement : public Variable {
         m_dictElement("RESOURCE:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_resource_collection->resolveMultiMatches(
             m_name, t->m_collections.m_resource_collection_key,
@@ -56,7 +56,7 @@ class Resource_NoDictElement : public Variable {
         : Variable("RESOURCE") { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_resource_collection->resolveMultiMatches(m_name,
             t->m_collections.m_resource_collection_key,
@@ -72,7 +72,7 @@ class Resource_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_resource_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_resource_collection_key,
@@ -90,7 +90,7 @@ class Resource_DynamicElement : public Variable {
         m_string(std::move(dictElement)) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_resource_collection->resolveMultiMatches(

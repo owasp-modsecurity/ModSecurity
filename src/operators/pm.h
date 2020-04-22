@@ -41,7 +41,7 @@ class Pm : public Operator {
         m_p = acmp_create(0);
     }
     ~Pm();
-    bool evaluate(Transaction *transaction, Rule *rule,
+    bool evaluate(Transaction *transaction, RuleWithActions *rule,
         const std::string &str,
         std::shared_ptr<RuleMessage> ruleMessage) override;
 

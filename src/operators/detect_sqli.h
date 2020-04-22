@@ -32,7 +32,7 @@ class DetectSQLi : public Operator {
             m_match_message.assign("detected SQLi using libinjection.");
         }
 
-    bool evaluate(Transaction *t, Rule *rule,
+    bool evaluate(Transaction *t, RuleWithActions *rule,
         const std::string& input,
         std::shared_ptr<RuleMessage> ruleMessage) override;
 };

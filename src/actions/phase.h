@@ -25,7 +25,7 @@ class Transaction;
 
 namespace modsecurity {
 class Transaction;
-class Rule;
+class RuleWithOperator;
 
 namespace actions {
 
@@ -37,7 +37,7 @@ class Phase : public Action {
         m_secRulesPhase(0) { }
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
 
     int m_phase;
     int m_secRulesPhase;

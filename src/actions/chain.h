@@ -25,7 +25,7 @@ class Transaction;
 
 namespace modsecurity {
 class Transaction;
-class Rule;
+class RuleWithOperator;
 
 namespace actions {
 
@@ -35,7 +35,7 @@ class Chain : public Action {
     explicit Chain(const std::string &action) 
         : Action(action, ConfigurationKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
 };
 
 }  // namespace actions

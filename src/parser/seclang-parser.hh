@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.5.1.
+// A Bison parser, made by GNU Bison 3.5.3.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
@@ -55,6 +55,7 @@ class Driver;
 }
 }
 
+#include "modsecurity/rule_unconditional.h"
 #include "src/rule_script.h"
 
 #include "src/actions/accuracy.h"
@@ -99,12 +100,12 @@ class Driver;
 #include "src/actions/skip_after.h"
 #include "src/actions/skip.h"
 #include "src/actions/tag.h"
-#include "src/actions/transformations/none.h"
-#include "src/actions/transformations/transformation.h"
-#include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/ver.h"
 #include "src/actions/xmlns.h"
 
+#include "src/actions/transformations/none.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/actions/transformations/url_decode_uni.h"
 #include "src/actions/transformations/hex_encode.h"
 #include "src/actions/transformations/parity_even_7bit.h"
 #include "src/actions/transformations/utf8_to_unicode.h"
@@ -294,7 +295,6 @@ class Driver;
 #include "src/variables/global.h"
 #include "src/variables/session.h"
 #include "src/variables/status.h"
-
 
 using namespace modsecurity;
 using namespace modsecurity::variables;

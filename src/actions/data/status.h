@@ -37,7 +37,7 @@ class Status : public Action {
     m_status(0) { }
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Transaction *transaction,
+    bool evaluate(RuleWithActions *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;
 
     int m_status;

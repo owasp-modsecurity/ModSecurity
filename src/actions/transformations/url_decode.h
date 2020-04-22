@@ -32,8 +32,10 @@ namespace transformations {
 
 class UrlDecode : public Transformation {
  public:
+
     explicit UrlDecode(const std::string &action) ;
-    std::string evaluate(std::string exp,
+
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 };
 

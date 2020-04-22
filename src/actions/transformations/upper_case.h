@@ -33,7 +33,8 @@ namespace transformations {
 class UpperCase : public Transformation {
  public:
     explicit UpperCase(const std::string &action) ;
-    std::string evaluate(std::string exp,
+
+    std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 };
 

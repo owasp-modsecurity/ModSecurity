@@ -32,7 +32,7 @@ bool RuleRemoveByTag::init(std::string *error) {
     return true;
 }
 
-bool RuleRemoveByTag::evaluate(Rule *rule, Transaction *transaction) {
+bool RuleRemoveByTag::evaluate(RuleWithActions *rule, Transaction *transaction) {
     transaction->m_ruleRemoveByTag.push_back(m_tag);
     return true;
 }

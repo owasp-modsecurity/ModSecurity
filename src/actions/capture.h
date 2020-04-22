@@ -22,7 +22,7 @@
 
 
 namespace modsecurity {
-class Rule;
+class RuleWithOperator;
 namespace actions {
 
 
@@ -31,7 +31,7 @@ class Capture : public Action {
     explicit Capture(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(RuleWithActions *rule, Transaction *transaction) override;
 };
 
 

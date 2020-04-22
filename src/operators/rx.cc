@@ -36,7 +36,7 @@ bool Rx::init(const std::string &arg, std::string *error) {
 }
 
 
-bool Rx::evaluate(Transaction *transaction, Rule *rule,
+bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     std::list<SMatch> matches;
     Regex *re;
@@ -53,7 +53,7 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
     }
 
     matches = re->searchAll(input);
-    if (rule && rule->m_containsCaptureAction && transaction) {
+    if (rule && rule->hasCaptureAction() && transaction) {
         int i = 0;
         matches.reverse();
         for (const SMatch& a : matches) {

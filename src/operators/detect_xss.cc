@@ -25,7 +25,7 @@ namespace modsecurity {
 namespace operators {
 
 
-bool DetectXSS::evaluate(Transaction *t, Rule *rule,
+bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, std::shared_ptr<RuleMessage> ruleMessage) {
     int is_xss;
 
@@ -34,7 +34,7 @@ bool DetectXSS::evaluate(Transaction *t, Rule *rule,
     if (t) {
         if (is_xss) {
             ms_dbg_a(t, 5, "detected XSS using libinjection.");
-            if (rule && t && rule->m_containsCaptureAction) {
+            if (rule && t && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst(
                     "0", std::string(input));
                 ms_dbg_a(t, 7, "Added DetectXSS match TX.0: " + \

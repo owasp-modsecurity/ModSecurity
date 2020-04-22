@@ -42,8 +42,8 @@ class XML_NoDictElement : public Variable {
         m_var(&m_name, &m_plain) {
         }
 
-    void evaluate(Transaction *t,
-        Rule *rule,
+    void evaluate(Transaction *transaction,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         l->push_back(new VariableValue(&m_var));
     }
@@ -59,7 +59,7 @@ class XML : public Variable {
         : Variable(_name) { }
 
     void evaluate(Transaction *transaction,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override;
 };
 

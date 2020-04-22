@@ -33,7 +33,7 @@ class Log : public Action {
     explicit Log(const std::string &action) 
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction,
+    bool evaluate(RuleWithActions *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;
 };
 

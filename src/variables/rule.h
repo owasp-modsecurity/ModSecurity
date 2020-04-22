@@ -38,9 +38,9 @@ class Rule_DictElement : public VariableDictElement { \
         : VariableDictElement(std::string("RULE"), dictElement) { }
 
     static void id(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        Rule *r = rule;
+        RuleWithActions *r = rule;
 
         while (r && r->m_ruleId == 0) {
             r = r->m_chainedRuleParent;
@@ -63,9 +63,9 @@ class Rule_DictElement : public VariableDictElement { \
 
 
     static void rev(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        Rule *r = rule;
+        RuleWithActions *r = rule;
 
         while (r && r->m_rev.empty()) {
             r = r->m_chainedRuleParent;
@@ -89,17 +89,17 @@ class Rule_DictElement : public VariableDictElement { \
 
 
     static void severity(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        Rule *r = rule;
+        RuleWithActions *r = rule;
 
-        while (r && !r->m_severity) {
+        while (r && !r->hasSeverity()) {
             r = r->m_chainedRuleParent;
         }
 
-        if (r && r->m_severity) {
+        if (r && r->hasSeverity()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(std::to_string(r->m_severity->m_severity));
+            std::string *a = new std::string(std::to_string(r->severity()));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_severity,
                 a
             );
@@ -113,17 +113,17 @@ class Rule_DictElement : public VariableDictElement { \
 
 
     static void logData(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        Rule *r = rule;
+        RuleWithActions *r = rule;
 
-        while (r && !r->m_logData) {
+        while (r && !r->hasLogData()) {
             r = r->m_chainedRuleParent;
         }
 
-        if (r && r->m_logData) {
+        if (r && r->hasLogData()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(r->m_logData->data(t));
+            std::string *a = new std::string(r->logData(t));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_logdata,
                 a
             );
@@ -136,17 +136,17 @@ class Rule_DictElement : public VariableDictElement { \
     }
 
     static void msg(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        Rule *r = rule;
+        RuleWithActions *r = rule;
 
-        while (r && !r->m_msg) {
+        while (r && !r->hasMsg()) {
             r = r->m_chainedRuleParent;
         }
 
-        if (r && r->m_msg) {
+        if (r && r->hasMsg()) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(r->m_msg->data(t));
+            std::string *a = new std::string(r->msg(t));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_msg,
                 a
             );
@@ -159,7 +159,7 @@ class Rule_DictElement : public VariableDictElement { \
     }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         if (m_dictElement == "id") {
             id(t, rule, l);
@@ -198,7 +198,7 @@ class Rule_DictElementRegexp : public VariableRegex {
         : VariableRegex("RULE", regex) { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         if (Utils::regex_search("id", m_r) > 0) {
             Rule_DictElement::id(t, rule, l);
@@ -230,7 +230,7 @@ class Rule_NoDictElement : public Variable {
         : Variable("RULE") { }
 
     void evaluate(Transaction *t,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         Rule_DictElement::id(t, rule, l);
         Rule_DictElement::rev(t, rule, l);

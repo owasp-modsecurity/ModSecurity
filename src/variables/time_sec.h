@@ -35,7 +35,7 @@ class TimeSec : public Variable {
         m_retName("TIME_SEC") { }
 
     void evaluate(Transaction *transaction,
-        Rule *rule,
+        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override;
     std::string m_retName;
 };
