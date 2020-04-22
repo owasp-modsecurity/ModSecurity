@@ -33,6 +33,7 @@
 #include "src/variables/variable.h"
 #include "src/variables/highest_severity.h"
 #include "src/actions/transformations/transformation.h"
+#include "modsecurity/rule_message.h"
 
 
 namespace modsecurity {
@@ -418,9 +419,33 @@ int Lua::getTriggeredRules(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
-    ms_dbg_a(t, 1,
-            "m.getTriggeredRules: OK");
-    return 0;
+    lua_newtable(L);
+    int idx = 0;
+    for (const auto& a: t->m_rulesMessages) {
+        ms_dbg_a(t, 1, RuleMessage::_details(&a));
+
+        // new index
+        lua_pushnumber(L, idx++);
+
+        // push new table element this table
+        lua_newtable(L);
+
+        // id: rule_id
+        lua_pushstring(L, "id");
+        lua_pushnumber(L, std::stoi(*(a.m_id)));
+        lua_settable(L, -3);
+
+        // msg: rule_msg
+        lua_pushstring(L, "msg");
+        lua_pushstring(L, a.m_message.c_str());
+        lua_settable(L, -3);
+
+        lua_settable(L, -3);
+    }
+
+    ms_dbg_a(t, 9, "m.getTriggeredRules: Finish");
+    
+    return 1;
 }
 
 
