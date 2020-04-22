@@ -38,12 +38,16 @@ namespace modsecurity {
 namespace Utils {
 
 
-Regex::Regex(const std::string& pattern_)
+Regex::Regex(const std::string& pattern_, bool ignoreCase)
     : pattern(pattern_.empty() ? ".*" : pattern_) {
     const char *errptr = NULL;
     int erroffset;
+    int flags = (PCRE_DOTALL|PCRE_MULTILINE);
 
-    m_pc = pcre_compile(pattern.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
+    if (ignoreCase == true) {
+        flags |= PCRE_CASELESS;
+    }
+    m_pc = pcre_compile(pattern.c_str(), flags,
         &errptr, &erroffset, NULL);
 
     m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
