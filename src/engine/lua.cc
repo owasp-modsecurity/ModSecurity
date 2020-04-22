@@ -422,7 +422,7 @@ int Lua::getTriggeredRules(lua_State *L) {
     lua_newtable(L);
     int idx = 0;
     for (const auto& a: t->m_rulesMessages) {
-        ms_dbg_a(t, 1, RuleMessage::_details(&a));
+        // ms_dbg_a(t, 1, RuleMessage::_details(&a));
 
         // new index
         lua_pushnumber(L, idx++);
@@ -432,7 +432,7 @@ int Lua::getTriggeredRules(lua_State *L) {
 
         // id: rule_id
         lua_pushstring(L, "id");
-        lua_pushnumber(L, std::stoi(*(a.m_id)));
+        lua_pushnumber(L, a.m_ruleId);
         lua_settable(L, -3);
 
         // msg: rule_msg
