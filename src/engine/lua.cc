@@ -420,7 +420,7 @@ int Lua::getTriggeredRules(lua_State *L) {
     t = reinterpret_cast<Transaction *>(z);
 
     lua_newtable(L);
-    int idx = 0;
+    int idx = 1;    // lua array index begins with 1
     for (const auto& a: t->m_rulesMessages) {
         // ms_dbg_a(t, 1, RuleMessage::_details(&a));
 
