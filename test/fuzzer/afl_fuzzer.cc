@@ -128,7 +128,9 @@ inline void op_test(const std::string &opName, const std::string &s) {
 int main(int argc, char** argv) {
     uint8_t buf[128];
 
+#if 0
     std::string lastString;
+#endif
 
     while (__AFL_LOOP(1000)) {
         ssize_t read_bytes;
@@ -138,7 +140,9 @@ int main(int argc, char** argv) {
 
         std::string currentString = std::string(read_bytes, 128);
         std::string s = currentString;
+#if 0
         std::string z = lastString;
+#endif
 
         ModSecurity *ms = new ModSecurity();
         RulesSet *rules = new RulesSet();
@@ -266,8 +270,9 @@ op_test("Within", s);
         delete t;
         delete rules;
         delete ms;
-
+#if 0
         lastString = currentString;
+#endif
     }
     return 0;
 }

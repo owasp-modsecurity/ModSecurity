@@ -63,7 +63,7 @@ class Rules {
          return j;
     }
 
-    bool insert(std::shared_ptr<Rule> rule) {
+    bool insert(const std::shared_ptr<Rule> &rule) {
         return insert(rule, nullptr, nullptr);
     }
 
