@@ -41,11 +41,12 @@ std::string RemoveWhitespace::evaluate(const std::string &val,
     std::string value(val);
 
     int64_t i = 0;
+    char nonBreakingSpaces = 0xa0;
 
     // loop through all the chars
     while (i < value.size()) {
         // remove whitespaces and non breaking spaces (NBSP)
-        if (isspace(value[i]) || (value[i] == NBSP)) {
+        if (isspace(value[i]) || (value[i] == nonBreakingSpaces)) {
             value.erase(i, 1);
         } else {
           /* if the space is not a whitespace char, increment counter

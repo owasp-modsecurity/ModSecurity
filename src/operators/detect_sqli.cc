@@ -32,26 +32,27 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
 
     issqli = libinjection_sqli(input.c_str(), input.length(), fingerprint);
 
-    if (issqli) {
-        if (t) {
-            t->m_matched.push_back(fingerprint);
-            ms_dbg_a(t, 4, "detected SQLi using libinjection with " \
-                "fingerprint '" + std::string(fingerprint) + "' at: '" +
-                input + "'");
-            if (rule && rule->hasCaptureAction()) {
-                t->m_collections.m_tx_collection->storeOrUpdateFirst(
-                    "0", std::string(fingerprint));
-                ms_dbg_a(t, 7, "Added DetectSQLi match TX.0: " + \
-                    std::string(fingerprint));
-                }
-        }
-    } else {
-        if (t) {
-            ms_dbg_a(t, 9, "detected SQLi: not able to find an " \
-                "inject on '" + input + "'");
-        }
+    if (!t) {
+        goto tisempty;
     }
 
+    if (issqli) {
+        t->m_matched.push_back(fingerprint);
+        ms_dbg_a(t, 4, "detected SQLi using libinjection with " \
+            "fingerprint '" + std::string(fingerprint) + "' at: '" +
+            input + "'");
+        if (rule && rule->hasCaptureAction()) {
+            t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                "0", std::string(fingerprint));
+            ms_dbg_a(t, 7, "Added DetectSQLi match TX.0: " + \
+                std::string(fingerprint));
+        }
+    } else {
+        ms_dbg_a(t, 9, "detected SQLi: not able to find an " \
+            "inject on '" + input + "'");
+    }
+
+tisempty:
     return issqli != 0;
 }
 

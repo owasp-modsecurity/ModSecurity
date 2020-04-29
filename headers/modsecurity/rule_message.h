@@ -69,7 +69,8 @@ class RuleMessage {
         m_serverIpAddress(trans->m_serverIpAddress),
         m_severity(0),
         m_uriNoQueryStringDecoded(trans->m_uri_no_query_string_decoded),
-        m_ver(rule->m_ver)
+        m_ver(rule->m_ver),
+        m_tags()
     { }
 
     explicit RuleMessage(RuleMessage *rule) :
@@ -93,8 +94,60 @@ class RuleMessage {
         m_serverIpAddress(rule->m_serverIpAddress),
         m_severity(rule->m_severity),
         m_uriNoQueryStringDecoded(rule->m_uriNoQueryStringDecoded),
-        m_ver(rule->m_ver)
+        m_ver(rule->m_ver),
+        m_tags(rule->m_tags)
     { }
+
+    RuleMessage(const RuleMessage& ruleMessage)
+        : m_accuracy(ruleMessage.m_accuracy),
+        m_clientIpAddress(ruleMessage.m_clientIpAddress),
+        m_data(ruleMessage.m_data),
+        m_id(ruleMessage.m_id),
+        m_isDisruptive(ruleMessage.m_isDisruptive),
+        m_match(ruleMessage.m_match),
+        m_maturity(ruleMessage.m_maturity),
+        m_message(ruleMessage.m_message),
+        m_noAuditLog(ruleMessage.m_noAuditLog),
+        m_phase(ruleMessage.m_phase),
+        m_reference(ruleMessage.m_reference),
+        m_rev(ruleMessage.m_rev),
+        m_rule(ruleMessage.m_rule),
+        m_ruleFile(ruleMessage.m_ruleFile),
+        m_ruleId(ruleMessage.m_ruleId),
+        m_ruleLine(ruleMessage.m_ruleLine),
+        m_saveMessage(ruleMessage.m_saveMessage),
+        m_serverIpAddress(ruleMessage.m_serverIpAddress),
+        m_severity(ruleMessage.m_severity),
+        m_uriNoQueryStringDecoded(ruleMessage.m_uriNoQueryStringDecoded),
+        m_ver(ruleMessage.m_ver),
+        m_tags(ruleMessage.m_tags)
+    { }
+
+    RuleMessage &operator=(const RuleMessage& ruleMessage) {
+        m_accuracy = ruleMessage.m_accuracy;
+        m_clientIpAddress = ruleMessage.m_clientIpAddress;
+        m_data = ruleMessage.m_data;
+        m_id = ruleMessage.m_id;
+        m_isDisruptive = ruleMessage.m_isDisruptive;
+        m_match = ruleMessage.m_match;
+        m_maturity = ruleMessage.m_maturity;
+        m_message = ruleMessage.m_message;
+        m_noAuditLog = ruleMessage.m_noAuditLog;
+        m_phase = ruleMessage.m_phase;
+        m_reference = ruleMessage.m_reference;
+        m_rev = ruleMessage.m_rev;
+        m_rule = ruleMessage.m_rule;
+        m_ruleFile = ruleMessage.m_ruleFile;
+        m_ruleId = ruleMessage.m_ruleId;
+        m_ruleLine = ruleMessage.m_ruleLine;
+        m_saveMessage = ruleMessage.m_saveMessage;
+        m_serverIpAddress = ruleMessage.m_serverIpAddress;
+        m_severity = ruleMessage.m_severity;
+        m_uriNoQueryStringDecoded = ruleMessage.m_uriNoQueryStringDecoded;
+        m_ver = ruleMessage.m_ver;
+        m_tags = ruleMessage.m_tags;
+        return *this;
+    }
 
     void clean() {
         m_data = "";

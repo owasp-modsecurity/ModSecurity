@@ -39,7 +39,7 @@ UrlDecode::UrlDecode(const std::string &action)
 
 std::string UrlDecode::evaluate(const std::string &value,
     Transaction *transaction) {
-    unsigned char *val = NULL;
+    unsigned char *val(NULL);
     int invalid_count = 0;
     int changed;
 

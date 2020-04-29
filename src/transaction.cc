@@ -340,7 +340,6 @@ bool Transaction::extractArguments(const std::string &orig,
 
     for (std::string t : key_value_sets) {
         char sep2 = '=';
-        int i = 0;
         size_t key_s = 0;
         size_t value_s = 0;
         int invalid = 0;
@@ -1307,14 +1306,13 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
  * contents of the response body, otherwise there is no need to call this
  * method.
  *
+ * WARN: This is a skeleton that it is not in use yet.
+ *
  * @return It returns a buffer (const char *)
- * @retval >0   body was update and available.
- * @retval NULL Nothing was updated.
  *
  */
 const char *Transaction::getResponseBody() const {
-    // int there_is_update = this->rules->loadResponseBodyFromJS(this);
-    return this->m_responseBody.str().c_str();
+    return strdup(this->m_responseBody.str().c_str());
 }
 
 

@@ -133,9 +133,8 @@ int main(int argc, char **argv) {
         std::cout << std::endl << std::endl;
         return -1;
     }
-    *(argv++);
-
-    std::string rules_arg(*argv);
+    char *rule = *(argv++);
+    std::string rules_arg(rule);
 
     /**
      * ModSecurity initial setup

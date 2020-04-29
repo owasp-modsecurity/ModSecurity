@@ -50,7 +50,8 @@ class RuleScript : public RuleWithActions {
         std::unique_ptr<std::string> fileName,
         int lineNumber)
             : RuleWithActions(actions, t, std::move(fileName), lineNumber),
-        m_name(name) { }
+        m_name(name),
+        m_lua() { }
 
     bool init(std::string *err);
     bool evaluate(Transaction *trans,

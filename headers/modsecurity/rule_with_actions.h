@@ -45,6 +45,57 @@ class RuleWithActions : public Rule {
 
     ~RuleWithActions();
 
+    RuleWithActions(const RuleWithActions& r)
+        : Rule(r),
+        m_rev(r.m_rev),
+        m_ver(r.m_ver),
+        m_accuracy(r.m_accuracy),
+        m_maturity(r.m_maturity),
+        m_ruleId(r.m_ruleId),
+        m_chainedRuleChild(r.m_chainedRuleChild),
+        m_chainedRuleParent(r.m_chainedRuleParent),
+        m_disruptiveAction(r.m_disruptiveAction),
+        m_logData(r.m_logData),
+        m_msg(r.m_msg),
+        m_severity(r.m_severity),
+        m_actionsRuntimePos(r.m_actionsRuntimePos),
+        m_actionsSetVar(r.m_actionsSetVar),
+        m_actionsTag(r.m_actionsTag),
+        m_transformations(r.m_transformations),
+        m_containsCaptureAction(r.m_containsCaptureAction),
+        m_containsMultiMatchAction(r.m_containsMultiMatchAction),
+        m_containsStaticBlockAction(r.m_containsStaticBlockAction),
+        m_isChained(r.m_isChained)
+    { }
+
+    RuleWithActions &operator=(const RuleWithActions& r) {
+        Rule::operator = (r);
+        m_rev = r.m_rev;
+        m_ver = r.m_ver;
+        m_accuracy = r.m_accuracy;
+        m_maturity = r.m_maturity;
+        m_ruleId = r.m_ruleId;
+        m_chainedRuleChild = r.m_chainedRuleChild;
+        m_chainedRuleParent = r.m_chainedRuleParent;
+
+        m_disruptiveAction = r.m_disruptiveAction;
+        m_logData = r.m_logData;
+        m_msg = r.m_msg;
+        m_severity = r.m_severity;
+        m_actionsRuntimePos = r.m_actionsRuntimePos;
+        m_actionsSetVar = r.m_actionsSetVar;
+        m_actionsTag = r.m_actionsTag;
+
+        m_transformations = r.m_transformations;
+
+        m_containsCaptureAction = r.m_containsCaptureAction;
+        m_containsMultiMatchAction = r.m_containsMultiMatchAction;
+        m_containsStaticBlockAction = r.m_containsStaticBlockAction;
+        m_isChained = r.m_isChained;
+
+        return *this;
+    }
+
     virtual bool evaluate(Transaction *transaction, std::shared_ptr<RuleMessage> ruleMessage) override;
 
     virtual bool evaluate(Transaction *transaction) override;
@@ -111,7 +162,7 @@ class RuleWithActions : public Rule {
 
     int64_t m_ruleId;
 
-    std::unique_ptr<RuleWithActions> m_chainedRuleChild;
+    std::shared_ptr<RuleWithActions> m_chainedRuleChild;
     RuleWithActions *m_chainedRuleParent;
 
  private:
