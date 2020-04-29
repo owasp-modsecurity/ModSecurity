@@ -56,8 +56,12 @@ void GeoLookup::cleanUp() {
 
 bool GeoLookup::setDataBase(const std::string& filePath,
     std::string *err) {
+#ifdef WITH_MAXMIND
     std::string intMax;
+#endif
+#ifdef WITH_GEOIP
     std::string intGeo;
+#endif
 
 #ifdef WITH_MAXMIND
     int status = MMDB_open(filePath.c_str(), MMDB_MODE_MMAP, &mmdb);
@@ -85,19 +89,22 @@ bool GeoLookup::setDataBase(const std::string& filePath,
 #ifdef WITH_MAXMIND
         err->append(" libMaxMind");
 #endif
-
 #ifdef WITH_GEOIP
         err->append(" GeoIP");
 #endif
         err->append(".");
 
+#ifdef WITH_MAXMIND
         if (intMax.size() > 0) {
             err->append(" " + intMax);
-
         }
+#endif
+#ifdef WITH_GEOIP
         if (intGeo.size() > 0) {
             err->append(" " + intGeo);
         }
+#endif
+
         return false;
     }
 

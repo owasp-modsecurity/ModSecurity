@@ -50,6 +50,13 @@ class RuleWithOperator : public RuleWithActions {
         m_variables(op.m_variables),
         m_operator(op.m_operator) { };
 
+    RuleWithOperator &operator=(const RuleWithOperator& r) {
+        RuleWithActions::operator = (r);
+        m_variables = r.m_variables;
+        m_operator = r.m_operator;
+        return *this;
+    }
+
     virtual ~RuleWithOperator();
 
     bool evaluate(Transaction *transaction) override;
