@@ -309,7 +309,7 @@ class TransactionSecMarkerManagement {
         m_marker.reset();
     }
 
-    void addMarker(std::shared_ptr<std::string> name) {
+    void addMarker(const std::shared_ptr<std::string> &name) {
         m_marker = name;
     }
 

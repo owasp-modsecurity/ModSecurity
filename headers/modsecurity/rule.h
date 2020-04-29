@@ -56,6 +56,13 @@ class Rule {
 
     }
 
+    Rule &operator=(const Rule& other) {
+        m_fileName = other.m_fileName;
+        m_lineNumber = other.m_lineNumber;
+        m_phase = other.m_phase;
+        return *this;
+    }
+
     virtual bool evaluate(Transaction *transaction) = 0;
 
     std::shared_ptr<std::string> getFileName() const {

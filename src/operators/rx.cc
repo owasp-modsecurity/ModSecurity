@@ -74,7 +74,7 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
         delete re;
     }
 
-    if (matches.size() > 0) {
+    if (!matches.empty()) {
         return true;
     }
 
