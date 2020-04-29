@@ -41,8 +41,8 @@ functionStatic:headers/modsecurity/transaction.h:453
 duplicateBranch:src/audit_log/audit_log.cc:223
 unreadVariable:src/request_body_processor/multipart.cc:435
 stlcstrParam:src/audit_log/writer/parallel.cc:145
+functionStatic:src/engine/lua.h:70
 functionStatic:src/engine/lua.h:71
-functionStatic:src/engine/lua.h:72
 functionConst:src/utils/geo_lookup.h:49
 useInitializationList:src/operators/rbl.h:69
 constStatement:test/common/modsecurity_test.cc:82
@@ -53,6 +53,9 @@ duplicateBranch:src/request_body_processor/multipart.cc:91
 syntaxError:src/transaction.cc:62
 noConstructor:src/variables/variable.h:152
 duplicateBranch:src/request_body_processor/multipart.cc:93
+knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
+knownConditionTrueFalse:src/operators/verify_svnr.cc:87
+
 
 noExplicitConstructor:seclang-parser.hh
 
@@ -63,3 +66,17 @@ preprocessorErrorDirective
 funcArgNamesDifferent
 unmatchedSuppression
 missingInclude
+unusedFunction
+missingIncludeSystem
+useStlAlgorithm
+preprocessorErrorDirective
+funcArgNamesDifferent
+unmatchedSuppression
+missingInclude
+
+purgedConfiguration
+
+
+// Examples
+memleak:examples/reading_logs_via_rule_message/reading_logs_via_rule_message.h:147
+memleak:examples/using_bodies_in_chunks/simple_request.cc
