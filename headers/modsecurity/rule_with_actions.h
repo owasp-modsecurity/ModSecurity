@@ -124,6 +124,50 @@ class RuleWithActions : public Rule {
         m_defaultContainsStaticBlockAction(r.m_defaultContainsStaticBlockAction),
         m_isChained(r.m_isChained) { };
 
+    RuleWithActions &operator=(const RuleWithActions& r) {
+        Rule::operator = (r);
+        m_ruleId = r.m_ruleId;
+        m_chainedRuleChild = r.m_chainedRuleChild;
+        m_chainedRuleParent = r.m_chainedRuleParent;
+        m_disruptiveAction = r.m_disruptiveAction;
+        m_logData = r.m_logData;
+        m_msg = r.m_msg;
+        m_actionsRuntimePos = r.m_actionsRuntimePos;
+        m_actionsSetVar = r.m_actionsSetVar;
+        m_actionsTag = r.m_actionsTag;
+        m_XmlNSs = r.m_XmlNSs;
+        m_defaultActionDisruptiveAction = r.m_defaultActionDisruptiveAction;
+        m_defaultActionLogData = r.m_defaultActionLogData;
+        m_defaultActionMsg = r.m_defaultActionMsg;
+        m_defaultActionActionsRuntimePos = r.m_defaultActionActionsRuntimePos;
+        m_defaultActionActionsSetVar = r.m_defaultActionActionsSetVar;
+        m_defaultActionActionsTag = r.m_defaultActionActionsTag;
+        m_transformations = r.m_transformations;
+        m_defaultTransformations = r.m_defaultTransformations;
+        m_severity = r.m_severity;
+        m_revision = r.m_revision;
+        m_version = r.m_version;
+        m_accuracy = r.m_accuracy;
+        m_maturity = r.m_maturity;
+        m_containsCaptureAction = r.m_containsCaptureAction;
+        m_containsLogAction = r.m_containsLogAction;
+        m_containsNoLogAction = r.m_containsNoLogAction;
+        m_containsMultiMatchAction = r.m_containsMultiMatchAction;
+        m_containsStaticBlockAction = r.m_containsStaticBlockAction;
+        m_defaultSeverity = r.m_defaultSeverity;
+        m_defaultRevision = r.m_defaultRevision;
+        m_defaultVersion = r.m_defaultVersion;
+        m_defaultAccuracy = r.m_defaultAccuracy;
+        m_defaultMaturity = r.m_defaultMaturity;
+        m_defaultContainsCaptureAction = r.m_defaultContainsCaptureAction;
+        m_defaultContainsLogAction = r.m_defaultContainsLogAction;
+        m_defaultContainsNoLogAction = r.m_defaultContainsNoLogAction;
+        m_defaultContainsMultiMatchAction = r.m_defaultContainsMultiMatchAction;
+        m_defaultContainsStaticBlockAction = r.m_defaultContainsStaticBlockAction;
+        m_isChained = r.m_isChained;
+        return *this;
+    }
+
 
     virtual bool evaluate(Transaction *transaction) override;
 
@@ -263,7 +307,7 @@ class RuleWithActions : public Rule {
     inline bool hasCaptureAction() const { return m_containsCaptureAction || m_defaultContainsCaptureAction; }
 
     inline bool hasDisruptiveAction() const { return m_disruptiveAction != nullptr || m_defaultActionDisruptiveAction != nullptr; }
-    inline void setDisruptiveAction(std::shared_ptr<actions::Action> a) { m_disruptiveAction = a; }
+    inline void setDisruptiveAction(const std::shared_ptr<actions::Action> &a) { m_disruptiveAction = a; }
     inline std::shared_ptr<actions::Action> getDisruptiveAction() const { return m_disruptiveAction; }
 
     inline bool hasBlockAction() const { return m_containsStaticBlockAction || m_defaultContainsStaticBlockAction; }
@@ -279,11 +323,11 @@ class RuleWithActions : public Rule {
     inline bool hasLogDataAction() const { return m_logData != nullptr || m_defaultActionLogData != nullptr; }
     inline std::shared_ptr<actions::LogData> getLogDataAction() const { return m_logData; }
     std::string getLogData(/*const */Transaction *t);
-    inline void setLogDataAction(std::shared_ptr<actions::LogData> data) { m_logData = data; }
+    inline void setLogDataAction(const std::shared_ptr<actions::LogData> &data) { m_logData = data; }
 
     inline bool hasMessageAction() const { return m_msg != nullptr || m_defaultActionMsg != nullptr; }
     inline std::shared_ptr<actions::Msg> getMessageAction() const { return m_msg; }
-    inline void setMessageAction(std::shared_ptr<actions::Msg> msg) { m_msg = msg; }
+    inline void setMessageAction(const std::shared_ptr<actions::Msg> &msg) { m_msg = msg; }
     std::string getMessage(/*const */Transaction *t);
 
 
