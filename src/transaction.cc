@@ -368,7 +368,6 @@ bool Transaction::extractArguments(const std::string &orig,
 
     for (std::string t : key_value_sets) {
         char sep2 = '=';
-        int i = 0;
         size_t key_s = 0;
         size_t value_s = 0;
         int invalid = 0;

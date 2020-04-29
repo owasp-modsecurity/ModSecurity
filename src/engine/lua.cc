@@ -65,8 +65,7 @@ bool Lua::isCompatible(const std::string &script, Lua *l, std::string *error) {
 
 bool Lua::load(const std::string &script, std::string *err) {
 #ifdef WITH_LUA
-    lua_State *L = NULL;
-    L = luaL_newstate();
+    lua_State *L = luaL_newstate();
     luaL_openlibs(L);
 
     m_scriptName = script;
@@ -234,7 +233,7 @@ err:
 
 #ifdef WITH_LUA
 int Lua::log(lua_State *L) {
-    const Transaction *t = NULL;
+    const Transaction *t(NULL);
     const char *text;
     int level;
 
@@ -256,9 +255,9 @@ int Lua::log(lua_State *L) {
 
 
 int Lua::getvar(lua_State *L) {
-    const char *varname = NULL;
-    Transaction *t = NULL;
-    void *z = NULL;
+    const char *varname(NULL);
+    Transaction *t(NULL);
+    void *z(NULL);
 
     /* Retrieve parameters. */
     varname = reinterpret_cast<const char *>(luaL_checkstring(L, 1));
@@ -282,9 +281,9 @@ int Lua::getvar(lua_State *L) {
 
 
 int Lua::getvars(lua_State *L) {
-    const char *varname = NULL;
-    Transaction *t = NULL;
-    void *z = NULL;
+    const char *varname(NULL);
+    Transaction *t(NULL);
+    void *z(NULL);
     std::vector<const VariableValue *> l;
     int idx = 1;
 
@@ -323,16 +322,16 @@ int Lua::getvars(lua_State *L) {
 
 
 int Lua::setvar(lua_State *L) {
-    Transaction *t = NULL;
-    const char *var_value = NULL;
-    const char *var_name = NULL;
+    Transaction *t(NULL);
+    const char *var_value(NULL);
+    const char *var_name(NULL);
     std::string vname;
     std::string collection;
     std::string variableName;
     int nargs = lua_gettop(L);
     char *chr = NULL;
     size_t pos;
-    void *z = NULL;
+    void *z(NULL);
 
     lua_getglobal(L, "__transaction");
     z = const_cast<void *>(lua_topointer(L, -1));
@@ -453,7 +452,7 @@ std::string Lua::applyTransformations(lua_State *L, Transaction *t,
     }
 
     if (lua_isstring(L, idx)) {
-        const char *name = NULL;
+        const char *name(NULL);
         name = reinterpret_cast<const char *>(luaL_checkstring(L, idx));
 
         actions::transformations::Transformation *tfn = \
