@@ -58,6 +58,12 @@ class RuleScript : public RuleWithActions {
         m_name(rs.m_name),
         m_lua(rs.m_lua) { }
 
+    RuleScript &operator=(const RuleScript& r) {
+        RuleWithActions::operator = (r);
+        m_name = r.m_name;
+        m_lua = r.m_lua;
+        return *this;
+    }
 
     bool init(std::string *err);
     bool evaluate(Transaction *trans) override;

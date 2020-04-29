@@ -63,6 +63,15 @@ class Action {
         m_name(a.m_name),
         m_parser_payload(a.m_parser_payload) { }
 
+    Action &operator=(const Action& a) {
+        m_isNone = a.m_isNone;
+        temporaryAction = a.temporaryAction;
+        action_kind = a.action_kind;
+        m_name = a.m_name;
+        m_parser_payload = a.m_parser_payload;
+        return *this;
+    }
+
     virtual ~Action() { }
 
     virtual std::string execute(const std::string &exp,
