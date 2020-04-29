@@ -45,8 +45,7 @@ class LuaScriptBlob {
 
 
     void write(const void *data, size_t len) {
-        unsigned char *d = NULL;
-        d = (unsigned char *)realloc((unsigned char *)m_data, len + m_len);
+        unsigned char *d = (unsigned char *)realloc((unsigned char *)m_data, len + m_len);
         std::memcpy(d + m_len, data, len);
         m_len = m_len + len;
         m_data = d;

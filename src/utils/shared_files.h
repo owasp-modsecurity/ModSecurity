@@ -81,7 +81,7 @@ class SharedFiles {
     {
 #ifdef MODSEC_USE_GENERAL_LOCK
         int shm_id;
-        bool toBeCreated;
+        bool toBeCreated(false);
         bool err = false;
 
         m_memKeyStructure = ftok(".", 1);
