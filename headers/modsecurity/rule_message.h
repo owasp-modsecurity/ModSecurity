@@ -55,6 +55,19 @@ class RuleMessage {
     { }
 
 
+    RuleMessage &operator=(const RuleMessage& ruleMessage) {
+        m_severity = ruleMessage.m_severity;
+        m_tags = ruleMessage.m_tags;
+        m_data = ruleMessage.m_data;
+        m_match = ruleMessage.m_match;
+        m_message = ruleMessage.m_message;
+        m_reference = ruleMessage.m_reference;
+        m_transaction = ruleMessage.m_transaction;
+        m_rule = ruleMessage.m_rule;
+        return *this;
+    }
+
+
     explicit RuleMessage(Transaction *transaction) :
         m_severity(0),
         m_tags(),
