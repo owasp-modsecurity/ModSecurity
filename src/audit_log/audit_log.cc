@@ -372,6 +372,13 @@ bool AuditLog::merge(AuditLog *from, std::string *error) {
     return init(error);
 }
 
+bool AuditLog::reopen(std::string *error) {
+    if (m_writer != NULL) {
+        return m_writer->reopen(error);
+    }
+    return true;
+}
+
 
 }  // namespace audit_log
 }  // namespace modsecurity

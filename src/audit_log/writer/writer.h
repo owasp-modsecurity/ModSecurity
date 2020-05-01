@@ -50,6 +50,7 @@ class Writer {
     virtual bool init(std::string *error) = 0;
     virtual bool write(Transaction *transaction, int parts,
         std::string *error) = 0;
+    virtual bool reopen(std::string *error) = 0;
 
     static void generateBoundary(std::string *boundary);
 

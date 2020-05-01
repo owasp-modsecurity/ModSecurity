@@ -57,6 +57,7 @@ typedef struct msc_file_handler {
 class SharedFiles {
  public:
     bool open(const std::string& fileName, std::string *error);
+    bool reopen(const std::string& filename, std::string *error);
     void close(const std::string& fileName);
     bool write(const std::string& fileName, const std::string &msg,
         std::string *error);
