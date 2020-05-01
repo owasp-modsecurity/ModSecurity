@@ -33,7 +33,8 @@ invalidScanfArgType_int:src/rules_set_properties.cc:102
 // ModSecurity v3 code...
 // 
 unmatchedSuppression:src/utils/geo_lookup.cc:82
-useInitializationList:src/utils/shared_files.h:87
+functionConst:src/utils/shared_files.h:60
+useInitializationList:src/utils/shared_files.h:88
 unmatchedSuppression:src/utils/msc_tree.cc
 functionStatic:headers/modsecurity/transaction.h:373
 duplicateBranch:src/audit_log/audit_log.cc:224
