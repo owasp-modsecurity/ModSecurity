@@ -282,6 +282,10 @@ class VariableMonkeyResolution {
                 t->m_variableUrlEncodedError.evaluate(l);
             } else if (comp(variable, "USERID")) {
                 t->m_variableUserID.evaluate(l);
+            } else if (comp(variable, "REQUEST_HEADERS")) {
+                t->m_variableRequestHeaders.resolve(l);
+            } else if (comp(variable, "RESPONSE_HEADERS")) {
+                t->m_variableResponseHeaders.resolve(l);
             } else {
                 throw std::invalid_argument("Variable not found.");
             }

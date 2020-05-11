@@ -268,8 +268,16 @@ int Lua::getvar(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
-    std::string var = variables::Variable::stringMatchResolve(t, varname);
-    var = applyTransformations(L, t, 2, var);
+    std::string var;
+    try {
+        var = variables::Variable::stringMatchResolve(t, varname);
+        var = applyTransformations(L, t, 2, var);
+    }
+    catch (const std::exception &exp) {
+        std::stringstream ss;
+        ss << "[WAF] " << exp.what() << " " << std::endl;
+        ms_dbg_a(t, 9, ss.str().c_str());
+    }
 
     if (var.size() == 0) {
         lua_pushnil(L);
@@ -296,7 +304,14 @@ int Lua::getvars(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
-    variables::Variable::stringMatchResolveMulti(t, varname, &l);
+    try {
+        variables::Variable::stringMatchResolveMulti(t, varname, &l);
+    }
+    catch (const std::exception &exp) {
+        std::stringstream ss;
+        ss << "[WAF] " << exp.what() << " " << std::endl;
+        ms_dbg_a(t, 9, ss.str().c_str());
+    }
 
     lua_newtable(L);
     for (auto i : l) {
@@ -420,7 +435,7 @@ int Lua::getTriggeredRules(lua_State *L) {
     t = reinterpret_cast<Transaction *>(z);
 
     lua_newtable(L);
-    int idx = 1;    // lua array index begins with 1
+    int idx = 1;
     for (const auto& a: t->m_rulesMessages) {
         // ms_dbg_a(t, 1, RuleMessage::_details(&a));
 
@@ -437,13 +452,18 @@ int Lua::getTriggeredRules(lua_State *L) {
 
         // msg: rule_msg
         lua_pushstring(L, "msg");
-        lua_pushstring(L, a.m_message.c_str());
+        lua_pushlstring(L, a.m_message.c_str(), a.m_message.size());
+        lua_settable(L, -3);
+
+        // matched_value
+        lua_pushstring(L, "matched_value");
+        lua_pushlstring(L, a.m_match.c_str(), a.m_match.size());
         lua_settable(L, -3);
 
         lua_settable(L, -3);
     }
 
-    ms_dbg_a(t, 9, "m.getTriggeredRules: Finish");
+    ms_dbg_a(t, 9, "[WAF] m.getTriggeredRules: Finish");
     
     return 1;
 }
