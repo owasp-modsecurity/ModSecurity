@@ -30,10 +30,10 @@ else
       RET=$?
       if [ $RET -eq 127 ]
       then
-          echo ":test-result: SKIP: json is not enabled. (unit/$RET) ../$FILE"
+          echo ":test-result: SKIP: json is not enabled. (unit/$RET) ../$FILE:$i"
       elif [ $RET -ne 0 ]
       then
-          echo ":test-result: FAIL possible segfault: (unit/$RET) ../$FILE"
+          echo ":test-result: FAIL possible segfault: (unit/$RET) ../$FILE:$i"
       fi
 fi
 
