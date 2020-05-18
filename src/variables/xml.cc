@@ -50,13 +50,12 @@ namespace variables {
 
 #ifndef WITH_LIBXML2
 void XML::evaluate(Transaction *t,
-    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) { }
 #else
 
 void XML::evaluate(Transaction *t,
-    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
+#if 0
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
     xmlNodeSetPtr nodes;
@@ -137,6 +136,7 @@ void XML::evaluate(Transaction *t,
     }
     xmlXPathFreeObject(xpathObj);
     xmlXPathFreeContext(xpathCtx);
+#endif
 }
 
 #endif

@@ -344,7 +344,6 @@ int Transaction::processConnection(const char *client, int cPort,
     ms_dbg(4, "Transaction context created.");
     ms_dbg(4, "Starting phase CONNECTION. (SecRules 0)");
 
-
     m_variableRemoteHost.set(*m_clientIpAddress.get(), m_variableOffset);
     m_variableUniqueID.set(*m_id.get(), m_variableOffset);
     m_variableRemoteAddr.set(*m_clientIpAddress.get(), m_variableOffset);
@@ -1495,7 +1494,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     /** TODO: Check variable */
     variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
     std::vector<const VariableValue *> l;
-    r->evaluate(this, NULL, &l);
+    r->evaluate(this, &l);
     delete r;
 
     ss << utils::string::dash_if_empty(
