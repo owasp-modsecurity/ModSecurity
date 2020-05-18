@@ -13,7 +13,6 @@
     "request":{
       "headers":{
         "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
         "User-Agent":"My sweet little browser"
       },
