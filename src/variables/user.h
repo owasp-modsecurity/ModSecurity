@@ -25,6 +25,7 @@
 
 #include "src/variables/variable.h"
 #include "src/run_time_string.h"
+#include "src/variables/variable_with_runtime_string.h"
 
 namespace modsecurity {
 
@@ -39,7 +40,6 @@ class User_DictElement : public Variable {
         m_dictElement("USER:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveMultiMatches(
             m_name, t->m_collections.m_user_collection_key,
@@ -56,7 +56,6 @@ class User_NoDictElement : public Variable {
         : Variable("USER") { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveMultiMatches(m_name,
             t->m_collections.m_user_collection_key,
@@ -72,7 +71,6 @@ class User_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_user_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_user_collection_key,
@@ -83,14 +81,16 @@ class User_DictElementRegexp : public VariableRegex {
 };
 
 
-class User_DynamicElement : public Variable {
+class User_DynamicElement : public VariableWithRunTimeString {
  public:
     explicit User_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
-        : Variable("USER:dynamic"),
-        m_string(std::move(dictElement)) { }
+        : VariableWithRunTimeString(
+            "USER:dynamic",
+            std::move(dictElement)
+        )
+    { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_user_collection->resolveMultiMatches(
@@ -112,8 +112,6 @@ class User_DynamicElement : public Variable {
             t->m_rules->m_secWebAppId.m_value,
             value);
     }
-
-    std::unique_ptr<RunTimeString> m_string;
 };
 
 

@@ -46,8 +46,8 @@ bool SetVar::execute(RuleWithActions *rule, Transaction *t) {
     std::string targetValue;
     std::string resolvedPre;
 
-    if (m_string) {
-        resolvedPre = m_string->evaluate(t, rule);
+    if (hasRunTimeString()) {
+        resolvedPre = getEvaluatedRunTimeString(t);
     }
 
     std::string m_variableNameExpanded;
@@ -66,17 +66,17 @@ bool SetVar::execute(RuleWithActions *rule, Transaction *t) {
     variables::User_DynamicElement *user = dynamic_cast<
         variables::User_DynamicElement *> (v);
     if (tx) {
-        m_variableNameExpanded = tx->m_string->evaluate(t, rule);
+        m_variableNameExpanded = tx->evaluateRunTimeString(t);
     } else if (session) {
-        m_variableNameExpanded = session->m_string->evaluate(t, rule);
+        m_variableNameExpanded = session->evaluateRunTimeString(t);
     } else if (ip) {
-        m_variableNameExpanded = ip->m_string->evaluate(t, rule);
+        m_variableNameExpanded = ip->evaluateRunTimeString(t);
     } else if (resource) {
-        m_variableNameExpanded = resource->m_string->evaluate(t, rule);
+        m_variableNameExpanded = resource->evaluateRunTimeString(t);
     } else if (global) {
-        m_variableNameExpanded = global->m_string->evaluate(t, rule);
+        m_variableNameExpanded = global->evaluateRunTimeString(t);
     } else if (user) {
-        m_variableNameExpanded = user->m_string->evaluate(t, rule);
+        m_variableNameExpanded = user->evaluateRunTimeString(t);
     } else {
         m_variableNameExpanded = m_variable->m_name;
     }
@@ -114,8 +114,7 @@ bool SetVar::execute(RuleWithActions *rule, Transaction *t) {
 
         try {
             std::vector<const VariableValue *> l;
-            RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(rule);
-            m_variable->evaluate(t, rr, &l);
+            m_variable->evaluate(t, &l);
             if (l.size() == 0) {
                 value = 0;
             } else {

@@ -18,7 +18,7 @@
 #include <memory>
 
 #include "modsecurity/actions/action.h"
-#include "src/run_time_string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 #ifndef SRC_ACTIONS_SET_ENV_H_
 #define SRC_ACTIONS_SET_ENV_H_
@@ -30,20 +30,25 @@ class Transaction;
 namespace actions {
 
 
-class SetENV : public Action {
+class SetENV : public ActionWithRunTimeString {
  public:
-    explicit SetENV(const std::string &_action)
-        : Action(_action) { }
+    explicit SetENV(std::unique_ptr<RunTimeString> runTimeString)
+        : ActionWithRunTimeString(
+            "setenv",
+            RunTimeOnlyIfMatchKind,
+            std::move(runTimeString)
+        )
+    { };
 
-    explicit SetENV(std::unique_ptr<RunTimeString> z)
-        : Action("setenv", RunTimeOnlyIfMatchKind),
-            m_string(std::move(z)) { }
+    explicit SetENV(const SetENV &action)
+        : ActionWithRunTimeString(action)
+    { };
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override;
-    bool init(std::string *error) override;
 
- private:
-    std::shared_ptr<RunTimeString> m_string;
+    virtual ActionWithRunTimeString *clone() override {
+        return new SetENV(*this);
+    }
 };
 
 

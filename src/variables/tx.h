@@ -25,6 +25,7 @@
 
 #include "src/variables/variable.h"
 #include "src/run_time_string.h"
+#include "src/variables/variable_with_runtime_string.h"
 
 namespace modsecurity {
 
@@ -39,7 +40,6 @@ class Tx_DictElement : public Variable {
         m_dictElement("TX:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveMultiMatches(
             m_name, l, m_keyExclusion);
@@ -55,7 +55,6 @@ class Tx_NoDictElement : public Variable {
         : Variable("TX") { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveMultiMatches("", l,
             m_keyExclusion);
@@ -70,7 +69,6 @@ class Tx_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveRegularExpression(
             m_dictElement, l, m_keyExclusion);
@@ -80,14 +78,16 @@ class Tx_DictElementRegexp : public VariableRegex {
 };
 
 
-class Tx_DynamicElement : public Variable {
+class Tx_DynamicElement : public VariableWithRunTimeString {
  public:
     explicit Tx_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
-        : Variable("TX:dynamic"),
-        m_string(std::move(dictElement)) { }
+        : VariableWithRunTimeString(
+            "TX:dynamic",
+            std::move(dictElement)
+        )
+    { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_tx_collection->resolveMultiMatches(string, l,
@@ -102,8 +102,6 @@ class Tx_DynamicElement : public Variable {
         std::string value) {
         t->m_collections.m_tx_collection->storeOrUpdateFirst(var, value);
     }
-
-    std::unique_ptr<RunTimeString> m_string;
 };
 
 

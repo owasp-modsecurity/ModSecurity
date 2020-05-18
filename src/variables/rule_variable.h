@@ -13,44 +13,48 @@
  *
  */
 
-#include "src/variables/time_wday.h"
-
-#include <time.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#include <iostream>
 #include <string>
 #include <vector>
 #include <list>
-#include <utility>
 
-#include "modsecurity/transaction.h"
+#ifndef SRC_VARIABLES_RULE_VARIABLE_H_
+#define SRC_VARIABLES_RULE_VARIABLE_H_
+
+#include "src/rule_with_actions.h"
+
 
 namespace modsecurity {
+
+class Transaction;
 namespace variables {
 
-void TimeWDay::evaluate(Transaction *transaction,
-    std::vector<const VariableValue *> *l) {
-    char tstr[200];
-    struct tm timeinfo;
-    time_t timer;
+class RuleVariable {
+ public:
+    RuleVariable()
+        : m_rule(nullptr)
+    { };
 
-    time(&timer);
-    memset(tstr, '\0', 200);
+    RuleVariable(const RuleVariable &a)
+        : m_rule(a.m_rule)
+    { };
 
-    localtime_r(&timer, &timeinfo);
-    strftime(tstr, 200, "%u", &timeinfo);
 
-    transaction->m_variableTimeWDay.assign(tstr);
+    void populate(const RuleWithActions *rule) {
+        m_rule = rule;
+    }
 
-    l->push_back(new VariableValue(&m_retName,
-        &transaction->m_variableTimeWDay));
-}
+    const RuleWithActions *getRule() const noexcept {
+        return m_rule;
+    }
+
+    virtual Variable* clone() = 0;
+
+ private:
+    const RuleWithActions *m_rule;
+};
 
 
 }  // namespace variables
 }  // namespace modsecurity
+
+#endif  // SRC_VARIABLES_RULE_VARIABLE_H_

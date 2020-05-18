@@ -30,7 +30,7 @@ namespace operators {
 
 
 bool Rx::init(const std::string &file, std::string *error) {
-    if (m_string->m_containsMacro == false) {
+    if (m_string->containsMacro() == false) {
         m_re = new Regex(m_param);
     }
 
@@ -44,11 +44,11 @@ bool Rx::evaluate(Transaction *transaction,
     RuleMessage *ruleMessage) {
     Regex *re;
 
-    if (m_param.empty() && !m_string->m_containsMacro) {
+    if (m_param.empty() && !m_string->containsMacro()) {
         return true;
     }
 
-    if (m_string->m_containsMacro) {
+    if (m_string->containsMacro()) {
         std::string eparam(m_string->evaluate(transaction));
         re = new Regex(eparam);
     } else {
@@ -73,12 +73,12 @@ bool Rx::evaluate(Transaction *transaction,
         logOffset(ruleMessage, capture.m_offset, capture.m_length);
     }
 
-    if (!captures.empty()) {
-        return true;
+    if (m_string->containsMacro()) {
+        delete re;
     }
 
-    if (m_string->m_containsMacro) {
-        delete re;
+    if (!captures.empty()) {
+        return true;
     }
 
     return false;
