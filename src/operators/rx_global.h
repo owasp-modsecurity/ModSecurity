@@ -43,13 +43,14 @@ class RxGlobal : public Operator {
         }
 
     ~RxGlobal() {
-        if (m_string->m_containsMacro == false && m_re != NULL) {
+        if (m_string->containsMacro() == false && m_re != NULL) {
             delete m_re;
             m_re = NULL;
         }
     }
 
-    bool evaluate(Transaction *transaction, RuleWithActions *rule,
+    bool evaluate(Transaction *transaction,
+        RuleWithActions *rule,
         const bpstd::string_view& input,
         RuleMessage *ruleMessage) override;
 

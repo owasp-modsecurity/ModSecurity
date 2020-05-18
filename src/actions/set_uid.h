@@ -18,7 +18,7 @@
 #include <utility>
 
 #include "modsecurity/actions/action.h"
-#include "src/run_time_string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 #ifndef SRC_ACTIONS_SET_UID_H_
 #define SRC_ACTIONS_SET_UID_H_
@@ -30,20 +30,26 @@ class Transaction;
 namespace actions {
 
 
-class SetUID : public Action {
+class SetUID : public ActionWithRunTimeString {
  public:
-    explicit SetUID(const std::string &_action)
-        : Action(_action) { }
+    explicit SetUID(std::unique_ptr<RunTimeString> runTimeString)
+        : ActionWithRunTimeString(
+            "setuid",
+            RunTimeOnlyIfMatchKind,
+            std::move(runTimeString)
+        )
+    { };
 
-    explicit SetUID(std::unique_ptr<RunTimeString> z)
-        : Action("setuid", RunTimeOnlyIfMatchKind),
-            m_string(std::move(z)) { }
+    explicit SetUID(const SetUID &action)
+        : ActionWithRunTimeString(action)
+    { };
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override;
-    bool init(std::string *error) override;
 
- private:
-    std::shared_ptr<RunTimeString> m_string;
+    virtual ActionWithRunTimeString *clone() override {
+        return new SetUID(*this);
+    }
+
 };
 
 

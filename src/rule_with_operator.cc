@@ -40,8 +40,10 @@
 #include "src/actions/set_var.h"
 #include "src/actions/block.h"
 #include "src/variables/variable.h"
+#include "src/variables/rule.h"
 #include "src/rule_with_operator.h"
 #include "modsecurity/string_view.hpp"
+
 
 
 namespace modsecurity {
@@ -60,7 +62,14 @@ RuleWithOperator::RuleWithOperator(Operator *op,
     int lineNumber)
     : RuleWithActions(actions, transformations, std::move(fileName), lineNumber),
     m_variables(std::unique_ptr<variables::Variables>(_variables)),
-    m_operator(std::unique_ptr<Operator>(op)) { /* */ }
+    m_operator(std::unique_ptr<Operator>(op)) {
+        for (auto &a : *m_variables.get()) {
+            variables::RuleVariable *vrule = dynamic_cast<variables::RuleVariable *>(a);
+            if (vrule != nullptr) {
+                vrule->populate(this);
+            }
+        }
+    }
 
 
 
@@ -247,8 +256,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
         + " against " \
         + variables + ".");
     } else {
-        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(getId()
-) \
+        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(getId()) \
             + ") Executing operator \"" + getOperatorName() \
             + " against " \
             + variables + ".");
@@ -262,7 +270,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) {
         if (!var) {
             continue;
         }
-        var->evaluate(trans, this, &e);
+        var->evaluate(trans, &e);
         for (const VariableValue *v : e) {
             TransformationsResults transformationsResults;
             const std::string &value = v->getValue();
