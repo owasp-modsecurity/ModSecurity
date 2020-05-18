@@ -211,7 +211,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                  */
                 if (test->m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << std::endl;
+                        << ":" << t->name << ":" << *count << std::endl;
                 } else {
                     std::cout << KRED << "failed!" << RESET << std::endl;
                 }
@@ -254,7 +254,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 /* Parser error was expected, but with a different content */
                 if (test->m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << std::endl;
+                        << ":" << t->name << ":" << *count << std::endl;
                 } else {
                     std::cout << KRED << "failed!" << RESET << std::endl;
                 }
@@ -280,7 +280,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             if (t->parser_error.empty() == false) {
                 if (test->m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << std::endl;
+                        << ":" << t->name << ":" << *count << std::endl;
                 } else {
                     std::cout << KRED << "failed!" << RESET << std::endl;
                     std::cout << KWHT << "Expected a parser error." \
@@ -387,7 +387,7 @@ end:
             if (!d->contains(t->debug_log)) {
                 if (test->m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << std::endl;
+                        << ":" << t->name << ":" << *count << std::endl;
                 } else {
                     std::cout << KRED << "failed!" << RESET << std::endl;
                 }
@@ -399,7 +399,7 @@ end:
             } else if (r.status != t->http_code) {
                 if (test->m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << std::endl;
+                        << ":" << t->name << ":" << *count << std::endl;
                 } else {
                     std::cout << KRED << "failed!" << RESET << std::endl;
                 }
@@ -423,7 +423,7 @@ end:
                 && !contains(getAuditLogContent(modsec_transaction->m_rules->m_auditLog->m_path1), t->audit_log)) {
                 if (test->m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << std::endl;
+                        << ":" << t->name << ":" << *count << std::endl;
                 } else {
                     std::cout << KRED << "failed!" << RESET << std::endl;
                 }
