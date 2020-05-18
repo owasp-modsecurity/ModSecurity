@@ -19,7 +19,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
-#include "src/run_time_string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
 #define SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
@@ -34,25 +34,33 @@ namespace actions {
 namespace disruptive {
 
 
-class Redirect : public Action {
+class Redirect : public ActionWithRunTimeString {
  public:
-    explicit Redirect(const std::string &action)
-        : Action(action, RunTimeOnlyIfMatchKind),
-        m_status(0),
-        m_string(nullptr) { }
+    explicit Redirect(std::unique_ptr<RunTimeString> runTimeString)
+        : ActionWithRunTimeString(
+            "redirert",
+            RunTimeOnlyIfMatchKind,
+            std::move(runTimeString)),
+        m_status(0)
+    { };
 
-    explicit Redirect(std::unique_ptr<RunTimeString> z)
-        : Action("redirert", RunTimeOnlyIfMatchKind),
-            m_status(0),
-            m_string(std::move(z)) { }
+    explicit Redirect(const Redirect &action)
+        : ActionWithRunTimeString(action),
+        m_status(action.m_status)
+    { };
+
+    bool init(std::string *error) override;
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override;
-    bool init(std::string *error) override;
+
     bool isDisruptive() override { return true; }
+
+    virtual ActionWithRunTimeString *clone() override {
+        return new Redirect(*this);
+    }
 
  private:
     int m_status;
-    std::unique_ptr<RunTimeString> m_string;
 };
 
 

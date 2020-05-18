@@ -18,31 +18,43 @@
 #include <memory>
 
 #include "modsecurity/actions/action.h"
-#include "src/run_time_string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 #ifndef SRC_ACTIONS_INIT_COL_H_
 #define SRC_ACTIONS_INIT_COL_H_
 
-class Transaction;
 
 namespace modsecurity {
 class Transaction;
 namespace actions {
 
 
-class InitCol : public Action {
+class InitCol : public ActionWithRunTimeString {
  public:
-    explicit InitCol(const std::string &action) : Action(action) { }
+    InitCol(
+        const std::string &action,
+        std::unique_ptr<RunTimeString> runTimeString
+    ) : ActionWithRunTimeString(
+            action,
+            std::move(runTimeString)
+        )
+    { };
 
-    InitCol(const std::string &action, std::unique_ptr<RunTimeString> z)
-        : Action(action, RunTimeOnlyIfMatchKind),
-            m_string(std::move(z)) { }
+    InitCol(const InitCol &action)
+        : ActionWithRunTimeString(action),
+        m_collection_key(action.m_collection_key)
+    { };
+
+    bool init(std::string *error) override;
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override;
-    bool init(std::string *error) override;
+
+    virtual ActionWithRunTimeString *clone() override {
+        return new InitCol(*this);
+    }
+
  private:
     std::string m_collection_key;
-    std::shared_ptr<RunTimeString> m_string;
 };
 
 
