@@ -28,7 +28,7 @@ namespace operators {
 
 
 bool RxGlobal::init(const std::string &arg, std::string *error) {
-    if (m_string->m_containsMacro == false) {
+    if (m_string->containsMacro() == false) {
         m_re = new Regex(m_param);
     }
 
@@ -40,11 +40,11 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
     const bpstd::string_view& input, RuleMessage *ruleMessage) {
     Regex *re;
 
-    if (m_param.empty() && !m_string->m_containsMacro) {
+    if (m_param.empty() && !m_string->containsMacro()) {
         return true;
     }
 
-    if (m_string->m_containsMacro) {
+    if (m_string->containsMacro()) {
         std::string eparam(m_string->evaluate(transaction));
         re = new Regex(eparam);
     } else {
@@ -69,7 +69,7 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
         logOffset(ruleMessage, capture.m_offset, capture.m_length);
     }
 
-    if (m_string->m_containsMacro) {
+    if (m_string->containsMacro()) {
         delete re;
     }
 

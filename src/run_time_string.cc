@@ -41,36 +41,30 @@ void RunTimeString::appendText(const std::string &text) {
 void RunTimeString::appendVar(
     std::unique_ptr<modsecurity::variables::Variable> var) {
     std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
-    r->m_var = std::move(var);
+    r->m_variable = std::move(var);
     m_elements.push_back(std::move(r));
     m_containsMacro = true;
 }
 
 
-std::string RunTimeString::evaluate(Transaction *t) {
-    return evaluate(t, NULL);
-}
-
-
-std::string RunTimeString::evaluate(Transaction *t, Rule *r) {
-    std::string s;
-    for (auto &z : m_elements) {
-        if (z->m_string.size() > 0) {
-            s.append(z->m_string);
-        } else if (z->m_var != NULL && t != NULL) {
+std::string RunTimeString::evaluate(Transaction *transaction) {
+    std::string retString;
+    // FIXME: Educated guess the size of retString based on the size of the elements.
+    for (auto &element : m_elements) {
+        if (element->m_string.size() > 0) {
+            retString.append(element->m_string);
+        } else if (element->m_variable != nullptr && transaction != nullptr) {
             std::vector<const VariableValue *> l;
-            // FIXME: This cast should be removed.
-            RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(r);
-            z->m_var->evaluate(t, rr, &l);
-            if (l.size() > 0) {
-                s.append(l[0]->getValue());
+            element->m_variable->evaluate(transaction, &l);
+            if (!l.empty()) {
+                retString.append(l[0]->getValue());
             }
             for (auto &i : l) {
                 delete i;
             }
         }
     }
-    return s;
+    return retString;
 }
 
 }  // namespace modsecurity
