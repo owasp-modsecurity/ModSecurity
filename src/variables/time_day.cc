@@ -34,7 +34,6 @@ namespace modsecurity {
 namespace variables {
 
 void TimeDay::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
     char tstr[200];
     struct tm timeinfo;

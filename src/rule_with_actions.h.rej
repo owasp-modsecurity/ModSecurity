@@ -1,0 +1,15 @@
+--- src/rule_with_actions.h
++++ src/rule_with_actions.h
+@@ -520,11 +528,10 @@ class RuleWithActions : public Rule {
+         for (auto &a : m_XmlNSs) {
+             dst.push_back(a.get());
+         }
+-        
++
+         return dst;
+     }
+ 
+-
+     virtual void dump(std::stringstream &out) const override {
+         out << "RuleWithActions" << std::endl;
+     }

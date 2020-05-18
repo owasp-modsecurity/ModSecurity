@@ -54,7 +54,7 @@ bool InspectFile::evaluate(Transaction *transaction,
     const bpstd::string_view &str,
     RuleMessage *ruleMessage) {
     if (m_isScript) {
-        return m_lua.run(transaction, str.c_str());
+        return m_lua.run(transaction, str.to_string());
     } else {
         FILE *in;
         char buff[512];
@@ -64,7 +64,7 @@ bool InspectFile::evaluate(Transaction *transaction,
 
         openstr.append(m_param);
         openstr.append(" ");
-        openstr.append(str.c_str());
+        openstr.append(str.to_string());
         if (!(in = popen(openstr.c_str(), "r"))) {
             return false;
         }

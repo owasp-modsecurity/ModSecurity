@@ -35,7 +35,6 @@ class TimeMin : public Variable {
         m_retName("TIME_MIN") { }
 
     void evaluate(Transaction *transaction,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override;
     std::string m_retName;
 };

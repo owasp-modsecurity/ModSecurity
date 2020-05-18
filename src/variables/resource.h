@@ -25,6 +25,7 @@
 
 #include "src/variables/variable.h"
 #include "src/run_time_string.h"
+#include "src/variables/variable_with_runtime_string.h"
 
 namespace modsecurity {
 
@@ -39,7 +40,6 @@ class Resource_DictElement : public Variable {
         m_dictElement("RESOURCE:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_resource_collection->resolveMultiMatches(
             m_name, t->m_collections.m_resource_collection_key,
@@ -56,7 +56,6 @@ class Resource_NoDictElement : public Variable {
         : Variable("RESOURCE") { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_resource_collection->resolveMultiMatches(m_name,
             t->m_collections.m_resource_collection_key,
@@ -72,7 +71,6 @@ class Resource_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_resource_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_resource_collection_key,
@@ -83,14 +81,16 @@ class Resource_DictElementRegexp : public VariableRegex {
 };
 
 
-class Resource_DynamicElement : public Variable {
+class Resource_DynamicElement : public VariableWithRunTimeString {
  public:
     explicit Resource_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
-        : Variable("RESOURCE:dynamic"),
-        m_string(std::move(dictElement)) { }
+        : VariableWithRunTimeString(
+            "RESOURCE:dynamic",
+            std::move(dictElement)
+        )
+    { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_resource_collection->resolveMultiMatches(
@@ -111,8 +111,6 @@ class Resource_DynamicElement : public Variable {
             var, t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, value);
     }
-
-    std::unique_ptr<RunTimeString> m_string;
 };
 
 

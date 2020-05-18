@@ -18,7 +18,7 @@
 #include <memory>
 
 #include "modsecurity/actions/action.h"
-#include "src/run_time_string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 #ifndef SRC_ACTIONS_SET_RSC_H_
 #define SRC_ACTIONS_SET_RSC_H_
@@ -30,20 +30,25 @@ class Transaction;
 namespace actions {
 
 
-class SetRSC : public Action {
+class SetRSC : public ActionWithRunTimeString {
  public:
-    explicit SetRSC(const std::string &_action)
-        : Action(_action) { }
+    explicit SetRSC(std::unique_ptr<RunTimeString> runTimeString)
+        : ActionWithRunTimeString(
+            "setsrc",
+            RunTimeOnlyIfMatchKind,
+            std::move(runTimeString)
+        )
+    { };
 
-    explicit SetRSC(std::unique_ptr<RunTimeString> z)
-        : Action("setsrc", RunTimeOnlyIfMatchKind),
-            m_string(std::move(z)) { }
+    explicit SetRSC(const SetRSC &action)
+        : ActionWithRunTimeString(action)
+    { };
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override;
-    bool init(std::string *error) override;
 
- private:
-    std::shared_ptr<RunTimeString> m_string;
+    virtual ActionWithRunTimeString *clone() override {
+        return new SetRSC(*this);
+    }
 };
 
 
