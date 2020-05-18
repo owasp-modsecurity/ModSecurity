@@ -46,6 +46,7 @@
 #include "src/actions/transformations/transformation.h"
 #include "src/actions/xmlns.h"
 #include "src/utils/string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 
 namespace modsecurity {
@@ -104,6 +105,14 @@ RuleWithActions::RuleWithActions(
 }
 
 void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
+
+    actions::ActionWithRunTimeString *arts = dynamic_cast<actions::ActionWithRunTimeString *>(a.get());
+    if (arts != nullptr) {
+        a = std::unique_ptr<actions::Action>(arts->clone());
+        arts = dynamic_cast<actions::ActionWithRunTimeString *>(a.get());
+        arts->populate(this);
+    }
+
     if (a->m_actionKind == Action::ConfigurationKind) {
         if (dynamic_cast<actions::Accuracy *>(a.get())) {
             actions::Accuracy *accuracy = dynamic_cast<actions::Accuracy *>(a.get());
@@ -133,7 +142,8 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
         } else if (dynamic_cast<actions::Msg *>(a.get())) {
             m_defaultActionMsg = std::static_pointer_cast<actions::Msg>(a);
         } else if (dynamic_cast<actions::SetVar *>(a.get())) {
-            m_defaultActionActionsSetVar.push_back(std::static_pointer_cast<actions::SetVar>(a));
+            actions::SetVar *var = dynamic_cast<actions::SetVar *>(a.get());
+            m_actionsSetVar.push_back(std::unique_ptr<actions::SetVar>(var));
         } else if (dynamic_cast<actions::Tag *>(a.get())) {
             m_defaultActionActionsTag.push_back(std::static_pointer_cast<actions::Tag>(a));
         } else if (dynamic_cast<actions::Log *>(a.get())) {
@@ -158,6 +168,13 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
 }
 
 void RuleWithActions::addAction(actions::Action *a) {
+    actions::ActionWithRunTimeString *arts = dynamic_cast<actions::ActionWithRunTimeString *>(a);
+    if (arts != nullptr) {
+        a = arts->clone();
+        arts = dynamic_cast<actions::ActionWithRunTimeString *>(a);
+        arts->populate(this);
+    }
+
     if (a->m_actionKind == Action::ConfigurationKind) {
         if (dynamic_cast<actions::Accuracy *>(a)) {
             actions::Accuracy *accuracy = dynamic_cast<actions::Accuracy *>(a);
@@ -188,7 +205,8 @@ void RuleWithActions::addAction(actions::Action *a) {
         } else if (dynamic_cast<actions::Msg *>(a)) {
             m_msg = std::unique_ptr<actions::Msg>(dynamic_cast<actions::Msg*>(a));
         } else if (dynamic_cast<actions::SetVar *>(a)) {
-            m_actionsSetVar.push_back(std::unique_ptr<actions::SetVar>(dynamic_cast<actions::SetVar *>(a)));
+            actions::SetVar *var = dynamic_cast<actions::SetVar *>(a);
+            m_actionsSetVar.push_back(std::unique_ptr<actions::SetVar>(var));
         } else if (dynamic_cast<actions::Maturity *>(a)) {
             actions::Maturity *maturity = dynamic_cast<actions::Maturity *>(a);
             m_maturity = maturity->getMaturity();
@@ -460,7 +478,7 @@ void RuleWithActions::executeTransformation(
 
 bool RuleWithActions::containsTag(const std::string& name, Transaction *t) const {
     for (auto &tag : getTagsAction()) {
-        if (tag != NULL && tag->getName(t) == name) {
+        if (tag != NULL && tag->getTagName(t) == name) {
             return true;
         }
     }
@@ -469,13 +487,12 @@ bool RuleWithActions::containsTag(const std::string& name, Transaction *t) const
 
 
 bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
-    return m_msg && m_msg->data(t) == name;
+    return m_msg && m_msg->getEvaluatedRunTimeString(t) == name;
 }
 
 
-std::string RuleWithActions::getLogData(Transaction *t) { return m_logData->data(t); }
-std::string RuleWithActions::getMessage(Transaction *t) { return m_msg->data(t); }
-
+std::string RuleWithActions::getLogData(Transaction *t) const { return m_logData->getEvaluatedRunTimeString(t); }
+std::string RuleWithActions::getMessage(Transaction *t) const { return m_msg->getEvaluatedRunTimeString(t); }
 
 
 }  // namespace modsecurity

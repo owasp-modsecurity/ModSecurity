@@ -47,17 +47,11 @@ namespace actions {
 
 
 bool Msg::execute(RuleWithActions *rule, Transaction *transaction) {
-    std::string msg = data(transaction);
+    std::string msg = getEvaluatedRunTimeString(transaction);
     transaction->messageGetLast()->m_message = msg;
     ms_dbg_a(transaction, 9, "Saving msg: " + msg);
 
     return true;
-}
-
-
-std::string Msg::data(Transaction *t) {
-    std::string a(m_string->evaluate(t));
-    return a;
 }
 
 

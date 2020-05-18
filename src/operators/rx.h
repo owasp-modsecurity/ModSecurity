@@ -43,7 +43,7 @@ class Rx : public Operator {
         }
 
     ~Rx() {
-        if (m_string->m_containsMacro == false && m_re != NULL) {
+        if (m_string->containsMacro() == false && m_re != NULL) {
             delete m_re;
             m_re = NULL;
         }
