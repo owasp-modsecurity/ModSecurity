@@ -49,13 +49,11 @@ namespace modsecurity {
 namespace variables {
 
 #ifndef WITH_LIBXML2
-void XML::evaluate(Transaction *t,
-    RuleWithActions *rule,
+void XML_WithNSPath::evaluate(Transaction *t,
     std::vector<const VariableValue *> *l) { }
 #else
 
-void XML::evaluate(Transaction *t,
-    RuleWithActions *rule,
+void XML_WithNSPath::evaluate(Transaction *t,
     std::vector<const VariableValue *> *l) {
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
@@ -88,20 +86,20 @@ void XML::evaluate(Transaction *t,
         return;
     }
 
-    if (rule == NULL) {
+    if (getRule() == NULL) {
         ms_dbg_a(t, 2, "XML: Can't look for xmlns, internal error.");
     } else {
-        std::vector<actions::XmlNS *> acts = rule->getXmlNSsPtr();
+        XmlNSsPtr acts = getRule()->getXmlNSsPtr();
         for (auto &z : acts) {
-            if (xmlXPathRegisterNs(xpathCtx, (const xmlChar*)z->m_scope.c_str(),
-                    (const xmlChar*)z->m_href.c_str()) != 0) {
+            if (xmlXPathRegisterNs(xpathCtx, (const xmlChar*)z->getScope().c_str(),
+                    (const xmlChar*)z->getHref().c_str()) != 0) {
                 ms_dbg_a(t, 1, "Failed to register XML namespace href \"" + \
-                    z->m_href + "\" prefix \"" + z->m_scope + "\".");
+                    z->getHref() + "\" prefix \"" + z->getScope() + "\".");
                 return;
             }
 
-            ms_dbg_a(t, 4, "Registered XML namespace href \"" + z->m_href + \
-                "\" prefix \"" + z->m_scope + "\"");
+            ms_dbg_a(t, 4, "Registered XML namespace href \"" + z->getHref() + \
+                "\" prefix \"" + z->getScope() + "\"");
         }
     }
 
