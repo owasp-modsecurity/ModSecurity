@@ -30,14 +30,9 @@ namespace actions {
 
 
 bool LogData::execute(RuleWithActions *rule, Transaction *transaction) {
-    transaction->messageGetLast()->m_data = data(transaction);
+    transaction->messageGetLast()->m_data = getEvaluatedRunTimeString(transaction);
 
     return true;
-}
-
-std::string LogData::data(Transaction *transaction) {
-    std::string a(m_string->evaluate(transaction));
-    return a;
 }
 
 

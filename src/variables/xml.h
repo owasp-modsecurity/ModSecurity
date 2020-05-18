@@ -24,43 +24,63 @@
 
 #include "src/variables/variable.h"
 #include "src/variables/xml.h"
+#include "src/variables/rule_variable.h"
 
 namespace modsecurity {
 
 class Transaction;
 namespace variables {
 
-
 /* Invocation without an XPath expression makes sense
  * with functions that manipulate the document tree.
  */
-class XML_NoDictElement : public Variable {
+class XML_WithoutNSPath : public RuleVariable, public Variable {
  public:
-    XML_NoDictElement()
-        : Variable("XML"),
+    XML_WithoutNSPath()
+        : RuleVariable(),
+        Variable("XML"),
         m_plain("[XML document tree]"),
-        m_var(&m_name, &m_plain) {
-        }
+        m_var(&m_name, &m_plain)
+    { };
+
+    XML_WithoutNSPath(const XML_WithoutNSPath &r)
+        : RuleVariable(r),
+        Variable(r),
+        m_plain(r.m_plain),
+        m_var(r.m_var)
+    { };
 
     void evaluate(Transaction *transaction,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         l->push_back(new VariableValue(&m_var));
     }
+
+    virtual variables::Variable *clone() override {
+        return new XML_WithoutNSPath(*this);
+    };
 
     std::string m_plain;
     VariableValue m_var;
 };
 
-
-class XML : public Variable {
+class XML_WithNSPath : public RuleVariable, public VariableDictElement {
  public:
-    explicit XML(const std::string &_name)
-        : Variable(_name) { }
+    explicit XML_WithNSPath(const std::string &nsPath)
+        : RuleVariable(),
+        VariableDictElement("XML", nsPath)
+    { };
+
+    XML_WithNSPath(const XML_WithNSPath &r)
+        : RuleVariable(),
+        VariableDictElement(r)
+    { };
 
     void evaluate(Transaction *transaction,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override;
+
+    virtual Variable *clone() override {
+        return new XML_WithNSPath(*this);
+    };
 };
 
 

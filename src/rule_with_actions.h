@@ -155,7 +155,9 @@ class RuleWithActions : public Rule {
         m_defaultContainsNoLogAction(r.m_defaultContainsNoLogAction),
         m_defaultContainsMultiMatchAction(r.m_defaultContainsMultiMatchAction),
         m_defaultContainsStaticBlockAction(r.m_defaultContainsStaticBlockAction),
-        m_isChained(r.m_isChained) { };
+        m_isChained(r.m_isChained) {
+            // TODO: Verify if it is necessary to process any other copy.
+        };
 
     RuleWithActions &operator=(const RuleWithActions& r) {
         Rule::operator = (r);
@@ -199,6 +201,7 @@ class RuleWithActions : public Rule {
         m_defaultContainsStaticBlockAction = r.m_defaultContainsStaticBlockAction;
         m_isChained = r.m_isChained;
         return *this;
+        // TODO: Verify if it is necessary to process any other copy.
     }
 
 
@@ -358,13 +361,13 @@ class RuleWithActions : public Rule {
 
     inline bool hasLogDataAction() const { return m_logData != nullptr || m_defaultActionLogData != nullptr; }
     inline std::shared_ptr<actions::LogData> getLogDataAction() const { return m_logData; }
-    std::string getLogData(/*const */Transaction *t);
+    std::string getLogData(/*const */Transaction *t) const;
     inline void setLogDataAction(const std::shared_ptr<actions::LogData> &data) { m_logData = data; }
 
     inline bool hasMessageAction() const { return m_msg != nullptr || m_defaultActionMsg != nullptr; }
     inline std::shared_ptr<actions::Msg> getMessageAction() const { return m_msg; }
     inline void setMessageAction(const std::shared_ptr<actions::Msg> &msg) { m_msg = msg; }
-    std::string getMessage(/*const */Transaction *t);
+    std::string getMessage(/*const */Transaction *t) const;
 
 
     inline bool hasSeverityAction() const { return m_severity != SEVERITY_NOT_SET || m_defaultSeverity != SEVERITY_NOT_SET; }
@@ -373,19 +376,19 @@ class RuleWithActions : public Rule {
     inline void setSeverity(unsigned int severity) { m_severity = severity; }
 
     inline bool hasRevisionAction() const { return m_revision != ""; }
-    inline std::string getRevision() const { return m_revision; };
+    inline const std::string getRevision() const { return m_revision; };
     inline void setRevision(const std::string &revision) { m_revision.assign(revision); }
 
     inline bool hasVersionAction() const { return m_version != ""; }
-    inline std::string getVersion() const { return m_version; };
+    inline const std::string getVersion() const { return m_version; };
     inline void setVersion(const std::string &version) { m_version.assign(version); }
 
     inline bool hasAccuracyAction() const { return m_accuracy != ACCURACY_NOT_SET || m_defaultAccuracy != ACCURACY_NOT_SET; }
-    inline int getAccuracy() const { return m_accuracy; }
+    inline const int getAccuracy() const { return m_accuracy; }
     inline void setAccuracy(unsigned int accuracy) { m_accuracy = accuracy; }
 
     inline bool hasMaturityAction() const { return m_maturity != MATURITY_NOT_SET || m_defaultMaturity != MATURITY_NOT_SET; }
-    inline int getMaturity() const { return m_maturity; }
+    inline const int getMaturity() const { return m_maturity; }
     inline void setDefaultActionMaturity(unsigned int maturity) { m_defaultMaturity = maturity; }
     inline void setMaturity(unsigned int maturity) { m_maturity = maturity; }
 
@@ -439,6 +442,14 @@ class RuleWithActions : public Rule {
 
     inline RuleWithActions *getChainedParent() {
         return m_chainedRuleParent;
+    }
+
+    XmlNSs getXmlNSs() const {
+        XmlNSs dst;
+        for (auto &a : m_XmlNSs) {
+            dst.push_back(a);
+        }
+        return dst;
     }
 
     XmlNSsPtr getXmlNSsPtr() const {

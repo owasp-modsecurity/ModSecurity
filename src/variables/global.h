@@ -25,6 +25,7 @@
 
 #include "src/variables/variable.h"
 #include "src/run_time_string.h"
+#include "src/variables/variable_with_runtime_string.h"
 
 namespace modsecurity {
 
@@ -39,7 +40,6 @@ class Global_DictElement : public Variable {
         m_dictElement("GLOBAL:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_global_collection->resolveMultiMatches(
             m_name, t->m_collections.m_global_collection_key,
@@ -56,7 +56,6 @@ class Global_NoDictElement : public Variable {
         : Variable("GLOBAL") { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_global_collection->resolveMultiMatches("",
             t->m_collections.m_global_collection_key,
@@ -72,7 +71,6 @@ class Global_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_global_collection->resolveRegularExpression(
             m_dictElement,
@@ -84,14 +82,16 @@ class Global_DictElementRegexp : public VariableRegex {
 };
 
 
-class Global_DynamicElement : public Variable {
+class Global_DynamicElement : public VariableWithRunTimeString {
  public:
     explicit Global_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
-        : Variable("GLOBAL:dynamic"),
-        m_string(std::move(dictElement)) { }
+        : VariableWithRunTimeString(
+            "GLOBAL:dynamic",
+            std::move(dictElement)
+        )
+    { };
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_global_collection->resolveMultiMatches(
@@ -113,8 +113,6 @@ class Global_DynamicElement : public Variable {
             t->m_rules->m_secWebAppId.m_value,
             value);
     }
-
-    std::unique_ptr<RunTimeString> m_string;
 };
 
 
