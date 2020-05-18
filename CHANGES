@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
   
+  - Regression: Mark the test as failed in case of segfault.
+    [@zimmerle]
   - Replaced t:lowerCase backend for a better performance.
     [@zimmerle]
   - More structured rules dump. Better supporting debugging.
