@@ -51,7 +51,8 @@ class RuleWithOperator : public RuleWithActions {
     RuleWithOperator(const RuleWithOperator &op)
         : RuleWithActions(op),
         m_variables(op.m_variables),
-        m_operator(op.m_operator) { };
+        m_operator(op.m_operator)
+    {  };
 
     RuleWithOperator &operator=(const RuleWithOperator& r) {
         RuleWithActions::operator = (r);

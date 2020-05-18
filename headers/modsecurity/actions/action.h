@@ -24,6 +24,7 @@
 #include "modsecurity/intervention.h"
 #include "modsecurity/rule.h"
 
+
 #ifndef HEADERS_MODSECURITY_ACTIONS_ACTION_H_
 #define HEADERS_MODSECURITY_ACTIONS_ACTION_H_
 
@@ -32,7 +33,7 @@
 namespace modsecurity {
 class Transaction;
 class RuleWithActions;
-
+class RunTimeString;
 
 namespace actions {
 

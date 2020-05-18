@@ -29,6 +29,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/variable_value.h"
 
+
 #ifdef __cplusplus
 
 namespace modsecurity {

@@ -18,7 +18,7 @@
 #include <utility>
 
 #include "modsecurity/actions/action.h"
-#include "src/run_time_string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 #ifndef SRC_ACTIONS_TAG_H_
 #define SRC_ACTIONS_TAG_H_
@@ -30,18 +30,29 @@ class Transaction;
 namespace actions {
 
 
-class Tag : public Action {
+class Tag : public ActionWithRunTimeString {
  public:
-    explicit Tag(std::unique_ptr<RunTimeString> z)
-        : Action("tag", RunTimeOnlyIfMatchKind),
-        m_string(std::move(z)) { }
+    explicit Tag(std::unique_ptr<RunTimeString> runTimeString)
+        : ActionWithRunTimeString(
+            "tag",
+            RunTimeOnlyIfMatchKind,
+            std::move(runTimeString)
+        )
+    { };
 
-    std::string getName(Transaction *transaction);
+    explicit Tag(const Tag &action)
+        : ActionWithRunTimeString(action)
+    { };
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
- protected:
-    std::shared_ptr<RunTimeString> m_string;
+    inline std::string getTagName(Transaction *transaction) const {
+        return getEvaluatedRunTimeString(transaction);
+    }
+
+    virtual ActionWithRunTimeString *clone() override {
+        return new Tag(*this);
+    }
 };
 
 

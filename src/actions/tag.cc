@@ -50,14 +50,8 @@ namespace modsecurity {
 namespace actions {
 
 
-std::string Tag::getName(Transaction *transaction) {
-    std::string tag(m_string->evaluate(transaction));
-    return tag;
-}
-
-
 bool Tag::execute(RuleWithActions *rule, Transaction *transaction) {
-    std::string tag = getName(transaction);
+    std::string tag = getTagName(transaction);
     ms_dbg_a(transaction, 9, "Rule tag: " + tag);
 
     transaction->messageGetLast()->m_tags.push_back(tag);
