@@ -214,6 +214,7 @@ void ModSecurity::serverLog(void *data, RuleMessage *rm) {
             m_logCb(data, a);
             return;
         }
+
         m_logCb(data, a);
         return;
     }

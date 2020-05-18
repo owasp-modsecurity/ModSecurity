@@ -29,7 +29,18 @@ namespace actions {
 
 class XmlNS : public Action {
  public:
-    explicit XmlNS(const std::string &action) : Action(action) { }
+    explicit XmlNS(const std::string &action)
+        : Action(action),
+        m_scope(""),
+        m_href("")
+    { };
+
+    XmlNS(const XmlNS &o)
+        : Action(o),
+        m_scope(o.m_scope),
+        m_href(o.m_href)
+    { };
+
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override {
         return true;
@@ -37,6 +48,15 @@ class XmlNS : public Action {
 
     bool init(std::string *error) override;
 
+    std::string getScope() const {
+        return m_scope;
+    }
+
+    std::string getHref() const {
+        return m_href;
+    }
+
+ private:
     std::string m_scope;
     std::string m_href;
 };

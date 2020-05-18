@@ -25,7 +25,6 @@ namespace modsecurity {
 namespace variables {
 
 void ModsecBuild::evaluate(Transaction *transaction,
-    RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
 
     l->push_back(new VariableValue(&m_retName, &m_build));

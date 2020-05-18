@@ -51,7 +51,15 @@ class RuleWithOperator : public RuleWithActions {
     RuleWithOperator(const RuleWithOperator &op)
         : RuleWithActions(op),
         m_variables(op.m_variables),
-        m_operator(op.m_operator) { };
+        m_operator(op.m_operator)
+    {
+        for (auto &a : *m_variables.get()) {
+            variables::RuleVariable *vrule = dynamic_cast<variables::RuleVariable *>(a);
+            if (vrule != nullptr) {
+                vrule->populate(this);
+            }
+        }
+    };
 
     RuleWithOperator &operator=(const RuleWithOperator& r) {
         RuleWithActions::operator = (r);
