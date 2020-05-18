@@ -23,7 +23,6 @@
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
 #include "src/utils/string.h"
 #include "src/utils/regex.h"
 
@@ -49,7 +48,6 @@ class n ## _DictElementRegexp : public VariableRegex { \
         : VariableRegex(#N, regex) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolveRegularExpression(&m_r, l, \
             m_keyExclusion); \
@@ -64,7 +62,6 @@ class n ## _DictElement : public VariableDictElement { \
         : VariableDictElement(#N, dictElement) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolve(m_dictElement, l); \
     } \
@@ -78,7 +75,6 @@ class n ## _NoDictElement : public Variable { \
         : Variable(#N) { } \
 \
     void evaluate(Transaction *transaction, \
-        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .resolve(l, m_keyExclusion); \
     } \
@@ -92,12 +88,13 @@ class n : public Variable { \
         : Variable(#N) { } \
     \
     void evaluate(Transaction *transaction, \
-        RuleWithActions *rule, \
         std::vector<const VariableValue *> *l) override { \
         transaction-> e .evaluate(l); \
     } \
 };
 
+
+// FIXME: Copy methods for variables modificators needs to be done.
 
 namespace modsecurity {
 
@@ -151,8 +148,19 @@ class KeyExclusionString : public KeyExclusion {
 
 class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
  public:
-    KeyExclusions() {
-    }
+
+    KeyExclusions()
+        : std::deque<std::unique_ptr<KeyExclusion>>()
+    { };
+
+
+    KeyExclusions(const KeyExclusions &k)
+        : std::deque<std::unique_ptr<KeyExclusion>>()
+    {
+        //for (auto &a : k) {
+
+        //}
+    };
 
     bool toOmit(std::string a) {
         for (auto &z : *this) {
@@ -545,12 +553,20 @@ class VariableMonkeyResolution {
 class Variable : public VariableMonkeyResolution {
  public:
     explicit Variable(const std::string &name);
+
     explicit Variable(Variable *_name);
+
+    Variable(const Variable &v)
+        : m_name(v.m_name),
+        m_collectionName(v.m_collectionName),
+        m_fullName(v.m_fullName),
+        m_keyExclusion(v.m_keyExclusion)
+    { };
+
     virtual ~Variable() { }
 
 
     virtual void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) = 0;
 
 
@@ -586,7 +602,14 @@ class Variable : public VariableMonkeyResolution {
 class VariableDictElement : public Variable {
  public:
     VariableDictElement(const std::string &name, const std::string &dict_element)
-        :  m_dictElement(dict_element), Variable(name + ":" + dict_element) { }
+        :  m_dictElement(dict_element), Variable(name + ":" + dict_element)
+    { };
+
+    VariableDictElement(const VariableDictElement &v)
+        : m_dictElement(v.m_dictElement),
+        Variable(v)
+    { };
+
 
     std::string m_dictElement;
 };
@@ -597,7 +620,15 @@ class VariableRegex : public Variable {
     VariableRegex(const std::string &name, const std::string &regex)
         :  m_r(regex),
         m_regex(regex),
-        Variable(name + ":" + "regex(" + regex + ")") { }
+        Variable(name + ":" + "regex(" + regex + ")")
+        { }
+
+    VariableRegex(const VariableRegex &v)
+        : m_r(v.m_regex),
+        m_regex(v.m_regex),
+        Variable(v)
+    { };
+
 
     Utils::Regex m_r;
     // FIXME: no need for that.
@@ -644,9 +675,8 @@ class VariableModificatorExclusion : public Variable {
         m_base(std::move(var)) { }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
-        m_base->evaluate(t, rule, l);
+        m_base->evaluate(t, l);
     }
 
     std::unique_ptr<Variable> m_base;
@@ -662,13 +692,12 @@ class VariableModificatorCount : public Variable {
         }
 
     void evaluate(Transaction *t,
-        RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         std::vector<const VariableValue *> reslIn;
         VariableValue *val = NULL;
         int count = 0;
 
-        m_base->evaluate(t, rule, &reslIn);
+        m_base->evaluate(t, &reslIn);
 
         for (const VariableValue *a : reslIn) {
             count++;

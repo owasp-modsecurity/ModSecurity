@@ -18,7 +18,7 @@
 #include <utility>
 
 #include "modsecurity/actions/action.h"
-#include "src/run_time_string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 #ifndef SRC_ACTIONS_LOG_DATA_H_
 #define SRC_ACTIONS_LOG_DATA_H_
@@ -30,20 +30,25 @@ class Transaction;
 namespace actions {
 
 
-class LogData : public Action {
+class LogData : public ActionWithRunTimeString {
  public:
-    explicit LogData(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    explicit LogData(std::unique_ptr<RunTimeString> runTimeString)
+        : ActionWithRunTimeString(
+            "logdata",
+            RunTimeOnlyIfMatchKind,
+            std::move(runTimeString)
+        )
+    { };
 
-    explicit LogData(std::unique_ptr<RunTimeString> z)
-        : Action("logdata", RunTimeOnlyIfMatchKind),
-            m_string(std::move(z)) { }
+    explicit LogData(const LogData &data)
+        : ActionWithRunTimeString(data)
+    { };
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
-    std::string data(Transaction *Transaction);
-
-    std::shared_ptr<RunTimeString> m_string;
+    virtual ActionWithRunTimeString *clone() override {
+        return new LogData(*this);
+    }
 };
 
 

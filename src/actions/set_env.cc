@@ -28,13 +28,8 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SetENV::init(std::string *error) {
-    return true;
-}
-
-
 bool SetENV::execute(RuleWithActions *rule, Transaction *t) {
-    std::string colNameExpanded(m_string->evaluate(t));
+    std::string colNameExpanded(getEvaluatedRunTimeString(t));
 
     ms_dbg_a(t, 8, "Setting envoriment variable: "
         + colNameExpanded + ".");

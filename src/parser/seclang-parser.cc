@@ -3800,7 +3800,7 @@ namespace yy {
   case 216:
 #line 2089 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML("XML:" + yystack_[0].value.as < std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML_WithNSPath(yystack_[0].value.as < std::string > ()));
       }
 #line 3806 "seclang-parser.cc"
     break;
@@ -3808,7 +3808,7 @@ namespace yy {
   case 217:
 #line 2093 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML("XML:" + yystack_[0].value.as < std::string > ()));
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML_WithNSPath(yystack_[0].value.as < std::string > ()));
       }
 #line 3814 "seclang-parser.cc"
     break;
@@ -3816,7 +3816,7 @@ namespace yy {
   case 218:
 #line 2097 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML_NoDictElement());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML_WithoutNSPath());
       }
 #line 3822 "seclang-parser.cc"
     break;

@@ -2087,15 +2087,15 @@ var:
       }
     | RUN_TIME_VAR_XML DICT_ELEMENT
       {
-        VARIABLE_CONTAINER($$, new variables::XML("XML:" + $2));
+        VARIABLE_CONTAINER($$, new variables::XML_WithNSPath($2));
       }
     | RUN_TIME_VAR_XML DICT_ELEMENT_REGEXP
       {
-        VARIABLE_CONTAINER($$, new variables::XML("XML:" + $2));
+        VARIABLE_CONTAINER($$, new variables::XML_WithNSPath($2));
       }
     | RUN_TIME_VAR_XML
       {
-        VARIABLE_CONTAINER($$, new variables::XML_NoDictElement());
+        VARIABLE_CONTAINER($$, new variables::XML_WithoutNSPath());
       }
     | VARIABLE_FILES_TMP_NAMES DICT_ELEMENT
       {

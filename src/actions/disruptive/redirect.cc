@@ -35,7 +35,7 @@ bool Redirect::init(std::string *error) {
 
 
 bool Redirect::execute(RuleWithActions *rule, Transaction *transaction) {
-    std::string m_urlExpanded(m_string->evaluate(transaction));
+    std::string m_urlExpanded(getEvaluatedRunTimeString(transaction));
     /* if it was changed before, lets keep it. */
     if (transaction->m_it.status == 200
         || (!(transaction->m_it.status <= 307 && transaction->m_it.status >= 301))) {

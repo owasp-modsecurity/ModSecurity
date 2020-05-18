@@ -19,7 +19,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
-#include "src/run_time_string.h"
+#include "src/actions/action_with_run_time_string.h"
 
 #ifndef SRC_ACTIONS_MSG_H_
 #define SRC_ACTIONS_MSG_H_
@@ -31,19 +31,25 @@ class Transaction;
 namespace actions {
 
 
-class Msg : public Action {
+class Msg : public ActionWithRunTimeString {
  public:
-    explicit Msg(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    explicit Msg(std::unique_ptr<RunTimeString> runTimeString)
+        : ActionWithRunTimeString(
+            "msg",
+            RunTimeOnlyIfMatchKind,
+            std::move(runTimeString)
+        )
+    { };
 
-    explicit Msg(std::unique_ptr<RunTimeString> z)
-        : Action("msg", RunTimeOnlyIfMatchKind),
-            m_string(std::move(z)) { }
+    explicit Msg(const Msg &action)
+        : ActionWithRunTimeString(action)
+    { };
 
     bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
-    std::string data(Transaction *Transaction);
-    std::shared_ptr<RunTimeString> m_string;
+    virtual ActionWithRunTimeString *clone() override {
+        return new Msg(*this);
+    }
 };
 
 
