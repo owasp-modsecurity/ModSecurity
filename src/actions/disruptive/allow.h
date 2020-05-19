@@ -13,20 +13,20 @@
  *
  */
 
+
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "modsecurity/transaction.h"
+
+#include "src/actions/disruptive/disruptive_action.h"
+
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_ALLOW_H_
 #define SRC_ACTIONS_DISRUPTIVE_ALLOW_H_
 
-#ifdef __cplusplus
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
-class RuleWithOperator;
-
 namespace actions {
 namespace disruptive {
 
@@ -51,17 +51,18 @@ enum AllowType : int {
 };
 
 
-class Allow : public Action {
+class Allow : public ActionDisruptive {
  public:
-    explicit Allow(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind),
-        m_allowType(NoneAllowType) { }
-
+    explicit Allow(const std::string &action)
+        : Action(action),
+        m_allowType(NoneAllowType)
+    { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
-    bool isDisruptive() override { return true; }
 
+    bool execute(Transaction *transaction) noexcept override;
+
+ private:
     AllowType m_allowType;
 
     static std::string allowTypeToName(AllowType a) {
@@ -83,6 +84,6 @@ class Allow : public Action {
 }  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_ACTIONS_DISRUPTIVE_ALLOW_H_

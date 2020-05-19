@@ -13,40 +13,40 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_NONE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_NONE_H_
 
-#ifdef __cplusplus
-namespace modsecurity {
-class Transaction;
 
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 
+
 class None : public Transformation {
  public:
-    explicit None(const std::string &action) 
-        : Transformation(action)
-        {  }
+    None()
+        :
+        Action("t:none")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
-
-    bool isNone() override {
-        return true;
-    }
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 };
+
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_NONE_H_

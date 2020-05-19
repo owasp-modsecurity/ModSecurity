@@ -13,21 +13,12 @@
  *
  */
 
+
 #include "src/actions/multi_match.h"
 
-#include <iostream>
-#include <string>
-
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
 
 namespace modsecurity {
 namespace actions {
-
-
-bool MultiMatch::execute(RuleWithActions *rule, Transaction *transaction) {
-    return true;
-}
 
 
 }  // namespace actions

@@ -13,20 +13,20 @@
  *
  */
 
+
 #include "src/actions/ctl/request_body_processor_json.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace ctl {
 
 
-bool RequestBodyProcessorJSON::execute(RuleWithActions *rule,
-    Transaction *transaction) {
+bool RequestBodyProcessorJSON::execute(Transaction *transaction) noexcept {
     transaction->m_requestBodyProcessor = Transaction::JSONRequestBody;
     transaction->m_variableReqbodyProcessor.set("JSON",
         transaction->m_variableOffset);

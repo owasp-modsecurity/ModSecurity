@@ -13,33 +13,34 @@
  *
  */
 
+
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
+
 
 #ifndef SRC_ACTIONS_MULTI_MATCH_H_
 #define SRC_ACTIONS_MULTI_MATCH_H_
 
-#ifdef __cplusplus
-class Transaction;
-
 namespace modsecurity {
-class Transaction;
-class RuleWithOperator;
-
 namespace actions {
 
 
-class MultiMatch : public Action {
+class MultiMatch : public ActionTypeRuleMetaData {
  public:
-    explicit MultiMatch(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    MultiMatch()
+        : Action("multiMatch")
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+
+    void configure(RuleWithActions *rule) override {
+        rule->setHasMultimatchAction(true);
+    }
 };
+
 
 }  // namespace actions
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_ACTIONS_MULTI_MATCH_H_

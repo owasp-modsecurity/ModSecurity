@@ -13,35 +13,39 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_COMPRESS_WHITESPACE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_COMPRESS_WHITESPACE_H_
 
-#ifdef __cplusplus
-namespace modsecurity {
-class Transaction;
 
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 
+
 class CompressWhitespace : public Transformation {
  public:
-    explicit CompressWhitespace(const std::string &action)
-        : Transformation(action) { }
+    CompressWhitespace()
+        : Action("t:compressWhitespace")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 };
+
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_COMPRESS_WHITESPACE_H_

@@ -48,6 +48,8 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
+#include "modsecurity/actions/action.h"
+
 
 #ifndef NO_LOGS
 #define ms_dbg(b, c) \
@@ -567,12 +569,12 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     int m_requestBodyAccess;
 
     /**
-     * The list m_auditLogModifier contains modifications to the `auditlogs'
-     * for this specific request, those modifications can happens via the
-     * utilization of the action: `ctl:auditLogParts='
+     * m_auditLogParts contains auditlog parts for this specific request,
+     * it also holds the modifications can happens via the utilization of
+     * the action: `ctl:auditLogParts='
      *
      */
-    std::list< std::pair<int, std::string> > m_auditLogModifier;
+    int m_auditLogParts;
 
     /**
      * Holds the request body, in case of any.

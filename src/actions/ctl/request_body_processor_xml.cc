@@ -13,20 +13,20 @@
  *
  */
 
+
 #include "src/actions/ctl/request_body_processor_xml.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace ctl {
 
 
-bool RequestBodyProcessorXML::execute(RuleWithActions *rule,
-    Transaction *transaction) {
+bool RequestBodyProcessorXML::execute(Transaction *transaction) noexcept {
     transaction->m_requestBodyProcessor = Transaction::XMLRequestBody;
     transaction->m_variableReqbodyProcessor.set("XML",
         transaction->m_variableOffset);

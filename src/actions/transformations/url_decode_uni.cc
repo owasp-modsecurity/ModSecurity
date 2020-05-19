@@ -13,24 +13,16 @@
  *
  */
 
+
 #include "src/actions/transformations/url_decode_uni.h"
 
-#include <string.h>
-
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
 
-#include "modsecurity/rules_set_properties.h"
-#include "modsecurity/rules_set.h"
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "modsecurity/rules_set.h"
+
 #include "src/utils/string.h"
-#include "src/utils/system.h"
 
 
 namespace modsecurity {
@@ -38,9 +30,9 @@ namespace actions {
 namespace transformations {
 
 
-void UrlDecodeUni::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void UrlDecodeUni::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>
@@ -64,7 +56,7 @@ void UrlDecodeUni::execute(Transaction *t,
  * IMP1 Assumes NUL-terminated
  */
 int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
-    Transaction *t) {
+    const Transaction *t) {
     unsigned char *d = input;
     int64_t i, count, fact, j, xv;
     int Code, hmap = -1;

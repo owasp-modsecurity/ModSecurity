@@ -13,25 +13,28 @@
  *
  */
 
+
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
+
 
 #ifndef SRC_ACTIONS_CAPTURE_H_
 #define SRC_ACTIONS_CAPTURE_H_
 
 
 namespace modsecurity {
-class RuleWithOperator;
 namespace actions {
 
 
-class Capture : public Action {
+class Capture : public ActionTypeRuleMetaData {
  public:
-    explicit Capture(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    Capture()
+        : Action("capture") { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    void configure(RuleWithActions *rule) override {
+        rule->setHasCaptureAction(true);
+    }
 };
 
 

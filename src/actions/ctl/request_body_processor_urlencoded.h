@@ -13,13 +13,16 @@
  *
  */
 
+
 #include <string>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 
+
 #ifndef SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_URLENCODED_H_
 #define SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_URLENCODED_H_
+
 
 namespace modsecurity {
 namespace actions {
@@ -28,10 +31,11 @@ namespace ctl {
 
 class RequestBodyProcessorURLENCODED : public Action {
  public:
-    explicit RequestBodyProcessorURLENCODED(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    explicit RequestBodyProcessorURLENCODED(const std::string &action)
+        : Action(action)
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 };
 
 

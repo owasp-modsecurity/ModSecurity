@@ -13,16 +13,19 @@
  *
  */
 
+
 #include "src/actions/disruptive/allow.h"
 
-#include <iostream>
 #include <string>
 
-#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+
 #include "src/utils/string.h"
-#include "modsecurity/modsecurity.h"
 
 
 namespace modsecurity {
@@ -31,7 +34,7 @@ namespace disruptive {
 
 
 bool Allow::init(std::string *error) {
-    std::string a = utils::string::tolower(m_parser_payload);
+    std::string a = utils::string::tolower(m_parserPayload);
 
     if (a == "phase") {
         m_allowType = PhaseAllowType;
@@ -49,7 +52,7 @@ bool Allow::init(std::string *error) {
 }
 
 
-bool Allow::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Allow::execute(Transaction *transaction) noexcept {
     ms_dbg_a(transaction, 4, "Dropping the evaluation of upcoming rules " \
         "in favor of an `allow' action of type: " \
         + allowTypeToName(m_allowType));

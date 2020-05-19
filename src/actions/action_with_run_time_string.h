@@ -13,49 +13,32 @@
  *
  */
 
+#include <utility>
+#include <memory>
+#include <string>
+
 #include "modsecurity/actions/action.h"
 #include "src/run_time_string.h"
 
 #ifndef SRC_ACTIONS_ACTION_WITH_RUN_TIME_STRING_H_
 #define SRC_ACTIONS_ACTION_WITH_RUN_TIME_STRING_H_
 
+
 namespace modsecurity {
 namespace actions {
 
-class ActionWithRunTimeString : public Action {
+
+class ActionWithRunTimeString : public virtual Action {
  public:
-    ActionWithRunTimeString(
-        const std::string &name,
-        int king,
-        std::unique_ptr<RunTimeString> string)
-            : Action(name, king),
-            m_string(std::move(string))
-    { };
-
-    ActionWithRunTimeString(const std::string &name,
-        std::unique_ptr<RunTimeString> string)
-            : Action(name),
-            m_string(std::move(string))
-    { };
-
-    ActionWithRunTimeString(const std::string &name,
-        int king)
-            : Action(name, king),
-            m_string(nullptr)
-    { };
-
-    ActionWithRunTimeString(const std::string &name)
-        : Action(name),
-        m_string(nullptr)
-    { };
+    explicit ActionWithRunTimeString(std::unique_ptr<RunTimeString> string = nullptr)
+        : m_string(std::move(string))
+    { }
 
     ActionWithRunTimeString(const ActionWithRunTimeString &a)
-        : Action(a),
-        m_string(a.m_string?std::unique_ptr<RunTimeString>(new RunTimeString(*a.m_string.get())):nullptr)
-    { };
+        : m_string(a.m_string?std::unique_ptr<RunTimeString>(new RunTimeString(*a.m_string.get())):nullptr)
+    { }
 
-    ActionWithRunTimeString& operator=(const ActionWithRunTimeString& a)
-    {
+    ActionWithRunTimeString& operator=(const ActionWithRunTimeString& a) {
         m_string = std::unique_ptr<RunTimeString>(new RunTimeString(*a.m_string.get()));
         return *this;
     }

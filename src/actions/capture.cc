@@ -13,28 +13,12 @@
  *
  */
 
+
 #include "src/actions/capture.h"
 
-#include <iostream>
-#include <string>
-#include <list>
-
-#include "modsecurity/transaction.h"
-
-#include "modsecurity/rule.h"
-#include "src/operators/operator.h"
-#include "src/operators/pm.h"
-#include "src/operators/rx.h"
-#include "src/operators/contains.h"
-#include "src/operators/detect_sqli.h"
 
 namespace modsecurity {
 namespace actions {
-
-
-bool Capture::execute(RuleWithActions *rule, Transaction *transaction) {
-    return true;
-}
 
 
 }  // namespace actions

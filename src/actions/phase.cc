@@ -15,25 +15,22 @@
 
 #include "src/actions/phase.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "modsecurity/modsecurity.h"
+
 #include "src/utils/string.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
 namespace actions {
 
 bool Phase::init(std::string *error) {
-    std::string a = utils::string::tolower(m_parser_payload);
+    std::string a = utils::string::tolower(m_parserPayload);
     m_phase = -1;
 
     try {
-        m_phase = std::stoi(m_parser_payload);
+        m_phase = std::stoi(m_parserPayload);
         if (m_phase == 0) {
             m_phase = modsecurity::Phases::ConnectionPhase;
             m_secRulesPhase = 0;
@@ -53,7 +50,7 @@ bool Phase::init(std::string *error) {
             m_phase = modsecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
         } else {
-            error->assign("Unknown phase: " + m_parser_payload);
+            error->assign("Unknown phase: " + m_parserPayload);
             return false;
         }
     } catch (...) {
@@ -72,11 +69,6 @@ bool Phase::init(std::string *error) {
     return true;
 }
 
-
-bool Phase::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setPhase(m_phase);
-    return true;
-}
 
 }  // namespace actions
 }  // namespace modsecurity

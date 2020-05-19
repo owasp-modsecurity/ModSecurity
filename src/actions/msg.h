@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 #include <memory>
 #include <utility>
@@ -34,20 +35,18 @@ namespace actions {
 class Msg : public ActionWithRunTimeString {
  public:
     explicit Msg(std::unique_ptr<RunTimeString> runTimeString)
-        : ActionWithRunTimeString(
-            "msg",
-            RunTimeOnlyIfMatchKind,
-            std::move(runTimeString)
-        )
+        : ActionWithRunTimeString(std::move(runTimeString)),
+        Action("msg")
     { };
 
     explicit Msg(const Msg &action)
-        : ActionWithRunTimeString(action)
+        : ActionWithRunTimeString(action),
+        Action(action)
     { };
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
-    virtual ActionWithRunTimeString *clone() override {
+    ActionWithRunTimeString *clone() override {
         return new Msg(*this);
     }
 };

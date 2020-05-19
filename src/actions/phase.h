@@ -13,38 +13,48 @@
  *
  */
 
+
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
+
 
 #ifndef SRC_ACTIONS_PHASE_H_
 #define SRC_ACTIONS_PHASE_H_
 
-#ifdef __cplusplus
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
-class RuleWithOperator;
-
 namespace actions {
 
 
-class Phase : public Action {
+class Phase : public ActionTypeRuleMetaData {
  public:
-    explicit Phase(const std::string &action) : Action(action, ConfigurationKind),
+    explicit Phase(const std::string &action)
+        : Action(action),
         m_phase(0),
         m_secRulesPhase(0) { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
+    void configure(RuleWithActions *rule) override {
+        rule->setPhase(m_phase);
+    }
+
+    int getSecRulePhase() const {
+        return m_secRulesPhase;
+    }
+
+    int getPhase() const {
+        return m_phase;
+    }
+
+ private:
     int m_phase;
     int m_secRulesPhase;
 };
 
+
 }  // namespace actions
 }  // namespace modsecurity
-#endif
 
 #endif  // SRC_ACTIONS_PHASE_H_
