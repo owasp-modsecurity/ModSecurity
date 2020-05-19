@@ -13,15 +13,14 @@
  *
  */
 
+
 #include "src/actions/transformations/transformation.h"
 
-#include <cstring>
-
-#include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/base64_decode_ext.h"
 #include "src/actions/transformations/base64_decode.h"
 #include "src/actions/transformations/base64_encode.h"
@@ -60,58 +59,94 @@
 #include "src/actions/transformations/utf8_to_unicode.h"
 
 
-#define IF_MATCH(b) \
-    if (a.compare(2, std::strlen(#b), #b) == 0)
-
-
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
-Transformation* Transformation::instantiate(std::string a) {
-    IF_MATCH(base64DecodeExt) { return new Base64DecodeExt(a); }
-    IF_MATCH(base64Decode) { return new Base64Decode(a); }
-    IF_MATCH(base64Encode) { return new Base64Encode(a); }
-    IF_MATCH(cmd_line) { return new CmdLine(a); }
-    IF_MATCH(compress_whitespace) { return new CompressWhitespace(a); }
-    IF_MATCH(cssDecode) { return new CssDecode(a); }
-    IF_MATCH(escapeSeqDecode) { return new EscapeSeqDecode(a); }
-    IF_MATCH(hexDecode) { return new HexDecode(a); }
-    IF_MATCH(hexEncode) { return new HexEncode(a); }
-    IF_MATCH(htmlEntityDecode) { return new HtmlEntityDecode(a); }
-    IF_MATCH(jsDecode) { return new JsDecode(a); }
-    IF_MATCH(length) { return new Length(a); }
-    IF_MATCH(lowercase) { return new LowerCase(a); }
-    IF_MATCH(md5) { return new Md5(a); }
-    IF_MATCH(none) { return new None(a); }
-    IF_MATCH(normalizePathWin) { return new NormalisePathWin(a); }
-    IF_MATCH(normalisePathWin) { return new NormalisePathWin(a); }
-    IF_MATCH(normalizePath) { return new NormalisePath(a); }
-    IF_MATCH(normalisePath) { return new NormalisePath(a); }
-    IF_MATCH(parityEven7bit) { return new ParityEven7bit(a); }
-    IF_MATCH(parityOdd7bit) { return new ParityOdd7bit(a); }
-    IF_MATCH(parityZero7bit) { return new ParityZero7bit(a); }
-    IF_MATCH(removeCommentsChar) { return new RemoveCommentsChar(a); }
-    IF_MATCH(removeComments) { return new RemoveComments(a); }
-    IF_MATCH(removeNulls) { return new RemoveNulls(a); }
-    IF_MATCH(removeWhitespace) { return new RemoveWhitespace(a); }
-    IF_MATCH(compressWhitespace) { return new CompressWhitespace(a); }
-    IF_MATCH(replaceComments) { return new ReplaceComments(a); }
-    IF_MATCH(replaceNulls) { return new ReplaceNulls(a); }
-    IF_MATCH(sha1) { return new Sha1(a); }
-    IF_MATCH(sqlHexDecode) { return new SqlHexDecode(a); }
-    IF_MATCH(transformation) { return new Transformation(a); }
-    IF_MATCH(trimLeft) { return new TrimLeft(a); }
-    IF_MATCH(trimRight) { return new TrimRight(a); }
-    IF_MATCH(trim) { return new Trim(a); }
-    IF_MATCH(uppercase) { return new UpperCase(a); }
-    IF_MATCH(urlDecodeUni) { return new UrlDecodeUni(a); }
-    IF_MATCH(urlDecode) { return new UrlDecode(a); }
-    IF_MATCH(urlEncode) { return new UrlEncode(a); }
-    IF_MATCH(utf8toUnicode) { return new Utf8ToUnicode(a); }
+class TransformationDoesNotExist: public std::exception {
+ public:
+    explicit TransformationDoesNotExist(const std::string& name)
+        : m_transformation(name)
+    { }
 
-    return new Transformation(a);
+  virtual const char* what() const throw() {
+    return std::string("Transformation not found: " + m_transformation + \
+        ". Make sure that the new transformation is registered at: " + \
+        "transformation.cc").c_str();
+  }
+
+ private:
+    std::string m_transformation;
+};
+
+
+Transformation* Transformation::instantiate(
+    const std::string &transformationName) {
+    /**
+     * 
+     * FIXME: Once part of ModSecurity, the transformation needs to register
+     *        here. That is necessary to load transformations from external
+     *        resources such as Python and Lua, not to mention the
+     *        unit/regression framework.
+     *
+     *        Today this registration is manual; as seen below, the idea is to
+     *        have those automatically generated. To avoid transformations not
+     *        to be listed.
+     */
+
+    std::string name(transformationName);
+    name.erase(std::remove(name.begin(), name.end(), '_'), name.end());
+
+    if (match(name, "t:base64DecodeExt")) { return new Base64DecodeExt(); }
+    if (match(name, "t:base64Decode")) { return new Base64Decode(); }
+    if (match(name, "t:base64Encode")) { return new Base64Encode(); }
+    if (match(name, "t:cmdLine")) { return new CmdLine(); }
+    if (match(name, "t:compressWhitespace")) {
+        return new CompressWhitespace();
+    }
+    if (match(name, "t:cssDecode")) { return new CssDecode(); }
+    if (match(name, "t:escapeSeqDecode")) { return new EscapeSeqDecode(); }
+    if (match(name, "t:hexDecode")) { return new HexDecode(); }
+    if (match(name, "t:hexEncode")) { return new HexEncode(); }
+    if (match(name, "t:htmlEntityDecode")) { return new HtmlEntityDecode(); }
+    if (match(name, "t:jsDecode")) { return new JsDecode(); }
+    if (match(name, "t:length")) { return new Length(); }
+    if (match(name, "t:lowercase")) { return new LowerCase(); }
+    if (match(name, "t:md5")) { return new Md5(); }
+    if (match(name, "t:none")) { return new None(); }
+    if (match(name, "t:normalizePathWin")) { return new NormalisePathWin(); }
+    if (match(name, "t:normalisePathWin")) { return new NormalisePathWin(); }
+    if (match(name, "t:normalizePath")) { return new NormalisePath(); }
+    if (match(name, "t:normalisePath")) { return new NormalisePath(); }
+    if (match(name, "t:parityEven7bit")) { return new ParityEven7bit(); }
+    if (match(name, "t:parityOdd7bit")) { return new ParityOdd7bit(); }
+    if (match(name, "t:parityZero7bit")) { return new ParityZero7bit(); }
+    if (match(name, "t:removeCommentsChar")) {
+        return new RemoveCommentsChar();
+    }
+    if (match(name, "t:removeComments")) { return new RemoveComments(); }
+    if (match(name, "t:removeNulls")) { return new RemoveNulls(); }
+    if (match(name, "t:removeWhitespace")) { return new RemoveWhitespace(); }
+    if (match(name, "t:compressWhitespace")) {
+        return new CompressWhitespace();
+    }
+    if (match(name, "t:replaceComments")) { return new ReplaceComments(); }
+    if (match(name, "t:replaceNulls")) { return new ReplaceNulls(); }
+    if (match(name, "t:sha1")) { return new Sha1(); }
+    if (match(name, "t:sqlHexDecode")) { return new SqlHexDecode(); }
+    if (match(name, "t:trimLeft")) { return new TrimLeft(); }
+    if (match(name, "t:trimRight")) { return new TrimRight(); }
+    if (match(name, "t:trim")) { return new Trim(); }
+    if (match(name, "t:uppercase")) { return new UpperCase(); }
+    if (match(name, "t:urlDecodeUni")) { return new UrlDecodeUni(); }
+    if (match(name, "t:urlDecode")) { return new UrlDecode(); }
+    if (match(name, "t:urlEncode")) { return new UrlEncode(); }
+    if (match(name, "t:utf8toUnicode")) { return new Utf8ToUnicode(); }
+
+    throw TransformationDoesNotExist(name);
+
+    return nullptr;
 }
 
 

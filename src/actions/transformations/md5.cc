@@ -13,17 +13,14 @@
  *
  */
 
+
 #include "src/actions/transformations/md5.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/utils/md5.h"
 
 namespace modsecurity {
@@ -31,9 +28,9 @@ namespace actions {
 namespace transformations {
 
 
-void Md5::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void Md5::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     std::string ret = Utils::Md5::digest(std::string(in.c_str(), in.size()));
 
     out.assign(ret.c_str(), ret.size());

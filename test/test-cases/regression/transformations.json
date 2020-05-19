@@ -107,12 +107,12 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "lowercase: \"test",
+      "debug_log": "lowerCase: \"test",
       "error_log": ""
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@contains test \" \"id:1,pass,t:trim,t:lowercase\""
+      "SecRule ARGS \"@contains test \" \"id:1,pass,t:trim,t:lowerCase\""
     ]
   }
 ]

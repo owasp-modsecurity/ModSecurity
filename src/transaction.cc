@@ -53,7 +53,7 @@
 #include "src/actions/disruptive/allow.h"
 #include "src/variables/remote_user.h"
 #include "src/rule_with_actions.h"
-
+#include "src/actions/ctl/audit_log_parts.h"
 
 
 using modsecurity::actions::Action;
@@ -150,7 +150,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     m_ruleRemoveTargetByTag(),
     m_ruleRemoveTargetById(),
     m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
-    m_auditLogModifier(),
+    m_auditLogParts(0),
     m_requestBody(),
     m_responseBody(),
     /* m_id(), */
@@ -198,6 +198,10 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
 
     ms_dbg(4, "Initializing transaction");
 
+    if (m_rules != NULL && m_rules->m_auditLog != NULL) {
+        m_auditLogParts = this->m_rules->m_auditLog->getParts();
+    }
+
     intervention::clean(&m_it);
 }
 
@@ -223,7 +227,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_ruleRemoveTargetByTag(),
     m_ruleRemoveTargetById(),
     m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
-    m_auditLogModifier(),
+    m_auditLogParts(0),
     m_requestBody(),
     m_responseBody(),
     m_id(std::unique_ptr<std::string>(new std::string(id))),
@@ -267,6 +271,10 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_variableUrlEncodedError.set("0", 0);
 
     ms_dbg(4, "Initializing transaction");
+
+    if (m_rules != NULL && m_rules->m_auditLog != NULL) {
+        m_auditLogParts = this->m_rules->m_auditLog->getParts();
+    }
 
     intervention::clean(&m_it);
 }
@@ -1407,35 +1415,15 @@ int Transaction::processLogging() {
 
     this->m_rules->evaluate(modsecurity::LoggingPhase, this);
 
-    /* If relevant, save this transaction information at the audit_logs */
-    if (m_rules != NULL && m_rules->m_auditLog != NULL) {
-        int parts = this->m_rules->m_auditLog->getParts();
+    if (m_auditLogParts != 0) {
         ms_dbg(8, "Checking if this request is suitable to be " \
             "saved as an audit log.");
 
-        if (!this->m_auditLogModifier.empty()) {
-            ms_dbg(4, "There was an audit log modifier for this transaction.");
-            std::list<std::pair<int, std::string>>::iterator it;
-            ms_dbg(7, "AuditLog parts before modification(s): " +
-                std::to_string(parts) + ".");
-            for (it = m_auditLogModifier.begin();
-                it != m_auditLogModifier.end(); ++it) {
-                std::pair <int, std::string> p = *it;
-                if (p.first == 0) {  // Add
-                    parts = this->m_rules->m_auditLog->addParts(parts,
-                        p.second);
-                } else {  // Remove
-                    parts = this->m_rules->m_auditLog->removeParts(parts,
-                        p.second);
-                }
-            }
-        }
-        ms_dbg(8, "Checking if this request is relevant to be " \
-            "part of the audit logs.");
-        bool saved = this->m_rules->m_auditLog->saveIfRelevant(this, parts);
+        // FIXME: m_auditLogParts can be accessed via Transaction.
+        bool saved = this->m_rules->m_auditLog->saveIfRelevant(this, m_auditLogParts);
         if (saved) {
             ms_dbg(8, "Request was relevant to be saved. Parts: " +
-                std::to_string(parts));
+                std::to_string(m_auditLogParts));
         }
     }
 
@@ -1801,7 +1789,7 @@ std::string Transaction::toJSON(int parts) {
                 reinterpret_cast<const unsigned char*>("tags"),
                 strlen("tags"));
             yajl_gen_array_open(g);
-           for (auto b : a->m_tags) {
+            for (auto &b : a->m_tags) {
                 yajl_gen_string(g,
                     reinterpret_cast<const unsigned char*>(b.c_str()),
                     strlen(b.c_str()));

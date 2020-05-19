@@ -13,26 +13,31 @@
  *
  */
 
+
 #include <string>
-#include <memory>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 
+#include "src/actions/disruptive/disruptive_action.h"
+
+
 #ifndef SRC_ACTIONS_DISRUPTIVE_PASS_H_
 #define SRC_ACTIONS_DISRUPTIVE_PASS_H_
+
 
 namespace modsecurity {
 namespace actions {
 namespace disruptive {
 
 
-class Pass : public Action {
+class Pass : public ActionDisruptive {
  public:
-    explicit Pass(const std::string &action) : Action(action) { }
+    Pass()
+        : Action("pass")
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
-    bool isDisruptive() override { return true; }
+    bool execute(Transaction *transaction) noexcept override;
 };
 
 

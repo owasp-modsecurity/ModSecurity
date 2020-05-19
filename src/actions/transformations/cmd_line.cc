@@ -15,15 +15,10 @@
 
 #include "src/actions/transformations/cmd_line.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {
@@ -31,9 +26,9 @@ namespace actions {
 namespace transformations {
 
 
-void CmdLine::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void CmdLine::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     int space = 0;
 
     for (auto& a : in) {

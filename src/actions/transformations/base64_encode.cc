@@ -13,17 +13,13 @@
  *
  */
 
+
 #include "src/actions/transformations/base64_encode.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/base64.h"
 
 
@@ -32,9 +28,9 @@ namespace actions {
 namespace transformations {
 
 
-void Base64Encode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void Base64Encode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     std::string ret = Utils::Base64::encode(
         std::string(in.c_str(), in.size()));
     out.assign(ret.c_str(), ret.size());

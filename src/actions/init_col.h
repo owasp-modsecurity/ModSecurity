@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 #include <utility>
 #include <memory>
@@ -33,23 +34,22 @@ class InitCol : public ActionWithRunTimeString {
  public:
     InitCol(
         const std::string &action,
-        std::unique_ptr<RunTimeString> runTimeString
-    ) : ActionWithRunTimeString(
-            action,
-            std::move(runTimeString)
-        )
-    { };
+        std::unique_ptr<RunTimeString> runTimeString)
+        : ActionWithRunTimeString(std::move(runTimeString)),
+        Action(action)
+    { }
 
     InitCol(const InitCol &action)
         : ActionWithRunTimeString(action),
+        Action(action),
         m_collection_key(action.m_collection_key)
-    { };
+    { }
 
     bool init(std::string *error) override;
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
-    virtual ActionWithRunTimeString *clone() override {
+    ActionWithRunTimeString *clone() override {
         return new InitCol(*this);
     }
 

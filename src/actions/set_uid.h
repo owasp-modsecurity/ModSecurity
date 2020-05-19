@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 #include <memory>
 #include <utility>
@@ -33,23 +34,20 @@ namespace actions {
 class SetUID : public ActionWithRunTimeString {
  public:
     explicit SetUID(std::unique_ptr<RunTimeString> runTimeString)
-        : ActionWithRunTimeString(
-            "setuid",
-            RunTimeOnlyIfMatchKind,
-            std::move(runTimeString)
-        )
+        : ActionWithRunTimeString(std::move(runTimeString)),
+        Action("setuid")
     { };
 
     explicit SetUID(const SetUID &action)
-        : ActionWithRunTimeString(action)
+        : ActionWithRunTimeString(action),
+        Action(action)
     { };
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
-    virtual ActionWithRunTimeString *clone() override {
+    ActionWithRunTimeString *clone() override {
         return new SetUID(*this);
     }
-
 };
 
 

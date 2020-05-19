@@ -13,28 +13,35 @@
  *
  */
 
-#include <string>
-#include <memory>
 
 #include "modsecurity/actions/action.h"
+
+#include "src/actions/action_allowed_in_sec_default_action.h"
+#include "src/actions/action_type_rule_metadata.h"
+#include "src/rule_with_actions.h"
+
 
 #ifndef SRC_ACTIONS_LOG_H_
 #define SRC_ACTIONS_LOG_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
-class Log : public Action {
+class Log : public ActionTypeRuleMetaData,
+    public ActionAllowedAsSecDefaultAction {
  public:
-    explicit Log(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    Log()
+        : Action("log")
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    void configure(RuleWithActions *rule) override {
+        rule->setHasLogAction(true);
+    }
+
 };
+
 
 }  // namespace actions
 }  // namespace modsecurity

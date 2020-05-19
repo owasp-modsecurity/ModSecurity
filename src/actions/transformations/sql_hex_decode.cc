@@ -13,18 +13,14 @@
  *
  */
 
+
 #include "src/actions/transformations/sql_hex_decode.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/utils/string.h"
 
 
@@ -32,18 +28,10 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-#ifndef VALID_HEX
-#define VALID_HEX(X) (((X >= '0') && (X <= '9')) \
-    || ((X >= 'a') && (X <= 'f')) \
-    || ((X >= 'A') && (X <= 'F')))
-#endif
-#ifndef ISODIGIT
-#define ISODIGIT(X) ((X >= '0') && (X <= '7'))
-#endif
 
-void SqlHexDecode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void SqlHexDecode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     unsigned char *input;
     int size = 0;
 

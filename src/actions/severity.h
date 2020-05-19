@@ -13,37 +13,41 @@
  *
  */
 
+
 #include <string>
 #include <memory>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
+
 
 #ifndef SRC_ACTIONS_SEVERITY_H_
 #define SRC_ACTIONS_SEVERITY_H_
 
-#ifdef __cplusplus
 
 namespace modsecurity {
-class Transaction;
-
 namespace actions {
 
 
-class Severity : public Action {
+class Severity : public ActionTypeRuleMetaData {
  public:
-    explicit Severity(const std::string &action) 
+    explicit Severity(const std::string &action)
         : Action(action),
-        m_severity(0) { }
+        m_severity(0)
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
+    void configure(RuleWithActions *rule) override {
+        rule->setSeverity(m_severity);
+    }
+
+ private:
     int m_severity;
 };
 
 
 }  // namespace actions
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_ACTIONS_SEVERITY_H_

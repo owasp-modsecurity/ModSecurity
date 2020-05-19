@@ -13,20 +13,17 @@
  *
  */
 
+
 #include "src/actions/no_audit_log.h"
 
-#include <iostream>
-#include <string>
-
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "modsecurity/rule_message.h"
+
 
 namespace modsecurity {
 namespace actions {
 
 
-bool NoAuditLog::execute(RuleWithActions *rule, Transaction *transaction) {
+bool NoAuditLog::execute(Transaction *transaction) noexcept {
     transaction->messageSetNoAuditLog(true);
     return true;
 }

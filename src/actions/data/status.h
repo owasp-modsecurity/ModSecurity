@@ -13,32 +13,36 @@
  *
  */
 
+
 #include <string>
-#include <memory>
 
 #include "modsecurity/actions/action.h"
-#include "modsecurity/rule_message.h"
+#include "modsecurity/transaction.h"
+
+#include "src/actions/action_allowed_in_sec_default_action.h"
+
 
 #ifndef SRC_ACTIONS_DATA_STATUS_H_
 #define SRC_ACTIONS_DATA_STATUS_H_
 
-#ifdef __cplusplus
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 namespace data {
 
 
-class Status : public Action {
+class Status : public ActionAllowedAsSecDefaultAction {
  public:
-    explicit Status(const std::string &action) : Action(action, 2),
-    m_status(0) { }
+    explicit Status(const std::string &action)
+        : Action(action),
+        m_status(0)
+    { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
+    bool execute(Transaction *transaction) noexcept override;
+
+ private:
     int m_status;
 };
 
@@ -46,6 +50,6 @@ class Status : public Action {
 }  // namespace data
 }  // namespace actions
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_ACTIONS_DATA_STATUS_H_
