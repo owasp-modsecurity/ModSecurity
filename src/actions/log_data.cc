@@ -13,25 +13,21 @@
  *
  */
 
+
 #include "src/actions/log_data.h"
 
-#include <iostream>
 #include <string>
-#include <memory>
 
-#include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
 
 
 namespace modsecurity {
 namespace actions {
 
-
-bool LogData::execute(RuleWithActions *rule, Transaction *transaction) {
-    transaction->messageGetLast()->m_data = getEvaluatedRunTimeString(transaction);
-
+bool LogData::execute(Transaction *transaction) noexcept {
+    transaction->messageGetLast()->m_data =
+        getEvaluatedRunTimeString(transaction);
     return true;
 }
 

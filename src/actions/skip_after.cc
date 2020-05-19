@@ -13,21 +13,24 @@
  *
  */
 
+
 #include "src/actions/skip_after.h"
 
-#include <iostream>
 #include <string>
 
-#include "modsecurity/rules_set.h"
-#include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
 
 
 namespace modsecurity {
 namespace actions {
 
 
-bool SkipAfter::execute(RuleWithActions *rule, Transaction *transaction) {
+bool SkipAfter::execute(Transaction *transaction) noexcept {
     ms_dbg_a(transaction, 5, "Setting skipAfter for: " + *m_skipName);
     transaction->addMarker(m_skipName);
     return true;

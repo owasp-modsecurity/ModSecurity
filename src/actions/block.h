@@ -13,34 +13,37 @@
  *
  */
 
+
 #include <string>
 #include <memory>
 
-#include "modsecurity/actions/action.h"
-#include "modsecurity/rule_message.h"
+#include "src/actions/action_type_rule_metadata.h"
+#include "src/actions/action_allowed_in_sec_default_action.h"
 
-#ifndef SRC_ACTIONS_DISRUPTIVE_BLOCK_H_
-#define SRC_ACTIONS_DISRUPTIVE_BLOCK_H_
 
-#ifdef __cplusplus
-class Transaction;
+#ifndef SRC_ACTIONS_BLOCK_H_
+#define SRC_ACTIONS_BLOCK_H_
+
 
 namespace modsecurity {
-class Transaction;
-
 namespace actions {
 
 
-class Block : public Action {
+class Block : public ActionTypeRuleMetaData,
+        public ActionAllowedAsSecDefaultAction {
  public:
-    explicit Block(const std::string &action) : Action(action) { }
+    Block()
+        : Action("block")
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    void configure(RuleWithActions *rule) override {
+        rule->setHasBlockAction(true);
+    }
 };
 
 
 }  // namespace actions
 }  // namespace modsecurity
-#endif
 
-#endif  // SRC_ACTIONS_DISRUPTIVE_BLOCK_H_
+
+#endif  // SRC_ACTIONS_BLOCK_H_

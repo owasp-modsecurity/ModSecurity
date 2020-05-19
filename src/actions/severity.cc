@@ -13,18 +13,18 @@
  *
  */
 
+
 #include "src/actions/severity.h"
 
-#include <iostream>
 #include <string>
-#include <memory>
 
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
 #include "modsecurity/rules_set.h"
-#include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
+
 #include "src/utils/string.h"
-#include "modsecurity/rule_message.h"
 
 
 namespace modsecurity {
@@ -32,7 +32,7 @@ namespace actions {
 
 
 bool Severity::init(std::string *error) {
-    std::string a = utils::string::tolower(m_parser_payload);
+    std::string a = utils::string::tolower(m_parserPayload);
     if (a == "emergency") {
         m_severity = 0;
         return true;
@@ -68,11 +68,6 @@ bool Severity::init(std::string *error) {
     }
 
     return false;
-}
-
-
-bool Severity::execute(RuleWithActions *rule, Transaction *transaction) {
-    return true;
 }
 
 

@@ -13,13 +13,20 @@
  *
  */
 
+
 #include "src/actions/ctl/audit_log_parts.h"
 
-#include <iostream>
 #include <string>
 #include <utility>
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/audit_log.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+
 
 namespace modsecurity {
 namespace actions {
@@ -27,20 +34,39 @@ namespace ctl {
 
 
 bool AuditLogParts::init(std::string *error) {
-    std::string what(m_parser_payload, 14, 1);
-    mParts = std::string(m_parser_payload, 15, m_parser_payload.length()-15);
+    std::string what(m_parserPayload, 14, 1);
+    std::string parts_str(m_parserPayload, 15, m_parserPayload.length()-15);
+
+    if ((what != "-") && (what != "+")) {
+        error->assign("ctl:auditLogParts modificators expects add or " \
+            "remove (+/-) in front of the modificator. Got: " + what);
+        return false;
+    }
+
+    int flags = AuditLog::addParts(0, parts_str);
+
     if (what == "+") {
-        mPartsAction = 0;
+        m_partsToModify = flags;
     } else {
-        mPartsAction = 1;
+        m_partsToModify = -1 * flags;
     }
 
     return true;
 }
 
-bool AuditLogParts::execute(RuleWithActions *rule, Transaction *transaction) {
-    transaction->m_auditLogModifier.push_back(
-        std::make_pair(mPartsAction, mParts));
+
+bool AuditLogParts::execute(Transaction *transaction) noexcept {
+    ms_dbg_a(transaction, 7, "AuditLog parts before modification: " +
+        std::to_string(transaction->m_auditLogParts) + ".");
+
+    if (m_partsToModify < 0) {
+        transaction->m_auditLogParts = \
+            transaction->m_auditLogParts & ~(m_partsToModify * -1);
+    } else {
+        transaction->m_auditLogParts = \
+            transaction->m_auditLogParts | m_partsToModify;
+    }
+
     return true;
 }
 

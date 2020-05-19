@@ -13,16 +13,19 @@
  *
  */
 
+
 #include "src/actions/msg.h"
 
-#include <iostream>
 #include <string>
-#include <memory>
 
-#include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "modsecurity/rule_message.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+
+#include "src/run_time_string.h"
 
 /*
  * Description: Assigns a custom message to the rule or chain in which it
@@ -46,7 +49,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Msg::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Msg::execute(Transaction *transaction) noexcept {
     std::string msg = getEvaluatedRunTimeString(transaction);
     transaction->messageGetLast()->m_message = msg;
     ms_dbg_a(transaction, 9, "Saving msg: " + msg);

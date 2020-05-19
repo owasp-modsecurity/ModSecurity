@@ -28,19 +28,17 @@ namespace actions {
 namespace transformations {
 
 
-PhpArgsNames::PhpArgsNames(const std::string &a)
-    : Transformation(a) {
-}
-
-std::string PhpArgsNames::evaluate(const std::string &val,
-    Transaction *transaction) {
+void PhpArgsNames::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     //Took the logic from php src code:
     //https://github.com/php/php-src/blob/master/main/php_variables.c
     //Function call PHPAPI void php_register_variable_ex(const char *var_name, zval *val, zval *track_vars_array)
-    std::string value(val);
+    std::string value(in);
     std::string ret = "";
     if(value[0] == '[' || value[0] == '=') {
-	return ret;
+		out = ret;
+		return;
     }
     std::string::size_type i = 0;
     while(value[i] == ' ') {
@@ -63,7 +61,7 @@ std::string PhpArgsNames::evaluate(const std::string &val,
 		    ret += '_';
 	    }
 	    else {
-		ret += value[i];
+			ret += value[i];
 	    }
     }
 
@@ -73,7 +71,8 @@ std::string PhpArgsNames::evaluate(const std::string &val,
 		char *tmp = &value[i];
 		char *close_bra = strchr(tmp, ']');
 		if(close_bra == NULL) {
-			return ret;
+			out = ret;
+			return;
 		}
 		int array_size = (int)(close_bra - start) + 1;
 		if(array_size - i == 3 && value[i+1] == ' ') {
@@ -84,11 +83,12 @@ std::string PhpArgsNames::evaluate(const std::string &val,
 			ret += value[i];
 		}
 		if(i >= val_size || value[i] != '[') {
-			return ret;
+			out = ret;
+			return;
 		}
 	    }
     }
-    return ret;
+    out = ret;
 
 }
 
