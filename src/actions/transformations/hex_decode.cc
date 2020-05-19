@@ -13,28 +13,27 @@
  *
  */
 
+
 #include "src/actions/transformations/hex_decode.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
 
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
+#include "modsecurity/modsecurity.h"
+#include "modsecurity/transaction.h"
+
 #include "src/utils/string.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
-void HexDecode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void HexDecode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     unsigned char *input;
     int size = 0;
 

@@ -13,23 +13,24 @@
  *
  */
 
+
 #include "src/actions/transformations/lower_case.h"
 
 #include <algorithm>
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
-#include "modsecurity/actions/action.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
-void LowerCase::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void LowerCase::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     out.resize(in.size());
     std::transform(in.begin(), in.end(), out.begin(), ::tolower);
 }

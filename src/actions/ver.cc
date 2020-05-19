@@ -13,24 +13,12 @@
  *
  */
 
+
 #include "src/actions/ver.h"
-
-#include <iostream>
-#include <string>
-
-#include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
 namespace actions {
-
-
-bool Ver::execute(RuleWithActions *rule, Transaction *transaction) {
-    return true;
-}
 
 
 }  // namespace actions

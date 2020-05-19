@@ -13,29 +13,31 @@
  *
  */
 
+
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
+
 
 #ifndef SRC_ACTIONS_ACCURACY_H_
 #define SRC_ACTIONS_ACCURACY_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
-class Accuracy : public Action {
+class Accuracy : public ActionTypeRuleMetaData {
  public:
-    explicit Accuracy(const std::string &action) 
-        : Action(action, ConfigurationKind),
+    explicit Accuracy(const std::string &action)
+        : Action(action),
         m_accuracy(0) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
-    int getAccuracy() const { return m_accuracy; }
+
+    void configure(RuleWithActions *rule) override {
+        rule->setAccuracy(m_accuracy);
+    }
 
  private:
     int m_accuracy;

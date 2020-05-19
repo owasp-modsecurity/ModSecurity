@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 #include <utility>
 #include <memory>
@@ -33,20 +34,18 @@ namespace actions {
 class SetRSC : public ActionWithRunTimeString {
  public:
     explicit SetRSC(std::unique_ptr<RunTimeString> runTimeString)
-        : ActionWithRunTimeString(
-            "setsrc",
-            RunTimeOnlyIfMatchKind,
-            std::move(runTimeString)
-        )
+        : ActionWithRunTimeString(std::move(runTimeString)),
+        Action("setsrc")
     { };
 
     explicit SetRSC(const SetRSC &action)
-        : ActionWithRunTimeString(action)
+        : ActionWithRunTimeString(action),
+        Action(action)
     { };
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
-    virtual ActionWithRunTimeString *clone() override {
+    ActionWithRunTimeString *clone() override {
         return new SetRSC(*this);
     }
 };

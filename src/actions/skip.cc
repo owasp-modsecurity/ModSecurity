@@ -13,14 +13,18 @@
  *
  */
 
+
 #include "src/actions/skip.h"
 
-#include <iostream>
 #include <string>
 
-#include "modsecurity/rules_set.h"
-#include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+
 
 namespace modsecurity {
 namespace actions {
@@ -28,9 +32,9 @@ namespace actions {
 
 bool Skip::init(std::string *error) {
     try {
-        m_skip_next = std::stoi(m_parser_payload);
+        m_skip_next = std::stoi(m_parserPayload);
     }  catch (...) {
-        error->assign("Skip: The input \"" + m_parser_payload + "\" is " \
+        error->assign("Skip: The input \"" + m_parserPayload + "\" is " \
             "not a number.");
         return false;
     }
@@ -38,7 +42,7 @@ bool Skip::init(std::string *error) {
 }
 
 
-bool Skip::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Skip::execute(Transaction *transaction) noexcept {
     ms_dbg_a(transaction, 5, "Skipping the next " + \
         std::to_string(m_skip_next) + " rules.");
 

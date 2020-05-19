@@ -13,14 +13,10 @@
  *
  */
 
+
 #include "src/actions/rule_id.h"
 
-#include <iostream>
 #include <string>
-
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
@@ -28,7 +24,7 @@ namespace actions {
 
 
 bool RuleId::init(std::string *error) {
-    std::string a = m_parser_payload;
+    std::string a = m_parserPayload;
 
     try {
         m_ruleId = std::stod(a);
@@ -46,12 +42,6 @@ bool RuleId::init(std::string *error) {
             "to be a valid rule id.");
         return false;
     }
-    return true;
-}
-
-
-bool RuleId::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setId(m_ruleId);
     return true;
 }
 

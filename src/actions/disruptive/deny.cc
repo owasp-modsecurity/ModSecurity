@@ -13,22 +13,26 @@
  *
  */
 
+
 #include "src/actions/disruptive/deny.h"
 
-#include <string.h>
-#include <iostream>
 #include <string>
-#include <cstring>
-#include <memory>
 
 #include "modsecurity/transaction.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+#include "modsecurity/rule_message.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace disruptive {
 
 
-bool Deny::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Deny::execute(Transaction *transaction) noexcept {
     ms_dbg_a(transaction, 8, "Running action deny");
 
     if (transaction->m_it.status == 200) {
@@ -37,9 +41,10 @@ bool Deny::execute(RuleWithActions *rule, Transaction *transaction) {
 
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
-    transaction->messageGetLast()->setRule(rule);
     transaction->m_it.log = strdup(
-        transaction->messageGetLast()->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
+        transaction->messageGetLast()->log(
+            RuleMessage::LogMessageInfo::ClientLogMessageInfo)
+                .c_str());
 
     return true;
 }

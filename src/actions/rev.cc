@@ -13,15 +13,10 @@
  *
  */
 
+
 #include "src/actions/rev.h"
 
-#include <iostream>
 #include <string>
-
-#include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
@@ -29,12 +24,7 @@ namespace actions {
 
 
 bool Rev::init(std::string *error) {
-    m_rev = m_parser_payload;
-    return true;
-}
-
-
-bool Rev::execute(RuleWithActions *rule, Transaction *transaction) {
+    m_revision = m_parserPayload;
     return true;
 }
 

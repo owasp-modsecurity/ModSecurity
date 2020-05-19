@@ -28,18 +28,13 @@ namespace actions {
 namespace transformations {
 
 
-PhpArgsNames::PhpArgsNames(const std::string &a)
-    : Transformation(a) {
-}
-
-
-void PhpArgsNames::execute(Transaction *t,
-    ModSecString &val,
-    ModSecString &out) {
+void PhpArgsNames::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     //Took the logic from php src code:
     //https://github.com/php/php-src/blob/master/main/php_variables.c
     //Function call PHPAPI void php_register_variable_ex(const char *var_name, zval *val, zval *track_vars_array)
-    std::string value(val);
+    std::string value(in);
     std::string ret = "";
     if(value[0] == '[' || value[0] == '=') {
 		out.assign(ret);
@@ -66,7 +61,7 @@ void PhpArgsNames::execute(Transaction *t,
 		    ret += '_';
 	    }
 	    else {
-		ret += value[i];
+			ret += value[i];
 	    }
     }
 
@@ -95,7 +90,6 @@ void PhpArgsNames::execute(Transaction *t,
     }
 	out.assign(ret);
 	return;
-
 }
 
 }  // namespace transformations
