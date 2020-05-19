@@ -13,13 +13,16 @@
  *
  */
 
+
 #include <string>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 
+
 #ifndef SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
 #define SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
+
 
 namespace modsecurity {
 namespace actions {
@@ -28,22 +31,23 @@ namespace ctl {
 
 class AuditLogParts : public Action {
  public:
-    explicit AuditLogParts(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind),
-        mPartsAction(0),
-        mParts("") { }
+    explicit AuditLogParts(const std::string &action)
+        : Action(action),
+        m_partsToModify(0)
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
 
+    bool execute(Transaction *transaction) noexcept override;
+
  protected:
-    int mPartsAction;
-    std::string mParts;
+    int m_partsToModify;
 };
 
 
 }  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
+
 
 #endif  // SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_

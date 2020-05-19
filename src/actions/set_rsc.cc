@@ -13,20 +13,24 @@
  *
  */
 
+
 #include "src/actions/set_rsc.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
 
 
 namespace modsecurity {
 namespace actions {
 
 
-bool SetRSC::execute(RuleWithActions *rule, Transaction *t) {
+bool SetRSC::execute(Transaction *t) noexcept {
     std::string colNameExpanded(getEvaluatedRunTimeString(t));
     ms_dbg_a(t, 8, "RESOURCE initiated with value: \'"
         + colNameExpanded + "\'.");

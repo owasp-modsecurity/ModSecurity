@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 
 #include "modsecurity/actions/action.h"
@@ -22,6 +23,7 @@
 #ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_
 #define SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_
 
+
 namespace modsecurity {
 namespace actions {
 namespace ctl {
@@ -29,14 +31,17 @@ namespace ctl {
 
 class RuleRemoveTargetById : public Action {
  public:
-    explicit RuleRemoveTargetById(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind),
+    explicit RuleRemoveTargetById(const std::string &action)
+        : Action(action),
         m_id(0),
-        m_target("") { }
+        m_target("")
+    { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
+    bool execute(Transaction *transaction) noexcept override;
+
+ private:
     int m_id;
     std::string m_target;
 };

@@ -13,18 +13,13 @@
  *
  */
 
+
 #include "src/actions/transformations/replace_comments.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {
@@ -32,9 +27,9 @@ namespace actions {
 namespace transformations {
 
 
-void ReplaceComments::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void ReplaceComments::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     uint64_t i, j, incomment;
 
     char *input = reinterpret_cast<char *>(

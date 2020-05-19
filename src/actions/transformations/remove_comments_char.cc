@@ -13,17 +13,13 @@
  *
  */
 
+
 #include "src/actions/transformations/remove_comments_char.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {
@@ -31,9 +27,9 @@ namespace actions {
 namespace transformations {
 
 
-void RemoveCommentsChar::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void RemoveCommentsChar::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     int64_t i;
     out = in;
 

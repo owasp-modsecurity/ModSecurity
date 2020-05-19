@@ -13,22 +13,26 @@
  *
  */
 
+
 #include "src/actions/set_env.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/utils/string.h"
-#include "src/rule_with_actions.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+
+#include "src/run_time_string.h"
 
 
 namespace modsecurity {
 namespace actions {
 
 
-bool SetENV::execute(RuleWithActions *rule, Transaction *t) {
+bool SetENV::execute(Transaction *t) noexcept {
     std::string colNameExpanded(getEvaluatedRunTimeString(t));
 
     ms_dbg_a(t, 8, "Setting envoriment variable: "

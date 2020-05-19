@@ -31,10 +31,10 @@
       ]
     },
     "expected":{  
-      "debug_log":"t:lowercase:"
+      "debug_log":"t:lowerCase:"
     },
     "rules":[  
-      "SecRule \"REQUEST_LINE\" \"@contains index.php/admin/cms/wysiwyg/directive/\" \"id:1,t:lowercase,ctl:auditLogParts=+E\""
+      "SecRule \"REQUEST_LINE\" \"@contains index.php/admin/cms/wysiwyg/directive/\" \"id:1,t:lowerCase,ctl:auditLogParts=+E\""
     ]
   },
   {  
@@ -69,10 +69,10 @@
       ]
     },
     "expected":{  
-      "debug_log":"t:lowercase:"
+      "debug_log":"t:lowerCase:"
     },
     "rules":[  
-      "SecRule \"REQUEST_LINE\" \"index.php/admin/cms/wysiwyg/directive/\" \"id:1,t:lowercase,ctl:auditLogParts=+E\""
+      "SecRule \"REQUEST_LINE\" \"index.php/admin/cms/wysiwyg/directive/\" \"id:1,t:lowerCase,ctl:auditLogParts=+E\""
     ]
   }
 ]

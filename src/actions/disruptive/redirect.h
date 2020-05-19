@@ -13,49 +13,49 @@
  *
  */
 
+
 #include <string>
 #include <memory>
 #include <utility>
 
 #include "modsecurity/actions/action.h"
-#include "modsecurity/rule_message.h"
+#include "modsecurity/transaction.h"
+
 #include "src/actions/action_with_run_time_string.h"
+#include "src/actions/disruptive/disruptive_action.h"
+#include "src/run_time_string.h"
+
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
 #define SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
 
-#ifdef __cplusplus
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
-
 namespace actions {
 namespace disruptive {
 
 
-class Redirect : public ActionWithRunTimeString {
+class Redirect : public ActionWithRunTimeString, public ActionDisruptive {
  public:
     explicit Redirect(std::unique_ptr<RunTimeString> runTimeString)
-        : ActionWithRunTimeString(
-            "redirert",
-            RunTimeOnlyIfMatchKind,
-            std::move(runTimeString)),
-        m_status(0)
-    { };
+        : ActionWithRunTimeString(std::move(runTimeString)),
+        Action("redirect"),
+        m_status(302)
+    { }
+
 
     explicit Redirect(const Redirect &action)
         : ActionWithRunTimeString(action),
+        ActionDisruptive(action),
+        Action(action),
         m_status(action.m_status)
-    { };
+    { }
 
-    bool init(std::string *error) override;
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
-    bool isDisruptive() override { return true; }
 
-    virtual ActionWithRunTimeString *clone() override {
+    ActionWithRunTimeString *clone() override {
         return new Redirect(*this);
     }
 
@@ -67,6 +67,6 @@ class Redirect : public ActionWithRunTimeString {
 }  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_

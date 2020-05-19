@@ -13,28 +13,33 @@
  *
  */
 
-#include <string>
-#include <memory>
 
 #include "modsecurity/actions/action.h"
+
+#include "src/actions/action_type_rule_metadata.h"
+#include "src/actions/action_allowed_in_sec_default_action.h"
+
 
 #ifndef SRC_ACTIONS_NO_LOG_H_
 #define SRC_ACTIONS_NO_LOG_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
-class NoLog : public Action {
+class NoLog : public ActionTypeRuleMetaData,
+    public ActionAllowedAsSecDefaultAction {
  public:
-    explicit NoLog(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    NoLog()
+        : Action("noLog")
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    void configure(RuleWithActions *rule) override {
+        rule->setHasNoLogAction(true);
+    }
 };
+
 
 }  // namespace actions
 }  // namespace modsecurity

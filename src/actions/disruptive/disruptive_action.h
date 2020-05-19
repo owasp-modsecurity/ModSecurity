@@ -16,36 +16,30 @@
 
 #include <string>
 
-#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+#include "src/actions/action_allowed_in_sec_default_action.h"
 
-#include "src/actions/transformations/transformation.h"
 
-
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
+#ifndef SRC_ACTIONS_DISRUPTIVE_DISRUPTIVE_ACTION_H_
+#define SRC_ACTIONS_DISRUPTIVE_DISRUPTIVE_ACTION_H_
 
 
 namespace modsecurity {
 namespace actions {
-namespace transformations {
+namespace disruptive {
 
 
-class ReplaceComments : public Transformation {
+class ActionDisruptive : public ActionAllowedAsSecDefaultAction {
  public:
-    ReplaceComments()
-        : Action("t:removeComments")
-    { }
-
-    void execute(const Transaction *t,
-        const ModSecString &in,
-        ModSecString &out) noexcept override;
+    bool isDisruptive() override {
+       return true;
+    }
 };
 
 
-}  // namespace transformations
+}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
 
 
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
+#endif  // SRC_ACTIONS_DISRUPTIVE_DISRUPTIVE_ACTION_H_

@@ -13,33 +13,34 @@
  *
  */
 
+
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
+
 
 #ifndef SRC_ACTIONS_CHAIN_H_
 #define SRC_ACTIONS_CHAIN_H_
 
-#ifdef __cplusplus
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
-class RuleWithOperator;
-
 namespace actions {
 
 
-class Chain : public Action {
+class Chain : public ActionTypeRuleMetaData {
  public:
-    explicit Chain(const std::string &action) 
-        : Action(action, ConfigurationKind) { }
+    Chain()
+        : Action("chain")
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    void configure(RuleWithActions *rule) override {
+        rule->setHasChainAction(true);
+    }
 };
+
 
 }  // namespace actions
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_ACTIONS_CHAIN_H_

@@ -13,13 +13,14 @@
  *
  */
 
+
 #include "src/actions/ctl/request_body_access.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/rules_set_properties.h"
 #include "modsecurity/transaction.h"
+
 
 namespace modsecurity {
 namespace actions {
@@ -27,26 +28,29 @@ namespace ctl {
 
 
 bool RequestBodyAccess::init(std::string *error) {
-    std::string what(m_parser_payload, 18, m_parser_payload.size() - 18);
+    std::string what(m_parserPayload, 18, m_parserPayload.size() - 18);
 
     if (what == "true") {
-        m_request_body_access = true;
+        m_requestBodyAccess = true;
     } else if (what == "false") {
-        m_request_body_access = false;
+        m_requestBodyAccess = false;
     } else {
         error->assign("Internal error. Expected: true or false, got: " \
-            + m_parser_payload);
+            + m_parserPayload);
         return false;
     }
 
     return true;
 }
 
-bool RequestBodyAccess::execute(RuleWithActions *rule, Transaction *transaction) {
-    if (m_request_body_access) {
-        transaction->m_requestBodyAccess = RulesSetProperties::TrueConfigBoolean;
+
+bool RequestBodyAccess::execute(Transaction *transaction) noexcept {
+    if (m_requestBodyAccess) {
+        transaction->m_requestBodyAccess =
+            RulesSetProperties::TrueConfigBoolean;
     } else {
-        transaction->m_requestBodyAccess = RulesSetProperties::FalseConfigBoolean;
+        transaction->m_requestBodyAccess =
+            RulesSetProperties::FalseConfigBoolean;
     }
 
     return true;

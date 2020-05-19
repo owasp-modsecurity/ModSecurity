@@ -13,28 +13,25 @@
  *
  */
 
+
 #include "src/actions/transformations/remove_whitespace.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 
-#define NBSP 160    // non breaking space char
+#include "src/utils/string.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
-void RemoveWhitespace::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void RemoveWhitespace::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     out = in;
     int64_t i = 0;
 
