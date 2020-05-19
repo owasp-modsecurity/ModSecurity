@@ -36,7 +36,7 @@
       ]
     },
     "expected":{
-      "debug_log": "t:base64encode: \"dmFsdWUyCg==\""
+      "debug_log": "t:base64Encode: \"dmFsdWUyCg==\""
     },
     "rules":[
       "SecRuleEngine On",
@@ -80,7 +80,7 @@
       ]
     },
     "expected":{
-      "debug_log": "t:base64decode: \"value2\""
+      "debug_log": "t:base64Decode: \"value2\""
     },
     "rules":[
       "SecRuleEngine On",

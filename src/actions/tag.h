@@ -13,44 +13,44 @@
  *
  */
 
+
 #include <string>
 #include <memory>
 #include <utility>
 
 #include "modsecurity/actions/action.h"
 #include "src/actions/action_with_run_time_string.h"
+#include "src/actions/action_allowed_in_sec_default_action.h"
 
 #ifndef SRC_ACTIONS_TAG_H_
 #define SRC_ACTIONS_TAG_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
-class Tag : public ActionWithRunTimeString {
+class Tag : public ActionWithRunTimeString,
+        public ActionAllowedAsSecDefaultAction {
  public:
     explicit Tag(std::unique_ptr<RunTimeString> runTimeString)
-        : ActionWithRunTimeString(
-            "tag",
-            RunTimeOnlyIfMatchKind,
-            std::move(runTimeString)
-        )
-    { };
+        : ActionWithRunTimeString(std::move(runTimeString)),
+        Action("tag")
+    { }
 
     explicit Tag(const Tag &action)
-        : ActionWithRunTimeString(action)
-    { };
+        : ActionWithRunTimeString(action),
+        Action(action)
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
     inline std::string getTagName(Transaction *transaction) const {
         return getEvaluatedRunTimeString(transaction);
     }
 
-    virtual ActionWithRunTimeString *clone() override {
+
+    ActionWithRunTimeString *clone() override {
         return new Tag(*this);
     }
 };

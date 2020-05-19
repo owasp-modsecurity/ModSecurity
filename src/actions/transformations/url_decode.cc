@@ -13,28 +13,25 @@
  *
  */
 
+
 #include "src/actions/transformations/url_decode.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/utils/decode.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
-void UrlDecode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void UrlDecode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     unsigned char *val(NULL);
     int invalid_count = 0;
     int changed;

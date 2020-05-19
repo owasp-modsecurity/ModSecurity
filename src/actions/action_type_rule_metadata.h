@@ -14,38 +14,38 @@
  */
 
 
-#include <string>
-
-#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+#include "src/rule_with_actions.h"
 
-#include "src/actions/transformations/transformation.h"
-
-
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
+#ifndef SRC_ACTIONS_ACTION_TYPE_CONFIGURE_H_
+#define SRC_ACTIONS_ACTION_TYPE_CONFIGURE_H_
 
 
 namespace modsecurity {
 namespace actions {
-namespace transformations {
 
 
-class ReplaceComments : public Transformation {
+class ActionTypeRuleMetaData : public virtual Action {
  public:
-    ReplaceComments()
-        : Action("t:removeComments")
-    { }
+     /**
+     *
+     * Action that are executed while loading the configuration. For instance
+     * the rule ID or the rule phase.
+     *
+     */
+    ActionTypeRuleMetaData()
+        : Action()
+    { };
 
-    void execute(const Transaction *t,
-        const ModSecString &in,
-        ModSecString &out) noexcept override;
+    bool execute(Transaction *t) noexcept override {
+        return true;
+    }
+
+    virtual void configure(RuleWithActions *rule) = 0;
 };
 
 
-}  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
+#endif  // SRC_ACTIONS_ACTION_TYPE_CONFIGURE_H_

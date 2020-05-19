@@ -13,32 +13,37 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_CSS_DECODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_CSS_DECODE_H_
 
-#ifdef __cplusplus
-namespace modsecurity {
-class Transaction;
 
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
 class CssDecode : public Transformation {
  public:
-    explicit CssDecode(const std::string &action)
-        : Transformation(action) { }
+    CssDecode()
+        : Action("t:cssDecode")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 
-    static int css_decode_inplace(unsigned char *input, int64_t input_len);
+ private:
+    static int css_decode_inplace(unsigned char *input,
+        int64_t input_len);
 };
 
 
@@ -46,6 +51,5 @@ class CssDecode : public Transformation {
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_CSS_DECODE_H_

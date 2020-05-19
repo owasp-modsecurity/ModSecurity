@@ -13,26 +13,26 @@
  *
  */
 
+
 #include "src/actions/disruptive/drop.h"
 
-#include <string.h>
-#include <iostream>
 #include <string>
-#include <cstring>
-#include <memory>
 
-#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/utils/string.h"
-#include "modsecurity/modsecurity.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+#include "modsecurity/rule_message.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace disruptive {
 
 
-bool Drop::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Drop::execute(Transaction *transaction) noexcept {
     ms_dbg_a(transaction, 8, "Running action drop " \
         "[executing deny instead of drop.]");
 
@@ -42,9 +42,11 @@ bool Drop::execute(RuleWithActions *rule, Transaction *transaction) {
 
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);
-    transaction->messageGetLast()->setRule(rule);
+
     transaction->m_it.log = strdup(
-        transaction->messageGetLast()->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
+        transaction->messageGetLast()->log(
+            RuleMessage::LogMessageInfo::ClientLogMessageInfo)
+                .c_str());
 
     return true;
 }

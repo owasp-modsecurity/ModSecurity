@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 
 #include "modsecurity/actions/action.h"
@@ -20,10 +21,8 @@
 #ifndef SRC_ACTIONS_XMLNS_H_
 #define SRC_ACTIONS_XMLNS_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
@@ -40,11 +39,6 @@ class XmlNS : public Action {
         m_scope(o.m_scope),
         m_href(o.m_href)
     { };
-
-
-    bool execute(RuleWithActions *rule, Transaction *transaction) override {
-        return true;
-    }
 
     bool init(std::string *error) override;
 
@@ -64,5 +58,6 @@ class XmlNS : public Action {
 
 }  // namespace actions
 }  // namespace modsecurity
+
 
 #endif  // SRC_ACTIONS_XMLNS_H_
