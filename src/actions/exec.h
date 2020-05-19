@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 
 #include "modsecurity/actions/action.h"
@@ -21,22 +22,21 @@
 #ifndef SRC_ACTIONS_EXEC_H_
 #define SRC_ACTIONS_EXEC_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
 class Exec : public Action {
  public:
-    explicit Exec(const std::string &action) 
+    explicit Exec(const std::string &action)
         : Action(action),
-        m_script("") { }
+        m_script("")
+    { }
 
     ~Exec() { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
     bool init(std::string *error) override;
 
  private:

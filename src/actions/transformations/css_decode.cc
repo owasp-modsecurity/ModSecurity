@@ -13,19 +13,14 @@
  *
  */
 
+
 #include "src/actions/transformations/css_decode.h"
 
-#include <string.h>
-
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/utils/string.h"
 
 
@@ -34,9 +29,9 @@ namespace actions {
 namespace transformations {
 
 
-void CssDecode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void CssDecode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     size_t s = in.size();
 
     char *tmp = reinterpret_cast<char *>(
@@ -44,7 +39,8 @@ void CssDecode::execute(Transaction *t,
     memcpy(tmp, in.c_str(), s + 1);
     tmp[s] = '\0';
 
-    size_t r = CssDecode::css_decode_inplace(reinterpret_cast<unsigned char *>(tmp),
+    size_t r = CssDecode::css_decode_inplace(
+        reinterpret_cast<unsigned char *>(tmp),
         s);
 
     out.assign(tmp, r);

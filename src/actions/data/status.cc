@@ -13,11 +13,10 @@
  *
  */
 
+
 #include "src/actions/data/status.h"
 
-#include <iostream>
 #include <string>
-#include <memory>
 
 #include "modsecurity/transaction.h"
 
@@ -26,11 +25,12 @@ namespace modsecurity {
 namespace actions {
 namespace data {
 
+
 bool Status::init(std::string *error) {
     try {
-        m_status = std::stoi(m_parser_payload);
+        m_status = std::stoi(m_parserPayload);
     } catch (...) {
-        error->assign("Not a valid number: " + m_parser_payload);
+        error->assign("Not a valid number: " + m_parserPayload);
         return false;
     }
 
@@ -38,7 +38,7 @@ bool Status::init(std::string *error) {
 }
 
 
-bool Status::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Status::execute(Transaction *transaction) noexcept {
     transaction->m_it.status = m_status;
     return true;
 }

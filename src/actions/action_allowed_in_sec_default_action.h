@@ -13,39 +13,22 @@
  *
  */
 
-
-#include <string>
-
-#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
 
-#include "src/actions/transformations/transformation.h"
-
-
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
+#ifndef SRC_ACTIONS_ACTION_ALLOWED_IN_SEC_DEFAULT_ACTION_H_
+#define SRC_ACTIONS_ACTION_ALLOWED_IN_SEC_DEFAULT_ACTION_H_
 
 
 namespace modsecurity {
 namespace actions {
-namespace transformations {
 
 
-class ReplaceComments : public Transformation {
+class ActionAllowedAsSecDefaultAction : public virtual Action {
  public:
-    ReplaceComments()
-        : Action("t:removeComments")
-    { }
-
-    void execute(const Transaction *t,
-        const ModSecString &in,
-        ModSecString &out) noexcept override;
 };
 
 
-}  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_REPLACE_COMMENTS_H_
+#endif  // SRC_ACTIONS_ACTION_ALLOWED_IN_SEC_DEFAULT_ACTION_H_

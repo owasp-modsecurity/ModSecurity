@@ -13,28 +13,12 @@
  *
  */
 
+
 #include "src/actions/block.h"
-
-#include <iostream>
-#include <string>
-#include <memory>
-
-#include "modsecurity/rules_set.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "modsecurity/intervention.h"
-#include "src/actions/data/status.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
 namespace actions {
-
-
-bool Block::execute(RuleWithActions *rule, Transaction *transaction) {
-    ms_dbg_a(transaction, 8, "Marking request as disruptive.");
-    return true;
-}
 
 
 }  // namespace actions
