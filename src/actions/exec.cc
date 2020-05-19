@@ -13,15 +13,18 @@
  *
  */
 
+
 #include "src/actions/exec.h"
 
-#include <iostream>
 #include <string>
 
-#include "modsecurity/rules_set.h"
-#include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+
 #include "src/utils/system.h"
 #include "src/engine/lua.h"
 
@@ -33,7 +36,7 @@ namespace actions {
 bool Exec::init(std::string *error) {
     std::string err;
 
-    m_script = utils::find_resource(m_parser_payload, "", &err);
+    m_script = utils::find_resource(m_parserPayload, "", &err);
 
     if (m_script.size() == 0) {
         error->assign("exec: Script not found: " + err);
@@ -49,7 +52,7 @@ bool Exec::init(std::string *error) {
 }
 
 
-bool Exec::execute(RuleWithActions *rule, Transaction *t) {
+bool Exec::execute(Transaction *t) noexcept {
     ms_dbg_a(t, 8, "Running script... " + m_script);
     m_lua.run(t);
     return true;

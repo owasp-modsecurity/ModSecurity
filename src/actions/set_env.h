@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 #include <utility>
 #include <memory>
@@ -33,20 +34,18 @@ namespace actions {
 class SetENV : public ActionWithRunTimeString {
  public:
     explicit SetENV(std::unique_ptr<RunTimeString> runTimeString)
-        : ActionWithRunTimeString(
-            "setenv",
-            RunTimeOnlyIfMatchKind,
-            std::move(runTimeString)
-        )
+        : ActionWithRunTimeString(std::move(runTimeString)),
+        Action("setenv")
     { };
 
     explicit SetENV(const SetENV &action)
-        : ActionWithRunTimeString(action)
+        : ActionWithRunTimeString(action),
+        Action(action)
     { };
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
-    virtual ActionWithRunTimeString *clone() override {
+    ActionWithRunTimeString *clone() override {
         return new SetENV(*this);
     }
 };

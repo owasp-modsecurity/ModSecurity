@@ -13,23 +13,23 @@
  *
  */
 
+
 #include "src/actions/transformations/upper_case.h"
 
-#include <algorithm>
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
-#include "modsecurity/actions/action.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
-void UpperCase::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void UpperCase::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     std::locale loc;
     out.reserve(in.size());
     for (std::string::size_type i=0; i < in.size(); ++i) {

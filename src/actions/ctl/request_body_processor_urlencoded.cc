@@ -13,20 +13,21 @@
  *
  */
 
+
 #include "src/actions/ctl/request_body_processor_urlencoded.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace ctl {
 
 
-bool RequestBodyProcessorURLENCODED::execute(RuleWithActions *rule,
-    Transaction *transaction) {
+bool RequestBodyProcessorURLENCODED::execute(
+    Transaction *transaction) noexcept {
     transaction->m_requestBodyType = Transaction::WWWFormUrlEncoded;
     transaction->m_variableReqbodyProcessor.set("URLENCODED",
         transaction->m_variableOffset);

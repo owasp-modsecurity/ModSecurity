@@ -13,18 +13,13 @@
  *
  */
 
+
 #include "src/actions/transformations/hex_encode.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <iterator>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {
@@ -32,9 +27,9 @@ namespace actions {
 namespace transformations {
 
 
-void HexEncode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void HexEncode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     std::stringstream result;
     for (std::size_t i=0; i < in.length(); i++) {
         int ii = reinterpret_cast<char>(in[i]);

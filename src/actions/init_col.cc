@@ -13,14 +13,17 @@
  *
  */
 
+
 #include "src/actions/init_col.h"
 
-#include <iostream>
 #include <string>
 
-#include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
 
 
 namespace modsecurity {
@@ -28,9 +31,9 @@ namespace actions {
 
 
 bool InitCol::init(std::string *error) {
-    int posEquals = m_parser_payload.find("=");
+    int posEquals = m_parserPayload.find("=");
 
-    if (m_parser_payload.size() < 2) {
+    if (m_parserPayload.size() < 2) {
         error->assign("Something wrong with initcol format: too small");
         return false;
     }
@@ -40,7 +43,7 @@ bool InitCol::init(std::string *error) {
         return false;
     }
 
-    m_collection_key = std::string(m_parser_payload, 0,  posEquals);
+    m_collection_key = std::string(m_parserPayload, 0,  posEquals);
 
     if (m_collection_key != "ip" &&
         m_collection_key != "global" &&
@@ -54,7 +57,7 @@ bool InitCol::init(std::string *error) {
 }
 
 
-bool InitCol::execute(RuleWithActions *rule, Transaction *t) {
+bool InitCol::execute(Transaction *t) noexcept {
     std::string collectionName(getEvaluatedRunTimeString(t));
 
     if (m_collection_key == "ip") {

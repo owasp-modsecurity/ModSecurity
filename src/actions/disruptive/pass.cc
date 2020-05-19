@@ -13,23 +13,25 @@
  *
  */
 
+
 #include "src/actions/disruptive/pass.h"
 
-#include <iostream>
 #include <string>
-#include <memory>
 
-#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "modsecurity/rule_message.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+
 
 namespace modsecurity {
 namespace actions {
 namespace disruptive {
 
 
-bool Pass::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Pass::execute(Transaction *transaction) noexcept {
     intervention::free(&transaction->m_it);
     intervention::reset(&transaction->m_it);
 

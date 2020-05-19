@@ -13,19 +13,16 @@
  *
  */
 
+
 #include "src/actions/transformations/normalise_path_win.h"
 
 #include <string.h>
-
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/actions/transformations/normalise_path.h"
 
 
@@ -34,9 +31,9 @@ namespace actions {
 namespace transformations {
 
 
-void NormalisePathWin::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void NormalisePathWin::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     int changed;
 
     char *tmp = reinterpret_cast<char *>(
