@@ -13,14 +13,15 @@
  *
  */
 
+
 #include "src/actions/ctl/rule_remove_target_by_id.h"
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <utility>
 
 #include "modsecurity/transaction.h"
+
 #include "src/utils/string.h"
 
 
@@ -30,7 +31,7 @@ namespace ctl {
 
 
 bool RuleRemoveTargetById::init(std::string *error) {
-    std::string what(m_parser_payload, 21, m_parser_payload.size() - 21);
+    std::string what(m_parserPayload, 21, m_parserPayload.size() - 21);
     std::vector<std::string> param = utils::string::split(what, ';');
 
     if (param.size() < 2) {
@@ -51,7 +52,8 @@ bool RuleRemoveTargetById::init(std::string *error) {
     return true;
 }
 
-bool RuleRemoveTargetById::execute(RuleWithActions *rule, Transaction *transaction) {
+
+bool RuleRemoveTargetById::execute(Transaction *transaction) noexcept {
     transaction->m_ruleRemoveTargetById.push_back(
         std::make_pair(m_id, m_target));
     return true;

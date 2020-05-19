@@ -13,19 +13,13 @@
  *
  */
 
+
 #include "src/actions/transformations/remove_nulls.h"
 
-#include <string.h>
-
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {
@@ -33,9 +27,9 @@ namespace actions {
 namespace transformations {
 
 
-void RemoveNulls::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void RemoveNulls::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     int64_t i;
     out = in;
 

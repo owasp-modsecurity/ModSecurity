@@ -13,15 +13,10 @@
  *
  */
 
+
 #include "src/actions/maturity.h"
 
-#include <iostream>
 #include <string>
-
-#include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
@@ -30,17 +25,12 @@ namespace actions {
 
 bool Maturity::init(std::string *error) {
     try {
-        m_maturity = std::stoi(m_parser_payload);
+        m_maturity = std::stoi(m_parserPayload);
     }  catch (...) {
-        error->assign("Maturity: The input \"" + m_parser_payload + "\" is " \
+        error->assign("Maturity: The input \"" + m_parserPayload + "\" is " \
             "not a number.");
         return false;
     }
-    return true;
-}
-
-
-bool Maturity::execute(RuleWithActions *rule, Transaction *transaction) {
     return true;
 }
 

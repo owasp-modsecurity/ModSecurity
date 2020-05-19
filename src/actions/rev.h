@@ -13,30 +13,35 @@
  *
  */
 
+
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
+
 
 #ifndef SRC_ACTIONS_REV_H_
 #define SRC_ACTIONS_REV_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
-class Rev : public Action {
+class Rev : public ActionTypeRuleMetaData {
  public:
-    explicit Rev(const std::string &action) : Action(action, ConfigurationKind) { }
+    explicit Rev(const std::string &action)
+        : Action(action),
+        m_revision("")
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
-   std::string getRevision() const { return m_rev; }
+
+    void configure(RuleWithActions *rule) override {
+        rule->setRevision(m_revision);
+    }
 
  private:
-   std::string m_rev;
+    std::string m_revision;
 };
 
 

@@ -13,14 +13,15 @@
  *
  */
 
+
 #include "src/actions/ctl/rule_engine.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/rules_set_properties.h"
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
+
 
 namespace modsecurity {
 namespace actions {
@@ -28,7 +29,7 @@ namespace ctl {
 
 
 bool RuleEngine::init(std::string *error) {
-    std::string what(m_parser_payload, 11, m_parser_payload.size() - 11);
+    std::string what(m_parserPayload, 11, m_parserPayload.size() - 11);
 
     if (what == "on") {
         m_ruleEngine = RulesSetProperties::EnabledRuleEngine;
@@ -38,14 +39,15 @@ bool RuleEngine::init(std::string *error) {
         m_ruleEngine = RulesSetProperties::DetectionOnlyRuleEngine;
     } else {
         error->assign("Internal error. Expected: On, Off or DetectionOnly; " \
-            "got: " + m_parser_payload);
+            "got: " + m_parserPayload);
         return false;
     }
 
     return true;
 }
 
-bool RuleEngine::execute(RuleWithActions *rule, Transaction *transaction) {
+
+bool RuleEngine::execute(Transaction *transaction) noexcept {
     std::stringstream a;
     a << "Setting SecRuleEngine to ";
     a << modsecurity::RulesSetProperties::ruleEngineStateString(m_ruleEngine);

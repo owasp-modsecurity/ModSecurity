@@ -29,6 +29,8 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/variable_value.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
 
 
 #ifdef __cplusplus
@@ -53,6 +55,7 @@ using Transformation = actions::transformations::Transformation;
 using Transformations = std::vector<std::shared_ptr<Transformation> >;
 using TransformationsPtr = std::vector<Transformation *>;
 using Action = actions::Action;
+using ActionTypeRuleMetaData = actions::ActionTypeRuleMetaData;
 using Actions = std::vector<actions::Action *>;
 using Tags = std::vector<std::shared_ptr<actions::Tag> >;
 using TagsPtr = std::vector<actions::Tag *>;
@@ -67,10 +70,10 @@ using XmlNSsPtr = std::vector<actions::XmlNS *>;
 
 class TransformationResult {
  public:
-    TransformationResult(
-        ModSecString *after,
-        std::string *transformation)
-        : m_after(*after),
+    explicit TransformationResult(
+        ModSecString &after,
+        const std::string *transformation = nullptr)
+        : m_after(after),
         m_transformation(transformation) { };
 
     explicit TransformationResult(
@@ -88,14 +91,14 @@ class TransformationResult {
     }
 
 
-    std::string *getTransformationName() {
+    const std::string *getTransformationName() const {
         return m_transformation;
     }
 
 
  private:
     ModSecString m_after;
-    std::string *m_transformation;
+    const std::string *m_transformation;
 };
 
 using TransformationsResults = std::list<TransformationResult>;
@@ -217,7 +220,6 @@ class RuleWithActions : public Rule {
     void executeAction(Transaction *trans,
         Action *a,
         bool context);
-
 
     static void executeTransformation(
         Transaction *transaction,
@@ -343,6 +345,7 @@ class RuleWithActions : public Rule {
     inline bool hasChainedParent() const { return m_chainedRuleParent != nullptr; }
     inline bool hasChainedChild() const { return m_chainedRuleChild.get() != nullptr; }
 
+    inline void setHasCaptureAction(bool b) { m_containsCaptureAction = b; }
     inline bool hasCaptureAction() const { return m_containsCaptureAction || m_defaultContainsCaptureAction; }
 
     inline bool hasDisruptiveAction() const { return m_disruptiveAction != nullptr || m_defaultActionDisruptiveAction != nullptr; }
@@ -352,6 +355,7 @@ class RuleWithActions : public Rule {
     inline bool hasBlockAction() const { return m_containsStaticBlockAction || m_defaultContainsStaticBlockAction; }
     inline void setHasBlockAction(bool b) { m_containsStaticBlockAction = b; }
 
+    inline void setHasMultimatchAction(bool b) { m_containsMultiMatchAction = b; }
     inline bool hasMultimatchAction() const { return m_containsMultiMatchAction || m_defaultContainsMultiMatchAction; }
 
     inline bool hasLogAction() const { return m_containsLogAction == true; }

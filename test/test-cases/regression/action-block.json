@@ -27,7 +27,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDefaultAction \"phase:1,log,block,status:404\"",
+      "SecDefaultAction \"phase:1,log,status:404\"",
       "SecRule REQUEST_URI \"@contains path1\" \"phase:1,block,id:5\""
     ]
   },
@@ -59,7 +59,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDefaultAction \"phase:1,log,block,deny,status:400\"",
+      "SecDefaultAction \"phase:1,log,deny,status:400\"",
       "SecRule REQUEST_URI \"@contains path1\" \"phase:1,block,id:5\""
     ]
   }

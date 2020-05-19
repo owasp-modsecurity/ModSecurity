@@ -13,39 +13,47 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_
 
-#define UNICODE_ERROR_CHARACTERS_MISSING    -1
-#define UNICODE_ERROR_INVALID_ENCODING      -2
-#define UNICODE_ERROR_OVERLONG_CHARACTER    -3
-#define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
-#define UNICODE_ERROR_DECODING_ERROR        -5
 
 namespace modsecurity {
-class Transaction;
-
 namespace actions {
 namespace transformations {
 
+
 class Utf8ToUnicode : public Transformation {
  public:
-    explicit Utf8ToUnicode(const std::string &action)
-        : Transformation(action) { }
+    Utf8ToUnicode()
+        : Action("t:utf8toUnicode")
+    { }
 
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+ private:
+    enum UnicodeError {
+        UNICODE_ERROR_CHARACTERS_MISSING = -1,
+        UNICODE_ERROR_INVALID_ENCODING = -2,
+        UNICODE_ERROR_OVERLONG_CHARACTER = -3,
+        UNICODE_ERROR_RESTRICTED_CHARACTER = -4,
+        UNICODE_ERROR_DECODING_ERROR = -5
+    };
 
     static char *inplace(unsigned char *input, uint64_t input_len,
         int *changed);
 };
+
 
 }  // namespace transformations
 }  // namespace actions

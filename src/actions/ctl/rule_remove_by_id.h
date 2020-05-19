@@ -13,7 +13,10 @@
  *
  */
 
+
 #include <string>
+#include <utility>
+#include <list>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -22,6 +25,7 @@
 #ifndef SRC_ACTIONS_CTL_RULE_REMOVE_BY_ID_H_
 #define SRC_ACTIONS_CTL_RULE_REMOVE_BY_ID_H_
 
+
 namespace modsecurity {
 namespace actions {
 namespace ctl {
@@ -29,12 +33,15 @@ namespace ctl {
 
 class RuleRemoveById : public Action {
  public:
-    explicit RuleRemoveById(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    explicit RuleRemoveById(const std::string &action)
+        : Action(action)
+    { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
+    bool execute(Transaction *transaction) noexcept override;
+
+ private:
     std::list<std::pair<int, int> > m_ranges;
     std::list<int> m_ids;
 };

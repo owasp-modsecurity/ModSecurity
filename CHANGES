@@ -3,7 +3,7 @@ v3.x.y - YYYY-MMM-DD (to be released)
    
   - actions: Computes Rule association while loading the rules given a
     performance boost on run time.
-    [@zimmerle]
+    [@zimmerle, @martinhsv, @WGH-]
   - Regression: Mark the test as failed in case of segfault.
     [@zimmerle]
   - Replaced t:lowerCase backend for a better performance.
