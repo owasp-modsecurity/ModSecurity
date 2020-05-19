@@ -13,37 +13,42 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_HEX_DECODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_HEX_DECODE_H_
 
-#ifdef __cplusplus
-namespace modsecurity {
-class Transaction;
 
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 
+
 class HexDecode : public Transformation {
  public:
-    explicit HexDecode(const std::string &action)
-        : Transformation(action) { }
+    HexDecode()
+        : Action("t:hexDecode")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 
+ private:
     static int inplace(unsigned char *data, int len);
 };
+
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_HEX_DECODE_H_

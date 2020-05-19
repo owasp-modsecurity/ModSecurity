@@ -13,38 +13,43 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_URL_ENCODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_URL_ENCODE_H_
 
-#ifdef __cplusplus
-namespace modsecurity {
-class Transaction;
 
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 
+
 class UrlEncode : public Transformation {
  public:
-    explicit UrlEncode(const std::string &action)
-        : Transformation(action) { };
+    UrlEncode()
+        : Action("t:urlEncode")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 
+ private:
     static std::string url_enc(const char *input,
         unsigned int input_len, int *changed);
 };
+
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_URL_ENCODE_H_

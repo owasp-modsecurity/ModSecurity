@@ -13,19 +13,16 @@
  *
  */
 
+
 #include "src/actions/transformations/escape_seq_decode.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/utils/string.h"
+
 
 namespace modsecurity {
 namespace actions {
@@ -135,9 +132,9 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 }
 
 
-void EscapeSeqDecode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void EscapeSeqDecode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
         * in.size() + 1);
     memcpy(tmp, in.c_str(), in.size() + 1);

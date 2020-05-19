@@ -13,18 +13,14 @@
  *
  */
 
+
 #include "src/actions/transformations/utf8_to_unicode.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/utils/string.h"
 
 
@@ -33,10 +29,9 @@ namespace actions {
 namespace transformations {
 
 
-void Utf8ToUnicode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
-
+void Utf8ToUnicode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     unsigned char *input;
     int changed = 0;
     char *out2;
@@ -71,8 +66,8 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
     unsigned char unicode[8];
     *changed = 0;
 
-    /* RFC3629 states that UTF-8 are encoded using sequences of 1 to 4 octets. */
-    /* Max size per character should fit in 4 bytes */
+    /* RFC3629 states that UTF-8 are encoded using sequences of 1 to 4 */
+    /* octets. Max size per character should fit in 4 bytes */
     len = input_len * 4 + 1;
     data = reinterpret_cast<char *>(malloc(sizeof(char) * len));
     if (data == NULL) {

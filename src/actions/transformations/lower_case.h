@@ -13,37 +13,39 @@
  *
  */
 
-#include <string>
-#include <unordered_map>
 
+#include <string>
+
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_LOWER_CASE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_LOWER_CASE_H_
 
-#ifdef __cplusplus
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 namespace transformations {
 
 
 class LowerCase : public Transformation {
  public:
-    explicit LowerCase(const std::string &action)
-        : Transformation(action) { };
+    LowerCase()
+        : Action("t:lowerCase")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 };
+
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_LOWER_CASE_H_

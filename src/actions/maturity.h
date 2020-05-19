@@ -13,9 +13,11 @@
  *
  */
 
+
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_rule_metadata.h"
+
 
 #ifndef SRC_ACTIONS_MATURITY_H_
 #define SRC_ACTIONS_MATURITY_H_
@@ -27,15 +29,17 @@ class Transaction;
 namespace actions {
 
 
-class Maturity : public Action {
+class Maturity : public ActionTypeRuleMetaData {
  public:
-    explicit Maturity(const std::string &action) 
-        : Action(action, ConfigurationKind),
+    explicit Maturity(const std::string &action)
+        : Action(action),
         m_maturity(0) { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
-    int getMaturity() const { return m_maturity; }
+
+    void configure(RuleWithActions *rule) override {
+        rule->setMaturity(m_maturity);
+    }
 
  private:
     int m_maturity;

@@ -13,24 +13,24 @@
  *
  */
 
+
 #include "src/actions/set_var.h"
 
-#include <iostream>
 #include <string>
-#include <memory>
 
-#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/utils/string.h"
+/**
+ * FIXME: rules_set.h inclusion is here due to ms_dbg_a.
+ *        It should be removed.
+ */
+#include "modsecurity/rules_set.h"
+
 #include "src/variables/global.h"
 #include "src/variables/ip.h"
 #include "src/variables/resource.h"
 #include "src/variables/session.h"
 #include "src/variables/tx.h"
 #include "src/variables/user.h"
-#include "src/variables/variable.h"
-#include "src/rule_with_operator.h"
 
 
 namespace modsecurity {
@@ -42,7 +42,7 @@ bool SetVar::init(std::string *error) {
 }
 
 
-bool SetVar::execute(RuleWithActions *rule, Transaction *t) {
+bool SetVar::execute(Transaction *t) noexcept {
     std::string targetValue;
     std::string resolvedPre;
 

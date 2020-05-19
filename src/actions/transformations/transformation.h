@@ -13,29 +13,46 @@
  *
  */
 
+
+#include <algorithm>
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
+#include "src/actions/action_allowed_in_sec_default_action.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_TRANSFORMATION_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_TRANSFORMATION_H_
 
 
 namespace modsecurity {
-class Transaction;
-
 namespace actions {
 namespace transformations {
 
-class Transformation : public Action {
+
+class Transformation : public ActionAllowedAsSecDefaultAction {
  public:
-    explicit Transformation(const std::string& _action)
-        : Action(_action, RunTimeBeforeMatchAttemptKind) { }
+    virtual void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept = 0;
 
-    virtual bool isNone() { return false; }
+    virtual ~Transformation()
+    { }
 
-    static Transformation* instantiate(std::string a);
+    static Transformation* instantiate(const std::string &name);
+
+ private:
+    static bool match(const std::string &a, const std::string &b) noexcept {
+        return ((a.size() == b.size())
+            && std::equal(a.begin(), a.end(), b.begin(),
+                [](const char & c1, const char & c2) {
+				    return (c1 == c2 || std::toupper(c1) == std::toupper(c2));
+				}));
+    }
 };
+
 
 }  // namespace transformations
 }  // namespace actions

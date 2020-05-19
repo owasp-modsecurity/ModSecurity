@@ -13,24 +13,12 @@
  *
  */
 
+
 #include "src/actions/chain.h"
-
-#include <iostream>
-#include <string>
-
-#include "modsecurity/transaction.h"
-#include "modsecurity/rule.h"
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
 namespace actions {
-
-
-bool Chain::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setHasChainAction(true);
-    return true;
-}
 
 
 }  // namespace actions

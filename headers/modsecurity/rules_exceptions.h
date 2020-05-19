@@ -37,6 +37,9 @@
 namespace modsecurity {
 namespace actions {
 class Action;
+namespace transformations {
+class Transformation;
+}
 }
 namespace variables {
 class Variable;
@@ -79,7 +82,7 @@ class RulesExceptions {
     std::unordered_multimap<double,
         std::shared_ptr<variables::Variable>> m_variable_update_target_by_id;
     std::unordered_multimap<double,
-        std::shared_ptr<actions::Action>> m_action_pre_update_target_by_id;
+        std::shared_ptr<actions::transformations::Transformation>> m_action_transformation_update_target_by_id;
     std::unordered_multimap<double,
         std::shared_ptr<actions::Action>> m_action_pos_update_target_by_id;
     std::list<std::string> m_remove_rule_by_msg;
