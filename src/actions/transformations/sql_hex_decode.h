@@ -13,30 +13,34 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_SQL_HEX_DECODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_SQL_HEX_DECODE_H_
 
-#ifdef __cplusplus
 namespace modsecurity {
-class Transaction;
-
 namespace actions {
 namespace transformations {
 
+
 class SqlHexDecode : public Transformation {
  public:
-    explicit SqlHexDecode(const std::string &action)
-        : Transformation(action) { }
+    SqlHexDecode()
+        : Action("t:sqlHexDecode")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 
+ private:
     static int inplace(unsigned char *data, int len);
 
     static int mytolower(int ch) {
@@ -47,10 +51,10 @@ class SqlHexDecode : public Transformation {
     }
 };
 
+
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_SQL_HEX_DECODE_H_

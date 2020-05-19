@@ -267,6 +267,50 @@
         "SecRuleUpdateActionById 200004 \"redirect:'https://%{request_headers.host}/'\"",
         "SecRule ARGS \"@contains value1\" \"phase:3,id:200004,block,deny\""
     ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRuleUpdateActionById (7/n)",
+    "issue":"2376",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"application/lhebs",
+        "Expect":"100-continue"
+      },
+      "uri":"/a=urlencoded?param1=value1",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code": 403
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecRuleUpdateActionById 200004 \"t:none,t:lowercase\"",
+        "SecRule ARGS \"@contains value1\" \"phase:3,id:200004,deny,status:403\""
+    ]
   }
 ]
 

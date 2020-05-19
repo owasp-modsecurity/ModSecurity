@@ -13,30 +13,35 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_NORMALISE_PATH_WIN_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_NORMALISE_PATH_WIN_H_
 
 
 namespace modsecurity {
-class Transaction;
-
 namespace actions {
 namespace transformations {
 
+
 class NormalisePathWin : public Transformation {
  public:
-    explicit NormalisePathWin(const std::string &action) 
-        : Transformation(action) { }
+    NormalisePathWin()
+        : Action("t:normalisePathWin")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 };
+
 
 }  // namespace transformations
 }  // namespace actions

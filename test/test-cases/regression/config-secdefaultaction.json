@@ -48,14 +48,14 @@
     },
     "expected":{
       "audit_log":"",
-      "debug_log":"lowercase: \"300\"",
+      "debug_log":"lowerCase: \"300\"",
       "error_log":""
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDefaultAction \"phase:2,t:lowercase,pass\"",
+      "SecDefaultAction \"phase:2,t:lowerCase,pass\"",
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1,msg:'This is a test, %{REQUEST_HEADERS:Accept}%'\"",
-      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
+      "SecRule TX \"@contains to_test\" \"id:2,t:lowerCase,t:none\""
     ]
   },
   {
@@ -123,7 +123,7 @@
     "version_max":0,
     "title":"Testing action :: SecDefaultAction: t:none",
     "expected":{
-      "parser_error":"The transformation none is not suitable to be part of the SecDefaultActions"
+      "parser_error":"The action 't:none' is not suitable to be part of the SecDefaultActions"
     },
     "rules":[
       "SecRuleEngine On",

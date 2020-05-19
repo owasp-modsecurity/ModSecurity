@@ -32,11 +32,13 @@ namespace transformations {
 
 class PhpArgsNames : public Transformation {
  public:
-    explicit PhpArgsNames(const std::string &action);
+    PhpArgsNames()
+        : Action("t:phpArgsNames")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 };
 
 }  // namespace transformations

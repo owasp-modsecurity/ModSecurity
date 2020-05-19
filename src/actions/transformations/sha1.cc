@@ -13,17 +13,14 @@
  *
  */
 
+
 #include "src/actions/transformations/sha1.h"
 
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
 #include "src/utils/sha1.h"
 
 
@@ -32,13 +29,11 @@ namespace actions {
 namespace transformations {
 
 
-void Sha1::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
-
+void Sha1::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     auto a = Utils::Sha1::digest(
-            std::string(in.c_str(), in.size())
-        );
+            std::string(in.c_str(), in.size()));
 
     out.assign(a.c_str(), a.size());
 }

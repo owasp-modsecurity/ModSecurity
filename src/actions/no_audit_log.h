@@ -13,33 +13,32 @@
  *
  */
 
-#include <string>
-#include <memory>
 
 #include "modsecurity/actions/action.h"
+#include "modsecurity/transaction.h"
+#include "src/actions/action_allowed_in_sec_default_action.h"
+
 
 #ifndef SRC_ACTIONS_NO_AUDIT_LOG_H_
 #define SRC_ACTIONS_NO_AUDIT_LOG_H_
 
-#ifdef __cplusplus
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
-
 namespace actions {
 
 
-class NoAuditLog : public Action {
+class NoAuditLog : public ActionAllowedAsSecDefaultAction {
  public:
-    explicit NoAuditLog(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+    NoAuditLog()
+        : Action("noAuditLog")
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 };
+
 
 }  // namespace actions
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_ACTIONS_NO_AUDIT_LOG_H_
