@@ -50,7 +50,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Tag::execute(RuleWithActions *rule, Transaction *transaction) {
+bool Tag::execute(Transaction *transaction) {
     std::string tag = getTagName(transaction);
     ms_dbg_a(transaction, 9, "Rule tag: " + tag);
 

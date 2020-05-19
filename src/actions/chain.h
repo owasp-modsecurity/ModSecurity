@@ -15,7 +15,8 @@
 
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_configure.h"
+
 
 #ifndef SRC_ACTIONS_CHAIN_H_
 #define SRC_ACTIONS_CHAIN_H_
@@ -30,12 +31,15 @@ class RuleWithOperator;
 namespace actions {
 
 
-class Chain : public Action {
+class Chain : public ActionTypeConfigure {
  public:
     explicit Chain(const std::string &action) 
-        : Action(action, ConfigurationKind) { }
+        : ActionTypeConfigure(action)
+    { };
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    virtual void configure(RuleWithActions *rule) override {
+        rule->setHasChainAction(true);
+    }
 };
 
 }  // namespace actions

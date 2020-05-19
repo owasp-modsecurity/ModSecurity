@@ -15,7 +15,8 @@
 
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_configure.h"
+
 
 #ifndef SRC_ACTIONS_PHASE_H_
 #define SRC_ACTIONS_PHASE_H_
@@ -30,14 +31,19 @@ class RuleWithOperator;
 namespace actions {
 
 
-class Phase : public Action {
+class Phase : public ActionTypeConfigure {
  public:
-    explicit Phase(const std::string &action) : Action(action, ConfigurationKind),
+    explicit Phase(const std::string &action)
+        : ActionTypeConfigure(action),
         m_phase(0),
         m_secRulesPhase(0) { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+
+    virtual void configure(RuleWithActions *rule) override {
+        rule->setPhase(m_phase);
+    }
+
 
     int m_phase;
     int m_secRulesPhase;

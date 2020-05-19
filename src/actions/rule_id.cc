@@ -50,11 +50,5 @@ bool RuleId::init(std::string *error) {
 }
 
 
-bool RuleId::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setId(m_ruleId);
-    return true;
-}
-
-
 }  // namespace actions
 }  // namespace modsecurity

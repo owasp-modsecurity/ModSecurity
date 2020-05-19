@@ -28,10 +28,5 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Ver::execute(RuleWithActions *rule, Transaction *transaction) {
-    return true;
-}
-
-
 }  // namespace actions
 }  // namespace modsecurity

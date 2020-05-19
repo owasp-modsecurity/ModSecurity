@@ -44,7 +44,7 @@ class LogData : public ActionWithRunTimeString {
         : ActionWithRunTimeString(data)
     { };
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
 
     virtual ActionWithRunTimeString *clone() override {
         return new LogData(*this);

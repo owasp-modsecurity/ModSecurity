@@ -45,7 +45,7 @@ class Msg : public ActionWithRunTimeString {
         : ActionWithRunTimeString(action)
     { };
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
 
     virtual ActionWithRunTimeString *clone() override {
         return new Msg(*this);

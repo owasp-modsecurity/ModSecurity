@@ -25,7 +25,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool MultiMatch::execute(RuleWithActions *rule, Transaction *transaction) {
+bool MultiMatch::execute(Transaction *transaction) {
     return true;
 }
 

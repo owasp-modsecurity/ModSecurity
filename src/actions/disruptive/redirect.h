@@ -51,7 +51,7 @@ class Redirect : public ActionWithRunTimeString {
 
     bool init(std::string *error) override;
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
 
     bool isDisruptive() override { return true; }
 

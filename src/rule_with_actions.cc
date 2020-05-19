@@ -47,6 +47,11 @@
 #include "src/actions/xmlns.h"
 #include "src/utils/string.h"
 #include "src/actions/action_with_run_time_string.h"
+#include "src/actions/phase.h"
+#include "src/actions/chain.h"
+#include "src/actions/rule_id.h"
+#include "src/actions/ver.h"
+#include "src/actions/action_type_configure.h"
 
 
 namespace modsecurity {
@@ -113,16 +118,9 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
         arts->populate(this);
     }
 
-    if (a->m_actionKind == Action::ConfigurationKind) {
-        if (dynamic_cast<actions::Accuracy *>(a.get())) {
-            actions::Accuracy *accuracy = dynamic_cast<actions::Accuracy *>(a.get());
-            m_defaultAccuracy = accuracy->getAccuracy();
-        } else if (dynamic_cast<actions::Rev *>(a.get())) {
-            actions::Rev *rev = dynamic_cast<actions::Rev *>(a.get());
-            m_defaultRevision = rev->getRevision();
-        } else {
-            a->execute(this, NULL);
-        }
+    if (dynamic_cast<ActionTypeConfigure *>(a.get())) {
+        ActionTypeConfigure *conf = dynamic_cast<ActionTypeConfigure *>(a.get());
+        conf->configure(this);
         return;
     }
 
@@ -134,9 +132,6 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
         } else if (dynamic_cast<actions::Severity *>(a.get())) {
             actions::Severity *severity = dynamic_cast<actions::Severity *>(a.get());
             setDefaultActionSeverity(severity->m_severity);
-        } else if (dynamic_cast<actions::Maturity *>(a.get())) {
-            actions::Maturity *maturity = dynamic_cast<actions::Maturity *>(a.get());
-            setDefaultActionMaturity(maturity->getMaturity());
         } else if (dynamic_cast<actions::LogData *>(a.get())) {
             m_defaultActionLogData = std::static_pointer_cast<actions::LogData>(a);
         } else if (dynamic_cast<actions::Msg *>(a.get())) {
@@ -175,16 +170,9 @@ void RuleWithActions::addAction(actions::Action *a) {
         arts->populate(this);
     }
 
-    if (a->m_actionKind == Action::ConfigurationKind) {
-        if (dynamic_cast<actions::Accuracy *>(a)) {
-            actions::Accuracy *accuracy = dynamic_cast<actions::Accuracy *>(a);
-            m_accuracy = accuracy->getAccuracy();
-        } else if (dynamic_cast<actions::Rev *>(a)) {
-            actions::Rev *rev = dynamic_cast<actions::Rev *>(a);
-            m_revision = rev->getRevision();
-        } else {
-            a->execute(this, NULL);
-        }
+    if (dynamic_cast<ActionTypeConfigure *>(a)) {
+        ActionTypeConfigure *conf = dynamic_cast<ActionTypeConfigure *>(a);
+        conf->configure(this);
         delete a;
         return;
     }
@@ -207,10 +195,6 @@ void RuleWithActions::addAction(actions::Action *a) {
         } else if (dynamic_cast<actions::SetVar *>(a)) {
             actions::SetVar *var = dynamic_cast<actions::SetVar *>(a);
             m_actionsSetVar.push_back(std::unique_ptr<actions::SetVar>(var));
-        } else if (dynamic_cast<actions::Maturity *>(a)) {
-            actions::Maturity *maturity = dynamic_cast<actions::Maturity *>(a);
-            m_maturity = maturity->getMaturity();
-            delete a;
         } else if (dynamic_cast<actions::Log *>(a)) {
             m_containsLogAction = true;
             delete a;
@@ -257,7 +241,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
             "action: " + *a->m_name.get());
 
-        a->execute(this, trans);
+        a->execute(trans);
     }
 
     for (auto &b :
@@ -271,20 +255,20 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         } else if (*a->m_name.get() == "setvar") {
             ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
                 "action: " + *a->m_name.get());
-            a->execute(this, trans);
+            a->execute(trans);
         }
     }
 
     if (m_logData) {
-        m_logData->execute(this, trans);
+        m_logData->execute(trans);
     } else if (m_defaultActionLogData) {
-        m_defaultActionLogData->execute(this, trans);
+        m_defaultActionLogData->execute(trans);
     }
 
     if (m_msg) {
-        m_msg->execute(this, trans);
+        m_msg->execute(trans);
     } else if (m_defaultActionMsg) {
-        m_defaultActionMsg->execute(this, trans);
+        m_defaultActionMsg->execute(trans);
     }
 }
 
@@ -307,7 +291,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
     for (actions::Tag *a : getTagsActionPtr()) {
         ms_dbg_a(trans, 4, "Running (non-disruptive) action: " \
             + *a->m_name.get());
-        a->execute(this, trans);
+        a->execute(trans);
     }
 
     /**
@@ -321,8 +305,13 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
             continue;
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        if (a->isDisruptive()) {
+            trans->messageGetLast()->setRule(this);
+        }
         executeAction(trans, a, false);
-        disruptiveAlreadyExecuted = true;
+        if (a->isDisruptive()) {
+            disruptiveAlreadyExecuted = true;
+        }
     }
     for (auto &a : getMatchActionsPtr()) {
         if (!a->isDisruptive()
@@ -348,7 +337,7 @@ void RuleWithActions::executeAction(Transaction *trans,
     if (a->isDisruptive() == false && *a->m_name.get() != "block") {
         ms_dbg_a(trans, 9, "Running " \
             "action: " + *a->m_name.get());
-        a->execute(this, trans);
+        a->execute(trans);
         return;
     }
 
@@ -361,7 +350,7 @@ void RuleWithActions::executeAction(Transaction *trans,
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + 
             *a->m_name.get() + ".");
-        a->execute(this, trans);
+        a->execute(trans);
         return;
     }
 

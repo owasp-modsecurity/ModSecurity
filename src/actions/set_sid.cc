@@ -26,7 +26,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SetSID::execute(RuleWithActions *rule, Transaction *t) {
+bool SetSID::execute(Transaction *t) {
     std::string colNameExpanded(getEvaluatedRunTimeString(t));
     ms_dbg_a(t, 8, "Session ID initiated with value: \'"
         + colNameExpanded + "\'.");

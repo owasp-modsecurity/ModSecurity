@@ -40,11 +40,5 @@ bool Accuracy::init(std::string *error) {
 }
 
 
-bool Accuracy::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setAccuracy(m_accuracy);
-    return true;
-}
-
-
 }  // namespace actions
 }  // namespace modsecurity
