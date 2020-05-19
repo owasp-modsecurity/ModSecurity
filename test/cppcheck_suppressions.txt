@@ -42,7 +42,7 @@ redundantAssignment:src/operators/pm.cc:94
 functionStatic:src/operators/geo_lookup.h:39
 useInitializationList:src/utils/shared_files.h:87
 unmatchedSuppression:src/utils/msc_tree.cc
-functionStatic:headers/modsecurity/transaction.h:452
+functionStatic:headers/modsecurity/transaction.h:454
 duplicateBranch:src/audit_log/audit_log.cc:223
 unreadVariable:src/request_body_processor/multipart.cc:435
 stlcstrParam:src/audit_log/writer/parallel.cc:145

@@ -13,6 +13,7 @@
  *
  */
 
+
 #include <string>
 
 #include "modsecurity/actions/action.h"
@@ -22,6 +23,7 @@
 #ifndef SRC_ACTIONS_CTL_REQUEST_BODY_ACCESS_H_
 #define SRC_ACTIONS_CTL_REQUEST_BODY_ACCESS_H_
 
+
 namespace modsecurity {
 namespace actions {
 namespace ctl {
@@ -29,19 +31,23 @@ namespace ctl {
 
 class RequestBodyAccess : public Action {
  public:
-    explicit RequestBodyAccess(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind),
-        m_request_body_access(false) { }
+    explicit RequestBodyAccess(const std::string &action)
+        : Action(action),
+        m_requestBodyAccess(false)
+    { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
-    bool m_request_body_access;
+    bool execute(Transaction *transaction) noexcept override;
+
+ private:
+    bool m_requestBodyAccess;
 };
 
 
 }  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
+
 
 #endif  // SRC_ACTIONS_CTL_REQUEST_BODY_ACCESS_H_

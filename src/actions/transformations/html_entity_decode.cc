@@ -13,19 +13,15 @@
  *
  */
 
+
 #include "src/actions/transformations/html_entity_decode.h"
 
-#include <string.h>
-
-#include <iostream>
 #include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
+#include "src/utils/string.h"
 
 
 namespace modsecurity {
@@ -33,9 +29,9 @@ namespace actions {
 namespace transformations {
 
 
-void HtmlEntityDecode::execute(Transaction *t,
-    ModSecString &in,
-    ModSecString &out) {
+void HtmlEntityDecode::execute(const Transaction *t,
+    const ModSecString &in,
+    ModSecString &out) noexcept {
     unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>

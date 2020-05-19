@@ -13,34 +13,38 @@
  *
  */
 
+
 #include <string>
 #include <memory>
 
 #include "modsecurity/actions/action.h"
 
+
 #ifndef SRC_ACTIONS_SKIP_AFTER_H_
 #define SRC_ACTIONS_SKIP_AFTER_H_
 
-class Transaction;
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
 class SkipAfter : public Action {
  public:
-    explicit SkipAfter(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind),
-        m_skipName(std::make_shared<std::string>(m_parser_payload)) { }
+    explicit SkipAfter(const std::string &action)
+        : Action(action),
+        m_skipName(std::make_shared<std::string>(m_parserPayload))
+    { }
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
+
  private:
-     std::shared_ptr<std::string> m_skipName;
+    // FIXME: This should be a regular pointer instead of a shared pointer.
+    std::shared_ptr<std::string> m_skipName;
 };
 
 
 }  // namespace actions
 }  // namespace modsecurity
+
 
 #endif  // SRC_ACTIONS_SKIP_AFTER_H_

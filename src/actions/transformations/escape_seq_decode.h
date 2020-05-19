@@ -13,37 +13,43 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_ESCAPE_SEQ_DECODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_ESCAPE_SEQ_DECODE_H_
 
-#ifdef __cplusplus
-namespace modsecurity {
-class Transaction;
 
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 
+
 class EscapeSeqDecode : public Transformation {
  public:
-    explicit EscapeSeqDecode(const std::string &action)
-        : Transformation(action) { }
+    EscapeSeqDecode()
+        : Action("t:escapeSeqDecode")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 
-    static int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len);
+ private:
+    static int ansi_c_sequences_decode_inplace(unsigned char *input,
+        int input_len);
 };
+
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_ESCAPE_SEQ_DECODE_H_

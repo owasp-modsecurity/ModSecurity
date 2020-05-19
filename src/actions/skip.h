@@ -13,9 +13,11 @@
  *
  */
 
+
 #include <string>
 
 #include "modsecurity/actions/action.h"
+
 
 #ifndef SRC_ACTIONS_SKIP_H_
 #define SRC_ACTIONS_SKIP_H_
@@ -29,13 +31,14 @@ namespace actions {
 
 class Skip : public Action {
  public:
-    explicit Skip(const std::string &action) 
-        : Action(action, RunTimeOnlyIfMatchKind),
+    explicit Skip(const std::string &action)
+        : Action(action),
         m_skip_next(0) { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) noexcept override;
 
+ private:
     int m_skip_next;
 };
 

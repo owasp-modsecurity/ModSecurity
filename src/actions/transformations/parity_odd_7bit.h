@@ -13,37 +13,43 @@
  *
  */
 
+
 #include <string>
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/actions/action.h"
+
 #include "src/actions/transformations/transformation.h"
+
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_PARITY_ODD_7BIT_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_PARITY_ODD_7BIT_H_
 
-#ifdef __cplusplus
-namespace modsecurity {
-class Transaction;
 
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 
+
 class ParityOdd7bit : public Transformation {
  public:
-    explicit ParityOdd7bit(const std::string &action)
-        : Transformation(action) { }
+    ParityOdd7bit()
+        : Action("t:parityOdd7bit")
+    { }
 
-    void execute(Transaction *t,
-        ModSecString &in,
-        ModSecString &out) override;
+    void execute(const Transaction *t,
+        const ModSecString &in,
+        ModSecString &out) noexcept override;
 
+ private:
     static bool inplace(unsigned char *input, uint64_t input_len);
 };
+
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
+
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_PARITY_ODD_7BIT_H_

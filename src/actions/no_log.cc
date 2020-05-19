@@ -13,25 +13,12 @@
  *
  */
 
+
 #include "src/actions/no_log.h"
-
-#include <iostream>
-#include <string>
-#include <memory>
-
-#include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
-#include "src/operators/operator.h"
-#include "modsecurity/rule_message.h"
 
 
 namespace modsecurity {
 namespace actions {
-
-
-bool NoLog::execute(RuleWithActions *rule, Transaction *transaction) {
-    return true;
-}
 
 
 }  // namespace actions

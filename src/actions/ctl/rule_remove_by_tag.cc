@@ -13,12 +13,13 @@
  *
  */
 
+
 #include "src/actions/ctl/rule_remove_by_tag.h"
 
-#include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
+
 
 namespace modsecurity {
 namespace actions {
@@ -26,13 +27,14 @@ namespace ctl {
 
 
 bool RuleRemoveByTag::init(std::string *error) {
-    std::string what(m_parser_payload, 16, m_parser_payload.size() - 16);
+    std::string what(m_parserPayload, 16, m_parserPayload.size() - 16);
     m_tag = what;
 
     return true;
 }
 
-bool RuleRemoveByTag::execute(RuleWithActions *rule, Transaction *transaction) {
+
+bool RuleRemoveByTag::execute(Transaction *transaction) noexcept {
     transaction->m_ruleRemoveByTag.push_back(m_tag);
     return true;
 }
