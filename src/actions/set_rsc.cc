@@ -26,7 +26,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SetRSC::execute(RuleWithActions *rule, Transaction *t) {
+bool SetRSC::execute(Transaction *t) {
     std::string colNameExpanded(getEvaluatedRunTimeString(t));
     ms_dbg_a(t, 8, "RESOURCE initiated with value: \'"
         + colNameExpanded + "\'.");

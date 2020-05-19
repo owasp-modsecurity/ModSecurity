@@ -40,10 +40,5 @@ bool Maturity::init(std::string *error) {
 }
 
 
-bool Maturity::execute(RuleWithActions *rule, Transaction *transaction) {
-    return true;
-}
-
-
 }  // namespace actions
 }  // namespace modsecurity

@@ -29,12 +29,7 @@ namespace actions {
 
 
 bool Rev::init(std::string *error) {
-    m_rev = m_parser_payload;
-    return true;
-}
-
-
-bool Rev::execute(RuleWithActions *rule, Transaction *transaction) {
+    m_revision = m_parser_payload;
     return true;
 }
 

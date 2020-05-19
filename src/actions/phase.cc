@@ -73,10 +73,5 @@ bool Phase::init(std::string *error) {
 }
 
 
-bool Phase::execute(RuleWithActions *rule, Transaction *transaction) {
-    rule->setPhase(m_phase);
-    return true;
-}
-
 }  // namespace actions
 }  // namespace modsecurity

@@ -29,6 +29,8 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/variable_value.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_configure.h"
 
 
 #ifdef __cplusplus
@@ -53,6 +55,7 @@ using Transformation = actions::transformations::Transformation;
 using Transformations = std::vector<std::shared_ptr<Transformation> >;
 using TransformationsPtr = std::vector<Transformation *>;
 using Action = actions::Action;
+using ActionTypeConfigure = actions::ActionTypeConfigure;
 using Actions = std::vector<actions::Action *>;
 using Tags = std::vector<std::shared_ptr<actions::Tag> >;
 using TagsPtr = std::vector<actions::Tag *>;

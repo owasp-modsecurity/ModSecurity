@@ -72,8 +72,8 @@ class Action {
 
     virtual std::string execute(const std::string &exp,
         Transaction *transaction);
-    virtual bool execute(RuleWithActions *rule,
-        Transaction *transaction);
+    virtual bool execute(Transaction *transaction = nullptr);
+
     /**
      * This method is meant to be used by transformations — a particular
      * type of action.

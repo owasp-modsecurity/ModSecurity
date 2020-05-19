@@ -26,7 +26,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SetUID::execute(RuleWithActions *rule, Transaction *t) {
+bool SetUID::execute(Transaction *t) {
     std::string colNameExpanded(getEvaluatedRunTimeString(t));
     ms_dbg_a(t, 8, "User collection initiated with value: \'"
         + colNameExpanded + "\'.");

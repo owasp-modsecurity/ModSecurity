@@ -78,7 +78,7 @@ class SetVar : public ActionWithRunTimeString {
 
 
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
     bool init(std::string *error) override;
 
     void populate(RuleWithActions *rule) override {

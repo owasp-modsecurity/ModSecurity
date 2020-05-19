@@ -47,7 +47,7 @@ class InitCol : public ActionWithRunTimeString {
 
     bool init(std::string *error) override;
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
 
     virtual ActionWithRunTimeString *clone() override {
         return new InitCol(*this);

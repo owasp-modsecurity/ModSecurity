@@ -44,7 +44,7 @@ class Tag : public ActionWithRunTimeString {
         : ActionWithRunTimeString(action)
     { };
 
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
+    bool execute(Transaction *transaction) override;
 
     inline std::string getTagName(Transaction *transaction) const {
         return getEvaluatedRunTimeString(transaction);

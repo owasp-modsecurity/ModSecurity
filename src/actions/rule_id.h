@@ -15,7 +15,8 @@
 
 #include <string>
 
-#include "modsecurity/actions/action.h"
+#include "src/actions/action_type_configure.h"
+
 
 #ifndef SRC_ACTIONS_RULE_ID_H_
 #define SRC_ACTIONS_RULE_ID_H_
@@ -30,15 +31,17 @@ class RuleWithOperator;
 namespace actions {
 
 
-class RuleId : public Action {
+class RuleId : public ActionTypeConfigure {
  public:
     explicit RuleId(const std::string &action) 
-        : Action(action, ConfigurationKind),
+        : ActionTypeConfigure(action),
         m_ruleId(0) { }
 
     bool init(std::string *error) override;
-    bool execute(RuleWithActions *rule, Transaction *transaction) override;
 
+    virtual void configure(RuleWithActions *rule) override {
+        rule->setId(m_ruleId);
+    }
  private:
     double m_ruleId;
 };
