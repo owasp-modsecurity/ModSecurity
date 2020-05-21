@@ -267,7 +267,7 @@ The libModSecurity design allows the integration with bindings. There is an effo
    * Python - https://github.com/actions-security/pymodsecurity
    * Varnish - https://github.com/xdecock/vmod-modsecurity
 
-## Packing
+## Packaging
 
 Having our packages in distros on time is a desire that we have, so let us know
 if there is anything we can do to facilitate your work as a packager.
