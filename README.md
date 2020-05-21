@@ -168,7 +168,7 @@ are willing to help with.
 
 ## Providing patches
 
-We prefer to have your patch within the GtiHub infrastructure to facilitate our
+We prefer to have your patch within the GitHub infrastructure to facilitate our
 review work, and our Q.A. integration. GitHub provides excellent
 documentation on how to perform “Pull Requests”, more information available
 here: https://help.github.com/articles/using-pull-requests/
