@@ -176,6 +176,14 @@ int RuleMessage::getAccuracy() const {
 }
 
 
+bool RuleMessage::toBeAuditLog() const {
+    if (m_rule) {
+        return m_rule->isItToBeAuditLogged();
+    }
+    return false;
+}
+
+
 std::string RuleMessage::getClientIpAddress() const {
     if (m_transaction) {
         return *m_transaction->m_clientIpAddress.get();
