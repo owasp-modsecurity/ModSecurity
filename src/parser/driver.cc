@@ -157,6 +157,12 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
                 firstRule->getChainedParent()->setHasLogAction(
                     firstRule->hasNoLogAction()
                 );
+                firstRule->getChainedParent()->setHasAuditLogAction(
+                    firstRule->hasAuditLogAction()
+                );
+                firstRule->getChainedParent()->setHasNoAuditLogAction(
+                    firstRule->hasNoAuditLogAction()
+                );
                 firstRule = firstRule->getChainedParent();
             }
         }
