@@ -130,6 +130,8 @@ class RuleMessage {
     std::string getUri() const;
     bool isDisruptive() const;
 
+    bool toBeAuditLog() const;
+
     int m_severity;
     std::list<std::string> m_tags;
 
