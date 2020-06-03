@@ -3,7 +3,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "auditlog : basic parser test - Parallel",
+    "title": "auditlog : basic parser test - Parallel 1",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -40,7 +40,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "debug_log": "Saving this request as part of the audit logs",
       "error_log": "",
       "http_code": 403
     },
@@ -60,7 +60,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "auditlog : basic parser test - Serial",
+    "title": "auditlog : basic parser test - Serial 1",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -96,8 +96,8 @@
       ]
     },
     "expected": {
-      "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "audit_log": "Access denied with code 403",
+      "debug_log": "",
       "error_log": "",
       "http_code": 403
     },
@@ -118,7 +118,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "auditlog : basic parser test - Parallel",
+    "title": "auditlog : basic parser test - Parallel 2",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -154,8 +154,8 @@
       ]
     },
     "expected": {
-      "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
+      "audit_log": "www.modsecurity.org 200.249.12.31",
+      "debug_log": "Saving this request as part of the audit logs",
       "error_log": "",
       "http_code": 403
     },
@@ -212,6 +212,56 @@
       "SecRuleEngine On",
       "SecDefaultAction \"phase:1,nolog,auditlog,deny,status:403\"",
       "SecRule ARGS \"@contains test\" \"id:1556,phase:1,block,nolog,auditlog\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/test/modsec_audit_auditlog_1.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "auditlog : messages verification - nolog,noauditlog",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "Accept-Language": "en-us,en;q=0.5",
+        "Accept-Encoding": "gzip,deflate",
+        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+        "Keep-Alive": "300",
+        "Connection": "keep-alive",
+        "Pragma": "no-cache",
+        "Cache-Control": "no-cache"
+      },
+      "uri": "\/test.pl?param1=test&param2=test2",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": ""
+    },
+    "expected": {
+      "audit_log": "1556",
+      "error_log": "",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:1,nolog,auditlog,status:403,pass\"",
+      "SecRule ARGS \"@contains test\" \"id:1555,phase:1,log,noauditlog\"",
+      "SecRule ARGS \"@contains test\" \"id:1556,phase:1,deny,auditlog\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",
       "SecAuditLog /tmp/test/modsec_audit_auditlog_1.log",

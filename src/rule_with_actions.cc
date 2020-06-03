@@ -90,6 +90,8 @@ RuleWithActions::RuleWithActions(
     m_containsCaptureAction(false),
     m_containsLogAction(false),
     m_containsNoLogAction(false),
+    m_containsAuditLogAction(false),
+    m_containsNoAuditLogAction(false),
     m_containsMultiMatchAction(false),
     m_containsStaticBlockAction(false),
     m_defaultSeverity(SEVERITY_NOT_SET),
@@ -100,6 +102,8 @@ RuleWithActions::RuleWithActions(
     m_defaultContainsCaptureAction(false),
     m_defaultContainsLogAction(false),
     m_defaultContainsNoLogAction(false),
+    m_defaultContainsAuditLogAction(false),
+    m_defaultContainsNoAuditLogAction(false),
     m_defaultContainsMultiMatchAction(false),
     m_defaultContainsStaticBlockAction(false),
     m_isChained(false) {

@@ -321,8 +321,7 @@ class TransactionSecMarkerManagement {
 class TransactionRuleMessageManagement {
  public:
     explicit TransactionRuleMessageManagement(Transaction *t)
-        : m_transaction(t),
-        m_noAuditLog(false) { 
+        : m_transaction(t) {
             messageNew();
         };
 
@@ -331,22 +330,7 @@ class TransactionRuleMessageManagement {
 
     void logMatchLastRuleOnTheChain(RuleWithActions *rule);
 
-    void messageSetNoAuditLog(bool a) {
-        m_noAuditLog = a;
-    }
-
-    bool messageSaveAuditLog() const {
-        return m_noAuditLog;
-    }
-
-    std::list<RuleMessage *> messageGetAll() {
-        std::list<RuleMessage *> messages;
-        for (RuleMessage *a : m_rulesMessages) {
-            messages.push_back(a);
-        }
-
-        return messages;
-    }
+    std::list<RuleMessage *> messageGetAll();
 
     void messageClear() {
         m_rulesMessages.clear();
@@ -361,7 +345,6 @@ class TransactionRuleMessageManagement {
     std::list<RuleMessage *> m_rulesMessages;
 
     Transaction *m_transaction;
-    bool m_noAuditLog;
 };
 
 

@@ -72,12 +72,15 @@ void TransactionRuleMessageManagement::logMatchLastRuleOnTheChain(RuleWithAction
 
     rm->setRule(rule);
 
-    if (rule->hasDisruptiveAction() && 
+    if (rule->hasDisruptiveAction() && rule->isItToBeLogged() &&
         (m_transaction->getRuleEngineState() == RulesSet::DetectionOnlyRuleEngine)) {
         /* error */
         // The error goes over the disruptive massage. We don't need it here.
         //m_transaction->serverLog(rm);
-    } else if (rule->hasBlockAction() && (!rule->hasNoLogAction()) || rule->hasLogAction()) {
+    } else if (rule->hasBlockAction() && rule->isItToBeLogged()) {
+        /* Log as warning. */
+        m_transaction->serverLog(rm);
+    } else if (rule->isItToBeLogged()) {
         /* Log as warning. */
         m_transaction->serverLog(rm);
     }
@@ -88,6 +91,15 @@ void TransactionRuleMessageManagement::logMatchLastRuleOnTheChain(RuleWithAction
 void TransactionRuleMessageManagement::messageNew() {
     m_rulesMessages.push_back(new RuleMessage(m_transaction));
 }
+
+std::list<RuleMessage *> TransactionRuleMessageManagement::messageGetAll() {
+    std::list<RuleMessage *> messages;
+    for (RuleMessage *a : m_rulesMessages) {
+        messages.push_back(a);
+    }
+    return messages;
+}
+
 
 
 /**
@@ -273,7 +285,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     ms_dbg(4, "Initializing transaction");
 
     if (m_rules != NULL && m_rules->m_auditLog != NULL) {
-        m_auditLogParts = this->m_rules->m_auditLog->getParts();
+        m_auditLogParts = m_rules->m_auditLog->getParts();
     }
 
     intervention::clean(&m_it);
@@ -1419,8 +1431,7 @@ int Transaction::processLogging() {
         ms_dbg(8, "Checking if this request is suitable to be " \
             "saved as an audit log.");
 
-        // FIXME: m_auditLogParts can be accessed via Transaction.
-        bool saved = this->m_rules->m_auditLog->saveIfRelevant(this, m_auditLogParts);
+        bool saved = m_rules->m_auditLog->saveIfRelevant(this);
         if (saved) {
             ms_dbg(8, "Request was relevant to be saved. Parts: " +
                 std::to_string(m_auditLogParts));
@@ -1606,6 +1617,9 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     if (parts & audit_log::AuditLog::HAuditLogPart) {
         audit_log << "--" << trailer << "-" << "H--" << std::endl;
         for (auto a : messageGetAll()) {
+            if (!a->toBeAuditLog()) {
+                continue;
+            }
             audit_log << a->log(0, m_httpCodeReturned) << std::endl;
         }
         audit_log << std::endl;
@@ -1769,6 +1783,10 @@ std::string Transaction::toJSON(int parts) {
             strlen("messages"));
         yajl_gen_array_open(g);
         for (auto a : messageGetAll()) {
+            if (!a->toBeAuditLog()) {
+                continue;
+            }
+
             yajl_gen_map_open(g);
             LOGFY_ADD("message", a->m_message.c_str());
             yajl_gen_string(g,
