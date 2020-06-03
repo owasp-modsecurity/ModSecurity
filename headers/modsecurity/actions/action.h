@@ -33,20 +33,20 @@ namespace actions {
 class Action {
  public:
     Action()
-        : m_name(""),
-        m_parserPayload("")
+        : m_parserPayload(""),
+        m_name("")
     { }
 
 
     explicit Action(const std::string& action)
-        : m_name(sort_name(action)),
-        m_parserPayload(sort_payload(action))
+        : m_parserPayload(sort_payload(action)),
+        m_name(sort_name(action))
     { }
 
 
     Action(const Action &a)
-        : m_name(a.m_name),
-        m_parserPayload(a.m_parserPayload)
+        : m_parserPayload(a.m_parserPayload),
+        m_name(a.m_name)
     { }
 
 
@@ -76,7 +76,7 @@ class Action {
     }
 
 
-    const std::string *getName() {
+    const std::string *getName() const {
         return &m_name;
     }
 

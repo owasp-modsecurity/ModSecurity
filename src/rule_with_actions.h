@@ -146,6 +146,8 @@ class RuleWithActions : public Rule {
         m_containsCaptureAction(r.m_containsCaptureAction),
         m_containsLogAction(r.m_containsLogAction),
         m_containsNoLogAction(r.m_containsNoLogAction),
+        m_containsAuditLogAction(r.m_containsAuditLogAction),
+        m_containsNoAuditLogAction(r.m_containsNoAuditLogAction),
         m_containsMultiMatchAction(r.m_containsMultiMatchAction),
         m_containsStaticBlockAction(r.m_containsStaticBlockAction),
         m_defaultSeverity(r.m_defaultSeverity),
@@ -156,6 +158,8 @@ class RuleWithActions : public Rule {
         m_defaultContainsCaptureAction(r.m_defaultContainsCaptureAction),
         m_defaultContainsLogAction(r.m_defaultContainsLogAction),
         m_defaultContainsNoLogAction(r.m_defaultContainsNoLogAction),
+        m_defaultContainsAuditLogAction(r.m_defaultContainsAuditLogAction),
+        m_defaultContainsNoAuditLogAction(r.m_defaultContainsNoAuditLogAction),
         m_defaultContainsMultiMatchAction(r.m_defaultContainsMultiMatchAction),
         m_defaultContainsStaticBlockAction(r.m_defaultContainsStaticBlockAction),
         m_isChained(r.m_isChained) {
@@ -190,6 +194,8 @@ class RuleWithActions : public Rule {
         m_containsCaptureAction = r.m_containsCaptureAction;
         m_containsLogAction = r.m_containsLogAction;
         m_containsNoLogAction = r.m_containsNoLogAction;
+        m_containsAuditLogAction = r.m_containsAuditLogAction;
+        m_containsNoAuditLogAction = r.m_containsNoAuditLogAction;
         m_containsMultiMatchAction = r.m_containsMultiMatchAction;
         m_containsStaticBlockAction = r.m_containsStaticBlockAction;
         m_defaultSeverity = r.m_defaultSeverity;
@@ -200,6 +206,8 @@ class RuleWithActions : public Rule {
         m_defaultContainsCaptureAction = r.m_defaultContainsCaptureAction;
         m_defaultContainsLogAction = r.m_defaultContainsLogAction;
         m_defaultContainsNoLogAction = r.m_defaultContainsNoLogAction;
+        m_defaultContainsAuditLogAction = r.m_defaultContainsAuditLogAction;
+        m_defaultContainsNoAuditLogAction = r.m_defaultContainsNoAuditLogAction;
         m_defaultContainsMultiMatchAction = r.m_defaultContainsMultiMatchAction;
         m_defaultContainsStaticBlockAction = r.m_defaultContainsStaticBlockAction;
         m_isChained = r.m_isChained;
@@ -358,10 +366,47 @@ class RuleWithActions : public Rule {
     inline void setHasMultimatchAction(bool b) { m_containsMultiMatchAction = b; }
     inline bool hasMultimatchAction() const { return m_containsMultiMatchAction || m_defaultContainsMultiMatchAction; }
 
+    inline bool hasAuditLogAction() const { return m_containsAuditLogAction == true; }
+    inline void setHasAuditLogAction(bool b) { m_containsAuditLogAction = b; }
+    inline bool hasNoAuditLogAction() const { return m_containsNoAuditLogAction == true; }
+    inline void setHasNoAuditLogAction(bool b) { m_containsNoAuditLogAction = b; }
+
     inline bool hasLogAction() const { return m_containsLogAction == true; }
     inline void setHasLogAction(bool b) { m_containsLogAction = b; }
     inline bool hasNoLogAction() const { return m_containsNoLogAction == true; }
     inline void setHasNoLogAction(bool b) { m_containsNoLogAction = b; }
+
+
+    inline bool isItToBeLogged() const noexcept {
+        if (m_containsNoLogAction) {
+            return false;
+        }
+
+        if (m_defaultContainsNoLogAction && !m_containsLogAction) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    inline bool isItToBeAuditLogged() const noexcept {
+        if (!isItToBeLogged() && !m_containsAuditLogAction
+            && !m_defaultContainsAuditLogAction) {
+            return false;
+        }
+
+        if (m_containsNoAuditLogAction) {
+            return false;
+        }
+
+        if (m_defaultContainsNoLogAction && !m_containsAuditLogAction) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     inline bool hasLogDataAction() const { return m_logData != nullptr || m_defaultActionLogData != nullptr; }
     inline std::shared_ptr<actions::LogData> getLogDataAction() const { return m_logData; }
@@ -543,6 +588,8 @@ class RuleWithActions : public Rule {
     bool m_containsCaptureAction:1;
     bool m_containsLogAction:1;
     bool m_containsNoLogAction:1;
+    bool m_containsAuditLogAction:1;
+    bool m_containsNoAuditLogAction:1;
     bool m_containsMultiMatchAction:1;
     bool m_containsStaticBlockAction:1;
 
@@ -555,6 +602,8 @@ class RuleWithActions : public Rule {
     bool m_defaultContainsCaptureAction:1;
     bool m_defaultContainsLogAction:1;
     bool m_defaultContainsNoLogAction:1;
+    bool m_defaultContainsAuditLogAction:1;
+    bool m_defaultContainsNoAuditLogAction:1;
     bool m_defaultContainsMultiMatchAction:1;
     bool m_defaultContainsStaticBlockAction:1;
 
