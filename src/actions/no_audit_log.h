@@ -15,7 +15,8 @@
 
 
 #include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
+
+#include "src/actions/action_type_rule_metadata.h"
 #include "src/actions/action_allowed_in_sec_default_action.h"
 
 
@@ -27,13 +28,16 @@ namespace modsecurity {
 namespace actions {
 
 
-class NoAuditLog : public ActionAllowedAsSecDefaultAction {
+class NoAuditLog : public ActionTypeRuleMetaData,
+    public ActionAllowedAsSecDefaultAction {
  public:
     NoAuditLog()
         : Action("noAuditLog")
     { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    void configure(RuleWithActions *rule) override {
+        rule->setHasNoAuditLogAction(true);
+    }
 };
 
 

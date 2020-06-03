@@ -170,9 +170,8 @@ class AuditLog {
     bool init(std::string *error);
     virtual bool close();
 
-    bool saveIfRelevant(Transaction *transaction);
-    bool saveIfRelevant(Transaction *transaction, int parts);
-    bool isRelevant(int status);
+    bool saveIfRelevant(Transaction *transaction) const noexcept;
+    bool isRelevant(int status) const noexcept;
 
     static int addParts(int parts, const std::string& new_parts);
     static int removeParts(int parts, const std::string& new_parts);
