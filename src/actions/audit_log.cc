@@ -15,19 +15,9 @@
 
 #include "src/actions/audit_log.h"
 
-#include <string>
-
-#include "modsecurity/transaction.h"
-
 
 namespace modsecurity {
 namespace actions {
-
-
-bool AuditLog::execute(Transaction *transaction) noexcept {
-    transaction->messageSetNoAuditLog(false);
-    return true;
-}
 
 
 }  // namespace actions
