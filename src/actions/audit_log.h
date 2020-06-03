@@ -16,6 +16,10 @@
 
 #include "src/actions/action_allowed_in_sec_default_action.h"
 
+#include "src/actions/action_type_rule_metadata.h"
+#include "src/actions/action_allowed_in_sec_default_action.h"
+
+
 #ifndef SRC_ACTIONS_AUDIT_LOG_H_
 #define SRC_ACTIONS_AUDIT_LOG_H_
 
@@ -24,13 +28,16 @@ namespace modsecurity {
 namespace actions {
 
 
-class AuditLog : public ActionAllowedAsSecDefaultAction {
+class AuditLog : public ActionTypeRuleMetaData,
+    public ActionAllowedAsSecDefaultAction {
  public:
     AuditLog()
         : Action("auditLog")
     { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    void configure(RuleWithActions *rule) override {
+        rule->setHasAuditLogAction(true);
+    }
 };
 
 

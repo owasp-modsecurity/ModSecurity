@@ -266,13 +266,12 @@ bool AuditLog::init(std::string *error) {
 }
 
 
-bool AuditLog::isRelevant(int status) {
+bool AuditLog::isRelevant(int status) const noexcept {
     std::string sstatus = std::to_string(status);
 
     if (m_relevant.empty()) {
         return false;
     }
-
 
     if (sstatus.empty()) {
         return true;
@@ -283,45 +282,34 @@ bool AuditLog::isRelevant(int status) {
 }
 
 
-bool AuditLog::saveIfRelevant(Transaction *transaction) {
-    return saveIfRelevant(transaction, -1);
-}
-
-
-bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
-    bool saveAnyway = false;
+bool AuditLog::saveIfRelevant(Transaction *transaction) const noexcept {
     if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
         ms_dbg_a(transaction, 5, "Audit log engine was not set.");
-        return true;
+        return false;
     }
 
-    saveAnyway = transaction->messageSaveAuditLog();
-
     if ((m_status == RelevantOnlyAuditLogStatus
-        && this->isRelevant(transaction->m_httpCodeReturned) == false)
-        && saveAnyway == false) {
+            && isRelevant(transaction->m_httpCodeReturned) == false)) {
         ms_dbg_a(transaction, 9, "Return code `" +
             std::to_string(transaction->m_httpCodeReturned) + "'" \
             " is not interesting to audit logs, relevant code(s): `" +
             m_relevant + "'.");
-
         return false;
     }
 
-    if (parts == -1) {
-        parts = m_parts;
-    }
     ms_dbg_a(transaction, 5, "Saving this request as part " \
             "of the audit logs.");
+
     if (m_writer == NULL) {
         ms_dbg_a(transaction, 1, "Internal error, audit log writer is null");
-    } else {
-        std::string error;
-        bool a = m_writer->write(transaction, parts, &error);
-        if (a == false) {
-            ms_dbg_a(transaction, 1, "Cannot save the audit log: " + error);
-            return false;
-        }
+        return false;
+    }
+
+    std::string error;
+    bool a = m_writer->write(transaction, transaction->m_auditLogParts, &error);
+    if (a == false) {
+        ms_dbg_a(transaction, 1, "Cannot save the audit log: " + error);
+        return false;
     }
 
     return true;
