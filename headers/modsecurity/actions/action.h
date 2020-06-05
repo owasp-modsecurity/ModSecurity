@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include <assert.h>
+
 #endif
 
 
@@ -35,7 +37,9 @@ class Action {
     Action()
         : m_parserPayload(""),
         m_name("")
-    { }
+    {
+        assert(0);
+    }
 
 
     explicit Action(const std::string& action)
@@ -44,9 +48,9 @@ class Action {
     { }
 
 
-    Action(const Action &a)
-        : m_parserPayload(a.m_parserPayload),
-        m_name(a.m_name)
+    Action(const Action &other)
+        : m_parserPayload(other.m_parserPayload),
+        m_name(other.m_name)
     { }
 
 
@@ -76,7 +80,7 @@ class Action {
     }
 
 
-    const std::string *getName() const {
+    const std::string *getName() const noexcept {
         return &m_name;
     }
 
