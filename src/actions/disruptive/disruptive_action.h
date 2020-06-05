@@ -31,9 +31,6 @@ namespace disruptive {
 
 class ActionDisruptive : public ActionAllowedAsSecDefaultAction {
  public:
-    bool isDisruptive() override {
-       return true;
-    }
 };
 
 
