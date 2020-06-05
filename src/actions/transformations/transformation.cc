@@ -64,17 +64,23 @@ namespace actions {
 namespace transformations {
 
 
-class TransformationDoesNotExist: public std::exception {
+class TransformationDoesNotExist : public std::exception {
  public:
+    explicit TransformationDoesNotExist(const char *name)
+        : m_transformation(name)
+    { }
+
     explicit TransformationDoesNotExist(const std::string& name)
         : m_transformation(name)
     { }
 
-  virtual const char* what() const throw() {
-    return std::string("Transformation not found: " + m_transformation + \
-        ". Make sure that the new transformation is registered at: " + \
-        "transformation.cc").c_str();
-  }
+    virtual ~TransformationDoesNotExist() throw (){}
+
+    virtual const char* what() const throw() {
+        return strdup(std::string("Transformation not found: " + m_transformation + \
+            ". Make sure that the new transformation is registered at: " + \
+            "transformation.cc").c_str());
+    }
 
  private:
     std::string m_transformation;
