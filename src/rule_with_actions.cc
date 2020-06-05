@@ -43,6 +43,7 @@
 #include "src/actions/set_var.h"
 #include "src/actions/severity.h"
 #include "src/actions/tag.h"
+#include "src/actions/disruptive/disruptive_action.h"
 #include "src/actions/transformations/transformation.h"
 #include "src/actions/transformations/none.h"
 #include "src/actions/xmlns.h"
@@ -142,7 +143,7 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
     } else if (dynamic_cast<actions::Block *>(a.get())) {
         m_defaultActionActionsRuntimePos.push_back(a);
         m_defaultContainsStaticBlockAction = true;
-    } else if (a->isDisruptive() == true) {
+    } else if (std::dynamic_pointer_cast<actions::disruptive::ActionDisruptive>(a) != NULL) {
         m_defaultActionDisruptiveAction = a;
     } else {
         m_defaultActionActionsRuntimePos.push_back(a);
@@ -179,7 +180,7 @@ void RuleWithActions::addAction(actions::Action *a) {
         m_containsStaticBlockAction = true;
     } else if (dynamic_cast<actions::XmlNS *>(a)) {
         m_XmlNSs.push_back(std::unique_ptr<actions::XmlNS>(dynamic_cast<actions::XmlNS *>(a)));
-    } else if (a->isDisruptive() == true) {
+    } else if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a) != NULL) {
         m_disruptiveAction = std::unique_ptr<Action>(a);
     } else {
         m_actionsRuntimePos.push_back(std::unique_ptr<Action>(a));
@@ -241,16 +242,16 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
             continue;
         }
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        if (a->isDisruptive()) {
+        if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a)) {
             trans->messageGetLast()->setRule(this);
         }
         executeAction(trans, a, false);
-        if (a->isDisruptive()) {
+        if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a)) {
             disruptiveAlreadyExecuted = true;
         }
     }
     for (auto &a : getMatchActionsPtr()) {
-        if (!a->isDisruptive()
+        if (!dynamic_cast<actions::disruptive::ActionDisruptive *>(a)
                 && !(disruptiveAlreadyExecuted
                 && dynamic_cast<actions::Block *>(a))) {
             executeAction(trans, a, false);
@@ -270,7 +271,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
 
 void RuleWithActions::executeAction(Transaction *trans,
     Action *a, bool defaultContext) {
-    if (a->isDisruptive() == false) {
+    if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a) == NULL) {
         ms_dbg_a(trans, 9, "Running action: " + *a->getName());
         a->execute(trans);
         return;
