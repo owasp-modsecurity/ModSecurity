@@ -18,7 +18,7 @@
 #include <string>
 #include <iostream>
 #include <memory>
-#include <list>
+#include <vector>
 #include <utility>
 #endif
 
@@ -37,7 +37,7 @@ namespace modsecurity {
 class Collection;
 class VariableValue {
  public:
-    using Origins = std::list<std::unique_ptr<VariableOrigin>>;
+    using Origins = std::vector<VariableOrigin>;
 
     explicit VariableValue(const std::string *key,
         const std::string *value = nullptr)
@@ -60,14 +60,9 @@ class VariableValue {
         m_collection(o->m_collection),
         m_key(o->m_key),
         m_keyWithCollection(o->m_keyWithCollection),
-        m_value(o->m_value)
+        m_value(o->m_value),
+        m_orign(o->m_orign)
     {
-        for (auto &i : o->m_orign) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            origin->m_offset = i->m_offset;
-            origin->m_length = i->m_length;
-            m_orign.push_back(std::move(origin));
-        }
     }
 
     VariableValue(const VariableValue &v) = delete;
@@ -98,10 +93,12 @@ class VariableValue {
     }
 
 
-    void addOrigin(std::unique_ptr<VariableOrigin> origin) {
-        m_orign.push_back(std::move(origin));
+    void addOrigin(VariableOrigin&& origin) {
+        m_orign.push_back(origin);
     }
-
+    void addOrigin(const VariableOrigin& origin) {
+        m_orign.push_back(origin);
+    }
 
     const Origins& getOrigin() const {
         return m_orign;
