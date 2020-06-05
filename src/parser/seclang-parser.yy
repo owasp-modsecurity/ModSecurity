@@ -1180,7 +1180,8 @@ expression:
         int secRuleDefinedPhase = -1;
         for (actions::Action *a : *actions) {
             actions::Phase *phase = dynamic_cast<actions::Phase *>(a);
-            if (a->isDisruptive() == true && dynamic_cast<actions::Block *>(a) == NULL) {
+            if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a) != NULL
+              && dynamic_cast<actions::Block *>(a) == NULL) {
                 hasDisruptive = true;
             }
             if (phase != NULL) {
