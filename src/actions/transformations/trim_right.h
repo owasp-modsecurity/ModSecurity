@@ -34,7 +34,7 @@ namespace transformations {
 class TrimRight : public Trim {
  public:
     TrimRight()
-        : Trim("t:trimRight")
+        : Action("t:trimRight")
     { }
 
     void execute(const Transaction *t,
