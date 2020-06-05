@@ -75,11 +75,6 @@ class Action {
     }
 
 
-    virtual bool isDisruptive() {
-        return false;
-    }
-
-
     const std::string *getName() const noexcept {
         return &m_name;
     }
