@@ -26,98 +26,69 @@
 
 namespace modsecurity {
 
-
+//FIXME remove the Transaction from the constructor
 AnchoredVariable::AnchoredVariable(Transaction *t,
-    const std::string &name)
-    : m_transaction(t),
-    m_offset(0),
-    m_name(""),
-    m_value(""),
-    m_var(NULL) {
-        m_name.append(name);
-        m_var = new VariableValue(&m_name);
+    const std::string& name)
+    : m_var{&name}
+{
 }
-
-
-AnchoredVariable::~AnchoredVariable() {
-    if (m_var) {
-        delete (m_var);
-        m_var = NULL;
-    }
-}
-
 
 void AnchoredVariable::unset() {
-    m_value.clear();
+    m_var = VariableValue{&m_var.getKey()};
 }
 
+//FIXME will remove this later when changing the
+//  interface but *obj.evaluate() is a pain
+const std::string& AnchoredVariable::getValue() const{
+    return m_var.getValue();
+}
+std::string& AnchoredVariable::getValue(){
+    return m_var.getValue();
+}
 
 void AnchoredVariable::set(const std::string &a, size_t offset,
     size_t offsetLen) {
+    m_var.getValue().assign(a.c_str(), a.size());
 
-    m_offset = offset;
-    m_value.assign(a.c_str(), a.size());
-
-    m_var->addOrigin(VariableOrigin{offsetLen, offset});
+    m_var.addOrigin(VariableOrigin{offsetLen, offset});
 }
 
 
 void AnchoredVariable::set(const std::string &a, size_t offset) {
-    m_offset = offset;
-    m_value.assign(a.c_str(), a.size());
-
-    m_var->addOrigin(VariableOrigin{m_value.size(), offset});
+  set(a, offset, a.size());
 }
 
 
 void AnchoredVariable::append(const std::string &a, size_t offset,
     bool spaceSeparator) {
-    if (spaceSeparator && !m_value.empty()) {
-        m_value.append(" " + a);
-    } else {
-        m_value.append(a);
-    }
-    m_offset = offset;
-
-    m_var->addOrigin(VariableOrigin{a.size(), offset});
+    append(a, offset, spaceSeparator, a.size());
 }
 
 
 void AnchoredVariable::append(const std::string &a, size_t offset,
     bool spaceSeparator, int size) {
-    if (spaceSeparator && !m_value.empty()) {
-        m_value.append(" " + a);
+    if (spaceSeparator && !m_var.getValue().empty()) {
+        m_var.getValue().append(" " + a);
     } else {
-        m_value.append(a);
+        m_var.getValue().append(a);
     }
-    m_offset = offset;
-
-    m_var->addOrigin(VariableOrigin{size, offset});
+    m_var.addOrigin(VariableOrigin{size, offset});
 }
 
-
 void AnchoredVariable::evaluate(std::vector<const VariableValue *> *l) {
-    if (m_name.empty()) {
-        return;
-    }
-
-    m_var->setValue(m_value);
     VariableValue *m_var2 = new VariableValue(m_var);
     l->push_back(m_var2);
 }
 
 
 std::string * AnchoredVariable::evaluate() {
-    return &m_value;
+    return &m_var.getValue();
 }
 
 
 std::unique_ptr<std::string> AnchoredVariable::resolveFirst() {
-    if (m_value.empty()) {
-        return nullptr;
-    }
-    std::unique_ptr<std::string> a(new std::string());
-    a->append(m_value);
+    const std::string& value = m_var.getValue();
+    std::unique_ptr<std::string> a(new std::string{value});
     return a;
 }
 

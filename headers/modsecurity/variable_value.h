@@ -56,16 +56,12 @@ class VariableValue {
         m_value(*value)
     { }
 
-    explicit VariableValue(const VariableValue *o) :
-        m_collection(o->m_collection),
-        m_key(o->m_key),
-        m_keyWithCollection(o->m_keyWithCollection),
-        m_value(o->m_value),
-        m_orign(o->m_orign)
+    explicit VariableValue(const VariableValue *o)
+        : VariableValue(*o)
     {
     }
 
-    VariableValue(const VariableValue &v) = delete;
+    VariableValue(const VariableValue &v) = default;
 
 
     const std::string& getKey() const {
@@ -82,7 +78,9 @@ class VariableValue {
         return m_collection;
     }
 
-
+    std::string& getValue() {
+        return m_value;
+    }
     const std::string& getValue() const {
         return m_value;
     }

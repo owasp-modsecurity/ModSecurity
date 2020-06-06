@@ -458,8 +458,9 @@ int Transaction::processURI(const char *uri, const char *method,
 
     m_variableRequestMethod.set(method, 0);
 
+    std::string method_str{method};
 
-    std::string requestLine(std::string(method) + " " + std::string(uri));
+    std::string requestLine(method_str + " " + std::string(uri));
     m_variableRequestLine.set(requestLine \
         + " HTTP/" + std::string(http_version), m_variableOffset);
 
@@ -476,12 +477,13 @@ int Transaction::processURI(const char *uri, const char *method,
             new std::string(m_uri_decoded));
     }
 
+    size_t qry_str_offset{0};
 
     if (pos_raw != std::string::npos) {
         std::string qry = std::string(uri_s, pos_raw + 1,
             uri_s.length() - (pos_raw + 1));
-        m_variableQueryString.set(qry, pos_raw + 1
-            + std::string(method).size() + 1);
+        qry_str_offset = pos_raw + method_str.size() + 2;
+        m_variableQueryString.set(qry, qry_str_offset);
     }
 
     std::string path_info;
@@ -509,7 +511,7 @@ int Transaction::processURI(const char *uri, const char *method,
             strlen(method) + 1 + offset + 1);
     }
 
-    m_variableOffset = m_variableRequestLine.m_value.size();
+    m_variableOffset = m_variableRequestLine.getValue().size();
 
     std::string parsedURI = m_uri_decoded;
     // The more popular case is without domain
@@ -535,13 +537,13 @@ int Transaction::processURI(const char *uri, const char *method,
         }
     }
 
-    m_variableRequestURI.set(parsedURI, std::string(method).size() + 1,
+    m_variableRequestURI.set(parsedURI, method_str.size() + 1,
         uri_s.size());
-    m_variableRequestURIRaw.set(uri, std::string(method).size() + 1);
+    m_variableRequestURIRaw.set(uri, method_str.size() + 1);
 
-    if (m_variableQueryString.m_value.empty() == false) {
-        extractArguments("GET", m_variableQueryString.m_value,
-            m_variableQueryString.m_offset);
+    if (m_variableQueryString.getValue().empty() == false) {
+        extractArguments("GET", m_variableQueryString.getValue(),
+            qry_str_offset);
     }
 
     m_variableOffset = m_variableOffset + 1;
@@ -784,7 +786,7 @@ int Transaction::processRequestBody() {
         return true;
     }
 
-    if (m_variableInboundDataError.m_value.empty() == true) {
+    if (m_variableInboundDataError.getValue().empty() == true) {
         m_variableInboundDataError.set("0", 0);
     }
 
@@ -1197,11 +1199,11 @@ int Transaction::processResponseBody() {
 
     std::set<std::string> &bi = \
         m_rules->m_responseBodyTypeToBeInspected.m_value;
-    auto t = bi.find(m_variableResponseContentType.m_value);
+    auto t = bi.find(m_variableResponseContentType.getValue());
     if (t == bi.end()
         && m_rules->m_responseBodyTypeToBeInspected.m_set == true) {
         ms_dbg(5, "Response Content-Type is " \
-            + m_variableResponseContentType.m_value \
+            + m_variableResponseContentType.getValue() \
             + ". It is not marked to be inspected.");
         std::string validContetTypes("");
         for (std::set<std::string>::iterator i = bi.begin();
@@ -1212,7 +1214,7 @@ int Transaction::processResponseBody() {
             + validContetTypes);
         return true;
     }
-    if (m_variableOutboundDataError.m_value.empty() == true) {
+    if (m_variableOutboundDataError.getValue().empty() == true) {
         m_variableOutboundDataError.set("0", m_variableOffset);
     }
 
@@ -1248,11 +1250,11 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
 
     std::set<std::string> &bi = \
         this->m_rules->m_responseBodyTypeToBeInspected.m_value;
-    auto t = bi.find(m_variableResponseContentType.m_value);
+    auto t = bi.find(m_variableResponseContentType.getValue());
     if (t == bi.end() && bi.empty() == false) {
         ms_dbg(4, "Not appending response body. " \
             "Response Content-Type is " \
-            + m_variableResponseContentType.m_value \
+            + m_variableResponseContentType.getValue() \
             + ". It is not marked to be inspected.");
         return true;
     }

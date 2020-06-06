@@ -39,23 +39,9 @@
 namespace modsecurity {
 class Transaction;
 
-
 class AnchoredVariable {
  public:
-    AnchoredVariable(Transaction* t, const std::string &name);
-
-    AnchoredVariable(const AnchoredVariable &a) = delete;
-    AnchoredVariable &operator= (const AnchoredVariable &a) = delete;
-
-    /*
-        : m_transaction(a.m_transaction),
-        m_offset(a.m_offset),
-        m_name(a.m_name),
-        m_value(a.m_value),
-        m_var(a.m_var) { }
-    */
-
-    ~AnchoredVariable();
+    AnchoredVariable(Transaction* t, const std::string& name);
 
     void unset();
     void set(const std::string &a, size_t offset);
@@ -65,17 +51,15 @@ class AnchoredVariable {
     void append(const std::string &a, size_t offset,
         bool spaceSeparator, int size);
 
+
+    std::string& getValue();
+    const std::string& getValue() const;
+
     void evaluate(std::vector<const VariableValue *> *l);
     std::string *  evaluate();
     std::unique_ptr<std::string> resolveFirst();
 
-    Transaction *m_transaction;
-    int m_offset;
-    std::string m_name;
-    std::string m_value;
-
- private:
-    VariableValue *m_var;
+    VariableValue m_var;
 };
 
 }  // namespace modsecurity
