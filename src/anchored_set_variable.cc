@@ -42,34 +42,20 @@ AnchoredSetVariable::~AnchoredSetVariable() {
 
 
 void AnchoredSetVariable::unset() {
-    for (const auto& x : *this) {
-        VariableValue *var = x.second;
-        delete var;
-    }
     clear();
 }
 
-
 void AnchoredSetVariable::set(const std::string &key,
-    const std::string &value, size_t offset, size_t len) {
-    std::string *v = new std::string(value);
-    VariableValue *var = new VariableValue(&m_name, &key, v);
-    delete v;
+    const std::string &value, size_t offset, size_t size) {
+    auto result = emplace(key, VariableValue(&m_name, &key, &value));
 
-    var->addOrigin(VariableOrigin{len, offset});
-    emplace(key, var);
+    result->second.addOrigin(VariableOrigin{size, offset});
 }
 
 void AnchoredSetVariable::set(const std::string &key,
     const std::string &value, size_t offset) {
-    std::string *v = new std::string(value);
-    VariableValue *var = new VariableValue(&m_name, &key, v);
-    delete v;
-
-    var->addOrigin(VariableOrigin{value.size(), offset});
-    emplace(key, var);
+  set(key, value, offset, value.size());
 }
-
 
 void AnchoredSetVariable::resolve(
     std::vector<const VariableValue *> *l) {
@@ -107,7 +93,7 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
     auto range = equal_range(key);
     for (auto it = range.first; it != range.second; ++it) {
         std::unique_ptr<std::string> b(new std::string());
-        b->assign(it->second->getValue());
+        b->assign(it->second.getValue());
         return b;
     }
     return nullptr;
