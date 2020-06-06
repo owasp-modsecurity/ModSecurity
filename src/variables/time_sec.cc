@@ -15,7 +15,7 @@
 
 #include "src/variables/time_sec.h"
 
-#include <time.h>
+#include "utils/time_format.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -36,17 +36,7 @@ namespace variables {
 void TimeSec::evaluate(Transaction *transaction,
     RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
-    char tstr[200];
-    struct tm timeinfo;
-    time_t timer;
-
-    time(&timer);
-    memset(tstr, '\0', 200);
-
-    localtime_r(&timer, &timeinfo);
-    strftime(tstr, 200, "%S", &timeinfo);
-
-    transaction->m_variableTimeSec.assign(tstr);
+    transaction->m_variableTimeSec = get_formatted_time_string_now<200>("%S");
 
     l->push_back(new VariableValue(&m_retName,
         &transaction->m_variableTimeSec));

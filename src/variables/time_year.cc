@@ -15,7 +15,7 @@
 
 #include "src/variables/time_year.h"
 
-#include <time.h>
+#include "utils/time_format.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -36,17 +36,7 @@ namespace variables {
 void TimeYear::evaluate(Transaction *transaction,
     RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
-    char tstr[200];
-    struct tm timeinfo;
-    time_t timer;
-
-    time(&timer);
-    memset(tstr, '\0', 200);
-
-    localtime_r(&timer, &timeinfo);
-    strftime(tstr, 200, "%Y", &timeinfo);
-
-    transaction->m_variableTimeYear.assign(tstr);
+    transaction->m_variableTimeYear = get_formatted_time_string_now<200>("%Y");
 
     l->push_back(new VariableValue(&m_retName,
         &transaction->m_variableTimeYear));

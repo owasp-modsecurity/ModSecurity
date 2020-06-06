@@ -15,7 +15,7 @@
 
 #include "src/request_body_processor/multipart.h"
 
-#include <time.h>
+#include "utils/time_format.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -455,21 +455,16 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
 
 int Multipart::tmp_file_name(std::string *filename) const {
     std::string path;
-    struct tm timeinfo;
-    char tstr[300];
     char *tmp;
     int fd;
     int mode;
-    time_t tt = time(NULL);
-
-    localtime_r(&tt, &timeinfo);
 
     path = m_transaction->m_rules->m_uploadDirectory.m_value;
     mode = m_transaction->m_rules->m_uploadFileMode.m_value;
 
-    memset(tstr, '\0', 300);
-    strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
-    path = path + tstr + "-" + *m_transaction->m_id.get();
+    std::string time_str = get_formatted_time_string_now("/%Y%m%d-%H%M%S");
+
+    path = path + time_str + "-" + *m_transaction->m_id.get();
     path = path + "-file-XXXXXX";
 
     tmp = strdup(path.c_str());

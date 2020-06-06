@@ -15,7 +15,7 @@
 
 #include "src/audit_log/writer/parallel.h"
 
-#include <time.h>
+#include "utils/time_format.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -46,31 +46,19 @@ Parallel::~Parallel() {
 
 inline std::string Parallel::logFilePath(time_t *t,
     int part) {
-    struct tm timeinfo;
-    char tstr[300];
-    std::string name("");
 
-    localtime_r(t, &timeinfo);
-
+    const char* format_str = nullptr;
     if (part & YearMonthDayDirectory) {
-        memset(tstr, '\0', 300);
-        strftime(tstr, 299, "/%Y%m%d", &timeinfo);
-        name = tstr;
+        format_str = "/%Y%m%d";
     }
-
     if (part & YearMonthDayAndTimeDirectory) {
-        memset(tstr, '\0', 300);
-        strftime(tstr, 299, "/%Y%m%d-%H%M", &timeinfo);
-        name = name + tstr;
+        format_str = "/%Y%m%d-%H%M";
     }
-
     if (part & YearMonthDayAndTimeFileName) {
-        memset(tstr, '\0', 300);
-        strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
-        name = name + tstr;
+        format_str = "/%Y%m%d-%H%M%S";
     }
 
-    return name;
+    return format_str ? get_formatted_time_string(format_str, t) : std::string();
 }
 
 

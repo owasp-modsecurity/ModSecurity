@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include <cstdio>
-#include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -32,6 +31,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "utils/time_format.h"
 #include "modsecurity/actions/action.h"
 #include "src/actions/disruptive/deny.h"
 #include "modsecurity/intervention.h"
@@ -1454,13 +1454,6 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
 std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     double size, const std::string &md5) {
     std::stringstream ss;
-    struct tm timeinfo;
-    char tstr[300];
-
-    memset(tstr, '\0', 300);
-    localtime_r(&this->m_timeStamp, &timeinfo);
-
-    strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
 
     ss << utils::string::dash_if_empty(
        m_variableRequestHeaders.resolveFirst("Host").get())
@@ -1479,7 +1472,8 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     //ss << utils::string::dash_if_empty(
     //    this->m_collections.resolveFirst("LOCAL_USER").get());
     //ss << " ";
-    ss << tstr << " ";
+    std::string time_str = get_formatted_time_string("[%d/%b/%Y:%H:%M:%S %z]", &this->m_timeStamp);
+    ss << time_str << " ";
 
     ss << "\"";
     ss << utils::string::dash_if_empty(m_variableRequestMethod.evaluate());
@@ -1514,15 +1508,10 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
 std::string Transaction::toOldAuditLogFormat(int parts,
     const std::string &trailer) {
     std::stringstream audit_log;
-    struct tm timeinfo;
-    char tstr[300];
-
-    memset(tstr, '\0', 300);
-    localtime_r(&this->m_timeStamp, &timeinfo);
+    std::string time_str = get_formatted_time_string("[%d/%b/%Y:%H:%M:%S %z]", &this->m_timeStamp);
 
     audit_log << "--" << trailer << "-" << "A--" << std::endl;
-    strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
-    audit_log << tstr;
+    audit_log << time_str;
     audit_log << " " << m_id->c_str();
     audit_log << " " << this->m_clientIpAddress;
     audit_log << " " << this->m_clientPort;

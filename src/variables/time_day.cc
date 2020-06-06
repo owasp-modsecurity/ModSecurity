@@ -15,7 +15,7 @@
 
 #include "src/variables/time_day.h"
 
-#include <time.h>
+#include "utils/time_format.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -36,17 +36,8 @@ namespace variables {
 void TimeDay::evaluate(Transaction *transaction,
     RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
-    char tstr[200];
-    struct tm timeinfo;
-    time_t timer;
 
-    time(&timer);
-    memset(tstr, '\0', 200);
-
-    localtime_r(&timer, &timeinfo);
-    strftime(tstr, 200, "%d", &timeinfo);
-
-    transaction->m_variableTimeDay.assign(tstr);
+    transaction->m_variableTimeDay = get_formatted_time_string_now<200>("%d");
 
     l->push_back(new VariableValue(&m_retName,
         &transaction->m_variableTimeDay));

@@ -15,7 +15,7 @@
 
 #include "src/variables/time_mon.h"
 
-#include <time.h>
+#include "utils/time_format.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -36,16 +36,10 @@ namespace variables {
 void TimeMon::evaluate(Transaction *transaction,
     RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
-    char tstr[200];
-    struct tm timeinfo;
-    time_t timer;
 
-    time(&timer);
-    memset(tstr, '\0', 200);
+    std::string time_str = get_formatted_time_string_now<200>("%m");
 
-    localtime_r(&timer, &timeinfo);
-    strftime(tstr, 200, "%m", &timeinfo);
-    int a = atoi(tstr);
+    int a = std::stoi(time_str);
     a--;
 
     transaction->m_variableTimeMin.assign(std::to_string(a));
