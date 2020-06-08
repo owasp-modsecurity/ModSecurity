@@ -84,6 +84,7 @@ class Driver;
 #include "src/actions/disruptive/redirect.h"
 #include "src/actions/init_col.h"
 #include "src/actions/exec.h"
+#include "src/actions/expire_var.h"
 #include "src/actions/log_data.h"
 #include "src/actions/log.h"
 #include "src/actions/maturity.h"
@@ -353,7 +354,7 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 357 "seclang-parser.hh"
+#line 358 "seclang-parser.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -487,7 +488,7 @@ using namespace modsecurity::operators;
 #endif
 
 namespace yy {
-#line 491 "seclang-parser.hh"
+#line 492 "seclang-parser.hh"
 
 
 
@@ -8628,7 +8629,7 @@ switch (yykind)
   }
 
 } // yy
-#line 8632 "seclang-parser.hh"
+#line 8633 "seclang-parser.hh"
 
 
 

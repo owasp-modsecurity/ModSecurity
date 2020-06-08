@@ -53,7 +53,7 @@ bool RuleRemoveTargetById::init(std::string *error) {
 }
 
 
-bool RuleRemoveTargetById::execute(Transaction *transaction) noexcept {
+bool RuleRemoveTargetById::execute(Transaction *transaction) const noexcept {
     transaction->m_ruleRemoveTargetById.push_back(
         std::make_pair(m_id, m_target));
     return true;

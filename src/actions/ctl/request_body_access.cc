@@ -44,7 +44,7 @@ bool RequestBodyAccess::init(std::string *error) {
 }
 
 
-bool RequestBodyAccess::execute(Transaction *transaction) noexcept {
+bool RequestBodyAccess::execute(Transaction *transaction) const noexcept {
     if (m_requestBodyAccess) {
         transaction->m_requestBodyAccess =
             RulesSetProperties::TrueConfigBoolean;
