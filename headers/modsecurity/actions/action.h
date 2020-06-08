@@ -69,12 +69,6 @@ class Action {
         return true;
     }
 
-
-    virtual bool execute(Transaction *transaction = nullptr) noexcept {
-        return true;
-    }
-
-
     const std::string *getName() const noexcept {
         return &m_name;
     }

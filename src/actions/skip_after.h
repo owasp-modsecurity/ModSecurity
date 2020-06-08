@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "modsecurity/actions/action.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_SKIP_AFTER_H_
@@ -28,14 +29,14 @@ namespace modsecurity {
 namespace actions {
 
 
-class SkipAfter : public Action {
+class SkipAfter : public ActionWithExecution {
  public:
     explicit SkipAfter(const std::string &action)
         : Action(action),
         m_skipName(std::make_shared<std::string>(m_parserPayload))
     { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  private:
     // FIXME: This should be a regular pointer instead of a shared pointer.

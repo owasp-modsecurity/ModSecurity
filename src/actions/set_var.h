@@ -23,6 +23,7 @@
 #include "src/actions/action_with_run_time_string.h"
 #include "src/variables/variable_with_runtime_string.h"
 #include "src/rule_with_operator.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_SET_VAR_H_
@@ -47,7 +48,7 @@ enum SetVarOperation {
 };
 
 
-class SetVar : public ActionWithRunTimeString {
+class SetVar : public ActionWithRunTimeString, public ActionWithExecution {
  public:
     SetVar(SetVarOperation operation,
         std::unique_ptr<modsecurity::variables::Variable> variable,
@@ -84,7 +85,7 @@ class SetVar : public ActionWithRunTimeString {
     }
 
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
     bool init(std::string *error) override;
 
     void populate(RuleWithActions *rule) override {
