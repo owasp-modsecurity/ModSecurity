@@ -20,6 +20,8 @@
 
 #include "modsecurity/actions/action.h"
 #include "src/actions/action_with_run_time_string.h"
+#include "src/actions/action_with_execution.h"
+
 
 #ifndef SRC_ACTIONS_INIT_COL_H_
 #define SRC_ACTIONS_INIT_COL_H_
@@ -30,7 +32,7 @@ class Transaction;
 namespace actions {
 
 
-class InitCol : public ActionWithRunTimeString {
+class InitCol : public ActionWithRunTimeString, public ActionWithExecution {
  public:
     InitCol(
         const std::string &action,
@@ -47,7 +49,7 @@ class InitCol : public ActionWithRunTimeString {
 
     bool init(std::string *error) override;
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
     ActionWithRunTimeString *clone() override {
         return new InitCol(*this);

@@ -52,7 +52,7 @@ bool Allow::init(std::string *error) {
 }
 
 
-bool Allow::execute(Transaction *transaction) noexcept {
+bool Allow::execute(Transaction *transaction) const noexcept {
     ms_dbg_a(transaction, 4, "Dropping the evaluation of upcoming rules " \
         "in favor of an `allow' action of type: " \
         + allowTypeToName(m_allowType));

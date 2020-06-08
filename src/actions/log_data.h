@@ -18,6 +18,7 @@
 
 #include "src/actions/action_with_run_time_string.h"
 #include "src/run_time_string.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_LOG_DATA_H_
@@ -28,7 +29,7 @@ namespace modsecurity {
 namespace actions {
 
 
-class LogData : public ActionWithRunTimeString {
+class LogData : public ActionWithRunTimeString, public ActionWithExecution {
  public:
     explicit LogData(std::unique_ptr<RunTimeString> runTimeString)
         : ActionWithRunTimeString(std::move(runTimeString)),
@@ -40,7 +41,7 @@ class LogData : public ActionWithRunTimeString {
         Action(data)
     { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
     ActionWithRunTimeString *clone() override {
         return new LogData(*this);

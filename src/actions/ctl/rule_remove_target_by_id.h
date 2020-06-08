@@ -18,6 +18,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_
@@ -29,7 +30,7 @@ namespace actions {
 namespace ctl {
 
 
-class RuleRemoveTargetById : public Action {
+class RuleRemoveTargetById : public ActionWithExecution {
  public:
     explicit RuleRemoveTargetById(const std::string &action)
         : Action(action),
@@ -39,7 +40,7 @@ class RuleRemoveTargetById : public Action {
 
     bool init(std::string *error) override;
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  private:
     int m_id;

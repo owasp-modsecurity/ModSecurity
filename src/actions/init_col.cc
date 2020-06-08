@@ -57,7 +57,7 @@ bool InitCol::init(std::string *error) {
 }
 
 
-bool InitCol::execute(Transaction *t) noexcept {
+bool InitCol::execute(Transaction *t) const noexcept {
     std::string collectionName(getEvaluatedRunTimeString(t));
 
     if (m_collection_key == "ip") {
