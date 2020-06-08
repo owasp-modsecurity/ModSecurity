@@ -31,6 +31,8 @@
 #include "modsecurity/rule.h"
 #include "modsecurity/actions/action.h"
 #include "src/actions/action_type_rule_metadata.h"
+#include "src/actions/action_with_execution.h"
+#include "src/actions/disruptive/disruptive_action.h"
 
 
 #ifdef __cplusplus
@@ -54,15 +56,20 @@ class Transformation;
 using Transformation = actions::transformations::Transformation;
 using Transformations = std::vector<std::shared_ptr<Transformation> >;
 using TransformationsPtr = std::vector<Transformation *>;
-using Action = actions::Action;
-using ActionTypeRuleMetaData = actions::ActionTypeRuleMetaData;
+
 using Actions = std::vector<actions::Action *>;
+using ActionWithExecution = actions::ActionWithExecution;
+using ActionTypeRuleMetaData = actions::ActionTypeRuleMetaData;
+using ActionDisruptive = actions::disruptive::ActionDisruptive;
+
+using MatchActions = std::vector<std::shared_ptr<ActionWithExecution > >;
+using MatchActionsPtr = std::vector<ActionWithExecution *>;
+
 using Tags = std::vector<std::shared_ptr<actions::Tag> >;
 using TagsPtr = std::vector<actions::Tag *>;
+
 using SetVars = std::vector<std::shared_ptr<actions::SetVar> >;
 using SetVarsPtr = std::vector<actions::SetVar *>;
-using MatchActions = std::vector<std::shared_ptr<actions::Action > >;
-using MatchActionsPtr = std::vector<actions::Action *>;
 
 using XmlNSs = std::vector<std::shared_ptr<actions::XmlNS> >;
 using XmlNSsPtr = std::vector<actions::XmlNS *>;
@@ -109,7 +116,6 @@ class RuleWithActions : public Rule {
     int SEVERITY_NOT_SET = 10;
     int ACCURACY_NOT_SET = 10;
     int MATURITY_NOT_SET = 10;
-
 
     RuleWithActions(
         Actions *a,
@@ -226,7 +232,11 @@ class RuleWithActions : public Rule {
         Transaction *trasn);
 
     void executeAction(Transaction *trans,
-        Action *a,
+        ActionWithExecution *a,
+        bool context);
+
+    void executeAction(Transaction *trans,
+        ActionDisruptive *a,
         bool context);
 
     static void executeTransformation(
@@ -357,8 +367,8 @@ class RuleWithActions : public Rule {
     inline bool hasCaptureAction() const { return m_containsCaptureAction || m_defaultContainsCaptureAction; }
 
     inline bool hasDisruptiveAction() const { return m_disruptiveAction != nullptr || m_defaultActionDisruptiveAction != nullptr; }
-    inline void setDisruptiveAction(const std::shared_ptr<actions::Action> &a) { m_disruptiveAction = a; }
-    inline std::shared_ptr<actions::Action> getDisruptiveAction() const { return m_disruptiveAction; }
+    inline void setDisruptiveAction(const std::shared_ptr<ActionDisruptive> &a) { m_disruptiveAction = a; }
+    inline std::shared_ptr<ActionDisruptive> getDisruptiveAction() const { return m_disruptiveAction; }
 
     inline bool hasBlockAction() const { return m_containsStaticBlockAction || m_defaultContainsStaticBlockAction; }
     inline void setHasBlockAction(bool b) { m_containsStaticBlockAction = b; }
@@ -526,7 +536,7 @@ class RuleWithActions : public Rule {
     RuleWithActions *m_chainedRuleParent;
 
     /* actions */
-    std::shared_ptr<actions::Action> m_disruptiveAction;
+    std::shared_ptr<ActionDisruptive> m_disruptiveAction;
     std::shared_ptr<actions::LogData> m_logData;
     std::shared_ptr<actions::Msg> m_msg;
     MatchActions m_actionsRuntimePos;
@@ -535,9 +545,10 @@ class RuleWithActions : public Rule {
     XmlNSs m_XmlNSs;
 
     /* actions || SecDefaultAction */
-    std::shared_ptr<actions::Action> m_defaultActionDisruptiveAction;
+    std::shared_ptr<ActionDisruptive> m_defaultActionDisruptiveAction;
     std::shared_ptr<actions::LogData> m_defaultActionLogData;
     std::shared_ptr<actions::Msg> m_defaultActionMsg;
+
     MatchActions m_defaultActionActionsRuntimePos;
     SetVars m_defaultActionActionsSetVar;
     Tags m_defaultActionActionsTag;

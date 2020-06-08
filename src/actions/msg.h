@@ -21,6 +21,8 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
 #include "src/actions/action_with_run_time_string.h"
+#include "src/actions/action_with_execution.h"
+
 
 #ifndef SRC_ACTIONS_MSG_H_
 #define SRC_ACTIONS_MSG_H_
@@ -32,7 +34,7 @@ class Transaction;
 namespace actions {
 
 
-class Msg : public ActionWithRunTimeString {
+class Msg : public ActionWithRunTimeString, public ActionWithExecution {
  public:
     explicit Msg(std::unique_ptr<RunTimeString> runTimeString)
         : ActionWithRunTimeString(std::move(runTimeString)),
@@ -44,7 +46,7 @@ class Msg : public ActionWithRunTimeString {
         Action(action)
     { };
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
     ActionWithRunTimeString *clone() override {
         return new Msg(*this);

@@ -55,7 +55,7 @@ bool AuditLogParts::init(std::string *error) {
 }
 
 
-bool AuditLogParts::execute(Transaction *transaction) noexcept {
+bool AuditLogParts::execute(Transaction *transaction) const noexcept {
     ms_dbg_a(transaction, 7, "AuditLog parts before modification: " +
         std::to_string(transaction->m_auditLogParts) + ".");
 

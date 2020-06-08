@@ -38,7 +38,7 @@ bool Status::init(std::string *error) {
 }
 
 
-bool Status::execute(Transaction *transaction) noexcept {
+bool Status::execute(Transaction *transaction) const noexcept {
     transaction->m_it.status = m_status;
     return true;
 }
