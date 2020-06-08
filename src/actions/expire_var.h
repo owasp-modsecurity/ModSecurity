@@ -14,37 +14,41 @@
  */
 
 
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
-
-#include "src/actions/disruptive/disruptive_action.h"
+#include "src/actions/action_with_run_time_string.h"
 #include "src/actions/action_with_execution.h"
 
 
-#ifndef SRC_ACTIONS_DISRUPTIVE_PASS_H_
-#define SRC_ACTIONS_DISRUPTIVE_PASS_H_
+#ifndef SRC_ACTIONS_EXPIRE_VAR_H_
+#define SRC_ACTIONS_EXPIRE_VAR_H_
 
 
 namespace modsecurity {
 namespace actions {
-namespace disruptive {
 
 
-class Pass : public ActionDisruptive, public ActionWithExecution {
+class ExpireVar : public ActionWithExecution {
  public:
-    Pass()
-        : Action("pass")
+    explicit ExpireVar(const std::string &action)
+        : Action(action)
     { }
 
-    bool execute(Transaction *transaction) const noexcept override;
+    ~ExpireVar() { }
+
+    bool execute(Transaction *transaction) const noexcept override { return true; };
+    bool init(std::string *error) override { return true; };
+
+ private:
 };
 
 
-}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
 
 
-#endif  // SRC_ACTIONS_DISRUPTIVE_PASS_H_
+#endif  // SRC_ACTIONS_EXPIRE_VAR_H_

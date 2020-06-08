@@ -32,7 +32,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Deny::execute(Transaction *transaction) noexcept {
+bool Deny::execute(Transaction *transaction) const noexcept {
     ms_dbg_a(transaction, 8, "Running action deny");
 
     if (transaction->m_it.status == 200) {

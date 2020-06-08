@@ -20,6 +20,7 @@
 #include "modsecurity/transaction.h"
 
 #include "src/actions/disruptive/disruptive_action.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_DENY_H_
@@ -31,13 +32,13 @@ namespace actions {
 namespace disruptive {
 
 
-class Deny : public ActionDisruptive {
+class Deny : public ActionDisruptive, public ActionWithExecution {
  public:
     Deny()
         : Action("deny")
     { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 };
 
 

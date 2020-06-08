@@ -42,7 +42,7 @@ bool Skip::init(std::string *error) {
 }
 
 
-bool Skip::execute(Transaction *transaction) noexcept {
+bool Skip::execute(Transaction *transaction) const noexcept {
     ms_dbg_a(transaction, 5, "Skipping the next " + \
         std::to_string(m_skip_next) + " rules.");
 

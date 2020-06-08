@@ -18,6 +18,7 @@
 
 #include "modsecurity/rules_set_properties.h"
 #include "modsecurity/actions/action.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_CTL_RULE_ENGINE_H_
@@ -29,7 +30,7 @@ namespace actions {
 namespace ctl {
 
 
-class RuleEngine : public Action {
+class RuleEngine : public ActionWithExecution {
  public:
     explicit RuleEngine(const std::string &action)
         : Action(action),
@@ -38,7 +39,7 @@ class RuleEngine : public Action {
 
     bool init(std::string *error) override;
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  private:
     RulesSetProperties::RuleEngine m_ruleEngine;
