@@ -17,6 +17,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_SKIP_H_
@@ -29,14 +30,14 @@ class Transaction;
 namespace actions {
 
 
-class Skip : public Action {
+class Skip : public ActionWithExecution {
  public:
     explicit Skip(const std::string &action)
         : Action(action),
         m_skip_next(0) { }
 
     bool init(std::string *error) override;
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  private:
     int m_skip_next;

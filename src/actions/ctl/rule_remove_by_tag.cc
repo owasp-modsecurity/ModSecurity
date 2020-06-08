@@ -34,7 +34,7 @@ bool RuleRemoveByTag::init(std::string *error) {
 }
 
 
-bool RuleRemoveByTag::execute(Transaction *transaction) noexcept {
+bool RuleRemoveByTag::execute(Transaction *transaction) const noexcept {
     transaction->m_ruleRemoveByTag.push_back(m_tag);
     return true;
 }

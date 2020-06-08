@@ -18,6 +18,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_URLENCODED_H_
@@ -29,13 +30,13 @@ namespace actions {
 namespace ctl {
 
 
-class RequestBodyProcessorURLENCODED : public Action {
+class RequestBodyProcessorURLENCODED : public ActionWithExecution {
  public:
     explicit RequestBodyProcessorURLENCODED(const std::string &action)
         : Action(action)
     { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 };
 
 
