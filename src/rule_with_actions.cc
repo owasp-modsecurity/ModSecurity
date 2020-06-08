@@ -141,12 +141,12 @@ void RuleWithActions::addDefaultAction(std::shared_ptr<actions::Action> a) {
     } else if (dynamic_cast<actions::Tag *>(a.get())) {
         m_defaultActionActionsTag.push_back(std::dynamic_pointer_cast<actions::Tag>(a));
     } else if (dynamic_cast<actions::Block *>(a.get())) {
-        m_defaultActionActionsRuntimePos.push_back(a);
+        m_defaultActionActionsRuntimePos.push_back(std::dynamic_pointer_cast<ActionWithExecution>(a));
         m_defaultContainsStaticBlockAction = true;
-    } else if (std::dynamic_pointer_cast<actions::disruptive::ActionDisruptive>(a) != NULL) {
-        m_defaultActionDisruptiveAction = a;
+    } else if (std::dynamic_pointer_cast<ActionDisruptive>(a) != NULL) {
+        m_defaultActionDisruptiveAction = std::dynamic_pointer_cast<ActionDisruptive>(a);
     } else {
-        m_defaultActionActionsRuntimePos.push_back(a);
+        m_defaultActionActionsRuntimePos.push_back(std::dynamic_pointer_cast<ActionWithExecution>(a));
     }
 }
 
@@ -165,7 +165,6 @@ void RuleWithActions::addAction(actions::Action *a) {
         return;
     }
 
-
     if (dynamic_cast<actions::LogData *>(a)) {
         m_logData = std::unique_ptr<actions::LogData>(dynamic_cast<actions::LogData*>(a));
     } else if (dynamic_cast<actions::Msg *>(a)) {
@@ -176,14 +175,14 @@ void RuleWithActions::addAction(actions::Action *a) {
     } else if (dynamic_cast<actions::Tag *>(a)) {
         m_actionsTag.push_back(std::unique_ptr<actions::Tag>(dynamic_cast<actions::Tag *>(a)));
     } else if (dynamic_cast<actions::Block *>(a)) {
-        m_actionsRuntimePos.push_back(std::unique_ptr<actions::Block>(dynamic_cast<actions::Block *>(a)));
+        m_actionsRuntimePos.push_back(std::unique_ptr<ActionWithExecution>(dynamic_cast<ActionWithExecution *>(a)));
         m_containsStaticBlockAction = true;
     } else if (dynamic_cast<actions::XmlNS *>(a)) {
         m_XmlNSs.push_back(std::unique_ptr<actions::XmlNS>(dynamic_cast<actions::XmlNS *>(a)));
-    } else if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a) != NULL) {
-        m_disruptiveAction = std::unique_ptr<Action>(a);
+    } else if (dynamic_cast<ActionDisruptive *>(a) != NULL) {
+        m_disruptiveAction = std::unique_ptr<ActionDisruptive>(dynamic_cast<ActionDisruptive *>(a));
     } else {
-        m_actionsRuntimePos.push_back(std::unique_ptr<Action>(a));
+        m_actionsRuntimePos.push_back(std::unique_ptr<ActionWithExecution >(dynamic_cast<ActionWithExecution *>(a)));
     }
 }
 
@@ -241,23 +240,22 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
         if (m_ruleId != b.first) {
             continue;
         }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
-        if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a)) {
+        ActionWithExecution *a = dynamic_cast<ActionWithExecution*>(b.second.get());
+        if (dynamic_cast<ActionDisruptive *>(a)) {
             trans->messageGetLast()->setRule(this);
         }
         executeAction(trans, a, false);
-        if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a)) {
+        if (dynamic_cast<ActionDisruptive *>(a)) {
             disruptiveAlreadyExecuted = true;
         }
     }
     for (auto &a : getMatchActionsPtr()) {
-        if (!dynamic_cast<actions::disruptive::ActionDisruptive *>(a)
+        if (!dynamic_cast<ActionDisruptive *>(a)
                 && !(disruptiveAlreadyExecuted
                 && dynamic_cast<actions::Block *>(a))) {
             executeAction(trans, a, false);
         }
     }
-
     if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
         executeAction(trans,
             m_disruptiveAction.get(), false);
@@ -270,13 +268,14 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) {
 
 
 void RuleWithActions::executeAction(Transaction *trans,
-    Action *a, bool defaultContext) {
-    if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a) == NULL) {
-        ms_dbg_a(trans, 9, "Running action: " + *a->getName());
-        a->execute(trans);
-        return;
-    }
+    ActionWithExecution *a, bool defaultContext) {
+    ms_dbg_a(trans, 9, "Running action: " + *a->getName());
+    a->execute(trans);
+}
 
+
+void RuleWithActions::executeAction(Transaction *trans,
+    ActionDisruptive *a, bool defaultContext) {
     if (defaultContext && !hasBlockAction()) {
         ms_dbg_a(trans, 4, "Ignoring action: " + *a->getName() + \
             " (rule does not cotains block)");
@@ -284,9 +283,10 @@ void RuleWithActions::executeAction(Transaction *trans,
     }
 
     if (trans->getRuleEngineState() == RulesSet::EnabledRuleEngine) {
-        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + 
+        ms_dbg_a(trans, 4, "Running (disruptive)     action: " + \
             *a->getName() + ".");
-        a->execute(trans);
+        ActionWithExecution *ae = dynamic_cast<ActionWithExecution *>(a);
+        ae->execute(trans);
         return;
     }
 

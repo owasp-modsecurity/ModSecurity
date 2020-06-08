@@ -20,6 +20,7 @@
 #include "modsecurity/transaction.h"
 
 #include "src/actions/action_allowed_in_sec_default_action.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_DATA_STATUS_H_
@@ -31,7 +32,7 @@ namespace actions {
 namespace data {
 
 
-class Status : public ActionAllowedAsSecDefaultAction {
+class Status : public ActionAllowedAsSecDefaultAction, public ActionWithExecution {
  public:
     explicit Status(const std::string &action)
         : Action(action),
@@ -40,7 +41,7 @@ class Status : public ActionAllowedAsSecDefaultAction {
 
     bool init(std::string *error) override;
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  private:
     int m_status;
