@@ -24,6 +24,7 @@
 #include "src/actions/action_with_run_time_string.h"
 #include "src/actions/disruptive/disruptive_action.h"
 #include "src/run_time_string.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
@@ -35,7 +36,8 @@ namespace actions {
 namespace disruptive {
 
 
-class Redirect : public ActionWithRunTimeString, public ActionDisruptive {
+class Redirect : public ActionWithRunTimeString, public ActionDisruptive,
+    public ActionWithExecution {
  public:
     explicit Redirect(std::unique_ptr<RunTimeString> runTimeString)
         : ActionWithRunTimeString(std::move(runTimeString)),
@@ -52,7 +54,7 @@ class Redirect : public ActionWithRunTimeString, public ActionDisruptive {
     { }
 
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
 
     ActionWithRunTimeString *clone() override {

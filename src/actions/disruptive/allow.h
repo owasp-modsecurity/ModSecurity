@@ -20,6 +20,7 @@
 #include "modsecurity/transaction.h"
 
 #include "src/actions/disruptive/disruptive_action.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_ALLOW_H_
@@ -51,7 +52,7 @@ enum AllowType : int {
 };
 
 
-class Allow : public ActionDisruptive {
+class Allow : public ActionDisruptive, public ActionWithExecution {
  public:
     explicit Allow(const std::string &action)
         : Action(action),
@@ -60,7 +61,7 @@ class Allow : public ActionDisruptive {
 
     bool init(std::string *error) override;
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  private:
     AllowType m_allowType;

@@ -47,7 +47,7 @@ bool RuleEngine::init(std::string *error) {
 }
 
 
-bool RuleEngine::execute(Transaction *transaction) noexcept {
+bool RuleEngine::execute(Transaction *transaction) const noexcept {
     std::stringstream a;
     a << "Setting SecRuleEngine to ";
     a << modsecurity::RulesSetProperties::ruleEngineStateString(m_ruleEngine);

@@ -30,7 +30,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SetSID::execute(Transaction *t) noexcept {
+bool SetSID::execute(Transaction *t) const noexcept {
     std::string colNameExpanded(getEvaluatedRunTimeString(t));
     ms_dbg_a(t, 8, "Session ID initiated with value: \'"
         + colNameExpanded + "\'.");

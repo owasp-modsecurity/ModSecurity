@@ -25,7 +25,7 @@
 namespace modsecurity {
 namespace actions {
 
-bool LogData::execute(Transaction *transaction) noexcept {
+bool LogData::execute(Transaction *transaction) const noexcept {
     transaction->messageGetLast()->m_data =
         getEvaluatedRunTimeString(transaction);
     return true;
