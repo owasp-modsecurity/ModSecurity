@@ -26,7 +26,7 @@ namespace actions {
 namespace ctl {
 
 
-bool RequestBodyProcessorXML::execute(Transaction *transaction) noexcept {
+bool RequestBodyProcessorXML::execute(Transaction *transaction) const noexcept {
     transaction->m_requestBodyProcessor = Transaction::XMLRequestBody;
     transaction->m_variableReqbodyProcessor.set("XML",
         transaction->m_variableOffset);

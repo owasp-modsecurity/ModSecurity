@@ -52,7 +52,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Tag::execute(Transaction *transaction) noexcept {
+bool Tag::execute(Transaction *transaction) const noexcept {
     ms_dbg_a(transaction, 9, "Rule tag: " + getTagName(transaction));
     return true;
 }
