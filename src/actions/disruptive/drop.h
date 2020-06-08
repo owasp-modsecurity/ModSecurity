@@ -20,6 +20,7 @@
 #include "modsecurity/transaction.h"
 
 #include "src/actions/disruptive/disruptive_action.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_DISRUPTIVE_DROP_H_
@@ -31,13 +32,13 @@ namespace actions {
 namespace disruptive {
 
 
-class Drop : public ActionDisruptive {
+class Drop : public ActionDisruptive, public ActionWithExecution {
  public:
     Drop()
         : Action("drop")
     { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 };
 
 

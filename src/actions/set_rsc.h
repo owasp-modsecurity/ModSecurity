@@ -20,6 +20,8 @@
 
 #include "modsecurity/actions/action.h"
 #include "src/actions/action_with_run_time_string.h"
+#include "src/actions/action_with_execution.h"
+
 
 #ifndef SRC_ACTIONS_SET_RSC_H_
 #define SRC_ACTIONS_SET_RSC_H_
@@ -31,7 +33,7 @@ class Transaction;
 namespace actions {
 
 
-class SetRSC : public ActionWithRunTimeString {
+class SetRSC : public ActionWithRunTimeString, public ActionWithExecution {
  public:
     explicit SetRSC(std::unique_ptr<RunTimeString> runTimeString)
         : ActionWithRunTimeString(std::move(runTimeString)),
@@ -43,7 +45,7 @@ class SetRSC : public ActionWithRunTimeString {
         Action(action)
     { };
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
     ActionWithRunTimeString *clone() override {
         return new SetRSC(*this);

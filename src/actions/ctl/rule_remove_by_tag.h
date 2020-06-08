@@ -18,6 +18,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_CTL_RULE_REMOVE_BY_TAG_H_
@@ -29,7 +30,7 @@ namespace actions {
 namespace ctl {
 
 
-class RuleRemoveByTag : public Action {
+class RuleRemoveByTag : public ActionWithExecution {
  public:
     explicit RuleRemoveByTag(const std::string &action)
         : Action(action),
@@ -38,7 +39,7 @@ class RuleRemoveByTag : public Action {
 
     bool init(std::string *error) override;
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  private:
     std::string m_tag;

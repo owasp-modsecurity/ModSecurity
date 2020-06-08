@@ -49,7 +49,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Msg::execute(Transaction *transaction) noexcept {
+bool Msg::execute(Transaction *transaction) const noexcept {
     std::string msg = getEvaluatedRunTimeString(transaction);
     transaction->messageGetLast()->m_message = msg;
     ms_dbg_a(transaction, 9, "Saving msg: " + msg);
