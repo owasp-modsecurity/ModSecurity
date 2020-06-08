@@ -18,6 +18,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_XML_H_
@@ -29,13 +30,13 @@ namespace actions {
 namespace ctl {
 
 
-class RequestBodyProcessorXML : public Action {
+class RequestBodyProcessorXML : public ActionWithExecution {
  public:
     explicit RequestBodyProcessorXML(const std::string &action)
         : Action(action)
     { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 };
 
 

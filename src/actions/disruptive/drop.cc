@@ -32,7 +32,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Drop::execute(Transaction *transaction) noexcept {
+bool Drop::execute(Transaction *transaction) const noexcept {
     ms_dbg_a(transaction, 8, "Running action drop " \
         "[executing deny instead of drop.]");
 

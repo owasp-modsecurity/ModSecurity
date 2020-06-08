@@ -37,10 +37,6 @@ class ActionTypeRuleMetaData : public virtual Action {
         : Action()
     { };
 
-    bool execute(Transaction *t) noexcept override {
-        return true;
-    }
-
     virtual void configure(RuleWithActions *rule) = 0;
 };
 

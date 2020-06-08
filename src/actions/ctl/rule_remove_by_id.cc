@@ -88,7 +88,7 @@ bool RuleRemoveById::init(std::string *error) {
 }
 
 
-bool RuleRemoveById::execute(Transaction *transaction) noexcept {
+bool RuleRemoveById::execute(Transaction *transaction) const noexcept {
     for (auto &i : m_ids) {
         transaction->m_ruleRemoveById.push_back(i);
     }
