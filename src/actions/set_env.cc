@@ -32,7 +32,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SetENV::execute(Transaction *t) noexcept {
+bool SetENV::execute(Transaction *t) const noexcept {
     std::string colNameExpanded(getEvaluatedRunTimeString(t));
 
     ms_dbg_a(t, 8, "Setting envoriment variable: "

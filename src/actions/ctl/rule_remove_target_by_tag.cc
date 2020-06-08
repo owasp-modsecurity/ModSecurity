@@ -46,7 +46,7 @@ bool RuleRemoveTargetByTag::init(std::string *error) {
 }
 
 
-bool RuleRemoveTargetByTag::execute(Transaction *transaction) noexcept {
+bool RuleRemoveTargetByTag::execute(Transaction *transaction) const noexcept {
     transaction->m_ruleRemoveTargetByTag.push_back(
         std::make_pair(m_tag, m_target));
     return true;
