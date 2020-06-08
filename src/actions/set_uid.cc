@@ -30,7 +30,7 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SetUID::execute(Transaction *t) noexcept {
+bool SetUID::execute(Transaction *t) const noexcept {
     std::string colNameExpanded(getEvaluatedRunTimeString(t));
     ms_dbg_a(t, 8, "User collection initiated with value: \'"
         + colNameExpanded + "\'.");

@@ -18,6 +18,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_CTL_REQUEST_BODY_ACCESS_H_
@@ -29,7 +30,7 @@ namespace actions {
 namespace ctl {
 
 
-class RequestBodyAccess : public Action {
+class RequestBodyAccess : public ActionWithExecution {
  public:
     explicit RequestBodyAccess(const std::string &action)
         : Action(action),
@@ -38,7 +39,7 @@ class RequestBodyAccess : public Action {
 
     bool init(std::string *error) override;
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  private:
     bool m_requestBodyAccess;

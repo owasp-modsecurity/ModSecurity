@@ -52,7 +52,7 @@ bool Exec::init(std::string *error) {
 }
 
 
-bool Exec::execute(Transaction *t) noexcept {
+bool Exec::execute(Transaction *t) const noexcept {
     ms_dbg_a(t, 8, "Running script... " + m_script);
     m_lua.run(t);
     return true;

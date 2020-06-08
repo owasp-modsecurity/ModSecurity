@@ -18,6 +18,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/actions/action_with_execution.h"
 
 
 #ifndef SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
@@ -29,7 +30,7 @@ namespace actions {
 namespace ctl {
 
 
-class AuditLogParts : public Action {
+class AuditLogParts : public ActionWithExecution {
  public:
     explicit AuditLogParts(const std::string &action)
         : Action(action),
@@ -38,7 +39,7 @@ class AuditLogParts : public Action {
 
     bool init(std::string *error) override;
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
 
  protected:
     int m_partsToModify;

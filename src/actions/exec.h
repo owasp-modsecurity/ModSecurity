@@ -18,6 +18,8 @@
 
 #include "modsecurity/actions/action.h"
 #include "src/engine/lua.h"
+#include "src/actions/action_with_execution.h"
+
 
 #ifndef SRC_ACTIONS_EXEC_H_
 #define SRC_ACTIONS_EXEC_H_
@@ -27,7 +29,7 @@ namespace modsecurity {
 namespace actions {
 
 
-class Exec : public Action {
+class Exec : public ActionWithExecution {
  public:
     explicit Exec(const std::string &action)
         : Action(action),
@@ -36,7 +38,7 @@ class Exec : public Action {
 
     ~Exec() { }
 
-    bool execute(Transaction *transaction) noexcept override;
+    bool execute(Transaction *transaction) const noexcept override;
     bool init(std::string *error) override;
 
  private:

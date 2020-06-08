@@ -32,7 +32,7 @@ namespace actions {
 namespace disruptive {
 
 
-bool Redirect::execute(Transaction *transaction) noexcept {
+bool Redirect::execute(Transaction *transaction) const noexcept {
     std::string m_urlExpanded(getEvaluatedRunTimeString(transaction));
     /* if it was changed before, lets keep it. */
     if (transaction->m_it.status == 200

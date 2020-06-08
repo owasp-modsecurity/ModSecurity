@@ -14,37 +14,28 @@
  */
 
 
-#include <string>
-
 #include "modsecurity/actions/action.h"
-#include "modsecurity/transaction.h"
+#include "src/rule_with_actions.h"
 
-#include "src/actions/disruptive/disruptive_action.h"
-#include "src/actions/action_with_execution.h"
-
-
-#ifndef SRC_ACTIONS_DISRUPTIVE_PASS_H_
-#define SRC_ACTIONS_DISRUPTIVE_PASS_H_
+#ifndef SRC_ACTIONS_ACTION_WITH_EXECUTION_H_
+#define SRC_ACTIONS_ACTION_WITH_EXECUTION_H_
 
 
 namespace modsecurity {
 namespace actions {
-namespace disruptive {
 
 
-class Pass : public ActionDisruptive, public ActionWithExecution {
+class ActionWithExecution : public virtual Action {
  public:
-    Pass()
-        : Action("pass")
-    { }
+    ActionWithExecution()
+        : Action()
+    { };
 
-    bool execute(Transaction *transaction) const noexcept override;
+    virtual bool execute(Transaction *t) const noexcept = 0;
 };
 
 
-}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
 
-
-#endif  // SRC_ACTIONS_DISRUPTIVE_PASS_H_
+#endif  // SRC_ACTIONS_ACTION_WITH_EXECUTION_H_
