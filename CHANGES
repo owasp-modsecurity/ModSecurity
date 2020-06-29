@@ -1,6 +1,9 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - rx: exit after full match (remove /g emulation); ensure capture
+    groups occuring after unused groups still populate TX vars
+    [Issue #2336 - @martinhsv]
   - Correct CHANGES file entry for #2234
   - Add support to test framework for audit log content verification
     and add regression tests for issues #2000, #2196
