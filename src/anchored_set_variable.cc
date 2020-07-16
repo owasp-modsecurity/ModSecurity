@@ -27,6 +27,11 @@
 
 namespace modsecurity {
 
+static void addReverse(VariableValueList* to, VariableValueList& from){
+    for (auto reverse_iter = from.rbegin(); reverse_iter != from.rend(); ++reverse_iter){
+        to->emplace_back(std::move(*reverse_iter));
+    }
+}
 
 AnchoredSetVariable::AnchoredSetVariable(Transaction *t,
     const std::string &name)
@@ -57,33 +62,38 @@ void AnchoredSetVariable::set(const std::string &key,
   set(key, value, offset, value.size());
 }
 
-void AnchoredSetVariable::resolve(
-    std::vector<const VariableValue *> *l) {
+void AnchoredSetVariable::resolve(VariableValueList *l) {
+    VariableValueList list;
+
     for (const auto& x : *this) {
-        l->insert(l->begin(), new VariableValue(x.second));
+        list.emplace_back(&x.second);
     }
+
+    addReverse(l, list);
 }
 
 
 void AnchoredSetVariable::resolve(
-    std::vector<const VariableValue *> *l,
+    VariableValueList *l,
     variables::KeyExclusions &ke) {
+    VariableValueList list;
     for (const auto& x : *this) {
         if (!ke.toOmit(x.first)) {
-            l->insert(l->begin(), new VariableValue(x.second));
+            list.emplace_back(&x.second);
         } else {
             ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
         }
     }
+    addReverse(l, list);
 }
 
 
 void AnchoredSetVariable::resolve(const std::string &key,
-    std::vector<const VariableValue *> *l) {
+    VariableValueList *l) {
     auto range = this->equal_range(key);
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new VariableValue(it->second));
+        l->emplace_back(&it->second);
     }
 }
 
@@ -101,32 +111,36 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
 
 
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
-    std::vector<const VariableValue *> *l) {
+    VariableValueList *l) {
+    VariableValueList list;
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
             continue;
         }
-        l->insert(l->begin(), new VariableValue(x.second));
+        list.emplace_back(&x.second);
     }
+    addReverse(l, list);
 }
 
 
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
-    std::vector<const VariableValue *> *l,
+    VariableValueList *l,
     variables::KeyExclusions &ke) {
+    VariableValueList list;
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
             continue;
         }
         if (!ke.toOmit(x.first)) {
-            l->insert(l->begin(), new VariableValue(x.second));
+            list.emplace_back(&x.second);
         } else {
             ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
         }
     }
+    addReverse(l, list);
 }
 
 

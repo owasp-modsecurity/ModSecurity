@@ -50,7 +50,7 @@ class n ## _DictElementRegexp : public VariableRegex { \
 \
     void evaluate(Transaction *transaction, \
         RuleWithActions *rule, \
-        std::vector<const VariableValue *> *l) override { \
+        VariableValueList *l) override { \
         transaction-> e .resolveRegularExpression(&m_r, l, \
             m_keyExclusion); \
     } \
@@ -65,7 +65,7 @@ class n ## _DictElement : public VariableDictElement { \
 \
     void evaluate(Transaction *transaction, \
         RuleWithActions *rule, \
-        std::vector<const VariableValue *> *l) override { \
+        VariableValueList *l) override { \
         transaction-> e .resolve(m_dictElement, l); \
     } \
 };
@@ -79,7 +79,7 @@ class n ## _NoDictElement : public Variable { \
 \
     void evaluate(Transaction *transaction, \
         RuleWithActions *rule, \
-        std::vector<const VariableValue *> *l) override { \
+        VariableValueList *l) override { \
         transaction-> e .resolve(l, m_keyExclusion); \
     } \
 };
@@ -93,7 +93,7 @@ class n : public Variable { \
     \
     void evaluate(Transaction *transaction, \
         RuleWithActions *rule, \
-        std::vector<const VariableValue *> *l) override { \
+        VariableValueList *l) override { \
         transaction-> e .evaluate(l); \
     } \
 };
@@ -178,7 +178,7 @@ class VariableMonkeyResolution {
 
     static void stringMatchResolveMulti(Transaction *t,
         const std::string &variable,
-        std::vector<const VariableValue *> *l) {
+        VariableValueList *l) {
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
             collection = variable.find(":");
@@ -551,7 +551,7 @@ class Variable : public VariableMonkeyResolution {
 
     virtual void evaluate(Transaction *t,
         RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) = 0;
+        VariableValueList *l) = 0;
 
 
     bool inline belongsToCollection(Variable *var) {
@@ -631,7 +631,7 @@ class VariableModificatorExclusion : public Variable {
 
     void evaluate(Transaction *t,
         RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) override {
+        VariableValueList *l) override {
         m_base->evaluate(t, rule, l);
     }
 
@@ -649,25 +649,13 @@ class VariableModificatorCount : public Variable {
 
     void evaluate(Transaction *t,
         RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) override {
-        std::vector<const VariableValue *> reslIn;
-        VariableValue *val = NULL;
-        int count = 0;
-
+        VariableValueList *l) override {
+        VariableValueList reslIn;
         m_base->evaluate(t, rule, &reslIn);
 
-        for (const VariableValue *a : reslIn) {
-            count++;
-            delete a;
-            a = NULL;
-        }
-        reslIn.clear();
+        std::string count(std::to_string(reslIn.size()));
 
-        std::string *res = new std::string(std::to_string(count));
-        val = new VariableValue(m_fullName.get(), res);
-        delete res;
-
-        l->push_back(val);
+        l->emplace_back(m_fullName.get(), &count);
         return;
     }
 

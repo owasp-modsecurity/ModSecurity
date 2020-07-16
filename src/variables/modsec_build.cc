@@ -26,9 +26,9 @@ namespace variables {
 
 void ModsecBuild::evaluate(Transaction *transaction,
     RuleWithActions *rule,
-    std::vector<const VariableValue *> *l) {
+    VariableValueList *l) {
 
-    l->push_back(new VariableValue(&m_retName, &m_build));
+    l->emplace_back(&m_retName, &m_build);
 }
 
 

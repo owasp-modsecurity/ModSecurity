@@ -55,7 +55,7 @@ class AnchoredVariable {
     std::string& getValue();
     const std::string& getValue() const;
 
-    void evaluate(std::vector<const VariableValue *> *l);
+    void evaluate(VariableValueList *l);
     std::string *  evaluate();
     std::unique_ptr<std::string> resolveFirst();
 

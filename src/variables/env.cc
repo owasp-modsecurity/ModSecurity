@@ -34,7 +34,7 @@ namespace variables {
 
 void Env::evaluate(Transaction *transaction,
     RuleWithActions *rule,
-    std::vector<const VariableValue *> *l) {
+    VariableValueList *l) {
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);
         size_t pos = env.find_first_of("=");
@@ -52,8 +52,8 @@ void Env::evaluate(Transaction *transaction,
             continue;
         }
         if (!m_keyExclusion.toOmit(x.first)) {
-            l->push_back(new VariableValue(&m_collectionName, &x.first,
-                &x.second));
+            l->emplace_back(&m_collectionName, &x.first,
+                &x.second);
         }
     }
 }

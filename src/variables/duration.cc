@@ -29,13 +29,13 @@ namespace variables {
 
 void Duration::evaluate(Transaction *transaction,
     RuleWithActions *rule,
-    std::vector<const VariableValue *> *l) {
+    VariableValueList *l) {
     double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
 
     transaction->m_variableDuration.assign(std::to_string(e));
 
-    l->push_back(new VariableValue(&m_retName,
-        &transaction->m_variableDuration));
+    l->emplace_back(&m_retName,
+        &transaction->m_variableDuration);
 }
 
 

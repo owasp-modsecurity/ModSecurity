@@ -285,7 +285,7 @@ int Lua::getvars(lua_State *L) {
     const char *varname = NULL;
     Transaction *t = NULL;
     void *z = NULL;
-    std::vector<const VariableValue *> l;
+    VariableValueList l;
     int idx = 1;
 
     /* Retrieve parameters. */
@@ -303,19 +303,15 @@ int Lua::getvars(lua_State *L) {
         lua_newtable(L);
 
         lua_pushstring(L, "name");
-        lua_pushlstring(L, i->getKeyWithCollection().c_str(), i->getKeyWithCollection().size());
+        lua_pushlstring(L, i.getKeyWithCollection().c_str(), i.getKeyWithCollection().size());
         lua_settable(L, -3);
 
         lua_pushstring(L, "value");
-        lua_pushlstring(L, i->getValue().c_str(), i->getValue().size());
+        lua_pushlstring(L, i.getValue().c_str(), i.getValue().size());
         lua_settable(L, -3);
 
         lua_settable(L, -3);
         idx++;
-    }
-
-    for (const VariableValue * i : l) {
-        delete i;
     }
 
     return 1;

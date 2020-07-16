@@ -35,12 +35,12 @@ namespace variables {
 
 void Time::evaluate(Transaction *transaction,
     RuleWithActions *rule,
-    std::vector<const VariableValue *> *l) {
+    VariableValueList *l) {
 
     transaction->m_variableTime = get_formatted_time_string_now<200>("%H:%M:%S");
 
-    l->push_back(new VariableValue(&m_retName,
-        &transaction->m_variableTime));
+    l->emplace_back(&m_retName,
+        &transaction->m_variableTime);
 }
 
 

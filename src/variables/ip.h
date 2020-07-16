@@ -40,7 +40,7 @@ class Ip_DictElement : public Variable {
 
     void evaluate(Transaction *t,
         RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) override {
+        VariableValueList *l) override {
         t->m_collections.m_ip_collection->resolveMultiMatches(
             m_name, t->m_collections.m_ip_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -57,7 +57,7 @@ class Ip_NoDictElement : public Variable {
 
     void evaluate(Transaction *t,
         RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) override {
+        VariableValueList *l) override {
         t->m_collections.m_ip_collection->resolveMultiMatches("",
             t->m_collections.m_ip_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -73,7 +73,7 @@ class Ip_DictElementRegexp : public VariableRegex {
 
     void evaluate(Transaction *t,
         RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) override {
+        VariableValueList *l) override {
         t->m_collections.m_ip_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_ip_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -91,7 +91,7 @@ class Ip_DynamicElement : public Variable {
 
     void evaluate(Transaction *t,
         RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) override {
+        VariableValueList *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_ip_collection->resolveMultiMatches(
             string,

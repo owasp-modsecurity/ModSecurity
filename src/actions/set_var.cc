@@ -111,16 +111,13 @@ bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
         }
 
         try {
-            std::vector<const VariableValue *> l;
+            VariableValueList l;
             RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(rule);
             m_variable->evaluate(t, rr, &l);
             if (l.size() == 0) {
                 value = 0;
             } else {
-                value = stoi(l[0]->getValue());
-                for (auto &i : l) {
-                    delete i;
-                }
+                value = stoi(l.front().getValue());
             }
         } catch (...) {
             value = 0;

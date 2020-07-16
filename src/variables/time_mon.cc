@@ -35,7 +35,7 @@ namespace variables {
 
 void TimeMon::evaluate(Transaction *transaction,
     RuleWithActions *rule,
-    std::vector<const VariableValue *> *l) {
+    VariableValueList *l) {
 
     std::string time_str = get_formatted_time_string_now<200>("%m");
 
@@ -44,8 +44,8 @@ void TimeMon::evaluate(Transaction *transaction,
 
     transaction->m_variableTimeMin.assign(std::to_string(a));
 
-    l->push_back(new VariableValue(&m_retName,
-        &transaction->m_variableTimeMin));
+    l->emplace_back(&m_retName,
+        &transaction->m_variableTimeMin);
 }
 
 

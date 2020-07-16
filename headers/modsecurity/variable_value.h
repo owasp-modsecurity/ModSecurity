@@ -61,8 +61,8 @@ class VariableValue {
     {
     }
 
-    VariableValue(const VariableValue &v) = default;
-
+    VariableValue(VariableValue&&) = default;
+    VariableValue& operator=(VariableValue&&) = default;
 
     const std::string& getKey() const {
         return m_key;
@@ -103,6 +103,9 @@ class VariableValue {
     }
 
  private:
+
+    VariableValue(const VariableValue &v) = default;
+
     Origins m_orign;
     std::string m_collection;
     std::string m_key;
@@ -110,6 +113,7 @@ class VariableValue {
     std::string m_value;
 };
 
+using VariableValueList = std::vector<VariableValue>;
 }  // namespace modsecurity
 #endif
 

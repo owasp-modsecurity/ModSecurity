@@ -35,11 +35,11 @@ namespace variables {
 
 void TimeSec::evaluate(Transaction *transaction,
     RuleWithActions *rule,
-    std::vector<const VariableValue *> *l) {
+    VariableValueList *l) {
     transaction->m_variableTimeSec = get_formatted_time_string_now<200>("%S");
 
-    l->push_back(new VariableValue(&m_retName,
-        &transaction->m_variableTimeSec));
+    l->emplace_back(&m_retName,
+        &transaction->m_variableTimeSec);
 }
 
 

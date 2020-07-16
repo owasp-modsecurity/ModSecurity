@@ -37,10 +37,10 @@ class WebAppId : public Variable {
 
     void evaluate(Transaction *transaction,
         RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) override {
+        VariableValueList *l) override {
         const std::string name("WEBAPPID");
-        const std::string rname = transaction->m_rules->m_secWebAppId.m_value;
-        l->push_back(new VariableValue(&m_name, &rname));
+        const std::string &rname = transaction->m_rules->m_secWebAppId.m_value;
+        l->emplace_back(&m_name, &rname);
     }
 };
 

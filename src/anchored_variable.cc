@@ -34,7 +34,7 @@ AnchoredVariable::AnchoredVariable(Transaction *t,
 }
 
 void AnchoredVariable::unset() {
-    m_var = VariableValue{&m_var.getKey()};
+    m_var = std::move(VariableValue{&m_var.getKey()});
 }
 
 //FIXME will remove this later when changing the
@@ -75,9 +75,8 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
     m_var.addOrigin(VariableOrigin{size, offset});
 }
 
-void AnchoredVariable::evaluate(std::vector<const VariableValue *> *l) {
-    VariableValue *m_var2 = new VariableValue(m_var);
-    l->push_back(m_var2);
+void AnchoredVariable::evaluate(VariableValueList *l) {
+    l->emplace_back(&m_var);
 }
 
 

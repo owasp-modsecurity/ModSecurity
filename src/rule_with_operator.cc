@@ -271,35 +271,32 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     getFinalVars(&vars, &exclusion, trans);
 
     for (auto &var : vars) {
-        std::vector<const VariableValue *> e;
+        VariableValueList e;
         if (!var) {
             continue;
         }
         var->evaluate(trans, this, &e);
-        for (const VariableValue *v : e) {
-            const std::string &value = v->getValue();
-            const std::string &key = v->getKeyWithCollection();
+        for (const VariableValue &v : e) {
+            const std::string &value = v.getValue();
+            const std::string &key = v.getKeyWithCollection();
 
-            if (exclusion.contains(v) ||
-                std::find_if(trans->m_ruleRemoveTargetById.begin(),
-                    trans->m_ruleRemoveTargetById.end(),
-                    [&, v, this](std::pair<int, std::string> &m) -> bool {
-                        return m.first == m_ruleId && m.second == v->getKeyWithCollection();
-                    }) != trans->m_ruleRemoveTargetById.end()
-            ) {
-                delete v;
-                v = NULL;
+            if (exclusion.contains(&v)){
                 continue;
             }
-            if (exclusion.contains(v) ||
-                std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
+            if (std::find_if(trans->m_ruleRemoveTargetById.begin(),
+                    trans->m_ruleRemoveTargetById.end(),
+                    [&v, this](std::pair<int, std::string> &m) -> bool {
+                        return m.first == m_ruleId && m.second == v.getKeyWithCollection();
+                    }) != trans->m_ruleRemoveTargetById.end()
+            ) {
+                continue;
+            }
+            if (std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
-                    [&, v, trans, this](std::pair<std::string, std::string> &m) -> bool {
-                        return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
+                    [&v, trans, this](std::pair<std::string, std::string> &m) -> bool {
+                        return containsTag(m.first, trans) && m.second == v.getKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
-                delete v;
-                v = NULL;
                 continue;
             }
 
@@ -316,7 +313,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 if (ret == true) {
                     ruleMessage->m_match = m_operator->resolveMatchMessage(trans,
                         key, value);
-                    for (auto &i : v->getOrigin()) {
+                    for (auto &i : v.getOrigin()) {
                         ruleMessage->m_reference.append(i.toText());
                     }
 
@@ -330,8 +327,6 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     globalRet = true;
                 }
             }
-            delete v;
-            v = NULL;
         }
         e.clear();
         e.reserve(4);
