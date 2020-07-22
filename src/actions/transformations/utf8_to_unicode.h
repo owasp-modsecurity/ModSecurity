@@ -50,7 +50,7 @@ class Utf8ToUnicode : public Transformation {
         UNICODE_ERROR_DECODING_ERROR = -5
     };
 
-    static char *inplace(unsigned char *input, uint64_t input_len,
+    static char *inplace(const unsigned char *input, uint64_t input_len,
         int *changed);
 };
 
