@@ -32,31 +32,19 @@ namespace transformations {
 void Utf8ToUnicode::execute(const Transaction *t,
     const ModSecString &in,
     ModSecString &out) noexcept {
-    unsigned char *input;
     int changed = 0;
     char *out2;
 
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * in.length()+1));
-
-    if (input == NULL) {
-        return;
-    }
-
-    memset(input, '\0', in.length()+1);
-    memcpy(input, in.c_str(), in.length()+1);
-
-    out2 = inplace(input, in.size() + 1, &changed);
+    out2 = inplace(reinterpret_cast<const unsigned char *>(&in[0]), in.size() + 1, &changed);
     if (out2 != NULL) {
         out.assign(reinterpret_cast<char *>(out2),
             strlen(reinterpret_cast<char *>(out2)));
         free(out2);
     }
-    free(input);
 }
 
 
-char *Utf8ToUnicode::inplace(unsigned char *input,
+char *Utf8ToUnicode::inplace(const unsigned char *input,
     uint64_t input_len, int *changed) {
     unsigned int count = 0;
     char *data;
@@ -84,7 +72,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
         int unicode_len = 0;
         unsigned int d = 0;
         unsigned char c;
-        unsigned char *utf = (unsigned char *)&input[i];
+        const unsigned char *utf = &input[i];
 
         c = *utf;
 
