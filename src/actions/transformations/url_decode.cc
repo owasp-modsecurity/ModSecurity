@@ -32,19 +32,14 @@ namespace transformations {
 void UrlDecode::execute(const Transaction *t,
     const ModSecString &in,
     ModSecString &out) noexcept {
-    unsigned char *val(NULL);
     int invalid_count = 0;
     int changed;
 
-    val = (unsigned char *) malloc(sizeof(char) * in.size() + 1);
-    memcpy(val, in.c_str(), in.size() + 1);
-    val[in.size()] = '\0';
-
-    int size = utils::urldecode_nonstrict_inplace(val, in.size(),
+    out.assign(in);
+    int size = utils::urldecode_nonstrict_inplace(
+        reinterpret_cast<unsigned char *>(&out[0]), out.size(),
         &invalid_count, &changed);
-    out.append((const char *)val, size);
-
-    free(val);
+    out.resize(size);
 }
 
 

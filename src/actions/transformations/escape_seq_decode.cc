@@ -135,14 +135,11 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 void EscapeSeqDecode::execute(const Transaction *t,
     const ModSecString &in,
     ModSecString &out) noexcept {
-    unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
-        * in.size() + 1);
-    memcpy(tmp, in.c_str(), in.size() + 1);
-    tmp[in.size()] = '\0';
 
-    int size = ansi_c_sequences_decode_inplace(tmp, in.size());
-    out.assign(reinterpret_cast<char *>(tmp), size);
-    free(tmp);
+    out.assign(in);
+    auto size = ansi_c_sequences_decode_inplace(
+        reinterpret_cast<unsigned char *>(&out[0]), out.size());
+    out.resize(size);
 }
 
 }  // namespace transformations
