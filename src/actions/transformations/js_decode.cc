@@ -32,21 +32,11 @@ namespace transformations {
 void JsDecode::execute(const Transaction *t,
     const ModSecString &in,
     ModSecString &out) noexcept {
-    unsigned char *input;
 
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * in.length()+1));
-
-    if (input == NULL) {
-        return;
-    }
-
-    memcpy(input, in.c_str(), in.length()+1);
-
-    size_t i = inplace(input, in.length());
-
-    out.assign(reinterpret_cast<char *>(input), i);
-    free(input);
+    out.assign(in);
+    auto i = inplace(reinterpret_cast<unsigned char *>(
+        &out[0]), out.length());
+    out.resize(i);
 }
 
 
