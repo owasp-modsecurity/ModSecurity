@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
-   
+ 
+  - Removed unnecessary while processing the transformations.
+    [#2368 - @WGH-, @zimmerle]  
   - auditlog: Computes whether or not to save while loading the rules.
     [@zimmerle]
   - actions: Computes Rule association while loading the rules given a

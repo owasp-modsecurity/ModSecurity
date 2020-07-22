@@ -33,21 +33,9 @@ namespace transformations {
 void UrlDecodeUni::execute(const Transaction *t,
     const ModSecString &in,
     ModSecString &out) noexcept {
-    unsigned char *input;
-
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * in.length()+1));
-
-    if (input == NULL) {
-        return;
-    }
-
-    memcpy(input, in.c_str(), in.length()+1);
-
-    size_t i = inplace(input, in.length(), t);
-
-    out.assign(reinterpret_cast<char *>(input), i);
-    free(input);
+    out.assign(in);
+    size_t i = inplace(reinterpret_cast<unsigned char *>(&out[0]), out.length(), t);
+    out.resize(i);
 }
 
 
