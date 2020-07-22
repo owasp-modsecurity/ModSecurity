@@ -31,18 +31,9 @@ void NormalisePath::execute(const Transaction *t,
     const ModSecString &in,
     ModSecString &out) noexcept {
     int changed = 0;
-
-    char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * in.size() + 1));
-    memcpy(tmp, in.c_str(), in.size() + 1);
-    tmp[in.size()] = '\0';
-
-    int i = normalize_path_inplace((unsigned char *)tmp,
-        in.size(), 0, &changed);
-
-    std::string ret("");
-    out.assign(tmp, i);
-    free(tmp);
+    out.assign(in);
+    auto size = normalize_path_inplace(reinterpret_cast<unsigned char *>(&out[0]), out.length(), 0, &changed);
+    out.resize(size);
 }
 
 
