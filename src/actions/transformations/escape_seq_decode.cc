@@ -142,17 +142,10 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 
 std::string EscapeSeqDecode::evaluate(const std::string &value,
     Transaction *transaction) {
+    std::string ret = value;
 
-    unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
-        * value.size() + 1);
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
-
-    int size = ansi_c_sequences_decode_inplace(tmp, value.size());
-
-    std::string ret("");
-    ret.assign(reinterpret_cast<char *>(tmp), size);
-    free(tmp);
+    auto size = ansi_c_sequences_decode_inplace(reinterpret_cast<unsigned char *>(&ret[0]), ret.size());
+    ret.resize(size);
 
     return ret;
 }

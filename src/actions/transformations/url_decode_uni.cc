@@ -40,22 +40,10 @@ namespace transformations {
 
 std::string UrlDecodeUni::evaluate(const std::string &value,
     Transaction *t) {
-    std::string ret;
-    unsigned char *input;
+    std::string ret = value;
 
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    memcpy(input, value.c_str(), value.length()+1);
-
-    size_t i = inplace(input, value.length(), t);
-
-    ret.assign(reinterpret_cast<char *>(input), i);
-    free(input);
+    size_t i = inplace(reinterpret_cast<unsigned char *>(&ret[0]), ret.length(), t);
+    ret.resize(i);
 
     return ret;
 }

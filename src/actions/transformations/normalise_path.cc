@@ -39,19 +39,11 @@ NormalisePath::NormalisePath(const std::string &action)
 
 std::string NormalisePath::evaluate(const std::string &value,
     Transaction *transaction) {
-    int changed = 0;
+    std::string ret = value;
+    int changed;
 
-    char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
-
-    int i = normalize_path_inplace((unsigned char *)tmp,
-        value.size(), 0, &changed);
-
-    std::string ret("");
-    ret.assign(tmp, i);
-    free(tmp);
+    auto size = normalize_path_inplace(reinterpret_cast<unsigned char *>(&ret[0]), ret.length(), 0, &changed);
+    ret.resize(size);
 
     return ret;
 }

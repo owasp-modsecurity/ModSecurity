@@ -36,21 +36,10 @@ namespace transformations {
 std::string Utf8ToUnicode::evaluate(const std::string &value,
     Transaction *transaction) {
     std::string ret;
-    unsigned char *input;
     int changed = 0;
     char *out;
 
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    memcpy(input, value.c_str(), value.length()+1);
-
-    out = inplace(input, value.size() + 1, &changed);
-    free(input);
+    out = inplace(reinterpret_cast<const unsigned char *>(&value[0]), value.size() + 1, &changed);
     if (out != NULL) {
         ret.assign(reinterpret_cast<char *>(out),
             strlen(reinterpret_cast<char *>(out)));
@@ -61,7 +50,7 @@ std::string Utf8ToUnicode::evaluate(const std::string &value,
 }
 
 
-char *Utf8ToUnicode::inplace(unsigned char *input,
+char *Utf8ToUnicode::inplace(const unsigned char *input,
     uint64_t input_len, int *changed) {
     unsigned int count = 0;
     char *data;
@@ -89,7 +78,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
         int unicode_len = 0;
         unsigned int d = 0;
         unsigned char c;
-        unsigned char *utf = (unsigned char *)&input[i];
+        const unsigned char *utf = &input[i];
 
         c = *utf;
 

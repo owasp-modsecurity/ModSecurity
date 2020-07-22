@@ -34,23 +34,10 @@ namespace transformations {
 
 std::string HexDecode::evaluate(const std::string &value,
     Transaction *transaction) {
-    std::string ret;
-    unsigned char *input;
-    int size = 0;
+    std::string ret = value;
 
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    memcpy(input, value.c_str(), value.length()+1);
-
-    size = inplace(input, value.length());
-
-    ret.assign(reinterpret_cast<char *>(input), size);
-    free(input);
+    auto size = inplace(reinterpret_cast<unsigned char *>(&ret[0]), ret.length());
+    ret.resize(size);
 
     return ret;
 }

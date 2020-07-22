@@ -34,23 +34,8 @@ namespace transformations {
 
 std::string ParityOdd7bit::evaluate(const std::string &value,
     Transaction *transaction) {
-    std::string ret;
-    unsigned char *input;
-
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    memcpy(input, value.c_str(), value.length()+1);
-
-    inplace(input, value.length());
-
-    ret.assign(reinterpret_cast<char *>(input), value.length());
-    free(input);
-
+    std::string ret = value;
+    inplace(reinterpret_cast<unsigned char *>(&ret[0]), ret.length());
     return ret;
 }
 

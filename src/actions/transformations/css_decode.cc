@@ -37,16 +37,11 @@ namespace transformations {
 std::string CssDecode::evaluate(const std::string &value,
     Transaction *transaction) {
 
-    char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
+    std::string ret = value;
 
-    CssDecode::css_decode_inplace(reinterpret_cast<unsigned char *>(tmp),
-        value.size());
+    auto size = CssDecode::css_decode_inplace(reinterpret_cast<unsigned char *>(&ret[0]), ret.size());
+    ret.resize(size);
 
-    std::string ret(tmp, 0, value.size());
-    free(tmp);
     return ret;
 }
 

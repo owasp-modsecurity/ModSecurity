@@ -39,23 +39,16 @@ UrlDecode::UrlDecode(const std::string &action)
 
 std::string UrlDecode::evaluate(const std::string &value,
     Transaction *transaction) {
-    unsigned char *val = NULL;
+    std::string ret = value;
     int invalid_count = 0;
     int changed;
 
-    val = (unsigned char *) malloc(sizeof(char) * value.size() + 1);
-    memcpy(val, value.c_str(), value.size() + 1);
-    val[value.size()] = '\0';
-
-    int size = utils::urldecode_nonstrict_inplace(val, value.size(),
+    int size = utils::urldecode_nonstrict_inplace(
+        reinterpret_cast<unsigned char *>(&ret[0]), ret.size(),
         &invalid_count, &changed);
-    std::string out;
+    ret.resize(size);
 
-    out.append((const char *)val, size);
-
-    free(val);
-
-    return out;
+    return ret;
 }
 
 

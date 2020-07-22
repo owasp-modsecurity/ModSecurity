@@ -36,20 +36,11 @@ namespace transformations {
 
 std::string NormalisePathWin::evaluate(const std::string &value,
     Transaction *transaction) {
+    std::string ret = value;
     int changed;
 
-    char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
-
-    int i = NormalisePath::normalize_path_inplace(
-        reinterpret_cast<unsigned char *>(tmp),
-        value.size(), 1, &changed);
-
-    std::string ret("");
-    ret.assign(tmp, i);
-    free(tmp);
+    auto size = NormalisePath::normalize_path_inplace(reinterpret_cast<unsigned char *>(&ret[0]), ret.length(), 1, &changed);
+    ret.resize(size);
 
     return ret;
 }

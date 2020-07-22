@@ -40,7 +40,7 @@ class Utf8ToUnicode : public Transformation {
     std::string evaluate(const std::string &exp,
         Transaction *transaction) override;
 
-    static char *inplace(unsigned char *input, uint64_t input_len,
+    static char *inplace(const unsigned char *input, uint64_t input_len,
         int *changed);
 };
 
