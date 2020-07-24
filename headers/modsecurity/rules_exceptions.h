@@ -28,6 +28,8 @@
 #include <memory>
 #endif
 
+#include "modsecurity/modsecurity.h"
+
 #ifndef HEADERS_MODSECURITY_RULES_EXCEPTIONS_H_
 #define HEADERS_MODSECURITY_RULES_EXCEPTIONS_H_
 
@@ -51,9 +53,9 @@ class RulesExceptions {
     ~RulesExceptions();
 
     bool load(const std::string &data, std::string *error);
-    bool addRange(int a, int b);
-    bool addNumber(int a);
-    bool contains(int a);
+    bool addRange(RuleId a, RuleId b);
+    bool addNumber(RuleId a);
+    bool contains(RuleId a);
     bool merge(RulesExceptions *from);
 
     bool loadRemoveRuleByMsg(const std::string &msg, std::string *error);
@@ -67,11 +69,11 @@ class RulesExceptions {
         std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > v,
         std::string *error);
 
-    bool loadUpdateTargetById(double id,
+    bool loadUpdateTargetById(RuleId id,
         std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > v,
         std::string *error);
 
-    bool loadUpdateActionById(double id,
+    bool loadUpdateActionById(RuleId id,
         std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > actions,
         std::string *error);
 
@@ -79,18 +81,18 @@ class RulesExceptions {
         std::shared_ptr<variables::Variable>> m_variable_update_target_by_tag;
     std::unordered_multimap<std::shared_ptr<std::string>,
         std::shared_ptr<variables::Variable>> m_variable_update_target_by_msg;
-    std::unordered_multimap<double,
+    std::unordered_multimap<RuleId,
         std::shared_ptr<variables::Variable>> m_variable_update_target_by_id;
-    std::unordered_multimap<double,
+    std::unordered_multimap<RuleId,
         std::shared_ptr<actions::transformations::Transformation>> m_action_transformation_update_target_by_id;
-    std::unordered_multimap<double,
+    std::unordered_multimap<RuleId,
         std::shared_ptr<actions::Action>> m_action_pos_update_target_by_id;
     std::list<std::string> m_remove_rule_by_msg;
     std::list<std::string> m_remove_rule_by_tag;
 
  private:
-    std::list<std::pair<int, int> > m_ranges;
-    std::list<int> m_numbers;
+    std::list<std::pair<RuleId, RuleId> > m_ranges;
+    std::list<RuleId> m_numbers;
 };
 
 }  // namespace modsecurity
