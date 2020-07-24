@@ -1471,10 +1471,10 @@ expression:
     | CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID variables_pre_process
       {
         std::string error;
-        double ruleId;
-        try {
-            ruleId = std::stod($1);
-        } catch (...) {
+        std::istringstream iss($1);
+        RuleId ruleId;
+        iss >> ruleId;
+        if (iss.fail()) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetById: failed to load:";
             ss << "The input \"" + $1 + "\" does not ";
@@ -1497,10 +1497,10 @@ expression:
     | CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID actions
       {
         std::string error;
-        double ruleId;
-        try {
-            ruleId = std::stod($1);
-        } catch (...) {
+        std::istringstream iss($1);
+        RuleId ruleId;
+        iss >> ruleId;
+        if (iss.fail()) {
             std::stringstream ss;
             ss << "SecRuleUpdateActionById: failed to load:";
             ss << "The input \"" + $1 + "\" does not ";
