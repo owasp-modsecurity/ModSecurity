@@ -26,18 +26,16 @@ namespace actions {
 bool RuleId::init(std::string *error) {
     std::string a = m_parserPayload;
 
-    try {
-        m_ruleId = std::stod(a);
-    } catch (...) {
+    std::istringstream iss(a);
+    iss >> m_ruleId;
+    if (iss.fail()) {
         m_ruleId = 0;
         error->assign("The input \"" + a + "\" does not " \
             "seems to be a valid rule id.");
         return false;
     }
 
-    std::ostringstream oss;
-    oss << std::setprecision(40) << m_ruleId;
-    if (a != oss.str() || m_ruleId < 0) {
+    if (a != std::to_string(m_ruleId) || m_ruleId < 0) {
         error->assign("The input \"" + a + "\" does not seems " \
             "to be a valid rule id.");
         return false;
