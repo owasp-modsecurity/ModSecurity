@@ -41,7 +41,7 @@ class RuleId : public ActionTypeRuleMetaData {
     }
 
  private:
-    double m_ruleId;
+    modsecurity::RuleId m_ruleId;
 };
 
 

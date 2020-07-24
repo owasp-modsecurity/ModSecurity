@@ -2867,10 +2867,10 @@ namespace yy {
 #line 1472 "seclang-parser.yy"
       {
         std::string error;
-        double ruleId;
-        try {
-            ruleId = std::stod(yystack_[1].value.as < std::string > ());
-        } catch (...) {
+        std::istringstream iss(yystack_[1].value.as < std::string > ());
+        RuleId ruleId;
+        iss >> ruleId;
+        if (iss.fail()) {
             std::stringstream ss;
             ss << "SecRuleUpdateTargetById: failed to load:";
             ss << "The input \"" + yystack_[1].value.as < std::string > () + "\" does not ";
@@ -2897,10 +2897,10 @@ namespace yy {
 #line 1498 "seclang-parser.yy"
       {
         std::string error;
-        double ruleId;
-        try {
-            ruleId = std::stod(yystack_[1].value.as < std::string > ());
-        } catch (...) {
+        std::istringstream iss(yystack_[1].value.as < std::string > ());
+        RuleId ruleId;
+        iss >> ruleId;
+        if (iss.fail()) {
             std::stringstream ss;
             ss << "SecRuleUpdateActionById: failed to load:";
             ss << "The input \"" + yystack_[1].value.as < std::string > () + "\" does not ";
