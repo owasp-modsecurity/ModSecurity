@@ -33,7 +33,7 @@ RulesExceptions::~RulesExceptions() {
 }
 
 
-bool RulesExceptions::loadUpdateActionById(double id,
+bool RulesExceptions::loadUpdateActionById(RuleId id,
     std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > actions,
     std::string *error) {
 
@@ -48,14 +48,15 @@ bool RulesExceptions::loadUpdateActionById(double id,
         if (dynamic_cast<actions::transformations::Transformation *>(a.get())) {
             actions::transformations::Transformation *t = dynamic_cast<actions::transformations::Transformation *>(a.get());
             m_action_transformation_update_target_by_id.emplace(
-                std::pair<double,
+                std::pair<RuleId,
                 std::unique_ptr<actions::transformations::Transformation>>(id, std::unique_ptr<actions::transformations::Transformation>(t))
             );
             continue;
+
         }
 
         m_action_pos_update_target_by_id.emplace(
-            std::pair<double,
+            std::pair<RuleId,
             std::unique_ptr<actions::Action>>(id , std::move(a))
         );
     }
@@ -111,13 +112,13 @@ bool RulesExceptions::loadUpdateTargetByTag(const std::string &tag,
 }
 
 
-bool RulesExceptions::loadUpdateTargetById(double id,
+bool RulesExceptions::loadUpdateTargetById(RuleId id,
     std::unique_ptr<std::vector<std::unique_ptr<variables::Variable> > > var,
     std::string *error) {
 
     for (auto &i : *var) {
         m_variable_update_target_by_id.emplace(
-            std::pair<double,
+            std::pair<RuleId,
                 std::unique_ptr<variables::Variable>>(id,
                 std::move(i)));
     }
@@ -139,19 +140,18 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
         if (dash != std::string::npos) {
             std::string n1s = std::string(b, 0, dash);
             std::string n2s = std::string(b, dash + 1, b.size() - (dash + 1));
-            int n1n = 0;
-            int n2n = 0;
-            try {
-                n1n = std::stoi(n1s);
-                added = true;
-            } catch (...) {
+            std::istringstream n1ss(n1s), n2ss(n2s);
+            RuleId n1n = 0;
+            RuleId n2n = 0;
+
+            n1ss >> n1n;
+            if (n1ss.fail()) {
                 error->assign("Not a number: " + n1s);
                 return false;
             }
-            try {
-                n2n = std::stoi(n2s);
-                added = true;
-            } catch (...) {
+
+            n2ss >> n2n;
+            if (n2ss.fail()) {
                 error->assign("Not a number: " + n2s);
                 return false;
             }
@@ -163,14 +163,15 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
             addRange(n1n, n2n);
             added = true;
         } else {
-            try {
-                int num = std::stoi(b);
-                addNumber(num);
-                added = true;
-            } catch (...) {
+            std::istringstream iss(b);
+            RuleId num;
+            iss >> num;
+            if (iss.fail()) {
                 error->assign("Not a number or range: " + b);
                 return false;
             }
+            addNumber(num);
+            added = true;
         }
     }
 
@@ -183,20 +184,20 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
 }
 
 
-bool RulesExceptions::addNumber(int a) {
+bool RulesExceptions::addNumber(RuleId a) {
     m_numbers.push_back(a);
     return true;
 }
 
 
-bool RulesExceptions::addRange(int a, int b) {
+bool RulesExceptions::addRange(RuleId a, RuleId b) {
     m_ranges.push_back(std::make_pair(a, b));
     return true;
 }
 
 
-bool RulesExceptions::contains(int a) {
-    for (int z : m_numbers) {
+bool RulesExceptions::contains(RuleId a) {
+    for (RuleId z : m_numbers) {
         if (a == z) {
             return true;
         }
@@ -213,7 +214,7 @@ bool RulesExceptions::contains(int a) {
 
 
 bool RulesExceptions::merge(RulesExceptions *from) {
-    for (int a : from->m_numbers) {
+    for (RuleId a : from->m_numbers) {
         bool ret = addNumber(a);
         if (ret == false) {
             return ret;
@@ -242,21 +243,21 @@ bool RulesExceptions::merge(RulesExceptions *from) {
 
     for (auto &p : from->m_variable_update_target_by_id) {
         m_variable_update_target_by_id.emplace(
-            std::pair<double,
+            std::pair<RuleId,
                 std::shared_ptr<variables::Variable>>(p.first,
                     p.second));
     }
 
     for (auto &p : from->m_action_pos_update_target_by_id) {
         m_action_pos_update_target_by_id.emplace(
-            std::pair<double,
+            std::pair<RuleId,
                 std::shared_ptr<actions::Action>>(p.first,
                     p.second));
     }
 
     for (auto &p : from->m_action_transformation_update_target_by_id) {
         m_action_transformation_update_target_by_id.emplace(
-            std::pair<double,
+            std::pair<RuleId,
                 std::shared_ptr<actions::transformations::Transformation>>(p.first,
                     p.second));
     }
