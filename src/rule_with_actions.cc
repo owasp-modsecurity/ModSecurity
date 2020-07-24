@@ -199,12 +199,9 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         a->evaluate(this, trans);
     }
 
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+    auto range = trans->m_rules->m_exceptions.m_action_pre_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = range.first; it != range.second; ++it) {
+        actions::Action *a = it->second.get();
         if (a->isDisruptive() == true && *a->m_name.get() == "block") {
             ms_dbg_a(trans, 9, "Rule contains a `block' action");
                 *containsBlock = true;
@@ -248,12 +245,10 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         a->evaluate(this, trans, ruleMessage);
     }
 
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+
+    auto range = trans->m_rules->m_exceptions.m_action_pos_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = range.first; it != range.second; ++it) {
+        actions::Action *a = it->second.get();
         executeAction(trans, containsBlock, ruleMessage, a, false);
         disruptiveAlreadyExecuted = true;
     }
@@ -382,23 +377,15 @@ void RuleWithActions::executeTransformations(
 
     // FIXME: It can't be something different from transformation. Sort this
     //        on rules compile time.
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        Transformation *a = dynamic_cast<Transformation*>(b.second.get());
+    auto range = trans->m_rules->m_exceptions.m_action_pre_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = range.first; it != range.second; ++it) {
+        Transformation *a = dynamic_cast<Transformation*>(it->second.get());
         if (a->m_isNone) {
             none++;
         }
     }
-
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        Transformation *a = dynamic_cast<Transformation*>(b.second.get());
+    for (auto it = range.first; it != range.second; ++it) {
+        Transformation *a = dynamic_cast<Transformation*>(it->second.get());
         if (none == 0) {
             Transformation *t = dynamic_cast<Transformation *>(a);
             executeTransformation(t, &value, trans, &ret, &path,
@@ -451,22 +438,17 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
             ret.push_back(z);
         }
     }
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+
+    auto range = trans->m_rules->m_exceptions.m_action_pre_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = range.first; it != range.second; ++it) {
+        actions::Action *z = it->second.get();
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
     }
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+    range = trans->m_rules->m_exceptions.m_action_pos_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = range.first; it != range.second; ++it) {
+        actions::Action *z = it->second.get();
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
