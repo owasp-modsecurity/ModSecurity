@@ -72,10 +72,9 @@ struct MyHash{
 
 
 class AnchoredSetVariable : public std::unordered_multimap<std::string,
-	VariableValue *, MyHash, MyEqual> {
+	std::shared_ptr<const VariableValue>, MyHash, MyEqual> {
  public:
     AnchoredSetVariable(Transaction *t, const std::string &name);
-    ~AnchoredSetVariable();
 
     void unset();
 
@@ -93,18 +92,18 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
 
     void setCopy(std::string key, std::string value, size_t offset);
 
-    void resolve(std::vector<const VariableValue *> *l);
-    void resolve(std::vector<const VariableValue *> *l,
+    void resolve(std::vector<std::shared_ptr<const VariableValue>> *l);
+    void resolve(std::vector<std::shared_ptr<const VariableValue>> *l,
         variables::KeyExclusions &ke);
 
     void resolve(const std::string &key,
-        std::vector<const VariableValue *> *l);
+        std::vector<std::shared_ptr<const VariableValue>> *l);
 
     void resolveRegularExpression(Utils::Regex *r,
-        std::vector<const VariableValue *> *l);
+        std::vector<std::shared_ptr<const VariableValue>> *l);
 
     void resolveRegularExpression(Utils::Regex *r,
-        std::vector<const VariableValue *> *l,
+        std::vector<std::shared_ptr<const VariableValue>> *l,
         variables::KeyExclusions &ke);
 
     std::unique_ptr<std::string> resolveFirst(const std::string &key);

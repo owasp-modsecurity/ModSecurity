@@ -286,7 +286,7 @@ int Lua::getvars(lua_State *L) {
     const char *varname(NULL);
     Transaction *t(NULL);
     void *z(NULL);
-    std::vector<const VariableValue *> l;
+    std::vector<std::shared_ptr<const VariableValue>> l;
     int idx = 1;
 
     /* Retrieve parameters. */
@@ -313,10 +313,6 @@ int Lua::getvars(lua_State *L) {
 
         lua_settable(L, -3);
         idx++;
-    }
-
-    for (const VariableValue * i : l) {
-        delete i;
     }
 
     return 1;
