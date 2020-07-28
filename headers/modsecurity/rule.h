@@ -52,9 +52,8 @@ namespace operators {
 class Operator;
 }
 
-using TransformationResult = std::pair<std::shared_ptr<std::string>,
-    std::shared_ptr<std::string>>;
-using TransformationResults = std::list<TransformationResult>;
+using TransformationResult = std::pair<std::string, std::string>;
+using TransformationResults = std::vector<TransformationResult>;
 
 using Transformation = actions::transformations::Transformation;
 using Transformations = std::vector<Transformation *>;

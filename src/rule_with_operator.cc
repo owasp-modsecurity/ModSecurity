@@ -101,7 +101,7 @@ void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
 
 
 bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &key,
-    std::string value, std::shared_ptr<RuleMessage> ruleMessage) {
+    const std::string &value, std::shared_ptr<RuleMessage> ruleMessage) {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
     clock_t end;
@@ -309,7 +309,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 
             for (const auto &valueTemp : values) {
                 bool ret;
-                std::string valueAfterTrans = std::move(*valueTemp.first);
+                const std::string &valueAfterTrans = valueTemp.first;
 
                 ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
 
@@ -320,7 +320,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                         ruleMessage->m_reference.append(i->toText());
                     }
 
-                    ruleMessage->m_reference.append(*valueTemp.second);
+                    ruleMessage->m_reference.append(valueTemp.second);
                     updateMatchedVars(trans, key, valueAfterTrans);
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);

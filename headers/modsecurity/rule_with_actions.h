@@ -72,10 +72,10 @@ class RuleWithActions : public Rule {
 
     inline void executeTransformation(
         actions::transformations::Transformation *a,
-        std::shared_ptr<std::string> *value,
+        std::string &value,
         Transaction *trans,
-        TransformationResults *ret,
-        std::string *path,
+        TransformationResults &ret,
+        std::string &path,
         int *nth) const;
 
 
