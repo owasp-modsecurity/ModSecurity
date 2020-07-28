@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace variables {
 
 void TimeMin::evaluate(Transaction *transaction,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -47,8 +47,7 @@ void TimeMin::evaluate(Transaction *transaction,
 
     transaction->m_variableTimeMin.assign(tstr);
 
-    l->push_back(new VariableValue(&m_retName,
-        &transaction->m_variableTimeMin));
+    l->push_back(std::make_shared<VariableValue>(&m_retName, &transaction->m_variableTimeMin));
 }
 
 
