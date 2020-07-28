@@ -56,97 +56,83 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
 
     static void id(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) {
-        std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-        std::string *a = new std::string(std::to_string(rule->getId()));
-        VariableValue *var = new VariableValue(&m_rule, &m_rule_id,
-            a
-        );
-        delete a;
-        origin->m_offset = 0;
-        origin->m_length = 0;
+        std::vector<std::shared_ptr<const VariableValue>> *l) {
+        std::string a = std::to_string(rule->getId());
+        auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_id, &a);
+        VariableOrigin origin;
+        origin.m_offset = 0;
+        origin.m_length = 0;
         var->addOrigin(std::move(origin));
-        l->push_back(var);
+        l->push_back(std::move(var));
     }
 
 
 
     static void rev(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) {
+        std::vector<std::shared_ptr<const VariableValue>> *l) {
 
         if (rule->hasRevisionAction()) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(rule->getRevision());
-            VariableValue *var = new VariableValue(&m_rule, &m_rule_rev,
-                a
-            );
-            delete a;
-            origin->m_offset = 0;
-            origin->m_length = 0;
+            std::string a(rule->getRevision());
+            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_rev, &a);
+            VariableOrigin origin;
+            origin.m_offset = 0;
+            origin.m_length = 0;
             var->addOrigin(std::move(origin));
             l->push_back(var);
+            l->push_back(std::move(var));
         }
     }
 
 
     static void severity(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) {
+        std::vector<std::shared_ptr<const VariableValue>> *l) {
 
         if (rule->hasSeverityAction()) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(std::to_string(rule->getSeverity()));
-            VariableValue *var = new VariableValue(&m_rule, &m_rule_severity,
-                a
-            );
-            delete a;
-            origin->m_offset = 0;
-            origin->m_length = 0;
+            std::string a(std::to_string(rule->getSeverity()));
+            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_severity, &a);
+            VariableOrigin origin;
+            origin.m_offset = 0;
+            origin.m_length = 0;
             var->addOrigin(std::move(origin));
-            l->push_back(var);
+            l->push_back(std::move(var));
         }
 
     }
 
     static void logData(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) {
+        std::vector<std::shared_ptr<const VariableValue>> *l) {
 
         if (rule->hasLogDataAction()) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(rule->getLogData(t));
-            VariableValue *var = new VariableValue(&m_rule, &m_rule_logdata,
-                a
-            );
-            delete a;
-            origin->m_offset = 0;
-            origin->m_length = 0;
+            std::string a(rule->getLogData(t));
+            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_logdata, &a);
+            VariableOrigin origin;
+            origin.m_offset = 0;
+            origin.m_length = 0;
             var->addOrigin(std::move(origin));
-            l->push_back(var);
+            l->push_back(std::move(var));
         }
     }
 
     static void msg(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<const VariableValue *> *l) {
+        std::vector<std::shared_ptr<const VariableValue>> *l) {
 
         if (rule->hasMessageAction()) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            std::string *a = new std::string(rule->getMessage(t));
-            VariableValue *var = new VariableValue(&m_rule, &m_rule_msg,
-                a
-            );
-            delete a;
-            origin->m_offset = 0;
-            origin->m_length = 0;
+            std::string a(rule->getMessage(t));
+            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_msg, &a);
+            VariableOrigin origin;
+            origin.m_offset = 0;
+            origin.m_length = 0;
             var->addOrigin(std::move(origin));
-            l->push_back(var);
+            l->push_back(std::move(var));
         }
     }
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
 
         if (m_dictElement == "id") {
             id(t, getRule(), l);
@@ -194,7 +180,7 @@ class Rule_DictElementRegexp : public RuleVariable, public VariableRegex {
 
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
 
         if (Utils::regex_search("id", m_r) > 0) {
             Rule_DictElement::id(t, getRule(), l);
@@ -239,7 +225,7 @@ class Rule_NoDictElement : public RuleVariable, public Variable  {
 
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
         Rule_DictElement::id(t, getRule(), l);
         Rule_DictElement::rev(t, getRule(), l);
         Rule_DictElement::severity(t, getRule(), l);

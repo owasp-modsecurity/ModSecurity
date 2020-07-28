@@ -37,21 +37,19 @@ namespace variables {
 
 
 void RemoteUser::evaluate(Transaction *transaction,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     size_t pos;
     std::string base64;
-    VariableValue *var;
     std::string header;
 
-    std::vector<const VariableValue *> *l2 = \
-	new std::vector<const VariableValue *>();
-    transaction->m_variableRequestHeaders.resolve("authorization", l2);
+    std::vector<std::shared_ptr<const VariableValue>> l2;
+    transaction->m_variableRequestHeaders.resolve("authorization", &l2);
 
-    if (l2->size() < 1) {
-        goto clear;
+    if (l2.size() < 1) {
+        return;
     }
 
-    header = std::string(l2->at(0)->getValue());
+    header = std::string(l2.at(0)->getValue());
 
     if (header.compare(0, 6, "Basic ") == 0) {
         base64 = std::string(header, 6, header.length());
@@ -61,27 +59,16 @@ void RemoteUser::evaluate(Transaction *transaction,
 
     pos = base64.find(":");
     if (pos == std::string::npos) {
-        goto clear;
+        return;
     }
     transaction->m_variableRemoteUser.assign(std::string(base64, 0, pos));
 
-    var = new VariableValue(&l2->at(0)->getKeyWithCollection(),
-        &transaction->m_variableRemoteUser);
+    auto var = std::make_shared<VariableValue>(&l2[0]->getKeyWithCollection(), &transaction->m_variableRemoteUser);
 
-    for (auto &i : l2->at(0)->getOrigin()) {
-        std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-        origin->m_offset = i->m_offset;
-        origin->m_length = i->m_length;
-        var->addOrigin(std::move(origin));
+    for (auto &i : l2[0]->getOrigin()) {
+        var->addOrigin(i);
     }
-    l->push_back(var);
-
-clear:
-    for (auto &a : *l2) {
-        delete a;
-    }
-    l2->clear();
-    delete l2;
+    l->push_back(std::move(var));
 }
 
 

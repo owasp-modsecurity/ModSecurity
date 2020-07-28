@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace variables {
 
 void Time::evaluate(Transaction *transaction,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
 
     char tstr[200];
     struct tm timeinfo;
@@ -47,8 +47,7 @@ void Time::evaluate(Transaction *transaction,
     strftime(tstr, 200, "%H:%M:%S", &timeinfo);
 
     transaction->m_variableTime.assign(tstr);
-    l->push_back(new VariableValue(&m_retName,
-        &transaction->m_variableTime));
+    l->push_back(std::make_shared<VariableValue>(&m_retName, &transaction->m_variableTime));
 }
 
 
