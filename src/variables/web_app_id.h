@@ -36,9 +36,10 @@ class WebAppId : public Variable {
         : Variable("WEBAPPID") { }
 
     void evaluate(Transaction *transaction,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        const std::string name("WEBAPPID");
         const std::string rname = transaction->m_rules->m_secWebAppId.m_value;
-        l->push_back(new VariableValue(&m_name, &rname));
+        l->push_back(std::make_shared<VariableValue>(&m_name, &rname));
     }
 };
 

@@ -36,59 +36,45 @@ AnchoredSetVariable::AnchoredSetVariable(Transaction *t,
     }
 
 
-AnchoredSetVariable::~AnchoredSetVariable() {
-    unset();
-}
-
-
 void AnchoredSetVariable::unset() {
-    for (const auto& x : *this) {
-        VariableValue *var = x.second;
-        delete var;
-    }
     clear();
 }
 
 
 void AnchoredSetVariable::set(const std::string &key,
     const std::string &value, size_t offset, size_t len) {
-    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-    std::string *v = new std::string(value);
-    VariableValue *var = new VariableValue(&m_name, &key, v);
-    delete v;
+    auto var = std::make_shared<VariableValue>(&m_name, &key, &value);
 
-    origin->m_offset = offset;
-    origin->m_length = len;
+    VariableOrigin origin;
+    origin.m_offset = offset;
+    origin.m_length = len;
 
     var->addOrigin(std::move(origin));
-    emplace(key, var);
+    emplace(key, std::move(var));
 }
 
 
 void AnchoredSetVariable::set(const std::string &key,
     const std::string &value, size_t offset) {
-    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-    std::string *v = new std::string(value);
-    VariableValue *var = new VariableValue(&m_name, &key, v);
-    delete v;
+    auto var = std::make_shared<VariableValue>(&m_name, &key, &value);
 
-    origin->m_offset = offset;
-    origin->m_length = value.size();
+    VariableOrigin origin;
+    origin.m_offset = offset;
+    origin.m_length = value.size();
 
     var->addOrigin(std::move(origin));
-    emplace(key, var);
+    emplace(key, std::move(var));
 }
 
 
 void AnchoredSetVariable::set(const std::string &key,
     const bpstd::string_view &value, size_t offset) {
-    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-    std::string *v = new std::string(value.c_str());
-    VariableValue *var = new VariableValue(&m_name, &key, v);
-    delete v;
+    std::string v(value.c_str());
+    auto var = std::make_shared<VariableValue>(&m_name, &key, &v);
 
-    origin->m_offset = offset;
-    origin->m_length = value.size();
+    VariableOrigin origin;
+    origin.m_offset = offset;
+    origin.m_length = value.size();
 
     var->addOrigin(std::move(origin));
     emplace(key, var);
@@ -97,13 +83,12 @@ void AnchoredSetVariable::set(const std::string &key,
 
 void AnchoredSetVariable::set(const std::string &key,
     const char *value, size_t offset) {
-    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-    std::string *v = new std::string(value);
-    VariableValue *var = new VariableValue(&m_name, &key, v);
-    delete v;
+    std::string v(value);
+    auto var = std::make_shared<VariableValue>(&m_name, &key, &v);
 
-    origin->m_offset = offset;
-    origin->m_length = strlen(value);
+    VariableOrigin origin;
+    origin.m_offset = offset;
+    origin.m_length = strlen(value);
 
     var->addOrigin(std::move(origin));
     emplace(key, var);
@@ -111,19 +96,19 @@ void AnchoredSetVariable::set(const std::string &key,
 
 
 void AnchoredSetVariable::resolve(
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     for (const auto& x : *this) {
-        l->insert(l->begin(), new VariableValue(x.second));
+        l->insert(l->begin(), x.second);
     }
 }
 
 
 void AnchoredSetVariable::resolve(
-    std::vector<const VariableValue *> *l,
+    std::vector<std::shared_ptr<const VariableValue>> *l,
     variables::KeyExclusions &ke) {
     for (const auto& x : *this) {
         if (!ke.toOmit(x.first)) {
-            l->insert(l->begin(), new VariableValue(x.second));
+            l->insert(l->begin(), x.second);
         } else {
             ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
@@ -133,10 +118,10 @@ void AnchoredSetVariable::resolve(
 
 
 void AnchoredSetVariable::resolve(const std::string &key,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     auto range = this->equal_range(key);
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new VariableValue(it->second));
+        l->push_back(it->second);
     }
 }
 
@@ -154,19 +139,19 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
 
 
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
             continue;
         }
-        l->insert(l->begin(), new VariableValue(x.second));
+        l->insert(l->begin(), x.second);
     }
 }
 
 
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
-    std::vector<const VariableValue *> *l,
+    std::vector<std::shared_ptr<const VariableValue>> *l,
     variables::KeyExclusions &ke) {
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
@@ -174,7 +159,7 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
             continue;
         }
         if (!ke.toOmit(x.first)) {
-            l->insert(l->begin(), new VariableValue(x.second));
+            l->insert(l->begin(), x.second);
         } else {
             ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");

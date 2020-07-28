@@ -35,7 +35,7 @@ class Duration : public Variable {
         m_retName("DURATION") { }
 
     void evaluate(Transaction *transaction,
-        std::vector<const VariableValue *> *l) override;
+        std::vector<std::shared_ptr<const VariableValue>> *l) override;
     std::string m_retName;
 };
 
