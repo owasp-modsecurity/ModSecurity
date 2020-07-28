@@ -40,7 +40,7 @@ class XML_WithoutNSPath : public RuleVariable, public Variable {
         : RuleVariable(),
         Variable("XML"),
         m_plain("[XML document tree]"),
-        m_var(&m_name, &m_plain)
+        m_var(std::make_shared<VariableValue>(&m_name, &m_plain))
     { };
 
     XML_WithoutNSPath(const XML_WithoutNSPath &r)
@@ -51,8 +51,8 @@ class XML_WithoutNSPath : public RuleVariable, public Variable {
     { };
 
     void evaluate(Transaction *transaction,
-        std::vector<const VariableValue *> *l) override {
-        l->push_back(new VariableValue(&m_var));
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        l->push_back(m_var);
     }
 
     virtual variables::Variable *clone() override {
@@ -60,7 +60,7 @@ class XML_WithoutNSPath : public RuleVariable, public Variable {
     };
 
     std::string m_plain;
-    VariableValue m_var;
+    std::shared_ptr<const VariableValue> m_var;
 };
 
 class XML_WithNSPath : public RuleVariable, public VariableDictElement {
@@ -76,7 +76,7 @@ class XML_WithNSPath : public RuleVariable, public VariableDictElement {
     { };
 
     void evaluate(Transaction *transaction,
-        std::vector<const VariableValue *> *l) override;
+        std::vector<std::shared_ptr<const VariableValue>> *l) override;
 
     virtual Variable *clone() override {
         return new XML_WithNSPath(*this);

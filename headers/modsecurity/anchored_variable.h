@@ -59,8 +59,6 @@ class AnchoredVariable {
         m_var(a.m_var) { }
     */
 
-    ~AnchoredVariable();
-
     void unset();
     void set(const std::string &a, size_t offset);
     void set(const bpstd::string_view &a, size_t offset);
@@ -71,7 +69,7 @@ class AnchoredVariable {
     void append(const std::string &a, size_t offset,
         bool spaceSeparator, int size);
 
-    void evaluate(std::vector<const VariableValue *> *l);
+    void evaluate(std::vector<std::shared_ptr<const VariableValue>> *l);
     std::string *  evaluate();
     std::unique_ptr<std::string> resolveFirst();
 
@@ -81,7 +79,7 @@ class AnchoredVariable {
     std::string m_value;
 
  private:
-    VariableValue *m_var;
+    VariableValue m_var;
 };
 
 }  // namespace modsecurity
