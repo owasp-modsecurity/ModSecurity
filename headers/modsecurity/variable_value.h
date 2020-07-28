@@ -37,7 +37,7 @@ namespace modsecurity {
 class Collection;
 class VariableValue {
  public:
-    using Origins = std::list<std::unique_ptr<VariableOrigin>>;
+    using Origins = std::vector<VariableOrigin>;
 
     explicit VariableValue(const std::string *key,
         const std::string *value = nullptr)
@@ -55,22 +55,6 @@ class VariableValue {
         m_keyWithCollection(*collection + ":" + *key),
         m_value(*value)
     { }
-
-    explicit VariableValue(const VariableValue *o) :
-        m_collection(o->m_collection),
-        m_key(o->m_key),
-        m_keyWithCollection(o->m_keyWithCollection),
-        m_value(o->m_value)
-    {
-        for (auto &i : o->m_orign) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-            origin->m_offset = i->m_offset;
-            origin->m_length = i->m_length;
-            m_orign.push_back(std::move(origin));
-        }
-    }
-
-    VariableValue(const VariableValue &v) = delete;
 
 
     const std::string& getKey() const {
@@ -98,7 +82,7 @@ class VariableValue {
     }
 
 
-    void addOrigin(std::unique_ptr<VariableOrigin> origin) {
+    void addOrigin(VariableOrigin origin) {
         m_orign.push_back(std::move(origin));
     }
 

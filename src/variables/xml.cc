@@ -50,11 +50,11 @@ namespace variables {
 
 #ifndef WITH_LIBXML2
 void XML::evaluate(Transaction *t,
-    std::vector<const VariableValue *> *l) { }
+    std::vector<std::shared_ptr<const VariableValue>> *l) { }
 #else
 
 void XML::evaluate(Transaction *t,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
 #if 0
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
@@ -124,13 +124,10 @@ void XML::evaluate(Transaction *t,
         content = reinterpret_cast<char *>(
             xmlNodeGetContent(nodes->nodeTab[i]));
         if (content != NULL) {
-            std::string *a = new std::string(content);
-            VariableValue *var = new VariableValue(m_fullName.get(),
-                a);
+            std::string a(content);
             if (!m_keyExclusion.toOmit(*m_fullName)) {
-                l->push_back(var);
+                l->push_back(std::make_shared<VariableValue>(m_fullName.get(), &a));
             }
-            delete a;
             xmlFree(content);
          }
     }

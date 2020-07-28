@@ -54,13 +54,10 @@ std::string RunTimeString::evaluate(Transaction *transaction) {
         if (element->m_string.size() > 0) {
             retString.append(element->m_string);
         } else if (element->m_variable != nullptr && transaction != nullptr) {
-            std::vector<const VariableValue *> l;
+            std::vector<std::shared_ptr<const VariableValue>> l;
             element->m_variable->evaluate(transaction, &l);
             if (!l.empty()) {
                 retString.append(l[0]->getValue());
-            }
-            for (auto &i : l) {
-                delete i;
             }
         }
     }

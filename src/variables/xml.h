@@ -39,16 +39,16 @@ class XML_NoDictElement : public Variable {
     XML_NoDictElement()
         : Variable("XML"),
         m_plain("[XML document tree]"),
-        m_var(&m_name, &m_plain) {
+        m_var(std::make_shared<VariableValue>(&m_name, &m_plain)) {
         }
 
     void evaluate(Transaction *transaction,
-        std::vector<const VariableValue *> *l) override {
-        l->push_back(new VariableValue(&m_var));
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        l->push_back(m_var);
     }
 
     std::string m_plain;
-    VariableValue m_var;
+    std::shared_ptr<const VariableValue> m_var;
 };
 
 
@@ -58,7 +58,7 @@ class XML : public Variable {
         : Variable(_name) { }
 
     void evaluate(Transaction *transaction,
-        std::vector<const VariableValue *> *l) override;
+        std::vector<std::shared_ptr<const VariableValue>> *l) override;
 };
 
 

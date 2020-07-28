@@ -266,14 +266,16 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
 
     getFinalVars(&vars, &exclusion, trans);
 
+    std::vector<std::shared_ptr<const VariableValue>> e;
     for (auto &var : vars) {
-        std::vector<const VariableValue *> e;
         if (!var) {
             continue;
         }
+        e.clear();
         var->evaluate(trans, &e);
-        for (const VariableValue *v : e) {
+        for (const auto &vv : e) {
             TransformationsResults transformationsResults;
+            const VariableValue *v = vv.get();
             const std::string &value = v->getValue();
             const std::string &key = v->getKeyWithCollection();
 
@@ -284,8 +286,6 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                         return m.first == getId() && m.second == v->getKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetById.end()
             ) {
-                delete v;
-                v = NULL;
                 continue;
             }
             if (exclusion.contains(v) ||
@@ -295,8 +295,6 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                         return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
-                delete v;
-                v = NULL;
                 continue;
             }
 
@@ -318,8 +316,8 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                     trans->messageGetLast()->m_match = m_operator->resolveMatchMessage(trans,
                         key, value);
 
-                    for (auto &i : v->getOrigin()) {
-                        trans->messageGetLast()->m_reference.append(i->toText());
+                    for (const auto &i : v->getOrigin()) {
+                        trans->messageGetLast()->m_reference.append(i.toText());
                     }
 
                     auto iter2 = transformationsResults.begin();
@@ -345,11 +343,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
 
                 iter++;
             }
-            delete v;
-            v = NULL;
         }
-        e.clear();
-        e.reserve(4);
     }
 
     if (globalRet == false) {
