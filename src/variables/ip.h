@@ -40,7 +40,7 @@ class Ip_DictElement : public Variable {
         m_dictElement("IP:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
         t->m_collections.m_ip_collection->resolveMultiMatches(
             m_name, t->m_collections.m_ip_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -56,7 +56,7 @@ class Ip_NoDictElement : public Variable {
         : Variable("IP") { }
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
         t->m_collections.m_ip_collection->resolveMultiMatches("",
             t->m_collections.m_ip_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -71,7 +71,7 @@ class Ip_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
         t->m_collections.m_ip_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_ip_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -91,7 +91,7 @@ class Ip_DynamicElement : public VariableWithRunTimeString {
     { }
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_ip_collection->resolveMultiMatches(
             string,

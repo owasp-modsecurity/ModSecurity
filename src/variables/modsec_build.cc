@@ -25,9 +25,9 @@ namespace modsecurity {
 namespace variables {
 
 void ModsecBuild::evaluate(Transaction *transaction,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
 
-    l->push_back(new VariableValue(&m_retName, &m_build));
+    l->push_back(std::make_shared<VariableValue>(&m_retName, &m_build));
 }
 
 
