@@ -961,11 +961,10 @@ int Transaction::processRequestBody() {
      * computationally intensive.
      */
     std::string fullRequest;
-    std::vector<const VariableValue *> l;
+    std::vector<std::shared_ptr<const VariableValue>> l;
     m_variableRequestHeaders.resolve(&l);
-    for (auto &h : l) {
+    for (const auto &h : l) {
         fullRequest = fullRequest + h->getKey() + ": " + h->getValue() + "\n";
-        delete h;
     }
 
     fullRequest = fullRequest + "\n\n";
@@ -1491,7 +1490,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << utils::string::dash_if_empty(this->m_clientIpAddress->c_str()) << " ";
     /** TODO: Check variable */
     variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
-    std::vector<const VariableValue *> l;
+    std::vector<std::shared_ptr<const VariableValue>> l;
     r->evaluate(this, &l);
     delete r;
 
@@ -1554,7 +1553,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     audit_log << std::endl;
 
     if (parts & audit_log::AuditLog::BAuditLogPart) {
-        std::vector<const VariableValue *> l;
+        std::vector<std::shared_ptr<const VariableValue>> l;
         audit_log << "--" << trailer << "-" << "B--" << std::endl;
         audit_log << utils::string::dash_if_empty(
             m_variableRequestMethod.evaluate());
@@ -1562,11 +1561,10 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << this->m_httpVersion.c_str() << std::endl;
 
         m_variableRequestHeaders.resolve(&l);
-        for (auto &h : l) {
+        for (const auto &h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
             audit_log << h->getKeyWithCollection().c_str() + pos << ": ";
             audit_log << h->getValue().c_str() << std::endl;
-            delete h;
         }
         audit_log << std::endl;
     }
@@ -1594,16 +1592,15 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << std::endl;
     }
     if (parts & audit_log::AuditLog::FAuditLogPart) {
-        std::vector<const VariableValue *> l;
+        std::vector<std::shared_ptr<const VariableValue>> l;
 
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
         audit_log << "HTTP/" << m_httpVersion.c_str()  << " ";
         audit_log << this->m_httpCodeReturned << std::endl;
         m_variableResponseHeaders.resolve(&l);
-        for (auto &h : l) {
+        for (const auto &h : l) {
             audit_log << h->getKey().c_str() << ": ";
             audit_log << h->getValue().c_str() << std::endl;
-            delete h;
         }
     }
     audit_log << std::endl;
@@ -1696,15 +1693,14 @@ std::string Transaction::toJSON(int parts) {
 
     /* request headers */
     if (parts & audit_log::AuditLog::BAuditLogPart) {
-        std::vector<const VariableValue *> l;
+        std::vector<std::shared_ptr<const VariableValue>> l;
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
             strlen("headers"));
         yajl_gen_map_open(g);
 
         m_variableRequestHeaders.resolve(&l);
-        for (auto &h : l) {
+        for (const auto &h : l) {
             LOGFY_ADD(h->getKey().c_str(), h->getValue().c_str());
-            delete h;
         }
 
         /* end: request headers */
@@ -1726,15 +1722,14 @@ std::string Transaction::toJSON(int parts) {
 
     /* response headers */
     if (parts & audit_log::AuditLog::FAuditLogPart) {
-        std::vector<const VariableValue *> l;
+        std::vector<std::shared_ptr<const VariableValue>> l;
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
             strlen("headers"));
         yajl_gen_map_open(g);
 
         m_variableResponseHeaders.resolve(&l);
-        for (auto &h : l) {
+        for (const auto &h : l) {
             LOGFY_ADD(h->getKey().c_str(), h->getValue().c_str());
-            delete h;
         }
 
         /* end: response headers */
