@@ -262,7 +262,7 @@ end_txn:
 
 
 void LMDB::resolveSingleMatch(const std::string& var,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     int rc;
     MDB_txn *txn;
     MDB_dbi dbi;
@@ -287,11 +287,10 @@ void LMDB::resolveSingleMatch(const std::string& var,
     mdb_cursor_open(txn, dbi, &cursor);
     while ((rc = mdb_cursor_get(cursor, &mdb_key,
             &mdb_value_ret, MDB_NEXT_DUP)) == 0) {
-        std::string *a = new std::string(
+        std::string a(
             reinterpret_cast<char *>(mdb_value_ret.mv_data),
             mdb_value_ret.mv_size);
-        VariableValue *v = new VariableValue(&var, a);
-        l->push_back(v);
+        l->emplace_back(&var, &a);
     }
 
     mdb_cursor_close(cursor);
@@ -466,7 +465,7 @@ end_txn:
 
 
 void LMDB::resolveMultiMatches(const std::string& var,
-    std::vector<const VariableValue *> *l,
+    std::vector<std::shared_ptr<const VariableValue>> *l,
     variables::KeyExclusions &ke) {
     MDB_val key, data;
     MDB_txn *txn = NULL;
@@ -496,7 +495,7 @@ void LMDB::resolveMultiMatches(const std::string& var,
 
     if (keySize == 0) {
         while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
-            l->insert(l->begin(), new VariableValue(
+            l->insert(l->begin(), std::make_shared<VariableValue>(
                 &m_name,
                 new std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
@@ -507,7 +506,7 @@ void LMDB::resolveMultiMatches(const std::string& var,
         while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
             char *a = reinterpret_cast<char *>(key.mv_data);
             if (strncmp(var.c_str(), a, keySize) == 0) {
-                l->insert(l->begin(), new VariableValue(
+                l->insert(l->begin(), std::make_shared<VariableValue>(
                     &m_name,
                     new std::string(reinterpret_cast<char *>(key.mv_data),
                     key.mv_size),
@@ -528,7 +527,7 @@ end_txn:
 
 
 void LMDB::resolveRegularExpression(const std::string& var,
-    std::vector<const VariableValue *> *l,
+    std::vector<std::shared_ptr<const VariableValue>> *l,
     variables::KeyExclusions &ke) {
     MDB_val key, data;
     MDB_txn *txn = NULL;

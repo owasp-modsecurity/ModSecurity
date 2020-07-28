@@ -124,15 +124,11 @@ class RunTimeString {
 
         void appendValueTo(/* const */ Transaction *transaction, std::string &v) const noexcept {
             if (m_variable && transaction) {
-                std::vector<const VariableValue *> l;
+                std::vector<std::shared_ptr<const VariableValue>> l;
                 m_variable->evaluate(transaction, &l);
                 if (!l.empty()) {
                     v.append(l[0]->getValue());
                 }
-                for (auto &i : l) {
-                    delete i;
-                }
-
                 return;
             }
 

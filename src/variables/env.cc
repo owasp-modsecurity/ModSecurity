@@ -33,7 +33,7 @@ namespace modsecurity {
 namespace variables {
 
 void Env::evaluate(Transaction *transaction,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);
         size_t pos = env.find_first_of("=");
@@ -51,8 +51,7 @@ void Env::evaluate(Transaction *transaction,
             continue;
         }
         if (!m_keyExclusion.toOmit(x.first)) {
-            l->push_back(new VariableValue(&m_collectionName, &x.first,
-                &x.second));
+            l->emplace_back(std::make_shared<VariableValue>(&m_collectionName, &x.first, &x.second));
         }
     }
 }
