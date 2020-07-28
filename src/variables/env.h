@@ -34,7 +34,7 @@ class Env : public Variable {
         : Variable(_name) { }
 
     void evaluate(Transaction *transaction,
-        std::vector<const VariableValue *> *l) override;
+        std::vector<std::shared_ptr<const VariableValue>> *l) override;
 };
 
 }  // namespace variables
