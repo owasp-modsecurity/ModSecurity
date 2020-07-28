@@ -28,13 +28,12 @@ namespace modsecurity {
 namespace variables {
 
 void Duration::evaluate(Transaction *transaction,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
 
     transaction->m_variableDuration.assign(std::to_string(e));
 
-    l->push_back(new VariableValue(&m_retName,
-        &transaction->m_variableDuration));
+    l->push_back(std::make_shared<VariableValue>(&m_retName, &transaction->m_variableDuration));
 }
 
 

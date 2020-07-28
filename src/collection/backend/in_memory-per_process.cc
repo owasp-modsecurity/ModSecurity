@@ -86,17 +86,17 @@ void InMemoryPerProcess::del(const std::string& key) {
 
 
 void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
-    std::vector<const VariableValue *> *l) {
+    std::vector<std::shared_ptr<const VariableValue>> *l) {
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new VariableValue(&m_name, &it->first, &it->second));
+        l->push_back(std::make_shared<VariableValue>(&m_name, &it->first, &it->second));
     }
 }
 
 
 void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
-    std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
+    std::vector<std::shared_ptr<const VariableValue>> *l, variables::KeyExclusions &ke) {
     size_t keySize = var.size();
     l->reserve(15);
 
@@ -105,8 +105,7 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
             if (ke.toOmit(i.first)) {
                 continue;
             }
-            l->insert(l->begin(), new VariableValue(&m_name, &i.first,
-                &i.second));
+            l->insert(l->begin(), std::make_shared<VariableValue>(&m_name, &i.first, &i.second));
         }
     } else {
         auto range = this->equal_range(var);
@@ -114,15 +113,14 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
             if (ke.toOmit(var)) {
                 continue;
             }
-            l->insert(l->begin(), new VariableValue(&m_name, &var,
-                &it->second));
+            l->insert(l->begin(), std::make_shared<VariableValue>(&m_name, &var, &it->second));
         }
     }
 }
 
 
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
-    std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
+    std::vector<std::shared_ptr<const VariableValue>> *l, variables::KeyExclusions &ke) {
 
     //if (var.find(":") == std::string::npos) {
     //    return;
@@ -155,7 +153,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
         if (ke.toOmit(x.first)) {
             continue;
         }
-        l->insert(l->begin(), new VariableValue(&m_name, &x.first, &x.second));
+        l->insert(l->begin(), std::make_shared<VariableValue>(&m_name, &x.first, &x.second));
     }
 }
 

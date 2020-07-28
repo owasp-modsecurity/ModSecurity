@@ -48,7 +48,7 @@ class n ## _DictElementRegexp : public VariableRegex { \
         : VariableRegex(#N, regex) { } \
 \
     void evaluate(Transaction *transaction, \
-        std::vector<const VariableValue *> *l) override { \
+        std::vector<std::shared_ptr<const VariableValue>> *l) override { \
         transaction-> e .resolveRegularExpression(&m_r, l, \
             m_keyExclusion); \
     } \
@@ -62,7 +62,7 @@ class n ## _DictElement : public VariableDictElement { \
         : VariableDictElement(#N, dictElement) { } \
 \
     void evaluate(Transaction *transaction, \
-        std::vector<const VariableValue *> *l) override { \
+        std::vector<std::shared_ptr<const VariableValue>> *l) override { \
         transaction-> e .resolve(m_dictElement, l); \
     } \
 };
@@ -75,7 +75,7 @@ class n ## _NoDictElement : public Variable { \
         : Variable(#N) { } \
 \
     void evaluate(Transaction *transaction, \
-        std::vector<const VariableValue *> *l) override { \
+        std::vector<std::shared_ptr<const VariableValue>> *l) override { \
         transaction-> e .resolve(l, m_keyExclusion); \
     } \
 };
@@ -88,7 +88,7 @@ class n : public Variable { \
         : Variable(#N) { } \
     \
     void evaluate(Transaction *transaction, \
-        std::vector<const VariableValue *> *l) override { \
+        std::vector<std::shared_ptr<const VariableValue>> *l) override { \
         transaction-> e .evaluate(l); \
     } \
 };
@@ -186,7 +186,7 @@ class VariableMonkeyResolution {
 
     static void stringMatchResolveMulti(Transaction *t,
         const std::string &variable,
-        std::vector<const VariableValue *> *l) {
+        std::vector<std::shared_ptr<const VariableValue>> *l) {
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
             collection = variable.find(":");
@@ -567,7 +567,7 @@ class Variable : public VariableMonkeyResolution {
 
 
     virtual void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) = 0;
+        std::vector<std::shared_ptr<const VariableValue>> *l) = 0;
 
 
     bool inline belongsToCollection(Variable *var) {
@@ -675,7 +675,7 @@ class VariableModificatorExclusion : public Variable {
         m_base(std::move(var)) { }
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
         m_base->evaluate(t, l);
     }
 
@@ -692,25 +692,14 @@ class VariableModificatorCount : public Variable {
         }
 
     void evaluate(Transaction *t,
-        std::vector<const VariableValue *> *l) override {
-        std::vector<const VariableValue *> reslIn;
-        VariableValue *val = NULL;
-        int count = 0;
+        std::vector<std::shared_ptr<const VariableValue>> *l) override {
 
+        std::vector<std::shared_ptr<const VariableValue>> reslIn;
         m_base->evaluate(t, &reslIn);
+        auto count = reslIn.size();
 
-        for (const VariableValue *a : reslIn) {
-            count++;
-            delete a;
-            a = NULL;
-        }
-        reslIn.clear();
-
-        std::string *res = new std::string(std::to_string(count));
-        val = new VariableValue(m_fullName.get(), res);
-        delete res;
-
-        l->push_back(val);
+        std::string res(std::to_string(count));
+        l->push_back(std::make_shared<VariableValue>(m_fullName.get(), &res));
         return;
     }
 
