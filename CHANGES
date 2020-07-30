@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
- 
+
+  - GeoIP: switch to GEOIP_MEMORY_CACHE from GEOIP_INDEX_CACHE
+    [Issues #2378, #2186 - @defanator]
   - rx: exit after full match (remove /g emulation); ensure capture
     groups occuring after unused groups still populate TX vars
     [Issue #2336 - @martinhsv]
