@@ -70,7 +70,7 @@ bool GeoLookup::setDataBase(const std::string& filePath,
 
 #ifdef WITH_GEOIP
     if (m_version == NOT_LOADED) {
-        m_gi = GeoIP_open(filePath.c_str(), GEOIP_INDEX_CACHE);
+        m_gi = GeoIP_open(filePath.c_str(), GEOIP_MEMORY_CACHE);
         if (m_gi == NULL) {
             intGeo.append("GeoIP: Can't open: " + filePath + ".");
         } else {
