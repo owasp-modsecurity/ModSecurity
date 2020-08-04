@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: FILES variable does not use multipart part name for key
+    [Issue #2377 - @martinhsv]
   - EXPERIMENTAL: Add new transformation call phpArgsNames
     [Issue #2387 - @marshal09]
   - Fix: Only delete Multipart tmp files after rules have run
