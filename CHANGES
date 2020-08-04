@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: FILES variable does not use multipart part name for key
+    [Issue #2377 - @martinhsv]
   - Regex key selection should not be case-sensitive
     [Issue #2296, #2107, #2297 - @michaelgranzow-avi, @victorhora,
                                  @airween, @martinhsv, @zimmerle]
