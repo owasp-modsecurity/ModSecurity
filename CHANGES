@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: FILES variable does not use multipart part name for key
+    [Issue #2377 - @martinhsv]
   - GeoIP: switch to GEOIP_MEMORY_CACHE from GEOIP_INDEX_CACHE
     [Issues #2378, #2186 - @defanator]
   - rx: exit after full match (remove /g emulation); ensure capture
