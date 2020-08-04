@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: FILES variable does not use multipart part name for key
+    [Issue #2377 - @martinhsv]
   - Replaces put with setenv in SetEnv action
     [Issue #2469 - @martinhsv, @WGH-, @zimmerle]
   - Regression: Mark the test as failed in case of segfault.

@@ -1138,7 +1138,7 @@ int Multipart::multipart_complete(std::string *error) {
                 name.assign(m->m_filename);
             }
 
-            m_transaction->m_variableFiles.set(m->m_filename,
+            m_transaction->m_variableFiles.set(m->m_name,
                 m->m_filename, m->m_filenameOffset);
 
             m_transaction->m_variableFilesNames.set(m->m_name,
