@@ -235,12 +235,9 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) const {
      * FIXME: SecRuleUpdateActionBy should be runtime
      * 
      */
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        ActionWithExecution *a = dynamic_cast<ActionWithExecution*>(b.second.get());
+    auto range = trans->m_rules->m_exceptions.m_action_pos_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = range.first; it != range.second; ++it) {
+        ActionWithExecution *a = dynamic_cast<ActionWithExecution*>(it->second.get());
         if (dynamic_cast<ActionDisruptive *>(a)) {
             trans->messageGetLast()->setRule(this);
         }
@@ -327,23 +324,16 @@ void RuleWithActions::executeTransformations(
 
     // FIXME: It can't be something different from transformation. Sort this
     //        on rules compile time.
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_transformation_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        Transformation *t = b.second.get();
+    auto range = trans->m_rules->m_exceptions.m_action_transformation_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = range.first; it != range.second; ++it) {
+        Transformation *t = it->second.get();
         if (dynamic_cast<actions::transformations::None *>(t)) {
             none++;
         }
     }
 
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_transformation_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        Transformation *t = b.second.get();
+    for (auto it = range.first; it != range.second; ++it) {
+        Transformation *t = it->second.get();
         if (none == 0) {
             executeTransformation(trans, &results, t);
         }
