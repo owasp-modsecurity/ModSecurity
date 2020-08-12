@@ -68,7 +68,7 @@ std::string RuleMessage::log(const RuleMessage *rm, int props, int code) {
     msg.reserve(2048);
 
     if (props & ClientLogMessageInfo) {
-        msg.append("[client " + std::string(*rm->m_clientIpAddress.get()) + "] ");
+        msg.append("[client " + (*rm->m_clientIpAddress.get()) + "] ");
     }
 
     if (rm->m_isDisruptive) {

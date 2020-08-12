@@ -289,11 +289,7 @@ class TransactionAnchoredVariables {
 class TransactionSecMarkerManagement {
  public:
     bool isInsideAMarker() const {
-        if (m_marker) {
-            return true;
-        }
-
-        return false;
+        return bool(m_marker);
     }
 
     std::shared_ptr<std::string> getCurrentMarker() const {
