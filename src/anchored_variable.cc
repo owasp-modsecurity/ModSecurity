@@ -34,7 +34,7 @@ AnchoredVariable::AnchoredVariable(Transaction *t,
 }
 
 void AnchoredVariable::unset() {
-    m_var = std::move(VariableValue{&m_var.getKey()});
+    m_var.getValue().assign("");
 }
 
 //FIXME will remove this later when changing the
@@ -76,7 +76,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
 }
 
 void AnchoredVariable::evaluate(VariableValueList *l) {
-    l->emplace_back(&m_var);
+    l->emplace_back(std::move(m_var.copy()));
 }
 
 

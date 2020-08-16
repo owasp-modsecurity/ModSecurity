@@ -45,7 +45,8 @@ class XML_NoDictElement : public Variable {
     void evaluate(Transaction *transaction,
         RuleWithActions *rule,
         VariableValueList *l) override {
-        l->emplace_back(&m_var);
+        VariableValue val = m_var.copy();
+        l->emplace_back(std::move(val));
     }
 
     std::string m_plain;

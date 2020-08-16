@@ -56,13 +56,27 @@ class VariableValue {
         m_value(*value)
     { }
 
-    explicit VariableValue(const VariableValue *o)
-        : VariableValue(*o)
-    {
+    VariableValue copy() const {
+        return VariableValue{*this};
     }
 
-    VariableValue(VariableValue&&) = default;
-    VariableValue& operator=(VariableValue&&) = default;
+    VariableValue(VariableValue&& val) noexcept
+    :m_orign{std::move(val.m_orign)}
+    ,m_collection{std::move(val.m_collection)}
+    ,m_key{std::move(val.m_key)}
+    ,m_keyWithCollection{std::move(val.m_keyWithCollection)}
+    ,m_value{std::move(val.m_value)} {
+
+    }
+    VariableValue& operator=(VariableValue&& val){
+        m_orign = std::move(val.m_orign);
+        m_collection = std::move(val.m_collection);
+        m_key = std::move(val.m_key);
+        m_keyWithCollection = std::move(val.m_keyWithCollection);
+        m_value = std::move(val.m_value);
+
+        return *this;
+    }
 
     const std::string& getKey() const {
         return m_key;
