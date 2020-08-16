@@ -71,13 +71,12 @@ class RuleWithActions : public Rule {
         Transaction *trasn, const std::string &value, TransformationResults &ret);
 
     inline void executeTransformation(
-        actions::transformations::Transformation *a,
-        std::shared_ptr<std::string> *value,
-        Transaction *trans,
-        TransformationResults *ret,
-        std::string *path,
-        int *nth) const;
-
+    actions::transformations::Transformation *a,
+    std::string &value,
+    Transaction *trans,
+    TransformationResults &ret,
+    std::string &path,
+    int &nth) const;
 
     void performLogging(Transaction *trans,
         std::shared_ptr<RuleMessage> ruleMessage,

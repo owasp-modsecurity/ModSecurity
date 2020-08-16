@@ -181,8 +181,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
     variables::Variables addition;
     getVariablesExceptions(trans, exclusion, &addition);
 
-    for (int i = 0; i < m_variables->size(); i++) {
-        Variable *variable = m_variables->at(i);
+    for (Variable *variable : *m_variables) {
         if (exclusion->contains(variable)) {
             continue;
         }
@@ -206,8 +205,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
         vars->push_back(variable);
     }
 
-    for (int i = 0; i < addition.size(); i++) {
-        Variable *variable = addition.at(i);
+    for (Variable *variable : addition) {
         vars->push_back(variable);
     }
 }
@@ -305,12 +303,11 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             executeTransformations(trans, value, values);
 
             for (const auto &valueTemp : values) {
-                bool ret;
-                std::string valueAfterTrans = std::move(*valueTemp.first);
+                const std::string& valueAfterTrans = valueTemp.first;
 
-                ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
+                bool ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
 
-                if (ret == true) {
+                if (ret) {
                     ruleMessage->m_match = m_operator->resolveMatchMessage(trans,
                         key, value);
                     for (auto &i : v.getOrigin()) {

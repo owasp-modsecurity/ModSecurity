@@ -301,51 +301,49 @@ void RuleWithActions::executeAction(Transaction *trans,
 
 inline void RuleWithActions::executeTransformation(
     actions::transformations::Transformation *a,
-    std::shared_ptr<std::string> *value,
+    std::string &value,
     Transaction *trans,
-    TransformationResults *ret,
-    std::string *path,
-    int *nth) const {
+    TransformationResults &ret,
+    std::string &path,
+    int &nth) const {
 
-    std::string *oldValue = (*value).get();
-    std::string newValue = a->evaluate(*oldValue, trans);
+    std::string newValue = a->evaluate(value, trans);
 
-    if (newValue != *oldValue) {
-        std::shared_ptr<std::string> u(new std::string(newValue));
+    if (value != newValue) {
+        value = std::move(newValue);
         if (m_containsMultiMatchAction) {
-            ret->push_back(std::make_pair(u, a->m_name));
-            (*nth)++;
+            ret.emplace_back(value, a->m_name);
+            nth++;
         }
-        *value = u;
     }
 
-    if (path->empty()) {
-        path->append(*a->m_name.get());
-    } else {
-        path->append("," + *a->m_name.get());
+    if (!m_containsMultiMatchAction){
+        if (!path.empty()){
+            path.append(",");
+        }
+        path.append(*a->m_name.get());
     }
 
     ms_dbg_a(trans, 9, " T (" + \
-        std::to_string(*nth) + ") " + \
+        std::to_string(nth) + ") " + \
         *a->m_name.get() + ": \"" + \
-        utils::string::limitTo(80, newValue) +"\"");
+        utils::string::limitTo(80, value) +"\"");
 }
 
 void RuleWithActions::executeTransformations(
     Transaction *trans, const std::string &in, TransformationResults &ret) {
-    int none = 0;
     int transformations = 0;
-    std::string path("");
-    std::shared_ptr<std::string> value =
-        std::shared_ptr<std::string>(new std::string(in));
+    std::string path{""};
+    std::string value{in};
 
-    if (m_containsMultiMatchAction == true) {
+    if (m_containsMultiMatchAction) {
         /* keep the original value */
-        ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(new std::string(*value)),
-            std::shared_ptr<std::string>(new std::string(path))));
+        ret.emplace_back(
+            value,
+            new std::string{path});
     }
 
+    int none{0};
     for (Action *a : m_transformations) {
         if (a->m_isNone) {
             none++;
@@ -355,7 +353,7 @@ void RuleWithActions::executeTransformations(
     // Check for transformations on the SecDefaultAction
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
-    if (none == 0) {
+    if (!none) {
         for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
             if (a->action_kind \
                 != actions::Action::RunTimeBeforeMatchAttemptKind) {
@@ -364,16 +362,16 @@ void RuleWithActions::executeTransformations(
 
             // FIXME: here the object needs to be a transformation already.
             Transformation *t = dynamic_cast<Transformation *>(a.get());
-            executeTransformation(t, &value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(t, value, trans, ret, path,
+                transformations);
         }
-    }
 
+    }
     for (Transformation *a : m_transformations) {
         if (none == 0) {
             Transformation *t = dynamic_cast<Transformation *>(a);
-            executeTransformation(t, &value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(t, value, trans, ret, path,
+                transformations);
         }
         if (a->m_isNone) {
             none--;
@@ -382,6 +380,7 @@ void RuleWithActions::executeTransformations(
 
     // FIXME: It can't be something different from transformation. Sort this
     //        on rules compile time.
+    none = 0;
     for (auto &b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
         if (m_ruleId != b.first) {
@@ -400,25 +399,22 @@ void RuleWithActions::executeTransformations(
         }
         Transformation *a = dynamic_cast<Transformation*>(b.second.get());
         if (none == 0) {
-            Transformation *t = dynamic_cast<Transformation *>(a);
-            executeTransformation(t, &value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(a, value, trans, ret, path,
+                transformations);
         }
         if (a->m_isNone) {
             none--;
         }
     }
 
-    if (m_containsMultiMatchAction == true) {
+    if (m_containsMultiMatchAction) {
         ms_dbg_a(trans, 9, "multiMatch is enabled. " \
             + std::to_string(ret.size()) + \
             " values to be tested.");
-    }
-
-    if (!m_containsMultiMatchAction) {
-        ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(new std::string(*value)),
-            std::shared_ptr<std::string>(new std::string(path))));
+    } else {
+        ret.emplace_back(
+            value,
+            new std::string{path});
     }
 }
 
