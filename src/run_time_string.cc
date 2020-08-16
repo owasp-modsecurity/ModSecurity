@@ -31,17 +31,13 @@ namespace modsecurity {
 
 
 void RunTimeString::appendText(const std::string &text) {
-    std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
-    r->m_string = text;
-    m_elements.push_back(std::move(r));
+    m_elements.emplace_back(text);
 }
 
 
 void RunTimeString::appendVar(
     std::unique_ptr<modsecurity::variables::Variable> var) {
-    std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
-    r->m_var = std::move(var);
-    m_elements.push_back(std::move(r));
+    m_elements.emplace_back(var);
     m_containsMacro = true;
 }
 
@@ -53,14 +49,14 @@ std::string RunTimeString::evaluate(Transaction *t) {
 
 std::string RunTimeString::evaluate(Transaction *t, Rule *r) {
     std::string s;
-    for (auto &z : m_elements) {
-        if (z->m_string.size() > 0) {
-            s.append(z->m_string);
-        } else if (z->m_var != NULL && t != NULL) {
+    for (auto &element : m_elements) {
+        if (element.m_string.size()) {
+            s.append(element.m_string);
+        } else if (element.m_var != NULL && t != NULL) {
             VariableValueList l;
             // FIXME: This cast should be removed.
             RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(r);
-            z->m_var->evaluate(t, rr, &l);
+            element.m_var->evaluate(t, rr, &l);
             if (l.size() > 0) {
                 s.append(l.front().getValue());
             }

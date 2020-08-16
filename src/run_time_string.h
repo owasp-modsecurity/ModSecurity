@@ -34,10 +34,25 @@ namespace modsecurity {
 
 class RunTimeElementHolder {
  public:
+    using var_ptr_t = std::unique_ptr<modsecurity::variables::Variable>;
     RunTimeElementHolder() :
-        m_string("") {
-            m_var.reset(NULL);
+        m_var{},
+        m_string{""} {
+
         }
+
+   RunTimeElementHolder(var_ptr_t& var) :
+        m_var{std::move(var)},
+        m_string{""} {
+
+        }
+
+   RunTimeElementHolder(const std::string& str) :
+        m_var{},
+        m_string{str} {
+
+        }
+
     std::unique_ptr<modsecurity::variables::Variable> m_var;
     std::string m_string;
 };
@@ -57,7 +72,7 @@ class RunTimeString {
     bool m_containsMacro;
 
  protected:
-    std::list<std::unique_ptr<RunTimeElementHolder>> m_elements;
+    std::vector<RunTimeElementHolder> m_elements;
 };
 
 
