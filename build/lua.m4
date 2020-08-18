@@ -68,6 +68,8 @@ else
         case $LUA_PKG_VERSION in
            (5.1*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
            (5.2*) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ; lua_5_2=1 ;;
+           (5.3*) LUA_CFLAGS="-DWITH_LUA_5_3 ${LUA_CFLAGS}" ; lua_5_3=1 ;;
+           (5.4*) LUA_CFLAGS="-DWITH_LUA_5_4 ${LUA_CFLAGS}" ; lua_5_4=1 ;;
            (2.0*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
            (2.1*) LUA_CFLAGS="-DWITH_LUA_5_1 -DWITH_LUA_JIT_2_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
         esac
@@ -211,7 +213,7 @@ AC_DEFUN([CHECK_FOR_LUA_AT], [
                              [ LUA_VERSION=502 ], [ lua_5_2=0 ]
                       )
         AC_TRY_COMPILE([ #include <lua.h> ],
-                         [ #if (LUA_VERSION_NUM == 502)
+                         [ #if (LUA_VERSION_NUM == 504)
                            return 0;
                            #else
                            #error Lua 5.4 not detected
@@ -225,9 +227,9 @@ AC_DEFUN([CHECK_FOR_LUA_AT], [
             do
             case "$line" in
                 (\#define\ LUA_VERSION_NUM*501*) LUA_VERSION=501 ;;
-                (\#define\ LUA_VERSION_NUM*502*) LUA_VERSION=501 ;;
+                (\#define\ LUA_VERSION_NUM*502*) LUA_VERSION=502 ;;
                 (\#define\ LUA_VERSION_NUM*503*) LUA_VERSION=503 ;;
-                (\#define\ LUA_VERSION_NUM*504*) LUA_VERSION=503
+                (\#define\ LUA_VERSION_NUM*504*) LUA_VERSION=504
             esac
             done <"${lua_inc_path}/lua.h"
             AC_MSG_NOTICE([LUA_VERSION is ${LUA_VERSION} found at: ${lua_inc_path}])
@@ -238,7 +240,8 @@ AC_DEFUN([CHECK_FOR_LUA_AT], [
         case $LUA_VERSION in
            (501) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
            (502) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ; lua_5_2=1 ;;
-           (504) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ; lua_5_2=1 ;;
+           (503) LUA_CFLAGS="-DWITH_LUA_5_3 ${LUA_CFLAGS}" ; lua_5_3=1 ;;
+           (504) LUA_CFLAGS="-DWITH_LUA_5_4 ${LUA_CFLAGS}" ; lua_5_4=1 ;;
         esac
     fi
 
