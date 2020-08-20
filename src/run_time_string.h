@@ -33,33 +33,11 @@
 
 namespace modsecurity {
 
-class RunTimeElementHolder {
- public:
-    RunTimeElementHolder()
-        : m_string(""),
-        m_variable(nullptr)
-    { };
-
-
-    RunTimeElementHolder(const RunTimeElementHolder &other)
-        : m_string(other.m_string),
-        m_variable(other.m_variable) {
-            variables::RuleVariable *rv = dynamic_cast<variables::RuleVariable *>(m_variable.get());
-            if (rv != nullptr) {
-                auto nrv = rv->clone();
-                rv = dynamic_cast<variables::RuleVariable *>(nrv);
-                rv->populate(nullptr);
-                m_variable = std::unique_ptr<variables::Variable>(nrv);
-            }
-        };
-
- /* protected: */
-    std::string m_string;
-    std::shared_ptr<variables::Variable> m_variable;
-};
-
 class RunTimeString {
  public:
+    using Variable = variables::Variable;
+    using RuleVariable = variables::RuleVariable;
+
     RunTimeString()
         : m_containsMacro(false),
         m_elements()
@@ -71,37 +49,124 @@ class RunTimeString {
         m_elements()
     {
         for (auto &m : other.m_elements) {
-            m_elements.push_back(std::unique_ptr<RunTimeElementHolder>(new RunTimeElementHolder(*m.get())));
+            m_elements.emplace_back(new ElementHolder(*m.get()));
         }
     };
 
-
-    void appendText(const std::string &text);
-    void appendVar(std::unique_ptr<modsecurity::variables::Variable> var);
-
-
-    std::string evaluate(Transaction *t);
-
-    inline std::string evaluate() {
-        return evaluate(NULL);
+    RunTimeString& operator=(RunTimeString other)
+    {
+        m_containsMacro = other.m_containsMacro;
+        for (auto &m : other.m_elements) {
+            m_elements.emplace_back(new ElementHolder(*m.get()));
+        }
+        return *this;
     }
 
 
-    inline bool containsMacro() const { return m_containsMacro; }
+    void append(const std::string &text);
+    void append(std::unique_ptr<Variable> var);
 
 
-    void populate(RuleWithActions *rule) {
+    /*
+     *
+     * FIXME: Transaction should be const here. Variables resolution does
+     *        not change anything on transaction instance.
+     *
+     */
+    std::string evaluate(/* const */ Transaction *t = nullptr) const noexcept;
+
+
+    inline bool containsMacro() const noexcept {
+        return m_containsMacro;
+    }
+
+
+    void populate(RuleWithActions *rule) noexcept {
         for (auto &a : m_elements) {
-            modsecurity::variables::RuleVariable *vrule = dynamic_cast<variables::RuleVariable *>(a->m_variable.get());
+            a->populate(rule);
+        }
+    }
+
+
+    class ElementHolder {
+     public:
+        ElementHolder()
+            : m_string(""),
+            m_variable(nullptr)
+        { };
+    
+        explicit ElementHolder(std::unique_ptr<Variable> variable)
+            : m_string(""),
+            m_variable(std::move(variable))
+        { };
+    
+        explicit ElementHolder(const std::string &str)
+            : m_string(str),
+            m_variable(nullptr)
+        { };
+
+        ElementHolder(const ElementHolder &other)
+            : m_string(other.m_string),
+            m_variable(nullptr) {
+                RuleVariable *rv = dynamic_cast<RuleVariable *>(other.m_variable.get());
+                if (rv != nullptr) {
+                    auto nrv = rv->clone();
+                    rv = dynamic_cast<RuleVariable *>(nrv);
+                    rv->populate(nullptr);
+                    m_variable = std::unique_ptr<Variable>(nrv);
+                    /* m_variable = nullptr; */
+                } else {
+                    m_variable = other.m_variable;
+                }
+
+            };
+
+
+        void appendValueTo(/* const */ Transaction *transaction, std::string &v) const noexcept {
+            if (m_variable && transaction) {
+                std::vector<const VariableValue *> l;
+                m_variable->evaluate(transaction, &l);
+                if (!l.empty()) {
+                    v.append(l[0]->getValue());
+                }
+                for (auto &i : l) {
+                    delete i;
+                }
+
+                return;
+            }
+
+            v.append(m_string);
+        }
+    
+
+        void populate(RuleWithActions *rule) noexcept {
+            if (!m_variable) {
+                return;
+            }
+
+            RuleVariable *vrule = dynamic_cast<RuleVariable *>(m_variable.get());
             if (vrule != nullptr) {
                 vrule->populate(rule);
             }
         }
-    }
 
+     private:
+        std::string m_string;
+        /*
+         *
+         * FIXME: In the current state m_variable should be a unique_ptr. There
+         *        is no copy for variables, thus having a shared pointer here.
+         *        As an optimization we can have it as a shared_ptr to reduce the
+         *        memory footprint in anchored variables.
+         *
+         */
+        std::shared_ptr<Variable> m_variable;
+    };
+    
  private:
-    bool m_containsMacro;
-    std::list<std::unique_ptr<RunTimeElementHolder>> m_elements;
+    bool m_containsMacro:1;
+    std::vector<std::unique_ptr<ElementHolder>> m_elements;
 };
 
 
