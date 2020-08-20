@@ -37,11 +37,6 @@ namespace modsecurity {
 namespace actions {
 
 
-bool SetVar::init(std::string *error) {
-    return true;
-}
-
-
 bool SetVar::execute(Transaction *t) const noexcept {
     std::string targetValue;
     std::string resolvedPre;
