@@ -5600,7 +5600,7 @@ namespace yy {
   case 436: // run_time_string: run_time_string "FREE_TEXT_QUOTE_MACRO_EXPANSION"
 #line 3024 "seclang-parser.yy"
       {
-        yystack_[1].value.as < std::unique_ptr<RunTimeString> > ()->appendText(yystack_[0].value.as < std::string > ());
+        yystack_[1].value.as < std::unique_ptr<RunTimeString> > ()->append(yystack_[0].value.as < std::string > ());
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(yystack_[1].value.as < std::unique_ptr<RunTimeString> > ());
       }
 #line 5607 "seclang-parser.cc"
@@ -5609,7 +5609,7 @@ namespace yy {
   case 437: // run_time_string: run_time_string var
 #line 3029 "seclang-parser.yy"
       {
-        yystack_[1].value.as < std::unique_ptr<RunTimeString> > ()->appendVar(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
+        yystack_[1].value.as < std::unique_ptr<RunTimeString> > ()->append(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(yystack_[1].value.as < std::unique_ptr<RunTimeString> > ());
       }
 #line 5616 "seclang-parser.cc"
@@ -5619,7 +5619,7 @@ namespace yy {
 #line 3034 "seclang-parser.yy"
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
-        r->appendText(yystack_[0].value.as < std::string > ());
+        r->append(yystack_[0].value.as < std::string > ());
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(r);
       }
 #line 5626 "seclang-parser.cc"
@@ -5629,7 +5629,7 @@ namespace yy {
 #line 3040 "seclang-parser.yy"
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
-        r->appendVar(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
+        r->append(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(r);
       }
 #line 5636 "seclang-parser.cc"

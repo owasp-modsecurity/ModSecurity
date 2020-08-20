@@ -121,7 +121,7 @@ bool Operator::evaluate(Transaction *transaction,
 Operator *Operator::instantiate(std::string op, std::string param_str) {
     std::string op_ = utils::string::tolower(op);
     std::unique_ptr<RunTimeString> param(new RunTimeString());
-    param->appendText(param_str);
+    param->append(param_str);
 
     IF_MATCH(beginswith) { return new BeginsWith(std::move(param)); }
     IF_MATCH(contains) { return new Contains(std::move(param)); }

@@ -3022,24 +3022,24 @@ setvar_action:
 run_time_string:
     run_time_string FREE_TEXT_QUOTE_MACRO_EXPANSION
       {
-        $1->appendText($2);
+        $1->append($2);
         $$ = std::move($1);
       }
     | run_time_string var
       {
-        $1->appendVar(std::move($2));
+        $1->append(std::move($2));
         $$ = std::move($1);
       }
     | FREE_TEXT_QUOTE_MACRO_EXPANSION
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
-        r->appendText($1);
+        r->append($1);
         $$ = std::move(r);
       }
     | var
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
-        r->appendVar(std::move($1));
+        r->append(std::move($1));
         $$ = std::move(r);
       }
     ;
