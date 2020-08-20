@@ -31,38 +31,22 @@
 namespace modsecurity {
 
 
-void RunTimeString::appendText(const std::string &text) {
-    std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
-    r->m_string = text;
-    m_elements.push_back(std::move(r));
+void RunTimeString::append(const std::string &text) {
+    m_elements.emplace_back(new ElementHolder(text));
 }
 
 
-void RunTimeString::appendVar(
-    std::unique_ptr<modsecurity::variables::Variable> var) {
-    std::unique_ptr<RunTimeElementHolder> r(new RunTimeElementHolder);
-    r->m_variable = std::move(var);
-    m_elements.push_back(std::move(r));
+void RunTimeString::append(std::unique_ptr<Variable> var) {
+    m_elements.emplace_back(new ElementHolder(std::move(var)));
     m_containsMacro = true;
 }
 
 
-std::string RunTimeString::evaluate(Transaction *transaction) {
+std::string RunTimeString::evaluate(/* const */ Transaction *transaction) const noexcept {
     std::string retString;
     // FIXME: Educated guess the size of retString based on the size of the elements.
     for (auto &element : m_elements) {
-        if (element->m_string.size() > 0) {
-            retString.append(element->m_string);
-        } else if (element->m_variable != nullptr && transaction != nullptr) {
-            std::vector<const VariableValue *> l;
-            element->m_variable->evaluate(transaction, &l);
-            if (!l.empty()) {
-                retString.append(l[0]->getValue());
-            }
-            for (auto &i : l) {
-                delete i;
-            }
-        }
+        element->appendValueTo(transaction, retString);
     }
     return retString;
 }
