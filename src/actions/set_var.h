@@ -86,7 +86,6 @@ class SetVar : public ActionWithRunTimeString, public ActionWithExecution {
 
 
     bool execute(Transaction *transaction) const noexcept override;
-    bool init(std::string *error) override;
 
     void populate(RuleWithActions *rule) override {
         ActionWithRunTimeString::populate(rule);
