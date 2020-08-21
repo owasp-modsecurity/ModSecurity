@@ -41,7 +41,7 @@ class Session_DictElement : public Variable {
     void evaluate(Transaction *t,
         std::vector<std::shared_ptr<const VariableValue>> *l) override {
         t->m_collections.m_session_collection->resolveMultiMatches(
-            m_name, t->m_collections.m_session_collection_key,
+            *getVariableKey(), t->m_collections.m_session_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
@@ -84,7 +84,7 @@ class Session_DynamicElement : public VariableWithRunTimeString {
  public:
     explicit Session_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
         : VariableWithRunTimeString(
-            "SESSION:dynamic",
+            "SESSION",
             std::move(dictElement)
         )
     { }
