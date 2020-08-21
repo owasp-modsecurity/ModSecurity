@@ -42,7 +42,7 @@ class User_DictElement : public Variable {
     void evaluate(Transaction *t,
         std::vector<std::shared_ptr<const VariableValue>> *l) override {
         t->m_collections.m_user_collection->resolveMultiMatches(
-            m_name, t->m_collections.m_user_collection_key,
+            *getVariableKey(), t->m_collections.m_user_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
 
@@ -57,7 +57,7 @@ class User_NoDictElement : public Variable {
 
     void evaluate(Transaction *t,
         std::vector<std::shared_ptr<const VariableValue>> *l) override {
-        t->m_collections.m_user_collection->resolveMultiMatches(m_name,
+        t->m_collections.m_user_collection->resolveMultiMatches(*getVariableKey(),
             t->m_collections.m_user_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
     }
@@ -85,7 +85,7 @@ class User_DynamicElement : public VariableWithRunTimeString {
  public:
     explicit User_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
         : VariableWithRunTimeString(
-            "USER:dynamic",
+            "USER",
             std::move(dictElement)
         )
     { }
