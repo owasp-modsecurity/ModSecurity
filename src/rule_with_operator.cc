@@ -187,7 +187,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
                 trans->m_ruleRemoveTargetById.end(),
                 [&, variable, this](std::pair<int, std::string> &m) -> bool {
                     return m.first == getId()
-                        && m.second == *variable->m_fullName.get();
+                        && m.second == *variable->getVariableKeyWithCollection();
                 }) != trans->m_ruleRemoveTargetById.end()) {
             continue;
         }
@@ -196,7 +196,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
                     [&, variable, trans, this](
                         std::pair<std::string, std::string> &m) -> bool {
                         return containsTag(m.first, trans)
-                            && m.second == *variable->m_fullName.get();
+                            && m.second == *variable->getVariableKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetByTag.end()) {
             continue;
         }
