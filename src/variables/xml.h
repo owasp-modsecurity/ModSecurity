@@ -40,7 +40,7 @@ class XML_WithoutNSPath : public RuleVariable, public Variable {
         : RuleVariable(),
         Variable("XML"),
         m_plain("[XML document tree]"),
-        m_var(std::make_shared<VariableValue>(&m_name, &m_plain))
+        m_var(std::make_shared<VariableValue>(getVariableKeyWithCollection().get(), &m_plain))
     { };
 
     XML_WithoutNSPath(const XML_WithoutNSPath &r)

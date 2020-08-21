@@ -47,11 +47,12 @@ void Env::evaluate(Transaction *transaction,
     }
 
     for (auto& x : transaction->m_variableEnvs) {
-        if (x.first != m_name && m_name.length() > 0) {
+        if (x.first != *getVariableKey() && getVariableKey()->length() > 0) {
             continue;
         }
         if (!m_keyExclusion.toOmit(x.first)) {
-            l->emplace_back(std::make_shared<VariableValue>(&m_collectionName, &x.first, &x.second));
+            l->emplace_back(std::make_shared<VariableValue>(getVariableKeyWithCollection().get(),
+                &x.first, &x.second));
         }
     }
 }
