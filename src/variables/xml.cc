@@ -63,7 +63,7 @@ void XML_WithNSPath::evaluate(Transaction *t,
     int i;
     //size_t pos;
 
-    param = m_name;
+    param = *getVariableKey();
     /*
     pos = m_name.find_first_of(":");
     if (pos == std::string::npos) {
@@ -124,8 +124,8 @@ void XML_WithNSPath::evaluate(Transaction *t,
             xmlNodeGetContent(nodes->nodeTab[i]));
         if (content != NULL) {
             std::string a(content);
-            if (!m_keyExclusion.toOmit(*m_fullName)) {
-                l->push_back(std::make_shared<VariableValue>(m_fullName.get(), &a));
+            if (!m_keyExclusion.toOmit(*getVariableKeyWithCollection())) {
+                l->push_back(std::make_shared<VariableValue>(getVariableKeyWithCollection().get(), &a));
             }
             xmlFree(content);
          }
