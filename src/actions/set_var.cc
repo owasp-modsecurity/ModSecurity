@@ -73,7 +73,7 @@ bool SetVar::execute(Transaction *t) const noexcept {
     } else if (user) {
         m_variableNameExpanded = user->evaluateRunTimeString(t);
     } else {
-        m_variableNameExpanded = m_variable->m_name;
+        m_variableNameExpanded = *m_variable->getVariableKey();
     }
 
     if (m_operation == setOperation) {
@@ -126,7 +126,7 @@ bool SetVar::execute(Transaction *t) const noexcept {
         }
     }
 
-    ms_dbg_a(t, 8, "Saving variable: " + m_variable->m_collectionName \
+    ms_dbg_a(t, 8, "Saving variable: " + *m_variable->getVariableKeyWithCollection() \
         + ":" + m_variableNameExpanded + " with value: " + targetValue);
 
     if (tx) {

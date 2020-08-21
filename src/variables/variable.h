@@ -554,26 +554,35 @@ class Variable : public VariableMonkeyResolution {
  public:
     explicit Variable(const std::string &name);
 
-    explicit Variable(Variable *_name);
 
-    Variable(const Variable &v)
-        : m_name(v.m_name),
-        m_collectionName(v.m_collectionName),
-        m_fullName(v.m_fullName),
-        m_keyExclusion(v.m_keyExclusion)
+    explicit Variable(Variable *var)
+        : m_keyWithCollection(var->m_keyWithCollection),
+        m_keyExclusion(var->m_keyExclusion),
+        m_collectionName(var->m_collectionName),
+        m_key(var->m_key)
     { };
 
-    virtual ~Variable() { }
+
+    Variable(const Variable &v)
+        : m_keyWithCollection(v.m_keyWithCollection),
+        m_keyExclusion(v.m_keyExclusion),
+        m_collectionName(v.m_collectionName),
+        m_key(v.m_key)
+    { };
+
+
+    virtual ~Variable()
+    { };
 
 
     virtual void evaluate(Transaction *t,
         std::vector<std::shared_ptr<const VariableValue>> *l) = 0;
 
 
-    bool inline belongsToCollection(Variable *var) {
-        return m_collectionName.size() == var->m_collectionName.size()
-             && std::equal(m_collectionName.begin(), m_collectionName.end(),
-                           var->m_collectionName.begin(),
+    bool inline belongsToCollection(Variable *var) const noexcept {
+        return m_collectionName->size() == var->m_collectionName->size()
+             && std::equal(m_collectionName->begin(), m_collectionName->end(),
+                           var->m_collectionName->begin(),
             [](char aa, char bb) {
             return toupper(aa) == bb;
         });
@@ -583,21 +592,64 @@ class Variable : public VariableMonkeyResolution {
     void addsKeyExclusion(Variable *v);
 
 
-    bool operator==(const Variable& b) const {
-        return m_collectionName == b.m_collectionName &&
-            m_name == b.m_name &&
-            *m_fullName == *b.m_fullName;
+    bool operator==(const Variable& b) const noexcept {
+        return *m_collectionName == *b.m_collectionName &&
+            *m_key == *b.m_key &&
+            *m_keyWithCollection == *b.m_keyWithCollection;
     }
 
 
-    std::string& operator+=(const char * p) {  return m_name; }
+    std::string& operator+=(const char *p) { return *m_key; }
 
 
-    std::string m_name;
-    std::string m_collectionName;
-    std::shared_ptr<std::string> m_fullName;
+    /**
+     *
+     * Returns the variable key, if any is specified.
+     *
+     * 'ENV:a' will return 'a'
+     * 'ENV' will return a blank std::shared_ptr.
+     *
+     **/
+    std::shared_ptr<std::string> getVariableKey() const noexcept {
+        return m_key;
+    }
+
+    /**
+     *
+     * Returns the Collection name.
+     *
+     * 'ENV:a' will return 'ENV'
+     * 'ENV' will return 'ENV'
+     *
+     **/
+    std::shared_ptr<std::string> getVariableCollection() const noexcept {
+        return m_collectionName;
+    }
+
+
+    /**
+     *
+     * Returns the Collection with key name.
+     *
+     * 'ENV:a' will return 'ENV:a'
+     * 'ENV' will return 'ENV'
+     *
+     **/
+    std::shared_ptr<std::string> getVariableKeyWithCollection() const noexcept {
+        return m_keyWithCollection;
+    }
+
+
+ protected:
     KeyExclusions m_keyExclusion;
+
+ private:
+    std::shared_ptr<std::string> m_keyWithCollection;
+    std::shared_ptr<std::string> m_key;
+    std::shared_ptr<std::string> m_collectionName;
 };
+
+
 
 class VariableDictElement : public Variable {
  public:
@@ -649,7 +701,7 @@ class Variables : public std::vector<Variable *> {
                 if (r) {
                     return r->m_r.searchAll(v->getKey()).size() > 0;
                 }
-                return v->getKeyWithCollection() == *m->m_fullName.get();
+                return v->getKeyWithCollection() == *m->getVariableKeyWithCollection();
             }) != end();
     };
 
@@ -658,9 +710,9 @@ class Variables : public std::vector<Variable *> {
         std::string names;
         for (auto a : *this) {
             if (names.length() > 0) {
-                names = names + sep + *a->m_fullName;
+                names = names + sep + *a->getVariableKeyWithCollection();
             } else {
-                names = *a->m_fullName;
+                names = *a->getVariableKeyWithCollection();
             }
         }
         return names;
@@ -699,7 +751,7 @@ class VariableModificatorCount : public Variable {
         auto count = reslIn.size();
 
         std::string res(std::to_string(count));
-        l->push_back(std::make_shared<VariableValue>(m_fullName.get(), &res));
+        l->push_back(std::make_shared<VariableValue>(getVariableKeyWithCollection().get(), &res));
         return;
     }
 

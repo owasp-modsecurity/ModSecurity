@@ -42,7 +42,7 @@ class Tx_DictElement : public Variable {
     void evaluate(Transaction *t,
         std::vector<std::shared_ptr<const VariableValue>> *l) override {
         t->m_collections.m_tx_collection->resolveMultiMatches(
-            m_name, l, m_keyExclusion);
+            *getVariableKey(), l, m_keyExclusion);
     }
 
     std::string m_dictElement;
@@ -82,7 +82,7 @@ class Tx_DynamicElement : public VariableWithRunTimeString {
  public:
     explicit Tx_DynamicElement(std::unique_ptr<RunTimeString> dictElement)
         : VariableWithRunTimeString(
-            "TX:dynamic",
+            "TX",
             std::move(dictElement)
         )
     { }

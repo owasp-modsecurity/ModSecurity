@@ -29,29 +29,23 @@ namespace variables {
 
 
 Variable::Variable(const std::string &name)
-    : m_name(name),
-    m_collectionName("") {
-    size_t a = m_name.find(":");
+    : m_keyWithCollection(new std::string("")),
+    m_keyExclusion(),
+    m_collectionName(new std::string("")),
+    m_key(new std::string("")) {
+    size_t a = name.find(":");
     if (a == std::string::npos) {
-        a = m_name.find(".");
+        a = name.find(".");
     }
     if (a != std::string::npos) {
-        m_collectionName = utils::string::toupper(std::string(m_name, 0, a));
-        m_name = std::string(m_name, a + 1, m_name.size());
-        m_fullName = std::make_shared<std::string>(m_collectionName
-            + ":" + m_name);
+        m_collectionName->assign(utils::string::toupper(std::string(name, 0, a)));
+        m_key->assign(std::string(name, a + 1, name.size()));
+        m_keyWithCollection->assign(*m_collectionName.get() + ":" + std::string(name, a + 1, name.size()));
     } else {
-        m_fullName = std::make_shared<std::string>(m_name);
-        m_collectionName = m_name;
-        m_name = "";
+        m_keyWithCollection->assign(name);
+        m_collectionName->assign(name);
     }
 }
-
-
-Variable::Variable(Variable *var) :
-    m_name(var->m_name),
-    m_collectionName(var->m_collectionName),
-    m_fullName(var->m_fullName) { }
 
 
 void Variable::addsKeyExclusion(Variable *v) {
@@ -67,7 +61,7 @@ void Variable::addsKeyExclusion(Variable *v) {
     vr = dynamic_cast<VariableRegex *>(ve->m_base.get());
 
     if (vr == NULL) {
-        r.reset(new KeyExclusionString(v->m_name));
+        r.reset(new KeyExclusionString(*v->getVariableKey()));
     } else {
         r.reset(new KeyExclusionRegex(vr->m_regex));
     }
@@ -77,7 +71,7 @@ void Variable::addsKeyExclusion(Variable *v) {
 
 
 std::string operator+(const std::string &a, Variable *v) {
-    return a + *v->m_fullName.get();
+    return a + *v->getVariableKeyWithCollection();
 }
 
 
