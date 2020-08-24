@@ -117,7 +117,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
 }
 
 
-void AnchoredVariable::evaluate(std::vector<std::shared_ptr<const VariableValue>> *l) {
+void AnchoredVariable::evaluate(VariableValues *l) {
     if (m_name.empty()) {
         return;
     }

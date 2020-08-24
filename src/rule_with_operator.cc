@@ -265,7 +265,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
 
     getFinalVars(&vars, &exclusion, trans);
 
-    std::vector<std::shared_ptr<const VariableValue>> e;
+    VariableValues e;
     for (auto &var : vars) {
         if (!var) {
             continue;
