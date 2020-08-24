@@ -50,11 +50,11 @@ namespace variables {
 
 #ifndef WITH_LIBXML2
 void XML_WithNSPath::evaluate(Transaction *t,
-    std::vector<std::shared_ptr<const VariableValue>> *l) { }
+    VariableValues *l) { }
 #else
 
 void XML_WithNSPath::evaluate(Transaction *t,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
     xmlNodeSetPtr nodes;

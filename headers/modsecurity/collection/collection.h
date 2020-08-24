@@ -60,12 +60,12 @@ class Collection {
         const std::string& var) = 0;
 
     virtual void resolveSingleMatch(const std::string& var,
-        std::vector<std::shared_ptr<const VariableValue>> *l) = 0;
+        VariableValues *l) = 0;
     virtual void resolveMultiMatches(const std::string& var,
-        std::vector<std::shared_ptr<const VariableValue>> *l,
+        VariableValues *l,
         variables::KeyExclusions &ke) = 0;
     virtual void resolveRegularExpression(const std::string& var,
-        std::vector<std::shared_ptr<const VariableValue>> *l,
+        VariableValues *l,
         variables::KeyExclusions &ke) = 0;
 
 
@@ -146,7 +146,7 @@ class Collection {
 
     /* resolveSingleMatch */
     virtual void resolveSingleMatch(const std::string& var,
-        std::string compartment, std::vector<std::shared_ptr<const VariableValue>> *l) {
+        std::string compartment, VariableValues *l) {
         std::string nkey = compartment + "::" + var;
         resolveSingleMatch(nkey, l);
     }
@@ -154,7 +154,7 @@ class Collection {
 
     virtual void resolveSingleMatch(const std::string& var,
         std::string compartment, std::string compartment2,
-        std::vector<std::shared_ptr<const VariableValue>> *l) {
+        VariableValues *l) {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveSingleMatch(nkey, l);
     }
@@ -162,7 +162,7 @@ class Collection {
 
     /* resolveMultiMatches */
     virtual void resolveMultiMatches(const std::string& var,
-        std::string compartment, std::vector<std::shared_ptr<const VariableValue>> *l,
+        std::string compartment, VariableValues *l,
         variables::KeyExclusions &ke) {
         std::string nkey = compartment + "::" + var;
         resolveMultiMatches(nkey, l, ke);
@@ -171,7 +171,7 @@ class Collection {
 
     virtual void resolveMultiMatches(const std::string& var,
         std::string compartment, std::string compartment2,
-        std::vector<std::shared_ptr<const VariableValue>> *l,
+        VariableValues *l,
         variables::KeyExclusions &ke) {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveMultiMatches(nkey, l, ke);
@@ -180,7 +180,7 @@ class Collection {
 
     /* resolveRegularExpression */
     virtual void resolveRegularExpression(const std::string& var,
-        std::string compartment, std::vector<std::shared_ptr<const VariableValue>> *l,
+        std::string compartment, VariableValues *l,
         variables::KeyExclusions &ke) {
         std::string nkey = compartment + "::" + var;
         resolveRegularExpression(nkey, l, ke);
@@ -189,7 +189,7 @@ class Collection {
 
     virtual void resolveRegularExpression(const std::string& var,
         std::string compartment, std::string compartment2,
-        std::vector<std::shared_ptr<const VariableValue>> *l, variables::KeyExclusions &ke) {
+        VariableValues *l, variables::KeyExclusions &ke) {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveRegularExpression(nkey, l, ke);
     }

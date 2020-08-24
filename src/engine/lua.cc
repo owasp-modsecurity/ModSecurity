@@ -286,7 +286,7 @@ int Lua::getvars(lua_State *L) {
     const char *varname(NULL);
     Transaction *t(NULL);
     void *z(NULL);
-    std::vector<std::shared_ptr<const VariableValue>> l;
+    VariableValues l;
     int idx = 1;
 
     /* Retrieve parameters. */
