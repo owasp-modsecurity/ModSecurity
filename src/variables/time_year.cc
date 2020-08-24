@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace variables {
 
 void TimeYear::evaluate(Transaction *transaction,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;

@@ -86,7 +86,7 @@ void InMemoryPerProcess::del(const std::string& key) {
 
 
 void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -96,7 +96,7 @@ void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
 
 
 void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
-    std::vector<std::shared_ptr<const VariableValue>> *l, variables::KeyExclusions &ke) {
+    VariableValues *l, variables::KeyExclusions &ke) {
     size_t keySize = var.size();
     l->reserve(15);
 
@@ -120,7 +120,7 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
 
 
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
-    std::vector<std::shared_ptr<const VariableValue>> *l, variables::KeyExclusions &ke) {
+    VariableValues *l, variables::KeyExclusions &ke) {
 
     //if (var.find(":") == std::string::npos) {
     //    return;
