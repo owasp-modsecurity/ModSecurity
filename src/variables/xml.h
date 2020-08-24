@@ -51,7 +51,7 @@ class XML_WithoutNSPath : public RuleVariable, public Variable {
     { };
 
     void evaluate(Transaction *transaction,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
         l->push_back(m_var);
     }
 
@@ -76,7 +76,7 @@ class XML_WithNSPath : public RuleVariable, public VariableDictElement {
     { };
 
     void evaluate(Transaction *transaction,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override;
+        VariableValues *l) override;
 
     virtual Variable *clone() override {
         return new XML_WithNSPath(*this);

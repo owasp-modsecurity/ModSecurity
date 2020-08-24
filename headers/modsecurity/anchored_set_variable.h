@@ -92,18 +92,18 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
 
     void setCopy(std::string key, std::string value, size_t offset);
 
-    void resolve(std::vector<std::shared_ptr<const VariableValue>> *l);
-    void resolve(std::vector<std::shared_ptr<const VariableValue>> *l,
+    void resolve(VariableValues *l);
+    void resolve(VariableValues *l,
         variables::KeyExclusions &ke);
 
     void resolve(const std::string &key,
-        std::vector<std::shared_ptr<const VariableValue>> *l);
+        VariableValues *l);
 
     void resolveRegularExpression(Utils::Regex *r,
-        std::vector<std::shared_ptr<const VariableValue>> *l);
+        VariableValues *l);
 
     void resolveRegularExpression(Utils::Regex *r,
-        std::vector<std::shared_ptr<const VariableValue>> *l,
+        VariableValues *l,
         variables::KeyExclusions &ke);
 
     std::unique_ptr<std::string> resolveFirst(const std::string &key);
