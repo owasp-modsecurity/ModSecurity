@@ -34,10 +34,14 @@ typedef struct Variable_t VariableValue;
 #ifdef __cplusplus
 namespace modsecurity {
 
+class VariableValue;
+using VariableValues = std::vector<std::shared_ptr<const VariableValue>>;
+using Origins = std::vector<VariableOrigin>;
+
+
 class Collection;
 class VariableValue {
  public:
-    using Origins = std::vector<VariableOrigin>;
 
     explicit VariableValue(const std::string *key,
         const std::string *value = nullptr)
