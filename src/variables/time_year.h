@@ -35,7 +35,7 @@ class TimeYear : public Variable {
         m_retName("TIME_YEAR") { }
 
     void evaluate(Transaction *transaction,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override;
+        VariableValues *l) override;
     std::string m_retName;
 };
 

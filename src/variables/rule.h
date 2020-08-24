@@ -56,7 +56,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
 
     static void id(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<std::shared_ptr<const VariableValue>> *l) {
+        VariableValues *l) {
         std::string a = std::to_string(rule->getId());
         auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_id, &a);
         VariableOrigin origin;
@@ -70,7 +70,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
 
     static void rev(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<std::shared_ptr<const VariableValue>> *l) {
+        VariableValues *l) {
 
         if (rule->hasRevisionAction()) {
             std::string a(rule->getRevision());
@@ -87,7 +87,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
 
     static void severity(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<std::shared_ptr<const VariableValue>> *l) {
+        VariableValues *l) {
 
         if (rule->hasSeverityAction()) {
             std::string a(std::to_string(rule->getSeverity()));
@@ -103,7 +103,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
 
     static void logData(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<std::shared_ptr<const VariableValue>> *l) {
+        VariableValues *l) {
 
         if (rule->hasLogDataAction()) {
             std::string a(rule->getLogData(t));
@@ -118,7 +118,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
 
     static void msg(Transaction *t,
         const RuleWithActions *rule,
-        std::vector<std::shared_ptr<const VariableValue>> *l) {
+        VariableValues *l) {
 
         if (rule->hasMessageAction()) {
             std::string a(rule->getMessage(t));
@@ -132,7 +132,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
     }
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
 
         if (m_dictElement == "id") {
             id(t, getRule(), l);
@@ -180,7 +180,7 @@ class Rule_DictElementRegexp : public RuleVariable, public VariableRegex {
 
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
 
         if (Utils::regex_search("id", m_r) > 0) {
             Rule_DictElement::id(t, getRule(), l);
@@ -225,7 +225,7 @@ class Rule_NoDictElement : public RuleVariable, public Variable  {
 
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
         Rule_DictElement::id(t, getRule(), l);
         Rule_DictElement::rev(t, getRule(), l);
         Rule_DictElement::severity(t, getRule(), l);

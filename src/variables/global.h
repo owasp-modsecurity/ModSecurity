@@ -40,7 +40,7 @@ class Global_DictElement : public Variable {
         m_dictElement("GLOBAL:" + dictElement) { }
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
         t->m_collections.m_global_collection->resolveMultiMatches(
             *getVariableKey(), t->m_collections.m_global_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -56,7 +56,7 @@ class Global_NoDictElement : public Variable {
         : Variable("GLOBAL") { }
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
         t->m_collections.m_global_collection->resolveMultiMatches("",
             t->m_collections.m_global_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -71,7 +71,7 @@ class Global_DictElementRegexp : public VariableRegex {
         m_dictElement(dictElement) { }
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
         t->m_collections.m_global_collection->resolveRegularExpression(
             m_dictElement,
             t->m_collections.m_global_collection_key,
@@ -92,7 +92,7 @@ class Global_DynamicElement : public VariableWithRunTimeString {
     { };
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_global_collection->resolveMultiMatches(
             string,
