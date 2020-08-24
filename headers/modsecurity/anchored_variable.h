@@ -69,7 +69,7 @@ class AnchoredVariable {
     void append(const std::string &a, size_t offset,
         bool spaceSeparator, int size);
 
-    void evaluate(std::vector<std::shared_ptr<const VariableValue>> *l);
+    void evaluate(VariableValues *l);
     std::string *  evaluate();
     std::unique_ptr<std::string> resolveFirst();
 

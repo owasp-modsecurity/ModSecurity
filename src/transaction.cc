@@ -962,7 +962,7 @@ int Transaction::processRequestBody() {
      * computationally intensive.
      */
     std::string fullRequest;
-    std::vector<std::shared_ptr<const VariableValue>> l;
+    VariableValues l;
     m_variableRequestHeaders.resolve(&l);
     for (const auto &h : l) {
         fullRequest = fullRequest + h->getKey() + ": " + h->getValue() + "\n";
@@ -1491,7 +1491,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << utils::string::dash_if_empty(this->m_clientIpAddress->c_str()) << " ";
     /** TODO: Check variable */
     variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
-    std::vector<std::shared_ptr<const VariableValue>> l;
+    VariableValues l;
     r->evaluate(this, &l);
     delete r;
 
@@ -1554,7 +1554,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     audit_log << std::endl;
 
     if (parts & audit_log::AuditLog::BAuditLogPart) {
-        std::vector<std::shared_ptr<const VariableValue>> l;
+        VariableValues l;
         audit_log << "--" << trailer << "-" << "B--" << std::endl;
         audit_log << utils::string::dash_if_empty(
             m_variableRequestMethod.evaluate());
@@ -1593,7 +1593,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << std::endl;
     }
     if (parts & audit_log::AuditLog::FAuditLogPart) {
-        std::vector<std::shared_ptr<const VariableValue>> l;
+        VariableValues l;
 
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
         audit_log << "HTTP/" << m_httpVersion.c_str()  << " ";
@@ -1694,7 +1694,7 @@ std::string Transaction::toJSON(int parts) {
 
     /* request headers */
     if (parts & audit_log::AuditLog::BAuditLogPart) {
-        std::vector<std::shared_ptr<const VariableValue>> l;
+        VariableValues l;
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
             strlen("headers"));
         yajl_gen_map_open(g);
@@ -1723,7 +1723,7 @@ std::string Transaction::toJSON(int parts) {
 
     /* response headers */
     if (parts & audit_log::AuditLog::FAuditLogPart) {
-        std::vector<std::shared_ptr<const VariableValue>> l;
+        VariableValues l;
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
             strlen("headers"));
         yajl_gen_map_open(g);

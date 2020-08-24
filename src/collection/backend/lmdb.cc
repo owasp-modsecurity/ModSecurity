@@ -262,7 +262,7 @@ end_txn:
 
 
 void LMDB::resolveSingleMatch(const std::string& var,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     int rc;
     MDB_txn *txn;
     MDB_dbi dbi;
@@ -465,7 +465,7 @@ end_txn:
 
 
 void LMDB::resolveMultiMatches(const std::string& var,
-    std::vector<std::shared_ptr<const VariableValue>> *l,
+    VariableValues *l,
     variables::KeyExclusions &ke) {
     MDB_val key, data;
     MDB_txn *txn = NULL;
@@ -527,7 +527,7 @@ end_txn:
 
 
 void LMDB::resolveRegularExpression(const std::string& var,
-    std::vector<std::shared_ptr<const VariableValue>> *l,
+    VariableValues *l,
     variables::KeyExclusions &ke) {
     MDB_val key, data;
     MDB_txn *txn = NULL;

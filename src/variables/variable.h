@@ -48,7 +48,7 @@ class n ## _DictElementRegexp : public VariableRegex { \
         : VariableRegex(#N, regex) { } \
 \
     void evaluate(Transaction *transaction, \
-        std::vector<std::shared_ptr<const VariableValue>> *l) override { \
+        VariableValues *l) override { \
         transaction-> e .resolveRegularExpression(&m_r, l, \
             m_keyExclusion); \
     } \
@@ -62,7 +62,7 @@ class n ## _DictElement : public VariableDictElement { \
         : VariableDictElement(#N, dictElement) { } \
 \
     void evaluate(Transaction *transaction, \
-        std::vector<std::shared_ptr<const VariableValue>> *l) override { \
+        VariableValues *l) override { \
         transaction-> e .resolve(m_dictElement, l); \
     } \
 };
@@ -75,7 +75,7 @@ class n ## _NoDictElement : public Variable { \
         : Variable(#N) { } \
 \
     void evaluate(Transaction *transaction, \
-        std::vector<std::shared_ptr<const VariableValue>> *l) override { \
+        VariableValues *l) override { \
         transaction-> e .resolve(l, m_keyExclusion); \
     } \
 };
@@ -88,7 +88,7 @@ class n : public Variable { \
         : Variable(#N) { } \
     \
     void evaluate(Transaction *transaction, \
-        std::vector<std::shared_ptr<const VariableValue>> *l) override { \
+        VariableValues *l) override { \
         transaction-> e .evaluate(l); \
     } \
 };
@@ -186,7 +186,7 @@ class VariableMonkeyResolution {
 
     static void stringMatchResolveMulti(Transaction *t,
         const std::string &variable,
-        std::vector<std::shared_ptr<const VariableValue>> *l) {
+        VariableValues *l) {
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
             collection = variable.find(":");
@@ -576,7 +576,7 @@ class Variable : public VariableMonkeyResolution {
 
 
     virtual void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) = 0;
+        VariableValues *l) = 0;
 
 
     bool inline belongsToCollection(Variable *var) const noexcept {
@@ -727,7 +727,7 @@ class VariableModificatorExclusion : public Variable {
         m_base(std::move(var)) { }
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
         m_base->evaluate(t, l);
     }
 
@@ -744,9 +744,9 @@ class VariableModificatorCount : public Variable {
         }
 
     void evaluate(Transaction *t,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override {
+        VariableValues *l) override {
 
-        std::vector<std::shared_ptr<const VariableValue>> reslIn;
+        VariableValues reslIn;
         m_base->evaluate(t, &reslIn);
         auto count = reslIn.size();
 
