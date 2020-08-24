@@ -27,7 +27,7 @@ namespace modsecurity {
 namespace variables {
 
 void HighestSeverity::evaluate(Transaction *transaction,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     transaction->m_variableHighestSeverityAction.assign(
         std::to_string(transaction->m_highestSeverityAction));
     l->push_back(std::make_shared<VariableValue>(getVariableKeyWithCollection().get(), &transaction->m_variableHighestSeverityAction));

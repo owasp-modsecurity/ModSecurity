@@ -108,7 +108,7 @@ bool SetVar::execute(Transaction *t) const noexcept {
         }
 
         try {
-            std::vector<std::shared_ptr<const VariableValue>> l;
+            VariableValues l;
             m_variable->evaluate(t, &l);
             if (l.size() == 0) {
                 value = 0;
