@@ -96,7 +96,7 @@ void AnchoredSetVariable::set(const std::string &key,
 
 
 void AnchoredSetVariable::resolve(
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     for (const auto& x : *this) {
         l->insert(l->begin(), x.second);
     }
@@ -104,7 +104,7 @@ void AnchoredSetVariable::resolve(
 
 
 void AnchoredSetVariable::resolve(
-    std::vector<std::shared_ptr<const VariableValue>> *l,
+    VariableValues *l,
     variables::KeyExclusions &ke) {
     for (const auto& x : *this) {
         if (!ke.toOmit(x.first)) {
@@ -118,7 +118,7 @@ void AnchoredSetVariable::resolve(
 
 
 void AnchoredSetVariable::resolve(const std::string &key,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     auto range = this->equal_range(key);
     for (auto it = range.first; it != range.second; ++it) {
         l->push_back(it->second);
@@ -139,7 +139,7 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
 
 
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
@@ -151,7 +151,7 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
 
 
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
-    std::vector<std::shared_ptr<const VariableValue>> *l,
+    VariableValues *l,
     variables::KeyExclusions &ke) {
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);

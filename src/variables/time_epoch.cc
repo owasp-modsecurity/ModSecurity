@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace variables {
 
 void TimeEpoch::evaluate(Transaction *transaction,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     transaction->m_variableTimeEpoch.assign(
         std::to_string(std::time(nullptr)));
     l->push_back(std::make_shared<VariableValue>(&m_retName, &transaction->m_variableTimeEpoch));

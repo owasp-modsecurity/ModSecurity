@@ -35,7 +35,7 @@ class HighestSeverity : public Variable {
     { }
 
     void evaluate(Transaction *transaction,
-        std::vector<std::shared_ptr<const VariableValue>> *l) override;
+        VariableValues *l) override;
 };
 
 
