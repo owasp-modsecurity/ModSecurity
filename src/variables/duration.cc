@@ -28,7 +28,7 @@ namespace modsecurity {
 namespace variables {
 
 void Duration::evaluate(Transaction *transaction,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
 
     transaction->m_variableDuration.assign(std::to_string(e));

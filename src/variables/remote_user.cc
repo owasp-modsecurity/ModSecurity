@@ -37,12 +37,12 @@ namespace variables {
 
 
 void RemoteUser::evaluate(Transaction *transaction,
-    std::vector<std::shared_ptr<const VariableValue>> *l) {
+    VariableValues *l) {
     size_t pos;
     std::string base64;
     std::string header;
 
-    std::vector<std::shared_ptr<const VariableValue>> l2;
+    VariableValues l2;
     transaction->m_variableRequestHeaders.resolve("authorization", &l2);
 
     if (l2.size() < 1) {
