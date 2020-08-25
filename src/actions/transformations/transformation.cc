@@ -35,6 +35,7 @@
 #include "src/actions/transformations/js_decode.h"
 #include "src/actions/transformations/length.h"
 #include "src/actions/transformations/lower_case.h"
+#include "src/actions/transformations/php_args_names.h"
 #include "src/actions/transformations/md5.h"
 #include "src/actions/transformations/none.h"
 #include "src/actions/transformations/normalise_path.h"
@@ -88,6 +89,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(jsDecode) { return new JsDecode(a); }
     IF_MATCH(length) { return new Length(a); }
     IF_MATCH(lowercase) { return new LowerCase(a); }
+    IF_MATCH(phpArgsNames) { return new PhpArgsNames(a); }
     IF_MATCH(md5) { return new Md5(a); }
     IF_MATCH(none) { return new None(a); }
     IF_MATCH(normalizePathWin) { return new NormalisePathWin(a); }

@@ -167,6 +167,7 @@ ACTIONS = \
 	actions/transformations/js_decode.cc \
 	actions/transformations/length.cc \
 	actions/transformations/lower_case.cc \
+	actions/transformations/php_args_names.cc \
 	actions/transformations/md5.cc \
 	actions/transformations/none.cc \
 	actions/transformations/normalise_path.cc \
