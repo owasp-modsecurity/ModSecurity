@@ -74,25 +74,26 @@ class VariableValue {
         }
     }
 
-    const std::string& getKey() const {
-        return m_key;
-    }
 
-
-    const std::string& getKeyWithCollection() const {
+    const std::string& getName() const noexcept {
         return m_keyWithCollection;
     }
 
 
-    const std::string& getCollection() const {
-        return m_collection;
-    }
-
-
-    const std::string& getValue() const {
+    const std::string& getValue() const noexcept {
         return m_value;
     }
 
+
+
+
+    const std::string& getKey() const {
+        return m_key;
+    }
+
+    const std::string& getCollection() const {
+        return m_collection;
+    }
 
     void setValue(const std::string &value) {
         m_value = value;
