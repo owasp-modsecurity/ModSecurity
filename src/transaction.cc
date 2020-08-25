@@ -1564,7 +1564,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         m_variableRequestHeaders.resolve(&l);
         for (const auto &h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
-            audit_log << h->getKeyWithCollection().c_str() + pos << ": ";
+            audit_log << h->getName().c_str() + pos << ": ";
             audit_log << h->getValue().c_str() << std::endl;
         }
         audit_log << std::endl;

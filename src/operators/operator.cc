@@ -86,7 +86,7 @@ std::string Operator::resolveMatchMessage(Transaction *t,
     std::string ret = m_match_message;
 
     if (ret.empty() == true) {
-        const std::string &key = v->getKeyWithCollection();
+        const std::string &key = v->getName();
         const std::string &value = v->getValue();
         if (m_couldContainsMacro == false) {
             ret = "Matched \"Operator `" + m_op + "' with parameter `" +
