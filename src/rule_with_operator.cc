@@ -81,7 +81,7 @@ RuleWithOperator::~RuleWithOperator() {
 void RuleWithOperator::updateMatchedVars(Transaction *trans,
     const VariableValue *v,
     const bpstd::string_view &value) {
-    const std::string &key = v->getKeyWithCollection();
+    const std::string &key = v->getName();
     ms_dbg_a(trans, 9, "Matched vars updated.");
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
     trans->m_variableMatchedVarName.set(key, trans->m_variableOffset);
@@ -113,7 +113,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans,
     ms_dbg_a(trans, 9, "Target value: \"" \
         + utils::string::limitTo(80,
             utils::string::toHexIfNeeded(value.to_string())) \
-        + "\" (Variable: " + v->getKeyWithCollection() + ")");
+        + "\" (Variable: " + v->getName() + ")");
 
     ret = m_operator->evaluateInternal(trans, this, value, trans->messageGetLast());
 
@@ -282,7 +282,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                 std::find_if(trans->m_ruleRemoveTargetById.begin(),
                     trans->m_ruleRemoveTargetById.end(),
                     [&, v, this](std::pair<int, std::string> &m) -> bool {
-                        return m.first == getId() && m.second == v->getKeyWithCollection();
+                        return m.first == getId() && m.second == v->getName();
                     }) != trans->m_ruleRemoveTargetById.end()
             ) {
                 continue;
@@ -292,7 +292,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, v, trans, this](std::pair<std::string, std::string> &m) -> bool {
-                        return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
+                        return containsTag(m.first, trans) && m.second == v->getName();
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
                 continue;
