@@ -128,7 +128,7 @@ class Operator {
     }
 
     virtual std::string resolveMatchMessage(Transaction *t,
-        std::string key, std::string value);
+        const VariableValue *v);
 
 
     std::string m_match_message;

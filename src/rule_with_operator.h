@@ -78,11 +78,11 @@ class RuleWithOperator : public RuleWithActions {
         variables::Variables *eclusion, Transaction *trans) const;
 
     bool executeOperatorAt(Transaction *transaction,
-        const std::string &key,
+        const VariableValue *v,
         const bpstd::string_view &value) const;
 
     static void updateMatchedVars(Transaction *transaction,
-        const std::string &key,
+        const VariableValue *v,
         const bpstd::string_view &value);
 
     static void cleanMatchedVars(Transaction *trasn);
