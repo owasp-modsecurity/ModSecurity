@@ -79,8 +79,9 @@ RuleWithOperator::~RuleWithOperator() {
 
 
 void RuleWithOperator::updateMatchedVars(Transaction *trans,
-    const std::string &key,
+    const VariableValue *v,
     const bpstd::string_view &value) {
+    const std::string &key = v->getKeyWithCollection();
     ms_dbg_a(trans, 9, "Matched vars updated.");
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
     trans->m_variableMatchedVarName.set(key, trans->m_variableOffset);
@@ -100,7 +101,7 @@ inline void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
 
 
 bool RuleWithOperator::executeOperatorAt(Transaction *trans,
-    const std::string &key,
+    const VariableValue *v,
     const bpstd::string_view &value) const {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
@@ -112,7 +113,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans,
     ms_dbg_a(trans, 9, "Target value: \"" \
         + utils::string::limitTo(80,
             utils::string::toHexIfNeeded(value.to_string())) \
-        + "\" (Variable: " + key + ")");
+        + "\" (Variable: " + v->getKeyWithCollection() + ")");
 
     ret = m_operator->evaluateInternal(trans, this, value, trans->messageGetLast());
 
@@ -276,7 +277,6 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
             TransformationsResults transformationsResults;
             const VariableValue *v = vv.get();
             const std::string &value = v->getValue();
-            const std::string &key = v->getKeyWithCollection();
 
             if (exclusion.contains(v) ||
                 std::find_if(trans->m_ruleRemoveTargetById.begin(),
@@ -287,6 +287,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
             ) {
                 continue;
             }
+
             if (exclusion.contains(v) ||
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
@@ -309,11 +310,10 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                 auto &valueTemp = *iter;
                 bpstd::string_view view = *valueTemp.getAfter();
 
-                ret = executeOperatorAt(trans, key, view);
+                ret = executeOperatorAt(trans, v, view);
 
                 if (ret == true) {
-                    trans->messageGetLast()->m_match = m_operator->resolveMatchMessage(trans,
-                        key, value);
+                    trans->messageGetLast()->m_match = m_operator->resolveMatchMessage(trans, v);
 
                     for (const auto &i : v->getOrigin()) {
                         trans->messageGetLast()->m_reference.append(i.toText());
@@ -334,7 +334,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                         iter2++;
                     }
 
-                    updateMatchedVars(trans, key, view);
+                    updateMatchedVars(trans, v, view);
                     executeActionsIndependentOfChainedRuleResult(trans);
 
                     globalRet = true;
