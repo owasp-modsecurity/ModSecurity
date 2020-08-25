@@ -63,7 +63,7 @@ void RemoteUser::evaluate(Transaction *transaction,
     }
     transaction->m_variableRemoteUser.assign(std::string(base64, 0, pos));
 
-    auto var = std::make_shared<VariableValue>(&l2[0]->getKeyWithCollection(), &transaction->m_variableRemoteUser);
+    auto var = std::make_shared<VariableValue>(&l2[0]->getName(), &transaction->m_variableRemoteUser);
 
     for (auto &i : l2[0]->getOrigin()) {
         var->addOrigin(i);
