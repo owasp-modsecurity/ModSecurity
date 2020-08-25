@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - EXPERIMENTAL: Add new transformation call phpArgsNames
+    [Issue #2387 - @marshal09]
   - Having ARGS_NAMES, variables proxied
     [@zimmerle, @martinhsv, @KaNikita]
   - Use explicit path for cross-compile environments.

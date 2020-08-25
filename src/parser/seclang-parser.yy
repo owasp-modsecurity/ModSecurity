@@ -77,6 +77,7 @@ class Driver;
 #include "src/actions/transformations/none.h"
 #include "src/actions/transformations/url_decode.h"
 #include "src/actions/transformations/lower_case.h"
+#include "src/actions/transformations/php_args_names.h"
 #include "src/actions/transformations/upper_case.h"
 #include "src/actions/transformations/hex_decode.h"
 #include "src/actions/transformations/url_encode.h"
@@ -546,6 +547,7 @@ using namespace modsecurity::operators;
   ACTION_TRANSFORMATION_JS_DECODE              "ACTION_TRANSFORMATION_JS_DECODE"
   ACTION_TRANSFORMATION_LENGTH                 "ACTION_TRANSFORMATION_LENGTH"
   ACTION_TRANSFORMATION_LOWERCASE              "ACTION_TRANSFORMATION_LOWERCASE"
+  ACTION_TRANSFORMATION_PHP_ARGS_NAMES         "ACTION_TRANSFORMATION_PHP_ARGS_NAMES"
   ACTION_TRANSFORMATION_MD5                    "ACTION_TRANSFORMATION_MD5"
   ACTION_TRANSFORMATION_NONE                   "ACTION_TRANSFORMATION_NONE"
   ACTION_TRANSFORMATION_NORMALISE_PATH         "ACTION_TRANSFORMATION_NORMALISE_PATH"
@@ -2902,6 +2904,10 @@ act:
     | ACTION_TRANSFORMATION_LOWERCASE
       {
         ACTION_CONTAINER($$, new actions::transformations::LowerCase($1));
+      }
+    | ACTION_TRANSFORMATION_PHP_ARGS_NAMES
+      {
+        ACTION_CONTAINER($$, new actions::transformations::PhpArgsNames($1));
       }
     | ACTION_TRANSFORMATION_UPPERCASE
       {
