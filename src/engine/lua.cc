@@ -304,7 +304,7 @@ int Lua::getvars(lua_State *L) {
         lua_newtable(L);
 
         lua_pushstring(L, "name");
-        lua_pushlstring(L, i->getKeyWithCollection().c_str(), i->getKeyWithCollection().size());
+        lua_pushlstring(L, i->getName().c_str(), i->getName().size());
         lua_settable(L, -3);
 
         lua_pushstring(L, "value");
