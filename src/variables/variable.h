@@ -701,7 +701,7 @@ class Variables : public std::vector<Variable *> {
                 if (r) {
                     return r->m_r.searchAll(v->getKey()).size() > 0;
                 }
-                return v->getKeyWithCollection() == *m->getVariableKeyWithCollection();
+                return v->getName() == *m->getVariableKeyWithCollection();
             }) != end();
     };
 
