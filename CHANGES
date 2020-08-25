@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - EXPERIMENTAL: Add new transformation call phpArgsNames
+    [Issue #2387 - @marshal09]
   - Fix: Only delete Multipart tmp files after rules have run
     [Issue #2427 - @martinhsv]
   - Fixed MatchedVar on chained rules
