@@ -319,6 +319,7 @@ TESTS+=test/test-cases/secrules-language-tests/transformations/htmlEntityDecode.
 TESTS+=test/test-cases/secrules-language-tests/transformations/jsDecode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/length.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/lowercase.json
+TESTS+=test/test-cases/secrules-language-tests/transformations/phpArgsNames.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/md5.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/normalisePath.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/normalisePathWin.json

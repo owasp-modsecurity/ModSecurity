@@ -4,6 +4,8 @@ v3.x.y - YYYY-MMM-DD (to be released)
   - Regex key selection should not be case-sensitive
     [Issue #2296, #2107, #2297 - @michaelgranzow-avi, @victorhora,
                                  @airween, @martinhsv, @zimmerle]
+  - EXPERIMENTAL: Add new transformation call phpArgsNames
+    [Issue #2387 - @marshal09]
   - Fix: Only delete Multipart tmp files after rules have run
     [Issue #2427 - @martinhsv]
   - Fixed MatchedVar on chained rules
