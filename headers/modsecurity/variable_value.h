@@ -60,20 +60,7 @@ class VariableValue {
         m_value(*value)
     { }
 
-    VariableValue(const VariableValue &o) :
-        m_collection(o.m_collection),
-        m_key(o.m_key),
-        m_keyWithCollection(o.m_keyWithCollection),
-        m_value(o.m_value)
-    {
-        for (auto &i : o.m_orign) {
-            VariableOrigin *origin(new VariableOrigin());
-            origin->m_offset = i.m_offset;
-            origin->m_length = i.m_length;
-            m_orign.push_back(*origin);
-        }
-    }
-
+    VariableValue(const VariableValue &o) = delete;
 
     const std::string& getName() const noexcept {
         return m_keyWithCollection;
