@@ -79,7 +79,7 @@ class AnchoredVariable {
     std::string m_value;
 
  private:
-    VariableValue m_var;
+    std::shared_ptr<VariableValue> m_var;
 };
 
 }  // namespace modsecurity
