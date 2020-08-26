@@ -34,7 +34,7 @@ AnchoredVariable::AnchoredVariable(Transaction *t,
     m_offset(0),
     m_name(name),
     m_value(""),
-    m_var(&name) {
+    m_var(std::make_shared<VariableValue>(&name)) {
 }
 
 void AnchoredVariable::unset() {
@@ -50,7 +50,7 @@ void AnchoredVariable::set(const std::string &a, size_t offset,
     VariableOrigin origin;
     origin.m_offset = offset;
     origin.m_length = offsetLen;
-    m_var.addOrigin(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -60,7 +60,7 @@ void AnchoredVariable::set(const std::string &a, size_t offset) {
     VariableOrigin origin;
     origin.m_offset = offset;
     origin.m_length = m_value.size();
-    m_var.addOrigin(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -71,7 +71,7 @@ void AnchoredVariable::set(const char *a, size_t offset) {
     m_value.assign(a, strlen(a));
     origin.m_offset = offset;
     origin.m_length = m_value.size();
-    m_var.addOrigin(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -83,7 +83,7 @@ void AnchoredVariable::set(const bpstd::string_view &a, size_t offset) {
     origin.m_offset = offset;
     origin.m_length = m_value.size();
 
-    m_var.addOrigin(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -98,7 +98,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
     VariableOrigin origin;
     origin.m_offset = offset;
     origin.m_length = a.size();
-    m_var.addOrigin(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -113,7 +113,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
     VariableOrigin origin;
     origin.m_offset = offset;
     origin.m_length = size;
-    m_var.addOrigin(std::move(origin));
+    m_var->addOrigin(std::move(origin));
 }
 
 
@@ -122,8 +122,8 @@ void AnchoredVariable::evaluate(VariableValues *l) {
         return;
     }
 
-    m_var.setValue(m_value);
-    l->push_back(std::make_shared<VariableValue>(m_var));
+    m_var->setValue(m_value);
+    l->push_back(m_var);
 }
 
 
