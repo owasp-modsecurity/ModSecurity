@@ -105,6 +105,7 @@ class KeyExclusion {
  public:
     KeyExclusion() { }
     virtual bool match(const std::string &a) = 0;
+    virtual bool match(const bpstd::string_view &a) = 0;
     virtual ~KeyExclusion() { }
 };
 
@@ -122,6 +123,10 @@ class KeyExclusionRegex : public KeyExclusion {
     bool match(const std::string &a) override {
         return m_re.searchAll(a).size() > 0;
     }
+    bool match(const bpstd::string_view &a) override {
+        // FIXME: string_view will be a good thing in searchAll.
+        return m_re.searchAll(std::string(a)).size() > 0;
+    }
 
     Utils::Regex m_re;
 };
@@ -135,6 +140,13 @@ class KeyExclusionString : public KeyExclusion {
     ~KeyExclusionString() override { }
 
     bool match(const std::string &a) override {
+        return a.size() == m_key.size() && std::equal(a.begin(), a.end(),
+            m_key.begin(),
+            [](char aa, char bb) {
+                return static_cast<char>(toupper(aa)) == static_cast<char>(bb);
+            });
+    }
+    bool match(const bpstd::string_view &a) override {
         return a.size() == m_key.size() && std::equal(a.begin(), a.end(),
             m_key.begin(),
             [](char aa, char bb) {
@@ -162,7 +174,7 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
         //}
     };
 
-    bool toOmit(std::string a) {
+    bool toOmit(const std::string &a) {
         for (auto &z : *this) {
             if (z->match(a)) {
                 return true;
@@ -170,6 +182,16 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
         }
         return false;
     }
+
+    bool toOmit(const bpstd::string_view &a) {
+        for (auto &z : *this) {
+            if (z->match(a)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 };
 
 
