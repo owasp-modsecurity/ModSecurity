@@ -57,10 +57,19 @@ struct SMatchCapture {
     size_t m_group; // E.g. 0 = full match; 6 = capture group 6
     size_t m_offset; // offset of match within the analyzed string
     size_t m_length;
+
+    // to_string is convenience method for returning string for the match.
+    // You must supply the same string that was used to obtain the match,
+    // as offset would be invalid otherwise.
+    std::string to_string(const std::string &matched_string) const {
+        return matched_string.substr(m_offset, m_length);
+    }
 };
 
 class Regex {
  public:
+    typedef std::vector<SMatchCapture> match_type;
+
     explicit Regex(const std::string& pattern_);
     ~Regex();
 
@@ -68,8 +77,8 @@ class Regex {
     Regex(const Regex&) = delete;
     Regex& operator=(const Regex&) = delete;
 
-    std::list<SMatch> searchAll(const std::string& s) const;
-    bool searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const;
+    bool searchOneMatch(const std::string& s, match_type& captures) const;
+    std::vector<match_type> searchAllMatches(const std::string &s) const;
     int search(const std::string &s, SMatch *match) const;
     int search(const std::string &s) const;
 

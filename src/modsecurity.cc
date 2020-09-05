@@ -229,9 +229,9 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     const unsigned char *buf;
     size_t jsonSize;
 
-    std::list<Utils::SMatch> vars = variables.searchAll(matchString);
-    std::list<Utils::SMatch> ops = operators.searchAll(matchString);
-    std::list<Utils::SMatch> trans = transformations.searchAll(matchString);
+    auto vars = variables.searchAllMatches(matchString);
+    auto ops = operators.searchAllMatches(matchString);
+    auto trans = transformations.searchAllMatches(matchString);
 
     g = yajl_gen_alloc(NULL);
     if (g == NULL) {
@@ -256,14 +256,11 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             strlen("highlight"));
 
         yajl_gen_array_open(g);
-    while (vars.size() > 0) {
+    for (const auto &m : vars) {
         std::string value;
         yajl_gen_map_open(g);
-        vars.pop_back();
-        const std::string &startingAt = vars.back().str();
-        vars.pop_back();
-        const std::string &size = vars.back().str();
-        vars.pop_back();
+        auto startingAt = m[1].to_string(matchString);
+        auto size = m[2].to_string(matchString);
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("startingAt"),
             strlen("startingAt"));
@@ -303,7 +300,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             varValue.size());
     yajl_gen_map_close(g);
 
-    while (trans.size() > 0) {
+    for (const auto &m : trans) {
         modsecurity::actions::transformations::Transformation *t;
         std::string varValueRes;
         yajl_gen_map_open(g);
@@ -311,15 +308,15 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             reinterpret_cast<const unsigned char*>("transformation"),
             strlen("transformation"));
 
+        auto transformation_name = m[0].to_string(matchString);
         yajl_gen_string(g,
-            reinterpret_cast<const unsigned char*>(trans.back().str().c_str()),
-            trans.back().str().size());
+            reinterpret_cast<const unsigned char*>(transformation_name.c_str()),
+            transformation_name.size());
 
         t = modsecurity::actions::transformations::Transformation::instantiate(
-            trans.back().str().c_str());
+            transformation_name.c_str());
         varValueRes = t->evaluate(varValue, NULL);
         varValue.assign(varValueRes);
-        trans.pop_back();
 
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("value"),
             strlen("value"));
@@ -338,16 +335,13 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
     yajl_gen_map_open(g);
 
-    while (ops.size() > 0) {
+    for (const auto &m : ops) {
         std::string value;
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("highlight"),
             strlen("highlight"));
         yajl_gen_map_open(g);
-        ops.pop_back();
-        std::string startingAt = ops.back().str();
-        ops.pop_back();
-        std::string size = ops.back().str();
-        ops.pop_back();
+        auto startingAt = m[1].to_string(matchString);
+        auto size = m[2].to_string(matchString);
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("startingAt"),
             strlen("startingAt"));

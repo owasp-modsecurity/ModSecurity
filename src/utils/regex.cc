@@ -61,41 +61,7 @@ Regex::~Regex() {
     }
 }
 
-
-std::list<SMatch> Regex::searchAll(const std::string& s) const {
-    const char *subject = s.c_str();
-    const std::string tmpString = std::string(s.c_str(), s.size());
-    int ovector[OVECCOUNT];
-    int rc, i, offset = 0;
-    std::list<SMatch> retList;
-
-    do {
-        rc = pcre_exec(m_pc, m_pce, subject,
-            s.size(), offset, 0, ovector, OVECCOUNT);
-
-        for (i = 0; i < rc; i++) {
-            size_t start = ovector[2*i];
-            size_t end = ovector[2*i+1];
-            size_t len = end - start;
-            if (end > s.size()) {
-                rc = 0;
-                break;
-            }
-            std::string match = std::string(tmpString, start, len);
-            offset = start + len;
-            retList.push_front(SMatch(match, start));
-
-            if (len == 0) {
-                rc = 0;
-                break;
-            }
-        }
-    } while (rc > 0);
-
-    return retList;
-}
-
-bool Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const {
+bool Regex::searchOneMatch(const std::string& s, match_type& captures) const {
     const char *subject = s.c_str();
     int ovector[OVECCOUNT];
 
@@ -113,6 +79,38 @@ bool Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& cap
     }
 
     return (rc > 0);
+}
+
+std::vector<Regex::match_type> Regex::searchAllMatches(const std::string& s) const {
+    int ovector[OVECCOUNT];
+    int offset = 0;
+    std::vector<Regex::match_type> matches;
+
+    while (int rc = pcre_exec(m_pc, m_pce, s.data(), s.size(), offset, 0, ovector, OVECCOUNT) > 0) {
+        Regex::match_type match;
+
+        for (int i = 0; i < rc; i++) {
+            int start = ovector[2*i];
+            int end = ovector[2*i+1];
+
+            // see man pcreapi for details when offsets are set to -1
+            if (start >= 0 && end >= 0) {
+                int len = end - start;
+                match.emplace_back(i, start, len);
+            }
+        }
+        matches.push_back(std::move(match));
+
+        // offsets for full match (group 0)
+        int start = ovector[0];
+        int end = ovector[1];
+        offset = end;
+        if (start == end) {
+            // skip zero-length match (otherwise, the loop won't terminate)
+            offset++;
+        }
+    }
+    return matches;
 }
 
 int Regex::search(const std::string& s, SMatch *match) const {

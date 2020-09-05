@@ -121,16 +121,19 @@ bool VerifySSN::evaluate(Transaction *t, RuleWithActions *rule,
     }
 
     for (i = 0; i < input.size() - 1 && is_ssn == false; i++) {
-        matches = m_re->searchAll(input.substr(i, input.size()));
-        for (const auto & j : matches) {
-            is_ssn = verify(j.str().c_str(), j.str().size());
+        std::string val = input.substr(i);
+        auto matches = m_re->searchAllMatches(val);
+        for (const auto & m : matches) {
+            const auto &g = m[0];
+            is_ssn = verify(&val[g.m_offset], g.m_length);
             if (is_ssn) {
-                logOffset(ruleMessage, j.offset(), j.str().size());
+                logOffset(ruleMessage, g.m_offset, g.m_length);
                 if (rule && t && rule->hasCaptureAction()) {
+                    std::string str = g.to_string(val);
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
-                        "0", j.str());
+                        "0", str);
                     ms_dbg_a(t, 7, "Added VerifySSN match TX.0: " + \
-                        j.str());
+                        str);
                 }
 
                 goto out;

@@ -51,7 +51,7 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
         re = m_re;
     }
 
-    std::vector<Utils::SMatchCapture> captures;
+    Regex::match_type captures;
     re->searchOneMatch(input, captures);
 
     if (rule && rule->hasCaptureAction() && transaction) {

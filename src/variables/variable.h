@@ -123,7 +123,7 @@ class KeyExclusionRegex : public KeyExclusion {
     ~KeyExclusionRegex() override { }
 
     bool match(const std::string &a) override {
-        return m_re.searchAll(a).size() > 0;
+        return m_re.search(a);
     }
 
     Utils::Regex m_re;
@@ -615,7 +615,7 @@ class Variables : public std::vector<Variable *> {
             [v](Variable *m) -> bool {
                 VariableRegex *r = dynamic_cast<VariableRegex *>(m);
                 if (r) {
-                    return r->m_r.searchAll(v->getKey()).size() > 0;
+                    return r->m_r.search(v->getKey());
                 }
                 return v->getKeyWithCollection() == *m->m_fullName.get();
             }) != end();
