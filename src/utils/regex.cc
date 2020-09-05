@@ -84,11 +84,12 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
             std::string match = std::string(tmpString, start, len);
             offset = start + len;
             retList.push_front(SMatch(match, start));
+        }
 
-            if (len == 0) {
-                rc = 0;
-                break;
-            }
+        offset = ovector[1]; // end
+        if (offset == ovector[0]) { // start == end (size == 0)
+            // skip zero-length match (otherwise, the loop won't terminate)
+            offset++;
         }
     } while (rc > 0);
 
