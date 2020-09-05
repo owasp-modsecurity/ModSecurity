@@ -23,6 +23,7 @@
 #include <list>
 #include <vector>
 
+#include "src/regex/backend/backend.h"
 #include "src/regex/regex_match.h"
 
 #ifndef SRC_REGEX_BACKEND_PCRE_H_
@@ -37,7 +38,7 @@ namespace backend {
 #define OVECCOUNT 900
 
 
-class Pcre {
+class Pcre : public Backend {
  public:
     explicit Pcre(const std::string& pattern_);
     ~Pcre();
@@ -46,13 +47,21 @@ class Pcre {
     Pcre(const Pcre&) = delete;
     Pcre& operator=(const Pcre&) = delete;
 
-    std::list<RegexMatch> searchAll(const std::string& s) const;
-    bool searchOneMatch(const std::string& s, std::vector<RegexMatchCapture>& captures) const;
-    int search(const std::string &s, RegexMatch *m) const;
-    int search(const std::string &s) const;
+    std::list<RegexMatch> searchAll(const std::string& s) const override;
+    bool searchOneMatch(const std::string& s, std::vector<RegexMatchCapture>& captures) const override;
+    int search(const std::string &s, RegexMatch *m) const override;
+    int search(const std::string &s) const override;
 
-    const std::string pattern;
+    virtual bool ok() const override {
+        return m_pc != NULL;
+    }
+
+    virtual const std::string& getPattern() const override {
+        return pattern;
+    };
  private:
+    const std::string pattern;
+
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;
 };

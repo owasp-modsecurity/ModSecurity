@@ -115,9 +115,9 @@ class KeyExclusion {
 // FIXME: use pre built regex.
 class KeyExclusionRegex : public KeyExclusion {
  public:
-    explicit KeyExclusionRegex(const regex::Regex &re)
-        : m_re(re.pattern) { }
-    explicit KeyExclusionRegex(const std::string &re)
+    explicit KeyExclusionRegex(regex::Regex re)
+        : m_re(re.getPattern()) { }
+    explicit KeyExclusionRegex(std::string re)
         : m_re(re) { }
 
     ~KeyExclusionRegex() override { }
