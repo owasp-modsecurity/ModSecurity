@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add support for new operator rxGlobal
+    [@martinhsv]
   - Fix maxminddb link on FreeBSD
     [Issue #2131 - @granalberto, @zimmerle]
   - Fix IP address logging in Section A

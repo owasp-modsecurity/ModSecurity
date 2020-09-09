@@ -221,6 +221,7 @@ OPERATORS = \
 	operators/rbl.cc \
 	operators/rsub.cc \
 	operators/rx.cc \
+	operators/rx_global.cc \
 	operators/str_eq.cc \
 	operators/str_match.cc \
 	operators/validate_byte_range.cc \
