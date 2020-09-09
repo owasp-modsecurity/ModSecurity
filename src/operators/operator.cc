@@ -47,6 +47,7 @@
 #include "src/operators/rbl.h"
 #include "src/operators/rsub.h"
 #include "src/operators/rx.h"
+#include "src/operators/rx_global.h"
 #include "src/operators/str_eq.h"
 #include "src/operators/str_match.h"
 #include "src/operators/validate_byte_range.h"
@@ -169,6 +170,7 @@ Operator *Operator::instantiate(std::string op, std::string param_str) {
     IF_MATCH(rbl) { return new Rbl(std::move(param)); }
     IF_MATCH(rsub) { return new Rsub(std::move(param)); }
     IF_MATCH(rx) { return new Rx(std::move(param)); }
+    IF_MATCH(rxglobal) { return new RxGlobal(std::move(param)); }
     IF_MATCH(streq) { return new StrEq(std::move(param)); }
     IF_MATCH(strmatch) { return new StrMatch(std::move(param)); }
     IF_MATCH(validatebyterange) {

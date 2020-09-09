@@ -33,6 +33,24 @@
 namespace modsecurity {
 namespace Utils {
 
+// Helper function to tell us if the current config indicates CRLF is a valid newline sequence
+bool crlfIsNewline() {
+    int d = 0;
+    pcre_config(PCRE_CONFIG_NEWLINE, &d);
+
+    unsigned int option_bits = (d == 13)? PCRE_NEWLINE_CR :
+        (d == 10)? PCRE_NEWLINE_LF :
+        (d == (13<<8 | 10))? PCRE_NEWLINE_CRLF :
+        (d == -2)? PCRE_NEWLINE_ANYCRLF :
+        (d == -1)? PCRE_NEWLINE_ANY : 0;
+
+    bool crlf_is_newline =
+        option_bits == PCRE_NEWLINE_ANY ||
+        option_bits == PCRE_NEWLINE_CRLF ||
+        option_bits == PCRE_NEWLINE_ANYCRLF;
+
+    return crlf_is_newline;
+}
 
 Regex::Regex(const std::string& pattern_)
     : pattern(pattern_.empty() ? ".*" : pattern_) {
@@ -113,6 +131,66 @@ bool Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& cap
     }
 
     return (rc > 0);
+}
+
+bool Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures) const {
+    const char *subject = s.c_str();
+
+    bool prev_match_zero_length = false;
+    int pcre_options = 0;
+    int startOffset = 0;
+
+    while (startOffset <= s.length()) {
+        int ovector[OVECCOUNT];
+        if (prev_match_zero_length) {
+            pcre_options = PCRE_NOTEMPTY_ATSTART | PCRE_ANCHORED;
+        } else {
+            pcre_options = 0; // common case
+        }
+        int rc = pcre_exec(m_pc, m_pce, subject, s.length(), startOffset, pcre_options, ovector, OVECCOUNT);
+
+        if (rc > 0) {
+            size_t firstGroupForThisFullMatch = captures.size();
+            for (int i = 0; i < rc; i++) {
+                size_t start = ovector[2*i];
+                size_t end = ovector[2*i+1];
+                size_t len = end - start;
+                if (end > s.length()) {
+                    continue;
+                }
+                SMatchCapture capture(firstGroupForThisFullMatch + i, start, len);
+                captures.push_back(capture);
+
+                if (i == 0) {
+                    if (len > 0) {
+                        // normal case; next call to pcre_exec should start after the end of the last full match string
+                        startOffset = end;
+                        prev_match_zero_length = false;
+                    } else {
+                        // zero-length match; modify next match attempt to avoid infinite loop
+                        prev_match_zero_length = true;
+                    }
+                }
+            }
+        } else {
+            if (prev_match_zero_length) {
+                // The n-1 search found a zero-length match, so we did a subsequent search
+                // with the special flags. That subsequent exec did not find a match, so now advance
+                // by one character (unless CRLF, then advance by two)
+                startOffset++;
+                if (crlfIsNewline() && (startOffset < s.length()) && (s[startOffset-1] == '\r')
+                    && (s[startOffset] == '\n')) {
+                    startOffset++;
+                }
+                prev_match_zero_length = false;
+            } else {
+                // normal case; no match on most recent scan (with options=0).  We are done.
+                break;
+            }
+        }
+    }
+
+    return (captures.size() > 0);
 }
 
 int Regex::search(const std::string& s, SMatch *match) const {

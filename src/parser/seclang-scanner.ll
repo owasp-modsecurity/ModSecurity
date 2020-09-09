@@ -302,6 +302,7 @@ OPERATOR_PM                             (?i:@pm)
 OPERATOR_RBL                            (?i:@rbl)
 OPERATOR_RSUB                           (?i:@rsub)
 OPERATOR_RX                             (?i:@rx)
+OPERATOR_RX_GLOBAL                      (?i:@rxGlobal)
 OPERATOR_STR_EQ                         (?i:@streq)
 OPERATOR_STR_MATCH                      (?i:@strmatch)
 OPERATOR_UNCONDITIONAL_MATCH            (?i:@unconditionalMatch)
@@ -1105,6 +1106,7 @@ EQUALS_MINUS                            (?i:=\-)
 {OPERATOR_PM}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_PM(*driver.loc.back()); }
 {OPERATOR_RBL}                          { BEGIN_PARAMETER(); return p::make_OPERATOR_RBL( *driver.loc.back()); }
 {OPERATOR_RX}                           { BEGIN_PARAMETER(); return p::make_OPERATOR_RX(*driver.loc.back()); }
+{OPERATOR_RX_GLOBAL}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_RX_GLOBAL(*driver.loc.back()); }
 {OPERATOR_STR_EQ}                       { BEGIN_PARAMETER(); return p::make_OPERATOR_STR_EQ(*driver.loc.back()); }
 {OPERATOR_STR_MATCH}                    { BEGIN_PARAMETER(); return p::make_OPERATOR_STR_MATCH(*driver.loc.back()); }
 {OPERATOR_BEGINS_WITH}                  { BEGIN_PARAMETER(); return p::make_OPERATOR_BEGINS_WITH(*driver.loc.back()); }
