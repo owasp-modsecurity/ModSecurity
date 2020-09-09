@@ -70,6 +70,7 @@ class Regex {
 
     std::list<SMatch> searchAll(const std::string& s) const;
     bool searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const;
+    bool searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures) const;
     int search(const std::string &s, SMatch *match) const;
     int search(const std::string &s) const;
 

@@ -39,7 +39,7 @@
       "SecRuleEngine On",
       "SecResponseBodyAccess On",
       "SecRequestBodyAccess On",
-      "SecRule RESPONSE_BODY \"@rx ([0-9]+)\" \"id:1,phase:4,capture,id:105\"",
+      "SecRule RESPONSE_BODY \"@rx ([0-9]+)\" \"id:105,phase:4,capture\"",
       "SecRule TX \"@rx ([A-z]+)\" \"phase:4,id:106\""
     ]
   },
@@ -77,7 +77,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule REQUEST_HEADERS \"@rx ([A-z]+)\" \"id:1,log,pass,capture,id:14\"",
+      "SecRule REQUEST_HEADERS \"@rx ([A-z]+)\" \"id:14,log,pass,capture\"",
       "SecRule TX:0 \"@rx ([A-z]+)\" \"id:15\""
     ]
   },
@@ -112,7 +112,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule ARGS \"@rx (aa)(bb|cc)?(dd)\" \"id:1,log,pass,capture,id:16\"",
+      "SecRule ARGS \"@rx (aa)(bb|cc)?(dd)\" \"id:16,log,pass,capture\"",
       "SecRule TX:3 \"@streq dd\" \"id:19,phase:2,log,pass\""
     ]
   },
@@ -217,6 +217,41 @@
     "rules":[
       "SecRuleEngine On",
       "SecRule ARGS \"@rx a:([0-9])(?:a:([0-9])(?:a:([0-9]))*)*\" \"id:18,phase:1,log,pass,capture\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":310000,
+    "title":"Testing Variables :: rxGlobal capture groups for two full matches",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "uri":"/?key=aabbddxxaaccddyy",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"Added regex subexpression TX\\.0: aabbdd[\\s\\S]*TX\\.1: aa[\\s\\S]*TX\\.2: bb[\\s\\S]*TX\\.3: dd[\\s\\S]*TX\\.4: aaccdd[\\s\\S]*TX\\.5: aa[\\s\\S]*TX\\.6: cc[\\s\\S]*TX\\.7: dd"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule ARGS \"@rxGlobal (aa)(bb|cc)?(dd)\" \"id:19,log,pass,capture\"",
+      "SecRule TX:6 \"@streq cc\" \"id:20,phase:2,log,pass\""
     ]
   }
 ]

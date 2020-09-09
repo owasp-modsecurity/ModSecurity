@@ -290,6 +290,7 @@ TESTS+=test/test-cases/secrules-language-tests/operators/noMatch.json
 TESTS+=test/test-cases/secrules-language-tests/operators/pmFromFile.json
 TESTS+=test/test-cases/secrules-language-tests/operators/pm.json
 TESTS+=test/test-cases/secrules-language-tests/operators/rx.json
+TESTS+=test/test-cases/secrules-language-tests/operators/rxGlobal.json
 TESTS+=test/test-cases/secrules-language-tests/operators/streq.json
 TESTS+=test/test-cases/secrules-language-tests/operators/strmatch.json
 TESTS+=test/test-cases/secrules-language-tests/operators/unconditionalMatch.json

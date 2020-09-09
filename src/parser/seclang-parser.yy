@@ -132,6 +132,7 @@ class Driver;
 #include "src/operators/rbl.h"
 #include "src/operators/rsub.h"
 #include "src/operators/rx.h"
+#include "src/operators/rx_global.h"
 #include "src/operators/str_eq.h"
 #include "src/operators/str_match.h"
 #include "src/operators/unconditional_match.h"
@@ -455,6 +456,7 @@ using namespace modsecurity::operators;
   OPERATOR_RSUB                                "OPERATOR_RSUB"
   OPERATOR_RX_CONTENT_ONLY                     "Operator RX (content only)"
   OPERATOR_RX                                  "OPERATOR_RX"
+  OPERATOR_RX_GLOBAL                           "OPERATOR_RX_GLOBAL"
   OPERATOR_STR_EQ                              "OPERATOR_STR_EQ"
   OPERATOR_STR_MATCH                           "OPERATOR_STR_MATCH"
   OPERATOR_UNCONDITIONAL_MATCH                 "OPERATOR_UNCONDITIONAL_MATCH"
@@ -1036,6 +1038,10 @@ op_before_init:
     | OPERATOR_RX run_time_string
       {
         OPERATOR_CONTAINER($$, new operators::Rx(std::move($2)));
+      }
+    | OPERATOR_RX_GLOBAL run_time_string
+      {
+        OPERATOR_CONTAINER($$, new operators::RxGlobal(std::move($2)));
       }
     | OPERATOR_STR_EQ run_time_string
       {

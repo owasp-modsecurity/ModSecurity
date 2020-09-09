@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add support for new operator rxGlobal
+    [@martinhsv]
   - Adds support to lua 5.4
     [@zimmerle]
   - GeoIP: switch to GEOIP_MEMORY_CACHE from GEOIP_INDEX_CACHE
