@@ -50,7 +50,7 @@ namespace modsecurity {
 int RulesSet::loadFromUri(const char *uri) {
     Driver *driver = new Driver();
 
-    if (driver->parseFile(uri) == false) {
+    if (driver->parseFile(uri) == 0) {
         m_parserError << driver->m_parserError.str();
         delete driver;
         return -1;
@@ -66,7 +66,7 @@ int RulesSet::loadFromUri(const char *uri) {
 int RulesSet::load(const char *file, const std::string &ref) {
     Driver *driver = new Driver();
 
-    if (driver->parse(file, ref) == false) {
+    if (driver->parse(file, ref) == 0) {
         m_parserError << driver->m_parserError.str();
         delete driver;
         return -1;

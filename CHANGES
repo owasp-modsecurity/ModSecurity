@@ -1,8 +1,18 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
- 
+
+  - Adds support to lua 5.4
+    [@zimmerle]
+  - GeoIP: switch to GEOIP_MEMORY_CACHE from GEOIP_INDEX_CACHE
+    [Issues #2378, #2186 - @defanator]
+  - rx: exit after full match (remove /g emulation); ensure capture
+    groups occuring after unused groups still populate TX vars
+    [Issue #2336 - @martinhsv]
+  - Correct CHANGES file entry for #2234
   - Add support to test framework for audit log content verification
     and add regression tests for issues #2000, #2196
+  - Support configurable limit on number of arguments processed
+    [Issue #2234 - @jleproust, @martinhsv]
   - Multipart Content-Dispostion should allow field: filename*=
     [@martinhsv]
   - Fix rule-update-target for non-regex
@@ -15,8 +25,6 @@ v3.x.y - YYYY-MMM-DD (to be released)
 v3.0.4 - 2020-Jan-13
 --------------------
 
- - Support configurable limit on number of arguments processed
-   [@jleproust, @martinhsv]
  - Fix: audit log data omitted when nolog,auditlog
    [@martinhsv]
  - Fix: ModSecurity 3.x inspectFile operator does not pass

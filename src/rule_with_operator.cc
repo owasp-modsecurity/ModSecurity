@@ -58,8 +58,8 @@ RuleWithOperator::RuleWithOperator(Operator *op,
     std::unique_ptr<std::string> fileName,
     int lineNumber)
     : RuleWithActions(actions, transformations, std::move(fileName), lineNumber),
-    m_operator(op),
-    m_variables(_variables) { /* */ }
+    m_variables(_variables),
+    m_operator(op) { /* */ }
 
 
 RuleWithOperator::~RuleWithOperator() {

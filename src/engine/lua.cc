@@ -155,7 +155,8 @@ int Lua::run(Transaction *t, const std::string &str) {
             case LUA_ERRMEM:
                 e.assign("Memory error. ");
                 break;
-#ifndef WITH_LUA_5_1
+#if defined(WITH_LUA_5_1) and !defined(WITH_LUA_5_4)
+
             case LUA_ERRGCMM:
                 e.assign("Garbage Collector error. ");
                 break;
