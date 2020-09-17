@@ -28,9 +28,9 @@ namespace variables {
 
 void HighestSeverity::evaluate(Transaction *transaction,
     VariableValues *l) {
-    transaction->m_variableHighestSeverityAction.assign(
-        std::to_string(transaction->m_highestSeverityAction));
-    l->push_back(std::make_shared<VariableValue>(getVariableKeyWithCollection().get(), &transaction->m_variableHighestSeverityAction));
+    l->push_back(std::make_shared<VariableValue>(
+        std::unique_ptr<std::string>(new std::string(std::to_string(transaction->m_highestSeverityAction))),
+        getVariableKeyWithCollection().get()));
 }
 
 

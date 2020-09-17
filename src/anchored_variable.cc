@@ -34,7 +34,8 @@ AnchoredVariable::AnchoredVariable(Transaction *t,
     m_offset(0),
     m_name(name),
     m_value(""),
-    m_var(std::make_shared<VariableValue>(&name)) {
+    m_var() {
+        m_var = std::make_shared<VariableValue>(&m_name);
 }
 
 void AnchoredVariable::unset() {

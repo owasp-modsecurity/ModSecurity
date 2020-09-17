@@ -35,9 +35,10 @@ namespace variables {
 
 void TimeEpoch::evaluate(Transaction *transaction,
     VariableValues *l) {
-    transaction->m_variableTimeEpoch.assign(
-        std::to_string(std::time(nullptr)));
-    l->push_back(std::make_shared<VariableValue>(&m_retName, &transaction->m_variableTimeEpoch));
+
+    l->push_back(std::make_shared<VariableValue>(
+        std::unique_ptr<std::string>(new std::string(std::to_string(std::time(nullptr)))),
+        &m_retName));
 }
 
 
