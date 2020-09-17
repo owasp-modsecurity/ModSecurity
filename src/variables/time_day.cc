@@ -45,9 +45,9 @@ void TimeDay::evaluate(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%d", &timeinfo);
 
-    transaction->m_variableTimeDay.assign(tstr);
-
-    l->push_back(std::make_shared<VariableValue>(&m_retName, &transaction->m_variableTimeDay));
+    l->push_back(std::make_shared<VariableValue>(
+        std::unique_ptr<std::string>(new std::string(tstr)),
+        &m_retName));
 }
 
 
