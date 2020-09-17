@@ -44,12 +44,12 @@ void TimeMon::evaluate(Transaction *transaction,
 
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%m", &timeinfo);
-    int a = atoi(tstr);
-    a--;
+    //int a = atoi(tstr);
+    //a--;
 
-    transaction->m_variableTimeMin.assign(std::to_string(a));
-
-    l->push_back(std::make_shared<VariableValue>(&m_retName, &transaction->m_variableTimeMin));
+    l->push_back(std::make_shared<VariableValue>(
+        std::unique_ptr<std::string>(new std::string(tstr)),
+        &m_retName));
 }
 
 
