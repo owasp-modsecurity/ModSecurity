@@ -30,11 +30,10 @@ namespace variables {
 
 class Env : public Variable {
  public:
-    explicit Env(const std::string &_name)
-        : Variable(_name) { }
+    explicit Env(const std::string &name)
+        : Variable(name) { }
 
-    void evaluate(Transaction *transaction,
-        VariableValues *l) override;
+    void evaluate(Transaction *transaction, VariableValues *l) override;
 };
 
 }  // namespace variables

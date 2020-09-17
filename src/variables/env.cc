@@ -32,28 +32,30 @@ extern char **environ;
 namespace modsecurity {
 namespace variables {
 
-void Env::evaluate(Transaction *transaction,
-    VariableValues *l) {
+void Env::evaluate(Transaction *transaction, VariableValues *l) {
+    bool checkForKey = getVariableKey()->length() > 0;
+
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);
         size_t pos = env.find_first_of("=");
         if (pos == std::string::npos) {
             continue;
         }
-        std::string key = std::string(env, 0, pos);
-        std::string value = std::string(env, pos+1, env.length() - (pos + 1));
-        std::pair<std::string, std::string> a(key, value);
-        transaction->m_variableEnvs.insert(a);
-    }
+        std::unique_ptr<std::string> key(new std::string(env, 0, pos));
+        std::unique_ptr<std::string> value(new std::string(env, pos+1, env.length() - (pos + 1)));
 
-    for (auto& x : transaction->m_variableEnvs) {
-        if (x.first != *getVariableKey() && getVariableKey()->length() > 0) {
+        if (checkForKey && *key != *getVariableKey()) {
             continue;
         }
-        if (!m_keyExclusion.toOmit(x.first)) {
-            l->emplace_back(std::make_shared<VariableValue>(getVariableKeyWithCollection().get(),
-                &x.first, &x.second));
+        if (m_keyExclusion.toOmit(*key)) {
+            continue;
         }
+
+        l->emplace_back(std::make_shared<VariableValue>(
+            std::move(value),
+            std::move(key),
+            getVariableKeyWithCollection()
+        ));
     }
 }
 
