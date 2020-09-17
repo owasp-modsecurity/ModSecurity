@@ -57,8 +57,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
     static void id(Transaction *t,
         const RuleWithActions *rule,
         VariableValues *l) {
-        std::string a = std::to_string(rule->getId());
-        auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_id, &a);
+        auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_id, std::unique_ptr<std::string>(new std::string(std::to_string(rule->getId()))));
         VariableOrigin origin;
         origin.m_offset = 0;
         origin.m_length = 0;
@@ -73,8 +72,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         VariableValues *l) {
 
         if (rule->hasRevisionAction()) {
-            std::string a(rule->getRevision());
-            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_rev, &a);
+            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_rev, std::unique_ptr<std::string>(new std::string(rule->getRevision())));
             VariableOrigin origin;
             origin.m_offset = 0;
             origin.m_length = 0;
@@ -90,8 +88,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         VariableValues *l) {
 
         if (rule->hasSeverityAction()) {
-            std::string a(std::to_string(rule->getSeverity()));
-            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_severity, &a);
+            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_severity, std::unique_ptr<std::string>(new std::string(std::to_string(rule->getSeverity()))));
             VariableOrigin origin;
             origin.m_offset = 0;
             origin.m_length = 0;
@@ -106,8 +103,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         VariableValues *l) {
 
         if (rule->hasLogDataAction()) {
-            std::string a(rule->getLogData(t));
-            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_logdata, &a);
+            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_logdata, std::unique_ptr<std::string>(new std::string(rule->getLogData(t))));
             VariableOrigin origin;
             origin.m_offset = 0;
             origin.m_length = 0;
@@ -121,8 +117,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         VariableValues *l) {
 
         if (rule->hasMessageAction()) {
-            std::string a(rule->getMessage(t));
-            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_msg, &a);
+            auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_msg, std::unique_ptr<std::string>(new std::string(rule->getMessage(t))));
             VariableOrigin origin;
             origin.m_offset = 0;
             origin.m_length = 0;
