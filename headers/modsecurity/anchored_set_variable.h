@@ -78,19 +78,15 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
 
     void unset();
 
-    void set(const std::string &key, const std::string &value,
-        size_t offset);
-
-    void set(const std::string &key, const bpstd::string_view &value,
-        size_t offset);
-
-    void set(const std::string &key, const char *value,
-        size_t offset);
+    void set(const std::string &key, const std::string &value, size_t offset) {
+        set(key, value, offset, value.size());
+    }
 
     void set(const std::string &key, const std::string &value,
         size_t offset, size_t len);
 
-    void setCopy(std::string key, std::string value, size_t offset);
+    void set(const std::string &key, const bpstd::string_view &value,
+        size_t offset);
 
     void resolve(VariableValues *l);
     void resolve(VariableValues *l,

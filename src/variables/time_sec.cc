@@ -45,9 +45,9 @@ void TimeSec::evaluate(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%S", &timeinfo);
 
-    transaction->m_variableTimeSec.assign(tstr);
-
-    l->push_back(std::make_shared<VariableValue>(&m_retName, &transaction->m_variableTimeSec));
+    l->push_back(std::make_shared<VariableValue>(
+        std::unique_ptr<std::string>(new std::string(tstr)),
+        &m_retName));
 }
 
 

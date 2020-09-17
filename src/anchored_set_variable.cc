@@ -41,9 +41,12 @@ void AnchoredSetVariable::unset() {
 }
 
 
+// FIXME: It may not be necessary to copy the content of
 void AnchoredSetVariable::set(const std::string &key,
     const std::string &value, size_t offset, size_t len) {
-    auto var = std::make_shared<VariableValue>(&m_name, &key, &value);
+    auto var = std::make_shared<VariableValue>(&m_name,
+        std::unique_ptr<std::string>(new std::string(key)),
+        std::unique_ptr<std::string>(new std::string(value)));
 
     VariableOrigin origin;
     origin.m_offset = offset;
@@ -55,40 +58,12 @@ void AnchoredSetVariable::set(const std::string &key,
 
 
 void AnchoredSetVariable::set(const std::string &key,
-    const std::string &value, size_t offset) {
+    const bpstd::string_view &value, size_t offset) {
     auto var = std::make_shared<VariableValue>(&m_name, &key, &value);
 
     VariableOrigin origin;
     origin.m_offset = offset;
     origin.m_length = value.size();
-
-    var->addOrigin(std::move(origin));
-    emplace(key, std::move(var));
-}
-
-
-void AnchoredSetVariable::set(const std::string &key,
-    const bpstd::string_view &value, size_t offset) {
-    std::string v(value.c_str());
-    auto var = std::make_shared<VariableValue>(&m_name, &key, &v);
-
-    VariableOrigin origin;
-    origin.m_offset = offset;
-    origin.m_length = value.size();
-
-    var->addOrigin(std::move(origin));
-    emplace(key, var);
-}
-
-
-void AnchoredSetVariable::set(const std::string &key,
-    const char *value, size_t offset) {
-    std::string v(value);
-    auto var = std::make_shared<VariableValue>(&m_name, &key, &v);
-
-    VariableOrigin origin;
-    origin.m_offset = offset;
-    origin.m_length = strlen(value);
 
     var->addOrigin(std::move(origin));
     emplace(key, var);
