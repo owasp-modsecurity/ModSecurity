@@ -113,7 +113,8 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
             if (ke.toOmit(var)) {
                 continue;
             }
-            l->insert(l->begin(), std::make_shared<VariableValue>(&m_name, &var, &it->second));
+            l->insert(l->begin(), std::make_shared<VariableValue>(&m_name, &it->first, &it->second));
+
         }
     }
 }
