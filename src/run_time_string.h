@@ -67,13 +67,7 @@ class RunTimeString {
     void append(std::unique_ptr<Variable> var);
 
 
-    /*
-     *
-     * FIXME: Transaction should be const here. Variables resolution does
-     *        not change anything on transaction instance.
-     *
-     */
-    std::string evaluate(/* const */ Transaction *t = nullptr) const noexcept;
+    std::string evaluate(const Transaction *t = nullptr) const noexcept;
 
 
     inline bool containsMacro() const noexcept {
@@ -122,7 +116,7 @@ class RunTimeString {
             };
 
 
-        void appendValueTo(/* const */ Transaction *transaction, std::string &v) const noexcept {
+        void appendValueTo(const Transaction *transaction, std::string &v) const noexcept {
             if (m_variable && transaction) {
                 VariableValues l;
                 m_variable->evaluate(transaction, &l);

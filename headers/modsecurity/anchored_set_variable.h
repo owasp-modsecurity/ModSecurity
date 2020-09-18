@@ -88,21 +88,21 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
     void set(const std::string &key, const bpstd::string_view &value,
         size_t offset);
 
-    void resolve(VariableValues *l);
+    void resolve(VariableValues *l) const noexcept;
     void resolve(VariableValues *l,
-        variables::KeyExclusions &ke);
+        const variables::KeyExclusions &ke) const noexcept;
 
     void resolve(const std::string &key,
-        VariableValues *l);
+        VariableValues *l) const noexcept;
 
-    void resolveRegularExpression(Utils::Regex *r,
-        VariableValues *l);
+    void resolveRegularExpression(const Utils::Regex *r,
+        VariableValues *l) const noexcept;
 
-    void resolveRegularExpression(Utils::Regex *r,
+    void resolveRegularExpression(const Utils::Regex *r,
         VariableValues *l,
-        variables::KeyExclusions &ke);
+        const variables::KeyExclusions &ke) const noexcept;
 
-    std::unique_ptr<std::string> resolveFirst(const std::string &key);
+    std::unique_ptr<std::string> resolveFirst(const std::string &key) const noexcept;
 
     Transaction *m_transaction;
     std::string m_name;

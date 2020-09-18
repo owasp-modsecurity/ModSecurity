@@ -32,7 +32,7 @@ extern char **environ;
 namespace modsecurity {
 namespace variables {
 
-void Env::evaluate(Transaction *transaction, VariableValues *l) {
+void Env::evaluate(const Transaction *transaction, VariableValues *l) const noexcept {
     bool checkForKey = getVariableKey()->length() > 0;
 
     for (char **current = environ; *current; current++) {
@@ -57,6 +57,7 @@ void Env::evaluate(Transaction *transaction, VariableValues *l) {
             getVariableKeyWithCollection()
         ));
     }
+
 }
 
 

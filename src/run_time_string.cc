@@ -42,7 +42,7 @@ void RunTimeString::append(std::unique_ptr<Variable> var) {
 }
 
 
-std::string RunTimeString::evaluate(/* const */ Transaction *transaction) const noexcept {
+std::string RunTimeString::evaluate(const Transaction *transaction) const noexcept {
     std::string retString;
     // FIXME: Educated guess the size of retString based on the size of the elements.
     for (auto &element : m_elements) {

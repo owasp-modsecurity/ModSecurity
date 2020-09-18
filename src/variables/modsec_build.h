@@ -43,8 +43,8 @@ class ModsecBuild : public Variable {
         m_build = ss.str();
     }
 
-    void evaluate(Transaction *transaction,
-        VariableValues *l) override;
+    void evaluate(const Transaction *transaction,
+        VariableValues *l) const noexcept override;
 
     std::string m_build;
     std::string m_retName;
