@@ -36,10 +36,8 @@ namespace modsecurity {
 namespace variables {
 
 
-
-void RemoteUser::evaluate(Transaction *transaction,
-    VariableValues *l) {
-
+void RemoteUser::evaluate(const Transaction *transaction,
+    VariableValues *l) const noexcept {
     auto userName = parserRemoteUser(transaction);
     auto var = std::make_shared<VariableValue>(
         std::unique_ptr<std::string>(new std::string(userName.first)),
