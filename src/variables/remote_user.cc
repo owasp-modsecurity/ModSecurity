@@ -30,45 +30,22 @@
 #include <memory>
 
 #include "modsecurity/transaction.h"
-#include "src/utils/base64.h"
+
 
 namespace modsecurity {
 namespace variables {
 
 
+
 void RemoteUser::evaluate(Transaction *transaction,
     VariableValues *l) {
-    size_t pos;
-    std::string base64;
-    std::string header;
 
-    VariableValues l2;
-    transaction->m_variableRequestHeaders.resolve("authorization", &l2);
+    auto userName = parserRemoteUser(transaction);
+    auto var = std::make_shared<VariableValue>(
+        std::unique_ptr<std::string>(new std::string(userName.first)),
+        &m_retName);
+    var->addOrigin(userName.second);
 
-    if (l2.size() < 1) {
-        return;
-    }
-
-    header = std::string(l2.at(0)->getValue());
-
-    if (header.compare(0, 6, "Basic ") == 0) {
-        base64 = std::string(header, 6, header.length());
-    }
-
-    base64 = Utils::Base64::decode(base64);
-
-    pos = base64.find(":");
-    if (pos == std::string::npos) {
-        return;
-    }
-    transaction->m_variableRemoteUser.assign(std::string(base64, 0, pos));
-
-    const std::string name = l2[0]->getName();
-    auto var = std::make_shared<VariableValue>(&name, &transaction->m_variableRemoteUser);
-
-    for (auto &i : l2[0]->getOrigin()) {
-        var->addOrigin(i);
-    }
     l->push_back(std::move(var));
 }
 
