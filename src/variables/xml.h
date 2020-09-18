@@ -50,8 +50,8 @@ class XML_WithoutNSPath : public RuleVariable, public Variable {
         m_var(r.m_var)
     { };
 
-    void evaluate(Transaction *transaction,
-        VariableValues *l) override {
+    void evaluate(const Transaction *transaction,
+        VariableValues *l) const noexcept override {
         l->push_back(m_var);
     }
 
@@ -75,8 +75,8 @@ class XML_WithNSPath : public RuleVariable, public VariableDictElement {
         VariableDictElement(r)
     { };
 
-    void evaluate(Transaction *transaction,
-        VariableValues *l) override;
+    void evaluate(const Transaction *transaction,
+        VariableValues *l) const noexcept override;
 
     virtual Variable *clone() override {
         return new XML_WithNSPath(*this);
