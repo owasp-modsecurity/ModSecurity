@@ -420,13 +420,13 @@ class RuleWithActions : public Rule {
 
     inline bool hasLogDataAction() const { return m_logData != nullptr || m_defaultActionLogData != nullptr; }
     inline std::shared_ptr<actions::LogData> getLogDataAction() const { return m_logData; }
-    std::string getLogData(/*const */Transaction *t) const;
+    std::string getLogData(const Transaction *t) const;
     inline void setLogDataAction(const std::shared_ptr<actions::LogData> &data) { m_logData = data; }
 
     inline bool hasMessageAction() const { return m_msg != nullptr || m_defaultActionMsg != nullptr; }
     inline std::shared_ptr<actions::Msg> getMessageAction() const { return m_msg; }
     inline void setMessageAction(const std::shared_ptr<actions::Msg> &msg) { m_msg = msg; }
-    std::string getMessage(/*const */Transaction *t) const;
+    std::string getMessage(const Transaction *t) const;
 
 
     inline bool hasSeverityAction() const { return m_severity != SEVERITY_NOT_SET || m_defaultSeverity != SEVERITY_NOT_SET; }
