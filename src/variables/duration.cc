@@ -27,8 +27,8 @@
 namespace modsecurity {
 namespace variables {
 
-void Duration::evaluate(Transaction *transaction,
-    VariableValues *l) {
+void Duration::evaluate(const Transaction *transaction,
+    VariableValues *l) const noexcept {
     double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
 
     l->push_back(std::make_shared<VariableValue>(

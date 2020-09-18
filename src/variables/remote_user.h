@@ -37,10 +37,10 @@ class RemoteUser : public Variable {
         : Variable(_name),
         m_retName("REMOTE_USER") { }
 
-    void evaluate(Transaction *transaction,
-        VariableValues *l) override;
+    void evaluate(const Transaction *transaction,
+        VariableValues *l) const noexcept override;
 
-    static std::pair<std::string, VariableOrigin> parserRemoteUser(Transaction *transaction) {
+    static std::pair<std::string, VariableOrigin> parserRemoteUser(const Transaction *transaction) {
         size_t pos;
         std::string base64;
         std::string header;
