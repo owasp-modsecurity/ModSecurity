@@ -86,7 +86,7 @@ void InMemoryPerProcess::del(const std::string& key) {
 
 
 void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
-    VariableValues *l) {
+    VariableValues *l) const noexcept {
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -96,7 +96,7 @@ void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
 
 
 void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
-    VariableValues *l, variables::KeyExclusions &ke) {
+    VariableValues *l, const variables::KeyExclusions &ke) const noexcept {
     size_t keySize = var.size();
     l->reserve(15);
 
@@ -121,7 +121,7 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
 
 
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
-    VariableValues *l, variables::KeyExclusions &ke) {
+    VariableValues *l, const variables::KeyExclusions &ke) const noexcept {
 
     //if (var.find(":") == std::string::npos) {
     //    return;
@@ -160,7 +160,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
 
 
 std::unique_ptr<std::string> InMemoryPerProcess::resolveFirst(
-    const std::string& var) {
+    const std::string& var) const noexcept {
     auto range = equal_range(var);
     for (auto it = range.first; it != range.second; ++it) {
         return std::unique_ptr<std::string>(new std::string(it->second));

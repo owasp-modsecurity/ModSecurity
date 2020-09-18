@@ -39,8 +39,8 @@ class User_DictElement : public Variable {
         : Variable("USER:" + dictElement),
         m_dictElement("USER:" + dictElement) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_user_collection->resolveMultiMatches(
             *getVariableKey(), t->m_collections.m_user_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -55,8 +55,8 @@ class User_NoDictElement : public Variable {
     User_NoDictElement()
         : Variable("USER") { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_user_collection->resolveMultiMatches(*getVariableKey(),
             t->m_collections.m_user_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -70,8 +70,8 @@ class User_DictElementRegexp : public VariableRegex {
         : VariableRegex("USER", dictElement),
         m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_user_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_user_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -90,8 +90,8 @@ class User_DynamicElement : public VariableWithRunTimeString {
         )
     { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_user_collection->resolveMultiMatches(
             string,

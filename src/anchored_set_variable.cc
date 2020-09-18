@@ -71,7 +71,7 @@ void AnchoredSetVariable::set(const std::string &key,
 
 
 void AnchoredSetVariable::resolve(
-    VariableValues *l) {
+    VariableValues *l) const noexcept {
     for (const auto& x : *this) {
         l->insert(l->begin(), x.second);
     }
@@ -80,7 +80,7 @@ void AnchoredSetVariable::resolve(
 
 void AnchoredSetVariable::resolve(
     VariableValues *l,
-    variables::KeyExclusions &ke) {
+    const variables::KeyExclusions &ke) const noexcept {
     for (const auto& x : *this) {
         if (!ke.toOmit(x.first)) {
             l->insert(l->begin(), x.second);
@@ -93,7 +93,7 @@ void AnchoredSetVariable::resolve(
 
 
 void AnchoredSetVariable::resolve(const std::string &key,
-    VariableValues *l) {
+    VariableValues *l) const noexcept {
     auto range = this->equal_range(key);
     for (auto it = range.first; it != range.second; ++it) {
         l->push_back(it->second);
@@ -102,7 +102,7 @@ void AnchoredSetVariable::resolve(const std::string &key,
 
 
 std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
-    const std::string &key) {
+    const std::string &key) const noexcept {
     auto range = equal_range(key);
     for (auto it = range.first; it != range.second; ++it) {
         std::unique_ptr<std::string> b(new std::string());
@@ -113,8 +113,8 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
 }
 
 
-void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
-    VariableValues *l) {
+void AnchoredSetVariable::resolveRegularExpression(const Utils::Regex *r,
+    VariableValues *l) const noexcept {
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
@@ -125,9 +125,9 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
 }
 
 
-void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
+void AnchoredSetVariable::resolveRegularExpression(const Utils::Regex *r,
     VariableValues *l,
-    variables::KeyExclusions &ke) {
+    const variables::KeyExclusions &ke) const noexcept {
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
