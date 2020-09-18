@@ -26,8 +26,8 @@
 namespace modsecurity {
 namespace variables {
 
-void HighestSeverity::evaluate(Transaction *transaction,
-    VariableValues *l) {
+void HighestSeverity::evaluate(const Transaction *transaction,
+    VariableValues *l) const noexcept {
     l->push_back(std::make_shared<VariableValue>(
         std::unique_ptr<std::string>(new std::string(std::to_string(transaction->m_highestSeverityAction))),
         getVariableKeyWithCollection().get()));

@@ -118,7 +118,7 @@ void AnchoredVariable::append(const std::string &a, size_t offset,
 }
 
 
-void AnchoredVariable::evaluate(VariableValues *l) {
+void AnchoredVariable::evaluate(VariableValues *l) const noexcept {
     if (m_name.empty()) {
         return;
     }
@@ -128,12 +128,12 @@ void AnchoredVariable::evaluate(VariableValues *l) {
 }
 
 
-std::string * AnchoredVariable::evaluate() {
+const std::string *AnchoredVariable::evaluate() const noexcept {
     return &m_value;
 }
 
 
-std::unique_ptr<std::string> AnchoredVariable::resolveFirst() {
+std::unique_ptr<std::string> AnchoredVariable::resolveFirst() const noexcept {
     if (m_value.empty()) {
         return nullptr;
     }
