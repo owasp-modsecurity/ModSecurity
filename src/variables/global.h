@@ -39,8 +39,8 @@ class Global_DictElement : public Variable {
         : Variable("GLOBAL:" + dictElement),
         m_dictElement("GLOBAL:" + dictElement) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_global_collection->resolveMultiMatches(
             *getVariableKey(), t->m_collections.m_global_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -55,8 +55,8 @@ class Global_NoDictElement : public Variable {
     Global_NoDictElement()
         : Variable("GLOBAL") { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_global_collection->resolveMultiMatches("",
             t->m_collections.m_global_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -70,8 +70,8 @@ class Global_DictElementRegexp : public VariableRegex {
         : VariableRegex("GLOBAL", dictElement),
         m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_global_collection->resolveRegularExpression(
             m_dictElement,
             t->m_collections.m_global_collection_key,
@@ -91,8 +91,8 @@ class Global_DynamicElement : public VariableWithRunTimeString {
         )
     { };
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_global_collection->resolveMultiMatches(
             string,

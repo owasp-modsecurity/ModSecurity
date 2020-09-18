@@ -34,8 +34,8 @@ class Duration : public Variable {
         : Variable(_name),
         m_retName("DURATION") { }
 
-    void evaluate(Transaction *transaction,
-        VariableValues *l) override;
+    void evaluate(const Transaction *transaction,
+        VariableValues *l) const noexcept override;
     std::string m_retName;
 };
 

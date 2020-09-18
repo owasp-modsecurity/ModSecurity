@@ -29,10 +29,10 @@ namespace variables {
 
 
 Variable::Variable(const std::string &name)
-    : m_keyWithCollection(new std::string("")),
-    m_keyExclusion(),
-    m_collectionName(new std::string("")),
-    m_key(new std::string("")) {
+    : m_keyExclusion(),
+    m_keyWithCollection(new std::string("")),
+    m_key(new std::string("")),
+    m_collectionName(new std::string("")) {
     size_t a = name.find(":");
     if (a == std::string::npos) {
         a = name.find(".");
