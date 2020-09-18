@@ -84,16 +84,16 @@ class InMemoryPerProcess :
 
     void del(const std::string& key) override;
 
-    std::unique_ptr<std::string> resolveFirst(const std::string& var) override;
+    std::unique_ptr<std::string> resolveFirst(const std::string& var) const noexcept override;
 
     void resolveSingleMatch(const std::string& var,
-        VariableValues *l) override;
+        VariableValues *l) const noexcept override;
     void resolveMultiMatches(const std::string& var,
         VariableValues *l,
-        variables::KeyExclusions &ke) override;
+        const variables::KeyExclusions &ke) const noexcept override;
     void resolveRegularExpression(const std::string& var,
         VariableValues *l,
-        variables::KeyExclusions &ke) override;
+        const variables::KeyExclusions &ke) const noexcept override;
 
  private:
     pthread_mutex_t m_lock;

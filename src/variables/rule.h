@@ -54,7 +54,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         return new Rule_DictElement(*this);
     };
 
-    static void id(Transaction *t,
+    static void id(const Transaction *t,
         const RuleWithActions *rule,
         VariableValues *l) {
         auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_id, std::unique_ptr<std::string>(new std::string(std::to_string(rule->getId()))));
@@ -67,7 +67,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
 
 
 
-    static void rev(Transaction *t,
+    static void rev(const Transaction *t,
         const RuleWithActions *rule,
         VariableValues *l) {
 
@@ -83,7 +83,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
     }
 
 
-    static void severity(Transaction *t,
+    static void severity(const Transaction *t,
         const RuleWithActions *rule,
         VariableValues *l) {
 
@@ -98,7 +98,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
 
     }
 
-    static void logData(Transaction *t,
+    static void logData(const Transaction *t,
         const RuleWithActions *rule,
         VariableValues *l) {
 
@@ -112,7 +112,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         }
     }
 
-    static void msg(Transaction *t,
+    static void msg(const Transaction *t,
         const RuleWithActions *rule,
         VariableValues *l) {
 
@@ -126,8 +126,8 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         }
     }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
 
         if (m_dictElement == "id") {
             id(t, getRule(), l);
@@ -174,8 +174,8 @@ class Rule_DictElementRegexp : public RuleVariable, public VariableRegex {
     { };
 
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
 
         if (Utils::regex_search("id", m_r) > 0) {
             Rule_DictElement::id(t, getRule(), l);
@@ -219,8 +219,8 @@ class Rule_NoDictElement : public RuleVariable, public Variable  {
     { };
 
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         Rule_DictElement::id(t, getRule(), l);
         Rule_DictElement::rev(t, getRule(), l);
         Rule_DictElement::severity(t, getRule(), l);

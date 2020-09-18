@@ -39,8 +39,8 @@ class Resource_DictElement : public Variable {
         : Variable("RESOURCE:" + dictElement),
         m_dictElement("RESOURCE:" + dictElement) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_resource_collection->resolveMultiMatches(
             *getVariableKey(), t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -55,8 +55,8 @@ class Resource_NoDictElement : public Variable {
     Resource_NoDictElement()
         : Variable("RESOURCE") { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_resource_collection->resolveMultiMatches(*getVariableKey(),
             t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -70,8 +70,8 @@ class Resource_DictElementRegexp : public VariableRegex {
         : VariableRegex("RESOURCE", dictElement),
         m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_resource_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_resource_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -90,8 +90,8 @@ class Resource_DynamicElement : public VariableWithRunTimeString {
         )
     { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_resource_collection->resolveMultiMatches(
             string,
