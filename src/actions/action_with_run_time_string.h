@@ -49,7 +49,7 @@ class ActionWithRunTimeString : public virtual Action {
         }
     }
 
-    std::string getEvaluatedRunTimeString(Transaction *transaction) const noexcept {
+    std::string getEvaluatedRunTimeString(const Transaction *transaction) const noexcept {
         return (m_string == nullptr)?"":m_string->evaluate(transaction);
     }
 

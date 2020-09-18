@@ -33,7 +33,7 @@ class Env : public Variable {
     explicit Env(const std::string &name)
         : Variable(name) { }
 
-    void evaluate(Transaction *transaction, VariableValues *l) override;
+    void evaluate(const Transaction *transaction, VariableValues *l) const noexcept override;
 };
 
 }  // namespace variables
