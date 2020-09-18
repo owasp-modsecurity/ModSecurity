@@ -23,6 +23,7 @@
 #define SRC_VARIABLES_REMOTE_USER_H_
 
 #include "src/variables/variable.h"
+#include "src/utils/base64.h"
 
 namespace modsecurity {
 
@@ -38,6 +39,38 @@ class RemoteUser : public Variable {
 
     void evaluate(Transaction *transaction,
         VariableValues *l) override;
+
+    static std::pair<std::string, VariableOrigin> parserRemoteUser(Transaction *transaction) {
+        size_t pos;
+        std::string base64;
+        std::string header;
+
+        VariableValues l2;
+        transaction->m_variableRequestHeaders.resolve("authorization", &l2);
+
+        if (l2.size() < 1) {
+            goto err;
+        }
+
+        header = std::string(l2.at(0)->getValue());
+
+        if (header.compare(0, 6, "Basic ") == 0) {
+            base64 = std::string(header, 6, header.length());
+        }
+
+        base64 = Utils::Base64::decode(base64);
+
+        pos = base64.find(":");
+        if (pos == std::string::npos) {
+            goto err;
+        }
+
+        return std::make_pair(std::string(base64, 0, pos), l2[0]->getOrigin()[0]);
+err:
+        return std::make_pair(std::string(""), VariableOrigin());
+
+    }
+
     std::string m_retName;
 };
 
