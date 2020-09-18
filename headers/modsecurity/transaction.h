@@ -625,8 +625,6 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 
     int m_secRuleEngine;
 
-    std::string m_variableRemoteUser;
-
  private:
     /**
      * Pointer to the callback function that will be called to fill

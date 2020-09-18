@@ -187,7 +187,6 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     m_json(NULL),
 #endif
     m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
-    m_variableRemoteUser(""),
     m_logCbData(logCbData),
     TransactionAnchoredVariables(this),
     TransactionRuleMessageManagement(this) {
@@ -253,7 +252,6 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_json(NULL),
 #endif
     m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
-    m_variableRemoteUser(""),
     m_logCbData(logCbData),
     TransactionAnchoredVariables(this),
     TransactionRuleMessageManagement(this) {
@@ -1467,14 +1465,8 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
        m_variableRequestHeaders.resolveFirst("Host").get())
         << " ";
     ss << utils::string::dash_if_empty(this->m_clientIpAddress->c_str()) << " ";
-    /** TODO: Check variable */
-    variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
-    VariableValues l;
-    r->evaluate(this, &l);
-    delete r;
 
-    ss << utils::string::dash_if_empty(
-        m_variableRemoteUser.c_str());
+    ss << utils::string::dash_if_empty(variables::RemoteUser::parserRemoteUser(this).first.c_str());
     ss << " ";
     /** TODO: Check variable */
     //ss << utils::string::dash_if_empty(
