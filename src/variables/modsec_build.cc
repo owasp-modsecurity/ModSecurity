@@ -24,8 +24,8 @@
 namespace modsecurity {
 namespace variables {
 
-void ModsecBuild::evaluate(Transaction *transaction,
-    VariableValues *l) {
+void ModsecBuild::evaluate(const Transaction *transaction,
+    VariableValues *l) const noexcept {
 
     l->push_back(std::make_shared<VariableValue>(&m_retName, &m_build));
 }

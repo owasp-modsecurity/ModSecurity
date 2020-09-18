@@ -49,12 +49,12 @@ namespace modsecurity {
 namespace variables {
 
 #ifndef WITH_LIBXML2
-void XML_WithNSPath::evaluate(Transaction *t,
-    VariableValues *l) { }
+void XML_WithNSPath::evaluate(const Transaction *t,
+    VariableValues *l) const noexcept { }
 #else
 
-void XML_WithNSPath::evaluate(Transaction *t,
-    VariableValues *l) {
+void XML_WithNSPath::evaluate(const Transaction *t,
+    VariableValues *l) const noexcept {
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
     xmlNodeSetPtr nodes;

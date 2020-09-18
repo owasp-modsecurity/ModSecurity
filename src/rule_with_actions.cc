@@ -395,8 +395,8 @@ bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) const
 }
 
 
-std::string RuleWithActions::getLogData(Transaction *t) const { return m_logData->getEvaluatedRunTimeString(t); }
-std::string RuleWithActions::getMessage(Transaction *t) const { return m_msg->getEvaluatedRunTimeString(t); }
+std::string RuleWithActions::getLogData(const Transaction *t) const { return m_logData->getEvaluatedRunTimeString(t); }
+std::string RuleWithActions::getMessage(const Transaction *t) const { return m_msg->getEvaluatedRunTimeString(t); }
 
 
 }  // namespace modsecurity

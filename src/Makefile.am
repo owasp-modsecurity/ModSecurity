@@ -312,6 +312,7 @@ libmodsecurity_la_CPPFLAGS = \
 	-fPIC \
 	-O3 \
 	-I../headers \
+	$(CURL_CFLAGS) \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \

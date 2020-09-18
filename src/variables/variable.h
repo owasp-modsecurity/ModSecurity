@@ -47,8 +47,8 @@ class n ## _DictElementRegexp : public VariableRegex { \
     explicit n ## _DictElementRegexp(const std::string &regex) \
         : VariableRegex(#N, regex) { } \
 \
-    void evaluate(Transaction *transaction, \
-        VariableValues *l) override { \
+    void evaluate(const Transaction *transaction, \
+        VariableValues *l) const noexcept override { \
         transaction-> e .resolveRegularExpression(&m_r, l, \
             m_keyExclusion); \
     } \
@@ -61,8 +61,8 @@ class n ## _DictElement : public VariableDictElement { \
     explicit n ## _DictElement(const std::string &dictElement) \
         : VariableDictElement(#N, dictElement) { } \
 \
-    void evaluate(Transaction *transaction, \
-        VariableValues *l) override { \
+    void evaluate(const Transaction *transaction, \
+        VariableValues *l) const noexcept override { \
         transaction-> e .resolve(m_dictElement, l); \
     } \
 };
@@ -74,8 +74,8 @@ class n ## _NoDictElement : public Variable { \
     explicit n ## _NoDictElement() \
         : Variable(#N) { } \
 \
-    void evaluate(Transaction *transaction, \
-        VariableValues *l) override { \
+    void evaluate(const Transaction *transaction, \
+        VariableValues *l) const noexcept override { \
         transaction-> e .resolve(l, m_keyExclusion); \
     } \
 };
@@ -87,8 +87,8 @@ class n : public Variable { \
     n() \
         : Variable(#N) { } \
     \
-    void evaluate(Transaction *transaction, \
-        VariableValues *l) override { \
+    void evaluate(const Transaction *transaction, \
+        VariableValues *l) const noexcept override { \
         transaction-> e .evaluate(l); \
     } \
 };
@@ -104,8 +104,8 @@ namespace variables {
 class KeyExclusion {
  public:
     KeyExclusion() { }
-    virtual bool match(const std::string &a) = 0;
-    virtual bool match(const bpstd::string_view &a) = 0;
+    virtual bool match(const std::string &a) const = 0;
+    virtual bool match(const bpstd::string_view &a) const = 0;
     virtual ~KeyExclusion() { }
 };
 
@@ -120,10 +120,10 @@ class KeyExclusionRegex : public KeyExclusion {
 
     ~KeyExclusionRegex() override { }
 
-    bool match(const std::string &a) override {
+    bool match(const std::string &a) const override {
         return m_re.searchAll(a).size() > 0;
     }
-    bool match(const bpstd::string_view &a) override {
+    bool match(const bpstd::string_view &a) const override {
         // FIXME: string_view will be a good thing in searchAll.
         return m_re.searchAll(std::string(a)).size() > 0;
     }
@@ -139,14 +139,14 @@ class KeyExclusionString : public KeyExclusion {
 
     ~KeyExclusionString() override { }
 
-    bool match(const std::string &a) override {
+    bool match(const std::string &a) const override {
         return a.size() == m_key.size() && std::equal(a.begin(), a.end(),
             m_key.begin(),
             [](char aa, char bb) {
                 return static_cast<char>(toupper(aa)) == static_cast<char>(bb);
             });
     }
-    bool match(const bpstd::string_view &a) override {
+    bool match(const bpstd::string_view &a) const override {
         return a.size() == m_key.size() && std::equal(a.begin(), a.end(),
             m_key.begin(),
             [](char aa, char bb) {
@@ -174,7 +174,7 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
         //}
     };
 
-    bool toOmit(const std::string &a) {
+    bool toOmit(const std::string &a) const {
         for (auto &z : *this) {
             if (z->match(a)) {
                 return true;
@@ -183,7 +183,7 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
         return false;
     }
 
-    bool toOmit(const bpstd::string_view &a) {
+    bool toOmit(const bpstd::string_view &a) const {
         for (auto &z : *this) {
             if (z->match(a)) {
                 return true;
@@ -206,7 +206,7 @@ class VariableMonkeyResolution {
         });
     }
 
-    static void stringMatchResolveMulti(Transaction *t,
+    static void stringMatchResolveMulti(const Transaction *t,
         const std::string &variable,
         VariableValues *l) {
         size_t collection = variable.find(".");
@@ -369,7 +369,7 @@ class VariableMonkeyResolution {
         }
     }
 
-    static std::string stringMatchResolve(Transaction *t,
+    static std::string stringMatchResolve(const Transaction *t,
         const std::string &variable) {
         std::unique_ptr<std::string> vv = nullptr;
         size_t collection = variable.find(".");
@@ -597,8 +597,8 @@ class Variable : public VariableMonkeyResolution {
     { };
 
 
-    virtual void evaluate(Transaction *t,
-        VariableValues *l) = 0;
+    virtual void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept = 0;
 
 
     bool inline belongsToCollection(Variable *var) const noexcept {
@@ -748,8 +748,8 @@ class VariableModificatorExclusion : public Variable {
         : Variable(var.get()),
         m_base(std::move(var)) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         m_base->evaluate(t, l);
     }
 
@@ -765,8 +765,8 @@ class VariableModificatorCount : public Variable {
             m_base.reset(var.release());
         }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
 
         VariableValues reslIn;
         m_base->evaluate(t, &reslIn);

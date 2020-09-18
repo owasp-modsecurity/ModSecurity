@@ -33,8 +33,8 @@
 namespace modsecurity {
 namespace variables {
 
-void Time::evaluate(Transaction *transaction,
-    VariableValues *l) {
+void Time::evaluate(const Transaction *transaction,
+    VariableValues *l) const noexcept {
 
     char tstr[200];
     struct tm timeinfo;
