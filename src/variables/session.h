@@ -38,8 +38,8 @@ class Session_DictElement : public Variable {
         : Variable("SESSION:" + dictElement),
         m_dictElement("SESSION:" + dictElement) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_session_collection->resolveMultiMatches(
             *getVariableKey(), t->m_collections.m_session_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -54,8 +54,8 @@ class Session_NoDictElement : public Variable {
     Session_NoDictElement()
         : Variable("SESSION") { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_session_collection->resolveMultiMatches("",
             t->m_collections.m_session_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -69,8 +69,8 @@ class Session_DictElementRegexp : public VariableRegex {
         : VariableRegex("SESSION", dictElement),
         m_dictElement(dictElement) { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         t->m_collections.m_session_collection->resolveRegularExpression(
             m_dictElement, t->m_collections.m_session_collection_key,
             t->m_rules->m_secWebAppId.m_value, l, m_keyExclusion);
@@ -89,8 +89,8 @@ class Session_DynamicElement : public VariableWithRunTimeString {
         )
     { }
 
-    void evaluate(Transaction *t,
-        VariableValues *l) override {
+    void evaluate(const Transaction *t,
+        VariableValues *l) const noexcept override {
         std::string string = m_string->evaluate(t);
         t->m_collections.m_session_collection->resolveMultiMatches(
             string,
