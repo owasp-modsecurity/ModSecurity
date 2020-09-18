@@ -34,8 +34,8 @@ class HighestSeverity : public Variable {
         : Variable(_name)
     { }
 
-    void evaluate(Transaction *transaction,
-        VariableValues *l) override;
+    void evaluate(const Transaction *transaction,
+        VariableValues *l) const noexcept override;
 };
 
 

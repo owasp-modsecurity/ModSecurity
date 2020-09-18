@@ -57,16 +57,16 @@ class Collection {
     virtual void del(const std::string& key) = 0;
 
     virtual std::unique_ptr<std::string> resolveFirst(
-        const std::string& var) = 0;
+        const std::string& var) const = 0;
 
     virtual void resolveSingleMatch(const std::string& var,
-        VariableValues *l) = 0;
+        VariableValues *l) const noexcept = 0;
     virtual void resolveMultiMatches(const std::string& var,
         VariableValues *l,
-        variables::KeyExclusions &ke) = 0;
+        const variables::KeyExclusions &ke) const noexcept = 0;
     virtual void resolveRegularExpression(const std::string& var,
         VariableValues *l,
-        variables::KeyExclusions &ke) = 0;
+        const variables::KeyExclusions &ke) const noexcept = 0;
 
 
     /* store */
@@ -131,14 +131,14 @@ class Collection {
 
     /* resolveFirst */
     virtual std::unique_ptr<std::string> resolveFirst(const std::string& var,
-        std::string compartment) {
+        const std::string &compartment) const noexcept {
         std::string nkey = compartment + "::" + var;
         return resolveFirst(nkey);
     }
 
 
     virtual std::unique_ptr<std::string> resolveFirst(const std::string& var,
-        std::string compartment, std::string compartment2) {
+        const std::string &compartment, const std::string &compartment2) const noexcept {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         return resolveFirst(nkey);
     }
@@ -146,15 +146,15 @@ class Collection {
 
     /* resolveSingleMatch */
     virtual void resolveSingleMatch(const std::string& var,
-        std::string compartment, VariableValues *l) {
+        const std::string &compartment, VariableValues *l) const noexcept {
         std::string nkey = compartment + "::" + var;
         resolveSingleMatch(nkey, l);
     }
 
 
     virtual void resolveSingleMatch(const std::string& var,
-        std::string compartment, std::string compartment2,
-        VariableValues *l) {
+        const std::string &compartment, const std::string &compartment2,
+        VariableValues *l) const noexcept {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveSingleMatch(nkey, l);
     }
@@ -162,17 +162,17 @@ class Collection {
 
     /* resolveMultiMatches */
     virtual void resolveMultiMatches(const std::string& var,
-        std::string compartment, VariableValues *l,
-        variables::KeyExclusions &ke) {
+        const std::string &compartment, VariableValues *l,
+        const variables::KeyExclusions &ke) const noexcept {
         std::string nkey = compartment + "::" + var;
         resolveMultiMatches(nkey, l, ke);
     }
 
 
     virtual void resolveMultiMatches(const std::string& var,
-        std::string compartment, std::string compartment2,
+        const std::string &compartment, const std::string &compartment2,
         VariableValues *l,
-        variables::KeyExclusions &ke) {
+        const variables::KeyExclusions &ke) const noexcept {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveMultiMatches(nkey, l, ke);
     }
@@ -180,16 +180,16 @@ class Collection {
 
     /* resolveRegularExpression */
     virtual void resolveRegularExpression(const std::string& var,
-        std::string compartment, VariableValues *l,
-        variables::KeyExclusions &ke) {
+        const std::string &compartment, VariableValues *l,
+        const variables::KeyExclusions &ke) const noexcept {
         std::string nkey = compartment + "::" + var;
         resolveRegularExpression(nkey, l, ke);
     }
 
 
     virtual void resolveRegularExpression(const std::string& var,
-        std::string compartment, std::string compartment2,
-        VariableValues *l, variables::KeyExclusions &ke) {
+        const std::string &compartment, const std::string &compartment2,
+        VariableValues *l, const variables::KeyExclusions &ke) const noexcept {
         std::string nkey = compartment + "::" + compartment2 + "::" + var;
         resolveRegularExpression(nkey, l, ke);
     }

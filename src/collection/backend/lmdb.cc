@@ -48,13 +48,13 @@ LMDB::~LMDB() {
 }
 
 
-void LMDB::string2val(const std::string& str, MDB_val *val) {
+void LMDB::string2val(const std::string& str, MDB_val *val) const {
     val->mv_size = sizeof(char)*(str.size());
     val->mv_data = const_cast<char *>(str.c_str());
 }
 
 
-void LMDB::lmdb_debug(int rc, std::string op, std::string scope) {
+void LMDB::lmdb_debug(int rc, std::string op, std::string scope) const {
 #ifndef LMDB_STDOUT_COUT
     return;
 #else
@@ -162,7 +162,7 @@ void LMDB::lmdb_debug(int rc, std::string op, std::string scope) {
 }
 
 
-std::unique_ptr<std::string> LMDB::resolveFirst(const std::string& var) {
+std::unique_ptr<std::string> LMDB::resolveFirst(const std::string& var) const noexcept {
     int rc;
     MDB_val mdb_key;
     MDB_val mdb_value;
@@ -262,7 +262,7 @@ end_txn:
 
 
 void LMDB::resolveSingleMatch(const std::string& var,
-    VariableValues *l) {
+    VariableValues *l) const noexcept {
     int rc;
     MDB_txn *txn;
     MDB_dbi dbi;
@@ -287,10 +287,11 @@ void LMDB::resolveSingleMatch(const std::string& var,
     mdb_cursor_open(txn, dbi, &cursor);
     while ((rc = mdb_cursor_get(cursor, &mdb_key,
             &mdb_value_ret, MDB_NEXT_DUP)) == 0) {
-        std::string a(
-            reinterpret_cast<char *>(mdb_value_ret.mv_data),
-            mdb_value_ret.mv_size);
-        l->emplace_back(&var, &a);
+        l->insert(l->begin(), std::make_shared<VariableValue>(
+            &m_name,
+            new std::string(var),
+            new std::string(reinterpret_cast<char *>(mdb_value_ret.mv_data),
+            mdb_value_ret.mv_size)));
     }
 
     mdb_cursor_close(cursor);
@@ -466,7 +467,7 @@ end_txn:
 
 void LMDB::resolveMultiMatches(const std::string& var,
     VariableValues *l,
-    variables::KeyExclusions &ke) {
+    const variables::KeyExclusions &ke) const noexcept {
     MDB_val key, data;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
@@ -528,7 +529,7 @@ end_txn:
 
 void LMDB::resolveRegularExpression(const std::string& var,
     VariableValues *l,
-    variables::KeyExclusions &ke) {
+    const variables::KeyExclusions &ke) const noexcept {
     MDB_val key, data;
     MDB_txn *txn = NULL;
     MDB_dbi dbi;
@@ -567,12 +568,16 @@ void LMDB::resolveRegularExpression(const std::string& var,
             continue;
         }
 
-        VariableValue *v = new VariableValue(
+        l->insert(l->begin(), std::make_shared<VariableValue>(
+            &m_name,
             new std::string(reinterpret_cast<char *>(key.mv_data),
-                key.mv_size),
+            key.mv_size),
             new std::string(reinterpret_cast<char *>(data.mv_data),
-                data.mv_size));
-        l->insert(l->begin(), v);
+            data.mv_size)));
+        //l->insert(l->begin(), std::make_shared<VariableValue>(&m_name,
+        //    new std::string(reinterpret_cast<char *>(key.mv_data), key.mv_size),
+        //    new std::string(reinterpret_cast<char *>(data.mv_data), data.mv_size))
+        //);
     }
 
     mdb_cursor_close(cursor);
