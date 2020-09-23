@@ -27,12 +27,13 @@
   },
   "expected": {
     "debug_log": "Rule returned 1",
-    "error_log": "Matched \"Operator `Rx' with parameter `\\^attack\\$'"
+    "error_log": "Matched \"Operator `Rx' with parameter `\\^attack\\$'",
+    "http_code": 403
   },
   "rules": [
     "SecRuleEngine On",
     "SecAction \"id:1, setvar:tx.bad_value=attack\"",
-    "SecRule ARGS:param \"@rx ^%{tx.bad_value}$\" \"id:2,log\""
+    "SecRule ARGS:param \"@rx ^%{tx.bad_value}$\" \"id:2,log,deny\""
   ]
 }
 ]

@@ -47,7 +47,7 @@ using actions::Action;
 class RuleScript : public RuleWithActions {
  public:
     RuleScript(const std::string &name,
-        std::vector<Action *> *actions,
+        Actions *actions,
         Transformations *t,
         std::unique_ptr<std::string> fileName,
         int lineNumber)

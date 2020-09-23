@@ -58,7 +58,7 @@ bool Rx::evaluate(Transaction *transaction,
     std::vector<Utils::SMatchCapture> captures;
     // FIXME: searchOneMatch should accept string_view.
     re->searchOneMatch(input.c_str(), captures);
-    if (rule && rule->hasCaptureAction() && transaction) {
+    if (rule && rule->hasCapture() && transaction) {
         for (const Utils::SMatchCapture& capture : captures) {
             const std::string capture_substring(input.substr(capture.m_offset,capture.m_length));
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst(

@@ -75,7 +75,7 @@ class RunTimeString {
     }
 
 
-    void populate(RuleWithActions *rule) noexcept {
+    void populate(const RuleWithActions *rule) noexcept {
         for (auto &a : m_elements) {
             a->populate(rule);
         }
@@ -108,7 +108,6 @@ class RunTimeString {
                     rv = dynamic_cast<RuleVariable *>(nrv);
                     rv->populate(nullptr);
                     m_variable = std::unique_ptr<Variable>(nrv);
-                    /* m_variable = nullptr; */
                 } else {
                     m_variable = other.m_variable;
                 }
@@ -119,7 +118,9 @@ class RunTimeString {
         void appendValueTo(const Transaction *transaction, std::string &v) const noexcept {
             if (m_variable && transaction) {
                 VariableValues l;
+
                 m_variable->evaluate(transaction, &l);
+
                 if (!l.empty()) {
                     v.append(l[0]->getValue());
                 }
@@ -130,19 +131,20 @@ class RunTimeString {
         }
     
 
-        void populate(RuleWithActions *rule) noexcept {
+        void populate(const RuleWithActions *rule) noexcept {
             if (!m_variable) {
                 return;
             }
 
             RuleVariable *vrule = dynamic_cast<RuleVariable *>(m_variable.get());
-            if (vrule != nullptr) {
-                vrule->populate(rule);
+            if (!vrule) {
+                return;
             }
+            vrule->populate(rule);
         }
 
      private:
-        std::string m_string;
+        const std::string m_string;
         /*
          *
          * FIXME: In the current state m_variable should be a unique_ptr. There
