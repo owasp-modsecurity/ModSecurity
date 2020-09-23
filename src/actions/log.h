@@ -37,7 +37,7 @@ class Log : public ActionTypeRuleMetaData,
     { }
 
     void configure(RuleWithActions *rule) override {
-        rule->setHasLogAction(true);
+        rule->setLog(true);
     }
 
 };

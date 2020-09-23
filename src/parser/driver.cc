@@ -109,59 +109,62 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
                     );
                     firstRule->setLogDataAction(nullptr);
                 }
-                if (firstRule->hasSeverityAction()) {
+                if (firstRule->hasSeverity()) {
                     firstRule->getChainedParent()->setSeverity(
                         firstRule->getSeverity()
                     );
                 }
-                if (firstRule->hasRevisionAction()) {
+                if (firstRule->hasRevision()) {
                     firstRule->getChainedParent()->setRevision(
                         firstRule->getRevision()
                     );
                 }
-                if (firstRule->hasVersionAction()) {
+                if (firstRule->hasVersion()) {
                     firstRule->getChainedParent()->setVersion(
                         firstRule->getVersion()
                     );
                 }
-                if (firstRule->hasAccuracyAction()) {
+                if (firstRule->hasAccuracy()) {
                     firstRule->getChainedParent()->setAccuracy(
                         firstRule->getAccuracy()
                     );
                 }
-                if (firstRule->hasMaturityAction()) {
+                if (firstRule->hasMaturity()) {
                     firstRule->getChainedParent()->setMaturity(
                         firstRule->getMaturity()
                     );
                 }
 
-                if (firstRule->hasTagAction()) {
+                if (firstRule->hasTags()) {
                     firstRule->getChainedParent()->setTags(
-                        firstRule->getTagsAction()
+                        firstRule->getTags()
                     );
-                    firstRule->cleanTags();
+                    firstRule->clearTags();
                 }
 
+                /* disruptive can only be set on the first rule
                 if (firstRule->hasDisruptiveAction()) {
                     firstRule->getChainedParent()->setDisruptiveAction(
                         firstRule->getDisruptiveAction()
                     );
                     firstRule->setDisruptiveAction(nullptr);
                 }
-                firstRule->getChainedParent()->setHasBlockAction(
-                    firstRule->hasBlockAction()
+                */
+
+                firstRule->getChainedParent()->setBlock(
+                    firstRule->hasBlock()
                 );
-                firstRule->getChainedParent()->setHasLogAction(
-                    firstRule->hasLogAction()
+                firstRule->getChainedParent()->setLog(
+                    firstRule->hasLog()
                 );
-                firstRule->getChainedParent()->setHasLogAction(
-                    firstRule->hasNoLogAction()
+                firstRule->getChainedParent()->setNoLog(
+                    firstRule->hasNoLog()
                 );
-                firstRule->getChainedParent()->setHasAuditLogAction(
-                    firstRule->hasAuditLogAction()
+                firstRule->getChainedParent()->setAuditLog(
+                    firstRule->hasAuditLog()
                 );
-                firstRule->getChainedParent()->setHasNoAuditLogAction(
-                    firstRule->hasNoAuditLogAction()
+                firstRule->getChainedParent()->setNoAuditLog(
+                    firstRule->hasNoAuditLog()
                 );
                 firstRule = firstRule->getChainedParent();
             }
