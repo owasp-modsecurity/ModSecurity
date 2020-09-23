@@ -33,46 +33,13 @@
 #include "src/actions/action_type_rule_metadata.h"
 #include "src/actions/action_with_execution.h"
 #include "src/actions/disruptive/disruptive_action.h"
+#include "src/rule_with_actions_properties.h"
 
 
 #ifdef __cplusplus
 
+
 namespace modsecurity {
-
-namespace actions {
-class Action;
-class Severity;
-class LogData;
-class Msg;
-class Rev;
-class SetVar;
-class Tag;
-class XmlNS;
-namespace transformations {
-class Transformation;
-}
-}
-
-using Transformation = actions::transformations::Transformation;
-using Transformations = std::vector<std::shared_ptr<Transformation> >;
-using TransformationsPtr = std::vector<Transformation *>;
-
-using Actions = std::vector<actions::Action *>;
-using ActionWithExecution = actions::ActionWithExecution;
-using ActionTypeRuleMetaData = actions::ActionTypeRuleMetaData;
-using ActionDisruptive = actions::disruptive::ActionDisruptive;
-
-using MatchActions = std::vector<std::shared_ptr<ActionWithExecution > >;
-using MatchActionsPtr = std::vector<ActionWithExecution *>;
-
-using Tags = std::vector<std::shared_ptr<actions::Tag> >;
-using TagsPtr = std::vector<actions::Tag *>;
-
-using SetVars = std::vector<std::shared_ptr<actions::SetVar> >;
-using SetVarsPtr = std::vector<actions::SetVar *>;
-
-using XmlNSs = std::vector<std::shared_ptr<actions::XmlNS> >;
-using XmlNSsPtr = std::vector<actions::XmlNS *>;
 
 
 class TransformationResult {
@@ -111,7 +78,10 @@ class TransformationResult {
 using TransformationsResults = std::list<TransformationResult>;
 
 
-class RuleWithActions : public Rule {
+
+
+
+class RuleWithActions : public Rule, public RuleWithActionsProperties {
  public:
     int SEVERITY_NOT_SET = 10;
     int ACCURACY_NOT_SET = 10;
@@ -126,97 +96,43 @@ class RuleWithActions : public Rule {
 
     RuleWithActions(const RuleWithActions &r)
         : Rule(r),
+        RuleWithActionsProperties(r),
+        m_accuracy(r.m_accuracy),
         m_ruleId(r.m_ruleId),
         m_chainedRuleChild(r.m_chainedRuleChild),
         m_chainedRuleParent(r.m_chainedRuleParent),
-        m_disruptiveAction(r.m_disruptiveAction),
-        m_logData(r.m_logData),
-        m_msg(r.m_msg),
-        m_actionsRuntimePos(r.m_actionsRuntimePos),
-        m_actionsSetVar(r.m_actionsSetVar),
-        m_actionsTag(r.m_actionsTag),
         m_XmlNSs(r.m_XmlNSs),
-        m_defaultActionDisruptiveAction(r.m_defaultActionDisruptiveAction),
-        m_defaultActionLogData(r.m_defaultActionLogData),
-        m_defaultActionMsg(r.m_defaultActionMsg),
-        m_defaultActionActionsRuntimePos(r.m_defaultActionActionsRuntimePos),
-        m_defaultActionActionsSetVar(r.m_defaultActionActionsSetVar),
-        m_defaultActionActionsTag(r.m_defaultActionActionsTag),
-        m_transformations(r.m_transformations),
-        m_defaultTransformations(r.m_defaultTransformations),
-        m_severity(r.m_severity),
-        m_revision(r.m_revision),
-        m_version(r.m_version),
-        m_accuracy(r.m_accuracy),
+        m_defaultActions(r.m_defaultActions),
+        m_isChained(r.m_isChained),
         m_maturity(r.m_maturity),
-        m_containsCaptureAction(r.m_containsCaptureAction),
-        m_containsLogAction(r.m_containsLogAction),
-        m_containsNoLogAction(r.m_containsNoLogAction),
-        m_containsAuditLogAction(r.m_containsAuditLogAction),
-        m_containsNoAuditLogAction(r.m_containsNoAuditLogAction),
-        m_containsMultiMatchAction(r.m_containsMultiMatchAction),
-        m_containsStaticBlockAction(r.m_containsStaticBlockAction),
-        m_defaultSeverity(r.m_defaultSeverity),
-        m_defaultRevision(r.m_defaultRevision),
-        m_defaultVersion(r.m_defaultVersion),
-        m_defaultAccuracy(r.m_defaultAccuracy),
-        m_defaultMaturity(r.m_defaultMaturity),
-        m_defaultContainsCaptureAction(r.m_defaultContainsCaptureAction),
-        m_defaultContainsLogAction(r.m_defaultContainsLogAction),
-        m_defaultContainsNoLogAction(r.m_defaultContainsNoLogAction),
-        m_defaultContainsAuditLogAction(r.m_defaultContainsAuditLogAction),
-        m_defaultContainsNoAuditLogAction(r.m_defaultContainsNoAuditLogAction),
-        m_defaultContainsMultiMatchAction(r.m_defaultContainsMultiMatchAction),
-        m_defaultContainsStaticBlockAction(r.m_defaultContainsStaticBlockAction),
-        m_isChained(r.m_isChained) {
+        m_revision(r.m_revision),
+        m_severity(r.m_severity),
+        m_version(r.m_version),
+        m_actionMsg(r.m_actionMsg),
+        m_actionLogData(r.m_actionLogData),
+        m_containsCaptureAction(r.m_containsCaptureAction)
+        {
             // TODO: Verify if it is necessary to process any other copy.
         };
 
     RuleWithActions &operator=(const RuleWithActions& r) {
         Rule::operator = (r);
+        RuleWithActionsProperties::operator= (r);
         m_ruleId = r.m_ruleId;
+        m_accuracy = r.m_accuracy;
         m_chainedRuleChild = r.m_chainedRuleChild;
         m_chainedRuleParent = r.m_chainedRuleParent;
-        m_disruptiveAction = r.m_disruptiveAction;
-        m_logData = r.m_logData;
-        m_msg = r.m_msg;
-        m_actionsRuntimePos = r.m_actionsRuntimePos;
-        m_actionsSetVar = r.m_actionsSetVar;
-        m_actionsTag = r.m_actionsTag;
         m_XmlNSs = r.m_XmlNSs;
-        m_defaultActionDisruptiveAction = r.m_defaultActionDisruptiveAction;
-        m_defaultActionLogData = r.m_defaultActionLogData;
-        m_defaultActionMsg = r.m_defaultActionMsg;
-        m_defaultActionActionsRuntimePos = r.m_defaultActionActionsRuntimePos;
-        m_defaultActionActionsSetVar = r.m_defaultActionActionsSetVar;
-        m_defaultActionActionsTag = r.m_defaultActionActionsTag;
-        m_transformations = r.m_transformations;
-        m_defaultTransformations = r.m_defaultTransformations;
-        m_severity = r.m_severity;
-        m_revision = r.m_revision;
-        m_version = r.m_version;
-        m_accuracy = r.m_accuracy;
-        m_maturity = r.m_maturity;
-        m_containsCaptureAction = r.m_containsCaptureAction;
-        m_containsLogAction = r.m_containsLogAction;
-        m_containsNoLogAction = r.m_containsNoLogAction;
-        m_containsAuditLogAction = r.m_containsAuditLogAction;
-        m_containsNoAuditLogAction = r.m_containsNoAuditLogAction;
-        m_containsMultiMatchAction = r.m_containsMultiMatchAction;
-        m_containsStaticBlockAction = r.m_containsStaticBlockAction;
-        m_defaultSeverity = r.m_defaultSeverity;
-        m_defaultRevision = r.m_defaultRevision;
-        m_defaultVersion = r.m_defaultVersion;
-        m_defaultAccuracy = r.m_defaultAccuracy;
-        m_defaultMaturity = r.m_defaultMaturity;
-        m_defaultContainsCaptureAction = r.m_defaultContainsCaptureAction;
-        m_defaultContainsLogAction = r.m_defaultContainsLogAction;
-        m_defaultContainsNoLogAction = r.m_defaultContainsNoLogAction;
-        m_defaultContainsAuditLogAction = r.m_defaultContainsAuditLogAction;
-        m_defaultContainsNoAuditLogAction = r.m_defaultContainsNoAuditLogAction;
-        m_defaultContainsMultiMatchAction = r.m_defaultContainsMultiMatchAction;
-        m_defaultContainsStaticBlockAction = r.m_defaultContainsStaticBlockAction;
+        m_defaultActions = r.m_defaultActions;
         m_isChained = r.m_isChained;
+        m_maturity = r.m_maturity;
+        m_revision = r.m_revision;
+        m_severity = r.m_severity;
+        m_version = r.m_version;
+        m_actionMsg = r.m_actionMsg;
+        m_actionLogData = r.m_actionLogData;
+        m_containsCaptureAction = r.m_containsCaptureAction;
+
         return *this;
         // TODO: Verify if it is necessary to process any other copy.
     }
@@ -255,13 +171,14 @@ class RuleWithActions : public Rule {
         const std::string &value,
         TransformationsResults &results) const;
 
-    void addAction(actions::Action *a);
-    void addTransformation(std::shared_ptr<actions::transformations::Transformation> t) {
-        m_transformations.push_back(t);
-    }
-    void addDefaultAction(std::shared_ptr<actions::Action>);
-    void addDefaultTransformation(std::shared_ptr<actions::transformations::Transformation> t) {
-        m_defaultTransformations.push_back(t);
+    void addAction(std::shared_ptr<actions::Action> a, int where = 0);
+
+    void addTransformation(std::shared_ptr<actions::transformations::Transformation> t, int where = 0) {
+        if (where == 0) {
+            m_transformations.push_back(t);
+        } else {
+            m_defaultActions.m_transformations.push_back(t);
+        }
     }
 
 
@@ -272,29 +189,12 @@ class RuleWithActions : public Rule {
 
 
     void clearDefaultActions() {
-        m_defaultSeverity = SEVERITY_NOT_SET;
-        m_defaultRevision = "";
-        m_defaultVersion = "";
-        m_defaultAccuracy = ACCURACY_NOT_SET;
-        m_defaultMaturity = MATURITY_NOT_SET;
-        m_defaultContainsCaptureAction = false;
-        m_defaultContainsLogAction = false;
-        m_defaultContainsNoLogAction = false;
-        m_defaultContainsMultiMatchAction = false;
-        m_defaultContainsStaticBlockAction = false;
-        m_defaultActionLogData = nullptr;
-        m_defaultActionMsg = nullptr;
-        m_defaultActionActionsSetVar.clear();
-        m_defaultActionActionsTag.clear();
-        m_defaultActionActionsRuntimePos.clear();
-        m_defaultActionDisruptiveAction = nullptr;
-        m_defaultActionActionsRuntimePos.clear();
-        m_defaultTransformations.clear();
+        m_defaultActions.clear();
     }
 
     Transformations getTransformation() const {
         Transformations dst;
-        for (auto &a : m_defaultTransformations) {
+        for (auto &a : m_defaultActions.m_transformations) {
             dst.push_back(a);
         }
         for (auto &a : m_transformations) {
@@ -305,7 +205,7 @@ class RuleWithActions : public Rule {
 
     TransformationsPtr getTransformationPtr() const {
         TransformationsPtr dst;
-        for (auto &a : m_defaultTransformations) {
+        for (auto &a : m_defaultActions.m_transformations) {
             dst.push_back(a.get());
         }
         for (auto &a : m_transformations) {
@@ -316,7 +216,7 @@ class RuleWithActions : public Rule {
 
     SetVars getSetVarsActions() const {
         SetVars dst;
-        for (auto &a : m_defaultActionActionsSetVar) {
+        for (auto &a : m_defaultActions.m_actionsSetVar) {
             dst.push_back(a);
         }
         for (auto &a : m_actionsSetVar) {
@@ -327,7 +227,7 @@ class RuleWithActions : public Rule {
 
     SetVarsPtr getSetVarsActionsPtr() const {
         SetVarsPtr dst;
-        for (auto &a : m_defaultActionActionsSetVar) {
+        for (auto &a : m_defaultActions.m_actionsSetVar) {
             dst.push_back(a.get());
         }
         for (auto &a : m_actionsSetVar) {
@@ -338,7 +238,7 @@ class RuleWithActions : public Rule {
 
     MatchActionsPtr getMatchActionsPtr() const {
         MatchActionsPtr dst;
-        for (auto &a : m_defaultActionActionsRuntimePos) {
+        for (auto &a : m_defaultActions.m_actionsRuntimePos) {
             dst.push_back(a.get());
         }
         for (auto &a : m_actionsRuntimePos) {
@@ -349,7 +249,7 @@ class RuleWithActions : public Rule {
 
     MatchActions getMatchActions() const {
         MatchActions dst;
-        for (auto &a : m_defaultActionActionsRuntimePos) {
+        for (auto &a : m_defaultActions.m_actionsRuntimePos) {
             dst.push_back(a);
         }
         for (auto &a : m_actionsRuntimePos) {
@@ -363,18 +263,16 @@ class RuleWithActions : public Rule {
     inline bool hasChainedParent() const { return m_chainedRuleParent != nullptr; }
     inline bool hasChainedChild() const { return m_chainedRuleChild.get() != nullptr; }
 
-    inline void setHasCaptureAction(bool b) { m_containsCaptureAction = b; }
-    inline bool hasCaptureAction() const { return m_containsCaptureAction || m_defaultContainsCaptureAction; }
 
-    inline bool hasDisruptiveAction() const { return m_disruptiveAction != nullptr || m_defaultActionDisruptiveAction != nullptr; }
-    inline void setDisruptiveAction(const std::shared_ptr<ActionDisruptive> &a) { m_disruptiveAction = a; }
-    inline std::shared_ptr<ActionDisruptive> getDisruptiveAction() const { return m_disruptiveAction; }
+    inline bool hasDisruptiveAction() const { return m_actionDisruptiveAction != nullptr || m_defaultActions.m_actionDisruptiveAction != nullptr; }
+    inline void setDisruptiveAction(const std::shared_ptr<ActionDisruptive> &a) { m_actionDisruptiveAction = a; }
+    inline std::shared_ptr<ActionDisruptive> getDisruptiveAction() const { return m_actionDisruptiveAction; }
 
-    inline bool hasBlockAction() const { return m_containsStaticBlockAction || m_defaultContainsStaticBlockAction; }
+    inline bool hasBlockAction() const { return m_containsStaticBlockAction || m_defaultActions.m_containsStaticBlockAction; }
     inline void setHasBlockAction(bool b) { m_containsStaticBlockAction = b; }
 
     inline void setHasMultimatchAction(bool b) { m_containsMultiMatchAction = b; }
-    inline bool hasMultimatchAction() const { return m_containsMultiMatchAction || m_defaultContainsMultiMatchAction; }
+    inline bool hasMultimatchAction() const { return m_containsMultiMatchAction || m_defaultActions.m_containsMultiMatchAction; }
 
     inline bool hasAuditLogAction() const { return m_containsAuditLogAction == true; }
     inline void setHasAuditLogAction(bool b) { m_containsAuditLogAction = b; }
@@ -392,7 +290,7 @@ class RuleWithActions : public Rule {
             return false;
         }
 
-        if (m_defaultContainsNoLogAction && !m_containsLogAction) {
+        if (m_defaultActions.m_containsNoLogAction && !m_containsLogAction) {
             return false;
         }
 
@@ -402,7 +300,7 @@ class RuleWithActions : public Rule {
 
     inline bool isItToBeAuditLogged() const noexcept {
         if (!isItToBeLogged() && !m_containsAuditLogAction
-            && !m_defaultContainsAuditLogAction) {
+            && !m_defaultActions.m_containsAuditLogAction) {
             return false;
         }
 
@@ -410,7 +308,7 @@ class RuleWithActions : public Rule {
             return false;
         }
 
-        if (m_defaultContainsNoLogAction && !m_containsAuditLogAction) {
+        if (m_defaultActions.m_containsAuditLogAction && !m_containsAuditLogAction) {
             return false;
         }
 
@@ -418,20 +316,20 @@ class RuleWithActions : public Rule {
     }
 
 
-    inline bool hasLogDataAction() const { return m_logData != nullptr || m_defaultActionLogData != nullptr; }
-    inline std::shared_ptr<actions::LogData> getLogDataAction() const { return m_logData; }
-    std::string getLogData(const Transaction *t) const;
-    inline void setLogDataAction(const std::shared_ptr<actions::LogData> &data) { m_logData = data; }
+    inline bool hasLogDataAction() const { return m_actionLogData != nullptr; }
+    inline std::shared_ptr<actions::LogData> getLogDataAction() const { return m_actionLogData; }
 
-    inline bool hasMessageAction() const { return m_msg != nullptr || m_defaultActionMsg != nullptr; }
-    inline std::shared_ptr<actions::Msg> getMessageAction() const { return m_msg; }
-    inline void setMessageAction(const std::shared_ptr<actions::Msg> &msg) { m_msg = msg; }
+    std::string getLogData(const Transaction *t) const;
+    inline void setLogDataAction(const std::shared_ptr<actions::LogData> &data) { m_actionLogData = data; }
+
+    inline bool hasMessageAction() const { return m_actionMsg != nullptr; }
+    inline std::shared_ptr<actions::Msg> getMessageAction() const { return m_actionMsg; }
+    inline void setMessageAction(const std::shared_ptr<actions::Msg> &msg) { m_actionMsg = msg; }
     std::string getMessage(const Transaction *t) const;
 
 
-    inline bool hasSeverityAction() const { return m_severity != SEVERITY_NOT_SET || m_defaultSeverity != SEVERITY_NOT_SET; }
-    inline int getSeverity() const { return (m_severity != SEVERITY_NOT_SET)?m_severity:m_defaultSeverity; }
-    inline void setDefaultActionSeverity(unsigned int severity) { m_defaultSeverity = severity; }
+    inline bool hasSeverityAction() const { return m_severity != SEVERITY_NOT_SET; }
+    inline int getSeverity() const { return m_severity; }
     inline void setSeverity(unsigned int severity) { m_severity = severity; }
 
     inline bool hasRevisionAction() const { return m_revision != ""; }
@@ -442,13 +340,10 @@ class RuleWithActions : public Rule {
     inline const std::string getVersion() const { return m_version; };
     inline void setVersion(const std::string &version) { m_version.assign(version); }
 
-    inline bool hasAccuracyAction() const { return m_accuracy != ACCURACY_NOT_SET || m_defaultAccuracy != ACCURACY_NOT_SET; }
-    inline const int getAccuracy() const { return m_accuracy; }
-    inline void setAccuracy(unsigned int accuracy) { m_accuracy = accuracy; }
+    inline bool hasAccuracyAction() const { return m_accuracy != ACCURACY_NOT_SET; }
 
-    inline bool hasMaturityAction() const { return m_maturity != MATURITY_NOT_SET || m_defaultMaturity != MATURITY_NOT_SET; }
+    inline bool hasMaturityAction() const { return m_maturity != MATURITY_NOT_SET; }
     inline const int getMaturity() const { return m_maturity; }
-    inline void setDefaultActionMaturity(unsigned int maturity) { m_defaultMaturity = maturity; }
     inline void setMaturity(unsigned int maturity) { m_maturity = maturity; }
 
     inline bool hasTagAction() const { return m_actionsTag.size() > 0; }
@@ -462,7 +357,7 @@ class RuleWithActions : public Rule {
     }
     Tags getTagsAction() const {
         Tags dst;
-        for (auto &a : m_defaultActionActionsTag) {
+        for (auto &a : m_defaultActions.m_actionsTag) {
             dst.push_back(a);
         }
         for (auto &a : m_actionsTag) {
@@ -473,7 +368,7 @@ class RuleWithActions : public Rule {
 
     TagsPtr getTagsActionPtr() const {
         TagsPtr dst;
-        for (auto &a : m_defaultActionActionsTag) {
+        for (auto &a : m_defaultActions.m_actionsTag) {
             dst.push_back(a.get());
         }
         for (auto &a : m_actionsTag) {
@@ -529,6 +424,24 @@ class RuleWithActions : public Rule {
         out << "RuleWithActions" << std::endl;
     }
 
+
+    /* capture */
+    inline void setHasCaptureAction(bool b) {
+        m_containsCaptureAction = b;
+    }
+    inline bool hasCaptureAction() const {
+        return m_containsCaptureAction;
+    }
+
+    /* accuracy */
+    inline const int getAccuracy() const {
+        return m_accuracy;
+    }
+    inline void setAccuracy(unsigned int accuracy) {
+        m_accuracy = accuracy;
+    }
+
+
  private:
     RuleId m_ruleId;
 
@@ -536,31 +449,17 @@ class RuleWithActions : public Rule {
     RuleWithActions *m_chainedRuleParent;
 
     /* actions */
-    std::shared_ptr<ActionDisruptive> m_disruptiveAction;
-    std::shared_ptr<actions::LogData> m_logData;
-    std::shared_ptr<actions::Msg> m_msg;
-    MatchActions m_actionsRuntimePos;
-    SetVars m_actionsSetVar;
-    Tags m_actionsTag;
     XmlNSs m_XmlNSs;
+    /**
+     * 1-9 where 9 is very strong and 1 has many false positives
+     */
+    unsigned int m_accuracy:3;
+    /**
+     * 1-9 where 9 is extensively tested and 1 is a brand new experimental rule
+     */
+    unsigned int m_maturity:3;
+    std::string m_revision;
 
-    /* actions || SecDefaultAction */
-    std::shared_ptr<ActionDisruptive> m_defaultActionDisruptiveAction;
-    std::shared_ptr<actions::LogData> m_defaultActionLogData;
-    std::shared_ptr<actions::Msg> m_defaultActionMsg;
-
-    MatchActions m_defaultActionActionsRuntimePos;
-    SetVars m_defaultActionActionsSetVar;
-    Tags m_defaultActionActionsTag;
-
-    /* actions > transformations */
-    Transformations m_transformations;
-
-    /* actions > transformations || SecDefaultAction */
-    Transformations m_defaultTransformations;
-
-
-    /* || */
     /**
      * 0 - EMERGENCY: is generated from correlation of anomaly
      *                scoring data where there is an inbound
@@ -582,41 +481,13 @@ class RuleWithActions : public Rule {
      * 7 - DEBUG
      **/
     unsigned int m_severity:3;
-
-    std::string m_revision;
     std::string m_version;
-
-    /**
-     * 1-9 where 9 is very strong and 1 has many false positives
-     */
-    unsigned int m_accuracy:3;
-    /**
-     * 1-9 where 9 is extensively tested and 1 is a brand new experimental rule
-     */
-    unsigned int m_maturity:3;
-
-
     bool m_containsCaptureAction:1;
-    bool m_containsLogAction:1;
-    bool m_containsNoLogAction:1;
-    bool m_containsAuditLogAction:1;
-    bool m_containsNoAuditLogAction:1;
-    bool m_containsMultiMatchAction:1;
-    bool m_containsStaticBlockAction:1;
+    std::shared_ptr<actions::Msg> m_actionMsg;
+    std::shared_ptr<actions::LogData> m_actionLogData;
 
-    /* || SecDefaultAction */
-    unsigned int m_defaultSeverity:3;
-    std::string m_defaultRevision;
-    std::string m_defaultVersion;
-    unsigned int m_defaultAccuracy:3;
-    unsigned int m_defaultMaturity:3;
-    bool m_defaultContainsCaptureAction:1;
-    bool m_defaultContainsLogAction:1;
-    bool m_defaultContainsNoLogAction:1;
-    bool m_defaultContainsAuditLogAction:1;
-    bool m_defaultContainsNoAuditLogAction:1;
-    bool m_defaultContainsMultiMatchAction:1;
-    bool m_defaultContainsStaticBlockAction:1;
+    /* SecDefaultAction */
+    RuleWithActionsProperties m_defaultActions;
 
     bool m_isChained:1;
 };

@@ -80,9 +80,6 @@ void TransactionRuleMessageManagement::logMatchLastRuleOnTheChain(const RuleWith
     } else if (rule->hasBlockAction() && rule->isItToBeLogged()) {
         /* Log as warning. */
         m_transaction->serverLog(rm);
-    } else if (rule->isItToBeLogged()) {
-        /* Log as warning. */
-        m_transaction->serverLog(rm);
     }
 
     messageNew();

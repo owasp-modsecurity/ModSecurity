@@ -56,7 +56,7 @@ using actions::transformations::None;
 
 RuleWithOperator::RuleWithOperator(Operator *op,
     variables::Variables *_variables,
-    std::vector<Action *> *actions,
+    Actions *actions,
     Transformations *transformations,
     std::unique_ptr<std::string> fileName,
     int lineNumber)

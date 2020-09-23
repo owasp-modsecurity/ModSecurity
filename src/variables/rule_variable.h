@@ -40,6 +40,8 @@ class RuleVariable {
 
 
     void populate(const RuleWithActions *rule) {
+        variables::Variable *rulev =
+            dynamic_cast<variables::Variable *>(this);
         m_rule = rule;
     }
 

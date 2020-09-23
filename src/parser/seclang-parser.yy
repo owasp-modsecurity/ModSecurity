@@ -1069,7 +1069,7 @@ expression:
     audit_log
     | DIRECTIVE variables op actions
       {
-        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<std::shared_ptr<actions::Action>> *a = new std::vector<std::shared_ptr<actions::Action>>();
         std::vector<std::shared_ptr<actions::transformations::Transformation> > *t = new std::vector<std::shared_ptr<actions::transformations::Transformation> >();
         for (auto &i : *$4.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
@@ -1077,7 +1077,7 @@ expression:
               std::shared_ptr<actions::transformations::Transformation> t2 = std::dynamic_pointer_cast<actions::transformations::Transformation>(std::move(at));
               t->push_back(std::move(t2));
             } else {
-              a->push_back(i.release());
+              a->push_back(std::move(i));
             }
         }
         variables::Variables *v = new variables::Variables();
@@ -1094,7 +1094,7 @@ expression:
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
-
+        // TODO: filename should be a shared_ptr.
         if (driver.addSecRule(std::move(rule)) == false) {
             YYERROR;
         }
@@ -1120,7 +1120,7 @@ expression:
       }
     | CONFIG_DIR_SEC_ACTION actions
       {
-        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<std::shared_ptr<actions::Action>> *a = new std::vector<std::shared_ptr<actions::Action>>();
         std::vector<std::shared_ptr<actions::transformations::Transformation> > *t = new std::vector<std::shared_ptr<actions::transformations::Transformation> >();
         for (auto &i : *$2.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
@@ -1128,7 +1128,7 @@ expression:
               std::shared_ptr<actions::transformations::Transformation> t2 = std::dynamic_pointer_cast<actions::transformations::Transformation>(std::move(at));
               t->push_back(std::move(t2));
             } else {
-              a->push_back(i.release());
+              a->push_back(std::move(i));
             }
         }
         std::unique_ptr<RuleUnconditional> rule(new RuleUnconditional(
@@ -1142,7 +1142,7 @@ expression:
     | DIRECTIVE_SECRULESCRIPT actions
       {
         std::string err;
-        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        std::vector<std::shared_ptr<actions::Action>> *a = new std::vector<std::shared_ptr<actions::Action>>();
         std::vector<std::shared_ptr<actions::transformations::Transformation> > *t = new std::vector<std::shared_ptr<actions::transformations::Transformation> >();
         for (auto &i : *$2.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
@@ -1150,7 +1150,7 @@ expression:
               std::shared_ptr<actions::transformations::Transformation> t2 = std::dynamic_pointer_cast<actions::transformations::Transformation>(std::move(at));
               t->push_back(std::move(t2));
             } else {
-              a->push_back(i.release());
+              a->push_back(std::move(i));
             }
         }
         std::unique_ptr<RuleScript> r(new RuleScript(
@@ -1172,25 +1172,25 @@ expression:
     | CONFIG_DIR_SEC_DEFAULT_ACTION actions
       {
         bool hasDisruptive = false;
-        std::vector<actions::Action *> *actions = new std::vector<actions::Action *>();
+        std::vector<std::shared_ptr<actions::Action>> *actions = new std::vector<std::shared_ptr<actions::Action>>();
         for (auto &i : *$2.get()) {
-            actions->push_back(i.release());
+            actions->push_back(std::move(i));
         }
-        std::vector<actions::Action *> checkedActions;
+        std::vector<std::shared_ptr<actions::Action>> checkedActions;
         int definedPhase = -1;
         int secRuleDefinedPhase = -1;
-        for (actions::Action *a : *actions) {
-            actions::Phase *phase = dynamic_cast<actions::Phase *>(a);
-            if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a) != NULL
-              && dynamic_cast<actions::Block *>(a) == NULL) {
+        for (auto &a : *actions) {
+            actions::Phase *phase = dynamic_cast<actions::Phase *>(a.get());
+            if (dynamic_cast<actions::disruptive::ActionDisruptive *>(a.get()) != NULL
+              && dynamic_cast<actions::Block *>(a.get()) == NULL) {
                 hasDisruptive = true;
             }
             if (phase != NULL) {
                 definedPhase = phase->getPhase();
                 secRuleDefinedPhase = phase->getSecRulePhase();
                 delete phase;
-            } else if (dynamic_cast<actions::ActionAllowedAsSecDefaultAction *>(a)
-              && !dynamic_cast<actions::transformations::None *>(a)) {
+            } else if (dynamic_cast<actions::ActionAllowedAsSecDefaultAction *>(a.get())
+              && !dynamic_cast<actions::transformations::None *>(a.get())) {
                 checkedActions.push_back(a);
             } else {
                 driver.error(@0, "The action '" + *a->getName() + "' is not suitable to be part of the SecDefaultActions");
@@ -1200,12 +1200,10 @@ expression:
         if (definedPhase == -1) {
             definedPhase = modsecurity::Phases::RequestHeadersPhase;
         }
-
         if (hasDisruptive == false) {
             driver.error(@0, "SecDefaultAction must specify a disruptive action.");
             YYERROR;
         }
-
         if (!driver.m_rulesSetPhases[definedPhase]->m_defaultActions.empty()) {
             std::stringstream ss;
             ss << "SecDefaultActions can only be placed once per phase and configuration context. Phase ";
@@ -1214,18 +1212,15 @@ expression:
             driver.error(@0, ss.str());
             YYERROR;
         }
-
-        for (actions::Action *a : checkedActions) {
-            if (dynamic_cast<actions::transformations::Transformation *>(a)) {
+        for (auto &a : checkedActions) {
+            if (dynamic_cast<actions::transformations::Transformation *>(a.get())) {
               driver.m_rulesSetPhases[definedPhase]->m_defaultTransformations.push_back(
-                std::shared_ptr<actions::transformations::Transformation>(
-                dynamic_cast<actions::transformations::Transformation *>(a)));
+                std::dynamic_pointer_cast<actions::transformations::Transformation>(a));
             } else {
-              driver.m_rulesSetPhases[definedPhase]->m_defaultActions.push_back(std::unique_ptr<Action>(a));
+              driver.m_rulesSetPhases[definedPhase]->m_defaultActions.push_back(a);
             }
         }
-
-        delete actions;
+        //delete actions;
       }
     | CONFIG_DIR_SEC_MARKER
       {
