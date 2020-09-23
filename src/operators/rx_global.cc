@@ -54,7 +54,7 @@ bool RxGlobal::evaluate(Transaction *transaction, const RuleWithActions *rule,
     std::vector<Utils::SMatchCapture> captures;
     re->searchGlobal(input.c_str(), captures);
 
-    if (rule && rule->hasCaptureAction() && transaction) {
+    if (rule && rule->hasCapture() && transaction) {
         for (const Utils::SMatchCapture& capture : captures) {
             const std::string capture_substring(input.substr(capture.m_offset,capture.m_length));
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst(

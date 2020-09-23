@@ -85,10 +85,12 @@
       ]
     },
     "expected":{
-      "error_log":"line \"55\""
+      "error_log":"line \"55\"",
+      "http_code": 403
     },
     "rules":[
       "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,deny\"",
       "SecRule WEBAPPID \"@contains test2\" \"id:1,phase:3,pass,t:trim\"",
       "Include test-cases/data/big-file.conf"
     ]

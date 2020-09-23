@@ -33,7 +33,7 @@ class Capture : public ActionTypeRuleMetaData {
         : Action("capture") { }
 
     void configure(RuleWithActions *rule) override {
-        rule->setHasCaptureAction(true);
+        rule->setHasCapture(true);
     }
 };
 
