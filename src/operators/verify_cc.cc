@@ -145,7 +145,7 @@ bool VerifyCC::evaluate(Transaction *transaction,
             int is_cc = luhnVerify(match.c_str(), match.size());
             if (is_cc) {
                 if (transaction) {
-                    if (rule && rule->hasCaptureAction()) {
+                    if (rule && rule->hasCapture()) {
                         transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                             "0", std::string(match));
                         ms_dbg_a(transaction, 7, "Added VerifyCC match TX.0: " + \
