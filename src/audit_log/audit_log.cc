@@ -288,8 +288,18 @@ bool AuditLog::saveIfRelevant(Transaction *transaction) const noexcept {
         return false;
     }
 
+    // FIXME: This could be pre-computed. No need to compute in run time.
+    bool isThereSomethingToBeSaved = false;
+    for (RuleMessage *i : transaction->messageGetAll()) {
+        if (i->toBeAuditLog()) {
+            isThereSomethingToBeSaved = true;
+            break;
+        }
+    }
+
     if ((m_status == RelevantOnlyAuditLogStatus
-            && isRelevant(transaction->m_httpCodeReturned) == false)) {
+            && isRelevant(transaction->m_httpCodeReturned) == false)
+            && isThereSomethingToBeSaved == false) {
         ms_dbg_a(transaction, 9, "Return code `" +
             std::to_string(transaction->m_httpCodeReturned) + "'" \
             " is not interesting to audit logs, relevant code(s): `" +

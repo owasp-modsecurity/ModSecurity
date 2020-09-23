@@ -218,7 +218,7 @@ std::string RuleMessage::getUri() const {
 
 bool RuleMessage::isDisruptive() const {
     if (m_rule) {
-        return m_rule->hasDisruptiveAction();
+        return m_rule->isDisruptive();
     }
     return 0;
 }

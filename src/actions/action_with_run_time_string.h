@@ -43,14 +43,14 @@ class ActionWithRunTimeString : public virtual Action {
         return *this;
     }
 
-    virtual void populate(RuleWithActions *rule) {
+    virtual void populate(const RuleWithActions *rule) {
         if (m_string) {
             m_string->populate(rule);
         }
     }
 
     std::string getEvaluatedRunTimeString(const Transaction *transaction) const noexcept {
-        return (m_string == nullptr)?"":m_string->evaluate(transaction);
+        return (!m_string)?"":m_string->evaluate(transaction);
     }
 
     bool hasRunTimeString() const noexcept {
