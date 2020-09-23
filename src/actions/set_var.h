@@ -87,7 +87,7 @@ class SetVar : public ActionWithRunTimeString, public ActionWithExecution {
 
     bool execute(Transaction *transaction) const noexcept override;
 
-    void populate(RuleWithActions *rule) override {
+    void populate(const RuleWithActions *rule) override {
         ActionWithRunTimeString::populate(rule);
         variables::RuleVariable *rulev =
             dynamic_cast<variables::RuleVariable *>(

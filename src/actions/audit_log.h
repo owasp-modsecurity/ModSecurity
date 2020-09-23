@@ -36,7 +36,7 @@ class AuditLog : public ActionTypeRuleMetaData,
     { }
 
     void configure(RuleWithActions *rule) override {
-        rule->setHasAuditLogAction(true);
+        rule->setAuditLog(true);
     }
 };
 

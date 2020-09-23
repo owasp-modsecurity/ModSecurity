@@ -71,7 +71,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         const RuleWithActions *rule,
         VariableValues *l) {
 
-        if (rule->hasRevisionAction()) {
+        if (rule->hasRevision()) {
             auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_rev, std::unique_ptr<std::string>(new std::string(rule->getRevision())));
             VariableOrigin origin;
             origin.m_offset = 0;
@@ -87,7 +87,7 @@ class Rule_DictElement : public RuleVariable, public VariableDictElement {
         const RuleWithActions *rule,
         VariableValues *l) {
 
-        if (rule->hasSeverityAction()) {
+        if (rule->hasSeverity()) {
             auto var = std::make_shared<VariableValue>(&m_rule, &m_rule_severity, std::unique_ptr<std::string>(new std::string(std::to_string(rule->getSeverity()))));
             VariableOrigin origin;
             origin.m_offset = 0;

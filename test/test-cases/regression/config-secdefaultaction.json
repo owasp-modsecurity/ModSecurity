@@ -277,7 +277,13 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecAuditEngine On",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/test/modsec_audit_auditlog_1.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:3|4(?!04))\"",
       "SecDefaultAction \"phase:2,log,auditlog,status:302,redirect:'http://www.google.com'\"",
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1,block\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none,block\""

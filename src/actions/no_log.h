@@ -36,7 +36,7 @@ class NoLog : public ActionTypeRuleMetaData,
     { }
 
     void configure(RuleWithActions *rule) override {
-        rule->setHasNoLogAction(true);
+        rule->setNoLog(true);
     }
 };
 
