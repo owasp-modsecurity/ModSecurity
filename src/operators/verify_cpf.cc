@@ -128,7 +128,7 @@ bool VerifyCPF::evaluate(Transaction *transaction,
             is_cpf = verify(m.str().c_str(), m.str().size());
             if (is_cpf) {
                 logOffset(ruleMessage, m.offset(), m.str().size());
-                if (rule && transaction && rule->hasCaptureAction()) {
+                if (rule && transaction && rule->hasCapture()) {
                     transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", m.str());
                     ms_dbg_a(transaction, 7, "Added VerifyCPF match TX.0: " + \
