@@ -229,7 +229,7 @@ bool Rbl::evaluate(Transaction *transaction,
     furtherInfo(sin, str.c_str(), transaction, m_provider);
 
     freeaddrinfo(info);
-    if (rule && transaction && rule->hasCaptureAction()) {
+    if (rule && transaction && rule->hasCapture()) {
         transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
         "0", std::string(str));
         ms_dbg_a(transaction, 7, "Added RXL match TX.0: " + \
