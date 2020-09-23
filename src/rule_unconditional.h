@@ -40,7 +40,7 @@ namespace modsecurity {
 class RuleUnconditional : public RuleWithActions {
  public:
     RuleUnconditional(
-        std::vector<actions::Action *> *actions,
+        Actions *actions,
         Transformations *transformations,
         std::unique_ptr<std::string> fileName,
         int lineNumber)

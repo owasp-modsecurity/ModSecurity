@@ -56,7 +56,7 @@ using actions::transformations::None;
 
 RuleWithOperator::RuleWithOperator(Operator *op,
     variables::Variables *_variables,
-    std::vector<Action *> *actions,
+    Actions *actions,
     Transformations *transformations,
     std::unique_ptr<std::string> fileName,
     int lineNumber)
@@ -217,7 +217,6 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
     bool globalRet = false;
     variables::Variables *variables = m_variables.get();
     bool recursiveGlobalRet;
-    bool containsBlock = hasBlockAction();
     std::string eparam;
     variables::Variables vars;
     vars.reserve(4);
@@ -303,7 +302,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
             executeTransformations(trans, value, transformationsResults);
 
             auto iter = transformationsResults.begin();
-            if (!hasMultimatchAction()) {
+            if (!processMultiMatch()) {
                 iter = transformationsResults.end();
                 std::advance(iter, -1);
             }
@@ -381,7 +380,7 @@ end_exec:
     /* last rule in the chain. */
     trans->logMatchLastRuleOnTheChain(this);
 
-    if (hasSeverityAction()) {
+    if (hasSeverity()) {
         ms_dbg_a(trans, 9, "This rule severity is: " + \
             std::to_string(getSeverity()) + " current transaction is: " + \
             std::to_string(trans->m_highestSeverityAction));

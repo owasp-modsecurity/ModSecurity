@@ -20,11 +20,11 @@
 #ifndef SRC_VARIABLES_RULE_VARIABLE_H_
 #define SRC_VARIABLES_RULE_VARIABLE_H_
 
-#include "src/rule_with_actions.h"
 
 
 namespace modsecurity {
 
+class RuleWithActions;
 class Transaction;
 namespace variables {
 
