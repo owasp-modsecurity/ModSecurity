@@ -37,7 +37,7 @@ class Block : public ActionTypeRuleMetaData,
     { }
 
     void configure(RuleWithActions *rule) override {
-        rule->setHasBlockAction(true);
+        rule->setBlock(true);
     }
 };
 

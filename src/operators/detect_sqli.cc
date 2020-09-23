@@ -45,7 +45,7 @@ bool DetectSQLi::evaluate(Transaction *transaction,
         ms_dbg_a(transaction, 4, "detected SQLi using libinjection with " \
             "fingerprint '" + std::string(fingerprint) + "' at: '" +
             input.to_string() + "'");
-        if (rule && rule->hasCaptureAction()) {
+        if (rule && rule->hasCapture()) {
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                 "0", std::string(fingerprint));
             ms_dbg_a(transaction, 7, "Added DetectSQLi match TX.0: " + \

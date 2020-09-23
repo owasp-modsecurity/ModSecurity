@@ -47,7 +47,7 @@ class Tag : public ActionWithRunTimeString,
 
     bool execute(Transaction *transaction) const noexcept override;
 
-    inline std::string getTagName(Transaction *transaction) const {
+    inline std::string getTagName(const Transaction *transaction) const {
         return getEvaluatedRunTimeString(transaction);
     }
 
