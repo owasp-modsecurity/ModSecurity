@@ -40,7 +40,7 @@ class VariableWithRunTimeString : public Variable {
         return *this;
     }
 
-    virtual void populate(RuleWithActions *rule) {
+    virtual void populate(const RuleWithActions *rule) {
         if (m_string) {
             m_string->populate(rule);
         }

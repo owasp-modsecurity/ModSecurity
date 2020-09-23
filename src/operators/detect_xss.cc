@@ -37,7 +37,7 @@ bool DetectXSS::evaluate(Transaction *transaction,
     if (transaction) {
         if (is_xss) {
             ms_dbg_a(transaction, 5, "detected XSS using libinjection.");
-            if (rule && rule->hasCaptureAction()) {
+            if (rule && rule->hasCapture()) {
                 transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                     "0", std::string(input));
                 ms_dbg_a(transaction, 7, "Added DetectXSS match TX.0: " + \

@@ -34,7 +34,7 @@ class MultiMatch : public ActionTypeRuleMetaData {
 
 
     void configure(RuleWithActions *rule) override {
-        rule->setHasMultimatchAction(true);
+        rule->setMultiMatch(true);
     }
 };
 

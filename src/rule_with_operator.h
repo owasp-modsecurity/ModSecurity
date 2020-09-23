@@ -43,7 +43,7 @@ class RuleWithOperator : public RuleWithActions {
  public:
     RuleWithOperator(operators::Operator *op,
         variables::Variables *variables,
-        std::vector<actions::Action *> *actions,
+        Actions *actions,
         Transformations *transformations,
         std::unique_ptr<std::string> fileName,
         int lineNumber);
