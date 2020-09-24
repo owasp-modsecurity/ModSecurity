@@ -236,10 +236,12 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) const {
         }
     }
     if (!disruptiveAlreadyExecuted && m_actionDisruptiveAction != nullptr) {
+        trans->messageGetLast()->setRule(this);
         executeAction(trans,
             m_actionDisruptiveAction.get(), false);
     } else if  (!disruptiveAlreadyExecuted && hasBlockAction()
         && m_defaultActions.m_actionDisruptiveAction != nullptr) {
+        trans->messageGetLast()->setRule(this);
         executeAction(trans,
             m_defaultActions.m_actionDisruptiveAction.get(), false);
     }

@@ -72,12 +72,12 @@ void TransactionRuleMessageManagement::logMatchLastRuleOnTheChain(const RuleWith
 
     rm->setRule(rule);
 
-    if (rule->hasDisruptiveAction() && rule->isItToBeLogged() &&
-        (m_transaction->getRuleEngineState() == RulesSet::DetectionOnlyRuleEngine)) {
+    if (rule->isItToBeLogged() &&
+        (m_transaction->getRuleEngineState() == RulesSet::EnabledRuleEngine)) {
         /* error */
         // The error goes over the disruptive massage. We don't need it here.
         //m_transaction->serverLog(rm);
-    } else if (rule->hasBlockAction() && rule->isItToBeLogged()) {
+    } else if (rule->isItToBeLogged()) {
         /* Log as warning. */
         m_transaction->serverLog(rm);
     }

@@ -294,25 +294,27 @@ class RuleWithActions : public Rule, public RuleWithActionsProperties {
             return false;
         }
 
+        if (!hasDisruptiveAction() && !hasBlockAction()) {
+            return false;
+        }
+
         return true;
     }
 
-
     inline bool isItToBeAuditLogged() const noexcept {
-        if (!isItToBeLogged() && !m_containsAuditLogAction
-            && !m_defaultActions.m_containsAuditLogAction) {
-            return false;
+        if (m_containsAuditLogAction) {
+            return true;
         }
 
-        if (m_containsNoAuditLogAction) {
-            return false;
+        if (m_defaultActions.m_containsAuditLogAction && !m_containsNoAuditLogAction) {
+            return true;
         }
 
-        if (m_defaultActions.m_containsAuditLogAction && !m_containsAuditLogAction) {
-            return false;
+        if (isItToBeLogged()) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
 
