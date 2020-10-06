@@ -625,8 +625,8 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     }
 
     ngx_str_t request_id_varname = ngx_string("request_id");
-    request_id_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &request_id_varname);    
-#endif    
+    request_id_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &request_id_varname);
+#endif
 
     azwaf_processing_result_key = ngx_hash_key_lc(
         azwaf_processing_result_var.data,
@@ -739,6 +739,16 @@ ngx_http_modsecurity_detection_thread_completion(ngx_event_t *ev)
     ngx_http_request_t *r = ev->data;
     /* 'blocked' is incremented in ngx_http_modsecurity_detection_task_offload */
     --r->main->blocked;
+    /* This is to handle the case when the connection is prematurely closed by the client.
+    During the execution of the thread-pool we will keep the request in blocked state, to prevent the request from getting closed/freed.
+    In the meantime if the client closes the connection we will set the connection->error in ngx_http_terminate_request
+    Here we utilize this information to set the count to 1 so that it gets freed up in ngx_http_finalize_request.
+    Without the fix the request was not closed leading to underlying sockets getting stuck in CLOSE_WAIT state.*/
+    if (r->connection->error == 1 && r->count > 1)
+    {
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ngx_http_modsecurity_detection_thread_completion : Updating the request count to 1, Earlier value was %d", r->count);
+        r->count = 1;
+    }
     /* This call will decrement r->main->count and do cleanup if needed */
     ngx_http_finalize_request(r, NGX_DONE);
 }
@@ -1048,7 +1058,7 @@ ngx_http_modsecurity_cleanup(void *data)
     if (ctx->connection != NULL) {
         (void) modsecFinishConnection(ctx->connection);
     }
-    
+
 }
 
     static char *
@@ -1126,4 +1136,3 @@ ngx_http_modsecurity_drop_action(request_rec *r)
     ctx->r->connection->error = 1;
     return 0;
 }
-
