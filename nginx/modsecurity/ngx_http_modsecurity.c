@@ -743,7 +743,7 @@ ngx_http_modsecurity_detection_thread_completion(ngx_event_t *ev)
     During the execution of the thread-pool we will keep the request in blocked state, to prevent the request from getting closed/freed.
     In the meantime if the client closes the connection we will set the connection->error in ngx_http_terminate_request
     Here we utilize this information to set the count to 1 so that it gets freed up in ngx_http_finalize_request.
-    Without the fix the request was not closed leading to underlying sockets getting stuck in CLOSE_WAIT state*/
+    Without the fix the request was not closed leading to underlying sockets getting stuck in CLOSE_WAIT state.*/
     if (r->connection->error == 1 && r->count > 1)
     {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ngx_http_modsecurity_detection_thread_completion : Updating the request count to 1, Earlier value was %d", r->count);
