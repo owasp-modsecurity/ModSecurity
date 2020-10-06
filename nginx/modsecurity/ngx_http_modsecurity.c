@@ -739,7 +739,7 @@ ngx_http_modsecurity_detection_thread_completion(ngx_event_t *ev)
     ngx_http_request_t *r = ev->data;
     /* 'blocked' is incremented in ngx_http_modsecurity_detection_task_offload */
     --r->main->blocked;
-    /* This is to handle the case when the request is prematurely closed by the client.
+    /* This is to handle the case when the connection is prematurely closed by the client.
     During the execution of the thread-pool we will keep the request in blocked state, to prevent the request from getting closed/freed.
     In the meantime if the client closes the connection we will set the connection->error in ngx_http_terminate_request
     Here we utilize this information to set the count to 1 so that it gets freed up in ngx_http_finalize_request.
