@@ -1485,7 +1485,7 @@ bool Multipart::process(const std::string& data, std::string *error,
                        will catch all "errors", without any modification, but we can
                        use the new, permission mode with "@eq 1"
                     */
-                    if (m_boundary_count > 0) {
+                    if (m_boundary_count > 0  && m_flag_unmatched_boundary == 1) {
                         m_flag_unmatched_boundary = 2;
                     }
                     int is_final = 0;
