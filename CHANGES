@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix IP address logging in Section A
+    [Issue #2300 - @inaratech, @zavazingo, @martinhsv]
   - Adds support to lua 5.4
     [@zimmerle]
   - GeoIP: switch to GEOIP_MEMORY_CACHE from GEOIP_INDEX_CACHE

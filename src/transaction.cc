@@ -1522,9 +1522,9 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
     audit_log << tstr;
     audit_log << " " << m_id->c_str();
-    audit_log << " " << this->m_clientIpAddress;
+    audit_log << " " << this->m_clientIpAddress->c_str();
     audit_log << " " << this->m_clientPort;
-    audit_log << " " << m_serverIpAddress;
+    audit_log << " " << m_serverIpAddress->c_str();
     audit_log << " " << this->m_serverPort;
     audit_log << std::endl;
 
