@@ -287,6 +287,7 @@ libmodsecurity_la_SOURCES = \
 	rules.cc \
 	rule_unconditional.cc \
 	rule_with_actions.cc \
+	rule_with_actions_properties.cc \
 	rule_with_operator.cc \
 	rule_message.cc \
 	rule_script.cc \

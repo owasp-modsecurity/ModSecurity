@@ -62,11 +62,11 @@ namespace modsecurity {
 
             RuleWithActions *nr = dynamic_cast<RuleWithActions *>(m_rules[i].get());
             nr->clearDefaultActions();
-            for (auto a : m_defaultActions) {
-                nr->addAction(a, 1);
+            for (auto &a : m_defaultActions) {
+                nr->addDefaultAction(a);
             }
             for (auto a : m_defaultTransformations) {
-                nr->addTransformation(a, 1);
+                nr->addDefaulTransformation(a);
             }
 
 
