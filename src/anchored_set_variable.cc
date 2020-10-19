@@ -22,7 +22,7 @@
 #include "modsecurity/anchored_set_variable.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 #include "src/variables/variable.h"
 
 namespace modsecurity {
@@ -123,10 +123,10 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
 }
 
 
-void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
+void AnchoredSetVariable::resolveRegularExpression(regex::Regex *r,
     std::vector<const VariableValue *> *l) {
     for (const auto& x : *this) {
-        int ret = Utils::regex_search(x.first, *r);
+        int ret = r->search(x.first);
         if (ret <= 0) {
             continue;
         }
@@ -135,11 +135,11 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
 }
 
 
-void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
+void AnchoredSetVariable::resolveRegularExpression(regex::Regex *r,
     std::vector<const VariableValue *> *l,
     variables::KeyExclusions &ke) {
     for (const auto& x : *this) {
-        int ret = Utils::regex_search(x.first, *r);
+        int ret = r->search(x.first);
         if (ret <= 0) {
             continue;
         }

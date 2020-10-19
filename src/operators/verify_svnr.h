@@ -7,13 +7,12 @@
 #include <utility>
 
 #include "src/operators/operator.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 
 
 namespace modsecurity {
-using Utils::SMatch;
-using Utils::regex_search;
-using Utils::Regex;
+using regex::RegexMatch;
+using regex::Regex;
 
 namespace operators {
 

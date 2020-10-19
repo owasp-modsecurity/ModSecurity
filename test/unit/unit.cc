@@ -19,11 +19,13 @@
 #include <iostream>
 #include <ctime>
 #include <string>
+#include <cassert>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
 #include "src/operators/operator.h"
 #include "src/actions/transformations/transformation.h"
+#include "src/actions/capture.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/actions/action.h"
 
@@ -40,6 +42,9 @@
 using modsecurity_test::UnitTest;
 using modsecurity_test::ModSecurityTest;
 using modsecurity_test::ModSecurityTestResults;
+using modsecurity::ModSecurity;
+using modsecurity::RuleWithActions;
+using modsecurity::Transaction;
 using modsecurity::actions::transformations::Transformation;
 using modsecurity::operators::Operator;
 
@@ -52,8 +57,30 @@ void print_help() {
     std::cout << std::endl;
 }
 
+static std::vector<std::string> get_capturing_groups(Transaction &transaction) {
+    // capturing groups are stored in the TX collection as "0", "1", and so on
+    std::vector<std::string> res;
+    for (int i = 0;; i++) {
+        const std::string key = std::to_string(i);
+        auto s = transaction.m_collections.m_tx_collection->resolveFirst(key);
+        if (s == NULL) break;
+        res.push_back(*s);
+    }
+    return res;
+}
 
-void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
+static std::unique_ptr<RuleWithActions> create_fake_capture_rule() {
+    auto actions = new modsecurity::Actions;
+    actions->push_back(new modsecurity::actions::Capture(""));
+    auto rule = std::unique_ptr<RuleWithActions>(new RuleWithActions{actions, nullptr, std::unique_ptr<std::string>(new std::string("")), 1});
+
+    assert(rule->hasCaptureAction());
+
+    return rule;
+}
+
+static void perform_unit_test(ModSecurity *modsec,
+    ModSecurityTest<UnitTest> *test, UnitTest *t,
     ModSecurityTestResults<UnitTest>* res) {
     std::string error;
     bool found = true;
@@ -76,11 +103,26 @@ void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
     }
 
     if (t->type == "op") {
+        modsecurity::RulesSet rules{};
+        Transaction transaction{modsec, &rules, NULL};
         Operator *op = Operator::instantiate(t->name, t->param);
+
+        // Rx operator won't capture groups otherwise
+        auto rule = create_fake_capture_rule();
+
         op->init(t->filename, &error);
-        int ret = op->evaluate(NULL, NULL, t->input, NULL);
+        int ret = op->evaluate(&transaction, rule.get(), t->input, NULL);
         t->obtained = ret;
-        if (ret != t->ret) {
+
+        bool pass = (ret == t->ret);
+        if (t->re_groups.size() > 0) {
+            t->obtained_re_groups = get_capturing_groups(transaction);
+            if (t->re_groups != t->obtained_re_groups) {
+                pass = false;
+            }
+        }
+
+        if (!pass) {
             res->push_back(t);
             if (test->m_automake_output) {
                 std::cout << "FAIL ";
@@ -151,6 +193,8 @@ int main(int argc, char **argv) {
         test.load_tests("test-cases/secrules-language-tests/transformations");
     }
 
+    ModSecurity modsec{};
+
     for (std::pair<std::string, std::vector<UnitTest *> *> a : test) {
         std::vector<UnitTest *> *tests = a.second;
 
@@ -161,7 +205,7 @@ int main(int argc, char **argv) {
             if (!test.m_automake_output) {
                 std::cout << "  " << a.first << "...\t";
             }
-            perform_unit_test(&test, t, &r);
+            perform_unit_test(&modsec, &test, t, &r);
 
             if (!test.m_automake_output) {
                 int skp = 0;

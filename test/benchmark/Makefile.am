@@ -15,7 +15,8 @@ benchmark_LDADD = \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
 	$(LIBXML2_LDADD) \
-	$(GLOBAL_LDADD)
+	$(GLOBAL_LDADD) \
+	$(RE2_LDADD)
 
 benchmark_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
@@ -29,7 +30,8 @@ benchmark_LDFLAGS = \
 	$(YAJL_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(LUA_LDFLAGS)
+	$(LUA_LDFLAGS) \
+	$(RE2_LDFLAGS)
 
 benchmark_CPPFLAGS = \
 	-std=c++11 \
@@ -37,7 +39,8 @@ benchmark_CPPFLAGS = \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(LMDB_CFLAGS) \
-	$(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(RE2_CFLAGS)
 
 MAINTAINERCLEANFILES = \
         Makefile.in

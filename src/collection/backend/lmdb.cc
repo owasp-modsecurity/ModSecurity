@@ -23,7 +23,7 @@
 #include <memory>
 
 #include "modsecurity/variable_value.h"
-#include "src/utils/regex.h"
+#include "src/regex/regex.h"
 #include "src/variables/variable.h"
 
 #undef LMDB_STDOUT_COUT
@@ -537,7 +537,7 @@ void LMDB::resolveRegularExpression(const std::string& var,
     MDB_stat mst;
     MDB_cursor *cursor;
 
-    Utils::Regex r(var);
+    regex::Regex r(var);
 
     rc = mdb_txn_begin(m_env, NULL, 0, &txn);
     lmdb_debug(rc, "txn", "resolveRegularExpression");
@@ -559,7 +559,7 @@ void LMDB::resolveRegularExpression(const std::string& var,
 
     while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
         char *a = reinterpret_cast<char *>(key.mv_data);
-        int ret = Utils::regex_search(a, r);
+        int ret = r.search(a);
         if (ret <= 0) {
             continue;
         }

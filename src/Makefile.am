@@ -247,11 +247,16 @@ UTILS = \
 	utils/md5.cc \
 	utils/msc_tree.cc \
 	utils/random.cc \
-	utils/regex.cc \
 	utils/sha1.cc \
 	utils/string.cc \
 	utils/system.cc \
 	utils/shared_files.cc
+
+
+REGEX = \
+	regex/regex.cc \
+	regex/backend/pcre.cc \
+	regex/backend/re2.cc
 
 
 COLLECTION = \
@@ -299,6 +304,7 @@ libmodsecurity_la_SOURCES = \
 	${COLLECTION} \
 	${OPERATORS} \
 	${UTILS} \
+	${REGEX} \
 	${VARIABLES}
 
 
@@ -323,7 +329,8 @@ libmodsecurity_la_CPPFLAGS = \
 	$(SSDEEP_CFLAGS) \
 	$(MAXMIND_CFLAGS) \
 	$(LUA_CFLAGS) \
-	$(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(RE2_CFLAGS)
 
 
 libmodsecurity_la_LDFLAGS = \
@@ -338,6 +345,7 @@ libmodsecurity_la_LDFLAGS = \
 	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
 	$(YAJL_LDFLAGS) \
+	$(RE2_LDFLAGS) \
 	-version-info @MSC_VERSION_INFO@
 
 
@@ -353,5 +361,6 @@ libmodsecurity_la_LIBADD = \
 	$(PCRE_LDADD) \
 	$(MAXMIND_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(RE2_LDADD)
 

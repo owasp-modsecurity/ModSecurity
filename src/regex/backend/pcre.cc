@@ -1,6 +1,6 @@
 /*
  * ModSecurity, http://www.modsecurity.org/
- * Copyright (c) 2015 - 2020 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ * Copyright (c) 2015 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -13,16 +13,22 @@
  *
  */
 
-#include "src/utils/regex.h"
 
-#include <pcre.h>
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <list>
 
-#include <fstream>
-#include <iostream>
 
-#include "src/utils/geo_lookup.h"
+#include "src/regex/backend/pcre.h"
+#include "src/regex/regex_match.h"
+
+
+namespace modsecurity {
+namespace regex {
+namespace backend {
+
+#ifdef WITH_PCRE
 
 #if PCRE_HAVE_JIT
 #define pcre_study_opt PCRE_STUDY_JIT_COMPILE
@@ -30,23 +36,30 @@
 #define pcre_study_opt 0
 #endif
 
-namespace modsecurity {
-namespace Utils {
 
-
-Regex::Regex(const std::string& pattern_)
+Pcre::Pcre(const std::string& pattern_)
     : pattern(pattern_.empty() ? ".*" : pattern_) {
     const char *errptr = NULL;
     int erroffset;
 
     m_pc = pcre_compile(pattern.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
         &errptr, &erroffset, NULL);
+    if (m_pc == NULL) {
+        m_error = "pcre_compile error at offset " + std::to_string(erroffset) + ": " + std::string(errptr);
+        return;
+    }
 
     m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
+    if (m_pce == NULL) {
+        m_error = "pcre_study error: " + std::string(errptr);
+        pcre_free(m_pc);
+        m_pc = nullptr;
+        return;
+    }
 }
 
 
-Regex::~Regex() {
+Pcre::~Pcre() {
     if (m_pc != NULL) {
         pcre_free(m_pc);
         m_pc = NULL;
@@ -62,12 +75,12 @@ Regex::~Regex() {
 }
 
 
-std::list<SMatch> Regex::searchAll(const std::string& s) const {
+std::list<RegexMatch> Pcre::searchAll(const std::string& s) const {
     const char *subject = s.c_str();
     const std::string tmpString = std::string(s.c_str(), s.size());
     int ovector[OVECCOUNT];
     int rc, i, offset = 0;
-    std::list<SMatch> retList;
+    std::list<RegexMatch> retList;
 
     do {
         rc = pcre_exec(m_pc, m_pce, subject,
@@ -83,19 +96,20 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
             }
             std::string match = std::string(tmpString, start, len);
             offset = start + len;
-            retList.push_front(SMatch(match, start));
+            retList.push_front(RegexMatch(match, start));
+        }
 
-            if (len == 0) {
-                rc = 0;
-                break;
-            }
+        offset = ovector[1]; // end
+        if (offset == ovector[0]) { // start == end (size == 0)
+            offset++;
         }
     } while (rc > 0);
 
     return retList;
 }
 
-bool Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const {
+
+bool Pcre::searchOneMatch(const std::string& s, std::vector<RegexMatchCapture>& captures) const {
     const char *subject = s.c_str();
     int ovector[OVECCOUNT];
 
@@ -108,20 +122,21 @@ bool Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& cap
         if (end > s.size()) {
             continue;
         }
-        SMatchCapture capture(i, start, len);
+        RegexMatchCapture capture(i, start, len);
         captures.push_back(capture);
     }
 
     return (rc > 0);
 }
 
-int Regex::search(const std::string& s, SMatch *match) const {
+
+int Pcre::search(const std::string& s, RegexMatch *match) const {
     int ovector[OVECCOUNT];
     int ret = pcre_exec(m_pc, m_pce, s.c_str(),
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 
     if (ret > 0) {
-        *match = SMatch(
+        *match = RegexMatch(
             std::string(s, ovector[ret-1], ovector[ret] - ovector[ret-1]),
             0);
     }
@@ -129,11 +144,16 @@ int Regex::search(const std::string& s, SMatch *match) const {
     return ret;
 }
 
-int Regex::search(const std::string& s) const {
+
+int Pcre::search(const std::string& s) const {
     int ovector[OVECCOUNT];
     return pcre_exec(m_pc, m_pce, s.c_str(),
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 }
 
-}  // namespace Utils
+#endif
+
+}  // namespace backend
+}  // namespace regex
 }  // namespace modsecurity
+

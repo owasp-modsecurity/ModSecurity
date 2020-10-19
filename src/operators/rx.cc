@@ -29,7 +29,12 @@ namespace operators {
 
 bool Rx::init(const std::string &arg, std::string *error) {
     if (m_string->m_containsMacro == false) {
+        std::string regex_error;
         m_re = new Regex(m_param);
+        if (!m_re->ok(&regex_error)) {
+            *error = "Failed to compile regular expression " + m_re->getPattern() + ": " + regex_error;
+            return false;
+        }
     }
 
     return true;
@@ -47,15 +52,23 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     if (m_string->m_containsMacro) {
         std::string eparam(m_string->evaluate(transaction));
         re = new Regex(eparam);
+        std::string regex_error;
+        if (!re->ok(&regex_error)) {
+            ms_dbg_a(transaction, 2,
+                    "Failed to compile regular expression with macro "
+                    + re->getPattern() + ": " + regex_error);
+            delete re;
+            return false;
+        }
     } else {
         re = m_re;
     }
 
-    std::vector<Utils::SMatchCapture> captures;
+    std::vector<regex::RegexMatchCapture> captures;
     re->searchOneMatch(input, captures);
 
     if (rule && rule->hasCaptureAction() && transaction) {
-        for (const Utils::SMatchCapture& capture : captures) {
+        for (const regex::RegexMatchCapture& capture : captures) {
             const std::string capture_substring(input.substr(capture.m_offset,capture.m_length));
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                 std::to_string(capture.m_group), capture_substring);
