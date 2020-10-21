@@ -39,12 +39,36 @@ bool RuleRemoveTargetById::init(std::string *error) {
         return false;
     }
 
-    try {
-        m_id = std::stoi(param[0]);
-    } catch(...) {
-        error->assign("Not able to convert '" + param[0] +
-            "' into a number");
-        return false;
+    size_t dash = param[0].find('-');
+    if (dash != std::string::npos) {
+        std::string n1s = std::string(param[0], 0, dash);
+        std::string n2s = std::string(param[0], dash + 1, param[0].size() - (dash + 1));
+        int n1n = 0;
+        int n2n = 0;
+        try {
+            n1n = std::stoi(n1s);
+        } catch(...) {
+            error->assign("Not a number: " + n1s);
+            return false;
+        }
+        try {
+            n2n = std::stoi(n2s);
+        } catch(...) {
+            error->assign("Not a number: " + n2s);
+            return false;
+        }
+        if (n1n > n2n) {
+            error->assign("Invalid range: " + param[0]);
+        }
+        m_id = n1n;
+        m_id_end_of_range = n2n;
+    } else {
+        try {
+            m_id = std::stoi(param[0]);
+        } catch(...) {
+            error->assign("Not able to convert '" + param[0] + "' into a number");
+            return false;
+        }
     }
 
     m_target = param[1];
@@ -54,8 +78,12 @@ bool RuleRemoveTargetById::init(std::string *error) {
 
 
 bool RuleRemoveTargetById::execute(Transaction *transaction) const noexcept {
-    transaction->m_ruleRemoveTargetById.push_back(
-        std::make_pair(m_id, m_target));
+    if (m_id_end_of_range == 0) {
+        transaction->m_ruleRemoveTargetById.push_back(std::make_pair(m_id, m_target));
+    } else {
+        std::pair<int, int> id_range = std::make_pair(m_id, m_id_end_of_range);
+        transaction->m_ruleRemoveTargetByIdRange.push_back(std::make_pair(id_range, m_target));
+    }
     return true;
 }
 
