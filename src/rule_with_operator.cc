@@ -194,6 +194,14 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
                 }) != trans->m_ruleRemoveTargetById.end()) {
             continue;
         }
+        if (std::find_if(trans->m_ruleRemoveTargetByIdRange.begin(),
+                trans->m_ruleRemoveTargetByIdRange.end(),
+                [&, variable, this](std::pair<std::pair<int, int>, std::string> &m) -> bool {
+                    return (m.first.first <= getId() && m.first.second >= getId()
+                        && m.second == *variable->getVariableKeyWithCollection());
+                    }) != trans->m_ruleRemoveTargetByIdRange.end()) {
+            continue;
+        }
         if (std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, variable, trans, this](
@@ -285,6 +293,17 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                     [&, v, this](std::pair<int, std::string> &m) -> bool {
                         return m.first == getId() && m.second == v->getName();
                     }) != trans->m_ruleRemoveTargetById.end()
+            ) {
+                continue;
+            }
+
+            if (exclusion.contains(v) ||
+                std::find_if(trans->m_ruleRemoveTargetByIdRange.begin(),
+                    trans->m_ruleRemoveTargetByIdRange.end(),
+                    [&, v, this](std::pair<std::pair<int, int>, std::string> &m) -> bool {
+                        return (m.first.first <= getId() && m.first.second >= getId()
+			    && m.second == v->getName());
+                    }) != trans->m_ruleRemoveTargetByIdRange.end()
             ) {
                 continue;
             }
