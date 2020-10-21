@@ -35,6 +35,7 @@ class RuleRemoveTargetById : public ActionWithExecution {
     explicit RuleRemoveTargetById(const std::string &action)
         : Action(action),
         m_id(0),
+        m_id_end_of_range(0),
         m_target("")
     { }
 
@@ -44,6 +45,7 @@ class RuleRemoveTargetById : public ActionWithExecution {
 
  private:
     int m_id;
+    int m_id_end_of_range;
     std::string m_target;
 };
 
