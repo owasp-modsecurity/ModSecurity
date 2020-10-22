@@ -51,6 +51,9 @@ duplicateBranch:src/request_body_processor/multipart.cc:91
 syntaxError:src/transaction.cc:62
 noConstructor:src/variables/variable.h:152
 duplicateBranch:src/request_body_processor/multipart.cc:93
+knownConditionTrueFalse:src/utils/geo_lookup.cc:94
+knownConditionTrueFalse:src/utils/geo_lookup.cc:98
+danglingTempReference:src/modsecurity.cc:204
 
 noExplicitConstructor:seclang-parser.hh
 
@@ -61,3 +64,4 @@ preprocessorErrorDirective
 funcArgNamesDifferent
 unmatchedSuppression
 missingInclude
+

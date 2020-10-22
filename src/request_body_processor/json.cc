@@ -232,7 +232,7 @@ int JSON::yajl_start_array(void *ctx) {
 
 int JSON::yajl_end_array(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    if (tthis->m_containers.size() <= 0) {
+    if (tthis->m_containers.empty()) {
         return 1;
     }
 
@@ -266,7 +266,7 @@ int JSON::yajl_start_map(void *ctx) {
  */
 int JSON::yajl_end_map(void *ctx) {
     JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    if (tthis->m_containers.size() <= 0) {
+    if (tthis->m_containers.empty()) {
         return 1;
     }
 

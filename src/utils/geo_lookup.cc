@@ -91,11 +91,11 @@ bool GeoLookup::setDataBase(const std::string& filePath,
 #endif
         err->append(".");
 
-        if (intMax.size() > 0) {
+        if (!intMax.empty()) {
             err->append(" " + intMax);
 
         }
-        if (intGeo.size() > 0) {
+        if (!intGeo.empty()) {
             err->append(" " + intGeo);
         }
         return false;
