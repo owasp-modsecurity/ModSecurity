@@ -1,0 +1,90 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Check TX variable case sensitivity (1/2)",
+    "url": "https:\/\/github.com\/SpiderLabs\/ModSecurity\/issues\/2296",
+    "gihub_issue": 2296,
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "name1": "value1"
+      },
+      "uri":"/",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":437,
+      "error_log":"`Within' with parameter `/name1/ /name2/' against variable `TX:header_name_name1'"
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecAction \"id:1,phase:1,setvar:'TX.restricted_headers=/name1/ /name2/'\"",
+        "SecRule REQUEST_HEADERS_NAMES \"^.*$\" \"id:2,phase:2,t:none,t:lowercase,setvar:'tx.header_name_%{tx.0}=/%{tx.0}/',deny,status:437,msg:'capture',capture,chain\"",
+        "SecRule TX:/^header_name_/ \"@within %{tx.restricted_headers}\" \"setvar:'tx.matched=1',log\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Check TX variable case sensitivity (2/2)",
+    "url": "https:\/\/github.com\/SpiderLabs\/ModSecurity\/issues\/2296",
+    "gihub_issue": 2296,
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "name1": "value1"
+      },
+      "uri":"/",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":437,
+      "error_log":"`Within' with parameter `/name1/ /name2/' against variable `TX:header_name_name1'"
+    },
+    "rules":[
+        "SecRuleEngine On",
+        "SecAction \"id:1,phase:1,setvar:'TX.restricted_headers=/name1/ /name2/'\"",
+        "SecRule REQUEST_HEADERS_NAMES \"^.*$\" \"id:2,phase:2,t:none,t:lowercase,setvar:'tx.header_name_%{tx.0}=/%{tx.0}/',deny,status:437,msg:'capture',capture,chain\"",
+        "SecRule TX:/^HEADER_NAME_/ \"@within %{tx.restricted_headers}\" \"setvar:'tx.matched=1',log\""
+    ]
+  }
+]
