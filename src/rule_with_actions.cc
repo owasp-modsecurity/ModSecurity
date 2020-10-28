@@ -288,14 +288,6 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
     for (auto &a : m_defaultActions.getSetVars()) {  f(trans, a);  }
     for (auto &a : getSetVars()) {  f(trans, a);  }
 
-
-    if (m_actionLogData) {
-        m_actionLogData->execute(trans);
-    }
-
-    if (m_actionMsg) {
-        m_actionMsg->execute(trans);
-    }
 }
 
 
@@ -323,6 +315,14 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans) const {
         }
         ms_dbg_a(trans, 9, "Running action placed by updateTargetById: " + *a->getName());
         a->execute(trans);
+    }
+
+    if (m_actionLogData) {
+        m_actionLogData->execute(trans);
+    }
+
+    if (m_actionMsg) {
+        m_actionMsg->execute(trans);
     }
 
     /* generic actions */
