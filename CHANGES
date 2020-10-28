@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fixed MatchedVar on chained rules
+    [Issue #2423, #2435, #2436 - @michaelgranzow-avi]
   - Add support for new operator rxGlobal
     [@martinhsv]
   - Fix maxminddb link on FreeBSD

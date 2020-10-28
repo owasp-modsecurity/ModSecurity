@@ -215,17 +215,6 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         }
     }
 
-    if (m_severity) {
-        m_severity->evaluate(this, trans, ruleMessage);
-    }
-
-    if (m_logData) {
-        m_logData->evaluate(this, trans, ruleMessage);
-    }
-
-    if (m_msg) {
-        m_msg->evaluate(this, trans, ruleMessage);
-    }
 }
 
 
@@ -256,6 +245,17 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
         executeAction(trans, containsBlock, ruleMessage, a, false);
         disruptiveAlreadyExecuted = true;
+    }
+    if (m_severity) {
+        m_severity->evaluate(this, trans, ruleMessage);
+    }
+
+    if (m_logData) {
+        m_logData->evaluate(this, trans, ruleMessage);
+    }
+
+    if (m_msg) {
+        m_msg->evaluate(this, trans, ruleMessage);
     }
     for (Action *a : this->m_actionsRuntimePos) {
         if (!a->isDisruptive()
