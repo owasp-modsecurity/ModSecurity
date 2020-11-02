@@ -54,6 +54,36 @@ struct MyEqual {
 };
 
 
+class MultipartPartTmpFile {
+ public:
+     MultipartPartTmpFile(Transaction *transaction)
+     : m_transaction(transaction),
+     m_tmp_file_fd(0),
+     m_delete(false) { }
+
+    ~MultipartPartTmpFile();
+
+    // forbid copying
+    MultipartPartTmpFile(const MultipartPartTmpFile&) = delete;
+    MultipartPartTmpFile& operator=(const MultipartPartTmpFile&) = delete;
+
+    int getFd() const {return m_tmp_file_fd;}
+    void setFd(int fd) {m_tmp_file_fd = fd;}
+    const std::string& getFilename() const {return m_tmp_file_name;}
+    void setDelete() {m_delete = true;}
+
+    bool isValid() const {return ((m_tmp_file_fd != 0) && (!m_tmp_file_name.empty()));}
+
+    void Open();
+    void Close();
+ private:
+    Transaction *m_transaction;
+    int m_tmp_file_fd;
+    std::string m_tmp_file_name;
+    bool m_delete; // whether to delete when transaction is done
+};
+
+
 class MultipartPart {
  public:
     MultipartPart()
@@ -63,8 +93,6 @@ class MultipartPart {
      m_value(""),
      m_valueOffset(0),
      m_value_parts(),
-     m_tmp_file_name(""),
-     m_tmp_file_fd(0),
      m_tmp_file_size(),
      m_filename(""),
      m_filenameOffset(0),
@@ -98,8 +126,7 @@ class MultipartPart {
     /* std::string m_content_type; */
 
     /* files only, the name of the temporary file holding data */
-    std::string m_tmp_file_name;
-    int m_tmp_file_fd;
+    std::shared_ptr<RequestBodyProcessor::MultipartPartTmpFile> m_tmp_file;
     std::pair<size_t, size_t> m_tmp_file_size;
 
     /* files only, filename as supplied by the browser */
@@ -132,8 +159,6 @@ class Multipart {
     int process_boundary(int last_part);
     int process_part_header(std::string *error, int offset);
     int process_part_data(std::string *error, size_t offset);
-
-    int tmp_file_name(std::string *filename) const;
 
     void validate_quotes(const char *data);
 
