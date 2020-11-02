@@ -159,6 +159,7 @@ TESTS+=test/test-cases/regression/issue-2000.json
 TESTS+=test/test-cases/regression/issue-2111.json
 TESTS+=test/test-cases/regression/issue-2196.json
 TESTS+=test/test-cases/regression/issue-2423-msg-in-chain.json
+TESTS+=test/test-cases/regression/issue-2427.json
 TESTS+=test/test-cases/regression/issue-394.json
 TESTS+=test/test-cases/regression/issue-849.json
 TESTS+=test/test-cases/regression/issue-960.json

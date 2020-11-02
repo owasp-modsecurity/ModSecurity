@@ -111,6 +111,7 @@ enum AllowType : int;
 namespace RequestBodyProcessor {
 class XML;
 class JSON;
+class MultipartPartTmpFile;
 }
 namespace operators {
 class Operator;
@@ -611,6 +612,8 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     std::string m_variableTimeSec;
     std::string m_variableTimeWDay;
     std::string m_variableTimeYear;
+
+    std::vector<std::shared_ptr<RequestBodyProcessor::MultipartPartTmpFile>> m_multipartPartTmpFiles;
 
  private:
     /**

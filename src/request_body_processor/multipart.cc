@@ -38,6 +38,61 @@ namespace RequestBodyProcessor {
 static const char* mime_charset_special = "!#$%&+-^_`{}~";
 static const char* attr_char_special = "!#$&+-.^_`~";
 
+MultipartPartTmpFile::~MultipartPartTmpFile() {
+    if (!m_tmp_file_name.empty() && m_delete) {
+        /* make sure it is closed first */
+        if (m_tmp_file_fd > 0) {
+            Close();
+        }
+
+        const int unlink_rc = unlink(m_tmp_file_name.c_str());
+        if (unlink_rc < 0) {
+            ms_dbg_a(m_transaction, 1, "Multipart: Failed to delete file (part) \"" \
+                + m_tmp_file_name + "\" because " \
+                + std::to_string(errno) +  "(" \
+                + strerror(errno) + ")");
+        } else {
+                ms_dbg_a(m_transaction, 4, "Multipart: file deleted successfully (part) \"" \
+                            + m_tmp_file_name + "\"");
+        }
+
+    }
+}
+
+void MultipartPartTmpFile::Open() {
+    struct tm timeinfo;
+    char tstr[300];
+    time_t tt = time(NULL);
+
+    localtime_r(&tt, &timeinfo);
+
+    memset(tstr, '\0', 300);
+    strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
+
+    std::string path = m_transaction->m_rules->m_uploadDirectory.m_value;
+    path = path + tstr + "-" + *m_transaction->m_id.get();
+    path += "-file-XXXXXX";
+
+    char* tmp = strdup(path.c_str());
+    m_tmp_file_fd = mkstemp(tmp);
+    m_tmp_file_name.assign(tmp);
+    free(tmp);
+    ms_dbg_a(m_transaction, 4, "MultipartPartTmpFile: Create filename= " + m_tmp_file_name);
+
+    int mode = m_transaction->m_rules->m_uploadFileMode.m_value;
+    if ((m_tmp_file_fd != -1) && (mode != 0)) {
+        if (fchmod(m_tmp_file_fd, mode) == -1) {
+            m_tmp_file_fd = -1;
+        }
+    }
+}
+
+void MultipartPartTmpFile::Close() {
+    close(m_tmp_file_fd);
+    m_tmp_file_fd = -1;
+}
+
+
 Multipart::Multipart(const std::string &header, Transaction *transaction)
     : m_reqbody_no_files_length(0),
     m_nfiles(0),
@@ -80,30 +135,14 @@ Multipart::~Multipart() {
     if (m_transaction->m_rules->m_uploadKeepFiles
         != RulesSetProperties::TrueConfigBoolean) {
         for (MultipartPart *m : m_parts) {
-            if (m->m_type == MULTIPART_FILE) {
-                if (!m->m_tmp_file_name.empty()) {
-                    /* make sure it is closed first */
-                    if (m->m_tmp_file_fd > 0) {
-                        close(m->m_tmp_file_fd);
-                        m->m_tmp_file_fd = -1;
-                    }
-                    const int unlink_rc =
-                        unlink(m->m_tmp_file_name.c_str());
-
-                    if (unlink_rc < 0) {
-                        ms_dbg_a(m_transaction, 1,
-                            "Multipart: Failed to delete file (part) \"" \
-                            + m->m_tmp_file_name + "\" because " \
-                            + std::to_string(errno) +  "(" \
-                            + strerror(errno) + ")");
-                    } else {
-                        ms_dbg_a(m_transaction, 4,
-                            "Multipart: file deleted successfully (part) \"" \
-                            + m->m_tmp_file_name + "\"");
-                    }
-
-                }
+            if ((m->m_type == MULTIPART_FILE) && (m->m_tmp_file)) {
+                // only mark for deletion for now; the file should stay on disk until
+                // the transaction is complete
+                ms_dbg_a(m_transaction, 9, "Multipart: Marking temporary file for deletion: " \
+                    + m->m_tmp_file->getFilename());
+                m->m_tmp_file->setDelete();
             }
+
         }
     }
 
@@ -432,7 +471,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                             + std::to_string(strlen(p)) + " bytes");
                         m_flag_invalid_quoting = 1;
                     }
-                    p++;
+                    /* p++; */
                     return -12;
                 }
                 p++; /* move over the semi-colon */
@@ -450,40 +489,6 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     }
 
     return 1;
-}
-
-
-int Multipart::tmp_file_name(std::string *filename) const {
-    std::string path;
-    struct tm timeinfo;
-    char tstr[300];
-    char *tmp;
-    int fd;
-    int mode;
-    time_t tt = time(NULL);
-
-    localtime_r(&tt, &timeinfo);
-
-    path = m_transaction->m_rules->m_uploadDirectory.m_value;
-    mode = m_transaction->m_rules->m_uploadFileMode.m_value;
-
-    memset(tstr, '\0', 300);
-    strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
-    path = path + tstr + "-" + *m_transaction->m_id.get();
-    path = path + "-file-XXXXXX";
-
-    tmp = strdup(path.c_str());
-
-    fd = mkstemp(tmp);
-    filename->assign(tmp);
-    free(tmp);
-    if ((fd != -1) && (mode != 0)) {
-        if (fchmod(fd, mode) == -1) {
-            return -1;
-        }
-    }
-
-    return fd;
 }
 
 
@@ -546,20 +551,18 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
          */
         if (extract) {
             /* first create a temporary file if we don't have it already */
-            if (m_mpp->m_tmp_file_fd == 0) {
-                std::string path;
-                m_mpp->m_tmp_file_fd = tmp_file_name(&path);
-
-                /* construct temporary file name */
-                m_mpp->m_tmp_file_name = path;
+            if (!m_mpp->m_tmp_file || !m_mpp->m_tmp_file->isValid()) {
+                m_mpp->m_tmp_file = std::make_shared<RequestBodyProcessor::MultipartPartTmpFile>(m_transaction);
+                m_transaction->m_multipartPartTmpFiles.push_back(m_mpp->m_tmp_file);
+                m_mpp->m_tmp_file->Open();
 
                 /* do we have an opened file? */
-                if (m_mpp->m_tmp_file_fd < 0) {
+                if (!m_mpp->m_tmp_file || m_mpp->m_tmp_file->getFd() < 0) {
                     ms_dbg_a(m_transaction, 1,
                         "Multipart: Failed to create file: " \
-                        + m_mpp->m_tmp_file_name);
+                        + m_mpp->m_tmp_file->getFilename());
                     error->assign("Multipart: Failed to create file: " \
-                        + m_mpp->m_tmp_file_name);
+                        + m_mpp->m_tmp_file->getFilename());
                     return -1;
                 }
                 /* keep track of the files count */
@@ -569,18 +572,18 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Created temporary file " \
                     + std::to_string(m_nfiles) + " (mode o" + std::to_string(m_transaction->m_rules->m_uploadFileMode.m_value) + "): " \
-                    + m_mpp->m_tmp_file_name);
+                    + m_mpp->m_tmp_file->getFilename());
             }
 
             /* write the reserve first */
             if (m_reserve[0] != 0) {
-                if (write(m_mpp->m_tmp_file_fd, &m_reserve[1], m_reserve[0])
+                if (write(m_mpp->m_tmp_file->getFd(), &m_reserve[1], m_reserve[0])
                     != m_reserve[0]) {
                     ms_dbg_a(m_transaction, 1,
                         "Multipart: writing to \"" \
-                        + m_mpp->m_tmp_file_name + "\" failed");
+                        + m_mpp->m_tmp_file->getFilename() + "\" failed");
                     error->assign("Multipart: writing to \"" \
-                        + m_mpp->m_tmp_file_name + "\" failed");
+                        + m_mpp->m_tmp_file->getFilename() + "\" failed");
                     return -1;
                 }
 
@@ -594,14 +597,14 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
 
             /* write data to the file */
 
-            if (write(m_mpp->m_tmp_file_fd, m_buf,
+            if (write(m_mpp->m_tmp_file->getFd(), m_buf,
                 MULTIPART_BUF_SIZE - m_bufleft)
                 != (MULTIPART_BUF_SIZE - m_bufleft)) {
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: writing to \"" \
-                    + m_mpp->m_tmp_file_name + "\" failed");
+                    + m_mpp->m_tmp_file->getFilename() + "\" failed");
                 error->assign("Multipart: writing to \"" \
-                    + m_mpp->m_tmp_file_name + "\" failed");
+                    + m_mpp->m_tmp_file->getFilename() + "\" failed");
                 return -1;
             }
 
@@ -911,11 +914,9 @@ int Multipart::process_boundary(int last_part) {
     /* if there was a part being built finish it */
     if (m_mpp != NULL) {
         /* close the temp file */
-        if ((m_mpp->m_type == MULTIPART_FILE)
-            && (!m_mpp->m_tmp_file_name.empty())
-            && (m_mpp->m_tmp_file_fd != 0)) {
-            close(m_mpp->m_tmp_file_fd);
-            m_mpp->m_tmp_file_fd = -1;
+        if ((m_mpp->m_type == MULTIPART_FILE) && (m_mpp->m_tmp_file)
+            && (m_mpp->m_tmp_file->isValid())) {
+            m_mpp->m_tmp_file->Close();
         }
 
         if (m_mpp->m_type != MULTIPART_FILE) {
@@ -1128,8 +1129,10 @@ int Multipart::multipart_complete(std::string *error) {
         if (m->m_type == MULTIPART_FILE) {
             std::string tmp_name;
             std::string name;
-            if (!m->m_tmp_file_name.empty()) {
-                tmp_name.assign(m->m_tmp_file_name);
+        if (m->m_tmp_file && !m->m_tmp_file->getFilename().empty()) {
+            tmp_name.assign(m->m_tmp_file->getFilename());
+            m_transaction->m_variableFilesTmpNames.set(m->m_tmp_file->getFilename(),
+                m->m_tmp_file->getFilename(), m->m_filenameOffset);
             }
             if (!m->m_filename.empty()) {
                 name.assign(m->m_filename);
@@ -1148,9 +1151,6 @@ int Multipart::multipart_complete(std::string *error) {
 
             m_transaction->m_variableFilesTmpContent.set(m->m_filename,
                m->m_value, m->m_valueOffset);
-
-            m_transaction->m_variableFilesTmpNames.set(m->m_tmp_file_name,
-               m->m_tmp_file_name, m->m_filenameOffset);
 
             file_combined_size = file_combined_size + m->m_tmp_file_size.first;
 

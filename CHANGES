@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: Only delete Multipart tmp files after rules have run
+    [Issue #2427 - @martinhsv]
   - Fixed MatchedVar on chained rules
     [Issue #2423, #2435, #2436 - @michaelgranzow-avi]
   - Add support for new operator rxGlobal
