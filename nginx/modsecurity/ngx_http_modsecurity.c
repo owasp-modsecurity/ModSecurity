@@ -72,10 +72,12 @@ static char *ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent, v
 static char *ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static char *ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 
+
 static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_request_t *r);
 static int ngx_http_modsecurity_drop_action(request_rec *r);
 static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
+static void ngx_http_calculate_waf_latency(ngx_http_request_t *r, ngx_time_t *start_time);
 
 static ngx_str_t thread_pool_name = ngx_string("default");
 
@@ -848,6 +850,20 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
     ngx_http_core_run_phases(r);
 }
 
+static void
+ngx_http_calculate_waf_latency(ngx_http_request_t *r, ngx_time_t *start_time)
+{
+    ngx_time_t *end_time;
+    ngx_msec_int_t   ms;
+    ngx_time_update();
+    end_time = ngx_timeofday();
+
+    ms = (ngx_msec_int_t)
+        ((end_time->sec - start_time->sec) * 1000 + (end_time->msec - start_time->msec));
+    ms = ngx_max(ms, 0);
+    r->waf_latency = ms;
+
+}
 
 /*
 ** [ENTRY POINT] does : this function called by nginx from the request handler
@@ -858,11 +874,15 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     ngx_http_modsecurity_loc_conf_t *cf;
     ngx_http_modsecurity_ctx_t      *ctx;
     ngx_int_t                        rc;
+    ngx_time_t                      *start_time;
+
+    start_time = ngx_timeofday();
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
 
     /* Process only main request */
     if (r != r->main || !cf->enable) {
+        ngx_http_calculate_waf_latency(r, start_time);
         return NGX_DECLINED;
     }
 
@@ -876,6 +896,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
                 MIN(azwaf_processing_result->len ,azwaf_action_allow.len)) == 0) {
 
             ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "The request is allowed by AzWAF, skip ModSecurity processing");
+            ngx_http_calculate_waf_latency(r, start_time);
             return NGX_DECLINED;
         }
     }
@@ -885,9 +906,11 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         rc = ngx_http_read_client_request_body(r, ngx_http_modsecurity_body_handler);
 
         if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+            ngx_http_calculate_waf_latency(r, start_time);
             return rc;
         }
 
+        ngx_http_calculate_waf_latency(r, start_time);
         return NGX_DONE;
     }
 
@@ -898,6 +921,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     if (ctx == NULL) {
         ctx = ngx_http_modsecurity_create_ctx(r);
         if (ctx == NULL) {
+            ngx_http_calculate_waf_latency(r, start_time);
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
 
@@ -910,23 +934,32 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
     // Sometimes Nginx calls ngx_http_modsecurity_handler multiple times for the same request, after a worker thread has already been started. This is to guard against it.
     if (ctx->thread_running) {
+        ngx_http_calculate_waf_latency(r, start_time);
         return NGX_DONE;
     }
 
     if (ctx->status_code != STATUS_CODE_NOT_SET) {
         if (ctx->status_code > 0) {
+            ngx_http_calculate_waf_latency(r, start_time);
             return ctx->status_code;
         }
 
+        ngx_http_calculate_waf_latency(r, start_time);
         // Request must be routed to the next handler
         return NGX_DECLINED;
     }
 
+    static ngx_int_t ret;
+
     if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
-        return ngx_http_modsecurity_detection_task_offload(r);
+        ret = ngx_http_modsecurity_detection_task_offload(r);
+        ngx_http_calculate_waf_latency(r, start_time);
+        return ret;
     }
 
-    return ngx_http_modsecurity_prevention_task_offload(r);
+    ret = ngx_http_modsecurity_prevention_task_offload(r);
+    ngx_http_calculate_waf_latency(r, start_time);
+    return ret;
 }
 
 #define TXID_SIZE 25
