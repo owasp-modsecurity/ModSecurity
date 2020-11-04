@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Fix: crash caused by use-after-free
+    [#2376 - @WGH-, @martinhsv]  
   - Implement id ranges for ctl:ruleRemoveTargetById
     [#2110 - @j0k2r, @martinhsv]  
   - Removed unnecessary while processing the transformations.

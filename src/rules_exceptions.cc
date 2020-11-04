@@ -46,10 +46,10 @@ bool RulesExceptions::loadUpdateActionById(RuleId id,
         }
 
         if (dynamic_cast<actions::transformations::Transformation *>(a.get())) {
-            actions::transformations::Transformation *t = dynamic_cast<actions::transformations::Transformation *>(a.get());
+            actions::transformations::Transformation *t = dynamic_cast<actions::transformations::Transformation *>(a.release());
             m_action_transformation_update_target_by_id.emplace(
                 std::pair<RuleId,
-                std::unique_ptr<actions::transformations::Transformation>>(id, std::unique_ptr<actions::transformations::Transformation>(t))
+                std::shared_ptr<actions::transformations::Transformation>>(id, std::shared_ptr<actions::transformations::Transformation>(t))
             );
             continue;
 
