@@ -1,6 +1,9 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Produce not-supported error for ctl:forceRequestBodyVariable
+    and ctl:auditEngine
+    [#2376 - @WGH-, @martinhsv]  
   - Fix: crash caused by use-after-free
     [#2376 - @WGH-, @martinhsv]  
   - Implement id ranges for ctl:ruleRemoveTargetById
