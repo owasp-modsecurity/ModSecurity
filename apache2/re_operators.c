@@ -1179,15 +1179,26 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
         /* We no longer escape the pattern here as it is done when logging */
         char *pattern = apr_pstrdup(msr->mp, log_escape(msr->mp, regex->pattern ? regex->pattern : "<Unknown Match>"));
+        apr_size_t pattern_max = strlen(pattern);
+        apr_size_t var_max = strlen(var->name);
+        int pattern_cut = 0, var_cut = 0;
 
-        /* This message will be logged. */
-        if (strlen(pattern) > 252) {
-            *error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s ...\" at %s.",
-                    pattern, var->name);
-        } else {
-            *error_msg = apr_psprintf(msr->mp, "Pattern match \"%s\" at %s.",
-                    pattern, var->name);
+        /* max 256 bytes for pattern and variable */
+        if (pattern_max + var_max > 256) {
+          if (var_max > 128) {
+            var_cut = 1;
+          }
+          if (pattern_max > 128) {
+            pattern_cut = 1;
+          }
+          var_max = var_cut ? 128 : var_max;
+          pattern_max = 256 - var_max;
         }
+
+        *error_msg =
+            apr_psprintf(msr->mp, "Pattern match \"%.*s%s\" at %.*s%s",
+                         pattern_max, pattern, pattern_cut ? " ..." : "",
+                         var_max, var->name, var_cut ? " ..." : "");
 
         return 1;
     }
