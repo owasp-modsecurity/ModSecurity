@@ -72,12 +72,19 @@ static char *ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent, v
 static char *ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static char *ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 
-
 static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_request_t *r);
 static int ngx_http_modsecurity_drop_action(request_rec *r);
 static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
-static void ngx_http_calculate_waf_latency(ngx_http_request_t *r, ngx_time_t *start_time);
+static ngx_int_t ngx_http_calculate_waf_latency(ngx_http_request_t *r, ngx_time_t *start_time);
+
+static ngx_int_t ngx_http_modsecurity_set_waf_latency(ngx_http_request_t* r,
+    ngx_http_variable_value_t* v, ngx_msec_int_t waf_latency);
+static ngx_int_t ngx_http_variable_get_waf_latency(ngx_http_request_t* r,
+    ngx_http_variable_value_t* v, uintptr_t data);
+
+static ngx_str_t waf_latency_varname = ngx_string("waf_latency");
+static ngx_uint_t waf_latency_index;
 
 static ngx_str_t thread_pool_name = ngx_string("default");
 
@@ -161,6 +168,13 @@ ngx_module_t ngx_http_modsecurity = {
     NGX_MODULE_V1_PADDING
 };
 
+
+static ngx_http_variable_t  ngx_http_modsecurity_vars[] = {
+    { ngx_string("waf_latency"), NULL,
+      ngx_http_variable_get_waf_latency,
+      0, NGX_HTTP_VAR_NOCACHEABLE, 0 },
+      ngx_http_null_variable
+};
 
 static ngx_http_upstream_t ngx_http_modsecurity_upstream;
 
@@ -542,8 +556,28 @@ static server_rec *modsec_server = NULL;
 static ngx_http_modsecurity_config_cache_t *config_cache = NULL;
 
 static ngx_int_t
+ngx_http_modsecurity_add_variables(ngx_conf_t* cf)
+{
+    ngx_http_variable_t* var, * v;
+
+    for (v = ngx_http_modsecurity_vars; v->name.len; v++) {
+        var = ngx_http_add_variable(cf, &v->name, v->flags);
+        if (var == NULL) {
+            return NGX_ERROR;
+        }
+
+        var->get_handler = v->get_handler;
+        var->data = v->data;
+    }
+
+    return NGX_OK;
+}
+
+static ngx_int_t
 ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 {
+    ngx_http_modsecurity_add_variables(cf);
+
     /*  XXX: temporary hack, nginx uses pcre as well and hijacks these two */
     pcre_malloc = modsec_pcre_malloc;
     pcre_free = modsec_pcre_free;
@@ -619,6 +653,8 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
 
     extern pthread_mutex_t msc_pregcomp_ex_mtx;
     pthread_mutex_init(&msc_pregcomp_ex_mtx, NULL);
+
+    waf_latency_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &waf_latency_varname);
 
 #ifdef WAF_JSON_LOGGING_ENABLE
     int result = init_appgw_rules_id_hash();
@@ -850,7 +886,7 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
     ngx_http_core_run_phases(r);
 }
 
-static void
+static ngx_int_t
 ngx_http_calculate_waf_latency(ngx_http_request_t *r, ngx_time_t *start_time)
 {
     ngx_time_t *end_time;
@@ -861,8 +897,9 @@ ngx_http_calculate_waf_latency(ngx_http_request_t *r, ngx_time_t *start_time)
     ms = (ngx_msec_int_t)
         ((end_time->sec - start_time->sec) * 1000 + (end_time->msec - start_time->msec));
     ms = ngx_max(ms, 0);
-    r->waf_latency = ms;
 
+    ngx_http_variable_value_t* waf_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
+    return ngx_http_modsecurity_set_waf_latency(r, waf_latency_var, ms);
 }
 
 /*
@@ -875,14 +912,19 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     ngx_http_modsecurity_ctx_t      *ctx;
     ngx_int_t                        rc;
     ngx_time_t                      *start_time;
+    static ngx_int_t                ret, waf_latency_ret;
 
+    ngx_time_update();
     start_time = ngx_timeofday();
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
 
     /* Process only main request */
     if (r != r->main || !cf->enable) {
-        ngx_http_calculate_waf_latency(r, start_time);
+        waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+        if (waf_latency_ret != NGX_OK) {
+            return waf_latency_ret;
+        }
         return NGX_DECLINED;
     }
 
@@ -896,7 +938,10 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
                 MIN(azwaf_processing_result->len ,azwaf_action_allow.len)) == 0) {
 
             ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "The request is allowed by AzWAF, skip ModSecurity processing");
-            ngx_http_calculate_waf_latency(r, start_time);
+            waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+            if (waf_latency_ret != NGX_OK) {
+                return waf_latency_ret;
+            }
             return NGX_DECLINED;
         }
     }
@@ -906,11 +951,17 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         rc = ngx_http_read_client_request_body(r, ngx_http_modsecurity_body_handler);
 
         if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
-            ngx_http_calculate_waf_latency(r, start_time);
+            waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+            if (waf_latency_ret != NGX_OK) {
+                return waf_latency_ret;
+            }
             return rc;
         }
 
-        ngx_http_calculate_waf_latency(r, start_time);
+        waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+        if (waf_latency_ret != NGX_OK) {
+            return waf_latency_ret;
+        }
         return NGX_DONE;
     }
 
@@ -921,7 +972,10 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     if (ctx == NULL) {
         ctx = ngx_http_modsecurity_create_ctx(r);
         if (ctx == NULL) {
-            ngx_http_calculate_waf_latency(r, start_time);
+            waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+            if (waf_latency_ret != NGX_OK) {
+                return waf_latency_ret;
+            }
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
 
@@ -934,31 +988,44 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
     // Sometimes Nginx calls ngx_http_modsecurity_handler multiple times for the same request, after a worker thread has already been started. This is to guard against it.
     if (ctx->thread_running) {
-        ngx_http_calculate_waf_latency(r, start_time);
+        waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+        if (waf_latency_ret != NGX_OK) {
+            return waf_latency_ret;
+        }
         return NGX_DONE;
     }
 
     if (ctx->status_code != STATUS_CODE_NOT_SET) {
         if (ctx->status_code > 0) {
-            ngx_http_calculate_waf_latency(r, start_time);
+            waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+            if (waf_latency_ret != NGX_OK) {
+                return waf_latency_ret;
+            }
             return ctx->status_code;
         }
 
-        ngx_http_calculate_waf_latency(r, start_time);
+        waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+        if (waf_latency_ret != NGX_OK) {
+            return waf_latency_ret;
+        }
         // Request must be routed to the next handler
         return NGX_DECLINED;
     }
 
-    static ngx_int_t ret;
-
     if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
         ret = ngx_http_modsecurity_detection_task_offload(r);
-        ngx_http_calculate_waf_latency(r, start_time);
+        waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+        if (waf_latency_ret != NGX_OK) {
+            return waf_latency_ret;
+        }
         return ret;
     }
 
     ret = ngx_http_modsecurity_prevention_task_offload(r);
-    ngx_http_calculate_waf_latency(r, start_time);
+    waf_latency_ret = ngx_http_calculate_waf_latency(r, start_time);
+    if (waf_latency_ret != NGX_OK) {
+        return waf_latency_ret;
+    }
     return ret;
 }
 
@@ -1168,4 +1235,31 @@ ngx_http_modsecurity_drop_action(request_rec *r)
     }
     ctx->r->connection->error = 1;
     return 0;
+}
+
+    static ngx_int_t
+ngx_http_variable_get_waf_latency(ngx_http_request_t* r,
+    ngx_http_variable_value_t* v, uintptr_t data)
+{
+    return NGX_OK;
+}
+
+    static ngx_int_t
+ngx_http_modsecurity_set_waf_latency(ngx_http_request_t* r,
+    ngx_http_variable_value_t* v, ngx_msec_int_t waf_latency)
+{
+    u_char* p;
+
+    p = ngx_pnalloc(r->pool, NGX_TIME_T_LEN + 4);
+    if (p == NULL) {
+        return NGX_ERROR;
+    }
+
+    v->len = ngx_sprintf(p, "%T.%03M", (time_t)(waf_latency) / 1000, waf_latency % 1000) - p;
+    v->valid = 1;
+    v->no_cacheable = 0;
+    v->not_found = 0;
+    v->data = p;
+
+    return NGX_OK;
 }
