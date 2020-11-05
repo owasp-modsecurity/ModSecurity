@@ -2626,18 +2626,18 @@ act:
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
@@ -2657,13 +2657,13 @@ act:
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_ON
       {
-        //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", @0);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_OFF
       {
-        //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", @0);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_ON
       {
