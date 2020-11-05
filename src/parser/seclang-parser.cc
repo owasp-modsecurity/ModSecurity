@@ -4827,8 +4827,8 @@ namespace yy {
   case 340: // act: "ACTION_CTL_AUDIT_ENGINE" "CONFIG_VALUE_ON"
 #line 2628 "seclang-parser.yy"
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as < std::string > ()));
+        ACTION_NOT_SUPPORTED("CtlAuditEngine", yystack_[2].location);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
 #line 4834 "seclang-parser.cc"
     break;
@@ -4836,8 +4836,8 @@ namespace yy {
   case 341: // act: "ACTION_CTL_AUDIT_ENGINE" "CONFIG_VALUE_OFF"
 #line 2633 "seclang-parser.yy"
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as < std::string > ()));
+        ACTION_NOT_SUPPORTED("CtlAuditEngine", yystack_[2].location);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
 #line 4843 "seclang-parser.cc"
     break;
@@ -4845,8 +4845,8 @@ namespace yy {
   case 342: // act: "ACTION_CTL_AUDIT_ENGINE" "CONFIG_VALUE_RELEVANT_ONLY"
 #line 2638 "seclang-parser.yy"
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as < std::string > ()));
+        ACTION_NOT_SUPPORTED("CtlAuditEngine", yystack_[2].location);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
 #line 4852 "seclang-parser.cc"
     break;
@@ -4886,8 +4886,8 @@ namespace yy {
   case 347: // act: "ACTION_CTL_FORCE_REQ_BODY_VAR" "CONFIG_VALUE_ON"
 #line 2659 "seclang-parser.yy"
       {
-        //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
-        ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as < std::string > ()));
+        ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", yystack_[2].location);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
 #line 4893 "seclang-parser.cc"
     break;
@@ -4895,8 +4895,8 @@ namespace yy {
   case 348: // act: "ACTION_CTL_FORCE_REQ_BODY_VAR" "CONFIG_VALUE_OFF"
 #line 2664 "seclang-parser.yy"
       {
-        //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
-        ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Action(yystack_[1].value.as < std::string > ()));
+        ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", yystack_[2].location);
+        //ACTION_CONTAINER($$, new actions::Action($1));
       }
 #line 4902 "seclang-parser.cc"
     break;
