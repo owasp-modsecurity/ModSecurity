@@ -40,6 +40,8 @@ class XmlNS : public Action {
         m_href(o.m_href)
     { };
 
+    XmlNS& operator=(XmlNS &arg) noexcept = delete;
+
     bool init(std::string *error) override;
 
     std::string getScope() const {
