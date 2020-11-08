@@ -343,7 +343,7 @@ class TransactionRuleMessageManagement {
      * of the actions: `log_data' and `msg'. These should be included on the
      * auditlogs.
      */
-    std::list<RuleMessage *> m_rulesMessages;
+    std::list<std::shared_ptr<RuleMessage>> m_rulesMessages;
 
     Transaction *m_transaction;
 };
