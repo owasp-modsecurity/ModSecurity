@@ -64,11 +64,11 @@ namespace modsecurity {
 
 
 RuleMessage *TransactionRuleMessageManagement::messageGetLast() {
-    return m_rulesMessages.back();
+    return m_rulesMessages.back().get();
 }
 
 void TransactionRuleMessageManagement::logMatchLastRuleOnTheChain(const RuleWithActions *rule) {
-    RuleMessage *rm = m_rulesMessages.back();
+    RuleMessage *rm = m_rulesMessages.back().get();
 
     rm->setRule(rule);
 
@@ -85,13 +85,13 @@ void TransactionRuleMessageManagement::logMatchLastRuleOnTheChain(const RuleWith
 }
 
 void TransactionRuleMessageManagement::messageNew() {
-    m_rulesMessages.push_back(new RuleMessage(m_transaction));
+    m_rulesMessages.push_back(std::make_shared<RuleMessage>(m_transaction));
 }
 
 std::list<RuleMessage *> TransactionRuleMessageManagement::messageGetAll() {
     std::list<RuleMessage *> messages;
-    for (RuleMessage *a : m_rulesMessages) {
-        messages.push_back(a);
+    for (auto iter = m_rulesMessages.begin(); iter != m_rulesMessages.end(); ++iter) {
+        messages.push_back((*iter).get());
     }
     return messages;
 }
