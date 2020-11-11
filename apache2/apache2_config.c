@@ -2362,7 +2362,7 @@ static const char *cmd_remote_timeout(cmd_parms *cmd, void *_dcfg, const char *p
     if (dcfg == NULL) return NULL;
 
     timeout = strtol(p1, NULL, 10);
-    if ((timeout == LONG_MAX)||(timeout == LONG_MIN)||(timeout <= 0)) {
+    if ((timeout == LONG_MAX)||(timeout == LONG_MIN)||(timeout < 0)) {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRemoteTimeout: %s", p1);
     }
 
