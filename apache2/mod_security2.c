@@ -79,6 +79,8 @@ msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
 #endif
 int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
 char DSOLOCAL *remote_rules_fail_message = NULL;
+unsigned long int DSOLOCAL remote_rules_timeout = NOT_SET;
+
 
 int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 

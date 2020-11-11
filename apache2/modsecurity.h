@@ -156,6 +156,7 @@ extern DSOLOCAL msc_remote_rules_server *remote_rules_server;
 #endif
 extern DSOLOCAL int remote_rules_fail_action;
 extern DSOLOCAL char *remote_rules_fail_message;
+extern DSOLOCAL unsigned long int remote_rules_timeout;
 
 extern DSOLOCAL int status_engine_state;
 

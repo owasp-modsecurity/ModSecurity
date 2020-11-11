@@ -358,6 +358,11 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
         /* We want Curl to return error in case there is an HTTP error code */
         curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
+        /* In case we want different timeout than a default one */
+        if (remote_rules_timeout != NOT_SET){
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, remote_rules_timeout);
+        }
+
         res = curl_easy_perform(curl);
 
         if (res != CURLE_OK)

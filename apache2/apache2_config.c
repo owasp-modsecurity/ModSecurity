@@ -2354,6 +2354,24 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
 }
 
 
+static const char *cmd_remote_timeout(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    long int timeout;
+
+    if (dcfg == NULL) return NULL;
+
+    timeout = strtol(p1, NULL, 10);
+    if ((timeout == LONG_MAX)||(timeout == LONG_MIN)||(timeout <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRemoteTimeout: %s", p1);
+    }
+
+    remote_rules_timeout = timeout;
+
+    return NULL;
+}
+
+
 static const char *cmd_status_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     if (strcasecmp(p1, "on") == 0) {
@@ -3665,6 +3683,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "Abort or Warn"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecRemoteTimeout",
+        cmd_remote_timeout,
+        NULL,
+        CMD_SCOPE_ANY,
+        "timeout in seconds"
     ),
 
 
