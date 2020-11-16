@@ -59,7 +59,9 @@ void AnchoredSetVariable::set(const std::string &key,
 
 void AnchoredSetVariable::set(const std::string &key,
     const bpstd::string_view &value, size_t offset) {
-    auto var = std::make_shared<VariableValue>(&m_name, &key, &value);
+    auto var = std::make_shared<VariableValue>(&m_name,
+        std::unique_ptr<std::string>(new std::string(key)),
+        std::unique_ptr<std::string>(new std::string(value)));
 
     VariableOrigin origin;
     origin.m_offset = offset;

@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Fix memory leak in updateMatchedVars
+    [#2376 - @WGH-, @martinhsv]
   - Fix memory leak of RuleMessages objects
     [#2376 - @WGH-, @martinhsv]
   - Produce not-supported error for ctl:forceRequestBodyVariable

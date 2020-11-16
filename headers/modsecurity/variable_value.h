@@ -152,18 +152,18 @@ class VariableValue {
 
     // FIXME: It maybe the case for VariableValue to use string_view for everything.
     /* Use case D.4. - MATCHED_VARS */
-    VariableValue(const std::string *collection,
-        const std::string *key,
-        const bpstd::string_view *value)
-        : m_origin(),
-        m_value(),
-        m_valueHolder(std::unique_ptr<std::string>(new std::string(value->c_str()))),
-        m_key(key),
-        m_keyHolder(nullptr),
-        m_collection(collection)
-    {
-        m_value = m_valueHolder.get();
-    };
+    //VariableValue(const std::string *collection,
+    //    const std::string *key,
+    //    const bpstd::string_view *value)
+    //    : m_origin(),
+    //    m_value(),
+    //    m_valueHolder(std::unique_ptr<std::string>(new std::string(value->c_str()))),
+    //    m_key(key),
+    //    m_keyHolder(nullptr),
+    //    m_collection(collection)
+    //{
+    //    m_value = m_valueHolder.get();
+    //};
 
 
     /* Use case E.1. - Env */
