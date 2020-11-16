@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Avoids to cleanup GeoIp on ModSecurity destructor
+    [#2041 - @zimmerle, @jptosso, @victorhora]
   - Fix memory leak of RuleMessages objects
     [#2376 - @WGH-, @martinhsv]
   - Produce not-supported error for ctl:forceRequestBodyVariable
