@@ -63,22 +63,26 @@ bool GeoLookup::setDataBase(const std::string& filePath,
     std::string intGeo;
 #endif
 
+    if (m_version != NOT_LOADED) {
+        cleanUp();
+    }
+
 #ifdef WITH_MAXMIND
     int status = MMDB_open(filePath.c_str(), MMDB_MODE_MMAP, &mmdb);
-    if (status != MMDB_SUCCESS) {
-        intMax.assign("libMaxMind: Can't open: " + std::string(MMDB_strerror(status)) + ".");
-    } else {
+    if (status == MMDB_SUCCESS) {
         m_version = VERSION_MAXMIND;
+    } else {
+        intMax.assign("libMaxMind: Can't open: " + std::string(MMDB_strerror(status)) + ".");
     }
 #endif
 
 #ifdef WITH_GEOIP
     if (m_version == NOT_LOADED) {
         m_gi = GeoIP_open(filePath.c_str(), GEOIP_MEMORY_CACHE);
-        if (m_gi == NULL) {
-            intGeo.append("GeoIP: Can't open: " + filePath + ".");
-        } else {
+        if (m_gi) {
             m_version = VERSION_GEOIP;
+        } else {
+            intGeo.append("GeoIP: Can't open: " + filePath + ".");
         }
     }
 #endif
