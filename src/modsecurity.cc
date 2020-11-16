@@ -95,9 +95,6 @@ ModSecurity::~ModSecurity() {
 #ifdef MSC_WITH_CURL
     curl_global_cleanup();
 #endif
-#ifdef WITH_GEOIP
-    Utils::GeoLookup::getInstance().cleanUp();
-#endif
 #ifdef WITH_LIBXML2
     xmlCleanupParser();
 #endif
