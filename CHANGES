@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Fix memory leak in VariableModificatorCount
+    [#2376 - @WGH-, @martinhsv]
   - Avoids to cleanup GeoIp on ModSecurity destructor
     [#2041 - @zimmerle, @jptosso, @victorhora]
   - Fix memory leak of RuleMessages objects

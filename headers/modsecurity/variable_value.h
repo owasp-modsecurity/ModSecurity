@@ -91,7 +91,7 @@ class VariableValue {
 
     /**
      *
-     *  Use case C + VariableModificatorCount
+     *  Use case C
      *
      *
      **/
@@ -182,7 +182,7 @@ class VariableValue {
     };
 
 
-    /* Use case E.2. - DURATION */
+    /* Use case E.2. - DURATION, VariableModificatorCount */
     VariableValue(std::unique_ptr<std::string> value,
         const std::string *collection)
         : m_origin(),

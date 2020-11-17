@@ -772,8 +772,8 @@ class VariableModificatorCount : public Variable {
         m_base->evaluate(t, &reslIn);
         auto count = reslIn.size();
 
-        std::string res(std::to_string(count));
-        l->push_back(std::make_shared<VariableValue>(getVariableKeyWithCollection().get(), &res));
+        std::unique_ptr<std::string> res(new std::string(std::to_string(count)));
+        l->push_back(std::make_shared<VariableValue>(std::move(res), getVariableKeyWithCollection().get()));
         return;
     }
 
