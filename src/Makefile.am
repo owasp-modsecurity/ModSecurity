@@ -272,6 +272,8 @@ libmodsecurity_la_SOURCES = \
 	parser/driver.cc \
 	transaction.cc \
 	anchored_set_variable.cc \
+	anchored_set_variable_match_vars.cc \
+	anchored_set_variable_match_vars_names.cc \
 	anchored_variable.cc \
 	audit_log/audit_log.cc \
 	audit_log/writer/writer.cc \

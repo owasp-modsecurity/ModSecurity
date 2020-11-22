@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "../headers/modsecurity/anchored_variable.h"
+#include "modsecurity/anchored_variable.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/regex.h"
