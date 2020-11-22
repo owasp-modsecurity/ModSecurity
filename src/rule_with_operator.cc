@@ -79,17 +79,14 @@ RuleWithOperator::~RuleWithOperator() {
 
 
 void RuleWithOperator::updateMatchedVars(Transaction *trans,
-    const VariableValue *v,
+    std::shared_ptr<const VariableValue> v,
     const bpstd::string_view &value) {
-    // FIXME: Memory leak.
-    const std::string *key = new std::string(v->getName());
-
     ms_dbg_a(trans, 9, "Matched vars updated.");
     trans->m_variableMatchedVar.set(value, trans->m_variableOffset);
-    trans->m_variableMatchedVarName.set(*key, trans->m_variableOffset);
+    trans->m_variableMatchedVarName.set(v);
 
-    trans->m_variableMatchedVars.set(*key, value, trans->m_variableOffset);
-    trans->m_variableMatchedVarsNames.set(*key, *key, trans->m_variableOffset);
+    trans->m_variableMatchedVars.set(v);
+    trans->m_variableMatchedVarsNames.set(v);
 }
 
 
@@ -354,7 +351,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
                         iter2++;
                     }
 
-                    updateMatchedVars(trans, v, view);
+                    updateMatchedVars(trans, vv, view);
                     executeActionsIndependentOfChainedRuleResult(trans);
 
                     globalRet = true;
