@@ -42,6 +42,9 @@ typedef struct Rules_t RulesSet;
 #endif
 
 #include "modsecurity/anchored_set_variable.h"
+#include "modsecurity/anchored_set_variable_match_vars_names.h"
+#include "modsecurity/anchored_set_variable_match_vars.h"
+#include "modsecurity/anchored_variable_match_var_name.h"
 #include "modsecurity/anchored_variable.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/collection/collections.h"
@@ -136,7 +139,7 @@ class TransactionAnchoredVariables {
         m_variableFullRequestLength(t, "FULL_REQUEST_LENGTH"),
         m_variableInboundDataError(t, "INBOUND_DATA_ERROR"),
         m_variableMatchedVar(t, "MATCHED_VAR"),
-        m_variableMatchedVarName(t, "MATCHED_VAR_NAME"),
+        m_variableMatchedVarName(),
         m_variableMultipartBoundaryQuoted(t, "MULTIPART_BOUNDARY_QUOTED"),
         m_variableMultipartBoundaryWhiteSpace(t,
             "MULTIPART_BOUNDARY_WHITESPACE"),
@@ -195,8 +198,8 @@ class TransactionAnchoredVariables {
         m_variableFilesTmpContent(t, "FILES_TMP_CONTENT"),
         m_variableMultipartFileName(t, "MULTIPART_FILENAME"),
         m_variableMultipartName(t, "MULTIPART_NAME"),
-        m_variableMatchedVarsNames(t, "MATCHED_VARS_NAMES"),
-        m_variableMatchedVars(t, "MATCHED_VARS"),
+        m_variableMatchedVarsNames(t),
+        m_variableMatchedVars(t),
         m_variableFiles(t, "FILES"),
         m_variableRequestCookies(t, "REQUEST_COOKIES"),
         m_variableRequestHeaders(t, "REQUEST_HEADERS"),
@@ -220,7 +223,7 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableFullRequestLength;
     AnchoredVariable m_variableInboundDataError;
     AnchoredVariable m_variableMatchedVar;
-    AnchoredVariable m_variableMatchedVarName;
+    AnchoredVariableMatchVarName m_variableMatchedVarName;
     AnchoredVariable m_variableMultipartBoundaryQuoted;
     AnchoredVariable m_variableMultipartBoundaryWhiteSpace;
     AnchoredVariable m_variableMultipartCrlfLFLines;
@@ -276,8 +279,8 @@ class TransactionAnchoredVariables {
     AnchoredSetVariable m_variableFilesTmpContent;
     AnchoredSetVariable m_variableMultipartFileName;
     AnchoredSetVariable m_variableMultipartName;
-    AnchoredSetVariable m_variableMatchedVarsNames;
-    AnchoredSetVariable m_variableMatchedVars;
+    AnchoredVariableMatchVarsNames m_variableMatchedVarsNames;
+    AnchoredVariableMatchVars m_variableMatchedVars;
     AnchoredSetVariable m_variableFiles;
     AnchoredSetVariable m_variableRequestCookies;
     AnchoredSetVariable m_variableRequestHeaders;

@@ -35,8 +35,11 @@ MAINTAINERCLEANFILES = \
 
 
 pkginclude_HEADERS = \
-	../headers/modsecurity/anchored_set_variable.h \
-	../headers/modsecurity/anchored_variable.h \
+    ../headers/modsecurity/anchored_set_variable.h \
+    ../headers/modsecurity/anchored_set_variable_match_vars.h \
+    ../headers/modsecurity/anchored_set_variable_match_vars_names.h \
+    ../headers/modsecurity/anchored_variable.h \
+    ../headers/modsecurity/anchored_variable_match_var_name.h \
 	../headers/modsecurity/audit_log.h \
 	../headers/modsecurity/debug_log.h \
 	../headers/modsecurity/intervention.h \
@@ -272,6 +275,8 @@ libmodsecurity_la_SOURCES = \
 	parser/driver.cc \
 	transaction.cc \
 	anchored_set_variable.cc \
+	anchored_set_variable_match_vars.cc \
+	anchored_set_variable_match_vars_names.cc \
 	anchored_variable.cc \
 	audit_log/audit_log.cc \
 	audit_log/writer/writer.cc \
