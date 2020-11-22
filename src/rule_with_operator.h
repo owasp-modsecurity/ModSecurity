@@ -82,7 +82,7 @@ class RuleWithOperator : public RuleWithActions {
         const bpstd::string_view &value) const;
 
     static void updateMatchedVars(Transaction *transaction,
-        const VariableValue *v,
+        std::shared_ptr<const VariableValue> v,
         const bpstd::string_view &value);
 
     static void cleanMatchedVars(Transaction *trasn);
