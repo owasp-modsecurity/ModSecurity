@@ -35,9 +35,9 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule ARGS:keyI \"@contains value\" \"chain,id:28,pass\"",
-      "SecRule ARGS:keyII \"@contains other_value\" \"chain\"",
-      "SecRule MATCHED_VAR_NAME \"@contains asdf\" \"\""
+      "SecRule ARGS:keyI \"@contains value\" \"id:28,pass\"",
+      "SecRule ARGS:keyII \"@contains other_value\" \"id:29,pass\"",
+      "SecRule MATCHED_VAR_NAME \"@contains asdf\" \"id:30,pass\""
     ]
   },
   {
