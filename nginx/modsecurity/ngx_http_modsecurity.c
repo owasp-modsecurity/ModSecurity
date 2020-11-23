@@ -63,7 +63,8 @@ typedef struct {
 /*
 ** Module's registred function/handlers.
 */
-static ngx_int_t ngx_http_modsecurity_handler(ngx_http_request_t *r);
+static ngx_int_t ngx_http_modsecurity_handler(ngx_http_request_t* r);
+static ngx_int_t ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r);
 static ngx_int_t ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf);
 static ngx_int_t ngx_http_modsecurity_init(ngx_conf_t *cf);
 static ngx_int_t ngx_http_modsecurity_init_process(ngx_cycle_t *cycle);
@@ -637,7 +638,7 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     if (h == NULL) {
         return NGX_ERROR;
     }
-    *h = ngx_http_modsecurity_handler;
+    *h = ngx_http_modsecurity_handler_with_timer;
 
     ngx_memzero(&ngx_http_modsecurity_upstream, sizeof(ngx_http_upstream_t));
     ngx_http_modsecurity_upstream.cacheable = 1;
@@ -897,34 +898,45 @@ ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_time_t *start_time)
     ms = (ngx_msec_int_t)
         ((end_time->sec - start_time->sec) * 1000 + (end_time->msec - start_time->msec));
     ms = ngx_max(ms, 0);
-
     ngx_http_variable_value_t* modsec_latency_var = ngx_http_get_indexed_variable(r, modsec_latency_index);
     return ngx_http_modsecurity_set_modsec_latency(r, modsec_latency_var, ms);
 }
 
 /*
 ** [ENTRY POINT] does : this function called by nginx from the request handler
+*   Calculate the modsec latency in this function and invoke the main handler.
 */
+static ngx_int_t
+ngx_http_modsecurity_handler_with_timer(ngx_http_request_t* r)
+{
+    ngx_time_update();
+    ngx_time_t* start_time;
+    ngx_int_t ret, modsec_latency_ret;
+    start_time = ngx_timeofday();
+
+    // Main modsec handler
+    ret  = ngx_http_modsecurity_handler(r);
+
+    // We return failure only if memory allocation fails for latency variable in calculating metric
+    modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
+    if (modsec_latency_ret != NGX_OK) {
+        ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "modSecurity: latency metric memory allocation failed");
+        return modsec_latency_ret;
+    }
+    return ret;
+}
+
 static ngx_int_t
 ngx_http_modsecurity_handler(ngx_http_request_t *r)
 {
     ngx_http_modsecurity_loc_conf_t *cf;
     ngx_http_modsecurity_ctx_t      *ctx;
     ngx_int_t                        rc;
-    ngx_time_t                      *start_time;
-    static ngx_int_t                ret, modsec_latency_ret;
-
-    ngx_time_update();
-    start_time = ngx_timeofday();
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
 
     /* Process only main request */
     if (r != r->main || !cf->enable) {
-        modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-        if (modsec_latency_ret != NGX_OK) {
-            return modsec_latency_ret;
-        }
         return NGX_DECLINED;
     }
 
@@ -938,10 +950,6 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
                 MIN(azwaf_processing_result->len ,azwaf_action_allow.len)) == 0) {
 
             ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "The request is allowed by AzWAF, skip ModSecurity processing");
-            modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-            if (modsec_latency_ret != NGX_OK) {
-                return modsec_latency_ret;
-            }
             return NGX_DECLINED;
         }
     }
@@ -951,17 +959,9 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         rc = ngx_http_read_client_request_body(r, ngx_http_modsecurity_body_handler);
 
         if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
-            modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-            if (modsec_latency_ret != NGX_OK) {
-                return modsec_latency_ret;
-            }
             return rc;
         }
 
-        modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-        if (modsec_latency_ret != NGX_OK) {
-            return modsec_latency_ret;
-        }
         return NGX_DONE;
     }
 
@@ -972,10 +972,6 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     if (ctx == NULL) {
         ctx = ngx_http_modsecurity_create_ctx(r);
         if (ctx == NULL) {
-            modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-            if (modsec_latency_ret != NGX_OK) {
-                return modsec_latency_ret;
-            }
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
 
@@ -988,45 +984,23 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
     // Sometimes Nginx calls ngx_http_modsecurity_handler multiple times for the same request, after a worker thread has already been started. This is to guard against it.
     if (ctx->thread_running) {
-        modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-        if (modsec_latency_ret != NGX_OK) {
-            return modsec_latency_ret;
-        }
         return NGX_DONE;
     }
 
     if (ctx->status_code != STATUS_CODE_NOT_SET) {
         if (ctx->status_code > 0) {
-            modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-            if (modsec_latency_ret != NGX_OK) {
-                return modsec_latency_ret;
-            }
             return ctx->status_code;
         }
 
-        modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-        if (modsec_latency_ret != NGX_OK) {
-            return modsec_latency_ret;
-        }
         // Request must be routed to the next handler
         return NGX_DECLINED;
     }
 
     if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
-        ret = ngx_http_modsecurity_detection_task_offload(r);
-        modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-        if (modsec_latency_ret != NGX_OK) {
-            return modsec_latency_ret;
-        }
-        return ret;
+        return ngx_http_modsecurity_detection_task_offload(r);
     }
 
-    ret = ngx_http_modsecurity_prevention_task_offload(r);
-    modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
-    if (modsec_latency_ret != NGX_OK) {
-        return modsec_latency_ret;
-    }
-    return ret;
+    return ngx_http_modsecurity_prevention_task_offload(r);
 }
 
 #define TXID_SIZE 25
