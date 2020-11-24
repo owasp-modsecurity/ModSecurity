@@ -63,7 +63,7 @@ typedef struct {
 /*
 ** Module's registred function/handlers.
 */
-static ngx_int_t ngx_http_modsecurity_handler(ngx_http_request_t* r);
+static ngx_int_t ngx_http_modsecurity_handler(ngx_http_request_t* r, ngx_http_modsecurity_loc_conf_t* cf);
 static ngx_int_t ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r);
 static ngx_int_t ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf);
 static ngx_int_t ngx_http_modsecurity_init(ngx_conf_t *cf);
@@ -77,15 +77,20 @@ static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_req
 static int ngx_http_modsecurity_drop_action(request_rec *r);
 static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
-static ngx_int_t ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_time_t *start_time);
+static ngx_int_t ngx_http_calculate_modsec_latency(ngx_http_request_t *r,
+    ngx_time_t *start_time, ngx_http_modsecurity_loc_conf_t* cf);
 
 static ngx_int_t ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, ngx_msec_int_t modsec_latency);
-static ngx_int_t ngx_http_variable_get_modsec_latency(ngx_http_request_t* r,
+static ngx_int_t ngx_http_variable_get_modsec_latency_detect_mode(ngx_http_request_t* r,
+    ngx_http_variable_value_t* v, uintptr_t data);
+static ngx_int_t ngx_http_variable_get_modsec_latency_prevent_mode(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, uintptr_t data);
 
-static ngx_str_t modsec_latency_varname = ngx_string("modsec_latency");
-static ngx_uint_t modsec_latency_index;
+static ngx_str_t modsec_latency_detect_varname = ngx_string("modsec_latency_detect_mode");
+static ngx_uint_t modsec_latency_detect_index;
+static ngx_str_t modsec_latency_prevent_varname = ngx_string("modsec_latency_prevent_mode");
+static ngx_uint_t modsec_latency_prevent_index;
 
 static ngx_str_t thread_pool_name = ngx_string("default");
 
@@ -171,8 +176,11 @@ ngx_module_t ngx_http_modsecurity = {
 
 
 static ngx_http_variable_t  ngx_http_modsecurity_vars[] = {
-    { ngx_string("modsec_latency"), NULL,
-    ngx_http_variable_get_modsec_latency,
+    { ngx_string("modsec_latency_detect_mode"), NULL,
+    ngx_http_variable_get_modsec_latency_detect_mode,
+    0, NGX_HTTP_VAR_NOCACHEABLE, 0 },
+    { ngx_string("modsec_latency_prevent_mode"), NULL,
+    ngx_http_variable_get_modsec_latency_prevent_mode,
     0, NGX_HTTP_VAR_NOCACHEABLE, 0 },
       ngx_http_null_variable
 };
@@ -655,7 +663,8 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     extern pthread_mutex_t msc_pregcomp_ex_mtx;
     pthread_mutex_init(&msc_pregcomp_ex_mtx, NULL);
 
-    modsec_latency_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &modsec_latency_varname);
+    modsec_latency_detect_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &modsec_latency_detect_varname);
+    modsec_latency_prevent_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &modsec_latency_prevent_varname);
 
 #ifdef WAF_JSON_LOGGING_ENABLE
     int result = init_appgw_rules_id_hash();
@@ -881,25 +890,42 @@ ngx_http_modsecurity_detection_task_offload(ngx_http_request_t *r)
 }
 
 static void
-ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
+ngx_http_modsecurity_body_handler(ngx_http_request_t* r)
 {
     r->main->count--;
     ngx_http_core_run_phases(r);
 }
 
 static ngx_int_t
-ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_time_t *start_time)
+ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_time_t *start_time,
+                                  ngx_http_modsecurity_loc_conf_t * cf)
 {
     ngx_time_t *end_time;
     ngx_msec_int_t   ms;
+    ngx_int_t ret;
     ngx_time_update();
     end_time = ngx_timeofday();
 
     ms = (ngx_msec_int_t)
         ((end_time->sec - start_time->sec) * 1000 + (end_time->msec - start_time->msec));
     ms = ngx_max(ms, 0);
-    ngx_http_variable_value_t* modsec_latency_var = ngx_http_get_indexed_variable(r, modsec_latency_index);
-    return ngx_http_modsecurity_set_modsec_latency(r, modsec_latency_var, ms);
+
+    ngx_http_variable_value_t* modsec_latency_detect_var = ngx_http_get_indexed_variable(r, modsec_latency_detect_index);
+    ngx_http_variable_value_t* modsec_latency_prevent_var = ngx_http_get_indexed_variable(r, modsec_latency_prevent_index);
+    if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
+        ret = ngx_http_modsecurity_set_modsec_latency(r, modsec_latency_detect_var, ms);
+        if (ret != NGX_OK) {
+            return ret;
+        }
+        return ngx_http_modsecurity_set_modsec_latency(r, modsec_latency_prevent_var, 0);
+    }
+    else {
+        ret = ngx_http_modsecurity_set_modsec_latency(r, modsec_latency_prevent_var, ms);
+        if (ret != NGX_OK) {
+            return ret;
+        }
+        return ngx_http_modsecurity_set_modsec_latency(r, modsec_latency_detect_var, 0);
+    }
 }
 
 /*
@@ -910,15 +936,18 @@ static ngx_int_t
 ngx_http_modsecurity_handler_with_timer(ngx_http_request_t* r)
 {
     ngx_time_update();
+    ngx_http_modsecurity_loc_conf_t* cf;
     ngx_time_t* start_time;
     ngx_int_t ret, modsec_latency_ret;
     start_time = ngx_timeofday();
 
+    cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
+
     // Main modsec handler
-    ret  = ngx_http_modsecurity_handler(r);
+    ret  = ngx_http_modsecurity_handler(r, cf);
 
     // We return failure only if memory allocation fails for latency variable in calculating metric
-    modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time);
+    modsec_latency_ret = ngx_http_calculate_modsec_latency(r, start_time, cf);
     if (modsec_latency_ret != NGX_OK) {
         ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "modSecurity: latency metric memory allocation failed");
         return modsec_latency_ret;
@@ -927,13 +956,10 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t* r)
 }
 
 static ngx_int_t
-ngx_http_modsecurity_handler(ngx_http_request_t *r)
+ngx_http_modsecurity_handler(ngx_http_request_t *r, ngx_http_modsecurity_loc_conf_t *cf)
 {
-    ngx_http_modsecurity_loc_conf_t *cf;
     ngx_http_modsecurity_ctx_t      *ctx;
     ngx_int_t                        rc;
-
-    cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
 
     /* Process only main request */
     if (r != r->main || !cf->enable) {
@@ -1212,8 +1238,15 @@ ngx_http_modsecurity_drop_action(request_rec *r)
 }
 
     static ngx_int_t
-ngx_http_variable_get_modsec_latency(ngx_http_request_t* r,
+ngx_http_variable_get_modsec_latency_detect_mode(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, uintptr_t data)
+{
+    return NGX_OK;
+}
+
+    static ngx_int_t
+ngx_http_variable_get_modsec_latency_prevent_mode(ngx_http_request_t* r,
+     ngx_http_variable_value_t* v, uintptr_t data)
 {
     return NGX_OK;
 }
