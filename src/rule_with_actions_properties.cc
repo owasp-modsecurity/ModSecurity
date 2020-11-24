@@ -55,7 +55,7 @@ RuleWithActionsProperties::RuleWithActionsProperties(const RuleWithActionsProper
     m_hasLog(o.m_hasLog),
     m_hasMultiMatch(o.m_hasMultiMatch),
     m_hasNoAuditLog(o.m_hasNoAuditLog),
-    m_hasNoLog(o.m_hasNoAuditLog),
+    m_hasNoLog(o.m_hasNoLog),
     m_executeIfMatchActions(),
     m_setVars(),
     m_disruptiveAction(o.m_disruptiveAction),

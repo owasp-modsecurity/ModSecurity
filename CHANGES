@@ -2,6 +2,10 @@ v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
 
+  - Fix: audit log output missing when DetectionOnly
+    [#2459 - @martinhsv]
+  - Fix hasNoLog assignment in RuleWithActionsProperties copy-constructor
+    [#2459 - @martinhsv]
   - Using a custom VariableMatch* implementation
     [#2428 - @zimmerle]
   - Avoids to cleanup GeoIp on ModSecurity destructor

@@ -258,10 +258,16 @@ class RuleWithActions : public Rule, public RuleWithActionsProperties {
     }
 
     inline bool isItToBeAuditLogged() const noexcept {
-        if (hasAuditLog()) {
+        if (hasNoAuditLog()) {
+            return false;
+        }
+        if (hasNoLog() && !hasAuditLog()) {
+            return false;
+        }
+        if (hasLog() || hasAuditLog()) {
             return true;
         }
-        if (m_defaultActions.hasAuditLog() && !hasNoAuditLog()) {
+        if (m_defaultActions.hasAuditLog()) {
             return true;
         }
         if (isItToBeLogged()) {
