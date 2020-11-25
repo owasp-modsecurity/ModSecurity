@@ -61,7 +61,7 @@ struct SMatchCapture {
 
 class Regex {
  public:
-    explicit Regex(const std::string& pattern_);
+    explicit Regex(const std::string& pattern_, bool ignoreCase = false);
     ~Regex();
 
     // m_pc and m_pce can't be easily copied

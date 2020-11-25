@@ -537,7 +537,7 @@ void LMDB::resolveRegularExpression(const std::string& var,
     MDB_stat mst;
     MDB_cursor *cursor;
 
-    Utils::Regex r(var);
+    Utils::Regex r(var, true);
 
     rc = mdb_txn_begin(m_env, NULL, 0, &txn);
     lmdb_debug(rc, "txn", "resolveRegularExpression");
