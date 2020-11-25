@@ -116,9 +116,9 @@ class KeyExclusion {
 class KeyExclusionRegex : public KeyExclusion {
  public:
     explicit KeyExclusionRegex(const Utils::Regex &re)
-        : m_re(re.pattern) { }
+        : m_re(re.pattern, true) { }
     explicit KeyExclusionRegex(const std::string &re)
-        : m_re(re) { }
+        : m_re(re, true) { }
 
     ~KeyExclusionRegex() override { }
 
@@ -595,7 +595,7 @@ class VariableDictElement : public Variable {
 class VariableRegex : public Variable {
  public:
     VariableRegex(const std::string &name, const std::string &regex)
-        :  m_r(regex),
+        :  m_r(regex, true),
         m_regex(regex),
         Variable(name + ":" + "regex(" + regex + ")") { }
 
