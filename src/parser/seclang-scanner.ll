@@ -461,6 +461,8 @@ NEW_LINE                                [\n\r]+
 EQUALS                                  (?i:=)
 EQUALS_PLUS                             (?i:=\+)
 EQUALS_MINUS                            (?i:=\-)
+EQUALS_BIGGER                           (?i:=\>)
+EQUALS_LESS                             (?i:=\<)
 
 %x EXPECTING_ACTION_PREDICATE_VARIABLE
 %x TRANSACTION_TO_VARIABLE
@@ -696,6 +698,8 @@ EQUALS_MINUS                            (?i:=\-)
 <SETVAR_ACTION_NONQUOTED_WAITING_OPERATION,SETVAR_ACTION_QUOTED_WAITING_OPERATION>{
 {EQUALS_PLUS}                                       { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_PLUS(*driver.loc.back()); }
 {EQUALS_MINUS}                                      { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_MINUS(*driver.loc.back()); }
+{EQUALS_BIGGER}                                     { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_APPEND(*driver.loc.back()); }
+{EQUALS_LESS}                                       { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_PREPEND(*driver.loc.back()); }
 {EQUALS}                                            { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS(*driver.loc.back()); }
 }
 
@@ -1042,6 +1046,8 @@ EQUALS_MINUS                            (?i:=\-)
 <EXPECTING_VAR_PARAMETER_OR_MACRO_QUOTED,EXPECTING_VAR_PARAMETER_OR_MACRO_NONQUOTED>{
 {EQUALS_PLUS}                             { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_PLUS(*driver.loc.back()); }
 {EQUALS_MINUS}                            { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_MINUS(*driver.loc.back()); }
+{EQUALS_BIGGER}                           { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_APPEND(*driver.loc.back()); }
+{EQUALS_LESS}                             { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_PREPEND(*driver.loc.back()); }
 {EQUALS}                                  { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS(*driver.loc.back()); }
 [\/]{DICT_ELEMENT_NO_PIPE}[\/][ ]         { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 [\/]{DICT_ELEMENT_NO_PIPE}[\/][|]         { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }

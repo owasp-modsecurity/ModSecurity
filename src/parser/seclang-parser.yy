@@ -435,6 +435,8 @@ using namespace modsecurity::operators;
   SETVAR_OPERATION_EQUALS
   SETVAR_OPERATION_EQUALS_PLUS
   SETVAR_OPERATION_EQUALS_MINUS
+  SETVAR_OPERATION_EQUALS_APPEND
+  SETVAR_OPERATION_EQUALS_PREPEND
   NOT                                          "NOT"
 
   OPERATOR_BEGINS_WITH                         "OPERATOR_BEGINS_WITH"
@@ -3023,6 +3025,14 @@ setvar_action:
     | var SETVAR_OPERATION_EQUALS_MINUS run_time_string
       {
         ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, std::move($1), std::move($3)));
+      }
+    | var SETVAR_OPERATION_EQUALS_APPEND run_time_string
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::appendStringOperation, std::move($1), std::move($3)));
+      }
+    | var SETVAR_OPERATION_EQUALS_PREPEND run_time_string
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::prependStringOperation, std::move($1), std::move($3)));
       }
     ;
 

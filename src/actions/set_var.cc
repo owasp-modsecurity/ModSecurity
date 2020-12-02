@@ -80,6 +80,22 @@ bool SetVar::execute(Transaction *t) const noexcept {
         targetValue = resolvedPre;
     } else if (m_operation == setToOneOperation) {
         targetValue = std::string("1");
+    } else if (m_operation == appendStringOperation) {
+        VariableValues l;
+        std::string value("");
+        m_variable->evaluate(t, &l);
+        if (l.size() > 0) {
+            value = l[0]->getValue();
+        }
+        targetValue = resolvedPre + value;
+    } else if (m_operation == prependStringOperation) {
+        VariableValues l;
+        std::string value("");
+        m_variable->evaluate(t, &l);
+        if (l.size() > 0) {
+            value = l[0]->getValue();
+        }
+        targetValue = value + resolvedPre;
     } else if (m_operation == unsetOperation) {
         if (tx) {
             tx->del(t, m_variableNameExpanded);

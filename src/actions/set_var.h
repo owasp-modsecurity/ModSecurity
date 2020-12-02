@@ -45,6 +45,8 @@ enum SetVarOperation {
     setToOneOperation,
     /* unset operation */
     unsetOperation,
+    appendStringOperation,
+    prependStringOperation,
 };
 
 

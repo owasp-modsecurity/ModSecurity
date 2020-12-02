@@ -1690,7 +1690,7 @@ namespace yy {
           switch (yyn)
             {
   case 2: // input: "end of file"
-#line 716 "seclang-parser.yy"
+#line 718 "seclang-parser.yy"
       {
         return 0;
       }
@@ -1698,7 +1698,7 @@ namespace yy {
     break;
 
   case 6: // audit_log: "CONFIG_DIR_AUDIT_DIR_MOD"
-#line 729 "seclang-parser.yy"
+#line 731 "seclang-parser.yy"
       {
         driver.m_auditLog->setStorageDirMode(strtol(yystack_[0].value.as < std::string > ().c_str(), NULL, 8));
       }
@@ -1706,7 +1706,7 @@ namespace yy {
     break;
 
   case 7: // audit_log: "CONFIG_DIR_AUDIT_DIR"
-#line 735 "seclang-parser.yy"
+#line 737 "seclang-parser.yy"
       {
         driver.m_auditLog->setStorageDir(yystack_[0].value.as < std::string > ());
       }
@@ -1714,7 +1714,7 @@ namespace yy {
     break;
 
   case 8: // audit_log: "CONFIG_DIR_AUDIT_ENG" "CONFIG_VALUE_RELEVANT_ONLY"
-#line 741 "seclang-parser.yy"
+#line 743 "seclang-parser.yy"
       {
         driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
       }
@@ -1722,7 +1722,7 @@ namespace yy {
     break;
 
   case 9: // audit_log: "CONFIG_DIR_AUDIT_ENG" "CONFIG_VALUE_OFF"
-#line 745 "seclang-parser.yy"
+#line 747 "seclang-parser.yy"
       {
         driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
       }
@@ -1730,7 +1730,7 @@ namespace yy {
     break;
 
   case 10: // audit_log: "CONFIG_DIR_AUDIT_ENG" "CONFIG_VALUE_ON"
-#line 749 "seclang-parser.yy"
+#line 751 "seclang-parser.yy"
       {
         driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
       }
@@ -1738,7 +1738,7 @@ namespace yy {
     break;
 
   case 11: // audit_log: "CONFIG_DIR_AUDIT_FLE_MOD"
-#line 755 "seclang-parser.yy"
+#line 757 "seclang-parser.yy"
       {
         driver.m_auditLog->setFileMode(strtol(yystack_[0].value.as < std::string > ().c_str(), NULL, 8));
       }
@@ -1746,7 +1746,7 @@ namespace yy {
     break;
 
   case 12: // audit_log: "CONFIG_DIR_AUDIT_LOG2"
-#line 761 "seclang-parser.yy"
+#line 763 "seclang-parser.yy"
       {
         driver.m_auditLog->setFilePath2(yystack_[0].value.as < std::string > ());
       }
@@ -1754,7 +1754,7 @@ namespace yy {
     break;
 
   case 13: // audit_log: "CONFIG_DIR_AUDIT_LOG_P"
-#line 767 "seclang-parser.yy"
+#line 769 "seclang-parser.yy"
       {
         driver.m_auditLog->setParts(yystack_[0].value.as < std::string > ());
       }
@@ -1762,7 +1762,7 @@ namespace yy {
     break;
 
   case 14: // audit_log: "CONFIG_DIR_AUDIT_LOG"
-#line 773 "seclang-parser.yy"
+#line 775 "seclang-parser.yy"
       {
         driver.m_auditLog->setFilePath1(yystack_[0].value.as < std::string > ());
       }
@@ -1770,7 +1770,7 @@ namespace yy {
     break;
 
   case 15: // audit_log: CONFIG_DIR_AUDIT_LOG_FMT JSON
-#line 778 "seclang-parser.yy"
+#line 780 "seclang-parser.yy"
       {
         driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::JSONAuditLogFormat);
       }
@@ -1778,7 +1778,7 @@ namespace yy {
     break;
 
   case 16: // audit_log: CONFIG_DIR_AUDIT_LOG_FMT NATIVE
-#line 783 "seclang-parser.yy"
+#line 785 "seclang-parser.yy"
       {
         driver.m_auditLog->setFormat(modsecurity::audit_log::AuditLog::NativeAuditLogFormat);
       }
@@ -1786,7 +1786,7 @@ namespace yy {
     break;
 
   case 17: // audit_log: "CONFIG_DIR_AUDIT_STS"
-#line 789 "seclang-parser.yy"
+#line 791 "seclang-parser.yy"
       {
         std::string relevant_status(yystack_[0].value.as < std::string > ());
         driver.m_auditLog->setRelevantStatus(relevant_status);
@@ -1795,7 +1795,7 @@ namespace yy {
     break;
 
   case 18: // audit_log: "CONFIG_DIR_AUDIT_TPE" "CONFIG_VALUE_SERIAL"
-#line 796 "seclang-parser.yy"
+#line 798 "seclang-parser.yy"
       {
         driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
       }
@@ -1803,7 +1803,7 @@ namespace yy {
     break;
 
   case 19: // audit_log: "CONFIG_DIR_AUDIT_TPE" "CONFIG_VALUE_PARALLEL"
-#line 800 "seclang-parser.yy"
+#line 802 "seclang-parser.yy"
       {
         driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
       }
@@ -1811,7 +1811,7 @@ namespace yy {
     break;
 
   case 20: // audit_log: "CONFIG_DIR_AUDIT_TPE" "CONFIG_VALUE_HTTPS"
-#line 804 "seclang-parser.yy"
+#line 806 "seclang-parser.yy"
       {
         driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
       }
@@ -1819,7 +1819,7 @@ namespace yy {
     break;
 
   case 21: // audit_log: "CONFIG_UPDLOAD_KEEP_FILES" "CONFIG_VALUE_ON"
-#line 810 "seclang-parser.yy"
+#line 812 "seclang-parser.yy"
       {
         driver.m_uploadKeepFiles = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
@@ -1827,7 +1827,7 @@ namespace yy {
     break;
 
   case 22: // audit_log: "CONFIG_UPDLOAD_KEEP_FILES" "CONFIG_VALUE_OFF"
-#line 814 "seclang-parser.yy"
+#line 816 "seclang-parser.yy"
       {
         driver.m_uploadKeepFiles = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
@@ -1835,7 +1835,7 @@ namespace yy {
     break;
 
   case 23: // audit_log: "CONFIG_UPDLOAD_KEEP_FILES" "CONFIG_VALUE_RELEVANT_ONLY"
-#line 818 "seclang-parser.yy"
+#line 820 "seclang-parser.yy"
       {
         driver.error(yystack_[2].location, "SecUploadKeepFiles RelevantOnly is not currently supported. Accepted values are On or Off");
         YYERROR;
@@ -1844,7 +1844,7 @@ namespace yy {
     break;
 
   case 24: // audit_log: "CONFIG_UPLOAD_FILE_LIMIT"
-#line 823 "seclang-parser.yy"
+#line 825 "seclang-parser.yy"
       {
         driver.m_uploadFileLimit.m_set = true;
         driver.m_uploadFileLimit.m_value = strtol(yystack_[0].value.as < std::string > ().c_str(), NULL, 10);
@@ -1853,7 +1853,7 @@ namespace yy {
     break;
 
   case 25: // audit_log: "CONFIG_UPLOAD_FILE_MODE"
-#line 828 "seclang-parser.yy"
+#line 830 "seclang-parser.yy"
       {
         driver.m_uploadFileMode.m_set = true;
         driver.m_uploadFileMode.m_value = strtol(yystack_[0].value.as < std::string > ().c_str(), NULL, 8);
@@ -1862,7 +1862,7 @@ namespace yy {
     break;
 
   case 26: // audit_log: "CONFIG_UPLOAD_DIR"
-#line 833 "seclang-parser.yy"
+#line 835 "seclang-parser.yy"
       {
         driver.m_uploadDirectory.m_set = true;
         driver.m_uploadDirectory.m_value = yystack_[0].value.as < std::string > ();
@@ -1871,7 +1871,7 @@ namespace yy {
     break;
 
   case 27: // audit_log: "CONFIG_UPDLOAD_SAVE_TMP_FILES" "CONFIG_VALUE_ON"
-#line 838 "seclang-parser.yy"
+#line 840 "seclang-parser.yy"
       {
         driver.m_tmpSaveUploadedFiles = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
@@ -1879,7 +1879,7 @@ namespace yy {
     break;
 
   case 28: // audit_log: "CONFIG_UPDLOAD_SAVE_TMP_FILES" "CONFIG_VALUE_OFF"
-#line 842 "seclang-parser.yy"
+#line 844 "seclang-parser.yy"
       {
         driver.m_tmpSaveUploadedFiles = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
@@ -1887,7 +1887,7 @@ namespace yy {
     break;
 
   case 29: // actions: "QUOTATION_MARK" actions_may_quoted "QUOTATION_MARK"
-#line 849 "seclang-parser.yy"
+#line 851 "seclang-parser.yy"
       {
         yylhs.value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > () = std::move(yystack_[1].value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ());
       }
@@ -1895,7 +1895,7 @@ namespace yy {
     break;
 
   case 30: // actions: actions_may_quoted
-#line 853 "seclang-parser.yy"
+#line 855 "seclang-parser.yy"
       {
         yylhs.value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > () = std::move(yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ());
       }
@@ -1903,7 +1903,7 @@ namespace yy {
     break;
 
   case 31: // actions_may_quoted: actions_may_quoted "," act
-#line 860 "seclang-parser.yy"
+#line 862 "seclang-parser.yy"
       {
         ACTION_INIT(yystack_[0].value.as < std::unique_ptr<actions::Action> > (), yystack_[3].location)
         yystack_[2].value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ()->push_back(std::move(yystack_[0].value.as < std::unique_ptr<actions::Action> > ()));
@@ -1913,7 +1913,7 @@ namespace yy {
     break;
 
   case 32: // actions_may_quoted: act
-#line 866 "seclang-parser.yy"
+#line 868 "seclang-parser.yy"
       {
         std::unique_ptr<std::vector<std::unique_ptr<actions::Action>>> b(new std::vector<std::unique_ptr<actions::Action>>());
         ACTION_INIT(yystack_[0].value.as < std::unique_ptr<actions::Action> > (), yystack_[1].location)
@@ -1924,7 +1924,7 @@ namespace yy {
     break;
 
   case 33: // op: op_before_init
-#line 876 "seclang-parser.yy"
+#line 878 "seclang-parser.yy"
       {
         yylhs.value.as < std::unique_ptr<Operator> > () = std::move(yystack_[0].value.as < std::unique_ptr<Operator> > ());
         std::string error;
@@ -1937,7 +1937,7 @@ namespace yy {
     break;
 
   case 34: // op: "NOT" op_before_init
-#line 885 "seclang-parser.yy"
+#line 887 "seclang-parser.yy"
       {
         yylhs.value.as < std::unique_ptr<Operator> > () = std::move(yystack_[0].value.as < std::unique_ptr<Operator> > ());
         yylhs.value.as < std::unique_ptr<Operator> > ()->m_negation = true;
@@ -1951,7 +1951,7 @@ namespace yy {
     break;
 
   case 35: // op: run_time_string
-#line 895 "seclang-parser.yy"
+#line 897 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
         std::string error;
@@ -1964,7 +1964,7 @@ namespace yy {
     break;
 
   case 36: // op: "NOT" run_time_string
-#line 904 "seclang-parser.yy"
+#line 906 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
         yylhs.value.as < std::unique_ptr<Operator> > ()->m_negation = true;
@@ -1978,7 +1978,7 @@ namespace yy {
     break;
 
   case 37: // op_before_init: "OPERATOR_UNCONDITIONAL_MATCH"
-#line 917 "seclang-parser.yy"
+#line 919 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::UnconditionalMatch());
       }
@@ -1986,7 +1986,7 @@ namespace yy {
     break;
 
   case 38: // op_before_init: "OPERATOR_DETECT_SQLI"
-#line 921 "seclang-parser.yy"
+#line 923 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::DetectSQLi());
       }
@@ -1994,7 +1994,7 @@ namespace yy {
     break;
 
   case 39: // op_before_init: "OPERATOR_DETECT_XSS"
-#line 925 "seclang-parser.yy"
+#line 927 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::DetectXSS());
       }
@@ -2002,7 +2002,7 @@ namespace yy {
     break;
 
   case 40: // op_before_init: "OPERATOR_VALIDATE_URL_ENCODING"
-#line 929 "seclang-parser.yy"
+#line 931 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::ValidateUrlEncoding());
       }
@@ -2010,7 +2010,7 @@ namespace yy {
     break;
 
   case 41: // op_before_init: "OPERATOR_VALIDATE_UTF8_ENCODING"
-#line 933 "seclang-parser.yy"
+#line 935 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::ValidateUtf8Encoding());
       }
@@ -2018,7 +2018,7 @@ namespace yy {
     break;
 
   case 42: // op_before_init: "OPERATOR_INSPECT_FILE" run_time_string
-#line 937 "seclang-parser.yy"
+#line 939 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::InspectFile(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2026,7 +2026,7 @@ namespace yy {
     break;
 
   case 43: // op_before_init: "OPERATOR_FUZZY_HASH" run_time_string
-#line 941 "seclang-parser.yy"
+#line 943 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::FuzzyHash(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2034,7 +2034,7 @@ namespace yy {
     break;
 
   case 44: // op_before_init: "OPERATOR_VALIDATE_BYTE_RANGE" run_time_string
-#line 945 "seclang-parser.yy"
+#line 947 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::ValidateByteRange(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2042,7 +2042,7 @@ namespace yy {
     break;
 
   case 45: // op_before_init: "OPERATOR_VALIDATE_DTD" run_time_string
-#line 949 "seclang-parser.yy"
+#line 951 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::ValidateDTD(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2050,7 +2050,7 @@ namespace yy {
     break;
 
   case 46: // op_before_init: "OPERATOR_VALIDATE_HASH" run_time_string
-#line 953 "seclang-parser.yy"
+#line 955 "seclang-parser.yy"
       {
         /* $$ = new operators::ValidateHash($1); */
         OPERATOR_NOT_SUPPORTED("ValidateHash", yystack_[2].location);
@@ -2059,7 +2059,7 @@ namespace yy {
     break;
 
   case 47: // op_before_init: "OPERATOR_VALIDATE_SCHEMA" run_time_string
-#line 958 "seclang-parser.yy"
+#line 960 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::ValidateSchema(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2067,7 +2067,7 @@ namespace yy {
     break;
 
   case 48: // op_before_init: "OPERATOR_VERIFY_CC" run_time_string
-#line 962 "seclang-parser.yy"
+#line 964 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::VerifyCC(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2075,7 +2075,7 @@ namespace yy {
     break;
 
   case 49: // op_before_init: "OPERATOR_VERIFY_CPF" run_time_string
-#line 966 "seclang-parser.yy"
+#line 968 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::VerifyCPF(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2083,7 +2083,7 @@ namespace yy {
     break;
 
   case 50: // op_before_init: "OPERATOR_VERIFY_SSN" run_time_string
-#line 970 "seclang-parser.yy"
+#line 972 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::VerifySSN(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2091,7 +2091,7 @@ namespace yy {
     break;
 
   case 51: // op_before_init: "OPERATOR_VERIFY_SVNR" run_time_string
-#line 974 "seclang-parser.yy"
+#line 976 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::VerifySVNR(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2099,7 +2099,7 @@ namespace yy {
     break;
 
   case 52: // op_before_init: "OPERATOR_GSB_LOOKUP" run_time_string
-#line 978 "seclang-parser.yy"
+#line 980 "seclang-parser.yy"
       {
         /* $$ = new operators::GsbLookup($1); */
         OPERATOR_NOT_SUPPORTED("GsbLookup", yystack_[2].location);
@@ -2108,7 +2108,7 @@ namespace yy {
     break;
 
   case 53: // op_before_init: "OPERATOR_RSUB" run_time_string
-#line 983 "seclang-parser.yy"
+#line 985 "seclang-parser.yy"
       {
         /* $$ = new operators::Rsub($1); */
         OPERATOR_NOT_SUPPORTED("Rsub", yystack_[2].location);
@@ -2117,7 +2117,7 @@ namespace yy {
     break;
 
   case 54: // op_before_init: "OPERATOR_WITHIN" run_time_string
-#line 988 "seclang-parser.yy"
+#line 990 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Within(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2125,7 +2125,7 @@ namespace yy {
     break;
 
   case 55: // op_before_init: "OPERATOR_CONTAINS_WORD" run_time_string
-#line 992 "seclang-parser.yy"
+#line 994 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::ContainsWord(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2133,7 +2133,7 @@ namespace yy {
     break;
 
   case 56: // op_before_init: "OPERATOR_CONTAINS" run_time_string
-#line 996 "seclang-parser.yy"
+#line 998 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Contains(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2141,7 +2141,7 @@ namespace yy {
     break;
 
   case 57: // op_before_init: "OPERATOR_ENDS_WITH" run_time_string
-#line 1000 "seclang-parser.yy"
+#line 1002 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::EndsWith(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2149,7 +2149,7 @@ namespace yy {
     break;
 
   case 58: // op_before_init: "OPERATOR_EQ" run_time_string
-#line 1004 "seclang-parser.yy"
+#line 1006 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Eq(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2157,7 +2157,7 @@ namespace yy {
     break;
 
   case 59: // op_before_init: "OPERATOR_GE" run_time_string
-#line 1008 "seclang-parser.yy"
+#line 1010 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Ge(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2165,7 +2165,7 @@ namespace yy {
     break;
 
   case 60: // op_before_init: "OPERATOR_GT" run_time_string
-#line 1012 "seclang-parser.yy"
+#line 1014 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Gt(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2173,7 +2173,7 @@ namespace yy {
     break;
 
   case 61: // op_before_init: "OPERATOR_IP_MATCH_FROM_FILE" run_time_string
-#line 1016 "seclang-parser.yy"
+#line 1018 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::IpMatchF(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2181,7 +2181,7 @@ namespace yy {
     break;
 
   case 62: // op_before_init: "OPERATOR_IP_MATCH" run_time_string
-#line 1020 "seclang-parser.yy"
+#line 1022 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::IpMatch(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2189,7 +2189,7 @@ namespace yy {
     break;
 
   case 63: // op_before_init: "OPERATOR_LE" run_time_string
-#line 1024 "seclang-parser.yy"
+#line 1026 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Le(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2197,7 +2197,7 @@ namespace yy {
     break;
 
   case 64: // op_before_init: "OPERATOR_LT" run_time_string
-#line 1028 "seclang-parser.yy"
+#line 1030 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Lt(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2205,7 +2205,7 @@ namespace yy {
     break;
 
   case 65: // op_before_init: "OPERATOR_PM_FROM_FILE" run_time_string
-#line 1032 "seclang-parser.yy"
+#line 1034 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::PmFromFile(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2213,7 +2213,7 @@ namespace yy {
     break;
 
   case 66: // op_before_init: "OPERATOR_PM" run_time_string
-#line 1036 "seclang-parser.yy"
+#line 1038 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Pm(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2221,7 +2221,7 @@ namespace yy {
     break;
 
   case 67: // op_before_init: "OPERATOR_RBL" run_time_string
-#line 1040 "seclang-parser.yy"
+#line 1042 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Rbl(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2229,7 +2229,7 @@ namespace yy {
     break;
 
   case 68: // op_before_init: "OPERATOR_RX" run_time_string
-#line 1044 "seclang-parser.yy"
+#line 1046 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::Rx(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2237,7 +2237,7 @@ namespace yy {
     break;
 
   case 69: // op_before_init: "OPERATOR_RX_GLOBAL" run_time_string
-#line 1048 "seclang-parser.yy"
+#line 1050 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::RxGlobal(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2245,7 +2245,7 @@ namespace yy {
     break;
 
   case 70: // op_before_init: "OPERATOR_STR_EQ" run_time_string
-#line 1052 "seclang-parser.yy"
+#line 1054 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::StrEq(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2253,7 +2253,7 @@ namespace yy {
     break;
 
   case 71: // op_before_init: "OPERATOR_STR_MATCH" run_time_string
-#line 1056 "seclang-parser.yy"
+#line 1058 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::StrMatch(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2261,7 +2261,7 @@ namespace yy {
     break;
 
   case 72: // op_before_init: "OPERATOR_BEGINS_WITH" run_time_string
-#line 1060 "seclang-parser.yy"
+#line 1062 "seclang-parser.yy"
       {
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::BeginsWith(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -2269,7 +2269,7 @@ namespace yy {
     break;
 
   case 73: // op_before_init: "OPERATOR_GEOLOOKUP"
-#line 1064 "seclang-parser.yy"
+#line 1066 "seclang-parser.yy"
       {
 #if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         OPERATOR_CONTAINER(yylhs.value.as < std::unique_ptr<Operator> > (), new operators::GeoLookup());
@@ -2284,7 +2284,7 @@ namespace yy {
     break;
 
   case 75: // expression: "DIRECTIVE" variables op actions
-#line 1079 "seclang-parser.yy"
+#line 1081 "seclang-parser.yy"
       {
         std::vector<std::shared_ptr<actions::Action>> *a = new std::vector<std::shared_ptr<actions::Action>>();
         std::vector<std::shared_ptr<actions::transformations::Transformation> > *t = new std::vector<std::shared_ptr<actions::transformations::Transformation> >();
@@ -2320,7 +2320,7 @@ namespace yy {
     break;
 
   case 76: // expression: "DIRECTIVE" variables op
-#line 1111 "seclang-parser.yy"
+#line 1113 "seclang-parser.yy"
       {
         variables::Variables *v = new variables::Variables();
         for (auto &i : *yystack_[1].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ().get()) {
@@ -2343,7 +2343,7 @@ namespace yy {
     break;
 
   case 77: // expression: "CONFIG_DIR_SEC_ACTION" actions
-#line 1130 "seclang-parser.yy"
+#line 1132 "seclang-parser.yy"
       {
         std::vector<std::shared_ptr<actions::Action>> *a = new std::vector<std::shared_ptr<actions::Action>>();
         std::vector<std::shared_ptr<actions::transformations::Transformation> > *t = new std::vector<std::shared_ptr<actions::transformations::Transformation> >();
@@ -2368,7 +2368,7 @@ namespace yy {
     break;
 
   case 78: // expression: "DIRECTIVE_SECRULESCRIPT" actions
-#line 1151 "seclang-parser.yy"
+#line 1153 "seclang-parser.yy"
       {
         std::string err;
         std::vector<std::shared_ptr<actions::Action>> *a = new std::vector<std::shared_ptr<actions::Action>>();
@@ -2402,7 +2402,7 @@ namespace yy {
     break;
 
   case 79: // expression: "CONFIG_DIR_SEC_DEFAULT_ACTION" actions
-#line 1181 "seclang-parser.yy"
+#line 1183 "seclang-parser.yy"
       {
         bool hasDisruptive = false;
         std::vector<std::shared_ptr<actions::Action>> *actions = new std::vector<std::shared_ptr<actions::Action>>();
@@ -2459,7 +2459,7 @@ namespace yy {
     break;
 
   case 80: // expression: "CONFIG_DIR_SEC_MARKER"
-#line 1234 "seclang-parser.yy"
+#line 1236 "seclang-parser.yy"
       {
         driver.addSecMarker(modsecurity::utils::string::removeBracketsIfNeeded(yystack_[0].value.as < std::string > ()),
             /* file name */ std::unique_ptr<std::string>(new std::string(*yystack_[0].location.end.filename)),
@@ -2470,7 +2470,7 @@ namespace yy {
     break;
 
   case 81: // expression: "CONFIG_DIR_RULE_ENG" "CONFIG_VALUE_OFF"
-#line 1241 "seclang-parser.yy"
+#line 1243 "seclang-parser.yy"
       {
         driver.m_secRuleEngine = modsecurity::RulesSet::DisabledRuleEngine;
       }
@@ -2478,7 +2478,7 @@ namespace yy {
     break;
 
   case 82: // expression: "CONFIG_DIR_RULE_ENG" "CONFIG_VALUE_ON"
-#line 1245 "seclang-parser.yy"
+#line 1247 "seclang-parser.yy"
       {
         driver.m_secRuleEngine = modsecurity::RulesSet::EnabledRuleEngine;
       }
@@ -2486,7 +2486,7 @@ namespace yy {
     break;
 
   case 83: // expression: "CONFIG_DIR_RULE_ENG" "CONFIG_VALUE_DETC"
-#line 1249 "seclang-parser.yy"
+#line 1251 "seclang-parser.yy"
       {
         driver.m_secRuleEngine = modsecurity::RulesSet::DetectionOnlyRuleEngine;
       }
@@ -2494,7 +2494,7 @@ namespace yy {
     break;
 
   case 84: // expression: "CONFIG_DIR_REQ_BODY" "CONFIG_VALUE_ON"
-#line 1253 "seclang-parser.yy"
+#line 1255 "seclang-parser.yy"
       {
         driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
@@ -2502,7 +2502,7 @@ namespace yy {
     break;
 
   case 85: // expression: "CONFIG_DIR_REQ_BODY" "CONFIG_VALUE_OFF"
-#line 1257 "seclang-parser.yy"
+#line 1259 "seclang-parser.yy"
       {
         driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
@@ -2510,7 +2510,7 @@ namespace yy {
     break;
 
   case 86: // expression: "CONFIG_DIR_RES_BODY" "CONFIG_VALUE_ON"
-#line 1261 "seclang-parser.yy"
+#line 1263 "seclang-parser.yy"
       {
         driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
@@ -2518,7 +2518,7 @@ namespace yy {
     break;
 
   case 87: // expression: "CONFIG_DIR_RES_BODY" "CONFIG_VALUE_OFF"
-#line 1265 "seclang-parser.yy"
+#line 1267 "seclang-parser.yy"
       {
         driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
@@ -2526,7 +2526,7 @@ namespace yy {
     break;
 
   case 88: // expression: "CONFIG_SEC_ARGUMENT_SEPARATOR"
-#line 1269 "seclang-parser.yy"
+#line 1271 "seclang-parser.yy"
       {
         if (yystack_[0].value.as < std::string > ().length() != 1) {
           driver.error(yystack_[1].location, "Argument separator should be set to a single character.");
@@ -2539,7 +2539,7 @@ namespace yy {
     break;
 
   case 89: // expression: "CONFIG_COMPONENT_SIG"
-#line 1278 "seclang-parser.yy"
+#line 1280 "seclang-parser.yy"
       {
         driver.m_components.push_back(yystack_[0].value.as < std::string > ());
       }
@@ -2547,7 +2547,7 @@ namespace yy {
     break;
 
   case 90: // expression: "CONFIG_CONN_ENGINE" "CONFIG_VALUE_ON"
-#line 1282 "seclang-parser.yy"
+#line 1284 "seclang-parser.yy"
       {
         driver.error(yystack_[2].location, "SecConnEngine is not yet supported.");
         YYERROR;
@@ -2556,14 +2556,14 @@ namespace yy {
     break;
 
   case 91: // expression: "CONFIG_CONN_ENGINE" "CONFIG_VALUE_OFF"
-#line 1287 "seclang-parser.yy"
+#line 1289 "seclang-parser.yy"
       {
       }
 #line 2563 "seclang-parser.cc"
     break;
 
   case 92: // expression: "CONFIG_SEC_WEB_APP_ID"
-#line 1290 "seclang-parser.yy"
+#line 1292 "seclang-parser.yy"
       {
         driver.m_secWebAppId.m_value = yystack_[0].value.as < std::string > ();
         driver.m_secWebAppId.m_set = true;
@@ -2572,7 +2572,7 @@ namespace yy {
     break;
 
   case 93: // expression: "CONFIG_SEC_SERVER_SIG"
-#line 1295 "seclang-parser.yy"
+#line 1297 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecServerSignature is not supported.");
         YYERROR;
@@ -2581,7 +2581,7 @@ namespace yy {
     break;
 
   case 94: // expression: "CONFIG_SEC_CACHE_TRANSFORMATIONS"
-#line 1300 "seclang-parser.yy"
+#line 1302 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecCacheTransformations is not supported.");
         YYERROR;
@@ -2590,7 +2590,7 @@ namespace yy {
     break;
 
   case 95: // expression: "CONFIG_SEC_DISABLE_BACKEND_COMPRESS" "CONFIG_VALUE_ON"
-#line 1305 "seclang-parser.yy"
+#line 1307 "seclang-parser.yy"
       {
         driver.error(yystack_[2].location, "SecDisableBackendCompression is not supported.");
         YYERROR;
@@ -2599,14 +2599,14 @@ namespace yy {
     break;
 
   case 96: // expression: "CONFIG_SEC_DISABLE_BACKEND_COMPRESS" "CONFIG_VALUE_OFF"
-#line 1310 "seclang-parser.yy"
+#line 1312 "seclang-parser.yy"
       {
       }
 #line 2606 "seclang-parser.cc"
     break;
 
   case 97: // expression: "CONFIG_CONTENT_INJECTION" "CONFIG_VALUE_ON"
-#line 1313 "seclang-parser.yy"
+#line 1315 "seclang-parser.yy"
       {
         driver.error(yystack_[2].location, "SecContentInjection is not yet supported.");
         YYERROR;
@@ -2615,14 +2615,14 @@ namespace yy {
     break;
 
   case 98: // expression: "CONFIG_CONTENT_INJECTION" "CONFIG_VALUE_OFF"
-#line 1318 "seclang-parser.yy"
+#line 1320 "seclang-parser.yy"
       {
       }
 #line 2622 "seclang-parser.cc"
     break;
 
   case 99: // expression: "CONFIG_SEC_CHROOT_DIR"
-#line 1321 "seclang-parser.yy"
+#line 1323 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecChrootDir is not supported.");
         YYERROR;
@@ -2631,7 +2631,7 @@ namespace yy {
     break;
 
   case 100: // expression: "CONFIG_SEC_HASH_ENGINE" "CONFIG_VALUE_ON"
-#line 1326 "seclang-parser.yy"
+#line 1328 "seclang-parser.yy"
       {
         driver.error(yystack_[2].location, "SecHashEngine is not yet supported.");
         YYERROR;
@@ -2640,14 +2640,14 @@ namespace yy {
     break;
 
   case 101: // expression: "CONFIG_SEC_HASH_ENGINE" "CONFIG_VALUE_OFF"
-#line 1331 "seclang-parser.yy"
+#line 1333 "seclang-parser.yy"
       {
       }
 #line 2647 "seclang-parser.cc"
     break;
 
   case 102: // expression: "CONFIG_SEC_HASH_KEY"
-#line 1334 "seclang-parser.yy"
+#line 1336 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecHashKey is not yet supported.");
         YYERROR;
@@ -2656,7 +2656,7 @@ namespace yy {
     break;
 
   case 103: // expression: "CONFIG_SEC_HASH_PARAM"
-#line 1339 "seclang-parser.yy"
+#line 1341 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecHashParam is not yet supported.");
         YYERROR;
@@ -2665,7 +2665,7 @@ namespace yy {
     break;
 
   case 104: // expression: "CONFIG_SEC_HASH_METHOD_RX"
-#line 1344 "seclang-parser.yy"
+#line 1346 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecHashMethodRx is not yet supported.");
         YYERROR;
@@ -2674,7 +2674,7 @@ namespace yy {
     break;
 
   case 105: // expression: "CONFIG_SEC_HASH_METHOD_PM"
-#line 1349 "seclang-parser.yy"
+#line 1351 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecHashMethodPm is not yet supported.");
         YYERROR;
@@ -2683,7 +2683,7 @@ namespace yy {
     break;
 
   case 106: // expression: "CONFIG_DIR_GSB_DB"
-#line 1354 "seclang-parser.yy"
+#line 1356 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecGsbLookupDb is not supported.");
         YYERROR;
@@ -2692,7 +2692,7 @@ namespace yy {
     break;
 
   case 107: // expression: "CONFIG_SEC_GUARDIAN_LOG"
-#line 1359 "seclang-parser.yy"
+#line 1361 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecGuardianLog is not supported.");
         YYERROR;
@@ -2701,7 +2701,7 @@ namespace yy {
     break;
 
   case 108: // expression: "CONFIG_SEC_INTERCEPT_ON_ERROR" "CONFIG_VALUE_ON"
-#line 1364 "seclang-parser.yy"
+#line 1366 "seclang-parser.yy"
       {
         driver.error(yystack_[2].location, "SecInterceptOnError is not yet supported.");
         YYERROR;
@@ -2710,14 +2710,14 @@ namespace yy {
     break;
 
   case 109: // expression: "CONFIG_SEC_INTERCEPT_ON_ERROR" "CONFIG_VALUE_OFF"
-#line 1369 "seclang-parser.yy"
+#line 1371 "seclang-parser.yy"
       {
       }
 #line 2717 "seclang-parser.cc"
     break;
 
   case 110: // expression: "CONFIG_SEC_CONN_R_STATE_LIMIT"
-#line 1372 "seclang-parser.yy"
+#line 1374 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecConnReadStateLimit is not yet supported.");
         YYERROR;
@@ -2726,7 +2726,7 @@ namespace yy {
     break;
 
   case 111: // expression: "CONFIG_SEC_CONN_W_STATE_LIMIT"
-#line 1377 "seclang-parser.yy"
+#line 1379 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecConnWriteStateLimit is not yet supported.");
         YYERROR;
@@ -2735,7 +2735,7 @@ namespace yy {
     break;
 
   case 112: // expression: "CONFIG_SEC_SENSOR_ID"
-#line 1382 "seclang-parser.yy"
+#line 1384 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecSensorId is not yet supported.");
         YYERROR;
@@ -2744,7 +2744,7 @@ namespace yy {
     break;
 
   case 113: // expression: "CONFIG_SEC_RULE_INHERITANCE" "CONFIG_VALUE_ON"
-#line 1387 "seclang-parser.yy"
+#line 1389 "seclang-parser.yy"
       {
         driver.error(yystack_[2].location, "SecRuleInheritance is not yet supported.");
         YYERROR;
@@ -2753,14 +2753,14 @@ namespace yy {
     break;
 
   case 114: // expression: "CONFIG_SEC_RULE_INHERITANCE" "CONFIG_VALUE_OFF"
-#line 1392 "seclang-parser.yy"
+#line 1394 "seclang-parser.yy"
       {
       }
 #line 2760 "seclang-parser.cc"
     break;
 
   case 115: // expression: "CONFIG_SEC_RULE_PERF_TIME"
-#line 1395 "seclang-parser.yy"
+#line 1397 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecRulePerfTime is not yet supported.");
         YYERROR;
@@ -2769,7 +2769,7 @@ namespace yy {
     break;
 
   case 116: // expression: "CONFIG_SEC_STREAM_IN_BODY_INSPECTION"
-#line 1400 "seclang-parser.yy"
+#line 1402 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecStreamInBodyInspection is not supported.");
         YYERROR;
@@ -2778,7 +2778,7 @@ namespace yy {
     break;
 
   case 117: // expression: "CONFIG_SEC_STREAM_OUT_BODY_INSPECTION"
-#line 1405 "seclang-parser.yy"
+#line 1407 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecStreamOutBodyInspection is not supported.");
         YYERROR;
@@ -2787,7 +2787,7 @@ namespace yy {
     break;
 
   case 118: // expression: "CONFIG_SEC_RULE_REMOVE_BY_ID"
-#line 1410 "seclang-parser.yy"
+#line 1412 "seclang-parser.yy"
       {
         std::string error;
         if (driver.m_exceptions.load(yystack_[0].value.as < std::string > (), &error) == false) {
@@ -2804,7 +2804,7 @@ namespace yy {
     break;
 
   case 119: // expression: "CONFIG_SEC_RULE_REMOVE_BY_TAG"
-#line 1423 "seclang-parser.yy"
+#line 1425 "seclang-parser.yy"
       {
         std::string error;
         if (driver.m_exceptions.loadRemoveRuleByTag(yystack_[0].value.as < std::string > (), &error) == false) {
@@ -2821,7 +2821,7 @@ namespace yy {
     break;
 
   case 120: // expression: "CONFIG_SEC_RULE_REMOVE_BY_MSG"
-#line 1436 "seclang-parser.yy"
+#line 1438 "seclang-parser.yy"
       {
         std::string error;
         if (driver.m_exceptions.loadRemoveRuleByMsg(yystack_[0].value.as < std::string > (), &error) == false) {
@@ -2838,7 +2838,7 @@ namespace yy {
     break;
 
   case 121: // expression: "CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG" variables_pre_process
-#line 1449 "seclang-parser.yy"
+#line 1451 "seclang-parser.yy"
       {
         std::string error;
         if (driver.m_exceptions.loadUpdateTargetByTag(yystack_[1].value.as < std::string > (), std::move(yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
@@ -2855,7 +2855,7 @@ namespace yy {
     break;
 
   case 122: // expression: "CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG" variables_pre_process
-#line 1462 "seclang-parser.yy"
+#line 1464 "seclang-parser.yy"
       {
         std::string error;
         if (driver.m_exceptions.loadUpdateTargetByMsg(yystack_[1].value.as < std::string > (), std::move(yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()), &error) == false) {
@@ -2872,7 +2872,7 @@ namespace yy {
     break;
 
   case 123: // expression: "CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID" variables_pre_process
-#line 1475 "seclang-parser.yy"
+#line 1477 "seclang-parser.yy"
       {
         std::string error;
         std::istringstream iss(yystack_[1].value.as < std::string > ());
@@ -2902,7 +2902,7 @@ namespace yy {
     break;
 
   case 124: // expression: "CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID" actions
-#line 1501 "seclang-parser.yy"
+#line 1503 "seclang-parser.yy"
       {
         std::string error;
         std::istringstream iss(yystack_[1].value.as < std::string > ());
@@ -2933,7 +2933,7 @@ namespace yy {
     break;
 
   case 125: // expression: "CONFIG_DIR_DEBUG_LVL"
-#line 1529 "seclang-parser.yy"
+#line 1531 "seclang-parser.yy"
       {
         if (driver.m_debugLog != NULL) {
           driver.m_debugLog->setDebugLogLevel(atoi(yystack_[0].value.as < std::string > ().c_str()));
@@ -2949,7 +2949,7 @@ namespace yy {
     break;
 
   case 126: // expression: "CONFIG_DIR_DEBUG_LOG"
-#line 1541 "seclang-parser.yy"
+#line 1543 "seclang-parser.yy"
       {
         if (driver.m_debugLog != NULL) {
             std::string error;
@@ -2972,7 +2972,7 @@ namespace yy {
     break;
 
   case 127: // expression: "CONFIG_DIR_GEO_DB"
-#line 1561 "seclang-parser.yy"
+#line 1563 "seclang-parser.yy"
       {
 #if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         std::string err;
@@ -3003,7 +3003,7 @@ namespace yy {
     break;
 
   case 128: // expression: "CONFIG_DIR_ARGS_LIMIT"
-#line 1588 "seclang-parser.yy"
+#line 1590 "seclang-parser.yy"
       {
         driver.m_argumentsLimit.m_set = true;
         driver.m_argumentsLimit.m_value = atoi(yystack_[0].value.as < std::string > ().c_str());
@@ -3012,7 +3012,7 @@ namespace yy {
     break;
 
   case 129: // expression: "CONFIG_DIR_REQ_BODY_LIMIT"
-#line 1594 "seclang-parser.yy"
+#line 1596 "seclang-parser.yy"
       {
         driver.m_requestBodyLimit.m_set = true;
         driver.m_requestBodyLimit.m_value = atoi(yystack_[0].value.as < std::string > ().c_str());
@@ -3021,7 +3021,7 @@ namespace yy {
     break;
 
   case 130: // expression: "CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT"
-#line 1599 "seclang-parser.yy"
+#line 1601 "seclang-parser.yy"
       {
         driver.m_requestBodyNoFilesLimit.m_set = true;
         driver.m_requestBodyNoFilesLimit.m_value = atoi(yystack_[0].value.as < std::string > ().c_str());
@@ -3030,7 +3030,7 @@ namespace yy {
     break;
 
   case 131: // expression: "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
-#line 1604 "seclang-parser.yy"
+#line 1606 "seclang-parser.yy"
       {
         std::stringstream ss;
         ss << "As of ModSecurity version 3.0, SecRequestBodyInMemoryLimit is no longer ";
@@ -3043,7 +3043,7 @@ namespace yy {
     break;
 
   case 132: // expression: "CONFIG_DIR_RES_BODY_LIMIT"
-#line 1613 "seclang-parser.yy"
+#line 1615 "seclang-parser.yy"
       {
         driver.m_responseBodyLimit.m_set = true;
         driver.m_responseBodyLimit.m_value = atoi(yystack_[0].value.as < std::string > ().c_str());
@@ -3052,7 +3052,7 @@ namespace yy {
     break;
 
   case 133: // expression: "CONFIG_DIR_REQ_BODY_LIMIT_ACTION" "CONFIG_VALUE_PROCESS_PARTIAL"
-#line 1618 "seclang-parser.yy"
+#line 1620 "seclang-parser.yy"
       {
         driver.m_requestBodyLimitAction = modsecurity::RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
@@ -3060,7 +3060,7 @@ namespace yy {
     break;
 
   case 134: // expression: "CONFIG_DIR_REQ_BODY_LIMIT_ACTION" "CONFIG_VALUE_REJECT"
-#line 1622 "seclang-parser.yy"
+#line 1624 "seclang-parser.yy"
       {
         driver.m_requestBodyLimitAction = modsecurity::RulesSet::BodyLimitAction::RejectBodyLimitAction;
       }
@@ -3068,7 +3068,7 @@ namespace yy {
     break;
 
   case 135: // expression: "CONFIG_DIR_RES_BODY_LIMIT_ACTION" "CONFIG_VALUE_PROCESS_PARTIAL"
-#line 1626 "seclang-parser.yy"
+#line 1628 "seclang-parser.yy"
       {
         driver.m_responseBodyLimitAction = modsecurity::RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
@@ -3076,7 +3076,7 @@ namespace yy {
     break;
 
   case 136: // expression: "CONFIG_DIR_RES_BODY_LIMIT_ACTION" "CONFIG_VALUE_REJECT"
-#line 1630 "seclang-parser.yy"
+#line 1632 "seclang-parser.yy"
       {
         driver.m_responseBodyLimitAction = modsecurity::RulesSet::BodyLimitAction::RejectBodyLimitAction;
       }
@@ -3084,7 +3084,7 @@ namespace yy {
     break;
 
   case 137: // expression: "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION" "CONFIG_VALUE_ABORT"
-#line 1634 "seclang-parser.yy"
+#line 1636 "seclang-parser.yy"
       {
         driver.m_remoteRulesActionOnFailed = RulesSet::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
@@ -3092,7 +3092,7 @@ namespace yy {
     break;
 
   case 138: // expression: "CONFIG_SEC_REMOTE_RULES_FAIL_ACTION" "CONFIG_VALUE_WARN"
-#line 1638 "seclang-parser.yy"
+#line 1640 "seclang-parser.yy"
       {
         driver.m_remoteRulesActionOnFailed = RulesSet::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
@@ -3100,7 +3100,7 @@ namespace yy {
     break;
 
   case 141: // expression: "CONGIG_DIR_RESPONSE_BODY_MP"
-#line 1652 "seclang-parser.yy"
+#line 1654 "seclang-parser.yy"
       {
         std::istringstream buf(yystack_[0].value.as < std::string > ());
         std::istream_iterator<std::string> beg(buf), end;
@@ -3116,7 +3116,7 @@ namespace yy {
     break;
 
   case 142: // expression: "CONGIG_DIR_RESPONSE_BODY_MP_CLEAR"
-#line 1664 "seclang-parser.yy"
+#line 1666 "seclang-parser.yy"
       {
         driver.m_responseBodyTypeToBeInspected.m_set = true;
         driver.m_responseBodyTypeToBeInspected.m_clear = true;
@@ -3126,7 +3126,7 @@ namespace yy {
     break;
 
   case 143: // expression: "CONFIG_XML_EXTERNAL_ENTITY" "CONFIG_VALUE_OFF"
-#line 1670 "seclang-parser.yy"
+#line 1672 "seclang-parser.yy"
       {
         driver.m_secXMLExternalEntity = modsecurity::RulesSetProperties::FalseConfigBoolean;
       }
@@ -3134,7 +3134,7 @@ namespace yy {
     break;
 
   case 144: // expression: "CONFIG_XML_EXTERNAL_ENTITY" "CONFIG_VALUE_ON"
-#line 1674 "seclang-parser.yy"
+#line 1676 "seclang-parser.yy"
       {
         driver.m_secXMLExternalEntity = modsecurity::RulesSetProperties::TrueConfigBoolean;
       }
@@ -3142,7 +3142,7 @@ namespace yy {
     break;
 
   case 145: // expression: "CONGIG_DIR_SEC_TMP_DIR"
-#line 1678 "seclang-parser.yy"
+#line 1680 "seclang-parser.yy"
       {
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
         std::stringstream ss;
@@ -3157,7 +3157,7 @@ namespace yy {
     break;
 
   case 148: // expression: "CONGIG_DIR_SEC_COOKIE_FORMAT"
-#line 1699 "seclang-parser.yy"
+#line 1701 "seclang-parser.yy"
       {
         if (atoi(yystack_[0].value.as < std::string > ().c_str()) == 1) {
           driver.error(yystack_[1].location, "SecCookieFormat 1 is not yet supported.");
@@ -3168,7 +3168,7 @@ namespace yy {
     break;
 
   case 149: // expression: "CONFIG_SEC_COOKIEV0_SEPARATOR"
-#line 1706 "seclang-parser.yy"
+#line 1708 "seclang-parser.yy"
       {
         driver.error(yystack_[1].location, "SecCookieV0Separator is not yet supported.");
         YYERROR;
@@ -3177,7 +3177,7 @@ namespace yy {
     break;
 
   case 151: // expression: "CONFIG_DIR_UNICODE_MAP_FILE"
-#line 1716 "seclang-parser.yy"
+#line 1718 "seclang-parser.yy"
       {
         std::string error;
         std::vector<std::string> param;
@@ -3235,7 +3235,7 @@ namespace yy {
     break;
 
   case 152: // expression: "CONFIG_SEC_COLLECTION_TIMEOUT"
-#line 1770 "seclang-parser.yy"
+#line 1772 "seclang-parser.yy"
       {
 /* Parser error disabled to avoid breaking default CRS installations with crs-setup.conf-recommended
         driver.error(@0, "SecCollectionTimeout is not yet supported.");
@@ -3246,7 +3246,7 @@ namespace yy {
     break;
 
   case 153: // expression: "CONFIG_SEC_HTTP_BLKEY"
-#line 1777 "seclang-parser.yy"
+#line 1779 "seclang-parser.yy"
       {
         driver.m_httpblKey.m_set = true;
         driver.m_httpblKey.m_value = yystack_[0].value.as < std::string > ();
@@ -3255,7 +3255,7 @@ namespace yy {
     break;
 
   case 154: // variables: variables_pre_process
-#line 1785 "seclang-parser.yy"
+#line 1787 "seclang-parser.yy"
       {
         std::unique_ptr<std::vector<std::unique_ptr<Variable> > > originalList = std::move(yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> newList(new std::vector<std::unique_ptr<Variable>>());
@@ -3293,7 +3293,7 @@ namespace yy {
     break;
 
   case 155: // variables_pre_process: variables_may_be_quoted
-#line 1822 "seclang-parser.yy"
+#line 1824 "seclang-parser.yy"
       {
         yylhs.value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
@@ -3301,7 +3301,7 @@ namespace yy {
     break;
 
   case 156: // variables_pre_process: "QUOTATION_MARK" variables_may_be_quoted "QUOTATION_MARK"
-#line 1826 "seclang-parser.yy"
+#line 1828 "seclang-parser.yy"
       {
         yylhs.value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[1].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
       }
@@ -3309,7 +3309,7 @@ namespace yy {
     break;
 
   case 157: // variables_may_be_quoted: variables_may_be_quoted PIPE var
-#line 1833 "seclang-parser.yy"
+#line 1835 "seclang-parser.yy"
       {
         yystack_[2].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
         yylhs.value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > () = std::move(yystack_[2].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ());
@@ -3318,7 +3318,7 @@ namespace yy {
     break;
 
   case 158: // variables_may_be_quoted: variables_may_be_quoted PIPE VAR_EXCLUSION var
-#line 1838 "seclang-parser.yy"
+#line 1840 "seclang-parser.yy"
       {
         std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ())));
         yystack_[3].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(c));
@@ -3328,7 +3328,7 @@ namespace yy {
     break;
 
   case 159: // variables_may_be_quoted: variables_may_be_quoted PIPE VAR_COUNT var
-#line 1844 "seclang-parser.yy"
+#line 1846 "seclang-parser.yy"
       {
         std::unique_ptr<Variable> c(new VariableModificatorCount(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ())));
         yystack_[3].value.as < std::unique_ptr<std::vector<std::unique_ptr<Variable> > >  > ()->push_back(std::move(c));
@@ -3338,7 +3338,7 @@ namespace yy {
     break;
 
   case 160: // variables_may_be_quoted: var
-#line 1850 "seclang-parser.yy"
+#line 1852 "seclang-parser.yy"
       {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         b->push_back(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
@@ -3348,7 +3348,7 @@ namespace yy {
     break;
 
   case 161: // variables_may_be_quoted: VAR_EXCLUSION var
-#line 1856 "seclang-parser.yy"
+#line 1858 "seclang-parser.yy"
       {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ())));
@@ -3359,7 +3359,7 @@ namespace yy {
     break;
 
   case 162: // variables_may_be_quoted: VAR_COUNT var
-#line 1863 "seclang-parser.yy"
+#line 1865 "seclang-parser.yy"
       {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         std::unique_ptr<Variable> c(new VariableModificatorCount(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ())));
@@ -3370,7 +3370,7 @@ namespace yy {
     break;
 
   case 163: // var: VARIABLE_ARGS "Dictionary element"
-#line 1873 "seclang-parser.yy"
+#line 1875 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Args_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3378,7 +3378,7 @@ namespace yy {
     break;
 
   case 164: // var: VARIABLE_ARGS "Dictionary element, selected by regexp"
-#line 1877 "seclang-parser.yy"
+#line 1879 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Args_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3386,7 +3386,7 @@ namespace yy {
     break;
 
   case 165: // var: VARIABLE_ARGS
-#line 1881 "seclang-parser.yy"
+#line 1883 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Args_NoDictElement());
       }
@@ -3394,7 +3394,7 @@ namespace yy {
     break;
 
   case 166: // var: VARIABLE_ARGS_POST "Dictionary element"
-#line 1885 "seclang-parser.yy"
+#line 1887 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsPost_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3402,7 +3402,7 @@ namespace yy {
     break;
 
   case 167: // var: VARIABLE_ARGS_POST "Dictionary element, selected by regexp"
-#line 1889 "seclang-parser.yy"
+#line 1891 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsPost_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3410,7 +3410,7 @@ namespace yy {
     break;
 
   case 168: // var: VARIABLE_ARGS_POST
-#line 1893 "seclang-parser.yy"
+#line 1895 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsPost_NoDictElement());
       }
@@ -3418,7 +3418,7 @@ namespace yy {
     break;
 
   case 169: // var: VARIABLE_ARGS_GET "Dictionary element"
-#line 1897 "seclang-parser.yy"
+#line 1899 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsGet_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3426,7 +3426,7 @@ namespace yy {
     break;
 
   case 170: // var: VARIABLE_ARGS_GET "Dictionary element, selected by regexp"
-#line 1901 "seclang-parser.yy"
+#line 1903 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsGet_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3434,7 +3434,7 @@ namespace yy {
     break;
 
   case 171: // var: VARIABLE_ARGS_GET
-#line 1905 "seclang-parser.yy"
+#line 1907 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsGet_NoDictElement());
       }
@@ -3442,7 +3442,7 @@ namespace yy {
     break;
 
   case 172: // var: VARIABLE_FILES_SIZES "Dictionary element"
-#line 1909 "seclang-parser.yy"
+#line 1911 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesSizes_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3450,7 +3450,7 @@ namespace yy {
     break;
 
   case 173: // var: VARIABLE_FILES_SIZES "Dictionary element, selected by regexp"
-#line 1913 "seclang-parser.yy"
+#line 1915 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesSizes_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3458,7 +3458,7 @@ namespace yy {
     break;
 
   case 174: // var: VARIABLE_FILES_SIZES
-#line 1917 "seclang-parser.yy"
+#line 1919 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesSizes_NoDictElement());
       }
@@ -3466,7 +3466,7 @@ namespace yy {
     break;
 
   case 175: // var: VARIABLE_FILES_NAMES "Dictionary element"
-#line 1921 "seclang-parser.yy"
+#line 1923 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3474,7 +3474,7 @@ namespace yy {
     break;
 
   case 176: // var: VARIABLE_FILES_NAMES "Dictionary element, selected by regexp"
-#line 1925 "seclang-parser.yy"
+#line 1927 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3482,7 +3482,7 @@ namespace yy {
     break;
 
   case 177: // var: VARIABLE_FILES_NAMES
-#line 1929 "seclang-parser.yy"
+#line 1931 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesNames_NoDictElement());
       }
@@ -3490,7 +3490,7 @@ namespace yy {
     break;
 
   case 178: // var: VARIABLE_FILES_TMP_CONTENT "Dictionary element"
-#line 1933 "seclang-parser.yy"
+#line 1935 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesTmpContent_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3498,7 +3498,7 @@ namespace yy {
     break;
 
   case 179: // var: VARIABLE_FILES_TMP_CONTENT "Dictionary element, selected by regexp"
-#line 1937 "seclang-parser.yy"
+#line 1939 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesTmpContent_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3506,7 +3506,7 @@ namespace yy {
     break;
 
   case 180: // var: VARIABLE_FILES_TMP_CONTENT
-#line 1941 "seclang-parser.yy"
+#line 1943 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesTmpContent_NoDictElement());
       }
@@ -3514,7 +3514,7 @@ namespace yy {
     break;
 
   case 181: // var: VARIABLE_MULTIPART_FILENAME "Dictionary element"
-#line 1945 "seclang-parser.yy"
+#line 1947 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultiPartFileName_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3522,7 +3522,7 @@ namespace yy {
     break;
 
   case 182: // var: VARIABLE_MULTIPART_FILENAME "Dictionary element, selected by regexp"
-#line 1949 "seclang-parser.yy"
+#line 1951 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultiPartFileName_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3530,7 +3530,7 @@ namespace yy {
     break;
 
   case 183: // var: VARIABLE_MULTIPART_FILENAME
-#line 1953 "seclang-parser.yy"
+#line 1955 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultiPartFileName_NoDictElement());
       }
@@ -3538,7 +3538,7 @@ namespace yy {
     break;
 
   case 184: // var: VARIABLE_MULTIPART_NAME "Dictionary element"
-#line 1957 "seclang-parser.yy"
+#line 1959 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultiPartName_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3546,7 +3546,7 @@ namespace yy {
     break;
 
   case 185: // var: VARIABLE_MULTIPART_NAME "Dictionary element, selected by regexp"
-#line 1961 "seclang-parser.yy"
+#line 1963 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultiPartName_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3554,7 +3554,7 @@ namespace yy {
     break;
 
   case 186: // var: VARIABLE_MULTIPART_NAME
-#line 1965 "seclang-parser.yy"
+#line 1967 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultiPartName_NoDictElement());
       }
@@ -3562,7 +3562,7 @@ namespace yy {
     break;
 
   case 187: // var: VARIABLE_MATCHED_VARS_NAMES "Dictionary element"
-#line 1969 "seclang-parser.yy"
+#line 1971 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MatchedVarsNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3570,7 +3570,7 @@ namespace yy {
     break;
 
   case 188: // var: VARIABLE_MATCHED_VARS_NAMES "Dictionary element, selected by regexp"
-#line 1973 "seclang-parser.yy"
+#line 1975 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MatchedVarsNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3578,7 +3578,7 @@ namespace yy {
     break;
 
   case 189: // var: VARIABLE_MATCHED_VARS_NAMES
-#line 1977 "seclang-parser.yy"
+#line 1979 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MatchedVarsNames_NoDictElement());
       }
@@ -3586,7 +3586,7 @@ namespace yy {
     break;
 
   case 190: // var: VARIABLE_MATCHED_VARS "Dictionary element"
-#line 1981 "seclang-parser.yy"
+#line 1983 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MatchedVars_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3594,7 +3594,7 @@ namespace yy {
     break;
 
   case 191: // var: VARIABLE_MATCHED_VARS "Dictionary element, selected by regexp"
-#line 1985 "seclang-parser.yy"
+#line 1987 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MatchedVars_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3602,7 +3602,7 @@ namespace yy {
     break;
 
   case 192: // var: VARIABLE_MATCHED_VARS
-#line 1989 "seclang-parser.yy"
+#line 1991 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MatchedVars_NoDictElement());
       }
@@ -3610,7 +3610,7 @@ namespace yy {
     break;
 
   case 193: // var: VARIABLE_FILES "Dictionary element"
-#line 1993 "seclang-parser.yy"
+#line 1995 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Files_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3618,7 +3618,7 @@ namespace yy {
     break;
 
   case 194: // var: VARIABLE_FILES "Dictionary element, selected by regexp"
-#line 1997 "seclang-parser.yy"
+#line 1999 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Files_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3626,7 +3626,7 @@ namespace yy {
     break;
 
   case 195: // var: VARIABLE_FILES
-#line 2001 "seclang-parser.yy"
+#line 2003 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Files_NoDictElement());
       }
@@ -3634,7 +3634,7 @@ namespace yy {
     break;
 
   case 196: // var: VARIABLE_REQUEST_COOKIES "Dictionary element"
-#line 2005 "seclang-parser.yy"
+#line 2007 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestCookies_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3642,7 +3642,7 @@ namespace yy {
     break;
 
   case 197: // var: VARIABLE_REQUEST_COOKIES "Dictionary element, selected by regexp"
-#line 2009 "seclang-parser.yy"
+#line 2011 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestCookies_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3650,7 +3650,7 @@ namespace yy {
     break;
 
   case 198: // var: VARIABLE_REQUEST_COOKIES
-#line 2013 "seclang-parser.yy"
+#line 2015 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestCookies_NoDictElement());
       }
@@ -3658,7 +3658,7 @@ namespace yy {
     break;
 
   case 199: // var: VARIABLE_REQUEST_HEADERS "Dictionary element"
-#line 2017 "seclang-parser.yy"
+#line 2019 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestHeaders_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3666,7 +3666,7 @@ namespace yy {
     break;
 
   case 200: // var: VARIABLE_REQUEST_HEADERS "Dictionary element, selected by regexp"
-#line 2021 "seclang-parser.yy"
+#line 2023 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestHeaders_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3674,7 +3674,7 @@ namespace yy {
     break;
 
   case 201: // var: VARIABLE_REQUEST_HEADERS
-#line 2025 "seclang-parser.yy"
+#line 2027 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestHeaders_NoDictElement());
       }
@@ -3682,7 +3682,7 @@ namespace yy {
     break;
 
   case 202: // var: VARIABLE_RESPONSE_HEADERS "Dictionary element"
-#line 2029 "seclang-parser.yy"
+#line 2031 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseHeaders_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3690,7 +3690,7 @@ namespace yy {
     break;
 
   case 203: // var: VARIABLE_RESPONSE_HEADERS "Dictionary element, selected by regexp"
-#line 2033 "seclang-parser.yy"
+#line 2035 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseHeaders_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3698,7 +3698,7 @@ namespace yy {
     break;
 
   case 204: // var: VARIABLE_RESPONSE_HEADERS
-#line 2037 "seclang-parser.yy"
+#line 2039 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseHeaders_NoDictElement());
       }
@@ -3706,7 +3706,7 @@ namespace yy {
     break;
 
   case 205: // var: VARIABLE_GEO "Dictionary element"
-#line 2041 "seclang-parser.yy"
+#line 2043 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Geo_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3714,7 +3714,7 @@ namespace yy {
     break;
 
   case 206: // var: VARIABLE_GEO "Dictionary element, selected by regexp"
-#line 2045 "seclang-parser.yy"
+#line 2047 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Geo_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3722,7 +3722,7 @@ namespace yy {
     break;
 
   case 207: // var: VARIABLE_GEO
-#line 2049 "seclang-parser.yy"
+#line 2051 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Geo_NoDictElement());
       }
@@ -3730,7 +3730,7 @@ namespace yy {
     break;
 
   case 208: // var: VARIABLE_REQUEST_COOKIES_NAMES "Dictionary element"
-#line 2053 "seclang-parser.yy"
+#line 2055 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestCookiesNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3738,7 +3738,7 @@ namespace yy {
     break;
 
   case 209: // var: VARIABLE_REQUEST_COOKIES_NAMES "Dictionary element, selected by regexp"
-#line 2057 "seclang-parser.yy"
+#line 2059 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestCookiesNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3746,7 +3746,7 @@ namespace yy {
     break;
 
   case 210: // var: VARIABLE_REQUEST_COOKIES_NAMES
-#line 2061 "seclang-parser.yy"
+#line 2063 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestCookiesNames_NoDictElement());
       }
@@ -3754,7 +3754,7 @@ namespace yy {
     break;
 
   case 211: // var: VARIABLE_RULE "Dictionary element"
-#line 2065 "seclang-parser.yy"
+#line 2067 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Rule_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3762,7 +3762,7 @@ namespace yy {
     break;
 
   case 212: // var: VARIABLE_RULE "Dictionary element, selected by regexp"
-#line 2069 "seclang-parser.yy"
+#line 2071 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Rule_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3770,7 +3770,7 @@ namespace yy {
     break;
 
   case 213: // var: VARIABLE_RULE
-#line 2073 "seclang-parser.yy"
+#line 2075 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Rule_NoDictElement());
       }
@@ -3778,7 +3778,7 @@ namespace yy {
     break;
 
   case 214: // var: "RUN_TIME_VAR_ENV" "Dictionary element"
-#line 2077 "seclang-parser.yy"
+#line 2079 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Env("ENV:" + yystack_[0].value.as < std::string > ()));
       }
@@ -3786,7 +3786,7 @@ namespace yy {
     break;
 
   case 215: // var: "RUN_TIME_VAR_ENV" "Dictionary element, selected by regexp"
-#line 2081 "seclang-parser.yy"
+#line 2083 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Env("ENV:" + yystack_[0].value.as < std::string > ()));
       }
@@ -3794,7 +3794,7 @@ namespace yy {
     break;
 
   case 216: // var: "RUN_TIME_VAR_ENV"
-#line 2085 "seclang-parser.yy"
+#line 2087 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Env("ENV"));
       }
@@ -3802,7 +3802,7 @@ namespace yy {
     break;
 
   case 217: // var: "RUN_TIME_VAR_XML" "Dictionary element"
-#line 2089 "seclang-parser.yy"
+#line 2091 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML_WithNSPath(yystack_[0].value.as < std::string > ()));
       }
@@ -3810,7 +3810,7 @@ namespace yy {
     break;
 
   case 218: // var: "RUN_TIME_VAR_XML" "Dictionary element, selected by regexp"
-#line 2093 "seclang-parser.yy"
+#line 2095 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML_WithNSPath(yystack_[0].value.as < std::string > ()));
       }
@@ -3818,7 +3818,7 @@ namespace yy {
     break;
 
   case 219: // var: "RUN_TIME_VAR_XML"
-#line 2097 "seclang-parser.yy"
+#line 2099 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::XML_WithoutNSPath());
       }
@@ -3826,7 +3826,7 @@ namespace yy {
     break;
 
   case 220: // var: "FILES_TMPNAMES" "Dictionary element"
-#line 2101 "seclang-parser.yy"
+#line 2103 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesTmpNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3834,7 +3834,7 @@ namespace yy {
     break;
 
   case 221: // var: "FILES_TMPNAMES" "Dictionary element, selected by regexp"
-#line 2105 "seclang-parser.yy"
+#line 2107 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesTmpNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3842,7 +3842,7 @@ namespace yy {
     break;
 
   case 222: // var: "FILES_TMPNAMES"
-#line 2109 "seclang-parser.yy"
+#line 2111 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesTmpNames_NoDictElement());
       }
@@ -3850,7 +3850,7 @@ namespace yy {
     break;
 
   case 223: // var: "RESOURCE" run_time_string
-#line 2113 "seclang-parser.yy"
+#line 2115 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Resource_DynamicElement(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -3858,7 +3858,7 @@ namespace yy {
     break;
 
   case 224: // var: "RESOURCE" "Dictionary element"
-#line 2117 "seclang-parser.yy"
+#line 2119 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Resource_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3866,7 +3866,7 @@ namespace yy {
     break;
 
   case 225: // var: "RESOURCE" "Dictionary element, selected by regexp"
-#line 2121 "seclang-parser.yy"
+#line 2123 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Resource_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3874,7 +3874,7 @@ namespace yy {
     break;
 
   case 226: // var: "RESOURCE"
-#line 2125 "seclang-parser.yy"
+#line 2127 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Resource_NoDictElement());
       }
@@ -3882,7 +3882,7 @@ namespace yy {
     break;
 
   case 227: // var: "VARIABLE_IP" run_time_string
-#line 2129 "seclang-parser.yy"
+#line 2131 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Ip_DynamicElement(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -3890,7 +3890,7 @@ namespace yy {
     break;
 
   case 228: // var: "VARIABLE_IP" "Dictionary element"
-#line 2133 "seclang-parser.yy"
+#line 2135 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Ip_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3898,7 +3898,7 @@ namespace yy {
     break;
 
   case 229: // var: "VARIABLE_IP" "Dictionary element, selected by regexp"
-#line 2137 "seclang-parser.yy"
+#line 2139 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Ip_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3906,7 +3906,7 @@ namespace yy {
     break;
 
   case 230: // var: "VARIABLE_IP"
-#line 2141 "seclang-parser.yy"
+#line 2143 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Ip_NoDictElement());
       }
@@ -3914,7 +3914,7 @@ namespace yy {
     break;
 
   case 231: // var: "VARIABLE_GLOBAL" run_time_string
-#line 2145 "seclang-parser.yy"
+#line 2147 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Global_DynamicElement(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -3922,7 +3922,7 @@ namespace yy {
     break;
 
   case 232: // var: "VARIABLE_GLOBAL" "Dictionary element"
-#line 2149 "seclang-parser.yy"
+#line 2151 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Global_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3930,7 +3930,7 @@ namespace yy {
     break;
 
   case 233: // var: "VARIABLE_GLOBAL" "Dictionary element, selected by regexp"
-#line 2153 "seclang-parser.yy"
+#line 2155 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Global_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3938,7 +3938,7 @@ namespace yy {
     break;
 
   case 234: // var: "VARIABLE_GLOBAL"
-#line 2157 "seclang-parser.yy"
+#line 2159 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Global_NoDictElement());
       }
@@ -3946,7 +3946,7 @@ namespace yy {
     break;
 
   case 235: // var: "VARIABLE_USER" run_time_string
-#line 2161 "seclang-parser.yy"
+#line 2163 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::User_DynamicElement(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -3954,7 +3954,7 @@ namespace yy {
     break;
 
   case 236: // var: "VARIABLE_USER" "Dictionary element"
-#line 2165 "seclang-parser.yy"
+#line 2167 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::User_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3962,7 +3962,7 @@ namespace yy {
     break;
 
   case 237: // var: "VARIABLE_USER" "Dictionary element, selected by regexp"
-#line 2169 "seclang-parser.yy"
+#line 2171 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::User_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -3970,7 +3970,7 @@ namespace yy {
     break;
 
   case 238: // var: "VARIABLE_USER"
-#line 2173 "seclang-parser.yy"
+#line 2175 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::User_NoDictElement());
       }
@@ -3978,7 +3978,7 @@ namespace yy {
     break;
 
   case 239: // var: "VARIABLE_TX" run_time_string
-#line 2177 "seclang-parser.yy"
+#line 2179 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Tx_DynamicElement(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -3986,7 +3986,7 @@ namespace yy {
     break;
 
   case 240: // var: "VARIABLE_TX" "Dictionary element"
-#line 2181 "seclang-parser.yy"
+#line 2183 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Tx_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -3994,7 +3994,7 @@ namespace yy {
     break;
 
   case 241: // var: "VARIABLE_TX" "Dictionary element, selected by regexp"
-#line 2185 "seclang-parser.yy"
+#line 2187 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Tx_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -4002,7 +4002,7 @@ namespace yy {
     break;
 
   case 242: // var: "VARIABLE_TX"
-#line 2189 "seclang-parser.yy"
+#line 2191 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Tx_NoDictElement());
       }
@@ -4010,7 +4010,7 @@ namespace yy {
     break;
 
   case 243: // var: "VARIABLE_SESSION" run_time_string
-#line 2193 "seclang-parser.yy"
+#line 2195 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Session_DynamicElement(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -4018,7 +4018,7 @@ namespace yy {
     break;
 
   case 244: // var: "VARIABLE_SESSION" "Dictionary element"
-#line 2197 "seclang-parser.yy"
+#line 2199 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Session_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -4026,7 +4026,7 @@ namespace yy {
     break;
 
   case 245: // var: "VARIABLE_SESSION" "Dictionary element, selected by regexp"
-#line 2201 "seclang-parser.yy"
+#line 2203 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Session_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -4034,7 +4034,7 @@ namespace yy {
     break;
 
   case 246: // var: "VARIABLE_SESSION"
-#line 2205 "seclang-parser.yy"
+#line 2207 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Session_NoDictElement());
       }
@@ -4042,7 +4042,7 @@ namespace yy {
     break;
 
   case 247: // var: "Variable ARGS_NAMES" "Dictionary element"
-#line 2209 "seclang-parser.yy"
+#line 2211 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -4050,7 +4050,7 @@ namespace yy {
     break;
 
   case 248: // var: "Variable ARGS_NAMES" "Dictionary element, selected by regexp"
-#line 2213 "seclang-parser.yy"
+#line 2215 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -4058,7 +4058,7 @@ namespace yy {
     break;
 
   case 249: // var: "Variable ARGS_NAMES"
-#line 2217 "seclang-parser.yy"
+#line 2219 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsNames_NoDictElement());
       }
@@ -4066,7 +4066,7 @@ namespace yy {
     break;
 
   case 250: // var: VARIABLE_ARGS_GET_NAMES "Dictionary element"
-#line 2221 "seclang-parser.yy"
+#line 2223 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsGetNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -4074,7 +4074,7 @@ namespace yy {
     break;
 
   case 251: // var: VARIABLE_ARGS_GET_NAMES "Dictionary element, selected by regexp"
-#line 2225 "seclang-parser.yy"
+#line 2227 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsGetNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -4082,7 +4082,7 @@ namespace yy {
     break;
 
   case 252: // var: VARIABLE_ARGS_GET_NAMES
-#line 2229 "seclang-parser.yy"
+#line 2231 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsGetNames_NoDictElement());
       }
@@ -4090,7 +4090,7 @@ namespace yy {
     break;
 
   case 253: // var: VARIABLE_ARGS_POST_NAMES "Dictionary element"
-#line 2234 "seclang-parser.yy"
+#line 2236 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsPostNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -4098,7 +4098,7 @@ namespace yy {
     break;
 
   case 254: // var: VARIABLE_ARGS_POST_NAMES "Dictionary element, selected by regexp"
-#line 2238 "seclang-parser.yy"
+#line 2240 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsPostNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -4106,7 +4106,7 @@ namespace yy {
     break;
 
   case 255: // var: VARIABLE_ARGS_POST_NAMES
-#line 2242 "seclang-parser.yy"
+#line 2244 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsPostNames_NoDictElement());
       }
@@ -4114,7 +4114,7 @@ namespace yy {
     break;
 
   case 256: // var: VARIABLE_REQUEST_HEADERS_NAMES "Dictionary element"
-#line 2247 "seclang-parser.yy"
+#line 2249 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestHeadersNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -4122,7 +4122,7 @@ namespace yy {
     break;
 
   case 257: // var: VARIABLE_REQUEST_HEADERS_NAMES "Dictionary element, selected by regexp"
-#line 2251 "seclang-parser.yy"
+#line 2253 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestHeadersNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -4130,7 +4130,7 @@ namespace yy {
     break;
 
   case 258: // var: VARIABLE_REQUEST_HEADERS_NAMES
-#line 2255 "seclang-parser.yy"
+#line 2257 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestHeadersNames_NoDictElement());
       }
@@ -4138,7 +4138,7 @@ namespace yy {
     break;
 
   case 259: // var: VARIABLE_RESPONSE_CONTENT_TYPE
-#line 2260 "seclang-parser.yy"
+#line 2262 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseContentType());
       }
@@ -4146,7 +4146,7 @@ namespace yy {
     break;
 
   case 260: // var: VARIABLE_RESPONSE_HEADERS_NAMES "Dictionary element"
-#line 2265 "seclang-parser.yy"
+#line 2267 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseHeadersNames_DictElement(yystack_[0].value.as < std::string > ()));
       }
@@ -4154,7 +4154,7 @@ namespace yy {
     break;
 
   case 261: // var: VARIABLE_RESPONSE_HEADERS_NAMES "Dictionary element, selected by regexp"
-#line 2269 "seclang-parser.yy"
+#line 2271 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseHeadersNames_DictElementRegexp(yystack_[0].value.as < std::string > ()));
       }
@@ -4162,7 +4162,7 @@ namespace yy {
     break;
 
   case 262: // var: VARIABLE_RESPONSE_HEADERS_NAMES
-#line 2273 "seclang-parser.yy"
+#line 2275 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseHeadersNames_NoDictElement());
       }
@@ -4170,7 +4170,7 @@ namespace yy {
     break;
 
   case 263: // var: VARIABLE_ARGS_COMBINED_SIZE
-#line 2277 "seclang-parser.yy"
+#line 2279 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ArgsCombinedSize());
       }
@@ -4178,7 +4178,7 @@ namespace yy {
     break;
 
   case 264: // var: "AUTH_TYPE"
-#line 2281 "seclang-parser.yy"
+#line 2283 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::AuthType());
       }
@@ -4186,7 +4186,7 @@ namespace yy {
     break;
 
   case 265: // var: "FILES_COMBINED_SIZE"
-#line 2285 "seclang-parser.yy"
+#line 2287 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FilesCombinedSize());
       }
@@ -4194,7 +4194,7 @@ namespace yy {
     break;
 
   case 266: // var: "FULL_REQUEST"
-#line 2289 "seclang-parser.yy"
+#line 2291 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FullRequest());
       }
@@ -4202,7 +4202,7 @@ namespace yy {
     break;
 
   case 267: // var: "FULL_REQUEST_LENGTH"
-#line 2293 "seclang-parser.yy"
+#line 2295 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::FullRequestLength());
       }
@@ -4210,7 +4210,7 @@ namespace yy {
     break;
 
   case 268: // var: "INBOUND_DATA_ERROR"
-#line 2297 "seclang-parser.yy"
+#line 2299 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::InboundDataError());
       }
@@ -4218,7 +4218,7 @@ namespace yy {
     break;
 
   case 269: // var: "MATCHED_VAR"
-#line 2301 "seclang-parser.yy"
+#line 2303 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MatchedVar());
       }
@@ -4226,7 +4226,7 @@ namespace yy {
     break;
 
   case 270: // var: "MATCHED_VAR_NAME"
-#line 2305 "seclang-parser.yy"
+#line 2307 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MatchedVarName());
       }
@@ -4234,7 +4234,7 @@ namespace yy {
     break;
 
   case 271: // var: VARIABLE_MULTIPART_BOUNDARY_QUOTED
-#line 2309 "seclang-parser.yy"
+#line 2311 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartBoundaryQuoted());
       }
@@ -4242,7 +4242,7 @@ namespace yy {
     break;
 
   case 272: // var: VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
-#line 2313 "seclang-parser.yy"
+#line 2315 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartBoundaryWhiteSpace());
       }
@@ -4250,7 +4250,7 @@ namespace yy {
     break;
 
   case 273: // var: "MULTIPART_CRLF_LF_LINES"
-#line 2317 "seclang-parser.yy"
+#line 2319 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartCrlfLFLines());
       }
@@ -4258,7 +4258,7 @@ namespace yy {
     break;
 
   case 274: // var: "MULTIPART_DATA_AFTER"
-#line 2321 "seclang-parser.yy"
+#line 2323 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartDateAfter());
       }
@@ -4266,7 +4266,7 @@ namespace yy {
     break;
 
   case 275: // var: VARIABLE_MULTIPART_DATA_BEFORE
-#line 2325 "seclang-parser.yy"
+#line 2327 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartDateBefore());
       }
@@ -4274,7 +4274,7 @@ namespace yy {
     break;
 
   case 276: // var: "MULTIPART_FILE_LIMIT_EXCEEDED"
-#line 2329 "seclang-parser.yy"
+#line 2331 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartFileLimitExceeded());
       }
@@ -4282,7 +4282,7 @@ namespace yy {
     break;
 
   case 277: // var: "MULTIPART_HEADER_FOLDING"
-#line 2333 "seclang-parser.yy"
+#line 2335 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartHeaderFolding());
       }
@@ -4290,7 +4290,7 @@ namespace yy {
     break;
 
   case 278: // var: "MULTIPART_INVALID_HEADER_FOLDING"
-#line 2337 "seclang-parser.yy"
+#line 2339 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidHeaderFolding());
       }
@@ -4298,7 +4298,7 @@ namespace yy {
     break;
 
   case 279: // var: VARIABLE_MULTIPART_INVALID_PART
-#line 2341 "seclang-parser.yy"
+#line 2343 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidPart());
       }
@@ -4306,7 +4306,7 @@ namespace yy {
     break;
 
   case 280: // var: "MULTIPART_INVALID_QUOTING"
-#line 2345 "seclang-parser.yy"
+#line 2347 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidQuoting());
       }
@@ -4314,7 +4314,7 @@ namespace yy {
     break;
 
   case 281: // var: VARIABLE_MULTIPART_LF_LINE
-#line 2349 "seclang-parser.yy"
+#line 2351 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartLFLine());
       }
@@ -4322,7 +4322,7 @@ namespace yy {
     break;
 
   case 282: // var: VARIABLE_MULTIPART_MISSING_SEMICOLON
-#line 2353 "seclang-parser.yy"
+#line 2355 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartMissingSemicolon());
       }
@@ -4330,7 +4330,7 @@ namespace yy {
     break;
 
   case 283: // var: VARIABLE_MULTIPART_SEMICOLON_MISSING
-#line 2357 "seclang-parser.yy"
+#line 2359 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartMissingSemicolon());
       }
@@ -4338,7 +4338,7 @@ namespace yy {
     break;
 
   case 284: // var: "MULTIPART_STRICT_ERROR"
-#line 2361 "seclang-parser.yy"
+#line 2363 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartStrictError());
       }
@@ -4346,7 +4346,7 @@ namespace yy {
     break;
 
   case 285: // var: "MULTIPART_UNMATCHED_BOUNDARY"
-#line 2365 "seclang-parser.yy"
+#line 2367 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartUnmatchedBoundary());
       }
@@ -4354,7 +4354,7 @@ namespace yy {
     break;
 
   case 286: // var: "OUTBOUND_DATA_ERROR"
-#line 2369 "seclang-parser.yy"
+#line 2371 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::OutboundDataError());
       }
@@ -4362,7 +4362,7 @@ namespace yy {
     break;
 
   case 287: // var: "PATH_INFO"
-#line 2373 "seclang-parser.yy"
+#line 2375 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::PathInfo());
       }
@@ -4370,7 +4370,7 @@ namespace yy {
     break;
 
   case 288: // var: "QUERY_STRING"
-#line 2377 "seclang-parser.yy"
+#line 2379 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::QueryString());
       }
@@ -4378,7 +4378,7 @@ namespace yy {
     break;
 
   case 289: // var: "REMOTE_ADDR"
-#line 2381 "seclang-parser.yy"
+#line 2383 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemoteAddr());
       }
@@ -4386,7 +4386,7 @@ namespace yy {
     break;
 
   case 290: // var: "REMOTE_HOST"
-#line 2385 "seclang-parser.yy"
+#line 2387 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemoteHost());
       }
@@ -4394,7 +4394,7 @@ namespace yy {
     break;
 
   case 291: // var: "REMOTE_PORT"
-#line 2389 "seclang-parser.yy"
+#line 2391 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemotePort());
       }
@@ -4402,7 +4402,7 @@ namespace yy {
     break;
 
   case 292: // var: "REQBODY_ERROR"
-#line 2393 "seclang-parser.yy"
+#line 2395 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyError());
       }
@@ -4410,7 +4410,7 @@ namespace yy {
     break;
 
   case 293: // var: "REQBODY_ERROR_MSG"
-#line 2397 "seclang-parser.yy"
+#line 2399 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyErrorMsg());
       }
@@ -4418,7 +4418,7 @@ namespace yy {
     break;
 
   case 294: // var: "REQBODY_PROCESSOR"
-#line 2401 "seclang-parser.yy"
+#line 2403 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessor());
       }
@@ -4426,7 +4426,7 @@ namespace yy {
     break;
 
   case 295: // var: "REQBODY_PROCESSOR_ERROR"
-#line 2405 "seclang-parser.yy"
+#line 2407 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessorError());
       }
@@ -4434,7 +4434,7 @@ namespace yy {
     break;
 
   case 296: // var: "REQBODY_PROCESSOR_ERROR_MSG"
-#line 2409 "seclang-parser.yy"
+#line 2411 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessorErrorMsg());
       }
@@ -4442,7 +4442,7 @@ namespace yy {
     break;
 
   case 297: // var: "REQUEST_BASENAME"
-#line 2413 "seclang-parser.yy"
+#line 2415 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBasename());
       }
@@ -4450,7 +4450,7 @@ namespace yy {
     break;
 
   case 298: // var: "REQUEST_BODY"
-#line 2417 "seclang-parser.yy"
+#line 2419 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBody());
       }
@@ -4458,7 +4458,7 @@ namespace yy {
     break;
 
   case 299: // var: "REQUEST_BODY_LENGTH"
-#line 2421 "seclang-parser.yy"
+#line 2423 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBodyLength());
       }
@@ -4466,7 +4466,7 @@ namespace yy {
     break;
 
   case 300: // var: "REQUEST_FILENAME"
-#line 2425 "seclang-parser.yy"
+#line 2427 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestFilename());
       }
@@ -4474,7 +4474,7 @@ namespace yy {
     break;
 
   case 301: // var: "REQUEST_LINE"
-#line 2429 "seclang-parser.yy"
+#line 2431 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestLine());
       }
@@ -4482,7 +4482,7 @@ namespace yy {
     break;
 
   case 302: // var: "REQUEST_METHOD"
-#line 2433 "seclang-parser.yy"
+#line 2435 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestMethod());
       }
@@ -4490,7 +4490,7 @@ namespace yy {
     break;
 
   case 303: // var: "REQUEST_PROTOCOL"
-#line 2437 "seclang-parser.yy"
+#line 2439 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestProtocol());
       }
@@ -4498,7 +4498,7 @@ namespace yy {
     break;
 
   case 304: // var: "REQUEST_URI"
-#line 2441 "seclang-parser.yy"
+#line 2443 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestURI());
       }
@@ -4506,7 +4506,7 @@ namespace yy {
     break;
 
   case 305: // var: "REQUEST_URI_RAW"
-#line 2445 "seclang-parser.yy"
+#line 2447 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestURIRaw());
       }
@@ -4514,7 +4514,7 @@ namespace yy {
     break;
 
   case 306: // var: "RESPONSE_BODY"
-#line 2449 "seclang-parser.yy"
+#line 2451 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseBody());
       }
@@ -4522,7 +4522,7 @@ namespace yy {
     break;
 
   case 307: // var: "RESPONSE_CONTENT_LENGTH"
-#line 2453 "seclang-parser.yy"
+#line 2455 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseContentLength());
       }
@@ -4530,7 +4530,7 @@ namespace yy {
     break;
 
   case 308: // var: "RESPONSE_PROTOCOL"
-#line 2457 "seclang-parser.yy"
+#line 2459 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseProtocol());
       }
@@ -4538,7 +4538,7 @@ namespace yy {
     break;
 
   case 309: // var: "RESPONSE_STATUS"
-#line 2461 "seclang-parser.yy"
+#line 2463 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseStatus());
       }
@@ -4546,7 +4546,7 @@ namespace yy {
     break;
 
   case 310: // var: "SERVER_ADDR"
-#line 2465 "seclang-parser.yy"
+#line 2467 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ServerAddr());
       }
@@ -4554,7 +4554,7 @@ namespace yy {
     break;
 
   case 311: // var: "SERVER_NAME"
-#line 2469 "seclang-parser.yy"
+#line 2471 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ServerName());
       }
@@ -4562,7 +4562,7 @@ namespace yy {
     break;
 
   case 312: // var: "SERVER_PORT"
-#line 2473 "seclang-parser.yy"
+#line 2475 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ServerPort());
       }
@@ -4570,7 +4570,7 @@ namespace yy {
     break;
 
   case 313: // var: "SESSIONID"
-#line 2477 "seclang-parser.yy"
+#line 2479 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::SessionID());
       }
@@ -4578,7 +4578,7 @@ namespace yy {
     break;
 
   case 314: // var: "UNIQUE_ID"
-#line 2481 "seclang-parser.yy"
+#line 2483 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::UniqueID());
       }
@@ -4586,7 +4586,7 @@ namespace yy {
     break;
 
   case 315: // var: "URLENCODED_ERROR"
-#line 2485 "seclang-parser.yy"
+#line 2487 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::UrlEncodedError());
       }
@@ -4594,7 +4594,7 @@ namespace yy {
     break;
 
   case 316: // var: "USERID"
-#line 2489 "seclang-parser.yy"
+#line 2491 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::UserID());
       }
@@ -4602,7 +4602,7 @@ namespace yy {
     break;
 
   case 317: // var: "VARIABLE_STATUS"
-#line 2493 "seclang-parser.yy"
+#line 2495 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Status());
       }
@@ -4610,7 +4610,7 @@ namespace yy {
     break;
 
   case 318: // var: "VARIABLE_STATUS_LINE"
-#line 2497 "seclang-parser.yy"
+#line 2499 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::Status());
       }
@@ -4618,7 +4618,7 @@ namespace yy {
     break;
 
   case 319: // var: "WEBAPPID"
-#line 2501 "seclang-parser.yy"
+#line 2503 "seclang-parser.yy"
       {
         VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::WebAppId());
       }
@@ -4626,7 +4626,7 @@ namespace yy {
     break;
 
   case 320: // var: "RUN_TIME_VAR_DUR"
-#line 2505 "seclang-parser.yy"
+#line 2507 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4637,7 +4637,7 @@ namespace yy {
     break;
 
   case 321: // var: "RUN_TIME_VAR_BLD"
-#line 2513 "seclang-parser.yy"
+#line 2515 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4648,7 +4648,7 @@ namespace yy {
     break;
 
   case 322: // var: "RUN_TIME_VAR_HSV"
-#line 2520 "seclang-parser.yy"
+#line 2522 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4659,7 +4659,7 @@ namespace yy {
     break;
 
   case 323: // var: "RUN_TIME_VAR_REMOTE_USER"
-#line 2527 "seclang-parser.yy"
+#line 2529 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4670,7 +4670,7 @@ namespace yy {
     break;
 
   case 324: // var: "RUN_TIME_VAR_TIME"
-#line 2534 "seclang-parser.yy"
+#line 2536 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4681,7 +4681,7 @@ namespace yy {
     break;
 
   case 325: // var: "RUN_TIME_VAR_TIME_DAY"
-#line 2541 "seclang-parser.yy"
+#line 2543 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4692,7 +4692,7 @@ namespace yy {
     break;
 
   case 326: // var: "RUN_TIME_VAR_TIME_EPOCH"
-#line 2548 "seclang-parser.yy"
+#line 2550 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4703,7 +4703,7 @@ namespace yy {
     break;
 
   case 327: // var: "RUN_TIME_VAR_TIME_HOUR"
-#line 2555 "seclang-parser.yy"
+#line 2557 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4714,7 +4714,7 @@ namespace yy {
     break;
 
   case 328: // var: "RUN_TIME_VAR_TIME_MIN"
-#line 2562 "seclang-parser.yy"
+#line 2564 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4725,7 +4725,7 @@ namespace yy {
     break;
 
   case 329: // var: "RUN_TIME_VAR_TIME_MON"
-#line 2569 "seclang-parser.yy"
+#line 2571 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4736,7 +4736,7 @@ namespace yy {
     break;
 
   case 330: // var: "RUN_TIME_VAR_TIME_SEC"
-#line 2576 "seclang-parser.yy"
+#line 2578 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4747,7 +4747,7 @@ namespace yy {
     break;
 
   case 331: // var: "RUN_TIME_VAR_TIME_WDAY"
-#line 2583 "seclang-parser.yy"
+#line 2585 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4758,7 +4758,7 @@ namespace yy {
     break;
 
   case 332: // var: "RUN_TIME_VAR_TIME_YEAR"
-#line 2590 "seclang-parser.yy"
+#line 2592 "seclang-parser.yy"
       {
         std::string name(yystack_[0].value.as < std::string > ());
         char z = name.at(0);
@@ -4769,7 +4769,7 @@ namespace yy {
     break;
 
   case 333: // act: "Accuracy"
-#line 2600 "seclang-parser.yy"
+#line 2602 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Accuracy(yystack_[0].value.as < std::string > ()));
       }
@@ -4777,7 +4777,7 @@ namespace yy {
     break;
 
   case 334: // act: "Allow"
-#line 2604 "seclang-parser.yy"
+#line 2606 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::disruptive::Allow(yystack_[0].value.as < std::string > ()));
       }
@@ -4785,7 +4785,7 @@ namespace yy {
     break;
 
   case 335: // act: "Append"
-#line 2608 "seclang-parser.yy"
+#line 2610 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("Append", yystack_[1].location);
       }
@@ -4793,7 +4793,7 @@ namespace yy {
     break;
 
   case 336: // act: "AuditLog"
-#line 2612 "seclang-parser.yy"
+#line 2614 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::AuditLog());
       }
@@ -4801,7 +4801,7 @@ namespace yy {
     break;
 
   case 337: // act: "Block"
-#line 2616 "seclang-parser.yy"
+#line 2618 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Block());
       }
@@ -4809,7 +4809,7 @@ namespace yy {
     break;
 
   case 338: // act: "Capture"
-#line 2620 "seclang-parser.yy"
+#line 2622 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Capture());
       }
@@ -4817,7 +4817,7 @@ namespace yy {
     break;
 
   case 339: // act: "Chain"
-#line 2624 "seclang-parser.yy"
+#line 2626 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Chain());
       }
@@ -4825,7 +4825,7 @@ namespace yy {
     break;
 
   case 340: // act: "ACTION_CTL_AUDIT_ENGINE" "CONFIG_VALUE_ON"
-#line 2628 "seclang-parser.yy"
+#line 2630 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("CtlAuditEngine", yystack_[2].location);
         //ACTION_CONTAINER($$, new actions::Action($1));
@@ -4834,7 +4834,7 @@ namespace yy {
     break;
 
   case 341: // act: "ACTION_CTL_AUDIT_ENGINE" "CONFIG_VALUE_OFF"
-#line 2633 "seclang-parser.yy"
+#line 2635 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("CtlAuditEngine", yystack_[2].location);
         //ACTION_CONTAINER($$, new actions::Action($1));
@@ -4843,7 +4843,7 @@ namespace yy {
     break;
 
   case 342: // act: "ACTION_CTL_AUDIT_ENGINE" "CONFIG_VALUE_RELEVANT_ONLY"
-#line 2638 "seclang-parser.yy"
+#line 2640 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("CtlAuditEngine", yystack_[2].location);
         //ACTION_CONTAINER($$, new actions::Action($1));
@@ -4852,7 +4852,7 @@ namespace yy {
     break;
 
   case 343: // act: "ACTION_CTL_AUDIT_LOG_PARTS"
-#line 2643 "seclang-parser.yy"
+#line 2645 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::AuditLogParts(yystack_[0].value.as < std::string > ()));
       }
@@ -4860,7 +4860,7 @@ namespace yy {
     break;
 
   case 344: // act: "ACTION_CTL_BDY_JSON"
-#line 2647 "seclang-parser.yy"
+#line 2649 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorJSON(yystack_[0].value.as < std::string > ()));
       }
@@ -4868,7 +4868,7 @@ namespace yy {
     break;
 
   case 345: // act: "ACTION_CTL_BDY_XML"
-#line 2651 "seclang-parser.yy"
+#line 2653 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorXML(yystack_[0].value.as < std::string > ()));
       }
@@ -4876,7 +4876,7 @@ namespace yy {
     break;
 
   case 346: // act: "ACTION_CTL_BDY_URLENCODED"
-#line 2655 "seclang-parser.yy"
+#line 2657 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyProcessorURLENCODED(yystack_[0].value.as < std::string > ()));
       }
@@ -4884,7 +4884,7 @@ namespace yy {
     break;
 
   case 347: // act: "ACTION_CTL_FORCE_REQ_BODY_VAR" "CONFIG_VALUE_ON"
-#line 2659 "seclang-parser.yy"
+#line 2661 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", yystack_[2].location);
         //ACTION_CONTAINER($$, new actions::Action($1));
@@ -4893,7 +4893,7 @@ namespace yy {
     break;
 
   case 348: // act: "ACTION_CTL_FORCE_REQ_BODY_VAR" "CONFIG_VALUE_OFF"
-#line 2664 "seclang-parser.yy"
+#line 2666 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", yystack_[2].location);
         //ACTION_CONTAINER($$, new actions::Action($1));
@@ -4902,7 +4902,7 @@ namespace yy {
     break;
 
   case 349: // act: "ACTION_CTL_REQUEST_BODY_ACCESS" "CONFIG_VALUE_ON"
-#line 2669 "seclang-parser.yy"
+#line 2671 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as < std::string > () + "true"));
       }
@@ -4910,7 +4910,7 @@ namespace yy {
     break;
 
   case 350: // act: "ACTION_CTL_REQUEST_BODY_ACCESS" "CONFIG_VALUE_OFF"
-#line 2673 "seclang-parser.yy"
+#line 2675 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RequestBodyAccess(yystack_[1].value.as < std::string > () + "false"));
       }
@@ -4918,7 +4918,7 @@ namespace yy {
     break;
 
   case 351: // act: "ACTION_CTL_RULE_ENGINE" "CONFIG_VALUE_ON"
-#line 2677 "seclang-parser.yy"
+#line 2679 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=on"));
       }
@@ -4926,7 +4926,7 @@ namespace yy {
     break;
 
   case 352: // act: "ACTION_CTL_RULE_ENGINE" "CONFIG_VALUE_OFF"
-#line 2681 "seclang-parser.yy"
+#line 2683 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=off"));
       }
@@ -4934,7 +4934,7 @@ namespace yy {
     break;
 
   case 353: // act: "ACTION_CTL_RULE_ENGINE" "CONFIG_VALUE_DETC"
-#line 2685 "seclang-parser.yy"
+#line 2687 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RuleEngine("ctl:RuleEngine=detectiononly"));
       }
@@ -4942,7 +4942,7 @@ namespace yy {
     break;
 
   case 354: // act: "ACTION_CTL_RULE_REMOVE_BY_ID"
-#line 2689 "seclang-parser.yy"
+#line 2691 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveById(yystack_[0].value.as < std::string > ()));
       }
@@ -4950,7 +4950,7 @@ namespace yy {
     break;
 
   case 355: // act: "ACTION_CTL_RULE_REMOVE_BY_TAG"
-#line 2693 "seclang-parser.yy"
+#line 2695 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveByTag(yystack_[0].value.as < std::string > ()));
       }
@@ -4958,7 +4958,7 @@ namespace yy {
     break;
 
   case 356: // act: "ACTION_CTL_RULE_REMOVE_TARGET_BY_ID"
-#line 2697 "seclang-parser.yy"
+#line 2699 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetById(yystack_[0].value.as < std::string > ()));
       }
@@ -4966,7 +4966,7 @@ namespace yy {
     break;
 
   case 357: // act: "ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG"
-#line 2701 "seclang-parser.yy"
+#line 2703 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ctl::RuleRemoveTargetByTag(yystack_[0].value.as < std::string > ()));
       }
@@ -4974,7 +4974,7 @@ namespace yy {
     break;
 
   case 358: // act: "Deny"
-#line 2705 "seclang-parser.yy"
+#line 2707 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::disruptive::Deny());
       }
@@ -4982,7 +4982,7 @@ namespace yy {
     break;
 
   case 359: // act: "DeprecateVar"
-#line 2709 "seclang-parser.yy"
+#line 2711 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("DeprecateVar", yystack_[1].location);
       }
@@ -4990,7 +4990,7 @@ namespace yy {
     break;
 
   case 360: // act: "Drop"
-#line 2713 "seclang-parser.yy"
+#line 2715 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::disruptive::Drop());
       }
@@ -4998,7 +4998,7 @@ namespace yy {
     break;
 
   case 361: // act: "Exec"
-#line 2717 "seclang-parser.yy"
+#line 2719 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Exec(yystack_[0].value.as < std::string > ()));
       }
@@ -5006,7 +5006,7 @@ namespace yy {
     break;
 
   case 362: // act: "ExpireVar"
-#line 2721 "seclang-parser.yy"
+#line 2723 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::ExpireVar(yystack_[0].value.as < std::string > ()));
       }
@@ -5014,7 +5014,7 @@ namespace yy {
     break;
 
   case 363: // act: "Id"
-#line 2725 "seclang-parser.yy"
+#line 2727 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::RuleId(yystack_[0].value.as < std::string > ()));
       }
@@ -5022,7 +5022,7 @@ namespace yy {
     break;
 
   case 364: // act: "InitCol" run_time_string
-#line 2729 "seclang-parser.yy"
+#line 2731 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::InitCol(yystack_[1].value.as < std::string > (), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5030,7 +5030,7 @@ namespace yy {
     break;
 
   case 365: // act: "LogData" run_time_string
-#line 2733 "seclang-parser.yy"
+#line 2735 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::LogData(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5038,7 +5038,7 @@ namespace yy {
     break;
 
   case 366: // act: "Log"
-#line 2737 "seclang-parser.yy"
+#line 2739 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Log());
       }
@@ -5046,7 +5046,7 @@ namespace yy {
     break;
 
   case 367: // act: "Maturity"
-#line 2741 "seclang-parser.yy"
+#line 2743 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Maturity(yystack_[0].value.as < std::string > ()));
       }
@@ -5054,7 +5054,7 @@ namespace yy {
     break;
 
   case 368: // act: "Msg" run_time_string
-#line 2745 "seclang-parser.yy"
+#line 2747 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Msg(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5062,7 +5062,7 @@ namespace yy {
     break;
 
   case 369: // act: "MultiMatch"
-#line 2749 "seclang-parser.yy"
+#line 2751 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::MultiMatch());
       }
@@ -5070,7 +5070,7 @@ namespace yy {
     break;
 
   case 370: // act: "NoAuditLog"
-#line 2753 "seclang-parser.yy"
+#line 2755 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::NoAuditLog());
       }
@@ -5078,7 +5078,7 @@ namespace yy {
     break;
 
   case 371: // act: "NoLog"
-#line 2757 "seclang-parser.yy"
+#line 2759 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::NoLog());
       }
@@ -5086,7 +5086,7 @@ namespace yy {
     break;
 
   case 372: // act: "Pass"
-#line 2761 "seclang-parser.yy"
+#line 2763 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::disruptive::Pass());
       }
@@ -5094,7 +5094,7 @@ namespace yy {
     break;
 
   case 373: // act: "Pause"
-#line 2765 "seclang-parser.yy"
+#line 2767 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("Pause", yystack_[1].location);
       }
@@ -5102,7 +5102,7 @@ namespace yy {
     break;
 
   case 374: // act: "Phase"
-#line 2769 "seclang-parser.yy"
+#line 2771 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Phase(yystack_[0].value.as < std::string > ()));
       }
@@ -5110,7 +5110,7 @@ namespace yy {
     break;
 
   case 375: // act: "Prepend"
-#line 2773 "seclang-parser.yy"
+#line 2775 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("Prepend", yystack_[1].location);
       }
@@ -5118,7 +5118,7 @@ namespace yy {
     break;
 
   case 376: // act: "Proxy"
-#line 2777 "seclang-parser.yy"
+#line 2779 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("Proxy", yystack_[1].location);
       }
@@ -5126,7 +5126,7 @@ namespace yy {
     break;
 
   case 377: // act: "Redirect" run_time_string
-#line 2781 "seclang-parser.yy"
+#line 2783 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::disruptive::Redirect(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5134,7 +5134,7 @@ namespace yy {
     break;
 
   case 378: // act: "Rev"
-#line 2785 "seclang-parser.yy"
+#line 2787 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Rev(yystack_[0].value.as < std::string > ()));
       }
@@ -5142,7 +5142,7 @@ namespace yy {
     break;
 
   case 379: // act: "SanitiseArg"
-#line 2789 "seclang-parser.yy"
+#line 2791 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("SanitiseArg", yystack_[1].location);
       }
@@ -5150,7 +5150,7 @@ namespace yy {
     break;
 
   case 380: // act: "SanitiseMatched"
-#line 2793 "seclang-parser.yy"
+#line 2795 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("SanitiseMatched", yystack_[1].location);
       }
@@ -5158,7 +5158,7 @@ namespace yy {
     break;
 
   case 381: // act: "SanitiseMatchedBytes"
-#line 2797 "seclang-parser.yy"
+#line 2799 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("SanitiseMatchedBytes", yystack_[1].location);
       }
@@ -5166,7 +5166,7 @@ namespace yy {
     break;
 
   case 382: // act: "SanitiseRequestHeader"
-#line 2801 "seclang-parser.yy"
+#line 2803 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("SanitiseRequestHeader", yystack_[1].location);
       }
@@ -5174,7 +5174,7 @@ namespace yy {
     break;
 
   case 383: // act: "SanitiseResponseHeader"
-#line 2805 "seclang-parser.yy"
+#line 2807 "seclang-parser.yy"
       {
         ACTION_NOT_SUPPORTED("SanitiseResponseHeader", yystack_[1].location);
       }
@@ -5182,7 +5182,7 @@ namespace yy {
     break;
 
   case 384: // act: "SetEnv" run_time_string
-#line 2809 "seclang-parser.yy"
+#line 2811 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetENV(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5190,7 +5190,7 @@ namespace yy {
     break;
 
   case 385: // act: "SetRsc" run_time_string
-#line 2813 "seclang-parser.yy"
+#line 2815 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetRSC(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5198,7 +5198,7 @@ namespace yy {
     break;
 
   case 386: // act: "SetSid" run_time_string
-#line 2817 "seclang-parser.yy"
+#line 2819 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetSID(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5206,7 +5206,7 @@ namespace yy {
     break;
 
   case 387: // act: "SetUID" run_time_string
-#line 2821 "seclang-parser.yy"
+#line 2823 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetUID(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5214,7 +5214,7 @@ namespace yy {
     break;
 
   case 388: // act: "SetVar" setvar_action
-#line 2825 "seclang-parser.yy"
+#line 2827 "seclang-parser.yy"
       {
         yylhs.value.as < std::unique_ptr<actions::Action> > () = std::move(yystack_[0].value.as < std::unique_ptr<actions::Action> > ());
       }
@@ -5222,7 +5222,7 @@ namespace yy {
     break;
 
   case 389: // act: "Severity"
-#line 2829 "seclang-parser.yy"
+#line 2831 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Severity(yystack_[0].value.as < std::string > ()));
       }
@@ -5230,7 +5230,7 @@ namespace yy {
     break;
 
   case 390: // act: "Skip"
-#line 2833 "seclang-parser.yy"
+#line 2835 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Skip(yystack_[0].value.as < std::string > ()));
       }
@@ -5238,7 +5238,7 @@ namespace yy {
     break;
 
   case 391: // act: "SkipAfter"
-#line 2837 "seclang-parser.yy"
+#line 2839 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SkipAfter(yystack_[0].value.as < std::string > ()));
       }
@@ -5246,7 +5246,7 @@ namespace yy {
     break;
 
   case 392: // act: "Status"
-#line 2841 "seclang-parser.yy"
+#line 2843 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::data::Status(yystack_[0].value.as < std::string > ()));
       }
@@ -5254,7 +5254,7 @@ namespace yy {
     break;
 
   case 393: // act: "Tag" run_time_string
-#line 2845 "seclang-parser.yy"
+#line 2847 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Tag(std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5262,7 +5262,7 @@ namespace yy {
     break;
 
   case 394: // act: "Ver"
-#line 2849 "seclang-parser.yy"
+#line 2851 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::Ver(yystack_[0].value.as < std::string > ()));
       }
@@ -5270,7 +5270,7 @@ namespace yy {
     break;
 
   case 395: // act: "xmlns"
-#line 2853 "seclang-parser.yy"
+#line 2855 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::XmlNS(yystack_[0].value.as < std::string > ()));
       }
@@ -5278,7 +5278,7 @@ namespace yy {
     break;
 
   case 396: // act: "ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT"
-#line 2857 "seclang-parser.yy"
+#line 2859 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::ParityZero7bit());
       }
@@ -5286,7 +5286,7 @@ namespace yy {
     break;
 
   case 397: // act: "ACTION_TRANSFORMATION_PARITY_ODD_7_BIT"
-#line 2861 "seclang-parser.yy"
+#line 2863 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::ParityOdd7bit());
       }
@@ -5294,7 +5294,7 @@ namespace yy {
     break;
 
   case 398: // act: "ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT"
-#line 2865 "seclang-parser.yy"
+#line 2867 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::ParityEven7bit());
       }
@@ -5302,7 +5302,7 @@ namespace yy {
     break;
 
   case 399: // act: "ACTION_TRANSFORMATION_SQL_HEX_DECODE"
-#line 2869 "seclang-parser.yy"
+#line 2871 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::SqlHexDecode());
       }
@@ -5310,7 +5310,7 @@ namespace yy {
     break;
 
   case 400: // act: "ACTION_TRANSFORMATION_BASE_64_ENCODE"
-#line 2873 "seclang-parser.yy"
+#line 2875 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Base64Encode());
       }
@@ -5318,7 +5318,7 @@ namespace yy {
     break;
 
   case 401: // act: "ACTION_TRANSFORMATION_BASE_64_DECODE"
-#line 2877 "seclang-parser.yy"
+#line 2879 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Base64Decode());
       }
@@ -5326,7 +5326,7 @@ namespace yy {
     break;
 
   case 402: // act: "ACTION_TRANSFORMATION_BASE_64_DECODE_EXT"
-#line 2881 "seclang-parser.yy"
+#line 2883 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Base64DecodeExt());
       }
@@ -5334,7 +5334,7 @@ namespace yy {
     break;
 
   case 403: // act: "ACTION_TRANSFORMATION_CMD_LINE"
-#line 2885 "seclang-parser.yy"
+#line 2887 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::CmdLine());
       }
@@ -5342,7 +5342,7 @@ namespace yy {
     break;
 
   case 404: // act: "ACTION_TRANSFORMATION_SHA1"
-#line 2889 "seclang-parser.yy"
+#line 2891 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Sha1());
       }
@@ -5350,7 +5350,7 @@ namespace yy {
     break;
 
   case 405: // act: "ACTION_TRANSFORMATION_MD5"
-#line 2893 "seclang-parser.yy"
+#line 2895 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Md5());
       }
@@ -5358,7 +5358,7 @@ namespace yy {
     break;
 
   case 406: // act: "ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE"
-#line 2897 "seclang-parser.yy"
+#line 2899 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::EscapeSeqDecode());
       }
@@ -5366,7 +5366,7 @@ namespace yy {
     break;
 
   case 407: // act: "ACTION_TRANSFORMATION_HEX_ENCODE"
-#line 2901 "seclang-parser.yy"
+#line 2903 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::HexEncode());
       }
@@ -5374,7 +5374,7 @@ namespace yy {
     break;
 
   case 408: // act: "ACTION_TRANSFORMATION_HEX_DECODE"
-#line 2905 "seclang-parser.yy"
+#line 2907 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::HexDecode());
       }
@@ -5382,7 +5382,7 @@ namespace yy {
     break;
 
   case 409: // act: "ACTION_TRANSFORMATION_LOWERCASE"
-#line 2909 "seclang-parser.yy"
+#line 2911 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::LowerCase());
       }
@@ -5390,7 +5390,7 @@ namespace yy {
     break;
 
   case 410: // act: "ACTION_TRANSFORMATION_PHP_ARGS_NAMES"
-#line 2913 "seclang-parser.yy"
+#line 2915 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::PhpArgsNames());
       }
@@ -5398,7 +5398,7 @@ namespace yy {
     break;
 
   case 411: // act: "ACTION_TRANSFORMATION_UPPERCASE"
-#line 2917 "seclang-parser.yy"
+#line 2919 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::UpperCase());
       }
@@ -5406,7 +5406,7 @@ namespace yy {
     break;
 
   case 412: // act: "ACTION_TRANSFORMATION_URL_DECODE_UNI"
-#line 2921 "seclang-parser.yy"
+#line 2923 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecodeUni());
       }
@@ -5414,7 +5414,7 @@ namespace yy {
     break;
 
   case 413: // act: "ACTION_TRANSFORMATION_URL_DECODE"
-#line 2925 "seclang-parser.yy"
+#line 2927 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::UrlDecode());
       }
@@ -5422,7 +5422,7 @@ namespace yy {
     break;
 
   case 414: // act: "ACTION_TRANSFORMATION_URL_ENCODE"
-#line 2929 "seclang-parser.yy"
+#line 2931 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::UrlEncode());
       }
@@ -5430,7 +5430,7 @@ namespace yy {
     break;
 
   case 415: // act: "ACTION_TRANSFORMATION_NONE"
-#line 2933 "seclang-parser.yy"
+#line 2935 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::None());
       }
@@ -5438,7 +5438,7 @@ namespace yy {
     break;
 
   case 416: // act: "ACTION_TRANSFORMATION_COMPRESS_WHITESPACE"
-#line 2937 "seclang-parser.yy"
+#line 2939 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::CompressWhitespace());
       }
@@ -5446,7 +5446,7 @@ namespace yy {
     break;
 
   case 417: // act: "ACTION_TRANSFORMATION_REMOVE_WHITESPACE"
-#line 2941 "seclang-parser.yy"
+#line 2943 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveWhitespace());
       }
@@ -5454,7 +5454,7 @@ namespace yy {
     break;
 
   case 418: // act: "ACTION_TRANSFORMATION_REPLACE_NULLS"
-#line 2945 "seclang-parser.yy"
+#line 2947 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceNulls());
       }
@@ -5462,7 +5462,7 @@ namespace yy {
     break;
 
   case 419: // act: "ACTION_TRANSFORMATION_REMOVE_NULLS"
-#line 2949 "seclang-parser.yy"
+#line 2951 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveNulls());
       }
@@ -5470,7 +5470,7 @@ namespace yy {
     break;
 
   case 420: // act: "ACTION_TRANSFORMATION_HTML_ENTITY_DECODE"
-#line 2953 "seclang-parser.yy"
+#line 2955 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::HtmlEntityDecode());
       }
@@ -5478,7 +5478,7 @@ namespace yy {
     break;
 
   case 421: // act: "ACTION_TRANSFORMATION_JS_DECODE"
-#line 2957 "seclang-parser.yy"
+#line 2959 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::JsDecode());
       }
@@ -5486,7 +5486,7 @@ namespace yy {
     break;
 
   case 422: // act: "ACTION_TRANSFORMATION_CSS_DECODE"
-#line 2961 "seclang-parser.yy"
+#line 2963 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::CssDecode());
       }
@@ -5494,7 +5494,7 @@ namespace yy {
     break;
 
   case 423: // act: "ACTION_TRANSFORMATION_TRIM"
-#line 2965 "seclang-parser.yy"
+#line 2967 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Trim());
       }
@@ -5502,7 +5502,7 @@ namespace yy {
     break;
 
   case 424: // act: "ACTION_TRANSFORMATION_TRIM_LEFT"
-#line 2969 "seclang-parser.yy"
+#line 2971 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::TrimLeft());
       }
@@ -5510,7 +5510,7 @@ namespace yy {
     break;
 
   case 425: // act: "ACTION_TRANSFORMATION_TRIM_RIGHT"
-#line 2973 "seclang-parser.yy"
+#line 2975 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::TrimRight());
       }
@@ -5518,7 +5518,7 @@ namespace yy {
     break;
 
   case 426: // act: "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
-#line 2977 "seclang-parser.yy"
+#line 2979 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePathWin());
       }
@@ -5526,7 +5526,7 @@ namespace yy {
     break;
 
   case 427: // act: "ACTION_TRANSFORMATION_NORMALISE_PATH"
-#line 2981 "seclang-parser.yy"
+#line 2983 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::NormalisePath());
       }
@@ -5534,7 +5534,7 @@ namespace yy {
     break;
 
   case 428: // act: "ACTION_TRANSFORMATION_LENGTH"
-#line 2985 "seclang-parser.yy"
+#line 2987 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Length());
       }
@@ -5542,7 +5542,7 @@ namespace yy {
     break;
 
   case 429: // act: "ACTION_TRANSFORMATION_UTF8_TO_UNICODE"
-#line 2989 "seclang-parser.yy"
+#line 2991 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::Utf8ToUnicode());
       }
@@ -5550,7 +5550,7 @@ namespace yy {
     break;
 
   case 430: // act: "ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR"
-#line 2993 "seclang-parser.yy"
+#line 2995 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveCommentsChar());
       }
@@ -5558,7 +5558,7 @@ namespace yy {
     break;
 
   case 431: // act: "ACTION_TRANSFORMATION_REMOVE_COMMENTS"
-#line 2997 "seclang-parser.yy"
+#line 2999 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::RemoveComments());
       }
@@ -5566,7 +5566,7 @@ namespace yy {
     break;
 
   case 432: // act: "ACTION_TRANSFORMATION_REPLACE_COMMENTS"
-#line 3001 "seclang-parser.yy"
+#line 3003 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::transformations::ReplaceComments());
       }
@@ -5574,7 +5574,7 @@ namespace yy {
     break;
 
   case 433: // setvar_action: "NOT" var
-#line 3008 "seclang-parser.yy"
+#line 3010 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::unsetOperation, std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ())));
       }
@@ -5582,7 +5582,7 @@ namespace yy {
     break;
 
   case 434: // setvar_action: var
-#line 3012 "seclang-parser.yy"
+#line 3014 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setToOneOperation, std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ())));
       }
@@ -5590,7 +5590,7 @@ namespace yy {
     break;
 
   case 435: // setvar_action: var SETVAR_OPERATION_EQUALS run_time_string
-#line 3016 "seclang-parser.yy"
+#line 3018 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::setOperation, std::move(yystack_[2].value.as < std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5598,7 +5598,7 @@ namespace yy {
     break;
 
   case 436: // setvar_action: var SETVAR_OPERATION_EQUALS_PLUS run_time_string
-#line 3020 "seclang-parser.yy"
+#line 3022 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, std::move(yystack_[2].value.as < std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
@@ -5606,53 +5606,69 @@ namespace yy {
     break;
 
   case 437: // setvar_action: var SETVAR_OPERATION_EQUALS_MINUS run_time_string
-#line 3024 "seclang-parser.yy"
+#line 3026 "seclang-parser.yy"
       {
         ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, std::move(yystack_[2].value.as < std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
       }
 #line 5614 "seclang-parser.cc"
     break;
 
-  case 438: // run_time_string: run_time_string "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-#line 3031 "seclang-parser.yy"
+  case 438: // setvar_action: var SETVAR_OPERATION_EQUALS_APPEND run_time_string
+#line 3030 "seclang-parser.yy"
+      {
+        ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::appendStringOperation, std::move(yystack_[2].value.as < std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
+      }
+#line 5622 "seclang-parser.cc"
+    break;
+
+  case 439: // setvar_action: var SETVAR_OPERATION_EQUALS_PREPEND run_time_string
+#line 3034 "seclang-parser.yy"
+      {
+        ACTION_CONTAINER(yylhs.value.as < std::unique_ptr<actions::Action> > (), new actions::SetVar(actions::SetVarOperation::prependStringOperation, std::move(yystack_[2].value.as < std::unique_ptr<Variable> > ()), std::move(yystack_[0].value.as < std::unique_ptr<RunTimeString> > ())));
+      }
+#line 5630 "seclang-parser.cc"
+    break;
+
+  case 440: // run_time_string: run_time_string "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+#line 3041 "seclang-parser.yy"
       {
         yystack_[1].value.as < std::unique_ptr<RunTimeString> > ()->append(yystack_[0].value.as < std::string > ());
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(yystack_[1].value.as < std::unique_ptr<RunTimeString> > ());
       }
-#line 5623 "seclang-parser.cc"
+#line 5639 "seclang-parser.cc"
     break;
 
-  case 439: // run_time_string: run_time_string var
-#line 3036 "seclang-parser.yy"
+  case 441: // run_time_string: run_time_string var
+#line 3046 "seclang-parser.yy"
       {
         yystack_[1].value.as < std::unique_ptr<RunTimeString> > ()->append(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(yystack_[1].value.as < std::unique_ptr<RunTimeString> > ());
       }
-#line 5632 "seclang-parser.cc"
+#line 5648 "seclang-parser.cc"
     break;
 
-  case 440: // run_time_string: "FREE_TEXT_QUOTE_MACRO_EXPANSION"
-#line 3041 "seclang-parser.yy"
+  case 442: // run_time_string: "FREE_TEXT_QUOTE_MACRO_EXPANSION"
+#line 3051 "seclang-parser.yy"
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
         r->append(yystack_[0].value.as < std::string > ());
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(r);
       }
-#line 5642 "seclang-parser.cc"
+#line 5658 "seclang-parser.cc"
     break;
 
-  case 441: // run_time_string: var
-#line 3047 "seclang-parser.yy"
+  case 443: // run_time_string: var
+#line 3057 "seclang-parser.yy"
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
         r->append(std::move(yystack_[0].value.as < std::unique_ptr<Variable> > ()));
         yylhs.value.as < std::unique_ptr<RunTimeString> > () = std::move(r);
       }
-#line 5652 "seclang-parser.cc"
+#line 5668 "seclang-parser.cc"
     break;
 
 
-#line 5656 "seclang-parser.cc"
+#line 5672 "seclang-parser.cc"
 
             default:
               break;
@@ -6001,66 +6017,67 @@ namespace yy {
   }
 
 
-  const short seclang_parser::yypact_ninf_ = -423;
+  const short seclang_parser::yypact_ninf_ = -418;
 
   const signed char seclang_parser::yytable_ninf_ = -1;
 
   const short
   seclang_parser::yypact_[] =
   {
-    2508,  -423,  -251,  -423,   -86,  -423,  -157,  -423,  -423,  -423,
-    -423,  -423,  -275,  -423,  -423,  -423,  -423,  -423,  -287,  -423,
-    -423,  -423,  -154,  -152,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -147,  -423,
-    -423,  -148,  -423,  -143,  -423,  -144,  -132,  -423,  -261,  2856,
-    2856,  -423,  -423,  -423,  -423,  -130,  -300,  -423,  -423,  -423,
-    1150,  1150,  1150,  2856,  -269,  -128,  -423,  -423,  -423,  -126,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  1150,
-    2856,  2669,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  2126,  -257,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -267,  -423,  -423,  -423,  -423,  -124,  -122,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    2220,  -423,  2220,  -423,  2220,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  2220,  -423,  -423,  -423,  -423,  -423,  -423,
-    2220,  2220,  2220,  2220,  -423,  -423,  -423,  -423,  2220,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  3039,  -423,
-       5,  -423,  -423,  -423,  -423,  -423,  -423,  2551,  2551,  -156,
-    -153,  -151,  -149,  -146,  -142,  -139,  -137,  -135,  -131,  -129,
-    -127,  -125,  -123,  -121,  -119,  -423,  -117,  -115,  -113,  -111,
-    -423,  -423,  -109,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -107,  -423,
-    -423,  -423,  -423,  -423,    50,  -423,  -423,  -423,  -105,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,   458,   547,   636,   970,  1059,  -103,  -101,  1483,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,     6,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  1663,  -423,  -423,  -423,  -423,
-    2551,   -49,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  2325,  2325,  2325,  2325,  2325,
-    2325,  2325,  2325,  2325,     4,  3039,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,  -423,
-    -423,  -423,  -423,  -423,  2325,  -423,  -423,  -423,  -423,  2325,
-    -423,  -423,  2325,  -423,  -423,  2325,  -423,  -423,  2325,  -423,
-    -423,  2325,  -423,  -423,  -423,  -423,     9,  1574,  1994,  2220,
-    2220,  2220,  -423,  -423,  2220,  2220,  2220,  -423,  2220,  2220,
-    2220,  2220,  2220,  2220,  2220,  2220,  2220,  2220,  2220,  2220,
-    2220,  2220,  2220,  2220,  -423,  2220,  2220,  2220,  2220,  -423,
-    -423,  2220,  2220,  2220,  2220,  2220,  2856,  -423,  2325,  -423,
-    2220,  2220,  2220,  -423,  -423,  -423,  -423,  -423,  2551,  2551,
-    -423,  -423,  2325,  2325,  2325,  2325,  2325,  2325,  2325,  2325,
-    2325,  2325,  2325,  2325,  2325,  2325,  2325,  2325,  2325,  2325,
-    2325,  2325,  2325,  2325,  2325,  2325,  2325,  2325,  2325,  2325,
-    2325,  2325,  2325,  2325,  -423,  2325,  2325,  2325,  -423,  -423
+    2680,  -418,  -257,  -418,     3,  -418,  -156,  -418,  -418,  -418,
+    -418,  -418,  -277,  -418,  -418,  -418,  -418,  -418,  -292,  -418,
+    -418,  -418,  -154,  -149,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -147,  -418,
+    -418,  -148,  -418,  -143,  -418,  -138,  -132,  -418,  -283,  2957,
+    2957,  -418,  -418,  -418,  -418,  -130,  -301,  -418,  -418,  -418,
+    1156,  1156,  1156,  2957,  -271,  -128,  -418,  -418,  -418,  -126,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  1156,
+    2957,  2768,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  2138,  -253,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -269,  -418,  -418,  -418,  -418,  -124,  -122,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    2337,  -418,  2337,  -418,  2337,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  2337,  -418,  -418,  -418,  -418,  -418,  -418,
+    2337,  2337,  2337,  2337,  -418,  -418,  -418,  -418,  2337,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  3140,  -418,
+       5,  -418,  -418,  -418,  -418,  -418,  -418,  2560,  2560,  -155,
+    -153,  -151,  -146,  -144,  -141,  -139,  -137,  -135,  -131,  -129,
+    -127,  -125,  -123,  -121,  -119,  -418,  -117,  -115,  -113,  -111,
+    -418,  -418,  -109,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -107,  -418,
+    -418,  -418,  -418,  -418,    48,  -418,  -418,  -418,  -105,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,   462,   551,   640,   976,  1065,  -103,  -101,  1491,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,     4,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  1671,  -418,  -418,  -418,  -418,
+    2560,   -54,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  2471,  2471,  2471,  2471,  2471,
+    2471,  2471,  2471,  2471,     2,  3140,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,  -418,
+    -418,  -418,  -418,  -418,  2471,  -418,  -418,  -418,  -418,  2471,
+    -418,  -418,  2471,  -418,  -418,  2471,  -418,  -418,  2471,  -418,
+    -418,  2471,  -418,  -418,  -418,  -418,     7,  1582,  2004,  2337,
+    2337,  2337,  -418,  -418,  2337,  2337,  2337,  -418,  2337,  2337,
+    2337,  2337,  2337,  2337,  2337,  2337,  2337,  2337,  2337,  2337,
+    2337,  2337,  2337,  2337,  -418,  2337,  2337,  2337,  2337,  -418,
+    -418,  2337,  2337,  2337,  2337,  2337,  2957,  -418,  2471,  -418,
+    2337,  2337,  2337,  2337,  2337,  -418,  -418,  -418,  -418,  -418,
+    2560,  2560,  -418,  -418,  2471,  2471,  2471,  2471,  2471,  2471,
+    2471,  2471,  2471,  2471,  2471,  2471,  2471,  2471,  2471,  2471,
+    2471,  2471,  2471,  2471,  2471,  2471,  2471,  2471,  2471,  2471,
+    2471,  2471,  2471,  2471,  2471,  2471,  -418,  2471,  2471,  2471,
+    2471,  2471,  -418,  -418
   };
 
   const short
@@ -6101,7 +6118,7 @@ namespace yy {
      331,   332,   121,   155,   160,   122,   123,   124,    22,    21,
       23,    28,    27,   143,   144,     0,   154,    78,     1,     3,
        0,   434,   388,   353,   352,   351,   341,   340,   342,   348,
-     347,   350,   349,   440,   441,   364,   365,   368,   377,   384,
+     347,   350,   349,   442,   443,   364,   365,   368,   377,   384,
      385,   386,   387,   393,     0,     0,   162,   161,   163,   164,
      166,   167,   169,   170,   172,   173,   175,   176,   178,   179,
      181,   182,   184,   185,   187,   188,   190,   191,   193,   194,
@@ -6114,18 +6131,19 @@ namespace yy {
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,    37,     0,     0,     0,     0,    40,
       41,     0,     0,     0,     0,     0,    76,    33,    35,   433,
-       0,     0,     0,   438,   439,    29,    31,   156,     0,     0,
-     157,    34,    36,    72,    56,    55,    57,    58,    43,    59,
-      52,    60,    42,    61,    62,    63,    64,    65,    66,    67,
-      53,    68,    69,    70,    71,    44,    45,    46,    47,    48,
-      49,    50,    51,    54,    75,   435,   436,   437,   159,   158
+       0,     0,     0,     0,     0,   440,   441,    29,    31,   156,
+       0,     0,   157,    34,    36,    72,    56,    55,    57,    58,
+      43,    59,    52,    60,    42,    61,    62,    63,    64,    65,
+      66,    67,    53,    68,    69,    70,    71,    44,    45,    46,
+      47,    48,    49,    50,    51,    54,    75,   435,   436,   437,
+     438,   439,   159,   158
   };
 
   const short
   seclang_parser::yypgoto_[] =
   {
-    -423,  -423,   -71,  -423,   -46,  -194,  -423,  -422,  -423,  -423,
-     -56,  -286,   -60,  -341,  -423,  -133
+    -418,  -418,   -69,  -418,   -47,  -191,  -418,  -417,  -418,  -418,
+     -55,  -274,   -60,  -324,  -418,  -133
   };
 
   const short
@@ -6138,53 +6156,12 @@ namespace yy {
   const short
   seclang_parser::yytable_[] =
   {
-     324,   324,   324,   215,   212,   325,   326,   365,   365,   356,
-     339,   357,   437,   216,   364,   437,   491,   327,    94,   324,
-     358,    95,   436,   336,   486,    96,     0,   359,   360,   361,
-     362,    91,    92,     0,   337,   363,    93,   328,   329,   346,
-     347,     0,   330,   111,   348,   112,   113,   343,     0,   344,
-     345,   480,   481,   482,   341,    85,    86,    87,    88,     0,
-     219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
-     229,   230,   231,   232,   233,   234,   235,   236,   237,   238,
-     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
-     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
-     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
-     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
-     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
-     289,   290,   291,   292,   293,   294,   295,   296,   297,   298,
-     299,   300,   301,   302,   303,   304,   305,   306,   307,    89,
-      90,   414,    97,    98,    99,   100,     0,   366,   367,   101,
-     102,   103,   104,   105,   106,   107,   108,     0,   419,   422,
-     425,   428,   431,     0,   109,   110,   213,   214,   331,   332,
-     333,   334,   349,   350,   351,   352,   368,   369,     0,   370,
-     371,   372,   373,   374,   375,     0,   376,   377,     0,     0,
-     378,   379,   478,   380,   381,   382,   383,   384,   385,     0,
-       0,   386,   387,   388,   389,   390,   391,   392,   393,   394,
-     395,   396,   397,   398,   399,   400,   401,   402,   403,   404,
-     405,   406,   407,   408,   409,   410,   411,   415,   416,   432,
-     433,   434,   435,     0,     0,     0,     0,     0,   324,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-     479,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,   484,   484,   484,   484,   484,
-     484,   484,   484,   484,     0,   492,   493,   494,   495,     0,
-       0,   496,   497,   498,     0,   499,   500,   501,   502,   503,
-     504,   505,   506,   507,   508,   509,   510,   511,   512,   513,
-     514,   485,   515,   516,   517,   518,   487,     0,   519,   520,
-     521,   522,   523,     0,     0,     0,     0,   525,   526,   527,
-       0,     0,     0,     0,   484,     0,     0,     0,     0,   484,
-       0,     0,   484,     0,     0,   484,     0,     0,   484,     0,
-       0,   484,     0,     0,     0,     0,   353,   490,   309,   310,
-     311,   312,   313,   314,   315,   316,   317,   318,   319,   320,
-     321,     0,   412,   413,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   484,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   528,   529,
-     524,     0,   484,   484,   484,   484,   484,   484,   484,   484,
-     484,   484,   484,   484,   484,   484,   484,   484,   484,   484,
-     484,   484,   484,   484,   484,   484,   484,   484,   484,   484,
-     484,   484,   484,   484,     0,   484,   484,   484,   219,   220,
+     324,   324,   324,   212,   215,   365,   325,   326,   365,   356,
+     437,   357,   339,   437,   216,    94,   327,   364,    95,   324,
+     358,   493,    96,   111,   336,   112,   113,   359,   360,   361,
+     362,    91,    92,   337,   436,   363,    93,   328,   329,   346,
+     347,   488,   330,     0,   348,     0,   480,   481,   482,   483,
+     484,    85,    86,   343,   341,   344,   345,     0,   219,   220,
      221,   222,   223,   224,   225,   226,   227,   228,   229,   230,
      231,   232,   233,   234,   235,   236,   237,   238,   239,   240,
      241,   242,   243,   244,   245,   246,   247,   248,   249,   250,
@@ -6193,16 +6170,109 @@ namespace yy {
      271,   272,   273,   274,   275,   276,   277,   278,   279,   280,
      281,   282,   283,   284,   285,   286,   287,   288,   289,   290,
      291,   292,   293,   294,   295,   296,   297,   298,   299,   300,
-     301,   302,   303,   304,   305,   306,   307,   219,   220,   221,
-     222,   223,   224,   225,   226,   227,   228,   229,   230,   231,
-     232,   233,   234,   235,   236,   237,   238,   239,   240,   241,
-     242,   243,   244,   245,   246,   247,   248,   249,   250,   251,
-     252,   253,   254,   255,   256,   257,   258,   259,   260,   261,
-     262,   263,   264,   265,   266,   267,   268,   269,   270,   271,
-     272,   273,   274,   275,   276,   277,   278,   279,   280,   281,
-     282,   283,   284,   285,   286,   287,   288,   289,   290,   291,
-     292,   293,   294,   295,   296,   297,   298,   299,   300,   301,
-     302,   303,   304,   305,   306,   307,   219,   220,   221,   222,
+     301,   302,   303,   304,   305,   306,   307,     0,    87,    88,
+       0,   414,    89,    90,    97,    98,     0,   366,   367,    99,
+     100,   101,   102,   103,   104,   105,   106,     0,   419,   422,
+     425,   428,   431,   107,   108,     0,   109,   110,   213,   214,
+     331,   332,   333,   334,   349,   350,   351,   352,     0,   368,
+     369,   370,   371,   372,   373,     0,     0,     0,   374,   375,
+     376,   377,   478,   378,   379,   380,   381,   382,   383,   384,
+     385,     0,     0,   386,   387,   388,   389,   390,   391,   392,
+     393,   394,   395,   396,   397,   398,   399,   400,   401,   402,
+     403,   404,   405,   406,   407,   408,   409,   410,   411,   415,
+     416,   432,   433,   434,   435,     0,     0,     0,   324,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     479,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,   486,   486,   486,   486,   486,
+     486,   486,   486,   486,     0,   494,   495,   496,   497,     0,
+       0,   498,   499,   500,     0,   501,   502,   503,   504,   505,
+     506,   507,   508,   509,   510,   511,   512,   513,   514,   515,
+     516,   487,   517,   518,   519,   520,   489,     0,   521,   522,
+     523,   524,   525,     0,     0,     0,     0,   527,   528,   529,
+     530,   531,     0,     0,   486,     0,     0,     0,     0,   486,
+       0,     0,   486,     0,     0,   486,     0,     0,   486,     0,
+       0,   486,     0,     0,     0,     0,   353,   492,   309,   310,
+     311,   312,   313,   314,   315,   316,   317,   318,   319,   320,
+     321,     0,   412,   413,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   486,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   526,
+     532,   533,     0,     0,   486,   486,   486,   486,   486,   486,
+     486,   486,   486,   486,   486,   486,   486,   486,   486,   486,
+     486,   486,   486,   486,   486,   486,   486,   486,   486,   486,
+     486,   486,   486,   486,   486,   486,     0,   486,   486,   486,
+     486,   486,   219,   220,   221,   222,   223,   224,   225,   226,
+     227,   228,   229,   230,   231,   232,   233,   234,   235,   236,
+     237,   238,   239,   240,   241,   242,   243,   244,   245,   246,
+     247,   248,   249,   250,   251,   252,   253,   254,   255,   256,
+     257,   258,   259,   260,   261,   262,   263,   264,   265,   266,
+     267,   268,   269,   270,   271,   272,   273,   274,   275,   276,
+     277,   278,   279,   280,   281,   282,   283,   284,   285,   286,
+     287,   288,   289,   290,   291,   292,   293,   294,   295,   296,
+     297,   298,   299,   300,   301,   302,   303,   304,   305,   306,
+     307,   219,   220,   221,   222,   223,   224,   225,   226,   227,
+     228,   229,   230,   231,   232,   233,   234,   235,   236,   237,
+     238,   239,   240,   241,   242,   243,   244,   245,   246,   247,
+     248,   249,   250,   251,   252,   253,   254,   255,   256,   257,
+     258,   259,   260,   261,   262,   263,   264,   265,   266,   267,
+     268,   269,   270,   271,   272,   273,   274,   275,   276,   277,
+     278,   279,   280,   281,   282,   283,   284,   285,   286,   287,
+     288,   289,   290,   291,   292,   293,   294,   295,   296,   297,
+     298,   299,   300,   301,   302,   303,   304,   305,   306,   307,
+     219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
+     229,   230,   231,   232,   233,   234,   235,   236,   237,   238,
+     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
+     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
+     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
+     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
+     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
+     289,   290,   291,   292,   293,   294,   295,   296,   297,   298,
+     299,   300,   301,   302,   303,   304,   305,   306,   307,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     353,     0,   309,   310,   311,   312,   313,   314,   315,   316,
+     317,   318,   319,   320,   321,     0,   417,   418,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   353,
+       0,   309,   310,   311,   312,   313,   314,   315,   316,   317,
+     318,   319,   320,   321,     0,   420,   421,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   353,     0,
+     309,   310,   311,   312,   313,   314,   315,   316,   317,   318,
+     319,   320,   321,     0,   423,   424,   219,   220,   221,   222,
+     223,   224,   225,   226,   227,   228,   229,   230,   231,   232,
+     233,   234,   235,   236,   237,   238,   239,   240,   241,   242,
+     243,   244,   245,   246,   247,   248,   249,   250,   251,   252,
+     253,   254,   255,   256,   257,   258,   259,   260,   261,   262,
+     263,   264,   265,   266,   267,   268,   269,   270,   271,   272,
+     273,   274,   275,   276,   277,   278,   279,   280,   281,   282,
+     283,   284,   285,   286,   287,   288,   289,   290,   291,   292,
+     293,   294,   295,   296,   297,   298,   299,   300,   301,   302,
+     303,   304,   305,   306,   307,   219,   220,   221,   222,   223,
+     224,   225,   226,   227,   228,   229,   230,   231,   232,   233,
+     234,   235,   236,   237,   238,   239,   240,   241,   242,   243,
+     244,   245,   246,   247,   248,   249,   250,   251,   252,   253,
+     254,   255,   256,   257,   258,   259,   260,   261,   262,   263,
+     264,   265,   266,   267,   268,   269,   270,   271,   272,   273,
+     274,   275,   276,   277,   278,   279,   280,   281,   282,   283,
+     284,   285,   286,   287,   288,   289,   290,   291,   292,   293,
+     294,   295,   296,   297,   298,   299,   300,   301,   302,   303,
+     304,   305,   306,   307,   217,   218,   219,   220,   221,   222,
      223,   224,   225,   226,   227,   228,   229,   230,   231,   232,
      233,   234,   235,   236,   237,   238,   239,   240,   241,   242,
      243,   244,   245,   246,   247,   248,   249,   250,   251,   252,
@@ -6218,7 +6288,7 @@ namespace yy {
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,   353,     0,   309,   310,   311,   312,
      313,   314,   315,   316,   317,   318,   319,   320,   321,     0,
-     417,   418,     0,     0,     0,     0,     0,     0,     0,     0,
+     426,   427,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
@@ -6226,95 +6296,44 @@ namespace yy {
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,   353,     0,   309,   310,   311,   312,   313,
-     314,   315,   316,   317,   318,   319,   320,   321,     0,   420,
-     421,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     314,   315,   316,   317,   318,   319,   320,   321,     0,   429,
+     430,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,   353,     0,   309,   310,   311,   312,   313,   314,
-     315,   316,   317,   318,   319,   320,   321,     0,   423,   424,
-     219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
-     229,   230,   231,   232,   233,   234,   235,   236,   237,   238,
-     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
-     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
-     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
-     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
-     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
-     289,   290,   291,   292,   293,   294,   295,   296,   297,   298,
-     299,   300,   301,   302,   303,   304,   305,   306,   307,   219,
-     220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
-     230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
-     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
-     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
-     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
-     270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
-     280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
-     290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
-     300,   301,   302,   303,   304,   305,   306,   307,   217,   218,
-     219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
-     229,   230,   231,   232,   233,   234,   235,   236,   237,   238,
-     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
-     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
-     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
-     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
-     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
-     289,   290,   291,   292,   293,   294,   295,   296,   297,   298,
-     299,   300,   301,   302,   303,   304,   305,   306,   307,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,   353,     0,   309,   310,
-     311,   312,   313,   314,   315,   316,   317,   318,   319,   320,
-     321,     0,   426,   427,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,   353,     0,   309,   310,   311,
-     312,   313,   314,   315,   316,   317,   318,   319,   320,   321,
-       0,   429,   430,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,   308,   309,   310,
-     311,   312,   313,   314,   315,   316,   317,   318,   319,   320,
-     321,   217,   218,   219,   220,   221,   222,   223,   224,   225,
-     226,   227,   228,   229,   230,   231,   232,   233,   234,   235,
-     236,   237,   238,   239,   240,   241,   242,   243,   244,   245,
-     246,   247,   248,   249,   250,   251,   252,   253,   254,   255,
-     256,   257,   258,   259,   260,   261,   262,   263,   264,   265,
-     266,   267,   268,   269,   270,   271,   272,   273,   274,   275,
-     276,   277,   278,   279,   280,   281,   282,   283,   284,   285,
-     286,   287,   288,   289,   290,   291,   292,   293,   294,   295,
-     296,   297,   298,   299,   300,   301,   302,   303,   304,   305,
-     306,   307,   488,   489,   219,   220,   221,   222,   223,   224,
-     225,   226,   227,   228,   229,   230,   231,   232,   233,   234,
-     235,   236,   237,   238,   239,   240,   241,   242,   243,   244,
-     245,   246,   247,   248,   249,   250,   251,   252,   253,   254,
-     255,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-     305,   306,   307,   219,   220,   221,   222,   223,   224,   225,
-     226,   227,   228,   229,   230,   231,   232,   233,   234,   235,
-     236,   237,   238,   239,   240,   241,   242,   243,   244,   245,
-     246,   247,   248,   249,   250,   251,   252,   253,   254,   255,
-     256,   257,   258,   259,   260,   261,   262,   263,   264,   265,
-     266,   267,   268,   269,   270,   271,   272,   273,   274,   275,
-     276,   277,   278,   279,   280,   281,   282,   283,   284,   285,
-     286,   287,   288,   289,   290,   291,   292,   293,   294,   295,
-     296,   297,   298,   299,   300,   301,   302,   303,   304,   305,
-     306,   307,     0,     0,     0,     0,   438,   439,   440,   441,
+       0,     0,     0,     0,     0,   308,   309,   310,   311,   312,
+     313,   314,   315,   316,   317,   318,   319,   320,   321,   217,
+     218,   219,   220,   221,   222,   223,   224,   225,   226,   227,
+     228,   229,   230,   231,   232,   233,   234,   235,   236,   237,
+     238,   239,   240,   241,   242,   243,   244,   245,   246,   247,
+     248,   249,   250,   251,   252,   253,   254,   255,   256,   257,
+     258,   259,   260,   261,   262,   263,   264,   265,   266,   267,
+     268,   269,   270,   271,   272,   273,   274,   275,   276,   277,
+     278,   279,   280,   281,   282,   283,   284,   285,   286,   287,
+     288,   289,   290,   291,   292,   293,   294,   295,   296,   297,
+     298,   299,   300,   301,   302,   303,   304,   305,   306,   307,
+     490,   491,   219,   220,   221,   222,   223,   224,   225,   226,
+     227,   228,   229,   230,   231,   232,   233,   234,   235,   236,
+     237,   238,   239,   240,   241,   242,   243,   244,   245,   246,
+     247,   248,   249,   250,   251,   252,   253,   254,   255,   256,
+     257,   258,   259,   260,   261,   262,   263,   264,   265,   266,
+     267,   268,   269,   270,   271,   272,   273,   274,   275,   276,
+     277,   278,   279,   280,   281,   282,   283,   284,   285,   286,
+     287,   288,   289,   290,   291,   292,   293,   294,   295,   296,
+     297,   298,   299,   300,   301,   302,   303,   304,   305,   306,
+     307,   219,   220,   221,   222,   223,   224,   225,   226,   227,
+     228,   229,   230,   231,   232,   233,   234,   235,   236,   237,
+     238,   239,   240,   241,   242,   243,   244,   245,   246,   247,
+     248,   249,   250,   251,   252,   253,   254,   255,   256,   257,
+     258,   259,   260,   261,   262,   263,   264,   265,   266,   267,
+     268,   269,   270,   271,   272,   273,   274,   275,   276,   277,
+     278,   279,   280,   281,   282,   283,   284,   285,   286,   287,
+     288,   289,   290,   291,   292,   293,   294,   295,   296,   297,
+     298,   299,   300,   301,   302,   303,   304,   305,   306,   307,
+       0,     0,     0,     0,     0,     0,   438,   439,   440,   441,
      442,   443,   444,   445,   446,   447,   448,   449,   450,   451,
      452,   453,   454,   455,   456,   457,   458,   459,     0,   460,
      461,   462,   463,   464,   465,   466,   467,   468,   469,   470,
@@ -6347,52 +6366,43 @@ namespace yy {
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-     305,   306,   307,     0,     0,     0,     0,     0,   439,   440,
-     441,   442,   443,   444,   445,   446,   447,   448,   449,   450,
-     451,   452,   453,   454,   455,   456,   457,   458,   459,     0,
-     460,   461,   462,   463,   464,   465,   466,   467,   468,   469,
-     470,   471,   472,   473,   474,   475,   219,   220,   221,   222,
-     223,   224,   225,   226,   227,   228,   229,   230,   231,   232,
-     233,   234,   235,   236,   237,   238,   239,   240,   241,   242,
-     243,   244,   245,   246,   247,   248,   249,   250,   251,   252,
-     253,   254,   255,   256,   257,   258,   259,   260,   261,   262,
-     263,   264,   265,   266,   267,   268,   269,   270,   271,   272,
-     273,   274,   275,   276,   277,   278,   279,   280,   281,   282,
-     283,   284,   285,   286,   287,   288,   289,   290,   291,   292,
-     293,   294,   295,   296,   297,   298,   299,   300,   301,   302,
-     303,   304,   305,   306,   307,     0,     0,     0,     0,   340,
-     219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
-     229,   230,   231,   232,   233,   234,   235,   236,   237,   238,
-     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
-     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
-     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
-     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
-     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
-     289,   290,   291,   292,   293,   294,   295,   296,   297,   298,
-     299,   300,   301,   302,   303,   304,   305,   306,   307,     0,
-     353,     0,   309,   310,   311,   312,   313,   314,   315,   316,
-     317,   318,   319,   320,   321,   219,   220,   221,   222,   223,
-     224,   225,   226,   227,   228,   229,   230,   231,   232,   233,
-     234,   235,   236,   237,   238,   239,   240,   241,   242,   243,
-     244,   245,   246,   247,   248,   249,   250,   251,   252,   253,
-     254,   255,   256,   257,   258,   259,   260,   261,   262,   263,
-     264,   265,   266,   267,   268,   269,   270,   271,   272,   273,
-     274,   275,   276,   277,   278,   279,   280,   281,   282,   283,
-     284,   285,   286,   287,   288,   289,   290,   291,   292,   293,
-     294,   295,   296,   297,   298,   299,   300,   301,   302,   303,
-     304,   305,   306,   307,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,   309,   310,   311,   312,   313,   314,
-     315,   316,   317,   318,   319,   320,   321,     0,     0,     0,
+     305,   306,   307,     0,     0,     0,     0,     0,     0,     0,
+     439,   440,   441,   442,   443,   444,   445,   446,   447,   448,
+     449,   450,   451,   452,   453,   454,   455,   456,   457,   458,
+     459,     0,   460,   461,   462,   463,   464,   465,   466,   467,
+     468,   469,   470,   471,   472,   473,   474,   475,   219,   220,
+     221,   222,   223,   224,   225,   226,   227,   228,   229,   230,
+     231,   232,   233,   234,   235,   236,   237,   238,   239,   240,
+     241,   242,   243,   244,   245,   246,   247,   248,   249,   250,
+     251,   252,   253,   254,   255,   256,   257,   258,   259,   260,
+     261,   262,   263,   264,   265,   266,   267,   268,   269,   270,
+     271,   272,   273,   274,   275,   276,   277,   278,   279,   280,
+     281,   282,   283,   284,   285,   286,   287,   288,   289,   290,
+     291,   292,   293,   294,   295,   296,   297,   298,   299,   300,
+     301,   302,   303,   304,   305,   306,   307,     0,     0,     0,
+       0,     0,     0,   340,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     1,     0,
-       0,     0,     2,     3,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,   353,     0,   309,   310,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,   353,     0,   309,   310,   311,   312,   313,   314,
+     315,   316,   317,   318,   319,   320,   321,   219,   220,   221,
+     222,   223,   224,   225,   226,   227,   228,   229,   230,   231,
+     232,   233,   234,   235,   236,   237,   238,   239,   240,   241,
+     242,   243,   244,   245,   246,   247,   248,   249,   250,   251,
+     252,   253,   254,   255,   256,   257,   258,   259,   260,   261,
+     262,   263,   264,   265,   266,   267,   268,   269,   270,   271,
+     272,   273,   274,   275,   276,   277,   278,   279,   280,   281,
+     282,   283,   284,   285,   286,   287,   288,   289,   290,   291,
+     292,   293,   294,   295,   296,   297,   298,   299,   300,   301,
+     302,   303,   304,   305,   306,   307,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   309,   310,
      311,   312,   313,   314,   315,   316,   317,   318,   319,   320,
      321,   219,   220,   221,   222,   223,   224,   225,   226,   227,
      228,   229,   230,   231,   232,   233,   234,   235,   236,   237,
@@ -6403,60 +6413,60 @@ namespace yy {
      278,   279,   280,   281,   282,   283,   284,   285,   286,   287,
      288,   289,   290,   291,   292,   293,   294,   295,   296,   297,
      298,   299,   300,   301,   302,   303,   304,   305,   306,   307,
-       4,   483,     0,   309,   310,   311,   312,   313,   314,   315,
-     316,   317,   318,   319,   320,   321,     0,     0,     0,   338,
-       0,     0,     0,     2,     3,     0,     0,     0,     0,     0,
+     219,   220,   221,   222,   223,   224,   225,   226,   227,   228,
+     229,   230,   231,   232,   233,   234,   235,   236,   237,   238,
+     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
+     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
+     259,   260,   261,   262,   263,   264,   265,   266,   267,   268,
+     269,   270,   271,   272,   273,   274,   275,   276,   277,   278,
+     279,   280,   281,   282,   283,   284,   285,   286,   287,   288,
+     289,   290,   291,   292,   293,   294,   295,   296,   297,   298,
+     299,   300,   301,   302,   303,   304,   305,   306,   307,     0,
+       0,     0,     0,     0,     0,   353,     0,   309,   310,   311,
+     312,   313,   314,   315,   316,   317,   318,   319,   320,   321,
+       1,     0,     0,     0,     2,     3,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     5,     6,     7,     8,
-       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
-      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
-      49,    50,    51,    52,     0,    53,    54,    55,    56,    57,
-      58,    59,    60,    61,    62,    63,    64,    65,    66,    67,
-      68,     4,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    69,    70,    71,    72,    73,    74,    75,    76,
-      77,    78,    79,    80,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   338,     0,
+       0,     0,     2,     3,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,   309,
-     310,   311,   312,   313,   314,   315,   316,   317,   318,   319,
-     320,   321,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     5,     6,     7,
-       8,     9,    10,    11,    12,    13,    14,    15,    16,    17,
-      18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
-      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
-      38,    39,    40,    41,    42,    43,    44,    45,    46,    47,
-      48,    49,    50,    51,    52,   114,    53,    54,    55,    56,
-      57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
-      67,    68,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,    69,    70,    71,    72,    73,    74,    75,
-      76,    77,    78,    79,    80,     0,     0,     0,     0,     0,
-       0,   115,   116,   117,   118,   119,   120,   121,   122,   123,
-     124,   125,   126,   127,   128,   129,   130,   131,   132,   133,
-     134,   135,   136,   137,   138,   139,   140,   141,   142,   143,
-     144,   145,   146,   147,   148,   149,   150,   151,   152,   153,
-     154,   155,   156,   157,   158,   159,   160,   161,   162,   163,
-     164,   165,   166,   167,   168,   169,   170,   171,   172,   173,
-     174,   175,   176,   177,   178,   179,   180,   181,   182,   183,
-     184,   185,   186,   187,   188,   189,   190,   191,   192,   193,
-     194,   195,   196,   197,   198,   199,   200,   201,   202,   203,
-     204,   205,   206,   207,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   114,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   485,
+       0,   309,   310,   311,   312,   313,   314,   315,   316,   317,
+     318,   319,   320,   321,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     4,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,   208,   115,   116,   117,   118,   119,   120,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     309,   310,   311,   312,   313,   314,   315,   316,   317,   318,
+     319,   320,   321,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     4,     0,     0,     0,     0,     0,     0,     0,
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,     0,    53,
+      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
+      64,    65,    66,    67,    68,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    69,    70,    71,    72,
+      73,    74,    75,    76,    77,    78,    79,    80,     5,     6,
+       7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+      17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+      27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
+      37,    38,    39,    40,    41,    42,    43,    44,    45,    46,
+      47,    48,    49,    50,    51,    52,   114,    53,    54,    55,
+      56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
+      66,    67,    68,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    78,    79,    80,     0,     0,     0,     0,
+       0,     0,     0,     0,   115,   116,   117,   118,   119,   120,
      121,   122,   123,   124,   125,   126,   127,   128,   129,   130,
      131,   132,   133,   134,   135,   136,   137,   138,   139,   140,
      141,   142,   143,   144,   145,   146,   147,   148,   149,   150,
@@ -6465,59 +6475,36 @@ namespace yy {
      171,   172,   173,   174,   175,   176,   177,   178,   179,   180,
      181,   182,   183,   184,   185,   186,   187,   188,   189,   190,
      191,   192,   193,   194,   195,   196,   197,   198,   199,   200,
-     201,   202,   203,   204,   205,   206,   207
+     201,   202,   203,   204,   205,   206,   207,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   114,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,   208,   115,   116,   117,
+     118,   119,   120,   121,   122,   123,   124,   125,   126,   127,
+     128,   129,   130,   131,   132,   133,   134,   135,   136,   137,
+     138,   139,   140,   141,   142,   143,   144,   145,   146,   147,
+     148,   149,   150,   151,   152,   153,   154,   155,   156,   157,
+     158,   159,   160,   161,   162,   163,   164,   165,   166,   167,
+     168,   169,   170,   171,   172,   173,   174,   175,   176,   177,
+     178,   179,   180,   181,   182,   183,   184,   185,   186,   187,
+     188,   189,   190,   191,   192,   193,   194,   195,   196,   197,
+     198,   199,   200,   201,   202,   203,   204,   205,   206,   207
   };
 
   const short
   seclang_parser::yycheck_[] =
   {
-      60,    61,    62,   303,    50,    61,    62,     3,     3,   142,
-      81,   144,     6,   313,   208,     6,   438,    63,   305,    79,
-     153,   308,   308,    79,   365,   312,    -1,   160,   161,   162,
-     163,   306,   307,    -1,    80,   168,   311,   306,   307,   306,
-     307,    -1,   311,   304,   311,   306,   307,   304,    -1,   306,
-     307,   100,   101,   102,   114,   306,   307,   143,   144,    -1,
-      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
-      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      40,    41,    42,    43,    44,    45,    46,    47,    48,    49,
-      50,    51,    52,    53,    54,    55,    56,    57,    58,    59,
-      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
-      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
-      90,    91,    92,    93,    94,    95,    96,    97,    98,   306,
-     307,   284,   306,   307,   306,   307,    -1,   217,   218,   306,
-     307,   309,   310,   306,   307,   309,   310,    -1,   301,   302,
-     303,   304,   305,    -1,   306,   307,   306,   307,   306,   307,
-     306,   307,   306,   307,   306,   307,   342,   343,    -1,   342,
-     343,   342,   343,   342,   343,    -1,   342,   343,    -1,    -1,
-     342,   343,   335,   342,   343,   342,   343,   342,   343,    -1,
-      -1,   342,   343,   342,   343,   342,   343,   342,   343,   342,
-     343,   342,   343,   342,   343,   342,   343,   342,   343,   342,
-     343,   342,   343,   342,   343,   342,   343,   342,   343,   342,
-     343,   342,   343,    -1,    -1,    -1,    -1,    -1,   308,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-     340,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,   355,   356,   357,   358,   359,
-     360,   361,   362,   363,    -1,   438,   439,   440,   441,    -1,
-      -1,   444,   445,   446,    -1,   448,   449,   450,   451,   452,
-     453,   454,   455,   456,   457,   458,   459,   460,   461,   462,
-     463,   327,   465,   466,   467,   468,   327,    -1,   471,   472,
-     473,   474,   475,    -1,    -1,    -1,    -1,   480,   481,   482,
-      -1,    -1,    -1,    -1,   414,    -1,    -1,    -1,    -1,   419,
-      -1,    -1,   422,    -1,    -1,   425,    -1,    -1,   428,    -1,
-      -1,   431,    -1,    -1,    -1,    -1,   326,   437,   328,   329,
-     330,   331,   332,   333,   334,   335,   336,   337,   338,   339,
-     340,    -1,   342,   343,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   478,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   488,   489,
-     476,    -1,   492,   493,   494,   495,   496,   497,   498,   499,
-     500,   501,   502,   503,   504,   505,   506,   507,   508,   509,
-     510,   511,   512,   513,   514,   515,   516,   517,   518,   519,
-     520,   521,   522,   523,    -1,   525,   526,   527,    10,    11,
+      60,    61,    62,    50,   305,     3,    61,    62,     3,   142,
+       6,   144,    81,     6,   315,   307,    63,   208,   310,    79,
+     153,   438,   314,   306,    79,   308,   309,   160,   161,   162,
+     163,   308,   309,    80,   308,   168,   313,   308,   309,   308,
+     309,   365,   313,    -1,   313,    -1,   100,   101,   102,   103,
+     104,   308,   309,   306,   114,   308,   309,    -1,    10,    11,
       12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
       22,    23,    24,    25,    26,    27,    28,    29,    30,    31,
       32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
@@ -6526,16 +6513,109 @@ namespace yy {
       62,    63,    64,    65,    66,    67,    68,    69,    70,    71,
       72,    73,    74,    75,    76,    77,    78,    79,    80,    81,
       82,    83,    84,    85,    86,    87,    88,    89,    90,    91,
-      92,    93,    94,    95,    96,    97,    98,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
-      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
-      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
-      43,    44,    45,    46,    47,    48,    49,    50,    51,    52,
-      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
-      63,    64,    65,    66,    67,    68,    69,    70,    71,    72,
-      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
-      93,    94,    95,    96,    97,    98,    10,    11,    12,    13,
+      92,    93,    94,    95,    96,    97,    98,    -1,   145,   146,
+      -1,   284,   308,   309,   308,   309,    -1,   217,   218,   308,
+     309,   308,   309,   311,   312,   308,   309,    -1,   301,   302,
+     303,   304,   305,   311,   312,    -1,   308,   309,   308,   309,
+     308,   309,   308,   309,   308,   309,   308,   309,    -1,   344,
+     345,   344,   345,   344,   345,    -1,    -1,    -1,   344,   345,
+     344,   345,   335,   344,   345,   344,   345,   344,   345,   344,
+     345,    -1,    -1,   344,   345,   344,   345,   344,   345,   344,
+     345,   344,   345,   344,   345,   344,   345,   344,   345,   344,
+     345,   344,   345,   344,   345,   344,   345,   344,   345,   344,
+     345,   344,   345,   344,   345,    -1,    -1,    -1,   308,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+     340,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,   355,   356,   357,   358,   359,
+     360,   361,   362,   363,    -1,   438,   439,   440,   441,    -1,
+      -1,   444,   445,   446,    -1,   448,   449,   450,   451,   452,
+     453,   454,   455,   456,   457,   458,   459,   460,   461,   462,
+     463,   329,   465,   466,   467,   468,   329,    -1,   471,   472,
+     473,   474,   475,    -1,    -1,    -1,    -1,   480,   481,   482,
+     483,   484,    -1,    -1,   414,    -1,    -1,    -1,    -1,   419,
+      -1,    -1,   422,    -1,    -1,   425,    -1,    -1,   428,    -1,
+      -1,   431,    -1,    -1,    -1,    -1,   328,   437,   330,   331,
+     332,   333,   334,   335,   336,   337,   338,   339,   340,   341,
+     342,    -1,   344,   345,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   478,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   476,
+     490,   491,    -1,    -1,   494,   495,   496,   497,   498,   499,
+     500,   501,   502,   503,   504,   505,   506,   507,   508,   509,
+     510,   511,   512,   513,   514,   515,   516,   517,   518,   519,
+     520,   521,   522,   523,   524,   525,    -1,   527,   528,   529,
+     530,   531,    10,    11,    12,    13,    14,    15,    16,    17,
+      18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
+      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
+      38,    39,    40,    41,    42,    43,    44,    45,    46,    47,
+      48,    49,    50,    51,    52,    53,    54,    55,    56,    57,
+      58,    59,    60,    61,    62,    63,    64,    65,    66,    67,
+      68,    69,    70,    71,    72,    73,    74,    75,    76,    77,
+      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
+      88,    89,    90,    91,    92,    93,    94,    95,    96,    97,
+      98,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
+      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
+      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
+      59,    60,    61,    62,    63,    64,    65,    66,    67,    68,
+      69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    44,    45,    46,    47,    48,    49,
+      50,    51,    52,    53,    54,    55,    56,    57,    58,    59,
+      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
+      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
+      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,    97,    98,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+     328,    -1,   330,   331,   332,   333,   334,   335,   336,   337,
+     338,   339,   340,   341,   342,    -1,   344,   345,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   328,
+      -1,   330,   331,   332,   333,   334,   335,   336,   337,   338,
+     339,   340,   341,   342,    -1,   344,   345,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   328,    -1,
+     330,   331,   332,   333,   334,   335,   336,   337,   338,   339,
+     340,   341,   342,    -1,   344,   345,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
+      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
+      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
+      64,    65,    66,    67,    68,    69,    70,    71,    72,    73,
+      74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
+      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
+      94,    95,    96,    97,    98,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
+      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
+      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,    97,    98,     8,     9,    10,    11,    12,    13,
       14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
       24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
       34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
@@ -6549,185 +6629,27 @@ namespace yy {
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,   326,    -1,   328,   329,   330,   331,
-     332,   333,   334,   335,   336,   337,   338,   339,   340,    -1,
-     342,   343,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,   328,    -1,   330,   331,   332,   333,
+     334,   335,   336,   337,   338,   339,   340,   341,   342,    -1,
+     344,   345,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,   326,    -1,   328,   329,   330,   331,   332,
-     333,   334,   335,   336,   337,   338,   339,   340,    -1,   342,
-     343,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,   328,    -1,   330,   331,   332,   333,   334,
+     335,   336,   337,   338,   339,   340,   341,   342,    -1,   344,
+     345,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,   326,    -1,   328,   329,   330,   331,   332,   333,
-     334,   335,   336,   337,   338,   339,   340,    -1,   342,   343,
-      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
-      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      40,    41,    42,    43,    44,    45,    46,    47,    48,    49,
-      50,    51,    52,    53,    54,    55,    56,    57,    58,    59,
-      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
-      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
-      90,    91,    92,    93,    94,    95,    96,    97,    98,    10,
-      11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
-      21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    37,    38,    39,    40,
-      41,    42,    43,    44,    45,    46,    47,    48,    49,    50,
-      51,    52,    53,    54,    55,    56,    57,    58,    59,    60,
-      61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
-      71,    72,    73,    74,    75,    76,    77,    78,    79,    80,
-      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
-      91,    92,    93,    94,    95,    96,    97,    98,     8,     9,
-      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
-      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      40,    41,    42,    43,    44,    45,    46,    47,    48,    49,
-      50,    51,    52,    53,    54,    55,    56,    57,    58,    59,
-      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
-      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
-      90,    91,    92,    93,    94,    95,    96,    97,    98,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,   326,    -1,   328,   329,
-     330,   331,   332,   333,   334,   335,   336,   337,   338,   339,
-     340,    -1,   342,   343,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,   326,    -1,   328,   329,   330,
-     331,   332,   333,   334,   335,   336,   337,   338,   339,   340,
-      -1,   342,   343,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,   327,   328,   329,
-     330,   331,   332,   333,   334,   335,   336,   337,   338,   339,
-     340,     8,     9,    10,    11,    12,    13,    14,    15,    16,
-      17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
-      27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
-      37,    38,    39,    40,    41,    42,    43,    44,    45,    46,
-      47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
-      57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
-      67,    68,    69,    70,    71,    72,    73,    74,    75,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
-      97,    98,     8,     9,    10,    11,    12,    13,    14,    15,
-      16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
-      26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
-      46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
-      56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
-      66,    67,    68,    69,    70,    71,    72,    73,    74,    75,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
-      96,    97,    98,    10,    11,    12,    13,    14,    15,    16,
-      17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
-      27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
-      37,    38,    39,    40,    41,    42,    43,    44,    45,    46,
-      47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
-      57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
-      67,    68,    69,    70,    71,    72,    73,    74,    75,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
-      97,    98,    -1,    -1,    -1,    -1,   103,   104,   105,   106,
-     107,   108,   109,   110,   111,   112,   113,   114,   115,   116,
-     117,   118,   119,   120,   121,   122,   123,   124,    -1,   126,
-     127,   128,   129,   130,   131,   132,   133,   134,   135,   136,
-     137,   138,   139,   140,   141,    -1,    -1,    -1,    -1,    -1,
-      -1,   328,   329,   330,   331,   332,   333,   334,   335,   336,
-     337,   338,   339,   340,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,   328,   329,   330,   331,   332,   333,   334,   335,
-     336,   337,   338,   339,   340,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   326,
-      -1,   328,   329,   330,   331,   332,   333,   334,   335,   336,
-     337,   338,   339,   340,    10,    11,    12,    13,    14,    15,
-      16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
-      26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
-      46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
-      56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
-      66,    67,    68,    69,    70,    71,    72,    73,    74,    75,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
-      96,    97,    98,    -1,    -1,    -1,    -1,    -1,   104,   105,
-     106,   107,   108,   109,   110,   111,   112,   113,   114,   115,
-     116,   117,   118,   119,   120,   121,   122,   123,   124,    -1,
-     126,   127,   128,   129,   130,   131,   132,   133,   134,   135,
-     136,   137,   138,   139,   140,   141,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
-      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
-      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
-      64,    65,    66,    67,    68,    69,    70,    71,    72,    73,
-      74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
-      94,    95,    96,    97,    98,    -1,    -1,    -1,    -1,   103,
-      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
-      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      40,    41,    42,    43,    44,    45,    46,    47,    48,    49,
-      50,    51,    52,    53,    54,    55,    56,    57,    58,    59,
-      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
-      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
-      90,    91,    92,    93,    94,    95,    96,    97,    98,    -1,
-     326,    -1,   328,   329,   330,   331,   332,   333,   334,   335,
-     336,   337,   338,   339,   340,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
-      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
-      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
-      95,    96,    97,    98,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,   328,   329,   330,   331,   332,   333,
-     334,   335,   336,   337,   338,   339,   340,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,     0,    -1,
-      -1,    -1,     4,     5,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,   326,    -1,   328,   329,
-     330,   331,   332,   333,   334,   335,   336,   337,   338,   339,
-     340,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      -1,    -1,    -1,    -1,    -1,   329,   330,   331,   332,   333,
+     334,   335,   336,   337,   338,   339,   340,   341,   342,     8,
+       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
       19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
       29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
       39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
@@ -6736,86 +6658,176 @@ namespace yy {
       69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
       79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
       89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
-     142,   326,    -1,   328,   329,   330,   331,   332,   333,   334,
-     335,   336,   337,   338,   339,   340,    -1,    -1,    -1,     0,
-      -1,    -1,    -1,     4,     5,    -1,    -1,    -1,    -1,    -1,
+       8,     9,    10,    11,    12,    13,    14,    15,    16,    17,
+      18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
+      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
+      38,    39,    40,    41,    42,    43,    44,    45,    46,    47,
+      48,    49,    50,    51,    52,    53,    54,    55,    56,    57,
+      58,    59,    60,    61,    62,    63,    64,    65,    66,    67,
+      68,    69,    70,    71,    72,    73,    74,    75,    76,    77,
+      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
+      88,    89,    90,    91,    92,    93,    94,    95,    96,    97,
+      98,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
+      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
+      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
+      59,    60,    61,    62,    63,    64,    65,    66,    67,    68,
+      69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
+      -1,    -1,    -1,    -1,    -1,    -1,   105,   106,   107,   108,
+     109,   110,   111,   112,   113,   114,   115,   116,   117,   118,
+     119,   120,   121,   122,   123,   124,   125,   126,    -1,   128,
+     129,   130,   131,   132,   133,   134,   135,   136,   137,   138,
+     139,   140,   141,   142,   143,    -1,    -1,    -1,    -1,    -1,
+      -1,   330,   331,   332,   333,   334,   335,   336,   337,   338,
+     339,   340,   341,   342,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,   238,   239,   240,   241,
-     242,   243,   244,   245,   246,   247,   248,   249,   250,   251,
-     252,   253,   254,   255,   256,   257,   258,   259,   260,   261,
-     262,   263,   264,   265,   266,   267,   268,   269,   270,   271,
-     272,   273,   274,   275,   276,   277,   278,   279,   280,   281,
-     282,   283,   284,   285,    -1,   287,   288,   289,   290,   291,
-     292,   293,   294,   295,   296,   297,   298,   299,   300,   301,
-     302,   142,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,   314,   315,   316,   317,   318,   319,   320,   321,
-     322,   323,   324,   325,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,   330,   331,   332,   333,   334,   335,   336,   337,
+     338,   339,   340,   341,   342,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   328,
-     329,   330,   331,   332,   333,   334,   335,   336,   337,   338,
-     339,   340,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,   238,   239,   240,
-     241,   242,   243,   244,   245,   246,   247,   248,   249,   250,
-     251,   252,   253,   254,   255,   256,   257,   258,   259,   260,
-     261,   262,   263,   264,   265,   266,   267,   268,   269,   270,
-     271,   272,   273,   274,   275,   276,   277,   278,   279,   280,
-     281,   282,   283,   284,   285,    99,   287,   288,   289,   290,
-     291,   292,   293,   294,   295,   296,   297,   298,   299,   300,
-     301,   302,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,   314,   315,   316,   317,   318,   319,   320,
-     321,   322,   323,   324,   325,    -1,    -1,    -1,    -1,    -1,
-      -1,   145,   146,   147,   148,   149,   150,   151,   152,   153,
-     154,   155,   156,   157,   158,   159,   160,   161,   162,   163,
-     164,   165,   166,   167,   168,   169,   170,   171,   172,   173,
-     174,   175,   176,   177,   178,   179,   180,   181,   182,   183,
-     184,   185,   186,   187,   188,   189,   190,   191,   192,   193,
-     194,   195,   196,   197,   198,   199,   200,   201,   202,   203,
-     204,   205,   206,   207,   208,   209,   210,   211,   212,   213,
-     214,   215,   216,   217,   218,   219,   220,   221,   222,   223,
-     224,   225,   226,   227,   228,   229,   230,   231,   232,   233,
-     234,   235,   236,   237,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,   330,   331,   332,   333,   334,   335,   336,   337,   338,
+     339,   340,   341,   342,    10,    11,    12,    13,    14,    15,
+      16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
+      26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
+      46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
+      56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
+      66,    67,    68,    69,    70,    71,    72,    73,    74,    75,
+      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
+      86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
+      96,    97,    98,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+     106,   107,   108,   109,   110,   111,   112,   113,   114,   115,
+     116,   117,   118,   119,   120,   121,   122,   123,   124,   125,
+     126,    -1,   128,   129,   130,   131,   132,   133,   134,   135,
+     136,   137,   138,   139,   140,   141,   142,   143,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
+      22,    23,    24,    25,    26,    27,    28,    29,    30,    31,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      42,    43,    44,    45,    46,    47,    48,    49,    50,    51,
+      52,    53,    54,    55,    56,    57,    58,    59,    60,    61,
+      62,    63,    64,    65,    66,    67,    68,    69,    70,    71,
+      72,    73,    74,    75,    76,    77,    78,    79,    80,    81,
+      82,    83,    84,    85,    86,    87,    88,    89,    90,    91,
+      92,    93,    94,    95,    96,    97,    98,    -1,    -1,    -1,
+      -1,    -1,    -1,   105,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    99,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,   327,   145,   146,   147,   148,   149,   150,
-     151,   152,   153,   154,   155,   156,   157,   158,   159,   160,
-     161,   162,   163,   164,   165,   166,   167,   168,   169,   170,
-     171,   172,   173,   174,   175,   176,   177,   178,   179,   180,
-     181,   182,   183,   184,   185,   186,   187,   188,   189,   190,
-     191,   192,   193,   194,   195,   196,   197,   198,   199,   200,
-     201,   202,   203,   204,   205,   206,   207,   208,   209,   210,
-     211,   212,   213,   214,   215,   216,   217,   218,   219,   220,
-     221,   222,   223,   224,   225,   226,   227,   228,   229,   230,
-     231,   232,   233,   234,   235,   236,   237
-  };
-
-  const short
-  seclang_parser::yystos_[] =
-  {
-       0,     0,     4,     5,   142,   238,   239,   240,   241,   242,
-     243,   244,   245,   246,   247,   248,   249,   250,   251,   252,
-     253,   254,   255,   256,   257,   258,   259,   260,   261,   262,
-     263,   264,   265,   266,   267,   268,   269,   270,   271,   272,
-     273,   274,   275,   276,   277,   278,   279,   280,   281,   282,
-     283,   284,   285,   287,   288,   289,   290,   291,   292,   293,
-     294,   295,   296,   297,   298,   299,   300,   301,   302,   314,
-     315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
-     325,   345,   346,   347,   352,   306,   307,   143,   144,   306,
-     307,   306,   307,   311,   305,   308,   312,   306,   307,   306,
-     307,   306,   307,   309,   310,   306,   307,   309,   310,   306,
-     307,   304,   306,   307,    99,   145,   146,   147,   148,   149,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,   328,    -1,   330,   331,   332,   333,   334,   335,
+     336,   337,   338,   339,   340,   341,   342,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
+      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
+      43,    44,    45,    46,    47,    48,    49,    50,    51,    52,
+      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
+      63,    64,    65,    66,    67,    68,    69,    70,    71,    72,
+      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,    97,    98,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   330,   331,
+     332,   333,   334,   335,   336,   337,   338,   339,   340,   341,
+     342,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
+      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    46,    47,    48,
+      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
+      59,    60,    61,    62,    63,    64,    65,    66,    67,    68,
+      69,    70,    71,    72,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,    97,    98,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    44,    45,    46,    47,    48,    49,
+      50,    51,    52,    53,    54,    55,    56,    57,    58,    59,
+      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
+      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
+      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,    97,    98,    -1,
+      -1,    -1,    -1,    -1,    -1,   328,    -1,   330,   331,   332,
+     333,   334,   335,   336,   337,   338,   339,   340,   341,   342,
+       0,    -1,    -1,    -1,     4,     5,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,     0,    -1,
+      -1,    -1,     4,     5,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   328,
+      -1,   330,   331,   332,   333,   334,   335,   336,   337,   338,
+     339,   340,   341,   342,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,   144,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+     330,   331,   332,   333,   334,   335,   336,   337,   338,   339,
+     340,   341,   342,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,   144,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
+     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
+     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
+     270,   271,   272,   273,   274,   275,   276,   277,   278,   279,
+     280,   281,   282,   283,   284,   285,   286,   287,    -1,   289,
+     290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
+     300,   301,   302,   303,   304,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,   316,   317,   318,   319,
+     320,   321,   322,   323,   324,   325,   326,   327,   240,   241,
+     242,   243,   244,   245,   246,   247,   248,   249,   250,   251,
+     252,   253,   254,   255,   256,   257,   258,   259,   260,   261,
+     262,   263,   264,   265,   266,   267,   268,   269,   270,   271,
+     272,   273,   274,   275,   276,   277,   278,   279,   280,   281,
+     282,   283,   284,   285,   286,   287,    99,   289,   290,   291,
+     292,   293,   294,   295,   296,   297,   298,   299,   300,   301,
+     302,   303,   304,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,   316,   317,   318,   319,   320,   321,
+     322,   323,   324,   325,   326,   327,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,   147,   148,   149,   150,   151,   152,
+     153,   154,   155,   156,   157,   158,   159,   160,   161,   162,
+     163,   164,   165,   166,   167,   168,   169,   170,   171,   172,
+     173,   174,   175,   176,   177,   178,   179,   180,   181,   182,
+     183,   184,   185,   186,   187,   188,   189,   190,   191,   192,
+     193,   194,   195,   196,   197,   198,   199,   200,   201,   202,
+     203,   204,   205,   206,   207,   208,   209,   210,   211,   212,
+     213,   214,   215,   216,   217,   218,   219,   220,   221,   222,
+     223,   224,   225,   226,   227,   228,   229,   230,   231,   232,
+     233,   234,   235,   236,   237,   238,   239,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    99,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,   329,   147,   148,   149,
      150,   151,   152,   153,   154,   155,   156,   157,   158,   159,
      160,   161,   162,   163,   164,   165,   166,   167,   168,   169,
      170,   171,   172,   173,   174,   175,   176,   177,   178,   179,
@@ -6824,8 +6836,34 @@ namespace yy {
      200,   201,   202,   203,   204,   205,   206,   207,   208,   209,
      210,   211,   212,   213,   214,   215,   216,   217,   218,   219,
      220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
-     230,   231,   232,   233,   234,   235,   236,   237,   327,   348,
-     349,   357,   348,   306,   307,   303,   313,     8,     9,    10,
+     230,   231,   232,   233,   234,   235,   236,   237,   238,   239
+  };
+
+  const short
+  seclang_parser::yystos_[] =
+  {
+       0,     0,     4,     5,   144,   240,   241,   242,   243,   244,
+     245,   246,   247,   248,   249,   250,   251,   252,   253,   254,
+     255,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287,   289,   290,   291,   292,   293,   294,   295,
+     296,   297,   298,   299,   300,   301,   302,   303,   304,   316,
+     317,   318,   319,   320,   321,   322,   323,   324,   325,   326,
+     327,   347,   348,   349,   354,   308,   309,   145,   146,   308,
+     309,   308,   309,   313,   307,   310,   314,   308,   309,   308,
+     309,   308,   309,   311,   312,   308,   309,   311,   312,   308,
+     309,   306,   308,   309,    99,   147,   148,   149,   150,   151,
+     152,   153,   154,   155,   156,   157,   158,   159,   160,   161,
+     162,   163,   164,   165,   166,   167,   168,   169,   170,   171,
+     172,   173,   174,   175,   176,   177,   178,   179,   180,   181,
+     182,   183,   184,   185,   186,   187,   188,   189,   190,   191,
+     192,   193,   194,   195,   196,   197,   198,   199,   200,   201,
+     202,   203,   204,   205,   206,   207,   208,   209,   210,   211,
+     212,   213,   214,   215,   216,   217,   218,   219,   220,   221,
+     222,   223,   224,   225,   226,   227,   228,   229,   230,   231,
+     232,   233,   234,   235,   236,   237,   238,   239,   329,   350,
+     351,   359,   350,   308,   309,   305,   315,     8,     9,    10,
       11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
       21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
       31,    32,    33,    34,    35,    36,    37,    38,    39,    40,
@@ -6834,79 +6872,80 @@ namespace yy {
       61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
       71,    72,    73,    74,    75,    76,    77,    78,    79,    80,
       81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
-      91,    92,    93,    94,    95,    96,    97,    98,   327,   328,
-     329,   330,   331,   332,   333,   334,   335,   336,   337,   338,
-     339,   340,   354,   355,   356,   354,   354,   348,   306,   307,
-     311,   306,   307,   306,   307,   353,   354,   348,     0,   346,
-     103,   356,   358,   304,   306,   307,   306,   307,   311,   306,
-     307,   306,   307,   326,   356,   359,   359,   359,   359,   359,
-     359,   359,   359,   359,   349,     3,   356,   356,   342,   343,
-     342,   343,   342,   343,   342,   343,   342,   343,   342,   343,
-     342,   343,   342,   343,   342,   343,   342,   343,   342,   343,
-     342,   343,   342,   343,   342,   343,   342,   343,   342,   343,
-     342,   343,   342,   343,   342,   343,   342,   343,   342,   343,
-     342,   343,   342,   343,   359,   342,   343,   342,   343,   359,
-     342,   343,   359,   342,   343,   359,   342,   343,   359,   342,
-     343,   359,   342,   343,   342,   343,   355,     6,   103,   104,
-     105,   106,   107,   108,   109,   110,   111,   112,   113,   114,
-     115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
-     126,   127,   128,   129,   130,   131,   132,   133,   134,   135,
-     136,   137,   138,   139,   140,   141,   350,   351,   359,   356,
-     100,   101,   102,   326,   356,   327,   357,   327,     8,     9,
-     356,   351,   359,   359,   359,   359,   359,   359,   359,   359,
-     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
-     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
-     359,   359,   359,   359,   348,   359,   359,   359,   356,   356
+      91,    92,    93,    94,    95,    96,    97,    98,   329,   330,
+     331,   332,   333,   334,   335,   336,   337,   338,   339,   340,
+     341,   342,   356,   357,   358,   356,   356,   350,   308,   309,
+     313,   308,   309,   308,   309,   355,   356,   350,     0,   348,
+     105,   358,   360,   306,   308,   309,   308,   309,   313,   308,
+     309,   308,   309,   328,   358,   361,   361,   361,   361,   361,
+     361,   361,   361,   361,   351,     3,   358,   358,   344,   345,
+     344,   345,   344,   345,   344,   345,   344,   345,   344,   345,
+     344,   345,   344,   345,   344,   345,   344,   345,   344,   345,
+     344,   345,   344,   345,   344,   345,   344,   345,   344,   345,
+     344,   345,   344,   345,   344,   345,   344,   345,   344,   345,
+     344,   345,   344,   345,   361,   344,   345,   344,   345,   361,
+     344,   345,   361,   344,   345,   361,   344,   345,   361,   344,
+     345,   361,   344,   345,   344,   345,   357,     6,   105,   106,
+     107,   108,   109,   110,   111,   112,   113,   114,   115,   116,
+     117,   118,   119,   120,   121,   122,   123,   124,   125,   126,
+     128,   129,   130,   131,   132,   133,   134,   135,   136,   137,
+     138,   139,   140,   141,   142,   143,   352,   353,   361,   358,
+     100,   101,   102,   103,   104,   328,   358,   329,   359,   329,
+       8,     9,   358,   353,   361,   361,   361,   361,   361,   361,
+     361,   361,   361,   361,   361,   361,   361,   361,   361,   361,
+     361,   361,   361,   361,   361,   361,   361,   361,   361,   361,
+     361,   361,   361,   361,   361,   361,   350,   361,   361,   361,
+     361,   361,   358,   358
   };
 
   const short
   seclang_parser::yyr1_[] =
   {
-       0,   344,   345,   345,   345,   346,   347,   347,   347,   347,
-     347,   347,   347,   347,   347,   347,   347,   347,   347,   347,
-     347,   347,   347,   347,   347,   347,   347,   347,   347,   348,
-     348,   349,   349,   350,   350,   350,   350,   351,   351,   351,
-     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
-     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
-     351,   351,   351,   351,   351,   351,   351,   351,   351,   351,
-     351,   351,   351,   351,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   352,   352,   352,   352,   352,   352,
-     352,   352,   352,   352,   353,   354,   354,   355,   355,   355,
-     355,   355,   355,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   356,   356,   356,   356,   356,   356,   356,
-     356,   356,   356,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   357,   357,   357,   357,   357,   357,   357,
-     357,   357,   357,   358,   358,   358,   358,   358,   359,   359,
-     359,   359
+       0,   346,   347,   347,   347,   348,   349,   349,   349,   349,
+     349,   349,   349,   349,   349,   349,   349,   349,   349,   349,
+     349,   349,   349,   349,   349,   349,   349,   349,   349,   350,
+     350,   351,   351,   352,   352,   352,   352,   353,   353,   353,
+     353,   353,   353,   353,   353,   353,   353,   353,   353,   353,
+     353,   353,   353,   353,   353,   353,   353,   353,   353,   353,
+     353,   353,   353,   353,   353,   353,   353,   353,   353,   353,
+     353,   353,   353,   353,   354,   354,   354,   354,   354,   354,
+     354,   354,   354,   354,   354,   354,   354,   354,   354,   354,
+     354,   354,   354,   354,   354,   354,   354,   354,   354,   354,
+     354,   354,   354,   354,   354,   354,   354,   354,   354,   354,
+     354,   354,   354,   354,   354,   354,   354,   354,   354,   354,
+     354,   354,   354,   354,   354,   354,   354,   354,   354,   354,
+     354,   354,   354,   354,   354,   354,   354,   354,   354,   354,
+     354,   354,   354,   354,   354,   354,   354,   354,   354,   354,
+     354,   354,   354,   354,   355,   356,   356,   357,   357,   357,
+     357,   357,   357,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   358,   358,   358,   358,   358,   358,   358,
+     358,   358,   358,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   359,   359,   359,   359,   359,   359,   359,
+     359,   359,   359,   360,   360,   360,   360,   360,   360,   360,
+     361,   361,   361,   361
   };
 
   const signed char
@@ -6955,8 +6994,8 @@ namespace yy {
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     2,     1,     3,     3,     3,     2,     2,
-       1,     1
+       1,     1,     1,     2,     1,     3,     3,     3,     3,     3,
+       2,     2,     1,     1
   };
 
 
@@ -7006,7 +7045,8 @@ namespace yy {
   "\"VARIABLE_GLOBAL\"", "\"VARIABLE_TX\"", "\"VARIABLE_SESSION\"",
   "\"VARIABLE_USER\"", "\"RUN_TIME_VAR_ENV\"", "\"RUN_TIME_VAR_XML\"",
   "\"SetVar\"", "SETVAR_OPERATION_EQUALS", "SETVAR_OPERATION_EQUALS_PLUS",
-  "SETVAR_OPERATION_EQUALS_MINUS", "\"NOT\"", "\"OPERATOR_BEGINS_WITH\"",
+  "SETVAR_OPERATION_EQUALS_MINUS", "SETVAR_OPERATION_EQUALS_APPEND",
+  "SETVAR_OPERATION_EQUALS_PREPEND", "\"NOT\"", "\"OPERATOR_BEGINS_WITH\"",
   "\"OPERATOR_CONTAINS\"", "\"OPERATOR_CONTAINS_WORD\"",
   "\"OPERATOR_DETECT_SQLI\"", "\"OPERATOR_DETECT_XSS\"",
   "\"OPERATOR_ENDS_WITH\"", "\"OPERATOR_EQ\"", "\"OPERATOR_FUZZY_HASH\"",
@@ -7148,51 +7188,51 @@ namespace yy {
   const short
   seclang_parser::yyrline_[] =
   {
-       0,   715,   715,   719,   720,   723,   728,   734,   740,   744,
-     748,   754,   760,   766,   772,   777,   782,   788,   795,   799,
-     803,   809,   813,   817,   822,   827,   832,   837,   841,   848,
-     852,   859,   865,   875,   884,   894,   903,   916,   920,   924,
-     928,   932,   936,   940,   944,   948,   952,   957,   961,   965,
-     969,   973,   977,   982,   987,   991,   995,   999,  1003,  1007,
-    1011,  1015,  1019,  1023,  1027,  1031,  1035,  1039,  1043,  1047,
-    1051,  1055,  1059,  1063,  1077,  1078,  1110,  1129,  1150,  1180,
-    1233,  1240,  1244,  1248,  1252,  1256,  1260,  1264,  1268,  1277,
-    1281,  1286,  1289,  1294,  1299,  1304,  1309,  1312,  1317,  1320,
-    1325,  1330,  1333,  1338,  1343,  1348,  1353,  1358,  1363,  1368,
-    1371,  1376,  1381,  1386,  1391,  1394,  1399,  1404,  1409,  1422,
-    1435,  1448,  1461,  1474,  1500,  1528,  1540,  1560,  1587,  1593,
-    1598,  1603,  1612,  1617,  1621,  1625,  1629,  1633,  1637,  1641,
-    1646,  1651,  1663,  1669,  1673,  1677,  1688,  1697,  1698,  1705,
-    1710,  1715,  1769,  1776,  1784,  1821,  1825,  1832,  1837,  1843,
-    1849,  1855,  1862,  1872,  1876,  1880,  1884,  1888,  1892,  1896,
-    1900,  1904,  1908,  1912,  1916,  1920,  1924,  1928,  1932,  1936,
-    1940,  1944,  1948,  1952,  1956,  1960,  1964,  1968,  1972,  1976,
-    1980,  1984,  1988,  1992,  1996,  2000,  2004,  2008,  2012,  2016,
-    2020,  2024,  2028,  2032,  2036,  2040,  2044,  2048,  2052,  2056,
-    2060,  2064,  2068,  2072,  2076,  2080,  2084,  2088,  2092,  2096,
-    2100,  2104,  2108,  2112,  2116,  2120,  2124,  2128,  2132,  2136,
-    2140,  2144,  2148,  2152,  2156,  2160,  2164,  2168,  2172,  2176,
-    2180,  2184,  2188,  2192,  2196,  2200,  2204,  2208,  2212,  2216,
-    2220,  2224,  2228,  2233,  2237,  2241,  2246,  2250,  2254,  2259,
-    2264,  2268,  2272,  2276,  2280,  2284,  2288,  2292,  2296,  2300,
-    2304,  2308,  2312,  2316,  2320,  2324,  2328,  2332,  2336,  2340,
-    2344,  2348,  2352,  2356,  2360,  2364,  2368,  2372,  2376,  2380,
-    2384,  2388,  2392,  2396,  2400,  2404,  2408,  2412,  2416,  2420,
-    2424,  2428,  2432,  2436,  2440,  2444,  2448,  2452,  2456,  2460,
-    2464,  2468,  2472,  2476,  2480,  2484,  2488,  2492,  2496,  2500,
-    2504,  2512,  2519,  2526,  2533,  2540,  2547,  2554,  2561,  2568,
-    2575,  2582,  2589,  2599,  2603,  2607,  2611,  2615,  2619,  2623,
-    2627,  2632,  2637,  2642,  2646,  2650,  2654,  2658,  2663,  2668,
-    2672,  2676,  2680,  2684,  2688,  2692,  2696,  2700,  2704,  2708,
-    2712,  2716,  2720,  2724,  2728,  2732,  2736,  2740,  2744,  2748,
-    2752,  2756,  2760,  2764,  2768,  2772,  2776,  2780,  2784,  2788,
-    2792,  2796,  2800,  2804,  2808,  2812,  2816,  2820,  2824,  2828,
-    2832,  2836,  2840,  2844,  2848,  2852,  2856,  2860,  2864,  2868,
-    2872,  2876,  2880,  2884,  2888,  2892,  2896,  2900,  2904,  2908,
-    2912,  2916,  2920,  2924,  2928,  2932,  2936,  2940,  2944,  2948,
-    2952,  2956,  2960,  2964,  2968,  2972,  2976,  2980,  2984,  2988,
-    2992,  2996,  3000,  3007,  3011,  3015,  3019,  3023,  3030,  3035,
-    3040,  3046
+       0,   717,   717,   721,   722,   725,   730,   736,   742,   746,
+     750,   756,   762,   768,   774,   779,   784,   790,   797,   801,
+     805,   811,   815,   819,   824,   829,   834,   839,   843,   850,
+     854,   861,   867,   877,   886,   896,   905,   918,   922,   926,
+     930,   934,   938,   942,   946,   950,   954,   959,   963,   967,
+     971,   975,   979,   984,   989,   993,   997,  1001,  1005,  1009,
+    1013,  1017,  1021,  1025,  1029,  1033,  1037,  1041,  1045,  1049,
+    1053,  1057,  1061,  1065,  1079,  1080,  1112,  1131,  1152,  1182,
+    1235,  1242,  1246,  1250,  1254,  1258,  1262,  1266,  1270,  1279,
+    1283,  1288,  1291,  1296,  1301,  1306,  1311,  1314,  1319,  1322,
+    1327,  1332,  1335,  1340,  1345,  1350,  1355,  1360,  1365,  1370,
+    1373,  1378,  1383,  1388,  1393,  1396,  1401,  1406,  1411,  1424,
+    1437,  1450,  1463,  1476,  1502,  1530,  1542,  1562,  1589,  1595,
+    1600,  1605,  1614,  1619,  1623,  1627,  1631,  1635,  1639,  1643,
+    1648,  1653,  1665,  1671,  1675,  1679,  1690,  1699,  1700,  1707,
+    1712,  1717,  1771,  1778,  1786,  1823,  1827,  1834,  1839,  1845,
+    1851,  1857,  1864,  1874,  1878,  1882,  1886,  1890,  1894,  1898,
+    1902,  1906,  1910,  1914,  1918,  1922,  1926,  1930,  1934,  1938,
+    1942,  1946,  1950,  1954,  1958,  1962,  1966,  1970,  1974,  1978,
+    1982,  1986,  1990,  1994,  1998,  2002,  2006,  2010,  2014,  2018,
+    2022,  2026,  2030,  2034,  2038,  2042,  2046,  2050,  2054,  2058,
+    2062,  2066,  2070,  2074,  2078,  2082,  2086,  2090,  2094,  2098,
+    2102,  2106,  2110,  2114,  2118,  2122,  2126,  2130,  2134,  2138,
+    2142,  2146,  2150,  2154,  2158,  2162,  2166,  2170,  2174,  2178,
+    2182,  2186,  2190,  2194,  2198,  2202,  2206,  2210,  2214,  2218,
+    2222,  2226,  2230,  2235,  2239,  2243,  2248,  2252,  2256,  2261,
+    2266,  2270,  2274,  2278,  2282,  2286,  2290,  2294,  2298,  2302,
+    2306,  2310,  2314,  2318,  2322,  2326,  2330,  2334,  2338,  2342,
+    2346,  2350,  2354,  2358,  2362,  2366,  2370,  2374,  2378,  2382,
+    2386,  2390,  2394,  2398,  2402,  2406,  2410,  2414,  2418,  2422,
+    2426,  2430,  2434,  2438,  2442,  2446,  2450,  2454,  2458,  2462,
+    2466,  2470,  2474,  2478,  2482,  2486,  2490,  2494,  2498,  2502,
+    2506,  2514,  2521,  2528,  2535,  2542,  2549,  2556,  2563,  2570,
+    2577,  2584,  2591,  2601,  2605,  2609,  2613,  2617,  2621,  2625,
+    2629,  2634,  2639,  2644,  2648,  2652,  2656,  2660,  2665,  2670,
+    2674,  2678,  2682,  2686,  2690,  2694,  2698,  2702,  2706,  2710,
+    2714,  2718,  2722,  2726,  2730,  2734,  2738,  2742,  2746,  2750,
+    2754,  2758,  2762,  2766,  2770,  2774,  2778,  2782,  2786,  2790,
+    2794,  2798,  2802,  2806,  2810,  2814,  2818,  2822,  2826,  2830,
+    2834,  2838,  2842,  2846,  2850,  2854,  2858,  2862,  2866,  2870,
+    2874,  2878,  2882,  2886,  2890,  2894,  2898,  2902,  2906,  2910,
+    2914,  2918,  2922,  2926,  2930,  2934,  2938,  2942,  2946,  2950,
+    2954,  2958,  2962,  2966,  2970,  2974,  2978,  2982,  2986,  2990,
+    2994,  2998,  3002,  3009,  3013,  3017,  3021,  3025,  3029,  3033,
+    3040,  3045,  3050,  3056
   };
 
   void
@@ -7224,9 +7264,9 @@ namespace yy {
 
 
 } // yy
-#line 7228 "seclang-parser.cc"
+#line 7268 "seclang-parser.cc"
 
-#line 3053 "seclang-parser.yy"
+#line 3063 "seclang-parser.yy"
 
 
 void yy::seclang_parser::error (const location_type& l, const std::string& m) {

@@ -111,6 +111,7 @@ TESTS+=test/test-cases/regression/action-setenv.json
 TESTS+=test/test-cases/regression/action-setrsc.json
 TESTS+=test/test-cases/regression/action-setsid.json
 TESTS+=test/test-cases/regression/action-setuid.json
+TESTS+=test/test-cases/regression/action-setvar.json
 TESTS+=test/test-cases/regression/actions.json
 TESTS+=test/test-cases/regression/action-skip.json
 TESTS+=test/test-cases/regression/action-tag.json

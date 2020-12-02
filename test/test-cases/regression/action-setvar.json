@@ -1,0 +1,278 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar action (string) 1/n",
+    "expected":{
+      "debug_log": " Saving variable: SESSION:test with value: PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120curl/7.38.0",
+      "error_log": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120curl/7.38.0",
+      "http_code":403
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'1',phase:2,setvar:SESSION.test=>%{MATCHED_VAR}\"",
+      "SecRule REQUEST_HEADERS:Cookie \"^(.*)$\" \"id:'2',phase:2,setvar:SESSION.test=>%{MATCHED_VAR}\"",
+      "SecRule SESSION:test \"PHP\" \"id:'3',phase:2,deny,chain\"",
+        "SecRule SESSION:test \"curl\" \"\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar action (string) 2/n",
+    "expected":{
+      "debug_log": " Saving variable: SESSION:test with value: curl/7.38.0PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+      "error_log": "curl/7.38.0PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+      "http_code":403
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'1',phase:2,setvar:SESSION.test=>%{MATCHED_VAR}\"",
+      "SecRule REQUEST_HEADERS:Cookie \"^(.*)$\" \"id:'2',phase:2,setvar:SESSION.test=<%{MATCHED_VAR}\"",
+      "SecRule SESSION:test \"PHP\" \"id:'3',phase:2,deny,chain\"",
+        "SecRule SESSION:test \"curl\" \"\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar action (string) 3/n",
+    "expected":{
+      "debug_log": "Saving variable: SESSION:test with value: PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120curl/7.38.0localhost",
+      "error_log": "\\*\/\\*PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120curl/7.38.0localhost",
+      "http_code":403
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"^(.*)$\" \"id:'1',phase:2,setvar:SESSION.test=>%{MATCHED_VAR}\"",
+      "SecRule SESSION:test \"PHP\" \"id:'2',phase:2,deny,chain\"",
+        "SecRule SESSION:test \"curl\" \"\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar action (string) 4/n",
+    "expected":{
+      "debug_log": "SESSION:test with value: localhostcurl/7.38.0PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+      "error_log": "localhostcurl/7.38.0PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120\\*\/\\*",
+      "http_code":403
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"^(.*)$\" \"id:'1',phase:2,setvar:SESSION.test=<%{MATCHED_VAR}\"",
+      "SecRule SESSION:test \"PHP\" \"id:'2',phase:2,deny,chain\"",
+        "SecRule SESSION:test \"curl\" \"\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar action (string) 5/n",
+    "expected":{
+      "debug_log": "TX:test with value: localhostcurl/7.38.0PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+      "error_log": "localhostcurl/7.38.0PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120\\*\/\\*",
+      "http_code":403
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"^(.*)$\" \"id:'1',phase:2,setvar:TX.test=<%{MATCHED_VAR}\"",
+      "SecRule TX:test \"PHP\" \"id:'2',phase:2,deny,chain\"",
+        "SecRule TX:test \"curl\" \"\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar action (string) 6/n",
+    "expected":{
+      "debug_log": "Saving variable: TX:test with value: '-REQUEST_HEADERS:Host: localhost''-REQUEST_HEADERS:User-Agent: curl/7.38.0''-REQUEST_HEADERS:Cookie: PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120''-REQUEST_HEADERS:Accept: \\*\/\\*'",
+      "error_log": "-REQUEST_HEADERS:Host: localhost''-REQUEST_HEADERS:User-Agent: curl/7.38.0''-REQUEST_HEADERS:Cookie",
+      "http_code":403
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"^(.*)$\" \"id:'1',phase:2,setvar:TX.test=<'-%{MATCHED_VAR_NAME}: %{MATCHED_VAR}'\"",
+      "SecRule TX:test \"PHP\" \"id:'2',phase:2,deny,chain\"",
+        "SecRule TX:test \"curl\" \"\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar action (string) 7/n",
+    "expected":{
+      "debug_log": "Saving variable: TX:test with value: '-REQUEST_HEADERS:Host: localhost /\\?key=value&key=other_value'",
+      "error_log": "-REQUEST_HEADERS:Host: localhost /\\?key=value&key=other_value''-REQUEST_HEADERS:User-Agent: curl/7.3",
+      "http_code":403
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"^(.*)$\" \"id:'1',phase:2,setvar:TX.test=<'-%{MATCHED_VAR_NAME}: %{MATCHED_VAR} %{REQUEST_URI}'\"",
+      "SecRule TX:test \"PHP\" \"id:'2',phase:2,deny,chain\"",
+        "SecRule TX:test \"curl\" \"\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing setvar action (string) 8/n",
+    "expected":{
+      "debug_log": "Saving variable: TX:test2 with value: 'This is test2'': '-REQUEST_HEADERS:Host: localhost",
+      "error_log": "'This is test2'': '-REQUEST_HEADERS:Host:",
+      "http_code":403
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"^(.*)$\" \"id:'1',phase:2,setvar:TX.test=<'-%{MATCHED_VAR_NAME}: %{MATCHED_VAR} %{REQUEST_URI}'\"",
+      "SecRule REQUEST_HEADERS:Host \"^(.*)$\" \"id:'2',phase:2,setvar:TX.test2='This is test2'\"",
+      "SecRule REQUEST_HEADERS:Host \"^(.*)$\" \"id:'3',phase:2,setvar:TX.test2=<': %{TX.test}'\"",
+      "SecRule TX:test2 \"PHP\" \"id:'4',phase:2,deny,chain\"",
+        "SecRule TX:test2 \"curl\" \"\""
+    ]
+  }
+]
