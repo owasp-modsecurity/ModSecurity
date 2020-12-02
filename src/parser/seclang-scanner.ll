@@ -898,6 +898,10 @@ EQUALS_LESS                             (?i:=\<)
 }
 
 
+<EXPECTING_ACTION_PREDICATE_VARIABLE>{
+{VAR_COUNT} { return p::make_VAR_COUNT(*driver.loc.back()); }
+}
+
 <EXPECTING_VARIABLE,EXPECTING_ACTION_PREDICATE_VARIABLE>{
 .                                           { BEGIN(LEXING_ERROR_VARIABLE); yyless(0); }
 {VARIABLE_ARGS_COMBINED_SIZE}               { return p::make_VARIABLE_ARGS_COMBINED_SIZE(*driver.loc.back()); }

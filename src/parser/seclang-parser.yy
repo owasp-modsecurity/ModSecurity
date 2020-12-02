@@ -3047,6 +3047,12 @@ run_time_string:
         $1->append(std::move($2));
         $$ = std::move($1);
       }
+    | run_time_string VAR_COUNT var
+      {
+        std::unique_ptr<Variable> c(new VariableModificatorCount(std::move($3)));
+        $1->append(std::move(c));
+        $$ = std::move($1);
+      }
     | FREE_TEXT_QUOTE_MACRO_EXPANSION
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
@@ -3057,6 +3063,13 @@ run_time_string:
       {
         std::unique_ptr<RunTimeString> r(new RunTimeString());
         r->append(std::move($1));
+        $$ = std::move(r);
+      }
+    | VAR_COUNT var
+      {
+        std::unique_ptr<RunTimeString> r(new RunTimeString());
+        std::unique_ptr<Variable> c(new VariableModificatorCount(std::move($2)));
+        r->append(std::move(c));
         $$ = std::move(r);
       }
     ;
