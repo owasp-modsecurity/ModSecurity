@@ -138,6 +138,8 @@ const std::string& ModSecurity::whoAmI() {
     platform = "MacOSX";
 #elif FREEBSD
     platform = "FreeBSD";
+#elif DRAGONFLY
+    platform = "DragonFlyBSD";
 #elif NETBSD
     platform = "NetBSD";
 #elif WIN32

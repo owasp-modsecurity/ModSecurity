@@ -187,6 +187,11 @@ case $host in
     AC_DEFINE([FREEBSD], [1], [Define if the operating system is FREEBSD])
     PLATFORM="kFreeBSD"
     ;;
+  *-*-dragonfly*)
+    echo "Checking platform... Identified as DragonFlyBSD, treating as linux"
+    AC_DEFINE([DRAGONFLY], [1], [Define if the operating system is DRAGONFLY])
+    PLATFORM="DragonFly"
+    ;;
   *-*-gnu*.*)
     echo "Checking platform... Identified as HURD, treating as linux"
     AC_DEFINE([LINUX], [1], [Define if the operating system is LINUX])
