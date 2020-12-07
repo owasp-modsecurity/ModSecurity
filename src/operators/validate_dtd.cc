@@ -49,6 +49,10 @@ bool ValidateDTD::evaluate(Transaction *transaction,
         RuleMessage *ruleMessage) {
     xmlValidCtxtPtr cvp;
 
+    if (m_dtd != NULL) {
+        xmlFreeDtd(m_dtd);
+        m_dtd = NULL;
+    }
     m_dtd = xmlParseDTD(NULL, (const xmlChar *)m_resource.c_str());
     if (m_dtd == NULL) {
         std::string err = std::string("XML: Failed to load DTD: ") \
