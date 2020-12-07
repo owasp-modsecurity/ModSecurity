@@ -1,0 +1,15 @@
+name: Manual Inputs
+on: 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Bump Version
+        default: v1.0.0
+        required: true
+jobs:
+  bump-version:
+    name: Bump Package Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Example variable usage
+        run: git tag ${{ github.event.inputs.version }}
