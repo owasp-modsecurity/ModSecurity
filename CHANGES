@@ -2,6 +2,8 @@ v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
 
+  - Fix memory leak in ValidateSchema
+    [#2469 - @martinhsv]
   - Using a custom VariableMatch* implementation
     [#2428 - @zimmerle]
   - Avoids to cleanup GeoIp on ModSecurity destructor

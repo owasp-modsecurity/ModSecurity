@@ -82,6 +82,10 @@ bool ValidateSchema::evaluate(Transaction *transaction,
         return true;
     }
 
+    if (m_validCtx != NULL) {
+        xmlSchemaFreeValidCtxt(m_validCtx);
+        m_validCtx = NULL;
+    }
     m_validCtx = xmlSchemaNewValidCtxt(m_schema);
     if (m_validCtx == NULL) {
         std::stringstream err("XML: Failed to create validation context.");
