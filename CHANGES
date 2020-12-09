@@ -1,7 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
-
+  - Replaces put with setenv in SetEnv action
+    [#2469 - @martinhsv, @WGH-, @zimmerle]
   - Using a custom VariableMatch* implementation
     [#2428 - @zimmerle, @martinhsv]
   - Avoids to cleanup GeoIp on ModSecurity destructor
