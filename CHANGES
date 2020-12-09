@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Replaces put with setenv in SetEnv action
+    [Issue #2469 - @martinhsv, @WGH-, @zimmerle]
   - Regression: Mark the test as failed in case of segfault.
     [@zimmerle]
   - Regex key selection should not be case-sensitive
