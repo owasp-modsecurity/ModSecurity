@@ -93,6 +93,7 @@ std::unique_ptr<std::string> AnchoredVariableMatchVarsNames::resolveFirst(const 
         }
         return std::unique_ptr<std::string>(new std::string(x->getName()));
     }
+    return std::unique_ptr<std::string>();
 }
 
 

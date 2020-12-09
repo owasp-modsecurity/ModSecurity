@@ -1,6 +1,9 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Fix AnchoredSetVariableMatchVars(Names) function with return
+    value may reach end of function
+    [@martinhsv]
   - Replaces put with setenv in SetEnv action
     [#2469 - @martinhsv, @WGH-, @zimmerle]
   - Using a custom VariableMatch* implementation

@@ -94,6 +94,7 @@ std::unique_ptr<std::string> AnchoredVariableMatchVars::resolveFirst(const std::
         }
         return std::unique_ptr<std::string>(new std::string(x->getValue()));
     }
+    return std::unique_ptr<std::string>();
 }
 
 
