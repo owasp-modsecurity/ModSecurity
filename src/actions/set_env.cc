@@ -34,10 +34,10 @@ bool SetENV::init(std::string *error) {
 bool SetENV::evaluate(RuleWithActions *rule, Transaction *t) {
     std::string colNameExpanded(m_string->evaluate(t));
 
+    auto pair = utils::string::ssplit_pair(colNameExpanded, '=');
     ms_dbg_a(t, 8, "Setting envoriment variable: "
-        + colNameExpanded + ".");
-
-    putenv(strdup(colNameExpanded.c_str()));
+        + pair.first + " to " + pair.second);
+    setenv(pair.first.c_str(), pair.second.c_str(), /*overwrite*/ 1);
 
     return true;
 }
