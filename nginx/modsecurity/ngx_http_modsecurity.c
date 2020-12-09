@@ -84,7 +84,7 @@ static ngx_int_t ngx_http_calculate_modsec_latency(ngx_http_request_t *r,
 
 static ngx_int_t ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, ngx_msec_int_t modsec_latency);
-static ngx_int_t ngx_http_modsecurity_set_modsec_mode(ngx_http_request_t* r,
+static void ngx_http_modsecurity_set_modsec_mode(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, ngx_uint_t modsec_mode);
 static ngx_int_t ngx_http_variable_get_modsec_latency(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, uintptr_t data);
@@ -931,6 +931,10 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
     ngx_int_t ret, modsec_latency_ret;
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
+    /* Process only main request */
+    if (r != r->main || !cf->enable) {
+        return NGX_DECLINED;
+    }
 
     // Get module request context or create if not yet created
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
@@ -945,17 +949,12 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
 
         ngx_http_variable_value_t* modsec_mode_var = ngx_http_get_indexed_variable(r, modsec_mode_index);
         if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
-            ret = ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, 0);
+            ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, 0);
         }
         else {
-            ret = ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, 1);
-        }
-        if (ret != NGX_OK) {
-            ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "modSecurity: latency mode memory allocation failed");
-            return ret;
+            ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, 1);
         }
     }
-
 
     // Main modsec handler
     ret  = ngx_http_modsecurity_handler(r, cf, ctx);
@@ -974,11 +973,6 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r, ngx_http_modsecurity_loc_con
                              ngx_http_modsecurity_ctx_t *ctx)
 {
     ngx_int_t                        rc;
-
-    /* Process only main request */
-    if (r != r->main || !cf->enable) {
-        return NGX_DECLINED;
-    }
 
     /* See if the request has been allowed by AzWAF so we should not process it */
     ngx_http_variable_value_t* azwaf_processing_result =
@@ -1275,7 +1269,7 @@ ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t* r,
     return NGX_OK;
 }
 
-    static ngx_int_t
+static void
 ngx_http_modsecurity_set_modsec_mode(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, ngx_uint_t modsec_mode)
 {
@@ -1295,6 +1289,4 @@ ngx_http_modsecurity_set_modsec_mode(ngx_http_request_t* r,
     v->no_cacheable = 0;
     v->not_found = 0;
     v->data = p;
-
-    return NGX_OK;
 }
