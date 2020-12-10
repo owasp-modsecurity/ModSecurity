@@ -34,6 +34,7 @@ jobs:
         run: ./build.sh
       - name: configure ${{ matrix.configure.label }}
         run: ./configure ${{ matrix.configure.opt }}
+      - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
         run: make -j `nproc`
       - name: check
@@ -67,6 +68,7 @@ jobs:
         run: ./build.sh
       - name: configure ${{ matrix.configure.label }}
         run: ./configure ${{ matrix.configure.opt }}
+      - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
         run: make -j `nproc`
       - name: check
