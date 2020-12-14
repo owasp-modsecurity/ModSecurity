@@ -79,8 +79,7 @@ static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_req
 static int ngx_http_modsecurity_drop_action(request_rec *r);
 static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
-static ngx_int_t ngx_http_calculate_modsec_latency(ngx_http_request_t *r,
-                 ngx_http_modsecurity_ctx_t *ctx, ngx_http_modsecurity_loc_conf_t *cf);
+static ngx_int_t ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ctx_t *ctx);
 
 static ngx_int_t ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, ngx_msec_int_t modsec_latency);
@@ -903,8 +902,7 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
 }
 
 static ngx_int_t
-ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ctx_t* ctx,
-                                  ngx_http_modsecurity_loc_conf_t * cf)
+ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ctx_t* ctx)
 {
     ngx_time_t *end_time;
     ngx_msec_int_t   ms;
@@ -960,7 +958,7 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
     ret  = ngx_http_modsecurity_handler(r, cf, ctx);
 
     // We return failure only if memory allocation fails for latency variable in calculating metric
-    modsec_latency_ret = ngx_http_calculate_modsec_latency(r, ctx, cf);
+    modsec_latency_ret = ngx_http_calculate_modsec_latency(r, ctx);
     if (modsec_latency_ret != NGX_OK) {
         ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "modSecurity: latency metric memory allocation failed");
         return modsec_latency_ret;
