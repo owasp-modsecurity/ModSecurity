@@ -290,7 +290,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
     unsigned char *buffer = NULL;
     unsigned char bitlen = 0;
     int bit_validation = 0, test_bit = 0;
-    int i = 0;
+    size_t i = 0;
     unsigned int x, y;
     TreeNode *node = NULL, *new_node = NULL;
     TreeNode *parent = NULL, *i_node = NULL;

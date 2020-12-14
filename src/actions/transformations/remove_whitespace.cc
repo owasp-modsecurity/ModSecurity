@@ -34,11 +34,12 @@ void RemoveWhitespace::execute(const Transaction *t,
     ModSecString &out) noexcept {
     out = in;
     int64_t i = 0;
+    char nonBreakingSpaces = 0xa0;
 
     // loop through all the chars
     while (i < out.size()) {
         // remove whitespaces and non breaking spaces (NBSP)
-        if (isspace(out[i]) || (out[i] == NBSP)) {
+        if (isspace(out[i]) || (out[i] == nonBreakingSpaces)) {
             out.erase(i, 1);
         } else {
           /* if the space is not a whitespace char, increment counter
