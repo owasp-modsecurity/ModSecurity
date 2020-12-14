@@ -25,7 +25,7 @@
  */
 #include "modsecurity/rules_set.h"
 
-
+#ifdef MSC_DOCUMENTATION
 /**
  * Description: Assigns a tag (category) to a rule or a chain.
  *
@@ -46,7 +46,7 @@
  *
  *
  */
-
+#endif
 
 namespace modsecurity {
 namespace actions {

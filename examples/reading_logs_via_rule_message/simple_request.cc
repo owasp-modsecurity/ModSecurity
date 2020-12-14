@@ -29,8 +29,8 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    *(argv++);
-    std::string rules(*argv);
+    char *rule = *(argv++);
+    std::string rules(rule);
     ReadingLogsViaRuleMessage rlvrm(request_header, request_uri, request_body,
         response_headers, response_body, ip, rules);
     rlvrm.process();
