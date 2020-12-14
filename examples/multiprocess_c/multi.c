@@ -42,11 +42,14 @@ void process_special_request (int j) {
     msc_process_uri(transaction,
         "http://www.modsecurity.org/test?foo=herewego",
         "GET", "1.1");
-    msc_add_request_header(transaction, "User-Agent",
-        "Basic ModSecurity example");
+    msc_add_request_header(transaction,
+        (const unsigned char *) "User-Agent",
+        (const unsigned char *) "Basic ModSecurity example");
     msc_process_request_headers(transaction);
     msc_process_request_body(transaction);
-    msc_add_response_header(transaction, "Content-type", "text/html");
+    msc_add_response_header(transaction,
+        (const unsigned char *) "Content-type",
+        (const unsigned char *) "text/html");
     msc_process_response_headers(transaction, 200, "HTTP 1.0");
     msc_process_response_body(transaction);
     msc_process_logging(transaction);
@@ -70,11 +73,14 @@ void process_request (int j) {
         msc_process_uri(transaction,
             "http://www.modsecurity.org/test?key1=value1&key2=value2&key3=value3",
             "GET", "1.1");
-        msc_add_request_header(transaction, "User-Agent",
-            "Basic ModSecurity example");
+        msc_add_request_header(transaction,
+            (const unsigned char *) "User-Agent",
+            (const unsigned char *) "Basic ModSecurity example");
         msc_process_request_headers(transaction);
         msc_process_request_body(transaction);
-        msc_add_response_header(transaction, "Content-type", "text/html");
+        msc_add_response_header(transaction,
+            (const unsigned char *) "Content-type",
+            (const unsigned char *) "text/html");
         msc_process_response_headers(transaction, 200, "HTTP 1.0");
         msc_process_response_body(transaction);
         msc_process_logging(transaction);
