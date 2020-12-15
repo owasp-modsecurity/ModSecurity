@@ -47,10 +47,8 @@ bool ValidateDTD::evaluate(Transaction *transaction,
         const RuleWithActions *rule,
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) {
-    xmlValidCtxtPtr cvp;
-
-    m_dtd = xmlParseDTD(NULL, (const xmlChar *)m_resource.c_str());
-    if (m_dtd == NULL) {
+    XmlDtdPtrManager m_dtd(xmlParseDTD(NULL, (const xmlChar *)m_resource.c_str()));
+    if (m_dtd.get() == NULL) {
         std::string err = std::string("XML: Failed to load DTD: ") \
             + m_resource;
         ms_dbg_a(transaction, 4, err);
@@ -79,7 +77,7 @@ bool ValidateDTD::evaluate(Transaction *transaction,
     }
 #endif
 
-    cvp = xmlNewValidCtxt();
+    xmlValidCtxtPtr cvp = xmlNewValidCtxt();
     if (cvp == NULL) {
         ms_dbg_a(transaction, 4,
             "XML: Failed to create a validation context.");
@@ -91,7 +89,7 @@ bool ValidateDTD::evaluate(Transaction *transaction,
     cvp->warning = (xmlSchemaValidityErrorFunc)warn_runtime;
     cvp->userData = transaction;
 
-    if (!xmlValidateDtd(cvp, transaction->m_xml->m_data.doc, m_dtd)) {
+    if (!xmlValidateDtd(cvp, transaction->m_xml->m_data.doc, m_dtd.get())) {
         ms_dbg_a(transaction, 4, "XML: DTD validation failed.");
         xmlFreeValidCtxt(cvp);
         return true;

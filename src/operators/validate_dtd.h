@@ -33,18 +33,30 @@
 namespace modsecurity {
 namespace operators {
 
+class XmlDtdPtrManager {
+ public:
+    explicit XmlDtdPtrManager(xmlDtdPtr dtd)
+        : m_dtd(dtd) { }
+    ~XmlDtdPtrManager() {
+#ifdef WITH_LIBXML2
+        if (m_dtd != NULL) {
+            xmlFreeDtd(m_dtd);
+            m_dtd = NULL;
+        }
+#endif
+    }
+    xmlDtdPtr get() const {return m_dtd;}
+ private:
+    xmlDtdPtr m_dtd; // The resource being managed
+};
+
 class ValidateDTD : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit ValidateDTD(std::unique_ptr<RunTimeString> param)
         : Operator("ValidateDTD", std::move(param)) { }
 #ifdef WITH_LIBXML2
-    ~ValidateDTD() {
-        if (m_dtd != NULL) {
-            xmlFreeDtd(m_dtd);
-            m_dtd = NULL;
-        }
-    }
+    ~ValidateDTD() { }
 
     bool evaluate(Transaction *transaction,
         const RuleWithActions *rule,
@@ -93,7 +105,6 @@ class ValidateDTD : public Operator {
 
  private:
     std::string m_resource;
-    xmlDtdPtr m_dtd = NULL;
 #endif
 };
 
