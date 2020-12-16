@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
  
+  - Fix memory leaks in ValidateSchema
+    [#2469 - @martinhsv, @zimmerle]
   - Fix memory leak of ValidateDTD's m_dtd
     [#2469 - @martinhsv, @zimmerle]
   - Replaces put with setenv in SetEnv action
