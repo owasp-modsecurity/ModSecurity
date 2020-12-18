@@ -1,7 +1,7 @@
 %skeleton "lalr1.cc" /* -*- C++ -*- */
 %require "3.0.2"
 %defines
-%define parser_class_name {seclang_parser}
+%define api.parser.class {seclang_parser}
 %define api.token.constructor
 %define api.value.type variant
 //%define api.namespace {modsecurity::yy}
