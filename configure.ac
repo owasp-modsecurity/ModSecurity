@@ -141,6 +141,7 @@ LT_INIT([dlopen])
 # Identify platform
 AC_CANONICAL_HOST
 
+CUSTOM_YFLAGS=""
 case $host in
   *-*-aix*)
     echo "Checking platform... Identified as AIX"
@@ -161,6 +162,7 @@ case $host in
     echo "Checking platform... Identified as Linux"
     AC_DEFINE([LINUX], [1], [Define if the operating system is LINUX])
     PLATFORM="Linux"
+    CUSTOM_YFLAGS="-d -Wno-yacc"
     ;;
   *-*-solaris*)
     echo "Checking platform... Identified as Solaris"
@@ -206,6 +208,8 @@ esac
 # Variables to be used inside the Makefile.am files.
 MSC_BASE_DIR=`pwd`
 AC_SUBST([MSC_BASE_DIR])
+
+AC_SUBST([CUSTOM_YFLAGS])
 
 MSC_VERSION_INFO=msc_version_info
 AC_SUBST([MSC_VERSION_INFO])
