@@ -13,12 +13,54 @@
  *
  */
 
+#include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
+#include "modsecurity/rules_set.h"
+#include "modsecurity/transaction.h"
+
+#include "src/parser/driver.h"
+#include "src/rule_marker.h"
 #include "src/rule_with_actions.h"
+#include "src/utils/https_client.h"
+
 
 
 namespace modsecurity {
 
+void Rules::fixDefaultActions(RulesWarnings *warnings, RulesErrors *errors) {
+    for (size_t i = 0; i < m_rules.size(); i++) {
+        auto &rule = m_rules[i];
+        RuleWithActions *r = dynamic_cast<RuleWithActions *>(rule.get());
+        if (!r) {
+            continue;
+        }
+        if (dynamic_cast<RuleWithOperator *>(rule.get())) {
+            RuleWithOperator *op = new RuleWithOperator(*dynamic_cast<RuleWithOperator *>(rule.get()));
+            std::unique_ptr<RuleWithOperator> nrp(op);
+            m_rules[i] = std::move(nrp);
+        } else if (dynamic_cast<RuleUnconditional *>(rule.get())) {
+            RuleUnconditional *un = new RuleUnconditional(*dynamic_cast<RuleUnconditional *>(rule.get()));
+            std::unique_ptr<RuleUnconditional> nrp(un);
+            m_rules[i] = std::move(nrp);
+        } else if (dynamic_cast<RuleScript *>(rule.get())) {
+            RuleScript *rs = new RuleScript(*dynamic_cast<RuleScript *>(rule.get()));
+            std::unique_ptr<RuleScript> nrp(rs);
+            m_rules[i] = std::move(nrp);
+        } else {
+            RuleWithActions *nr = new RuleWithActions(*dynamic_cast<RuleWithActions *>(rule.get()));
+            std::unique_ptr<RuleWithActions> nrp(nr);
+            m_rules[i] = std::move(nrp);
+        }
+        RuleWithActions *nr = dynamic_cast<RuleWithActions *>(m_rules[i].get());
+        nr->clearDefaultActions();
+        for (auto &a : m_defaultActions) {
+            nr->addDefaultAction(a);
+        }
+        for (auto a : m_defaultTransformations) {
+            nr->addDefaulTransformation(a);
+        }
+    }
+}
 
 int Rules::append(Rules *from) {
     m_rules.insert(m_rules.end(), from->m_rules.begin(), from->m_rules.end());
