@@ -23,6 +23,8 @@
 #include <string>
 #include <utility>
 
+#include "test/common/colors.h"
+
 #ifndef TEST_REGRESSION_REGRESSION_TEST_H_
 #define TEST_REGRESSION_REGRESSION_TEST_H_
 
@@ -80,17 +82,118 @@ class RegressionTest {
 
 class RegressionTestResult {
  public:
-    RegressionTestResult() :
-      passed(false),
-      skipped(false),
-      disabled(false),
-      test(NULL) { }
+    enum TestStatus {
+        PENDING = 2,
+        SKIPPED = 4,
+        DISABLED = 8,
+        PASSED = 16,
+        FAILED = 32
+    };
 
-    bool passed;
-    bool skipped;
-    bool disabled;
-    RegressionTest *test;
+    explicit RegressionTestResult(RegressionTest *t) :
+      m_status(PENDING),
+      m_test(t)
+    {
+        if (t->enabled == 0) {
+            m_status = DISABLED;
+        }
+    }
+
+
+    std::string getTestResources() const {
+        return m_test->resource;
+    }
+
+    std::string getName() const {
+        return m_test->name;
+    }
+
+    std::string getRules() const {
+        return m_test->rules;
+    }
+
+    std::string getExpectedParserError() const {
+        return m_test->parser_error;
+    }
+
+    std::string getFileName() const {
+        size_t offset = m_test->filename.find_last_of("/\\");
+        std::string filename("");
+        if (offset != std::string::npos) {
+            filename = std::string(m_test->filename, offset + 1,
+                m_test->filename.length() - offset - 1);
+        } else {
+            filename = m_test->filename;
+        }
+
+        return filename;
+    }
+
+    void failed(const std::string &reason) {
+        m_status = FAILED;
+        this->reason << reason;
+    }
+
+    void passed() {
+        m_status = PASSED;
+    }
+
+    void skipped(const std::string &reason) {
+        m_status = SKIPPED;
+        this->reason << reason;
+    }
+
+    void print(bool automake = false) const {
+        std::string statusAutoMake;
+        std::string statusConsole;
+        std::string statusColor;
+
+        if (m_status == RegressionTestResult::TestStatus::PENDING) {
+            return;
+        }
+
+        if (m_status == RegressionTestResult::TestStatus::SKIPPED) {
+            statusAutoMake = "SKIP";
+            statusConsole = "skipped";
+            statusColor = KCYN;
+        }
+
+        if (m_status == RegressionTestResult::TestStatus::DISABLED) {
+            statusAutoMake = "SKIP";
+            statusConsole = "disabled";
+            statusColor = KCYN;
+        }
+
+        if (m_status == RegressionTestResult::TestStatus::PASSED) {
+            statusAutoMake = "PASS";
+            statusConsole = "passed!";
+            statusColor = KGRN;
+        }
+
+        if (m_status == RegressionTestResult::TestStatus::FAILED) {
+            statusAutoMake = "FAILED";
+            statusConsole = "failed!";
+            statusColor = KRED;
+        }
+
+        if (automake) {
+            std::cout << ":test-result: " << statusAutoMake \
+                << " " << getFileName();
+                //<< ":" << getName();
+            std::cout << std::endl;
+            return;
+        }
+
+        std::cout << statusColor << statusConsole << RESET << std::endl;
+        std::cout << reason.str() << std::endl;
+    }
+
+
+
     std::stringstream reason;
+    TestStatus m_status;
+ private:
+    RegressionTest *m_test;
 };
 
 
