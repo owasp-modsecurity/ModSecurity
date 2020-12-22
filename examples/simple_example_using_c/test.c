@@ -27,6 +27,7 @@ int main (int argc, char **argv)
 {
     int ret;
     const char *error = NULL;
+    const char *warn = NULL;
     ModSecurity *modsec;
     Transaction *transaction = NULL;
     RulesSet *rules;
@@ -38,7 +39,7 @@ int main (int argc, char **argv)
 
     rules = msc_create_rules_set();
 
-    ret = msc_rules_add_file(rules, main_rule_uri, &error);
+    ret = msc_rules_add_file(rules, main_rule_uri, &warn, &error);
     if (ret < 0) {
         fprintf(stderr, "Problems loading the rules --\n");
         fprintf(stderr, "%s\n", error);
@@ -48,7 +49,7 @@ int main (int argc, char **argv)
 
     ret = msc_rules_add_remote(rules, "test",
         "https://www.modsecurity.org/modsecurity-regression-test-secremoterules.txt",
-        &error);
+        &warn, &error);
     if (ret < 0) {
         fprintf(stderr, "Problems loading the rules --\n");
         fprintf(stderr, "%s\n", error);

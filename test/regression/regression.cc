@@ -157,7 +157,7 @@ modsecurity::ModSecurity *setupModSec() {
 }
 
 
-modsecurity::RulesSet *setupModSecRules(RegressionTestResult *r) {
+modsecurity::RulesSet *setupModSecRules(RegressionTestResult *r, std::string &warning) {
     CustomDebugLog *debug_log = new CustomDebugLog();
     auto rules = new modsecurity::RulesSet(debug_log);
     rules->load("SecDebugLogLevel 9");
@@ -165,8 +165,11 @@ modsecurity::RulesSet *setupModSecRules(RegressionTestResult *r) {
 
     if (rules->load(r->getRules().c_str(), r->getFileName()) >= 0 &&
         r->getExpectedParserError().empty()) {
+        warning.assign(rules->getParserWarnings());
         return rules;
     }
+    warning.assign(rules->getParserWarnings());
+
 
     if (!r->getExpectedParserError().empty()) {
         Regex re(r->getExpectedParserError());
@@ -287,6 +290,7 @@ void processLogs(RegressionTest *t,
     const std::string &serverLog,
     const std::string &audit_log,
     const std::string &debug_log,
+    const std::string &parser_warning,
     int status_code) {
 
 
@@ -318,6 +322,13 @@ void processLogs(RegressionTest *t,
         reason << KWHT << "Expecting: " << RESET \
             << t->audit_log + "";
         testRes->failed(reason.str());
+    } else if (!contains(parser_warning, t->parser_warn)) {
+        std::stringstream reason;
+        reason << "Parser warning was not matching the " \
+            << "expected results." << std::endl;
+        reason << KWHT << "Expecting: " << RESET \
+            << t->parser_warn + "";
+        testRes->failed(reason.str());
     } else {
         testRes->passed();
         return;
@@ -331,6 +342,8 @@ void processLogs(RegressionTest *t,
         testRes->reason << serverLog << std::endl;
         testRes->reason << KWHT << "Audit log:" << RESET << std::endl;
         testRes->reason << audit_log << std::endl;
+        testRes->reason << KWHT << "Parser warning:" << RESET << std::endl;
+        testRes->reason << parser_warning << std::endl;
     }
 }
 
@@ -346,6 +359,7 @@ RegressionTestResult *perform_regression_test(
     std::string error_log;
     std::string audit_log;
     std::string debug_log;
+    std::string parser_warning;
     int status_code = 200;
 
     if (t->enabled == 0) {
@@ -363,7 +377,7 @@ RegressionTestResult *perform_regression_test(
         goto ret;
     }
 
-    modsec_rules = setupModSecRules(testRes);
+    modsec_rules = setupModSecRules(testRes, parser_warning);
     if (modsec_rules == nullptr) {
         goto ret;
     }
@@ -381,6 +395,7 @@ RegressionTestResult *perform_regression_test(
       error_log,
       audit_log,
       debug_log,
+      parser_warning,
       status_code);
 
 ret:

@@ -457,6 +457,7 @@ class RulesSetProperties {
     RulesExceptions m_exceptions;
     std::list<std::string> m_components;
     std::ostringstream m_parserError;
+    std::ostringstream m_parserWarn;
     ConfigSet m_responseBodyTypeToBeInspected;
     ConfigString m_httpblKey;
     ConfigString m_uploadDirectory;

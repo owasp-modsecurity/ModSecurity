@@ -58,6 +58,11 @@ int RulesSet::loadFromUri(const char *uri) {
         return -1;
     }
 
+    auto warn = driver->m_parserWarn.str();
+    if (warn.size() > 0) {
+        m_parserWarn << warn;
+    }
+
     int rules = this->merge(driver);
     delete driver;
 
@@ -73,12 +78,19 @@ int RulesSet::load(const char *file, const std::string &ref) {
         delete driver;
         return -1;
     }
+
     int rules = this->merge(driver);
     if (rules == -1) {
         m_parserError << driver->m_parserError.str();
         delete driver;
         return -1;
     }
+
+    auto warn = driver->m_parserWarn.str();
+    if (warn.size() > 0) {
+        m_parserWarn << warn;
+    }
+
     delete driver;
 
     return rules;
@@ -150,9 +162,13 @@ bool RulesSet::containsDuplicatedIds(RulesWarnings *warning, RulesErrors *error)
 
 
 std::string RulesSet::getParserError() {
-    return this->m_parserError.str();
+    return m_parserError.str();
 }
 
+
+std::string RulesSet::getParserWarnings() {
+    return m_parserWarn.str();
+}
 
 int RulesSet::evaluate(int phase, Transaction *t) {
     if (phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
@@ -344,41 +360,67 @@ extern "C" void msc_rules_dump(RulesSet *rules) {
 
 
 extern "C" int msc_rules_merge(RulesSet *rules_dst,
-    RulesSet *rules_from, const char **error) {
+    RulesSet *rules_from,
+    const char **warn, const char **error) {
     int ret = rules_dst->merge(rules_from);
     if (ret < 0) {
         *error = strdup(rules_dst->getParserError().c_str());
     }
+
+    auto warnings = rules_dst->getParserWarnings();
+    if (warnings.size() > 0) {
+        *warn = strdup(warnings.c_str());
+    }
+
     return ret;
 }
 
 
 extern "C" int msc_rules_add_remote(RulesSet *rules,
-    const char *key, const char *uri, const char **error) {
+    const char *key, const char *uri,
+    const char **warn, const char **error) {
     int ret = rules->loadRemote(key, uri);
     if (ret < 0) {
         *error = strdup(rules->getParserError().c_str());
     }
+
+    auto warnings = rules->getParserWarnings();
+    if (warnings.size() > 0) {
+        *warn = strdup(warnings.c_str());
+    }
+
     return ret;
 }
 
 
 extern "C" int msc_rules_add_file(RulesSet *rules, const char *file,
-    const char **error) {
+    const char **warn, const char **error) {
     int ret = rules->loadFromUri(file);
     if (ret < 0) {
         *error = strdup(rules->getParserError().c_str());
     }
+
+    auto warnings = rules->getParserWarnings();
+    if (warnings.size() > 0) {
+        *warn = strdup(warnings.c_str());
+    }
+
     return ret;
 }
 
 
 extern "C" int msc_rules_add(RulesSet *rules, const char *plain_rules,
-    const char **error) {
+    const char **warn, const char **error) {
     int ret = rules->load(plain_rules);
     if (ret < 0) {
         *error = strdup(rules->getParserError().c_str());
     }
+
+    auto warnings = rules->getParserWarnings();
+    if (warnings.size() > 0) {
+        *warn = strdup(warnings.c_str());
+    }
+
     return ret;
 }
 

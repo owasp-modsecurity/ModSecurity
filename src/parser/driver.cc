@@ -180,7 +180,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
      */
     if (rule->getId() == 0) {
         m_parserError << "Rules must have an ID. File: ";
-        m_parserError << rule->getFileName() << " at line: ";
+        m_parserError << *rule->getFileName() << " at line: ";
         m_parserError << std::to_string(rule->getLineNumber()) << std::endl;
         return false;
     }
@@ -278,6 +278,31 @@ void Driver::error(const yy::location& l, const std::string& m,
 
     if (c.empty() == false) {
         m_parserError << c;
+    }
+}
+
+
+void Driver::warn(const yy::location& l, const std::string& m) {
+    warn(l, m, "");
+}
+
+
+void Driver::warn(const yy::location& l, const std::string& m,
+    const std::string& c) {
+    if (m_parserWarn.tellp() != 0) {
+        m_parserWarn << std::endl;
+    }
+    m_parserWarn << "Warning. ";
+    m_parserWarn << "File: " << *l.end.filename << ". ";
+    m_parserWarn << "Line: " << l.end.line << ". ";
+    m_parserWarn << "Column: " << l.end.column - 1 << ". ";
+
+    if (m.empty() == false) {
+        m_parserWarn << "" << m << " ";
+    }
+
+    if (c.empty() == false) {
+        m_parserWarn << c;
     }
 }
 

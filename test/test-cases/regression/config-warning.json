@@ -1,0 +1,63 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing parser warning (1/n)",
+    "expected":{
+      "parser_warn": "Action ctl:forceRequestBodyVariable is not supported in version 3"
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":12300
+    },
+    "request":{
+      "headers":{
+        "Host":"a.b.com",
+        "Accept":"*/*",
+        "User-Agent":"My sweet little browser",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/path1",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains path1\" \"phase:1,block,id:5,ctl:forceRequestBodyVariable=Off\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing parser warning (2/n)",
+    "expected":{
+      "parser_warn": "config-warning.json. Line: 2. Column: 58. Action ctl:forceRequestBodyVariable is not supported in version 3."
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":12300
+    },
+    "request":{
+      "headers":{
+        "Host":"a.b.com",
+        "Accept":"*/*",
+        "User-Agent":"My sweet little browser",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/path1",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains path1\" \"phase:1,block,id:5,ctl:forceRequestBodyVariable=Off\"",
+      "SecRule REQUEST_URI \"@contains path1\" \"phase:1,block,id:7,ctl:forceRequestBodyVariable=On\""
+    ]
+  }
+]

@@ -86,6 +86,10 @@ class Driver : public RulesSetProperties {
     void error(const yy::location& l, const std::string& m,
         const std::string& c);
 
+    void warn(const yy::location& l, const std::string& m);
+    void warn(const yy::location& l, const std::string& m,
+        const std::string& c);
+
     std::list<yy::location *> loc;
 
     std::string buffer;

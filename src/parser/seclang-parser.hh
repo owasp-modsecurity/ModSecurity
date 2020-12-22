@@ -324,7 +324,13 @@ using namespace modsecurity::operators;
     if (t)
 
 
-#define ACTION_NOT_SUPPORTED(a, b) \
+#define ACTION_NOT_SUPPORTED(a, b, c) \
+    std::unique_ptr<actions::Action> d(new actions::ActionNotSupported(b)); \
+    a = std::move(d); \
+    driver.warn(c, "Action " + std::string(b) + " is not supported in version 3.");
+
+
+#define ACTION_NOT_SUPPORTED_OLD(a, b) \
     driver.error(b, "Action: " + std::string(a) + " is not yet supported."); \
     YYERROR;
 
@@ -354,7 +360,7 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 358 "seclang-parser.hh"
+#line 364 "seclang-parser.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -488,7 +494,7 @@ using namespace modsecurity::operators;
 #endif
 
 namespace yy {
-#line 492 "seclang-parser.hh"
+#line 498 "seclang-parser.hh"
 
 
 
@@ -8629,7 +8635,7 @@ switch (yykind)
   }
 
 } // yy
-#line 8633 "seclang-parser.hh"
+#line 8639 "seclang-parser.hh"
 
 
 

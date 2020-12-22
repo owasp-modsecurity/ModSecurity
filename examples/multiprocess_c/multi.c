@@ -97,6 +97,7 @@ int main (int argc, char **argv)
 {
     int ret;
     const char *error = NULL;
+    const char *warn = NULL;
     int i = 0;
     pid_t pid;
     int f;
@@ -108,7 +109,7 @@ int main (int argc, char **argv)
 
     rules = msc_create_rules_set();
 
-    ret = msc_rules_add_file(rules, main_rule_uri, &error);
+    ret = msc_rules_add_file(rules, main_rule_uri, &warn, &error);
     if (ret < 0) {
         fprintf(stderr, "Problems loading the rules --\n");
         fprintf(stderr, "%s\n", error);

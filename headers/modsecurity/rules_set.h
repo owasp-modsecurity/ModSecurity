@@ -75,6 +75,7 @@ class RulesSet : public RulesSetProperties {
     int evaluate(int phase, Transaction *transaction);
 
     std::string getParserError();
+    std::string getParserWarnings();
 
     void debug(int level, const std::string &id, const std::string &uri,
         const std::string &msg);
@@ -95,11 +96,14 @@ extern "C" {
 
 RulesSet *msc_create_rules_set(void);
 void msc_rules_dump(RulesSet *rules);
-int msc_rules_merge(RulesSet *rules_dst, RulesSet *rules_from, const char **error);
+int msc_rules_merge(RulesSet *rules_dst, RulesSet *rules_from,
+    const char **warn, const char **error);
 int msc_rules_add_remote(RulesSet *rules, const char *key, const char *uri,
-    const char **error);
-int msc_rules_add_file(RulesSet *rules, const char *file, const char **error);
-int msc_rules_add(RulesSet *rules, const char *plain_rules, const char **error);
+    const char **warn, const char **error);
+int msc_rules_add_file(RulesSet *rules, const char *file,
+    const char **warn, const char **error);
+int msc_rules_add(RulesSet *rules, const char *plain_rules,
+    const char **warn, const char **error);
 int msc_rules_cleanup(RulesSet *rules);
 
 #ifdef __cplusplus

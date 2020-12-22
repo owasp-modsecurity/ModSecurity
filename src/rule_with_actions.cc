@@ -87,7 +87,9 @@ RuleWithActions::RuleWithActions(
     std::vector<std::shared_ptr<Action>> newActions;
     if (actions) {
         for (auto &a : *actions) {
-            if (std::dynamic_pointer_cast<ActionTypeRuleMetaData>(a)) {
+            if (std::dynamic_pointer_cast<actions::ActionNotSupported>(a)) {
+                continue;
+            } else if (std::dynamic_pointer_cast<ActionTypeRuleMetaData>(a)) {
                 confs.push_back(std::dynamic_pointer_cast<ActionTypeRuleMetaData>(a));
                 continue;
             } else if (std::dynamic_pointer_cast<ActionDisruptive>(a)) {

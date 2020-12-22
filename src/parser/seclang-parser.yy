@@ -285,7 +285,13 @@ using namespace modsecurity::operators;
     if (t)
 
 
-#define ACTION_NOT_SUPPORTED(a, b) \
+#define ACTION_NOT_SUPPORTED(a, b, c) \
+    std::unique_ptr<actions::Action> d(new actions::ActionNotSupported(b)); \
+    a = std::move(d); \
+    driver.warn(c, "Action " + std::string(b) + " is not supported in version 3.");
+
+
+#define ACTION_NOT_SUPPORTED_OLD(a, b) \
     driver.error(b, "Action: " + std::string(a) + " is not yet supported."); \
     YYERROR;
 
@@ -1285,6 +1291,8 @@ expression:
       }
     | CONFIG_CONN_ENGINE CONFIG_VALUE_OFF
       {
+        driver.error(@0, "SecConnEngine is not yet supported.");
+        YYERROR;
       }
     | CONFIG_SEC_WEB_APP_ID
       {
@@ -1308,6 +1316,8 @@ expression:
       }
     | CONFIG_SEC_DISABLE_BACKEND_COMPRESS CONFIG_VALUE_OFF
       {
+        driver.error(@0, "SecDisableBackendCompression is not supported.");
+        YYERROR;
       }
     | CONFIG_CONTENT_INJECTION CONFIG_VALUE_ON
       {
@@ -1316,6 +1326,8 @@ expression:
       }
     | CONFIG_CONTENT_INJECTION CONFIG_VALUE_OFF
       {
+        driver.error(@0, "SecContentInjection is not yet supported.");
+        YYERROR;
       }
     | CONFIG_SEC_CHROOT_DIR
       {
@@ -1329,6 +1341,8 @@ expression:
       }
     | CONFIG_SEC_HASH_ENGINE CONFIG_VALUE_OFF
       {
+        driver.error(@0, "SecHashEngine is not yet supported.");
+        YYERROR;
       }
     | CONFIG_SEC_HASH_KEY
       {
@@ -1367,6 +1381,8 @@ expression:
       }
     | CONFIG_SEC_INTERCEPT_ON_ERROR CONFIG_VALUE_OFF
       {
+        driver.error(@0, "SecInterceptOnError is not yet supported.");
+        YYERROR;
       }
     | CONFIG_SEC_CONN_R_STATE_LIMIT
       {
@@ -1390,6 +1406,8 @@ expression:
       }
     | CONFIG_SEC_RULE_INHERITANCE CONFIG_VALUE_OFF
       {
+        driver.error(@0, "SecRuleInheritance is not yet supported.");
+        YYERROR;
       }
     | CONFIG_SEC_RULE_PERF_TIME
       {
@@ -1639,15 +1657,19 @@ expression:
         driver.m_remoteRulesActionOnFailed = RulesSet::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
     | CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
+      {
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
         driver.error(@0, "SecPcreMatchLimitRecursion is not currently supported. Default PCRE values are being used for now");
         YYERROR;
 */
+      }
     | CONFIG_DIR_PCRE_MATCH_LIMIT
+      {
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
         driver.error(@0, "SecPcreMatchLimit is not currently supported. Default PCRE values are being used for now");
         YYERROR;
 */
+      }
     | CONGIG_DIR_RESPONSE_BODY_MP
       {
         std::istringstream buf($1);
@@ -1677,23 +1699,25 @@ expression:
     | CONGIG_DIR_SEC_TMP_DIR
       {
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
-        std::stringstream ss;
-        ss << "As of ModSecurity version 3.0, SecTmpDir is no longer supported.";
-        ss << " Instead, you can use your web server configurations to control when";
-        ss << "and where to swap. ModSecurity will follow the web server decision.";
+         std::stringstream ss;
+         ss << "As of ModSecurity version 3.0, SecTmpDir is no longer supported.";
+         ss << " Instead, you can use your web server configurations to control when";
+         ss << "and where to swap. ModSecurity will follow the web server decision.";
         driver.error(@0, ss.str());
         YYERROR;
 */
       }
     | CONGIG_DIR_SEC_DATA_DIR
+      {
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
-        std::stringstream ss;
-        ss << "SecDataDir is not currently supported.";
-        ss << " Collections are kept in memory (in_memory-per_process) for now.";
-        ss << " When using a backend such as LMDB, temp data path is currently defined by the backend.";
+         std::stringstream ss;
+         ss << "SecDataDir is not currently supported.";
+         ss << " Collections are kept in memory (in_memory-per_process) for now.";
+         ss << " When using a backend such as LMDB, temp data path is currently defined by the backend.";
         driver.error(@0, ss.str());
         YYERROR;
 */
+      }
     | CONGIG_DIR_SEC_ARG_SEP
     | CONGIG_DIR_SEC_COOKIE_FORMAT
       {
@@ -1708,10 +1732,12 @@ expression:
         YYERROR;
       }
     | CONGIG_DIR_SEC_STATUS_ENGINE
+      {
 /* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
         driver.error(@0, "SecStatusEngine is not yet supported.");
         YYERROR;
 */
+      }
     | CONFIG_DIR_UNICODE_MAP_FILE
       {
         std::string error;
@@ -2606,7 +2632,7 @@ act:
       }
     | ACTION_APPEND
       {
-        ACTION_NOT_SUPPORTED("Append", @0);
+        ACTION_NOT_SUPPORTED_OLD("Append", @0);
       }
     | ACTION_AUDIT_LOG
       {
@@ -2626,18 +2652,15 @@ act:
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
       {
-        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED_OLD("ctl:auditEngine", @0);
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
       {
-        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED_OLD("ctl:auditEngine", @0);
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
       {
-        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED_OLD("ctl:auditEngine", @0);
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
@@ -2657,13 +2680,11 @@ act:
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_ON
       {
-        ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED($$, "ctl:forceRequestBodyVariable", @0);
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_OFF
       {
-        ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED($$, "ctl:forceRequestBodyVariable", @0);
       }
     | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_ON
       {
@@ -2707,7 +2728,7 @@ act:
       }
     | ACTION_DEPRECATE_VAR
       {
-        ACTION_NOT_SUPPORTED("DeprecateVar", @0);
+        ACTION_NOT_SUPPORTED_OLD("DeprecateVar", @0);
       }
     | ACTION_DROP
       {
@@ -2763,7 +2784,7 @@ act:
       }
     | ACTION_PAUSE
       {
-        ACTION_NOT_SUPPORTED("Pause", @0);
+        ACTION_NOT_SUPPORTED_OLD("Pause", @0);
       }
     | ACTION_PHASE
       {
@@ -2771,11 +2792,11 @@ act:
       }
     | ACTION_PREPEND
       {
-        ACTION_NOT_SUPPORTED("Prepend", @0);
+        ACTION_NOT_SUPPORTED_OLD("Prepend", @0);
       }
     | ACTION_PROXY
       {
-        ACTION_NOT_SUPPORTED("Proxy", @0);
+        ACTION_NOT_SUPPORTED_OLD("Proxy", @0);
       }
     | ACTION_REDIRECT run_time_string
       {
@@ -2787,23 +2808,23 @@ act:
       }
     | ACTION_SANITISE_ARG
       {
-        ACTION_NOT_SUPPORTED("SanitiseArg", @0);
+        ACTION_NOT_SUPPORTED_OLD("SanitiseArg", @0);
       }
     | ACTION_SANITISE_MATCHED
       {
-        ACTION_NOT_SUPPORTED("SanitiseMatched", @0);
+        ACTION_NOT_SUPPORTED_OLD("SanitiseMatched", @0);
       }
     | ACTION_SANITISE_MATCHED_BYTES
       {
-        ACTION_NOT_SUPPORTED("SanitiseMatchedBytes", @0);
+        ACTION_NOT_SUPPORTED_OLD("SanitiseMatchedBytes", @0);
       }
     | ACTION_SANITISE_REQUEST_HEADER
       {
-        ACTION_NOT_SUPPORTED("SanitiseRequestHeader", @0);
+        ACTION_NOT_SUPPORTED_OLD("SanitiseRequestHeader", @0);
       }
     | ACTION_SANITISE_RESPONSE_HEADER
       {
-        ACTION_NOT_SUPPORTED("SanitiseResponseHeader", @0);
+        ACTION_NOT_SUPPORTED_OLD("SanitiseResponseHeader", @0);
       }
     | ACTION_SETENV run_time_string
       {

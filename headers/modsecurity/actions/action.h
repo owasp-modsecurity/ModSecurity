@@ -120,6 +120,19 @@ class Action {
     }
 };
 
+class ActionNotSupported : public Action {
+ public:
+    ActionNotSupported() : Action()
+    { };
+
+    explicit ActionNotSupported(const std::string& action)
+        : Action(action)
+    { };
+
+    ActionNotSupported(const ActionNotSupported &other) = delete;
+    ActionNotSupported &operator=(const ActionNotSupported& a) = delete;
+};
+
 
 }  // namespace actions
 }  // namespace modsecurity
