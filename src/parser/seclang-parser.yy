@@ -284,6 +284,8 @@ using namespace modsecurity::operators;
     } \
     if (t)
 
+#define CONFIG_DEPRECATED(a, b, c) \
+    driver.warn(c, "Configuration " + std::string(a) + " is deprecated and not working. You can read more info about it at https://github.com/SpiderLabs/ModSecurity/wiki/deprecated#" + b);
 
 #define ACTION_NOT_SUPPORTED(a, b, c) \
     std::unique_ptr<actions::Action> d(new actions::ActionNotSupported(b)); \
@@ -1257,19 +1259,19 @@ expression:
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_ON
       {
-        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
+        CONFIG_DEPRECATED("SecRequestBodyAccess", "requestBodyAccess", @0)
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_OFF
       {
-        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
+        CONFIG_DEPRECATED("SecRequestBodyAccess", "requestBodyAccess", @0)
       }
     | CONFIG_DIR_RES_BODY CONFIG_VALUE_ON
       {
-        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
+        CONFIG_DEPRECATED("SecResponseBodyAccess", "responseBodyAccess", @0)
       }
     | CONFIG_DIR_RES_BODY CONFIG_VALUE_OFF
       {
-        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::FalseConfigBoolean;
+        CONFIG_DEPRECATED("SecResponseBodyAccess", "responseBodyAccess", @0)
       }
     | CONFIG_SEC_ARGUMENT_SEPARATOR
       {
@@ -1897,26 +1899,32 @@ variables_may_be_quoted:
 var:
     VARIABLE_ARGS DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::Args_DictElement($2));
       }
     | VARIABLE_ARGS DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::Args_DictElementRegexp($2));
       }
     | VARIABLE_ARGS
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::Args_NoDictElement());
       }
     | VARIABLE_ARGS_POST DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsPost_DictElement($2));
       }
     | VARIABLE_ARGS_POST DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsPost_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_POST
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsPost_NoDictElement());
       }
     | VARIABLE_ARGS_GET DICT_ELEMENT
@@ -1933,62 +1941,77 @@ var:
       }
     | VARIABLE_FILES_SIZES DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesSizes_DictElement($2));
       }
     | VARIABLE_FILES_SIZES DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesSizes_DictElementRegexp($2));
       }
     | VARIABLE_FILES_SIZES
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesSizes_NoDictElement());
       }
     | VARIABLE_FILES_NAMES DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesNames_DictElement($2));
       }
     | VARIABLE_FILES_NAMES DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesNames_DictElementRegexp($2));
       }
     | VARIABLE_FILES_NAMES
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesNames_NoDictElement());
       }
     | VARIABLE_FILES_TMP_CONTENT DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesTmpContent_DictElement($2));
       }
     | VARIABLE_FILES_TMP_CONTENT DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesTmpContent_DictElementRegexp($2));
       }
     | VARIABLE_FILES_TMP_CONTENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesTmpContent_NoDictElement());
       }
     | VARIABLE_MULTIPART_FILENAME DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultiPartFileName_DictElement($2));
       }
     | VARIABLE_MULTIPART_FILENAME DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultiPartFileName_DictElementRegexp($2));
       }
     | VARIABLE_MULTIPART_FILENAME
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultiPartFileName_NoDictElement());
       }
     | VARIABLE_MULTIPART_NAME DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultiPartName_DictElement($2));
       }
     | VARIABLE_MULTIPART_NAME DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultiPartName_DictElementRegexp($2));
       }
     | VARIABLE_MULTIPART_NAME
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultiPartName_NoDictElement());
       }
     | VARIABLE_MATCHED_VARS_NAMES DICT_ELEMENT
@@ -2017,14 +2040,17 @@ var:
       }
     | VARIABLE_FILES DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::Files_DictElement($2));
       }
     | VARIABLE_FILES DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::Files_DictElementRegexp($2));
       }
     | VARIABLE_FILES
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::Files_NoDictElement());
       }
     | VARIABLE_REQUEST_COOKIES DICT_ELEMENT
@@ -2125,14 +2151,17 @@ var:
       }
     | VARIABLE_FILES_TMP_NAMES DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesTmpNames_DictElement($2));
       }
     | VARIABLE_FILES_TMP_NAMES DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesTmpNames_DictElementRegexp($2));
       }
     | VARIABLE_FILES_TMP_NAMES
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesTmpNames_NoDictElement());
       }
     | VARIABLE_RESOURCE run_time_string
@@ -2233,14 +2262,17 @@ var:
       }
     | VARIABLE_ARGS_NAMES DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsNames_DictElement($2));
       }
     | VARIABLE_ARGS_NAMES DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsNames_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_NAMES
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsNames_NoDictElement());
       }
     | VARIABLE_ARGS_GET_NAMES DICT_ELEMENT
@@ -2258,14 +2290,17 @@ var:
 
     | VARIABLE_ARGS_POST_NAMES DICT_ELEMENT
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsPostNames_DictElement($2));
       }
     | VARIABLE_ARGS_POST_NAMES DICT_ELEMENT_REGEXP
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsPostNames_DictElementRegexp($2));
       }
     | VARIABLE_ARGS_POST_NAMES
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsPostNames_NoDictElement());
       }
 
@@ -2284,6 +2319,7 @@ var:
 
     | VARIABLE_RESPONSE_CONTENT_TYPE
       {
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ResponseContentType());
       }
 
@@ -2301,6 +2337,7 @@ var:
       }
     | VARIABLE_ARGS_COMBINED_SIZE
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ArgsCombinedSize());
       }
    | VARIABLE_AUTH_TYPE
@@ -2309,18 +2346,22 @@ var:
       }
     | VARIABLE_FILES_COMBINED_SIZE
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FilesCombinedSize());
       }
     | VARIABLE_FULL_REQUEST
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FullRequest());
       }
     | VARIABLE_FULL_REQUEST_LENGTH
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::FullRequestLength());
       }
     | VARIABLE_INBOUND_DATA_ERROR
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::InboundDataError());
       }
     | VARIABLE_MATCHED_VAR
@@ -2341,6 +2382,7 @@ var:
       }
     | VARIABLE_MULTIPART_CRLF_LF_LINES
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultipartCrlfLFLines());
       }
     | VARIABLE_MULTIPART_DATA_AFTER
@@ -2385,14 +2427,17 @@ var:
       }
     | VARIABLE_MULTIPART_STRICT_ERROR
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultipartStrictError());
       }
     | VARIABLE_MULTIPART_UNMATCHED_BOUNDARY
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::MultipartUnmatchedBoundary());
       }
     | VARIABLE_OUTBOUND_DATA_ERROR
       {
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::OutboundDataError());
       }
     | VARIABLE_PATH_INFO
@@ -2417,22 +2462,27 @@ var:
       }
     | VARIABLE_REQBODY_ERROR
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ReqbodyError());
       }
     | VARIABLE_REQBODY_ERROR_MSG
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ReqbodyErrorMsg());
       }
     | VARIABLE_REQBODY_PROCESSOR
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ReqbodyProcessor());
       }
     | VARIABLE_REQBODY_PROCESSOR_ERROR
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ReqbodyProcessorError());
       }
     | VARIABLE_REQBODY_PROCESSOR_ERROR_MSG
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ReqbodyProcessorErrorMsg());
       }
     | VARIABLE_REQUEST_BASENAME
@@ -2441,10 +2491,12 @@ var:
       }
     | VARIABLE_REQUEST_BODY
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::RequestBody());
       }
     | VARIABLE_REQUEST_BODY_LENGTH
       {
+        driver.m_secRequestBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::RequestBodyLength());
       }
     | VARIABLE_REQUEST_FILE_NAME
@@ -2473,10 +2525,12 @@ var:
       }
     | VARIABLE_RESPONSE_BODY
       {
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ResponseBody());
       }
     | VARIABLE_RESPONSE_CONTENT_LENGTH
       {
+        driver.m_secResponseBodyAccess = modsecurity::RulesSetProperties::TrueConfigBoolean;
         VARIABLE_CONTAINER($$, new variables::ResponseContentLength());
       }
     | VARIABLE_RESPONSE_PROTOCOL

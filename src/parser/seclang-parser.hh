@@ -323,6 +323,8 @@ using namespace modsecurity::operators;
     } \
     if (t)
 
+#define CONFIG_DEPRECATED(a, b, c) \
+    driver.warn(c, "Configuration " + std::string(a) + " is deprecated and not working. You can read more info about it at https://github.com/SpiderLabs/ModSecurity/wiki/deprecated#" + b);
 
 #define ACTION_NOT_SUPPORTED(a, b, c) \
     std::unique_ptr<actions::Action> d(new actions::ActionNotSupported(b)); \
@@ -360,7 +362,7 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 364 "seclang-parser.hh"
+#line 366 "seclang-parser.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -494,7 +496,7 @@ using namespace modsecurity::operators;
 #endif
 
 namespace yy {
-#line 498 "seclang-parser.hh"
+#line 500 "seclang-parser.hh"
 
 
 
@@ -8635,7 +8637,7 @@ switch (yykind)
   }
 
 } // yy
-#line 8639 "seclang-parser.hh"
+#line 8641 "seclang-parser.hh"
 
 
 

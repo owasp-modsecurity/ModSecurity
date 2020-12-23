@@ -913,7 +913,8 @@ int Transaction::processRequestBody() {
 
     if (m_rules->m_secRequestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
         if (m_requestBodyAccess != RulesSetProperties::TrueConfigBoolean) {
-            ms_dbg(4, "Request body processing is disabled");
+            ms_dbg(4, "Request body processing is disabled, evaluating rules on the phase and returning...");
+            this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
             return true;
         } else {
             ms_dbg(4, "Request body processing is disabled, but " \
@@ -924,7 +925,8 @@ int Transaction::processRequestBody() {
         if (m_requestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
             ms_dbg(4, "Request body processing is enabled, but " \
                 "disabled to this transaction due to ctl:requestBodyAccess " \
-                "action");
+                "action. Evaluating rules on the phase and returning...");
+            this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
             return true;
         }
     }
@@ -1209,7 +1211,8 @@ int Transaction::processResponseBody() {
     }
 
     if (m_rules->m_secResponseBodyAccess != RulesSetProperties::TrueConfigBoolean) {
-        ms_dbg(4, "Response body is disabled, returning... " + std::to_string(m_rules->m_secResponseBodyAccess));
+        ms_dbg(4, "Response body is disabled, evaluating rules on the phase and returning...");
+        m_rules->evaluate(modsecurity::ResponseBodyPhase, this);
         return true;
     }
 

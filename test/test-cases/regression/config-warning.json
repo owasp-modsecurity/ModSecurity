@@ -59,5 +59,31 @@
       "SecRule REQUEST_URI \"@contains path1\" \"phase:1,block,id:5,ctl:forceRequestBodyVariable=Off\"",
       "SecRule REQUEST_URI \"@contains path1\" \"phase:1,block,id:7,ctl:forceRequestBodyVariable=On\""
     ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing parser warning (4/n)",
+    "expected":{
+      "parser_warn": "Configuration SecRequestBodyAccess is deprecated and not working. You can read more info about it at https://github.com/SpiderLabs/ModSecurity/wiki/deprecated#requestBodyAccess"
+    },
+    "client":{
+      "ip":"200.249.12.31",
+      "port":12300
+    },
+    "request":{
+      "headers":{
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+      },
+      "uri":"/path1",
+      "method":"GET"
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "rules":[
+      "SecRequestBodyAccess On"
+    ]
   }
 ]
