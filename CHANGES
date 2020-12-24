@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Use explicit path for cross-compile environments.
+    [Issue #2485 - @dtoubelis]
   - Fix: FILES variable does not use multipart part name for key
     [Issue #2377 - @martinhsv]
   - Replaces put with setenv in SetEnv action

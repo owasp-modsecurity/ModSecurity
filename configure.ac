@@ -55,7 +55,7 @@ AC_PROG_MAKE_SET
 # AX_CXX_COMPILE_STDCXX_11(,mandatory)
 
 # Check for libinjection
-if ! test -f "others/libinjection/src/libinjection_html5.c"; then
+if ! test -f "${srcdir}/others/libinjection/src/libinjection_html5.c"; then
 AC_MSG_ERROR([\
 
 
