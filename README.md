@@ -21,26 +21,26 @@ and applying traditional ModSecurity processing. In general, it provides the
 capability to load/interpret rules written in the ModSecurity SecRules format
 and apply them to HTTP content provided by your application via Connectors.
 
-If you are looking for ModSecurity for Apache (aka ModSecurity v2.x), it is still under maintenence and available:
+If you are looking for ModSecurity for Apache (aka ModSecurity v2.x), it is still under maintenance and available:
 [here](https://github.com/SpiderLabs/ModSecurity/tree/v2/master).
 
 ### What is the difference between this project and the old ModSecurity (v2.x.x)?
 
-* All Apache dependences have been removed
+* All Apache dependencies have been removed
 * Higher performance
 * New features
 * New architecture
 
 Libmodsecurity is a complete rewrite of the ModSecurity platform. When it was first devised the ModSecurity project started as just an Apache module. Over time the project has been extended, due to popular demand, to support other platforms including (but not limited to) Nginx and IIS. In order to provide for the growing demand for additional platform support, it has became necessary to remove the Apache dependencies underlying this project, making it more platform independent.
 
-As a result of this goal we have rearchitected Libmodsecurity such that it is no longer dependent on the Apache web server (both at compilation and during runtime). One side effect of this is that across all platforms users can expect increased performance. Additionally, we have taken this opprotunity to lay the groundwork for some new features that users have been long seeking. For example we are looking to nativly support auditlogs in the JSON format, along with a host of other functionality in future versions.
+As a result of this goal we have rearchitected Libmodsecurity such that it is no longer dependent on the Apache web server (both at compilation and during runtime). One side effect of this is that across all platforms users can expect increased performance. Additionally, we have taken this opportunity to lay the groundwork for some new features that users have been long seeking. For example we are looking to natively support auditlogs in the JSON format, along with a host of other functionality in future versions.
 
 
 ### It is no longer just a module.
 
-The 'ModSecurity' branch no longer contains the traditional module logic (for Nginx, Apache, and IIS) that has traditionally been packaged all together. Instead, this branch only contains the library portion (libmodsecurity) for this project. This library is consumed by what we have termed 'Connectors' these connectors will interface with your webserver and provide the library with a common format that it undersands. Each of these connectors is maintained as a seperate GitHub project. For instance, the Nginx connector is supplied by the ModSecurity-nginx project (https://github.com/SpiderLabs/ModSecurity-nginx).
+The 'ModSecurity' branch no longer contains the traditional module logic (for Nginx, Apache, and IIS) that has traditionally been packaged all together. Instead, this branch only contains the library portion (libmodsecurity) for this project. This library is consumed by what we have termed 'Connectors' these connectors will interface with your webserver and provide the library with a common format that it understands. Each of these connectors is maintained as a separate GitHub project. For instance, the Nginx connector is supplied by the ModSecurity-nginx project (https://github.com/SpiderLabs/ModSecurity-nginx).
 
-Keeping these connectors seperated allows each project to be have different release cycles, issues and development trees. Addtionally, it means that when you install ModSecurity v3 you only get exactly what you need, no extras you won't be using.
+Keeping these connectors separated allows each project to be have different release cycles, issues and development trees. Additionally, it means that when you install ModSecurity v3 you only get exactly what you need, no extras you won't be using.
 
 # Compilation
 
@@ -78,7 +78,7 @@ Windows build is not ready yet.
 ## Dependencies
 
 This library is written in C++ using the C++11 standards. It also uses Flex
-and Yacc to produce the “Sec Rules Language” parser. Other, manditory dependencies include YAJL, as ModSecurity uses JSON for producing logs and its testing framework, libpcre (not yet manditory) for processing regular expressions in SecRules, and libXML2 (not yet manditory) which is used for parsing XML requests.
+and Yacc to produce the “Sec Rules Language” parser. Other, mandatory dependencies include YAJL, as ModSecurity uses JSON for producing logs and its testing framework, libpcre (not yet mandatory) for processing regular expressions in SecRules, and libXML2 (not yet mandatory) which is used for parsing XML requests.
 
 All others dependencies are related to operators specified within SecRules or configuration directives and may not be required for compilation. A short list of such dependencies is as follows:
 
@@ -97,7 +97,7 @@ The library provides a C++ and C interface. Some resources are currently only
 available via the C++ interface, for instance, the capability to create custom logging
 mechanism (see the regression test to check for how those logging mechanism works).
 The objective is to have both APIs (C, C++) providing the same functionality,
-if you find an aspect of the API that is missing via a perticular interface, please open an issue.
+if you find an aspect of the API that is missing via a particular interface, please open an issue.
 
 Inside the subfolder examples, there are simple examples on how to use the API.
 Below some are illustrated:
@@ -199,7 +199,7 @@ A TODO list is also available as part of the Doxygen documentation.
 
 Along with the manual testing, we strongly recommend you to use the our
 regression tests and unit tests. If you have implemented an operator, don’t
-forget to create unit tests for it. If you impliment anything else, it is encouraged that you develop complimentary regression tests for it.
+forget to create unit tests for it. If you implement anything else, it is encouraged that you develop complimentary regression tests for it.
 
 The regression test and unit test utilities are native and do not demand any
 external tool or script, although you need to fetch the test cases from other
@@ -222,7 +222,7 @@ Before start the debugging process, make sure of where your bug is. The problem
 could be on your connector or in libmodsecurity. In order to identify where the
 bug is, it is recommended that you develop a regression test that mimics the
 scenario where the bug is happening. If the bug is reproducible with the
-regression-test utility, then it will be far simpliar to debug and ensure that it never occurs again. On Linux it is
+regression-test utility, then it will be far simpler to debug and ensure that it never occurs again. On Linux it is
 recommended that anyone undertaking debugging utilize gdb and/or valgrind as needed.
 
 During the configuration/compilation time, you may want to disable the compiler
@@ -271,7 +271,3 @@ The libModSecurity design allows the integration with bindings. There is an effo
 
 Having our packages in distros on time is a desire that we have, so let us know
 if there is anything we can do to facilitate your work as a packager.
-
-
-
-
