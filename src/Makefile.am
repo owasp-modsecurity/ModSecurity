@@ -331,7 +331,8 @@ libmodsecurity_la_CPPFLAGS = \
 	$(SSDEEP_CFLAGS) \
 	$(MAXMIND_CFLAGS) \
 	$(LUA_CFLAGS) \
-	$(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(CXX_FLAGS)
 
 
 libmodsecurity_la_LDFLAGS = \

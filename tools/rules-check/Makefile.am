@@ -34,7 +34,8 @@ modsec_rules_check_CPPFLAGS = \
 	$(PCRE_CFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(MAXMIND_CFLAGS) \
-	$(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(CXX_FLAGS)
 
 MAINTAINERCLEANFILES = \
         Makefile.in
