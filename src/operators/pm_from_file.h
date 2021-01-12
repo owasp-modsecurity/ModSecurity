@@ -35,7 +35,7 @@ class PmFromFile : public Pm {
     explicit PmFromFile(const std::string &n, std::unique_ptr<RunTimeString> param)
         : Pm(n, std::move(param)) { }
 
-    bool init(const std::string &file, std::string *error) override;
+    bool init(std::shared_ptr<std::string> file, std::string *error) override;
 
 private:
     static bool isComment(const std::string &s);

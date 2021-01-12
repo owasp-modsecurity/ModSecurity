@@ -63,9 +63,9 @@ namespace modsecurity {
 RuleWithActions::RuleWithActions(
     Actions *actions,
     Transformations *transformations,
-    std::unique_ptr<std::string> fileName,
+    std::shared_ptr<std::string> fileName,
     int lineNumber)
-    : Rule(std::move(fileName), lineNumber),
+    : Rule(fileName, lineNumber),
     RuleWithActionsProperties(transformations),
     m_ruleId(0),
     m_chainedRuleChild(nullptr),
@@ -96,6 +96,7 @@ RuleWithActions::RuleWithActions(
             }
             newActions.push_back(a);
         }
+        delete actions;
     }
 
 

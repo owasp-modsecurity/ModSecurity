@@ -25,7 +25,7 @@ namespace modsecurity {
 namespace operators {
 
 
-bool IpMatch::init(const std::string &file, std::string *error) {
+bool IpMatch::init(std::shared_ptr<std::string> file, std::string *error) {
     std::string e("");
     bool res = m_tree.addFromBuffer(m_param, &e);
 

@@ -43,7 +43,7 @@ class ValidateByteRange : public Operator {
         RuleMessage *ruleMessage) override;
 
     bool getRange(const bpstd::string_view &rangeRepresentation, std::string *error);
-    bool init(const std::string& file, std::string *error) override;
+    bool init(std::shared_ptr<std::string>  file, std::string *error) override;
  private:
     std::vector<std::string> ranges;
     char table[32];

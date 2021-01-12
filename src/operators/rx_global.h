@@ -54,7 +54,7 @@ class RxGlobal : public Operator {
         const bpstd::string_view& input,
         RuleMessage *ruleMessage) override;
 
-    bool init(const std::string &arg, std::string *error) override;
+    bool init(std::shared_ptr<std::string> arg, std::string *error) override;
 
  private:
     Regex *m_re;

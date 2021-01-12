@@ -27,7 +27,7 @@ namespace operators {
 
 #ifdef WITH_LIBXML2
 
-bool ValidateSchema::init(const std::string &file, std::string *error) {
+bool ValidateSchema::init(std::shared_ptr<std::string> file, std::string *error) {
     std::string err;
     m_resource = utils::find_resource(m_param, file, &err);
     if (m_resource == "") {

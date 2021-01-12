@@ -31,6 +31,10 @@ namespace utils {
 double cpu_seconds(void);
 std::string find_resource(const std::string& file, const std::string& config,
     std::string *err);
+
+std::string find_resource(const std::string& file, std::shared_ptr<std::string> config,
+    std::string *err);
+
 std::string get_path(const std::string& file);
 std::list<std::string> expandEnv(const std::string& var, int flags);
 bool createDir(std::string dir, int mode, std::string *error);

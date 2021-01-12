@@ -42,9 +42,9 @@ class RuleUnconditional : public RuleWithActions {
     RuleUnconditional(
         Actions *actions,
         Transformations *transformations,
-        std::unique_ptr<std::string> fileName,
+        std::shared_ptr<std::string> fileName,
         int lineNumber)
-        : RuleWithActions(actions, transformations, std::move(fileName), lineNumber) { }
+        : RuleWithActions(actions, transformations, fileName, lineNumber) { }
 
     RuleUnconditional(const RuleUnconditional &r)
         : RuleWithActions(r)

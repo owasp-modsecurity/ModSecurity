@@ -29,7 +29,7 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Rx::init(const std::string &file, std::string *error) {
+bool Rx::init(std::shared_ptr<std::string> file, std::string *error) {
     if (m_string->containsMacro() == false) {
         m_re = new Regex(m_param);
     }

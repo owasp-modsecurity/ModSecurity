@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 
     if (*args == NULL) {
         print_help(argv[0]);
-        return 0;
+        goto ret;
     }
 
     while (*args != NULL) {
@@ -90,19 +90,22 @@ int main(int argc, char **argv) {
         std::cout << "Loaded " << std::to_string(r) << " rules." << std::endl;
         if (err.empty() == false) {
             std::cerr << "    " << err << std::endl;
+            goto end;
         }
         rules->dump();
 next:
         args++;
     }
 
-    delete rules;
-
+end:
     if (ret < 0) {
         std::cout << "Test failed." << std::endl;
     } else {
         std::cout << "Test ok." << std::endl;
     }
+
+ret:
+    delete rules;
 
     return ret;
 }

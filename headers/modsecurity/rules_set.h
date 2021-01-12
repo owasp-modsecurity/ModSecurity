@@ -60,7 +60,8 @@ class RulesSet : public RulesSetProperties {
 #endif
         { }
 
-    ~RulesSet() { }
+    ~RulesSet()
+    { }
 
     int loadFromUri(const char *uri);
     int loadRemote(const char *key, const char *uri);

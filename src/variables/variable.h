@@ -711,6 +711,24 @@ class VariableRegex : public Variable {
 
 class Variables : public std::vector<Variable *> {
  public:
+
+    explicit Variables(bool cleanup = true)
+        : m_cleanup(cleanup)
+    { }
+
+    Variables(const Variable &a) = delete;
+    Variables& operator=(const Variables& other) = delete;
+
+    ~Variables() {
+        if (!m_cleanup) {
+            return;
+        }
+
+        for (auto *a : *this) {
+            delete a;
+        }
+    }
+
     bool contains(Variable *v) {
         return std::find_if(begin(), end(),
             [v](Variable *m) -> bool { return *v == *m; }) != end();
@@ -739,6 +757,8 @@ class Variables : public std::vector<Variable *> {
         }
         return names;
     }
+ private:
+    bool m_cleanup;
 };
 
 

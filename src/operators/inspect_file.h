@@ -35,7 +35,7 @@ class InspectFile : public Operator {
         m_file(""),
         m_isScript(false) { }
 
-    bool init(const std::string &file, std::string *error) override;
+    bool init(std::shared_ptr<std::string> file, std::string *error) override;
 
     bool evaluate(Transaction *transaction,
         const RuleWithActions *rule,

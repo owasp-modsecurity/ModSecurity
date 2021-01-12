@@ -48,7 +48,7 @@ class Pm : public Operator {
         RuleMessage *ruleMessage) override;
 
 
-    bool init(const std::string &file, std::string *error) override;
+    bool init(std::shared_ptr<std::string> file, std::string *error) override;
     void postOrderTraversal(acmp_btree_node_t *node);
     void cleanup(acmp_node_t *n);
 

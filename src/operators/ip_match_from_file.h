@@ -31,7 +31,7 @@ class IpMatchFromFile : public IpMatch {
         : IpMatch("IpMatchFromFile", std::move(param)) { }
     IpMatchFromFile(const std::string &n, std::unique_ptr<RunTimeString> param)
         : IpMatch(n, std::move(param)) { }
-    bool init(const std::string& file, std::string *error) override;
+    bool init(std::shared_ptr<std::string>  file, std::string *error) override;
 };
 
 }  // namespace operators

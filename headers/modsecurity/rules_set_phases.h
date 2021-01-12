@@ -47,6 +47,15 @@ class RulesSetPhases {
     using iterator = typename container::iterator;
     using const_iterator = typename container::const_iterator;
 
+    RulesSetPhases()
+        : m_rulesAtPhase()
+    { }
+
+    RulesSetPhases(const RulesSetPhases&) = delete;
+
+    virtual ~RulesSetPhases()
+    { };
+
     void insert(std::shared_ptr<Rule> rule);
     void append(RulesSetPhases *from);
 

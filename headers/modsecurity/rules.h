@@ -47,6 +47,17 @@ class Rules {
     using iterator=typename container::iterator;
     using const_iterator=typename container::const_iterator;
 
+    Rules()
+        : m_rules()
+    { };
+
+    Rules(const Rules&) = delete;
+
+    virtual ~Rules() {
+        m_rules.clear();
+    }
+
+
     int append(Rules *from);
 
     bool insert(const std::shared_ptr<Rule> &rule);

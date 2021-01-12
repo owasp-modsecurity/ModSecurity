@@ -91,7 +91,7 @@ int VerifyCC::luhnVerify(const char *ccnumber, int len) {
 
 
 
-bool VerifyCC::init(const std::string &param2, std::string *error) {
+bool VerifyCC::init(std::shared_ptr<std::string> param2, std::string *error) {
     const char *errptr = NULL;
     int erroffset = 0;
 

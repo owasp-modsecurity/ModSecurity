@@ -40,6 +40,7 @@
 
 # include <iostream>
 # include <string>
+# include <memory>
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
@@ -61,7 +62,7 @@ namespace yy {
   {
   public:
     /// Type for file name.
-    typedef const std::string filename_type;
+    typedef const std::shared_ptr<std::string>  filename_type;
     /// Type for line and column numbers.
     typedef int counter_type;
 
@@ -174,12 +175,14 @@ namespace yy {
     location (const position& b, const position& e)
       : begin (b)
       , end (e)
+      , m_fileName()
     {}
 
     /// Construct a 0-width location in \a p.
     explicit location (const position& p = position ())
       : begin (p)
       , end (p)
+      , m_fileName()
     {}
 
     /// Construct a 0-width location in \a f, \a l, \a c.
@@ -188,6 +191,7 @@ namespace yy {
                        counter_type c = 1)
       : begin (f, l, c)
       , end (f, l, c)
+      , m_fileName()
     {}
 
 
@@ -222,12 +226,28 @@ namespace yy {
     }
     /** \} */
 
+    void setFileName(std::string fileName) {
+      m_fileName = std::make_shared<std::string>(fileName);
+      begin.filename = &m_fileName;
+      end.filename = &m_fileName;
+    }
+
+    std::shared_ptr<std::string> getFileName() {
+      if (!m_fileName) {
+        if (end.filename) {
+          m_fileName = *end.filename;
+        }
+      }
+      return m_fileName;
+    }
 
   public:
     /// Beginning of the located region.
     position begin;
     /// End of the located region.
     position end;
+  private:
+    std::shared_ptr<std::string> m_fileName;
   };
 
   /// Join two locations, in place.

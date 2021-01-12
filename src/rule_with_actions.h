@@ -79,11 +79,14 @@ class RuleWithActions : public Rule, public RuleWithActionsProperties {
     RuleWithActions(
         Actions *a,
         Transformations *t,
-        std::unique_ptr<std::string> fileName,
+        std::shared_ptr<std::string> fileName,
         int lineNumber);
 
     RuleWithActions(const RuleWithActions &r);
     RuleWithActions &operator=(const RuleWithActions& r);
+
+    virtual ~RuleWithActions()
+    { };
 
     virtual bool evaluate(Transaction *transaction) const override;
 

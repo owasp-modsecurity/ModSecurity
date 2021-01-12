@@ -77,7 +77,8 @@ void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
 
     if (t->type == "op") {
         Operator *op = Operator::instantiate(t->name, t->param);
-        op->init(t->filename, &error);
+        std::shared_ptr<std::string> fileName = std::make_shared<std::string>(t->filename);
+        op->init(fileName, &error);
         int ret = op->evaluate(NULL, NULL, t->input, NULL);
         t->obtained = ret;
         if (ret != t->ret) {

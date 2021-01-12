@@ -23,7 +23,6 @@ depcomp
 .dirstamp
 src/config.h
 src/config.h.in
-src/location.hh
 src/position.hh
 src/stack.hh
 src/stamp-h1

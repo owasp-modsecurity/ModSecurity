@@ -44,8 +44,8 @@ class Operator;
 
 class Rule {
  public:
-    Rule(std::unique_ptr<std::string> fileName, int lineNumber)
-        : m_fileName(std::move(fileName)),
+    Rule(std::shared_ptr<std::string> fileName, int lineNumber)
+        : m_fileName(fileName),
         m_lineNumber(lineNumber),
         m_phase(modsecurity::Phases::RequestHeadersPhase)
     { }

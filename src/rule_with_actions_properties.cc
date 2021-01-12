@@ -44,8 +44,15 @@ RuleWithActionsProperties::RuleWithActionsProperties(Transformations *transforma
     m_setVars(),
     m_disruptiveAction(nullptr),
     m_tags(),
-    m_transformations(transformations != nullptr ? *transformations : Transformations())
-{ }
+    m_transformations()
+{
+    if (transformations != nullptr) {
+        for (auto &t : *transformations) {
+            m_transformations.push_back(t);
+        }
+    }
+    delete transformations;
+}
 
 
 

@@ -27,7 +27,7 @@ namespace modsecurity {
 namespace operators {
 
 
-bool RxGlobal::init(const std::string &arg, std::string *error) {
+bool RxGlobal::init(std::shared_ptr<std::string> arg, std::string *error) {
     if (m_string->containsMacro() == false) {
         m_re = new Regex(m_param);
     }

@@ -23,7 +23,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool FuzzyHash::init(const std::string &param2, std::string *error) {
+bool FuzzyHash::init(std::shared_ptr<std::string> param2, std::string *error) {
 #ifdef WITH_SSDEEP
     std::string digit;
     std::string file;

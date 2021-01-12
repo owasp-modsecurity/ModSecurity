@@ -64,11 +64,13 @@ typedef struct Driver_t Driver;
 class Driver : public RulesSetProperties {
  public:
     Driver();
+    Driver(const Driver &d) = delete;
+    Driver &operator=(const Driver& other) = delete;
     virtual ~Driver();
 
-    int addSecRule(std::unique_ptr<RuleWithActions> rule);
+    int addSecRule(std::unique_ptr<RuleWithOperator> rule);
     int addSecAction(std::unique_ptr<RuleWithActions> rule);
-    int addSecMarker(std::string marker, std::unique_ptr<std::string> fileName, int lineNumber);
+    int addSecMarker(std::string marker, std::shared_ptr<std::string> fileName, int lineNumber);
     int addSecRuleScript(std::unique_ptr<RuleScript> rule);
 
     bool scan_begin();
@@ -82,16 +84,29 @@ class Driver : public RulesSetProperties {
 
     bool trace_parsing;
 
-    void error(const yy::location& l, const std::string& m);
-    void error(const yy::location& l, const std::string& m,
+    void error(const yy::seclang_parser::location_type& l, const std::string& m);
+    void error(const yy::seclang_parser::location_type& l, const std::string& m,
         const std::string& c);
 
-    std::list<yy::location *> loc;
+    void newLocation(std::string file) {
+        m_location.push_back(std::make_shared<yy::seclang_parser::location_type>());
+        m_location.back()->setFileName(file);
+    }
+
+    yy::seclang_parser::location_type *currentLocation() {
+        return m_location.back().get();
+    }
+
+    void popLocation() {
+        m_location.pop_back();
+    }
 
     std::string buffer;
     RuleWithActions *m_lastRule;
 
     RulesSetPhases m_rulesSetPhases;
+ private:
+    std::list<std::shared_ptr<yy::seclang_parser::location_type>> m_location;
 };
 
 

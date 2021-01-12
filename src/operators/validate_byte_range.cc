@@ -85,7 +85,7 @@ bool ValidateByteRange::getRange(const bpstd::string_view &rangeRepresentation,
 }
 
 
-bool ValidateByteRange::init(const std::string &file,
+bool ValidateByteRange::init(std::shared_ptr<std::string> file,
     std::string *error) {
     size_t pos = m_param.find_first_of(",");
 

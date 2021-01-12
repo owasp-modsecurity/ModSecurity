@@ -43,7 +43,7 @@ bool PmFromFile::isComment(const std::string &s) {
     return true;
 }
 
-bool PmFromFile::init(const std::string &config, std::string *error) {
+bool PmFromFile::init(std::shared_ptr<std::string> config, std::string *error) {
     std::istream *iss;
 
     if (m_param.compare(0, 8, "https://") == 0) {
@@ -56,7 +56,7 @@ bool PmFromFile::init(const std::string &config, std::string *error) {
         iss = new std::stringstream(client.content);
     } else {
         std::string err;
-        std::string resource = utils::find_resource(m_param, config.c_str(), &err);
+        std::string resource = utils::find_resource(m_param, config.get()->c_str(), &err);
         iss = new std::ifstream(resource, std::ios::in);
 
         if (((std::ifstream *)iss)->is_open() == false) {

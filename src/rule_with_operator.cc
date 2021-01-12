@@ -58,7 +58,7 @@ RuleWithOperator::RuleWithOperator(Operator *op,
     variables::Variables *_variables,
     Actions *actions,
     Transformations *transformations,
-    std::unique_ptr<std::string> fileName,
+    std::shared_ptr<std::string> fileName,
     int lineNumber)
     : RuleWithActions(actions, transformations, std::move(fileName), lineNumber),
     m_variables(std::unique_ptr<variables::Variables>(_variables)),
@@ -74,8 +74,8 @@ RuleWithOperator::RuleWithOperator(Operator *op,
 
 
 
-RuleWithOperator::~RuleWithOperator() {
-}
+RuleWithOperator::~RuleWithOperator()
+{ }
 
 
 void RuleWithOperator::updateMatchedVars(Transaction *trans,
@@ -223,9 +223,9 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
     variables::Variables *variables = m_variables.get();
     bool recursiveGlobalRet;
     std::string eparam;
-    variables::Variables vars;
+    variables::Variables vars(false);
     vars.reserve(4);
-    variables::Variables exclusion;
+    variables::Variables exclusion(false);
 
     RuleWithActions::evaluate(trans);
 
@@ -278,6 +278,7 @@ bool RuleWithOperator::evaluate(Transaction *trans) const {
             continue;
         }
         e.clear();
+
         var->evaluate(trans, &e);
         for (const auto &vv : e) {
             TransformationsResults transformationsResults;

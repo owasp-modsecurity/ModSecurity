@@ -25,7 +25,7 @@ namespace modsecurity {
 namespace operators {
 
 #ifdef WITH_LIBXML2
-bool ValidateDTD::init(const std::string &file, std::string *error) {
+bool ValidateDTD::init(std::shared_ptr<std::string> file, std::string *error) {
     std::string err;
     m_resource = utils::find_resource(m_param, file, &err);
     if (m_resource == "") {

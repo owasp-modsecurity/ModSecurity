@@ -45,16 +45,21 @@
 #ifndef YY_YY_SECLANG_PARSER_HH_INCLUDED
 # define YY_YY_SECLANG_PARSER_HH_INCLUDED
 // "%code requires" blocks.
-#line 10 "seclang-parser.yy"
+#line 13 "seclang-parser.yy"
 
 #include <string>
 #include <iterator>
+#include <memory>
+#include "location.hh"
 
 namespace ModSecurity {
 namespace Parser {
 class Driver;
 }
+
 }
+
+
 
 #include "src/rule_unconditional.h"
 #include "src/rule_with_operator.h"
@@ -200,6 +205,7 @@ class Driver;
 #include "src/utils/geo_lookup.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
+#include "src/variables/variable.h"
 #include "src/variables/args_combined_size.h"
 #include "src/variables/args_get.h"
 #include "src/variables/args_get_names.h"
@@ -354,7 +360,7 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 358 "seclang-parser.hh"
+#line 364 "seclang-parser.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -399,7 +405,7 @@ using namespace modsecurity::operators;
 #else
 # define YY_CONSTEXPR
 #endif
-# include "location.hh"
+
 #include <typeinfo>
 #ifndef YY_ASSERT
 # include <cassert>
@@ -488,7 +494,7 @@ using namespace modsecurity::operators;
 #endif
 
 namespace yy {
-#line 492 "seclang-parser.hh"
+#line 498 "seclang-parser.hh"
 
 
 
@@ -946,7 +952,7 @@ namespace yy {
     typedef YYSTYPE semantic_type;
 #endif
     /// Symbol locations.
-    typedef location location_type;
+    typedef  yy::location  location_type;
 
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error
@@ -8629,7 +8635,7 @@ switch (yykind)
   }
 
 } // yy
-#line 8633 "seclang-parser.hh"
+#line 8639 "seclang-parser.hh"
 
 
 

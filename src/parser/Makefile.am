@@ -38,7 +38,6 @@ CLEANFILES = test.cc \
 	seclang-scanner.cc \
 	seclang-parser.cc \
 	seclang-parser.hh \
-	location.hh \
 	position.hh \
 	stack.hh
 

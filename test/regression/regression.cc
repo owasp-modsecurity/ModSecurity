@@ -174,6 +174,7 @@ modsecurity::RulesSet *setupModSecRules(RegressionTestResult *r) {
         auto s = rules->getParserError();
         if (regex_search(s, &match, re)) {
             r->passed();
+            delete rules;
             return nullptr;
         }
     }
@@ -187,6 +188,7 @@ modsecurity::RulesSet *setupModSecRules(RegressionTestResult *r) {
     reason << KWHT << "Expected: " << RESET << r->getExpectedParserError() << std::endl;
     reason << KWHT << "Produced: " << RESET << rules->getParserError() << std::endl;
     r->failed(reason.str());
+    delete rules;
     return nullptr;
 }
 
@@ -277,6 +279,8 @@ void processRequest(
     error_log.assign(serverLog.str());
     CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>(rules->m_debugLog);
     debug_log.assign(d->log_messages());
+
+    delete modsec_transaction;
 
     *status_code = r.status;
 }
@@ -398,9 +402,9 @@ int main(int argc, char **argv) {
     ModSecurityTest<RegressionTest> test;
 
     std::string ver(MODSECURITY_VERSION);
-    std::string envvar("MODSECURITY=ModSecurity " + ver + " regression tests");
+    std::string envvar("ModSecurity " + ver + " regression tests");
 
-    putenv(strdup(envvar.c_str()));
+    setenv("MODSECURITY", envvar.c_str(), 0);
 #ifndef NO_LOGS
     int test_number = 0;
 #endif

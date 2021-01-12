@@ -4,18 +4,26 @@
 %define api.parser.class {seclang_parser}
 %define api.token.constructor
 %define api.value.type variant
-//%define api.namespace {modsecurity::yy}
 %define parse.assert
+//%define api.filename.type { std::shared_ptr<std::string> }
+%define api.location.type { yy::location }
+
+
 %code requires
 {
 #include <string>
 #include <iterator>
+#include <memory>
+#include "location.hh"
 
 namespace ModSecurity {
 namespace Parser {
 class Driver;
 }
+
 }
+
+
 
 #include "src/rule_unconditional.h"
 #include "src/rule_with_operator.h"
@@ -161,6 +169,7 @@ class Driver;
 #include "src/utils/geo_lookup.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
+#include "src/variables/variable.h"
 #include "src/variables/args_combined_size.h"
 #include "src/variables/args_get.h"
 #include "src/variables/args_get_names.h"
@@ -321,8 +330,9 @@ using namespace modsecurity::operators;
 %initial-action
 {
   // Initialize the initial location.
-  @$.begin.filename = @$.end.filename = new std::string(driver.file);
+  @$.setFileName(driver.file);
 };
+
 %define parse.trace
 %define parse.error verbose
 %code
@@ -876,7 +886,7 @@ op:
       {
         $$ = std::move($1);
         std::string error;
-        if ($$->init(*@1.end.filename, &error) == false) {
+        if ($$->init(@1.getFileName(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -886,7 +896,7 @@ op:
         $$ = std::move($2);
         $$->m_negation = true;
         std::string error;
-        if ($$->init(*@1.end.filename, &error) == false) {
+        if ($$->init(@1.getFileName(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -895,7 +905,7 @@ op:
       {
         OPERATOR_CONTAINER($$, new operators::Rx(std::move($1)));
         std::string error;
-        if ($$->init(*@1.end.filename, &error) == false) {
+        if ($$->init(@1.getFileName(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -905,7 +915,7 @@ op:
         OPERATOR_CONTAINER($$, new operators::Rx(std::move($2)));
         $$->m_negation = true;
         std::string error;
-        if ($$->init(*@1.end.filename, &error) == false) {
+        if ($$->init(@1.getFileName(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -952,7 +962,7 @@ op_before_init:
     | OPERATOR_VALIDATE_HASH run_time_string
       {
         /* $$ = new operators::ValidateHash($1); */
-        OPERATOR_NOT_SUPPORTED("ValidateHash", @0);
+        OPERATOR_NOT_SUPPORTED("ValidateHash", @1);
       }
     | OPERATOR_VALIDATE_SCHEMA run_time_string
       {
@@ -977,12 +987,12 @@ op_before_init:
     | OPERATOR_GSB_LOOKUP run_time_string
       {
         /* $$ = new operators::GsbLookup($1); */
-        OPERATOR_NOT_SUPPORTED("GsbLookup", @0);
+        OPERATOR_NOT_SUPPORTED("GsbLookup", @1);
       }
     | OPERATOR_RSUB run_time_string
       {
         /* $$ = new operators::Rsub($1); */
-        OPERATOR_NOT_SUPPORTED("Rsub", @0);
+        OPERATOR_NOT_SUPPORTED("Rsub", @1);
       }
     | OPERATOR_WITHIN run_time_string
       {
@@ -1099,7 +1109,7 @@ expression:
             /* variables */ v,
             /* actions */ a,
             /* transformations */ t,
-            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
+            /* file name */ @1.getFileName(),
             /* line number */ @1.end.line
             ));
         // TODO: filename should be a shared_ptr.
@@ -1119,7 +1129,7 @@ expression:
             /* variables */ v,
             /* actions */ NULL,
             /* transformations */ NULL,
-            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
+            /* file name */ @1.getFileName(),
             /* line number */ @1.end.line
             ));
         if (driver.addSecRule(std::move(rule)) == false) {
@@ -1142,7 +1152,7 @@ expression:
         std::unique_ptr<RuleUnconditional> rule(new RuleUnconditional(
             /* actions */ a,
             /* transformations */ t,
-            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
+            /* file name */ @1.getFileName(),
             /* line number */ @1.end.line
             ));
         driver.addSecAction(std::move(rule));
@@ -1165,7 +1175,7 @@ expression:
             /* path to script */ $1,
             /* actions */ a,
             /* transformations */ t,
-            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
+            /* file name */ @1.getFileName(),
             /* line number */ @1.end.line
             ));
 
@@ -1196,12 +1206,12 @@ expression:
             if (phase != NULL) {
                 definedPhase = phase->getPhase();
                 secRuleDefinedPhase = phase->getSecRulePhase();
-                delete phase;
             } else if (dynamic_cast<actions::ActionAllowedAsSecDefaultAction *>(a.get())
               && !dynamic_cast<actions::transformations::None *>(a.get())) {
                 checkedActions.push_back(a);
             } else {
                 driver.error(@0, "The action '" + *a->getName() + "' is not suitable to be part of the SecDefaultActions");
+                delete actions;
                 YYERROR;
             }
         }
@@ -1210,6 +1220,7 @@ expression:
         }
         if (hasDisruptive == false) {
             driver.error(@0, "SecDefaultAction must specify a disruptive action.");
+            delete actions;
             YYERROR;
         }
         if (!driver.m_rulesSetPhases[definedPhase]->m_defaultActions.empty()) {
@@ -1218,6 +1229,7 @@ expression:
             ss << secRuleDefinedPhase;
             ss << " was informed already.";
             driver.error(@0, ss.str());
+            delete actions;
             YYERROR;
         }
         for (auto &a : checkedActions) {
@@ -1228,12 +1240,12 @@ expression:
               driver.m_rulesSetPhases[definedPhase]->m_defaultActions.push_back(a);
             }
         }
-        //delete actions;
+        delete actions;
       }
     | CONFIG_DIR_SEC_MARKER
       {
         driver.addSecMarker(modsecurity::utils::string::removeBracketsIfNeeded($1),
-            /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
+            /* file name */ @1.getFileName(),
             /* line number */ @1.end.line
         );
       }
@@ -1562,7 +1574,7 @@ expression:
 #if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
         std::string err;
         std::string file = modsecurity::utils::find_resource($1,
-            *@1.end.filename, &err);
+            @1.getFileName(), &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to load locate the GeoDB file from: " << $1 << " ";
@@ -1749,7 +1761,7 @@ expression:
             param.pop_back();
         }
 
-        file = modsecurity::utils::find_resource(f, *@1.end.filename, &err);
+        file = modsecurity::utils::find_resource(f, @1.getFileName(), &err);
         if (file.empty()) {
             std::stringstream ss;
             ss << "Failed to locate the unicode map file from: " << f << " ";
@@ -2606,7 +2618,7 @@ act:
       }
     | ACTION_APPEND
       {
-        ACTION_NOT_SUPPORTED("Append", @0);
+        ACTION_NOT_SUPPORTED("Append", @1);
       }
     | ACTION_AUDIT_LOG
       {
@@ -2626,18 +2638,15 @@ act:
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
       {
-        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("ctl:auditEngine", @1);
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
       {
-        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("ctl:auditEngine", @1);
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
       {
-        ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("ctl:auditEngine", @1);
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
@@ -2657,13 +2666,11 @@ act:
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_ON
       {
-        ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("ctl:forceRequestBodyVariable", @1);
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_OFF
       {
-        ACTION_NOT_SUPPORTED("CtlForceRequestBodyVariable", @0);
-        //ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_NOT_SUPPORTED("ctl:forceRequestBodyVariable", @1);
       }
     | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_ON
       {
@@ -2707,7 +2714,7 @@ act:
       }
     | ACTION_DEPRECATE_VAR
       {
-        ACTION_NOT_SUPPORTED("DeprecateVar", @0);
+        ACTION_NOT_SUPPORTED("DeprecateVar", @1);
       }
     | ACTION_DROP
       {
@@ -2763,7 +2770,7 @@ act:
       }
     | ACTION_PAUSE
       {
-        ACTION_NOT_SUPPORTED("Pause", @0);
+        ACTION_NOT_SUPPORTED("Pause", @1);
       }
     | ACTION_PHASE
       {
@@ -2771,11 +2778,11 @@ act:
       }
     | ACTION_PREPEND
       {
-        ACTION_NOT_SUPPORTED("Prepend", @0);
+        ACTION_NOT_SUPPORTED("Prepend", @1);
       }
     | ACTION_PROXY
       {
-        ACTION_NOT_SUPPORTED("Proxy", @0);
+        ACTION_NOT_SUPPORTED("Proxy", @1);
       }
     | ACTION_REDIRECT run_time_string
       {
@@ -2787,23 +2794,23 @@ act:
       }
     | ACTION_SANITISE_ARG
       {
-        ACTION_NOT_SUPPORTED("SanitiseArg", @0);
+        ACTION_NOT_SUPPORTED("SanitiseArg", @1);
       }
     | ACTION_SANITISE_MATCHED
       {
-        ACTION_NOT_SUPPORTED("SanitiseMatched", @0);
+        ACTION_NOT_SUPPORTED("SanitiseMatched", @1);
       }
     | ACTION_SANITISE_MATCHED_BYTES
       {
-        ACTION_NOT_SUPPORTED("SanitiseMatchedBytes", @0);
+        ACTION_NOT_SUPPORTED("SanitiseMatchedBytes", @1);
       }
     | ACTION_SANITISE_REQUEST_HEADER
       {
-        ACTION_NOT_SUPPORTED("SanitiseRequestHeader", @0);
+        ACTION_NOT_SUPPORTED("SanitiseRequestHeader", @1);
       }
     | ACTION_SANITISE_RESPONSE_HEADER
       {
-        ACTION_NOT_SUPPORTED("SanitiseResponseHeader", @0);
+        ACTION_NOT_SUPPORTED("SanitiseResponseHeader", @1);
       }
     | ACTION_SETENV run_time_string
       {

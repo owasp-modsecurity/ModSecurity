@@ -62,6 +62,11 @@ double cpu_seconds(void) {
 }
 
 
+std::string find_resource(const std::string& file, std::shared_ptr<std::string> config,
+    std::string *err) {
+    return find_resource(file, *config.get(), err);
+}
+
 std::string find_resource(const std::string& resource,
     const std::string& config, std::string *err) {
     std::ifstream *iss;

@@ -26,7 +26,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool InspectFile::init(const std::string &param2, std::string *error) {
+bool InspectFile::init(std::shared_ptr<std::string> param2, std::string *error) {
     std::istream *iss;
     std::string err;
     std::string err_lua;

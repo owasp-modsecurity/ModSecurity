@@ -39,7 +39,7 @@ class IpMatch : public Operator {
         const bpstd::string_view &input,
         RuleMessage *ruleMessage) override;
 
-    bool init(const std::string &file, std::string *error) override;
+    bool init(std::shared_ptr<std::string> file, std::string *error) override;
 
  protected:
     Utils::IpTree m_tree;

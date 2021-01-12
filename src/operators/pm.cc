@@ -117,7 +117,7 @@ bool Pm::evaluate(Transaction *transaction,
 }
 
 
-bool Pm::init(const std::string &file, std::string *error) {
+bool Pm::init(std::shared_ptr<std::string> file, std::string *error) {
     std::vector<std::string> vec;
     std::istringstream *iss;
     const char *err = NULL;

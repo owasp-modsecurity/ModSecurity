@@ -62,6 +62,8 @@ class RunTimeString {
         return *this;
     }
 
+    ~RunTimeString()
+    { }
 
     void append(const std::string &text);
     void append(std::unique_ptr<Variable> var);

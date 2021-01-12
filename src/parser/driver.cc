@@ -34,18 +34,16 @@ Driver::Driver()
 
 
 Driver::~Driver() {
-    while (loc.empty() == false) {
-        yy::location *a = loc.back();
-        loc.pop_back();
-        delete a;
+    while (!m_location.empty()) {
+        m_location.pop_back();
     }
 }
 
 
-int Driver::addSecMarker(std::string marker, std::unique_ptr<std::string> fileName, int lineNumber) {
+int Driver::addSecMarker(std::string marker, std::shared_ptr<std::string> fileName, int lineNumber) {
     // FIXME: we might move this to the parser.
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        RuleMarker *r = new RuleMarker(marker, std::move(fileName), lineNumber);
+        RuleMarker *r = new RuleMarker(marker, fileName, lineNumber);
         std::unique_ptr<RuleMarker> rule(std::move(r));
         rule->setPhase(i);
         m_rulesSetPhases.insert(std::move(rule));
@@ -73,7 +71,7 @@ int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
 }
 
 
-int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
+int Driver::addSecRule(std::unique_ptr<RuleWithOperator> r) {
     if (r->getPhase() >= modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(r->getPhase());
         m_parserError << std::endl;
@@ -173,7 +171,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         return true;
     }
 
-    std::shared_ptr<RuleWithActions> rule(std::move(r));
+    std::shared_ptr<RuleWithOperator> rule(std::move(r));
     /*
      * Checking if the rule has an ID and also checking if this ID is not used
      * by other rule
@@ -195,11 +193,10 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
 
 int Driver::parse(const std::string &f, const std::string &ref) {
     m_lastRule = nullptr;
-    loc.push_back(new yy::location());
     if (ref.empty()) {
-        loc.back()->begin.filename = loc.back()->end.filename = new std::string("<<reference missing or not informed>>");
+        newLocation("<<reference missing or not informed>>");
     } else {
-        loc.back()->begin.filename = loc.back()->end.filename = new std::string(ref);
+        newLocation(ref);
     }
 
     if (f.empty()) {
@@ -258,16 +255,16 @@ int Driver::parseFile(const std::string &f) {
 }
 
 
-void Driver::error(const yy::location& l, const std::string& m) {
+void Driver::error(const yy::seclang_parser::location_type& l, const std::string& m) {
     error(l, m, "");
 }
 
 
-void Driver::error(const yy::location& l, const std::string& m,
+void Driver::error(const yy::seclang_parser::location_type& l, const std::string& m,
     const std::string& c) {
     if (m_parserError.tellp() == 0) {
         m_parserError << "Rules error. ";
-        m_parserError << "File: " << *l.end.filename << ". ";
+        m_parserError << "File: " << *l.end.filename->get() << ". ";
         m_parserError << "Line: " << l.end.line << ". ";
         m_parserError << "Column: " << l.end.column - 1 << ". ";
     }

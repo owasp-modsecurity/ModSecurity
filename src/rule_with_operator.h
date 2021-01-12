@@ -45,7 +45,7 @@ class RuleWithOperator : public RuleWithActions {
         variables::Variables *variables,
         Actions *actions,
         Transformations *transformations,
-        std::unique_ptr<std::string> fileName,
+        std::shared_ptr<std::string> fileName,
         int lineNumber);
 
     RuleWithOperator(const RuleWithOperator &op)
@@ -95,7 +95,7 @@ class RuleWithOperator : public RuleWithActions {
 
     virtual void dump(std::stringstream &out) const override {
         Rule::dump(out);
-        out << "# RuleWithOperator" << std::endl;
+        out << "# RuleWithOperator (op counter: " << m_operator.use_count() << ")" << std::endl;
         out << "SecRule ";
         out << m_variables->getVariableNames() << " ";
         out << "\"" << "@" << m_operator->m_op << " " << m_operator->m_param << "\"";
