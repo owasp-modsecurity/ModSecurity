@@ -11,6 +11,14 @@ addons:
     - liblmdb-dev
     - cppcheck
 
+  homebrew:
+    packages:
+    - cppcheck
+    - libmaxminddb
+    - lmdb
+    - yajl
+    update: true
+
 language: cpp
 
 compiler:
@@ -20,6 +28,8 @@ compiler:
 os:
   - linux
   - osx
+
+osx_image: xcode12
 
 env:
   - OPTS="--enable-parser-generation $OPTS"
@@ -31,16 +41,14 @@ env:
   - OPTS="--without-lua $OPTS"
   - OPTS="--without-maxmind $OPTS"
 
+
 before_script:
   - echo $TRAVIS_OS_NAME
-  - '[ "$TRAVIS_OS_NAME" != osx ] || brew update'
-  - '[ "$TRAVIS_OS_NAME" != osx ] || brew install cppcheck'
-  - '[ "$TRAVIS_OS_NAME" != osx ] || brew install libmaxminddb'
-  - '[ "$TRAVIS_OS_NAME" != osx ] || brew install lmdb'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo add-apt-repository --yes ppa:maxmind/ppa'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-get update'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-cache search maxmind'
   - '[ "$TRAVIS_OS_NAME" != linux ] || sudo apt-get install -y libmaxminddb-dev'
+
 
 script:
   - ./build.sh
