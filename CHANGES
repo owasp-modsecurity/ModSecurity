@@ -1,6 +1,10 @@
 DD mmm YYYY - 2.9.x (to be released)
 ------------------------------------
 
+ * Store temporaries in the request pool for regexes compiled per-request.
+   [Issue #890, #2049 - @lightsey]
+ * Fix other usage of the global pool for request temporaries in re_operators.c
+   [Issue #890, #2049 - @lightsey]
  * Adds a sanity check before use ctl:ruleRemoveTargetById and ctl:ruleRemoveTargetByMsg.
    [Issue #2033 - @studersi]
  * Fix the order of error_msg validation
