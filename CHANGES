@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 ------------------------------------
 
+ * Add microsec timestamp resolution to the formatted log timestamp
+   [Issue #2095 - @rainerjung]
  * Store temporaries in the request pool for regexes compiled per-request.
    [Issue #890, #2049 - @lightsey]
  * Fix other usage of the global pool for request temporaries in re_operators.c
