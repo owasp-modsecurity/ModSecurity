@@ -35,6 +35,7 @@ MAINTAINERCLEANFILES = \
 
 
 pkginclude_HEADERS = \
+	../headers/modsecurity/anchored_set_variable_translation_proxy.h \
 	../headers/modsecurity/anchored_set_variable.h \
 	../headers/modsecurity/anchored_variable.h \
 	../headers/modsecurity/audit_log.h \

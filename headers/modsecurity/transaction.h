@@ -48,6 +48,7 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
+#include "modsecurity/anchored_set_variable_translation_proxy.h"
 
 
 #ifndef NO_LOGS
@@ -121,10 +122,7 @@ class Operator;
 class TransactionAnchoredVariables {
  public:
     explicit TransactionAnchoredVariables(Transaction *t)
-        : m_variableArgsNames(t, "ARGS_NAMES"),
-        m_variableArgsGetNames(t, "ARGS_GET_NAMES"),
-        m_variableArgsPostNames(t, "ARGS_POST_NAMES"),
-        m_variableRequestHeadersNames(t, "REQUEST_HEADERS_NAMES"),
+        : m_variableRequestHeadersNames(t, "REQUEST_HEADERS_NAMES"),
         m_variableResponseContentType(t, "RESPONSE_CONTENT_TYPE"),
         m_variableResponseHeadersNames(t, "RESPONSE_HEADERS_NAMES"),
         m_variableARGScombinedSize(t, "ARGS_COMBINED_SIZE"),
@@ -202,12 +200,12 @@ class TransactionAnchoredVariables {
         m_variableGeo(t, "GEO"),
         m_variableRequestCookiesNames(t, "REQUEST_COOKIES_NAMES"),
         m_variableFilesTmpNames(t, "FILES_TMPNAMES"),
-        m_variableOffset(0)
+        m_variableOffset(0),
+        m_variableArgsNames("ARGS_NAMES", &m_variableArgs),
+        m_variableArgsGetNames("ARGS_GET_NAMES", &m_variableArgsGet),
+        m_variableArgsPostNames("ARGS_POST_NAMES", &m_variableArgsPost)
         { }
 
-    AnchoredSetVariable m_variableArgsNames;
-    AnchoredSetVariable m_variableArgsGetNames;
-    AnchoredSetVariable m_variableArgsPostNames;
     AnchoredSetVariable m_variableRequestHeadersNames;
     AnchoredVariable m_variableResponseContentType;
     AnchoredSetVariable m_variableResponseHeadersNames;
@@ -285,6 +283,10 @@ class TransactionAnchoredVariables {
     AnchoredSetVariable m_variableFilesTmpNames;
 
     int m_variableOffset;
+
+    AnchoredSetVariableTranslationProxy m_variableArgsNames;
+    AnchoredSetVariableTranslationProxy m_variableArgsGetNames;
+    AnchoredSetVariableTranslationProxy m_variableArgsPostNames;
 };
 
 class TransactionSecMarkerManagement {

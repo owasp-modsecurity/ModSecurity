@@ -393,17 +393,13 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
         return false;
     }
 
-    size_t k_offset = offset;
     offset = offset + key.size() + 1;
     m_variableArgs.set(key, value, offset);
-    m_variableArgsNames.set(key, key, k_offset);
 
     if (orig == "GET") {
         m_variableArgsGet.set(key, value, offset);
-        m_variableArgsGetNames.set(key, key, k_offset);
     } else if (orig == "POST") {
         m_variableArgsPost.set(key, value, offset);
-        m_variableArgsPostNames.set(key, key, k_offset);
     }
 
     m_ARGScombinedSizeDouble = m_ARGScombinedSizeDouble + \
