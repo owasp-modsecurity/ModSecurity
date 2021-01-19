@@ -1,8 +1,7 @@
 
 <img src="https://github.com/SpiderLabs/ModSecurity/raw/v3/master/others/modsec.png" width="50%">
 
-[![Build Status](https://travis-ci.org/SpiderLabs/ModSecurity.svg?branch=v3/master)](https://travis-ci.org/SpiderLabs/ModSecurity)
-[![](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.com)
+![Quality Assurance](https://github.com/SpiderLabs/ModSecurity/workflows/Quality%20Assurance/badge.svg)
 [![Build Status](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=alert_status)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
 [![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=sqale_rating
 )](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
