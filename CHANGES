@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix memory leak in rx operator when pattern includes macro
+    [@martinhsv]
   - Regression: Mark the test as failed in case of segfault.
     [@zimmerle]
   - Regex key selection should not be case-sensitive

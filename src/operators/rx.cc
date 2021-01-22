@@ -69,12 +69,12 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
         logOffset(ruleMessage, capture.m_offset, capture.m_length);
     }
 
-    if (!captures.empty()) {
-        return true;
-    }
-
     if (m_string->m_containsMacro) {
         delete re;
+    }
+
+    if (!captures.empty()) {
+        return true;
     }
 
     return false;
