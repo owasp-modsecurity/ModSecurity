@@ -14,12 +14,12 @@ jobs:
         compiler: [gcc, clang]
         configure:
           - {label: "with parser generation", opt: "--enable-parser-generation" }
-          - {label: "without curl",    opt: "--without-curl" }
-          - {label: "without yajl",    opt: "--without-yajl" }
-          - {label: "without geoip",   opt: "--without-geoip" }
-          - {label: "without lmdb",    opt: "--without-lmdb" }
-          - {label: "without ssdeep",  opt: "--without-ssdeep" }
-          - {label: "without lua",     opt: "--without-lua" }
+          - {label: "wo curl",    opt: "--without-curl" }
+          - {label: "wo yajl",    opt: "--without-yajl" }
+          - {label: "wo geoip",   opt: "--without-geoip" }
+          - {label: "wo lmdb",    opt: "--without-lmdb" }
+          - {label: "wo ssdeep",  opt: "--without-ssdeep" }
+          - {label: "wo lua",     opt: "--without-lua" }
           - {label: "without maxmind", opt: "--without-maxmind" }
     steps:
       - name: Setup Dependencies
@@ -46,21 +46,21 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-10.15, macos-11.0]
-        compiler: [gcc, clang]
+        os: [macos-10.15]
+        compiler: [clang]
         configure:
           - {label: "with parser generation", opt: "--enable-parser-generation" }
-          - {label: "without curl",    opt: "--without-curl" }
-          - {label: "without yajl",    opt: "--without-yajl" }
-          - {label: "without geoip",   opt: "--without-geoip" }
-          - {label: "without lmdb",    opt: "--without-lmdb" }
-          - {label: "without ssdeep",  opt: "--without-ssdeep" }
-          - {label: "without lua",     opt: "--without-lua" }
-          - {label: "without maxmind", opt: "--without-maxmind" }
+          - {label: "wo curl",    opt: "--without-curl" }
+          - {label: "wo yajl",    opt: "--without-yajl" }
+          - {label: "wo geoip",   opt: "--without-geoip" }
+          - {label: "wo lmdb",    opt: "--without-lmdb" }
+          - {label: "wo ssdeep",  opt: "--without-ssdeep" }
+          - {label: "wo lua",     opt: "--without-lua" }
+          - {label: "wo maxmind", opt: "--without-maxmind" }
     steps:
       - name: Setup Dependencies
         run: |
-          brew install autoconf automake cppcheck lmdb libyaml lua ssdeep libmaxminddb
+          brew install autoconf automake cppcheck lmdb libyaml lua ssdeep libmaxminddb bison
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -70,7 +70,7 @@ jobs:
         run: ./configure ${{ matrix.configure.opt }}
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
-        run: make -j `nproc`
+        run: make -j `sysctl -n hw.logicalcpu`
       - name: check
         run: make check
       - name: check-static
