@@ -53,6 +53,7 @@ typedef struct {
     int                  thread_running;
     int                  status_code;
     ngx_time_t           *start_time;
+    ngx_msec_int_t       azwaf_latency;
 } ngx_http_modsecurity_ctx_t;
 
 #define STATUS_CODE_NOT_SET -1000
@@ -80,6 +81,7 @@ static int ngx_http_modsecurity_drop_action(request_rec *r);
 static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
 static ngx_int_t ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ctx_t *ctx);
+static void store_azwaf_latency(ngx_http_modsecurity_ctx_t *ctx, ngx_http_variable_value_t *modsec_latency_var);
 
 static ngx_int_t ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, ngx_msec_int_t modsec_latency);
@@ -90,10 +92,10 @@ static ngx_int_t ngx_http_variable_get_modsec_latency(ngx_http_request_t* r,
 static ngx_int_t ngx_http_variable_get_modsec_mode(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, uintptr_t data);
 
-static ngx_str_t modsec_latency_varname = ngx_string("modsec_latency");
-static ngx_uint_t modsec_latency_index;
-static ngx_str_t modsec_mode_varname = ngx_string("modsec_mode");
-static ngx_uint_t modsec_mode_index;
+static ngx_str_t waf_latency_varname = ngx_string("waf_latency");
+static ngx_uint_t waf_latency_index;
+static ngx_str_t waf_mode_varname = ngx_string("waf_mode");
+static ngx_uint_t waf_mode_index;
 static ngx_str_t modsec_mode_prev = ngx_string("Prevention");
 static ngx_str_t modsec_mode_detect = ngx_string("Detection");
 
@@ -181,12 +183,12 @@ ngx_module_t ngx_http_modsecurity = {
 
 
 static ngx_http_variable_t  ngx_http_modsecurity_vars[] = {
-    { ngx_string("modsec_latency"), NULL,
+    { ngx_string("waf_latency"), NULL,
     ngx_http_variable_get_modsec_latency,
-    0, NGX_HTTP_VAR_NOCACHEABLE, 0 },
-    { ngx_string("modsec_mode"), NULL,
+    0, NGX_HTTP_VAR_CHANGEABLE | NGX_HTTP_VAR_CHANGEABLE, 0 },
+    { ngx_string("waf_mode"), NULL,
     ngx_http_variable_get_modsec_mode,
-    0, NGX_HTTP_VAR_NOCACHEABLE, 0 },
+    0, NGX_HTTP_VAR_NOCACHEABLE | NGX_HTTP_VAR_CHANGEABLE, 0 },
       ngx_http_null_variable
 };
 
@@ -668,8 +670,8 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     extern pthread_mutex_t msc_pregcomp_ex_mtx;
     pthread_mutex_init(&msc_pregcomp_ex_mtx, NULL);
 
-    modsec_latency_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &modsec_latency_varname);
-    modsec_mode_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &modsec_mode_varname);
+    waf_latency_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &waf_latency_varname);
+    waf_mode_index = (ngx_uint_t)ngx_http_get_variable_index(cf, &waf_mode_varname);
 
 #ifdef WAF_JSON_LOGGING_ENABLE
     int result = init_appgw_rules_id_hash();
@@ -901,6 +903,17 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
     ngx_http_core_run_phases(r);
 }
 
+static void
+store_azwaf_latency(ngx_http_modsecurity_ctx_t* ctx, ngx_http_variable_value_t* modsec_latency_var)
+{
+    int sec, ms;
+    char* token = strtok((char*)modsec_latency_var->data, ".");
+    sec = atoi(token);
+    token = strtok(NULL, " ");
+    ms = atoi(token);
+    ctx->azwaf_latency = sec * 1000 + ms;
+}
+
 static ngx_int_t
 ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ctx_t* ctx)
 {
@@ -913,7 +926,11 @@ ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ct
         ((end_time->sec - ctx->start_time->sec) * 1000 + (end_time->msec - ctx->start_time->msec));
     ms = ngx_max(ms, 0);
 
-    ngx_http_variable_value_t* modsec_latency_var = ngx_http_get_indexed_variable(r, modsec_latency_index);
+    // Add azwaf latency if we are in hybrid mode
+    if (ctx->azwaf_latency != 0) {
+        ms += ctx->azwaf_latency;
+    }
+    ngx_http_variable_value_t* modsec_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
     return ngx_http_modsecurity_set_modsec_latency(r, modsec_latency_var, ms);
 }
 
@@ -945,7 +962,13 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
 
         ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
 
-        ngx_http_variable_value_t* modsec_mode_var = ngx_http_get_indexed_variable(r, modsec_mode_index);
+        ngx_http_variable_value_t* modsec_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
+        // We are in hybrid mode, save the latency from azwaf to add later to the waf_latency.
+        if (modsec_latency_var->data != NULL) {
+            store_azwaf_latency(ctx, modsec_latency_var);
+        }
+
+        ngx_http_variable_value_t* modsec_mode_var = ngx_http_get_indexed_variable(r, waf_mode_index);
         if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
             ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, 0);
         }
@@ -1249,8 +1272,8 @@ ngx_http_variable_get_modsec_mode(ngx_http_request_t* r,
 }
 
     static ngx_int_t
-ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t* r,
-    ngx_http_variable_value_t* v, ngx_msec_int_t modsec_latency)
+ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t *r,
+    ngx_http_variable_value_t *v, ngx_msec_int_t modsec_latency)
 {
     if (v->data == NULL) {
         v->data = ngx_pnalloc(r->pool, NGX_TIME_T_LEN + 4);
