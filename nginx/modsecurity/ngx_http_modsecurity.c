@@ -951,6 +951,20 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
+    /* See if the request has been allowed by AzWAF so we should not process it */
+    ngx_http_variable_value_t* azwaf_processing_result =
+        ngx_http_get_variable(r, &azwaf_processing_result_var, azwaf_processing_result_key);
+    if (azwaf_processing_result != NULL && !azwaf_processing_result->not_found) {
+        if (ngx_strncasecmp(
+            azwaf_processing_result->data,
+            azwaf_action_allow.data,
+            MIN(azwaf_processing_result->len, azwaf_action_allow.len)) == 0) {
+
+            ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "The request is allowed by AzWAF, skip ModSecurity processing");
+            return NGX_DECLINED;
+        }
+    }
+
     // Get module request context or create if not yet created
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
     if (ctx == NULL) {
@@ -994,20 +1008,6 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r, ngx_http_modsecurity_loc_con
                              ngx_http_modsecurity_ctx_t *ctx)
 {
     ngx_int_t                        rc;
-
-    /* See if the request has been allowed by AzWAF so we should not process it */
-    ngx_http_variable_value_t* azwaf_processing_result =
-        ngx_http_get_variable(r, &azwaf_processing_result_var, azwaf_processing_result_key);
-    if (azwaf_processing_result != NULL && !azwaf_processing_result->not_found) {
-        if (ngx_strncasecmp(
-                azwaf_processing_result->data,
-                azwaf_action_allow.data,
-                MIN(azwaf_processing_result->len ,azwaf_action_allow.len)) == 0) {
-
-            ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "The request is allowed by AzWAF, skip ModSecurity processing");
-            return NGX_DECLINED;
-        }
-    }
 
     // Read body if not yet read
     if (!r->request_body) {
