@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Having ARGS_NAMES, variables proxied
+    [@zimmerle, @martinhsv, @KaNikita]
   - Use explicit path for cross-compile environments.
     [Issue #2485 - @dtoubelis]
   - Fix: FILES variable does not use multipart part name for key
