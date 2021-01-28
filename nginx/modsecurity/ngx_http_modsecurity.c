@@ -83,7 +83,7 @@ static int ngx_http_modsecurity_drop_action(request_rec *r);
 static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
 static ngx_int_t ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ctx_t *ctx);
-static void store_azwaf_latency(ngx_http_modsecurity_ctx_t *ctx, ngx_http_variable_value_t *modsec_latency_var);
+static void store_azwaf_latency(ngx_http_modsecurity_ctx_t *ctx, ngx_http_variable_value_t *waf_latency_var);
 
 static ngx_int_t ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, ngx_msec_int_t modsec_latency);
