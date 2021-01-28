@@ -30,6 +30,8 @@
 #endif
 
 #define NOTE_NGINX_REQUEST_CTX "nginx-ctx"
+#define WAF_DETECTION_MODE 0
+#define WAF_PREVENTION_MODE 1
 
 typedef struct {
     ngx_flag_t                  enable;
@@ -904,10 +906,10 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
 }
 
 static void
-store_azwaf_latency(ngx_http_modsecurity_ctx_t* ctx, ngx_http_variable_value_t* modsec_latency_var)
+store_azwaf_latency(ngx_http_modsecurity_ctx_t* ctx, ngx_http_variable_value_t* waf_latency_var)
 {
     int sec, ms;
-    char* token = strtok((char*)modsec_latency_var->data, ".");
+    char* token = strtok((char*)waf_latency_var->data, ".");
     sec = atoi(token);
     token = strtok(NULL, " ");
     ms = atoi(token);
@@ -976,18 +978,18 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
 
         ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
 
-        ngx_http_variable_value_t* modsec_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
+        ngx_http_variable_value_t* waf_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
         // We are in hybrid mode, save the latency from azwaf to add later to the waf_latency.
-        if (modsec_latency_var->data != NULL) {
-            store_azwaf_latency(ctx, modsec_latency_var);
+        if (waf_latency_var->data != NULL) {
+            store_azwaf_latency(ctx, waf_latency_var);
         }
 
         ngx_http_variable_value_t* modsec_mode_var = ngx_http_get_indexed_variable(r, waf_mode_index);
         if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
-            ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, 0);
+            ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, WAF_DETECTION_MODE);
         }
         else {
-            ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, 1);
+            ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, WAF_PREVENTION_MODE);
         }
     }
 
@@ -1296,7 +1298,7 @@ ngx_http_modsecurity_set_modsec_mode(ngx_http_request_t* r,
 {
     u_char *p;
     size_t len;
-    if (modsec_mode == 0) {
+    if (modsec_mode == WAF_DETECTION_MODE) {
         len = modsec_mode_detect.len;
         p = modsec_mode_detect.data;
     }
