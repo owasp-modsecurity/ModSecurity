@@ -187,7 +187,7 @@ ngx_module_t ngx_http_modsecurity = {
 static ngx_http_variable_t  ngx_http_modsecurity_vars[] = {
     { ngx_string("waf_latency"), NULL,
     ngx_http_variable_get_modsec_latency,
-    0, NGX_HTTP_VAR_CHANGEABLE | NGX_HTTP_VAR_CHANGEABLE, 0 },
+    0, NGX_HTTP_VAR_NOCACHEABLE | NGX_HTTP_VAR_CHANGEABLE, 0 },
     { ngx_string("waf_mode"), NULL,
     ngx_http_variable_get_modsec_mode,
     0, NGX_HTTP_VAR_NOCACHEABLE | NGX_HTTP_VAR_CHANGEABLE, 0 },
@@ -979,6 +979,8 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
         ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
 
         ngx_http_variable_value_t* waf_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
+        ctx->azwaf_latency = 0;
+
         // We are in hybrid mode, save the latency from azwaf to add later to the waf_latency.
         if (waf_latency_var->data != NULL) {
             store_azwaf_latency(ctx, waf_latency_var);
