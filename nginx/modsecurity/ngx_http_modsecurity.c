@@ -981,7 +981,7 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
         ngx_http_variable_value_t* waf_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
         ctx->azwaf_latency = 0;
 
-        // We are in Hybrid mode, save the latency from azwaf to add later to the waf_latency.
+        // We are in hybrid mode, save the latency from azwaf to add later to the waf_latency.
         if (waf_latency_var->data != NULL) {
             store_azwaf_latency(ctx, waf_latency_var);
         }
