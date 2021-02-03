@@ -29,6 +29,7 @@ Open a `PowerShell` command line to follow the steps below.
  4. Download dependencies using helper PowerShell script:
      ```bash
      .\getModSecurityPkgs.ps1 https://modsecurity.blob.core.windows.net/windows-artifacts
+     Binaries are also available in the folder ModSecurity/iis/dependencies_bin/
      ```
  5. Open Visual Studio 2015 x64 Native Tools Command Prompt, change to `iis` subdirectory and start the build:
      ```bash
