@@ -53,6 +53,8 @@ class RuleScript : public RuleWithActions {
         m_name(name),
         m_lua() { }
 
+    RuleScript(const RuleWithActions& r) = delete;
+
     bool init(std::string *err);
     bool evaluate(Transaction *trans,
         std::shared_ptr<RuleMessage> ruleMessage) override;

@@ -68,7 +68,7 @@ using MatchActions = std::vector<actions::Action *>;
 class Rule {
  public:
     Rule(std::unique_ptr<std::string> fileName, int lineNumber)
-        : m_fileName(std::move(fileName)),
+        : m_fileName(std::make_shared<std::string>(*fileName)),
         m_lineNumber(lineNumber),
         m_phase(modsecurity::Phases::RequestHeadersPhase) {
         }
@@ -103,7 +103,10 @@ class Rule {
     void setPhase(int phase) { m_phase = phase; }
 
     virtual std::string getReference() {
-        return *m_fileName + ":" + std::to_string(m_lineNumber);
+        if (m_fileName) {
+            return *m_fileName + ":" + std::to_string(m_lineNumber);
+        }
+        return "<<no file>>:" + std::to_string(m_lineNumber);
     }
 
 
