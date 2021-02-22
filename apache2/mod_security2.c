@@ -1013,13 +1013,28 @@ static int hook_request_late(request_rec *r) {
     }
 
     rc = read_request_body(msr, &my_error_msg);
-    if (rc < 0 && msr->txcfg->is_enabled == MODSEC_ENABLED) {
+    if (rc < 0) {
         switch(rc) {
             case -1 :
                 if (my_error_msg != NULL) {
                     msr_log(msr, 1, "%s", my_error_msg);
                 }
                 return HTTP_INTERNAL_SERVER_ERROR;
+                break;
+            case -2 : /* Bad request. */
+            case -6 : /* EOF when reading request body. */
+            case -7 : /* Partial recieved */
+                if (my_error_msg != NULL) {
+                    msr_log(msr, 4, "%s", my_error_msg);
+                }
+                r->connection->keepalive = AP_CONN_CLOSE;
+                return HTTP_BAD_REQUEST;
+                break;
+            case -3 : /* Apache's LimitRequestBody. */
+                if (my_error_msg != NULL) {
+                    msr_log(msr, 1, "%s", my_error_msg);
+                }
+                return HTTP_REQUEST_ENTITY_TOO_LARGE;
                 break;
             case -4 : /* Timeout. */
                 if (my_error_msg != NULL) {
@@ -1042,19 +1057,11 @@ static int hook_request_late(request_rec *r) {
                     }
                 }
                 break;
-            case -6 : /* EOF when reading request body. */
+            case -8 : /* Filter error. */
                 if (my_error_msg != NULL) {
-                    msr_log(msr, 4, "%s", my_error_msg);
+                    msr_log(msr, 1, "%s", my_error_msg);
                 }
-                r->connection->keepalive = AP_CONN_CLOSE;
-                return HTTP_BAD_REQUEST;
-                break;
-            case -7 : /* Partial recieved */
-                if (my_error_msg != NULL) {
-                    msr_log(msr, 4, "%s", my_error_msg);
-                }
-                r->connection->keepalive = AP_CONN_CLOSE;
-                return HTTP_BAD_REQUEST;
+                return AP_FILTER_ERROR;
                 break;
             default :
                 /* allow through */

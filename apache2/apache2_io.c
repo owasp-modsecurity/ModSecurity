@@ -217,6 +217,10 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
              *      too large and APR_EGENERAL when the client disconnects.
              */
             switch(rc) {
+                case AP_FILTER_ERROR :
+                    *error_msg = apr_pstrdup(msr->mp, "Error reading request body: filter error");
+                    return -8;
+
                 case APR_INCOMPLETE :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
                     return -7;
@@ -226,7 +230,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                 case APR_TIMEUP :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
                     return -4;
-                case AP_FILTER_ERROR :
+                case APR_ENOSPC:
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: HTTP Error 413 - Request entity too large. (Most likely.)");
                     return -3;
                 case APR_EGENERAL :
