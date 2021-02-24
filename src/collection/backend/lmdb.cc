@@ -505,16 +505,21 @@ void LMDB::resolveMultiMatches(const std::string& var,
                 data.mv_size)));
         }
     } else {
-        while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
-            char *a = reinterpret_cast<char *>(key.mv_data);
-            if (strncmp(var.c_str(), a, keySize) == 0) {
-                l->insert(l->begin(), new VariableValue(
-                    &m_name,
-                    std::string(reinterpret_cast<char *>(key.mv_data),
-                    key.mv_size),
-                    std::string(reinterpret_cast<char *>(data.mv_data),
-                    data.mv_size)));
-            }
+        string2val(var, &key);
+        if (rc = mdb_cursor_get(cursor, &key, &data, MDB_SET_RANGE) == 0) {
+            do {
+                char *a = reinterpret_cast<char *>(key.mv_data);
+                if (strncmp(var.c_str(), a, keySize) == 0) {
+                    l->insert(l->begin(), new VariableValue(
+                        &m_name,
+                        std::string(reinterpret_cast<char *>(key.mv_data),
+                        key.mv_size),
+                        std::string(reinterpret_cast<char *>(data.mv_data),
+                        data.mv_size)));
+                } else {
+                    break;
+                }
+            } while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0);
         }
     }
 
