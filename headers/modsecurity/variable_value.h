@@ -47,6 +47,13 @@ class VariableValue {
         m_value(value != nullptr?*value:"")
     { }
 
+    VariableValue(std::string&& key,
+        std::string&& value)
+        : m_collection(""),
+        m_key(std::move(key)),
+        m_value(std::move(value))
+    { m_keyWithCollection = m_key; }
+
     VariableValue(const std::string *collection,
         const std::string *key,
         const std::string *value)
@@ -55,6 +62,14 @@ class VariableValue {
         m_keyWithCollection(*collection + ":" + *key),
         m_value(*value)
     { }
+
+    VariableValue(const std::string *collection,
+        std::string&& key,
+        std::string&& value)
+        : m_collection(*collection),
+        m_key(std::move(key)),
+        m_value(std::move(value))
+    { m_keyWithCollection = m_collection + ":" + m_key; }
 
     explicit VariableValue(const VariableValue *o) :
         m_collection(o->m_collection),
