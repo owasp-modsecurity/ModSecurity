@@ -66,8 +66,8 @@ class VariableValue {
     VariableValue(const std::string *collection,
         std::string&& key,
         std::string&& value)
-        : m_key(std::move(key)),
-        m_collection(*collection),
+        : m_collection(*collection),
+        m_key(std::move(key)),
         m_value(std::move(value))
     { m_keyWithCollection = m_collection + ":" + m_key; }
 

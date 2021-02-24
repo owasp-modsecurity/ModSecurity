@@ -506,7 +506,8 @@ void LMDB::resolveMultiMatches(const std::string& var,
         }
     } else {
         string2val(var, &key);
-        if (rc = mdb_cursor_get(cursor, &key, &data, MDB_SET_RANGE) == 0) {
+        rc = mdb_cursor_get(cursor, &key, &data, MDB_SET_RANGE);
+        if (rc == 0) {
             do {
                 char *a = reinterpret_cast<char *>(key.mv_data);
                 if (strncmp(var.c_str(), a, keySize) == 0) {
