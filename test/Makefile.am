@@ -5,7 +5,7 @@ endif
 
 
 SUBDIRS = \
-	benchmark \
+	benchmark \\
 	$(MAYBE_AFL_FUZZER)
 
 
