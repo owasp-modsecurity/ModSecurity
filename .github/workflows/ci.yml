@@ -20,7 +20,6 @@ jobs:
           - {label: "wo lmdb",    opt: "--without-lmdb" }
           - {label: "wo ssdeep",  opt: "--without-ssdeep" }
           - {label: "wo lua",     opt: "--without-lua" }
-          - {label: "wo hs",      opt: "--without-hyperscan" }
           - {label: "without maxmind", opt: "--without-maxmind" }
     steps:
       - name: Setup Dependencies
