@@ -23,7 +23,6 @@ afl_fuzzer_LDADD = \
 	$(MAXMIND_LDFLAGS) $(MAXMIND_LDADD) \
 	$(SSDEEP_LDFLAGS) $(SSDEEP_LDADD) \
 	$(LUA_LDFLAGS) $(LUA_LDADD) \
-	$(HS_LDFLAGS) \
 	$(LIBXML2_LDADD) \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(top_builddir)/others/libinjection.la \
@@ -46,5 +45,4 @@ afl_fuzzer_CPPFLAGS = \
 	$(YAJL_CFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
-	$(HS_CFLAGS)
+	$(LIBXML2_CFLAGS)

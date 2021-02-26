@@ -51,8 +51,7 @@ unit_tests_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD) \
-	$(HS_LDADD)
+	$(YAJL_LDADD)
 
 
 unit_tests_LDFLAGS = \
@@ -66,8 +65,7 @@ unit_tests_LDFLAGS = \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS) \
-	$(HS_LDFLAGS)
+	$(YAJL_LDFLAGS)
 
 
 unit_tests_CPPFLAGS = \
@@ -86,8 +84,7 @@ unit_tests_CPPFLAGS = \
 	$(YAJL_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(SSDEEP_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
-	$(HS_CFLAGS)
+	$(LIBXML2_CFLAGS)
 
 
 # regression
@@ -108,8 +105,7 @@ regression_tests_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD) \
-	$(HS_LDADD)
+	$(YAJL_LDADD)
 
 
 regression_tests_LDFLAGS = \
@@ -123,8 +119,7 @@ regression_tests_LDFLAGS = \
 	$(YAJL_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(LUA_LDFLAGS) \
-	$(HS_LDFLAGS)
+	$(LUA_LDFLAGS)
 
 
 regression_tests_CPPFLAGS = \
@@ -143,8 +138,7 @@ regression_tests_CPPFLAGS = \
 	$(SSDEEP_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
-	$(HS_CFLAGS)
+	$(LIBXML2_CFLAGS)
 
 
 # optimization
@@ -164,8 +158,7 @@ rules_optimization_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD) \
-	$(HS_LDADD)
+	$(YAJL_LDADD)
 
 rules_optimization_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
@@ -178,8 +171,7 @@ rules_optimization_LDFLAGS = \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS) \
-	$(HS_LDFLAGS)
+	$(YAJL_LDFLAGS)
 
 rules_optimization_CPPFLAGS = \
 	-std=c++11 \
@@ -197,6 +189,5 @@ rules_optimization_CPPFLAGS = \
 	$(SSDEEP_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
-	$(HS_CFLAGS)
+	$(LIBXML2_CFLAGS)
 

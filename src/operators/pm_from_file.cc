@@ -68,18 +68,13 @@ bool PmFromFile::init(const std::string &config, std::string *error) {
 
     for (std::string line; std::getline(*iss, line); ) {
         if (isComment(line) == false) {
-#ifdef WITH_HS
-#else
             acmp_add_pattern(m_p, line.c_str(), NULL, NULL, line.length());
-#endif
 	}
     }
 
-#ifndef WITH_HS
     while (m_p->is_failtree_done == 0) {
         acmp_prepare(m_p);
     }
-#endif
 
     delete iss;
     return true;

@@ -15,8 +15,7 @@ simple_request_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD) \
-	$(HS_LDADD)
+	$(YAJL_LDADD)
 
 simple_request_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
@@ -29,7 +28,6 @@ simple_request_LDFLAGS = \
 	$(LUA_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(HS_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 
 simple_request_CPPFLAGS = \
@@ -46,7 +44,6 @@ simple_request_CPPFLAGS = \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(YAJL_CFLAGS) \
-	$(HS_CFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(PCRE_CFLAGS) \
