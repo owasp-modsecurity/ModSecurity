@@ -15,6 +15,7 @@ read_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
+	$(HS_LDADD) \
 	$(YAJL_LDADD)
 
 read_LDFLAGS = \
@@ -28,6 +29,7 @@ read_LDFLAGS = \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
+	$(HS_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 
 read_CPPFLAGS = \
@@ -48,6 +50,7 @@ read_CPPFLAGS = \
 	$(LMDB_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(PCRE_CFLAGS) \
+	$(HS_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
 

@@ -34,11 +34,17 @@ class Pm : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit Pm(std::unique_ptr<RunTimeString> param)
         : Operator("Pm", std::move(param)) {
+#ifdef WITH_HS
+#else
         m_p = acmp_create(0);
+#endif
     }
     explicit Pm(const std::string &n, std::unique_ptr<RunTimeString> param)
         : Operator(n, std::move(param)) {
+#ifdef WITH_HS
+#else
         m_p = acmp_create(0);
+#endif
     }
     ~Pm();
     bool evaluate(Transaction *transaction, RuleWithActions *rule,
@@ -47,17 +53,23 @@ class Pm : public Operator {
 
 
     bool init(const std::string &file, std::string *error) override;
+#ifndef WITH_HS
     void postOrderTraversal(acmp_btree_node_t *node);
     void cleanup(acmp_node_t *n);
+#endif
 
  protected:
+#ifndef WITH_HS
     ACMP *m_p;
-
-#ifdef MODSEC_MUTEX_ON_PM
+#endif
 
  private:
+#ifndef WITH_HS
+#ifdef MODSEC_MUTEX_ON_PM
     pthread_mutex_t m_lock;
 #endif
+#endif
+
 };
 
 
