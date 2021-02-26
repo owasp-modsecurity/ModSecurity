@@ -15,6 +15,7 @@ simple_request_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
+	$(HS_LDADD) \
 	$(YAJL_LDADD)
 
 simple_request_LDFLAGS = \
@@ -29,6 +30,7 @@ simple_request_LDFLAGS = \
 	-lpthread \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
+	$(HS_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 
 simple_request_CPPFLAGS = \
@@ -49,6 +51,7 @@ simple_request_CPPFLAGS = \
 	$(LMDB_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(PCRE_CFLAGS) \
+	$(HS_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
 MAINTAINERCLEANFILES = \

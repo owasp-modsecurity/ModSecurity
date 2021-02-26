@@ -25,14 +25,23 @@
 #include <list>
 #include <memory>
 
+#ifdef WITH_HS
+#include <hs.h>
+#endif
+
+
 #include "src/operators/operator.h"
+#ifndef WITH_HS
 #include "src/utils/acmp.h"
+#endif
 #include "src/utils/string.h"
 
 namespace modsecurity {
 namespace operators {
 
 Pm::~Pm() {
+#ifdef WITH_HS
+#else
     acmp_node_t *root = m_p->root_node;
 
     cleanup(root);
@@ -42,9 +51,10 @@ Pm::~Pm() {
 #ifdef MODSEC_MUTEX_ON_PM
     pthread_mutex_destroy(&m_lock);
 #endif
+#endif
 }
 
-
+#ifndef WITH_HS
 void Pm::cleanup(acmp_node_t *n) {
     if (n == NULL) {
         return;
@@ -67,8 +77,9 @@ void Pm::cleanup(acmp_node_t *n) {
 
     free(n);
 }
+#endif
 
-
+#ifndef WITH_HS
 void Pm::postOrderTraversal(acmp_btree_node_t *node) {
     if (node == NULL) {
         return;
@@ -79,10 +90,14 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
 
     free(node);
 }
+#endif
 
 
 bool Pm::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string &input, std::shared_ptr<RuleMessage> ruleMessage) {
+#ifdef WITH_HS
+    return 0;
+#else
     int rc;
     ACMPT pt;
     pt.parser = m_p;
@@ -110,10 +125,16 @@ bool Pm::evaluate(Transaction *transaction, RuleWithActions *rule,
     }
 
     return rc >= 0;
+#endif
+
+    return 0;
 }
 
 
 bool Pm::init(const std::string &file, std::string *error) {
+#ifdef WITH_HS
+    fprintf(stdout, "Sopport for HS is on the way: %s\n", hs_version());
+#else
     std::vector<std::string> vec;
     std::istringstream *iss;
     const char *err = NULL;
@@ -146,7 +167,7 @@ bool Pm::init(const std::string &file, std::string *error) {
     }
 
     delete iss;
-
+#endif
     return true;
 }
 

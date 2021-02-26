@@ -8,6 +8,7 @@ test_SOURCES = \
 test_LDADD = \
 	$(GLOBAL_LDADD) \
 	$(LUA_LDADD) \
+	$(HS_LDADD) \
 	$(SSDEEP_LDADD)
 
 test_LDFLAGS = \
@@ -18,6 +19,7 @@ test_LDFLAGS = \
 	-lstdc++ \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
+	$(HS_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 
 test_CFLAGS = \

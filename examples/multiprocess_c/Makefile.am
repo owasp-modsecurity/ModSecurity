@@ -9,7 +9,8 @@ multi_LDADD = \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
 	$(MAXMIND_LDADD) \
-	$(GLOBAL_LDADD)
+	$(GLOBAL_LDADD) \
+	$(HS_LDADD)
 
 multi_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
@@ -21,6 +22,7 @@ multi_LDFLAGS = \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
+	$(HS_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 
 multi_CFLAGS = \

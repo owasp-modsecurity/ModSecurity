@@ -78,6 +78,10 @@ AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git de
 # SecLang test version
 AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(cd "test/test-cases/secrules-language-tests" && git log -1 --format="%h" --abbrev-commit && cd ../../..))
 
+# Check for hyperscan
+PROG_HS
+AM_CONDITIONAL([HS_VERSION], [test "$HS_VERSION" != ""])
+
 
 # Check for yajl
 PROG_YAJL
@@ -553,6 +557,22 @@ if test "x$LUA_FOUND" = "x2"; then
     echo "   + LUA                                           ....disabled"
 fi
 
+## HyperScan
+if test "x$HS_FOUND" = "x0"; then
+    echo "   + HyperScan                                     ....not found"
+fi
+if test "x$HS_FOUND" = "x1"; then
+    echo -n "   + HyperScan                                     ....found "
+    if ! test "x$HS_VERSION" = "x"; then
+        echo "v${HS_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${HS_DISPLAY}"
+fi
+if test "x$HS_FOUND" = "x2"; then
+    echo "   + HyperScan                                     ....disabled"
+fi
 
 echo " "
 echo " Other Options"
