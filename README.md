@@ -270,3 +270,7 @@ The libModSecurity design allows the integration with bindings. There is an effo
 
 Having our packages in distros on time is a desire that we have, so let us know
 if there is anything we can do to facilitate your work as a packager.
+
+## Sponsor Note
+
+ModSecurity is sponsored by Trustwave. Trustwave offers a range of commercial services related to ModSecurity, including a set of Rules, consultancy and customization of ModSecurity. Contact the Trustwave sales department for more information - sales@trustwave.com 
