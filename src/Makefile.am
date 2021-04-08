@@ -245,6 +245,7 @@ UTILS = \
 	utils/decode.cc \
 	utils/geo_lookup.cc \
 	utils/https_client.cc \
+	utils/hyperscan.cc \
 	utils/ip_tree.cc \
 	utils/md5.cc \
 	utils/msc_tree.cc \

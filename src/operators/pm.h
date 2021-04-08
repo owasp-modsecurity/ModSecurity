@@ -22,8 +22,11 @@
 #include <utility>
 
 #include "src/operators/operator.h"
+#ifdef WITH_HS
+#include "src/utils/hyperscan.h"
+#else
 #include "src/utils/acmp.h"
-
+#endif
 
 namespace modsecurity {
 namespace operators {
@@ -34,15 +37,13 @@ class Pm : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit Pm(std::unique_ptr<RunTimeString> param)
         : Operator("Pm", std::move(param)) {
-#ifdef WITH_HS
-#else
+#ifndef WITH_HS
         m_p = acmp_create(0);
 #endif
     }
     explicit Pm(const std::string &n, std::unique_ptr<RunTimeString> param)
         : Operator(n, std::move(param)) {
-#ifdef WITH_HS
-#else
+#ifndef WITH_HS
         m_p = acmp_create(0);
 #endif
     }
@@ -59,15 +60,16 @@ class Pm : public Operator {
 #endif
 
  protected:
-#ifndef WITH_HS
+#ifdef WITH_HS
+    std::shared_ptr<Utils::HyperscanPm> m_hs =
+        std::make_shared<Utils::HyperscanPm>();
+#else
     ACMP *m_p;
 #endif
 
  private:
-#ifndef WITH_HS
 #ifdef MODSEC_MUTEX_ON_PM
     pthread_mutex_t m_lock;
-#endif
 #endif
 
 };
