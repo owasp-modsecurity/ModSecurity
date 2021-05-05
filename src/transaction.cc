@@ -523,7 +523,7 @@ int Transaction::processURI(const char *uri, const char *method,
             }
             if (netloc != std::string::npos && fullDomain == true) {
                 size_t path = m_uri_decoded.find("/", netloc);
-                if (path != std::string::npos && fullDomain == true) {
+                if (path != std::string::npos) {
                     parsedURI = m_uri_decoded.substr(path);
                 }
             }
