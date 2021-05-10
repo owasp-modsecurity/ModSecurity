@@ -59,14 +59,14 @@ std::string RemoveComments::evaluate(const std::string &value,
             } else if ((input[i] == '<') && (i + 1 < input_len)
                 && (input[i + 1] == '!') && (i + 2 < input_len)
                 && (input[i+2] == '-') && (i + 3 < input_len)
-                && (input[i + 3] == '-') && (incomment == 0)) {
+                && (input[i + 3] == '-')) {
                 incomment = 1;
                 i += 4;
             } else if ((input[i] == '-') && (i + 1 < input_len)
-                && (input[i + 1] == '-') && (incomment == 0)) {
+                && (input[i + 1] == '-')) {
                 input[i] = ' ';
                 break;
-            } else if (input[i] == '#' && (incomment == 0)) {
+            } else if (input[i] == '#') {
                 input[i] = ' ';
                 break;
             } else {
