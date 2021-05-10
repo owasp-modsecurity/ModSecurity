@@ -53,7 +53,7 @@ bool Https::write(Transaction *transaction, int parts, std::string *error) {
 
     std::string log = transaction->toJSON(parts);
     m_http_client.setRequestType("application/json");
-    m_http_client.setRequestBody(log.c_str());
+    m_http_client.setRequestBody(log);
     m_http_client.download(m_audit->m_path1);
     return true;
 }
