@@ -341,7 +341,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             const char* start_of_filename = p;
             while ((*p != '\0') && (*p != ';')) {
                 if (*p == '%') {
-                    if ((*(p+1) == '\0') || (!isxdigit(*(p+1))) || (!isxdigit(*p+2))) {
+                    if ((*(p+1) == '\0') || (!isxdigit(*(p+1))) || (!isxdigit(*(p+2)))) {
                         return -18;
                     }
                     p += 3;

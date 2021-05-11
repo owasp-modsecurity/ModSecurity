@@ -2,7 +2,7 @@
   {  
     "enabled":1,
     "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (1/6)",
+    "title":"multipart Content-Disposition should allow filename* field (1/7)",
     "client":{  
       "ip":"200.249.12.31",
       "port":123
@@ -50,7 +50,7 @@
   {  
     "enabled":1,
     "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (2/6)",
+    "title":"multipart Content-Disposition should allow filename* field (2/7)",
     "client":{  
       "ip":"200.249.12.31",
       "port":123
@@ -98,7 +98,7 @@
   {  
     "enabled":1,
     "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (3/6)",
+    "title":"multipart Content-Disposition should allow filename* field (3/7)",
     "client":{  
       "ip":"200.249.12.31",
       "port":123
@@ -146,7 +146,7 @@
   {  
     "enabled":1,
     "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (4/6)",
+    "title":"multipart Content-Disposition should allow filename* field (4/7)",
     "client":{  
       "ip":"200.249.12.31",
       "port":123
@@ -194,7 +194,7 @@
   {  
     "enabled":1,
     "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (5/6)",
+    "title":"multipart Content-Disposition should allow filename* field (5/7)",
     "client":{  
       "ip":"200.249.12.31",
       "port":123
@@ -242,7 +242,7 @@
   {  
     "enabled":1,
     "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (6/6)",
+    "title":"multipart Content-Disposition should allow filename* field (6/7)",
     "client":{  
       "ip":"200.249.12.31",
       "port":123
@@ -285,6 +285,54 @@
     "rules":[  
       "SecRuleEngine On",
       "SecRule MULTIPART_FILENAME \"@contains 0\" \"id:1,phase:2,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"multipart Content-Disposition should allow filename* field (7/7)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length":"330",
+        "Content-Type":"multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect":"100-continue"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body":[
+        "----------------------------756b6d74fa1a8ee2",
+        "Content-Disposition: form-data; name=\"name\"",
+        "",
+        "test",
+        "----------------------------756b6d74fa1a8ee2",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"03CB1664.txt\"; filename*=utf-8''%61%62.txt",
+        "Content-Type: text/plain",
+        "",
+        "This is a very small test file..",
+        "----------------------------756b6d74fa1a8ee2--"
+      ]
+    },
+    "response":{  
+      "headers":"",
+      "body":""
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:1,phase:2,deny,status:403\""
     ]
   }
 ]
