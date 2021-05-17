@@ -9,11 +9,6 @@ dnl  MAXMIND_VERSION
 
 AC_DEFUN([PROG_MAXMIND], [
 
-
-# Needed if pkg-config will be used.
-AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-
-
 # Possible names for the maxmind library/package (pkg-config)
 MAXMIND_POSSIBLE_LIB_NAMES="maxminddb maxmind"
 
