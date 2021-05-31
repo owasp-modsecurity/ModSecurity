@@ -29,6 +29,12 @@ SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\+|/)|text/)xml" \
 SecRule REQUEST_HEADERS:Content-Type "application/json" \
      "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 
+# Enable JSON request body parser for more subtypes.
+# Initiate JSON Processor in case of JSON suffix in subtype
+#
+SecRule REQUEST_HEADERS:Content-Type "^application/.+[+]json$" \
+     "id:'200006',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+
 # Maximum request body size we will accept for buffering. If you support
 # file uploads then the value given on the first line has to be as large
 # as the largest file you are willing to accept. The second value refers

@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - New rule to enable JSON parser for subtypes with +json suffix
+    [@dune73, @martinhsv]
   - Having ARGS_NAMES, variables proxied
     [@zimmerle, @martinhsv, @KaNikita]
   - Use explicit path for cross-compile environments.
