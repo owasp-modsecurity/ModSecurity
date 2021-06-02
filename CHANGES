@@ -1,5 +1,5 @@
-DD mmm YYYY - 2.9.x (to be released)
-------------------------------------
+21 Jun 2021 - 2.9.4
+-------------------
 
  * Add microsec timestamp resolution to the formatted log timestamp
    [Issue #2095 - @rainerjung]
