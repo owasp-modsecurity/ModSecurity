@@ -20,9 +20,10 @@ nmake /f Makefile.vc mode=dll ENABLE_WINSSL=yes MACHINE=%ARCH% WITH_ZLIB=dll
 
 cd "%WORK_DIR%"
 
-copy /y "%WORK_DIR%\curl\builds\libcurl-vc-%ARCH%-release-dll-zlib-dll-ipv6-sspi-winssl-obj-lib\libcurl.dll" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\curl\builds\libcurl-vc-%ARCH%-release-dll-zlib-dll-ipv6-sspi-winssl-obj-lib\libcurl.lib" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\curl\builds\libcurl-vc-%ARCH%-release-dll-zlib-dll-ipv6-sspi-winssl-obj-lib\libcurl.lib" "%WORK_DIR%\curl\libcurl.lib"
+copy /y "%WORK_DIR%\curl\builds\libcurl-vc-%ARCH%-release-dll-zlib-dll-ipv6-sspi-schannel-obj-lib\libcurl.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\curl\builds\libcurl-vc-%ARCH%-release-dll-zlib-dll-ipv6-sspi-schannel-obj-lib\libcurl.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\curl\builds\libcurl-vc-%ARCH%-release-dll-zlib-dll-ipv6-sspi-schannel-obj-lib\libcurl.lib" "%WORK_DIR%\curl\libcurl.lib"
+
 
 exit /B 0
 

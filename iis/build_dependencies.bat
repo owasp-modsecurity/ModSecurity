@@ -10,15 +10,15 @@
 @set CMAKE=cmake-3.12.4-win32-x86.zip
 @set PCRE=pcre-8.41.zip
 @set ZLIB=zlib-1.2.11.tar.gz
-@set LIBXML2=libxml2-2.9.8.tar.gz
-@set LUA=lua-5.3.5.tar.gz
-@set CURL=curl-7.62.0.zip
-@set APACHE_SRC=httpd-2.4.37.tar.gz
-@set APACHE_BIN32=httpd-2.4.37-win32-VC11.zip
-@set APACHE_BIN64=httpd-2.4.37-win64-VC11.zip
+@set LIBXML2=libxml2-2.9.11.tar.gz
+@set LUA=lua-5.3.6.tar.gz
+@set CURL=curl-7.77.0.zip
+@set APACHE_SRC=httpd-2.4.48.tar.gz
+@set APACHE_BIN32=httpd-2.4.48-win32-VS16.zip
+@set APACHE_BIN64=httpd-2.4.48-win64-VS16.zip
 @set YAJL=yajl-2.1.0.zip
-@set SSDEEP=ssdeep-2.13.tar.gz
-@set SSDEEP_BIN=ssdeep-2.13.zip
+@set SSDEEP=ssdeep-2.14.1.tar.gz
+@set SSDEEP_BIN=ssdeep-2.14.1.zip
 
 @set CMAKE_DIR=%WORK_DIR%\%CMAKE:~0,-4%\bin
 
@@ -64,7 +64,7 @@ call cl 2>&1 | findstr /C:"x64"
 @echo # pcre. - %PCRE%
 @call dependencies/build_pcre.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_pcre
-@cd "%CURRENT_DIR%"
+@cd "%CURRENT_DIR%
 
 @echo # zlib - %ZLIB%
 @call dependencies/build_zlib.bat
