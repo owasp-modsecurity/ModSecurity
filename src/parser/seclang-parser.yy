@@ -317,7 +317,7 @@ using namespace modsecurity::operators;
 %initial-action
 {
   // Initialize the initial location.
-  @$.begin.filename = @$.end.filename = new std::string(driver.file);
+  @$.begin.filename = @$.end.filename = std::shared_ptr<const std::string>(new std::string(driver.file));
 };
 %define parse.trace
 %define parse.error verbose

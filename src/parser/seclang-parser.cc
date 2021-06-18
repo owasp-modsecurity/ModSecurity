@@ -1317,7 +1317,7 @@ namespace yy {
 #line 318 "seclang-parser.yy"
 {
   // Initialize the initial location.
-  yyla.location.begin.filename = yyla.location.end.filename = new std::string(driver.file);
+  yyla.location.begin.filename = yyla.location.end.filename = std::shared_ptr<const std::string>(new std::string(driver.file));
 }
 
 #line 1324 "seclang-parser.cc"

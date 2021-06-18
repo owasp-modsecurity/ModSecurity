@@ -80,6 +80,10 @@ RuleWithActions::RuleWithActions(
     m_containsStaticBlockAction(false),
     m_isChained(false) {
 
+    if (transformations != NULL) {
+        delete transformations;
+    }
+
     if (actions) {
         for (Action *a : *actions) {
             if (a->action_kind == Action::ConfigurationKind) {

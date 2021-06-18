@@ -129,9 +129,9 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     m_lastRule = nullptr;
     loc.push_back(new yy::location());
     if (ref.empty()) {
-        loc.back()->begin.filename = loc.back()->end.filename = new std::string("<<reference missing or not informed>>");
+        loc.back()->begin.filename = loc.back()->end.filename = std::shared_ptr<const std::string>(new std::string("<<reference missing or not informed>>"));
     } else {
-        loc.back()->begin.filename = loc.back()->end.filename = new std::string(ref);
+        loc.back()->begin.filename = loc.back()->end.filename = std::shared_ptr<const std::string>(new std::string(ref));
     }
 
     if (f.empty()) {

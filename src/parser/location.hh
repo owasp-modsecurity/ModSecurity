@@ -80,7 +80,7 @@ namespace yy {
                      counter_type l = 1,
                      counter_type c = 1)
     {
-      filename = fn;
+      filename = std::shared_ptr<filename_type>(fn);
       line = l;
       column = c;
     }
@@ -105,7 +105,7 @@ namespace yy {
     /** \} */
 
     /// File name to which this position refers.
-    filename_type* filename;
+    std::shared_ptr<filename_type> filename;
     /// Current line number.
     counter_type line;
     /// Current column number.

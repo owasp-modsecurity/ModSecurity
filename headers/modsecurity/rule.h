@@ -86,6 +86,8 @@ class Rule {
         return *this;
     }
 
+    virtual ~Rule() {}
+
     virtual bool evaluate(Transaction *transaction) = 0;
 
     virtual bool evaluate(Transaction *transaction,
