@@ -22,8 +22,9 @@ and apply them to HTTP content provided by your application via Connectors.
 
 # Build ModSecurity WASM library
 
-Please read this [guide]() to build your own wasm library using Emscripten.
+Please read this [guide](https://github.com/leyao-daily/ModSecurity/blob/v3/master/modsecurity2wasm.md) to build your own wasm library using Emscripten.
 
+---
 
 If you are looking for ModSecurity for Apache (aka ModSecurity v2.x), it is still under maintenance and available:
 [here](https://github.com/SpiderLabs/ModSecurity/tree/v2/master).
