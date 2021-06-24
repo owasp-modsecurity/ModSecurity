@@ -62,9 +62,6 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
         openstr.append(m_param);
         openstr.append(" ");
         openstr.append(str);
-        if (!(in = popen(openstr.c_str(), "r"))) {
-            return false;
-        }
 
         while (fgets(buff, sizeof(buff), in) != NULL) {
             s << buff;

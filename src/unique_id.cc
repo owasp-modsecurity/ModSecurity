@@ -90,10 +90,6 @@ std::string UniqueId::machineName() {
 #ifdef HAVE_SYS_UTSNAME_H
     static struct utsname u;
 
-    if (uname(&u) < 0) {
-        goto failed;
-    }
-
     snprintf(machine_name, len-1, "%s", u.nodename);
 #endif
 
