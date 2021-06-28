@@ -18,11 +18,11 @@ cd emsdk
 # Fetch the latest version of the emsdk (not needed the first time you clone)
 git pull
 
-# Download and install the latest SDK tools.
-./emsdk install latest
+# Download and install the SDK tools (version used by envoy).
+./emsdk install 2.0.7
 
 # Make the "latest" SDK "active" for the current user. (writes .emscripten file)
-./emsdk activate latest
+./emsdk activate 2.0.7
 
 # Activate PATH and other environment variables in the current terminal
 source ./emsdk_env.sh
