@@ -22,7 +22,7 @@ and apply them to HTTP content provided by your application via Connectors.
 
 # Build ModSecurity WASM library
 
-Please read this [guide](https://github.com/leyao-daily/ModSecurity/blob/v3/master/modsecurity2wasm.md) to build your own wasm library using Emscripten.
+Please read this [guide](https://github.com/leyao-daily/ModSecurity/blob/v3/master/modsecurity2wasm.md) to build your own ModSecurity WASM library using Emscripten.
 
 ---
 
