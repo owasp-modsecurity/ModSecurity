@@ -445,11 +445,21 @@ int Transaction::processURI(const char *uri, const char *method,
     m_httpVersion = http_version;
     m_uri = uri;
     std::string uri_s(uri);
-    m_uri_decoded = utils::uri_decode(uri);
 
-    size_t pos = m_uri_decoded.find("?");
-    size_t pos_raw = uri_s.find("?");
-    size_t var_size = pos_raw;
+    // any uri-fragment that was received should only be retained in
+    // - m_uri
+    // - m_variableRequestURIRaw
+    // - m_variableRequestLine
+    size_t pos_raw_fragment = uri_s.find("#");
+    if (pos_raw_fragment != std::string::npos) {
+        uri_s = uri_s.substr(0, pos_raw_fragment);
+    }
+
+    size_t pos_raw_query = uri_s.find("?");
+
+    m_uri_decoded = utils::uri_decode(uri_s);
+
+    size_t var_size = pos_raw_query;
 
     m_variableRequestMethod.set(method, 0);
 
@@ -462,28 +472,28 @@ int Transaction::processURI(const char *uri, const char *method,
         m_variableOffset + requestLine.size() + 1);
 
 
-
-    if (pos != std::string::npos) {
+    size_t pos_query = m_uri_decoded.find("?");
+    if (pos_query != std::string::npos) {
         m_uri_no_query_string_decoded = std::unique_ptr<std::string>(
-            new std::string(m_uri_decoded, 0, pos));
+            new std::string(m_uri_decoded, 0, pos_query));
     } else {
         m_uri_no_query_string_decoded = std::unique_ptr<std::string>(
             new std::string(m_uri_decoded));
     }
 
 
-    if (pos_raw != std::string::npos) {
-        std::string qry = std::string(uri_s, pos_raw + 1,
-            uri_s.length() - (pos_raw + 1));
-        m_variableQueryString.set(qry, pos_raw + 1
+    if (pos_raw_query != std::string::npos) {
+        std::string qry = std::string(uri_s, pos_raw_query + 1,
+            uri_s.length() - (pos_raw_query + 1));
+        m_variableQueryString.set(qry, pos_raw_query + 1
             + std::string(method).size() + 1);
     }
 
     std::string path_info;
-    if (pos == std::string::npos) {
+    if (pos_query == std::string::npos) {
         path_info = std::string(m_uri_decoded, 0);
     } else {
-        path_info = std::string(m_uri_decoded, 0, pos);
+        path_info = std::string(m_uri_decoded, 0, pos_query);
     }
     if (var_size == std::string::npos) {
         var_size = uri_s.size();
@@ -493,7 +503,6 @@ int Transaction::processURI(const char *uri, const char *method,
         1, var_size);
     m_variableRequestFilename.set(path_info,  m_variableOffset +
         strlen(method) + 1, var_size);
-
 
 
     size_t offset = path_info.find_last_of("/\\");

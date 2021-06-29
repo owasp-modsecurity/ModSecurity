@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Handle URI received with uri-fragment
+    [@martinhsv]
   - Having ARGS_NAMES, variables proxied
     [@zimmerle, @martinhsv, @KaNikita]
   - Use explicit path for cross-compile environments.
