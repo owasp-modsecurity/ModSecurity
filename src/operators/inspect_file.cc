@@ -67,7 +67,7 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
             s << buff;
         }
 
-        pclose(in);
+        //pclose(in);
 
         res.append(s.str());
         if (res.size() > 1 && res.at(0) != '1') {
