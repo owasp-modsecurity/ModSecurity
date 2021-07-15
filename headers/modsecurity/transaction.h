@@ -303,7 +303,7 @@ class TransactionSecMarkerManagement {
         if (m_marker) {
             return m_marker;
         } else {
-            throw;
+            throw std::runtime_error("Error get current marker\n");
         }
     }
 

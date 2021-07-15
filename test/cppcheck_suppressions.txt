@@ -57,6 +57,7 @@ knownConditionTrueFalse:src/operators/verify_svnr.cc:87
 
 noExplicitConstructor:seclang-parser.hh
 constParameter:seclang-parser.hh
+accessMoved:seclang-parser.hh
 
 unusedFunction
 missingIncludeSystem

@@ -120,7 +120,7 @@ RuleWithActions::RuleWithActions(
                 delete a;
                 std::cout << "General failure, action: " << a->m_name;
                 std::cout << " has an unknown type." << std::endl;
-                throw;
+                throw std::runtime_error("Unexpected condition. Action without a type.\n");
             }
         }
         delete actions;
