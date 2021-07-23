@@ -79,7 +79,7 @@ git submodule init
 git submodule update
 
 # Configure ModSecurity with core functions
-emconfigure ./configure --without-yajl --without-geoip --without-libxml --without-curl --disable-shared --disable-examples --disable-libtool-lock --disable-debug-logs  --disable-mutex-on-pm --without-lmdb --without-maxmind --without-ssdeep with-pcre=./pcre-config
+emconfigure ./configure --without-yajl --without-geoip --without-libxml --without-curl --without-lua --disable-shared --disable-examples --disable-libtool-lock --disable-debug-logs  --disable-mutex-on-pm --without-lmdb --without-maxmind --without-ssdeep --with-pcre=./pcre-config
 
 # Build the library
 emmake make -j <num_cpus>
