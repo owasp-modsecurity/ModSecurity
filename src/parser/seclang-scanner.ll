@@ -3,6 +3,7 @@
 #include <climits>
 #include <cstdlib>
 #include <string>
+#include <regex.h>
 
 #include "src/parser/driver.h"
 #include "src/parser/seclang-parser.hh"
@@ -1237,7 +1238,14 @@ EQUALS_MINUS                            (?i:=\-)
 
 {CONFIG_INCLUDE}[ \t]+{CONFIG_VALUE_PATH} {
     std::string err;
-    const char *file = strchr(yytext, ' ') + 1;
+    regex_t ex;
+    regmatch_t match;
+    regcomp(&ex, "include[ \t]+", REG_ICASE|REG_EXTENDED );
+    regexec(&ex, yytext, 1, &match,  0);  
+    const char *file = yytext+match.rm_eo;
+    std::cout << "file:" << file << std::endl;
+    regfree(&ex);
+
     std::string fi = modsecurity::utils::find_resource(file, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
@@ -1264,7 +1272,14 @@ EQUALS_MINUS                            (?i:=\-)
 
 {CONFIG_INCLUDE}[ \t]+["]{CONFIG_VALUE_PATH}["] {
     std::string err;
-    const char *file = strchr(yytext, ' ') + 1;
+    regex_t ex;
+    regmatch_t match;
+    regcomp(&ex, "include[ \t]+", REG_ICASE|REG_EXTENDED );
+    regexec(&ex, yytext, 1, &match,  0);  
+    const char *file = yytext+match.rm_eo;
+    std::cout << "file:" << file << std::endl;
+    regfree(&ex);
+
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
     std::string fi = modsecurity::utils::find_resource(f, *driver.loc.back()->end.filename, &err);
