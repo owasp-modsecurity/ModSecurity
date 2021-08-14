@@ -3,6 +3,7 @@
 #include <climits>
 #include <cstdlib>
 #include <string>
+#include <string.h>
 
 #include "src/parser/driver.h"
 #include "src/parser/seclang-parser.hh"
@@ -1237,12 +1238,11 @@ EQUALS_MINUS                            (?i:=\-)
 
 {CONFIG_INCLUDE}[ \t]+{CONFIG_VALUE_PATH} {
     std::string err;
-    int i = strlen("include");
-    while((' ' == yytext[i]) ||( '\t' ==  yytext[i] ))
-    {
-        i++;
-    }
-    const char *file = yytext+i;
+
+    char *tmpStr = strdup ( yytext+strlen("include")); 
+    char *fileNameStart  = strtok ( tmpStr, " \t");
+    const char *file = yytext +strlen("include") + (fileNameStart-tmpStr);
+    free(tmpStr);
 
     std::string fi = modsecurity::utils::find_resource(file, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
@@ -1271,12 +1271,11 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_INCLUDE}[ \t]+["]{CONFIG_VALUE_PATH}["] {
     std::string err;
 
-    int i = strlen("include");
-    while((' ' == yytext[i]) ||( '\t' ==  yytext[i]  ))
-    {
-        i++;
-    }
-    const char *file = yytext+i;
+    char *tmpStr = strdup ( yytext+strlen("include")); 
+    char *fileNameStart  = strtok ( tmpStr, " \t");
+    const char *file = yytext +strlen("include") + (fileNameStart-tmpStr);
+    free(tmpStr);
+
     char *f = strdup(file);
 
     std::string fi = modsecurity::utils::find_resource(f, *driver.loc.back()->end.filename, &err);
