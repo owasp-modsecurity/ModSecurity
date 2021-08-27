@@ -1,3 +1,9 @@
+DD mmm YYYY - 2.9.x (to be released)
+-------------------
+ * Multipart names/filenames may include single quote if double-quote enclosed
+   [Issue #2352 - @martinhsv]
+
+
 21 Jun 2021 - 2.9.4
 -------------------
 
