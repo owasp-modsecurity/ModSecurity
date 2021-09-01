@@ -1237,7 +1237,8 @@ EQUALS_MINUS                            (?i:=\-)
 
 {CONFIG_INCLUDE}[ \t]+{CONFIG_VALUE_PATH} {
     std::string err;
-    const char *file = strchr(yytext, ' ') + 1;
+    const char *tmpStr = yytext + strlen("include");
+    const char *file   = tmpStr + strspn ( tmpStr, " \t");
     std::string fi = modsecurity::utils::find_resource(file, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
@@ -1264,9 +1265,9 @@ EQUALS_MINUS                            (?i:=\-)
 
 {CONFIG_INCLUDE}[ \t]+["]{CONFIG_VALUE_PATH}["] {
     std::string err;
-    const char *file = strchr(yytext, ' ') + 1;
-    char *f = strdup(file + 1);
-    f[strlen(f)-1] = '\0';
+    const char *tmpStr = yytext + strlen("include");
+    const char *file   = tmpStr + strspn ( tmpStr, " \t");
+    char *f = strdup(file);
     std::string fi = modsecurity::utils::find_resource(f, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
