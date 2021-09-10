@@ -574,6 +574,18 @@ int Transaction::processRequestHeaders() {
         ms_dbg(4, "Rule engine disabled, returning...");
         return true;
     }
+    
+    std::vector<const VariableValue *> *l2 = \
+	new std::vector<const VariableValue *>();
+    m_variableRequestHeaders.resolve("X-Forwarded-For", l2);
+
+    if (l2->size() >= 1) {
+        m_remotePublicIp = std::string(l2->at(0)->getValue());
+        ms_dbg(4, "PUBLIC_IP header found " + m_remotePublicIp);
+    }
+    else {
+        ms_dbg(4, "PUBLIC_IP header not found");
+    }
 
     this->m_rules->evaluate(modsecurity::RequestHeadersPhase, this);
 
@@ -1467,6 +1479,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
        m_variableRequestHeaders.resolveFirst("Host").get())
         << " ";
     ss << utils::string::dash_if_empty(this->m_clientIpAddress->c_str()) << " ";
+    ss << utils::string::dash_if_empty(m_remotePublicIp.c_str()) << " ";
     /** TODO: Check variable */
     variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
     std::vector<const VariableValue *> l;
@@ -1526,6 +1539,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     audit_log << tstr;
     audit_log << " " << m_id->c_str();
     audit_log << " " << this->m_clientIpAddress->c_str();
+    audit_log << " " << m_remotePublicIp.c_str();
     audit_log << " " << this->m_clientPort;
     audit_log << " " << m_serverIpAddress->c_str();
     audit_log << " " << this->m_serverPort;
@@ -1645,6 +1659,7 @@ std::string Transaction::toJSON(int parts) {
     yajl_gen_map_open(g);
     /* Part: A (header mandatory) */
     LOGFY_ADD("client_ip", this->m_clientIpAddress->c_str());
+    LOGFY_ADD("client_public_ip", m_remotePublicIp.c_str());
     LOGFY_ADD("time_stamp", ts.c_str());
     LOGFY_ADD("server_id", uniqueId.c_str());
     LOGFY_ADD_NUM("client_port", m_clientPort);

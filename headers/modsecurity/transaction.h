@@ -430,6 +430,11 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      * Holds the HTTP version: 1.2, 2.0, 3.0 and so on....
      */
     std::string m_httpVersion;
+    
+    /**
+     * Holds the Public ip of user, as per X-Forwarded-For header
+     */
+    std::string m_remotePublicIp;
 
     /**
      * Holds the server IP Address
