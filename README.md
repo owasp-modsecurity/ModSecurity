@@ -16,4 +16,4 @@ Please refer to: [the documentation folder](https://github.com/SpiderLabs/ModSec
 
 ## Sponsor Note
 
-ModSecurity is sponsored by Trustwave. Trustwave offers a range of commercial services related to ModSecurity, including a set of Rules, consultancy and customization of ModSecurity. Contact the Trustwave sales department for more information - sales@trustwave.com 
+Development of ModSecurity is sponsored by Trustwave. Sponsorship will end July 1, 2024. Additional information can be found here https://www.trustwave.com/en-us/resources/security-resources/software-updates/end-of-sale-and-trustwave-support-for-modsecurity-web-application-firewall/
