@@ -1659,7 +1659,7 @@ std::string Transaction::toJSON(int parts) {
     yajl_gen_map_open(g);
     /* Part: A (header mandatory) */
     LOGFY_ADD("client_ip", this->m_clientIpAddress->c_str());
-    LOGFY_ADD("client_public_ip", m_remotePublicIp.c_str());
+    LOGFY_ADD("x_forwarded_for", m_remotePublicIp.c_str());
     LOGFY_ADD("time_stamp", ts.c_str());
     LOGFY_ADD("server_id", uniqueId.c_str());
     LOGFY_ADD_NUM("client_port", m_clientPort);
