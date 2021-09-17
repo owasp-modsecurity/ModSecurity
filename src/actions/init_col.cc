@@ -46,7 +46,7 @@ bool InitCol::init(std::string *error) {
         m_collection_key != "global" &&
         m_collection_key != "resource") {
         error->assign("Something wrong with initcol: collection must be " \
-            "`ip' or `global'");
+            "'ip' 'global' or 'resource'  ");
         return false;
     }
 
