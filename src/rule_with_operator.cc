@@ -324,7 +324,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     updateMatchedVars(trans, key, valueAfterTrans);
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
-
+                    //if multimatch is one of actions, ruleMessage is incomplete, for example data is not initilaized.
                     performLogging(trans, ruleMessage, false);
 
                     globalRet = true;
@@ -369,7 +369,9 @@ end_exec:
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
 
     /* last rule in the chain. */
+    //if multimatch is one of actions, !hasMultimatch() block to push_back ruleMessage because lastLog is true;
     performLogging(trans, ruleMessage, true, true);
+
     return true;
 }
 
