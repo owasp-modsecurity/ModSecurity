@@ -50,8 +50,8 @@ void HttpsClient::setKey(const std::string& key) {
     m_key = "ModSec-key: " + key;
 }
 
-void HttpsClient::setRequestBody(const std::string& requestType) {
-    m_requestBody = requestType;
+void HttpsClient::setRequestBody(const std::string& requestBody) {
+    m_requestBody = requestBody;
 }
 
 void HttpsClient::setRequestType(const std::string& requestType) {
