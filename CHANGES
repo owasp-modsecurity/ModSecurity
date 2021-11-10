@@ -1,9 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
-
-
-
+  - Fix SecRuleUpdateTargetById for ARGS_*NAMES with regex
+    [Issue #2627 - @lontchianicet, @martinhsv]
 
 v3.0.5 - 2021-Jul-07
 --------------------
