@@ -1,0 +1,164 @@
+[
+    {
+      "enabled":1,
+      "version_min":300000,
+      "title":"Case 1. Rule matches the request but the return status code '403' is not relevant. The 'noauditlog' action is not specified.",
+      "client":{
+        "ip":"127.0.0.1",
+        "port":1234
+      },
+      "server":{
+        "ip":"127.0.0.1",
+        "port":80
+      },
+      "request":{
+        "headers":{
+          "Host":"localhost",
+          "User-Agent":"curl/7.38.0",
+          "Accept":"*/*"
+        },
+        "uri":"index.php?foo=bar",
+        "method":"GET",
+        "body": ""
+      },
+      "expected": {
+        "http_code": 403,
+        "error_log": "Access denied with code 403",
+        "audit_log": "^$",
+        "debug_log": "Return code `403' is not interesting to audit logs"
+      },
+      "rules":[
+        "SecRuleEngine On",
+        "SecAuditEngine RelevantOnly",
+        "SecAuditLogParts ABIJDEFHZ",
+        "SecAuditLog /tmp/test/modsec_audit.log",
+        "SecAuditLogDirMode 0766",
+        "SecAuditLogFileMode 0666",
+        "SecAuditLogType Serial",
+        "SecAuditLogRelevantStatus \"^500\"",
+        "SecRule ARGS:foo \"@rx ^bar$\" \"id:1234,phase:request,deny,status:403\""
+      ]
+    },
+    {
+        "enabled":1,
+        "version_min":300000,
+        "title":"Case 2. Rule matches the request but the return status code '403' is not relevant. The 'noauditlog' action is specified.",
+        "client":{
+          "ip":"127.0.0.1",
+          "port":1234
+        },
+        "server":{
+          "ip":"127.0.0.1",
+          "port":80
+        },
+        "request":{
+          "headers":{
+            "Host":"localhost",
+            "User-Agent":"curl/7.38.0",
+            "Accept":"*/*"
+          },
+          "uri":"index.php?foo=bar",
+          "method":"GET",
+          "body": ""
+        },
+        "expected": {
+          "http_code": 403,
+          "error_log": "Access denied with code 403",
+          "audit_log": "^$",
+          "debug_log": "Return code `403' is not interesting to audit logs"
+        },
+        "rules":[
+          "SecRuleEngine On",
+          "SecAuditEngine RelevantOnly",
+          "SecAuditLogParts ABIJDEFHZ",
+          "SecAuditLog /tmp/test/modsec_audit.log",
+          "SecAuditLogDirMode 0766",
+          "SecAuditLogFileMode 0666",
+          "SecAuditLogType Serial",
+          "SecAuditLogRelevantStatus \"^500\"",
+          "SecRule ARGS:foo \"@rx ^bar$\" \"id:1234,phase:request,noauditlog,deny,status:403\""
+        ]
+      },
+      {
+        "enabled":1,
+        "version_min":300000,
+        "title":"Case 3. Rule matches the request and the return status code '403' is relevant. The 'noauditlog' action is not specified.",
+        "client":{
+          "ip":"127.0.0.1",
+          "port":1234
+        },
+        "server":{
+          "ip":"127.0.0.1",
+          "port":80
+        },
+        "request":{
+          "headers":{
+            "Host":"localhost",
+            "User-Agent":"curl/7.38.0",
+            "Accept":"*/*"
+          },
+          "uri":"index.php?foo=bar",
+          "method":"GET",
+          "body": ""
+        },
+        "expected": {
+          "http_code": 403,
+          "error_log": "Access denied with code 403",
+          "audit_log": "Access denied with code 403",
+          "debug_log": "Request was relevant to be saved"
+        },
+        "rules":[
+          "SecRuleEngine On",
+          "SecAuditEngine RelevantOnly",
+          "SecAuditLogParts ABIJDEFHZ",
+          "SecAuditLog /tmp/test/modsec_audit.log",
+          "SecAuditLogDirMode 0766",
+          "SecAuditLogFileMode 0666",
+          "SecAuditLogType Serial",
+          "SecAuditLogRelevantStatus \"^403\"",
+          "SecRule ARGS:foo \"@rx ^bar$\" \"id:1234,phase:request,deny,status:403\""
+        ]
+      },
+      {
+        "enabled":1,
+        "version_min":300000,
+        "title":"Case 4. Rule matches the request and the return status code '403' is relevant. The 'noauditlog' action is specified.",
+        "client":{
+          "ip":"127.0.0.1",
+          "port":1234
+        },
+        "server":{
+          "ip":"127.0.0.1",
+          "port":80
+        },
+        "request":{
+          "headers":{
+            "Host":"localhost",
+            "User-Agent":"curl/7.38.0",
+            "Accept":"*/*"
+          },
+          "uri":"index.php?foo=bar",
+          "method":"GET",
+          "body": ""
+        },
+        "expected": {
+          "http_code": 403,
+          "error_log": "Access denied with code 403",
+          "audit_log": "^$",
+          "debug_log": "Return code `403' is not interesting to audit logs"
+        },
+        "rules":[
+          "SecRuleEngine On",
+          "SecAuditEngine RelevantOnly",
+          "SecAuditLogParts ABIJDEFHZ",
+          "SecAuditLog /tmp/test/modsec_audit.log",
+          "SecAuditLogDirMode 0766",
+          "SecAuditLogFileMode 0666",
+          "SecAuditLogType Serial",
+          "SecAuditLogRelevantStatus \"^403\"",
+          "SecRule ARGS:foo \"@rx ^bar$\" \"id:1234,phase:request,noauditlog,deny,status:403\""
+        ]
+      }
+
+  ]
+  

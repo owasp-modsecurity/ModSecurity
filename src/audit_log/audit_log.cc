@@ -304,11 +304,11 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
 
     if ((m_status == RelevantOnlyAuditLogStatus
         && this->isRelevant(transaction->m_httpCodeReturned) == false)
-        && saveAnyway == false) {
+        || saveAnyway == false) {
         ms_dbg_a(transaction, 9, "Return code `" +
             std::to_string(transaction->m_httpCodeReturned) + "'" \
             " is not interesting to audit logs, relevant code(s): `" +
-            m_relevant + "'.");
+            m_relevant + "', saveAnyway: `" + std::to_string(saveAnyway) + "'.");
 
         return false;
     }
