@@ -54,9 +54,14 @@ duplicateBranch:src/request_body_processor/multipart.cc:93
 danglingTempReference:src/modsecurity.cc:206
 knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
 knownConditionTrueFalse:src/operators/verify_svnr.cc:87
+rethrowNoCurrentException:headers/modsecurity/transaction.h:306
+rethrowNoCurrentException:src/rule_with_actions.cc:123
+constVariable:src/utils/base64.cc:122
 
 noExplicitConstructor:seclang-parser.hh
 constParameter:seclang-parser.hh
+accessMoved:seclang-parser.hh
+returnTempReference:seclang-parser.hh
 
 unusedFunction
 missingIncludeSystem
@@ -67,6 +72,8 @@ unmatchedSuppression
 missingInclude
 
 purgedConfiguration
+
+constParameter
 
 
 // Examples
