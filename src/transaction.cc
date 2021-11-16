@@ -830,6 +830,9 @@ int Transaction::processRequestBody() {
     if (m_requestBodyProcessor == JSONRequestBody) {
 #endif
         std::string error;
+        if (m_rules->m_requestBodyJsonDepthLimit.m_set) {
+            m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
+        }
         if (m_json->init() == true) {
             m_json->processChunk(m_requestBody.str().c_str(),
                 m_requestBody.str().size(),

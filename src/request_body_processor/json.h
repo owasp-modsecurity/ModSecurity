@@ -29,7 +29,6 @@
 #include "modsecurity/rules_set.h"
 
 
-
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
@@ -104,12 +103,19 @@ class JSON {
         return ret;
     }
 
+    void setMaxDepth(double max_depth) {
+        m_max_depth = max_depth;
+    }
+
  private:
     std::deque<JSONContainer *> m_containers;
     Transaction *m_transaction;
     yajl_handle m_handle;
     yajl_status m_status;
     std::string m_current_key;
+    double m_max_depth;
+    int64_t m_current_depth;
+    bool m_depth_limit_exceeded;
 };
 
 
