@@ -95,6 +95,7 @@ typedef struct msc_parm msc_parm;
 #define REQUEST_BODY_DEFAULT_INMEMORY_LIMIT     131072
 #define REQUEST_BODY_DEFAULT_LIMIT              134217728
 #define REQUEST_BODY_NO_FILES_DEFAULT_LIMIT     1048576
+#define REQUEST_BODY_JSON_DEPTH_DEFAULT_LIMIT   10000
 #define RESPONSE_BODY_DEFAULT_LIMIT             524288
 #define RESPONSE_BODY_HARD_LIMIT                1073741824L
 
@@ -498,6 +499,7 @@ struct directory_config {
     long int             reqbody_inmemory_limit;
     long int             reqbody_limit;
     long int             reqbody_no_files_limit;
+    long int             reqbody_json_depth_limit;
     int                  resbody_access;
 
     long int             of_limit;

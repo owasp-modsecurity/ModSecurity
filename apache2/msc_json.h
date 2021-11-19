@@ -40,6 +40,8 @@ struct json_data {
     /* prefix is used to create data hierarchy (i.e., 'parent.child.value') */
     unsigned char *prefix;
     unsigned char *current_key;
+    long int current_depth;
+    int depth_limit_exceeded;
 };
 
 /* Functions */

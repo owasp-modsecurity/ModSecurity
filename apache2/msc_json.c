@@ -164,6 +164,11 @@ static int yajl_start_array(void *ctx) {
     else {
         msr->json->prefix = apr_pstrdup(msr->mp, msr->json->current_key);
     }
+    msr->json->current_depth++;
+    if (msr->json->current_depth > msr->txcfg->reqbody_json_depth_limit) {
+        msr->json->depth_limit_exceeded = 1;
+	return 0;
+    }
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "New JSON hash context (prefix '%s')", msr->json->prefix);
@@ -200,6 +205,7 @@ static int yajl_end_array(void *ctx) {
          */
         msr->json->prefix = (unsigned char *) NULL;
     }
+    msr->json->current_depth--;
 
     return 1;
 }
@@ -228,6 +234,11 @@ static int yajl_start_map(void *ctx)
     }
     else {
         msr->json->prefix = apr_pstrdup(msr->mp, msr->json->current_key);
+    }
+    msr->json->current_depth++;
+    if (msr->json->current_depth > msr->txcfg->reqbody_json_depth_limit) {
+        msr->json->depth_limit_exceeded = 1;
+	return 0;
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
@@ -270,6 +281,7 @@ static int yajl_end_map(void *ctx)
         msr->json->current_key = msr->json->prefix;
         msr->json->prefix = (unsigned char *) NULL;
     }
+    msr->json->current_depth--;
 
     return 1;
 }
@@ -308,6 +320,9 @@ int json_init(modsec_rec *msr, char **error_msg) {
     msr->json->prefix = (unsigned char *) NULL;
     msr->json->current_key = (unsigned char *) NULL;
 
+    msr->json->current_depth = 0;
+    msr->json->depth_limit_exceeded = 0;
+
     /**
      * yajl initialization
      *
@@ -337,7 +352,11 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
     msr->json->status = yajl_parse(msr->json->handle, buf, size);
     if (msr->json->status != yajl_status_ok) {
         /* We need to free the yajl error message later, how to do this? */
-        *error_msg = yajl_get_error(msr->json->handle, 0, buf, size);
+	if (msr->json->depth_limit_exceeded) {
+           *error_msg = "JSON depth limit exceeded";
+	} else {
+           *error_msg = yajl_get_error(msr->json->handle, 0, NULL, 0);
+	}
         return -1;
     }
 
@@ -357,7 +376,12 @@ int json_complete(modsec_rec *msr, char **error_msg) {
     msr->json->status = yajl_complete_parse(msr->json->handle);
     if (msr->json->status != yajl_status_ok) {
         /* We need to free the yajl error message later, how to do this? */
-        *error_msg = yajl_get_error(msr->json->handle, 0, NULL, 0);
+	if (msr->json->depth_limit_exceeded) {
+           *error_msg = "JSON depth limit exceeded";
+	} else {
+           *error_msg = yajl_get_error(msr->json->handle, 0, NULL, 0);
+	}
+
         return -1;
     }
 
