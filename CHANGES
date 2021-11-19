@@ -1,3 +1,9 @@
+DD mmm YYYY - 2.9.x (to be released)
+-------------------
+
+ * Support configurable limit on depth of JSON parsing
+   [@theMiddleBlue, @airween, @dune73, @martinhsv]
+
 21 Jun 2021 - 2.9.4
 -------------------
 
