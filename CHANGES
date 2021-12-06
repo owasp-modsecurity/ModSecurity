@@ -1,3 +1,9 @@
+DD mmm YYYY - 2.9.x (to be released)
+-------------------
+
+ * IIS: Update dependencies for Windows build as of v2.9.5
+   [@martinhsv]
+
 22 Nov 2021 - 2.9.5
 -------------------
 

@@ -8,14 +8,14 @@
 
 :: Dependencies
 @set CMAKE=cmake-3.12.4-win32-x86.zip
-@set PCRE=pcre-8.41.zip
+@set PCRE=pcre-8.45.zip
 @set ZLIB=zlib-1.2.11.tar.gz
-@set LIBXML2=libxml2-2.9.11.tar.gz
+@set LIBXML2=libxml2-2.9.12.tar.gz
 @set LUA=lua-5.3.6.tar.gz
-@set CURL=curl-7.77.0.zip
-@set APACHE_SRC=httpd-2.4.48.tar.gz
-@set APACHE_BIN32=httpd-2.4.48-win32-VS16.zip
-@set APACHE_BIN64=httpd-2.4.48-win64-VS16.zip
+@set CURL=curl-7.79.0.zip
+@set APACHE_SRC=httpd-2.4.51.tar.gz
+@set APACHE_BIN32=httpd-2.4.51-win32-VS16.zip
+@set APACHE_BIN64=httpd-2.4.51-win64-VS16.zip
 @set YAJL=yajl-2.1.0.zip
 @set SSDEEP=ssdeep-2.14.1.tar.gz
 @set SSDEEP_BIN=ssdeep-2.14.1.zip
@@ -23,11 +23,11 @@
 @set CMAKE_DIR=%WORK_DIR%\%CMAKE:~0,-4%\bin
 
 :: Aditional paths.
-@set PATH=%PATH%;%CMAKE_DIR%;"c:\program files\7-zip"
+@set "DIR_7ZIP=c:\program files\7-zip"
+@set PATH=%PATH%;%CMAKE_DIR%;%DIR_7ZIP%
 
-
-:: @set VCARGS32="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
-:: @set VCARGS64="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
+:: @set VCARGS32="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
+:: @set VCARGS64="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsx86_amd64.bat"
 
 
 :: Do not edit bellow this line.
