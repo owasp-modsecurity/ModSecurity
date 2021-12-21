@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Add SecRequestBodyJsonDepthLimit to modsecurity.conf-recommended
+   [Issue #2647 @theMiddleBlue, @airween, @877509395 ,@martinhsv]
  * IIS: Update dependencies for Windows build as of v2.9.5
    [@martinhsv]
 
