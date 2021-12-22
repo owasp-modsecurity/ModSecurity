@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add SecRequestBodyJsonDepthLimit to modsecurity.conf-recommended
+    [Issue #2647 @theMiddleBlue, @airween, @877509395 ,@martinhsv]
 
 
 v3.0.6 - 2021-Nov-19
