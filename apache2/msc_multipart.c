@@ -20,7 +20,7 @@
 #include "msc_util.h"
 #include "msc_parsers.h"
 
-void validate_quotes(modsec_rec *msr, char *data)  {
+void validate_quotes(modsec_rec *msr, char *data, char quote)  {
     int i, len;
 
     if(msr == NULL)
@@ -31,6 +31,12 @@ void validate_quotes(modsec_rec *msr, char *data)  {
 
     if(data == NULL)
         return;
+
+    // if the value was enclosed in double quotes, then we don't care about
+    // a single quote character within the name.
+    if (quote == '"') {
+        return;
+    }
 
     len = strlen(data);
 
@@ -123,9 +129,10 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
          * set so the user can deal with it in the rules if they so wish.
          */
 
+        char quote = '\0';
         if ((*p == '"') || (*p == '\'')) {
             /* quoted */
-            char quote = *p;
+            quote = *p; // remember which quote character was used for the value
 
             if (quote == '\'') {
                 msr->mpd->flag_invalid_quoting = 1;
@@ -182,7 +189,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
         if (strcmp(name, "name") == 0) {
 
-            validate_quotes(msr, value);
+            validate_quotes(msr, value, quote);
 
             msr->multipart_name = apr_pstrdup(msr->mp, value);
 
@@ -201,7 +208,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         else
         if (strcmp(name, "filename") == 0) {
 
-            validate_quotes(msr, value);
+            validate_quotes(msr, value, quote);
 
             msr->multipart_filename = apr_pstrdup(msr->mp, value);
 

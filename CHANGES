@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Multipart names/filenames may include single quote if double-quote enclosed
+   [Issue #2352 @martinhsv]
  * Add SecRequestBodyJsonDepthLimit to modsecurity.conf-recommended
    [Issue #2647 @theMiddleBlue, @airween, @877509395 ,@martinhsv]
  * IIS: Update dependencies for Windows build as of v2.9.5

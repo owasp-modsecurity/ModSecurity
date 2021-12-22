@@ -736,6 +736,45 @@
     ),
 },
 
+# Single quote within double quotes is ok
+{
+    type => "misc",
+    comment => "multipart parser (C-D uses single quote within double quotes)",
+    conf => qq(
+        SecRuleEngine On
+        SecDebugLog $ENV{DEBUG_LOG}
+        SecDebugLogLevel 9
+        SecRequestBodyAccess On
+        SecRule MULTIPART_INVALID_QUOTING "!\@eq 0" "phase:2,deny,id:500169"
+    ),
+    match_log => {
+        debug => [ qr/Adding request argument \(BODY\): name "a'b/s, 1 ],
+        -debug => [ qr/Adding request argument \(BODY\): name "b/s, 1 ],
+    },
+    match_response => {
+        status => qr/^200$/,
+    },
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="a'b"
+                
+                1
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="aaa"; filename="d'ummy"
+                
+                2
+                -----------------------------69343412719991675451336310646--
+            ),
+        ),
+    ),
+},
+
 # Invalid boundary separators
 {
     type => "misc",
