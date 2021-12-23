@@ -227,11 +227,17 @@ int Multipart::boundary_characters_valid(const char *boundary) {
 }
 
 
-void Multipart::validate_quotes(const char *data)  {
+void Multipart::validate_quotes(const char *data, char quote)  {
     int i, len;
 
     if (data == NULL)
         return;
+
+    // if the value was enclosed in double quotes, then we don't care about
+    // a single quote character within the name.
+    if (quote == '"') {
+        return;
+    }
 
     len = strlen(data);
 
@@ -318,6 +324,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             return -6;
         }
 
+        char quote = '\0';
         if (name == "filename*") {
             /* filename*=charset'[optional-language]'filename */
             /* Read beyond the charset and the optional language*/
@@ -357,7 +364,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
              * technically "'" is invalid and so flag_invalid_quoting is
              * set so the user can deal with it in the rules if they so wish.
              */
-            char quote = *p;
+            quote = *p; // remember which quote character was used for the value
 
             if (quote == '\'') {
                 m_flag_invalid_quoting = 1;
@@ -408,7 +415,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
 
         /* evaluate part */
         if (name == "name") {
-            validate_quotes(value.c_str());
+            validate_quotes(value.c_str(), quote);
 
             m_transaction->m_variableMultipartName.set(value, value,
                 offset + ((p - c_d_value) - value.size()));
@@ -424,7 +431,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Content-Disposition name: " + value + ".");
         } else if (name == "filename") {
-            validate_quotes(value.c_str());
+            validate_quotes(value.c_str(), quote);
             m_transaction->m_variableMultipartFileName.set(value, value, \
                 offset + ((p - c_d_value) - value.size()));
 
