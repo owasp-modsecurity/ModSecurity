@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Fix memory leak that occurs on JSON parsing error
+   [Issue #2236 @argenet, @vloup, @martinhsv]
  * Multipart names/filenames may include single quote if double-quote enclosed
    [Issue #2352 @martinhsv]
  * Add SecRequestBodyJsonDepthLimit to modsecurity.conf-recommended
