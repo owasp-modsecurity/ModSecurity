@@ -1,7 +1,7 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
-  - Multipart names/filenames may include single quote if double-quote enclosed
+  - Adjust confusing variable name in setRequestBody method
     [Issue #2635 @Mesar-Ali, @martinhsv]
   - Multipart names/filenames may include single quote if double-quote enclosed
     [Issue #2352 @martinhsv]
