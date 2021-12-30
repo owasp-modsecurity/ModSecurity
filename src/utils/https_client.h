@@ -47,7 +47,7 @@ class HttpsClient {
     size_t handle_impl(char * data, size_t size, size_t nmemb);
     void setKey(const std::string& key);
     void setRequestType(const std::string& requestType);
-    void setRequestBody(const std::string& requestType);
+    void setRequestBody(const std::string& requestBody);
 
     std::string error;
  private:
