@@ -64,6 +64,7 @@ class Driver;
 #include "src/actions/block.h"
 #include "src/actions/capture.h"
 #include "src/actions/chain.h"
+#include "src/actions/ctl/audit_engine.h"
 #include "src/actions/ctl/audit_log_parts.h"
 #include "src/actions/ctl/request_body_access.h"
 #include "src/actions/ctl/rule_engine.h"
@@ -350,7 +351,7 @@ using namespace modsecurity::operators;
     a = std::move(c);
 
 
-#line 354 "seclang-parser.hh"
+#line 355 "seclang-parser.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -484,7 +485,7 @@ using namespace modsecurity::operators;
 #endif
 
 namespace yy {
-#line 488 "seclang-parser.hh"
+#line 489 "seclang-parser.hh"
 
 
 
@@ -8625,7 +8626,7 @@ switch (yykind)
   }
 
 } // yy
-#line 8629 "seclang-parser.hh"
+#line 8630 "seclang-parser.hh"
 
 
 

@@ -21,6 +21,7 @@
 
 #include <fstream>
 
+#include "modsecurity/transaction.h"
 #include "modsecurity/rule_message.h"
 #include "src/audit_log/writer/https.h"
 #include "src/audit_log/writer/parallel.h"
@@ -61,7 +62,8 @@ AuditLog::AuditLog()
     m_status(NotSetLogStatus),
     m_type(NotSetAuditLogType),
     m_relevant(""),
-    m_writer(NULL) { }
+    m_writer(NULL),
+    m_ctlAuditEngineActive(false) { }
 
 
 AuditLog::~AuditLog() {
@@ -210,7 +212,8 @@ bool AuditLog::setType(AuditLogType audit_type) {
 bool AuditLog::init(std::string *error) {
     audit_log::writer::Writer *tmp_writer;
 
-    if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
+    if ((m_status == OffAuditLogStatus || m_status == NotSetLogStatus)
+        && !m_ctlAuditEngineActive) {
         if (m_writer) {
             delete m_writer;
             m_writer = NULL;
@@ -275,7 +278,13 @@ bool AuditLog::saveIfRelevant(Transaction *transaction) {
 
 bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
     bool saveAnyway = false;
-    if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
+
+    AuditLogStatus transactionAuditLogStatus(m_status);
+    if (transaction->m_ctlAuditEngine != NotSetLogStatus) {
+        transactionAuditLogStatus = transaction->m_ctlAuditEngine;
+    }
+
+    if (transactionAuditLogStatus == OffAuditLogStatus || transactionAuditLogStatus == NotSetLogStatus) {
         ms_dbg_a(transaction, 5, "Audit log engine was not set.");
         return true;
     }
@@ -287,7 +296,7 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
         }
     }
 
-    if ((m_status == RelevantOnlyAuditLogStatus
+    if ((transactionAuditLogStatus == RelevantOnlyAuditLogStatus
         && this->isRelevant(transaction->m_httpCodeReturned) == false)
         && saveAnyway == false) {
         ms_dbg_a(transaction, 9, "Return code `" +
@@ -351,6 +360,10 @@ bool AuditLog::merge(AuditLog *from, std::string *error) {
 
     if (from->m_format != NotSetAuditLogFormat) {
         m_format = from->m_format;
+    }
+
+    if (from->m_ctlAuditEngineActive) {
+        m_ctlAuditEngineActive = from->m_ctlAuditEngineActive;
     }
 
     return init(error);
