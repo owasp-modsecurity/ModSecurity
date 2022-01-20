@@ -775,6 +775,17 @@ ngx_http_modsecurity_detection_thread_func(void *data, ngx_log_t *log)
     ngx_http_modsecurity_thread_ctx_t *thread_ctx = data;
     ngx_http_modsecurity_ctx_t *mod_ctx = ngx_http_get_module_ctx(thread_ctx->r, ngx_http_modsecurity);
 
+    /*
+     * Work item - 13015536
+     * error_page directive can cause the request to switch to a location where ModSecurity is disabled
+     * ngx_http_get_module_ctx call above will return a NULL in this case.
+     * TODO: The current design of handing off modsec execution to a thread is happening too soon. It must
+     * be done after modsec has everything it needs from nginx request structure.
+     */
+    if (NULL == mod_ctx) {
+        return;
+    }
+
     // Processing request headers
     ngx_int_t rc = ngx_http_modsecurity_status(modsecProcessRequestHeaders(mod_ctx->req));
     if (rc != NGX_DECLINED) {
