@@ -370,7 +370,16 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
                 msr_log(msr, 2, "%s", *error_msg);
+                json_free_error(msr, &my_error_msg);
             }
+
+            /*
+	     * Jan 14 2022 - The way json_process_chunk is implemented, my_error_msg will be
+	     * initialized only in the case where a negative/error value is returned. It is
+	     * safe to avoid calling json_free_error here. If the implementation of json_process_chunk
+	     * were to change, it might be neccessary to call json_free_error outside the if block above
+	     * to avoid memory leaks.
+	     */
 #else
             *error_msg = apr_psprintf(msr->mp, "JSON support was not enabled");
             msr->msc_reqbody_error = 1;
@@ -715,8 +724,17 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
                 msr_log(msr, 2, "%s", *error_msg);
-                 return -1;
-             }
+                json_free_error(msr, &my_error_msg);
+                return -1;
+            }
+
+            /*
+	     * Jan 14 2022 - The way json_process_chunk is implemented, my_error_msg will be
+	     * initialized only in the case where a negative/error value is returned. It is
+	     * safe to avoid calling json_free_error here. If the implementation of json_process_chunk
+	     * were to change, it might be neccessary to call json_free_error outside the if block above
+	     * to avoid memory leaks.
+	     */
 #else
             *error_msg = apr_psprintf(msr->mp, "JSON support was not enabled");
             msr->msc_reqbody_error = 1;

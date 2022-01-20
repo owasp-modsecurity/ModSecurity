@@ -277,9 +277,7 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
     /* Feed our parser and catch any errors */
     msr->json->status = yajl_parse(msr->json->handle, buf, size);
     if (msr->json->status != yajl_status_ok) {
-        char *yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
-        *error_msg = apr_pstrdup(msr->mp, yajl_err);
-        yajl_free_error(msr->json->handle, yajl_err);
+        *error_msg = yajl_get_error(msr->json->handle, 0, buf, size);
         return -1;
     }
 
@@ -298,13 +296,21 @@ int json_complete(modsec_rec *msr, char **error_msg) {
     /* Wrap up the parsing process */
     msr->json->status = yajl_complete_parse(msr->json->handle);
     if (msr->json->status != yajl_status_ok) {
-        char *yajl_err = yajl_get_error(msr->json->handle, 0, NULL, 0);
-        *error_msg = apr_pstrdup(msr->mp, yajl_err);
-        yajl_free_error(msr->json->handle, yajl_err);
+        *error_msg = yajl_get_error(msr->json->handle, 0, NULL, 0);
         return -1;
     }
 
     return 1;
+}
+
+/**
+ * Frees yajl error string.
+ */
+void json_free_error(modsec_rec *msr, char **error_msg) {
+    if ((error_msg != NULL) && (*error_msg != NULL)) {
+        yajl_free_error(msr->json->handle, *error_msg);
+        *error_msg = NULL;
+    }
 }
 
 /**
