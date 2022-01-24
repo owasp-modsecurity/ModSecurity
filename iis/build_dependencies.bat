@@ -23,7 +23,7 @@
 @set CMAKE_DIR=%WORK_DIR%\%CMAKE:~0,-4%\bin
 
 :: Aditional paths.
-@set PATH=%PATH%;%CMAKE_DIR%;"c:\program files\7-zip"
+@set PATH=%PATH%;%CMAKE_DIR%
 
 
 :: @set VCARGS32="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
