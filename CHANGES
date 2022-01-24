@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix multiMatch msg, etc, population in audit log
+    [Issue #2573 - @Sachin-M-Desai, @martinhsv]
   - Fix some name handling for ARGS_*NAMES: regex SecRuleUpdateTargetById, etc.
     [Issue #2627, #2648 - @lontchianicet, @victorserbu2709, @martinhsv]
   - Adjust confusing variable name in setRequestBody method
