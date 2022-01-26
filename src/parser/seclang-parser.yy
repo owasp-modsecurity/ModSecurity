@@ -25,6 +25,7 @@ class Driver;
 #include "src/actions/block.h"
 #include "src/actions/capture.h"
 #include "src/actions/chain.h"
+#include "src/actions/ctl/audit_engine.h"
 #include "src/actions/ctl/audit_log_parts.h"
 #include "src/actions/ctl/request_body_access.h"
 #include "src/actions/ctl/rule_engine.h"
@@ -2625,18 +2626,17 @@ act:
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::AuditEngine("ctl:auditengine=on"));
+        driver.m_auditLog->setCtlAuditEngineActive();
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::AuditEngine("ctl:auditengine=off"));
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::AuditEngine("ctl:auditengine=relevantonly"));
+        driver.m_auditLog->setCtlAuditEngineActive();
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
