@@ -1,6 +1,10 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix duplication typo in code comment
+    [Issue #2677 - @gleydsonsoares]
+  - Add ctl:auditEngine action support
+    [Issue #2606 - @alekravch, @martinhsv]
   - Fix multiMatch msg, etc, population in audit log
     [Issue #2573 - @Sachin-M-Desai, @martinhsv]
   - Fix some name handling for ARGS_*NAMES: regex SecRuleUpdateTargetById, etc.
