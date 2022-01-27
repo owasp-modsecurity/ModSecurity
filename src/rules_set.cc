@@ -37,7 +37,7 @@ namespace modsecurity {
  * @brief   load rules from a give uri
  * @ingroup ModSecCore
  *
- * Load the rules from a given uri into memory into memory in
+ * Load the rules from a given uri into memory in
  * the format expected by ModSecurity core.
  *
  * @param uri Full path to the rules file.
