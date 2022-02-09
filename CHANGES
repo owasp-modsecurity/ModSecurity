@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix misuses of LMDB API
+    [Issue #2601, #2602 - @hyc]
   - Fix duplication typo in code comment
     [Issue #2677 - @gleydsonsoares]
   - Add ctl:auditEngine action support
