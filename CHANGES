@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Support SecRequestBodyNoFilesLimit
+    [Issue #2670 - @airween, @martinhsv]
   - Fix misuses of LMDB API
     [Issue #2601, #2602 - @hyc]
   - Fix duplication typo in code comment
