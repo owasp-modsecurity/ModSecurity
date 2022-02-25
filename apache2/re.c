@@ -1029,6 +1029,27 @@ msre_action *msre_create_action(msre_engine *engine, apr_pool_t *mp, const char 
     return action;
 }
 
+// Return 1 if "name=value" is present in table
+static int apr_table_exists_(apr_pool_t* p, const apr_table_t* vartable, const char* expected, const char* name, const char* value) {
+    const char* vars = apr_table_getm(p, vartable, name);
+    if (!vars) return 0;
+
+    char pattern[200];
+    sprintf(pattern, "(?:^|,)%.185s(?:,|$)", value);
+
+    const char* errptr = NULL;
+    int erroffset;
+    const pcre* regex = pcre_compile(pattern, 0, &errptr, &erroffset, NULL);
+    return !pcre_exec(regex, NULL, vars, strlen(vars), 0, 0, 0, 0);
+}
+
+// Return 1 if "name=value" is present in table for tags & logdata
+static int action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* name, const char* value) {
+    if (strcmp(name, "logdata") == 0 && apr_table_exists_(p, vartable, "logdata", name, value)) return 1;
+    if (strcmp(name, "tag")     == 0 && apr_table_exists_(p, vartable, "tag",     name, value)) return 1;
+    return 0;
+}
+
 /**
  * Generic parser that is used as basis for target and action parsing.
  * It breaks up the input string into name-parameter pairs and places
@@ -1146,9 +1167,11 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
             value = apr_pstrmemdup(mp, value, p - value);
         }
 
+        if (!action_exists(mp, vartable, name, value)) {
         /* add to table */
         apr_table_addn(vartable, name, value);
         count++;
+        }
 
         /* move to the first character of the next name-value pair */
         while(isspace(*p)||(*p == ',')||(*p == '|')) p++;
