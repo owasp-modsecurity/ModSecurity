@@ -1029,8 +1029,10 @@ msre_action *msre_create_action(msre_engine *engine, apr_pool_t *mp, const char 
     return action;
 }
 
-// Return 1 if "name=value" is present in table
-static int apr_table_exists_(apr_pool_t* p, const apr_table_t* vartable, const char* expected, const char* name, const char* value) {
+// Return 1 if "name=value" is present in table (for supplied action)
+static int apr_table_action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* action, const char* name, const char* value) {
+    if (strcmp(name, action) != 0) return 0;
+
     const char* vars = apr_table_getm(p, vartable, name);
     if (!vars) return 0;
 
@@ -1043,10 +1045,22 @@ static int apr_table_exists_(apr_pool_t* p, const apr_table_t* vartable, const c
     return !pcre_exec(regex, NULL, vars, strlen(vars), 0, 0, 0, 0);
 }
 
-// Return 1 if "name=value" is present in table for tags & logdata
+// Return 1 if "name=value" is present in table for tags, logdata (and others)
 static int action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* name, const char* value) {
-    if (strcmp(name, "logdata") == 0 && apr_table_exists_(p, vartable, "logdata", name, value)) return 1;
-    if (strcmp(name, "tag")     == 0 && apr_table_exists_(p, vartable, "tag",     name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "capture",    name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "chain",      name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "initcol",    name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "logdata",    name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "multiMatch", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "tag",        name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitiseArg", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitiseMatched", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitiseMatchedBytes", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitiseRequestHeader", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitiseResponseHeader", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "tsetuidag",              name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "setrsc",                 name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "setsid",               name, value)) return 1;
     return 0;
 }
 
