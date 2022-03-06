@@ -27,6 +27,9 @@
 #include "src/parser/driver.h"
 #include "src/utils/https_client.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule_unconditional.h"
+#include "modsecurity/rule_with_operator.h"
+
 
 void print_help() {
     std::cout << "Use ./optimization /path/to/files.something" << std::endl;
@@ -77,18 +80,16 @@ int main(int argc, char **argv) {
         std::cout << " rules)" << std::endl;
 
         std::unordered_map<std::string, int> operators;
-        std::unordered_map<std::string, int> variables;
-        std::unordered_map<std::string, int> op2var;
 
         for (int i = 0; i < rules->size(); i++) {
             auto z = rules->at(i);
-            //std::string key;
+            std::string key;
             if (z == NULL) {
                 continue;
             }
-            #if 0
-            if (z->isUnconditional() == false) {
-                std::string op = z->getOperatorName();
+
+            if (dynamic_cast<modsecurity::RuleUnconditional *>(z.get()) != nullptr) {
+                std::string op = "Unconditional";
                 if (operators.count(op) > 0) {
                     operators[op] = 1 + operators[op];
                 } else {
@@ -96,53 +97,29 @@ int main(int argc, char **argv) {
                 }
                 key = op;
             }
-            #endif
 
-            #if 0
-            FIXME: This test may not be useful anymore. Disabling it for now.
+            if (dynamic_cast<modsecurity::RuleWithOperator *>(z.get()) != nullptr) {
+                auto *rwo = dynamic_cast<modsecurity::RuleWithOperator *>(z.get());
 
-            if (z->m_variables != NULL) {
-                std::string var = std::string("") + z->m_variables;
-                if (variables.count(var) > 0) {
-                    variables[var] = 1 + variables[var];
+                std::string op = rwo->getOperatorName();
+                if (operators.count(op) > 0) {
+                    operators[op] = 1 + operators[op];
                 } else {
-                    variables[var] = 1;
+                    operators[op] = 1;
                 }
-                key = key + var;
+                key = op;
             }
-            if (z->m_variables != NULL && z->m_op != NULL) {
-                if (op2var.count(key) > 0) {
-                    op2var[key] = 1 + op2var[key];
-                } else {
-                    op2var[key] = 1;
-                }
-            }
-            #endif
+
         }
-
-        if (operators.empty() && variables.empty() && op2var.empty()) {
+        if (operators.empty()) {
             std::cout << " ~ no SecRule found ~ " << std::endl;
             continue;
         }
+
         std::cout << " Operators" << std::endl;
         for (auto &z : operators) {
             auto &s = z.second;
             std::cout << "   " << std::left << std::setw(20) << z.first;
-            std::cout << std::right << std::setw(4) << s;
-            std::cout << std::endl;
-        }
-
-        std::cout << " Variables" << std::endl;
-        for (auto &z : variables) {
-            auto &s = z.second;
-            std::cout << "   " << std::left << std::setw(20) << z.first;
-            std::cout << std::right << std::setw(4) << s;
-            std::cout << std::endl;
-        }
-        std::cout << " Operators applied to variables" << std::endl;
-        for (auto &z : op2var) {
-            auto &s = z.second;
-            std::cout << "   " << std::left << std::setw(40) << z.first;
             std::cout << std::right << std::setw(4) << s;
             std::cout << std::endl;
         }

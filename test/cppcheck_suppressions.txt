@@ -35,8 +35,8 @@ invalidScanfArgType_int:src/rules_set_properties.cc:102
 unmatchedSuppression:src/utils/geo_lookup.cc:82
 useInitializationList:src/utils/shared_files.h:87
 unmatchedSuppression:src/utils/msc_tree.cc
-functionStatic:headers/modsecurity/transaction.h:407
-duplicateBranch:src/audit_log/audit_log.cc:223
+functionStatic:headers/modsecurity/transaction.h:408
+duplicateBranch:src/audit_log/audit_log.cc:226
 unreadVariable:src/request_body_processor/multipart.cc:435
 stlcstrParam:src/audit_log/writer/parallel.cc:145
 functionStatic:src/engine/lua.h:70
@@ -54,9 +54,26 @@ duplicateBranch:src/request_body_processor/multipart.cc:93
 danglingTempReference:src/modsecurity.cc:206
 knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
 knownConditionTrueFalse:src/operators/verify_svnr.cc:87
+rethrowNoCurrentException:headers/modsecurity/transaction.h:307
+rethrowNoCurrentException:src/rule_with_actions.cc:123
+ctunullpointer:src/rule_with_actions.cc:237
+ctunullpointer:src/rule_with_operator.cc:135
+ctunullpointer:src/rule_with_operator.cc:95
+passedByValue:src/variables/global.h:109
+passedByValue:src/variables/global.h:110
+passedByValue:src/variables/tx.h:102
+passedByValue:src/operators/operator.cc:141
+passedByValue:src/parser/driver.cc:45
+passedByValue:src/transaction.cc:281
+passedByValue:src/utils/system.cc:154
+passedByValue:src/utils/system.cc:166
+passedByValue:test/common/modsecurity_test.cc:49
+passedByValue:test/common/modsecurity_test.cc:98
 
 noExplicitConstructor:seclang-parser.hh
 constParameter:seclang-parser.hh
+accessMoved:seclang-parser.hh
+returnTempReference:seclang-parser.hh
 
 unusedFunction
 missingIncludeSystem
@@ -67,6 +84,11 @@ unmatchedSuppression
 missingInclude
 
 purgedConfiguration
+
+constParameter
+
+nullPointerRedundantCheck
+knownConditionTrueFalse
 
 
 // Examples

@@ -49,6 +49,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_PROG_CXX
 AM_PROG_AR
 AC_PROG_MAKE_SET
+PKG_PROG_PKG_CONFIG
 
 
 # Check if the compiler is c++11 compatible.

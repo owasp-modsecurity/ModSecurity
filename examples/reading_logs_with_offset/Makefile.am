@@ -39,6 +39,7 @@ read_CPPFLAGS = \
 	-I../others \
 	-fPIC \
 	-O3 \
+	$(CURL_CFLAGS) \
 	$(GEOIP_CFLAGS) \
 	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \

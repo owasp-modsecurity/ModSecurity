@@ -119,7 +119,7 @@ void Base64::decode_forgiven_engine(unsigned char *plain_text,
     int i = 0, j = 0, k = 0;
     int ch = 0;
     static const char b64_pad = '=';
-    static int b64_reverse_t[256] = {
+    static const int b64_reverse_t[256] = {
         -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -1, -2, -2, -1, -2, -2,
         -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
         -1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, 62, -2, -2, -2, 63,

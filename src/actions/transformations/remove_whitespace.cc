@@ -25,7 +25,6 @@
 #include "modsecurity/transaction.h"
 #include "src/actions/transformations/transformation.h"
 
-#define NBSP 160    // non breaking space char
 
 namespace modsecurity {
 namespace actions {
@@ -41,12 +40,15 @@ std::string RemoveWhitespace::evaluate(const std::string &val,
     std::string value(val);
 
     int64_t i = 0;
-    char nonBreakingSpaces = 0xa0;
+    const char nonBreakingSpaces = 0xa0;
+    const char nonBreakingSpaces2 = 0xc2;
 
     // loop through all the chars
     while (i < value.size()) {
         // remove whitespaces and non breaking spaces (NBSP)
-        if (isspace(value[i]) || (value[i] == nonBreakingSpaces)) {
+        if (std::isspace(static_cast<unsigned char>(value[i]))
+            || (value[i] == nonBreakingSpaces)
+            || value[i] == nonBreakingSpaces2) {
             value.erase(i, 1);
         } else {
           /* if the space is not a whitespace char, increment counter

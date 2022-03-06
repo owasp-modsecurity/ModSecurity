@@ -22,12 +22,11 @@
 #ifndef HEADERS_MODSECURITY_AUDIT_LOG_H_
 #define HEADERS_MODSECURITY_AUDIT_LOG_H_
 
-#include "modsecurity/transaction.h"
-
 
 #ifdef __cplusplus
 
 namespace modsecurity {
+class Transaction;
 namespace audit_log {
 namespace writer {
 class Writer;
@@ -177,6 +176,10 @@ class AuditLog {
     static int addParts(int parts, const std::string& new_parts);
     static int removeParts(int parts, const std::string& new_parts);
 
+    void setCtlAuditEngineActive() {
+        m_ctlAuditEngineActive = true;
+    }
+
     bool merge(AuditLog *from, std::string *error);
 
     std::string m_path1;
@@ -203,6 +206,7 @@ class AuditLog {
     std::string m_relevant;
 
     audit_log::writer::Writer *m_writer;
+    bool m_ctlAuditEngineActive; // rules have at least one action On or RelevantOnly
 };
 
 

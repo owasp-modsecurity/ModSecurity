@@ -3,10 +3,6 @@ dnl CHECK_YAJL(ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND])
 
 AC_DEFUN([PROG_YAJL], [
 
-# Needed if pkg-config will be used.
-AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-
-
 # Possible names for the yajl library/package (pkg-config)
 YAJL_POSSIBLE_LIB_NAMES="yajl2 yajl"
 

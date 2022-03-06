@@ -118,6 +118,7 @@ ACTIONS = \
 	actions/capture.cc \
 	actions/chain.cc \
 	actions/ctl/audit_log_parts.cc \
+	actions/ctl/audit_engine.cc \
 	actions/ctl/rule_engine.cc \
 	actions/ctl/request_body_processor_json.cc \
 	actions/ctl/request_body_processor_xml.cc \
@@ -315,6 +316,7 @@ libmodsecurity_la_CPPFLAGS = \
 	-fPIC \
 	-O3 \
 	-I../headers \
+	$(CURL_CFLAGS) \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \

@@ -41,6 +41,7 @@ simple_request_CPPFLAGS = \
 	-fPIC \
 	-O3 \
 	$(GEOIP_CFLAGS) \
+	$(CURL_CFLAGS) \
 	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \

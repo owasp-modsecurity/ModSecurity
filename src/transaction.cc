@@ -122,6 +122,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     m_ruleRemoveTargetById(),
     m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
     m_auditLogModifier(),
+    m_ctlAuditEngine(AuditLog::AuditLogStatus::NotSetLogStatus),
     m_rulesMessages(),
     m_requestBody(),
     m_responseBody(),
@@ -195,6 +196,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_ruleRemoveTargetById(),
     m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
     m_auditLogModifier(),
+    m_ctlAuditEngine(AuditLog::AuditLogStatus::NotSetLogStatus),
     m_rulesMessages(),
     m_requestBody(),
     m_responseBody(),
@@ -445,11 +447,21 @@ int Transaction::processURI(const char *uri, const char *method,
     m_httpVersion = http_version;
     m_uri = uri;
     std::string uri_s(uri);
-    m_uri_decoded = utils::uri_decode(uri);
 
-    size_t pos = m_uri_decoded.find("?");
-    size_t pos_raw = uri_s.find("?");
-    size_t var_size = pos_raw;
+    // any uri-fragment that was received should only be retained in
+    // - m_uri
+    // - m_variableRequestURIRaw
+    // - m_variableRequestLine
+    size_t pos_raw_fragment = uri_s.find("#");
+    if (pos_raw_fragment != std::string::npos) {
+        uri_s = uri_s.substr(0, pos_raw_fragment);
+    }
+
+    size_t pos_raw_query = uri_s.find("?");
+
+    m_uri_decoded = utils::uri_decode(uri_s);
+
+    size_t var_size = pos_raw_query;
 
     m_variableRequestMethod.set(method, 0);
 
@@ -462,28 +474,28 @@ int Transaction::processURI(const char *uri, const char *method,
         m_variableOffset + requestLine.size() + 1);
 
 
-
-    if (pos != std::string::npos) {
+    size_t pos_query = m_uri_decoded.find("?");
+    if (pos_query != std::string::npos) {
         m_uri_no_query_string_decoded = std::unique_ptr<std::string>(
-            new std::string(m_uri_decoded, 0, pos));
+            new std::string(m_uri_decoded, 0, pos_query));
     } else {
         m_uri_no_query_string_decoded = std::unique_ptr<std::string>(
             new std::string(m_uri_decoded));
     }
 
 
-    if (pos_raw != std::string::npos) {
-        std::string qry = std::string(uri_s, pos_raw + 1,
-            uri_s.length() - (pos_raw + 1));
-        m_variableQueryString.set(qry, pos_raw + 1
+    if (pos_raw_query != std::string::npos) {
+        std::string qry = std::string(uri_s, pos_raw_query + 1,
+            uri_s.length() - (pos_raw_query + 1));
+        m_variableQueryString.set(qry, pos_raw_query + 1
             + std::string(method).size() + 1);
     }
 
     std::string path_info;
-    if (pos == std::string::npos) {
+    if (pos_query == std::string::npos) {
         path_info = std::string(m_uri_decoded, 0);
     } else {
-        path_info = std::string(m_uri_decoded, 0, pos);
+        path_info = std::string(m_uri_decoded, 0, pos_query);
     }
     if (var_size == std::string::npos) {
         var_size = uri_s.size();
@@ -493,7 +505,6 @@ int Transaction::processURI(const char *uri, const char *method,
         1, var_size);
     m_variableRequestFilename.set(path_info,  m_variableOffset +
         strlen(method) + 1, var_size);
-
 
 
     size_t offset = path_info.find_last_of("/\\");
@@ -523,7 +534,7 @@ int Transaction::processURI(const char *uri, const char *method,
             }
             if (netloc != std::string::npos && fullDomain == true) {
                 size_t path = m_uri_decoded.find("/", netloc);
-                if (path != std::string::npos && fullDomain == true) {
+                if (path != std::string::npos) {
                     parsedURI = m_uri_decoded.substr(path);
                 }
             }
@@ -793,25 +804,43 @@ int Transaction::processRequestBody() {
      */
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
+
+    bool requestBodyNoFilesLimitExceeded = false;
+    if ((m_requestBodyType == WWWFormUrlEncoded) ||
+        (m_requestBodyProcessor == JSONRequestBody) ||
+        (m_requestBodyProcessor == XMLRequestBody)) {
+        if ((m_rules->m_requestBodyNoFilesLimit.m_set)
+            && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
+            m_variableReqbodyError.set("1", 0);
+            m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
+            m_variableInboundDataError.set("1", m_variableOffset);
+            ms_dbg(5, "Request body excluding files is bigger than the maximum expected.");
+            requestBodyNoFilesLimitExceeded = true;
+	}
+    }
+
 #ifdef WITH_LIBXML2
     if (m_requestBodyProcessor == XMLRequestBody) {
-        std::string error;
-        if (m_xml->init() == true) {
-            m_xml->processChunk(m_requestBody.str().c_str(),
-                m_requestBody.str().size(),
-                &error);
-            m_xml->complete(&error);
-        }
-        if (error.empty() == false) {
-            m_variableReqbodyError.set("1", m_variableOffset);
-            m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
-                m_variableOffset);
-            m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
-                + error, m_variableOffset);
-            m_variableReqbodyProcessorError.set("1", m_variableOffset);
-        } else {
-            m_variableReqbodyError.set("0", m_variableOffset);
-            m_variableReqbodyProcessorError.set("0", m_variableOffset);
+        // large size might cause issues in the parsing itself; omit if exceeded
+        if (!requestBodyNoFilesLimitExceeded) {
+            std::string error;
+            if (m_xml->init() == true) {
+                m_xml->processChunk(m_requestBody.str().c_str(),
+                    m_requestBody.str().size(),
+                    &error);
+                m_xml->complete(&error);
+            }
+            if (error.empty() == false) {
+                m_variableReqbodyError.set("1", m_variableOffset);
+                m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
+                    m_variableOffset);
+                m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
+                    + error, m_variableOffset);
+                m_variableReqbodyProcessorError.set("1", m_variableOffset);
+            } else {
+                m_variableReqbodyError.set("0", m_variableOffset);
+                m_variableReqbodyProcessorError.set("0", m_variableOffset);
+            }
         }
 #endif
 #if WITH_YAJL
@@ -820,23 +849,29 @@ int Transaction::processRequestBody() {
 #else
     if (m_requestBodyProcessor == JSONRequestBody) {
 #endif
-        std::string error;
-        if (m_json->init() == true) {
-            m_json->processChunk(m_requestBody.str().c_str(),
-                m_requestBody.str().size(),
-                &error);
-            m_json->complete(&error);
-        }
-        if (error.empty() == false && m_requestBody.str().size() > 0) {
-            m_variableReqbodyError.set("1", m_variableOffset);
-            m_variableReqbodyProcessorError.set("1", m_variableOffset);
-            m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
-                m_variableOffset);
-            m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
-                + error, m_variableOffset);
-        } else {
-            m_variableReqbodyError.set("0", m_variableOffset);
-            m_variableReqbodyProcessorError.set("0", m_variableOffset);
+        // large size might cause issues in the parsing itself; omit if exceeded
+        if (!requestBodyNoFilesLimitExceeded) {
+            std::string error;
+            if (m_rules->m_requestBodyJsonDepthLimit.m_set) {
+                m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
+            }
+            if (m_json->init() == true) {
+                m_json->processChunk(m_requestBody.str().c_str(),
+                    m_requestBody.str().size(),
+                    &error);
+                m_json->complete(&error);
+            }
+            if (error.empty() == false && m_requestBody.str().size() > 0) {
+                m_variableReqbodyError.set("1", m_variableOffset);
+                m_variableReqbodyProcessorError.set("1", m_variableOffset);
+                m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
+                    m_variableOffset);
+                m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
+                    + error, m_variableOffset);
+            } else {
+                m_variableReqbodyError.set("0", m_variableOffset);
+                m_variableReqbodyProcessorError.set("0", m_variableOffset);
+            }
         }
 #endif
 #if defined(WITH_LIBXML2) or defined(WITH_YAJL)
@@ -845,11 +880,13 @@ int Transaction::processRequestBody() {
     if (m_requestBodyType == MultiPartRequestBody) {
 #endif
         std::string error;
+        int reqbodyNoFilesLength = 0;
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
                 m.process(m_requestBody.str(), &error, m_variableOffset);
             }
+            reqbodyNoFilesLength = m.m_reqbody_no_files_length;
             m.multipart_complete(&error);
         }
         if (error.empty() == false) {
@@ -859,13 +896,22 @@ int Transaction::processRequestBody() {
                 m_variableOffset);
             m_variableReqbodyProcessorErrorMsg.set("Multipart parsing " \
                 "error: " + error, m_variableOffset);
+        } else if (((m_rules->m_requestBodyNoFilesLimit.m_set)
+                   && (reqbodyNoFilesLength > m_rules->m_requestBodyNoFilesLimit.m_value))) {
+            m_variableReqbodyError.set("1", 0);
+            m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
+            m_variableInboundDataError.set("1", m_variableOffset);
+            ms_dbg(5, "Request body excluding files is bigger than the maximum expected.");
         } else {
             m_variableReqbodyError.set("0", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         m_variableOffset++;
-        extractArguments("POST", m_requestBody.str(), m_variableOffset);
+        // large size might cause issues in the parsing itself; omit if exceeded
+        if (!requestBodyNoFilesLimitExceeded) {
+            extractArguments("POST", m_requestBody.str(), m_variableOffset);
+	}
     } else if (m_requestBodyType != UnknownFormat) {
         /**
          * FIXME: double check to see if that is a valid scenario...

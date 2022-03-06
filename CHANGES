@@ -1,6 +1,37 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Support SecRequestBodyNoFilesLimit
+    [Issue #2670 - @airween, @martinhsv]
+  - Fix misuses of LMDB API
+    [Issue #2601, #2602 - @hyc]
+  - Fix duplication typo in code comment
+    [Issue #2677 - @gleydsonsoares]
+  - Add ctl:auditEngine action support
+    [Issue #2606 - @alekravch, @martinhsv]
+  - Fix multiMatch msg, etc, population in audit log
+    [Issue #2573 - @Sachin-M-Desai, @martinhsv]
+  - Fix some name handling for ARGS_*NAMES: regex SecRuleUpdateTargetById, etc.
+    [Issue #2627, #2648 - @lontchianicet, @victorserbu2709, @martinhsv]
+  - Adjust confusing variable name in setRequestBody method
+    [Issue #2635 @Mesar-Ali, @martinhsv]
+  - Multipart names/filenames may include single quote if double-quote enclosed
+    [Issue #2352 @martinhsv]
+  - Add SecRequestBodyJsonDepthLimit to modsecurity.conf-recommended
+    [Issue #2647 @theMiddleBlue, @airween, @877509395 ,@martinhsv]
+
+
+v3.0.6 - 2021-Nov-19
+-------------------------------------
+
+  - Support configurable limit on depth of JSON parsing
+    [@theMiddleBlue, @martinhsv]
+
+v3.0.5 - 2021-Jul-07
+--------------------
+
+  - Handle URI received with uri-fragment
+    [@martinhsv]
   - Having ARGS_NAMES, variables proxied
     [@zimmerle, @martinhsv, @KaNikita]
   - Use explicit path for cross-compile environments.

@@ -162,7 +162,7 @@ class Multipart {
     int process_part_header(std::string *error, int offset);
     int process_part_data(std::string *error, size_t offset);
 
-    void validate_quotes(const char *data);
+    void validate_quotes(const char *data, char quote);
 
     size_t m_reqbody_no_files_length;
     std::list<MultipartPart *> m_parts;

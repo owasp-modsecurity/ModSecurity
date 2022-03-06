@@ -9,10 +9,10 @@ AC_DEFUN([CHECK_LUA],
 LUA_POSSIBLE_LIB_NAMES="lua54 lua5.4 lua-5.4 lua53 lua5.3 lua-5.3 lua52 lua5.2 lua-5.2 lua51 lua5.1 lua-5.1 lua"
 
 # Possible extensions for the library
-LUA_POSSIBLE_EXTENSIONS="so so0 la sl dll dylib so.0.0.0"
+LUA_POSSIBLE_EXTENSIONS="so la sl dll dylib"
 
 # Possible paths (if pkg-config was not found, proceed with the file lookup)
-LUA_POSSIBLE_PATHS="/usr/lib /usr/local/lib /usr/local/lib64 /usr/local/lua /usr/local/liblua /usr/local /opt /usr /usr/lib64 /opt/local"
+LUA_POSSIBLE_PATHS="/usr/lib /usr/local/lib /usr/local/lib64 /usr/local/lua /usr/local/liblua /usr/local /opt /usr /usr/lib64 /opt/local /usr/lib/lua5.3/liblua /usr/lib/lua5.2/liblua"
 
 # Variables to be set by this very own script.
 LUA_CFLAGS=""

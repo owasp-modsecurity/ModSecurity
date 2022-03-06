@@ -39,6 +39,7 @@ simple_request_CPPFLAGS = \
 	-I../others \
 	-fPIC \
 	-O3 \
+	$(CURL_CFLAGS) \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \

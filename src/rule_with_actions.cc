@@ -215,6 +215,18 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         }
     }
 
+    if (m_containsMultiMatchAction && !m_isChained) {
+        if (m_severity) {
+            m_severity->evaluate(this, trans, ruleMessage);
+        }
+        if (m_logData) {
+            m_logData->evaluate(this, trans, ruleMessage);
+        }
+        if (m_msg) {
+            m_msg->evaluate(this, trans, ruleMessage);
+        }
+    }
+
 }
 
 

@@ -39,7 +39,7 @@ As a result of this goal we have rearchitected Libmodsecurity such that it is no
 
 The 'ModSecurity' branch no longer contains the traditional module logic (for Nginx, Apache, and IIS) that has traditionally been packaged all together. Instead, this branch only contains the library portion (libmodsecurity) for this project. This library is consumed by what we have termed 'Connectors' these connectors will interface with your webserver and provide the library with a common format that it understands. Each of these connectors is maintained as a separate GitHub project. For instance, the Nginx connector is supplied by the ModSecurity-nginx project (https://github.com/SpiderLabs/ModSecurity-nginx).
 
-Keeping these connectors separated allows each project to be have different release cycles, issues and development trees. Additionally, it means that when you install ModSecurity v3 you only get exactly what you need, no extras you won't be using.
+Keeping these connectors separated allows each project to have different release cycles, issues and development trees. Additionally, it means that when you install ModSecurity v3 you only get exactly what you need, no extras you won't be using.
 
 # Compilation
 
@@ -262,7 +262,7 @@ new issue, please check if there is one already opened on the same topic.
 
 ## Bindings
 
-The libModSecurity design allows the integration with bindings. There is an effort to avoid brake the API [binary] compatibility to make an easy integration with possible bindings. Currently, there are two notable projects maintained by the community:
+The libModSecurity design allows the integration with bindings. There is an effort to avoid breaking API [binary] compatibility to make an easy integration with possible bindings. Currently, there are two notable projects maintained by the community:
    * Python - https://github.com/actions-security/pymodsecurity
    * Varnish - https://github.com/xdecock/vmod-modsecurity
 
@@ -270,3 +270,7 @@ The libModSecurity design allows the integration with bindings. There is an effo
 
 Having our packages in distros on time is a desire that we have, so let us know
 if there is anything we can do to facilitate your work as a packager.
+
+## Sponsor Note
+
+Development of ModSecurity is sponsored by Trustwave. Sponsorship will end July 1, 2024. Additional information can be found here https://www.trustwave.com/en-us/resources/security-resources/software-updates/end-of-sale-and-trustwave-support-for-modsecurity-web-application-firewall/
