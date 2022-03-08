@@ -99,7 +99,6 @@ class LMDB :
     public Collection {
  public:
     explicit LMDB(std::string name);
-    ~LMDB();
     void store(std::string key, std::string value) override;
 
     bool storeOrUpdateFirst(const std::string &key,

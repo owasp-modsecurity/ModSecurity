@@ -40,11 +40,6 @@ namespace backend {
 LMDB::LMDB(std::string name) :
     Collection(name), m_env(NULL), isOpen(false) {}
 
-
-LMDB::~LMDB() {
-    mdb_env_close(m_env);
-}
-
 int LMDB::txn_begin(unsigned int flags, MDB_txn **ret) {
     if (!isOpen) {
         MDBEnvProvider* provider = MDBEnvProvider::GetInstance();
