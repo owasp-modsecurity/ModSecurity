@@ -507,7 +507,7 @@ end_txn:
 }
 
 
-MDBEnvProvider* MDBEnvProvider::provider_ = nullptr;;
+MDBEnvProvider* MDBEnvProvider::provider_ = nullptr;
 
 MDBEnvProvider* MDBEnvProvider::GetInstance() {
     if (provider_==nullptr) {
@@ -542,6 +542,7 @@ void MDBEnvProvider::init() {
     pthread_mutex_lock(&m_lock);
     if (!initialized) {
         MDB_txn *txn;
+        initialized = true;
         mdb_env_create(&m_env);
         mdb_env_open(m_env, "./modsec-shared-collections",
             MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
