@@ -235,6 +235,8 @@ class Driver;
 #include "src/variables/response_protocol.h"
 #include "src/variables/response_status.h"
 #include "src/variables/rule.h"
+#include "src/variables/rx_error.h"
+#include "src/variables/rx_error_rule_id.h"
 #include "src/variables/server_addr.h"
 #include "src/variables/server_name.h"
 #include "src/variables/server_port.h"
@@ -411,6 +413,8 @@ using namespace modsecurity::operators;
   VARIABLE_RESPONSE_HEADERS_NAMES
   VARIABLE_RESPONSE_PROTOCOL    "RESPONSE_PROTOCOL"
   VARIABLE_RESPONSE_STATUS      "RESPONSE_STATUS"
+  VARIABLE_RX_ERROR             "RX_ERROR"
+  VARIABLE_RX_ERROR_RULE_ID     "RX_ERROR_RULE_ID"
   VARIABLE_SERVER_ADDR          "SERVER_ADDR"
   VARIABLE_SERVER_NAME          "SERVER_NAME"
   VARIABLE_SERVER_PORT          "SERVER_PORT"
@@ -1648,10 +1652,10 @@ expression:
         YYERROR;
 */
     | CONFIG_DIR_PCRE_MATCH_LIMIT
-/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
-        driver.error(@0, "SecPcreMatchLimit is not currently supported. Default PCRE values are being used for now");
-        YYERROR;
-*/
+      {
+        driver.m_pcreMatchLimit.m_set = true;
+        driver.m_pcreMatchLimit.m_value = atoi($1.c_str());
+      }
     | CONGIG_DIR_RESPONSE_BODY_MP
       {
         std::istringstream buf($1);
@@ -2476,6 +2480,14 @@ var:
     | VARIABLE_RESPONSE_STATUS
       {
         VARIABLE_CONTAINER($$, new variables::ResponseStatus());
+      }
+    | VARIABLE_RX_ERROR
+      {
+        VARIABLE_CONTAINER($$, new variables::RxError());
+      }
+    | VARIABLE_RX_ERROR_RULE_ID
+      {
+        VARIABLE_CONTAINER($$, new variables::RxErrorRuleID());
       }
     | VARIABLE_SERVER_ADDR
       {

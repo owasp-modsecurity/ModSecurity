@@ -51,12 +51,41 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
         re = m_re;
     }
 
-    std::vector<Utils::SMatchCapture> captures;
     if (re->hasError()) {
         ms_dbg_a(transaction, 3, "Error with regular expression: \"" + re->pattern + "\"");
         return false;
     }
-    re->searchOneMatch(input, captures);
+
+    Utils::RegexResult regex_result;
+    std::vector<Utils::SMatchCapture> captures;
+
+    if (transaction && transaction->m_rules->m_pcreMatchLimit.m_set) {
+        unsigned long match_limit = transaction->m_rules->m_pcreMatchLimit.m_value;
+        regex_result = re->searchOneMatch(input, captures, match_limit);
+    } else {
+        regex_result = re->searchOneMatch(input, captures);
+    }
+
+    // FIXME: DRY regex error reporting. This logic is currently duplicated in other operators.
+    if (regex_result != Utils::RegexResult::Ok) {
+        std::string regex_error_str = "OTHER";
+        if (regex_result == Utils::RegexResult::ErrorMatchLimit) {
+            regex_error_str = "MATCH_LIMIT";
+        }
+
+        ms_dbg_a(transaction, 1, "rx: regex error '" + regex_error_str + "' for pattern '" + re->pattern + "'");
+
+        // Only expose the first regex error to indicate there is an issue
+        if (rule && transaction && transaction->m_variableRxError.m_value.empty()) {
+            transaction->m_variableRxError.set(regex_error_str, transaction->m_variableOffset);
+            transaction->m_variableRxErrorRuleID.set(
+                std::to_string(rule->m_ruleId),
+                transaction->m_variableOffset
+            );
+        }
+
+        return false;
+    }
 
     if (rule && rule->hasCaptureAction() && transaction) {
         for (const Utils::SMatchCapture& capture : captures) {

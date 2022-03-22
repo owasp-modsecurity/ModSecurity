@@ -231,6 +231,8 @@ VARIABLE_RESPONSE_CONTENT_TYPE            (?i:RESPONSE_CONTENT_TYPE)
 VARIABLE_RESPONSE_HEADERS_NAMES           (?i:RESPONSE_HEADERS_NAMES)
 VARIABLE_RESPONSE_PROTOCOL                (?i:RESPONSE_PROTOCOL)
 VARIABLE_RESPONSE_STATUS                  (?i:RESPONSE_STATUS)
+VARIABLE_RX_ERROR                         (?i:RX_ERROR)
+VARIABLE_RX_ERROR_RULE_ID                 (?i:RX_ERROR_RULE_ID)
 VARIABLE_SERVER_ADDR                      (?i:SERVER_ADDR)
 VARIABLE_SERVER_NAME                      (?i:SERVER_NAME)
 VARIABLE_SERVER_PORT                      (?i:SERVER_PORT)
@@ -959,6 +961,8 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_RESPONSE_HEADERS_NAMES}[:.]       { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RESPONSE_HEADERS_NAMES(*driver.loc.back()); }
 {VARIABLE_RESPONSE_PROTOCOL}                { return p::make_VARIABLE_RESPONSE_PROTOCOL(*driver.loc.back()); }
 {VARIABLE_RESPONSE_STATUS}                  { return p::make_VARIABLE_RESPONSE_STATUS(*driver.loc.back()); }
+{VARIABLE_RX_ERROR}                         { return p::make_VARIABLE_RX_ERROR(*driver.loc.back()); }
+{VARIABLE_RX_ERROR_RULE_ID}                 { return p::make_VARIABLE_RX_ERROR_RULE_ID(*driver.loc.back()); }
 {VARIABLE_SERVER_ADDR}                      { return p::make_VARIABLE_SERVER_ADDR(*driver.loc.back()); }
 {VARIABLE_SERVER_NAME}                      { return p::make_VARIABLE_SERVER_NAME(*driver.loc.back()); }
 {VARIABLE_SERVER_PORT}                      { return p::make_VARIABLE_SERVER_PORT(*driver.loc.back()); }

@@ -282,6 +282,10 @@ class VariableMonkeyResolution {
                 t->m_variableUrlEncodedError.evaluate(l);
             } else if (comp(variable, "USERID")) {
                 t->m_variableUserID.evaluate(l);
+            } else if (comp(variable, "RX_ERROR")) {
+                t->m_variableRxError.evaluate(l);
+            } else if (comp(variable, "RX_ERROR_RULE_ID")) {
+                t->m_variableRxErrorRuleID.evaluate(l);
             } else {
                 throw std::invalid_argument("Variable not found.");
             }
@@ -462,6 +466,10 @@ class VariableMonkeyResolution {
             } else if (comp(variable, "GLOBAL")) {
                 vv = t->m_collections.m_global_collection->resolveFirst("",
                     t->m_collections.m_global_collection_key, t->m_rules->m_secWebAppId.m_value);
+            } else if (comp(variable, "RX_ERROR")) {
+                vv = t->m_variableRxError.resolveFirst();
+            } else if (comp(variable, "RX_ERROR_RULE_ID")) {
+                vv = t->m_variableRxErrorRuleID.resolveFirst();
             } else {
                 throw std::invalid_argument("Variable not found.");
             }

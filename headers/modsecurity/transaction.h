@@ -184,6 +184,8 @@ class TransactionAnchoredVariables {
         m_variableUniqueID(t, "UNIQUE_ID"),
         m_variableUrlEncodedError(t, "URLENCODED_ERROR"),
         m_variableUserID(t, "USERID"),
+        m_variableRxError(t, "RX_ERROR"),
+        m_variableRxErrorRuleID(t, "RX_ERROR_RULE_ID"),
         m_variableArgs(t, "ARGS"),
         m_variableArgsGet(t, "ARGS_GET"),
         m_variableArgsPost(t, "ARGS_POST"),
@@ -265,6 +267,8 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableUniqueID;
     AnchoredVariable m_variableUrlEncodedError;
     AnchoredVariable m_variableUserID;
+    AnchoredVariable m_variableRxError;
+    AnchoredVariable m_variableRxErrorRuleID;
 
     AnchoredSetVariable m_variableArgs;
     AnchoredSetVariable m_variableArgsGet;
