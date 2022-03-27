@@ -49,6 +49,7 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
 #include "modsecurity/anchored_set_variable_translation_proxy.h"
+#include "modsecurity/audit_log.h"
 
 
 #ifndef NO_LOGS
@@ -528,6 +529,12 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      *
      */
     std::list< std::pair<int, std::string> > m_auditLogModifier;
+
+    /**
+     * This transaction's most recent action ctl:auditEngine
+     *
+     */
+    audit_log::AuditLog::AuditLogStatus m_ctlAuditEngine;
 
     /**
      * This variable holds all the messages asked to be save by the utilization

@@ -273,4 +273,4 @@ if there is anything we can do to facilitate your work as a packager.
 
 ## Sponsor Note
 
-Development of ModSecurity is sponsored by Trustwave. Trustwave offers a Commercial Ruleset for ModSecurity to Large Enterprise customers. Contact the Trustwave sales department for more information
+Development of ModSecurity is sponsored by Trustwave. Sponsorship will end July 1, 2024. Additional information can be found here https://www.trustwave.com/en-us/resources/security-resources/software-updates/end-of-sale-and-trustwave-support-for-modsecurity-web-application-firewall/

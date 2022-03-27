@@ -122,6 +122,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     m_ruleRemoveTargetById(),
     m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
     m_auditLogModifier(),
+    m_ctlAuditEngine(AuditLog::AuditLogStatus::NotSetLogStatus),
     m_rulesMessages(),
     m_requestBody(),
     m_responseBody(),
@@ -195,6 +196,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_ruleRemoveTargetById(),
     m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
     m_auditLogModifier(),
+    m_ctlAuditEngine(AuditLog::AuditLogStatus::NotSetLogStatus),
     m_rulesMessages(),
     m_requestBody(),
     m_responseBody(),
@@ -802,25 +804,43 @@ int Transaction::processRequestBody() {
      */
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
+
+    bool requestBodyNoFilesLimitExceeded = false;
+    if ((m_requestBodyType == WWWFormUrlEncoded) ||
+        (m_requestBodyProcessor == JSONRequestBody) ||
+        (m_requestBodyProcessor == XMLRequestBody)) {
+        if ((m_rules->m_requestBodyNoFilesLimit.m_set)
+            && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
+            m_variableReqbodyError.set("1", 0);
+            m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
+            m_variableInboundDataError.set("1", m_variableOffset);
+            ms_dbg(5, "Request body excluding files is bigger than the maximum expected.");
+            requestBodyNoFilesLimitExceeded = true;
+	}
+    }
+
 #ifdef WITH_LIBXML2
     if (m_requestBodyProcessor == XMLRequestBody) {
-        std::string error;
-        if (m_xml->init() == true) {
-            m_xml->processChunk(m_requestBody.str().c_str(),
-                m_requestBody.str().size(),
-                &error);
-            m_xml->complete(&error);
-        }
-        if (error.empty() == false) {
-            m_variableReqbodyError.set("1", m_variableOffset);
-            m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
-                m_variableOffset);
-            m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
-                + error, m_variableOffset);
-            m_variableReqbodyProcessorError.set("1", m_variableOffset);
-        } else {
-            m_variableReqbodyError.set("0", m_variableOffset);
-            m_variableReqbodyProcessorError.set("0", m_variableOffset);
+        // large size might cause issues in the parsing itself; omit if exceeded
+        if (!requestBodyNoFilesLimitExceeded) {
+            std::string error;
+            if (m_xml->init() == true) {
+                m_xml->processChunk(m_requestBody.str().c_str(),
+                    m_requestBody.str().size(),
+                    &error);
+                m_xml->complete(&error);
+            }
+            if (error.empty() == false) {
+                m_variableReqbodyError.set("1", m_variableOffset);
+                m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
+                    m_variableOffset);
+                m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
+                    + error, m_variableOffset);
+                m_variableReqbodyProcessorError.set("1", m_variableOffset);
+            } else {
+                m_variableReqbodyError.set("0", m_variableOffset);
+                m_variableReqbodyProcessorError.set("0", m_variableOffset);
+            }
         }
 #endif
 #if WITH_YAJL
@@ -829,23 +849,29 @@ int Transaction::processRequestBody() {
 #else
     if (m_requestBodyProcessor == JSONRequestBody) {
 #endif
-        std::string error;
-        if (m_json->init() == true) {
-            m_json->processChunk(m_requestBody.str().c_str(),
-                m_requestBody.str().size(),
-                &error);
-            m_json->complete(&error);
-        }
-        if (error.empty() == false && m_requestBody.str().size() > 0) {
-            m_variableReqbodyError.set("1", m_variableOffset);
-            m_variableReqbodyProcessorError.set("1", m_variableOffset);
-            m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
-                m_variableOffset);
-            m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
-                + error, m_variableOffset);
-        } else {
-            m_variableReqbodyError.set("0", m_variableOffset);
-            m_variableReqbodyProcessorError.set("0", m_variableOffset);
+        // large size might cause issues in the parsing itself; omit if exceeded
+        if (!requestBodyNoFilesLimitExceeded) {
+            std::string error;
+            if (m_rules->m_requestBodyJsonDepthLimit.m_set) {
+                m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
+            }
+            if (m_json->init() == true) {
+                m_json->processChunk(m_requestBody.str().c_str(),
+                    m_requestBody.str().size(),
+                    &error);
+                m_json->complete(&error);
+            }
+            if (error.empty() == false && m_requestBody.str().size() > 0) {
+                m_variableReqbodyError.set("1", m_variableOffset);
+                m_variableReqbodyProcessorError.set("1", m_variableOffset);
+                m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
+                    m_variableOffset);
+                m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
+                    + error, m_variableOffset);
+            } else {
+                m_variableReqbodyError.set("0", m_variableOffset);
+                m_variableReqbodyProcessorError.set("0", m_variableOffset);
+            }
         }
 #endif
 #if defined(WITH_LIBXML2) or defined(WITH_YAJL)
@@ -854,11 +880,13 @@ int Transaction::processRequestBody() {
     if (m_requestBodyType == MultiPartRequestBody) {
 #endif
         std::string error;
+        int reqbodyNoFilesLength = 0;
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
                 m.process(m_requestBody.str(), &error, m_variableOffset);
             }
+            reqbodyNoFilesLength = m.m_reqbody_no_files_length;
             m.multipart_complete(&error);
         }
         if (error.empty() == false) {
@@ -868,13 +896,22 @@ int Transaction::processRequestBody() {
                 m_variableOffset);
             m_variableReqbodyProcessorErrorMsg.set("Multipart parsing " \
                 "error: " + error, m_variableOffset);
+        } else if (((m_rules->m_requestBodyNoFilesLimit.m_set)
+                   && (reqbodyNoFilesLength > m_rules->m_requestBodyNoFilesLimit.m_value))) {
+            m_variableReqbodyError.set("1", 0);
+            m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
+            m_variableInboundDataError.set("1", m_variableOffset);
+            ms_dbg(5, "Request body excluding files is bigger than the maximum expected.");
         } else {
             m_variableReqbodyError.set("0", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         m_variableOffset++;
-        extractArguments("POST", m_requestBody.str(), m_variableOffset);
+        // large size might cause issues in the parsing itself; omit if exceeded
+        if (!requestBodyNoFilesLimitExceeded) {
+            extractArguments("POST", m_requestBody.str(), m_variableOffset);
+	}
     } else if (m_requestBodyType != UnknownFormat) {
         /**
          * FIXME: double check to see if that is a valid scenario...

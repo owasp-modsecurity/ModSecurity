@@ -25,6 +25,7 @@ class Driver;
 #include "src/actions/block.h"
 #include "src/actions/capture.h"
 #include "src/actions/chain.h"
+#include "src/actions/ctl/audit_engine.h"
 #include "src/actions/ctl/audit_log_parts.h"
 #include "src/actions/ctl/request_body_access.h"
 #include "src/actions/ctl/rule_engine.h"
@@ -604,6 +605,7 @@ using namespace modsecurity::operators;
   CONFIG_SEC_CONN_W_STATE_LIMIT                "CONFIG_SEC_CONN_W_STATE_LIMIT"
   CONFIG_SEC_SENSOR_ID                         "CONFIG_SEC_SENSOR_ID"
   CONFIG_DIR_ARGS_LIMIT                        "CONFIG_DIR_ARGS_LIMIT"
+  CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT         "CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT"
   CONFIG_DIR_REQ_BODY                          "CONFIG_DIR_REQ_BODY"
   CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT          "CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT"
   CONFIG_DIR_REQ_BODY_LIMIT                    "CONFIG_DIR_REQ_BODY_LIMIT"
@@ -1581,6 +1583,11 @@ expression:
       {
         driver.m_argumentsLimit.m_set = true;
         driver.m_argumentsLimit.m_value = atoi($1.c_str());
+      }
+    | CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT
+      {
+        driver.m_requestBodyJsonDepthLimit.m_set = true;
+        driver.m_requestBodyJsonDepthLimit.m_value = atoi($1.c_str());
       }
     /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT
@@ -2619,18 +2626,17 @@ act:
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::AuditEngine("ctl:auditengine=on"));
+        driver.m_auditLog->setCtlAuditEngineActive();
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::AuditEngine("ctl:auditengine=off"));
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
       {
-        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        ACTION_CONTAINER($$, new actions::Action($1));
+        ACTION_CONTAINER($$, new actions::ctl::AuditEngine("ctl:auditengine=relevantonly"));
+        driver.m_auditLog->setCtlAuditEngineActive();
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {

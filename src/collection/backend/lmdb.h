@@ -79,6 +79,7 @@ class LMDB :
     void inline lmdb_debug(int rc, std::string op, std::string scope);
 
     MDB_env *m_env;
+    MDB_dbi m_dbi;
 };
 
 }  // namespace backend

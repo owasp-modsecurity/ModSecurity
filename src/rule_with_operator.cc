@@ -101,7 +101,7 @@ void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
 
 
 bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &key,
-    std::string value, std::shared_ptr<RuleMessage> ruleMessage) {
+    const std::string &value, std::shared_ptr<RuleMessage> ruleMessage) {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
     clock_t end;

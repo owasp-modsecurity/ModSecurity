@@ -361,6 +361,7 @@ CONFIG_SEC_STREAM_OUT_BODY_INSPECTION   (?i:SecStreamOutBodyInspection)
 CONFIG_DIR_PCRE_MATCH_LIMIT             (?i:SecPcreMatchLimit)
 CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION   (?i:SecPcreMatchLimitRecursion)
 CONFIG_DIR_ARGS_LIMIT                   (?i:SecArgumentsLimit)
+CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT    (?i:SecRequestBodyJsonDepthLimit)
 CONFIG_DIR_REQ_BODY                     (?i:SecRequestBodyAccess)
 CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT     (?i:SecRequestBodyInMemoryLimit)
 CONFIG_DIR_REQ_BODY_LIMIT               (?i:SecRequestBodyLimit)
@@ -612,6 +613,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_VALUE_DETC}                                                     { return p::make_CONFIG_VALUE_DETC(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_OFF}                                                      { return p::make_CONFIG_VALUE_OFF(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_ON}                                                       { return p::make_CONFIG_VALUE_ON(yytext, *driver.loc.back()); }
+{CONFIG_VALUE_RELEVANT_ONLY}                                            { return p::make_CONFIG_VALUE_RELEVANT_ONLY(yytext, *driver.loc.back()); }
 [ \t]*\\\n[ \t]*                                                        { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 [ \t]*\\\r\n[ \t]*                                                      { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 }
@@ -769,6 +771,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION}[ \t]+{CONFIG_VALUE_NUMBER}      { return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_PCRE_MATCH_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}                { return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_ARGS_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}                      { return p::make_CONFIG_DIR_ARGS_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}       { return p::make_CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT}[ \t]+{CONFIG_VALUE_NUMBER}        { return p::make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 {CONFIG_DIR_REQ_BODY_LIMIT_ACTION}                                      { return p::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }

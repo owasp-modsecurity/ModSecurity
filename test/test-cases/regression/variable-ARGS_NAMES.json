@@ -209,7 +209,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"name1\" \\(Variable: ARGS_NAMES\\)"
+      "debug_log":"Target value: \"name1\" \\(Variable: ARGS_NAMES:name1\\)"
     },
     "rules":[
         "SecRuleEngine On",

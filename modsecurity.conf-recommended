@@ -52,6 +52,11 @@ SecRequestBodyNoFilesLimit 131072
 #
 SecRequestBodyLimitAction Reject
 
+# Maximum parsing depth allowed for JSON objects. You want to keep this
+# value as low as practical.
+#
+SecRequestBodyJsonDepthLimit 512
+
 # Verify that we've correctly processed the request body.
 # As a rule of thumb, when failing to process a request body
 # you should reject the request (when deployed in blocking mode)
