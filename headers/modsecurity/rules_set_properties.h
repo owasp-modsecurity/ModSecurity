@@ -368,6 +368,7 @@ class RulesSetProperties {
         to->m_argumentsLimit.merge(&from->m_argumentsLimit);
         to->m_requestBodyJsonDepthLimit.merge(&from->m_requestBodyJsonDepthLimit);
         to->m_requestBodyLimit.merge(&from->m_requestBodyLimit);
+        to->m_requestBodyNoFilesLimit.merge(&from->m_requestBodyNoFilesLimit);
         to->m_responseBodyLimit.merge(&from->m_responseBodyLimit);
 
         merge_bodylimitaction_value(to->m_requestBodyLimitAction,

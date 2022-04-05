@@ -56,7 +56,7 @@ class RuleWithOperator : public RuleWithActions {
         variables::Variables *eclusion, Transaction *trans);
 
     bool executeOperatorAt(Transaction *trasn, const std::string &key,
-        std::string value, std::shared_ptr<RuleMessage> rm);
+        const std::string &value, std::shared_ptr<RuleMessage> rm);
 
     static void updateMatchedVars(Transaction *trasn, const std::string &key,
         const std::string &value);
