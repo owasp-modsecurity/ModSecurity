@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Support PCRE2
+    [Issue #2668 - @martinhsv]
   - Support SecRequestBodyNoFilesLimit
     [Issue #2670 - @airween, @martinhsv]
   - Fix misuses of LMDB API
