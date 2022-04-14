@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Fix memory leak in streams
+   [Issue #2208 - @marcstern, @vloup, @JamesColeman-LW]
  * mlogc log-line parsing fails due to enhanced timestamp
    [Issue #2682 - @bozhinov, @ABrauer-CPT, @martinhsv]
  * Allow no-key, single-value JSON body
