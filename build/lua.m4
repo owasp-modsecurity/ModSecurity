@@ -6,7 +6,7 @@ AC_DEFUN([CHECK_LUA],
 [dnl
 
 # Possible names for the lua library/package (pkg-config)
-LUA_POSSIBLE_LIB_NAMES="lua54 lua5.4 lua-5.4 lua53 lua5.3 lua-5.3 lua52 lua5.2 lua-5.2 lua51 lua5.1 lua-5.1 lua"
+LUA_POSSIBLE_LIB_NAMES="lua54 lua5.4 lua-5.4 lua53 lua5.3 lua-5.3 lua52 lua5.2 lua-5.2 lua51 lua5.1 lua-5.1 luajit-5.1 luajit lua"
 
 # Possible extensions for the library
 LUA_POSSIBLE_EXTENSIONS="so la sl dll dylib"
@@ -40,41 +40,41 @@ else
     else
         LUA_MANDATORY=no
     fi
-    for x in ${LUA_POSSIBLE_PATHS}; do
-        CHECK_FOR_LUA_AT(${x})
-        if test -n "${LUA_CFLAGS}"; then
-            break
-        fi
-    done
+    # Trying to figure out the version using pkg-config...
+    if test -n "${PKG_CONFIG}"; then
+        LUA_PKG_NAME=""
+        for x in ${LUA_POSSIBLE_LIB_NAMES}; do
+            if ${PKG_CONFIG} --exists ${x}; then
+                LUA_PKG_NAME="$x"
+                LUA_PKG_VERSION="`${PKG_CONFIG} ${LUA_PKG_NAME} --modversion`"
+                break
+            fi
+        done
+    fi
+    if test -n "${LUA_PKG_NAME}"; then
+        # Package was found using the pkg-config scripts
+        LUA_PKG_VERSION="`${PKG_CONFIG} ${LUA_PKG_NAME} --modversion`"
+        LUA_CFLAGS="`${PKG_CONFIG} ${LUA_PKG_NAME} --cflags`"
+        LUA_LDADD="`${PKG_CONFIG} ${LUA_PKG_NAME} --libs-only-l`"
+        LUA_LDFLAGS="`${PKG_CONFIG} ${LUA_PKG_NAME} --libs-only-L --libs-only-other`"
+        LUA_DISPLAY="${LUA_LDADD}, ${LUA_CFLAGS}"
+    case $LUA_PKG_VERSION in
+        (5.4*) LUA_CFLAGS="-DWITH_LUA_5_4 ${LUA_CFLAGS}" ; lua_5_4=1 ;;
+        (5.3*) LUA_CFLAGS="-DWITH_LUA_5_3 ${LUA_CFLAGS}" ; lua_5_3=1 ;;
+        (5.2*) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ; lua_5_2=1 ;;
+        (5.1*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
+        (2.0*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
+        (2.1*) LUA_CFLAGS="-DWITH_LUA_5_1 -DWITH_LUA_JIT_2_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
+    esac
+        AC_MSG_NOTICE([LUA pkg-config version: ${LUA_PKG_VERSION}])
+    fi
     if test -z "${LUA_CFLAGS}"; then
-     #Trying to figure out the version using pkg-config...
-        if test -n "${PKG_CONFIG}"; then
-            LUA_PKG_NAME=""
-            for x in ${LUA_POSSIBLE_LIB_NAMES}; do
-                if ${PKG_CONFIG} --exists ${x}; then
-                    LUA_PKG_NAME="$x"
-                    LUA_PKG_VERSION="`${PKG_CONFIG} ${LUA_PKG_NAME} --modversion`"
-                    break
-                fi
-            done
-        fi
-        if test -n "${LUA_PKG_NAME}"; then
-           # Package was found using the pkg-config scripts
-           LUA_PKG_VERSION="`${PKG_CONFIG} ${LUA_PKG_NAME} --modversion`"
-           LUA_CFLAGS="`${PKG_CONFIG} ${LUA_PKG_NAME} --cflags`"
-           LUA_LDADD="`${PKG_CONFIG} ${LUA_PKG_NAME} --libs-only-l`"
-           LUA_LDFLAGS="`${PKG_CONFIG} ${LUA_PKG_NAME} --libs-only-L --libs-only-other`"
-           LUA_DISPLAY="${LUA_LDADD}, ${LUA_CFLAGS}"
-        case $LUA_PKG_VERSION in
-           (5.1*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
-           (5.2*) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ; lua_5_2=1 ;;
-           (5.3*) LUA_CFLAGS="-DWITH_LUA_5_3 ${LUA_CFLAGS}" ; lua_5_3=1 ;;
-           (5.4*) LUA_CFLAGS="-DWITH_LUA_5_4 ${LUA_CFLAGS}" ; lua_5_4=1 ;;
-           (2.0*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
-           (2.1*) LUA_CFLAGS="-DWITH_LUA_5_1 -DWITH_LUA_JIT_2_1 ${LUA_CFLAGS}" ; lua_5_1=1 ;;
-        esac
-           AC_MSG_NOTICE([LUA pkg-config version: ${LUA_PKG_VERSION}])
-        fi
+        for x in ${LUA_POSSIBLE_PATHS}; do
+            CHECK_FOR_LUA_AT(${x})
+            if test -n "${LUA_CFLAGS}"; then
+                break
+            fi
+        done
     fi
 fi
 
