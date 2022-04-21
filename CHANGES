@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add DebugLog message for bad pattern in rx operator
+    [Issue #2722 - @martinhsv]
   - Support PCRE2
     [Issue #2668 - @martinhsv]
   - Support SecRequestBodyNoFilesLimit

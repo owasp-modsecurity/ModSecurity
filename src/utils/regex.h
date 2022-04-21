@@ -72,6 +72,9 @@ class Regex {
     Regex(const Regex&) = delete;
     Regex& operator=(const Regex&) = delete;
 
+    bool hasError() const {
+        return (m_pc == NULL);
+    }
     std::list<SMatch> searchAll(const std::string& s) const;
     bool searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const;
     bool searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures) const;
