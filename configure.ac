@@ -129,6 +129,13 @@ CHECK_LIBXML2
 CHECK_PCRE
 
 
+#
+# Check for pcre2
+#
+PROG_PCRE2
+AM_CONDITIONAL([PCRE2_CFLAGS], [test "PCRE2_CFLAGS" != ""])
+
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string])
@@ -554,6 +561,23 @@ if test "x$LUA_FOUND" = "x2"; then
     echo "   + LUA                                           ....disabled"
 fi
 
+
+## PCRE2
+if test "x$PCRE2_FOUND" = "x0"; then
+    echo "   + PCRE2                                          ....not found"
+fi
+if test "x$PCRE2_FOUND" = "x1"; then
+    echo -n "   + PCRE2                                          ....found "
+    if ! test "x$PCRE2_VERSION" = "x"; then
+        echo "v${PCRE2_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${PCRE2_DISPLAY}"
+fi
+if test "x$PCRE2_FOUND" = "x2"; then
+    echo "   + PCRE2                                          ....disabled"
+fi
 
 echo " "
 echo " Other Options"

@@ -15,7 +15,6 @@
 
 #include "src/utils/regex.h"
 
-#include <pcre.h>
 #include <string>
 #include <list>
 
@@ -24,10 +23,12 @@
 
 #include "src/utils/geo_lookup.h"
 
+#ifndef WITH_PCRE2
 #if PCRE_HAVE_JIT
 #define pcre_study_opt PCRE_STUDY_JIT_COMPILE
 #else
 #define pcre_study_opt 0
+#endif
 #endif
 
 namespace modsecurity {
@@ -35,6 +36,14 @@ namespace Utils {
 
 // Helper function to tell us if the current config indicates CRLF is a valid newline sequence
 bool crlfIsNewline() {
+#if WITH_PCRE2
+    uint32_t newline = 0;
+    pcre2_config(PCRE2_CONFIG_NEWLINE, &newline);
+    bool crlf_is_newline =
+        newline == PCRE2_NEWLINE_ANY ||
+        newline == PCRE2_NEWLINE_CRLF ||
+        newline == PCRE2_NEWLINE_ANYCRLF;
+#else
     int d = 0;
     pcre_config(PCRE_CONFIG_NEWLINE, &d);
 
@@ -48,12 +57,26 @@ bool crlfIsNewline() {
         option_bits == PCRE_NEWLINE_ANY ||
         option_bits == PCRE_NEWLINE_CRLF ||
         option_bits == PCRE_NEWLINE_ANYCRLF;
-
+#endif
     return crlf_is_newline;
 }
 
 Regex::Regex(const std::string& pattern_, bool ignoreCase)
     : pattern(pattern_.empty() ? ".*" : pattern_) {
+#if WITH_PCRE2
+    PCRE2_SPTR pcre2_pattern = reinterpret_cast<PCRE2_SPTR>(pattern.c_str());
+    uint32_t pcre2_options = (PCRE2_DOTALL|PCRE2_MULTILINE);
+    if (ignoreCase) {
+        pcre2_options |= PCRE2_CASELESS;
+    }
+    int errornumber = 0;
+    PCRE2_SIZE erroroffset = 0;
+    m_pc = pcre2_compile(pcre2_pattern, PCRE2_ZERO_TERMINATED,
+        pcre2_options, &errornumber, &erroroffset, NULL);
+    if (m_pc != NULL) {
+        m_match_data = pcre2_match_data_create_from_pattern(m_pc, NULL);
+    }
+#else
     const char *errptr = NULL;
     int erroffset;
     int flags = (PCRE_DOTALL|PCRE_MULTILINE);
@@ -65,10 +88,15 @@ Regex::Regex(const std::string& pattern_, bool ignoreCase)
         &errptr, &erroffset, NULL);
 
     m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
+#endif
 }
 
 
 Regex::~Regex() {
+#if WITH_PCRE2
+    pcre2_match_data_free(m_match_data);
+    pcre2_code_free(m_pc);
+#else
     if (m_pc != NULL) {
         pcre_free(m_pc);
         m_pc = NULL;
@@ -81,29 +109,39 @@ Regex::~Regex() {
 #endif
         m_pce = NULL;
     }
+#endif
 }
 
 
 std::list<SMatch> Regex::searchAll(const std::string& s) const {
-    const char *subject = s.c_str();
-    const std::string tmpString = std::string(s.c_str(), s.size());
-    int ovector[OVECCOUNT];
-    int rc, i, offset = 0;
     std::list<SMatch> retList;
+    int rc;
+#ifdef WITH_PCRE2
+    PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
+    PCRE2_SIZE offset = 0;
+
+    do {
+        rc = pcre2_match(m_pc, pcre2_s, s.length(),
+                         offset, 0, m_match_data, NULL);
+        PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(m_match_data);
+#else
+    const char *subject = s.c_str();
+    int ovector[OVECCOUNT];
+    int offset = 0;
 
     do {
         rc = pcre_exec(m_pc, m_pce, subject,
             s.size(), offset, 0, ovector, OVECCOUNT);
-
-        for (i = 0; i < rc; i++) {
+#endif
+        for (int i = 0; i < rc; i++) {
             size_t start = ovector[2*i];
             size_t end = ovector[2*i+1];
             size_t len = end - start;
             if (end > s.size()) {
-                rc = 0;
+                rc = -1;
                 break;
             }
-            std::string match = std::string(tmpString, start, len);
+            std::string match = std::string(s, start, len);
             offset = start + len;
             retList.push_front(SMatch(match, start));
 
@@ -118,10 +156,16 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
 }
 
 bool Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const {
+#ifdef WITH_PCRE2
+    PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
+    int rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, 0, m_match_data, NULL);
+    PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(m_match_data);
+#else
     const char *subject = s.c_str();
     int ovector[OVECCOUNT];
 
     int rc = pcre_exec(m_pc, m_pce, subject, s.size(), 0, 0, ovector, OVECCOUNT);
+#endif
 
     for (int i = 0; i < rc; i++) {
         size_t start = ovector[2*i];
@@ -138,9 +182,22 @@ bool Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& cap
 }
 
 bool Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures) const {
-    const char *subject = s.c_str();
-
     bool prev_match_zero_length = false;
+#ifdef WITH_PCRE2
+    PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
+    PCRE2_SIZE startOffset = 0;
+
+    while (startOffset <= s.length()) {
+        uint32_t pcre2_options = 0;
+        if (prev_match_zero_length) {
+            pcre2_options = PCRE2_NOTEMPTY_ATSTART | PCRE2_ANCHORED;
+        }
+        int rc = pcre2_match(m_pc, pcre2_s, s.length(),
+                         startOffset, pcre2_options, m_match_data, NULL);
+        PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(m_match_data);
+
+#else
+    const char *subject = s.c_str();
     int startOffset = 0;
 
     while (startOffset <= s.length()) {
@@ -151,6 +208,7 @@ bool Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>& captu
         }
         int rc = pcre_exec(m_pc, m_pce, subject, s.length(), startOffset, pcre_options, ovector, OVECCOUNT);
 
+#endif
         if (rc > 0) {
             size_t firstGroupForThisFullMatch = captures.size();
             for (int i = 0; i < rc; i++) {
@@ -169,8 +227,13 @@ bool Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>& captu
                         startOffset = end;
                         prev_match_zero_length = false;
                     } else {
-                        // zero-length match; modify next match attempt to avoid infinite loop
-                        prev_match_zero_length = true;
+                        if ( startOffset == s.length()) {
+                            // zero-length match at end of string; force end of while-loop
+                            startOffset++;
+                        } else {
+                            // zero-length match mid-string; adjust next match attempt
+                            prev_match_zero_length = true;
+                        }
                     }
                 }
             }
@@ -196,11 +259,20 @@ bool Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>& captu
 }
 
 int Regex::search(const std::string& s, SMatch *match) const {
+#ifdef WITH_PCRE2
+    PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
+    int ret = pcre2_match(m_pc, pcre2_s, s.length(),
+        0, 0, m_match_data, NULL) > 0;
+
+    if (ret > 0) { // match
+        PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(m_match_data);
+#else
     int ovector[OVECCOUNT];
     int ret = pcre_exec(m_pc, m_pce, s.c_str(),
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 
     if (ret > 0) {
+#endif
         *match = SMatch(
             std::string(s, ovector[ret-1], ovector[ret] - ovector[ret-1]),
             0);
@@ -210,9 +282,19 @@ int Regex::search(const std::string& s, SMatch *match) const {
 }
 
 int Regex::search(const std::string& s) const {
+#ifdef WITH_PCRE2
+    PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
+    int rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, 0, m_match_data, NULL);
+    if (rc > 0) {
+        return 1; // match
+    } else {
+        return 0; // no match
+    }
+#else
     int ovector[OVECCOUNT];
     return pcre_exec(m_pc, m_pce, s.c_str(),
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
+#endif
 }
 
 }  // namespace Utils
