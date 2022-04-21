@@ -528,8 +528,8 @@ int Transaction::processURI(const char *uri, const char *method,
         // Searching with a pos of -1 is undefined we also shortcut
         if (scheme != std::string::npos && fullDomain == true) {
             // Assuming we found a colon make sure its followed
-            size_t netloc = m_uri_decoded.find("//", scheme) + 2;
-            if (netloc == std::string::npos || (netloc != scheme + 2)) {
+            size_t netloc = m_uri_decoded.find("//", scheme) + 2;//
+            if (netloc == std::string::npos || (netloc != scheme + 2)) { //(netloc == std::string::npos) will be false forever, for +2 in size_t netloc = m_uri_decoded.find("//", scheme) + 2
                 fullDomain = false;
             }
             if (netloc != std::string::npos && fullDomain == true) {
