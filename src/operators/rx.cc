@@ -52,6 +52,10 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     }
 
     std::vector<Utils::SMatchCapture> captures;
+    if (re->hasError()) {
+        ms_dbg_a(transaction, 3, "Error with regular expression: \"" + re->pattern + "\"");
+        return false;
+    }
     re->searchOneMatch(input, captures);
 
     if (rule && rule->hasCaptureAction() && transaction) {

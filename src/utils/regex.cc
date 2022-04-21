@@ -75,6 +75,9 @@ Regex::Regex(const std::string& pattern_, bool ignoreCase)
         pcre2_options, &errornumber, &erroroffset, NULL);
     if (m_pc != NULL) {
         m_match_data = pcre2_match_data_create_from_pattern(m_pc, NULL);
+        if (m_match_data == NULL) {
+            m_pc = NULL;
+        }
     }
 #else
     const char *errptr = NULL;
