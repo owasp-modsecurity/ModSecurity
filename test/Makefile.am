@@ -50,6 +50,7 @@ unit_tests_LDADD = \
 	$(LMDB_LDADD) \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
+	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
 	$(YAJL_LDADD)
 
@@ -81,6 +82,7 @@ unit_tests_CPPFLAGS = \
 	$(GLOBAL_CPPFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
+	$(PCRE2_CFLAGS) \
 	$(YAJL_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(SSDEEP_CFLAGS) \
@@ -104,6 +106,7 @@ regression_tests_LDADD = \
 	$(LMDB_LDADD) \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
+	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
 	$(YAJL_LDADD)
 
@@ -137,6 +140,7 @@ regression_tests_CPPFLAGS = \
 	$(LUA_CFLAGS) \
 	$(SSDEEP_CFLAGS) \
 	$(PCRE_CFLAGS) \
+	$(PCRE2_CFLAGS) \
 	$(YAJL_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
@@ -157,6 +161,7 @@ rules_optimization_LDADD = \
 	$(LMDB_LDADD) \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
+	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
 	$(YAJL_LDADD)
 
@@ -188,6 +193,7 @@ rules_optimization_CPPFLAGS = \
 	$(LUA_CFLAGS) \
 	$(SSDEEP_CFLAGS) \
 	$(PCRE_CFLAGS) \
+	$(PCRE2_CFLAGS) \
 	$(YAJL_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
