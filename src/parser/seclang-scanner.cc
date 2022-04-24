@@ -8544,7 +8544,7 @@ YY_RULE_SETUP
         std::string err;
         std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
         driver.loc.push_back(new yy::location());
-        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(f);
+        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = std::make_shared<const std::string>(f);
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
@@ -8575,7 +8575,7 @@ YY_RULE_SETUP
     for (auto& s: files) {
         std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
         driver.loc.push_back(new yy::location());
-        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(f);
+        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = std::make_shared<const std::string>(f);
 
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
@@ -8608,7 +8608,7 @@ YY_RULE_SETUP
     c.setKey(key);
 
     driver.loc.push_back(new yy::location());
-    driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(url);
+    driver.loc.back()->begin.filename = driver.loc.back()->end.filename = std::make_shared<const std::string>(url);
     YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
     yypush_buffer_state(temp);
 

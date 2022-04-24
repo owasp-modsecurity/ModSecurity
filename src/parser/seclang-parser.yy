@@ -319,7 +319,7 @@ using namespace modsecurity::operators;
 %initial-action
 {
   // Initialize the initial location.
-  @$.begin.filename = @$.end.filename = new std::string(driver.file);
+  @$.begin.filename = @$.end.filename = std::make_shared<const std::string>(driver.file);
 };
 %define parse.trace
 %define parse.error verbose
@@ -1077,7 +1077,7 @@ expression:
     | DIRECTIVE variables op actions
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        auto t = std::make_shared<std::vector<actions::transformations::Transformation *>>();
         for (auto &i : *$4.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
@@ -1095,7 +1095,7 @@ expression:
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* transformations */ t,
+            /* transformations */ t.get(),
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
@@ -1126,7 +1126,7 @@ expression:
     | CONFIG_DIR_SEC_ACTION actions
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        auto t = std::make_shared<std::vector<actions::transformations::Transformation *>>();
         for (auto &i : *$2.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
@@ -1136,7 +1136,7 @@ expression:
         }
         std::unique_ptr<RuleUnconditional> rule(new RuleUnconditional(
             /* actions */ a,
-            /* transformations */ t,
+            /* transformations */ t.get(),
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));
@@ -1146,7 +1146,7 @@ expression:
       {
         std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        auto t = std::make_shared<std::vector<actions::transformations::Transformation *>>();
         for (auto &i : *$2.get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
@@ -1157,7 +1157,7 @@ expression:
         std::unique_ptr<RuleScript> r(new RuleScript(
             /* path to script */ $1,
             /* actions */ a,
-            /* transformations */ t,
+            /* transformations */ t.get(),
             /* file name */ std::unique_ptr<std::string>(new std::string(*@1.end.filename)),
             /* line number */ @1.end.line
             ));

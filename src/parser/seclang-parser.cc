@@ -1321,7 +1321,7 @@ namespace yy {
 #line 320 "seclang-parser.yy"
 {
   // Initialize the initial location.
-  yyla.location.begin.filename = yyla.location.end.filename = new std::string(driver.file);
+  yyla.location.begin.filename = yyla.location.end.filename = std::make_shared<const std::string>(driver.file);
 }
 
 #line 1328 "seclang-parser.cc"
@@ -2287,7 +2287,7 @@ namespace yy {
 #line 1078 "seclang-parser.yy"
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        auto t = std::make_shared<std::vector<actions::transformations::Transformation *>>();
         for (auto &i : *yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ().get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
@@ -2305,7 +2305,7 @@ namespace yy {
             /* op */ op,
             /* variables */ v,
             /* actions */ a,
-            /* transformations */ t,
+            /* transformations */ t.get(),
             /* file name */ std::unique_ptr<std::string>(new std::string(*yystack_[3].location.end.filename)),
             /* line number */ yystack_[3].location.end.line
             ));
@@ -2344,7 +2344,7 @@ namespace yy {
 #line 1127 "seclang-parser.yy"
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        auto t = std::make_shared<std::vector<actions::transformations::Transformation *>>();
         for (auto &i : *yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ().get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
@@ -2354,7 +2354,7 @@ namespace yy {
         }
         std::unique_ptr<RuleUnconditional> rule(new RuleUnconditional(
             /* actions */ a,
-            /* transformations */ t,
+            /* transformations */ t.get(),
             /* file name */ std::unique_ptr<std::string>(new std::string(*yystack_[1].location.end.filename)),
             /* line number */ yystack_[1].location.end.line
             ));
@@ -2368,7 +2368,7 @@ namespace yy {
       {
         std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
-        std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        auto t = std::make_shared<std::vector<actions::transformations::Transformation *>>();
         for (auto &i : *yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ().get()) {
             if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
@@ -2379,7 +2379,7 @@ namespace yy {
         std::unique_ptr<RuleScript> r(new RuleScript(
             /* path to script */ yystack_[1].value.as < std::string > (),
             /* actions */ a,
-            /* transformations */ t,
+            /* transformations */ t.get(),
             /* file name */ std::unique_ptr<std::string>(new std::string(*yystack_[1].location.end.filename)),
             /* line number */ yystack_[1].location.end.line
             ));
