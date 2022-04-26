@@ -1375,6 +1375,16 @@ bool Multipart::init(std::string *error) {
             return false;
         }
 
+        /* Some frameworks are known to incorrectly include a charset= parameter */
+        /* after the boundary. Doing so is not RFC-compliant, but we will tolerate it.*/
+        if (boundary_characters_valid(m_boundary.c_str()) != 1) {
+            size_t semicolon_after_boundary = m_boundary.find(';');
+            if (semicolon_after_boundary != std::string::npos) {
+                ms_dbg_a(m_transaction, 3,
+                    "Multipart: Invalid parameter after boundary in C-T (tolerated).");
+                m_boundary = m_boundary.substr(0, semicolon_after_boundary);
+            }
+        }
         /* Validate the characters used in the boundary. */
         if (boundary_characters_valid(m_boundary.c_str()) != 1) {
             m_flag_error = 1;
