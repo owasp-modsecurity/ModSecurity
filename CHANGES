@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Tolerate other parameters after boundary in multipart C-T
+    [Issue #1900 - @martinhsv]
   - Add DebugLog message for bad pattern in rx operator
     [Issue #2723 - @martinhsv]
   - Support PCRE2
