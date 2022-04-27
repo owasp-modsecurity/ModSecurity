@@ -101,7 +101,8 @@ class Operator {
         }
 
     virtual ~Operator() { }
-    static Operator *instantiate(std::string opName, std::string param);
+    static Operator *instantiate(const std::string& opName,
+        const std::string& param);
 
     virtual bool init(const std::string &arg, std::string *error) {
         return true;

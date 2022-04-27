@@ -278,7 +278,7 @@ Transaction::~Transaction() {
  *
  */
 #ifndef NO_LOGS
-void Transaction::debug(int level, std::string message) const {
+void Transaction::debug(int level, const std::string& message) const {
     if (m_rules == NULL) {
         return;
     }
