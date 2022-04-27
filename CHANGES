@@ -2,7 +2,7 @@ v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
   - Fix initcol error message wording
-    [Issue #2731 - @877509395, @martinhsv]
+    [Issue #2732 - @877509395, @martinhsv]
   - Tolerate other parameters after boundary in multipart C-T
     [Issue #1900 - @martinhsv]
   - Add DebugLog message for bad pattern in rx operator
