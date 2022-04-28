@@ -42,9 +42,8 @@ LMDB::LMDB(std::string name) :
 
 int LMDB::txn_begin(unsigned int flags, MDB_txn **ret) {
     if (!isOpen) {
-        MDBEnvProvider* provider = MDBEnvProvider::GetInstance();
-        m_env = provider->GetEnv();
-        m_dbi = *(provider->GetDBI());
+        m_env = MDBEnvProvider::GetInstance().GetEnv();
+        m_dbi = *(MDBEnvProvider::GetInstance().GetDBI());
         isOpen = true;
     }
     return mdb_txn_begin(m_env, NULL, flags, ret);
@@ -501,22 +500,6 @@ end_txn:
     return;
 }
 
-
-MDBEnvProvider* MDBEnvProvider::provider_ = nullptr;
-
-MDBEnvProvider* MDBEnvProvider::GetInstance() {
-    if (provider_==nullptr) {
-        provider_ = new MDBEnvProvider();
-    }
-    return provider_;
-}
-
-void MDBEnvProvider::Finalize() {
-    if (provider_!=nullptr) {
-        provider_->close();
-        provider_ = nullptr;
-    }
-}
 
 MDBEnvProvider::MDBEnvProvider() :
     m_env(NULL), initialized(false) {

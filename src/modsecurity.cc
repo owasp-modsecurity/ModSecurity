@@ -106,9 +106,6 @@ ModSecurity::~ModSecurity() {
     delete m_ip_collection;
     delete m_session_collection;
     delete m_user_collection;
-#ifdef WITH_LMDB
-    collection::backend::MDBEnvProvider::Finalize();
-#endif
 }
 
 

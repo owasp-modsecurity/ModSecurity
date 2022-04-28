@@ -66,9 +66,7 @@ namespace backend {
  *   "Use an MDB_env* in the process which opened it, without fork()ing."
  */
 class MDBEnvProvider {
- protected:
-    static MDBEnvProvider* provider_;
-    MDBEnvProvider();
+
  public:
     MDBEnvProvider(MDBEnvProvider &other) = delete;
     void operator=(const MDBEnvProvider &) = delete;
@@ -77,11 +75,12 @@ class MDBEnvProvider {
      * This is the static method that controls the access to the singleton
      * instance. On the first run, it creates a singleton object and places it
      * into the static field. On subsequent runs, it returns the client existing
-     * object stored in the static field.
+     * object stored in the static field (Meyers Singleton implementation).
      */
-    static MDBEnvProvider* GetInstance();
-    static void Finalize();
-
+    static MDBEnvProvider& GetInstance() {
+        static MDBEnvProvider instance;
+        return instance;
+    }
     MDB_env* GetEnv();
     MDB_dbi* GetDBI();
 
@@ -90,6 +89,7 @@ class MDBEnvProvider {
     MDB_dbi m_dbi;
     pthread_mutex_t m_lock;
 
+    MDBEnvProvider();
     bool initialized;
     void init();
     void close();
