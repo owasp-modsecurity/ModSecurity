@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix LMDB initialization issues
+    [Issue #2688 - @ziollek, @martinhsv]
   - Fix initcol error message wording
     [Issue #2732 - @877509395, @martinhsv]
   - Tolerate other parameters after boundary in multipart C-T
