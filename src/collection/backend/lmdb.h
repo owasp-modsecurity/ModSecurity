@@ -83,16 +83,12 @@ class MDBEnvProvider {
     }
     MDB_env* GetEnv();
     MDB_dbi* GetDBI();
-
+    ~MDBEnvProvider();
  private:
     MDB_env *m_env;
     MDB_dbi m_dbi;
-    pthread_mutex_t m_lock;
 
     MDBEnvProvider();
-    bool initialized;
-    void init();
-    void close();
 };
 
 class LMDB :

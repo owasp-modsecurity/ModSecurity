@@ -501,43 +501,27 @@ end_txn:
 }
 
 
-MDBEnvProvider::MDBEnvProvider() :
-    m_env(NULL), initialized(false) {
-    pthread_mutex_init(&m_lock, NULL);
+MDBEnvProvider::MDBEnvProvider() : m_env(NULL) {
+    MDB_txn *txn;
+    mdb_env_create(&m_env);
+    mdb_env_open(m_env, "./modsec-shared-collections",
+        MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
+    mdb_txn_begin(m_env, NULL, 0, &txn);
+    mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &m_dbi);
+    mdb_txn_commit(txn);
 }
 
 MDB_env* MDBEnvProvider::GetEnv() {
-    init();
     return m_env;
 }
 
 MDB_dbi* MDBEnvProvider::GetDBI() {
-    init();
     return &m_dbi;
 }
 
-void MDBEnvProvider::init() {
-    pthread_mutex_lock(&m_lock);
-    if (!initialized) {
-        MDB_txn *txn;
-        initialized = true;
-        mdb_env_create(&m_env);
-        mdb_env_open(m_env, "./modsec-shared-collections",
-            MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
-        mdb_txn_begin(m_env, NULL, 0, &txn);
-        mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &m_dbi);
-        mdb_txn_commit(txn);
-    }
-    pthread_mutex_unlock(&m_lock);
-}
-
-void MDBEnvProvider::close() {
-    pthread_mutex_lock(&m_lock);
-    if (initialized) {
-        mdb_dbi_close(m_env, m_dbi);
-        mdb_env_close(m_env);
-    }
-    pthread_mutex_unlock(&m_lock);
+MDBEnvProvider::~MDBEnvProvider() {
+    mdb_dbi_close(m_env, m_dbi);
+    mdb_env_close(m_env);
 }
 
 #endif
