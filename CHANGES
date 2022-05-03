@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Allow no-key, single-value JSON body
+   [Issue #2735 - @marcstern, @martinhsv]
  * Set SecStatusEngine Off in modsecurity.conf-recommended
    [Issue #2717 - @un99known99, @martinhsv]
  * Fix memory leak that occurs on JSON parsing error
