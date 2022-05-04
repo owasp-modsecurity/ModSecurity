@@ -57,6 +57,16 @@ SecRequestBodyLimitAction Reject
 #
 SecRequestBodyJsonDepthLimit 512
 
+# Maximum number of args allowed per request. You want to keep this
+# value as low as practical. The value should match that in rule 200007.
+SecArgumentsLimit 1000
+
+# If SecArgumentsLimit has been set, you probably want to reject any
+# request body that has only been partly parsed. The value used in this
+# rule should match what was used with SecArgumentsLimit
+SecRule &ARGS "@ge 1000" \
+"id:'200007', phase:2,t:none,log,deny,status:400,msg:'Failed to fully parse request body due to large argument count',severity:2"
+
 # Verify that we've correctly processed the request body.
 # As a rule of thumb, when failing to process a request body
 # you should reject the request (when deployed in blocking mode)
