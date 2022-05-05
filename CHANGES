@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix memory leak when concurrent log includes REMOTE_USER
+    [Issue #2727 - @liudongmiao]
   - Fix LMDB initialization issues
     [Issue #2688 - @ziollek, @martinhsv]
   - Fix initcol error message wording
