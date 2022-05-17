@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add SecArgumentsLimit, 200007 to modsecurity.conf-recommended
+    [Issue #2738 - @jleproust, @martinhsv]
   - Fix memory leak when concurrent log includes REMOTE_USER
     [Issue #2727 - @liudongmiao]
   - Fix LMDB initialization issues
