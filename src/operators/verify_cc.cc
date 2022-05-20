@@ -104,11 +104,6 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
         pcre2_options, &errornumber, &erroroffset, NULL);
     if (m_pc == NULL) {
         return false;
-    } else {
-        m_match_data = pcre2_match_data_create_from_pattern(m_pc, NULL);
-        if (m_match_data == NULL) {
-            return false;
-        }
     }
 #else
     const char *errptr = NULL;
@@ -145,15 +140,16 @@ bool VerifyCC::evaluate(Transaction *t, RuleWithActions *rule,
     PCRE2_SIZE offset = 0;
     size_t target_length = i.length();
     PCRE2_SPTR pcre2_i = reinterpret_cast<PCRE2_SPTR>(i.c_str());
+    pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(m_pc, NULL);
 
     for (offset = 0; offset < target_length; offset++) {
-        int ret = pcre2_match(m_pc, pcre2_i, target_length, offset, 0, m_match_data, NULL);
+        int ret = pcre2_match(m_pc, pcre2_i, target_length, offset, 0, match_data, NULL);
 
         /* If there was no match, then we are done. */
         if (ret < 0) {
             break;
         }
-	PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(m_match_data);
+	PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
 
 #else
     int offset = 0;
@@ -188,10 +184,17 @@ bool VerifyCC::evaluate(Transaction *t, RuleWithActions *rule,
                         "\" at " + i + ". [offset " +
                         std::to_string(offset) + "]");
                 }
+#ifdef WITH_PCRE2
+                pcre2_match_data_free(match_data);
+#endif
                 return true;
             }
         }
     }
+
+#ifdef WITH_PCRE2
+    pcre2_match_data_free(match_data);
+#endif
 
     return false;
 }

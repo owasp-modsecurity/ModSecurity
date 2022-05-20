@@ -85,7 +85,6 @@ class Regex {
  private:
 #if WITH_PCRE2
     pcre2_code *m_pc;
-    pcre2_match_data *m_match_data;
 #else
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;

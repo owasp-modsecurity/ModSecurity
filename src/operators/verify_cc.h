@@ -38,10 +38,10 @@ class VerifyCC : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit VerifyCC(std::unique_ptr<RunTimeString> param)
         : Operator("VerifyCC", std::move(param)),
-        m_pc(NULL),
 #if WITH_PCRE2
-        m_match_data(NULL) { }
+        m_pc(NULL) { }
 #else
+        m_pc(NULL),
         m_pce(NULL) { }
 #endif
     ~VerifyCC();
@@ -53,7 +53,6 @@ class VerifyCC : public Operator {
  private:
 #if WITH_PCRE2
     pcre2_code *m_pc;
-    pcre2_match_data *m_match_data;
 #else
     pcre *m_pc;
     pcre_extra *m_pce;
