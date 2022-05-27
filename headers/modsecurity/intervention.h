@@ -26,6 +26,7 @@ typedef struct ModSecurityIntervention_t {
     char *url;
     char *log;
     int disruptive;
+    int severity;
 } ModSecurityIntervention;
 
 #ifdef __cplusplus
@@ -34,6 +35,7 @@ namespace intervention {
         i->status = 200;
         i->pause = 0;
         i->disruptive = 0;
+        i->severity = 0;
     }
 
     static void clean(ModSecurityIntervention_t *i) {
