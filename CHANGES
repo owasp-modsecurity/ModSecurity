@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * mlogc log-line parsing fails due to enhanced timestamp
+   [Issue #2682 - @bozhinov, @ABrauer-CPT, @martinhsv]
  * Allow no-key, single-value JSON body
    [Issue #2735 - @marcstern, @martinhsv]
  * Set SecStatusEngine Off in modsecurity.conf-recommended
