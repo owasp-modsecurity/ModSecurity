@@ -1476,7 +1476,6 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
         }
         it->disruptive = m_it.disruptive;
         it->status = m_it.status;
-        it->severity = m_it.severity;
 
         if (m_it.log != NULL) {
             std::string log("");
@@ -1487,6 +1486,7 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
         }
         intervention::reset(&m_it);
     }
+    it->severity = m_it.severity;
 
     return it->disruptive;
 }
