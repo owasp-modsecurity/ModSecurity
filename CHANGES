@@ -1,5 +1,5 @@
-v3.x.y - YYYY-MMM-DD (to be released)
--------------------------------------
+v3.0.7 - 2022-May-30
+--------------------
 
   - Move PCRE2 match block from member variable
     [@martinhsv]
