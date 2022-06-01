@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Fix: negative usec on log line when data type long is 32b
+   [Issue #2753 - @ABrauer-CPT, @martinhsv]
  * mlogc log-line parsing fails due to enhanced timestamp
    [Issue #2682 - @bozhinov, @ABrauer-CPT, @martinhsv]
  * Allow no-key, single-value JSON body
