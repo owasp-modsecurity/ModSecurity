@@ -30,9 +30,9 @@ If you are looking for ModSecurity for Apache (aka ModSecurity v2.x), it is stil
 * New features
 * New architecture
 
-Libmodsecurity is a complete rewrite of the ModSecurity platform. When it was first devised the ModSecurity project started as just an Apache module. Over time the project has been extended, due to popular demand, to support other platforms including (but not limited to) Nginx and IIS. In order to provide for the growing demand for additional platform support, it has became necessary to remove the Apache dependencies underlying this project, making it more platform independent.
+Libmodsecurity is a complete rewrite of the ModSecurity platform. When it was first devised the ModSecurity project started as just an Apache module. Over time the project has been extended, due to popular demand, to support other platforms including (but not limited to) Nginx and IIS. In order to provide for the growing demand for additional platform support, it is necessary to remove the Apache dependencies underlying this project, making ModSecurity more platform independent.
 
-As a result of this goal we have rearchitected Libmodsecurity such that it is no longer dependent on the Apache web server (both at compilation and during runtime). One side effect of this is that across all platforms users can expect increased performance. Additionally, we have taken this opportunity to lay the groundwork for some new features that users have been long seeking. For example we are looking to natively support auditlogs in the JSON format, along with a host of other functionality in future versions.
+As a result of this goal we have redesigned Libmodsecurity such that it is no longer dependent on the Apache web server (both at compilation and during runtime). One side effect of this is that across all platforms users can expect increased performance. Additionally, we have taken this opportunity to lay the groundwork for some new features that users have sought for a while. For example we are looking to natively support auditlogs in the JSON format, along with a host of other functionality in future versions.
 
 
 ### It is no longer just a module.
@@ -161,8 +161,7 @@ int main (int argc, char **argv)
 
 # Contributing
 
-You are more than welcome to contribute to this project and look forward to growing the community around this new version of ModSecurity. Areas of interest include: New
-functionalities, fixes, bug report, support for beginning users, or anything that you
+You are more than welcome to contribute to this project and look forward to growing the community around this new version of ModSecurity. Areas of interest include: New functionalities, fixes, bug report, support for beginning users, or anything that you
 are willing to help with.
 
 ## Providing patches
