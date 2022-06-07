@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Fix memory leak in streams
+   [Issue #2208 - @marcstern, @vloup, @JamesColeman-LW]
  * Fix: negative usec on log line when data type long is 32b
    [Issue #2753 - @ABrauer-CPT, @martinhsv]
  * mlogc log-line parsing fails due to enhanced timestamp
