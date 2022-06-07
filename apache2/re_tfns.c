@@ -110,6 +110,31 @@ static int msre_fn_lowercase_execute(apr_pool_t *mptmp, unsigned char *input,
     return changed;
 }
 
+/* uppercase */
+
+static int msre_fn_uppercase_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int i;
+    int changed = 0;
+
+    if (rval == NULL) return -1;
+    *rval = NULL;
+
+    i = 0;
+    while(i < input_len) {
+        int x = input[i];
+        input[i] = toupper(x);
+        if (x != input[i]) changed = 1;
+        i++;
+    }
+
+    *rval = (char *)input;
+    *rval_len = input_len;
+
+    return changed;
+}
+
 /* trimLeft */
 
 static int msre_fn_trimLeft_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -903,6 +928,12 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "lowercase",
         msre_fn_lowercase_execute
+    );
+
+    /* uppercase */
+    msre_engine_tfn_register(engine,
+        "uppercase",
+        msre_fn_uppercase_execute
     );
 
     /* md5 */
