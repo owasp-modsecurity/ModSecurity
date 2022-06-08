@@ -140,6 +140,9 @@ apr_status_t xml_cleanup(modsec_rec *msr) {
     if (msr->xml->parsing_ctx != NULL) {
         if (msr->xml->parsing_ctx->myDoc) {
             xmlFreeDoc(msr->xml->parsing_ctx->myDoc);
+            if (msr->xml->parsing_ctx->myDoc == msr->xml->doc) {
+                msr->xml->doc = NULL;
+            }
         }
         xmlFreeParserCtxt(msr->xml->parsing_ctx);
         msr->xml->parsing_ctx = NULL;
