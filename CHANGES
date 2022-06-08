@@ -1,6 +1,10 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * XML parser cleanup: NULL duplicate pointer
+   [Issue #2760 - @martinhsv]
+ * Properly cleanup XML parser contexts upon completion
+   [Issue #2239 - @argenet]
  * Fix memory leak in streams
    [Issue #2208 - @marcstern, @vloup, @JamesColeman-LW]
  * Fix: negative usec on log line when data type long is 32b
