@@ -46,7 +46,12 @@ int LMDB::txn_begin(unsigned int flags, MDB_txn **ret) {
         m_dbi = *(MDBEnvProvider::GetInstance().GetDBI());
         isOpen = true;
     }
-    return mdb_txn_begin(m_env, NULL, flags, ret);
+
+    if (MDBEnvProvider::GetInstance().isValid()) {
+        return mdb_txn_begin(m_env, NULL, flags, ret);
+    } else {
+        return -1;
+    }
 }
 
 void LMDB::string2val(const std::string& str, MDB_val *val) {
@@ -501,14 +506,19 @@ end_txn:
 }
 
 
-MDBEnvProvider::MDBEnvProvider() : m_env(NULL) {
+MDBEnvProvider::MDBEnvProvider() : m_env(NULL), valid(false) {
+    int rc;
     MDB_txn *txn;
     mdb_env_create(&m_env);
-    mdb_env_open(m_env, "./modsec-shared-collections",
+    rc = mdb_env_open(m_env, "./modsec-shared-collections",
         MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
-    mdb_txn_begin(m_env, NULL, 0, &txn);
-    mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &m_dbi);
-    mdb_txn_commit(txn);
+
+    if (rc == 0) {
+        valid = true;
+        mdb_txn_begin(m_env, NULL, 0, &txn);
+        mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &m_dbi);
+        mdb_txn_commit(txn);
+    }
 }
 
 MDB_env* MDBEnvProvider::GetEnv() {
@@ -517,6 +527,10 @@ MDB_env* MDBEnvProvider::GetEnv() {
 
 MDB_dbi* MDBEnvProvider::GetDBI() {
     return &m_dbi;
+}
+
+bool MDBEnvProvider::isValid() {
+    return valid;
 }
 
 MDBEnvProvider::~MDBEnvProvider() {
