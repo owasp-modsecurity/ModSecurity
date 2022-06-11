@@ -278,7 +278,7 @@ Transaction::~Transaction() {
  *
  */
 #ifndef NO_LOGS
-void Transaction::debug(int level, std::string message) const {
+void Transaction::debug(int level, const std::string& message) const {
     if (m_rules == NULL) {
         return;
     }
@@ -1508,6 +1508,9 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
     std::vector<const VariableValue *> l;
     r->evaluate(this, NULL, &l);
+    for (auto &a : l) {
+        delete a;
+    }
     delete r;
 
     ss << utils::string::dash_if_empty(

@@ -61,14 +61,14 @@ ctunullpointer:src/rule_with_operator.cc:135
 ctunullpointer:src/rule_with_operator.cc:95
 passedByValue:src/variables/global.h:109
 passedByValue:src/variables/global.h:110
-passedByValue:src/variables/tx.h:102
-passedByValue:src/operators/operator.cc:141
 passedByValue:src/parser/driver.cc:45
-passedByValue:src/transaction.cc:281
 passedByValue:src/utils/system.cc:154
 passedByValue:src/utils/system.cc:166
 passedByValue:test/common/modsecurity_test.cc:49
 passedByValue:test/common/modsecurity_test.cc:98
+
+uninitvar:src/operators/verify_cpf.cc:77
+uninitvar:src/operators/verify_svnr.cc:67
 
 noExplicitConstructor:seclang-parser.hh
 constParameter:seclang-parser.hh
@@ -89,6 +89,11 @@ constParameter
 
 nullPointerRedundantCheck
 knownConditionTrueFalse
+cstyleCast
+functionStatic
+variableScope
+shadowFunction
+unreadVariable
 
 
 // Examples

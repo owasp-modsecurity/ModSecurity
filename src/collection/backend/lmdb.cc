@@ -22,6 +22,8 @@
 #include <string>
 #include <memory>
 
+#include <pthread.h>
+
 #include "modsecurity/variable_value.h"
 #include "src/utils/regex.h"
 #include "src/variables/variable.h"
@@ -36,21 +38,16 @@ namespace backend {
 #ifdef WITH_LMDB
 
 LMDB::LMDB(std::string name) :
-    Collection(name), m_env(NULL) {
-    MDB_txn *txn;
-    mdb_env_create(&m_env);
-    mdb_env_open(m_env, "./modsec-shared-collections",
-        MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
-    mdb_txn_begin(m_env, NULL, 0, &txn);
-    mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &m_dbi);
-    mdb_txn_commit(txn);
+    Collection(name), m_env(NULL), isOpen(false) {}
+
+int LMDB::txn_begin(unsigned int flags, MDB_txn **ret) {
+    if (!isOpen) {
+        m_env = MDBEnvProvider::GetInstance().GetEnv();
+        m_dbi = *(MDBEnvProvider::GetInstance().GetDBI());
+        isOpen = true;
+    }
+    return mdb_txn_begin(m_env, NULL, flags, ret);
 }
-
-
-LMDB::~LMDB() {
-    mdb_env_close(m_env);
-}
-
 
 void LMDB::string2val(const std::string& str, MDB_val *val) {
     val->mv_size = sizeof(char)*(str.size());
@@ -159,7 +156,7 @@ std::unique_ptr<std::string> LMDB::resolveFirst(const std::string& var) {
 
     string2val(var, &mdb_key);
 
-    rc = mdb_txn_begin(m_env, NULL, MDB_RDONLY, &txn);
+    rc = txn_begin(MDB_RDONLY, &txn);
     lmdb_debug(rc, "txn", "resolveFirst");
     if (rc != 0) {
         goto end_txn;
@@ -192,7 +189,7 @@ bool LMDB::storeOrUpdateFirst(const std::string &key,
     string2val(key, &mdb_key);
     string2val(value, &mdb_value);
 
-    rc = mdb_txn_begin(m_env, NULL, 0, &txn);
+    rc = txn_begin(0, &txn);
     lmdb_debug(rc, "txn", "storeOrUpdateFirst");
     if (rc != 0) {
         goto end_txn;
@@ -240,7 +237,7 @@ void LMDB::resolveSingleMatch(const std::string& var,
     MDB_val mdb_value_ret;
     MDB_cursor *cursor;
 
-    rc = mdb_txn_begin(m_env, NULL, MDB_RDONLY, &txn);
+    rc = txn_begin(MDB_RDONLY, &txn);
     lmdb_debug(rc, "txn", "resolveSingleMatch");
     if (rc != 0) {
         goto end_txn;
@@ -271,7 +268,7 @@ void LMDB::store(std::string key, std::string value) {
     int rc;
     MDB_stat mst;
 
-    rc = mdb_txn_begin(m_env, NULL, 0, &txn);
+    rc = txn_begin(0, &txn);
     lmdb_debug(rc, "txn", "store");
     if (rc != 0) {
         goto end_txn;
@@ -310,7 +307,7 @@ bool LMDB::updateFirst(const std::string &key,
     MDB_val mdb_value;
     MDB_val mdb_value_ret;
 
-    rc = mdb_txn_begin(m_env, NULL, 0, &txn);
+    rc = txn_begin(0, &txn);
     lmdb_debug(rc, "txn", "updateFirst");
     if (rc != 0) {
         goto end_txn;
@@ -364,7 +361,7 @@ void LMDB::del(const std::string& key) {
     MDB_val mdb_value_ret;
     MDB_stat mst;
 
-    rc = mdb_txn_begin(m_env, NULL, 0, &txn);
+    rc = txn_begin(0, &txn);
     lmdb_debug(rc, "txn", "del");
     if (rc != 0) {
         goto end_txn;
@@ -411,7 +408,7 @@ void LMDB::resolveMultiMatches(const std::string& var,
     size_t keySize = var.size();
     MDB_cursor *cursor;
 
-    rc = mdb_txn_begin(m_env, NULL, MDB_RDONLY, &txn);
+    rc = txn_begin(MDB_RDONLY, &txn);
     lmdb_debug(rc, "txn", "resolveMultiMatches");
     if (rc != 0) {
         goto end_txn;
@@ -465,7 +462,7 @@ void LMDB::resolveRegularExpression(const std::string& var,
 
     Utils::Regex r(var, true);
 
-    rc = mdb_txn_begin(m_env, NULL, MDB_RDONLY, &txn);
+    rc = txn_begin(MDB_RDONLY, &txn);
     lmdb_debug(rc, "txn", "resolveRegularExpression");
     if (rc != 0) {
         goto end_txn;
@@ -501,6 +498,30 @@ end_cursor_open:
     mdb_txn_abort(txn);
 end_txn:
     return;
+}
+
+
+MDBEnvProvider::MDBEnvProvider() : m_env(NULL) {
+    MDB_txn *txn;
+    mdb_env_create(&m_env);
+    mdb_env_open(m_env, "./modsec-shared-collections",
+        MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
+    mdb_txn_begin(m_env, NULL, 0, &txn);
+    mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &m_dbi);
+    mdb_txn_commit(txn);
+}
+
+MDB_env* MDBEnvProvider::GetEnv() {
+    return m_env;
+}
+
+MDB_dbi* MDBEnvProvider::GetDBI() {
+    return &m_dbi;
+}
+
+MDBEnvProvider::~MDBEnvProvider() {
+    mdb_dbi_close(m_env, m_dbi);
+    mdb_env_close(m_env);
 }
 
 #endif

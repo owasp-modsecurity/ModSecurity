@@ -12,8 +12,12 @@
  * directly using the email address security@modsecurity.org.
  *
  */
-
+#if WITH_PCRE2
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+#else
 #include <pcre.h>
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -68,6 +72,9 @@ class Regex {
     Regex(const Regex&) = delete;
     Regex& operator=(const Regex&) = delete;
 
+    bool hasError() const {
+        return (m_pc == NULL);
+    }
     std::list<SMatch> searchAll(const std::string& s) const;
     bool searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const;
     bool searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures) const;
@@ -76,8 +83,12 @@ class Regex {
 
     const std::string pattern;
  private:
+#if WITH_PCRE2
+    pcre2_code *m_pc;
+#else
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;
+#endif
 };
 
 

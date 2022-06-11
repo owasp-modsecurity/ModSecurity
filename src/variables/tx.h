@@ -99,7 +99,7 @@ class Tx_DynamicElement : public Variable {
     }
 
     static void storeOrUpdateFirst(Transaction *t, const std::string &var,
-        std::string value) {
+        const std::string &value) {
         t->m_collections.m_tx_collection->storeOrUpdateFirst(var, value);
     }
 
