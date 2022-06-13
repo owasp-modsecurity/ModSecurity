@@ -1,7 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
-
+  - Restore Unique_id to include random portion after timestamp
+    [Issue #2752, #2758 - @datkps11, @martinhsv]
 
 v3.0.7 - 2022-May-30
 --------------------
