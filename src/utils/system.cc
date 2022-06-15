@@ -151,7 +151,7 @@ std::list<std::string> expandEnv(const std::string& var, int flags) {
     return vars;
 }
 
-bool createDir(std::string dir, int mode, std::string *error) {
+bool createDir(const std::string& dir, int mode, std::string *error) {
     int ret = mkdir(dir.data(), mode);
     if (ret != 0 && errno != EEXIST) {
         error->assign("Not able to create directory: " + dir + ": " \
@@ -163,7 +163,7 @@ bool createDir(std::string dir, int mode, std::string *error) {
 }
 
 
-bool isFile(std::string f) {
+bool isFile(const std::string& f) {
     struct stat fileInfo;
     FILE *fp = fopen(f.c_str(), "r");
     if (fp == NULL) {
