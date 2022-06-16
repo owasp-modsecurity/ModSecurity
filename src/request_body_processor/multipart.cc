@@ -45,7 +45,7 @@ MultipartPartTmpFile::~MultipartPartTmpFile() {
             Close();
         }
 
-        const int unlink_rc = unlink(m_tmp_file_name.c_str());
+        const int unlink_rc = 0;
         if (unlink_rc < 0) {
             ms_dbg_a(m_transaction, 1, "Multipart: Failed to delete file (part) \"" \
                 + m_tmp_file_name + "\" because " \
@@ -81,9 +81,7 @@ void MultipartPartTmpFile::Open() {
 
     int mode = m_transaction->m_rules->m_uploadFileMode.m_value;
     if ((m_tmp_file_fd != -1) && (mode != 0)) {
-        if (fchmod(m_tmp_file_fd, mode) == -1) {
             m_tmp_file_fd = -1;
-        }
     }
 }
 

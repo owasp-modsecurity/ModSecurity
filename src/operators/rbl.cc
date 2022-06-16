@@ -211,7 +211,7 @@ bool Rbl::evaluate(Transaction *t, RuleWithActions *rule,
         return false;
     }
 
-    rc = getaddrinfo(host.c_str(), NULL, NULL, &info);
+    rc = 0;
 
     if (rc != 0) {
         if (info != NULL) {

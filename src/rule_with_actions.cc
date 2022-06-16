@@ -120,7 +120,6 @@ RuleWithActions::RuleWithActions(
                 delete a;
                 std::cout << "General failure, action: " << a->m_name;
                 std::cout << " has an unknown type." << std::endl;
-                throw;
             }
         }
         delete actions;
@@ -513,17 +512,23 @@ void RuleWithActions::performLogging(Transaction *trans,
                 trans->m_rulesMessages.push_back(*ruleMessage);
 
                 /* error */
+                trans->serverLog(ruleMessage);
+                /*
                 if (!ruleMessage->m_isDisruptive) {
                     trans->serverLog(ruleMessage);
                 }
+                */
             }
         } else if (hasBlockAction() && !hasMultimatch()) {
             /* warn */
             trans->m_rulesMessages.push_back(*ruleMessage);
             /* error */
+            trans->serverLog(ruleMessage);
+            /*
             if (!ruleMessage->m_isDisruptive) {
                 trans->serverLog(ruleMessage);
             }
+            */
         } else {
             if (isItToBeLogged && !hasMultimatch()
                 && !ruleMessage->m_message.empty()) {
@@ -531,9 +536,12 @@ void RuleWithActions::performLogging(Transaction *trans,
                 trans->m_rulesMessages.push_back(*ruleMessage);
 
                 /* error */
+                trans->serverLog(ruleMessage);
+                /*
                 if (!ruleMessage->m_isDisruptive) {
                     trans->serverLog(ruleMessage);
                 }
+                */
             }
         }
     } else {
@@ -542,10 +550,12 @@ void RuleWithActions::performLogging(Transaction *trans,
             trans->m_rulesMessages.push_back(*ruleMessage.get());
 
             /* error */
+            trans->serverLog(ruleMessage);
+            /*
             if (!ruleMessage->m_isDisruptive) {
                 trans->serverLog(ruleMessage);
             }
-
+            */
             RuleMessage *rm = new RuleMessage(this, trans);
             rm->m_saveMessage = ruleMessage->m_saveMessage;
             ruleMessage.reset(rm);
