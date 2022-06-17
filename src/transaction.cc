@@ -163,8 +163,9 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     m_logCbData(logCbData),
     TransactionAnchoredVariables(this) {
     m_id = std::unique_ptr<std::string>( new std::string(
-        std::to_string(m_timeStamp)
-        + std::to_string(modsecurity::utils::generate_transaction_unique_id())));
+        std::to_string(m_timeStamp)));
+        //+ std::to_string(modsecurity::utils::generate_transaction_unique_id())));
+        // Wasm VM does not support the random generation that involves a file system operation
 
     m_variableUrlEncodedError.set("0", 0);
 
