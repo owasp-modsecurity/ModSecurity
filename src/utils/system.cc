@@ -65,13 +65,13 @@ std::list<std::string> expandEnv(const std::string& var, int flags) {
     return vars;
 }
 
-bool createDir(std::string dir, int mode, std::string *error) {
+bool createDir(const std::string& dir, int mode, std::string *error) {
 
     return true;
 }
 
 
-bool isFile(std::string f) {
+bool isFile(const std::string& f) {
 
     return true;
 }
