@@ -1134,7 +1134,7 @@ char *current_logtime(apr_pool_t *mp) {
 
     apr_strftime(tstr, &len, 80, "%d/%b/%Y:%H:%M:%S.", &t);
     apr_snprintf(tstr + strlen(tstr), 80 - strlen(tstr), "%06ld %c%.2d%.2d",
-            ((long)now) % 1000000L,
+            (long)apr_time_usec(now),
             t.tm_gmtoff < 0 ? '-' : '+',
             t.tm_gmtoff / (60 * 60), (t.tm_gmtoff / 60) % 60);
     return apr_pstrdup(mp, tstr);

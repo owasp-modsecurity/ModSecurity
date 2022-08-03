@@ -325,6 +325,21 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     #endif
 #endif
 
+    /* Streams cleanup. */
+    if (msr->stream_input_data != NULL) {
+        free(msr->stream_input_data);
+        msr->stream_input_data = NULL;
+        msr->stream_input_length = 0;
+#ifdef MSC_LARGE_STREAM_INPUT
+        msr->stream_input_allocated_length = 0;
+#endif
+    }
+    if (msr->stream_output_data != NULL) {
+        free(msr->stream_output_data);
+        msr->stream_output_data = NULL;
+        msr->stream_output_length = 0;
+    }
+
     return APR_SUCCESS;
 }
 

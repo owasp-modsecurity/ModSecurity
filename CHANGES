@@ -1,6 +1,20 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * XML parser cleanup: NULL duplicate pointer
+   [Issue #2760 - @martinhsv]
+ * Properly cleanup XML parser contexts upon completion
+   [Issue #2239 - @argenet]
+ * Fix memory leak in streams
+   [Issue #2208 - @marcstern, @vloup, @JamesColeman-LW]
+ * Fix: negative usec on log line when data type long is 32b
+   [Issue #2753 - @ABrauer-CPT, @martinhsv]
+ * mlogc log-line parsing fails due to enhanced timestamp
+   [Issue #2682 - @bozhinov, @ABrauer-CPT, @martinhsv]
+ * Allow no-key, single-value JSON body
+   [Issue #2735 - @marcstern, @martinhsv]
+ * Set SecStatusEngine Off in modsecurity.conf-recommended
+   [Issue #2717 - @un99known99, @martinhsv]
  * Fix memory leak that occurs on JSON parsing error
    [Issue #2236 @argenet, @vloup, @martinhsv]
  * Multipart names/filenames may include single quote if double-quote enclosed

@@ -224,6 +224,40 @@
 			),
 		),
 	),
+},
+{
+	type => "rule",
+	comment => "json parser - no-key single value",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+                SecAuditEngine RelevantOnly
+                SecAuditLog "$ENV{AUDIT_LOG}"
+		SecDebugLogLevel 9
+		SecRequestBodyJsonDepthLimit 3
+		SecRule REQUEST_HEADERS:Content-Type "application/json" \\
+		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200444',phase:2,log,deny,status:403,msg:'Failed to parse request body'"
+		SecRule ARGS "\@streq 25" "id:'200445',phase:2,log,deny,status:403"
+	),
+	match_log => {
+		audit => [ qr/200445/s, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q(
+				25
+			),
+		),
+	),
 }
 
 
