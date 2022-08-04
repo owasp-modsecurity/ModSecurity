@@ -25,12 +25,6 @@
 #include "apr_optional.h"
 #include "mod_log_config.h"
 
-/*
- * #ifdef APLOG_USE_MODULE
- * APLOG_USE_MODULE(security2);
- * #endif
- */
-
 #include "msc_logging.h"
 #include "msc_util.h"
 
