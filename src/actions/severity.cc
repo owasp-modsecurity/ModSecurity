@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <charconv>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/actions/action.h"
@@ -58,15 +59,14 @@ bool Severity::init(std::string *error) {
         m_severity = 7;
         return true;
     } else {
-        try {
-            m_severity = std::stoi(a);
-            return true;
-        }  catch (...) {
+        const auto conv_res = std::from_chars(a.data(), a.data() + a.size(), m_severity);
+        if (conv_res.ec == std::errc::invalid_argument) {
             error->assign("Severity: The input \"" + a + "\" is " \
                 "not a number.");
+        } else {
+            return true;
         }
     }
-
     return false;
 }
 

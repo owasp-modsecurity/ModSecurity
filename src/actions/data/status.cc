@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <charconv>
 
 #include "modsecurity/transaction.h"
 
@@ -27,9 +28,8 @@ namespace actions {
 namespace data {
 
 bool Status::init(std::string *error) {
-    try {
-        m_status = std::stoi(m_parser_payload);
-    } catch (...) {
+    const auto conv_res = std::from_chars(m_parser_payload.data(), m_parser_payload.data() + m_parser_payload.size(), m_status);
+    if (conv_res.ec == std::errc::invalid_argument) {
         error->assign("Not a valid number: " + m_parser_payload);
         return false;
     }

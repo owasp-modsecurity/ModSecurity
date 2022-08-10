@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <charconv>
 
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"
@@ -38,9 +39,8 @@ bool RuleRemoveTargetById::init(std::string *error) {
         return false;
     }
 
-    try {
-        m_id = std::stoi(param[0]);
-    } catch(...) {
+    const auto conv_res = std::from_chars(param[0].data(), param[0].data() + param[0].size(), m_id);
+    if (conv_res.ec == std::errc::invalid_argument) {
         error->assign("Not able to convert '" + param[0] +
             "' into a number");
         return false;

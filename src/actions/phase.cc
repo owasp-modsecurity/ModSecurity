@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <charconv>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
@@ -31,8 +32,22 @@ bool Phase::init(std::string *error) {
     std::string a = utils::string::tolower(m_parser_payload);
     m_phase = -1;
 
-    try {
-        m_phase = std::stoi(m_parser_payload);
+
+    const auto conv_res = std::from_chars(m_parser_payload.data(), m_parser_payload.data() + m_parser_payload.size(), m_phase);
+    if (conv_res.ec == std::errc::invalid_argument) {
+        // Conversion Fail
+        if (a == "request") {
+            m_phase = modsecurity::Phases::RequestBodyPhase;
+            m_secRulesPhase = 2;
+        } else if (a == "response") {
+            m_phase = modsecurity::Phases::ResponseBodyPhase;
+            m_secRulesPhase = 4;
+        } else if (a == "logging") {
+            m_phase = modsecurity::Phases::LoggingPhase;
+            m_secRulesPhase = 5;
+        }
+    } else {
+        // Conversion Done
         if (m_phase == 0) {
             m_phase = modsecurity::Phases::ConnectionPhase;
             m_secRulesPhase = 0;
@@ -55,19 +70,7 @@ bool Phase::init(std::string *error) {
             error->assign("Unknown phase: " + m_parser_payload);
             return false;
         }
-    } catch (...) {
-        if (a == "request") {
-            m_phase = modsecurity::Phases::RequestBodyPhase;
-            m_secRulesPhase = 2;
-        } else if (a == "response") {
-            m_phase = modsecurity::Phases::ResponseBodyPhase;
-            m_secRulesPhase = 4;
-        } else if (a == "logging") {
-            m_phase = modsecurity::Phases::LoggingPhase;
-            m_secRulesPhase = 5;
-        }
     }
-
     return true;
 }
 

@@ -17,6 +17,7 @@
 
 #include <string>
 #include <memory>
+#include <charconv>
 
 #include "src/operators/operator.h"
 
@@ -29,34 +30,29 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
     int start;
     int end;
 
-    if (pos == std::string::npos) {
-        try {
-            start = std::stoi(rangeRepresentation);
-        } catch(...) {
+    if (pos == std::string::npos) {  
+        const auto conv_res = std::from_chars(rangeRepresentation.data(), rangeRepresentation.data() + rangeRepresentation.size(), start);
+        if (conv_res.ec == std::errc::invalid_argument) {
             error->assign("Not able to convert '" + rangeRepresentation +
                 "' into a number");
             return false;
         }
+
         table[start >> 3] = (table[start >> 3] | (1 << (start & 0x7)));
         return true;
     }
 
-    try {
-        start = std::stoi(std::string(rangeRepresentation, 0, pos));
-    } catch (...) {
-        error->assign("Not able to convert '" +
-            std::string(rangeRepresentation, 0, pos) +
-            "' into a number");
+    std::string to_be_converted(rangeRepresentation, 0, pos);
+    const auto conv_res2 = std::from_chars(to_be_converted.data(), to_be_converted.data() + to_be_converted.size(), start);
+    if (conv_res2.ec == std::errc::invalid_argument) {
+        error->assign("Not able to convert '" + to_be_converted + "' into a number");
         return false;
     }
 
-    try {
-        end = std::stoi(std::string(rangeRepresentation, pos + 1,
-            rangeRepresentation.length() - (pos + 1)));
-    } catch (...) {
-        error->assign("Not able to convert '" + std::string(rangeRepresentation,
-            pos + 1, rangeRepresentation.length() - (pos + 1)) +
-            "' into a number");
+    std::string to_be_converted2(rangeRepresentation, pos + 1, rangeRepresentation.length() - (pos + 1));
+    const auto conv_res3 = std::from_chars(to_be_converted2.data(), to_be_converted2.data() + to_be_converted2.size(), end);
+    if (conv_res3.ec == std::errc::invalid_argument) {
+        error->assign("Not able to convert '" + to_be_converted2 + "' into a number");
         return false;
     }
 

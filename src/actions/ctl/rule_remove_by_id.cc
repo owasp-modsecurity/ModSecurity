@@ -17,6 +17,8 @@
 
 #include <iostream>
 #include <string>
+#include <charconv>
+
 
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"
@@ -42,19 +44,21 @@ bool RuleRemoveById::init(std::string *error) {
             std::string n2s = std::string(b, dash + 1, b.size() - (dash + 1));
             int n1n = 0;
             int n2n = 0;
-            try {
-                n1n = std::stoi(n1s);
-                added = true;
-            } catch (...) {
+
+            const auto conv_res = std::from_chars(n1s.data(), n1s.data() + n1s.size(), n1n);
+            if (conv_res.ec == std::errc::invalid_argument) {
                 error->assign("Not a number: " + n1s);
                 return false;
-            }
-            try {
-                n2n = std::stoi(n2s);
+            } else {
                 added = true;
-            } catch (...) {
+            }
+
+            const auto conv_res2 = std::from_chars(n2s.data(), n2s.data() + n2s.size(), n2n);
+            if (conv_res2.ec == std::errc::invalid_argument) {
                 error->assign("Not a number: " + n2s);
                 return false;
+            } else {
+                added = true;
             }
 
             if (n1n > n2n) {
@@ -64,13 +68,16 @@ bool RuleRemoveById::init(std::string *error) {
             m_ranges.push_back(std::make_pair(n1n, n2n));
             added = true;
         } else {
-            try {
-                int num = std::stoi(b);
-                m_ids.push_back(num);
-                added = true;
-            } catch (...) {
+            int num;
+            const auto conv_res3 = std::from_chars(b.data(), b.data() + b.size(), num);
+            if (conv_res3.ec == std::errc::invalid_argument) {
+                // Conversion Fail
                 error->assign("Not a number or range: " + b);
                 return false;
+            } else {
+                // Conversion Done
+                m_ids.push_back(num);
+                added = true;
             }
         }
     }

@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <charconv>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
@@ -28,9 +29,10 @@ namespace actions {
 
 
 bool Maturity::init(std::string *error) {
-    try {
-        m_maturity = std::stoi(m_parser_payload);
-    }  catch (...) {
+
+    const auto conv_res = std::from_chars(m_parser_payload.data(), m_parser_payload.data() + m_parser_payload.size(), m_maturity);
+    if (conv_res.ec == std::errc::invalid_argument) {
+        // Conversion error
         error->assign("Maturity: The input \"" + m_parser_payload + "\" is " \
             "not a number.");
         return false;
