@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <charconv>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
@@ -28,14 +29,24 @@ namespace actions {
 bool RuleId::init(std::string *error) {
     std::string a = m_parser_payload;
 
-    try {
-        m_ruleId = std::stod(a);
-    } catch (...) {
+    const auto format = std::chars_format::fixed;
+    const auto conv_res = std::from_chars(a.data(), a.data() + a.size(), m_ruleId, format);
+    if (conv_res.ec == std::errc::invalid_argument || conv_res.ec == std::errc::result_out_of_range) {
+        // Conversion error
         m_ruleId = 0;
         error->assign("The input \"" + a + "\" does not " \
             "seems to be a valid rule id.");
         return false;
     }
+
+    // try {
+    //     m_ruleId = std::stod(a);
+    // } catch (...) {
+    //     m_ruleId = 0;
+    //     error->assign("The input \"" + a + "\" does not " \
+    //         "seems to be a valid rule id.");
+    //     return false;
+    // }
 
     std::ostringstream oss;
     oss << std::setprecision(40) << m_ruleId;
