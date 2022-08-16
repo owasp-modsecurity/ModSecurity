@@ -38,9 +38,8 @@ bool FuzzyHash::init(const std::string &param2, std::string *error) {
     }
     digit.append(std::string(m_param, pos+1));
     file.append(std::string(m_param, 0, pos));
-    try {
-        m_threshold = std::stoi(digit);
-    } catch (...) {
+    const auto conv_res = std::from_chars(digit.data(), digit.data() + digit.size(), m_threshold);
+    if (conv_res.ec == std::errc::invalid_argument) {
         error->assign("Expecting a digit, got: " + digit);
         return false;
     }
