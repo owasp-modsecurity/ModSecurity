@@ -31,7 +31,7 @@ namespace variables {
 
 
 DEFINE_VARIABLE(MultipartInvalidPart, MULTIPART_INVALID_PART,
-    m_variableMultipartInvalidHeaderFolding)
+    m_variableMultipartInvalidPart)
 
 
 }  // namespace variables
