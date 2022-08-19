@@ -117,23 +117,41 @@ bool Pm::init(const std::string &file, std::string *error) {
     std::vector<std::string> vec;
     std::istringstream *iss;
     const char *err = NULL;
+    char *content = NULL;
+    char pm_custom_separator;
+    std::string tmp;
 
 #ifdef MODSEC_MUTEX_ON_PM
     pthread_mutex_init(&m_lock, NULL);
 #endif
-    char *content = parse_pm_content(m_param.c_str(), m_param.length(), &err);
-    if (content == NULL) {
+
+    // Checking if Pm is required based on  a custom separator
+    // Example expected syntax: "@Pm PmCustomSeparator:| htaccess|This is an error string| hi"
+    // Emulating PmFromFile logic, it bypasses Snort-Suricata format parsing. It permits the match
+    // of the '|' symbol for piped commands maching or the usage of the pipe symbol as a separator
+    if (m_param.compare(0, 18, "PmCustomSeparator:") == 0 && m_param.size() > 19) {
+        pm_custom_separator=m_param.at(18);
+        m_param.erase(0,20);
         iss = new std::istringstream(m_param);
+        while (std::getline(*iss, tmp, pm_custom_separator)) {
+            acmp_add_pattern(m_p, tmp.c_str(), NULL, NULL, tmp.length());
+        }
+    // Usual Pm behaviour with Snort-Suricata format parsing if 'PmCustomSeparator:' is not found
     } else {
-        iss = new std::istringstream(content);
-    }
+        content = parse_pm_content(m_param.c_str(), m_param.length(), &err);
+        if (content == NULL) {
+            iss = new std::istringstream(m_param);
+        } else {
+            iss = new std::istringstream(content);
+        }
 
-    std::copy(std::istream_iterator<std::string>(*iss),
-        std::istream_iterator<std::string>(),
-        back_inserter(vec));
+        std::copy(std::istream_iterator<std::string>(*iss),
+            std::istream_iterator<std::string>(),
+            back_inserter(vec));
 
-    for (auto &a : vec) {
-        acmp_add_pattern(m_p, a.c_str(), NULL, NULL, a.length());
+        for (auto &a : vec) {
+            acmp_add_pattern(m_p, a.c_str(), NULL, NULL, a.length());
+        }
     }
 
     while (m_p->is_failtree_done == 0) {
