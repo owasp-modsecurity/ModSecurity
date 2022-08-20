@@ -1353,15 +1353,14 @@
         SecDebugLog $ENV{DEBUG_LOG}
         SecDebugLogLevel 9
         SecRequestBodyAccess On
-        SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500134"
-        SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500135"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500136"
+        SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:400,id:500134"
+        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:400,id:500136"
     ),
     match_log => {
-        debug => [ qr/boundary was quoted.*No boundaries found in payload/s, 1 ],
+        debug => [ qr/Multipart: Warning: boundary was quoted./s, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^400$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1370,20 +1369,20 @@
         ],
         normalize_raw_request_data(
             q(
-                --0000
+                -- 0000
                 Content-Disposition: form-data; name="name"
                 
                 Brian Rectanus
-                --0000
+                -- 0000
                 Content-Disposition: form-data; name="email"
                 
                 brian.rectanus@breach.com
-                --0000
+                -- 0000
                 Content-Disposition: form-data; name="image"; filename="image.jpg"
                 Content-Type: image/jpeg
                 
                 BINARYDATA
-                --0000--
+                -- 0000--
             ),
         ),
     ),
