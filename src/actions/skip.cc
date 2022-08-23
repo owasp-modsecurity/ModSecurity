@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <charconv>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/actions/action.h"
@@ -27,9 +28,8 @@ namespace actions {
 
 
 bool Skip::init(std::string *error) {
-    try {
-        m_skip_next = std::stoi(m_parser_payload);
-    }  catch (...) {
+    const auto conv_res = std::from_chars(m_parser_payload.data(), m_parser_payload.data() + m_parser_payload.size(), m_skip_next);
+    if (conv_res.ec == std::errc::invalid_argument) {
         error->assign("Skip: The input \"" + m_parser_payload + "\" is " \
             "not a number.");
         return false;

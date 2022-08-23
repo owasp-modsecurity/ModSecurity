@@ -16,6 +16,7 @@
 #include "src/operators/eq.h"
 
 #include <string>
+#include <charconv>
 
 #include "src/operators/operator.h"
 
@@ -29,14 +30,12 @@ bool Eq::evaluate(Transaction *transaction, const std::string &input) {
     int i = 0;
     std::string pt(m_string->evaluate(transaction));
 
-    try {
-        p = std::stoi(pt);
-    } catch (...) {
+    const auto conv_res = std::from_chars(pt.data(), pt.data() + pt.size(), p);
+    if (conv_res.ec == std::errc::invalid_argument) {
         p = 0;
     }
-    try {
-        i = std::stoi(input);
-    } catch (...) {
+    const auto conv_res2 = std::from_chars(input.data(), input.data() + input.size(), i);
+    if (conv_res2.ec == std::errc::invalid_argument) {
         i = 0;
     }
 

@@ -1470,9 +1470,11 @@ expression:
       {
         std::string error;
         double ruleId;
-        try {
-            ruleId = std::stod($1);
-        } catch (...) {
+        std::stringstream ss_conv;
+        ss_conv<<$1;
+        ss_conv>>ruleId;
+        if (ss_conv.fail()) {
+            ss_conv.clear();
             std::stringstream ss;
             ss << "SecRuleUpdateTargetById: failed to load:";
             ss << "The input \"" + $1 + "\" does not ";
@@ -1496,9 +1498,11 @@ expression:
       {
         std::string error;
         double ruleId;
-        try {
-            ruleId = std::stod($1);
-        } catch (...) {
+        std::stringstream ss_conv;
+        ss_conv<<$1;
+        ss_conv>>ruleId;
+        if (ss_conv.fail()) {
+            ss_conv.clear();
             std::stringstream ss;
             ss << "SecRuleUpdateActionById: failed to load:";
             ss << "The input \"" + $1 + "\" does not ";
@@ -1729,9 +1733,11 @@ expression:
             YYERROR;
         }
 
-        try {
-            num = std::stod(param.back());
-        } catch (...) {
+        std::stringstream ss_conv;
+        ss_conv<<param.back();
+        ss_conv>>num;
+        if (ss_conv.fail()) {
+            ss_conv.clear();
             std::stringstream ss;
             ss << "Failed to process unicode map, last parameter is ";
             ss << "expected to be a number: " << param.back() << " ";

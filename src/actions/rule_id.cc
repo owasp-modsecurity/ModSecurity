@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
@@ -27,10 +28,12 @@ namespace actions {
 
 bool RuleId::init(std::string *error) {
     std::string a = m_parser_payload;
-
-    try {
-        m_ruleId = std::stod(a);
-    } catch (...) {
+    
+    std::stringstream ss;
+    ss<<a;
+    ss>>m_ruleId;
+    if (ss.fail()) {
+        ss.clear();
         m_ruleId = 0;
         error->assign("The input \"" + a + "\" does not " \
             "seems to be a valid rule id.");

@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <charconv>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
@@ -104,27 +105,28 @@ bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
         int pre = 0;
         int value = 0;
 
-        try {
-            pre = stoi(resolvedPre);
-        } catch (...) {
+
+        const auto conv_res = std::from_chars(resolvedPre.data(), resolvedPre.data() + resolvedPre.size(), pre);
+        if (conv_res.ec == std::errc::invalid_argument) {
+            // Conversion error
             pre = 0;
         }
 
-        try {
-            std::vector<const VariableValue *> l;
-            RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(rule);
-            m_variable->evaluate(t, rr, &l);
-            if (l.size() == 0) {
-                value = 0;
-            } else {
-                value = stoi(l[0]->getValue());
-                for (auto &i : l) {
-                    delete i;
-                }
-            }
-        } catch (...) {
+        std::vector<const VariableValue *> l;
+        RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(rule);
+        m_variable->evaluate(t, rr, &l);
+        if (l.size() == 0) {
             value = 0;
+        } else {
+            const auto conv_res2 = std::from_chars(l[0]->getValue().data(), l[0]->getValue().data() + l[0]->getValue().size(), value);
+            if (conv_res2.ec == std::errc::invalid_argument) {
+                value = 0;
+            }
+            for (auto &i : l) {
+                delete i;
+            }
         }
+
 
         if (m_operation == sumAndSetOperation) {
             targetValue = std::to_string(value + pre);

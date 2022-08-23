@@ -16,6 +16,7 @@
 #include "modsecurity/rules_exceptions.h"
 
 #include <string>
+#include <charconv>
 
 #include "src/utils/string.h"
 #include "src/variables/variable.h"
@@ -134,21 +135,24 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
             std::string n2s = std::string(b, dash + 1, b.size() - (dash + 1));
             int n1n = 0;
             int n2n = 0;
-            try {
-                n1n = std::stoi(n1s);
-                added = true;
-            } catch (...) {
+            const auto conv_res = std::from_chars(n1s.data(), n1s.data() + n1s.size(), n1n);
+            if (conv_res.ec == std::errc::invalid_argument) {
+                // Conversion error
                 error->assign("Not a number: " + n1s);
                 return false;
-            }
-            try {
-                n2n = std::stoi(n2s);
+            } else {
+                // Conversion done
                 added = true;
-            } catch (...) {
+            }
+            const auto conv_res2 = std::from_chars(n2s.data(), n2s.data() + n2s.size(), n2n);
+            if (conv_res2.ec == std::errc::invalid_argument) {
+                // Conversion error
                 error->assign("Not a number: " + n2s);
                 return false;
+            } else {
+                // Conversion done
+                added = true;
             }
-
             if (n1s > n2s) {
                 error->assign("Invalid range: " + b);
                 return false;
@@ -156,14 +160,19 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
             addRange(n1n, n2n);
             added = true;
         } else {
-            try {
-                int num = std::stoi(b);
-                addNumber(num);
-                added = true;
-            } catch (...) {
+            addNumber(0);
+            added = true;
+            int num;
+            const auto conv_res = std::from_chars(b.data(), b.data() + b.size(), num);
+            if (conv_res.ec == std::errc::invalid_argument) {
+                // Conversion error
                 error->assign("Not a number or range: " + b);
                 return false;
-            }
+            } else {
+                // Conversion done
+                addNumber(num);
+                added = true;
+            }            
         }
     }
 
