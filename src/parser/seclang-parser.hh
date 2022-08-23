@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.7.2.
+// A Bison parser, made by GNU Bison 3.8.2.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2015, 2018-2020 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015, 2018-2021 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // As a special exception, you may create a larger work that contains
 // part or all of the Bison parser skeleton and distribute that work
@@ -32,7 +32,7 @@
 
 
 /**
- ** \file y.tab.h
+ ** \file seclang-parser.hh
  ** Define the yy::parser class.
  */
 
@@ -422,17 +422,23 @@ using namespace modsecurity::operators;
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
+# define YY_USE(E) ((void) (E))
 #else
-# define YYUSE(E) /* empty */
+# define YY_USE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
-# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                            \
+#if defined __GNUC__ && ! defined __ICC && 406 <= __GNUC__ * 100 + __GNUC_MINOR__
+# if __GNUC__ * 100 + __GNUC_MINOR__ < 407
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
+    _Pragma ("GCC diagnostic push")                                     \
+    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")
+# else
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
     _Pragma ("GCC diagnostic push")                                     \
     _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")              \
     _Pragma ("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+# endif
 # define YY_IGNORE_MAYBE_UNINITIALIZED_END      \
     _Pragma ("GCC diagnostic pop")
 #else
@@ -485,7 +491,7 @@ using namespace modsecurity::operators;
 #endif
 
 namespace yy {
-#line 489 "seclang-parser.hh"
+#line 495 "seclang-parser.hh"
 
 
 
@@ -494,27 +500,32 @@ namespace yy {
   class seclang_parser
   {
   public:
-#ifndef YYSTYPE
+#ifdef YYSTYPE
+# ifdef __GNUC__
+#  pragma GCC message "bison: do not #define YYSTYPE in C++, use %define api.value.type"
+# endif
+    typedef YYSTYPE value_type;
+#else
   /// A buffer to store and retrieve objects.
   ///
   /// Sort of a variant, but does not keep track of the nature
   /// of the stored data, since that knowledge is available
   /// via the current parser state.
-  class semantic_type
+  class value_type
   {
   public:
     /// Type of *this.
-    typedef semantic_type self_type;
+    typedef value_type self_type;
 
     /// Empty construction.
-    semantic_type () YY_NOEXCEPT
-      : yybuffer_ ()
+    value_type () YY_NOEXCEPT
+      : yyraw_ ()
       , yytypeid_ (YY_NULLPTR)
     {}
 
     /// Construct and fill.
     template <typename T>
-    semantic_type (YY_RVREF (T) t)
+    value_type (YY_RVREF (T) t)
       : yytypeid_ (&typeid (T))
     {
       YY_ASSERT (sizeof (T) <= size);
@@ -523,13 +534,13 @@ namespace yy {
 
 #if 201103L <= YY_CPLUSPLUS
     /// Non copyable.
-    semantic_type (const self_type&) = delete;
+    value_type (const self_type&) = delete;
     /// Non copyable.
     self_type& operator= (const self_type&) = delete;
 #endif
 
     /// Destruction, allowed only if empty.
-    ~semantic_type () YY_NOEXCEPT
+    ~value_type () YY_NOEXCEPT
     {
       YY_ASSERT (!yytypeid_);
     }
@@ -565,7 +576,7 @@ namespace yy {
       YY_ASSERT (!yytypeid_);
       YY_ASSERT (sizeof (T) <= size);
       yytypeid_ = & typeid (T);
-      return *new (yyas_<T> ()) T (std::move((T&)t));
+      return *new (yyas_<T> ()) T (t);
     }
 # endif
 
@@ -673,7 +684,7 @@ namespace yy {
   private:
 #if YY_CPLUSPLUS < 201103L
     /// Non copyable.
-    semantic_type (const self_type&);
+    value_type (const self_type&);
     /// Non copyable.
     self_type& operator= (const self_type&);
 #endif
@@ -683,7 +694,7 @@ namespace yy {
     T*
     yyas_ () YY_NOEXCEPT
     {
-      void *yyp = yybuffer_.yyraw;
+      void *yyp = yyraw_;
       return static_cast<T*> (yyp);
      }
 
@@ -692,7 +703,7 @@ namespace yy {
     const T*
     yyas_ () const YY_NOEXCEPT
     {
-      const void *yyp = yybuffer_.yyraw;
+      const void *yyp = yyraw_;
       return static_cast<const T*> (yyp);
      }
 
@@ -930,18 +941,19 @@ namespace yy {
     union
     {
       /// Strongest alignment constraints.
-      long double yyalign_me;
+      long double yyalign_me_;
       /// A buffer large enough to store any of the semantic values.
-      char yyraw[size];
-    } yybuffer_;
+      char yyraw_[size];
+    };
 
     /// Whether the content is built: if defined, the name of the stored type.
     const std::type_info *yytypeid_;
   };
 
-#else
-    typedef YYSTYPE semantic_type;
 #endif
+    /// Backward compatibility (Bison 3.8).
+    typedef value_type semantic_type;
+
     /// Symbol locations.
     typedef location location_type;
 
@@ -1319,7 +1331,7 @@ namespace yy {
     };
 
     /// Token kind, as returned by yylex.
-    typedef token::yytokentype token_kind_type;
+    typedef token::token_kind_type token_kind_type;
 
     /// Backward compatibility alias (Bison 3.6).
     typedef token_kind_type token_type;
@@ -1713,7 +1725,7 @@ namespace yy {
       typedef Base super_type;
 
       /// Default constructor.
-      basic_symbol ()
+      basic_symbol () YY_NOEXCEPT
         : value ()
         , location ()
       {}
@@ -1967,7 +1979,7 @@ namespace yy {
       /// Copy constructor.
       basic_symbol (const basic_symbol& that);
 
-      /// Constructor for valueless symbols, and symbols from each type.
+      /// Constructors for typed symbols.
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, location_type&& l)
         : Base (t)
@@ -1979,6 +1991,7 @@ namespace yy {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::string&& v, location_type&& l)
         : Base (t)
@@ -1992,6 +2005,7 @@ namespace yy {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::unique_ptr<Operator>&& v, location_type&& l)
         : Base (t)
@@ -2005,6 +2019,7 @@ namespace yy {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::unique_ptr<RunTimeString>&& v, location_type&& l)
         : Base (t)
@@ -2018,6 +2033,7 @@ namespace yy {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::unique_ptr<Variable>&& v, location_type&& l)
         : Base (t)
@@ -2031,6 +2047,7 @@ namespace yy {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::unique_ptr<actions::Action>&& v, location_type&& l)
         : Base (t)
@@ -2044,6 +2061,7 @@ namespace yy {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::unique_ptr<std::vector<std::unique_ptr<Variable> > > && v, location_type&& l)
         : Base (t)
@@ -2057,6 +2075,7 @@ namespace yy {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > && v, location_type&& l)
         : Base (t)
@@ -2077,8 +2096,10 @@ namespace yy {
         clear ();
       }
 
+
+
       /// Destroy contents, and record that is empty.
-      void clear ()
+      void clear () YY_NOEXCEPT
       {
         // User destructor.
         symbol_kind_type yykind = this->kind ();
@@ -2346,7 +2367,7 @@ switch (yykind)
       void move (basic_symbol& s);
 
       /// The semantic value.
-      semantic_type value;
+      value_type value;
 
       /// The location.
       location_type location;
@@ -2361,25 +2382,27 @@ switch (yykind)
     /// Type access provider for token (enum) based symbols.
     struct by_kind
     {
-      /// Default constructor.
-      by_kind ();
-
-#if 201103L <= YY_CPLUSPLUS
-      /// Move constructor.
-      by_kind (by_kind&& that);
-#endif
-
-      /// Copy constructor.
-      by_kind (const by_kind& that);
-
       /// The symbol kind as needed by the constructor.
       typedef token_kind_type kind_type;
 
+      /// Default constructor.
+      by_kind () YY_NOEXCEPT;
+
+#if 201103L <= YY_CPLUSPLUS
+      /// Move constructor.
+      by_kind (by_kind&& that) YY_NOEXCEPT;
+#endif
+
+      /// Copy constructor.
+      by_kind (const by_kind& that) YY_NOEXCEPT;
+
       /// Constructor from (external) token numbers.
-      by_kind (kind_type t);
+      by_kind (kind_type t) YY_NOEXCEPT;
+
+
 
       /// Record that this symbol is empty.
-      void clear ();
+      void clear () YY_NOEXCEPT;
 
       /// Steal the symbol kind from \a that.
       void move (by_kind& that);
@@ -2406,35 +2429,34 @@ switch (yykind)
       typedef basic_symbol<by_kind> super_type;
 
       /// Empty symbol.
-      symbol_type () {}
+      symbol_type () YY_NOEXCEPT {}
 
       /// Constructor for valueless symbols, and symbols from each type.
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, location_type l)
-        : super_type(token_type (tok), std::move (l))
-      {
-        YY_ASSERT (tok == token::TOK_END || tok == token::TOK_YYerror || tok == token::TOK_YYUNDEF || tok == token::TOK_COMMA || tok == token::TOK_CONFIG_CONTENT_INJECTION || tok == token::TOK_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR || tok == token::TOK_PIPE || tok == token::TOK_NEW_LINE || tok == token::TOK_VAR_COUNT || tok == token::TOK_VAR_EXCLUSION || tok == token::TOK_VARIABLE_ARGS || tok == token::TOK_VARIABLE_ARGS_POST || tok == token::TOK_VARIABLE_ARGS_GET || tok == token::TOK_VARIABLE_FILES_SIZES || tok == token::TOK_VARIABLE_FILES_NAMES || tok == token::TOK_VARIABLE_FILES_TMP_CONTENT || tok == token::TOK_VARIABLE_MULTIPART_FILENAME || tok == token::TOK_VARIABLE_MULTIPART_NAME || tok == token::TOK_VARIABLE_MATCHED_VARS_NAMES || tok == token::TOK_VARIABLE_MATCHED_VARS || tok == token::TOK_VARIABLE_FILES || tok == token::TOK_VARIABLE_REQUEST_COOKIES || tok == token::TOK_VARIABLE_REQUEST_HEADERS || tok == token::TOK_VARIABLE_RESPONSE_HEADERS || tok == token::TOK_VARIABLE_GEO || tok == token::TOK_VARIABLE_REQUEST_COOKIES_NAMES || tok == token::TOK_VARIABLE_ARGS_COMBINED_SIZE || tok == token::TOK_VARIABLE_ARGS_GET_NAMES || tok == token::TOK_VARIABLE_RULE || tok == token::TOK_VARIABLE_ARGS_NAMES || tok == token::TOK_VARIABLE_ARGS_POST_NAMES || tok == token::TOK_VARIABLE_AUTH_TYPE || tok == token::TOK_VARIABLE_FILES_COMBINED_SIZE || tok == token::TOK_VARIABLE_FILES_TMP_NAMES || tok == token::TOK_VARIABLE_FULL_REQUEST || tok == token::TOK_VARIABLE_FULL_REQUEST_LENGTH || tok == token::TOK_VARIABLE_INBOUND_DATA_ERROR || tok == token::TOK_VARIABLE_MATCHED_VAR || tok == token::TOK_VARIABLE_MATCHED_VAR_NAME || tok == token::TOK_VARIABLE_MULTIPART_BOUNDARY_QUOTED || tok == token::TOK_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE || tok == token::TOK_VARIABLE_MULTIPART_CRLF_LF_LINES || tok == token::TOK_VARIABLE_MULTIPART_DATA_AFTER || tok == token::TOK_VARIABLE_MULTIPART_DATA_BEFORE || tok == token::TOK_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED || tok == token::TOK_VARIABLE_MULTIPART_HEADER_FOLDING || tok == token::TOK_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING || tok == token::TOK_VARIABLE_MULTIPART_INVALID_PART || tok == token::TOK_VARIABLE_MULTIPART_INVALID_QUOTING || tok == token::TOK_VARIABLE_MULTIPART_LF_LINE || tok == token::TOK_VARIABLE_MULTIPART_MISSING_SEMICOLON || tok == token::TOK_VARIABLE_MULTIPART_SEMICOLON_MISSING || tok == token::TOK_VARIABLE_MULTIPART_STRICT_ERROR || tok == token::TOK_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY || tok == token::TOK_VARIABLE_OUTBOUND_DATA_ERROR || tok == token::TOK_VARIABLE_PATH_INFO || tok == token::TOK_VARIABLE_QUERY_STRING || tok == token::TOK_VARIABLE_REMOTE_ADDR || tok == token::TOK_VARIABLE_REMOTE_HOST || tok == token::TOK_VARIABLE_REMOTE_PORT || tok == token::TOK_VARIABLE_REQBODY_ERROR_MSG || tok == token::TOK_VARIABLE_REQBODY_ERROR || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR || tok == token::TOK_VARIABLE_REQUEST_BASENAME || tok == token::TOK_VARIABLE_REQUEST_BODY_LENGTH || tok == token::TOK_VARIABLE_REQUEST_BODY || tok == token::TOK_VARIABLE_REQUEST_FILE_NAME || tok == token::TOK_VARIABLE_REQUEST_HEADERS_NAMES || tok == token::TOK_VARIABLE_REQUEST_LINE || tok == token::TOK_VARIABLE_REQUEST_METHOD || tok == token::TOK_VARIABLE_REQUEST_PROTOCOL || tok == token::TOK_VARIABLE_REQUEST_URI_RAW || tok == token::TOK_VARIABLE_REQUEST_URI || tok == token::TOK_VARIABLE_RESOURCE || tok == token::TOK_VARIABLE_RESPONSE_BODY || tok == token::TOK_VARIABLE_RESPONSE_CONTENT_LENGTH || tok == token::TOK_VARIABLE_RESPONSE_CONTENT_TYPE || tok == token::TOK_VARIABLE_RESPONSE_HEADERS_NAMES || tok == token::TOK_VARIABLE_RESPONSE_PROTOCOL || tok == token::TOK_VARIABLE_RESPONSE_STATUS || tok == token::TOK_VARIABLE_SERVER_ADDR || tok == token::TOK_VARIABLE_SERVER_NAME || tok == token::TOK_VARIABLE_SERVER_PORT || tok == token::TOK_VARIABLE_SESSION_ID || tok == token::TOK_VARIABLE_UNIQUE_ID || tok == token::TOK_VARIABLE_URL_ENCODED_ERROR || tok == token::TOK_VARIABLE_USER_ID || tok == token::TOK_VARIABLE_WEB_APP_ID || tok == token::TOK_VARIABLE_STATUS || tok == token::TOK_VARIABLE_STATUS_LINE || tok == token::TOK_VARIABLE_IP || tok == token::TOK_VARIABLE_GLOBAL || tok == token::TOK_VARIABLE_TX || tok == token::TOK_VARIABLE_SESSION || tok == token::TOK_VARIABLE_USER || tok == token::TOK_RUN_TIME_VAR_ENV || tok == token::TOK_RUN_TIME_VAR_XML || tok == token::TOK_ACTION_SETVAR || tok == token::TOK_SETVAR_OPERATION_EQUALS || tok == token::TOK_SETVAR_OPERATION_EQUALS_PLUS || tok == token::TOK_SETVAR_OPERATION_EQUALS_MINUS || tok == token::TOK_NOT || tok == token::TOK_OPERATOR_BEGINS_WITH || tok == token::TOK_OPERATOR_CONTAINS || tok == token::TOK_OPERATOR_CONTAINS_WORD || tok == token::TOK_OPERATOR_DETECT_SQLI || tok == token::TOK_OPERATOR_DETECT_XSS || tok == token::TOK_OPERATOR_ENDS_WITH || tok == token::TOK_OPERATOR_EQ || tok == token::TOK_OPERATOR_FUZZY_HASH || tok == token::TOK_OPERATOR_GEOLOOKUP || tok == token::TOK_OPERATOR_GE || tok == token::TOK_OPERATOR_GSB_LOOKUP || tok == token::TOK_OPERATOR_GT || tok == token::TOK_OPERATOR_INSPECT_FILE || tok == token::TOK_OPERATOR_IP_MATCH_FROM_FILE || tok == token::TOK_OPERATOR_IP_MATCH || tok == token::TOK_OPERATOR_LE || tok == token::TOK_OPERATOR_LT || tok == token::TOK_OPERATOR_PM_FROM_FILE || tok == token::TOK_OPERATOR_PM || tok == token::TOK_OPERATOR_RBL || tok == token::TOK_OPERATOR_RSUB || tok == token::TOK_OPERATOR_RX_CONTENT_ONLY || tok == token::TOK_OPERATOR_RX || tok == token::TOK_OPERATOR_RX_GLOBAL || tok == token::TOK_OPERATOR_STR_EQ || tok == token::TOK_OPERATOR_STR_MATCH || tok == token::TOK_OPERATOR_UNCONDITIONAL_MATCH || tok == token::TOK_OPERATOR_VALIDATE_BYTE_RANGE || tok == token::TOK_OPERATOR_VALIDATE_DTD || tok == token::TOK_OPERATOR_VALIDATE_HASH || tok == token::TOK_OPERATOR_VALIDATE_SCHEMA || tok == token::TOK_OPERATOR_VALIDATE_URL_ENCODING || tok == token::TOK_OPERATOR_VALIDATE_UTF8_ENCODING || tok == token::TOK_OPERATOR_VERIFY_CC || tok == token::TOK_OPERATOR_VERIFY_CPF || tok == token::TOK_OPERATOR_VERIFY_SSN || tok == token::TOK_OPERATOR_VERIFY_SVNR || tok == token::TOK_OPERATOR_WITHIN || tok == token::TOK_CONFIG_DIR_AUDIT_LOG_FMT || tok == token::TOK_JSON || tok == token::TOK_NATIVE || tok == token::TOK_ACTION_CTL_RULE_ENGINE);
-      }
+        : super_type (token_kind_type (tok), std::move (l))
 #else
       symbol_type (int tok, const location_type& l)
-        : super_type(token_type (tok), l)
-      {
-        YY_ASSERT (tok == token::TOK_END || tok == token::TOK_YYerror || tok == token::TOK_YYUNDEF || tok == token::TOK_COMMA || tok == token::TOK_CONFIG_CONTENT_INJECTION || tok == token::TOK_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR || tok == token::TOK_PIPE || tok == token::TOK_NEW_LINE || tok == token::TOK_VAR_COUNT || tok == token::TOK_VAR_EXCLUSION || tok == token::TOK_VARIABLE_ARGS || tok == token::TOK_VARIABLE_ARGS_POST || tok == token::TOK_VARIABLE_ARGS_GET || tok == token::TOK_VARIABLE_FILES_SIZES || tok == token::TOK_VARIABLE_FILES_NAMES || tok == token::TOK_VARIABLE_FILES_TMP_CONTENT || tok == token::TOK_VARIABLE_MULTIPART_FILENAME || tok == token::TOK_VARIABLE_MULTIPART_NAME || tok == token::TOK_VARIABLE_MATCHED_VARS_NAMES || tok == token::TOK_VARIABLE_MATCHED_VARS || tok == token::TOK_VARIABLE_FILES || tok == token::TOK_VARIABLE_REQUEST_COOKIES || tok == token::TOK_VARIABLE_REQUEST_HEADERS || tok == token::TOK_VARIABLE_RESPONSE_HEADERS || tok == token::TOK_VARIABLE_GEO || tok == token::TOK_VARIABLE_REQUEST_COOKIES_NAMES || tok == token::TOK_VARIABLE_ARGS_COMBINED_SIZE || tok == token::TOK_VARIABLE_ARGS_GET_NAMES || tok == token::TOK_VARIABLE_RULE || tok == token::TOK_VARIABLE_ARGS_NAMES || tok == token::TOK_VARIABLE_ARGS_POST_NAMES || tok == token::TOK_VARIABLE_AUTH_TYPE || tok == token::TOK_VARIABLE_FILES_COMBINED_SIZE || tok == token::TOK_VARIABLE_FILES_TMP_NAMES || tok == token::TOK_VARIABLE_FULL_REQUEST || tok == token::TOK_VARIABLE_FULL_REQUEST_LENGTH || tok == token::TOK_VARIABLE_INBOUND_DATA_ERROR || tok == token::TOK_VARIABLE_MATCHED_VAR || tok == token::TOK_VARIABLE_MATCHED_VAR_NAME || tok == token::TOK_VARIABLE_MULTIPART_BOUNDARY_QUOTED || tok == token::TOK_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE || tok == token::TOK_VARIABLE_MULTIPART_CRLF_LF_LINES || tok == token::TOK_VARIABLE_MULTIPART_DATA_AFTER || tok == token::TOK_VARIABLE_MULTIPART_DATA_BEFORE || tok == token::TOK_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED || tok == token::TOK_VARIABLE_MULTIPART_HEADER_FOLDING || tok == token::TOK_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING || tok == token::TOK_VARIABLE_MULTIPART_INVALID_PART || tok == token::TOK_VARIABLE_MULTIPART_INVALID_QUOTING || tok == token::TOK_VARIABLE_MULTIPART_LF_LINE || tok == token::TOK_VARIABLE_MULTIPART_MISSING_SEMICOLON || tok == token::TOK_VARIABLE_MULTIPART_SEMICOLON_MISSING || tok == token::TOK_VARIABLE_MULTIPART_STRICT_ERROR || tok == token::TOK_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY || tok == token::TOK_VARIABLE_OUTBOUND_DATA_ERROR || tok == token::TOK_VARIABLE_PATH_INFO || tok == token::TOK_VARIABLE_QUERY_STRING || tok == token::TOK_VARIABLE_REMOTE_ADDR || tok == token::TOK_VARIABLE_REMOTE_HOST || tok == token::TOK_VARIABLE_REMOTE_PORT || tok == token::TOK_VARIABLE_REQBODY_ERROR_MSG || tok == token::TOK_VARIABLE_REQBODY_ERROR || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR_ERROR || tok == token::TOK_VARIABLE_REQBODY_PROCESSOR || tok == token::TOK_VARIABLE_REQUEST_BASENAME || tok == token::TOK_VARIABLE_REQUEST_BODY_LENGTH || tok == token::TOK_VARIABLE_REQUEST_BODY || tok == token::TOK_VARIABLE_REQUEST_FILE_NAME || tok == token::TOK_VARIABLE_REQUEST_HEADERS_NAMES || tok == token::TOK_VARIABLE_REQUEST_LINE || tok == token::TOK_VARIABLE_REQUEST_METHOD || tok == token::TOK_VARIABLE_REQUEST_PROTOCOL || tok == token::TOK_VARIABLE_REQUEST_URI_RAW || tok == token::TOK_VARIABLE_REQUEST_URI || tok == token::TOK_VARIABLE_RESOURCE || tok == token::TOK_VARIABLE_RESPONSE_BODY || tok == token::TOK_VARIABLE_RESPONSE_CONTENT_LENGTH || tok == token::TOK_VARIABLE_RESPONSE_CONTENT_TYPE || tok == token::TOK_VARIABLE_RESPONSE_HEADERS_NAMES || tok == token::TOK_VARIABLE_RESPONSE_PROTOCOL || tok == token::TOK_VARIABLE_RESPONSE_STATUS || tok == token::TOK_VARIABLE_SERVER_ADDR || tok == token::TOK_VARIABLE_SERVER_NAME || tok == token::TOK_VARIABLE_SERVER_PORT || tok == token::TOK_VARIABLE_SESSION_ID || tok == token::TOK_VARIABLE_UNIQUE_ID || tok == token::TOK_VARIABLE_URL_ENCODED_ERROR || tok == token::TOK_VARIABLE_USER_ID || tok == token::TOK_VARIABLE_WEB_APP_ID || tok == token::TOK_VARIABLE_STATUS || tok == token::TOK_VARIABLE_STATUS_LINE || tok == token::TOK_VARIABLE_IP || tok == token::TOK_VARIABLE_GLOBAL || tok == token::TOK_VARIABLE_TX || tok == token::TOK_VARIABLE_SESSION || tok == token::TOK_VARIABLE_USER || tok == token::TOK_RUN_TIME_VAR_ENV || tok == token::TOK_RUN_TIME_VAR_XML || tok == token::TOK_ACTION_SETVAR || tok == token::TOK_SETVAR_OPERATION_EQUALS || tok == token::TOK_SETVAR_OPERATION_EQUALS_PLUS || tok == token::TOK_SETVAR_OPERATION_EQUALS_MINUS || tok == token::TOK_NOT || tok == token::TOK_OPERATOR_BEGINS_WITH || tok == token::TOK_OPERATOR_CONTAINS || tok == token::TOK_OPERATOR_CONTAINS_WORD || tok == token::TOK_OPERATOR_DETECT_SQLI || tok == token::TOK_OPERATOR_DETECT_XSS || tok == token::TOK_OPERATOR_ENDS_WITH || tok == token::TOK_OPERATOR_EQ || tok == token::TOK_OPERATOR_FUZZY_HASH || tok == token::TOK_OPERATOR_GEOLOOKUP || tok == token::TOK_OPERATOR_GE || tok == token::TOK_OPERATOR_GSB_LOOKUP || tok == token::TOK_OPERATOR_GT || tok == token::TOK_OPERATOR_INSPECT_FILE || tok == token::TOK_OPERATOR_IP_MATCH_FROM_FILE || tok == token::TOK_OPERATOR_IP_MATCH || tok == token::TOK_OPERATOR_LE || tok == token::TOK_OPERATOR_LT || tok == token::TOK_OPERATOR_PM_FROM_FILE || tok == token::TOK_OPERATOR_PM || tok == token::TOK_OPERATOR_RBL || tok == token::TOK_OPERATOR_RSUB || tok == token::TOK_OPERATOR_RX_CONTENT_ONLY || tok == token::TOK_OPERATOR_RX || tok == token::TOK_OPERATOR_RX_GLOBAL || tok == token::TOK_OPERATOR_STR_EQ || tok == token::TOK_OPERATOR_STR_MATCH || tok == token::TOK_OPERATOR_UNCONDITIONAL_MATCH || tok == token::TOK_OPERATOR_VALIDATE_BYTE_RANGE || tok == token::TOK_OPERATOR_VALIDATE_DTD || tok == token::TOK_OPERATOR_VALIDATE_HASH || tok == token::TOK_OPERATOR_VALIDATE_SCHEMA || tok == token::TOK_OPERATOR_VALIDATE_URL_ENCODING || tok == token::TOK_OPERATOR_VALIDATE_UTF8_ENCODING || tok == token::TOK_OPERATOR_VERIFY_CC || tok == token::TOK_OPERATOR_VERIFY_CPF || tok == token::TOK_OPERATOR_VERIFY_SSN || tok == token::TOK_OPERATOR_VERIFY_SVNR || tok == token::TOK_OPERATOR_WITHIN || tok == token::TOK_CONFIG_DIR_AUDIT_LOG_FMT || tok == token::TOK_JSON || tok == token::TOK_NATIVE || tok == token::TOK_ACTION_CTL_RULE_ENGINE);
-      }
+        : super_type (token_kind_type (tok), l)
 #endif
+      {
+#if !defined _MSC_VER || defined __clang__
+        YY_ASSERT (tok == token::TOK_END
+                   || (token::TOK_YYerror <= tok && tok <= token::TOK_ACTION_CTL_RULE_ENGINE));
+#endif
+      }
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, std::string v, location_type l)
-        : super_type(token_type (tok), std::move (v), std::move (l))
-      {
-        YY_ASSERT (tok == token::TOK_ACTION_ACCURACY || tok == token::TOK_ACTION_ALLOW || tok == token::TOK_ACTION_APPEND || tok == token::TOK_ACTION_AUDIT_LOG || tok == token::TOK_ACTION_BLOCK || tok == token::TOK_ACTION_CAPTURE || tok == token::TOK_ACTION_CHAIN || tok == token::TOK_ACTION_CTL_AUDIT_ENGINE || tok == token::TOK_ACTION_CTL_AUDIT_LOG_PARTS || tok == token::TOK_ACTION_CTL_BDY_JSON || tok == token::TOK_ACTION_CTL_BDY_XML || tok == token::TOK_ACTION_CTL_BDY_URLENCODED || tok == token::TOK_ACTION_CTL_FORCE_REQ_BODY_VAR || tok == token::TOK_ACTION_CTL_REQUEST_BODY_ACCESS || tok == token::TOK_ACTION_CTL_RULE_REMOVE_BY_ID || tok == token::TOK_ACTION_CTL_RULE_REMOVE_BY_TAG || tok == token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID || tok == token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG || tok == token::TOK_ACTION_DENY || tok == token::TOK_ACTION_DEPRECATE_VAR || tok == token::TOK_ACTION_DROP || tok == token::TOK_ACTION_EXEC || tok == token::TOK_ACTION_EXPIRE_VAR || tok == token::TOK_ACTION_ID || tok == token::TOK_ACTION_INITCOL || tok == token::TOK_ACTION_LOG || tok == token::TOK_ACTION_LOG_DATA || tok == token::TOK_ACTION_MATURITY || tok == token::TOK_ACTION_MSG || tok == token::TOK_ACTION_MULTI_MATCH || tok == token::TOK_ACTION_NO_AUDIT_LOG || tok == token::TOK_ACTION_NO_LOG || tok == token::TOK_ACTION_PASS || tok == token::TOK_ACTION_PAUSE || tok == token::TOK_ACTION_PHASE || tok == token::TOK_ACTION_PREPEND || tok == token::TOK_ACTION_PROXY || tok == token::TOK_ACTION_REDIRECT || tok == token::TOK_ACTION_REV || tok == token::TOK_ACTION_SANITISE_ARG || tok == token::TOK_ACTION_SANITISE_MATCHED || tok == token::TOK_ACTION_SANITISE_MATCHED_BYTES || tok == token::TOK_ACTION_SANITISE_REQUEST_HEADER || tok == token::TOK_ACTION_SANITISE_RESPONSE_HEADER || tok == token::TOK_ACTION_SETENV || tok == token::TOK_ACTION_SETRSC || tok == token::TOK_ACTION_SETSID || tok == token::TOK_ACTION_SETUID || tok == token::TOK_ACTION_SEVERITY || tok == token::TOK_ACTION_SKIP || tok == token::TOK_ACTION_SKIP_AFTER || tok == token::TOK_ACTION_STATUS || tok == token::TOK_ACTION_TAG || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT || tok == token::TOK_ACTION_TRANSFORMATION_CMD_LINE || tok == token::TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE || tok == token::TOK_ACTION_TRANSFORMATION_CSS_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_HEX_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_HEX_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_JS_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_LENGTH || tok == token::TOK_ACTION_TRANSFORMATION_LOWERCASE || tok == token::TOK_ACTION_TRANSFORMATION_MD5 || tok == token::TOK_ACTION_TRANSFORMATION_NONE || tok == token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH || tok == token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_NULLS || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE || tok == token::TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS || tok == token::TOK_ACTION_TRANSFORMATION_REPLACE_NULLS || tok == token::TOK_ACTION_TRANSFORMATION_SHA1 || tok == token::TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_TRIM || tok == token::TOK_ACTION_TRANSFORMATION_TRIM_LEFT || tok == token::TOK_ACTION_TRANSFORMATION_TRIM_RIGHT || tok == token::TOK_ACTION_TRANSFORMATION_UPPERCASE || tok == token::TOK_ACTION_TRANSFORMATION_URL_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_URL_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI || tok == token::TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE || tok == token::TOK_ACTION_VER || tok == token::TOK_ACTION_XMLNS || tok == token::TOK_CONFIG_COMPONENT_SIG || tok == token::TOK_CONFIG_CONN_ENGINE || tok == token::TOK_CONFIG_SEC_ARGUMENT_SEPARATOR || tok == token::TOK_CONFIG_SEC_WEB_APP_ID || tok == token::TOK_CONFIG_SEC_SERVER_SIG || tok == token::TOK_CONFIG_DIR_AUDIT_DIR || tok == token::TOK_CONFIG_DIR_AUDIT_DIR_MOD || tok == token::TOK_CONFIG_DIR_AUDIT_ENG || tok == token::TOK_CONFIG_DIR_AUDIT_FLE_MOD || tok == token::TOK_CONFIG_DIR_AUDIT_LOG || tok == token::TOK_CONFIG_DIR_AUDIT_LOG2 || tok == token::TOK_CONFIG_DIR_AUDIT_LOG_P || tok == token::TOK_CONFIG_DIR_AUDIT_STS || tok == token::TOK_CONFIG_DIR_AUDIT_TPE || tok == token::TOK_CONFIG_DIR_DEBUG_LOG || tok == token::TOK_CONFIG_DIR_DEBUG_LVL || tok == token::TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS || tok == token::TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS || tok == token::TOK_CONFIG_SEC_HASH_ENGINE || tok == token::TOK_CONFIG_SEC_HASH_KEY || tok == token::TOK_CONFIG_SEC_HASH_PARAM || tok == token::TOK_CONFIG_SEC_HASH_METHOD_RX || tok == token::TOK_CONFIG_SEC_HASH_METHOD_PM || tok == token::TOK_CONFIG_SEC_CHROOT_DIR || tok == token::TOK_CONFIG_DIR_GEO_DB || tok == token::TOK_CONFIG_DIR_GSB_DB || tok == token::TOK_CONFIG_SEC_GUARDIAN_LOG || tok == token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT || tok == token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION || tok == token::TOK_CONFIG_SEC_CONN_R_STATE_LIMIT || tok == token::TOK_CONFIG_SEC_CONN_W_STATE_LIMIT || tok == token::TOK_CONFIG_SEC_SENSOR_ID || tok == token::TOK_CONFIG_DIR_ARGS_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY || tok == token::TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION || tok == token::TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT || tok == token::TOK_CONFIG_DIR_RES_BODY || tok == token::TOK_CONFIG_DIR_RES_BODY_LIMIT || tok == token::TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION || tok == token::TOK_CONFIG_SEC_RULE_INHERITANCE || tok == token::TOK_CONFIG_SEC_RULE_PERF_TIME || tok == token::TOK_CONFIG_DIR_RULE_ENG || tok == token::TOK_CONFIG_DIR_SEC_ACTION || tok == token::TOK_CONFIG_DIR_SEC_DEFAULT_ACTION || tok == token::TOK_CONFIG_DIR_SEC_MARKER || tok == token::TOK_CONFIG_DIR_UNICODE_MAP_FILE || tok == token::TOK_CONFIG_DIR_UNICODE_CODE_PAGE || tok == token::TOK_CONFIG_SEC_COLLECTION_TIMEOUT || tok == token::TOK_CONFIG_SEC_HTTP_BLKEY || tok == token::TOK_CONFIG_SEC_INTERCEPT_ON_ERROR || tok == token::TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_ID || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID || tok == token::TOK_CONFIG_UPDLOAD_KEEP_FILES || tok == token::TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES || tok == token::TOK_CONFIG_UPLOAD_DIR || tok == token::TOK_CONFIG_UPLOAD_FILE_LIMIT || tok == token::TOK_CONFIG_UPLOAD_FILE_MODE || tok == token::TOK_CONFIG_VALUE_ABORT || tok == token::TOK_CONFIG_VALUE_DETC || tok == token::TOK_CONFIG_VALUE_HTTPS || tok == token::TOK_CONFIG_VALUE_OFF || tok == token::TOK_CONFIG_VALUE_ON || tok == token::TOK_CONFIG_VALUE_PARALLEL || tok == token::TOK_CONFIG_VALUE_PROCESS_PARTIAL || tok == token::TOK_CONFIG_VALUE_REJECT || tok == token::TOK_CONFIG_VALUE_RELEVANT_ONLY || tok == token::TOK_CONFIG_VALUE_SERIAL || tok == token::TOK_CONFIG_VALUE_WARN || tok == token::TOK_CONFIG_XML_EXTERNAL_ENTITY || tok == token::TOK_CONGIG_DIR_RESPONSE_BODY_MP || tok == token::TOK_CONGIG_DIR_SEC_ARG_SEP || tok == token::TOK_CONGIG_DIR_SEC_COOKIE_FORMAT || tok == token::TOK_CONFIG_SEC_COOKIEV0_SEPARATOR || tok == token::TOK_CONGIG_DIR_SEC_DATA_DIR || tok == token::TOK_CONGIG_DIR_SEC_STATUS_ENGINE || tok == token::TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION || tok == token::TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION || tok == token::TOK_CONGIG_DIR_SEC_TMP_DIR || tok == token::TOK_DIRECTIVE || tok == token::TOK_DIRECTIVE_SECRULESCRIPT || tok == token::TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION || tok == token::TOK_QUOTATION_MARK || tok == token::TOK_RUN_TIME_VAR_BLD || tok == token::TOK_RUN_TIME_VAR_DUR || tok == token::TOK_RUN_TIME_VAR_HSV || tok == token::TOK_RUN_TIME_VAR_REMOTE_USER || tok == token::TOK_RUN_TIME_VAR_TIME || tok == token::TOK_RUN_TIME_VAR_TIME_DAY || tok == token::TOK_RUN_TIME_VAR_TIME_EPOCH || tok == token::TOK_RUN_TIME_VAR_TIME_HOUR || tok == token::TOK_RUN_TIME_VAR_TIME_MIN || tok == token::TOK_RUN_TIME_VAR_TIME_MON || tok == token::TOK_RUN_TIME_VAR_TIME_SEC || tok == token::TOK_RUN_TIME_VAR_TIME_WDAY || tok == token::TOK_RUN_TIME_VAR_TIME_YEAR || tok == token::TOK_VARIABLE || tok == token::TOK_DICT_ELEMENT || tok == token::TOK_DICT_ELEMENT_REGEXP);
-      }
+        : super_type (token_kind_type (tok), std::move (v), std::move (l))
 #else
       symbol_type (int tok, const std::string& v, const location_type& l)
-        : super_type(token_type (tok), v, l)
-      {
-        YY_ASSERT (tok == token::TOK_ACTION_ACCURACY || tok == token::TOK_ACTION_ALLOW || tok == token::TOK_ACTION_APPEND || tok == token::TOK_ACTION_AUDIT_LOG || tok == token::TOK_ACTION_BLOCK || tok == token::TOK_ACTION_CAPTURE || tok == token::TOK_ACTION_CHAIN || tok == token::TOK_ACTION_CTL_AUDIT_ENGINE || tok == token::TOK_ACTION_CTL_AUDIT_LOG_PARTS || tok == token::TOK_ACTION_CTL_BDY_JSON || tok == token::TOK_ACTION_CTL_BDY_XML || tok == token::TOK_ACTION_CTL_BDY_URLENCODED || tok == token::TOK_ACTION_CTL_FORCE_REQ_BODY_VAR || tok == token::TOK_ACTION_CTL_REQUEST_BODY_ACCESS || tok == token::TOK_ACTION_CTL_RULE_REMOVE_BY_ID || tok == token::TOK_ACTION_CTL_RULE_REMOVE_BY_TAG || tok == token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID || tok == token::TOK_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG || tok == token::TOK_ACTION_DENY || tok == token::TOK_ACTION_DEPRECATE_VAR || tok == token::TOK_ACTION_DROP || tok == token::TOK_ACTION_EXEC || tok == token::TOK_ACTION_EXPIRE_VAR || tok == token::TOK_ACTION_ID || tok == token::TOK_ACTION_INITCOL || tok == token::TOK_ACTION_LOG || tok == token::TOK_ACTION_LOG_DATA || tok == token::TOK_ACTION_MATURITY || tok == token::TOK_ACTION_MSG || tok == token::TOK_ACTION_MULTI_MATCH || tok == token::TOK_ACTION_NO_AUDIT_LOG || tok == token::TOK_ACTION_NO_LOG || tok == token::TOK_ACTION_PASS || tok == token::TOK_ACTION_PAUSE || tok == token::TOK_ACTION_PHASE || tok == token::TOK_ACTION_PREPEND || tok == token::TOK_ACTION_PROXY || tok == token::TOK_ACTION_REDIRECT || tok == token::TOK_ACTION_REV || tok == token::TOK_ACTION_SANITISE_ARG || tok == token::TOK_ACTION_SANITISE_MATCHED || tok == token::TOK_ACTION_SANITISE_MATCHED_BYTES || tok == token::TOK_ACTION_SANITISE_REQUEST_HEADER || tok == token::TOK_ACTION_SANITISE_RESPONSE_HEADER || tok == token::TOK_ACTION_SETENV || tok == token::TOK_ACTION_SETRSC || tok == token::TOK_ACTION_SETSID || tok == token::TOK_ACTION_SETUID || tok == token::TOK_ACTION_SEVERITY || tok == token::TOK_ACTION_SKIP || tok == token::TOK_ACTION_SKIP_AFTER || tok == token::TOK_ACTION_STATUS || tok == token::TOK_ACTION_TAG || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT || tok == token::TOK_ACTION_TRANSFORMATION_CMD_LINE || tok == token::TOK_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE || tok == token::TOK_ACTION_TRANSFORMATION_CSS_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_HEX_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_HEX_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_JS_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_LENGTH || tok == token::TOK_ACTION_TRANSFORMATION_LOWERCASE || tok == token::TOK_ACTION_TRANSFORMATION_MD5 || tok == token::TOK_ACTION_TRANSFORMATION_NONE || tok == token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH || tok == token::TOK_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_NULLS || tok == token::TOK_ACTION_TRANSFORMATION_REMOVE_WHITESPACE || tok == token::TOK_ACTION_TRANSFORMATION_REPLACE_COMMENTS || tok == token::TOK_ACTION_TRANSFORMATION_REPLACE_NULLS || tok == token::TOK_ACTION_TRANSFORMATION_SHA1 || tok == token::TOK_ACTION_TRANSFORMATION_SQL_HEX_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_TRIM || tok == token::TOK_ACTION_TRANSFORMATION_TRIM_LEFT || tok == token::TOK_ACTION_TRANSFORMATION_TRIM_RIGHT || tok == token::TOK_ACTION_TRANSFORMATION_UPPERCASE || tok == token::TOK_ACTION_TRANSFORMATION_URL_ENCODE || tok == token::TOK_ACTION_TRANSFORMATION_URL_DECODE || tok == token::TOK_ACTION_TRANSFORMATION_URL_DECODE_UNI || tok == token::TOK_ACTION_TRANSFORMATION_UTF8_TO_UNICODE || tok == token::TOK_ACTION_VER || tok == token::TOK_ACTION_XMLNS || tok == token::TOK_CONFIG_COMPONENT_SIG || tok == token::TOK_CONFIG_CONN_ENGINE || tok == token::TOK_CONFIG_SEC_ARGUMENT_SEPARATOR || tok == token::TOK_CONFIG_SEC_WEB_APP_ID || tok == token::TOK_CONFIG_SEC_SERVER_SIG || tok == token::TOK_CONFIG_DIR_AUDIT_DIR || tok == token::TOK_CONFIG_DIR_AUDIT_DIR_MOD || tok == token::TOK_CONFIG_DIR_AUDIT_ENG || tok == token::TOK_CONFIG_DIR_AUDIT_FLE_MOD || tok == token::TOK_CONFIG_DIR_AUDIT_LOG || tok == token::TOK_CONFIG_DIR_AUDIT_LOG2 || tok == token::TOK_CONFIG_DIR_AUDIT_LOG_P || tok == token::TOK_CONFIG_DIR_AUDIT_STS || tok == token::TOK_CONFIG_DIR_AUDIT_TPE || tok == token::TOK_CONFIG_DIR_DEBUG_LOG || tok == token::TOK_CONFIG_DIR_DEBUG_LVL || tok == token::TOK_CONFIG_SEC_CACHE_TRANSFORMATIONS || tok == token::TOK_CONFIG_SEC_DISABLE_BACKEND_COMPRESS || tok == token::TOK_CONFIG_SEC_HASH_ENGINE || tok == token::TOK_CONFIG_SEC_HASH_KEY || tok == token::TOK_CONFIG_SEC_HASH_PARAM || tok == token::TOK_CONFIG_SEC_HASH_METHOD_RX || tok == token::TOK_CONFIG_SEC_HASH_METHOD_PM || tok == token::TOK_CONFIG_SEC_CHROOT_DIR || tok == token::TOK_CONFIG_DIR_GEO_DB || tok == token::TOK_CONFIG_DIR_GSB_DB || tok == token::TOK_CONFIG_SEC_GUARDIAN_LOG || tok == token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT || tok == token::TOK_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION || tok == token::TOK_CONFIG_SEC_CONN_R_STATE_LIMIT || tok == token::TOK_CONFIG_SEC_CONN_W_STATE_LIMIT || tok == token::TOK_CONFIG_SEC_SENSOR_ID || tok == token::TOK_CONFIG_DIR_ARGS_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY || tok == token::TOK_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_LIMIT || tok == token::TOK_CONFIG_DIR_REQ_BODY_LIMIT_ACTION || tok == token::TOK_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT || tok == token::TOK_CONFIG_DIR_RES_BODY || tok == token::TOK_CONFIG_DIR_RES_BODY_LIMIT || tok == token::TOK_CONFIG_DIR_RES_BODY_LIMIT_ACTION || tok == token::TOK_CONFIG_SEC_RULE_INHERITANCE || tok == token::TOK_CONFIG_SEC_RULE_PERF_TIME || tok == token::TOK_CONFIG_DIR_RULE_ENG || tok == token::TOK_CONFIG_DIR_SEC_ACTION || tok == token::TOK_CONFIG_DIR_SEC_DEFAULT_ACTION || tok == token::TOK_CONFIG_DIR_SEC_MARKER || tok == token::TOK_CONFIG_DIR_UNICODE_MAP_FILE || tok == token::TOK_CONFIG_DIR_UNICODE_CODE_PAGE || tok == token::TOK_CONFIG_SEC_COLLECTION_TIMEOUT || tok == token::TOK_CONFIG_SEC_HTTP_BLKEY || tok == token::TOK_CONFIG_SEC_INTERCEPT_ON_ERROR || tok == token::TOK_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_ID || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_MSG || tok == token::TOK_CONFIG_SEC_RULE_REMOVE_BY_TAG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID || tok == token::TOK_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID || tok == token::TOK_CONFIG_UPDLOAD_KEEP_FILES || tok == token::TOK_CONFIG_UPDLOAD_SAVE_TMP_FILES || tok == token::TOK_CONFIG_UPLOAD_DIR || tok == token::TOK_CONFIG_UPLOAD_FILE_LIMIT || tok == token::TOK_CONFIG_UPLOAD_FILE_MODE || tok == token::TOK_CONFIG_VALUE_ABORT || tok == token::TOK_CONFIG_VALUE_DETC || tok == token::TOK_CONFIG_VALUE_HTTPS || tok == token::TOK_CONFIG_VALUE_OFF || tok == token::TOK_CONFIG_VALUE_ON || tok == token::TOK_CONFIG_VALUE_PARALLEL || tok == token::TOK_CONFIG_VALUE_PROCESS_PARTIAL || tok == token::TOK_CONFIG_VALUE_REJECT || tok == token::TOK_CONFIG_VALUE_RELEVANT_ONLY || tok == token::TOK_CONFIG_VALUE_SERIAL || tok == token::TOK_CONFIG_VALUE_WARN || tok == token::TOK_CONFIG_XML_EXTERNAL_ENTITY || tok == token::TOK_CONGIG_DIR_RESPONSE_BODY_MP || tok == token::TOK_CONGIG_DIR_SEC_ARG_SEP || tok == token::TOK_CONGIG_DIR_SEC_COOKIE_FORMAT || tok == token::TOK_CONFIG_SEC_COOKIEV0_SEPARATOR || tok == token::TOK_CONGIG_DIR_SEC_DATA_DIR || tok == token::TOK_CONGIG_DIR_SEC_STATUS_ENGINE || tok == token::TOK_CONFIG_SEC_STREAM_IN_BODY_INSPECTION || tok == token::TOK_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION || tok == token::TOK_CONGIG_DIR_SEC_TMP_DIR || tok == token::TOK_DIRECTIVE || tok == token::TOK_DIRECTIVE_SECRULESCRIPT || tok == token::TOK_FREE_TEXT_QUOTE_MACRO_EXPANSION || tok == token::TOK_QUOTATION_MARK || tok == token::TOK_RUN_TIME_VAR_BLD || tok == token::TOK_RUN_TIME_VAR_DUR || tok == token::TOK_RUN_TIME_VAR_HSV || tok == token::TOK_RUN_TIME_VAR_REMOTE_USER || tok == token::TOK_RUN_TIME_VAR_TIME || tok == token::TOK_RUN_TIME_VAR_TIME_DAY || tok == token::TOK_RUN_TIME_VAR_TIME_EPOCH || tok == token::TOK_RUN_TIME_VAR_TIME_HOUR || tok == token::TOK_RUN_TIME_VAR_TIME_MIN || tok == token::TOK_RUN_TIME_VAR_TIME_MON || tok == token::TOK_RUN_TIME_VAR_TIME_SEC || tok == token::TOK_RUN_TIME_VAR_TIME_WDAY || tok == token::TOK_RUN_TIME_VAR_TIME_YEAR || tok == token::TOK_VARIABLE || tok == token::TOK_DICT_ELEMENT || tok == token::TOK_DICT_ELEMENT_REGEXP);
-      }
+        : super_type (token_kind_type (tok), v, l)
 #endif
+      {
+#if !defined _MSC_VER || defined __clang__
+        YY_ASSERT ((token::TOK_ACTION_ACCURACY <= tok && tok <= token::TOK_DICT_ELEMENT_REGEXP));
+#endif
+      }
     };
 
     /// Build a parser object.
@@ -2482,7 +2504,7 @@ switch (yykind)
     /// YYSYMBOL.  No bounds checking.
     static std::string symbol_name (symbol_kind_type yysymbol);
 
-    // Implementation of make_symbol for each symbol type.
+    // Implementation of make_symbol for each token kind.
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
@@ -7649,9 +7671,9 @@ switch (yykind)
     {
     public:
       context (const seclang_parser& yyparser, const symbol_type& yyla);
-      const symbol_type& lookahead () const { return yyla_; }
-      symbol_kind_type token () const { return yyla_.kind (); }
-      const location_type& location () const { return yyla_.location; }
+      const symbol_type& lookahead () const YY_NOEXCEPT { return yyla_; }
+      symbol_kind_type token () const YY_NOEXCEPT { return yyla_.kind (); }
+      const location_type& location () const YY_NOEXCEPT { return yyla_.location; }
 
       /// Put in YYARG at most YYARGN of the expected tokens, and return the
       /// number of tokens stored in YYARG.  If YYARG is null, return the
@@ -7689,19 +7711,19 @@ switch (yykind)
 
     /// Whether the given \c yypact_ value indicates a defaulted state.
     /// \param yyvalue   the value to check
-    static bool yy_pact_value_is_default_ (int yyvalue);
+    static bool yy_pact_value_is_default_ (int yyvalue) YY_NOEXCEPT;
 
     /// Whether the given \c yytable_ value indicates a syntax error.
     /// \param yyvalue   the value to check
-    static bool yy_table_value_is_error_ (int yyvalue);
+    static bool yy_table_value_is_error_ (int yyvalue) YY_NOEXCEPT;
 
     static const short yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token kind \a t to a symbol kind.
     /// In theory \a t should be a token_kind_type, but character literals
-    /// are valid, yet not members of the token_type enum.
-    static symbol_kind_type yytranslate_ (int t);
+    /// are valid, yet not members of the token_kind_type enum.
+    static symbol_kind_type yytranslate_ (int t) YY_NOEXCEPT;
 
     /// Convert the symbol name \a n to a form suitable for a diagnostic.
     static std::string yytnamerr_ (const char *yystr);
@@ -7733,14 +7755,14 @@ switch (yykind)
 
     static const short yycheck_[];
 
-    // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
-    // symbol of state STATE-NUM.
+    // YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
+    // state STATE-NUM.
     static const short yystos_[];
 
-    // YYR1[YYN] -- Symbol number of symbol that rule YYN derives.
+    // YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.
     static const short yyr1_[];
 
-    // YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.
+    // YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.
     static const signed char yyr2_[];
 
 
@@ -7839,7 +7861,7 @@ switch (yykind)
       typedef typename S::size_type size_type;
       typedef typename std::ptrdiff_t index_type;
 
-      stack (size_type n = 200)
+      stack (size_type n = 200) YY_NOEXCEPT
         : seq_ (n)
       {}
 
@@ -7918,7 +7940,7 @@ switch (yykind)
       class slice
       {
       public:
-        slice (const stack& stack, index_type range)
+        slice (const stack& stack, index_type range) YY_NOEXCEPT
           : stack_ (stack)
           , range_ (range)
         {}
@@ -7968,7 +7990,7 @@ switch (yykind)
     void yypush_ (const char* m, state_type s, YY_MOVE_REF (symbol_type) sym);
 
     /// Pop \a n symbols from the stack.
-    void yypop_ (int n = 1);
+    void yypop_ (int n = 1) YY_NOEXCEPT;
 
     /// Constants.
     enum
@@ -7986,7 +8008,7 @@ switch (yykind)
 
   inline
   seclang_parser::symbol_kind_type
-  seclang_parser::yytranslate_ (int t)
+  seclang_parser::yytranslate_ (int t) YY_NOEXCEPT
   {
     // YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to
     // TOKEN-NUM as returned by yylex.
@@ -8061,7 +8083,7 @@ switch (yykind)
     if (t <= 0)
       return symbol_kind::S_YYEOF;
     else if (t <= code_max)
-      return YY_CAST (symbol_kind_type, translate_table[t]);
+      return static_cast <symbol_kind_type> (translate_table[t]);
     else
       return symbol_kind::S_YYUNDEF;
   }
@@ -8313,12 +8335,14 @@ switch (yykind)
 
 
 
+
   template <typename Base>
   seclang_parser::symbol_kind_type
   seclang_parser::basic_symbol<Base>::type_get () const YY_NOEXCEPT
   {
     return this->kind ();
   }
+
 
   template <typename Base>
   bool
@@ -8573,13 +8597,13 @@ switch (yykind)
 
   // by_kind.
   inline
-  seclang_parser::by_kind::by_kind ()
+  seclang_parser::by_kind::by_kind () YY_NOEXCEPT
     : kind_ (symbol_kind::S_YYEMPTY)
   {}
 
 #if 201103L <= YY_CPLUSPLUS
   inline
-  seclang_parser::by_kind::by_kind (by_kind&& that)
+  seclang_parser::by_kind::by_kind (by_kind&& that) YY_NOEXCEPT
     : kind_ (that.kind_)
   {
     that.clear ();
@@ -8587,18 +8611,20 @@ switch (yykind)
 #endif
 
   inline
-  seclang_parser::by_kind::by_kind (const by_kind& that)
+  seclang_parser::by_kind::by_kind (const by_kind& that) YY_NOEXCEPT
     : kind_ (that.kind_)
   {}
 
   inline
-  seclang_parser::by_kind::by_kind (token_kind_type t)
+  seclang_parser::by_kind::by_kind (token_kind_type t) YY_NOEXCEPT
     : kind_ (yytranslate_ (t))
   {}
 
+
+
   inline
   void
-  seclang_parser::by_kind::clear ()
+  seclang_parser::by_kind::clear () YY_NOEXCEPT
   {
     kind_ = symbol_kind::S_YYEMPTY;
   }
@@ -8618,6 +8644,7 @@ switch (yykind)
     return kind_;
   }
 
+
   inline
   seclang_parser::symbol_kind_type
   seclang_parser::by_kind::type_get () const YY_NOEXCEPT
@@ -8625,8 +8652,9 @@ switch (yykind)
     return this->kind ();
   }
 
+
 } // yy
-#line 8630 "seclang-parser.hh"
+#line 8658 "seclang-parser.hh"
 
 
 
