@@ -2240,10 +2240,6 @@ extern "C" int msc_add_n_response_header(Transaction *transaction,
  *
  * @param transaction ModSecurity transaction.
  *
- * @returns If the operation was successful or not.
- * @retval 1 Operation was successful.
- * @retval 0 Operation failed.
- *
  */
 extern "C" void msc_transaction_cleanup(Transaction *transaction) {
     delete transaction;
