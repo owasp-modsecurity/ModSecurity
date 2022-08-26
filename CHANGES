@@ -2,7 +2,7 @@ DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
  * IIS: Update dependencies for next planned release
-   [Issue #2792 - @martinhsv]
+   [@martinhsv]
  * XML parser cleanup: NULL duplicate pointer
    [Issue #2760 - @martinhsv]
  * Properly cleanup XML parser contexts upon completion
