@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix msc_transaction_cleanup function comment typo
+    [Issue #2788 - @lookat23]
   - Fix: MULTIPART_INVALID_PART connected to wrong internal variable
     [Issue #2785 - @martinhsv]
   - Restore Unique_id to include random portion after timestamp
