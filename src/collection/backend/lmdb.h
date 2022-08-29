@@ -83,10 +83,13 @@ class MDBEnvProvider {
     }
     MDB_env* GetEnv();
     MDB_dbi* GetDBI();
+    bool isValid();
+
     ~MDBEnvProvider();
  private:
     MDB_env *m_env;
     MDB_dbi m_dbi;
+    bool valid;
 
     MDBEnvProvider();
 };
