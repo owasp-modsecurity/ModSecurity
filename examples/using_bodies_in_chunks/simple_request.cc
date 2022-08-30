@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
         std::cout << std::endl << std::endl;
         return -1;
     }
-    char *rule = *(argv++);
+    char *rule = *(++argv);
     std::string rules_arg(rule);
 
     /**
