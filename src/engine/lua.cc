@@ -329,7 +329,6 @@ int Lua::setvar(lua_State *L) {
     std::string collection;
     std::string variableName;
     int nargs = lua_gettop(L);
-    char *chr = NULL;
     size_t pos;
     void *z(NULL);
 

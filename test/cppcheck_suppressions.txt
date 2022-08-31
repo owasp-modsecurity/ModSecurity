@@ -64,6 +64,7 @@ passedByValue:src/variables/global.h:110
 passedByValue:src/parser/driver.cc:45
 passedByValue:test/common/modsecurity_test.cc:49
 passedByValue:test/common/modsecurity_test.cc:98
+unreadVariable:src/rule_with_operator.cc:219
 
 uninitvar:src/operators/verify_cpf.cc:77
 uninitvar:src/operators/verify_svnr.cc:67
@@ -91,7 +92,6 @@ cstyleCast
 functionStatic
 variableScope
 shadowFunction
-unreadVariable
 
 
 // Examples

@@ -97,7 +97,6 @@ int main (int argc, char **argv)
 {
     int ret;
     const char *error = NULL;
-    int i = 0;
     pid_t pid;
     int f;
 

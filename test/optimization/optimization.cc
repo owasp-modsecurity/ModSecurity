@@ -83,7 +83,6 @@ int main(int argc, char **argv) {
 
         for (int i = 0; i < rules->size(); i++) {
             auto z = rules->at(i);
-            std::string key;
             if (z == NULL) {
                 continue;
             }
@@ -95,7 +94,6 @@ int main(int argc, char **argv) {
                 } else {
                     operators[op] = 1;
                 }
-                key = op;
             }
 
             if (dynamic_cast<modsecurity::RuleWithOperator *>(z.get()) != nullptr) {
@@ -107,7 +105,6 @@ int main(int argc, char **argv) {
                 } else {
                     operators[op] = 1;
                 }
-                key = op;
             }
 
         }
