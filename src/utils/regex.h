@@ -85,9 +85,7 @@ class Regex {
  private:
 #if WITH_PCRE2
     pcre2_code *m_pc;
-    pcre2_match_context *m_pmc;
     int m_pcje;
-    pcre2_jit_stack *m_pcjs;
 #else
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;
