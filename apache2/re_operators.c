@@ -656,7 +656,9 @@ nextround:
         msr->if_stream_changed = 1;
 
         memcpy(msr->stream_input_data, data, size);
+#ifndef MSC_LARGE_STREAM_INPUT
         msr->stream_input_data[size] = '\0';
+#endif
 
         var->value_len = size;
         var->value = msr->stream_input_data;
