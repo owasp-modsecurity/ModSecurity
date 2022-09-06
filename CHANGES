@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Limit rsub null termination to where necessary
+   [Issue #2794 - @marcstern, @martinhsv]
  * IIS: Update dependencies for next planned release
    [@martinhsv]
  * XML parser cleanup: NULL duplicate pointer
