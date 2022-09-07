@@ -201,6 +201,7 @@ class TransactionAnchoredVariables {
         m_variableGeo(t, "GEO"),
         m_variableRequestCookiesNames(t, "REQUEST_COOKIES_NAMES"),
         m_variableFilesTmpNames(t, "FILES_TMPNAMES"),
+        m_variableMultipartPartHeaders(t, "MULTIPART_PART_HEADERS"),
         m_variableOffset(0),
         m_variableArgsNames("ARGS_NAMES", &m_variableArgs),
         m_variableArgsGetNames("ARGS_GET_NAMES", &m_variableArgsGet),
@@ -282,6 +283,7 @@ class TransactionAnchoredVariables {
     AnchoredSetVariable m_variableGeo;
     AnchoredSetVariable m_variableRequestCookiesNames;
     AnchoredSetVariable m_variableFilesTmpNames;
+    AnchoredSetVariable m_variableMultipartPartHeaders;
 
     int m_variableOffset;
 

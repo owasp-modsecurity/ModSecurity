@@ -217,6 +217,7 @@ class Driver;
 #include "src/variables/request_body_length.h"
 #include "src/variables/request_cookies.h"
 #include "src/variables/request_cookies_names.h"
+#include "src/variables/multipart_part_headers.h"
 #include "src/variables/request_file_name.h"
 #include "src/variables/request_headers.h"
 #include "src/variables/request_headers_names.h"
@@ -352,6 +353,7 @@ using namespace modsecurity::operators;
   VARIABLE_RESPONSE_HEADERS
   VARIABLE_GEO
   VARIABLE_REQUEST_COOKIES_NAMES
+  VARIABLE_MULTIPART_PART_HEADERS
   VARIABLE_ARGS_COMBINED_SIZE
   VARIABLE_ARGS_GET_NAMES
   VARIABLE_RULE
@@ -2060,6 +2062,18 @@ var:
     | VARIABLE_REQUEST_COOKIES_NAMES
       {
         VARIABLE_CONTAINER($$, new variables::RequestCookiesNames_NoDictElement());
+      }
+    | VARIABLE_MULTIPART_PART_HEADERS DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new variables::MultipartPartHeaders_DictElement($2));
+      }
+    | VARIABLE_MULTIPART_PART_HEADERS DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new variables::MultipartPartHeaders_DictElementRegexp($2));
+      }
+    | VARIABLE_MULTIPART_PART_HEADERS
+      {
+        VARIABLE_CONTAINER($$, new variables::MultipartPartHeaders_NoDictElement());
       }
     | VARIABLE_RULE DICT_ELEMENT
       {
