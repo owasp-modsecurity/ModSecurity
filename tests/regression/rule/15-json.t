@@ -236,7 +236,7 @@
                 SecAuditLog "$ENV{AUDIT_LOG}"
 		SecDebugLogLevel 9
 		SecRequestBodyJsonDepthLimit 3
-		SecRule REQUEST_HEADERS:Content-Type "application/json" \\
+		SecRule REQUEST_HEADERS:Content-Type "^application/json" \\
 		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200444',phase:2,log,deny,status:403,msg:'Failed to parse request body'"
 		SecRule ARGS "\@streq 25" "id:'200445',phase:2,log,deny,status:403"
