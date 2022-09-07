@@ -36,7 +36,7 @@
     "rules":[
       "SecRuleEngine On",
       "SecArgumentsLimit 6",
-      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'200001',phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQUEST_HEADERS:Content-Type \"^application/json\" \"id:'200001',phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}'\"",
       "SecRule ARGS:/k5/ \"@rx v5\" \"id:'1234',phase:2,deny,status:403,t:none,log,auditlog\""
     ]
@@ -78,7 +78,7 @@
     "rules":[
       "SecRuleEngine On",
       "SecArgumentsLimit 5",
-      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'200001',phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQUEST_HEADERS:Content-Type \"^application/json\" \"id:'200001',phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}'\"",
       "SecRule ARGS:/k5/ \"@rx v5\" \"id:'1234',phase:2,deny,status:403,t:none,log,auditlog\""
     ]
