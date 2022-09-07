@@ -55,6 +55,8 @@ struct multipart_part {
 
     char                    *last_header_name;
     apr_table_t             *headers;
+    char                    *last_header_line;
+    apr_array_header_t      *header_lines;
 
     unsigned int             offset;
     unsigned int             length;
@@ -81,6 +83,15 @@ struct multipart_data {
     char                    *bufptr;
     int                      bufleft;
 
+    /* line ending status seen immediately before current position.
+     * 0 = neither LF nor CR; 1 = prev char CR; 2 = prev char LF alone;
+     * 3 = prev two chars were CRLF
+     */
+    int                      crlf_state;
+
+    /* crlf_state at end of previous buffer */
+    int                      crlf_state_buf_end;
+
     unsigned int             buf_offset;
 
     /* pointer that keeps track of a part while
@@ -93,6 +104,14 @@ struct multipart_data {
      * headers, 1 means we are collecting data
      */
     int                      mpp_state;
+
+    /* part parsing substate;  if mpp_state is 1 (collecting
+     * data), then for this variable:
+     * 0 means we have not yet read any data between the
+     * post-headers blank line and the next boundary
+     * 1 means we have read at some data after that blank line
+     */
+    int                      mpp_substate_part_data_read;
 
     /* because of the way this parsing algorithm
      * works we hold back the last two bytes of

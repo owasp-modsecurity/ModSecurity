@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Multipart parsing fixes and new MULTIPART_PART_HEADERS collection
+   [Issue #2797 - @terjanq, @martinhsv]
  * Limit rsub null termination to where necessary
    [Issue #2794 - @marcstern, @martinhsv]
  * IIS: Update dependencies for next planned release

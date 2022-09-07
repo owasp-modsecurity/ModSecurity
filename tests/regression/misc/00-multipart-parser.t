@@ -1849,3 +1849,48 @@
     ),
 },
 
+# part headers
+{
+    type => "misc",
+    comment => "multipart parser (part headers)",
+    conf => qq(
+        SecRuleEngine On
+        SecDebugLog $ENV{DEBUG_LOG}
+        SecDebugLogLevel 9
+        SecRequestBodyAccess On
+        SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:400,id:500168"
+        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:400,id:500169"
+        SecRule MULTIPART_PART_HEADERS:image "\@rx content-type:.*jpeg" "phase:2,deny,status:403,id:500170,t:lowercase"
+    ),
+    match_log => {
+        debug => [ qr/500170.*against MULTIPART_PART_HEADERS:image.*Rule returned 1./s, 1 ],
+    },
+    match_response => {
+        status => qr/^403$/,
+    },
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => q(multipart/form-data; boundary=0000),
+        ],
+        normalize_raw_request_data(
+            q(
+                --0000
+                Content-Disposition: form-data; name="username"
+                
+                Bill
+                --0000
+                Content-Disposition: form-data; name="email"
+                
+                bill@fakesite.com
+                --0000
+                Content-Disposition: form-data; name="image"; filename="image.jpg"
+                Content-Type: image/jpeg
+                
+                BINARYDATA
+                --0000--
+            ),
+        ),
+    ),
+},
+
