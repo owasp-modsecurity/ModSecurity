@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Adjust parser activation rules in modsecurity.conf-recommended
+   [Issue #2799 - @terjanq, @martinhsv]
  * Multipart parsing fixes and new MULTIPART_PART_HEADERS collection
    [Issue #2797 - @terjanq, @martinhsv]
  * Limit rsub null termination to where necessary

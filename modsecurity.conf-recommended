@@ -19,21 +19,21 @@ SecRequestBodyAccess On
 # Enable XML request body parser.
 # Initiate XML Processor in case of xml content-type
 #
-SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\+|/)|text/)xml" \
+SecRule REQUEST_HEADERS:Content-Type "^(?:application(?:/soap\+|/)|text/)xml" \
      "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
 
 # Enable JSON request body parser.
 # Initiate JSON Processor in case of JSON content-type; change accordingly
 # if your application does not use 'application/json'
 #
-SecRule REQUEST_HEADERS:Content-Type "application/json" \
+SecRule REQUEST_HEADERS:Content-Type "^application/json" \
      "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 
 # Sample rule to enable JSON request body parser for more subtypes.
 # Uncomment or adapt this rule if you want to engage the JSON
 # Processor for "+json" subtypes
 #
-#SecRule REQUEST_HEADERS:Content-Type "^application/.+[+]json$" \
+#SecRule REQUEST_HEADERS:Content-Type "^application/[a-z0-9.-]+[+]json" \
 #     "id:'200006',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 
 # Maximum request body size we will accept for buffering. If you support

@@ -394,7 +394,7 @@
         SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500029, \\
+		SecRule REQUEST_HEADERS:Content-Type "^(?:application(?:/soap\+|/)|text/)xml" "id:500029, \\
 		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500030
 		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope-bad.dtd" "id:500031 \\
