@@ -138,6 +138,9 @@ class MultipartPart {
     std::string m_last_header_name;
     std::unordered_map<std::string, std::pair<size_t, std::string>,
         MyHash, MyEqual> m_headers;
+    std::string m_last_header_line;
+    std::vector<std::pair<size_t, std::string>> m_header_lines;
+
 
     unsigned int m_offset;
     unsigned int m_length;
@@ -186,6 +189,15 @@ class Multipart {
 
     unsigned int m_buf_offset;
 
+    /* line ending status seen immediately before current position.
+     * 0 = neither LF nor CR; 1 = prev char CR; 2 = prev char LF alone;
+     * 3 = prev two chars were CRLF
+     */
+    int                      m_crlf_state;
+
+    /* crlf_state at end of previous buffer */
+    int                      m_crlf_state_buf_end;
+
     /* pointer that keeps track of a part while
      * it is being built
      */
@@ -196,6 +208,14 @@ class Multipart {
      * headers, 1 means we are collecting data
      */
     int m_mpp_state;
+
+    /* part parsing substate;  if mpp_state is 1 (collecting
+     * data), then for this variable:
+     * 0 means we have not yet read any data between the
+     * post-headers blank line and the next boundary
+     * 1 means we have read at some data after that blank line
+     */
+    int m_mpp_substate_part_data_read;
 
     /* because of the way this parsing algorithm
      * works we hold back the last two bytes of

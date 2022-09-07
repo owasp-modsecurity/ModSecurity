@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Multipart parsing fixes and new MULTIPART_PART_HEADERS collection
+    [Issue #2795 - @terjanq, @martinhsv]
   - Prevent LMDB related segfault
     [Issue #2755, #2761 - @dvershinin]
   - Fix msc_transaction_cleanup function comment typo

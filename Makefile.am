@@ -225,6 +225,7 @@ TESTS+=test/test-cases/regression/variable-MULTIPART_CRLF_LF_LINES.json
 TESTS+=test/test-cases/regression/variable-MULTIPART_FILENAME.json
 TESTS+=test/test-cases/regression/variable-MULTIPART_INVALID_HEADER_FOLDING.json
 TESTS+=test/test-cases/regression/variable-MULTIPART_NAME.json
+TESTS+=test/test-cases/regression/variable-MULTIPART_PART_HEADERS.json
 TESTS+=test/test-cases/regression/variable-MULTIPART_STRICT_ERROR.json
 TESTS+=test/test-cases/regression/variable-MULTIPART_UNMATCHED_BOUNDARY.json
 TESTS+=test/test-cases/regression/variable-OUTBOUND_DATA_ERROR.json

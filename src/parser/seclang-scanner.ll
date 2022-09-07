@@ -253,6 +253,7 @@ VARIABLE_REQUEST_HEADERS                  (?i:REQUEST_HEADERS)
 VARIABLE_RESPONSE_HEADERS                 (?i:RESPONSE_HEADERS)
 VARIABLE_GEO                              (?i:GEO)
 VARIABLE_REQUEST_COOKIES_NAMES            (?i:REQUEST_COOKIES_NAMES)
+VARIABLE_MULTIPART_PART_HEADERS           (?i:MULTIPART_PART_HEADERS)
 VARIABLE_RULE                             (?i:RULE)
 VARIABLE_SESSION                          (?i:(SESSION))
 VARIABLE_IP                               (?i:(IP))
@@ -996,6 +997,8 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_GEO}[:.]                          { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_GEO(*driver.loc.back()); }
 {VARIABLE_REQUEST_COOKIES_NAMES}            { return p::make_VARIABLE_REQUEST_COOKIES_NAMES(*driver.loc.back()); }
 {VARIABLE_REQUEST_COOKIES_NAMES}[:.]        { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_REQUEST_COOKIES_NAMES(*driver.loc.back()); }
+{VARIABLE_MULTIPART_PART_HEADERS}           { return p::make_VARIABLE_MULTIPART_PART_HEADERS(*driver.loc.back()); }
+{VARIABLE_MULTIPART_PART_HEADERS}[:.]       { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_PART_HEADERS(*driver.loc.back()); }
 {VARIABLE_RULE}                             { return p::make_VARIABLE_RULE(*driver.loc.back()); }
 {VARIABLE_RULE}[:.]                         { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RULE(*driver.loc.back()); }
 {VARIABLE_FILES_TMP_NAMES}                  { return p::make_VARIABLE_FILES_TMP_NAMES(*driver.loc.back()); }
