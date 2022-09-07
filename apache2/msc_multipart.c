@@ -325,7 +325,14 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         }
 
         msr->mpd->mpp_state = 1;
+        msr->mpd->mpp_substate_part_data_read = 0;
         msr->mpd->mpp->last_header_name = NULL;
+
+        /* Record the last part header line in the collection */
+        if (msr->mpd->mpp->last_header_line != NULL) {
+            *(char **)apr_array_push(msr->mpd->mpp->header_lines) = msr->mpd->mpp->last_header_line;
+            msr_log(msr, 9, "Multipart: Added part header line \"%s\"", msr->mpd->mpp->last_header_line);
+        }
     } else {
         /* Header line. */
 
@@ -379,12 +386,28 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Part header too long.");
                 return -1;
             }
+            if ((msr->mpd->mpp->last_header_line != NULL) && (msr->mpd->mpp->last_header_name != NULL)
+                && (new_value != NULL)) {
+                msr->mpd->mpp->last_header_line = apr_psprintf(msr->mp,
+                    "%s: %s", msr->mpd->mpp->last_header_name, new_value);
+            }
+
         } else {
             char *header_name, *header_value, *data;
 
             /* new header */
 
+            /* Record the most recently-seen part header line in the collection */
+            if (msr->mpd->mpp->last_header_line != NULL) {
+                *(char **)apr_array_push(msr->mpd->mpp->header_lines) = msr->mpd->mpp->last_header_line;
+                msr_log(msr, 9, "Multipart: Added part header line \"%s\"", msr->mpd->mpp->last_header_line);
+	    }
+
             data = msr->mpd->buf;
+
+            msr->mpd->mpp->last_header_line = apr_pstrdup(msr->mp, data);
+            remove_lf_crlf_inplace(msr->mpd->mpp->last_header_line);
+
             while((*data != ':') && (*data != '\0')) data++;
             if (*data == '\0') {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid part header (colon missing): %s.",
@@ -437,6 +460,8 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
+
+    msr->mpd->mpp_substate_part_data_read = 1;
 
     /* Preserve some bytes for later. */
     if (   ((MULTIPART_BUF_SIZE - msr->mpd->bufleft) >= 1)
@@ -680,10 +705,14 @@ static int multipart_process_boundary(modsec_rec *msr, int last_part, char **err
         if (msr->mpd->mpp == NULL) return -1;
         msr->mpd->mpp->type = MULTIPART_FORMDATA;
         msr->mpd->mpp_state = 0;
+        msr->mpd->mpp_substate_part_data_read = 0;
 
         msr->mpd->mpp->headers = apr_table_make(msr->mp, 10);
         if (msr->mpd->mpp->headers == NULL) return -1;
         msr->mpd->mpp->last_header_name = NULL;
+        msr->mpd->mpp->last_header_line = NULL;
+        msr->mpd->mpp->header_lines = apr_array_make(msr->mp, 2, sizeof(char *));
+        if (msr->mpd->mpp->header_lines == NULL) return -1;
 
         msr->mpd->reserve[0] = 0;
         msr->mpd->reserve[1] = 0;
@@ -983,6 +1012,19 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                     && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) == '-')
                     && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary) + 1) == '-') )
                 {
+                    if ((msr->mpd->crlf_state_buf_end == 2) && (msr->mpd->flag_lf_line != 1)) {
+                        msr->mpd->flag_lf_line = 1;
+                        if (msr->mpd->flag_crlf_line) {
+                            msr_log(msr, 4, "Multipart: Warning: mixed line endings used (CRLF/LF).");
+                        } else {
+                            msr_log(msr, 4, "Multipart: Warning: incorrect line endings used (LF).");
+                        }
+                    }
+                    if (msr->mpd->mpp_substate_part_data_read == 0) {
+                        /* it looks like the final boundary, but it's where part data should begin */
+                        msr->mpd->flag_invalid_part = 1;
+                        msr_log(msr, 4, "Multipart: Warning: Invalid part (data contains final boundary)");
+                    }
                     /* Looks like the final boundary - process it. */
                     if (multipart_process_boundary(msr, 1 /* final */, error_msg) < 0) {
                         msr->mpd->flag_error = 1;
@@ -1075,54 +1117,63 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                 if (   (strlen(msr->mpd->buf) >= strlen(msr->mpd->boundary) + 2)
                     && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) )
                 {
-                    char *boundary_end = msr->mpd->buf + 2 + strlen(msr->mpd->boundary);
-                    int is_final = 0;
+                    if (msr->mpd->crlf_state_buf_end == 2) {
+                        msr->mpd->flag_lf_line = 1;
+                    }
+                    if ((msr->mpd->mpp_substate_part_data_read == 0) && (msr->mpd->boundary_count > 0)) {
+                        /* string matches our boundary, but it's where part data should begin */
+                        msr->mpd->flag_invalid_part = 1;
+                        msr_log(msr, 4, "Multipart: Warning: Invalid part (data contains boundary)");
+                    } else {
+                        char *boundary_end = msr->mpd->buf + 2 + strlen(msr->mpd->boundary);
+                        int is_final = 0;
 
-                    /* Is this the final boundary? */
-                    if ((*boundary_end == '-') && (*(boundary_end + 1)== '-')) {
-                        is_final = 1;
-                        boundary_end += 2;
+                        /* Is this the final boundary? */
+                        if ((*boundary_end == '-') && (*(boundary_end + 1)== '-')) {
+                            is_final = 1;
+                            boundary_end += 2;
 
-                        if (msr->mpd->is_complete != 0) {
+                            if (msr->mpd->is_complete != 0) {
+                                msr->mpd->flag_error = 1;
+                                *error_msg = apr_psprintf(msr->mp,
+                                    "Multipart: Invalid boundary (final duplicate).");
+                                return -1;
+                            }
+                        }
+
+                        /* Allow for CRLF and LF line endings. */
+                        if (   ( (*boundary_end == '\r')
+                                  && (*(boundary_end + 1) == '\n')
+                                  && (*(boundary_end + 2) == '\0') )
+                            || ( (*boundary_end == '\n')
+                                  && (*(boundary_end + 1) == '\0') ) )
+                        {
+                            if (*boundary_end == '\n') {
+                                msr->mpd->flag_lf_line = 1;
+                            } else {
+                                msr->mpd->flag_crlf_line = 1;
+                            }
+
+                            if (multipart_process_boundary(msr, (is_final ? 1 : 0), error_msg) < 0) {
+                                msr->mpd->flag_error = 1;
+                                return -1;
+                            }
+
+                            if (is_final) {
+                                msr->mpd->is_complete = 1;
+                            }
+
+                            processed_as_boundary = 1;
+                            msr->mpd->boundary_count++;
+                        }
+                        else {
+                            /* error */
                             msr->mpd->flag_error = 1;
                             *error_msg = apr_psprintf(msr->mp,
-                                "Multipart: Invalid boundary (final duplicate).");
+                                "Multipart: Invalid boundary: %s",
+                                log_escape_nq(msr->mp, msr->mpd->buf));
                             return -1;
                         }
-                    }
-
-                    /* Allow for CRLF and LF line endings. */
-                    if (   ( (*boundary_end == '\r')
-                              && (*(boundary_end + 1) == '\n')
-                              && (*(boundary_end + 2) == '\0') )
-                        || ( (*boundary_end == '\n')
-                              && (*(boundary_end + 1) == '\0') ) )
-                    {
-                        if (*boundary_end == '\n') {
-                            msr->mpd->flag_lf_line = 1;
-                        } else {
-                            msr->mpd->flag_crlf_line = 1;
-                        }
-
-                        if (multipart_process_boundary(msr, (is_final ? 1 : 0), error_msg) < 0) {
-                            msr->mpd->flag_error = 1;
-                            return -1;
-                        }
-
-                        if (is_final) {
-                            msr->mpd->is_complete = 1;
-                        }
-
-                        processed_as_boundary = 1;
-                        msr->mpd->boundary_count++;
-                    }
-                    else {
-                        /* error */
-                        msr->mpd->flag_error = 1;
-                        *error_msg = apr_psprintf(msr->mp,
-                            "Multipart: Invalid boundary: %s",
-                            log_escape_nq(msr->mp, msr->mpd->buf));
-                        return -1;
                     }
                 } else { /* It looks like a boundary but we couldn't match it. */
                     char *p = NULL;
@@ -1221,6 +1272,21 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
             msr->mpd->bufptr = msr->mpd->buf;
             msr->mpd->bufleft = MULTIPART_BUF_SIZE;
             msr->mpd->buf_contains_line = (c == 0x0a) ? 1 : 0;
+
+            if (c == 0x0a) {
+                if (msr->mpd->crlf_state == 1) {
+                    msr->mpd->crlf_state = 3;
+	        } else {
+                    msr->mpd->crlf_state = 2;
+	        }
+	    }
+            msr->mpd->crlf_state_buf_end = msr->mpd->crlf_state;
+        }
+
+        if (c == 0x0d) {
+            msr->mpd->crlf_state = 1;
+        } else if (c != 0x0a) {
+            msr->mpd->crlf_state = 0;
         }
 
         if ((msr->mpd->is_complete) && (inleft != 0)) {
