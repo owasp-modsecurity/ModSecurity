@@ -1,5 +1,5 @@
-v3.x.y - YYYY-MMM-DD (to be released)
--------------------------------------
+v3.0.8 - 2022-Sep-07
+--------------------
 
   - Adjust parser activation rules in modsecurity.conf-recommended
     [Issue #2796 - @terjanq, @martinhsv]
