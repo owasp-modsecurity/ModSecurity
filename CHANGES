@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Correct whitespace handling for Include directive
+    [Issue #2800 - @877509395, @martinhsv]
 
 
 v3.0.8 - 2022-Sep-07
