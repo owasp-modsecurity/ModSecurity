@@ -5104,7 +5104,7 @@ static const flex_int16_t yy_rule_linenum[544] =
      1179, 1180, 1181, 1182, 1184, 1185, 1186, 1187, 1189, 1190,
      1191, 1192, 1194, 1196, 1197, 1199, 1200, 1201, 1202, 1204,
      1209, 1210, 1211, 1215, 1216, 1217, 1222, 1224, 1225, 1226,
-     1245, 1272, 1302
+     1245, 1273, 1303
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -8530,7 +8530,8 @@ YY_RULE_SETUP
 #line 1245 "seclang-scanner.ll"
 {
     std::string err;
-    const char *file = strchr(yytext, ' ') + 1;
+    const char *tmpStr = yytext + strlen("include");
+    const char *file   = tmpStr + strspn( tmpStr, " \t");
     std::string fi = modsecurity::utils::find_resource(file, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
@@ -8557,12 +8558,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 542:
 YY_RULE_SETUP
-#line 1272 "seclang-scanner.ll"
+#line 1273 "seclang-scanner.ll"
 {
     std::string err;
-    const char *file = strchr(yytext, ' ') + 1;
-    char *f = strdup(file + 1);
-    f[strlen(f)-1] = '\0';
+    const char *tmpStr = yytext + strlen("include");
+    const char *file   = tmpStr + strspn( tmpStr, " \t");
+    char *f = strdup(file);
     std::string fi = modsecurity::utils::find_resource(f, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
@@ -8591,7 +8592,7 @@ YY_RULE_SETUP
 case 543:
 /* rule 543 can match eol */
 YY_RULE_SETUP
-#line 1302 "seclang-scanner.ll"
+#line 1303 "seclang-scanner.ll"
 {
     HttpsClient c;
     std::string key;
@@ -8629,10 +8630,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 544:
 YY_RULE_SETUP
-#line 1338 "seclang-scanner.ll"
+#line 1339 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 8636 "seclang-scanner.cc"
+#line 8637 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -9737,7 +9738,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 1338 "seclang-scanner.ll"
+#line 1339 "seclang-scanner.ll"
 
 
 namespace modsecurity {
