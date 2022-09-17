@@ -35,7 +35,7 @@ bool SetENV::evaluate(RuleWithActions *rule, Transaction *t) {
     std::string colNameExpanded(m_string->evaluate(t));
 
     auto pair = utils::string::ssplit_pair(colNameExpanded, '=');
-    ms_dbg_a(t, 8, "Setting envoriment variable: "
+    ms_dbg_a(t, 8, "Setting environment variable: "
         + pair.first + " to " + pair.second);
     setenv(pair.first.c_str(), pair.second.c_str(), /*overwrite*/ 1);
 
