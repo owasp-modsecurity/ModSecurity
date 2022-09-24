@@ -20,6 +20,8 @@
 
 #include <apr_base64.h>
 
+#include <ngx_http_azwaf.h>
+
 #undef CR
 #undef LF
 #undef CRLF
@@ -54,8 +56,8 @@ typedef struct {
 
     int                  thread_running;
     int                  status_code;
-    ngx_time_t           *start_time;
-    ngx_msec_int_t       azwaf_latency;
+    ngx_msec_t           start_time;
+    ngx_msec_t           latency;
 } ngx_http_modsecurity_ctx_t;
 
 #define STATUS_CODE_NOT_SET -1000
@@ -78,15 +80,14 @@ static char *ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent, v
 static char *ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static char *ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 
-static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_request_t *r, ngx_time_t *start_time);
+static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_request_t *r);
 static int ngx_http_modsecurity_drop_action(request_rec *r);
 static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
-static ngx_int_t ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ctx_t *ctx);
-static void store_azwaf_latency(ngx_http_modsecurity_ctx_t *ctx, ngx_http_variable_value_t *waf_latency_var);
+static ngx_int_t ngx_http_modsecurity_set_latency(ngx_http_request_t *r);
 
-static ngx_int_t ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t* r,
-    ngx_http_variable_value_t* v, ngx_msec_int_t modsec_latency);
+static ngx_int_t ngx_http_modsecurity_set_latency_var(ngx_http_request_t* r,
+    ngx_http_variable_value_t* v, ngx_msec_t latency);
 static void ngx_http_modsecurity_set_modsec_mode(ngx_http_request_t* r,
     ngx_http_variable_value_t* v, ngx_uint_t modsec_mode);
 static ngx_int_t ngx_http_variable_get_modsec_latency(ngx_http_request_t* r,
@@ -916,35 +917,27 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
     ngx_http_core_run_phases(r);
 }
 
-static void
-store_azwaf_latency(ngx_http_modsecurity_ctx_t* ctx, ngx_http_variable_value_t* waf_latency_var)
-{
-    int sec, ms;
-    char* token = strtok((char*)waf_latency_var->data, ".");
-    sec = atoi(token);
-    token = strtok(NULL, " ");
-    ms = atoi(token);
-    ctx->azwaf_latency = sec * 1000 + ms;
-}
-
 static ngx_int_t
-ngx_http_calculate_modsec_latency(ngx_http_request_t *r, ngx_http_modsecurity_ctx_t* ctx)
+ngx_http_modsecurity_set_latency(ngx_http_request_t *r)
 {
-    ngx_time_t *end_time;
-    ngx_msec_int_t   ms;
-    ngx_time_update();
-    end_time = ngx_timeofday();
+    ngx_http_modsecurity_ctx_t *ctx;
+    ngx_http_variable_value_t  *modsec_latency_var;
+    ngx_msec_t                  azwaf_latency;
 
-    ms = (ngx_msec_int_t)
-        ((end_time->sec - ctx->start_time->sec) * 1000 + (end_time->msec - ctx->start_time->msec));
-    ms = ngx_max(ms, 0);
-
-    // Add azwaf latency if we are in hybrid mode
-    if (ctx->azwaf_latency != 0) {
-        ms += ctx->azwaf_latency;
+    ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
+    if (NULL == ctx) {
+        return NGX_ERROR;
     }
-    ngx_http_variable_value_t* modsec_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
-    return ngx_http_modsecurity_set_modsec_latency(r, modsec_latency_var, ms);
+
+    ctx->latency = ngx_current_msec - ctx->start_time;
+
+    azwaf_latency = 0;
+    if (ngx_http_azwaf_get_latency(r, &azwaf_latency) == NGX_OK) {
+        ctx->latency += azwaf_latency;
+    }
+
+    modsec_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
+    return ngx_http_modsecurity_set_latency_var(r, modsec_latency_var, ctx->latency);
 }
 
 /*
@@ -955,8 +948,8 @@ static ngx_int_t
 ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
 {
     ngx_http_modsecurity_loc_conf_t *cf;
-    ngx_http_modsecurity_ctx_t *ctx;
-    ngx_int_t ret, modsec_latency_ret;
+    ngx_http_modsecurity_ctx_t      *ctx;
+    ngx_int_t                        ret, modsec_latency_ret;
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     /* Process only main request */
@@ -981,23 +974,16 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
     // Get module request context or create if not yet created
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
     if (ctx == NULL) {
-        ngx_time_update();
-        ctx = ngx_http_modsecurity_create_ctx(r, ngx_timeofday());
+        ngx_http_variable_value_t *modsec_mode_var;
+
+        ctx = ngx_http_modsecurity_create_ctx(r);
         if (ctx == NULL) {
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
 
         ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
 
-        ngx_http_variable_value_t* waf_latency_var = ngx_http_get_indexed_variable(r, waf_latency_index);
-        ctx->azwaf_latency = 0;
-
-        // We are in hybrid mode, save the latency from azwaf to add later to the waf_latency.
-        if (waf_latency_var->data != NULL) {
-            store_azwaf_latency(ctx, waf_latency_var);
-        }
-
-        ngx_http_variable_value_t* modsec_mode_var = ngx_http_get_indexed_variable(r, waf_mode_index);
+        modsec_mode_var = ngx_http_get_indexed_variable(r, waf_mode_index);
         if (cf->config->is_enabled == MODSEC_DETECTION_ONLY) {
             ngx_http_modsecurity_set_modsec_mode(r, modsec_mode_var, WAF_DETECTION_MODE);
         }
@@ -1010,11 +996,12 @@ ngx_http_modsecurity_handler_with_timer(ngx_http_request_t *r)
     ret  = ngx_http_modsecurity_handler(r, cf, ctx);
 
     // We return failure only if memory allocation fails for latency variable in calculating metric
-    modsec_latency_ret = ngx_http_calculate_modsec_latency(r, ctx);
+    modsec_latency_ret = ngx_http_modsecurity_set_latency(r);
     if (modsec_latency_ret != NGX_OK) {
         ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "modSecurity: latency metric memory allocation failed");
         return modsec_latency_ret;
     }
+
     return ret;
 }
 
@@ -1066,16 +1053,16 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r, ngx_http_modsecurity_loc_con
 #define TXID_SIZE 25
 
 static ngx_http_modsecurity_ctx_t *
-ngx_http_modsecurity_create_ctx(ngx_http_request_t *r, ngx_time_t *start_time)
+ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
 {
     ngx_http_modsecurity_loc_conf_t *cf;
     ngx_pool_cleanup_t              *cln;
     ngx_http_modsecurity_ctx_t      *ctx;
     apr_sockaddr_t                  *asa;
     struct sockaddr_in              *sin;
-    char *txid;
-    unsigned char salt[TXID_SIZE];
-    int i;
+    char                            *txid;
+    unsigned char                    salt[TXID_SIZE];
+    int                              i;
 #if (NGX_HAVE_INET6)
     struct sockaddr_in6             *sin6;
 #endif
@@ -1095,7 +1082,7 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r, ngx_time_t *start_time)
     cln->data = ctx;
 
     ctx->r = r;
-    ctx->start_time = start_time;
+    ctx->start_time = ngx_current_msec;
 
     if (r->connection->requests == 0 || ctx->connection == NULL) {
 
@@ -1287,8 +1274,8 @@ ngx_http_variable_get_modsec_mode(ngx_http_request_t* r,
 }
 
     static ngx_int_t
-ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t *r,
-    ngx_http_variable_value_t *v, ngx_msec_int_t modsec_latency)
+ngx_http_modsecurity_set_latency_var(ngx_http_request_t *r,
+    ngx_http_variable_value_t *v, ngx_msec_t latency)
 {
     if (v->data == NULL) {
         v->data = ngx_pnalloc(r->pool, NGX_TIME_T_LEN + 4);
@@ -1297,7 +1284,7 @@ ngx_http_modsecurity_set_modsec_latency(ngx_http_request_t *r,
         }
     }
 
-    v->len = ngx_sprintf(v->data, "%T.%03M", (time_t)(modsec_latency) / 1000, modsec_latency % 1000) - v->data;
+    v->len = ngx_sprintf(v->data, "%T.%03M", (time_t)(latency) / 1000, latency % 1000) - v->data;
     v->valid = 1;
     v->no_cacheable = 0;
     v->not_found = 0;
