@@ -132,7 +132,7 @@ CHECK_PCRE
 #
 # Check for pcre2
 #
-PROG_PCRE2
+AX_CHECK_PCRE2
 AM_CONDITIONAL([PCRE2_CFLAGS], [test "PCRE2_CFLAGS" != ""])
 
 
@@ -424,9 +424,9 @@ echo " "
 echo "ModSecurity - ${MSC_GIT_VERSION} for $PLATFORM"
 echo " "
 echo " Mandatory dependencies"
-echo -n "   + libInjection                                  ...."
+echo $ECHO_N "   + libInjection                                  ....$ECHO_C"
 echo LIBINJECTION_VERSION
-echo -n "   + SecLang tests                                 ...."
+echo $ECHO_N "   + SecLang tests                                 ....$ECHO_C"
 echo SECLANG_TEST_VERSION
 
 echo " "
@@ -439,7 +439,7 @@ if test "x$GEOIP_FOUND" = "x0" && test "x$MAXMIND_FOUND" = "x0"; then
     echo "   + GeoIP/MaxMind                                 ....not found"
 fi
 if test "x$GEOIP_FOUND" = "x1" || test "x$MAXMIND_FOUND" = "x1"; then
-    echo -n "   + GeoIP/MaxMind                                 ....found "
+    echo $ECHO_N "   + GeoIP/MaxMind                                 ....found "
     echo ""
     if test "x$MAXMIND_FOUND" = "x1"; then
         echo "      * (MaxMind) v${MAXMIND_VERSION}"
@@ -460,7 +460,7 @@ if test "x$CURL_FOUND" = "x0"; then
     echo "   + LibCURL                                       ....not found"
 fi
 if test "x$CURL_FOUND" = "x1"; then
-    echo -n "   + LibCURL                                       ....found "
+    echo $ECHO_N "   + LibCURL                                       ....found $ECHO_C"
     if ! test "x$CURL_VERSION" = "x"; then
         echo "v${CURL_VERSION}"
     else
@@ -478,7 +478,7 @@ if test "x$YAJL_FOUND" = "x0"; then
     echo "   + YAJL                                          ....not found"
 fi
 if test "x$YAJL_FOUND" = "x1"; then
-    echo -n "   + YAJL                                          ....found "
+    echo $ECHO_N "   + YAJL                                          ....found $ECHO_C"
     if ! test "x$YAJL_VERSION" = "x"; then
         echo "v${YAJL_VERSION}"
     else
@@ -496,7 +496,7 @@ if test "x$LMDB_FOUND" = "x0"; then
     echo "   + LMDB                                          ....not found"
 fi
 if test "x$LMDB_FOUND" = "x1"; then
-    echo -n "   + LMDB                                          ....found "
+    echo $ECHO_N "   + LMDB                                          ....found $ECHO_C"
     if ! test "x$LMDB_VERSION" = "x"; then
         echo "v${LMDB_VERSION}"
     else
@@ -514,7 +514,7 @@ if test "x$LIBXML2_FOUND" = "x0"; then
     echo "   + LibXML2                                       ....not found"
 fi
 if test "x$LIBXML2_FOUND" = "x1"; then
-    echo -n "   + LibXML2                                       ....found "
+    echo $ECHO_N "   + LibXML2                                       ....found $ECHO_C"
     if ! test "x$LIBXML2_VERSION" = "x"; then
         echo "v${LIBXML2_VERSION}"
     else
@@ -532,7 +532,7 @@ if test "x$SSDEEP_FOUND" = "x0"; then
     echo "   + SSDEEP                                        ....not found"
 fi
 if test "x$SSDEEP_FOUND" = "x1"; then
-    echo -n "   + SSDEEP                                        ....found "
+    echo $ECHO_N "   + SSDEEP                                        ....found $ECHO_C"
     if ! test "x$SSDEEP_VERSION" = "x"; then
         echo "v${SSDEEP_VERSION}"
     else
@@ -549,7 +549,7 @@ if test "x$LUA_FOUND" = "x0"; then
     echo "   + LUA                                           ....not found"
 fi
 if test "x$LUA_FOUND" = "x1"; then
-    echo -n "   + LUA                                           ....found "
+    echo $ECHO_N "   + LUA                                           ....found $ECHO_C"
     if ! test "x$LUA_VERSION" = "x"; then
         echo "v${LUA_VERSION}"
     else
@@ -567,7 +567,7 @@ if test "x$PCRE2_FOUND" = "x0"; then
     echo "   + PCRE2                                          ....not found"
 fi
 if test "x$PCRE2_FOUND" = "x1"; then
-    echo -n "   + PCRE2                                          ....found "
+    echo $ECHO_N "   + PCRE2                                          ....found $ECHO_C"
     if ! test "x$PCRE2_VERSION" = "x"; then
         echo "v${PCRE2_VERSION}"
     else
