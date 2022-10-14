@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Use pkg-config to find libxml2 first
+    [Issue #2714 - @hughmcmaster]
   - Fix two rule-reload memory leak issues
     [Issue #2801 - @Abce, @martinhsv]
   - Correct whitespace handling for Include directive
