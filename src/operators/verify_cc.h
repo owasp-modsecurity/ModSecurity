@@ -16,6 +16,10 @@
 #ifndef SRC_OPERATORS_VERIFY_CC_H_
 #define SRC_OPERATORS_VERIFY_CC_H_
 
+#if HAVE_CONFIG_H
+#include "src/config.h"
+#endif
+
 #if WITH_PCRE2
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>

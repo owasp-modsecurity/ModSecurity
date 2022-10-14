@@ -12,6 +12,14 @@
  * directly using the email address security@modsecurity.org.
  *
  */
+
+#ifndef SRC_UTILS_REGEX_H_
+#define SRC_UTILS_REGEX_H_
+
+#if HAVE_CONFIG_H
+#include "src/config.h"
+#endif
+
 #if WITH_PCRE2
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
@@ -24,9 +32,6 @@
 #include <string>
 #include <list>
 #include <vector>
-
-#ifndef SRC_UTILS_REGEX_H_
-#define SRC_UTILS_REGEX_H_
 
 
 namespace modsecurity {
