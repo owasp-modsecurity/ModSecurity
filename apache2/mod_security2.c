@@ -105,39 +105,39 @@ static int server_limit, thread_limit;
 *
 * \param mp Pointer to memory pool
 */
-static void version(apr_pool_t *mp) {
+static void version(apr_pool_t *mp, server_rec *s) {
     char *pcre_vrs = NULL;
 
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s,
             "ModSecurity: APR compiled version=\"%s\"; "
             "loaded version=\"%s\"", APR_VERSION_STRING, apr_version_string());
 
     if (strstr(apr_version_string(), APR_VERSION_STRING) == NULL)    {
-        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Loaded APR do not match with compiled!");
+        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, s, "ModSecurity: Loaded APR do not match with compiled!");
     }
 
     pcre_vrs = apr_psprintf(mp,"%d.%d ", PCRE_MAJOR, PCRE_MINOR);
 
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s,
             "ModSecurity: PCRE compiled version=\"%s\"; "
             "loaded version=\"%s\"", pcre_vrs, pcre_version());
 
     if (strstr(pcre_version(),pcre_vrs) == NULL)    {
-        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Loaded PCRE do not match with compiled!");
+        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, s, "ModSecurity: Loaded PCRE do not match with compiled!");
     }
 
     /* Lua version function was removed in current 5.1. Need to check in future versions if it's back */
 #if defined(WITH_LUA)
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s,
             "ModSecurity: LUA compiled version=\"%s\"", LUA_VERSION);
 #endif /* WITH_LUA */
 
 #ifdef WITH_YAJL
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s,
             "ModSecurity: YAJL compiled version=\"%d.%d.%d\"", YAJL_MAJOR, YAJL_MINOR, YAJL_MICRO);
 #endif /* WITH_YAJL */
 
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s,
             "ModSecurity: LIBXML compiled version=\"%s\"", LIBXML_DOTTED_VERSION);
 }
 
@@ -762,7 +762,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
                 "%s configured.", MODSEC_MODULE_NAME_FULL);
 
-        version(mp);
+        version(mp, s);
 
         /* If we've changed the server signature make note of the original. */
         if (new_server_signature != NULL) {
@@ -776,7 +776,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
             msc_status_engine_call();
         }
         else {
-            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s,
                     "ModSecurity: Status engine is currently disabled, enable " \
                     "it by set SecStatusEngine to On.");
         }
@@ -796,14 +796,14 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         {
             if (remote_rules_server->amount_of_rules == 1)
             {
-                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s,
                     "ModSecurity: Loaded %d rule from: '%s'.",
                     remote_rules_server->amount_of_rules,
                     remote_rules_server->uri);
             }
             else
             {
-                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s,
                     "ModSecurity: Loaded %d rules from: '%s'.",
                     remote_rules_server->amount_of_rules,
                     remote_rules_server->uri);
@@ -812,7 +812,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
 #endif
         if (remote_rules_fail_message != NULL)
         {
-            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL, "ModSecurity: " \
+            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s, "ModSecurity: " \
                 "Problems loading external resources: %s",
                 remote_rules_fail_message);
         }
