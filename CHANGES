@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Support for PCRE2
+   [Issue #2737, #2827 - @martinhsv]
 
 07 Sep 2022 - 2.9.6
 -------------------

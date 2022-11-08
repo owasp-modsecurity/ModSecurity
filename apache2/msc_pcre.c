@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -20,6 +20,16 @@
  */
 static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
     if (regex != NULL) {
+#ifdef WITH_PCRE2
+        if (regex->match_context != NULL) {
+            pcre2_match_context_free(regex->match_context);
+            regex->match_context = NULL;
+        }
+        if (regex->re != NULL) {
+            pcre2_code_free(regex->re);
+            regex->re = NULL;
+        }
+#else
         if (regex->pe != NULL) {
 #if defined(VERSION_NGINX)
             pcre_free(regex->pe);
@@ -32,6 +42,7 @@ static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
             pcre_free(regex->re);
             regex->re = NULL;
         }
+#endif
     }
 
     return APR_SUCCESS;
@@ -48,6 +59,78 @@ static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
 void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
                       const char **_errptr, int *_erroffset,
                       int match_limit, int match_limit_recursion)
+#ifdef WITH_PCRE2
+{
+    msc_regex_t *regex = NULL;
+    PCRE2_SPTR pcre2_pattern;
+    uint32_t pcre2_options;
+    int error_number = 0;
+    PCRE2_SIZE error_offset = 0;
+    pcre2_match_context *match_context = NULL;
+
+    regex = apr_pcalloc(pool, sizeof(msc_regex_t));
+    if (regex == NULL) return NULL;
+    regex->pattern = pattern;
+
+    pcre2_pattern = (PCRE2_SPTR)pattern;
+    pcre2_options = (uint32_t)options;
+
+    regex->re = pcre2_compile(pcre2_pattern, PCRE2_ZERO_TERMINATED,
+        pcre2_options, &error_number, &error_offset, NULL);
+    if (regex->re == NULL) {
+        if (_erroffset != NULL) {
+            *_erroffset = (int)error_offset;
+        }
+        return NULL;
+    }
+
+    /* TODO: Add PCRE2 JIT support */
+
+    /* Setup the pcre2 match context */
+    regex->match_context = NULL;
+    match_context = pcre2_match_context_create(NULL);
+    if (match_context == NULL) {
+        return NULL;
+    }
+
+    /* Prefer the match limit passed as an arg; else use compilation default */
+    {
+        uint32_t final_match_limit = 0;
+        if (match_limit > 0) {
+            final_match_limit = match_limit;
+            pcre2_set_match_limit(match_context, final_match_limit);
+        }
+#ifdef MODSEC_PCRE_MATCH_LIMIT
+        else {
+            final_match_limit = MODSEC_PCRE_MATCH_LIMIT;
+            pcre2_set_match_limit(match_context, final_match_limit);
+        }
+#endif /* MODSEC_PCRE_MATCH_LIMIT */
+    }
+
+    /* Prefer the depth limit passed as an arg; else use compilation default */
+    {
+        uint32_t final_match_limit_recursion = 0;
+        if (match_limit_recursion > 0) {
+            final_match_limit_recursion = match_limit_recursion;
+            pcre2_set_depth_limit(match_context, final_match_limit_recursion);
+        }
+#ifdef MODSEC_PCRE_MATCH_LIMIT_RECURSION
+        else {
+            final_match_limit_recursion = MODSEC_PCRE_MATCH_LIMIT_RECURSION;
+            pcre2_set_depth_limit(match_context, final_match_limit_recursion);
+        }
+#endif /* MODSEC_PCRE_MATCH_LIMIT_RECURSION */
+    }
+
+    regex->match_context = match_context;
+
+    apr_pool_cleanup_register(pool, (void *)regex,
+        (apr_status_t (*)(void *))msc_pcre_cleanup, apr_pool_cleanup_null);
+
+    return regex;
+}
+#else /* not WITH_PCRE2 */
 {
     const char *errptr = NULL;
     int erroffset;
@@ -131,6 +214,7 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
 
     return regex;
 }
+#endif /* WITH_PCRE2 */
 
 /**
  * Compiles the provided regular expression pattern.  Calls msc_pregcomp_ex()
@@ -143,9 +227,9 @@ void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
 }
 
 /**
- * Executes regular expression with extended options.
- * Returns PCRE_ERROR_NOMATCH when there is no match, error code < -1
- * on errors, and a value > 0 when there is a match.
+ * Executes regular expression with extended options (or match context)
+ * Returns PCRE_ERROR_NOMATCH (or PCRE2_ERROR_NOMATCH),
+ * error code < -1 on errors, and a value > 0 when there is a match.
  */
 int msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
     int startoffset, int options, int *ovector, int ovecsize, char **error_msg)
@@ -153,7 +237,41 @@ int msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
     if (error_msg == NULL) return -1000; /* To differentiate from PCRE as it already uses -1. */
     *error_msg = NULL;
 
+#ifdef WITH_PCRE2
+    {
+        PCRE2_SPTR pcre2_s;
+        int pcre2_ret;
+        pcre2_match_data *match_data;
+	PCRE2_SIZE *pcre2_ovector = NULL;
+
+        pcre2_s = (PCRE2_SPTR)s;
+        match_data = pcre2_match_data_create_from_pattern(regex->re, NULL);
+
+	pcre2_ret = pcre2_match(regex->re, pcre2_s, (PCRE2_SIZE)strlen(s),
+            (PCRE2_SIZE)(startoffset), (uint32_t)options, match_data, regex->match_context);
+	if (match_data != NULL) {
+	    if (ovector != NULL) {
+	        pcre2_ovector = pcre2_get_ovector_pointer(match_data);
+	        if (pcre2_ovector != NULL) {
+                    for (int i = 0; ((i < pcre2_ret) && ((i*2) <= ovecsize)); i++) {
+                        if ((i*2) < ovecsize) {
+                            ovector[2*i] = pcre2_ovector[2*i];
+                            ovector[2*i+1] = pcre2_ovector[2*i+1];
+                        }
+	            }
+	        }
+	    }
+            pcre2_match_data_free(match_data);
+	}
+        if ((pcre2_ret*2) > ovecsize) {
+            return 0;
+        } else {
+            return pcre2_ret;
+        }
+    }
+#else
     return pcre_exec(regex->re, regex->pe, s, slen, startoffset, options, ovector, ovecsize);
+#endif
 }
 
 /**
@@ -188,6 +306,10 @@ int msc_regexec(msc_regex_t *regex, const char *s, unsigned int slen,
  */
 int msc_fullinfo(msc_regex_t *regex, int what, void *where)
 {
+#ifdef WITH_PCRE2
+    return pcre2_pattern_info(regex->re, (uint32_t)what, where);
+#else
     return pcre_fullinfo(regex->re, regex->pe, what, where);
+#endif
 }
 

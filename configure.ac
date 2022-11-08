@@ -865,6 +865,7 @@ AC_SUBST(APXS_MODULES)
 AC_SUBST(APXS_HTTPD)
 
 CHECK_PCRE()
+CHECK_PCRE2()
 if test "$build_apache2_module" -ne 0 -o "$build_mlogc" -ne 0; then
 CHECK_APR()
 CHECK_APU()

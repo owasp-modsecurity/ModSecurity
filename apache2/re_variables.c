@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -21,6 +21,9 @@
 
 #include "libxml/xpathInternals.h"
 
+#ifdef WITH_PCRE2
+#define PCRE_ERROR_NOMATCH PCRE2_ERROR_NOMATCH
+#endif
 /**
  * Generates a variable from a string and a length.
  */
@@ -64,12 +67,18 @@ static char *var_generic_list_validate(msre_ruleset *ruleset, msre_var *var) {
         msc_regex_t *regex = NULL;
         const char *errptr = NULL;
         const char *pattern = NULL;
+        int options = 0;
         int erroffset;
 
         pattern = apr_pstrmemdup(ruleset->mp, var->param + 1, strlen(var->param + 1) - 1);
         if (pattern == NULL) return FATAL_ERROR;
 
-        regex = msc_pregcomp(ruleset->mp, pattern, PCRE_DOTALL | PCRE_CASELESS | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset);
+#ifdef WITH_PCRE2
+        options = PCRE2_DOTALL | PCRE2_CASELESS | PCRE2_DOLLAR_ENDONLY;
+#else
+        options = PCRE_DOTALL | PCRE_CASELESS | PCRE_DOLLAR_ENDONLY;
+#endif
+        regex = msc_pregcomp(ruleset->mp, pattern, options, &errptr, &erroffset);
         if (regex == NULL) {
             return apr_psprintf(ruleset->mp, "Error compiling pattern (offset %d): %s",
                 erroffset, errptr);

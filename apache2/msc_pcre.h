@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -17,7 +17,14 @@
 
 typedef struct msc_regex_t msc_regex_t;
 
+#ifdef WITH_PCRE2
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include "pcre2.h"
+#else
 #include "pcre.h"
+#endif
+
+#ifndef WITH_PCRE2
 
 #ifndef PCRE_ERROR_MATCHLIMIT
 /* Define for compile, but not valid in this version of PCRE. */
@@ -29,12 +36,19 @@ typedef struct msc_regex_t msc_regex_t;
 #define PCRE_ERROR_RECURSIONLIMIT (-21)
 #endif /* PCRE_ERROR_RECURSIONLIMIT */
 
+#endif
+
 #include "apr_general.h"
 #include "modsecurity.h"
 
 struct msc_regex_t {
+#ifdef WITH_PCRE2
+    pcre2_code          *re;
+    pcre2_match_context *match_context;
+#else
     void            *re;
     void            *pe;
+#endif
     const char      *pattern;
 };
 

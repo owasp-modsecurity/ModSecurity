@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -697,7 +697,12 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
 
     /* Compile pattern */
     if(strstr(pattern,"%{") == NULL)    {
-        regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+#ifdef WITH_PCRE2
+        int options = PCRE2_DOTALL | PCRE2_DOLLAR_ENDONLY;
+#else
+        int options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
+#endif
+        regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
         if (regex == NULL) {
             *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
                     erroffset, errptr);
@@ -747,6 +752,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
     const char *target;
     const char *errptr = NULL;
     int erroffset;
+    int options = 0;
     unsigned int target_length;
     char *my_error_msg = NULL;
     int ovector[33];
@@ -786,7 +792,12 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
                 msr_log(msr, 6, "Escaping pattern [%s]",pattern);
             }
 
-            regex = msc_pregcomp_ex(msr->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr,
+#ifdef WITH_PCRE2
+            options = PCRE2_DOTALL | PCRE2_DOLLAR_ENDONLY;
+#else
+            options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
+#endif
+            regex = msc_pregcomp_ex(msr->mp, pattern, options, &errptr,
                     &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
             if (regex == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Error compiling pattern (offset %d): %s",
@@ -831,7 +842,11 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
      * and no memory has to be allocated for any backreferences.
      */
     rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
+#ifdef WITH_PCRE2
+    if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
+#else
     if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
+#endif
         msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
 
         if (s == NULL) return -1;
@@ -861,7 +876,11 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
         return -1;
     }
 
+#ifdef WITH_PCRE2
+    if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
+#else
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
+#endif
         /* We no longer escape the pattern here as it is done when logging */
         char *pattern = apr_pstrdup(msr->mp, log_escape(msr->mp, regex->pattern ? regex->pattern : "<Unknown Match>"));
         char *hmac = NULL, *valid = NULL;
@@ -940,7 +959,12 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
 
     /* Compile pattern */
     if(strstr(pattern,"%{") == NULL)    {
-        regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+#ifdef WITH_PCRE2
+        int options = PCRE2_DOTALL | PCRE2_DOLLAR_ENDONLY;
+#else
+        int options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
+#endif
+        regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
         if (regex == NULL) {
             *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
                     erroffset, errptr);
@@ -979,6 +1003,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     const char *target;
     const char *errptr = NULL;
     int erroffset;
+    int options = 0;
     unsigned int target_length;
     char *my_error_msg = NULL;
     int ovector[33];
@@ -1020,7 +1045,12 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                 msr_log(msr, 6, "Escaping pattern [%s]",pattern);
             }
 
-            regex = msc_pregcomp_ex(msr->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+#ifdef WITH_PCRE2
+        options = PCRE2_DOTALL | PCRE2_DOLLAR_ENDONLY;
+#else
+        options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
+#endif
+            regex = msc_pregcomp_ex(msr->mp, pattern, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
             if (regex == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Error compiling pattern (offset %d): %s",
                         erroffset, errptr);
@@ -1075,7 +1105,11 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     /* Show when the regex captures but "capture" is not set */
     if (msr->txcfg->debuglog_level >= 6) {
         int capcount = 0;
+#ifdef WITH_PCRE2
+        rc = msc_fullinfo(regex, PCRE2_INFO_CAPTURECOUNT, &capcount);
+#else
         rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
+#endif
         if (msr->txcfg->debuglog_level >= 6) {
             if ((capture == 0) && (capcount > 0)) {
                 msr_log(msr, 6, "Ignoring regex captures since \"capture\" action is not enabled.");
@@ -1087,7 +1121,11 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
      * and no memory has to be allocated for any backreferences.
      */
     rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
+#ifdef WITH_PCRE2
+    if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
+#else
     if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
+#endif
         msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
 
         if (s == NULL) return -1;
@@ -1178,7 +1216,11 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         }
     }
 
+#ifdef WITH_PCRE2
+    if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
+#else
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
+#endif
         /* We no longer escape the pattern here as it is done when logging */
         char *pattern = apr_pstrdup(msr->mp, log_escape(msr->mp, regex->pattern ? regex->pattern : "<Unknown Match>"));
 
@@ -1623,13 +1665,19 @@ static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned 
 static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
+    int options = 0;
     msc_regex_t *regex;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     /* Compile rule->op_param */
-    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+#ifdef WITH_PCRE2
+    options = PCRE2_DOTALL | PCRE2_MULTILINE;
+#else
+    options = PCRE_DOTALL | PCRE_MULTILINE;
+#endif
+    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
 
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
@@ -1659,6 +1707,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     char *my_error_msg = NULL;
     int ovector[33];
     unsigned int offset = 0;
+    int options = 0;
     gsb_db *gsb = msr->txcfg->gsb;
     const char *match = NULL;
     unsigned int match_length;
@@ -1697,7 +1746,12 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
     memcpy(data,var->value,var->value_len);
 
-    while (offset < size && (rv = msc_regexec_ex(regex, data, size, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg)) >= 0)
+#ifdef WITH_PCRE2
+    options = PCRE2_NOTEMPTY;
+#else
+    options = PCRE_NOTEMPTY;
+#endif
+    while (offset < size && (rv = msc_regexec_ex(regex, data, size, offset, options, ovector, 30, &my_error_msg)) >= 0)
     {
         for(i = 0; i < rv; ++i)
         {
@@ -2731,13 +2785,19 @@ static int luhn_verify(const char *ccnumber, int len) {
 static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
+    int options = 0;
     msc_regex_t *regex;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
+#ifdef WITH_PCRE2
+    options = PCRE2_DOTALL | PCRE2_MULTILINE;
+#else
+    options = PCRE_DOTALL | PCRE_MULTILINE;
+#endif
     /* Compile rule->op_param */
-    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
                 erroffset, errptr);
@@ -2758,6 +2818,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     int rc;
     int is_cc = 0;
     int offset;
+    int options = 0;
     int matched_bytes = 0;
     char *qspos = NULL;
     const char *parm = NULL;
@@ -2817,10 +2878,19 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
             }
         }
 
-        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg);
+#ifdef WITH_PCRE2
+        options = PCRE2_NOTEMPTY;
+#else
+        options = PCRE_NOTEMPTY;
+#endif
+        rc = msc_regexec_ex(regex, target, target_length, offset, options, ovector, 30, &my_error_msg);
 
         /* If there was no match, then we are done. */
+#ifdef WITH_PCRE2
+        if (rc == PCRE2_ERROR_NOMATCH) {
+#else
         if (rc == PCRE_ERROR_NOMATCH) {
+#endif
             break;
         }
 
@@ -3029,13 +3099,19 @@ static int cpf_verify(const char *cpfnumber, int len) {
 static int msre_op_verifyCPF_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
+    int options = 0;
     msc_regex_t *regex;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
+#ifdef WITH_PCRE2
+    options = PCRE2_DOTALL | PCRE2_MULTILINE;
+#else
+    options = PCRE_DOTALL | PCRE_MULTILINE;
+#endif
     /* Compile rule->op_param */
-    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
                 erroffset, errptr);
@@ -3068,6 +3144,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     int rc;
     int is_cpf = 0;
     int offset;
+    int options = 0;
     int matched_bytes = 0;
     char *qspos = NULL;
     const char *parm = NULL;
@@ -3127,10 +3204,19 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             }
         }
 
-        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg);
+#ifdef WITH_PCRE2
+        options = PCRE2_NOTEMPTY;
+#else
+        options = PCRE_NOTEMPTY;
+#endif
+        rc = msc_regexec_ex(regex, target, target_length, offset, options, ovector, 30, &my_error_msg);
 
         /* If there was no match, then we are done. */
+#ifdef WITH_PCRE2
+        if (rc == PCRE2_ERROR_NOMATCH) {
+#else
         if (rc == PCRE_ERROR_NOMATCH) {
+#endif
             break;
         }
 
@@ -3323,13 +3409,19 @@ invalid:
 static int msre_op_verifySSN_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
+    int options = 0;
     msc_regex_t *regex;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
+#ifdef WITH_PCRE2
+    options = PCRE2_DOTALL | PCRE2_MULTILINE;
+#else
+    options = PCRE_DOTALL | PCRE_MULTILINE;
+#endif
     /* Compile rule->op_param */
-    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
             erroffset, errptr);
@@ -3362,6 +3454,7 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     int rc;
     int is_ssn = 0;
     int offset;
+    int options = 0;
     int matched_bytes = 0;
     char *qspos = NULL;
     const char *parm = NULL;
@@ -3421,10 +3514,19 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             }
         }
 
-        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg);
+#ifdef WITH_PCRE2
+        options = PCRE2_NOTEMPTY;
+#else
+        options = PCRE_NOTEMPTY;
+#endif
+        rc = msc_regexec_ex(regex, target, target_length, offset, options, ovector, 30, &my_error_msg);
 
         /* If there was no match, then we are done. */
+#ifdef WITH_PCRE2
+        if (rc == PCRE2_ERROR_NOMATCH) {
+#else
         if (rc == PCRE_ERROR_NOMATCH) {
+#endif
             break;
         }
 

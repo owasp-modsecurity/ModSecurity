@@ -82,7 +82,6 @@ AC_SUBST(PCRE_LD_PATH)
 
 if test -z "${PCRE_VERSION}"; then
     AC_MSG_NOTICE([*** pcre library not found.])
-    ifelse([$2], , AC_MSG_ERROR([pcre library is required]), $2)
 else
     AC_MSG_NOTICE([using pcre v${PCRE_VERSION}])
     ifelse([$1], , , $1) 

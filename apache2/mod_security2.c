@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -107,6 +107,8 @@ static int server_limit, thread_limit;
 */
 static void version(apr_pool_t *mp) {
     char *pcre_vrs = NULL;
+    char *pcre_loaded_vrs = NULL;
+    char pcre2_loaded_vrs_buffer[80] ={0};
 
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
             "ModSecurity: APR compiled version=\"%s\"; "
@@ -116,13 +118,20 @@ static void version(apr_pool_t *mp) {
         ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Loaded APR do not match with compiled!");
     }
 
+#ifdef WITH_PCRE2
+    pcre_vrs = apr_psprintf(mp,"%d.%d ", PCRE2_MAJOR, PCRE2_MINOR);
+    pcre_loaded_vrs = pcre2_loaded_vrs_buffer;
+    pcre2_config(PCRE2_CONFIG_VERSION, pcre_loaded_vrs);
+#else
     pcre_vrs = apr_psprintf(mp,"%d.%d ", PCRE_MAJOR, PCRE_MINOR);
+    pcre_loaded_vrs = pcre_version();
+#endif
 
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
             "ModSecurity: PCRE compiled version=\"%s\"; "
-            "loaded version=\"%s\"", pcre_vrs, pcre_version());
+            "loaded version=\"%s\"", pcre_vrs, pcre_loaded_vrs);
 
-    if (strstr(pcre_version(),pcre_vrs) == NULL)    {
+    if (strstr(pcre_loaded_vrs,pcre_vrs) == NULL)    {
         ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Loaded PCRE do not match with compiled!");
     }
 

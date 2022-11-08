@@ -42,6 +42,7 @@ mod_security2_la_CFLAGS = @APR_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
+    @PCRE2_CFLAGS@ \
     @YAJL_CFLAGS@ \
     @SSDEEP_CFLAGS@
 
@@ -50,7 +51,8 @@ mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ \
     @CURL_CPPFLAGS@ \
     @LIBXML2_CFLAGS@ \
     @LIBXML2_CPPFLAGS@ \
-    @PCRE_CPPFLAGS@
+    @PCRE_CPPFLAGS@ \
+    @PCRE2_CPPFLAGS@
 
 mod_security2_la_LIBADD = @APR_LDADD@ \
     @APU_LDADD@ \
@@ -59,6 +61,7 @@ mod_security2_la_LIBADD = @APR_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
+    @PCRE2_LDADD@ \
     @YAJL_LDADD@
 
 if AIX
@@ -71,6 +74,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 endif
@@ -85,6 +89,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 endif
@@ -99,6 +104,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 endif
@@ -113,6 +119,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 endif
@@ -127,6 +134,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version -R @PCRE_LD_PATH
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 endif
@@ -141,6 +149,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 endif
@@ -155,6 +164,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 endif
@@ -169,6 +179,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 endif

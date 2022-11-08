@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -561,7 +561,11 @@ static int is_response_status_relevant(modsec_rec *msr, int status) {
 
     rc = msc_regexec(msr->txcfg->auditlog_relevant_regex, buf, strlen(buf), &my_error_msg);
     if (rc >= 0) return 1;
+#ifdef WITH_PCRE2
+    if (rc == PCRE2_ERROR_NOMATCH) return 0;
+#else
     if (rc == PCRE_ERROR_NOMATCH) return 0;
+#endif
 
     msr_log(msr, 1, "Regex processing failed (rc %d): %s", rc, my_error_msg);
     

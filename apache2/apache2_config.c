@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -1293,7 +1293,11 @@ static const char *cmd_audit_log_relevant_status(cmd_parms *cmd, void *_dcfg,
 {
     directory_config *dcfg = _dcfg;
 
+#ifdef WITH_PCRE2
+    dcfg->auditlog_relevant_regex = msc_pregcomp(cmd->pool, p1, PCRE2_DOTALL, NULL, NULL);
+#else
     dcfg->auditlog_relevant_regex = msc_pregcomp(cmd->pool, p1, PCRE_DOTALL, NULL, NULL);
+#endif
     if (dcfg->auditlog_relevant_regex == NULL) {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p1);
     }

@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -345,8 +345,13 @@ int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len) 
 
     apr = APR_VERSION_STRING;
     apr_loaded = apr_version_string();
+#ifdef WITH_PCRE2
+    apr_snprintf(pcre, 7, "%d.%d", PCRE2_MAJOR, PCRE2_MINOR);
+    pcre_loaded = ""; /* complete this if/when status reactivated */
+#else
     apr_snprintf(pcre, 7, "%d.%d", PCRE_MAJOR, PCRE_MINOR);
     pcre_loaded = pcre_version();
+#endif
 #ifdef WITH_LUA
     lua = LUA_VERSION;
 #endif
