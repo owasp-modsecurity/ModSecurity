@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -28,7 +28,12 @@
 #if APR_HAVE_UNISTD_H
 #include <unistd.h>         /* for getpid() */
 #endif
+#ifdef WITH_PCRE2
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+#else
 #include <pcre.h>
+#endif
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -147,7 +152,13 @@ static int                    keep_alive = 150;           /* Not used yet. */
 static int                    keep_alive_timeout = 300;   /* Not used yet. */
 static int                    keep_entries = 0;
 static const char            *log_repository = NULL;
+#ifdef WITH_PCRE2
+static pcre2_code            *logline_regex = NULL;
+static pcre2_code            *requestline_regex = NULL;
+#else
 static void                  *logline_regex = NULL;
+static void                  *requestline_regex = NULL;
+#endif
 static int                    max_connections = 10;
 static int                    max_worker_requests = 1000;
 static apr_global_mutex_t    *gmutex = NULL;
@@ -161,7 +172,6 @@ static int                    ssl_validation = 0;
 static int                    tlsprotocol = 1;
 static curl_version_info_data* curlversion = NULL;
 /* static apr_time_t             queue_time = 0; */
-static void                  *requestline_regex = NULL;
 static int                    running = 0;
 static const char            *sensor_password = NULL;
 static const char            *sensor_username = NULL;
@@ -1208,6 +1218,10 @@ static void logc_init(void)
     int i, erroffset;
     /* cURL major, minor and patch version */
     short cmaj, cmin, cpat = 0;
+#ifdef WITH_PCRE2
+    int pcre2_errorcode = 0;
+    PCRE2_SIZE pcre2_erroffset = 0;
+#endif
 
     queue = apr_array_make(pool, 64, sizeof(entry_t *));
     if (queue == NULL) {
@@ -1311,16 +1325,26 @@ static void logc_init(void)
     	error_log(LOG_DEBUG2, NULL, "TLSv1.2 is unsupported in cURL %d.%d.%d",  cmaj, cmin, cpat);
     }
 
+#ifdef WITH_PCRE2
+    logline_regex = pcre2_compile(logline_pattern, PCRE2_ZERO_TERMINATED, PCRE2_CASELESS,
+                                 &pcre2_errorcode, &pcre2_erroffset, NULL);
+#else
     logline_regex = pcre_compile(logline_pattern, PCRE_CASELESS,
                                  &errptr, &erroffset, NULL);
+#endif
     if (logline_regex == NULL) {
         error_log(LOG_ERROR, NULL,
                   "Failed to compile pattern: %s\n", logline_pattern);
         logc_shutdown(1);
     }
 
-    requestline_regex = pcre_compile(requestline_pattern,
-                                     PCRE_CASELESS, &errptr, &erroffset, NULL);
+#ifdef WITH_PCRE2
+    requestline_regex = pcre2_compile(requestline_pattern, PCRE2_ZERO_TERMINATED, PCRE2_CASELESS,
+                                     &pcre2_errorcode, &pcre2_erroffset, NULL);
+#else
+    requestline_regex = pcre_compile(requestline_pattern, PCRE_CASELESS,
+                                     &errptr, &erroffset, NULL);
+#endif
     if (requestline_regex == NULL) {
         error_log(LOG_ERROR, NULL,
                   "Failed to compile pattern: %s\n", requestline_pattern);
@@ -1431,6 +1455,9 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
     apr_status_t rc;
     apr_finfo_t finfo;
     int capturevector[CAPTUREVECTORSIZE];
+#ifdef WITH_PCRE2
+    pcre2_match_data *pcre2_match_data = NULL;
+#endif
     int take_new = 1;
     apr_pool_t *tpool;
     struct curl_slist *headerlist = NULL;
@@ -1536,9 +1563,24 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
             num_requests++;
         }
 
+#ifdef WITH_PCRE2
+        pcre2_match_data  = pcre2_match_data_create_from_pattern(logline_regex, NULL);
+        rc = pcre2_match(logline_regex, entry->line, entry->line_size, 0, 0,
+            pcre2_match_data, NULL);
+	if (rc > 0) {
+            PCRE2_SIZE *pcre2_ovector = pcre2_get_ovector_pointer(pcre2_match_data);
+            for (int i = 0; i < rc; i++) {
+                capturevector[2*i] = pcre2_ovector[2*i];
+                capturevector[2*i+1] = pcre2_ovector[2*i+1];
+            }
+        }
+        pcre2_match_data_free(pcre2_match_data);
+        if (rc == PCRE2_ERROR_NOMATCH) {
+#else
         rc = pcre_exec(logline_regex, NULL, entry->line, entry->line_size, 0, 0,
             capturevector, CAPTUREVECTORSIZE);
-        if (rc == PCRE_ERROR_NOMATCH) { /* No match. */
+        if (rc == PCRE_ERROR_NOMATCH) {
+#endif
             error_log(LOG_WARNING, thread,
                       "Invalid entry (failed to match regex): %s",
                       _log_escape(tpool, entry->line, entry->line_size));
@@ -2292,6 +2334,11 @@ static void usage(void) {
  * Version text.
  */
 static void version(void) {
+#ifdef WITH_PCRE2
+    char pcre2_loaded_version_buffer[80] ={0};
+    char *pcre_loaded_version = pcre2_loaded_version_buffer;
+    pcre2_config(PCRE2_CONFIG_VERSION, pcre_loaded_version);
+#endif
     fprintf(stderr,
             "ModSecurity Log Collector (mlogc) v%s\n", VERSION);
     fprintf(stderr,
@@ -2299,7 +2346,11 @@ static void version(void) {
             "loaded=\"%s\"\n", APR_VERSION_STRING, apr_version_string());
     fprintf(stderr,
             "  PCRE: compiled=\"%d.%d\"; "
+#ifdef WITH_PCRE2
+            "loaded=\"%s\"\n", PCRE2_MAJOR, PCRE2_MINOR, pcre_loaded_version);
+#else
             "loaded=\"%s\"\n", PCRE_MAJOR, PCRE_MINOR, pcre_version());
+#endif
     fprintf(stderr,
             "  cURL: compiled=\"%s\"; "
             "loaded=\"%s\"\n", LIBCURL_VERSION, curl_version());
