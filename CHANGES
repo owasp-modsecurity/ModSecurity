@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - During configure, do not check for pcre if pcre2 specified
+    [Issue #2750 - @dvershinin, @martinhsv]
   - Use pkg-config to find libxml2 first
     [Issue #2714 - @hughmcmaster]
   - Fix two rule-reload memory leak issues
