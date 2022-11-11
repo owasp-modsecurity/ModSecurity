@@ -229,7 +229,7 @@ AC_SUBST([MSC_GIT_VERSION])
 
 
 AC_ARG_ENABLE(debug-logs,
-    [AC_HELP_STRING([--disable-debug-logs],[Turn off the SecDebugLog feature])],
+    [AS_HELP_STRING([--disable-debug-logs],[Turn off the SecDebugLog feature])],
 
     [case "${enableval}" in
         yes) debugLogs=true ;;
@@ -247,7 +247,7 @@ fi
 
 # Fuzzer
 AC_ARG_ENABLE(afl-fuzz,
-    [AC_HELP_STRING([--enable-afl-fuzz],[Turn on the afl fuzzer compilation utilities])],
+    [AS_HELP_STRING([--enable-afl-fuzz],[Turn on the afl fuzzer compilation utilities])],
 
     [case "${enableval}" in
         yes) aflFuzzer=true ;;
@@ -260,7 +260,7 @@ AC_ARG_ENABLE(afl-fuzz,
 
 # Examples
 AC_ARG_ENABLE(examples,
-    [AC_HELP_STRING([--enable-examples],[Turn on the examples compilation (default option)])],
+    [AS_HELP_STRING([--enable-examples],[Turn on the examples compilation (default option)])],
 
     [case "${enableval}" in
         yes) buildExamples=true ;;
@@ -273,7 +273,7 @@ AC_ARG_ENABLE(examples,
 
 # Parser
 AC_ARG_ENABLE(parser-generation,
-    [AC_HELP_STRING([--enable-parser-generation],[Enables parser generation during the build])],
+    [AS_HELP_STRING([--enable-parser-generation],[Enables parser generation during the build])],
 
     [case "${enableval}" in
         yes) buildParser=true ;;
@@ -286,7 +286,7 @@ AC_ARG_ENABLE(parser-generation,
 
 # Mutex
 AC_ARG_ENABLE(mutex-on-pm,
-    [AC_HELP_STRING([--enable-mutex-on-pm],[Treats pm operations as a critical section])],
+    [AS_HELP_STRING([--enable-mutex-on-pm],[Treats pm operations as a critical section])],
 
     [case "${enableval}" in
         yes) mutexPm=true ;;

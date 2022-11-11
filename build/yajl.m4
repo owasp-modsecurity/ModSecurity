@@ -21,10 +21,7 @@ YAJL_LDFLAGS=""
 
 AC_ARG_WITH(
     yajl,
-    AC_HELP_STRING(
-      [--with-yajl=PATH],
-      [Path to yajl prefix or config script]
-    )
+    [AS_HELP_STRING([--with-yajl=PATH],[Path to yajl prefix or config script])]
 )
 
 if test "x${with_yajl}" == "xno"; then

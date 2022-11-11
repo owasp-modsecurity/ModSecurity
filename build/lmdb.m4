@@ -21,10 +21,7 @@ LMDB_LDFLAGS=""
 
 AC_ARG_WITH(
     lmdb,
-    AC_HELP_STRING(
-      [--with-lmdb=PATH],
-      [Path to lmdb prefix or config script]
-    )
+    [AS_HELP_STRING([--with-lmdb=PATH],[Path to lmdb prefix or config script])]
 )
 
 if test "x${with_lmdb}" == "xno"; then

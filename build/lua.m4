@@ -22,10 +22,7 @@ LUA_DISPLAY=""
 
 AC_ARG_WITH(
     lua,
-    AC_HELP_STRING(
-    [--with-lua=PATH],
-    [Path to lua prefix]
-    )
+    [AS_HELP_STRING([--with-lua=PATH],[Path to lua prefix])]
 )
 
 

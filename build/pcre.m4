@@ -17,7 +17,7 @@ AC_DEFUN([CHECK_PCRE],
 
 AC_ARG_WITH(
     pcre,
-    [AC_HELP_STRING([--with-pcre=PATH],[Path to pcre prefix or config script])],
+    [AS_HELP_STRING([--with-pcre=PATH],[Path to pcre prefix or config script])],
     [test_paths="${with_pcre}"],
     [test_paths="/usr/local/libpcre /usr/local/pcre /usr/local /opt/libpcre /opt/pcre /opt /usr /opt/local"])
 

@@ -64,7 +64,7 @@ AC_DEFUN([CHECK_LIBXML2], [
 
 AC_ARG_WITH(
     libxml,
-    [AC_HELP_STRING([--with-libxml=PATH],[Path to libxml2 prefix or config script])],
+    [AS_HELP_STRING([--with-libxml=PATH],[Path to libxml2 prefix or config script])],
     [test_paths="${with_libxml}"],
     [test_paths="/usr/local/libxml2 /usr/local/xml2 /usr/local/xml /usr/local /opt/libxml2 /opt/libxml /opt/xml2 /opt/xml /opt /usr"])
 
