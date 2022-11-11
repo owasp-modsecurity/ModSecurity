@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Use AS_HELP_STRING instead of obsolete AC_HELP_STRING macro
+    [Issue #2806 - @hughmcmaster]
   - During configure, do not check for pcre if pcre2 specified
     [Issue #2750 - @dvershinin, @martinhsv]
   - Use pkg-config to find libxml2 first
