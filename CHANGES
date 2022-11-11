@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Use pkg-config to find libxml2 first
+   [Issue #2818 - @hughmcmaster]
  * Support for PCRE2 in mlogc
    [Issue #2737, #2827 - @martinhsv]
  * Support for PCRE2
