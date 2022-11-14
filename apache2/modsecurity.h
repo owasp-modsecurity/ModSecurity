@@ -145,6 +145,9 @@ extern DSOLOCAL char *real_server_signature;
 extern DSOLOCAL char *chroot_dir;
 
 extern module AP_MODULE_DECLARE_DATA security2_module;
+#ifdef APLOG_USE_MODULE
+    APLOG_USE_MODULE(security2);
+#endif
 
 extern DSOLOCAL const command_rec module_directives[];
 
