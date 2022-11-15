@@ -27,6 +27,10 @@
 #include <curl/curl.h>
 #endif
 
+#ifdef APLOG_USE_MODULE
+    APLOG_USE_MODULE(security2);
+#endif
+
 unsigned long int DSOLOCAL unicode_codepage = 0;
 
 int DSOLOCAL *unicode_map_table = NULL;

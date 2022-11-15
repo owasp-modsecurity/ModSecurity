@@ -18,6 +18,10 @@
 #include "apache2.h"
 #include "msc_crypt.h"
 
+#ifdef APLOG_USE_MODULE
+    APLOG_USE_MODULE(security2);
+#endif
+
 /* -- Input filter -- */
 
 #if 0

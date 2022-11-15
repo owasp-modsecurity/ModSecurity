@@ -17,6 +17,10 @@
 #include "http_core.h"
 #include "util_script.h"
 
+#ifdef APLOG_USE_MODULE
+    APLOG_USE_MODULE(security2);
+#endif
+
 /**
  * Sends a brigade with an error bucket down the filter chain.
  */
