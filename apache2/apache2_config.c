@@ -26,6 +26,9 @@
 #include "msc_lua.h"
 #endif
 
+#ifdef APLOG_USE_MODULE
+    APLOG_USE_MODULE(security2);
+#endif
 
 /* -- Directory context creation and initialisation -- */
 

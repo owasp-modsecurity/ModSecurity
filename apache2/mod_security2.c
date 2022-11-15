@@ -46,6 +46,10 @@
 #include <yajl/yajl_version.h>
 #endif /* WITH_YAJL */
 
+#ifdef APLOG_USE_MODULE
+    APLOG_USE_MODULE(security2);
+#endif
+
 /* ModSecurity structure */
 
 msc_engine DSOLOCAL *modsecurity = NULL;

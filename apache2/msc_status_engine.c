@@ -45,6 +45,10 @@
 #include <sys/utsname.h>
 #endif
 
+#ifdef APLOG_USE_MODULE
+    APLOG_USE_MODULE(security2);
+#endif
+
 // Bese32 encode, based on:
 // https://code.google.com/p/google-authenticator/source/browse/libpam/base32.c
 int DSOLOCAL msc_status_engine_base32_encode(char *encoded,
@@ -504,4 +508,3 @@ failed_beacon_string_malloc:
 
     return ret;
 }
-
