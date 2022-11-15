@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Adjustment of previous fix for log messages
+   [Issue #2832 - @marcstern, @erkia]
  * Mark apache error log messages as from mod_security2
    [Issue #2781 - @erkia]
  * Use pkg-config to find libxml2 first
