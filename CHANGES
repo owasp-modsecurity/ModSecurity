@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Only check for pcre2 install if required
+   [Issue #2833 - @martinhsv]
  * Adjustment of previous fix for log messages
    [Issue #2832 - @marcstern, @erkia]
  * Mark apache error log messages as from mod_security2
