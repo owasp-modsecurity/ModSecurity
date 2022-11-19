@@ -1220,7 +1220,7 @@ int Multipart::multipart_complete(std::string *error) {
                 m->m_tmp_file_size.second,
                 m->m_tmp_file_size.first);
 
-            m_transaction->m_variableFilesTmpContent.set(m->m_filename,
+            m_transaction->m_variableFilesTmpContent.set(m->m_name,
                m->m_value, m->m_valueOffset);
 
             file_combined_size = file_combined_size + m->m_tmp_file_size.first;
