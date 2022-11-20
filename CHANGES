@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Fix: handle error with SecConnReadStateLimit configuration
+   [Issue #2815, #2834 - @marcstern, @martinhsv]
  * Only check for pcre2 install if required
    [Issue #2833 - @martinhsv]
  * Adjustment of previous fix for log messages
