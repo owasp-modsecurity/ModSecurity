@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: FILES_TMP_CONTENT collection key should use part name
+    [Issue #2831 - @airween]
   - Use AS_HELP_STRING instead of obsolete AC_HELP_STRING macro
     [Issue #2806 - @hughmcmaster]
   - During configure, do not check for pcre if pcre2 specified
