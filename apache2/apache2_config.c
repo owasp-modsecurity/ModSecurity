@@ -1732,6 +1732,12 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
     char *param = strchr(p2, ' ');
     char *file = NULL;
     char *error_msg = NULL;
+
+    if (param == NULL) {
+        return apr_psprintf(mp, "ModSecurity: Space character between operator " \
+           "and parameter not found with ConnReadStateLimit: %s", p2);
+    }
+
     param++;
 
     config_orig_path = apr_pstrndup(mp, filename,
