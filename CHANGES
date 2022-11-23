@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Use uid for user if apr_uid_name_get() fails
+   [Issue #2046 - @arminabf, @marcstern]
  * Fix: handle error with SecConnReadStateLimit configuration
    [Issue #2815, #2834 - @marcstern, @martinhsv]
  * Only check for pcre2 install if required
