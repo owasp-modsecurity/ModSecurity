@@ -122,9 +122,11 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
         if (m_pcje == 0) {
             rc = pcre2_jit_match(m_pc, pcre2_s, s.length(),
                             offset, 0, match_data, NULL);
-        } else {
+        } 
+        
+        if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
             rc = pcre2_match(m_pc, pcre2_s, s.length(),
-                            offset, 0, match_data, NULL);
+                            offset, PCRE2_NO_JIT, match_data, NULL);
         }
         PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
 #else
@@ -168,8 +170,10 @@ bool Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& cap
     int rc;
     if (m_pcje == 0) {
         rc = pcre2_jit_match(m_pc, pcre2_s, s.length(), 0, 0, match_data, NULL);
-    } else {
-        rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, 0, match_data, NULL);
+    } 
+    
+    if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+        rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, PCRE2_NO_JIT, match_data, NULL);
     }
     PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
 #else
@@ -285,9 +289,11 @@ int Regex::search(const std::string& s, SMatch *match) const {
     if (m_pcje == 0) {
         ret = pcre2_match(m_pc, pcre2_s, s.length(),
             0, 0, match_data, NULL) > 0;
-    } else {
+    } 
+    
+    if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
         ret = pcre2_match(m_pc, pcre2_s, s.length(),
-            0, 0, match_data, NULL) > 0;
+            0, PCRE2_NO_JIT, match_data, NULL) > 0;
     }
     if (ret > 0) { // match
         PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
@@ -316,8 +322,10 @@ int Regex::search(const std::string& s) const {
     int rc;
     if (m_pcje == 0) {
         rc = pcre2_jit_match(m_pc, pcre2_s, s.length(), 0, 0, match_data, NULL);
-    } else {
-        rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, 0, match_data, NULL);
+    }
+
+    if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+        rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, PCRE2_NO_JIT, match_data, NULL);
     }
     pcre2_match_data_free(match_data);
     if (rc > 0) {
