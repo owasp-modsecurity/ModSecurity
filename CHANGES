@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Support comments in ipMatchFromFile file via '#' token
+    [Issue #2554 - @tomsommer, @martinhsv]
   - Fix: FILES_TMP_CONTENT collection key should use part name
     [Issue #2831 - @airween]
   - Use AS_HELP_STRING instead of obsolete AC_HELP_STRING macro

@@ -88,6 +88,10 @@ IpTree::~IpTree() {
 bool IpTree::addFromBuffer(std::istream *ss, std::string *error) {
     char *error_msg = NULL;
     for (std::string line; std::getline(*ss, line); ) {
+        size_t comment_start = line.find('#');
+        if (comment_start != std::string::npos) {
+            line = line.substr(0, comment_start);
+        }
         int res = add_ip_from_param(line.c_str(), &m_tree, &error_msg);
         if (res != 0) {
             if (error_msg != NULL) {
