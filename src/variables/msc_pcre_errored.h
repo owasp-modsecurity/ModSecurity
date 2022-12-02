@@ -19,8 +19,8 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLES_RX_ERROR_H_
-#define SRC_VARIABLES_RX_ERROR_H_
+#ifndef SRC_VARIABLES_MSC_PCRE_ERRORED_H_
+#define SRC_VARIABLES_MSC_PCRE_ERRORED_H_
 
 #include "src/variables/variable.h"
 
@@ -30,10 +30,10 @@ class Transaction;
 namespace variables {
 
 
-DEFINE_VARIABLE(RxError, RX_ERROR, m_variableRxError)
+DEFINE_VARIABLE(MscPcreErrored, MSC_PCRE_ERRORED, m_variableMscPcreErrored)
 
 
 }  // namespace variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_RX_ERROR_H_
+#endif  // SRC_VARIABLES_MSC_PCRE_ERRORED_H_

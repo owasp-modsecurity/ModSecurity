@@ -186,6 +186,8 @@ VARIABLE_GLOBAL                           (?i:GLOBAL)
 VARIABLE_INBOUND_DATA_ERROR               (?i:INBOUND_DATA_ERROR)
 VARIABLE_MATCHED_VAR                      (?i:MATCHED_VAR)
 VARIABLE_MATCHED_VAR_NAME                 (?i:MATCHED_VAR_NAME)
+VARIABLE_MSC_PCRE_ERRORED                 (?i:MSC_PCRE_ERRORED)
+VARIABLE_MSC_PCRE_LIMITS_EXCEEDED         (?i:MSC_PCRE_LIMITS_EXCEEDED)
 VARIABLE_MULTIPART_BOUNDARY_QUOTED        (?i:MULTIPART_BOUNDARY_QUOTED)
 VARIABLE_MULTIPART_BOUNDARY_WHITESPACE    (?i:MULTIPART_BOUNDARY_WHITESPACE)
 VARIABLE_MULTIPART_CRLF_LF_LINES          (?i:MULTIPART_CRLF_LF_LINES)
@@ -231,8 +233,6 @@ VARIABLE_RESPONSE_CONTENT_TYPE            (?i:RESPONSE_CONTENT_TYPE)
 VARIABLE_RESPONSE_HEADERS_NAMES           (?i:RESPONSE_HEADERS_NAMES)
 VARIABLE_RESPONSE_PROTOCOL                (?i:RESPONSE_PROTOCOL)
 VARIABLE_RESPONSE_STATUS                  (?i:RESPONSE_STATUS)
-VARIABLE_RX_ERROR                         (?i:RX_ERROR)
-VARIABLE_RX_ERROR_RULE_ID                 (?i:RX_ERROR_RULE_ID)
 VARIABLE_SERVER_ADDR                      (?i:SERVER_ADDR)
 VARIABLE_SERVER_NAME                      (?i:SERVER_NAME)
 VARIABLE_SERVER_PORT                      (?i:SERVER_PORT)
@@ -912,6 +912,8 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_INBOUND_DATA_ERROR}               { return p::make_VARIABLE_INBOUND_DATA_ERROR(*driver.loc.back()); }
 {VARIABLE_MATCHED_VAR_NAME}                 { return p::make_VARIABLE_MATCHED_VAR_NAME(*driver.loc.back()); }
 {VARIABLE_MATCHED_VAR}                      { return p::make_VARIABLE_MATCHED_VAR(*driver.loc.back()); }
+{VARIABLE_MSC_PCRE_ERRORED}                 { return p::make_VARIABLE_MSC_PCRE_ERRORED(*driver.loc.back()); }
+{VARIABLE_MSC_PCRE_LIMITS_EXCEEDED}         { return p::make_VARIABLE_MSC_PCRE_LIMITS_EXCEEDED(*driver.loc.back()); }
 {VARIABLE_MULTIPART_BOUNDARY_QUOTED}        { return p::make_VARIABLE_MULTIPART_BOUNDARY_QUOTED(*driver.loc.back()); }
 {VARIABLE_MULTIPART_BOUNDARY_WHITESPACE}    { return p::make_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE(*driver.loc.back()); }
 {VARIABLE_MULTIPART_CRLF_LF_LINES}          { return p::make_VARIABLE_MULTIPART_CRLF_LF_LINES(*driver.loc.back()); }
@@ -961,8 +963,6 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_RESPONSE_HEADERS_NAMES}[:.]       { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RESPONSE_HEADERS_NAMES(*driver.loc.back()); }
 {VARIABLE_RESPONSE_PROTOCOL}                { return p::make_VARIABLE_RESPONSE_PROTOCOL(*driver.loc.back()); }
 {VARIABLE_RESPONSE_STATUS}                  { return p::make_VARIABLE_RESPONSE_STATUS(*driver.loc.back()); }
-{VARIABLE_RX_ERROR}                         { return p::make_VARIABLE_RX_ERROR(*driver.loc.back()); }
-{VARIABLE_RX_ERROR_RULE_ID}                 { return p::make_VARIABLE_RX_ERROR_RULE_ID(*driver.loc.back()); }
 {VARIABLE_SERVER_ADDR}                      { return p::make_VARIABLE_SERVER_ADDR(*driver.loc.back()); }
 {VARIABLE_SERVER_NAME}                      { return p::make_VARIABLE_SERVER_NAME(*driver.loc.back()); }
 {VARIABLE_SERVER_PORT}                      { return p::make_VARIABLE_SERVER_PORT(*driver.loc.back()); }

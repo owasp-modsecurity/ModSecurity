@@ -19,8 +19,8 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLES_RX_ERROR_RULE_ID_H_
-#define SRC_VARIABLES_RX_ERROR_RULE_ID_H_
+#ifndef SRC_VARIABLES_MSC_PCRE_LIMITS_EXCEEDED_H_
+#define SRC_VARIABLES_MSC_PCRE_LIMITS_EXCEEDED_H_
 
 #include "src/variables/variable.h"
 
@@ -30,10 +30,10 @@ class Transaction;
 namespace variables {
 
 
-DEFINE_VARIABLE(RxErrorRuleID, RX_ERROR_RULE_ID, m_variableRxErrorRuleID)
+DEFINE_VARIABLE(MscPcreLimitsExceeded, MSC_PCRE_LIMITS_EXCEEDED, m_variableMscPcreLimitsExceeded)
 
 
 }  // namespace variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_RX_ERROR_RULE_ID_H_
+#endif  // SRC_VARIABLES_MSC_PCRE_LIMITS_EXCEEDED_H_

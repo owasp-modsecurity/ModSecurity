@@ -62,21 +62,15 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
 
     // FIXME: DRY regex error reporting. This logic is currently duplicated in other operators.
     if (regex_result != Utils::RegexResult::Ok) {
+        transaction->m_variableMscPcreErrored.set("1", transaction->m_variableOffset);
+
         std::string regex_error_str = "OTHER";
         if (regex_result == Utils::RegexResult::ErrorMatchLimit) {
             regex_error_str = "MATCH_LIMIT";
+            transaction->m_variableMscPcreLimitsExceeded.set("1", transaction->m_variableOffset);
         }
 
         ms_dbg_a(transaction, 1, "rxGlobal: regex error '" + regex_error_str + "' for pattern '" + re->pattern + "'");
-
-        // Only expose the first regex error to indicate there is an issue
-        if (rule && transaction && transaction->m_variableRxError.m_value.empty()) {
-            transaction->m_variableRxError.set(regex_error_str, transaction->m_variableOffset);
-            transaction->m_variableRxErrorRuleID.set(
-                std::to_string(rule->m_ruleId),
-                transaction->m_variableOffset
-            );
-        }
 
         return false;
     }

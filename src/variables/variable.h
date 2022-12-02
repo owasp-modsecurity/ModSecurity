@@ -202,6 +202,10 @@ class VariableMonkeyResolution {
                 t->m_variableMatchedVar.evaluate(l);
             } else if (comp(variable, "MATCHED_VAR_NAME")) {
                 t->m_variableMatchedVarName.evaluate(l);
+            } else if (comp(variable, "MSC_PCRE_ERRORED")) {
+                t->m_variableMscPcreErrored.evaluate(l);
+            } else if (comp(variable, "MSC_PCRE_LIMITS_EXCEEDED")) {
+                t->m_variableMscPcreLimitsExceeded.evaluate(l);
             } else if (comp(variable, "MULTIPART_CRLF_LF_LINES")) {
                 t->m_variableMultipartCrlfLFLines.evaluate(l);
             } else if (comp(variable, "MULTIPART_DATA_AFTER")) {
@@ -282,10 +286,6 @@ class VariableMonkeyResolution {
                 t->m_variableUrlEncodedError.evaluate(l);
             } else if (comp(variable, "USERID")) {
                 t->m_variableUserID.evaluate(l);
-            } else if (comp(variable, "RX_ERROR")) {
-                t->m_variableRxError.evaluate(l);
-            } else if (comp(variable, "RX_ERROR_RULE_ID")) {
-                t->m_variableRxErrorRuleID.evaluate(l);
             } else {
                 throw std::invalid_argument("Variable not found.");
             }
@@ -369,6 +369,10 @@ class VariableMonkeyResolution {
                 vv = t->m_variableMatchedVar.resolveFirst();
             } else if (comp(variable, "MATCHED_VAR_NAME")) {
                 vv = t->m_variableMatchedVarName.resolveFirst();
+            } else if (comp(variable, "MSC_PCRE_ERRORED")) {
+                vv = t->m_variableMscPcreErrored.resolveFirst();
+            } else if (comp(variable, "MSC_PCRE_LIMITS_EXCEEDED")) {
+                vv = t->m_variableMscPcreLimitsExceeded.resolveFirst();
             } else if (comp(variable, "MULTIPART_CRLF_LF_LINES")) {
                 vv = t->m_variableMultipartCrlfLFLines.resolveFirst();
             } else if (comp(variable, "MULTIPART_DATA_AFTER")) {
@@ -466,10 +470,6 @@ class VariableMonkeyResolution {
             } else if (comp(variable, "GLOBAL")) {
                 vv = t->m_collections.m_global_collection->resolveFirst("",
                     t->m_collections.m_global_collection_key, t->m_rules->m_secWebAppId.m_value);
-            } else if (comp(variable, "RX_ERROR")) {
-                vv = t->m_variableRxError.resolveFirst();
-            } else if (comp(variable, "RX_ERROR_RULE_ID")) {
-                vv = t->m_variableRxErrorRuleID.resolveFirst();
             } else {
                 throw std::invalid_argument("Variable not found.");
             }

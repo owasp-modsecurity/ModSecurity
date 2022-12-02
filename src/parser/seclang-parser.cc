@@ -4279,330 +4279,330 @@ namespace yy {
 #line 4280 "seclang-parser.cc"
     break;
 
-  case 275: // var: VARIABLE_MULTIPART_BOUNDARY_QUOTED
+  case 275: // var: "MSC_PCRE_ERRORED"
 #line 2329 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartBoundaryQuoted());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MscPcreErrored());
       }
 #line 4288 "seclang-parser.cc"
     break;
 
-  case 276: // var: VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
+  case 276: // var: "MSC_PCRE_LIMITS_EXCEEDED"
 #line 2333 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartBoundaryWhiteSpace());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MscPcreLimitsExceeded());
       }
 #line 4296 "seclang-parser.cc"
     break;
 
-  case 277: // var: "MULTIPART_CRLF_LF_LINES"
+  case 277: // var: VARIABLE_MULTIPART_BOUNDARY_QUOTED
 #line 2337 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartCrlfLFLines());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartBoundaryQuoted());
       }
 #line 4304 "seclang-parser.cc"
     break;
 
-  case 278: // var: "MULTIPART_DATA_AFTER"
+  case 278: // var: VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
 #line 2341 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartDateAfter());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartBoundaryWhiteSpace());
       }
 #line 4312 "seclang-parser.cc"
     break;
 
-  case 279: // var: VARIABLE_MULTIPART_DATA_BEFORE
+  case 279: // var: "MULTIPART_CRLF_LF_LINES"
 #line 2345 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartDateBefore());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartCrlfLFLines());
       }
 #line 4320 "seclang-parser.cc"
     break;
 
-  case 280: // var: "MULTIPART_FILE_LIMIT_EXCEEDED"
+  case 280: // var: "MULTIPART_DATA_AFTER"
 #line 2349 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartFileLimitExceeded());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartDateAfter());
       }
 #line 4328 "seclang-parser.cc"
     break;
 
-  case 281: // var: "MULTIPART_HEADER_FOLDING"
+  case 281: // var: VARIABLE_MULTIPART_DATA_BEFORE
 #line 2353 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartHeaderFolding());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartDateBefore());
       }
 #line 4336 "seclang-parser.cc"
     break;
 
-  case 282: // var: "MULTIPART_INVALID_HEADER_FOLDING"
+  case 282: // var: "MULTIPART_FILE_LIMIT_EXCEEDED"
 #line 2357 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidHeaderFolding());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartFileLimitExceeded());
       }
 #line 4344 "seclang-parser.cc"
     break;
 
-  case 283: // var: VARIABLE_MULTIPART_INVALID_PART
+  case 283: // var: "MULTIPART_HEADER_FOLDING"
 #line 2361 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidPart());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartHeaderFolding());
       }
 #line 4352 "seclang-parser.cc"
     break;
 
-  case 284: // var: "MULTIPART_INVALID_QUOTING"
+  case 284: // var: "MULTIPART_INVALID_HEADER_FOLDING"
 #line 2365 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidQuoting());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidHeaderFolding());
       }
 #line 4360 "seclang-parser.cc"
     break;
 
-  case 285: // var: VARIABLE_MULTIPART_LF_LINE
+  case 285: // var: VARIABLE_MULTIPART_INVALID_PART
 #line 2369 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartLFLine());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidPart());
       }
 #line 4368 "seclang-parser.cc"
     break;
 
-  case 286: // var: VARIABLE_MULTIPART_MISSING_SEMICOLON
+  case 286: // var: "MULTIPART_INVALID_QUOTING"
 #line 2373 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartMissingSemicolon());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartInvalidQuoting());
       }
 #line 4376 "seclang-parser.cc"
     break;
 
-  case 287: // var: VARIABLE_MULTIPART_SEMICOLON_MISSING
+  case 287: // var: VARIABLE_MULTIPART_LF_LINE
 #line 2377 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartMissingSemicolon());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartLFLine());
       }
 #line 4384 "seclang-parser.cc"
     break;
 
-  case 288: // var: "MULTIPART_STRICT_ERROR"
+  case 288: // var: VARIABLE_MULTIPART_MISSING_SEMICOLON
 #line 2381 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartStrictError());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartMissingSemicolon());
       }
 #line 4392 "seclang-parser.cc"
     break;
 
-  case 289: // var: "MULTIPART_UNMATCHED_BOUNDARY"
+  case 289: // var: VARIABLE_MULTIPART_SEMICOLON_MISSING
 #line 2385 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartUnmatchedBoundary());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartMissingSemicolon());
       }
 #line 4400 "seclang-parser.cc"
     break;
 
-  case 290: // var: "OUTBOUND_DATA_ERROR"
+  case 290: // var: "MULTIPART_STRICT_ERROR"
 #line 2389 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::OutboundDataError());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartStrictError());
       }
 #line 4408 "seclang-parser.cc"
     break;
 
-  case 291: // var: "PATH_INFO"
+  case 291: // var: "MULTIPART_UNMATCHED_BOUNDARY"
 #line 2393 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::PathInfo());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MultipartUnmatchedBoundary());
       }
 #line 4416 "seclang-parser.cc"
     break;
 
-  case 292: // var: "QUERY_STRING"
+  case 292: // var: "OUTBOUND_DATA_ERROR"
 #line 2397 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::QueryString());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::OutboundDataError());
       }
 #line 4424 "seclang-parser.cc"
     break;
 
-  case 293: // var: "REMOTE_ADDR"
+  case 293: // var: "PATH_INFO"
 #line 2401 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemoteAddr());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::PathInfo());
       }
 #line 4432 "seclang-parser.cc"
     break;
 
-  case 294: // var: "REMOTE_HOST"
+  case 294: // var: "QUERY_STRING"
 #line 2405 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemoteHost());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::QueryString());
       }
 #line 4440 "seclang-parser.cc"
     break;
 
-  case 295: // var: "REMOTE_PORT"
+  case 295: // var: "REMOTE_ADDR"
 #line 2409 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemotePort());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemoteAddr());
       }
 #line 4448 "seclang-parser.cc"
     break;
 
-  case 296: // var: "REQBODY_ERROR"
+  case 296: // var: "REMOTE_HOST"
 #line 2413 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyError());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemoteHost());
       }
 #line 4456 "seclang-parser.cc"
     break;
 
-  case 297: // var: "REQBODY_ERROR_MSG"
+  case 297: // var: "REMOTE_PORT"
 #line 2417 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyErrorMsg());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RemotePort());
       }
 #line 4464 "seclang-parser.cc"
     break;
 
-  case 298: // var: "REQBODY_PROCESSOR"
+  case 298: // var: "REQBODY_ERROR"
 #line 2421 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessor());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyError());
       }
 #line 4472 "seclang-parser.cc"
     break;
 
-  case 299: // var: "REQBODY_PROCESSOR_ERROR"
+  case 299: // var: "REQBODY_ERROR_MSG"
 #line 2425 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessorError());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyErrorMsg());
       }
 #line 4480 "seclang-parser.cc"
     break;
 
-  case 300: // var: "REQBODY_PROCESSOR_ERROR_MSG"
+  case 300: // var: "REQBODY_PROCESSOR"
 #line 2429 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessorErrorMsg());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessor());
       }
 #line 4488 "seclang-parser.cc"
     break;
 
-  case 301: // var: "REQUEST_BASENAME"
+  case 301: // var: "REQBODY_PROCESSOR_ERROR"
 #line 2433 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBasename());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessorError());
       }
 #line 4496 "seclang-parser.cc"
     break;
 
-  case 302: // var: "REQUEST_BODY"
+  case 302: // var: "REQBODY_PROCESSOR_ERROR_MSG"
 #line 2437 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBody());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessorErrorMsg());
       }
 #line 4504 "seclang-parser.cc"
     break;
 
-  case 303: // var: "REQUEST_BODY_LENGTH"
+  case 303: // var: "REQUEST_BASENAME"
 #line 2441 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBodyLength());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBasename());
       }
 #line 4512 "seclang-parser.cc"
     break;
 
-  case 304: // var: "REQUEST_FILENAME"
+  case 304: // var: "REQUEST_BODY"
 #line 2445 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestFilename());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBody());
       }
 #line 4520 "seclang-parser.cc"
     break;
 
-  case 305: // var: "REQUEST_LINE"
+  case 305: // var: "REQUEST_BODY_LENGTH"
 #line 2449 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestLine());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestBodyLength());
       }
 #line 4528 "seclang-parser.cc"
     break;
 
-  case 306: // var: "REQUEST_METHOD"
+  case 306: // var: "REQUEST_FILENAME"
 #line 2453 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestMethod());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestFilename());
       }
 #line 4536 "seclang-parser.cc"
     break;
 
-  case 307: // var: "REQUEST_PROTOCOL"
+  case 307: // var: "REQUEST_LINE"
 #line 2457 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestProtocol());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestLine());
       }
 #line 4544 "seclang-parser.cc"
     break;
 
-  case 308: // var: "REQUEST_URI"
+  case 308: // var: "REQUEST_METHOD"
 #line 2461 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestURI());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestMethod());
       }
 #line 4552 "seclang-parser.cc"
     break;
 
-  case 309: // var: "REQUEST_URI_RAW"
+  case 309: // var: "REQUEST_PROTOCOL"
 #line 2465 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestURIRaw());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestProtocol());
       }
 #line 4560 "seclang-parser.cc"
     break;
 
-  case 310: // var: "RESPONSE_BODY"
+  case 310: // var: "REQUEST_URI"
 #line 2469 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseBody());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestURI());
       }
 #line 4568 "seclang-parser.cc"
     break;
 
-  case 311: // var: "RESPONSE_CONTENT_LENGTH"
+  case 311: // var: "REQUEST_URI_RAW"
 #line 2473 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseContentLength());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RequestURIRaw());
       }
 #line 4576 "seclang-parser.cc"
     break;
 
-  case 312: // var: "RESPONSE_PROTOCOL"
+  case 312: // var: "RESPONSE_BODY"
 #line 2477 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseProtocol());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseBody());
       }
 #line 4584 "seclang-parser.cc"
     break;
 
-  case 313: // var: "RESPONSE_STATUS"
+  case 313: // var: "RESPONSE_CONTENT_LENGTH"
 #line 2481 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseStatus());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseContentLength());
       }
 #line 4592 "seclang-parser.cc"
     break;
 
-  case 314: // var: "RX_ERROR"
+  case 314: // var: "RESPONSE_PROTOCOL"
 #line 2485 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RxError());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseProtocol());
       }
 #line 4600 "seclang-parser.cc"
     break;
 
-  case 315: // var: "RX_ERROR_RULE_ID"
+  case 315: // var: "RESPONSE_STATUS"
 #line 2489 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::RxErrorRuleID());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ResponseStatus());
       }
 #line 4608 "seclang-parser.cc"
     break;
@@ -6087,14 +6087,14 @@ namespace yy {
     -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,
     -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  3133,  -308,
        2,  -308,  -308,  -308,  -308,  -308,  -308,  2698,  2698,  -307,
-    -292,  -197,  -194,  -193,  -187,  -186,  -183,  -182,  -172,  -171,
+    -292,  -197,  -193,  -192,  -187,  -186,  -183,  -182,  -172,  -171,
     -168,  -167,  -164,  -163,  -160,  -159,  -308,  -156,  -155,  -152,
     -151,  -308,  -308,  -148,  -308,  -308,  -308,  -308,  -308,  -308,
     -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,
     -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,
-    -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -147,
-    -308,  -308,  -308,  -308,  -308,   462,  -308,  -308,  -308,  -144,
     -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,
+    -308,  -147,  -308,  -308,  -308,  -308,  -308,   462,  -308,  -308,
+    -308,  -144,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,
     -308,  -308,  -308,  -308,   554,   646,   984,  1076,  1168,  -141,
     -140,  1602,  -308,  -308,  -308,  -308,  -308,  -308,  -308,  -308,
     -308,  -308,  -308,  -308,  -308,  -308,    16,  -308,  -308,  -308,
@@ -6151,9 +6151,9 @@ namespace yy {
      259,   268,   269,   226,   270,   271,   272,   273,   274,   275,
      276,   277,   278,   279,   280,   281,   282,   283,   284,   285,
      286,   287,   288,   289,   290,   291,   292,   293,   294,   295,
-     297,   296,   300,   299,   298,   301,   303,   302,   304,   262,
-     305,   306,   307,   309,   308,   230,   310,   311,   263,   266,
-     312,   313,   314,   315,   316,   317,   318,   319,   320,   321,
+     296,   297,   299,   298,   302,   301,   300,   303,   305,   304,
+     306,   262,   307,   308,   309,   311,   310,   230,   312,   313,
+     263,   266,   314,   315,   316,   317,   318,   319,   320,   321,
      322,   325,   323,   324,   234,   238,   246,   250,   242,   220,
      223,     0,   327,   326,   328,   329,   330,   331,   332,   333,
      334,   335,   336,   337,   338,   121,   156,   161,   122,   123,
@@ -6183,7 +6183,7 @@ namespace yy {
   const short
   seclang_parser::yypgoto_[] =
   {
-    -308,  -308,   -74,  -308,   -47,    24,  -308,  -288,  -308,  -308,
+    -308,  -308,   -74,  -308,   -47,   -59,  -308,  -211,  -308,  -308,
      -51,   -78,   -61,  -134,  -308,  -136
   };
 
@@ -6211,8 +6211,8 @@ namespace yy {
      170,   171,   172,   173,   174,   175,   176,   177,   178,   179,
      180,   181,   182,   183,   184,   185,   186,   187,   188,   189,
      190,   191,   192,   193,   194,   195,   196,   197,   198,   199,
-     200,   201,   202,   203,   204,   205,   206,   207,   375,   419,
-     376,   377,   379,   378,   380,   496,   369,   370,   381,   383,
+     200,   201,   202,   203,   204,   205,   206,   207,   375,   367,
+     376,   419,   377,   379,   378,   380,   369,   370,   381,   383,
      382,   384,   385,   387,   386,   388,    90,    91,   424,   427,
      430,   433,   436,   389,   391,   390,   392,   393,   395,   394,
      396,   397,   399,   398,   400,   401,   403,   402,   404,   405,
@@ -6220,7 +6220,7 @@ namespace yy {
      416,   420,   483,   421,   437,   439,   438,   440,    98,    99,
      100,   101,   102,   103,   104,   105,   106,   107,   108,   109,
      110,   111,   213,   214,   334,   335,   336,   337,   352,   353,
-     354,   355,   367,   441,   491,     0,     0,     0,   208,     0,
+     354,   355,   496,   441,   491,     0,     0,     0,   208,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
      327,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
@@ -6554,8 +6554,8 @@ namespace yy {
      202,   203,   204,   205,   206,   207,   208,   209,   210,   211,
      212,   213,   214,   215,   216,   217,   218,   219,   220,   221,
      222,   223,   224,   225,   226,   227,   228,   229,   230,   231,
-     232,   233,   234,   235,   236,   237,   238,   239,   345,   285,
-     347,   345,   345,   347,   347,   443,   217,   218,   345,   345,
+     232,   233,   234,   235,   236,   237,   238,   239,   345,   208,
+     347,   287,   345,   345,   347,   347,   217,   218,   345,   345,
      347,   347,   345,   345,   347,   347,   309,   310,   304,   305,
      306,   307,   308,   345,   345,   347,   347,   345,   345,   347,
      347,   345,   345,   347,   347,   345,   345,   347,   347,   345,
@@ -6563,7 +6563,7 @@ namespace yy {
      347,   345,   338,   347,   345,   345,   347,   347,   309,   310,
      309,   310,   309,   310,   312,   313,   309,   310,   312,   313,
      309,   310,   309,   310,   309,   310,   309,   310,   309,   310,
-     309,   310,   208,   311,   368,    -1,    -1,    -1,   330,    -1,
+     309,   310,   443,   311,   368,    -1,    -1,    -1,   330,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
      311,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
@@ -7060,8 +7060,8 @@ namespace yy {
   "VARIABLE_RULE", "\"Variable ARGS_NAMES\"", "VARIABLE_ARGS_POST_NAMES",
   "\"AUTH_TYPE\"", "\"FILES_COMBINED_SIZE\"", "\"FILES_TMPNAMES\"",
   "\"FULL_REQUEST\"", "\"FULL_REQUEST_LENGTH\"", "\"INBOUND_DATA_ERROR\"",
-  "\"MATCHED_VAR\"", "\"MATCHED_VAR_NAME\"",
-  "VARIABLE_MULTIPART_BOUNDARY_QUOTED",
+  "\"MATCHED_VAR\"", "\"MATCHED_VAR_NAME\"", "\"MSC_PCRE_ERRORED\"",
+  "\"MSC_PCRE_LIMITS_EXCEEDED\"", "VARIABLE_MULTIPART_BOUNDARY_QUOTED",
   "VARIABLE_MULTIPART_BOUNDARY_WHITESPACE", "\"MULTIPART_CRLF_LF_LINES\"",
   "\"MULTIPART_DATA_AFTER\"", "VARIABLE_MULTIPART_DATA_BEFORE",
   "\"MULTIPART_FILE_LIMIT_EXCEEDED\"", "\"MULTIPART_HEADER_FOLDING\"",
@@ -7080,9 +7080,8 @@ namespace yy {
   "\"REQUEST_URI_RAW\"", "\"REQUEST_URI\"", "\"RESOURCE\"",
   "\"RESPONSE_BODY\"", "\"RESPONSE_CONTENT_LENGTH\"",
   "VARIABLE_RESPONSE_CONTENT_TYPE", "VARIABLE_RESPONSE_HEADERS_NAMES",
-  "\"RESPONSE_PROTOCOL\"", "\"RESPONSE_STATUS\"", "\"RX_ERROR\"",
-  "\"RX_ERROR_RULE_ID\"", "\"SERVER_ADDR\"", "\"SERVER_NAME\"",
-  "\"SERVER_PORT\"", "\"SESSIONID\"", "\"UNIQUE_ID\"",
+  "\"RESPONSE_PROTOCOL\"", "\"RESPONSE_STATUS\"", "\"SERVER_ADDR\"",
+  "\"SERVER_NAME\"", "\"SERVER_PORT\"", "\"SESSIONID\"", "\"UNIQUE_ID\"",
   "\"URLENCODED_ERROR\"", "\"USERID\"", "\"WEBAPPID\"",
   "\"VARIABLE_STATUS\"", "\"VARIABLE_STATUS_LINE\"", "\"VARIABLE_IP\"",
   "\"VARIABLE_GLOBAL\"", "\"VARIABLE_TX\"", "\"VARIABLE_SESSION\"",
@@ -7307,7 +7306,7 @@ namespace yy {
 
 
 } // yy
-#line 7311 "seclang-parser.cc"
+#line 7310 "seclang-parser.cc"
 
 #line 3077 "seclang-parser.yy"
 

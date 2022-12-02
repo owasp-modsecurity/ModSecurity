@@ -184,6 +184,8 @@ class Driver;
 #include "src/variables/matched_vars.h"
 #include "src/variables/matched_vars_names.h"
 #include "src/variables/modsec_build.h"
+#include "src/variables/msc_pcre_errored.h"
+#include "src/variables/msc_pcre_limits_exceeded.h"
 #include "src/variables/multipart_boundary_quoted.h"
 #include "src/variables/multipart_boundary_whitespace.h"
 #include "src/variables/multipart_crlf_lf_lines.h"
@@ -235,8 +237,6 @@ class Driver;
 #include "src/variables/response_protocol.h"
 #include "src/variables/response_status.h"
 #include "src/variables/rule.h"
-#include "src/variables/rx_error.h"
-#include "src/variables/rx_error_rule_id.h"
 #include "src/variables/server_addr.h"
 #include "src/variables/server_name.h"
 #include "src/variables/server_port.h"
@@ -370,6 +370,8 @@ using namespace modsecurity::operators;
   VARIABLE_INBOUND_DATA_ERROR   "INBOUND_DATA_ERROR"
   VARIABLE_MATCHED_VAR          "MATCHED_VAR"
   VARIABLE_MATCHED_VAR_NAME     "MATCHED_VAR_NAME"
+  VARIABLE_MSC_PCRE_ERRORED "MSC_PCRE_ERRORED"
+  VARIABLE_MSC_PCRE_LIMITS_EXCEEDED "MSC_PCRE_LIMITS_EXCEEDED"
   VARIABLE_MULTIPART_BOUNDARY_QUOTED
   VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
   VARIABLE_MULTIPART_CRLF_LF_LINES    "MULTIPART_CRLF_LF_LINES"
@@ -413,8 +415,6 @@ using namespace modsecurity::operators;
   VARIABLE_RESPONSE_HEADERS_NAMES
   VARIABLE_RESPONSE_PROTOCOL    "RESPONSE_PROTOCOL"
   VARIABLE_RESPONSE_STATUS      "RESPONSE_STATUS"
-  VARIABLE_RX_ERROR             "RX_ERROR"
-  VARIABLE_RX_ERROR_RULE_ID     "RX_ERROR_RULE_ID"
   VARIABLE_SERVER_ADDR          "SERVER_ADDR"
   VARIABLE_SERVER_NAME          "SERVER_NAME"
   VARIABLE_SERVER_PORT          "SERVER_PORT"
@@ -2325,6 +2325,14 @@ var:
       {
         VARIABLE_CONTAINER($$, new variables::MatchedVarName());
       }
+    | VARIABLE_MSC_PCRE_ERRORED
+      {
+        VARIABLE_CONTAINER($$, new variables::MscPcreErrored());
+      }
+    | VARIABLE_MSC_PCRE_LIMITS_EXCEEDED
+      {
+        VARIABLE_CONTAINER($$, new variables::MscPcreLimitsExceeded());
+      }
     | VARIABLE_MULTIPART_BOUNDARY_QUOTED
       {
         VARIABLE_CONTAINER($$, new variables::MultipartBoundaryQuoted());
@@ -2480,14 +2488,6 @@ var:
     | VARIABLE_RESPONSE_STATUS
       {
         VARIABLE_CONTAINER($$, new variables::ResponseStatus());
-      }
-    | VARIABLE_RX_ERROR
-      {
-        VARIABLE_CONTAINER($$, new variables::RxError());
-      }
-    | VARIABLE_RX_ERROR_RULE_ID
-      {
-        VARIABLE_CONTAINER($$, new variables::RxErrorRuleID());
       }
     | VARIABLE_SERVER_ADDR
       {
