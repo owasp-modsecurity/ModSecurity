@@ -711,7 +711,11 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
 
         #ifdef WITH_PCRE_STUDY
             #ifdef WITH_PCRE_JIT
+                #ifdef WITH_PCRE2
+        rc = regex->jit_compile_rc;
+                #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+                #endif
         if ((rc != 0) || (jit != 1)) {
             *error_msg = apr_psprintf(rule->ruleset->mp,
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
@@ -808,7 +812,11 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             #ifdef WITH_PCRE_STUDY
                 #ifdef WITH_PCRE_JIT
             if (msr->txcfg->debuglog_level >= 4) {
+                    #ifdef WITH_PCRE2
+                rc = regex->jit_compile_rc;
+                    #else
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+                    #endif
                 if ((rc != 0) || (jit != 1)) {
                     *error_msg = apr_psprintf(msr->mp,
                             "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
@@ -973,7 +981,11 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
 
         #ifdef WITH_PCRE_STUDY
             #ifdef WITH_PCRE_JIT
+                #ifdef WITH_PCRE2
+        rc = regex->jit_compile_rc;
+                #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+                #endif
         if ((rc != 0) || (jit != 1)) {
             *error_msg = apr_psprintf(rule->ruleset->mp,
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
@@ -1060,7 +1072,11 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             #ifdef WITH_PCRE_STUDY
                 #ifdef WITH_PCRE_JIT
             if (msr->txcfg->debuglog_level >= 4) {
+                    #ifdef WITH_PCRE2
+                rc = regex->jit_compile_rc;
+                    #else
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+                    #endif
                 if ((rc != 0) || (jit != 1)) {
                     *error_msg = apr_psprintf(msr->mp,
                             "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
@@ -2842,7 +2858,11 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
     if (msr->txcfg->debuglog_level >= 4) {
+            #ifdef WITH_PCRE2
+        rc = regex->jit_compile_rc;
+            #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+            #endif
         if ((rc != 0) || (jit != 1)) {
             *error_msg = apr_psprintf(msr->mp,
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
@@ -3169,7 +3189,11 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
     if (msr->txcfg->debuglog_level >= 4) {
+            #ifdef WITH_PCRE2
+        rc = regex->jit_compile_rc;
+            #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+            #endif
         if ((rc != 0) || (jit != 1)) {
             *error_msg = apr_psprintf(msr->mp,
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
@@ -3479,7 +3503,11 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
     if (msr->txcfg->debuglog_level >= 4) {
+            #ifdef WITH_PCRE2
+        rc = regex->jit_compile_rc;
+            #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+            #endif
         if ((rc != 0) || (jit != 1)) {
             *error_msg = apr_psprintf(msr->mp,
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
