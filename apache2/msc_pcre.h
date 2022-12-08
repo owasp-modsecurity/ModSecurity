@@ -45,6 +45,10 @@ struct msc_regex_t {
 #ifdef WITH_PCRE2
     pcre2_code          *re;
     pcre2_match_context *match_context;
+#ifdef WITH_PCRE_JIT
+    int                 jit_compile_rc;
+#endif
+
 #else
     void            *re;
     void            *pe;

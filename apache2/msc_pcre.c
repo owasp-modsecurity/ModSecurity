@@ -84,7 +84,9 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
         return NULL;
     }
 
-    /* TODO: Add PCRE2 JIT support */
+#ifdef WITH_PCRE_JIT
+    regex->jit_compile_rc = pcre2_jit_compile(regex->re, PCRE2_JIT_COMPLETE);
+#endif
 
     /* Setup the pcre2 match context */
     regex->match_context = NULL;
@@ -242,27 +244,38 @@ int msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
         PCRE2_SPTR pcre2_s;
         int pcre2_ret;
         pcre2_match_data *match_data;
-	PCRE2_SIZE *pcre2_ovector = NULL;
+        PCRE2_SIZE *pcre2_ovector = NULL;
 
         pcre2_s = (PCRE2_SPTR)s;
         match_data = pcre2_match_data_create_from_pattern(regex->re, NULL);
 
-	pcre2_ret = pcre2_match(regex->re, pcre2_s, (PCRE2_SIZE)strlen(s),
+#ifdef WITH_PCRE_JIT
+        if (regex->jit_compile_rc == 0) {
+            pcre2_ret = pcre2_jit_match(regex->re, pcre2_s, (PCRE2_SIZE)strlen(s),
+                (PCRE2_SIZE)(startoffset), (uint32_t)options, match_data, regex->match_context);
+        }
+        if (regex->jit_compile_rc != 0 || pcre2_ret == PCRE2_ERROR_JIT_STACKLIMIT) {
+            pcre2_ret = pcre2_match(regex->re, pcre2_s, (PCRE2_SIZE)strlen(s),
+                (PCRE2_SIZE)(startoffset), (PCRE2_NO_JIT | (uint32_t)options), match_data, regex->match_context);
+        }
+#else
+        pcre2_ret = pcre2_match(regex->re, pcre2_s, (PCRE2_SIZE)strlen(s),
             (PCRE2_SIZE)(startoffset), (uint32_t)options, match_data, regex->match_context);
-	if (match_data != NULL) {
-	    if (ovector != NULL) {
-	        pcre2_ovector = pcre2_get_ovector_pointer(match_data);
-	        if (pcre2_ovector != NULL) {
+#endif
+        if (match_data != NULL) {
+            if (ovector != NULL) {
+                pcre2_ovector = pcre2_get_ovector_pointer(match_data);
+                if (pcre2_ovector != NULL) {
                     for (int i = 0; ((i < pcre2_ret) && ((i*2) <= ovecsize)); i++) {
                         if ((i*2) < ovecsize) {
                             ovector[2*i] = pcre2_ovector[2*i];
                             ovector[2*i+1] = pcre2_ovector[2*i+1];
                         }
-	            }
-	        }
-	    }
+                    }
+                }
+            }
             pcre2_match_data_free(match_data);
-	}
+        }
         if ((pcre2_ret*2) > ovecsize) {
             return 0;
         } else {
