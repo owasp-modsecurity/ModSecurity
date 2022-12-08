@@ -291,7 +291,7 @@ int Regex::search(const std::string& s, SMatch *match) const {
             0, 0, match_data, NULL) > 0;
     } 
     
-    if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+    if (m_pcje != 0 || ret == PCRE2_ERROR_JIT_STACKLIMIT) {
         ret = pcre2_match(m_pc, pcre2_s, s.length(),
             0, PCRE2_NO_JIT, match_data, NULL) > 0;
     }
