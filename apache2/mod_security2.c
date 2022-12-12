@@ -105,7 +105,7 @@ static int server_limit, thread_limit;
 */
 static void version(apr_pool_t *mp) {
     char *pcre_vrs = NULL;
-    char *pcre_loaded_vrs = NULL;
+    const char *pcre_loaded_vrs = NULL;
     char pcre2_loaded_vrs_buffer[80] ={0};
 
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
@@ -119,7 +119,7 @@ static void version(apr_pool_t *mp) {
 #ifdef WITH_PCRE2
     pcre_vrs = apr_psprintf(mp,"%d.%d ", PCRE2_MAJOR, PCRE2_MINOR);
     pcre_loaded_vrs = pcre2_loaded_vrs_buffer;
-    pcre2_config(PCRE2_CONFIG_VERSION, pcre_loaded_vrs);
+    pcre2_config(PCRE2_CONFIG_VERSION, pcre2_loaded_vrs_buffer);
 #else
     pcre_vrs = apr_psprintf(mp,"%d.%d ", PCRE_MAJOR, PCRE_MINOR);
     pcre_loaded_vrs = pcre_version();
