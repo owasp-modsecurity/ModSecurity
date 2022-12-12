@@ -126,7 +126,11 @@ static void version(apr_pool_t *mp) {
 #endif
 
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+#ifdef WITH_PCRE2
+            "ModSecurity: PCRE2 compiled version=\"%s\"; "
+#else
             "ModSecurity: PCRE compiled version=\"%s\"; "
+#endif
             "loaded version=\"%s\"", pcre_vrs, pcre_loaded_vrs);
 
     if (strstr(pcre_loaded_vrs,pcre_vrs) == NULL)    {
