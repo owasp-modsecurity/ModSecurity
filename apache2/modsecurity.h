@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -96,6 +96,7 @@ typedef struct msc_parm msc_parm;
 #define REQUEST_BODY_DEFAULT_LIMIT              134217728
 #define REQUEST_BODY_NO_FILES_DEFAULT_LIMIT     1048576
 #define REQUEST_BODY_JSON_DEPTH_DEFAULT_LIMIT   10000
+#define ARGUMENTS_LIMIT                         1000
 #define RESPONSE_BODY_DEFAULT_LIMIT             524288
 #define RESPONSE_BODY_HARD_LIMIT                1073741824L
 
@@ -500,6 +501,7 @@ struct directory_config {
     long int             reqbody_limit;
     long int             reqbody_no_files_limit;
     long int             reqbody_json_depth_limit;
+    long int             arguments_limit;
     int                  resbody_access;
 
     long int             of_limit;

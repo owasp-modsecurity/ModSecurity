@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ * Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -56,6 +56,15 @@ int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "Adding JSON argument '%s' with value '%s'",
             arg->name, arg->value);
+    }
+    if (apr_table_elts(msr->arguments)->nelts >= msr->txcfg->arguments_limit) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Skipping request argument, over limit (%s): name \"%s\", value \"%s\"",
+                    arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
+                    log_escape_ex(msr->mp, arg->value, arg->value_len));
+        }
+        msr->msc_reqbody_error = 1;
+        return 0;
     }
 
     apr_table_addn(msr->arguments,

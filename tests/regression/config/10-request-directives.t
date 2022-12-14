@@ -703,3 +703,50 @@
 	),
 },
 
+# SecArgumentsLimit
+{
+	type => "config",
+	comment => "SecArgumentsLimit (pos)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecArgumentsLimit 5
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'500232',phase:2,log,deny,status:403,msg:'Failed to parse request body'"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 403 /, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		"a=1&b=2&c=3&d=4&e=5&f=6",
+	),
+},
+{
+	type => "config",
+	comment => "SecArgumentsLimit (neg)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecArgumentsLimit 5
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'500233',phase:2,log,deny,status:403,msg:'Failed to parse request body'"
+	),
+	match_log => {
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		"a=1&b=2&c=3&d=4&e=5",
+	),
+},
+
