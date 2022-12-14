@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Support configurable limit on number of arguments processed
+   [Issue #2844 - @jleproust, @martinhsv]
  * Silence compiler warning about discarded const
    [Issue #2843 - @Steve8291, @martinhsv]
  * Support for JIT option for PCRE2

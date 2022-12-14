@@ -54,6 +54,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->reqbody_limit = NOT_SET;
     dcfg->reqbody_no_files_limit = NOT_SET;
     dcfg->reqbody_json_depth_limit = NOT_SET;
+    dcfg->arguments_limit = NOT_SET;
     dcfg->resbody_access = NOT_SET;
 
     dcfg->debuglog_name = NOT_SET_P;
@@ -338,6 +339,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->reqbody_no_files_limit : child->reqbody_no_files_limit);
     merged->reqbody_json_depth_limit = (child->reqbody_json_depth_limit == NOT_SET
         ? parent->reqbody_json_depth_limit : child->reqbody_json_depth_limit);
+    merged->arguments_limit = (child->arguments_limit == NOT_SET
+        ? parent->arguments_limit : child->arguments_limit);
     merged->resbody_access = (child->resbody_access == NOT_SET
         ? parent->resbody_access : child->resbody_access);
 
@@ -655,6 +658,7 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->reqbody_limit == NOT_SET) dcfg->reqbody_limit = REQUEST_BODY_DEFAULT_LIMIT;
     if (dcfg->reqbody_no_files_limit == NOT_SET) dcfg->reqbody_no_files_limit = REQUEST_BODY_NO_FILES_DEFAULT_LIMIT;
     if (dcfg->reqbody_json_depth_limit == NOT_SET) dcfg->reqbody_json_depth_limit = REQUEST_BODY_JSON_DEPTH_DEFAULT_LIMIT;
+    if (dcfg->arguments_limit == NOT_SET) dcfg->arguments_limit = ARGUMENTS_LIMIT;
     if (dcfg->resbody_access == NOT_SET) dcfg->resbody_access = 0;
     if (dcfg->of_limit == NOT_SET) dcfg->of_limit = RESPONSE_BODY_DEFAULT_LIMIT;
     if (dcfg->if_limit_action == NOT_SET) dcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_REJECT;
@@ -1951,6 +1955,24 @@ static const char *cmd_request_body_json_depth_limit(cmd_parms *cmd, void *_dcfg
     }
 
     dcfg->reqbody_json_depth_limit = limit;
+
+    return NULL;
+}
+
+static const char *cmd_arguments_limit(cmd_parms *cmd, void *_dcfg,
+                                                     const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    long int limit;
+
+    if (dcfg == NULL) return NULL;
+
+    limit = strtol(p1, NULL, 10);
+    if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecArgumentsLimit: %s", p1);
+    }
+
+    dcfg->arguments_limit = limit;
 
     return NULL;
 }
@@ -3594,6 +3616,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "maximum request body JSON parsing depth ModSecurity will accept."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecArgumentsLimit",
+        cmd_arguments_limit,
+        NULL,
+        CMD_SCOPE_ANY,
+        "maximum number of ARGS that ModSecurity will accept."
     ),
 
     AP_INIT_TAKE1 (

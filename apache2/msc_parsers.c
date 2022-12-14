@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -346,6 +346,21 @@ void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg)
                 log_escape_ex(msr->mp, arg->value, arg->value_len));
     }
 
-    apr_table_addn(arguments, log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *)arg);
+    if (apr_table_elts(arguments)->nelts >= msr->txcfg->arguments_limit) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Skipping request argument, over limit (%s): name \"%s\", value \"%s\"",
+                    arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
+                    log_escape_ex(msr->mp, arg->value, arg->value_len));
+        }
+        if (msr->msc_reqbody_error != 1) {
+            char *error_msg = apr_psprintf(msr->mp, "SecArgumentsLimit exceeded");
+            msr->msc_reqbody_error = 1;
+            if (error_msg != NULL) {
+                msr->msc_reqbody_error_msg = error_msg;
+            }
+        }
+    } else {
+        apr_table_addn(arguments, log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *)arg);
+    }
 }
 
