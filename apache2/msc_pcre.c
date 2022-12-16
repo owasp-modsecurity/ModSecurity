@@ -251,15 +251,15 @@ int msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
 
 #ifdef WITH_PCRE_JIT
         if (regex->jit_compile_rc == 0) {
-            pcre2_ret = pcre2_jit_match(regex->re, pcre2_s, (PCRE2_SIZE)strlen(s),
+            pcre2_ret = pcre2_jit_match(regex->re, pcre2_s, slen,
                 (PCRE2_SIZE)(startoffset), (uint32_t)options, match_data, regex->match_context);
         }
         if (regex->jit_compile_rc != 0 || pcre2_ret == PCRE2_ERROR_JIT_STACKLIMIT) {
-            pcre2_ret = pcre2_match(regex->re, pcre2_s, (PCRE2_SIZE)strlen(s),
+            pcre2_ret = pcre2_match(regex->re, pcre2_s, slen,
                 (PCRE2_SIZE)(startoffset), (PCRE2_NO_JIT | (uint32_t)options), match_data, regex->match_context);
         }
 #else
-        pcre2_ret = pcre2_match(regex->re, pcre2_s, (PCRE2_SIZE)strlen(s),
+        pcre2_ret = pcre2_match(regex->re, pcre2_s, slen,
             (PCRE2_SIZE)(startoffset), (uint32_t)options, match_data, regex->match_context);
 #endif
         if (match_data != NULL) {
