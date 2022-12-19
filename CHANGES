@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add JIT support for PCRE2
+    [Issue #2791 - @wfjsw, @airween, @FireBurn, @martinhsv]
   - Support comments in ipMatchFromFile file via '#' token
     [Issue #2554 - @tomsommer, @martinhsv]
   - Use name package name libmaxminddb with pkg-config
