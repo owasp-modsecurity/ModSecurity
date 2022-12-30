@@ -31,7 +31,7 @@ std::string RuleMessage::_details(const RuleMessage *rm) {
     msg.append(" [id \"" + std::to_string(rm->m_ruleId) + "\"]");
     msg.append(" [rev \"" + rm->m_rev + "\"]");
     msg.append(" [msg \"" + rm->m_message + "\"]");
-    msg.append(" [data \"" + utils::string::limitTo(200, rm->m_data) + "\"]");
+    msg.append(" [data \"" + utils::string::log_escape_hex(utils::string::limitTo(200, rm->m_data)) + "\"]");
     msg.append(" [severity \"" +
         std::to_string(rm->m_severity) + "\"]");
     msg.append(" [ver \"" + rm->m_ver + "\"]");

@@ -267,6 +267,28 @@ void replaceAll(std::string *str, const std::string& from,
     }
 }
 
+std::string log_escape_hex(std::string s) {
+
+    std::string ret = "";
+    char tchar[2];
+
+    for (std::string::size_type i = 0; i < s.size(); i++) {
+        if (  (s[i] == '"')
+                ||(s[i] == '\\')
+                ||(s[i] <= 0x1f)
+                ||(s[i] >= 0x7f))
+        {
+            ret.append("\\x");
+            c2x(s[i], (unsigned char*)tchar);
+            ret.push_back(tchar[0]);
+            ret.push_back(tchar[1]);
+        }
+        else {
+            ret.push_back(s[i]);
+        }
+    }
+    return ret;
+}
 
 }  // namespace string
 }  // namespace utils
