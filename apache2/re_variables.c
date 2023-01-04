@@ -1173,6 +1173,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
                 FILE *file;
                 size_t nread;
                 char *full_content = NULL;
+                char *full_content_tmp_ptr = NULL;
                 size_t total_lenght = 0;
                 msre_var *rvar = NULL;
 
@@ -1182,19 +1183,23 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
                     continue;
                 }
 
+                full_content = (char *)apr_pcalloc(mptmp, (sizeof(char)*parts[i]->length) + 1);
+                if (full_content == NULL) {
+                    if (msr->txcfg->debuglog_level >= 3) {
+                        msr_log(msr, 3, "Variable FILES_TMP_CONTENT will not be created, not " \
+                            "enough memory available.");
+                    }
+                    goto files_tmp_content_not_enough_mem;
+                }
+                full_content_tmp_ptr = full_content;
+
                 while ((nread = fread(buf, 1, 1023, file)) > 0)
                 {   
-                    total_lenght += nread;
-                    buf[nread] = '\0';
-                    if (full_content == NULL)
-                    {
-                        full_content = apr_psprintf(mptmp, "%s", buf);
-                    }
-                    else
-                    {
-                        full_content = apr_psprintf(mptmp, "%s%s", full_content, buf);
-                    }
+                    full_content_tmp_ptr = memcpy(full_content_tmp_ptr, buf, nread);
+                    full_content_tmp_ptr += nread;
+                    total_lenght         += nread;
                 }
+                full_content_tmp_ptr[total_lenght] = '\0';
                 fclose(file);
 
                 rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
@@ -1209,6 +1214,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
         }
     }
 
+files_tmp_content_not_enough_mem:
     return count;
 }
 
