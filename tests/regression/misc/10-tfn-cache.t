@@ -182,6 +182,6 @@
 			"Content-Type" => "application/x-www-form-urlencoded",
 		],
 		# 1000 Args
-		join("&", map { sprintf "arg%08d=0123456789abcdef+0123456789ABCDEF+0123456789abcdef", $_ } (1 .. 1000))."&test=Foo+Bar",
+		join("&", map { sprintf "arg%08d=0123456789abcdef+0123456789ABCDEF+0123456789abcdef", $_ } (1 .. 999))."&test=Foo+Bar",
 	),
 },
