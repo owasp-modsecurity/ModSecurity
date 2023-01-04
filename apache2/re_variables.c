@@ -1431,18 +1431,20 @@ static int var_multipart_part_headers_generate(modsec_rec *msr, msre_var *var, m
 
         /* If we had a match add this argument to the collection. */
         if (match) {
-            for (j = 0; j < parts[i]->header_lines->nelts; j++) {
-                char *header_line = ((char **)parts[i]->header_lines->elts)[j];
-                msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (parts[i]->header_lines) { /* this NULL check shouldn't be necessary */
+                for (j = 0; j < parts[i]->header_lines->nelts; j++) {
+                    char *header_line = ((char **)parts[i]->header_lines->elts)[j];
+                    msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
 
-                rvar->value = header_line;
-                rvar->value_len = strlen(rvar->value);
-                rvar->name = apr_psprintf(mptmp, "MULTIPART_PART_HEADERS:%s",
-                    log_escape_nq(mptmp, parts[i]->name));
-                apr_table_addn(vartab, rvar->name, (void *)rvar);
+                    rvar->value = header_line;
+                    rvar->value_len = strlen(rvar->value);
+                    rvar->name = apr_psprintf(mptmp, "MULTIPART_PART_HEADERS:%s",
+                        log_escape_nq(mptmp, parts[i]->name));
+                    apr_table_addn(vartab, rvar->name, (void *)rvar);
 
-                count++;
-	    }
+                    count++;
+	        }
+            }
         }
     }
 
