@@ -253,14 +253,14 @@
       "body": ""
     },
     "expected": {
-      "audit_log": "\\[msg \"testmsg\"\\]",
+      "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
       "error_log": "",
       "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
       "SecDefaultAction \"phase:1,nolog,auditlog,deny,status:403\"",
-      "SecRule ARGS \"@contains test2\" \"id:1557,phase:1,multiMatch,block,log,t:none,t:urlDecode,t:lowercase,msg:'testmsg'\"",
+      "SecRule ARGS \"@contains test2\" \"id:1557,phase:1,multiMatch,block,log,t:none,t:urlDecode,t:lowercase,msg:'testmsg',logdata:'testdata',severity:'DEBUG',tag:'testtag1',tag:'testtag2'\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",
       "SecAuditLog /tmp/test/modsec_audit_multimatch_1.log",
@@ -302,14 +302,14 @@
       "body": ""
     },
     "expected": {
-      "audit_log": "\\[msg \"tstmsg\"\\]",
+      "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
       "error_log": "",
       "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
       "SecDefaultAction \"phase:1,nolog,auditlog,deny,status:403\"",
-      "SecRule ARGS \"@streq tEst2\" \"id:1558,phase:1,multiMatch,block,log,t:none,t:trim,t:lowercase,msg:'tstmsg'\"",
+      "SecRule ARGS \"@streq tEst2\" \"id:1558,phase:1,multiMatch,block,log,t:none,t:trim,t:lowercase,msg:'testmsg',logdata:'testdata',severity:'DEBUG',tag:'testtag1',tag:'testtag2'\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",
       "SecAuditLog /tmp/test/modsec_audit_multimatch_2.log",
