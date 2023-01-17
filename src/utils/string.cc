@@ -135,13 +135,18 @@ std::string string_to_hex(const std::string& input) {
     return output;
 }
 
-
 std::string toHexIfNeeded(const std::string &str) {
+    return toHexIfNeeded(str, false);
+}
+
+std::string toHexIfNeeded(const std::string &str, bool escape_spec) {
+    // escape_spec: escape special chars or not
+    // spec chars: '"' (quotation mark, ascii 34), '\' (backslash, ascii 92)
     std::stringstream res;
 
     for (int i = 0; i < str.size(); i++) {
         int c = (unsigned char)str.at(i);
-        if (c < 32 || c > 126) {
+        if (c < 32 || c > 126 || (escape_spec == true && (c == 34 || c == 92))) {
             res << "\\x" << std::setw(2) << std::setfill('0') << std::hex << c;
         } else {
             res << str.at(i);
@@ -265,29 +270,6 @@ void replaceAll(std::string *str, const std::string& from,
         str->replace(start_pos, from.length(), to);
         start_pos += to.length();
     }
-}
-
-std::string log_escape_hex(std::string s) {
-
-    std::string ret = "";
-    char tchar[2];
-
-    for (std::string::size_type i = 0; i < s.size(); i++) {
-        if (  (s[i] == '"')
-                ||(s[i] == '\\')
-                ||(s[i] <= 0x1f)
-                ||(s[i] >= 0x7f))
-        {
-            ret.append("\\x");
-            c2x(s[i], (unsigned char*)tchar);
-            ret.push_back(tchar[0]);
-            ret.push_back(tchar[1]);
-        }
-        else {
-            ret.push_back(s[i]);
-        }
-    }
-    return ret;
 }
 
 }  // namespace string
