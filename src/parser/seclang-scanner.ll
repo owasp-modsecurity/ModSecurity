@@ -421,9 +421,6 @@ DICT_ELEMENT_WITH_PIPE                  [^ =\t"]+
 DICT_ELEMENT_NO_PIPE                    [^ =\|\t"]+
 DICT_ELEMENT_NO_MACRO                   ([^\"|,%{\n \t}=]|([^\\]\\\"))+
 
-DICT_ELEMENT_TWO                        [^\"\=, \t\r\n\\]*
-DICT_ELEMENT_TWO_QUOTED                 [^\"\'\=\r\n\\]*
-DICT_ELEMENT_TWO2                       [A-Za-z_ -\%\{\.\}\-\/]+
 DIRECTIVE                               (?i:SecRule)
 DIRECTIVE_SECRULESCRIPT                 (?i:SecRuleScript)
 FREE_TEXT_NEW_LINE                      [^\"|\n]+
