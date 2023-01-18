@@ -503,25 +503,12 @@ int Transaction::processURI(const char *uri, const char *method,
 
     m_variablePathInfo.set(path_info, m_variableOffset + strlen(method) +
         1, var_size);
-    m_variableRequestFilename.set(path_info,  m_variableOffset +
-        strlen(method) + 1, var_size);
-
-
-    size_t offset = path_info.find_last_of("/\\");
-    if (offset != std::string::npos && path_info.length() > offset + 1) {
-        std::string basename = std::string(path_info, offset + 1,
-            path_info.length() - (offset + 1));
-        m_variableRequestBasename.set(basename, m_variableOffset +
-            strlen(method) + 1 + offset + 1);
-    }
-
-    m_variableOffset = m_variableRequestLine.m_value.size();
 
     std::string parsedURI = m_uri_decoded;
     // The more popular case is without domain
     if (!m_uri_decoded.empty() && m_uri_decoded.at(0) != '/') {
         bool fullDomain = true;
-        size_t scheme = m_uri_decoded.find(":")+1;
+        size_t scheme = m_uri_decoded.find(":") + 1;
         if (scheme == std::string::npos) {
             fullDomain = false;
         }
@@ -530,16 +517,31 @@ int Transaction::processURI(const char *uri, const char *method,
             // Assuming we found a colon make sure its followed
             size_t netloc = m_uri_decoded.find("//", scheme) + 2;
             if (netloc == std::string::npos || (netloc != scheme + 2)) {
-                fullDomain = false;
+              fullDomain = false;
             }
             if (netloc != std::string::npos && fullDomain == true) {
-                size_t path = m_uri_decoded.find("/", netloc);
-                if (path != std::string::npos) {
-                    parsedURI = m_uri_decoded.substr(path);
-                }
+              size_t path = m_uri_decoded.find("/", netloc);
+              if (path != std::string::npos) {
+                parsedURI = m_uri_decoded.substr(path);
+              }
             }
         }
     }
+
+    m_variableRequestFilename.set(
+        path_info,
+        m_variableOffset + strlen(method) + 1,
+        var_size);
+
+    size_t offset = path_info.find_last_of("/\\");
+    if (offset != std::string::npos && path_info.length() > offset + 1) {
+        std::string basename = std::string(path_info, offset + 1,
+                                           path_info.length() - (offset + 1));
+        m_variableRequestBasename.set(
+            basename, m_variableOffset + strlen(method) + 1 + offset + 1);
+    }
+
+    m_variableOffset = m_variableRequestLine.m_value.size();
 
     m_variableRequestURI.set(parsedURI, std::string(method).size() + 1,
         uri_s.size());
