@@ -135,10 +135,6 @@ std::string string_to_hex(const std::string& input) {
     return output;
 }
 
-std::string toHexIfNeeded(const std::string &str) {
-    return toHexIfNeeded(str, false);
-}
-
 std::string toHexIfNeeded(const std::string &str, bool escape_spec) {
     // escape_spec: escape special chars or not
     // spec chars: '"' (quotation mark, ascii 34), '\' (backslash, ascii 92)
