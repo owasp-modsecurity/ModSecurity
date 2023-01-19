@@ -79,7 +79,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule REQUEST_FILENAME \"@eq /one/two/login.php \" \"id:1,phase:3,deny,status:403,t:trim\""
+      "SecRule REQUEST_FILENAME \"@streq /one/two/login.php\" \"id:1,phase:3,deny,status:403,t:trim\""
     ]
   }
 ]
