@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Encode two special chars in error.log output
+    [Issue #2854 - @airween, @martinhsv]
   - Add JIT support for PCRE2
     [Issue #2791 - @wfjsw, @airween, @FireBurn, @martinhsv]
   - Support comments in ipMatchFromFile file via '#' token
