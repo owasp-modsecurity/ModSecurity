@@ -680,6 +680,7 @@ using namespace modsecurity::operators;
   RUN_TIME_VAR_TIME_YEAR                       "RUN_TIME_VAR_TIME_YEAR"
   VARIABLE                                     "VARIABLE"
   DICT_ELEMENT                                 "Dictionary element"
+  DICT_ELEMENT_WITH_EQUALS                     "Dictionary element, with equals"
   DICT_ELEMENT_REGEXP                          "Dictionary element, selected by regexp"
 ;
 
