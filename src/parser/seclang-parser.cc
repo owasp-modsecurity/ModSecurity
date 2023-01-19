@@ -4279,10 +4279,10 @@ namespace yy {
 #line 4280 "seclang-parser.cc"
     break;
 
-  case 275: // var: "MSC_PCRE_ERRORED"
+  case 275: // var: "MSC_PCRE_ERROR"
 #line 2329 "seclang-parser.yy"
       {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MscPcreErrored());
+        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::MscPcreError());
       }
 #line 4288 "seclang-parser.cc"
     break;
@@ -7060,7 +7060,7 @@ namespace yy {
   "VARIABLE_RULE", "\"Variable ARGS_NAMES\"", "VARIABLE_ARGS_POST_NAMES",
   "\"AUTH_TYPE\"", "\"FILES_COMBINED_SIZE\"", "\"FILES_TMPNAMES\"",
   "\"FULL_REQUEST\"", "\"FULL_REQUEST_LENGTH\"", "\"INBOUND_DATA_ERROR\"",
-  "\"MATCHED_VAR\"", "\"MATCHED_VAR_NAME\"", "\"MSC_PCRE_ERRORED\"",
+  "\"MATCHED_VAR\"", "\"MATCHED_VAR_NAME\"", "\"MSC_PCRE_ERROR\"",
   "\"MSC_PCRE_LIMITS_EXCEEDED\"", "VARIABLE_MULTIPART_BOUNDARY_QUOTED",
   "VARIABLE_MULTIPART_BOUNDARY_WHITESPACE", "\"MULTIPART_CRLF_LF_LINES\"",
   "\"MULTIPART_DATA_AFTER\"", "VARIABLE_MULTIPART_DATA_BEFORE",

@@ -186,7 +186,7 @@ VARIABLE_GLOBAL                           (?i:GLOBAL)
 VARIABLE_INBOUND_DATA_ERROR               (?i:INBOUND_DATA_ERROR)
 VARIABLE_MATCHED_VAR                      (?i:MATCHED_VAR)
 VARIABLE_MATCHED_VAR_NAME                 (?i:MATCHED_VAR_NAME)
-VARIABLE_MSC_PCRE_ERRORED                 (?i:MSC_PCRE_ERRORED)
+VARIABLE_MSC_PCRE_ERROR                   (?i:MSC_PCRE_ERROR)
 VARIABLE_MSC_PCRE_LIMITS_EXCEEDED         (?i:MSC_PCRE_LIMITS_EXCEEDED)
 VARIABLE_MULTIPART_BOUNDARY_QUOTED        (?i:MULTIPART_BOUNDARY_QUOTED)
 VARIABLE_MULTIPART_BOUNDARY_WHITESPACE    (?i:MULTIPART_BOUNDARY_WHITESPACE)
@@ -912,7 +912,7 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_INBOUND_DATA_ERROR}               { return p::make_VARIABLE_INBOUND_DATA_ERROR(*driver.loc.back()); }
 {VARIABLE_MATCHED_VAR_NAME}                 { return p::make_VARIABLE_MATCHED_VAR_NAME(*driver.loc.back()); }
 {VARIABLE_MATCHED_VAR}                      { return p::make_VARIABLE_MATCHED_VAR(*driver.loc.back()); }
-{VARIABLE_MSC_PCRE_ERRORED}                 { return p::make_VARIABLE_MSC_PCRE_ERRORED(*driver.loc.back()); }
+{VARIABLE_MSC_PCRE_ERROR}                   { return p::make_VARIABLE_MSC_PCRE_ERROR(*driver.loc.back()); }
 {VARIABLE_MSC_PCRE_LIMITS_EXCEEDED}         { return p::make_VARIABLE_MSC_PCRE_LIMITS_EXCEEDED(*driver.loc.back()); }
 {VARIABLE_MULTIPART_BOUNDARY_QUOTED}        { return p::make_VARIABLE_MULTIPART_BOUNDARY_QUOTED(*driver.loc.back()); }
 {VARIABLE_MULTIPART_BOUNDARY_WHITESPACE}    { return p::make_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE(*driver.loc.back()); }

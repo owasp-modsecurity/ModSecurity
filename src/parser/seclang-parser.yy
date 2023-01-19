@@ -184,7 +184,7 @@ class Driver;
 #include "src/variables/matched_vars.h"
 #include "src/variables/matched_vars_names.h"
 #include "src/variables/modsec_build.h"
-#include "src/variables/msc_pcre_errored.h"
+#include "src/variables/msc_pcre_error.h"
 #include "src/variables/msc_pcre_limits_exceeded.h"
 #include "src/variables/multipart_boundary_quoted.h"
 #include "src/variables/multipart_boundary_whitespace.h"
@@ -370,7 +370,7 @@ using namespace modsecurity::operators;
   VARIABLE_INBOUND_DATA_ERROR   "INBOUND_DATA_ERROR"
   VARIABLE_MATCHED_VAR          "MATCHED_VAR"
   VARIABLE_MATCHED_VAR_NAME     "MATCHED_VAR_NAME"
-  VARIABLE_MSC_PCRE_ERRORED "MSC_PCRE_ERRORED"
+  VARIABLE_MSC_PCRE_ERROR           "MSC_PCRE_ERROR"
   VARIABLE_MSC_PCRE_LIMITS_EXCEEDED "MSC_PCRE_LIMITS_EXCEEDED"
   VARIABLE_MULTIPART_BOUNDARY_QUOTED
   VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
@@ -2325,9 +2325,9 @@ var:
       {
         VARIABLE_CONTAINER($$, new variables::MatchedVarName());
       }
-    | VARIABLE_MSC_PCRE_ERRORED
+    | VARIABLE_MSC_PCRE_ERROR
       {
-        VARIABLE_CONTAINER($$, new variables::MscPcreErrored());
+        VARIABLE_CONTAINER($$, new variables::MscPcreError());
       }
     | VARIABLE_MSC_PCRE_LIMITS_EXCEEDED
       {

@@ -82,16 +82,13 @@ class Regex {
         return (m_pc == NULL);
     }
     std::list<SMatch> searchAll(const std::string& s) const;
-    RegexResult searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const;
-    RegexResult searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures, unsigned long match_limit) const;
-    RegexResult searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures) const;
-    RegexResult searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures, unsigned long match_limit) const;
+    RegexResult searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures, unsigned long match_limit = 0) const;
+    RegexResult searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures, unsigned long match_limit = 0) const;
     int search(const std::string &s, SMatch *match) const;
     int search(const std::string &s) const;
 
     const std::string pattern;
  private:
-    unsigned long get_default_match_limit() const;
     RegexResult to_regex_result(int pcre_exec_result) const;
 
 #if WITH_PCRE2

@@ -42,6 +42,7 @@ class Pcre2MatchContextPtr {
         : m_match_context(pcre2_match_context_create(NULL)) {}
 
 		Pcre2MatchContextPtr(const Pcre2MatchContextPtr&) = delete;
+		Pcre2MatchContextPtr& operator=(const Pcre2MatchContextPtr&) = delete;
 
     ~Pcre2MatchContextPtr() {
         pcre2_match_context_free(m_match_context);
@@ -188,16 +189,13 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
     return retList;
 }
 
-RegexResult Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures) const {
-    return searchOneMatch(s, captures, get_default_match_limit());
-}
-
 RegexResult Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures, unsigned long match_limit) const {
 #ifdef WITH_PCRE2
     Pcre2MatchContextPtr match_context;
-    // TODO: What if setting the match limit fails?
-    pcre2_set_match_limit(match_context, match_limit);
-
+    if (match_limit > 0) {
+        // TODO: What if setting the match limit fails?
+        pcre2_set_match_limit(match_context, match_limit);
+    }
 
     PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
     pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(m_pc, NULL);
@@ -214,9 +212,9 @@ RegexResult Regex::searchOneMatch(const std::string& s, std::vector<SMatchCaptur
     const char *subject = s.c_str();
     int ovector[OVECCOUNT];
     pcre_extra local_pce;
-    pcre_extra *pce = NULL;
+    pcre_extra *pce = m_pce;
 
-    if (m_pce != NULL) {
+    if (m_pce != NULL && match_limit > 0) {
         local_pce = *m_pce;
         local_pce.match_limit = match_limit;
         local_pce.flags |= PCRE_EXTRA_MATCH_LIMIT;
@@ -243,18 +241,16 @@ RegexResult Regex::searchOneMatch(const std::string& s, std::vector<SMatchCaptur
     return to_regex_result(rc);
 }
 
-RegexResult Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures) const {
-    return searchGlobal(s, captures, get_default_match_limit());
-}
-
 RegexResult Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures, unsigned long match_limit) const {
     const char *subject = s.c_str();
 
     bool prev_match_zero_length = false;
 #ifdef WITH_PCRE2
     Pcre2MatchContextPtr match_context;
-    // TODO: What if setting the match limit fails?
-    pcre2_set_match_limit(match_context, match_limit);
+    if (match_limit > 0) {
+        // TODO: What if setting the match limit fails?
+        pcre2_set_match_limit(match_context, match_limit);
+    }
 
     PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
     PCRE2_SIZE startOffset = 0;
@@ -271,9 +267,9 @@ RegexResult Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>
 
 #else
     pcre_extra local_pce;
-    pcre_extra *pce = NULL;
+    pcre_extra *pce = m_pce;
 
-    if (m_pce != NULL) {
+    if (m_pce != NULL && match_limit > 0) {
         local_pce = *m_pce;
         local_pce.match_limit = match_limit;
         local_pce.flags |= PCRE_EXTRA_MATCH_LIMIT;
@@ -405,19 +401,6 @@ int Regex::search(const std::string& s) const {
     return pcre_exec(m_pc, m_pce, s.c_str(),
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 #endif
-}
-
-unsigned long Regex::get_default_match_limit() const {
-    unsigned long default_match_limit;
-#ifdef WITH_PCRE2
-    int ret = pcre2_config(PCRE2_CONFIG_MATCHLIMIT, &default_match_limit);
-#else
-    int ret = pcre_config(PCRE_CONFIG_MATCH_LIMIT, &default_match_limit);
-#endif
-    if (ret < 0) {
-        default_match_limit = 10000000;
-    }
-    return default_match_limit;
 }
 
 RegexResult Regex::to_regex_result(int pcre_exec_result) const {

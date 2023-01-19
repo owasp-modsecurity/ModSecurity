@@ -223,7 +223,7 @@ class Driver;
 #include "src/variables/matched_vars.h"
 #include "src/variables/matched_vars_names.h"
 #include "src/variables/modsec_build.h"
-#include "src/variables/msc_pcre_errored.h"
+#include "src/variables/msc_pcre_error.h"
 #include "src/variables/msc_pcre_limits_exceeded.h"
 #include "src/variables/multipart_boundary_quoted.h"
 #include "src/variables/multipart_boundary_whitespace.h"
@@ -1025,7 +1025,7 @@ namespace yy {
     TOK_VARIABLE_INBOUND_DATA_ERROR = 292, // "INBOUND_DATA_ERROR"
     TOK_VARIABLE_MATCHED_VAR = 293, // "MATCHED_VAR"
     TOK_VARIABLE_MATCHED_VAR_NAME = 294, // "MATCHED_VAR_NAME"
-    TOK_VARIABLE_MSC_PCRE_ERRORED = 295, // "MSC_PCRE_ERRORED"
+    TOK_VARIABLE_MSC_PCRE_ERROR = 295, // "MSC_PCRE_ERROR"
     TOK_VARIABLE_MSC_PCRE_LIMITS_EXCEEDED = 296, // "MSC_PCRE_LIMITS_EXCEEDED"
     TOK_VARIABLE_MULTIPART_BOUNDARY_QUOTED = 297, // VARIABLE_MULTIPART_BOUNDARY_QUOTED
     TOK_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE = 298, // VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
@@ -1391,7 +1391,7 @@ namespace yy {
         S_VARIABLE_INBOUND_DATA_ERROR = 37,      // "INBOUND_DATA_ERROR"
         S_VARIABLE_MATCHED_VAR = 38,             // "MATCHED_VAR"
         S_VARIABLE_MATCHED_VAR_NAME = 39,        // "MATCHED_VAR_NAME"
-        S_VARIABLE_MSC_PCRE_ERRORED = 40,        // "MSC_PCRE_ERRORED"
+        S_VARIABLE_MSC_PCRE_ERROR = 40,          // "MSC_PCRE_ERROR"
         S_VARIABLE_MSC_PCRE_LIMITS_EXCEEDED = 41, // "MSC_PCRE_LIMITS_EXCEEDED"
         S_VARIABLE_MULTIPART_BOUNDARY_QUOTED = 42, // VARIABLE_MULTIPART_BOUNDARY_QUOTED
         S_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE = 43, // VARIABLE_MULTIPART_BOUNDARY_WHITESPACE
@@ -3122,16 +3122,16 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_VARIABLE_MSC_PCRE_ERRORED (location_type l)
+      make_VARIABLE_MSC_PCRE_ERROR (location_type l)
       {
-        return symbol_type (token::TOK_VARIABLE_MSC_PCRE_ERRORED, std::move (l));
+        return symbol_type (token::TOK_VARIABLE_MSC_PCRE_ERROR, std::move (l));
       }
 #else
       static
       symbol_type
-      make_VARIABLE_MSC_PCRE_ERRORED (const location_type& l)
+      make_VARIABLE_MSC_PCRE_ERROR (const location_type& l)
       {
-        return symbol_type (token::TOK_VARIABLE_MSC_PCRE_ERRORED, l);
+        return symbol_type (token::TOK_VARIABLE_MSC_PCRE_ERROR, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
