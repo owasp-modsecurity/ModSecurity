@@ -529,7 +529,7 @@ int Transaction::processURI(const char *uri, const char *method,
     }
 
     m_variableRequestFilename.set(
-        path_info,
+        path_info.substr(m_uri_decoded.size() - parsedURI.size()),
         m_variableOffset + strlen(method) + 1,
         var_size);
 

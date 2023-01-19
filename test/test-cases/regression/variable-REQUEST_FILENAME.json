@@ -74,11 +74,12 @@
       ]
     },
     "expected":{
+      "http_code": 403,
       "debug_log":"Target value: \"/one/two/login.php\" \\(Variable: REQUEST_FILENAME\\)"
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule REQUEST_FILENAME \"@contains test \" \"id:1,phase:3,pass,t:trim\""
+      "SecRule REQUEST_FILENAME \"@eq /one/two/login.php \" \"id:1,phase:3,deny,status:403,t:trim\""
     ]
   }
 ]
