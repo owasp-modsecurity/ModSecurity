@@ -219,7 +219,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         }
     }
 
-    if (m_containsMultiMatchAction && !m_isChained) {
+    if (m_containsMultiMatchAction && m_chainedRuleParent == nullptr) {
         if (m_severity) {
             m_severity->evaluate(this, trans, ruleMessage);
         }
