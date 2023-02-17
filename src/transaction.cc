@@ -814,7 +814,8 @@ int Transaction::processRequestBody() {
             m_variableReqbodyError.set("1", 0);
             m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
             m_variableInboundDataError.set("1", m_variableOffset);
-            ms_dbg(5, "Request body excluding files is bigger than the maximum expected.");
+            ms_dbg(5, "Request body excluding files is bigger than the maximum expected. Limit: " \
+                + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
             requestBodyNoFilesLimitExceeded = true;
 	}
     }
@@ -901,7 +902,8 @@ int Transaction::processRequestBody() {
             m_variableReqbodyError.set("1", 0);
             m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
             m_variableInboundDataError.set("1", m_variableOffset);
-            ms_dbg(5, "Request body excluding files is bigger than the maximum expected.");
+            ms_dbg(5, "Request body excluding files is bigger than the maximum expected. Limit: " \
+                + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
         } else {
             m_variableReqbodyError.set("0", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
