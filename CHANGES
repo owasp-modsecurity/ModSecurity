@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Support equals sign in XPath expressions
+    [Issue #2328 - @dennus, @martinhsv]
   - Encode two special chars in error.log output
     [Issue #2854 - @airween, @martinhsv]
   - Add JIT support for PCRE2
