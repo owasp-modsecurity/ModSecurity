@@ -696,7 +696,7 @@ AC_ARG_ENABLE(large-stream-input,
               AS_HELP_STRING([--enable-large-stream-input],
                              [Enable optimization for large stream input]),
 [
-  if test "$enableval" == "yes"; then
+  if test "$enableval" = "yes"; then
     large_stream_input="-DMSC_LARGE_STREAM_INPUT"
     MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $large_stream_input"
   else
