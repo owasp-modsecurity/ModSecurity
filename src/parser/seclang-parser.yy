@@ -319,7 +319,8 @@ using namespace modsecurity::operators;
 %initial-action
 {
   // Initialize the initial location.
-  @$.begin.filename = @$.end.filename = new std::string(driver.file);
+  driver.m_filenames.push_back(driver.file);
+  @$.begin.filename = @$.end.filename = &(driver.m_filenames.back());
 };
 %define parse.trace
 %define parse.error verbose

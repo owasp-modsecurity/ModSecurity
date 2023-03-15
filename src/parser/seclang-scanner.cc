@@ -5106,7 +5106,7 @@ static const flex_int16_t yy_rule_linenum[544] =
      1177, 1178, 1179, 1180, 1182, 1183, 1184, 1185, 1187, 1188,
      1189, 1190, 1192, 1194, 1195, 1197, 1198, 1199, 1200, 1202,
      1207, 1208, 1209, 1213, 1214, 1215, 1220, 1222, 1223, 1224,
-     1243, 1271, 1301
+     1243, 1272, 1303
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -8546,7 +8546,8 @@ YY_RULE_SETUP
         std::string err;
         std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
         driver.loc.push_back(new yy::location());
-        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(f);
+        driver.m_filenames.push_back(f);
+        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
@@ -8560,7 +8561,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 542:
 YY_RULE_SETUP
-#line 1271 "seclang-scanner.ll"
+#line 1272 "seclang-scanner.ll"
 {
     std::string err;
     const char *tmpStr = yytext + strlen("include");
@@ -8577,7 +8578,8 @@ YY_RULE_SETUP
     for (auto& s: files) {
         std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
         driver.loc.push_back(new yy::location());
-        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(f);
+        driver.m_filenames.push_back(f);
+        driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
 
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
@@ -8594,7 +8596,7 @@ YY_RULE_SETUP
 case 543:
 /* rule 543 can match eol */
 YY_RULE_SETUP
-#line 1301 "seclang-scanner.ll"
+#line 1303 "seclang-scanner.ll"
 {
     HttpsClient c;
     std::string key;
@@ -8610,7 +8612,8 @@ YY_RULE_SETUP
     c.setKey(key);
 
     driver.loc.push_back(new yy::location());
-    driver.loc.back()->begin.filename = driver.loc.back()->end.filename = new std::string(url);
+    driver.m_filenames.push_back(url);
+    driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
     YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
     yypush_buffer_state(temp);
 
@@ -8632,10 +8635,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 544:
 YY_RULE_SETUP
-#line 1337 "seclang-scanner.ll"
+#line 1340 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 8639 "seclang-scanner.cc"
+#line 8642 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -9740,7 +9743,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 1337 "seclang-scanner.ll"
+#line 1340 "seclang-scanner.ll"
 
 
 namespace modsecurity {
