@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Resolve memory leak on reload (bison-generated variable)
+    [Issue #2876 - @martinhsv]
   - Support equals sign in XPath expressions
     [Issue #2328 - @dennus, @martinhsv]
   - Encode two special chars in error.log output
