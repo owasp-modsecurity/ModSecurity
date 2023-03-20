@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Substitute two equals-equals operators in build
+   [Issue #2883 - @Polynomial-C]
 
 04 Jan 2023 - 2.9.7
 -------------------
