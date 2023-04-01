@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add some member variable inits in Transaction class
+    [Issue #2886 - @GNU-Plus-Windows-User, @airween, @mdounin, @martinhsv]
   - Resolve memory leak on reload (bison-generated variable)
     [Issue #2876 - @martinhsv]
   - Support equals sign in XPath expressions

@@ -101,11 +101,11 @@ namespace modsecurity {
  */
 Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
     : m_creationTimeStamp(utils::cpu_seconds()),
-    /* m_clientIpAddress(nullptr), */
+     m_clientIpAddress(std::make_shared<std::string>("")),
     m_httpVersion(""),
-    /* m_serverIpAddress(""), */
+    m_serverIpAddress(std::make_shared<std::string>("")),
     m_uri(""),
-    /* m_uri_no_query_string_decoded(""), */
+    m_uri_no_query_string_decoded(std::make_shared<std::string>("")),
     m_ARGScombinedSizeDouble(0),
     m_clientPort(0),
     m_highestSeverityAction(255),
@@ -175,11 +175,11 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
 
 Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCbData)
     : m_creationTimeStamp(utils::cpu_seconds()),
-    /* m_clientIpAddress(""), */
+    m_clientIpAddress(std::make_shared<std::string>("")),
     m_httpVersion(""),
-    /* m_serverIpAddress(""), */
+    m_serverIpAddress(std::make_shared<std::string>("")),
     m_uri(""),
-    /* m_uri_no_query_string_decoded(""), */
+    m_uri_no_query_string_decoded(std::make_shared<std::string>("")),
     m_ARGScombinedSizeDouble(0),
     m_clientPort(0),
     m_highestSeverityAction(255),
