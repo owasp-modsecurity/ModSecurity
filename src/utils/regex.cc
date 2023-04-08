@@ -242,8 +242,6 @@ RegexResult Regex::searchOneMatch(const std::string& s, std::vector<SMatchCaptur
 }
 
 RegexResult Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>& captures, unsigned long match_limit) const {
-    const char *subject = s.c_str();
-
     bool prev_match_zero_length = false;
 #ifdef WITH_PCRE2
     Pcre2MatchContextPtr match_context;
@@ -266,6 +264,7 @@ RegexResult Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>
         PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
 
 #else
+    const char *subject = s.c_str();
     pcre_extra local_pce;
     pcre_extra *pce = m_pce;
 
