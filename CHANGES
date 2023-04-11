@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: possible segfault on reload if duplicate ip+CIDR in ip match list
+    [Issue #2877, #2890 - @tomsommer, @martinhsv]
   - Add some member variable inits in Transaction class
     [Issue #2886 - @GNU-Plus-Windows-User, @airween, @mdounin, @martinhsv]
   - Resolve memory leak on reload (bison-generated variable)
