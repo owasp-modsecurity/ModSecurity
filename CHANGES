@@ -1,5 +1,5 @@
-v3.x.y - YYYY-MMM-DD (to be released)
--------------------------------------
+v3.0.9 - 2023-Apr-12
+--------------------
 
   - Fix: possible segfault on reload if duplicate ip+CIDR in ip match list
     [Issue #2877, #2890 - @tomsommer, @martinhsv]
