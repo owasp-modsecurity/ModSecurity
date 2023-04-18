@@ -70,14 +70,12 @@ uninitvar:src/operators/verify_svnr.cc:67
 noExplicitConstructor:seclang-parser.hh
 constParameter:seclang-parser.hh
 accessMoved:seclang-parser.hh
-returnTempReference:seclang-parser.hh
 
 unusedFunction
 missingIncludeSystem
 useStlAlgorithm
 preprocessorErrorDirective
 funcArgNamesDifferent
-unmatchedSuppression
 missingInclude
 
 purgedConfiguration
@@ -88,7 +86,6 @@ nullPointerRedundantCheck
 knownConditionTrueFalse
 cstyleCast
 functionStatic
-variableScope
 shadowFunction
 
 constVariable
