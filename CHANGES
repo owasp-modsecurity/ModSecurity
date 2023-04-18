@@ -1,5 +1,7 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
+  - Add test: empty lines in ipMatchFromFile test
+    [Issue #2846 - @tomsommer]
 
 
 
