@@ -1,5 +1,7 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
+  - Adjust position of memset from 2890
+    [Issue #2891 - @mirkodziadzka-avi, @martinhsv]
   - Add test: empty lines in ipMatchFromFile test
     [Issue #2846 - @tomsommer]
 
