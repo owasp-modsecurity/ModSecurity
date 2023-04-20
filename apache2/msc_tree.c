@@ -293,6 +293,8 @@ int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
     return 0;
 }
 
+TreeNode* CPTRetriveNode(modsec_rec* msr, unsigned char* buffer, unsigned int ip_bitmask, TreeNode* node);
+
 TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree *tree, unsigned char netmask)   {
     unsigned char *buffer = NULL;
     unsigned char bitlen = 0;
@@ -322,6 +324,9 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
     }
 
     node = tree->head;
+    TreeNode* exists = CPTRetriveNode(NULL, ipdata, ip_bitmask, node);
+    if (exists) return exists;
+
     buffer = prefix->buffer;
     bitlen = prefix->bitlen;
 
