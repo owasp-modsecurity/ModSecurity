@@ -324,9 +324,6 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
     }
 
     node = tree->head;
-    TreeNode* exists = CPTRetriveNode(NULL, ipdata, ip_bitmask, node);
-    if (exists) return exists;
-
     buffer = prefix->buffer;
     bitlen = prefix->bitlen;
 
@@ -383,6 +380,12 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
     if (bit_validation < test_bit)
         test_bit = bit_validation;
+
+    TreeNode* exists = CPTRetriveNode(NULL, ipdata, ip_bitmask, node);
+    if (exists) return exists;
+
+    TreeNode* exists = CPTRetriveNode(NULL, ipdata, ip_bitmask, node);
+    if (exists) return exists;
 
     parent = node->parent;
 
