@@ -935,8 +935,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 "Multipart: Added part header \"" + header_name \
                 + "\" \"" + header_value + "\".");
             if (len_without_termination > 0) {
-                m_buf[len_without_termination] = '\0';
-                m_mpp->m_last_header_line.assign(m_buf);
+                m_mpp->m_last_header_line.assign(m_buf, len_without_termination);
             } else {
                 m_mpp->m_last_header_line.assign("");
             }
