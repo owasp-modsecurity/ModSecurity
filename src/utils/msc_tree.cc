@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2015 - 2021 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ * Copyright (c) 2015 - 2023 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -258,10 +258,13 @@ int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
             }
 
             node->count++;
-            node->netmasks = reinterpret_cast<unsigned char *>(malloc(node->count * sizeof(unsigned char)));
 
-            if(node->netmasks == NULL)
+            node->netmasks = reinterpret_cast<unsigned char *>(malloc(node->count * sizeof(unsigned char)));
+            if(node->netmasks == NULL) {
                 return 0;
+            }
+            memset(node->netmasks, 0, (node->count *  sizeof(unsigned char)));
+
             if ((node->count-1) == 0) {
                 node->netmasks[0] = netmask;
                 return 1;
@@ -410,6 +413,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
                 node->count++;
                 new_node = node;
                 node->netmasks = reinterpret_cast<unsigned char *>(malloc(node->count *  sizeof(unsigned char)));
+                memset(node->netmasks, 0, (node->count *  sizeof(unsigned char)));
 
                 if ((node->count -1) == 0) {
                     node->netmasks[0] = netmask;
@@ -418,16 +422,16 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
                 node->netmasks[node->count - 1] = netmask;
 
-                i = node->count - 2;
-                while (i >= 0) {
-                    if (netmask < node->netmasks[i]) {
-                        node->netmasks[i + 1] = netmask;
+                int index = node->count - 2;
+                while (index >= 0) {
+                    if (netmask < node->netmasks[index]) {
+                        node->netmasks[index + 1] = netmask;
                         break;
                     }
 
-                    node->netmasks[i + 1] = node->netmasks[i];
-                    node->netmasks[i] = netmask;
-                    i--;
+                    node->netmasks[index + 1] = node->netmasks[index];
+                    node->netmasks[index] = netmask;
+                    index--;
                 }
             }
         } else {
@@ -481,6 +485,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
             }
 
             i_node->netmasks = reinterpret_cast<unsigned char *>(malloc((node->count - i) * sizeof(unsigned char)));
+            memset(i_node->netmasks, 0, ((node->count - i) * sizeof(unsigned char)));
 
             if(i_node->netmasks == NULL) {
                 free(new_node->prefix);

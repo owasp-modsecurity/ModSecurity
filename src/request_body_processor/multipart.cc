@@ -1199,15 +1199,9 @@ int Multipart::multipart_complete(std::string *error) {
         size_t offset = m_transaction->m_variableOffset + 1;
 
         if (m->m_type == MULTIPART_FILE) {
-            std::string tmp_name;
-            std::string name;
-        if (m->m_tmp_file && !m->m_tmp_file->getFilename().empty()) {
-            tmp_name.assign(m->m_tmp_file->getFilename());
-            m_transaction->m_variableFilesTmpNames.set(m->m_tmp_file->getFilename(),
-                m->m_tmp_file->getFilename(), m->m_filenameOffset);
-            }
-            if (!m->m_filename.empty()) {
-                name.assign(m->m_filename);
+            if (m->m_tmp_file && !m->m_tmp_file->getFilename().empty()) {
+                m_transaction->m_variableFilesTmpNames.set(m->m_tmp_file->getFilename(),
+                    m->m_tmp_file->getFilename(), m->m_filenameOffset);
             }
 
             m_transaction->m_variableFiles.set(m->m_name,
