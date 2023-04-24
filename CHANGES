@@ -1,5 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
+
+  - Exclude CRLF from MULTIPART_PART_HEADER value
+    [Issue #2870 - @airween, @martinhsv]
   - Configure: use AS_ECHO_N instead echo -n
     [Issue #2894 - @liudongmiao, @martinhsv]
   - Adjust position of memset from 2890
