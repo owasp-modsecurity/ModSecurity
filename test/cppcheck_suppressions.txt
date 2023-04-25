@@ -55,7 +55,7 @@ knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
 knownConditionTrueFalse:src/operators/verify_svnr.cc:87
 rethrowNoCurrentException:headers/modsecurity/transaction.h:309
 rethrowNoCurrentException:src/rule_with_actions.cc:127
-ctunullpointer:src/rule_with_actions.cc:241
+ctunullpointer:src/rule_with_actions.cc:244
 ctunullpointer:src/rule_with_operator.cc:135
 ctunullpointer:src/rule_with_operator.cc:95
 passedByValue:src/variables/global.h:109

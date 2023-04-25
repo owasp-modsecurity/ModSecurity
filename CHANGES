@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: audit log may omit tags when multiMatch
+    [Issue #2866 - @mlevogiannis]
   - Exclude CRLF from MULTIPART_PART_HEADER value
     [Issue #2870 - @airween, @martinhsv]
   - Configure: use AS_ECHO_N instead echo -n
@@ -9,7 +11,6 @@ v3.x.y - YYYY-MMM-DD (to be released)
     [Issue #2891 - @mirkodziadzka-avi, @martinhsv]
   - Add test: empty lines in ipMatchFromFile test
     [Issue #2846 - @tomsommer]
-
 
 
 v3.0.9 - 2023-Apr-12
