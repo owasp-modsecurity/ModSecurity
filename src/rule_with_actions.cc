@@ -229,6 +229,9 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         if (m_msg) {
             m_msg->evaluate(this, trans, ruleMessage);
         }
+        for (actions::Tag *a : m_actionsTag) {
+            a->evaluate(this, trans, ruleMessage);
+        }
     }
 
 }
