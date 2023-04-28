@@ -608,7 +608,7 @@ class Variables : public std::vector<Variable *> {
  public:
     bool contains(Variable *v) {
         return std::find_if(begin(), end(),
-            [v](Variable *m) -> bool { return *v == *m; }) != end();
+            [v](const Variable *m) -> bool { return *v == *m; }) != end();
     };
     bool contains(const VariableValue *v) {
         return std::find_if(begin(), end(),

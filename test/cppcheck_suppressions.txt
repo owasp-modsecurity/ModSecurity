@@ -80,8 +80,6 @@ missingInclude
 
 purgedConfiguration
 
-constParameter
-
 nullPointerRedundantCheck
 knownConditionTrueFalse
 cstyleCast
