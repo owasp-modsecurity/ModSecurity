@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: meta actions not applied if multiMatch in first rule of chain
+    [Issue #2867, #2868 - @mlevogiannis, @martinhsv]
   - Fix: audit log may omit tags when multiMatch
     [Issue #2866 - @mlevogiannis]
   - Exclude CRLF from MULTIPART_PART_HEADER value
