@@ -18,7 +18,7 @@ jobs:
           - {label: "wo yajl",    opt: "--without-yajl" }
           - {label: "wo geoip",   opt: "--without-geoip" }
           - {label: "wo lmdb",    opt: "--without-lmdb" }
-          - {label: "wo ssdeep",  opt: "--without-ssdeep" }
+          - {label: "with pcre2",  opt: "--with-pcre2" }
           - {label: "wo lua",     opt: "--without-lua" }
           - {label: "without maxmind", opt: "--without-maxmind" }
     steps:
@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo add-apt-repository --yes ppa:maxmind/ppa
           sudo apt-get update -y -qq
-          sudo apt-get install -y libfuzzy-dev libyajl-dev libgeoip-dev liblua5.2-dev liblmdb-dev cppcheck libmaxminddb-dev libcurl4-openssl-dev
+          sudo apt-get install -y libfuzzy-dev libyajl-dev libgeoip-dev liblua5.2-dev liblmdb-dev cppcheck libmaxminddb-dev libcurl4-openssl-dev libpcre2-dev pcre2-utils
       - uses: actions/checkout@v2
         with:
           submodules: true
