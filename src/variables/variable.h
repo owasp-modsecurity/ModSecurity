@@ -202,6 +202,10 @@ class VariableMonkeyResolution {
                 t->m_variableMatchedVar.evaluate(l);
             } else if (comp(variable, "MATCHED_VAR_NAME")) {
                 t->m_variableMatchedVarName.evaluate(l);
+            } else if (comp(variable, "MSC_PCRE_ERROR")) {
+                t->m_variableMscPcreError.evaluate(l);
+            } else if (comp(variable, "MSC_PCRE_LIMITS_EXCEEDED")) {
+                t->m_variableMscPcreLimitsExceeded.evaluate(l);
             } else if (comp(variable, "MULTIPART_CRLF_LF_LINES")) {
                 t->m_variableMultipartCrlfLFLines.evaluate(l);
             } else if (comp(variable, "MULTIPART_DATA_AFTER")) {
@@ -365,6 +369,10 @@ class VariableMonkeyResolution {
                 vv = t->m_variableMatchedVar.resolveFirst();
             } else if (comp(variable, "MATCHED_VAR_NAME")) {
                 vv = t->m_variableMatchedVarName.resolveFirst();
+            } else if (comp(variable, "MSC_PCRE_ERROR")) {
+                vv = t->m_variableMscPcreError.resolveFirst();
+            } else if (comp(variable, "MSC_PCRE_LIMITS_EXCEEDED")) {
+                vv = t->m_variableMscPcreLimitsExceeded.resolveFirst();
             } else if (comp(variable, "MULTIPART_CRLF_LF_LINES")) {
                 vv = t->m_variableMultipartCrlfLFLines.resolveFirst();
             } else if (comp(variable, "MULTIPART_DATA_AFTER")) {
