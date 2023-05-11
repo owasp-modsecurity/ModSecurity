@@ -68,7 +68,6 @@ uninitvar:src/operators/verify_svnr.cc:67
 functionConst:src/collection/backend/lmdb.h:86
 unusedLabel:src/collection/backend/lmdb.cc:297
 
-passedByValue:src/collection/backend/lmdb.cc
 variableScope:src/operators/rx.cc
 variableScope:src/operators/rx_global.cc
 
