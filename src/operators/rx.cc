@@ -74,6 +74,8 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
         if (regex_result == Utils::RegexResult::ErrorMatchLimit) {
             regex_error_str = "MATCH_LIMIT";
             transaction->m_variableMscPcreLimitsExceeded.set("1", transaction->m_variableOffset);
+            transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_LIMITS_EXCEEDED", "1");
+            ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_LIMITS_EXCEEDED to 1");
         }
 
         ms_dbg_a(transaction, 1, "rx: regex error '" + regex_error_str + "' for pattern '" + re->pattern + "'");
