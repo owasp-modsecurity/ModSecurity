@@ -444,6 +444,11 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     std::shared_ptr<std::string> m_serverIpAddress;
 
     /**
+     * Holds the request's hostname
+     */
+    std::shared_ptr<std::string> m_requestHostName;
+
+    /**
      * Holds the raw URI that was requested.
      */
     std::string m_uri;

@@ -104,6 +104,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
      m_clientIpAddress(std::make_shared<std::string>("")),
     m_httpVersion(""),
     m_serverIpAddress(std::make_shared<std::string>("")),
+    m_requestHostName(std::make_shared<std::string>("")),
     m_uri(""),
     m_uri_no_query_string_decoded(std::make_shared<std::string>("")),
     m_ARGScombinedSizeDouble(0),
@@ -180,6 +181,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_clientIpAddress(std::make_shared<std::string>("")),
     m_httpVersion(""),
     m_serverIpAddress(std::make_shared<std::string>("")),
+    m_requestHostName(std::make_shared<std::string>("")),
     m_uri(""),
     m_uri_no_query_string_decoded(std::make_shared<std::string>("")),
     m_ARGScombinedSizeDouble(0),
@@ -316,6 +318,7 @@ int Transaction::processConnection(const char *client, int cPort,
     const char *server, int sPort) {
     m_clientIpAddress = std::unique_ptr<std::string>(new std::string(client));
     m_serverIpAddress = std::unique_ptr<std::string>(new std::string(server));
+    m_requestHostName = std::unique_ptr<std::string>(new std::string(server));
     this->m_clientPort = cPort;
     this->m_serverPort = sPort;
     ms_dbg(4, "Transaction context created.");
@@ -706,6 +709,7 @@ int Transaction::addRequestHeader(const std::string& key,
     if (keyl == "host") {
         std::vector<std::string> host = utils::string::split(value, ':');
         m_variableServerName.set(host[0], m_variableOffset);
+        m_requestHostName = std::unique_ptr<std::string>(new std::string(host[0]));
     }
     m_variableOffset = m_variableOffset + value.size() + 1;
 
