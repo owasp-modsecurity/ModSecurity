@@ -1,5 +1,5 @@
 
-#line 2 "seclang-scanner.cc"
+#line 3 "seclang-scanner.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -5128,7 +5128,7 @@ static const flex_int16_t yy_rule_linenum[546] =
      1174, 1179, 1181, 1182, 1183, 1184, 1186, 1187, 1188, 1189,
      1191, 1192, 1193, 1194, 1196, 1198, 1199, 1201, 1202, 1203,
      1204, 1206, 1211, 1212, 1213, 1217, 1218, 1219, 1224, 1226,
-     1227, 1228, 1247, 1276, 1307
+     1227, 1228, 1247, 1276, 1306
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -5214,15 +5214,15 @@ static std::stack<int> YY_PREVIOUS_STATE;
 #define BEGIN_PREVIOUS() { BEGIN(YY_PREVIOUS_STATE.top()); YY_PREVIOUS_STATE.pop(); }
 
 // The location of the current token.
-#line 5217 "seclang-scanner.cc"
+#line 5218 "seclang-scanner.cc"
 #define YY_NO_INPUT 1
 
 #line 494 "seclang-scanner.ll"
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  driver.loc.back()->columns (yyleng);
 
-#line 5224 "seclang-scanner.cc"
 #line 5225 "seclang-scanner.cc"
+#line 5226 "seclang-scanner.cc"
 
 #define INITIAL 0
 #define EXPECTING_ACTION_PREDICATE_VARIABLE 1
@@ -5544,7 +5544,7 @@ YY_DECL
   // Code run each time yylex is called.
   driver.loc.back()->step();
 
-#line 5547 "seclang-scanner.cc"
+#line 5548 "seclang-scanner.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -8597,9 +8597,9 @@ YY_RULE_SETUP
 {
     std::string err;
     const char *tmpStr = yytext + strlen("include");
-    const char *file   = tmpStr + strspn( tmpStr, " \t");
-    char *f = strdup(file);
-    std::string fi = modsecurity::utils::find_resource(f, *driver.loc.back()->end.filename, &err);
+    const char *afterWhitespace   = tmpStr + strspn( tmpStr, " \t");
+    std::string file(afterWhitespace+1, strlen(afterWhitespace)-2);
+    std::string fi = modsecurity::utils::find_resource(file, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
         driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
@@ -8622,13 +8622,12 @@ YY_RULE_SETUP
         }
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
-    free(f);
 }
 	YY_BREAK
 case 545:
 /* rule 545 can match eol */
 YY_RULE_SETUP
-#line 1307 "seclang-scanner.ll"
+#line 1306 "seclang-scanner.ll"
 {
     HttpsClient c;
     std::string key;
@@ -8667,7 +8666,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 546:
 YY_RULE_SETUP
-#line 1344 "seclang-scanner.ll"
+#line 1343 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
 #line 8673 "seclang-scanner.cc"
@@ -9775,7 +9774,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 1344 "seclang-scanner.ll"
+#line 1343 "seclang-scanner.ll"
 
 
 namespace modsecurity {

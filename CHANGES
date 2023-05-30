@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: quoted Include config with wildcard
+    [Issue #2905 - @wiseelf, @airween, @martinhsv]
   - Support isolated PCRE match limits
     [Issue #2736 - @brandonpayton, @martinhsv]
   - Fix: meta actions not applied if multiMatch in first rule of chain
