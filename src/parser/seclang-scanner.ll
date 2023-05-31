@@ -1275,9 +1275,9 @@ EQUALS_MINUS                            (?i:=\-)
 {CONFIG_INCLUDE}[ \t]+["]{CONFIG_VALUE_PATH}["] {
     std::string err;
     const char *tmpStr = yytext + strlen("include");
-    const char *file   = tmpStr + strspn( tmpStr, " \t");
-    char *f = strdup(file);
-    std::string fi = modsecurity::utils::find_resource(f, *driver.loc.back()->end.filename, &err);
+    const char *afterWhitespace   = tmpStr + strspn( tmpStr, " \t");
+    std::string file(afterWhitespace+1, strlen(afterWhitespace)-2);
+    std::string fi = modsecurity::utils::find_resource(file, *driver.loc.back()->end.filename, &err);
     if (fi.empty() == true) {
         BEGIN(INITIAL);
         driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file. ") + err);
@@ -1300,7 +1300,6 @@ EQUALS_MINUS                            (?i:=\-)
         }
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
-    free(f);
 }
 
 {CONFIG_SEC_REMOTE_RULES}[ ][^ ]+[ ][^\n\r ]+ {
