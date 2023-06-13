@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: Lua scripts cannot read whole collection at once
+    [Issue #2900 - @udi-aharon, @airween, @martinhsv]
   - Fix: quoted Include config with wildcard
     [Issue #2905 - @wiseelf, @airween, @martinhsv]
   - Support isolated PCRE match limits
