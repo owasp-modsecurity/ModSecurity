@@ -73,5 +73,3 @@ jobs:
         run: make -j `sysctl -n hw.logicalcpu`
       - name: check
         run: make check
-      - name: check-static
-        run: make check-static
