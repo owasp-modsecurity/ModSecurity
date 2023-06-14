@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Make MULTIPART_PART_HEADERS accessible to lua
+    [Issue #2916 - @martinhsv]
   - Fix: Lua scripts cannot read whole collection at once
     [Issue #2900 - @udi-aharon, @airween, @martinhsv]
   - Fix: quoted Include config with wildcard
