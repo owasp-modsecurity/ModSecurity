@@ -1,6 +1,6 @@
 /*
  * ModSecurity, http://www.modsecurity.org/
- * Copyright (c) 2015 - 2023 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ * Copyright (c) 2015 - 2021 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -231,8 +231,6 @@ class VariableMonkeyResolution {
             anchoredSetVariable = &t->m_variableGeo;
         } else if (comp(col, "REQUEST_COOKIES_NAMES")) {
             anchoredSetVariable = &t->m_variableRequestCookiesNames;
-        } else if (comp(col, "MULTIPART_PART_HEADERS")) {
-            anchoredSetVariable = &t->m_variableMultipartPartHeaders;
         } else if (comp(col, "FILES_TMPNAMES")) {
             anchoredSetVariable = &t->m_variableFilesTmpNames;
         }
@@ -555,8 +553,6 @@ class VariableMonkeyResolution {
                 vv = t->m_variableRequestCookiesNames.resolveFirst(var);
             } else if (comp(col, "FILES_TMPNAMES")) {
                 vv = t->m_variableFilesTmpNames.resolveFirst(var);
-            } else if (comp(col, "MULTIPART_PART_HEADERS")) {
-                vv = t->m_variableMultipartPartHeaders.resolveFirst(var);
             } else if (comp(col, "TX")) {
                 vv = t->m_collections.m_tx_collection->resolveFirst(var);
             } else if (comp(col, "RESOURCE")) {
