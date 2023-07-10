@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add TX synonym for MSC_PCRE_LIMITS_EXCEEDED
+    [Issue #2901 - @airween]
   - Make MULTIPART_PART_HEADERS accessible to lua
     [Issue #2916 - @martinhsv]
   - Fix: Lua scripts cannot read whole collection at once
