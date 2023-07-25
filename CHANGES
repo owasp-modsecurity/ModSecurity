@@ -1,5 +1,5 @@
-v3.x.y - YYYY-MMM-DD (to be released)
--------------------------------------
+v3.0.10 - 2023-Jul-25
+---------------------
 
   - Fix: worst-case time in implementation of four transformations
     [Issue #2934 - @martinhsv]
