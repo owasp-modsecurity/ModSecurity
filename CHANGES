@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: worst-case time in implementation of four transformations
+    [Issue #2934 - @martinhsv]
   - Add TX synonym for MSC_PCRE_LIMITS_EXCEEDED
     [Issue #2901 - @airween]
   - Make MULTIPART_PART_HEADERS accessible to lua
