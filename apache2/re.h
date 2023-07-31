@@ -70,7 +70,7 @@ msre_var DSOLOCAL *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, con
 int DSOLOCAL msre_parse_generic(apr_pool_t *pool, const char *text, apr_table_t *vartable,
     char **error_msg);
 
-int DSOLOCAL rule_id_in_range(int ruleid, const char *range);
+int DSOLOCAL rule_id_in_range(long ruleid, const char *range);
 
 msre_var DSOLOCAL *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
     msre_rule *rule, apr_pool_t *mptmp);

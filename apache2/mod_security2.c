@@ -162,7 +162,7 @@ int perform_interception(modsec_rec *msr) {
     msre_actionset *actionset = NULL;
     const char *message = NULL;
     const char *phase_text = "";
-    unsigned int pause = 0;
+    unsigned long pause = 0;
     int status = DECLINED;
     int log_level = 1;
 
@@ -199,20 +199,20 @@ int perform_interception(modsec_rec *msr) {
             var->value_len = strlen(actionset->intercept_pause);
             expand_macros(msr, var, NULL, msr->mp);
 
-            pause = atoi(var->value);
-            if ((pause == LONG_MAX)||(pause == LONG_MIN)||(pause <= 0))
+            pause = strtoul(var->value, 0, 10);
+            if ((pause == ULONG_MAX)||(pause == LONG_MIN)||(pause <= 0))
                 pause = 0;
 
             msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
-                    "%d msec.", pause);
+                    "%lu msec.", pause);
             /* apr_sleep accepts microseconds */
             apr_sleep((apr_interval_time_t)(pause * 1000));
         } else {
-            pause = atoi(actionset->intercept_pause);
-            if ((pause == LONG_MAX)||(pause == LONG_MIN)||(pause <= 0))
+            pause = strtoul(actionset->intercept_pause, 0, 10);
+            if ((pause == ULONG_MAX)||(pause == LONG_MIN)||(pause <= 0))
                 pause = 0;
             msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
-                    "%d msec.", pause);
+                    "%lu msec.", pause);
             /* apr_sleep accepts microseconds */
             apr_sleep((apr_interval_time_t)(pause * 1000));
         }
