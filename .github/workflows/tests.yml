@@ -22,6 +22,7 @@ jobs:
         run: cd iis; .\getModSecurityPkgs.ps1 https://modsecurity.blob.core.windows.net/windows-artifacts
       - name: Pre-Build Preparation
         run: |
+          choco install python2
           cd iis
           #setup the python virtual env - not a must but still
           py.exe -2 -m pip install virtualenv
