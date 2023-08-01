@@ -2748,7 +2748,7 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
         /* Ignore empty lines and comments */
         if (*word == '#') continue;
 
-        for (i = 0; i < strlen(word); i++)
+        for (i = 0; word[i]; i++)
         {
             if (apr_isxdigit(word[i]) || word[i] == '.' || word[i] == '/' || word[i] == ':' || word[i] == '\n')
             {
@@ -2882,7 +2882,7 @@ size_t msc_curl_write_memory_cb(void *contents, size_t size,
     else
     {
         mem->memory = realloc(mem->memory, mem->size + realsize + 1);
-        memset(mem->memory + mem->size, '\0', sizeof(realsize + 1));
+        memset(mem->memory + mem->size, '\0', sizeof(realsize) + 1);
     }
 
     if (mem->memory == NULL) {
