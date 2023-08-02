@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Configure: add additional name to pcre2 pkg-config list
+    [Issue #2939 - @agebhar1, @fzipi, @martinhsv]
 
 v3.0.10 - 2023-Jul-25
 ---------------------
