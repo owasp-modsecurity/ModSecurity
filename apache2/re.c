@@ -1844,7 +1844,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                 return 1;
             }
 
-            if (rule->actionset->skip_after != NULL) {
+            if (rule->actionset != NULL && rule->actionset->skip_after != NULL) {
                 skip_after = rule->actionset->skip_after;
                 mode = SKIP_RULES;
                 saw_starter = 1;
