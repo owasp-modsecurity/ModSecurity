@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2023 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -1024,7 +1024,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     int matched = 0;
     int rc;
     char *qspos = NULL;
-    const char *parm = NULL, *pattern = NULL;
+    const char *parm = NULL;
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
@@ -1052,9 +1052,9 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
             expand_macros(msr, re_pattern, rule, msr->mp);
 
-            pattern = log_escape_re(msr->mp, re_pattern->value);
             if (msr->txcfg->debuglog_level >= 6) {
-                msr_log(msr, 6, "Escaping pattern [%s]",pattern);
+                char *pattern = log_escape_re(msr->mp, re_pattern->value);
+                msr_log(msr, 6, "Expanded-macro pattern [%s]",pattern);
             }
 
 #ifdef WITH_PCRE2
@@ -1062,7 +1062,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 #else
         options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
 #endif
-            regex = msc_pregcomp_ex(msr->mp, pattern, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+            regex = msc_pregcomp_ex(msr->mp, re_pattern->value, options, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
             if (regex == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Error compiling pattern (offset %d): %s",
                         erroffset, errptr);
@@ -1109,6 +1109,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     }
 
     /* Are we supposed to capture subexpressions? */
+    if (rule->actionset) { //MST
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
     matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
     if(!matched_bytes)
@@ -1117,6 +1118,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     matched = apr_table_get(rule->actionset->actions, "sanitizeMatched") ? 1 : 0;
     if(!matched)
         matched = apr_table_get(rule->actionset->actions, "sanitiseMatched") ? 1 : 0;
+    }
 
     /* Show when the regex captures but "capture" is not set */
     if (msr->txcfg->debuglog_level >= 6) {

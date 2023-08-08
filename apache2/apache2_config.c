@@ -1746,6 +1746,10 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
 
     config_orig_path = apr_pstrndup(mp, filename,
         strlen(filename) - strlen(apr_filepath_name_get(filename)));
+    //MST
+    if (config_orig_path == NULL) {
+        return apr_psprintf(mp, "ModSecurity: failed to duplicate filename in parser_conn_limits_operator");
+    }
 
     apr_filepath_merge(&file, config_orig_path, param, APR_FILEPATH_TRUENAME,
         mp);
