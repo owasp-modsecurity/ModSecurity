@@ -1131,7 +1131,6 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
-    if (msr->mpd->parts == NULL) return 0; //MST
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for (i = 0; i < msr->mpd->parts->nelts; i++)
@@ -1229,7 +1228,6 @@ static int var_files_tmpnames_generate(modsec_rec *msr, msre_var *var, msre_rule
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
-    if (msr->mpd->parts == NULL) return 0; //MST
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
@@ -1275,7 +1273,6 @@ static int var_files_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
-    if (msr->mpd->parts == NULL) return 0; //MST
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
@@ -1321,7 +1318,6 @@ static int var_files_sizes_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
-    if (msr->mpd->parts == NULL) return 0; //MST
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
@@ -1367,7 +1363,6 @@ static int var_files_names_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
-    if (msr->mpd->parts == NULL) return 0; //MST
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
@@ -1423,7 +1418,6 @@ static int var_multipart_part_headers_generate(modsec_rec *msr, msre_var *var, m
     int i, j, count = 0;
 
     if (msr->mpd == NULL) return 0;
-    if (msr->mpd->parts == NULL) return 0; //MST
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {

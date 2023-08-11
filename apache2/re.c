@@ -1844,7 +1844,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                 return 1;
             }
 
-            if (rule->actionset != NULL && rule->actionset->skip_after != NULL) {
+            if (rule->actionset->skip_after != NULL) {
                 skip_after = rule->actionset->skip_after;
                 mode = SKIP_RULES;
                 saw_starter = 1;
@@ -2763,7 +2763,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         }
 
         /* Keep track of the highest severity matched so far */
-        if (msr && (acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity)
+        if ((acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity)
             && !rule->actionset->is_chained)   {
             msr->highest_severity = acting_actionset->severity;
         }
