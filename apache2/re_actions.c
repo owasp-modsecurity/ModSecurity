@@ -1254,13 +1254,19 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         p1 = apr_strtok(value,";",&savedptr);
 
         p2 = apr_strtok(NULL,";",&savedptr);
+        if (p2 == NULL) {
+        			msr_log(msr, 1, "ModSecurity: Missing target for tag \"%s\"", p1);
+        			return -1;
+      		}
+
+        // Expand macros
+        msc_string* str = (msc_string*)apr_pcalloc(msr->mp, sizeof(msc_string));
+        str->value = apr_pstrdup(msr->mp, p2);
+        str->value_len = strlen(p2);
+        expand_macros(msr, str, rule, msr->mp);
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: ruleRemoveTargetByTag tag=%s targets=%s", p1, p2);
-        }
-        if (p2 == NULL) {
-            msr_log(msr, 1, "ModSecurity: Missing target for tag \"%s\"", p1);
-            return -1;
+            msr_log(msr, 4, "Ctl: ruleRemoveTargetByTag tag=%s targets=%s", p1, str->value);
         }
 
     re = apr_pcalloc(msr->mp, sizeof(rule_exception));
@@ -1271,7 +1277,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
         return -1;
     }
-    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
+    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, str->value), (void *)re);
     return 1;
     } else
     if (strcasecmp(name, "ruleRemoveTargetByMsg") == 0)  {
@@ -1282,13 +1288,13 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         p1 = apr_strtok(value,";",&savedptr);
 
         p2 = apr_strtok(NULL,";",&savedptr);
+        if (p2 == NULL) {
+        			msr_log(msr, 1, "ModSecurity: Missing target for tag \"%s\"", p1);
+        			return -1;
+      		}
 
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: ruleRemoveTargetByMsg msg=%s targets=%s", p1, p2);
-        }
-        if (p2 == NULL) {
-            msr_log(msr, 1, "ModSecurity: Missing target for msg \"%s\"", p1);
-            return -1;
         }
 
     re = apr_pcalloc(msr->mp, sizeof(rule_exception));
@@ -1299,7 +1305,14 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
         return -1;
     }
-    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
+
+    // Expand macros
+    msc_string* str = (msc_string*)apr_pcalloc(msr->mp, sizeof(msc_string));
+    str->value = apr_pstrdup(msr->mp, p2);
+    str->value_len = strlen(p2);
+    expand_macros(msr, str, rule, msr->mp);
+
+    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, str->value), (void *)re);
     return 1;
     }
     else {
