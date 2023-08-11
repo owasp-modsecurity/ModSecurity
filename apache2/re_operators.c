@@ -1109,7 +1109,6 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     }
 
     /* Are we supposed to capture subexpressions? */
-    if (rule->actionset) { //MST
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
     matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
     if(!matched_bytes)
@@ -1118,7 +1117,6 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     matched = apr_table_get(rule->actionset->actions, "sanitizeMatched") ? 1 : 0;
     if(!matched)
         matched = apr_table_get(rule->actionset->actions, "sanitiseMatched") ? 1 : 0;
-    }
 
     /* Show when the regex captures but "capture" is not set */
     if (msr->txcfg->debuglog_level >= 6) {
