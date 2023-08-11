@@ -1122,13 +1122,13 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
                     return -1;
                 } else
                     if (*p == '\\') {
-                        if ( (*(p + 1) == '\0') || ((*(p + 1) != '\'')&&(*(p + 1) != '\\')) ) {
+                        if ((*(p + 1) == '\0')) {
                             *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
                                     (int)(p - text), text);
                             free(value);
                             return -1;
                         }
-                        p++;
+                        if ((*(p + 1) == '\'') || (*(p + 1) == '\\')) p++; // compatibility with previous behaviour
                         *(d++) = *(p++);
                     } else
                         if (*p == '\'') {
