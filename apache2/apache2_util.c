@@ -30,6 +30,7 @@ apr_status_t send_error_bucket(modsec_rec *msr, ap_filter_t *f, int status) {
 
     /* Set the status line explicitly for the error document */
     f->r->status_line = ap_get_status_line(status);
+    f->r->status = 200; // needed for custom error messages
 
     brigade = apr_brigade_create(f->r->pool, f->r->connection->bucket_alloc);
     if (brigade == NULL) return APR_EGENERAL;
@@ -99,7 +100,12 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
         return -1;
     }
 
-    apr_procattr_io_set(procattr, APR_NO_PIPE, APR_FULL_BLOCK, APR_NO_PIPE);
+    rc = apr_procattr_io_set(procattr, APR_NO_PIPE, APR_FULL_BLOCK, APR_NO_PIPE);
+    if (rc != APR_SUCCESS) {
+        msr_log(msr, 1, "Exec: apr_procattr_io_set failed: %d (%s)", rc, get_apr_error(r->pool, rc));
+        return -1;
+    }
+
     apr_procattr_cmdtype_set(procattr, APR_SHELLCMD);
 
     if (msr->txcfg->debuglog_level >= 9) {

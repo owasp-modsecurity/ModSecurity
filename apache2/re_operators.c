@@ -630,18 +630,13 @@ nextround:
     }
 
     if(msr->stream_input_data != NULL && input_body == 1) {
-        memset(msr->stream_input_data, 0x0, msr->stream_input_length);
         free(msr->stream_input_data);
         msr->stream_input_data = NULL;
         msr->stream_input_length = 0;
 #ifdef MSC_LARGE_STREAM_INPUT
         msr->stream_input_allocated_length  = 0;
-
-        msr->stream_input_data = (char *)malloc(size);
-#else
-        msr->stream_input_data = (char *)malloc(size+1);
 #endif
-
+        msr->stream_input_data = (char *)malloc(size+1);
         if(msr->stream_input_data == NULL)  {
             return -1;
         }
@@ -649,16 +644,11 @@ nextround:
         msr->stream_input_length = size;
 #ifdef MSC_LARGE_STREAM_INPUT
         msr->stream_input_allocated_length = size;
-        memset(msr->stream_input_data, 0x0, size);
-#else
-        memset(msr->stream_input_data, 0x0, size+1);
 #endif
         msr->if_stream_changed = 1;
 
         memcpy(msr->stream_input_data, data, size);
-#ifndef MSC_LARGE_STREAM_INPUT
         msr->stream_input_data[size] = '\0';
-#endif
 
         var->value_len = size;
         var->value = msr->stream_input_data;
@@ -4312,6 +4302,9 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
 
     /* Check every byte of the target to detect characters that are not allowed. */
 
+    /* Handle capture as tx.1=char */
+    int capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+    
     count = 0;
     for(i = 0; i < var->value_len; i++) {
         int x = ((unsigned char *)var->value)[i];
@@ -4320,6 +4313,17 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
                 msr_log(msr, 9, "Value %d in %s outside range: %s", x, var->name, rule->op_param);
             }
             count++;
+            /* Handle capture as tx.1=char */
+         			if (capture) {
+           				msc_string* s = (msc_string*)apr_pcalloc(msr->mp, sizeof(msc_string));
+           				s->name = apr_psprintf(msr->mp, "%d", count);
+           				s->name_len = strlen(s->name);
+           				s->value = apr_pcalloc(msr->mp, 2);
+           				s->value[0] = var->value[i];
+           				s->value[1] = '\0';
+           				s->value_len = 1;
+           				apr_table_setn(msr->tx_vars, s->name, (void*)s);
+         			}
         }
     }
 

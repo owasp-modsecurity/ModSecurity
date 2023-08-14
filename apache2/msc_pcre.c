@@ -156,7 +156,7 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
 
     /* Setup the pcre_extra record if pcre_study did not already do it */
     if (pe == NULL) {
-        pe = pcre_malloc(sizeof(pcre_extra));
+        pe = (pcre_extra*)pcre_malloc(sizeof(pcre_extra));
         if (pe == NULL) {
             return NULL;
         }
