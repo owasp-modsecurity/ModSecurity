@@ -2384,8 +2384,6 @@ char *construct_single_var(modsec_rec *msr, char *name) {
     msre_var *vx = NULL;
     char *my_error_msg = NULL;
 
-    if (msr->msc_rule_mptmp == NULL) return NULL; //MST
-
     /* Extract variable name and its parameter from the script. */
     varname = apr_pstrdup(msr->mp, name);
     param = strchr(varname, '.');
