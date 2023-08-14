@@ -851,6 +851,8 @@ static int hook_request_early(request_rec *r) {
     modsec_rec *msr = NULL;
     int rc = DECLINED;
 
+    apr_table_set(r->subprocess_env, "ModSecVersion", MODSEC_MODULE_VERSION);
+
     /* This function needs to run only once per transaction
      * (i.e. subrequests and redirects are excluded).
      */
