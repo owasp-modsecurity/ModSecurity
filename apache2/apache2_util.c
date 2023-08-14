@@ -30,6 +30,7 @@ apr_status_t send_error_bucket(modsec_rec *msr, ap_filter_t *f, int status) {
 
     /* Set the status line explicitly for the error document */
     f->r->status_line = ap_get_status_line(status);
+    f->r->status = 200; // needed for custom error messages
 
     brigade = apr_brigade_create(f->r->pool, f->r->connection->bucket_alloc);
     if (brigade == NULL) return APR_EGENERAL;
