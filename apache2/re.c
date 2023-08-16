@@ -386,8 +386,13 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             } else {
 
                 target = strdup(p);
-                if(target == NULL)
-                    return NULL;
+                if(target == NULL) {
+                   if(target_list != NULL)
+                       free(target_list);
+                   if(replace != NULL)
+                       free(replace);
+                   return NULL;
+                  }
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
@@ -421,6 +426,8 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                         free(target_list);
                     if(replace != NULL)
                         free(replace);
+                    if(target != NULL)
+                        free(target);
                     if(msr) {
                         msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
                     }
@@ -512,18 +519,12 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if(target_list != NULL) {
+    if(target_list != NULL)
         free(target_list);
-        target_list = NULL;
-    }
-    if(replace != NULL) {
+    if(replace != NULL)
         free(replace);
-        replace = NULL;
-    }
-    if(target != NULL)  {
+    if(target != NULL)
         free(target);
-        target = NULL;
-    }
     return NULL;
 }
 
@@ -637,7 +638,10 @@ static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 /**
  * Generate an action string from an actionset.
  */
-static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
+#ifndef DEBUG_CONF
+ static 
+#endif
+char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
@@ -1033,6 +1037,42 @@ msre_action *msre_create_action(msre_engine *engine, apr_pool_t *mp, const char 
     return action;
 }
 
+// Remove redundant actions (tags, logdata, ...)
+// Return 1 if "name=value" is present in table (for supplied action)
+static int apr_table_action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* action, const char* name, const char* value) {
+	if (strcmp(name, action) != 0) return 0;
+
+	const char* vars = apr_table_getm(p, vartable, name);
+	if (!vars) return 0;
+
+	char pattern[200];
+	sprintf(pattern, "(?:^|,)%.185s(?:,|$)", value);
+
+	const char* errptr = NULL;
+	int erroffset;
+	const pcre* regex = pcre_compile(pattern, 0, &errptr, &erroffset, NULL);
+	return !pcre_exec(regex, NULL, vars, strlen(vars), 0, 0, 0, 0);
+}
+
+// Return 1 if "name=value" is present in table for tags, logdata (and others)
+static int action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* name, const char* value) {
+	if (apr_table_action_exists(p, vartable, "capture", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "chain", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "initcol", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "logdata", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "multiMatch", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseArg", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseMatched", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseMatchedBytes", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseRequestHeader", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseResponseHeader", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "setrsc", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "setsid", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "setuid", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "tag", name, value)) return 1;
+	return 0;
+}
+
 /**
  * Generic parser that is used as basis for target and action parsing.
  * It breaks up the input string into name-parameter pairs and places
@@ -1122,13 +1162,13 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
                     return -1;
                 } else
                     if (*p == '\\') {
-                        if ( (*(p + 1) == '\0') || ((*(p + 1) != '\'')&&(*(p + 1) != '\\')) ) {
+                        if ((*(p + 1) == '\0')) {
                             *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
                                     (int)(p - text), text);
                             free(value);
                             return -1;
                         }
-                        p++;
+                        if ((*(p + 1) == '\'') || (*(p + 1) == '\\')) p++; // compatibility with previous behaviour
                         *(d++) = *(p++);
                     } else
                         if (*p == '\'') {
@@ -1150,9 +1190,11 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
             value = apr_pstrmemdup(mp, value, p - value);
         }
 
-        /* add to table */
-        apr_table_addn(vartable, name, value);
-        count++;
+        /* add to table (only if not already present) */
+        if (!action_exists(mp, vartable, name, value)) {
+			        apr_table_addn(vartable, name, value);
+			        count++;
+	      	}
 
         /* move to the first character of the next name-value pair */
         while(isspace(*p)||(*p == ',')||(*p == '|')) p++;
@@ -1566,7 +1608,10 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                         saw_starter = 0;
 
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",rule->actionset->id,last_rule->actionset->is_chained,skip_after,saw_starter);
+                     						if (rule->actionset->id)
+                     							msr_log(msr, 9, "Current rule is id=\"%s\" %sis trying to find the SecMarker=\"%s\" [stater %d]", rule->actionset->id, last_rule->actionset->is_chained?"(chained) ":"", skip_after, saw_starter);
+                     						else
+                     							msr_log(msr, 9, "Current rule is \"%.50s\" %sis trying to find the SecMarker=\"%s\" [stater %d]", rule->actionset->rule->unparsed, last_rule->actionset->is_chained?"(chained) ":"", skip_after, saw_starter);
                         }
 
                     }
