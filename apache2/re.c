@@ -386,8 +386,13 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             } else {
 
                 target = strdup(p);
-                if(target == NULL)
-                    return NULL;
+                if(target == NULL) {
+                   if(target_list != NULL)
+                       free(target_list);
+                   if(replace != NULL)
+                       free(replace);
+                   return NULL;
+                  }
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
@@ -421,6 +426,8 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                         free(target_list);
                     if(replace != NULL)
                         free(replace);
+                    if(target != NULL)
+                        free(target);
                     if(msr) {
                         msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
                     }
