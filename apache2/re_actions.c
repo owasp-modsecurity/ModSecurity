@@ -1305,7 +1305,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     str->value_len = strlen(p2);
     expand_macros(msr, str, rule, msr->mp);
 
-    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, str->value), (void *)re);
+    apr_table_addn(msr->removed_targets, str->value, (void *)re);
     return 1;
     }
     else {
