@@ -519,18 +519,12 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if(target_list != NULL) {
+    if(target_list != NULL)
         free(target_list);
-        target_list = NULL;
-    }
-    if(replace != NULL) {
+    if(replace != NULL)
         free(replace);
-        replace = NULL;
-    }
-    if(target != NULL)  {
+    if(target != NULL)
         free(target);
-        target = NULL;
-    }
     return NULL;
 }
 
