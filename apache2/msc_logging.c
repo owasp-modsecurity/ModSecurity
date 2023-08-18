@@ -1459,7 +1459,8 @@ void sec_audit_logger_json(modsec_rec *msr) {
      * as it does not need an index file.
      */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-
+      if (!msr->modsecurity->auditlog_lock) msr_log(msr, 1, "Audit log: Global mutex was not created"); // MST
+		    else {
         /* Unlock the mutex we used to serialise access to the audit log file. */
         rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
         if (rc != APR_SUCCESS) {
@@ -1468,6 +1469,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
         }
 
         return;
+      }
     }
 
     /* From here on only concurrent-style processing. */
