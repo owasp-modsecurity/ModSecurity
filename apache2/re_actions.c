@@ -436,26 +436,18 @@ static apr_status_t msre_action_logdata_init(msre_engine *engine, apr_pool_t *mp
 static apr_status_t msre_action_sanitizeMatchedBytes_init(msre_engine *engine, apr_pool_t *mp,
         msre_actionset *actionset, msre_action *action)
 {
-    char *parse_parm = NULL;
-    char *ac_param = NULL;
-    char *savedptr = NULL;
-    int arg_min = 0;
-    int arg_max = 0;
+    // init in case no bytes are provided
+    actionset->arg_min = actionset->arg_max = 0;
+    if (!action->param) return 1;
 
-    if (action->param != NULL && strlen(action->param) == 3)   {
-
-        ac_param = apr_pstrdup(mp, action->param);
-        parse_parm = apr_strtok(ac_param,"/",&savedptr);
-
-        if(apr_isdigit(*parse_parm) && apr_isdigit(*savedptr))    {
-            arg_max = atoi(parse_parm);
-            arg_min = atoi(savedptr);
-        }
+    char* endptr = NULL;
+    actionset->arg_max = (int)strtol(action->param, &endptr, 0);
+    if (actionset->arg_max < 0 || actionset->arg_max == LONG_MAX) actionset->arg_max = 0;
+    if (*endptr == '/') {
+        actionset->arg_min = (int)strtol(++endptr, NULL, 0);
+        if (actionset->arg_min < 0 || actionset->arg_min == LONG_MAX) actionset->arg_min = 0;
     }
-
-    actionset->arg_min = arg_min;
-    actionset->arg_max = arg_max;
-
+    
     return 1;
 }
 
