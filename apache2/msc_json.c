@@ -364,7 +364,7 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
 	if (msr->json->depth_limit_exceeded) {
            *error_msg = "JSON depth limit exceeded";
 	} else {
-           char *yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
+           char *yajl_err = yajl_get_error(msr->json->handle, 0, base_offset, size);
            *error_msg = apr_pstrdup(msr->mp, yajl_err);
            yajl_free_error(msr->json->handle, yajl_err);
 	}
