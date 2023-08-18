@@ -334,7 +334,7 @@ cleanup:
         apr_sdbm_close(dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
         apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
-ÿ nd罎
+#endif
     }
 
     return NULL;
