@@ -931,7 +931,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         }
     }
 
-    if (rule->actionset->is_chained != 1) {
+    if (rule->actionset && rule->actionset->is_chained != 1) {
         /* If this rule is part of the chain but does
          * not want more rules to follow in the chain
          * then cut it (the chain).
