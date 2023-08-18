@@ -64,6 +64,7 @@
 #endif
 #define MODSEC_MODULE_VERSION MODSEC_VERSION
 #define MODSEC_MODULE_NAME_FULL MODSEC_MODULE_NAME "/" MODSEC_MODULE_VERSION " (http://www.modsecurity.org/)"
+#define MODSEC_MODULE_NAME_FULL2 MODSEC_MODULE_NAME "/" MODSEC_MODULE_VERSION ".1 (Approach " __DATE__ ")" //MST
 
 int DSOLOCAL get_modsec_build_type(const char *name);
 
