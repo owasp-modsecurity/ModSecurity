@@ -1037,6 +1037,42 @@ msre_action *msre_create_action(msre_engine *engine, apr_pool_t *mp, const char 
     return action;
 }
 
+// Remove redundant actions (tags, logdata, ...)
+// Return 1 if "name=value" is present in table (for supplied action)
+static int apr_table_action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* action, const char* name, const char* value) {
+	if (strcmp(name, action) != 0) return 0;
+
+	const char* vars = apr_table_getm(p, vartable, name);
+	if (!vars) return 0;
+
+	char pattern[200];
+	sprintf(pattern, "(?:^|,)%.185s(?:,|$)", value);
+
+	const char* errptr = NULL;
+	int erroffset;
+	const pcre* regex = pcre_compile(pattern, 0, &errptr, &erroffset, NULL);
+	return !pcre_exec(regex, NULL, vars, strlen(vars), 0, 0, 0, 0);
+}
+
+// Return 1 if "name=value" is present in table for tags, logdata (and others)
+static int action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* name, const char* value) {
+	if (apr_table_action_exists(p, vartable, "capture", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "chain", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "initcol", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "logdata", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "multiMatch", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseArg", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseMatched", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseMatchedBytes", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseRequestHeader", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitiseResponseHeader", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "setrsc", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "setsid", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "setuid", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "tag", name, value)) return 1;
+	return 0;
+}
+
 /**
  * Generic parser that is used as basis for target and action parsing.
  * It breaks up the input string into name-parameter pairs and places
@@ -1154,9 +1190,11 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
             value = apr_pstrmemdup(mp, value, p - value);
         }
 
-        /* add to table */
-        apr_table_addn(vartable, name, value);
-        count++;
+        /* add to table (only if not already present) */
+        if (!action_exists(mp, vartable, name, value)) {
+			        apr_table_addn(vartable, name, value);
+			        count++;
+	      	}
 
         /* move to the first character of the next name-value pair */
         while(isspace(*p)||(*p == ',')||(*p == '|')) p++;
