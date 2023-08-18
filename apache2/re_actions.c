@@ -2089,7 +2089,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     apr_table_setn(msr->collections, apr_pstrdup(msr->mp, col_name), (void *)table);
 
     if (msr->txcfg->debuglog_level >= 4) {
-        if (strcmp(col_name, real_col_name) != 0) {
+        if (col_name && real_col_name && strcmp(col_name, real_col_name) != 0) {
             msr_log(msr, 4, "Added collection \"%s\" to the list as \"%s\".",
                 log_escape(msr->mp, real_col_name), log_escape(msr->mp, col_name));
         } else {
