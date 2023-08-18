@@ -4314,6 +4314,9 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
 
     /* Check every byte of the target to detect characters that are not allowed. */
 
+    /* Handle capture as tx.1=char */
+    int capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+    
     count = 0;
     for(i = 0; i < var->value_len; i++) {
         int x = ((unsigned char *)var->value)[i];
@@ -4322,6 +4325,17 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
                 msr_log(msr, 9, "Value %d in %s outside range: %s", x, var->name, rule->op_param);
             }
             count++;
+            /* Handle capture as tx.1=char */
+         			if (capture) {
+           				msc_string* s = (msc_string*)apr_pcalloc(msr->mp, sizeof(msc_string));
+           				s->name = apr_psprintf(msr->mp, "%d", count);
+           				s->name_len = strlen(s->name);
+           				s->value = apr_pcalloc(msr->mp, 2);
+           				s->value[0] = var->value[i];
+           				s->value[1] = '\0';
+           				s->value_len = 1;
+           				apr_table_setn(msr->tx_vars, s->name, (void*)s);
+         			}
         }
     }
 
