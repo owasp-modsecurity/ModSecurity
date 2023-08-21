@@ -378,7 +378,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     }
 #if !defined(MSC_TEST)
                     else {
-                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find varibale to replace");
+                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find variable to replace");
                     }
 #endif
                     goto end;
