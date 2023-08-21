@@ -954,7 +954,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     }
 
     /* Keep track of any rule IDs we need to skip after */
-    if (rule->actionset->skip_after != NOT_SET_P) {
+    if (rule->actionset && rule->actionset->skip_after != NOT_SET_P) {
         char *tmp_id = apr_pstrdup(cmd->pool, rule->actionset->skip_after);
         apr_table_setn(dcfg->tmp_rule_placeholders, tmp_id, tmp_id);
 
@@ -977,7 +977,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     }
 
     /* Add an additional placeholder if this rule ID is on the list */
-    if ((rule->actionset->id != NULL) && apr_table_get(dcfg->tmp_rule_placeholders, rule->actionset->id)) {
+    if (rule->actionset && (rule->actionset->id != NULL) && apr_table_get(dcfg->tmp_rule_placeholders, rule->actionset->id)) {
         msre_rule *phrule = apr_palloc(rule->ruleset->mp, sizeof(msre_rule));
         if (phrule == NULL) {
             return FATAL_ERROR;
@@ -985,7 +985,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
         #ifdef DEBUG_CONF
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "Adding placeholder %pp for rule %pp id=\"%s\".", phrule, rule, rule->actionset->id);
+            "Adding placeholder %pp for rule %pp id=\"%s\".", phrule, rule, rule->actionset?rule->actionset->id:0);
         #endif
 
         /* shallow copy of original rule with placeholder marked as target */
@@ -993,12 +993,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         phrule->placeholder = RULE_PH_SKIPAFTER;
 
         /* Add placeholder. */
-        if (msre_ruleset_rule_add(dcfg->ruleset, phrule, phrule->actionset->phase) < 0) {
+        if (phrule->actionset && msre_ruleset_rule_add(dcfg->ruleset, phrule, phrule->actionset->phase) < 0) {
             return "Internal Error: Failed to add placeholder to the ruleset.";
         }
 
         /* No longer need to search for the ID */
-        apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
+        if (rule->actionset) apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
     }
 
     /* Update the unparsed rule */
