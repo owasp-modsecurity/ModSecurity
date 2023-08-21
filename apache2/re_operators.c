@@ -761,7 +761,6 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
     char *my_error_msg = NULL;
     int ovector[33];
     int rc;
-    const char *pattern = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
     int jit;
@@ -780,7 +779,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             *error_msg = "Internal Error: regex data is null.";
             return -1;
         } else  {
-
+            const char *pattern = NULL;
+            
             if(re_pattern == NULL)  {
                 *error_msg = "Internal Error: regex variable data is null.";
                 return -1;
