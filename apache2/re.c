@@ -506,7 +506,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
         if(var_appended == 1)  {
             current_targets = msre_generate_target_string(ruleset->mp, rule);
             rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, current_targets, NULL, NULL);
-            rule->p1 = apr_pstrdup(ruleset->mp, current_targets);
+            rule->p1 = current_targets;
             if(msr) {
                 msr_log(msr, 9, "Successfully appended variable");
             }
