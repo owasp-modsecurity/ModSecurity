@@ -972,7 +972,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     #endif
 
     /* Add rule to the recipe. */
-    if (msre_ruleset_rule_add(dcfg->ruleset, rule, rule->actionset->phase) < 0) {
+    if (rule->actionset && msre_ruleset_rule_add(dcfg->ruleset, rule, rule->actionset->phase) < 0) {
         return "Internal Error: Failed to add rule to the ruleset.";
     }
 
