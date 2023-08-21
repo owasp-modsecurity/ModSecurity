@@ -782,7 +782,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             expand_macros(msr, re_pattern, rule, msr->mp);
 
             if (msr->txcfg->debuglog_level >= 6) {
-                const char *pattern = log_escape_re(msr->mp, re_pattern->value);
+                pattern = log_escape_re(msr->mp, re_pattern->value);
                 msr_log(msr, 6, "Escaping pattern [%s]",pattern);
             }
 
