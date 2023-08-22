@@ -3268,7 +3268,6 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                 matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
                 if (!matched_bytes)
                     matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
-            }
 
             if (apr_table_get(rule->actionset->actions, "capture")) {
                 for(; i < rc; i++) {
@@ -3322,6 +3321,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             }
 
             break;
+        }
         }
     }
 
