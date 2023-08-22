@@ -660,6 +660,7 @@ static const char *modsec_var_log_handler(request_rec *r, char *name) {
 
     msr = retrieve_tx_context(r);
     if (msr == NULL) return NULL;
+    if (msr->msc_rule_mptmp == NULL) return NULL;
 
     return construct_single_var(msr, name);
 }

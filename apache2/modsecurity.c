@@ -327,6 +327,7 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
             msr->msc_full_request_buffer != NULL) {
         msr->msc_full_request_length = 0;
         free(msr->msc_full_request_buffer);
+        msr->msc_full_request_buffer = NULL;
     }
 
 #if defined(WITH_LUA)
