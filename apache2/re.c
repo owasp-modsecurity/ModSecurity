@@ -1044,10 +1044,11 @@ static int apr_table_action_exists(apr_pool_t* p, const apr_table_t* vartable, c
 	char pattern[200];
 	sprintf(pattern, "(?:^|,)%.185s(?:,|$)", value);
 
-	const char* errptr = NULL;
-	int erroffset;
-	const pcre* regex = pcre_compile(pattern, 0, &errptr, &erroffset, NULL);
-	return !pcre_exec(regex, NULL, vars, strlen(vars), 0, 0, 0, 0);
+ char *error_msg = NULL;
+ msc_regex_t *regex = msc_pregcomp(p, pattern, 0, NULL, NULL);
+ if (regex == NULL) return 0; // we could log an error here
+
+ return (msc_regexec(regex, vars, strlen(vars), &error_msg) > 0);
 }
 
 // Return 1 if "name=value" is present in table for tags, logdata (and others)
