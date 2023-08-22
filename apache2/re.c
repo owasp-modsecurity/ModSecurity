@@ -1635,7 +1635,8 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
 
             /* Check if this rule was removed at runtime */
-        if ((rule->actionset && (rule->actionset->id !=NULL) && !apr_is_empty_array(msr->removed_rules)) ||
+        if (rule->actionset)
+           if (((rule->actionset->id !=NULL) && !apr_is_empty_array(msr->removed_rules)) ||
                  (apr_is_empty_array(msr->removed_rules_tag)==0) || (apr_is_empty_array(msr->removed_rules_msg)==0)) {
             int j, act, rc;
             int do_process = 1;
