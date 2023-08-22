@@ -1635,7 +1635,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
 
             /* Check if this rule was removed at runtime */
-        if (((rule->actionset->id !=NULL) && !apr_is_empty_array(msr->removed_rules)) ||
+        if ((rule->actionset && (rule->actionset->id !=NULL) && !apr_is_empty_array(msr->removed_rules)) ||
                  (apr_is_empty_array(msr->removed_rules_tag)==0) || (apr_is_empty_array(msr->removed_rules_msg)==0)) {
             int j, act, rc;
             int do_process = 1;
@@ -1785,7 +1785,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
         }
 
         if (rc == RULE_NO_MATCH) {
-            if (rule->actionset->is_chained) {
+            if (rule->actionset && rule->actionset->is_chained) {
                 /* If the current rule is part of a chain then
                  * we need to skip over all the rules in the chain.
                  */
@@ -1874,7 +1874,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
              * determine how many rules/chains we need to
              * skip and configure the counter accordingly.
              */
-            if (rule->actionset->is_chained == 0) {
+            if (rule->actionset && rule->actionset->is_chained == 0) {
                 apr_table_clear(msr->matched_vars);
                 if (rule->chain_starter != NULL) {
                     if (rule->chain_starter->actionset->skip_count > 0) {
@@ -1884,7 +1884,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                         }
                     }
                 }
-                else if (rule->actionset->skip_count > 0) {
+                else if (rule->actionset && rule->actionset->skip_count > 0) {
                     skip = rule->actionset->skip_count;
                     if (msr->txcfg->debuglog_level >= 4) {
                         msr_log(msr, 4, "Skipping %d rules/chains.", skip);
@@ -1896,10 +1896,10 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             const char *id = "";
             const char *msg = "";
             if (rule->actionset) {
-                if (rule->actionset->id) {
+                if (rule->actionset && rule->actionset->id) {
                     id = rule->actionset->id;
                 }
-                if (rule->actionset->msg) {
+                if (rule->actionset && rule->actionset->msg) {
                     msg = rule->actionset->msg;
                 }
             }
@@ -2696,7 +2696,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         apr_time_t rule_time = 0;
         const char *rt_time = NULL;
 
-        if(rule->actionset->id != NULL) {
+        if(rule->actionset && rule->actionset->id != NULL) {
             rt_time = apr_table_get(msr->perf_rules, rule->actionset->id);
             if(rt_time == NULL) {
                 rt_time = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (t1 - time_before_op));
@@ -2764,7 +2764,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
 
         /* Keep track of the highest severity matched so far */
         if (msr && (acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity)
-            && !rule->actionset->is_chained)   {
+            && rule->actionset && !rule->actionset->is_chained)   {
             msr->highest_severity = acting_actionset->severity;
         }
 
@@ -2775,7 +2775,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         /* Perform disruptive actions, but only if
          * this rule is not part of a chain.
          */
-        if (rule->actionset->is_chained == 0) {
+        if (rule->actionset && rule->actionset->is_chained == 0) {
             msre_perform_disruptive_actions(msr, rule, acting_actionset, mptmp, my_error_msg);
         }
 
