@@ -239,7 +239,12 @@ static void copy_rules_phase(apr_pool_t *mp,
 
             if (copy > 0) {
 #ifdef DEBUG_CONF
-                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, rule->actionset->id);
+                const char* id = "";
+				if (rule->actionset) {
+					rule->actionset->id;
+					if (!id) id = rule->actionset->rule->unparsed;
+				}
+				ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, id);
 #endif
 
                 /* Copy the rule. */
