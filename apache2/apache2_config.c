@@ -239,7 +239,7 @@ static void copy_rules_phase(apr_pool_t *mp,
 
             if (copy > 0) {
 #ifdef DEBUG_CONF
-                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, rule->actionset && rule->actionset->id ? rule->actionset->id) : "";
+                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, rule->actionset && rule->actionset->id ? rule->actionset->id : "");
 #endif
 
                 /* Copy the rule. */
