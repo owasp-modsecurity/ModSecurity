@@ -94,7 +94,9 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
         if(targets != NULL) {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, rule->actionset->id);
+		const char* id = rule->actionset->id;
+		if (!id) id = rule->actionset->rule->unparsed;
+                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %.50s", targets, id);
             }
             target = apr_strtok((char *)targets, ",", &savedptr);
 
@@ -139,7 +141,9 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
             }
         } else  {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", rule->actionset->id);
+		const char* id = rule->actionset->id;
+		if (!id) id = rule->actionset->rule->unparsed;
+		msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %.50s.", id);
 
             }
         }
@@ -378,7 +382,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     }
 #if !defined(MSC_TEST)
                     else {
-                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find varibale to replace");
+                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find variable to replace");
                     }
 #endif
                     goto end;
@@ -386,8 +390,13 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             } else {
 
                 target = strdup(p);
-                if(target == NULL)
-                    return NULL;
+                if(target == NULL) {
+                   if(target_list != NULL)
+                       free(target_list);
+                   if(replace != NULL)
+                       free(replace);
+                   return NULL;
+                  }
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
@@ -421,6 +430,8 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                         free(target_list);
                     if(replace != NULL)
                         free(replace);
+                    if(target != NULL)
+                        free(target);
                     if(msr) {
                         msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
                     }
@@ -499,7 +510,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
         if(var_appended == 1)  {
             current_targets = msre_generate_target_string(ruleset->mp, rule);
             rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, current_targets, NULL, NULL);
-            rule->p1 = apr_pstrdup(ruleset->mp, current_targets);
+            rule->p1 = current_targets;
             if(msr) {
                 msr_log(msr, 9, "Successfully appended variable");
             }
@@ -512,18 +523,12 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if(target_list != NULL) {
+    if(target_list != NULL)
         free(target_list);
-        target_list = NULL;
-    }
-    if(replace != NULL) {
+    if(replace != NULL)
         free(replace);
-        replace = NULL;
-    }
-    if(target != NULL)  {
+    if(target != NULL)
         free(target);
-        target = NULL;
-    }
     return NULL;
 }
 
@@ -637,7 +642,10 @@ static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 /**
  * Generate an action string from an actionset.
  */
-static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
+#ifndef DEBUG_CONF
+ static 
+#endif
+char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
@@ -1159,13 +1167,13 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
                     return -1;
                 } else
                     if (*p == '\\') {
-                        if ( (*(p + 1) == '\0') || ((*(p + 1) != '\'')&&(*(p + 1) != '\\')) ) {
+                        if ((*(p + 1) == '\0')) {
                             *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
                                     (int)(p - text), text);
                             free(value);
                             return -1;
                         }
-                        p++;
+                        if ((*(p + 1) == '\'') || (*(p + 1) == '\\')) p++; // compatibility with previous behaviour
                         *(d++) = *(p++);
                     } else
                         if (*p == '\'') {
@@ -1517,8 +1525,10 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         /* Ignore markers, which are never processed. */
         if (rule->placeholder == RULE_PH_MARKER) continue;
 
+	const char* id = rule->actionset->rule->unparsed;
+	if (rule->actionset && rule->actionset->id) id = rule->actionset->id;
         msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %u usec", rule,
-                ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                id,
                 rule->filename != NULL ? rule->filename : "-",
                 rule->line_num,
                 (rule->execution_time / PERFORMANCE_MEASUREMENT_LOOP));
@@ -1605,7 +1615,9 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                         saw_starter = 0;
 
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",rule->actionset->id,last_rule->actionset->is_chained,skip_after,saw_starter);
+				const char* id = rule->actionset->id;
+				if (!id) id = rule->actionset->rule->unparsed;
+				msr_log(msr, 9, "Current rule is id=\"%.50s\" %sis trying to find the SecMarker=\"%s\" [stater %d]", id, last_rule && last_rule->actionset && last_rule->actionset->is_chained?"(chained) ":"", skip_after, saw_starter);
                         }
 
                     }
@@ -1759,10 +1771,12 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             /* Go to the next rule if this one has been removed. */
             if (do_process == 0) {
                 if (msr->txcfg->debuglog_level >= 5) {
-                    msr_log(msr, 5, "Not processing %srule id=\"%s\": "
+			const char* id = rule->actionset->id;
+			if (!id) id = rule->actionset->rule->unparsed;
+			msr_log(msr, 5, "Not processing %srule id=\"%.50s\": "
                             "removed by ctl action",
                             rule->actionset->is_chained ? "chained " : "",
-                            rule->actionset->id);
+                            id);
                 }
 
                 /* Skip the whole chain, if this is a chained rule */
@@ -1883,7 +1897,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                 return 1;
             }
 
-            if (rule->actionset->skip_after != NULL) {
+            if (rule->actionset != NULL && rule->actionset->skip_after != NULL) {
                 skip_after = rule->actionset->skip_after;
                 mode = SKIP_RULES;
                 saw_starter = 1;
@@ -1937,7 +1951,9 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             if (rule->actionset) {
                 if (rule->actionset->id) {
                     id = rule->actionset->id;
-                }
+                } else {
+			id = rule->actionset->rule->unparsed;
+		}
                 if (rule->actionset->msg) {
                     msg = rule->actionset->msg;
                 }
@@ -2802,7 +2818,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         }
 
         /* Keep track of the highest severity matched so far */
-        if ((acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity)
+        if (msr && (acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity)
             && !rule->actionset->is_chained)   {
             msr->highest_severity = acting_actionset->severity;
         }

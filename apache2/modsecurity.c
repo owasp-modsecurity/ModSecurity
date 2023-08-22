@@ -126,6 +126,12 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
 int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     apr_status_t rc;
 
+    // MST
+    msce->auditlog_lock = msce->geo_lock = NULL;
+#ifdef GLOBAL_COLLECTION_LOCK
+    msce->geo_lock = NULL;
+#endif
+
     /**
      * Notice that curl is initialized here but never cleaned up. First version
      * of this implementation curl was initialized and cleaned for every
@@ -321,6 +327,7 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
             msr->msc_full_request_buffer != NULL) {
         msr->msc_full_request_length = 0;
         free(msr->msc_full_request_buffer);
+        msr->msc_full_request_buffer = NULL;
     }
 
 #if defined(WITH_LUA)
