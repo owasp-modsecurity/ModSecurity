@@ -111,7 +111,7 @@ int DSOLOCAL msc_status_engine_fill_with_dots(char *encoded_with_dots,
         goto return_length;
     }
 
-    for (i = 0; i < strlen(data) && i < len; i++) {
+    for (i = 0; data[i] && i < len; i++) {
         if (i % space == 0 && i != 0) {
             encoded_with_dots[count++] = '.';
         }
