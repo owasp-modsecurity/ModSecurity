@@ -6,15 +6,14 @@ multi_SOURCES = \
 	multi.c
 
 multi_LDADD = \
+	$(top_builddir)/src/libmodsecurity.la \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
 	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD)
 
 multi_LDFLAGS = \
-	-L$(top_builddir)/src/.libs/ \
 	$(GEOIP_LDFLAGS) \
-	-lmodsecurity \
 	-lpthread \
 	-lm \
 	-lstdc++ \
