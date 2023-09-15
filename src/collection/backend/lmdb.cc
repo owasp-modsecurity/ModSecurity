@@ -257,6 +257,7 @@ void LMDB::resolveSingleMatch(const std::string& var,
             reinterpret_cast<char *>(mdb_value_ret.mv_data),
             mdb_value_ret.mv_size);
         VariableValue *v = new VariableValue(&var, a);
+        delete a;
         l->push_back(v);
     }
 
@@ -429,22 +430,28 @@ void LMDB::resolveMultiMatches(const std::string& var,
         while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
             l->insert(l->begin(), new VariableValue(
                 &m_name,
-                new std::string(reinterpret_cast<char *>(key.mv_data),
+                std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
-                new std::string(reinterpret_cast<char *>(data.mv_data),
+                std::string(reinterpret_cast<char *>(data.mv_data),
                 data.mv_size)));
         }
     } else {
-        while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
-            char *a = reinterpret_cast<char *>(key.mv_data);
-            if (strncmp(var.c_str(), a, keySize) == 0) {
-                l->insert(l->begin(), new VariableValue(
-                    &m_name,
-                    new std::string(reinterpret_cast<char *>(key.mv_data),
-                    key.mv_size),
-                    new std::string(reinterpret_cast<char *>(data.mv_data),
-                    data.mv_size)));
-            }
+        string2val(var, &key);
+        rc = mdb_cursor_get(cursor, &key, &data, MDB_SET_RANGE);
+        if (rc == 0) {
+            do {
+                char *a = reinterpret_cast<char *>(key.mv_data);
+                if (strncmp(var.c_str(), a, keySize) == 0) {
+                    l->insert(l->begin(), new VariableValue(
+                        &m_name,
+                        std::string(reinterpret_cast<char *>(key.mv_data),
+                        key.mv_size),
+                        std::string(reinterpret_cast<char *>(data.mv_data),
+                        data.mv_size)));
+                } else {
+                    break;
+                }
+            } while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0);
         }
     }
 
@@ -491,9 +498,9 @@ void LMDB::resolveRegularExpression(const std::string& var,
         }
 
         VariableValue *v = new VariableValue(
-            new std::string(reinterpret_cast<char *>(key.mv_data),
+            std::string(reinterpret_cast<char *>(key.mv_data),
                 key.mv_size),
-            new std::string(reinterpret_cast<char *>(data.mv_data),
+            std::string(reinterpret_cast<char *>(data.mv_data),
                 data.mv_size));
         l->insert(l->begin(), v);
     }
