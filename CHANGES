@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix memory leaks in lmdb code (new'd strings)
+    [Issue #2983 - @martinhsv]
   - Configure: add additional name to pcre2 pkg-config list
     [Issue #2939 - @agebhar1, @fzipi, @martinhsv]
 
