@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Check return code of apr_procattr_io_set()
+   [Issue #2958 - @marcstern]
  * Do not escape special chars in rx pattern with macro
    [Issue #2357 - @marcstern, @martinhsv]
  * Substitute two equals-equals operators in build
