@@ -473,12 +473,11 @@ void LMDB::resolveRegularExpression(const std::string& var,
     }
 
     while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
-        char *a = reinterpret_cast<char *>(key.mv_data);
-        int ret = Utils::regex_search(a, r);
+        std::string key_to_insert(reinterpret_cast<char *>(key.mv_data), key.mv_size);
+        int ret = Utils::regex_search(key_to_insert, r);
         if (ret <= 0) {
             continue;
         }
-        std::string key_to_insert(reinterpret_cast<char *>(key.mv_data), key.mv_size);
         if (ke.toOmit(key_to_insert)) {
             continue;
         }

@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix: lmdb regex match on non-null terminated string
+    [Issue #2985 - @martinhsv]
   - Fix memory leaks in lmdb code (new'd strings)
     [Issue #2983 - @martinhsv]
   - Configure: add additional name to pcre2 pkg-config list
