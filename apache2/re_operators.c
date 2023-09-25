@@ -958,7 +958,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     const char *pattern = rule->op_param;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int rc, jit;
+    int rc, jit = 0;
        #endif
     #endif
 
