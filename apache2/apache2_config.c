@@ -30,6 +30,15 @@
     APLOG_USE_MODULE(security2);
 #endif
 
+static const char* id_log(msre_rule* rule) {
+    const char* id = "";
+    if (rule->actionset) {
+        id = rule->actionset->id;
+        if (!id || id == (const char* )0xffffffffffffffff || !*id) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
+    }
+    return id;
+}
+
 /* -- Directory context creation and initialisation -- */
 
 /**
@@ -239,7 +248,7 @@ static void copy_rules_phase(apr_pool_t *mp,
 
             if (copy > 0) {
 #ifdef DEBUG_CONF
-                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, rule->actionset->id);
+                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, id_log(rule));
 #endif
 
                 /* Copy the rule. */
@@ -967,8 +976,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     #ifdef DEBUG_CONF
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-        "Adding rule %pp phase=%d id=\"%s\".", rule, rule->actionset->phase, (rule->actionset->id == NOT_SET_P
-        ? "(none)" : rule->actionset->id));
+        "Adding rule %pp phase=%d id=\"%s\".", rule, rule->actionset->phase, id_log(rule));
     #endif
 
     /* Add rule to the recipe. */
@@ -985,7 +993,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
         #ifdef DEBUG_CONF
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "Adding placeholder %pp for rule %pp id=\"%s\".", phrule, rule, rule->actionset->id);
+            "Adding placeholder %pp for rule %pp id=\"%s\".", phrule, rule, id_log(rule));
         #endif
 
         /* shallow copy of original rule with placeholder marked as target */
@@ -1042,8 +1050,7 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg,
     for (p = PHASE_FIRST; p <= PHASE_LAST; p++) {
         #ifdef DEBUG_CONF
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "Adding marker %pp phase=%d id=\"%s\".", rule, p, (rule->actionset->id == NOT_SET_P
-            ? "(none)" : rule->actionset->id));
+            "Adding marker %pp phase=%d id=\"%s\".", rule, p, id_log(rule));
         #endif
 
         if (msre_ruleset_rule_add(dcfg->ruleset, rule, p) < 0) {
@@ -1117,9 +1124,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
         char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "Update rule %pp id=\"%s\" old action: \"%s\"",
-            rule,
-            (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
-            actions);
+            rule, id_log(rule), actions);
     }
     #endif
 
@@ -1137,9 +1142,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
         char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "Update rule %pp id=\"%s\" new action: \"%s\"",
-            rule,
-            (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
-            actions);
+            rule, id_log(rule), actions);
     }
     #endif
 
