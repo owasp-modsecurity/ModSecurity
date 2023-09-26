@@ -1479,7 +1479,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         if (rule->placeholder == RULE_PH_MARKER) continue;
 
         msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %u usec", rule,
-                ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                rule->actionset->id,
                 rule->filename != NULL ? rule->filename : "-",
                 rule->line_num,
                 (rule->execution_time / PERFORMANCE_MEASUREMENT_LOOP));
@@ -1566,10 +1566,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                         saw_starter = 0;
 
                         if (msr->txcfg->debuglog_level >= 9) {
-                     						if (rule->actionset->id)
-                     							msr_log(msr, 9, "Current rule is id=\"%s\" %sis trying to find the SecMarker=\"%s\" [stater %d]", rule->actionset->id, last_rule->actionset->is_chained?"(chained) ":"", skip_after, saw_starter);
-                     						else
-                     							msr_log(msr, 9, "Current rule is \"%.50s\" %sis trying to find the SecMarker=\"%s\" [stater %d]", rule->actionset->rule->unparsed, last_rule->actionset->is_chained?"(chained) ":"", skip_after, saw_starter);
+				msr_log(msr, 9, "Current rule is id=\"%s\" %sis trying to find the SecMarker=\"%s\" [stater %d]", rule->actionset->id, last_rule && last_rule->actionset && last_rule->actionset->is_chained?"(chained) ":"", skip_after, saw_starter);
                         }
 
                     }
