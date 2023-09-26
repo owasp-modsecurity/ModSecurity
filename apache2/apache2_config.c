@@ -34,7 +34,7 @@ static const char* id_log(msre_rule* rule) {
     const char* id = "";
     if (rule->actionset) {
         id = rule->actionset->id;
-        if (!id || id == (const char* )0xffffffffffffffff || !*id) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
+        if (!id || id == NOT_SET_P || !*id) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
     }
     return id;
 }
