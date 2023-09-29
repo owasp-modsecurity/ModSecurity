@@ -1,6 +1,6 @@
 /*
  * ModSecurity, http://www.modsecurity.org/
- * Copyright (c) 2015 - 2021 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ * Copyright (c) 2015 - 2023 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 #ifdef __cplusplus
 #include <string>
-#include <iostream>
 #include <unordered_map>
 #include <list>
 #include <vector>
@@ -55,6 +54,8 @@ class Collection {
         const std::string &value) = 0;
 
     virtual void del(const std::string& key) = 0;
+
+    virtual void setExpiry(const std::string& key, int32_t expiry_seconds) = 0;
 
     virtual std::unique_ptr<std::string> resolveFirst(
         const std::string& var) = 0;
@@ -126,6 +127,21 @@ class Collection {
         std::string compartment2) {
         std::string nkey = compartment + "::" + compartment2 + "::" + key;
         del(nkey);
+    }
+
+
+    /* setExpiry */
+    virtual void setExpiry(const std::string& key, std::string compartment,
+        int32_t expiry_seconds) {
+        std::string nkey = compartment + "::" + key;
+        setExpiry(nkey, expiry_seconds);
+    }
+
+
+    virtual void setExpiry(const std::string& key, std::string compartment,
+        std::string compartment2, int32_t expiry_seconds) {
+        std::string nkey = compartment + "::" + compartment2 + "::" + key;
+        setExpiry(nkey, expiry_seconds);
     }
 
 

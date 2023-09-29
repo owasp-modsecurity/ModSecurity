@@ -78,6 +78,7 @@ accessMoved:seclang-parser.hh
 unreadVariable:src/operators/rx.cc
 unreadVariable:src/operators/rx_global.cc
 
+noExplicitConstructor:src/collection/backend/collection_data.h
 
 unusedFunction
 missingIncludeSystem
