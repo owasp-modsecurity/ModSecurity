@@ -94,9 +94,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
         if(targets != NULL) {
             if (msr->txcfg->debuglog_level >= 9) {
-		const char* id = rule->actionset->id;
-		if (!id) id = rule->actionset->rule->unparsed;
-                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %.50s", targets, id);
+                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, rule->actionset->id);
             }
             target = apr_strtok((char *)targets, ",", &savedptr);
 
@@ -141,9 +139,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
             }
         } else  {
             if (msr->txcfg->debuglog_level >= 9) {
-		const char* id = rule->actionset->id;
-		if (!id) id = rule->actionset->rule->unparsed;
-		msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %.50s.", id);
+                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", rule->actionset->id);
 
             }
         }
@@ -1525,10 +1521,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         /* Ignore markers, which are never processed. */
         if (rule->placeholder == RULE_PH_MARKER) continue;
 
-	const char* id = rule->actionset->rule->unparsed;
-	if (rule->actionset && rule->actionset->id) id = rule->actionset->id;
         msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %u usec", rule,
-                id,
+                (rule->actionset->id != NOT_SET_P) ? rule->actionset->id : "-",
                 rule->filename != NULL ? rule->filename : "-",
                 rule->line_num,
                 (rule->execution_time / PERFORMANCE_MEASUREMENT_LOOP));
@@ -1615,9 +1609,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                         saw_starter = 0;
 
                         if (msr->txcfg->debuglog_level >= 9) {
-				const char* id = rule->actionset->id;
-				if (!id) id = rule->actionset->rule->unparsed;
-				msr_log(msr, 9, "Current rule is id=\"%.50s\" %sis trying to find the SecMarker=\"%s\" [stater %d]", id, last_rule && last_rule->actionset && last_rule->actionset->is_chained?"(chained) ":"", skip_after, saw_starter);
+                            msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",(rule->actionset->id != NOT_SET_P) ? rule->actionset->id : "-",last_rule->actionset->is_chained,skip_after,saw_starter);
                         }
 
                     }
@@ -1772,12 +1764,10 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             /* Go to the next rule if this one has been removed. */
             if (do_process == 0) {
                 if (msr->txcfg->debuglog_level >= 5) {
-			const char* id = rule->actionset->id;
-			if (!id) id = rule->actionset->rule->unparsed;
-			msr_log(msr, 5, "Not processing %srule id=\"%.50s\": "
+                    msr_log(msr, 5, "Not processing %srule id=\"%s\": "
                             "removed by ctl action",
                             rule->actionset->is_chained ? "chained " : "",
-                            id);
+                            rule->actionset->id);
                 }
 
                 /* Skip the whole chain, if this is a chained rule */
@@ -1952,9 +1942,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             if (rule->actionset) {
                 if (rule->actionset && rule->actionset->id) {
                     id = rule->actionset->id;
-                } else {
-			id = rule->actionset->rule->unparsed;
-		}
+                }
                 if (rule->actionset && rule->actionset->msg) {
                     msg = rule->actionset->msg;
                 }
