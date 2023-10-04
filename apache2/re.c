@@ -1063,10 +1063,15 @@ static int action_exists(apr_pool_t* p, const apr_table_t* vartable, const char*
 	if (apr_table_action_exists(p, vartable, "logdata", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "multiMatch", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "sanitiseArg", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitizeArg", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "sanitiseMatched", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitizeMatched", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "sanitiseMatchedBytes", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitizeMatchedBytes", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "sanitiseRequestHeader", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitizeRequestHeader", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "sanitiseResponseHeader", name, value)) return 1;
+	if (apr_table_action_exists(p, vartable, "sanitizeResponseHeader", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "setrsc", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "setsid", name, value)) return 1;
 	if (apr_table_action_exists(p, vartable, "setuid", name, value)) return 1;
