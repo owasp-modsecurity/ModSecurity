@@ -183,9 +183,9 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
      *      no macros in the input data.
      */
 
-    data = apr_pstrdup(mptmp, var->value); /* IMP1 Are we modifying data anywhere? */
+    data = var->value;
     arr = apr_array_make(mptmp, 16, sizeof(msc_string *));
-    if ((data == NULL)||(arr == NULL)) return -1;
+    if (arr == NULL) return -1;
 
     text_start = next_text_start = data;
     do {
@@ -436,26 +436,18 @@ static apr_status_t msre_action_logdata_init(msre_engine *engine, apr_pool_t *mp
 static apr_status_t msre_action_sanitizeMatchedBytes_init(msre_engine *engine, apr_pool_t *mp,
         msre_actionset *actionset, msre_action *action)
 {
-    char *parse_parm = NULL;
-    char *ac_param = NULL;
-    char *savedptr = NULL;
-    int arg_min = 0;
-    int arg_max = 0;
+    // init in case no bytes are provided
+    actionset->arg_min = actionset->arg_max = 0;
+    if (!action->param) return 1;
 
-    if (action->param != NULL && strlen(action->param) == 3)   {
-
-        ac_param = apr_pstrdup(mp, action->param);
-        parse_parm = apr_strtok(ac_param,"/",&savedptr);
-
-        if(apr_isdigit(*parse_parm) && apr_isdigit(*savedptr))    {
-            arg_max = atoi(parse_parm);
-            arg_min = atoi(savedptr);
-        }
+    char* endptr = NULL;
+    actionset->arg_max = (int)strtol(action->param, &endptr, 0);
+    if (actionset->arg_max < 0 || actionset->arg_max == LONG_MAX) actionset->arg_max = 0;
+    if (*endptr == '/') {
+        actionset->arg_min = (int)strtol(++endptr, NULL, 0);
+        if (actionset->arg_min < 0 || actionset->arg_min == LONG_MAX) actionset->arg_min = 0;
     }
-
-    actionset->arg_min = arg_min;
-    actionset->arg_max = arg_max;
-
+    
     return 1;
 }
 
@@ -1254,26 +1246,32 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         p1 = apr_strtok(value,";",&savedptr);
 
         p2 = apr_strtok(NULL,";",&savedptr);
+      		if (p2 == NULL) {
+      			msr_log(msr, 1, "ModSecurity: Missing target for tag \"%s\"", p1);
+      			return -1;
+      		}
+
+        // Expand macros
+        msc_string* str = (msc_string*)apr_pcalloc(msr->mp, sizeof(msc_string));
+        str->value = apr_pstrdup(msr->mp, p2);
+        str->value_len = strlen(p2);
+        expand_macros(msr, str, rule, msr->mp);
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: ruleRemoveTargetByTag tag=%s targets=%s", p1, p2);
+            msr_log(msr, 4, "Ctl: ruleRemoveTargetByTag tag=%s targets=%s", p1, str->value);
         }
-        if (p2 == NULL) {
-            msr_log(msr, 1, "ModSecurity: Missing target for tag \"%s\"", p1);
+ 
+        re = apr_pcalloc(msr->mp, sizeof(rule_exception));
+        re->type = RULE_EXCEPTION_REMOVE_TAG;
+        re->param = (const char *)apr_pstrdup(msr->mp, p1);
+        re->param_data = msc_pregcomp(msr->mp, p1, 0, NULL, NULL);
+        if (re->param_data == NULL) {
+            msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
             return -1;
-        }
-
-    re = apr_pcalloc(msr->mp, sizeof(rule_exception));
-    re->type = RULE_EXCEPTION_REMOVE_TAG;
-    re->param = (const char *)apr_pstrdup(msr->mp, p1);
-    re->param_data = msc_pregcomp(msr->mp, p1, 0, NULL, NULL);
-    if (re->param_data == NULL) {
-        msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
-        return -1;
     }
-    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
-    return 1;
-    } else
+
+    apr_table_addn(msr->removed_targets, str->value, (void *)re);
+    return 1;    } else
     if (strcasecmp(name, "ruleRemoveTargetByMsg") == 0)  {
         rule_exception *re = NULL;
         char *p1 = NULL, *p2 = NULL;
@@ -1282,25 +1280,32 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         p1 = apr_strtok(value,";",&savedptr);
 
         p2 = apr_strtok(NULL,";",&savedptr);
-
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: ruleRemoveTargetByMsg msg=%s targets=%s", p1, p2);
-        }
         if (p2 == NULL) {
             msr_log(msr, 1, "ModSecurity: Missing target for msg \"%s\"", p1);
             return -1;
         }
 
-    re = apr_pcalloc(msr->mp, sizeof(rule_exception));
-    re->type = RULE_EXCEPTION_REMOVE_MSG;
-    re->param = apr_pstrdup(msr->mp, p1);
-    re->param_data = msc_pregcomp(msr->mp, p1, 0, NULL, NULL);
-    if (re->param_data == NULL) {
-        msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
-        return -1;
-    }
-    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
-    return 1;
+       if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: ruleRemoveTargetByMsg msg=%s targets=%s", p1, p2);
+       }
+ 
+   	   re = apr_pcalloc(msr->mp, sizeof(rule_exception));
+   	   re->type = RULE_EXCEPTION_REMOVE_MSG;
+   	   re->param = apr_pstrdup(msr->mp, p1);
+   	   re->param_data = msc_pregcomp(msr->mp, p1, 0, NULL, NULL);
+   	   if (re->param_data == NULL) {
+   		   msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
+   		   return -1;
+   	   }
+
+   	   // MST: Expand macros
+   	   msc_string* str = (msc_string*)apr_pcalloc(msr->mp, sizeof(msc_string));
+   	   str->value = apr_pstrdup(msr->mp, p2);
+   	   str->value_len = strlen(p2);
+   	   expand_macros(msr, str, rule, msr->mp);
+
+   	   apr_table_addn(msr->removed_targets, str->value, (void*)re);
+   	   return 1;
     }
     else {
         /* Should never happen, but log if it does. */
@@ -1561,8 +1566,7 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
     /* Figure out the collection name. */
     target_col = msr->tx_vars;
-    s = strstr(var_name, ".");
-    if (s == NULL) {
+    if (var_name == NULL || (s = strstr(var_name, ".")) == NULL) {
         if (msr->txcfg->debuglog_level >= 3) {
             msr_log(msr, 3, "Asked to set variable \"%s\", but no collection name specified. ",
                 log_escape(msr->mp, var_name));
@@ -2085,7 +2089,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     apr_table_setn(msr->collections, apr_pstrdup(msr->mp, col_name), (void *)table);
 
     if (msr->txcfg->debuglog_level >= 4) {
-        if (strcmp(col_name, real_col_name) != 0) {
+        if (col_name && real_col_name && strcmp(col_name, real_col_name) != 0) {
             msr_log(msr, 4, "Added collection \"%s\" to the list as \"%s\".",
                 log_escape(msr->mp, real_col_name), log_escape(msr->mp, col_name));
         } else {

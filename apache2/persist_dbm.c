@@ -100,18 +100,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     apr_table_entry_t *te;
     int expired = 0;
     int i;
-
-    /**
-     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
-     */
-    char *userinfo;
-    apr_uid_t uid;
-    apr_gid_t gid;
-    apr_uid_current(&uid, &gid, msr->mp);
-    rc = apr_uid_name_get(&userinfo, uid, msr->mp);
-    if (rc != APR_SUCCESS) {
-      userinfo = apr_psprintf(msr->mp, "%u", uid);
-    }
+    char *userinfo = get_username(msr->mp);
 
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "collection_retrieve_ex: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
@@ -384,18 +373,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     int i;
     const apr_table_t *stored_col = NULL;
     const apr_table_t *orig_col = NULL;
-
-    /**
-     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
-     */
-    char *userinfo;
-    apr_uid_t uid;
-    apr_gid_t gid;
-    apr_uid_current(&uid, &gid, msr->mp);
-    rc = apr_uid_name_get(&userinfo, uid, msr->mp);
-    if (rc != APR_SUCCESS) {
-      userinfo = apr_psprintf(msr->mp, "%u", uid);
-    }
+    char *userinfo = get_username(msr->mp);
 
     var_name = (msc_string *)apr_table_get(col, "__name");
     if (var_name == NULL) {
@@ -677,18 +655,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     char **keys;
     apr_time_t now = apr_time_sec(msr->request_time);
     int i;
-
-    /**
-     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
-     */
-    char *userinfo;
-    apr_uid_t uid;
-    apr_gid_t gid;
-    apr_uid_current(&uid, &gid, msr->mp);
-    rc = apr_uid_name_get(&userinfo, uid, msr->mp);
-    if (rc != APR_SUCCESS) {
-      userinfo = apr_psprintf(msr->mp, "%u", uid);
-    }
+    char *userinfo = get_username(msr->mp);
 
     if (msr->txcfg->data_dir == NULL) {
         /* The user has been warned about this problem enough times already by now.
