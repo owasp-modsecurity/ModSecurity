@@ -32,8 +32,7 @@ static void msre_engine_action_register(msre_engine *engine, const char *name,
     if (metadata == NULL) return;
 
     metadata->name = name;
-    if (strcmpi(name, "sanitizeMatched"     ) == 0) metadata->name = "sanitiseMatched";
-    if (strcmpi(name, "sanitizeMatchedBytes") == 0) metadata->name = "sanitiseMatchedBytes";
+    if (strncasecmp(name, "sanitize", 8) == 0) ((char*)metadata->name)[6] = 's';
     metadata->type = type;
     metadata->argc_min = argc_min;
     metadata->argc_max = argc_max;
