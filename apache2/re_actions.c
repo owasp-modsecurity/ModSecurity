@@ -749,8 +749,15 @@ static char *msre_action_allow_validate(msre_engine *engine, apr_pool_t *mp, msr
 /* phase */
 
 static char *msre_action_phase_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
-    /* ENH Add validation. */
-    return NULL;
+    if (strcasecmp(action->param, "request") == 0) return NULL;
+    if (strcasecmp(action->param, "response") == 0) return NULL;
+    if (strcasecmp(action->param, "logging") == 0) return NULL;
+    if (strcasecmp(action->param, "1") == 0) return NULL;
+    if (strcasecmp(action->param, "2") == 0) return NULL;
+    if (strcasecmp(action->param, "3") == 0) return NULL;
+    if (strcasecmp(action->param, "4") == 0) return NULL;
+    if (strcasecmp(action->param, "5") == 0) return NULL;
+    return apr_psprintf(mp, "Invalid parameter for phase: %s", action->param);;
 }
 
 static apr_status_t msre_action_phase_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
