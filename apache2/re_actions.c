@@ -31,8 +31,12 @@ static void msre_engine_action_register(msre_engine *engine, const char *name,
         sizeof(msre_action_metadata));
     if (metadata == NULL) return;
 
-    metadata->name = name;
-    if (strncasecmp(name, "sanitize", 8) == 0) ((char*)metadata->name)[6] = 's';
+    if (strncasecmp(name, "sanitize", 8) == 0) {
+    	char *buf = apr_pstrdup(engine->mp, name);
+    	buf[6] = 's';
+    	metadata->name = buf;
+    }
+    else metadata->name = name;
     metadata->type = type;
     metadata->argc_min = argc_min;
     metadata->argc_max = argc_max;
