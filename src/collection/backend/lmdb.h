@@ -126,6 +126,8 @@ class LMDB :
     void string2val(const std::string& str, MDB_val *val);
     void inline lmdb_debug(int rc, const std::string &op, const std::string &scope);
 
+    void delIfExpired(const std::string& key);
+
     MDB_env *m_env;
     MDB_dbi m_dbi;
     bool isOpen;

@@ -79,6 +79,7 @@ unreadVariable:src/operators/rx.cc
 unreadVariable:src/operators/rx_global.cc
 
 noExplicitConstructor:src/collection/backend/collection_data.h
+stlIfStrFind:src/collection/backend/collection_data.cc
 
 unusedFunction
 missingIncludeSystem

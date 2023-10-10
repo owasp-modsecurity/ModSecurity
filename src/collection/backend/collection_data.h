@@ -16,12 +16,9 @@
 
 #ifdef __cplusplus
 #include <string>
-#include <memory>
 #include <chrono>
 #endif
 
-
-#include "modsecurity/collection/collection.h"
 
 #ifndef SRC_COLLECTION_DATA_H_
 #define SRC_COLLECTION_DATA_H_
@@ -52,6 +49,9 @@ public:
     void setExpiry(int32_t seconds_until_expiry);
     bool hasExpiry() const { return m_hasExpiryTime;}
     bool isExpired() const;
+
+    std::string getSerialized() const;
+    void setFromSerialized(const char* serializedData, size_t length);
 
 private:
     bool m_hasValue;
