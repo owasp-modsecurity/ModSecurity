@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Configure: do not check for pcre1 if pcre2 requested
+   [Issue #2975 - @zhaoshikui, @martinhsv]
  * Check return code of apr_procattr_io_set()
    [Issue #2958 - @marcstern]
  * Do not escape special chars in rx pattern with macro
