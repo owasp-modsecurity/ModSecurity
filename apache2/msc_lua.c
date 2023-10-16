@@ -429,12 +429,12 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
 #else
 
     /* Create new state. */
-#if LUA_VERSION_NUM == 502 || LUA_VERSION_NUM == 503 || LUA_VERSION_NUM == 501
+#if LUA_VERSION_NUM == 502 || LUA_VERSION_NUM == 503 || LUA_VERSION_NUM == 504 || LUA_VERSION_NUM == 501
     L = luaL_newstate();
 #elif LUA_VERSION_NUM == 500
     L = lua_open();
 #else
-#error We are only tested under Lua 5.0, 5.1, 5.2, or 5.3.
+#error We are only tested under Lua 5.0, 5.1, 5.2, 5.3, or 5.4.
 #endif
     luaL_openlibs(L);
 
@@ -459,10 +459,10 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
     /* Register functions. */
 #if LUA_VERSION_NUM == 500 || LUA_VERSION_NUM == 501
     luaL_register(L, "m", mylib);
-#elif LUA_VERSION_NUM == 502 || LUA_VERSION_NUM == 503
+#elif LUA_VERSION_NUM == 502 || LUA_VERSION_NUM == 503 || LUA_VERSION_NUM == 504
     luaL_setfuncs(L, mylib, 0);
 #else
-#error We are only tested under Lua 5.0, 5.1, 5.2, or 5.3.
+#error We are only tested under Lua 5.0, 5.1, 5.2, 5.3, or 5.4.
 #endif
 
     lua_setglobal(L, "m");
