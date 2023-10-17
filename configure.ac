@@ -245,7 +245,7 @@ AC_ARG_ENABLE(mlogc,
 CHECK_CURL()
 
 if test -z "${CURL_VERSION}"; then
-  AC_MSG_NOTICE([NOTE: mlgoc compilation was disabled.])
+  AC_MSG_NOTICE([NOTE: mlogc compilation was disabled.])
   build_mlogc=0
 fi
 
