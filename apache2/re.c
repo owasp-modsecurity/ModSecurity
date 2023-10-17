@@ -353,11 +353,11 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
                         if(msr) {
-                            msr_log(msr, 9, "Error parsing rule targets to replace variable");
+                            msr_log(msr, 9, "Error parsing rule targets to replace variable: %s", my_error_msg);
                         }
 #if !defined(MSC_TEST)
                         else {
-                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parsing rule targets to replace variable");
+                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parsing rule targets to replace variable: %s", my_error_msg);
                         }
 #endif
                         goto end;
