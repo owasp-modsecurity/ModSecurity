@@ -154,7 +154,9 @@ static int var_args_combined_size_generate(modsec_rec *msr, msre_var *var, msre_
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+#ifndef ARGS_COMBINED_SIZE_VALUE_ONLY
         combined_size += arg->name_len;
+#endif
         combined_size += arg->value_len;
     }
 
