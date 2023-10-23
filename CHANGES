@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add support for expirevar action
+    [Issue #1803, #3001 - @martinhsv]
   - Fix: lmdb regex match on non-null terminated string
     [Issue #2985 - @martinhsv]
   - Fix memory leaks in lmdb code (new'd strings)
