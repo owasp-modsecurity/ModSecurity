@@ -4324,7 +4324,7 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
             }
             count++;
             /* Handle capture as tx.1=char */
-         			if (capture) {
+         			if (capture && count < 10) {
            				msc_string* s = (msc_string*)apr_pcalloc(msr->mp, sizeof(msc_string));
            				s->name = apr_psprintf(msr->mp, "%d", count);
            				s->name_len = strlen(s->name);
