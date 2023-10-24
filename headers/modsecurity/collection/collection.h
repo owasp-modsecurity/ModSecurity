@@ -45,7 +45,6 @@ class Collection {
  public:
     explicit Collection(const std::string &a) : m_name(a) { }
     virtual ~Collection() { }
-    virtual void store(std::string key, std::string value) = 0;
 
     virtual bool storeOrUpdateFirst(const std::string &key,
         const std::string &value) = 0;
@@ -68,21 +67,6 @@ class Collection {
     virtual void resolveRegularExpression(const std::string& var,
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) = 0;
-
-
-    /* store */
-    virtual void store(std::string key, std::string compartment,
-        std::string value) {
-        std::string nkey = compartment + "::" + key;
-        store(nkey, value);
-    }
-
-
-    virtual void store(std::string key, std::string compartment,
-        std::string compartment2, std::string value) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + key;
-        store(nkey, value);
-    }
 
 
     /* storeOrUpdateFirst */

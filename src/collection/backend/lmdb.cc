@@ -397,43 +397,6 @@ end_txn:
 }
 
 
-void LMDB::store(std::string key, std::string value) {
-    MDB_val mdb_key, mdb_data;
-    MDB_txn *txn = NULL;
-    int rc;
-    MDB_stat mst;
-
-    rc = txn_begin(0, &txn);
-    lmdb_debug(rc, "txn", "store");
-    if (rc != 0) {
-        goto end_txn;
-    }
-
-    string2val(key, &mdb_key);
-    string2val(value, &mdb_data);
-    rc = mdb_put(txn, m_dbi, &mdb_key, &mdb_data, 0);
-    lmdb_debug(rc, "put", "store");
-    if (rc != 0) {
-        goto end_put;
-    }
-
-    rc = mdb_txn_commit(txn);
-    lmdb_debug(rc, "commit", "store");
-    if (rc != 0) {
-        goto end_commit;
-    }
-
-end_put:
-end_dbi:
-    if (rc != 0) {
-        mdb_txn_abort(txn);
-    }
-end_commit:
-end_txn:
-    return;
-}
-
-
 bool LMDB::updateFirst(const std::string &key,
     const std::string &value) {
     int rc;

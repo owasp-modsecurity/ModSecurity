@@ -98,7 +98,6 @@ class LMDB :
     public Collection {
  public:
     explicit LMDB(const std::string &name);
-    void store(std::string key, std::string value) override;
 
     bool storeOrUpdateFirst(const std::string &key,
         const std::string &value) override;
