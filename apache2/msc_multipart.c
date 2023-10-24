@@ -85,7 +85,6 @@ static char *multipart_construct_filename(modsec_rec *msr) {
  */
 static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value) {
     char *p = NULL, *t = NULL;
-    int filenamestar = 0;
 
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
@@ -211,7 +210,6 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
             validate_quotes(msr, value, quote);
 
-            if (filenamestar) continue;
             msr->multipart_filename = apr_pstrdup(msr->mp, value);
 
             if (msr->mpd->mpp->filename != NULL) {
@@ -223,22 +221,6 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
-                    log_escape_nq(msr->mp, value));
-            }
-        }
-        else if (strcmp(name, "filename*") == 0) {
-            if (strncasecmp(value, "UTF-8''", 7) && strncasecmp(value, "ISO-8859-1''", 12)) {
-                msr_log(msr, 4, "Multipart: filename* must contain encoding: %s",
-                    log_escape_nq(msr->mp, value));
-                msr->mpd->flag_error = 1;
-                return -16;
-            }
-            filenamestar = 1;
-            value = strstr(value, "''") + 2;
-            msr->multipart_filename = apr_pstrdup(msr->mp, value);
-            msr->mpd->mpp->filename = value;
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Multipart: Content-Disposition filename*: %s",
                     log_escape_nq(msr->mp, value));
             }
         }
