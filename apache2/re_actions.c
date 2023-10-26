@@ -279,7 +279,7 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
             part->value_len = strlen(part->value);
             *(msc_string **)apr_array_push(arr) = part;
         }
-    } while (p != NULL);
+    } while (p != NULL && *next_text_start);
 
     /* If there's more than one member of the array that
      * means there was at least one macro present. Combine
