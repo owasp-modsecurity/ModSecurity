@@ -283,11 +283,9 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
         }
     } while (p != NULL && *next_text_start);
 
-    /* If there's more than one member of the array that
-     * means there was at least one macro present. Combine
-     * text parts into a single string now.
+    /* Combine text parts into a single string now.
+     * If no macro was present, we already returned
      */
-    if (arr->nelts > 1) {
         /* Figure out the required size for the string. */
         var->value_len = 0;
         for(i = 0; i < arr->nelts; i++) {
@@ -307,7 +305,6 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
             offset += part->value_len;
         }
         var->value[offset] = '\0';
-    }
 
     return 1;
 }
