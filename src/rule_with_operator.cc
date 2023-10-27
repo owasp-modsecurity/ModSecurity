@@ -228,7 +228,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 
 
     // FIXME: Make a class runTimeException to handle this cases.
-    for (auto &i : trans->m_ruleRemoveById) {
+    for (const auto &i : trans->m_ruleRemoveById) {
         if (m_ruleId != i) {
             continue;
         }
@@ -236,7 +236,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             " was skipped due to a ruleRemoveById action...");
         return true;
     }
-    for (auto &i : trans->m_ruleRemoveByIdRange) {
+    for (const auto &i : trans->m_ruleRemoveByIdRange) {
         if (!(i.first <= m_ruleId && i.second >= m_ruleId)) {
             continue;
         }

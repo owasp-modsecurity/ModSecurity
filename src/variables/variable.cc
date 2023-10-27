@@ -83,7 +83,7 @@ std::string operator+(const std::string &a, Variable *v) {
 
 std::string operator+(const std::string &a, Variables *v) {
     std::string test;
-    for (auto &b : *v) {
+    for (const auto &b : *v) {
         if (test.empty()) {
             test = std::string("") + b;
         } else {

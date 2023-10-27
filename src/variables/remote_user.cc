@@ -69,7 +69,7 @@ void RemoteUser::evaluate(Transaction *transaction,
     var = new VariableValue(&l2->at(0)->getKeyWithCollection(),
         &transaction->m_variableRemoteUser);
 
-    for (auto &i : l2->at(0)->getOrigin()) {
+    for (const auto &i : l2->at(0)->getOrigin()) {
         std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
         origin->m_offset = i->m_offset;
         origin->m_length = i->m_length;

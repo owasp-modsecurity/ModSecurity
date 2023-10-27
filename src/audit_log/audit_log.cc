@@ -289,7 +289,7 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
         return true;
     }
 
-    for (RuleMessage &i : transaction->m_rulesMessages) {
+    for (const RuleMessage &i : transaction->m_rulesMessages) {
         if (i.m_noAuditLog == false) {
             saveAnyway = true;
             break;

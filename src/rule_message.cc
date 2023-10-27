@@ -38,7 +38,7 @@ std::string RuleMessage::_details(const RuleMessage *rm) {
     msg.append(" [maturity \"" + std::to_string(rm->m_maturity) + "\"]");
     msg.append(" [accuracy \"" + std::to_string(rm->m_accuracy) + "\"]");
 
-    for (auto &a : rm->m_tags) {
+    for (const auto &a : rm->m_tags) {
         msg.append(" [tag \"" + utils::string::toHexIfNeeded(a, true) + "\"]");
     }
 

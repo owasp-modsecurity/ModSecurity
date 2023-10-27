@@ -62,7 +62,7 @@ class VariableValue {
         m_keyWithCollection(o->m_keyWithCollection),
         m_value(o->m_value)
     {
-        for (auto &i : o->m_orign) {
+        for (const auto &i : o->m_orign) {
             std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             origin->m_offset = i->m_offset;
             origin->m_length = i->m_length;

@@ -30,7 +30,7 @@ bool RuleRemoveById::init(std::string *error) {
     std::string what(m_parser_payload, 15, m_parser_payload.size() - 15);
     bool added = false;
     std::vector<std::string> toRemove = utils::string::ssplit(what, ' ');
-    for (std::string &a : toRemove) {
+    for (const std::string &a : toRemove) {
         std::string b = modsecurity::utils::string::parserSanitizer(a);
         if (b.size() == 0) {
             continue;
