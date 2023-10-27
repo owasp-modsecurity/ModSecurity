@@ -96,7 +96,6 @@ cstyleCast
 functionStatic
 shadowFunction
 
-constVariable
 stlcstrConstructor
 stlcstrStream
 uselessCallsSubstr
