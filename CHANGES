@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Fix memory leak of validateDTD's dtd object
+    [Issue #3008 - @martinhsv, @zimmerle]
   - Fix memory leaks in ValidateSchema
     [Issue #3005 - @martinhsv, @zimmerle]
   - Add support for expirevar action
