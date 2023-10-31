@@ -2132,6 +2132,7 @@ static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, 
                                             &my_error_msg);
                                     if (rc >= 0)    {
                                         remove_rule = 1;
+                                        break;
                                     }
                                 }
                             }
