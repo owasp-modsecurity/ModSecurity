@@ -575,7 +575,6 @@ int msre_ruleset_rule_matches_exception(msre_rule *rule, rule_exception *re)   {
                                     &my_error_msg);
                             if (rc >= 0)    {
                                 match = 1;
-                                break;
                             }
                         }
                     }
@@ -2132,7 +2131,6 @@ static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, 
                                             &my_error_msg);
                                     if (rc >= 0)    {
                                         remove_rule = 1;
-                                        break;
                                     }
                                 }
                             }
