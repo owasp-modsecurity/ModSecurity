@@ -76,7 +76,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
     if(rule->actionset == NULL)
         return 0;
 
-    if(rule->actionset->id !=NULL)    {
+    {
 
         myvar = apr_pstrdup(msr->mp, var->name);
 
@@ -576,7 +576,6 @@ int msre_ruleset_rule_matches_exception(msre_rule *rule, rule_exception *re)   {
                                     &my_error_msg);
                             if (rc >= 0)    {
                                 match = 1;
-                                break;
                             }
                         }
                     }
@@ -2187,7 +2186,6 @@ static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, 
                                             &my_error_msg);
                                     if (rc >= 0)    {
                                         remove_rule = 1;
-                                        break;
                                     }
                                 }
                             }
