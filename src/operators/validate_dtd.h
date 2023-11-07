@@ -33,23 +33,23 @@
 namespace modsecurity {
 namespace operators {
 
+#ifdef WITH_LIBXML2
 class XmlDtdPtrManager {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit XmlDtdPtrManager(xmlDtdPtr dtd)
         : m_dtd(dtd) { }
     ~XmlDtdPtrManager() {
-#ifdef WITH_LIBXML2
         if (m_dtd != NULL) {
             xmlFreeDtd(m_dtd);
             m_dtd = NULL;
         }
-#endif
     }
     xmlDtdPtr get() const {return m_dtd;}
  private:
     xmlDtdPtr m_dtd; // The resource being managed
 };
+#endif
 
 class ValidateDTD : public Operator {
  public:
