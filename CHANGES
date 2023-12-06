@@ -1,5 +1,5 @@
-v3.x.y - YYYY-MMM-DD (to be released)
--------------------------------------
+v3.0.11 - 2023-Dec-06
+---------------------
 
   - Add WRDE_NOCMD to wordexp call
     [Issue #3024 - @sahruldotid, @martinhsv]
