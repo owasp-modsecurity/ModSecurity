@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Add WRDE_NOCMD to wordexp call
+    [Issue #3024 - @sahruldotid, @martinhsv]
   - Fix: validateDTD compile fails if when libxml2 not installed
     [Issue #3014 - @zangobot, @martinhsv]
   - Fix memory leak of validateDTD's dtd object
