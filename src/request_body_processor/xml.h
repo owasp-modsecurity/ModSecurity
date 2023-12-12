@@ -16,6 +16,7 @@
 #ifdef WITH_LIBXML2
 #include <libxml/xmlschemas.h>
 #include <libxml/xpath.h>
+#include <libxml/parser.h>
 #endif
 
 #include <string>
