@@ -1,16 +1,16 @@
 
 <img src="https://github.com/SpiderLabs/ModSecurity/raw/v3/master/others/modsec.png" width="50%">
 
-![Quality Assurance](https://github.com/SpiderLabs/ModSecurity/workflows/Quality%20Assurance/badge.svg)
-[![Build Status](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=alert_status)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
-[![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=sqale_rating
-)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
-[![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=reliability_rating
-)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
-[![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=security_rating
-)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
-[![](https://sonarcloud.io/api/project_badges/measure?project=USHvY32Uy62L&metric=vulnerabilities
-)](https://sonarcloud.io/dashboard?id=USHvY32Uy62L)
+![Quality Assurance](https://github.com/owasp-modsecurity/ModSecurity/workflows/Quality%20Assurance/badge.svg)
+[![Build Status](https://sonarcloud.io/api/project_badges/measure?project=owasp-modsecurity_ModSecurity&metric=alert_status)](https://sonarcloud.io/dashboard?id=owasp-modsecurity_ModSecurity)
+[![](https://sonarcloud.io/api/project_badges/measure?project=owasp-modsecurity_ModSecurity&metric=sqale_rating
+)](https://sonarcloud.io/dashboard?id=owasp-modsecurity_ModSecurity)
+[![](https://sonarcloud.io/api/project_badges/measure?project=owasp-modsecurity_ModSecurity&metric=reliability_rating
+)](https://sonarcloud.io/dashboard?id=owasp-modsecurity_ModSecurity)
+[![](https://sonarcloud.io/api/project_badges/measure?project=owasp-modsecurity_ModSecurity&metric=security_rating
+)](https://sonarcloud.io/dashboard?id=owasp-modsecurity_ModSecurity)
+[![](https://sonarcloud.io/api/project_badges/measure?project=owasp-modsecurity_ModSecurity&metric=vulnerabilities
+)](https://sonarcloud.io/dashboard?id=owasp-modsecurity_ModSecurity)
 
 
 
