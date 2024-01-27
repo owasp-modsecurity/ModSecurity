@@ -1,6 +1,8 @@
 v3.x.y - YYYY-MMM-DD (to be released)
 -------------------------------------
 
+  - Set the minimum security protocol version for SecRemoteRules
+    [Issue security/code-scanning/2 - @airween]
 
 v3.0.11 - 2023-Dec-06
 ---------------------
