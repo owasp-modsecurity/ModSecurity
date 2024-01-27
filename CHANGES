@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Set the minimum security protocol version for SecRemoteRules
+   [Issue security/code-scanning/2 - @airween]
  * Allow lua version 5.4
    [Issue #2996 - @3eka, @martinhsv]
  * Configure: do not check for pcre1 if pcre2 requested
