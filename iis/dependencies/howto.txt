@@ -38,7 +38,7 @@ ssdeep-2.13
 
 --------------------------------------
 
-1. Create working directory (e.g. c:\work) and drop the latest clone from ModSecurity's 2.x Github (https://github.com/SpiderLabs/ModSecurity/archive/v2/master.zip)
+1. Create working directory (e.g. c:\work) and drop the latest clone from ModSecurity's 2.x Github (https://github.com/owasp-modsecurity/ModSecurity/archive/v2/master.zip)
 2. Make sure the prerequisites mentioned above are all set
 3. If you haven't download the dependency files before, uncomment the "@call download_files.bat" line on build_dependencies.bat to have them downloaded prior
 4. Open a command prompt (cmd.exe) and head to the "iis" folder inside ModSecurity tree working directory (e.g. cd c:\work\ModSecurity\iis)
