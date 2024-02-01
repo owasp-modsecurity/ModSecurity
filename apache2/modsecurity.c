@@ -126,7 +126,6 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
 int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     apr_status_t rc;
 
-    // MST
     msce->auditlog_lock = msce->geo_lock = NULL;
 #ifdef GLOBAL_COLLECTION_LOCK
     msce->geo_lock = NULL;
