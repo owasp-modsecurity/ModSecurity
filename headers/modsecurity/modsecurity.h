@@ -286,7 +286,7 @@ class ModSecurity {
     void setServerLogCb(ModSecLogCb cb);
     /**
      *
-     * properties   Properties to inform ModSecurity what kind of infornation
+     * properties   Properties to inform ModSecurity what kind of information
      *              is expected be returned.
      *
      */
