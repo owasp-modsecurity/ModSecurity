@@ -608,8 +608,8 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
     rc = apr_sdbm_store(dbm, key, value, APR_SDBM_REPLACE);
     if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s", dbm_filename,
-                get_apr_error(msr->mp, rc));
+        msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s (key=%s, length=%d)", dbm_filename,
+               get_apr_error(msr->mp, rc), key.dptr, value.dsize);
         if (dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
             apr_sdbm_close(dbm);
