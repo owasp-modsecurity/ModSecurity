@@ -771,7 +771,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     /* Log our presence to the error log. */
     if (first_time) {
         ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "%s configured.", MODSEC_MODULE_NAME_FULL2);
+                "%s configured.", MODSEC_MODULE_NAME_FULL);
 
         version(mp);
 
@@ -786,13 +786,11 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         if (status_engine_state != STATUS_ENGINE_DISABLED) {
             msc_status_engine_call();
         }
-/*MST
         else {
             ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
                     "ModSecurity: Status engine is currently disabled, enable " \
                     "it by set SecStatusEngine to On.");
         }
-*/
 #endif
     }
 
