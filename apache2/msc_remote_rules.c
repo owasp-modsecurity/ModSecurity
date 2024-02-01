@@ -331,8 +331,8 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
             headers_chunk = curl_slist_append(headers_chunk, header_key);
         }
 
-        /* Make it TLS 1.x only. */
-        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+        /* Make it TLS 1.2 at least. */
+        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
 #ifdef WIN32
         res_len = SearchPathA(NULL, "curl-ca-bundle.crt", NULL, (2048 + 1), buf, &ptr);

@@ -8,4 +8,4 @@ Please access the ModSecurity Github space to access the below documentation.
     * Reference Manual
     * RoadMap
 
-https://github.com/SpiderLabs/ModSecurity/wiki/
+https://github.com/owasp-modsecurity/ModSecurity/wiki/
