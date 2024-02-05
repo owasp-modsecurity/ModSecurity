@@ -30,6 +30,13 @@
     APLOG_USE_MODULE(security2);
 #endif
 
+# Returns the rule id if existing, otherwise the file name & line number
+static const char* id_log(msre_rule* rule) {
+    const char* id = rule->actionset->id;
+    if (id == NOT_SET_P || !*id) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
+    return id;
+}
+
 /* -- Directory context creation and initialisation -- */
 
 /**
@@ -251,7 +258,7 @@ static void copy_rules_phase(apr_pool_t *mp,
         } else {
             if (mode == 2) {
 #ifdef DEBUG_CONF
-                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy chain %pp for rule %pp [id \"%s\"]", rule, rule->chain_starter, rule->chain_starter->actionset->id);
+                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy chain %pp for rule %pp [id \"%s\"]", rule, rule->chain_starter, id_log(rule->chain_starter));
 #endif
 
                 /* Copy the rule (it belongs to the chain we want to include. */
@@ -894,7 +901,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         }
 
         /* Must NOT use skip. */
-        if (rule->actionset->skip_count != NOT_SET) {
+        if (rule->actionset && rule->actionset->skip_count != NOT_SET) {
             return apr_psprintf(cmd->pool, "ModSecurity: The skip action can only be used "
                 " by chain starter rules. ");
         }
@@ -931,7 +938,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         }
     }
 
-    if (rule->actionset->is_chained != 1) {
+    if (rule->actionset && rule->actionset->is_chained != 1) {
         /* If this rule is part of the chain but does
          * not want more rules to follow in the chain
          * then cut it (the chain).
@@ -954,7 +961,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     }
 
     /* Keep track of any rule IDs we need to skip after */
-    if (rule->actionset->skip_after != NOT_SET_P) {
+    if (rule->actionset && rule->actionset->skip_after != NOT_SET_P) {
         char *tmp_id = apr_pstrdup(cmd->pool, rule->actionset->skip_after);
         apr_table_setn(dcfg->tmp_rule_placeholders, tmp_id, tmp_id);
 
@@ -967,17 +974,16 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     #ifdef DEBUG_CONF
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-        "Adding rule %pp phase=%d id=\"%s\".", rule, rule->actionset->phase, (rule->actionset->id == NOT_SET_P
-        ? "(none)" : rule->actionset->id));
+        "Adding rule %pp phase=%d id=\"%s\".", rule, rule->actionset->phase, id_log(rule));
     #endif
 
     /* Add rule to the recipe. */
-    if (msre_ruleset_rule_add(dcfg->ruleset, rule, rule->actionset->phase) < 0) {
+    if (rule->actionset && msre_ruleset_rule_add(dcfg->ruleset, rule, rule->actionset->phase) < 0) {
         return "Internal Error: Failed to add rule to the ruleset.";
     }
 
     /* Add an additional placeholder if this rule ID is on the list */
-    if ((rule->actionset->id != NULL) && apr_table_get(dcfg->tmp_rule_placeholders, rule->actionset->id)) {
+    if (rule->actionset && (rule->actionset->id != NULL) && apr_table_get(dcfg->tmp_rule_placeholders, rule->actionset->id)) {
         msre_rule *phrule = apr_palloc(rule->ruleset->mp, sizeof(msre_rule));
         if (phrule == NULL) {
             return FATAL_ERROR;
@@ -993,7 +999,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         phrule->placeholder = RULE_PH_SKIPAFTER;
 
         /* Add placeholder. */
-        if (msre_ruleset_rule_add(dcfg->ruleset, phrule, phrule->actionset->phase) < 0) {
+        if (phrule->actionset && msre_ruleset_rule_add(dcfg->ruleset, phrule, phrule->actionset->phase) < 0) {
             return "Internal Error: Failed to add placeholder to the ruleset.";
         }
 
@@ -1042,9 +1048,8 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg,
     for (p = PHASE_FIRST; p <= PHASE_LAST; p++) {
         #ifdef DEBUG_CONF
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "Adding marker %pp phase=%d id=\"%s\".", rule, p, (rule->actionset->id == NOT_SET_P
-            ? "(none)" : rule->actionset->id));
-        #endif
+            "Adding marker %pp phase=%d id=\"%s\".", rule, p, id_log(rule));
+#endif
 
         if (msre_ruleset_rule_add(dcfg->ruleset, rule, p) < 0) {
             return "Internal Error: Failed to add marker to the ruleset.";
@@ -1052,7 +1057,7 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg,
     }
 
     /* No longer need to search for the ID */
-    if (dcfg->tmp_rule_placeholders != NULL) {
+    if (rule->actionset && rule->actionset->id && dcfg->tmp_rule_placeholders != NULL) {
         apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
     }
 
@@ -1103,23 +1108,22 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     if (my_error_msg != NULL) return my_error_msg;
 
     /* Must NOT change an id */
-    if ((new_actionset->id != NOT_SET_P) && (rule->actionset->id != NULL) && (strcmp(rule->actionset->id, new_actionset->id) != 0)) {
+    if ((new_actionset->id != NOT_SET_P) && rule->actionset && (rule->actionset->id != NULL) && (strcmp(rule->actionset->id, new_actionset->id) != 0)) {
         return apr_psprintf(cmd->pool, "ModSecurity: Rule IDs cannot be updated via SecRuleUpdateActionById.");
     }
 
     /* Must NOT alter the phase */
-    if ((new_actionset->phase != NOT_SET) && (rule->actionset->phase != new_actionset->phase)) {
+    if ((new_actionset->phase != NOT_SET) && rule->actionset && (rule->actionset->phase != new_actionset->phase)) {
         return apr_psprintf(cmd->pool, "ModSecurity: Rule phases cannot be updated via SecRuleUpdateActionById.");
     }
 
     #ifdef DEBUG_CONF
+    if (rule->actionset)
     {
         char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "Update rule %pp id=\"%s\" old action: \"%s\"",
-            rule,
-            (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
-            actions);
+            rule, id_log(rule), actions);
     }
     #endif
 
@@ -1133,13 +1137,12 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, NULL, NULL, NULL);
 
     #ifdef DEBUG_CONF
+    if (rule->actionset)
     {
         char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "Update rule %pp id=\"%s\" new action: \"%s\"",
-            rule,
-            (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
-            actions);
+            rule, id_log(rule), actions);
     }
     #endif
 
