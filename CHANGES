@@ -1,8 +1,39 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+DD mmm YYYY - 2.9.x (to be released)
+-------------------
+
  * Fix: NULL pointers. In case no rule id exists, log file name & line number in debug log.
    [PR #3052 - @marcstern]
+ * Support for PCRE2 in Windows
+   [PR #2931, @leancz]
+ * Fix ; incorrectly replaced by space in t:cmdline
+   [PR #3051, @marcstern]
+ * Add some syntax validation 
+   [PR #2994, @marcstern]
+ * Optimize macro processing
+   [PR #2992/3004, @marcstern]
+ * Add detailed error message when writing collections
+   [PR #3050, @marcstern]
+ * Add context info to error message
+   [PR #2997, @marcstern]
+ * Fix ctl:ruleRemoveByTag that isn't executed if no rule id is present
+   [PR #3012, @marcstern]
+ * Ignore empty action instead of storing it
+   [PR #3003, @marcstern]
+ * Fixed memory leak if builded modsecurity with --enable-pcre-study
+   [Issue #610, @marcstern]
+ * Remove useless code
+   [PR #2953/2954, @marcstern]
+ * Centralized function to get user name, compatible with Linux & Windows
+   [PR #2956, @marcstern]
+ * Compatibility with libyajl decoding the buffer inline
+   [PR #2957, @marcstern]
+ * Fixed memory leaks
+   [PR #2960/2963/2969, @marcstern]
+ * Fixed uninitialized variable
+   [PR #2987, @marcstern]
  * Set the minimum security protocol version for SecRemoteRules
    [Issue security/code-scanning/2 - @airween]
  * Allow lua version 5.4
