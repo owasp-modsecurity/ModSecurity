@@ -1,29 +1,21 @@
 ###########################################################################
 #
-# Usage:   NMAKE -f Makefile.win APACHE={httpd installion dir}  PCRE|PCRE2={pcre dir} LIBXML2={LibXML2 dir} [   LUA={Lua dir} ]
+# Usage:   NMAKE -f Makefile.win APACHE={httpd installion dir}  PCRE={pcre dir} LIBXML2={LibXML2 dir} [   LUA={Lua dir} ]
 #
-!IF "$(PCRE2)" != ""
-PCRE = $(PCRE2)
-!ENDIF
-
 !IF "$(APACHE)" == "" || "$(PCRE)" == "" || "$(LIBXML2)" == "" || "$(CURL)" == ""
-!ERROR NMAKE arguments: APACHE=dir PCRE|PCRE2=dir LIBXML2=dir CURL=dir are required to build mod_security2 for Windows
+!ERROR NMAKE arguments: APACHE=dir PCRE=dir LIBXML2=dir CURL=dir are required to build mod_security2 for Windows
 !ENDIF
 
 # Linking libraries
 LIBS = $(APACHE)\lib\libhttpd.lib \
        $(APACHE)\lib\libapr-1.lib \
        $(APACHE)\lib\libaprutil-1.lib \
+       $(PCRE)\pcre.lib \
        $(CURL)\libcurl.lib \
        $(LIBXML2)\win32\bin.msvc\libxml2.lib \
        Ws2_32.lib \
        "iphlpapi.lib"
 
-!IF "$(PCRE2)" != ""
-LIBS =$(LIBS) $(PCRE2)\lib\pcre2-8.lib
-!ELSE
-LIBS =$(LIBS) $(PCRE)\lib\pcre.lib
-!ENDIF
 ###########################################################################
 ###########################################################################
 
@@ -48,11 +40,6 @@ INCLUDES = -I. -I.. \
 
 # Enables support for SecRemoteRules and external resources.
 DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
-
-# Enable PCRE2
-!IF "$(PCRE2)" != ""
-DEFS =$(DEFS) -DWITH_PCRE2
-!ENDIF
 
 # Lua is optional
 !IF "$(LUA)" != ""
