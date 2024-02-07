@@ -1545,10 +1545,10 @@ static const char *gsb_replace_tpath(apr_pool_t *pool, const char *domain, int l
     url = apr_palloc(pool, len + 1);
     data = apr_palloc(pool, len + 1);
 
-    data[0] = '\0';
-    
+    memset(data, 0, len+1);
+    memset(url, 0, len+1);
+
     memcpy(url, domain, len);
-    url[len] = 0;
 
     while(( pos = strstr(url , "/./" )) != NULL) {
         match = 1;
