@@ -678,7 +678,7 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
     const char *pattern = rule->op_param;
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
-    int rc, jit = 0;
+    int rc, jit;
         #endif
     #endif
 
@@ -753,7 +753,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
     int rc;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
@@ -947,7 +947,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     const char *pattern = rule->op_param;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int rc, jit = 0;
+    int rc, jit;
        #endif
     #endif
 
@@ -1017,7 +1017,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
@@ -2830,7 +2830,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
@@ -3160,7 +3160,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
@@ -3474,7 +3474,7 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
