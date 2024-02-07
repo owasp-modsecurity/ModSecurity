@@ -228,18 +228,20 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                 msre_var *var_resolved = NULL;
 
                 /* Add the text part before the macro to the array. */
+                if (p != text_start) {
                 part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
                 if (part == NULL) return -1;
                 part->value_len = p - text_start;
                 part->value = apr_pstrmemdup(mptmp, text_start, part->value_len);
                 *(msc_string **)apr_array_push(arr) = part;
+                }
 
                 /* Resolve the macro and add that to the array. */
                 var_resolved = msre_create_var_ex(mptmp, msr->modsecurity->msre, var_name, var_value,
                     msr, &my_error_msg);
                 if (var_resolved != NULL) {
                     var_generated = generate_single_var(msr, var_resolved, NULL, rule, mptmp);
-                    if (var_generated != NULL) {
+                    if (var_generated != NULL && var_generated->value_len) {
                         part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
                         if (part == NULL) return -1;
                         part->value_len = var_generated->value_len;
@@ -273,19 +275,18 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                 next_text_start = p + 1;
             }
         } else {
+            if (arr->nelts == 0) return 0; /* no macro */
             /* Text part. */
             part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
             part->value = apr_pstrdup(mptmp, text_start);
             part->value_len = strlen(part->value);
             *(msc_string **)apr_array_push(arr) = part;
         }
-    } while (p != NULL);
+    } while (p != NULL && *next_text_start);
 
-    /* If there's more than one member of the array that
-     * means there was at least one macro present. Combine
-     * text parts into a single string now.
+    /* Combine text parts into a single string now.
+     * If no macro was present, we already returned
      */
-    if (arr->nelts > 1) {
         /* Figure out the required size for the string. */
         var->value_len = 0;
         for(i = 0; i < arr->nelts; i++) {
@@ -305,7 +306,6 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
             offset += part->value_len;
         }
         var->value[offset] = '\0';
-    }
 
     return 1;
 }
@@ -755,8 +755,15 @@ static char *msre_action_allow_validate(msre_engine *engine, apr_pool_t *mp, msr
 /* phase */
 
 static char *msre_action_phase_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
-    /* ENH Add validation. */
-    return NULL;
+    if (strcasecmp(action->param, "request") == 0) return NULL;
+    if (strcasecmp(action->param, "response") == 0) return NULL;
+    if (strcasecmp(action->param, "logging") == 0) return NULL;
+    if (strcasecmp(action->param, "1") == 0) return NULL;
+    if (strcasecmp(action->param, "2") == 0) return NULL;
+    if (strcasecmp(action->param, "3") == 0) return NULL;
+    if (strcasecmp(action->param, "4") == 0) return NULL;
+    if (strcasecmp(action->param, "5") == 0) return NULL;
+    return apr_psprintf(mp, "Invalid parameter for phase: %s", action->param);;
 }
 
 static apr_status_t msre_action_phase_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,

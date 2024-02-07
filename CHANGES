@@ -1,9 +1,6 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
-DD mmm YYYY - 2.9.x (to be released)
--------------------
-
  * Fix: NULL pointers. In case no rule id exists, log file name & line number in debug log.
    [PR #3052 - @marcstern]
  * Support for PCRE2 in Windows
