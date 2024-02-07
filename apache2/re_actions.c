@@ -273,7 +273,6 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                 next_text_start = p + 1;
             }
         } else {
-            if (arr->nelts == 0) return 0; /* no macro */
             /* Text part. */
             part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
             part->value = apr_pstrdup(mptmp, text_start);
