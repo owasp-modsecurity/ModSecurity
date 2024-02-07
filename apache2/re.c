@@ -378,7 +378,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     }
 #if !defined(MSC_TEST)
                     else {
-                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find variable to replace");
+                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find varibale to replace");
                     }
 #endif
                     goto end;
@@ -386,13 +386,8 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             } else {
 
                 target = strdup(p);
-                if(target == NULL) {
-                   if(target_list != NULL)
-                       free(target_list);
-                   if(replace != NULL)
-                       free(replace);
-                   return NULL;
-                  }
+                if(target == NULL)
+                    return NULL;
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
@@ -426,8 +421,6 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                         free(target_list);
                     if(replace != NULL)
                         free(replace);
-                    if(target != NULL)
-                        free(target);
                     if(msr) {
                         msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
                     }
@@ -519,12 +512,18 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if(target_list != NULL)
+    if(target_list != NULL) {
         free(target_list);
-    if(replace != NULL)
+        target_list = NULL;
+    }
+    if(replace != NULL) {
         free(replace);
-    if(target != NULL)
+        replace = NULL;
+    }
+    if(target != NULL)  {
         free(target);
+        target = NULL;
+    }
     return NULL;
 }
 
