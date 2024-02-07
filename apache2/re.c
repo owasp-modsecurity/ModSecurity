@@ -637,10 +637,7 @@ static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 /**
  * Generate an action string from an actionset.
  */
-#ifndef DEBUG_CONF
- static 
-#endif
-char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
+static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
