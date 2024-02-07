@@ -1749,9 +1749,6 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
 
     apr_filepath_merge(&file, config_orig_path, param, APR_FILEPATH_TRUENAME,
         mp);
-    if (config_orig_path == NULL) {
-        return apr_psprintf(mp, "ModSecurity: failed to duplicate filename in parser_conn_limits_operator");
-    }
 
     if ((strncasecmp(p2, "!@ipMatchFromFile", strlen("!@ipMatchFromFile")) == 0) ||
         (strncasecmp(p2, "!@ipMatchF", strlen("!@ipMatchF")) == 0)) {
