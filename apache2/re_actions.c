@@ -183,9 +183,9 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
      *      no macros in the input data.
      */
 
-    data = var->value;
+    data = apr_pstrdup(mptmp, var->value); /* IMP1 Are we modifying data anywhere? */
     arr = apr_array_make(mptmp, 16, sizeof(msc_string *));
-    if (arr == NULL) return -1;
+    if ((data == NULL)||(arr == NULL)) return -1;
 
     text_start = next_text_start = data;
     do {
