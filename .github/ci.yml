@@ -1,0 +1,30 @@
+name: Quality Assurance
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        platform: [x64]
+        compiler: [gcc]
+        configure:
+          - {label: "with pcre2",  opt: "--with-pcre2" }
+          - {label: "with lua",     opt: "--with-lua" }
+    steps:
+      - name: Setup Dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev pkg-config libyajl-dev
+      - uses: actions/checkout@v2
+      - name: build.sh
+        run: ./build.sh
+      - name: configure ${{ matrix.configure.label }}
+        run: ./configure ${{ matrix.configure.opt }}
+      - uses: ammaraskar/gcc-problem-matcher@master
+      - name: make
+        run: make -j `nproc`
