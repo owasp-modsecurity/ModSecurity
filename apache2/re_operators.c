@@ -751,6 +751,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
     char *my_error_msg = NULL;
     int ovector[33];
     int rc;
+    const char *pattern = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
     int jit;
@@ -780,8 +781,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
 
             expand_macros(msr, re_pattern, rule, msr->mp);
 
+            pattern = log_escape_re(msr->mp, re_pattern->value);
             if (msr->txcfg->debuglog_level >= 6) {
-                const char *pattern = log_escape_re(msr->mp, re_pattern->value);
                 msr_log(msr, 6, "Escaping pattern [%s]",pattern);
             }
 
