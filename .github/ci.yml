@@ -13,8 +13,9 @@ jobs:
         platform: [x64]
         compiler: [gcc]
         configure:
-          - {label: "with pcre2",  opt: "--with-pcre2" }
-          - {label: "with lua",     opt: "--with-lua" }
+          - {label: "with pcre2", opt: "--with-pcre2" }
+          - {label: "with lua",   opt: "--with-lua" }
+          - {label: "wo lua",     opt: "--without-lua" }
     steps:
       - name: Setup Dependencies
         run: |
