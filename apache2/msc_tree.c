@@ -656,6 +656,7 @@ TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, unsigned char *ipdata, unsig
         }
 
         node = CPTRetriveNode(msr, ipdata, ip_bitmask, node);
+        if (node == NULL) return NULL;
 
         if (node && node->bit != ip_bitmask)    {
             if (msr && msr->txcfg->debuglog_level >= 9) {

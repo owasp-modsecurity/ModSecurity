@@ -906,16 +906,16 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
      */
     rule->actionset = msre_actionset_merge(modsecurity->msre, cmd->pool, dcfg->tmp_default_actionset,
         rule->actionset, 1);
-
-    /* Keep track of the parent action for "block" */
-    if (rule->actionset) {
-        rule->actionset->parent_intercept_action_rec = dcfg->tmp_default_actionset->intercept_action_rec;
-        rule->actionset->parent_intercept_action = dcfg->tmp_default_actionset->intercept_action;
+    if (rule->actionset == NULL) {
+        return apr_psprintf(cmd->pool, "ModSecurity: cannot merge actionset (memory full?).");
     }
 
+    /* Keep track of the parent action for "block" */
+    rule->actionset->parent_intercept_action_rec = dcfg->tmp_default_actionset->intercept_action_rec;
+    rule->actionset->parent_intercept_action = dcfg->tmp_default_actionset->intercept_action;
+
     /* Must NOT specify a disruptive action in logging phase. */
-    if ((rule->actionset != NULL)
-        && (rule->actionset->phase == PHASE_LOGGING)
+    if (   (rule->actionset->phase == PHASE_LOGGING)
         && (rule->actionset->intercept_action != ACTION_ALLOW)
         && (rule->actionset->intercept_action != ACTION_ALLOW_REQUEST)
         && (rule->actionset->intercept_action != ACTION_NONE)
@@ -926,9 +926,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     if (dcfg->tmp_chain_starter != NULL) {
         rule->chain_starter = dcfg->tmp_chain_starter;
-        if (rule->actionset) {
-            rule->actionset->phase = rule->chain_starter->actionset->phase;
-        }
+        rule->actionset->phase = rule->chain_starter->actionset->phase;
     }
 
     if (rule->actionset->is_chained != 1) {

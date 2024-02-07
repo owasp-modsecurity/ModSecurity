@@ -1098,26 +1098,28 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     }
 
     /* Are we supposed to capture subexpressions? */
-    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
-    matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
-    if(!matched_bytes)
-        matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
+    if (rule->actionset) {
+        capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+        matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
+        if(!matched_bytes)
+            matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
 
-    matched = apr_table_get(rule->actionset->actions, "sanitizeMatched") ? 1 : 0;
-    if(!matched)
-        matched = apr_table_get(rule->actionset->actions, "sanitiseMatched") ? 1 : 0;
+        matched = apr_table_get(rule->actionset->actions, "sanitizeMatched") ? 1 : 0;
+        if(!matched)
+            matched = apr_table_get(rule->actionset->actions, "sanitiseMatched") ? 1 : 0;
 
-    /* Show when the regex captures but "capture" is not set */
-    if (msr->txcfg->debuglog_level >= 6) {
-        int capcount = 0;
-#ifdef WITH_PCRE2
-        rc = msc_fullinfo(regex, PCRE2_INFO_CAPTURECOUNT, &capcount);
-#else
-        rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
-#endif
+        /* Show when the regex captures but "capture" is not set */
         if (msr->txcfg->debuglog_level >= 6) {
-            if ((capture == 0) && (capcount > 0)) {
-                msr_log(msr, 6, "Ignoring regex captures since \"capture\" action is not enabled.");
+            int capcount = 0;
+#ifdef WITH_PCRE2
+            rc = msc_fullinfo(regex, PCRE2_INFO_CAPTURECOUNT, &capcount);
+#else
+            rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
+#endif
+            if (msr->txcfg->debuglog_level >= 6) {
+                if ((capture == 0) && (capcount > 0)) {
+                    msr_log(msr, 6, "Ignoring regex captures since \"capture\" action is not enabled.");
+                }
             }
         }
     }
@@ -2934,52 +2936,51 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 
             if (rule->actionset) {
                 matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
-            }
-            if(!matched_bytes)
-                matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
+                if(!matched_bytes)
+                    matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
 
+                if (apr_table_get(rule->actionset->actions, "capture")) {
+                    for(; i < rc; i++) {
+                        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+                        if (s == NULL) return -1;
+                        s->name = apr_psprintf(msr->mp, "%d", i);
+                        if (s->name == NULL) return -1;
+                        s->name_len = strlen(s->name);
+                        s->value = apr_pstrmemdup(msr->mp, match, length);
+                        if (s->value == NULL) return -1;
+                        s->value_len = length;
 
-            if (apr_table_get(rule->actionset->actions, "capture")) {
-                for(; i < rc; i++) {
-                    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-                    if (s == NULL) return -1;
-                    s->name = apr_psprintf(msr->mp, "%d", i);
-                    if (s->name == NULL) return -1;
-                    s->name_len = strlen(s->name);
-                    s->value = apr_pstrmemdup(msr->mp, match, length);
-                    if (s->value == NULL) return -1;
-                    s->value_len = length;
+                        apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
-                    apr_table_setn(msr->tx_vars, s->name, (void *)s);
-
-                    if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
-                                log_escape_nq_ex(msr->mp, s->value, s->value_len));
-                    }
-
-                    if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
-                        qspos = apr_psprintf(msr->mp, "%s", var->name);
-                        parm = strstr(qspos, ":");
-                        if (parm != NULL)   {
-                            parm++;
-                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
-                            if (mparm == NULL)
-                                continue;
-
-                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
-                            mparm->pad_1 = rule->actionset->arg_min;
-                            mparm->pad_2 = rule->actionset->arg_max;
-                            apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
-                        } else  {
-                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
-                            if (mparm == NULL)
-                                continue;
-
-                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
-                            apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
+                                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
                         }
-                    }
 
+                        if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
+                            qspos = apr_psprintf(msr->mp, "%s", var->name);
+                            parm = strstr(qspos, ":");
+                            if (parm != NULL)   {
+                                parm++;
+                                mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                                if (mparm == NULL)
+                                    continue;
+
+                                mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                                mparm->pad_1 = rule->actionset->arg_min;
+                                mparm->pad_2 = rule->actionset->arg_max;
+                                apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
+                            } else  {
+                                mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                                if (mparm == NULL)
+                                    continue;
+
+                                mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                                apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                            }
+                        }
+
+                    }
                 }
             }
 
@@ -3264,51 +3265,51 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
             if (rule->actionset) {
                 matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
-            }
-            if(!matched_bytes)
-                matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
+                if(!matched_bytes)
+                    matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
 
-            if (apr_table_get(rule->actionset->actions, "capture")) {
-                for(; i < rc; i++) {
-                    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-                    if (s == NULL) return -1;
-                    s->name = apr_psprintf(msr->mp, "%d", i);
-                    if (s->name == NULL) return -1;
-                    s->name_len = strlen(s->name);
-                    s->value = apr_pstrmemdup(msr->mp, match, length);
-                    if (s->value == NULL) return -1;
-                    s->value_len = length;
+                if (apr_table_get(rule->actionset->actions, "capture")) {
+                    for(; i < rc; i++) {
+                        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+                        if (s == NULL) return -1;
+                        s->name = apr_psprintf(msr->mp, "%d", i);
+                        if (s->name == NULL) return -1;
+                        s->name_len = strlen(s->name);
+                        s->value = apr_pstrmemdup(msr->mp, match, length);
+                        if (s->value == NULL) return -1;
+                        s->value_len = length;
 
-                    apr_table_setn(msr->tx_vars, s->name, (void *)s);
+                        apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
-                    if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
-                            log_escape_nq_ex(msr->mp, s->value, s->value_len));
-                    }
-
-                    if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
-                        qspos = apr_psprintf(msr->mp, "%s", var->name);
-                        parm = strstr(qspos, ":");
-                        if (parm != NULL)   {
-                            parm++;
-                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
-                            if (mparm == NULL)
-                                continue;
-
-                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
-                            mparm->pad_1 = rule->actionset->arg_min;
-                            mparm->pad_2 = rule->actionset->arg_max;
-                            apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
-                        } else  {
-                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
-                            if (mparm == NULL)
-                                continue;
-
-                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
-                            apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
+                                log_escape_nq_ex(msr->mp, s->value, s->value_len));
                         }
-                    }
 
+                        if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
+                            qspos = apr_psprintf(msr->mp, "%s", var->name);
+                            parm = strstr(qspos, ":");
+                            if (parm != NULL)   {
+                                parm++;
+                                mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                                if (mparm == NULL)
+                                    continue;
+
+                                mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                                mparm->pad_1 = rule->actionset->arg_min;
+                                mparm->pad_2 = rule->actionset->arg_max;
+                                apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
+                            } else  {
+                                mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                                if (mparm == NULL)
+                                    continue;
+
+                                mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                                apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                            }
+                        }
+
+                    }
                 }
             }
 
@@ -3578,51 +3579,51 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
             if (rule->actionset) {
                 matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
-            }
-            if(!matched_bytes)
-                matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
+                if(!matched_bytes)
+                    matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
 
-            if (apr_table_get(rule->actionset->actions, "capture")) {
-                for(; i < rc; i++) {
-                    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-                    if (s == NULL) return -1;
-                    s->name = apr_psprintf(msr->mp, "%d", i);
-                    if (s->name == NULL) return -1;
-                    s->name_len = strlen(s->name);
-                    s->value = apr_pstrmemdup(msr->mp, match, length);
-                    if (s->value == NULL) return -1;
-                    s->value_len = length;
+                if (apr_table_get(rule->actionset->actions, "capture")) {
+                    for(; i < rc; i++) {
+                        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+                        if (s == NULL) return -1;
+                        s->name = apr_psprintf(msr->mp, "%d", i);
+                        if (s->name == NULL) return -1;
+                        s->name_len = strlen(s->name);
+                        s->value = apr_pstrmemdup(msr->mp, match, length);
+                        if (s->value == NULL) return -1;
+                        s->value_len = length;
 
-                    apr_table_setn(msr->tx_vars, s->name, (void *)s);
+                        apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
-                    if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
-                            log_escape_nq_ex(msr->mp, s->value, s->value_len));
-                    }
-
-                    if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
-                        qspos = apr_psprintf(msr->mp, "%s", var->name);
-                        parm = strstr(qspos, ":");
-                        if (parm != NULL)   {
-                            parm++;
-                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
-                            if (mparm == NULL)
-                                continue;
-
-                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
-                            mparm->pad_1 = rule->actionset->arg_min;
-                            mparm->pad_2 = rule->actionset->arg_max;
-                            apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
-                        } else  {
-                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
-                            if (mparm == NULL)
-                                continue;
-
-                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
-                            apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
+                                log_escape_nq_ex(msr->mp, s->value, s->value_len));
                         }
-                    }
 
+                        if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
+                            qspos = apr_psprintf(msr->mp, "%s", var->name);
+                            parm = strstr(qspos, ":");
+                            if (parm != NULL)   {
+                                parm++;
+                                mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                                if (mparm == NULL)
+                                    continue;
+
+                                mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                                mparm->pad_1 = rule->actionset->arg_min;
+                                mparm->pad_2 = rule->actionset->arg_max;
+                                apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
+                            } else  {
+                                mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                                if (mparm == NULL)
+                                    continue;
+
+                                mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                                apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                            }
+                        }
+
+                    }
                 }
             }
 
