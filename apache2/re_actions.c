@@ -228,20 +228,18 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                 msre_var *var_resolved = NULL;
 
                 /* Add the text part before the macro to the array. */
-                if (p != text_start) {
                 part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
                 if (part == NULL) return -1;
                 part->value_len = p - text_start;
                 part->value = apr_pstrmemdup(mptmp, text_start, part->value_len);
                 *(msc_string **)apr_array_push(arr) = part;
-                }
 
                 /* Resolve the macro and add that to the array. */
                 var_resolved = msre_create_var_ex(mptmp, msr->modsecurity->msre, var_name, var_value,
                     msr, &my_error_msg);
                 if (var_resolved != NULL) {
                     var_generated = generate_single_var(msr, var_resolved, NULL, rule, mptmp);
-                    if (var_generated != NULL && var_generated->value_len) {
+                    if (var_generated != NULL) {
                         part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
                         if (part == NULL) return -1;
                         part->value_len = var_generated->value_len;
@@ -282,11 +280,13 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
             part->value_len = strlen(part->value);
             *(msc_string **)apr_array_push(arr) = part;
         }
-    } while (p != NULL && *next_text_start);
+    } while (p != NULL);
 
-    /* Combine text parts into a single string now.
-     * If no macro was present, we already returned
+    /* If there's more than one member of the array that
+     * means there was at least one macro present. Combine
+     * text parts into a single string now.
      */
+    if (arr->nelts > 1) {
         /* Figure out the required size for the string. */
         var->value_len = 0;
         for(i = 0; i < arr->nelts; i++) {
@@ -306,6 +306,7 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
             offset += part->value_len;
         }
         var->value[offset] = '\0';
+    }
 
     return 1;
 }
