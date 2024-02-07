@@ -1058,12 +1058,6 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
         /* ignore whitespace */
         while(isspace(*p)) p++;
         if (*p == '\0') return count;
- 
-        /* ignore empty action */
-        if (*p == ',') {
-          	p++;
-           continue;
-        }
 
         /* we are at the beginning of the name */
         name = p;
