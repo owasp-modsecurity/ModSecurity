@@ -22,8 +22,8 @@ jobs:
           sudo apt-get update -y -qq
           sudo apt-get install -y apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev pkg-config libyajl-dev
       - uses: actions/checkout@v2
-      - name: build.sh
-        run: ./build.sh
+      - name: autogen.sh
+        run: ./autogen.sh
       - name: configure ${{ matrix.configure.label }}
         run: ./configure ${{ matrix.configure.opt }}
       - uses: ammaraskar/gcc-problem-matcher@master
