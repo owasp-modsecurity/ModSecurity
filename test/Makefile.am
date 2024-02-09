@@ -70,7 +70,7 @@ unit_tests_LDFLAGS = \
 
 
 unit_tests_CPPFLAGS = \
-	-std=c++11 \
+	-std=c++17 \
 	-Icommon \
 	-I../ \
 	-g \
@@ -126,7 +126,7 @@ regression_tests_LDFLAGS = \
 
 
 regression_tests_CPPFLAGS = \
-	-std=c++11 \
+	-std=c++17 \
 	-Icommon \
 	-I../ \
 	-g \
@@ -179,7 +179,7 @@ rules_optimization_LDFLAGS = \
 	$(YAJL_LDFLAGS)
 
 rules_optimization_CPPFLAGS = \
-	-std=c++11 \
+	-std=c++17 \
 	-Icommon \
 	-I../ \
 	-g \

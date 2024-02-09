@@ -11,11 +11,10 @@ libmodsec_parser_la_SOURCES = \
 	test.cc
 
 libmodsec_parser_la_CPPFLAGS = \
-	-std=c++11 \
+	-std=c++17 \
 	-I../.. \
 	-I../../headers \
 	-I../../others \
-	-std=c++11 \
 	-I.. \
 	-g \
 	-fPIC \

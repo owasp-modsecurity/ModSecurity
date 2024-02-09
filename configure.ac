@@ -52,8 +52,8 @@ AC_PROG_MAKE_SET
 PKG_PROG_PKG_CONFIG
 
 
-# Check if the compiler is c++11 compatible.
-# AX_CXX_COMPILE_STDCXX_11(,mandatory)
+# Check if the compiler is c++17 compatible.
+# AX_CXX_COMPILE_STDCXX_17(,mandatory)
 
 # Check for libinjection
 if ! test -f "${srcdir}/others/libinjection/src/libinjection_html5.c"; then

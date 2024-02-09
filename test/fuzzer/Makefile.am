@@ -30,7 +30,7 @@ afl_fuzzer_LDADD = \
 
 
 afl_fuzzer_CPPFLAGS = \
-	-std=c++11 \
+	-std=c++17 \
 	-Icommon \
 	-I../ \
 	-I../../ \
