@@ -4,7 +4,8 @@
     "version_min":300000,
     "title":"Testing CtlRuleRemoteById (1)",
     "expected":{
-      "debug_log": "Rule id: 1 was skipped due to a ruleRemoveById action..."
+      "debug_log": "Rule id: 1 was skipped due to a ruleRemoveById action...",
+      "http_code": 200
     },
     "client":{
       "ip":"200.249.12.31",
