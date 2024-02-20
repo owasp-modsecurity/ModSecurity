@@ -24,9 +24,10 @@ xml_unload_external_entity(const char *URI, xmlCharEncoding enc)    {
  * Initialise XML parser.
  */
 int xml_init(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     xmlParserInputBufferCreateFilenameFunc entity;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     msr->xml = apr_pcalloc(msr->mp, sizeof(xml_data));
@@ -59,7 +60,8 @@ static void xml_receive_sax_error(void *data, const char *msg, ...) {
  * Feed one chunk of data to the XML parser.
  */
 int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char **error_msg) {
-    if (error_msg == NULL) return -1;
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     /* We want to initialise our parsing context here, to
@@ -107,7 +109,8 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
  * Finalise XML parsing.
  */
 int xml_complete(modsec_rec *msr, char **error_msg) {
-    if (error_msg == NULL) return -1;
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     /* Only if we have a context, meaning we've done some work. */

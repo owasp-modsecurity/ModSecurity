@@ -21,6 +21,7 @@
 #include "msc_parsers.h"
 
 void validate_quotes(modsec_rec *msr, char *data, char quote)  {
+    assert(msr != NULL);
     int i, len;
 
     if(msr == NULL)
@@ -84,6 +85,8 @@ static char *multipart_construct_filename(modsec_rec *msr) {
  *
  */
 static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value) {
+    assert(msr != NULL);
+    assert(c_d_value != NULL);
     char *p = NULL, *t = NULL;
 
     /* accept only what we understand */
@@ -255,9 +258,10 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
  *
  */
 static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     int i, len, rc;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     /* Check for nul bytes. */
@@ -454,11 +458,12 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
  *
  */
 static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     char *p = msr->mpd->buf + (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
     char localreserve[2] = { '\0', '\0' }; /* initialized to quiet warning */
     int bytes_reserved = 0;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     msr->mpd->mpp_substate_part_data_read = 1;
@@ -628,6 +633,8 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
  *
  */
 static char *multipart_combine_value_parts(modsec_rec *msr, apr_array_header_t *value_parts) {
+    assert(msr != NULL);
+    assert(value_parts != NULL);
     value_part_t **parts = NULL;
     char *rval = apr_palloc(msr->mp, msr->mpd->mpp->length + 1);
     unsigned long int offset;
@@ -652,6 +659,7 @@ static char *multipart_combine_value_parts(modsec_rec *msr, apr_array_header_t *
  *
  */
 static int multipart_process_boundary(modsec_rec *msr, int last_part, char **error_log) {
+    assert(msr != NULL);
     /* if there was a part being built finish it */
     if (msr->mpd->mpp != NULL) {
         /* close the temp file */
@@ -788,7 +796,8 @@ static int multipart_count_boundary_params(apr_pool_t *mp, const char *header_va
  *
  */
 int multipart_init(modsec_rec *msr, char **error_msg) {
-    if (error_msg == NULL) return -1;
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     msr->mpd = (multipart_data *)apr_pcalloc(msr->mp, sizeof(multipart_data));
@@ -952,6 +961,8 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
  * is clear that there is no more data to be processed.
  */
 int multipart_complete(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     if (msr->mpd == NULL) return 1;
 
     if (msr->txcfg->debuglog_level >= 4) {
@@ -1055,10 +1066,12 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
 int multipart_process_chunk(modsec_rec *msr, const char *buf,
     unsigned int size, char **error_msg)
 {
+    assert(msr != NULL);
+    assert(buf != NULL);
+    assert(error_msg != NULL);
     char *inptr = (char *)buf;
     unsigned int inleft = size;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     if (size == 0) return 1;
@@ -1433,6 +1446,7 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
  *
  */
 int multipart_get_arguments(modsec_rec *msr, char *origin, apr_table_t *arguments) {
+    assert(msr != NULL);
     multipart_part **parts;
     int i;
 

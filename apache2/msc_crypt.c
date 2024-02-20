@@ -32,13 +32,11 @@
  * \retval NULL on fail
  */
 char *normalize_path(modsec_rec *msr, char *input) {
+    assert(msr != NULL);
+    assert(input != NULL);
     xmlURI *uri = NULL;
     char *parsed_content = NULL;
     char *content = NULL;
-
-    if(msr == NULL) return NULL;
-
-    if(input == NULL) return NULL;
 
     uri = xmlParseURI(input);
 
@@ -195,6 +193,8 @@ char *mschmac(modsec_rec *msr, const char *key, int key_len,
 char *hmac(modsec_rec *msr, const char *key, int key_len,
         unsigned char *msg, int msglen) {
 #endif
+    assert(msr != NULL);
+    assert(msg != NULL);
     apr_sha1_ctx_t ctx;
     unsigned char digest[APR_SHA1_DIGESTSIZE];
     unsigned char hmac_ipad[HMAC_PAD_SIZE], hmac_opad[HMAC_PAD_SIZE];
@@ -346,6 +346,8 @@ int init_response_body_html_parser(modsec_rec *msr)   {
  * \retval -1 on fail
  */
 int do_hash_method(modsec_rec *msr, char *link, int type)   {
+    assert(msr != NULL);
+    assert(link != NULL);
     hash_method **em = NULL;
     int i = 0;
     char *error_msg = NULL;
@@ -1051,6 +1053,7 @@ ctx_error:
  * \retval -1 On fail
  */
 int inject_hashed_response_body(modsec_rec *msr, int elts) {
+    assert(msr != NULL);
     xmlOutputBufferPtr output_buf = NULL;
     xmlCharEncodingHandlerPtr  handler = NULL;
     char *p = NULL;
@@ -1290,12 +1293,12 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
  * \retval NULL on fail
  */
 char *do_hash_link(modsec_rec *msr, char *link, int type)  {
+    assert(msr != NULL);
+    assert(link != NULL);
     char  *mac_link = NULL;
     char *path_chunk = NULL;
     char *hash_value = NULL;
     char *qm = NULL;
-
-    if(msr == NULL) return NULL;
 
     if(strlen(link) > 7 && strncmp("http:",(char*)link,5)==0){
         path_chunk = strchr(link+7,'/');

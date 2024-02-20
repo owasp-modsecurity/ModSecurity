@@ -15,6 +15,7 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
+#include <assert.h>
 #include <sys/types.h>
 #include <apr_file_info.h>
 

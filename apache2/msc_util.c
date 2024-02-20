@@ -667,6 +667,7 @@ int convert_to_int(const char c)
  * \retval 0 On Sucess|Fail
  */
 int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  {
+    assert(msr != NULL);
 
     if (capture) {
         msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -2378,6 +2379,7 @@ apr_fileperms_t mode2fileperms(int mode) {
  * Generate a single variable.
  */
 char *construct_single_var(modsec_rec *msr, char *name) {
+    assert(msr != NULL);
     char *varname = NULL;
     char *param = NULL;
     msre_var *var = NULL;
@@ -2386,6 +2388,7 @@ char *construct_single_var(modsec_rec *msr, char *name) {
 
     /* Extract variable name and its parameter from the script. */
     varname = apr_pstrdup(msr->mp, name);
+    if (varname == NULL) return NULL;
     param = strchr(varname, '.');
     if (param != NULL) {
         *param = '\0';
@@ -2703,6 +2706,10 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
 int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
     const char *value, modsec_rec *msr, char **error_msg)
 {
+    assert(mp != NULL);
+    assert(value != NULL);
+    // msr can be NULL;
+    assert(error_msg != NULL);
     struct in_addr in;
 #if APR_HAVE_IPV6
     struct in6_addr in6;

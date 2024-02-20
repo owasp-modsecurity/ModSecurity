@@ -20,6 +20,7 @@ const char *base_offset=NULL;
 
 int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
 {
+    assert(msr != NULL);
     msc_arg *arg = (msc_arg *) NULL;
 
     /**
@@ -298,6 +299,8 @@ static int yajl_end_map(void *ctx)
  * Initialise JSON parser.
  */
 int json_init(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     /**
      * yajl configuration and callbacks
      */
@@ -315,7 +318,6 @@ int json_init(modsec_rec *msr, char **error_msg) {
         yajl_end_array
     };
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     msr_log(msr, 4, "JSON parser initialization");
@@ -352,7 +354,8 @@ int json_init(modsec_rec *msr, char **error_msg) {
  * Feed one chunk of data to the JSON parser.
  */
 int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char **error_msg) {
-    if (error_msg == NULL) return -1;
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
     // Take a copy in case libyajl decodes the buffer inline
     base_offset = apr_pstrmemdup(msr->mp, buf, size);
@@ -378,9 +381,10 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
  * Finalise JSON parsing.
  */
 int json_complete(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     char *json_data = (char *) NULL;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     /* Wrap up the parsing process */
