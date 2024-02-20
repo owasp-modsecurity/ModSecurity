@@ -76,7 +76,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
     if(rule->actionset == NULL)
         return 0;
 
-    {
+    if(rule->actionset->id !=NULL)    {
 
         myvar = apr_pstrdup(msr->mp, var->name);
 
@@ -353,11 +353,11 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
                         if(msr) {
-                            msr_log(msr, 9, "Error parsing rule targets to replace variable: %s", my_error_msg);
+                            msr_log(msr, 9, "Error parsing rule targets to replace variable");
                         }
 #if !defined(MSC_TEST)
                         else {
-                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parsing rule targets to replace variable: %s", my_error_msg);
+                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parsing rule targets to replace variable");
                         }
 #endif
                         goto end;
@@ -378,7 +378,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     }
 #if !defined(MSC_TEST)
                     else {
-                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find variable to replace");
+                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find varibale to replace");
                     }
 #endif
                     goto end;
@@ -386,13 +386,8 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             } else {
 
                 target = strdup(p);
-                if(target == NULL) {
-                   if(target_list != NULL)
-                       free(target_list);
-                   if(replace != NULL)
-                       free(replace);
-                   return NULL;
-                  }
+                if(target == NULL)
+                    return NULL;
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
@@ -426,8 +421,6 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                         free(target_list);
                     if(replace != NULL)
                         free(replace);
-                    if(target != NULL)
-                        free(target);
                     if(msr) {
                         msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
                     }
@@ -506,7 +499,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
         if(var_appended == 1)  {
             current_targets = msre_generate_target_string(ruleset->mp, rule);
             rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, current_targets, NULL, NULL);
-            rule->p1 = current_targets;
+            rule->p1 = apr_pstrdup(ruleset->mp, current_targets);
             if(msr) {
                 msr_log(msr, 9, "Successfully appended variable");
             }
@@ -519,12 +512,18 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if(target_list != NULL)
+    if(target_list != NULL) {
         free(target_list);
-    if(replace != NULL)
+        target_list = NULL;
+    }
+    if(replace != NULL) {
         free(replace);
-    if(target != NULL)
+        replace = NULL;
+    }
+    if(target != NULL)  {
         free(target);
+        target = NULL;
+    }
     return NULL;
 }
 
@@ -638,10 +637,7 @@ static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 /**
  * Generate an action string from an actionset.
  */
-#ifndef DEBUG_CONF
- static 
-#endif
-char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
+static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
@@ -1058,12 +1054,6 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
         /* ignore whitespace */
         while(isspace(*p)) p++;
         if (*p == '\0') return count;
- 
-        /* ignore empty action */
-        if (*p == ',') {
-          	p++;
-           continue;
-        }
 
         /* we are at the beginning of the name */
         name = p;
