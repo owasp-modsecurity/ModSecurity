@@ -8494,7 +8494,7 @@ static int yy_get_next_buffer (void)
 {
     	char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
 	char *source = (yytext_ptr);
-	int number_to_move, i;
+	int number_to_move;
 	int ret_val;
 
 	if ( (yy_c_buf_p) > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars) + 1] )
@@ -8525,7 +8525,7 @@ static int yy_get_next_buffer (void)
 	/* First move last chars to start of buffer. */
 	number_to_move = (int) ((yy_c_buf_p) - (yytext_ptr) - 1);
 
-	for ( i = 0; i < number_to_move; ++i )
+	for (int i = 0;i < number_to_move;++i)
 		*(dest++) = *(source++);
 
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_buffer_status == YY_BUFFER_EOF_PENDING )
@@ -8636,12 +8636,11 @@ static int yy_get_next_buffer (void)
 /* %endif */
 {
 	yy_state_type yy_current_state;
-	char *yy_cp;
     
 /* %% [15.0] code to get the start state into yy_current_state goes here */
 	yy_current_state = (yy_start);
 
-	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
+	for (char *yy_cp = (yytext_ptr) + YY_MORE_ADJ;yy_cp < (yy_c_buf_p);++yy_cp)
 		{
 /* %% [16.0] code to find the next state goes here */
 		YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
@@ -9177,7 +9176,6 @@ YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, int  _yybytes_len )
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = (yy_size_t) (_yybytes_len + 2);
@@ -9185,7 +9183,7 @@ YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, int  _yybytes_len )
 	if ( ! buf )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_scan_bytes()" );
 
-	for ( i = 0; i < _yybytes_len; ++i )
+	for (int i = 0;i < _yybytes_len;++i)
 		buf[i] = yybytes[i];
 
 	buf[_yybytes_len] = buf[_yybytes_len+1] = YY_END_OF_BUFFER_CHAR;
@@ -9391,9 +9389,7 @@ int yylex_destroy  (void)
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char* s1, const char * s2, int n )
 {
-		
-	int i;
-	for ( i = 0; i < n; ++i )
+	for (int i = 0;i < n;++i)
 		s1[i] = s2[i];
 }
 #endif
