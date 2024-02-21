@@ -58,13 +58,13 @@ std::string HexDecode::evaluate(const std::string &value,
 
 int HexDecode::inplace(unsigned char *data, int len) {
     unsigned char *d = data;
-    int i, count = 0;
+    int count = 0;
 
     if ((data == NULL) || (len == 0)) {
         return 0;
     }
 
-    for (i = 0; i <= len - 2; i += 2) {
+    for (int i = 0;i <= len - 2;i += 2) {
         *d++ = utils::string::x2c(&data[i]);
         count++;
     }
