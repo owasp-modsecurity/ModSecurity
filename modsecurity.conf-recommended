@@ -281,5 +281,5 @@ SecUnicodeMapFile unicode.mapping 20127
 # The following information will be shared: ModSecurity version,
 # Web Server version, APR version, PCRE version, Lua version, Libxml2
 # version, Anonymous unique id for host.
-SecStatusEngine On
+SecStatusEngine Off
 
