@@ -33,7 +33,6 @@ AC_PATH_PROGS(ENV_CMD, [env printenv], )
 PKG_PROG_PKG_CONFIG
 
 # Checks for header files.
-#AC_HEADER_STDC
 AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h unistd.h sys/types.h sys/stat.h sys/utsname.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
