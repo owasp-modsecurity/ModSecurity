@@ -13,7 +13,7 @@ SSDEEP_LDADD=""
 
 AC_ARG_WITH(
     ssdeep,
-    [AC_HELP_STRING([--with-ssdeep=PATH],[Path to ssdeep prefix])]
+    [AS_HELP_STRING([--with-ssdeep=PATH],[Path to ssdeep prefix])]
     ,, with_ssdeep=yes)
 
 AS_CASE(["${with_ssdeep}"],
