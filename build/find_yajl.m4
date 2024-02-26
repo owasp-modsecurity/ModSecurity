@@ -23,7 +23,7 @@ YAJL_SONAMES="so la sl dll dylib"
 
 AC_ARG_WITH(
     yajl,
-    [AC_HELP_STRING([--with-yajl=PATH],[Path to yajl prefix or config script])]
+    [AS_HELP_STRING([--with-yajl=PATH],[Path to yajl prefix or config script])]
     ,, with_yajl=yes)
 
 AS_CASE(["${with_yajl}"],

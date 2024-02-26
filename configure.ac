@@ -33,7 +33,6 @@ AC_PATH_PROGS(ENV_CMD, [env printenv], )
 PKG_PROG_PKG_CONFIG
 
 # Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h unistd.h sys/types.h sys/stat.h sys/utsname.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -889,13 +888,13 @@ ORIG_CFLAGS="$CFLAGS $APU_CFLAGS"
 ORIG_CPPFLAGS="$CPPFLAGS"
 CFLAGS="$CFLAGS $APR_CFLAGS"
 CPPFLAGS="$CPPFLAGS $APR_CPPFLAGS"
-AC_TRY_COMPILE(
-	[#include <apr_crypto.h>],
-	[
+AC_LINK_IFELSE(
+	[AC_LANG_PROGRAM([[ #include <apr_crypto.h> ]],
+	[[
           #if APU_HAVE_CRYPTO == 0
           #error APR util was not compiled with crypto support.
           #endif
-	],
+	]])],
 	[ AC_DEFINE([WITH_APU_CRYPTO], [1], [APR util was compiled with crypto support])
 	  MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS -DWITH_APU_CRYPTO"
 	],
