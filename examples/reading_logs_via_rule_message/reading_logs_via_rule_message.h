@@ -103,7 +103,6 @@ static void *process_request(void *data) {
     }
 
     pthread_exit(NULL);
-    return NULL;
 }
 
 
@@ -165,7 +164,6 @@ class ReadingLogsViaRuleMessage {
 
         delete rules;
         delete modsec;
-        pthread_exit(NULL);
         return 0;
     }
 
