@@ -102,7 +102,7 @@ struct data_ms {
         delete modsecTransaction;
     }
 
-    pthread_exit(NULL);
+    pthread_exit(nullptr);
 }
 
 
