@@ -73,7 +73,7 @@ struct data_ms {
 };
 
 
-static void *process_request(void *data) {
+[[noreturn]] static void *process_request(void *data) {
     struct data_ms *a = (struct data_ms *)data;
     modsecurity::ModSecurity *modsec = a->modsec;
     modsecurity::RulesSet *rules = a->rules;
@@ -102,8 +102,7 @@ static void *process_request(void *data) {
         delete modsecTransaction;
     }
 
-    pthread_exit(NULL);
-    return NULL;
+    pthread_exit(nullptr);
 }
 
 
@@ -165,7 +164,6 @@ class ReadingLogsViaRuleMessage {
 
         delete rules;
         delete modsec;
-        pthread_exit(NULL);
         return 0;
     }
 
