@@ -137,7 +137,6 @@ AM_CONDITIONAL([PCRE2_CFLAGS], [test "PCRE2_CFLAGS" != ""])
 
 
 # Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS([string])
 AC_CHECK_HEADERS([iostream])
 AC_CHECK_HEADERS([sys/utsname.h])
@@ -304,7 +303,7 @@ fi
 
 if test $buildParser = true; then
     AC_PROG_YACC
-    AC_PROG_LEX
+    AC_PROG_LEX(noyywrap)
     AC_PATH_PROG([FLEX], [flex])
     test "x$FLEX" = "x" && AC_MSG_ERROR([flex is needed to build ModSecurity])
 
