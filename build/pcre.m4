@@ -77,9 +77,11 @@ else
         CFLAGS="${PCRE_CFLAGS} ${CFLAGS}"
         LDFLAGS="${PCRE_LDADD} ${LDFLAGS}"
         LIBS="${PCRE_LDADD} ${LIBS}"
-        AC_TRY_LINK([ #include <pcre.h> ],
-            [ pcre_jit_exec(NULL, NULL, NULL, 0, 0, 0, NULL, 0, NULL); ],
-            [ pcre_jit_available=yes ], [:]
+        AC_LINK_IFELSE(
+            [AC_LANG_PROGRAM([[ #include <pcre.h> ]],
+               [[ pcre_jit_exec(NULL, NULL, NULL, 0, 0, 0, NULL, 0, NULL); ]])],
+            [ pcre_jit_available=yes ],
+            [:]
         )
 
         if test "x$pcre_jit_available" = "xyes"; then

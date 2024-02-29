@@ -32,7 +32,7 @@ read_LDFLAGS = \
 
 read_CPPFLAGS = \
 	$(GLOBAL_CFLAGS) \
-	-std=c++11 \
+	-std=c++17 \
 	-I$(top_builddir)/headers \
 	-I$(top_builddir) \
 	-g \
