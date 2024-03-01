@@ -3,6 +3,8 @@ v3.0.13 - YYYY-MMM-DD
 
   - Reducing the scope of variables in a for loop
     [PR #3098 - @devzero2000]
+  - Replace obsolete macros
+    [PR #3095 - @airween]
   - Change 'SecEngineStatus' to Off by default
     [PR #3092 - @airween]
   - Update bug-report-for-version-3-x.md
