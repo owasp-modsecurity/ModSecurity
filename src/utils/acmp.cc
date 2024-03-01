@@ -190,10 +190,9 @@ static size_t acmp_strlen(ACMP *parser, const char *str) {
  *       len - length of input string
  */
 static void acmp_strtoucs(ACMP *parser, const char *str, long *ucs_chars, int len) {
-    int i;
     const char *c = str;
 
-    for (i = 0; i < len; i++) {
+    for (int i = 0;i < len;i++) {
         *(ucs_chars++) = *(c++);
     }
 }
