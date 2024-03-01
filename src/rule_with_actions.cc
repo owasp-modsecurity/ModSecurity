@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 
+#include <cassert>
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -121,10 +122,8 @@ RuleWithActions::RuleWithActions(
                     m_actionsRuntimePos.push_back(a);
                 }
             } else {
+                assert(false); // Not implemented
                 delete a;
-                std::cout << "General failure, action: " << a->m_name;
-                std::cout << " has an unknown type." << std::endl;
-                throw;
             }
         }
         delete actions;

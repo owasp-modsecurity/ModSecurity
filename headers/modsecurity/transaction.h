@@ -14,6 +14,7 @@
  */
 
 #ifdef __cplusplus
+#include <cassert>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -307,11 +308,8 @@ class TransactionSecMarkerManagement {
     }
 
     std::shared_ptr<std::string> getCurrentMarker() const {
-        if (m_marker) {
-            return m_marker;
-        } else {
-            throw;
-        }
+        assert(m_marker != nullptr);
+        return m_marker;
     }
 
     void removeMarker() {
@@ -323,7 +321,7 @@ class TransactionSecMarkerManagement {
     }
 
  private:
-    std::shared_ptr<std::string> m_marker;
+    std::shared_ptr<std::string> m_marker = nullptr;
 };
 
 /** @ingroup ModSecurity_CPP_API */
