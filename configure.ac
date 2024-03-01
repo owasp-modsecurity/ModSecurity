@@ -227,6 +227,19 @@ MSC_GIT_VERSION=msc_version_git
 AC_SUBST([MSC_GIT_VERSION])
 
 
+
+AC_ARG_ENABLE(assertions,
+    [AS_HELP_STRING([--enable-assertions],[Turn on assertions feature: undefine NDEBUG])],
+
+    [case "${enableval}" in
+        yes) assertions=true ;;
+        no)  assertions=false ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-asserions) ;;
+    esac],
+
+    [assertions=false]
+    )
+
 AC_ARG_ENABLE(debug-logs,
     [AS_HELP_STRING([--disable-debug-logs],[Turn off the SecDebugLog feature])],
 
@@ -355,6 +368,12 @@ if test "$aflFuzzer" == "true"; then
     GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $FUZZ_CPPCFLAGS"
     $buildExamples = false
 fi
+
+if test "$assertions" == "false"; then
+    ASSERTIONS_CPPCFLAGS="-DNDEBUG"
+    GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $ASSERTIONS_CPPCFLAGS"
+fi
+
 AC_SUBST(GLOBAL_LDADD)
 AC_SUBST(GLOBAL_CPPFLAGS)
 
@@ -589,6 +608,14 @@ if test $buildTestUtilities = true; then
 else
     echo "   + Test Utilities                                ....disabled"
 fi
+
+
+if test $assertions = true; then
+    echo "   + Assertions                                    ....enabled"
+else
+    echo "   + Assertions                                    ....disabled"
+fi
+
 if test $debugLogs = true; then
     echo "   + SecDebugLog                                   ....enabled"
 else
