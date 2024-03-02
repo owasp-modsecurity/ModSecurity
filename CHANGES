@@ -1,3 +1,19 @@
+v3.0.13 - YYYY-MMM-DD
+---------------------
+
+  - Reducing the scope of variables in a for loop
+    [PR #3098 - @devzero2000]
+  - Replace obsolete macros
+    [PR #3095 - @airween]
+  - Change 'SecEngineStatus' to Off by default
+    [PR #3092 - @airween]
+  - Update bug-report-for-version-3-x.md
+    [PR #3086 - @fzipi]
+  - Logical, syntax and cosmetic fixes on test cases
+    [PR #3080 - @MirkoDziadzka, @airween]
+  - Bump the C++ version from C++11 to C++17
+    [PR #3079 - @MirkoDziadzka]
+
 v3.0.12 - 2024-Jan-30
 ---------------------
 
