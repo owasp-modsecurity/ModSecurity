@@ -59,7 +59,7 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
         }
 
         blob_offset += 2;
-        if (blob_offset + var->name_len > blob_size) return NULL;
+        if (var->name_len < 1 || blob_offset + var->name_len > blob_size) return NULL;
         var->name = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->name_len - 1);
         blob_offset += var->name_len;
         var->name_len--;
@@ -67,7 +67,7 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
         var->value_len = (blob[blob_offset] << 8) + blob[blob_offset + 1];
         blob_offset += 2;
 
-        if (blob_offset + var->value_len > blob_size) return NULL;
+        if (var->value_len < 1 || blob_offset + var->value_len > blob_size) return NULL;
         var->value = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->value_len - 1);
         blob_offset += var->value_len;
         var->value_len--;
