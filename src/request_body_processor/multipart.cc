@@ -231,7 +231,7 @@ int Multipart::boundary_characters_valid(const char *boundary) {
 
 
 void Multipart::validate_quotes(const char *data, char quote)  {
-    int i, len;
+    int len;
 
     if (data == NULL)
         return;
@@ -244,7 +244,7 @@ void Multipart::validate_quotes(const char *data, char quote)  {
 
     len = strlen(data);
 
-    for (i = 0; i < len; i++)   {
+    for (int i = 0;i < len;i++)   {
         if (data[i] == '\'') {
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Invalid quoting detected: " \
