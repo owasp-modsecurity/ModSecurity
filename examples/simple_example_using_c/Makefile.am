@@ -6,14 +6,13 @@ test_SOURCES = \
 	test.c
 
 test_LDADD = \
+	$(top_builddir)/src/libmodsecurity.la \
 	$(GLOBAL_LDADD) \
 	$(LUA_LDADD) \
 	$(SSDEEP_LDADD)
 
 test_LDFLAGS = \
-	-L$(top_builddir)/src/.libs/ \
 	$(GEOIP_LDFLAGS) \
-	-lmodsecurity \
 	-lm \
 	-lstdc++ \
 	$(LUA_LDFLAGS) \

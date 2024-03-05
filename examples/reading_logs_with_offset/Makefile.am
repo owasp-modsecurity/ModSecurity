@@ -6,6 +6,7 @@ read_SOURCES = \
 	read.cc
 
 read_LDADD = \
+	$(top_builddir)/src/libmodsecurity.la \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
 	$(MAXMIND_LDADD) \
@@ -18,9 +19,7 @@ read_LDADD = \
 	$(YAJL_LDADD)
 
 read_LDFLAGS = \
-	-L$(top_builddir)/src/.libs/ \
 	$(GEOIP_LDFLAGS) \
-	-lmodsecurity \
 	-lpthread \
 	-lm \
 	-lstdc++ \

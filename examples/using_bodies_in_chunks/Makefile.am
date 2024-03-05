@@ -6,6 +6,7 @@ simple_request_SOURCES = \
 	simple_request.cc
 
 simple_request_LDADD = \
+	$(top_builddir)/src/libmodsecurity.la \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
 	$(MAXMIND_LDADD) \
@@ -18,9 +19,7 @@ simple_request_LDADD = \
 	$(YAJL_LDADD)
 
 simple_request_LDFLAGS = \
-	-L$(top_builddir)/src/.libs/ \
 	$(GEOIP_LDFLAGS) \
-	-lmodsecurity \
 	-lpthread \
 	-lm \
 	-lstdc++ \
