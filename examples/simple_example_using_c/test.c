@@ -70,6 +70,7 @@ int main (int argc, char **argv)
 end:
     msc_rules_cleanup(rules);
     msc_cleanup(modsec);
+    free(error);
 
     return 0;
 }
