@@ -99,8 +99,8 @@ std::string uri_decode(const std::string & sSrc) {
     while (pSrc < SRC_LAST_DEC) {
         if (*pSrc == '%') {
             char dec1, dec2;
-            if (-1 != (dec1 = string::HEX2DEC[*(pSrc + 1)])
-                && -1 != (dec2 = string::HEX2DEC[*(pSrc + 2)])) {
+            if ((char)-1 != (dec1 = string::HEX2DEC[*(pSrc + 1)])
+                && (char)-1 != (dec2 = string::HEX2DEC[*(pSrc + 2)])) {
                 *pEnd++ = (dec1 << 4) + dec2;
                 pSrc += 3;
                 continue;
