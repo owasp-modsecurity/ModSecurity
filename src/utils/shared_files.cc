@@ -155,6 +155,64 @@ out:
 }
 
 
+bool SharedFiles::reopen(const std::string& fileName, std::string *error) {
+    std::pair<msc_file_handler *, FILE *> *a = NULL;
+    bool ret = true;
+    FILE *fp;
+    struct stat target_stat;
+    struct stat current_stat;
+
+#if MODSEC_USE_GENERAL_LOCK
+    pthread_mutex_lock(m_generalLock);
+#endif
+
+    for (auto &i : m_handlers) {
+        if (i.first == fileName) {
+            a = &i.second;
+            break;
+        }
+    }
+
+    if (a == NULL || a->first == NULL || a->second == NULL) {
+        error->assign("Cannot find open file to reopen: " + fileName);
+        ret = false;
+        goto out;
+    }
+
+    if (
+        stat(fileName.c_str(), &target_stat) == 0 &&
+        fstat(fileno(a->second), &current_stat) == 0 &&
+        current_stat.st_dev == target_stat.st_dev &&
+        current_stat.st_ino == target_stat.st_ino
+    ) {
+        // We already have a file open at the right path. Let's skip reopen.
+        ret = true;
+        goto out;
+    }
+
+    // Use fopen() and fclose() instead of freopen() because freopen() closes
+    // the current file before proving it can open the new file.
+    // If the open fails, it's better to continue writing to the old file than
+    // to fail outright.
+    fp = fopen(fileName.c_str(), "a");
+    if (fp == NULL) {
+        error->assign("Failed to open file: " + fileName);
+        ret = false;
+        goto out;
+    }
+
+    fclose(a->second);
+    a->second = fp;
+
+out:
+#if MODSEC_USE_GENERAL_LOCK
+    pthread_mutex_unlock(m_generalLock);
+#endif
+
+    return ret;
+}
+
+
 void SharedFiles::close(const std::string& fileName) {
     std::pair<msc_file_handler *, FILE *> a;
     /* int ret; */
