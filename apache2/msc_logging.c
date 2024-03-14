@@ -2325,3 +2325,77 @@ void sec_audit_logger(modsec_rec *msr) {
     }
     #endif
 }
+
+int modsec_open_logs(apr_pool_t *pconf, apr_pool_t *p, apr_pool_t *ptemp, server_rec *s_main) {
+    directory_config *dcfg = ap_get_module_config(s_main->lookup_defaults, &security2_module);
+
+    if (dcfg->auditlog_name == NOT_SET_P) {
+        return OK;
+    }
+    if (dcfg->auditlog_name[0] == '|') {
+        const char *pipe_name = dcfg->auditlog_name + 1;
+        piped_log *pipe_log;
+
+        pipe_log = ap_open_piped_log(p, pipe_name);
+        if (pipe_log == NULL) {
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
+                         "ModSecurity: Failed to open the audit log pipe: %s", pipe_name);
+            return DONE;
+        }
+        dcfg->auditlog_fd = ap_piped_log_write_fd(pipe_log);
+    }
+    else {
+        const char *file_name = ap_server_root_relative(p, dcfg->auditlog_name);
+        apr_status_t rc;
+
+        if (dcfg->auditlog_fileperms == NOT_SET) {
+            dcfg->auditlog_fileperms = CREATEMODE;
+        }
+        rc = apr_file_open(&dcfg->auditlog_fd, file_name,
+                APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
+                dcfg->auditlog_fileperms, p);
+
+        if (rc != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
+                         "ModSecurity: Failed to open the audit log file: %s", file_name);
+            return DONE;
+        }
+    }
+
+    if (dcfg->auditlog2_name == NOT_SET_P) {
+        return OK;
+    }
+    if (dcfg->auditlog2_name[0] == '|') {
+        const char *pipe_name = ap_server_root_relative(p, dcfg->auditlog2_name + 1);
+        piped_log *pipe_log;
+
+        pipe_log = ap_open_piped_log(p, pipe_name);
+        if (pipe_log == NULL) {
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                        "ModSecurity: Failed to open the secondary audit log pipe: %s",
+                        pipe_name);
+            return OK;
+        }
+        dcfg->auditlog2_fd = ap_piped_log_write_fd(pipe_log);
+    }
+    else {
+        const char *file_name = ap_server_root_relative(p, dcfg->auditlog2_name);
+        apr_status_t rc;
+
+        if (dcfg->auditlog_fileperms == NOT_SET) {
+            dcfg->auditlog_fileperms = CREATEMODE;
+        }
+        rc = apr_file_open(&dcfg->auditlog2_fd, file_name,
+                APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
+                dcfg->auditlog_fileperms, p);
+
+        if (rc != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                         "ModSecurity: Failed to open the secondary audit log file: %s",
+                         file_name);
+            return OK;
+        }
+    }
+
+    return OK;
+}
