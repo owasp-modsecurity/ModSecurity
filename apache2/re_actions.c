@@ -1615,7 +1615,7 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
             /* Relative change. */
             msc_string *rec = NULL;
             msc_string *val = apr_palloc(msr->mp, sizeof(msc_string));
-            int value = 0;
+            long long value = 0;
 
             if (val == NULL) {
                 msr_log(msr, 1, "Failed to allocate space to expand value macros");
@@ -1629,11 +1629,11 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
                 rec->name = apr_pstrdup(msr->mp, var_name);
                 rec->name_len = strlen(rec->name);
                 value = 0;
-                rec->value = apr_psprintf(msr->mp, "%d", value);
+                rec->value = apr_psprintf(msr->mp, "%d", 0);
                 rec->value_len = strlen(rec->value);
             }
             else {
-                value = atoi(rec->value);
+                value = atoll(rec->value);
             }
 
             /* Record the original value before we change it */
@@ -1650,15 +1650,23 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
             var_value = val->value;
 
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Relative change: %s=%d%s", var_name, value, var_value);
+                /* The printf functions provided by Apache do not understand the %lld format.
+                 * Therefore, we convert value to a string first. */
+                char value_str[23] =  {'\0'};
+                sprintf(value_str, "%lld", value);
+                msr_log(msr, 9, "Relative change: %s=%s%s", var_name, value_str, var_value);
             }
 
             /* Change value. */
-            value += atoi(var_value);
+            value += atoll(var_value);
             if (value < 0) value = 0; /* Counters never go below zero. */
 
             /* Put the variable back. */
-            rec->value = apr_psprintf(msr->mp, "%d", value);
+            /* The printf functions provided by Apache do not understand the %lld format.
+             * Therefore, we convert value to a string first. */
+            char value_str[23] =  {'\0'};
+            sprintf(value_str, "%lld", value);
+            rec->value = apr_psprintf(msr->mp, "%s", value_str);
             rec->value_len = strlen(rec->value);
             apr_table_setn(target_col, rec->name, (void *)rec);
 
@@ -1839,7 +1847,7 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
     apr_table_t *target_col = NULL;
     msc_string *var = NULL, *var_last_update_time = NULL;
     apr_time_t last_update_time, current_time;
-    long current_value, new_value;
+    long long current_value, new_value;
 
     /* Extract the name and the value. */
     /* IMP1 We have a function for this now, parse_name_eq_value? */
@@ -1910,7 +1918,7 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
         }
         return 0;
     }
-    current_value = atoi(var->value);
+    current_value = atoll(var->value);
 
     /* Find the last update time (of the collection). */
     var_last_update_time = (msc_string *)apr_table_get(target_col, "LAST_UPDATE_TIME");
@@ -1937,27 +1945,36 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
      * time elapsed since the last update.
      */
     new_value = current_value -
-        (atol(var_value) * ((current_time - last_update_time) / atol(s)));
+        (atoll(var_value) * ((current_time - last_update_time) / atoll(s)));
     if (new_value < 0) new_value = 0;
+
+    /* The printf functions provided by Apache do not understand the %lld format.
+     * Therefore, we convert value to a string first. */
+    char new_value_str[23] =  {'\0'};
+    sprintf(new_value_str, "%lld", new_value);
 
     /* Only change the value if it differs. */
     if (new_value != current_value) {
-        var->value = apr_psprintf(msr->mp, "%ld", new_value);
+        var->value = apr_psprintf(msr->mp, "%s", new_value_str);
         var->value_len = strlen(var->value);
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %ld to %ld (%" APR_TIME_T_FMT " seconds since "
+            char current_value_str[23] =  {'\0'};
+            sprintf(current_value_str, "%lld", current_value);
+            msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %s to %s (%" APR_TIME_T_FMT " seconds since "
                 "last update).", log_escape(msr->mp, col_name), log_escape(msr->mp, var_name),
-                current_value, new_value, (apr_time_t)(current_time - last_update_time));
+                current_value_str, new_value_str, (apr_time_t)(current_time - last_update_time));
         }
 
         apr_table_set(msr->collections_dirty, col_name, "1");
     } else {
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%ld) is "
-                "the same as the old one (%ld) (%" APR_TIME_T_FMT " seconds since last update).",
-                log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value,
-                new_value, (apr_time_t)(current_time - last_update_time));
+            char current_value_str[23] =  {'\0'};
+            sprintf(current_value_str, "%lld", current_value);
+            msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%s) is "
+                "the same as the old one (%s) (%" APR_TIME_T_FMT " seconds since last update).",
+                log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value_str,
+                new_value_str, (apr_time_t)(current_time - last_update_time));
         }
     }
 
