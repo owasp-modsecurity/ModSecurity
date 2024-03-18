@@ -1068,6 +1068,7 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
                             "reject the request");
                     m_it.status = 403;
                     m_it.disruptive = true;
+                    m_it.severity = 0;
                 } else {
                     ms_dbg(5, "Not rejecting the request as the engine is " \
                         "not Enabled");
@@ -1327,6 +1328,7 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
                         "the request");
                     m_it.status = 403;
                     m_it.disruptive = true;
+                    m_it.severity = 0;
                 } else {
                     ms_dbg(5, "Not rejecting the request as the engine is " \
                         "not Enabled");
@@ -1486,6 +1488,7 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
         }
         intervention::reset(&m_it);
     }
+    it->severity = m_it.severity;
 
     return it->disruptive;
 }

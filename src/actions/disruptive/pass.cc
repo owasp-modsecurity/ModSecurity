@@ -35,6 +35,9 @@ bool Pass::evaluate(RuleWithActions *rule, Transaction *transaction,
     intervention::reset(&transaction->m_it);
 
     ms_dbg_a(transaction, 8, "Running action pass");
+    if (rule->hasSeverity()) {
+        transaction->m_it.severity = rule->severity();
+    }
 
     return true;
 }
