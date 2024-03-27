@@ -32,7 +32,7 @@ void print_help(const char *name) {
 
 
 int main(int argc, char **argv) {
-    std::unique_ptr<modsecurity::RulesSet> rules (new modsecurity::RulesSet());
+    std::unique_ptr<modsecurity::RulesSet> rules = std::make_unique<modsecurity::RulesSet>();
     char **args = argv;
     int ret = 0;
 
@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 
     while (*args != NULL) {
         struct stat buffer;
-        std::string arg = (*args);
+        std::string arg = *args;
         std::string err;
         int r;
 
