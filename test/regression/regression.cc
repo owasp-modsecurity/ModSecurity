@@ -476,7 +476,9 @@ int main(int argc, char **argv) {
     std::string ver(MODSECURITY_VERSION);
     std::string envvar("MODSECURITY=ModSecurity " + ver + " regression tests");
 
-    putenv(strdup(envvar.c_str()));
+    char *envvarptr = strdup(envvar.c_str());
+
+    putenv(envvarptr);
 #ifndef NO_LOGS
     int test_number = 0;
 #endif
@@ -536,6 +538,9 @@ int main(int argc, char **argv) {
 
     if (test.m_count_all) {
         std::cout << std::to_string(keyList.size()) << std::endl;
+        if (envvarptr != nullptr) {
+            free(envvarptr);
+        }
         exit(0);
     }
 
@@ -606,5 +611,9 @@ int main(int argc, char **argv) {
     }
 
 #endif
+    if (envvarptr != nullptr) {
+        free(envvarptr);
+    }
+
     return 0;
 }
