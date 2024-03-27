@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
 
     if (*args == NULL) {
         print_help(argv[0]);
+        delete rules;
         return 0;
     }
 
@@ -50,6 +51,7 @@ int main(int argc, char **argv) {
         const char *arg = *args;
         std::string err;
         int r;
+        bool need_free = false;
 
         if (argFull.empty() == false) {
             if (arg[strlen(arg)-1] == '\"') {
@@ -72,6 +74,7 @@ int main(int argc, char **argv) {
 
         if (argFull.empty() == false) {
             arg = strdup(argFull.c_str());
+            need_free = true;
             argFull.clear();
         }
 
@@ -80,6 +83,9 @@ int main(int argc, char **argv) {
             r = rules->loadFromUri(arg);
         } else {
             r = rules->load(arg);
+        }
+        if(need_free == true && arg != nullptr) {
+            free((void*)arg);
         }
         if (r < 0) {
             err.assign(rules->m_parserError.str());
