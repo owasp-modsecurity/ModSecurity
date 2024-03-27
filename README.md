@@ -231,7 +231,7 @@ CFLAGS to disable the compilation optimization parameters:
 ```shell
 $ export CFLAGS="-g -O0"
 $ ./build.sh
-$ ./configure
+$ ./configure --enable-assertions=yes
 $ make
 $ sudo make install
 ```
