@@ -32,61 +32,39 @@ void print_help(const char *name) {
 
 
 int main(int argc, char **argv) {
-    modsecurity::RulesSet *rules;
+    std::unique_ptr<modsecurity::RulesSet> rules (new modsecurity::RulesSet());
     char **args = argv;
-    rules = new modsecurity::RulesSet();
     int ret = 0;
 
     args++;
 
     if (*args == NULL) {
         print_help(argv[0]);
-        delete rules;
         return 0;
     }
 
     while (*args != NULL) {
         struct stat buffer;
-        std::string argFull("");
-        const char *arg = *args;
+        std::string arg = (*args);
         std::string err;
         int r;
-        bool need_free = false;
 
-        if (argFull.empty() == false) {
-            if (arg[strlen(arg)-1] == '\"') {
-                argFull.append(arg, strlen(arg)-1);
-                goto next;
-            } else {
-                argFull.append(arg);
-                goto next;
-            }
-        }
+        // strip arg from leading and trailing '"' chars
+        arg.erase(arg.find_last_not_of('\"')+1);
+        arg.erase(0, arg.find_first_not_of('\"'));
 
-        if (arg[0] == '\"' && argFull.empty() == true) {
-            if (arg[strlen(arg)-1] == '\"') {
-                argFull.append(arg+1, strlen(arg) - 2);
-            } else {
-                argFull.append(arg+1);
-                goto next;
-            }
-        }
-
-        if (argFull.empty() == false) {
-            arg = strdup(argFull.c_str());
-            need_free = true;
-            argFull.clear();
+        if (arg.empty() == true) {
+            args++;
+            continue;
         }
 
         std::cout << " : " << arg << "  --  ";
-        if (stat(arg, &buffer) == 0) {
-            r = rules->loadFromUri(arg);
+        if (stat(arg.c_str(), &buffer) == 0) {
+            r = rules->loadFromUri(arg.c_str());
         } else {
-            r = rules->load(arg);
+            r = rules->load(arg.c_str());
         }
-        if(need_free == true && arg != nullptr) {
-            free((void*)arg);
-        }
+
         if (r < 0) {
             err.assign(rules->m_parserError.str());
             rules->m_parserError.str("");
@@ -97,11 +75,9 @@ int main(int argc, char **argv) {
         if (err.empty() == false) {
             std::cerr << "    " << err << std::endl;
         }
-next:
+
         args++;
     }
-
-    delete rules;
 
     if (ret < 0) {
         std::cout << "Test failed." << std::endl;
