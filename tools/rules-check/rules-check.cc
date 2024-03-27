@@ -32,7 +32,7 @@ void print_help(const char *name) {
 
 
 int main(int argc, char **argv) {
-    std::unique_ptr<modsecurity::RulesSet> rules = std::make_unique<modsecurity::RulesSet>();
+    auto rules = std::make_unique<modsecurity::RulesSet>();
     char **args = argv;
     int ret = 0;
 
