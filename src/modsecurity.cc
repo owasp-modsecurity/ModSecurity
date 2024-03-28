@@ -210,10 +210,6 @@ void ModSecurity::serverLog(void *data, std::shared_ptr<RuleMessage> rm) {
 
     if (m_logProperties & RuleMessageLogProperty) {
         const void *a = static_cast<const void *>(rm.get());
-        if (m_logProperties & IncludeFullHighlightLogProperty) {
-            m_logCb(data, a);
-            return;
-        }
         m_logCb(data, a);
         return;
     }
