@@ -67,13 +67,13 @@ bool InMemoryPerProcess::storeOrUpdateFirst(const std::string &key,
 bool InMemoryPerProcess::updateFirst(const std::string &key,
     const std::string &value) {
     pthread_mutex_lock(&m_lock);
-    auto range = this->equal_range(key);
 
-    for (auto it = range.first; it != range.second; ++it) {
-        it->second.setValue(value);
+    if (auto search = this->find(key); search != this->end()) {
+        search->second.setValue(value);
         pthread_mutex_unlock(&m_lock);
         return true;
     }
+
     pthread_mutex_unlock(&m_lock);
     return false;
 }
@@ -97,11 +97,11 @@ void InMemoryPerProcess::delIfExpired(const std::string& key) {
 
 void InMemoryPerProcess::setExpiry(const std::string& key, int32_t expiry_seconds) {
     pthread_mutex_lock(&m_lock);
-    auto range = this->equal_range(key);
-    for (auto it = range.first; it != range.second; ++it) {
-        it->second.setExpiry(expiry_seconds);
+
+    if (auto search = this->find(key); search != this->end()) {
+        search->second.setExpiry(expiry_seconds);
         pthread_mutex_unlock(&m_lock);
-	return;
+        return;
     }
 
     // We allow an expiry value to be set for a key that has not (yet) had a value set.
