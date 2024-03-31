@@ -111,9 +111,7 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
     const std::string &key) {
 
     if (auto search = this->find(key); search != this->end()) {
-        auto b = std::make_unique<std::string>();
-        b->assign(search->second->getValue());
-        return b;
+        return std::make_unique<std::string>(search->second->getValue());
     }
 
     return nullptr;
