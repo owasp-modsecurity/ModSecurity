@@ -215,11 +215,9 @@ char *msre_ruleset_phase_rule_update_target_matching_exception(modsec_rec *msr, 
     rules = (msre_rule **)phase_arr->elts;
     for (i = 0; i < phase_arr->nelts; i++) {
         msre_rule *rule = (msre_rule *)rules[i];
-
         if (mode == 0) { /* Looking for next rule. */
             if (msre_ruleset_rule_matches_exception(rule, re)) {
-
-                err = update_rule_target_ex(NULL, ruleset, rule, p2, p3);
+                err = update_rule_target_ex(msr, ruleset, rule, p2, p3);
                 if (err) return err;
                 if (rule->actionset->is_chained) mode = 2; /* Match all rules in this chain. */
             } else {
@@ -3141,6 +3139,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             /* Perform transformations. */
 
             tarr = apr_table_elts(normtab);
+			/* if no transformation, multi_match makes no sense and breaks the logic */
+            if (tarr->nelts == 0) multi_match = 0;
 
             /* Execute transformations in a loop. */
 

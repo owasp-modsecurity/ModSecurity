@@ -24,9 +24,6 @@ void validate_quotes(modsec_rec *msr, char *data, char quote)  {
     assert(msr != NULL);
     int i, len;
 
-    if(msr == NULL)
-        return;
-
     if(msr->mpd == NULL)
         return;
 

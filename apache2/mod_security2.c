@@ -867,10 +867,7 @@ static int hook_request_early(request_rec *r) {
      * create the initial configuration.
      */
     msr = create_tx_context(r);
-    if (msr == NULL) {
-        msr_log(msr, 9, "Failed to create context after request failure.");
-        return DECLINED;
-    }
+    if (msr == NULL) return DECLINED;
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "Context created after request failure.");
     }
@@ -1165,11 +1162,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
 #else
         msr = create_tx_context((request_rec*)r);
 #endif
-        if (msr == NULL) {
-            msr_log(msr, 9, "Failed to create context after request failure.");
-            return;
-        }
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "Context created after request failure.");
         }
     }
