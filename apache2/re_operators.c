@@ -643,13 +643,18 @@ nextround:
     }
 
     if(msr->stream_input_data != NULL && input_body == 1) {
+        memset(msr->stream_input_data, 0x0, msr->stream_input_length);
         free(msr->stream_input_data);
         msr->stream_input_data = NULL;
         msr->stream_input_length = 0;
 #ifdef MSC_LARGE_STREAM_INPUT
         msr->stream_input_allocated_length  = 0;
-#endif
+
+        msr->stream_input_data = (char *)malloc(size);
+#else
         msr->stream_input_data = (char *)malloc(size+1);
+#endif
+
         if(msr->stream_input_data == NULL)  {
             return -1;
         }
@@ -657,11 +662,16 @@ nextround:
         msr->stream_input_length = size;
 #ifdef MSC_LARGE_STREAM_INPUT
         msr->stream_input_allocated_length = size;
+        memset(msr->stream_input_data, 0x0, size);
+#else
+        memset(msr->stream_input_data, 0x0, size+1);
 #endif
         msr->if_stream_changed = 1;
 
         memcpy(msr->stream_input_data, data, size);
+#ifndef MSC_LARGE_STREAM_INPUT
         msr->stream_input_data[size] = '\0';
+#endif
 
         var->value_len = size;
         var->value = msr->stream_input_data;
@@ -691,7 +701,7 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
     const char *pattern = rule->op_param;
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
-    int rc, jit = 0;
+    int rc, jit;
         #endif
     #endif
 
@@ -774,7 +784,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
     int rc;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
@@ -966,7 +976,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     const char *pattern = rule->op_param;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int rc, jit = 0;
+    int rc, jit;
        #endif
     #endif
 
@@ -1049,7 +1059,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
@@ -1574,10 +1584,10 @@ static const char *gsb_replace_tpath(apr_pool_t *pool, const char *domain, int l
     url = apr_palloc(pool, len + 1);
     data = apr_palloc(pool, len + 1);
 
-    data[0] = '\0';
-    
+    memset(data, 0, len+1);
+    memset(url, 0, len+1);
+
     memcpy(url, domain, len);
-    url[len] = 0;
 
     while(( pos = strstr(url , "/./" )) != NULL) {
         match = 1;
@@ -2932,7 +2942,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
@@ -3265,7 +3275,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 
@@ -3585,7 +3595,7 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     msc_parm *mparm = NULL;
     #ifdef WITH_PCRE_STUDY
        #ifdef WITH_PCRE_JIT
-    int jit = 0;
+    int jit;
        #endif
     #endif
 

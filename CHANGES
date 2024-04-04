@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Fix possible segfault in collection_unpack
+   [Issue #3072 - @twouters]
  * Set the minimum security protocol version for SecRemoteRules
    [Issue security/code-scanning/2 - @airween]
  * Allow lua version 5.4

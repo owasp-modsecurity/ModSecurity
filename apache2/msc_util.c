@@ -2850,14 +2850,3 @@ char* strtok_r(
 }
 #endif
 
-// Function compatible with Linux & Windows, also with mpm-itk & mod_ruid2
-char* get_username(apr_pool_t* mp) {
-  	char* username;
-  	apr_uid_t uid;
-  	apr_gid_t gid;
-  	int rc = apr_uid_current(&uid, &gid, mp);
-  	if (rc != APR_SUCCESS) return "apache";
-   rc = apr_uid_name_get(&username, uid, mp);
-   if (rc != APR_SUCCESS) return "apache";
-   return username;
-}

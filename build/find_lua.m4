@@ -21,7 +21,7 @@ LUA_SONAMES="so la sl dll dylib a"
 
 AC_ARG_WITH(
     lua,
-    [AC_HELP_STRING([--with-lua=PATH],[Path to lua prefix or config script])]
+    [AS_HELP_STRING([--with-lua=PATH],[Path to lua prefix or config script])]
     ,, with_lua=yes)
 
 AS_CASE(["${with_lua}"],
