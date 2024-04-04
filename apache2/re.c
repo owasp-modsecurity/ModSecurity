@@ -48,6 +48,13 @@ static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
 /* -- Actions, variables, functions and operator functions ----------------- */
 
+// Returns the rule id if existing, otherwise the file name & line number
+static const char* id_log(msre_rule* rule) {
+    const char* id = rule->actionset->id;
+    if (!id || !*id || id == NOT_SET_P) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
+    return id;
+}
+
 /**
  * \brief Remove rule targets to be processed
  *
@@ -94,7 +101,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
         if(targets != NULL) {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, rule->actionset->id);
+                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, id_log(rule));
             }
             target = apr_strtok((char *)targets, ",", &savedptr);
 
@@ -139,7 +146,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
             }
         } else  {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", rule->actionset->id);
+                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", id_log(rule));
 
             }
         }
@@ -1583,7 +1590,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                         saw_starter = 0;
 
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",rule->actionset->id,last_rule->actionset->is_chained,skip_after,saw_starter);
+                            msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]", id_log(rule),last_rule->actionset->is_chained,skip_after,saw_starter);
                         }
 
                     }
@@ -1740,7 +1747,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                     msr_log(msr, 5, "Not processing %srule id=\"%s\": "
                             "removed by ctl action",
                             rule->actionset->is_chained ? "chained " : "",
-                            rule->actionset->id);
+                            id_log(rule));
                 }
 
                 /* Skip the whole chain, if this is a chained rule */
@@ -1910,15 +1917,11 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
         else if (rc < 0) {
-            const char *id = "";
             const char *msg = "";
-            if (rule->actionset->id) {
-                id = rule->actionset->id;
-            }
             if (rule->actionset->msg) {
                 msg = rule->actionset->msg;
             }
-            msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", id, msg);
+            msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", id_log(rule), msg);
 
             if (msr->txcfg->reqintercept_oe == 1)   {
                 apr_table_clear(msr->matched_vars);
@@ -1948,15 +1951,11 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
         else {
-            const char *id = "";
             const char *msg = "";
-            if (rule->actionset->id) {
-                id = rule->actionset->id;
-            }
             if (rule->actionset->msg) {
                 msg = rule->actionset->msg;
             }
-            msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, id, msg);
+            msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, id_log(rule), msg);
             apr_table_clear(msr->matched_vars);
             return -1;
         }
