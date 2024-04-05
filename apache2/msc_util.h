@@ -165,6 +165,8 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
     apr_pool_t *mp, char **error_msg);
 #endif
 
+char DSOLOCAL *get_username(apr_pool_t* mp);
+
 int read_line(char *buff, int size, FILE *fp);
 
 size_t msc_curl_write_memory_cb(void *contents, size_t size,
