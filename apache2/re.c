@@ -873,6 +873,7 @@ static msre_action_metadata *msre_resolve_action(msre_engine *engine, const char
 msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
         modsec_rec *msr, char **error_msg)
 {
+    // msr can be NULL
     const char *varparam = param;
     msre_var *var = apr_pcalloc(pool, sizeof(msre_var));
     if (var == NULL) return NULL;
@@ -953,7 +954,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
 static msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
         modsec_rec *msr, char **error_msg)
 {
-    assert(msr != NULL);
+    // msr can be NULL
     assert(ruleset != NULL);
     assert(error_msg != NULL);
     msre_var *var = msre_create_var_ex(ruleset->mp, ruleset->engine, name, param, msr, error_msg);
