@@ -75,6 +75,10 @@ int DSOLOCAL rule_id_in_range(int ruleid, const char *range);
 msre_var DSOLOCAL *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
     msre_rule *rule, apr_pool_t *mptmp);
 
+#ifdef DEBUG_CONF
+char DSOLOCAL* msre_actionset_generate_action_string(apr_pool_t* pool, const msre_actionset* actionset);
+#endif
+
 #if defined(WITH_LUA)
 apr_table_t DSOLOCAL *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
     msre_rule *rule, apr_pool_t *mptmp);

@@ -168,7 +168,6 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
  * \param p3 Pointer to configuration option REPLACED_TARGET
  */
 char *msre_ruleset_rule_update_target_matching_exception(modsec_rec *msr, msre_ruleset *ruleset, rule_exception *re, const char *p2, const char *p3) {
-    assert(msr != NULL);
     char *err;
 
     if(ruleset == NULL)
@@ -210,7 +209,6 @@ char *msre_ruleset_phase_rule_update_target_matching_exception(modsec_rec *msr, 
         apr_array_header_t *phase_arr, const char *p2,
         const char *p3)
 {
-    assert(msr != NULL);
     assert(ruleset != NULL);
     msre_rule **rules;
     int i, j, mode;
@@ -245,7 +243,6 @@ char *msre_ruleset_phase_rule_update_target_matching_exception(modsec_rec *msr, 
 
 char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *rule, const char *p2,
         const char *p3)   {
-    assert(msr != NULL);
     assert(ruleset != NULL);
 
     msre_var **targets = NULL;
@@ -646,7 +643,10 @@ static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 /**
  * Generate an action string from an actionset.
  */
-static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
+#ifndef DEBUG_CONF
+static
+#endif
+char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
