@@ -304,7 +304,20 @@ if test "$build_docs" -eq 1; then
     AC_CONFIG_FILES([doc/Makefile])
 fi
 
-
+AC_ARG_ENABLE(assertions,
+              AS_HELP_STRING([--enable-assertions],
+                             [Turn on assertions checks (undefine NDEBUG])),
+[
+  if test "${enableval}" = "yes"; then
+      assertions=-UNDEBUG
+      MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $assertions"
+  else
+      assertions=
+  fi
+]],
+[
+  assertions=
+])    
 # Add PCRE Studying
 
 AC_ARG_ENABLE(pcre-study,
@@ -827,7 +840,8 @@ else
     EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
   fi
 fi
-
+EXTRA_CFLAGS="$EXTRA_CFLAGS $assertions"
+ 
 MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input"
 
 APXS_WRAPPER=build/apxs-wrapper
@@ -905,7 +919,7 @@ AC_LINK_IFELSE(
 CFLAGS="$ORIG_CFLAGS"
 CPPFLAGS="$ORIG_CPPFLAGS"
 
-# Current our unique download backend is curl, furhter we can support more.
+# Currently our unique download backend is curl, further we can support more.
 if test ! -z "${CURL_VERSION}"; then
   AC_DEFINE([WITH_REMOTE_RULES], [1], [Enables SecRemoteRules support])
   MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS -DWITH_REMOTE_RULES"
