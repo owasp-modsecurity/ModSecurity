@@ -312,11 +312,11 @@ AC_ARG_ENABLE(assertions,
       assertions=-UNDEBUG
       MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $assertions"
   else
-      assertions=
+      assertions=-DNDEBUG
   fi
 ]],
 [
-  assertions=
+  assertions=-DNDEBUG
 ])    
 # Add PCRE Studying
 
