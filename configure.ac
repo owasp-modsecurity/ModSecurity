@@ -306,7 +306,7 @@ fi
 
 AC_ARG_ENABLE(assertions,
               AS_HELP_STRING([--enable-assertions],
-                             [Turn on assertions checks (undefine NDEBUG])),
+                             [Turn on assertions checks (undefine NDEBUG)]),
 [
   if test "${enableval}" = "yes"; then
       assertions=-UNDEBUG
@@ -314,7 +314,7 @@ AC_ARG_ENABLE(assertions,
   else
       assertions=-DNDEBUG
   fi
-]],
+],
 [
   assertions=-DNDEBUG
 ])    
@@ -774,7 +774,7 @@ VERSION_OK
        AC_MSG_NOTICE(apache is too old, mmn must be at least $HTTPD_WANTED_MMN)
      fi
     ])
-  fi
+ÿ fi
   APXS_INCLUDEDIR="`$APXS -q INCLUDEDIR`"
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs INCLUDEDIR: $APXS_INCLUDEDIR); fi
   # Make sure the include dir is used
