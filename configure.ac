@@ -304,20 +304,24 @@ if test "$build_docs" -eq 1; then
     AC_CONFIG_FILES([doc/Makefile])
 fi
 
+
+# Add assert() usage
+
 AC_ARG_ENABLE(assertions,
               AS_HELP_STRING([--enable-assertions],
                              [Turn on assertions checks (undefine NDEBUG)]),
 [
   if test "${enableval}" = "yes"; then
-      assertions=-UNDEBUG
+      assertions='-UNDEBUG'
       MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $assertions"
   else
-      assertions=-DNDEBUG
+      assertions='-DNDEBUG'
   fi
 ],
 [
-  assertions=-DNDEBUG
-])    
+  assertions='-DNDEBUG'
+])
+    
 # Add PCRE Studying
 
 AC_ARG_ENABLE(pcre-study,
@@ -774,7 +778,7 @@ VERSION_OK
        AC_MSG_NOTICE(apache is too old, mmn must be at least $HTTPD_WANTED_MMN)
      fi
     ])
-ÿ fi
+  fi
   APXS_INCLUDEDIR="`$APXS -q INCLUDEDIR`"
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs INCLUDEDIR: $APXS_INCLUDEDIR); fi
   # Make sure the include dir is used
@@ -841,7 +845,7 @@ else
   fi
 fi
 EXTRA_CFLAGS="$EXTRA_CFLAGS $assertions"
- 
+
 MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type $unique_id $log_filename $log_server $log_collection_delete_problem $log_dechunk $log_stopwatch $log_handler $log_server_context $collection_global_lock $large_stream_input"
 
 APXS_WRAPPER=build/apxs-wrapper
