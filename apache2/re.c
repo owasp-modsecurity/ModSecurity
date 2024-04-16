@@ -48,13 +48,6 @@ static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
 /* -- Actions, variables, functions and operator functions ----------------- */
 
-// Returns the rule id if existing, otherwise the file name & line number
-static const char* id_log(msre_rule* rule) {
-    const char* id = rule->actionset->id;
-    if (!id || !*id || id == NOT_SET_P) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
-    return id;
-}
-
 /**
  * \brief Remove rule targets to be processed
  *

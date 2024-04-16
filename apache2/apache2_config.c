@@ -31,10 +31,9 @@
 #endif
 
 // Returns the rule id if existing, otherwise the file name & line number
-static const char* id_log(msre_rule* rule) {
+const char* id_log(msre_rule* rule) {
 	char* id = rule->actionset->id;
-	if (id == NOT_SET_P || !id || !*id)
-        id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
+    if (!id || !*id || id == NOT_SET_P) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
 	return id;
 }
 
