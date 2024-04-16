@@ -34,7 +34,7 @@
 const char* id_log(msre_rule* rule) {
     assert(rule != NULL);
     assert(rule->actionset != NULL);
-    char* id = rule->actionset->id;
+    const char* id = rule->actionset->id;
     if (!id || !*id || id == NOT_SET_P) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
 	return id;
 }
