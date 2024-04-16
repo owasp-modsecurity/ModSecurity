@@ -180,7 +180,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
  */
 apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
     assert(msr != NULL);
-    assert( error_msg!= NULL);
+    assert(error_msg!= NULL);
     request_rec *r = msr->r;
     unsigned int finished_reading;
     apr_bucket_brigade *bb_in;
