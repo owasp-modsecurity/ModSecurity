@@ -129,8 +129,18 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 #endif
                             if (regex == NULL) {
                                 if (msr->txcfg->debuglog_level >= 9) {
+#ifdef WITH_PCRE2
+                                    // in case of PCRE2 the errptr won't fill
+                                    msr_log(msr, 9, "fetch_target_exception: Regexp /%s/ failed to compile at pos %d.",
+                                            value + 1, erroffset);
+                                    ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: exclusion regexp /%s/ failed to compile at pos %d.",
+                                            value + 1, erroffset);
+#else
                                     msr_log(msr, 9, "fetch_target_exception: Regexp /%s/ failed to compile at pos %d: %s.",
                                             value + 1, erroffset, errptr);
+                                    ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: exclusion regexp /%s/ failed to compile at pos %d: %s.",
+                                            value + 1, erroffset, errptr);
+#endif
                                 }
                             } else {
 #ifdef WITH_PCRE2
