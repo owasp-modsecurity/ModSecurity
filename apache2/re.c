@@ -167,12 +167,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
                             }
                             match = 1;
                         }
-                    } else if (value == NULL && myvalue == NULL)    {
-                        if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
-                        }
-                        match = 1;
-                    } else if (value == NULL && myvalue != NULL)   {
+                    } else {
                         if (msr->txcfg->debuglog_level >= 9) {
                             msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
                         }
