@@ -66,6 +66,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
     char *errptr;
     int erroffset;
     int match = 0;
+    size_t value_len;
 
     if(msr == NULL)
         return 0;
@@ -114,12 +115,17 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
                     value = NULL;
                 }
 
+                value_len = 0;
+                if (value != NULL) {
+                    value_len = strlen(value);
+                }
+
                 if((strlen(myname) == strlen(name)) &&
-                        (strncasecmp(myname, name,strlen(myname)) == 0))   {
+                        (strncasecmp(myname, name, strlen(myname)) == 0))   {
 
                     if(value != NULL && myvalue != NULL)  {
-                        if(strlen(value) > 2 && value[0] == '/' && value[strlen(value) - 1] == '/') {
-                            value[strlen(value) - 1] = '\0';
+                        if(value_len > 2 && value[0] == '/' && value[value_len - 1] == '/') {
+                            value[value_len - 1] = '\0';
 #ifdef WITH_PCRE2
                             regex = msc_pregcomp(msr->mp, value + 1,
                                         PCRE2_DOTALL | PCRE2_CASELESS | PCRE2_DOLLAR_ENDONLY, (const char **)&errptr, &erroffset);
@@ -154,7 +160,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
                                     match = 1;
                                 }
                             }
-                        } else if((strlen(myvalue) == strlen(value)) &&
+                        } else if((strlen(myvalue) == value_len) &&
                                 strncasecmp(myvalue,value,strlen(myvalue)) == 0) {
                             if (msr->txcfg->debuglog_level >= 9) {
                                 msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
