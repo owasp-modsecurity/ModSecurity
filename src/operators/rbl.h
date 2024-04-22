@@ -71,9 +71,9 @@ class Rbl : public Operator {
                 m_demandsPassword = true;
                 m_provider = RblProvider::httpbl;
             } else if (m_service.find("uribl.com") != std::string::npos) {
-                m_provider = RblProvider::httpbl;
+                m_provider = RblProvider::uribl;
             } else if (m_service.find("spamhaus.org") != std::string::npos) {
-                m_provider = RblProvider::httpbl;
+                m_provider = RblProvider::spamhaus;
             }
         }
     bool evaluate(Transaction *transaction, RuleWithActions *rule,
