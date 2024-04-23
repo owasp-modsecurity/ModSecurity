@@ -18,7 +18,11 @@
 #include "src/collection/backend/collection_data.h"
 
 #include <sys/types.h>
+#ifndef WIN32
 #include <unistd.h>
+#else
+#include <io.h>
+#endif
 
 #include <string>
 #include <memory>

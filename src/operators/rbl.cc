@@ -16,10 +16,15 @@
 #include "src/operators/rbl.h"
 
 #include <sys/types.h>
+#ifndef WIN32
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#else
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
 
 #include <string>
 

@@ -21,7 +21,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifndef WIN32
 #include <unistd.h>
+#else
+#include <io.h>
+#include "src/compat/msvc.h"
+#endif
 #include <stdlib.h>
 
 #include <fstream>

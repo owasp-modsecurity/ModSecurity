@@ -15,7 +15,11 @@
 
 #include <string.h>
 #include <sys/stat.h>
+#ifndef WIN32
 #include <unistd.h>
+#else
+#include <io.h>
+#endif
 
 #include <ctime>
 #include <iostream>

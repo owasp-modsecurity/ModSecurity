@@ -53,6 +53,9 @@
 #include "src/actions/disruptive/allow.h"
 #include "src/variables/remote_user.h"
 
+#ifdef WIN32
+#include "src/compat/msvc.h"
+#endif
 
 
 using modsecurity::actions::Action;

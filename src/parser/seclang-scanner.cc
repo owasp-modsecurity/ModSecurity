@@ -4952,7 +4952,11 @@ static std::stack<int> YY_PREVIOUS_STATE;
  * The user has a chance to override it with an option.
  */
 /* %if-c-only */
+#ifndef WIN32
 #include <unistd.h>
+#else
+#include <io.h>
+#endif
 /* %endif */
 /* %if-c++-only */
 /* %endif */
