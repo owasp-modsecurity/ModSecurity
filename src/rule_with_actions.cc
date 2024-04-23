@@ -172,9 +172,7 @@ RuleWithActions::~RuleWithActions() {
 
 
 bool RuleWithActions::evaluate(Transaction *transaction) {
-    RuleMessage rm(this, transaction);
-    std::shared_ptr<RuleMessage> rm2 = std::make_shared<RuleMessage>(&rm);
-    return evaluate(transaction, rm2);
+    return evaluate(transaction, std::make_shared<RuleMessage>(this, transaction));
 }
 
 
@@ -330,7 +328,7 @@ inline void RuleWithActions::executeTransformation(
     std::string newValue = a->evaluate(*oldValue, trans);
 
     if (newValue != *oldValue) {
-        std::shared_ptr<std::string> u(new std::string(newValue));
+        auto u = std::make_shared<std::string>(newValue);
         if (m_containsMultiMatchAction) {
             ret->push_back(std::make_pair(u, a->m_name));
             (*nth)++;
@@ -355,14 +353,13 @@ void RuleWithActions::executeTransformations(
     int none = 0;
     int transformations = 0;
     std::string path("");
-    std::shared_ptr<std::string> value =
-        std::shared_ptr<std::string>(new std::string(in));
+    auto value = std::make_shared<std::string>(in);
 
     if (m_containsMultiMatchAction == true) {
         /* keep the original value */
         ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(new std::string(*value)),
-            std::shared_ptr<std::string>(new std::string(path))));
+            std::make_shared<std::string>(*value),
+            std::make_shared<std::string>(path)));
     }
 
     for (Action *a : m_transformations) {
@@ -436,8 +433,8 @@ void RuleWithActions::executeTransformations(
 
     if (!m_containsMultiMatchAction) {
         ret.push_back(std::make_pair(
-            std::shared_ptr<std::string>(new std::string(*value)),
-            std::shared_ptr<std::string>(new std::string(path))));
+            std::make_shared<std::string>(*value),
+            std::make_shared<std::string>(path)));
     }
 }
 
