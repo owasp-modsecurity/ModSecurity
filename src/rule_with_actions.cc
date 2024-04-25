@@ -87,43 +87,50 @@ RuleWithActions::RuleWithActions(
 
     if (actions) {
         for (Action *a : *actions) {
-            if (a->action_kind == Action::ConfigurationKind) {
-                a->evaluate(this, NULL);
-                delete a;
-
-            } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
-                if (dynamic_cast<actions::Capture *>(a)) {
-                    m_containsCaptureAction = true;
+            switch (a->action_kind) {
+                case Action::ConfigurationKind:
+                    a->evaluate(this, NULL);
                     delete a;
-                } else if (dynamic_cast<actions::MultiMatch *>(a)) {
-                    m_containsMultiMatchAction = true;
-                    delete a;
-                } else if (dynamic_cast<actions::Severity *>(a)) {
-                    m_severity = dynamic_cast<actions::Severity *>(a);
-                } else if (dynamic_cast<actions::LogData *>(a)) {
-                    m_logData = dynamic_cast<actions::LogData*>(a);
-                } else if (dynamic_cast<actions::Msg *>(a)) {
-                    m_msg = dynamic_cast<actions::Msg*>(a);
-                } else if (dynamic_cast<actions::SetVar *>(a)) {
-                    m_actionsSetVar.push_back(
-                        dynamic_cast<actions::SetVar *>(a));
-                } else if (dynamic_cast<actions::Tag *>(a)) {
-                    m_actionsTag.push_back(dynamic_cast<actions::Tag *>(a));
-                } else if (dynamic_cast<actions::Block *>(a)) {
-                    m_actionsRuntimePos.push_back(a);
-                    m_containsStaticBlockAction = true;
-                } else if (a->isDisruptive() == true) {
-                    if (m_disruptiveAction != nullptr) {
-                        delete m_disruptiveAction;
-                        m_disruptiveAction = nullptr;
+                    break;
+                case Action::RunTimeOnlyIfMatchKind:
+                    if (dynamic_cast<actions::Capture *>(a)) {
+                        m_containsCaptureAction = true;
+                        delete a;
+                    } else if (dynamic_cast<actions::MultiMatch *>(a)) {
+                        m_containsMultiMatchAction = true;
+                        delete a;
+                    } else if (dynamic_cast<actions::Severity *>(a)) {
+                        m_severity = dynamic_cast<actions::Severity *>(a);
+                    } else if (dynamic_cast<actions::LogData *>(a)) {
+                        m_logData = dynamic_cast<actions::LogData*>(a);
+                    } else if (dynamic_cast<actions::Msg *>(a)) {
+                        m_msg = dynamic_cast<actions::Msg*>(a);
+                    } else if (dynamic_cast<actions::SetVar *>(a)) {
+                        m_actionsSetVar.push_back(
+                            dynamic_cast<actions::SetVar *>(a));
+                    } else if (dynamic_cast<actions::Tag *>(a)) {
+                        m_actionsTag.push_back(dynamic_cast<actions::Tag *>(a));
+                    } else if (dynamic_cast<actions::Block *>(a)) {
+                        m_actionsRuntimePos.push_back(a);
+                        m_containsStaticBlockAction = true;
+                    } else if (a->isDisruptive() == true) {
+                        if (m_disruptiveAction != nullptr) {
+                            delete m_disruptiveAction;
+                            m_disruptiveAction = nullptr;
+                        }
+                        m_disruptiveAction = a;
+                    } else {
+                        m_actionsRuntimePos.push_back(a);
                     }
-                    m_disruptiveAction = a;
-                } else {
-                    m_actionsRuntimePos.push_back(a);
-                }
-            } else {
-                assert(false && "The handling of RunTimeBeforeMatchAttemptKind has not been implemented yet.");
-                delete a;
+                    break;
+                default:
+                    std::cout << "General failure, action: " << a->m_name;
+                    std::cout << " has an unknown type." << std::endl;
+                    delete a;
+                    #ifdef NDEBUG
+                    break;
+                    #endif
+                    assert(false);
             }
         }
         delete actions;
@@ -240,7 +247,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
+    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck_suppressions.txt:55
         if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
