@@ -234,7 +234,7 @@ AC_ARG_ENABLE(assertions,
     [case "${enableval}" in
         yes) assertions=true ;;
         no)  assertions=false ;;
-        *) AC_MSG_ERROR(bad value ${enableval} for --enable-asserions) ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-assertions) ;;
     esac],
 
     [assertions=false]
@@ -369,10 +369,12 @@ if test "$aflFuzzer" == "true"; then
     $buildExamples = false
 fi
 
-if test "$assertions" == "false"; then
-    ASSERTIONS_CPPCFLAGS="-DNDEBUG"
-    GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $ASSERTIONS_CPPCFLAGS"
-fi
+case $assertions in
+    false) ASSERTIONS_CPPCFLAGS="-DNDEBUG" ;;
+    true) ASSERTIONS_CPPCFLAGS="-UNDEBUG" ;;
+    *) AC_MSG_ERROR(bad value ${assertions} for assertions) ;;
+esac
+GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $ASSERTIONS_CPPCFLAGS"
 
 AC_SUBST(GLOBAL_LDADD)
 AC_SUBST(GLOBAL_CPPFLAGS)
