@@ -213,6 +213,12 @@ $ cd test
 $ ./regression-tests
 $ ./unit-tests
  ```
+Please take care that the '<path/to/modsecurity>/test/cppcheck_suppressions.txt'
+file contains hardcoded 'filename:line number' suppressions. If you modify a
+file with explicit suppressions, you must update the 'cppcheck_suppressions.txt'
+accordingly to ensure the suppression references remain aligned with the
+intended lines of code. Failing to do so might trigger 'make check-static' to
+break the build with errors that are logically unrelated to your modifications.
 
 ### Debugging
 
@@ -235,7 +241,12 @@ $ ./configure --enable-assertions=yes
 $ make
 $ sudo make install
 ```
+"Assertions allow us to document assumptions and to spot violations early in the
+development process. What is more, assertions allow us to spot violations with a
+minimum of effort." https://dl.acm.org/doi/pdf/10.1145/240964.240969
 
+It is recommended to use assertions where applicable, and to enable them with
+'--enable-assertions=yes' during the testing and debugging workflow.
 
 ## Reporting Issues
 
