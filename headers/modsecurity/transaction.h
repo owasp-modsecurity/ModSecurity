@@ -321,7 +321,7 @@ class TransactionSecMarkerManagement {
     }
 
  private:
-    std::shared_ptr<std::string> m_marker = nullptr;
+    std::shared_ptr<std::string> m_marker;
 };
 
 /** @ingroup ModSecurity_CPP_API */
