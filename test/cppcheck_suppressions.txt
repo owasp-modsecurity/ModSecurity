@@ -52,7 +52,7 @@ noConstructor:src/variables/variable.h:152
 danglingTempReference:src/modsecurity.cc:206
 knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
 knownConditionTrueFalse:src/operators/verify_svnr.cc:87
-ctunullpointer:src/rule_with_actions.cc:250
+ctunullpointer:src/rule_with_actions.cc:247
 ctunullpointer:src/rule_with_operator.cc:135
 ctunullpointer:src/rule_with_operator.cc:95
 passedByValue:test/common/modsecurity_test.cc:49
