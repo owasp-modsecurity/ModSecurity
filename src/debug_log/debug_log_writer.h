@@ -37,8 +37,8 @@ class DebugLogWriter {
     static int open(const std::string& m_fileName, std::string *error);
 
  private:
-    DebugLogWriter() { }
-    ~DebugLogWriter() { }
+    DebugLogWriter() = default;
+    ~DebugLogWriter() = default;
 
     // C++ 03
     // ========
