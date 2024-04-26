@@ -127,7 +127,11 @@ RuleWithActions::RuleWithActions(
                     std::cout << "General failure, action: " << a->m_name;
                     std::cout << " has an unknown type." << std::endl;
                     delete a;
+                    #ifdef NDEBUG
+                    break;
+                    #else
                     assert(false);
+                    #endif
             }
         }
         delete actions;
