@@ -248,7 +248,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck_suppressions.txt:55
+    for (const auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck_suppressions.txt:55
         if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
