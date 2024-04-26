@@ -18,7 +18,7 @@
 
 #ifdef WIN32
 #include "src/compat/msvc.h"
-#include <winsock2.h>
+#include <WinSock2.h>
 #include <iphlpapi.h>
 #endif
 
