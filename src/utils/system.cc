@@ -98,19 +98,15 @@ double cpu_seconds(void) {
 
 std::string find_resource(const std::string& resource,
     const std::string& config, std::string *err) {
-    std::ifstream *iss;
 
     err->assign("Looking at: ");
     // Trying absolute or relative to the current dir.
-    iss = new std::ifstream(resource, std::ios::in);
-    if (iss->is_open()) {
-        iss->close();
-        delete iss;
+    auto iss = std::ifstream(resource, std::ios::in);
+    if (iss.is_open()) {
         return resource;
     } else {
         err->append("'" + resource + "', ");
     }
-    delete iss;
 
     // What about `*' ?
     if (utils::expandEnv(resource, 0).size() > 0) {
@@ -121,15 +117,12 @@ std::string find_resource(const std::string& resource,
 
     // Trying the same path of the configuration file.
     std::string f = get_path(config) + "/" + resource;
-    iss = new std::ifstream(f, std::ios::in);
-    if (iss->is_open()) {
-        iss->close();
-        delete iss;
+    iss = std::ifstream(f, std::ios::in);
+    if (iss.is_open()) {
         return f;
     } else {
         err->append("'" + f + "', ");
     }
-    delete iss;
 
     // What about `*' ?
     if (utils::expandEnv(f, 0).size() > 0) {
