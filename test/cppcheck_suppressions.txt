@@ -33,7 +33,6 @@ shiftNegative:src/utils/msc_tree.cc
 useInitializationList:src/utils/shared_files.h:87
 duplicateBranch:src/audit_log/audit_log.cc:226
 unreadVariable:src/request_body_processor/multipart.cc:435
-stlcstrParam:src/audit_log/writer/parallel.cc:145
 syntaxError:src/transaction.cc:62
 noConstructor:src/variables/variable.h:152
 rethrowNoCurrentException:headers/modsecurity/transaction.h:313

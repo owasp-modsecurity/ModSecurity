@@ -118,7 +118,7 @@ bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
         log = transaction->toOldAuditLogFormat(parts, "-" + boundary + "--");
     }
 
-    std::string logPath = m_audit->m_storage_dir;
+    const auto &logPath = m_audit->m_storage_dir;
     fileName = logPath + fileName + "-" + *transaction->m_id.get();
 
     if (logPath.empty()) {
