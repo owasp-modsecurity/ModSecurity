@@ -101,5 +101,4 @@ stlcstrStream
 uselessCallsSubstr
 
 // Examples
-memleak:examples/reading_logs_via_rule_message/reading_logs_via_rule_message.h:147
 memleak:examples/using_bodies_in_chunks/simple_request.cc

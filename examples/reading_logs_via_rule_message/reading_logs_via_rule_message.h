@@ -130,29 +130,25 @@ class ReadingLogsViaRuleMessage {
         struct data_ms dms;
         void *status;
 
-        modsecurity::ModSecurity *modsec;
-        modsecurity::RulesSet *rules;
-
-        modsec = new modsecurity::ModSecurity();
+        auto modsec = std::make_unique<modsecurity::ModSecurity>();
         modsec->setConnectorInformation("ModSecurity-test v0.0.1-alpha" \
             " (ModSecurity test)");
         modsec->setServerLogCb(logCb, modsecurity::RuleMessageLogProperty
             | modsecurity::IncludeFullHighlightLogProperty);
 
-        rules = new modsecurity::RulesSet();
+        auto rules = std::make_unique<modsecurity::RulesSet>();
         if (rules->loadFromUri(m_rules.c_str()) < 0) {
             std::cout << "Problems loading the rules..." << std::endl;
             std::cout << rules->m_parserError.str() << std::endl;
             return -1;
         }
 
-        dms.modsec = modsec;
-        dms.rules = rules;
+        dms.modsec = modsec.get();
+        dms.rules = rules.get();
 
         for (i = 0; i < NUM_THREADS; i++) {
             pthread_create(&threads[i], NULL, process_request,
 		reinterpret_cast<void *>(&dms));
-            //  process_request((void *)&dms);
         }
 
         usleep(10000);
@@ -162,8 +158,6 @@ class ReadingLogsViaRuleMessage {
             std::cout << "Main: completed thread id :" << i << std::endl;
         }
 
-        delete rules;
-        delete modsec;
         return 0;
     }
 
