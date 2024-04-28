@@ -49,6 +49,21 @@ bool Serial::write(Transaction *transaction, int parts, std::string *error) {
         error);
 }
 
+
+bool Serial::reopen(std::string *error) {
+    bool success;
+    
+    std::string errorDetail;
+    success = utils::SharedFiles::getInstance().reopen(m_audit->m_path1, &errorDetail);
+    if (!success) {
+        *error = "There was an error reopening the serial audit log. ";
+        error->append(errorDetail);
+    }
+
+    return success;
+}
+
+
 }  // namespace writer
 }  // namespace audit_log
 }  // namespace modsecurity

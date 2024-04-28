@@ -191,6 +191,38 @@ bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
     return true;
 }
 
+
+bool Parallel::reopen(std::string *error) {
+    bool        success1 = true;
+    bool        success2 = true;
+    std::string error1;
+    std::string error2;
+
+    if (!m_audit->m_path1.empty()) {
+        success1 = utils::SharedFiles::getInstance().reopen(m_audit->m_path1, &error1);
+    }
+    if (!m_audit->m_path2.empty()) {
+        success2 = utils::SharedFiles::getInstance().reopen(m_audit->m_path2, &error2);
+    } 
+
+    std::stringstream errorStream;
+    if (!success1 || !success2) {
+        errorStream << "There was an error reopening parallel audit logs.";
+
+        if (!success1 && !error1.empty()) {
+            errorStream << " " << error1;
+        }
+        if (!success2 && !error2.empty()) {
+            errorStream << " " << error2;
+        }
+
+        *error = errorStream.str();
+    }
+
+    return success1 && success2;
+}
+
+
 }  // namespace writer
 }  // namespace audit_log
 }  // namespace modsecurity
