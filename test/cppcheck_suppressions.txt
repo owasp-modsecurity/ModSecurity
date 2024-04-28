@@ -25,36 +25,19 @@
 shiftNegative:src/utils/msc_tree.cc
 *:src/utils/acmp.cc
 *:src/utils/msc_tree.cc
-invalidScanfArgType_int:src/rules_set_properties.cc:101
-invalidScanfArgType_int:src/rules_set_properties.cc:102
 
 
 // 
 // ModSecurity v3 code...
 // 
 useInitializationList:src/utils/shared_files.h:87
-functionStatic:headers/modsecurity/transaction.h:408
 duplicateBranch:src/audit_log/audit_log.cc:226
 unreadVariable:src/request_body_processor/multipart.cc:435
 stlcstrParam:src/audit_log/writer/parallel.cc:145
-functionStatic:src/engine/lua.h:70
-functionStatic:src/engine/lua.h:71
-functionConst:src/utils/geo_lookup.h:49
-useInitializationList:src/operators/rbl.h:69
-functionStatic:src/operators/geo_lookup.h:35
 syntaxError:src/transaction.cc:62
 noConstructor:src/variables/variable.h:152
-knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77
-knownConditionTrueFalse:src/operators/verify_svnr.cc:87
 rethrowNoCurrentException:headers/modsecurity/transaction.h:313
 rethrowNoCurrentException:src/rule_with_actions.cc:127
-ctunullpointer:src/rule_with_actions.cc:244
-ctunullpointer:src/rule_with_operator.cc:135
-ctunullpointer:src/rule_with_operator.cc:95
-unreadVariable:src/rule_with_operator.cc:219
-
-uninitvar:src/operators/verify_cpf.cc:77
-uninitvar:src/operators/verify_svnr.cc:67
 
 variableScope:src/operators/rx.cc
 variableScope:src/operators/rx_global.cc

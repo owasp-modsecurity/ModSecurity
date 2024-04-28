@@ -66,10 +66,11 @@ class Rbl : public Operator {
         m_demandsPassword(false),
         m_provider(RblProvider::UnknownProvider),
         Operator("Rbl", std::move(param)) {
-            m_service = m_string->evaluate();
-            if (m_service.find("httpbl.org") != std::string::npos) {
-                m_demandsPassword = true;
-                m_provider = RblProvider::httpbl;
+        m_service = m_string->evaluate(); // cppcheck-suppress useInitializationList
+        if (m_service.find("httpbl.org") != std::string::npos)
+        {
+            m_demandsPassword = true;
+            m_provider = RblProvider::httpbl;
             } else if (m_service.find("uribl.com") != std::string::npos) {
                 m_provider = RblProvider::uribl;
             } else if (m_service.find("spamhaus.org") != std::string::npos) {

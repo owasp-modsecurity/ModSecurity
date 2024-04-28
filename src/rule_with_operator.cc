@@ -92,6 +92,7 @@ void RuleWithOperator::updateMatchedVars(Transaction *trans, const std::string &
 
 void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
     ms_dbg_a(trans, 9, "Matched vars cleaned.");
+    // cppcheck-suppress ctunullpointer
     trans->m_variableMatchedVar.unset();
     trans->m_variableMatchedVars.unset();
     trans->m_variableMatchedVarName.unset();
@@ -132,7 +133,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &
 
 void RuleWithOperator::getVariablesExceptions(Transaction *t,
     variables::Variables *exclusion, variables::Variables *addition) {
-    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) {
+    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) { // cppcheck-suppress ctunullpointer
         if (containsTag(*a.first.get(), t) == false) {
             continue;
         }
