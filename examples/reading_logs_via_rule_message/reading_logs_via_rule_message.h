@@ -124,7 +124,7 @@ class ReadingLogsViaRuleMessage {
             m_rules(rules)
         { }
 
-    int process() {
+    int process() const {
         pthread_t threads[NUM_THREADS];
         int i;
         struct data_ms dms;

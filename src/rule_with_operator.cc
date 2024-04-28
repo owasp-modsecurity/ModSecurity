@@ -133,7 +133,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &
 
 void RuleWithOperator::getVariablesExceptions(Transaction *t,
     variables::Variables *exclusion, variables::Variables *addition) {
-    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) { // cppcheck-suppress ctunullpointer
+    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) { // cppcheck-suppress ctunullpointer
         if (containsTag(*a.first.get(), t) == false) {
             continue;
         }
@@ -147,7 +147,7 @@ void RuleWithOperator::getVariablesExceptions(Transaction *t,
         }
     }
 
-    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_msg) {
+    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_msg) {
         if (containsMsg(*a.first.get(), t) == false) {
             continue;
         }
@@ -161,7 +161,7 @@ void RuleWithOperator::getVariablesExceptions(Transaction *t,
         }
     }
 
-    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
+    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
         if (m_ruleId != a.first) {
             continue;
         }
