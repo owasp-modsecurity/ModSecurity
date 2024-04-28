@@ -178,20 +178,21 @@ jobs:
           ctest -C ${{ matrix.configuration }} --output-on-failure
 
   cppcheck:
-    runs-on: [ubuntu-22.04]
+    runs-on: [macos-14]
     steps:
       - name: Setup Dependencies
         run: |
-          sudo apt-get update -y -qq
-          sudo apt-get install -y cppcheck
-      - name: Checkout source
-        uses: actions/checkout@v4
+          brew install autoconf \
+                       automake \
+                       libtool \
+                       cppcheck
+      - uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
-      - name: Configure libModSecurity
+      - name: configure
         run: |
           ./build.sh
           ./configure
-      - name: Run cppcheck on libModSecurity
+      - name: cppcheck
         run: make check-static
