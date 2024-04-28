@@ -659,7 +659,7 @@ MDB_dbi* MDBEnvProvider::GetDBI() {
     return &m_dbi;
 }
 
-bool MDBEnvProvider::isValid() {
+bool MDBEnvProvider::isValid() const {
     return valid;
 }
 

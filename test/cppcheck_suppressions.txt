@@ -59,9 +59,6 @@ unreadVariable:src/rule_with_operator.cc:219
 uninitvar:src/operators/verify_cpf.cc:77
 uninitvar:src/operators/verify_svnr.cc:67
 
-functionConst:src/collection/backend/lmdb.h:86
-unusedLabel:src/collection/backend/lmdb.cc:297
-
 variableScope:src/operators/rx.cc
 variableScope:src/operators/rx_global.cc
 
