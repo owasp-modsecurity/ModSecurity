@@ -44,7 +44,6 @@ functionStatic:src/engine/lua.h:71
 functionConst:src/utils/geo_lookup.h:49
 useInitializationList:src/operators/rbl.h:69
 functionStatic:src/operators/geo_lookup.h:35
-duplicateBreak:src/operators/validate_utf8_encoding.cc
 syntaxError:src/transaction.cc:62
 noConstructor:src/variables/variable.h:152
 knownConditionTrueFalse:src/operators/validate_url_encoding.cc:77

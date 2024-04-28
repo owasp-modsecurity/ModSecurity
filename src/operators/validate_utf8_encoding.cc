@@ -132,7 +132,6 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                         std::to_string(i) + "\"]");
                 }
                 return true;
-                break;
             case UNICODE_ERROR_INVALID_ENCODING :
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Invalid UTF-8 encoding: "
@@ -142,7 +141,6 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                     logOffset(ruleMessage, i, str.size());
                 }
                 return true;
-                break;
             case UNICODE_ERROR_OVERLONG_CHARACTER :
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Invalid UTF-8 encoding: "
@@ -152,7 +150,6 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                     logOffset(ruleMessage, i, str.size());
                 }
                 return true;
-                break;
             case UNICODE_ERROR_RESTRICTED_CHARACTER :
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Invalid UTF-8 encoding: "
@@ -162,7 +159,6 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                     logOffset(ruleMessage, i, str.size());
                 }
                 return true;
-                break;
             case UNICODE_ERROR_DECODING_ERROR :
                 if (transaction) {
                     ms_dbg_a(transaction, 8, "Error validating UTF-8 decoding "
@@ -171,7 +167,6 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction, RuleWithActions *r
                     logOffset(ruleMessage, i, str.size());
                 }
                 return true;
-                break;
         }
 
         if (rc <= 0) {
