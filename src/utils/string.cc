@@ -20,12 +20,9 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include <algorithm>
 #include <random>
 #include <memory>
-#include <functional>
 #include <string>
-#include <iostream>
 #include <sstream>
 #include <cstring>
 
@@ -145,32 +142,6 @@ std::string toHexIfNeeded(const std::string &str, bool escape_spec) {
     }
 
     return res.str();
-}
-
-
-std::string tolower(std::string str) {
-    std::string value;
-    value.resize(str.length());
-
-    std::transform(str.begin(),
-            str.end(),
-            value.begin(),
-            ::tolower);
-
-    return value;
-}
-
-
-std::string toupper(std::string str) {
-    std::string value;
-    value.resize(str.length());
-
-    std::transform(str.begin(),
-            str.end(),
-            value.begin(),
-            ::toupper);
-
-    return value;
 }
 
 

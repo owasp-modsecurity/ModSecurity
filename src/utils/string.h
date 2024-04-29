@@ -14,9 +14,10 @@
  */
 
 #include <ctime>
-#include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <utility>
 
 #ifndef SRC_UTILS_STRING_H_
 #define SRC_UTILS_STRING_H_
@@ -62,8 +63,6 @@ std::string limitTo(int amount, const std::string &str);
 std::string removeBracketsIfNeeded(std::string a);
 std::string string_to_hex(const std::string& input);
 std::string toHexIfNeeded(const std::string &str, bool escape_spec = false);
-std::string tolower(std::string str);
-std::string toupper(std::string str);
 std::vector<std::string> ssplit(std::string str, char delimiter);
 std::pair<std::string, std::string> ssplit_pair(const std::string& str, char delimiter);
 std::vector<std::string> split(std::string str, char delimiter);
@@ -76,6 +75,28 @@ std::string parserSanitizer(std::string a);
 unsigned char x2c(const unsigned char *what);
 unsigned char xsingle2c(const unsigned char *what);
 unsigned char *c2x(unsigned what, unsigned char *where);
+
+
+template<typename Operation>
+inline std::string toCaseHelper(std::string str, Operation op) {
+    std::transform(str.begin(),
+            str.end(),
+            str.begin(),
+            op);
+
+    return str;
+}
+
+
+inline std::string tolower(std::string str) { // cppcheck-suppress passedByValue ; copied value is used for in-place transformation
+    return toCaseHelper(str, ::tolower);
+}
+
+
+inline std::string toupper(std::string str) { // cppcheck-suppress passedByValue ; copied value is used for in-place transformation
+    return toCaseHelper(str, ::toupper);
+}
+
 
 }  // namespace string
 }  // namespace utils
