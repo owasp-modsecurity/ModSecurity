@@ -32,11 +32,6 @@ namespace modsecurity {
 namespace actions {
 
 
-bool ExpireVar::init(std::string *error) {
-    return true;
-}
-
-
 bool ExpireVar::evaluate(RuleWithActions *rule, Transaction *t) {
 
     std::string expireExpressionExpanded(m_string->evaluate(t));
