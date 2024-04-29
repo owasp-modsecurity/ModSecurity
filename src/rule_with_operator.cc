@@ -176,7 +176,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
         }
         if (std::find_if(trans->m_ruleRemoveTargetById.begin(),
                 trans->m_ruleRemoveTargetById.end(),
-                [&, variable, this](std::pair<int, std::string> &m) -> bool {
+                [&, variable, this](const auto &m) -> bool {
                     return m.first == m_ruleId
                         && m.second == *variable->m_fullName.get();
                 }) != trans->m_ruleRemoveTargetById.end()) {
@@ -185,7 +185,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
         if (std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, variable, trans, this](
-                        std::pair<std::string, std::string> &m) -> bool {
+                        const auto &m) -> bool {
                         return containsTag(m.first, trans)
                             && m.second == *variable->m_fullName.get();
                     }) != trans->m_ruleRemoveTargetByTag.end()) {
@@ -203,7 +203,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
 bool RuleWithOperator::evaluate(Transaction *trans,
     RuleMessage &ruleMessage) {
     bool globalRet = false;
-    variables::Variables *variables = this->m_variables;
+    const variables::Variables *variables = this->m_variables; // cppcheck-suppress unreadVariable ; false positive
     bool recursiveGlobalRet;
     bool containsBlock = hasBlockAction();
     std::string eparam;
@@ -270,23 +270,23 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             if (exclusion.contains(v) ||
                 std::find_if(trans->m_ruleRemoveTargetById.begin(),
                     trans->m_ruleRemoveTargetById.end(),
-                    [&, v, this](std::pair<int, std::string> &m) -> bool {
+                    [&, v, this](const auto &m) -> bool {
                         return m.first == m_ruleId && m.second == v->getKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetById.end()
             ) {
                 delete v;
-                v = NULL;
+                v = nullptr;
                 continue;
             }
             if (exclusion.contains(v) ||
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
-                    [&, v, trans, this](std::pair<std::string, std::string> &m) -> bool {
+                    [&, v, trans, this](const auto &m) -> bool {
                         return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
                 delete v;
-                v = NULL;
+                v = nullptr;
                 continue;
             }
 
@@ -360,7 +360,7 @@ end_exec:
 }
 
 
-std::string RuleWithOperator::getOperatorName() const { return m_operator->m_op; }
+const std::string& RuleWithOperator::getOperatorName() const { return m_operator->m_op; }
 
 
 }  // namespace modsecurity

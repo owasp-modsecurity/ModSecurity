@@ -118,7 +118,7 @@ static inline bool inplace(std::string &value) {
                     j++;
                 }
                 if (j > k) { /* Do we have at least one digit? */
-                    const auto x = reinterpret_cast<const char*>(&input[k]);
+                    const auto *x = reinterpret_cast<const char*>(&input[k]);
 
                     /* Decode the entity. */
                     /* ENH What about others? */

@@ -24,7 +24,7 @@ int VerifySVNR::convert_to_int(const char c) {
 }
 
 
-bool VerifySVNR::verify(const char *svnrnumber, int len) {
+bool VerifySVNR::verify(const char *svnrnumber, int len) const {
     int var_len = len;
     int sum = 0;
     unsigned int i = 0, svnr_len = 10;

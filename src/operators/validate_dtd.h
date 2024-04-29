@@ -62,7 +62,7 @@ class ValidateDTD : public Operator {
 
 
     static void error_runtime(void *ctx, const char *msg, ...) {
-        Transaction *t = reinterpret_cast<Transaction *>(ctx);
+        const Transaction *t = reinterpret_cast<Transaction *>(ctx);
         char buf[1024];
         std::string s;
         va_list args;
@@ -79,7 +79,7 @@ class ValidateDTD : public Operator {
 
 
     static void warn_runtime(void *ctx, const char *msg, ...) {
-        Transaction *t = reinterpret_cast<Transaction *>(ctx);
+        const Transaction *t = reinterpret_cast<Transaction *>(ctx);
         char buf[1024];
         std::string s;
         va_list args;
@@ -95,7 +95,7 @@ class ValidateDTD : public Operator {
     }
 
 
-    static void null_error(void *ctx, const char *msg, ...) {
+    static void null_error(void *ctx, const char *msg, ...) { // cppcheck-suppress[constParameterPointer,constParameterCallback]
     }
 
  private:

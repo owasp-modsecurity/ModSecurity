@@ -88,13 +88,13 @@ class Rbl : public Operator {
     std::string mapIpToAddress(const std::string &ipStr, Transaction *trans) const;
 
     static void futherInfo_httpbl(struct sockaddr_in *sin, const std::string &ipStr,
-        Transaction *trans);
+        const Transaction *trans);
     static void futherInfo_spamhaus(unsigned int high8bits, const std::string &ipStr,
-        Transaction *trans);
+        const Transaction *trans);
     static void futherInfo_uribl(unsigned int high8bits, const std::string &ipStr,
-        Transaction *trans);
+        const Transaction *trans);
     static void furtherInfo(struct sockaddr_in *sin, const std::string &ipStr,
-        Transaction *trans, RblProvider provider);
+        const Transaction *trans, RblProvider provider);
 
  private:
     std::string m_service;

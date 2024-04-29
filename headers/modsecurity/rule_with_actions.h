@@ -79,7 +79,7 @@ class RuleWithActions : public Rule {
         bool chainedParentNull = false) const;
 
     std::vector<actions::Action *> getActionsByName(const std::string& name,
-        Transaction *t);
+        const Transaction *t);
     bool containsTag(const std::string& name, Transaction *t);
     bool containsMsg(const std::string& name, Transaction *t);
 

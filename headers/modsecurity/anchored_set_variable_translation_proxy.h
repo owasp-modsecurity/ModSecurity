@@ -42,7 +42,7 @@ class AnchoredSetVariableTranslationProxy {
         : m_name(name),
         m_fount(fount)
     {
-        m_translate = [](std::string *name, std::vector<const VariableValue *> *l) {
+        m_translate = [](const std::string *name, std::vector<const VariableValue *> *l) {
             for (int i = 0; i < l->size(); ++i) {
                 VariableValue *newVariableValue = new VariableValue(name, &l->at(i)->getKey(), &l->at(i)->getKey());
                 const VariableValue *oldVariableValue = l->at(i);

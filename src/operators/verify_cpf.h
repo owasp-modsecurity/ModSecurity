@@ -45,7 +45,7 @@ class VerifyCPF : public Operator {
         const std::string& input,
         RuleMessage &ruleMessage) override;
 
-    bool verify(const char *ssnumber, int len);
+    bool verify(const char *ssnumber, int len) const;
 
  private:
     static int convert_to_int(const char c);

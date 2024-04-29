@@ -89,7 +89,7 @@ template <class T>
 void
 ModSecurityTest<T>::load_tests(const std::string &path) {
     DIR *dir;
-    struct dirent *ent;
+    const struct dirent *ent;
     struct stat buffer;
 
     if ((dir = opendir(path.c_str())) == nullptr) {

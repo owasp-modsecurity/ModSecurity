@@ -713,7 +713,7 @@ int msc_process_uri(Transaction *transaction, const char *uri,
     const char *protocol, const char *http_version);
 
 /** @ingroup ModSecurity_C_API */
-const char *msc_get_response_body(Transaction *transaction);
+const char *msc_get_response_body(const Transaction *transaction);
 
 /** @ingroup ModSecurity_C_API */
 size_t msc_get_response_body_length(Transaction *transaction);

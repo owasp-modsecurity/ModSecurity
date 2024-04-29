@@ -31,7 +31,7 @@ class VerifySVNR : public Operator {
         const std::string& input,
         RuleMessage &ruleMessage) override;
 
-    bool verify(const char *ssnumber, int len);
+    bool verify(const char *ssnumber, int len) const;
 
  private:
     std::unique_ptr<Regex> m_re;

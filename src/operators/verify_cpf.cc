@@ -38,7 +38,7 @@ int VerifyCPF::convert_to_int(const char c) {
 }
 
 
-bool VerifyCPF::verify(const char *cpfnumber, int len) {
+bool VerifyCPF::verify(const char *cpfnumber, int len) const {
     int factor, part_1, part_2, var_len = len;
     unsigned int sum = 0, i = 0, cpf_len = 11, c;
     int cpf[11];

@@ -92,7 +92,7 @@ struct TransformationTest {
         return tfn;
     }
 
-    static UnitTestResult eval(const ItemType &tfn, const UnitTest &t, modsecurity::Transaction &transaction) {
+    static UnitTestResult eval(const ItemType &tfn, const UnitTest &t, const modsecurity::Transaction &transaction) {
         auto ret = t.input;
         tfn.transform(ret, &transaction);
         return {1, ret};

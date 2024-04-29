@@ -363,7 +363,7 @@ void RuleWithActions::executeTransformations(
                        std::make_shared<std::string>(path));
     }
 
-    for (Action *a : m_transformations) {
+    for (const Action *a : m_transformations) {
         if (a->m_isNone) {
             none++;
         }
@@ -457,7 +457,7 @@ bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
 
 
 std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::string& name,
-    Transaction *trans) {
+    const Transaction *trans) {
     std::vector<actions::Action *> ret;
     for (auto &z : m_actionsRuntimePos) {
         if (*z->m_name.get() == name) {

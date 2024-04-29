@@ -93,7 +93,7 @@ extern "C" {
 #endif
 
 RulesSet *msc_create_rules_set(void);
-void msc_rules_dump(RulesSet *rules);
+void msc_rules_dump(const RulesSet *rules);
 int msc_rules_merge(RulesSet *rules_dst, RulesSet *rules_from, const char **error);
 int msc_rules_add_remote(RulesSet *rules, const char *key, const char *uri,
     const char **error);

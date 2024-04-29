@@ -33,7 +33,7 @@ class GeoLookup : public Operator {
 
  protected:
     // cppcheck-suppress functionStatic
-    bool debug(Transaction *transaction, int x, const std::string &a) {
+    bool debug(const Transaction *transaction, int x, const std::string &a) {
         ms_dbg_a(transaction, x, a);
         return true;
     }

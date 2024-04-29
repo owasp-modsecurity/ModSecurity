@@ -30,9 +30,9 @@ void ConfigUnicodeMap::loadConfig(std::string f, double configCodePage,
     RulesSetProperties *driver, std::string *errg) {
     char *buf = NULL;
     char *hmap = NULL;
-    char *p = NULL;
+    const char *p = NULL;
     char *savedptr = NULL;
-    char *ucode = NULL;
+    const char *ucode = NULL;
     int code = 0;
     int found = 0;
     int length = 0;

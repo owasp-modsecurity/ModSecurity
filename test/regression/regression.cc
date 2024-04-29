@@ -26,6 +26,7 @@
 #include <string>
 #include <list>
 #include <algorithm>
+#include <cassert>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
@@ -110,8 +111,8 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
     }
 }
 
-void perform_unit_test(ModSecurityTest<RegressionTest> *test,
-    std::vector<std::unique_ptr<RegressionTest>> &tests,
+void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
+    const std::vector<std::unique_ptr<RegressionTest>> &tests,
     ModSecurityTestResults<RegressionTestResult> *res, int *count)
 {
     for (auto &t : tests) {
@@ -131,7 +132,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             filename = t->filename;
         }
 
-        if (!test->m_automake_output) {
+        if (!test.m_automake_output) {
             std::cout << std::setw(3) << std::right <<
                 std::to_string(*count) << " ";
             std::cout << std::setw(50) << std::left << filename;
@@ -139,7 +140,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         }
 
         if (t->enabled == 0) {
-            if (test->m_automake_output) {
+            if (test.m_automake_output) {
                 std::cout << ":test-result: SKIP" << filename \
                     << ":" << t->name << std::endl;
             } else {
@@ -173,7 +174,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             testRes->reason << KCYN << "compiled with support " << std::endl;
             testRes->reason << KCYN << "to: " << t->resource << std::endl;
             testRes->reason << RESET << std::endl;
-            if (test->m_automake_output) {
+            if (test.m_automake_output) {
                 std::cout << ":test-result: SKIP " << filename \
                     << ":" << t->name << std::endl;
             } else {
@@ -192,7 +193,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                  * Not expecting any error, thus return the error to
                  * the user.
                  */
-                if (test->m_automake_output) {
+                if (test.m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
                         << ":" << t->name << ":" << *count << std::endl;
                 } else {
@@ -213,7 +214,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             const auto s = context.m_modsec_rules.getParserError();
 
             if (regex_search(s, &match, re)) {
-                if (test->m_automake_output) {
+                if (test.m_automake_output) {
                     std::cout << ":test-result: PASS " << filename \
                         << ":" << t->name << std::endl;
                 } else {
@@ -227,7 +228,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 continue;
             } else {
                 /* Parser error was expected, but with a different content */
-                if (test->m_automake_output) {
+                if (test.m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
                         << ":" << t->name << ":" << *count << std::endl;
                 } else {
@@ -249,7 +250,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         } else {
             /* Parser error was expected but never happened */
             if (t->parser_error.empty() == false) {
-                if (test->m_automake_output) {
+                if (test.m_automake_output) {
                     std::cout << ":test-result: FAIL " << filename \
                         << ":" << t->name << ":" << *count << std::endl;
                 } else {
@@ -318,7 +319,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         const auto *d = static_cast<CustomDebugLog *>(context.m_modsec_rules.m_debugLog);
 
         if (!d->contains(t->debug_log)) {
-            if (test->m_automake_output) {
+            if (test.m_automake_output) {
                 std::cout << ":test-result: FAIL " << filename \
                     << ":" << t->name << ":" << *count << std::endl;
             } else {
@@ -330,7 +331,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 << t->debug_log + "";
             testRes->passed = false;
         } else if (r.status != t->http_code) {
-            if (test->m_automake_output) {
+            if (test.m_automake_output) {
                 std::cout << ":test-result: FAIL " << filename \
                     << ":" << t->name << ":" << *count << std::endl;
             } else {
@@ -341,7 +342,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 " got: " + std::to_string(r.status) + "\n";
             testRes->passed = false;
         } else if (!contains(context.m_server_log.str(), t->error_log)) {
-            if (test->m_automake_output) {
+            if (test.m_automake_output) {
                 std::cout << ":test-result: FAIL " << filename \
                     << ":" << t->name << std::endl;
             } else {
@@ -353,7 +354,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 << t->error_log + "";
             testRes->passed = false;
         } else if (!t->audit_log.empty() && !contains(getAuditLogContent(modsec_transaction.m_rules->m_auditLog->m_path1), t->audit_log)) {
-            if (test->m_automake_output) {
+            if (test.m_automake_output) {
                 std::cout << ":test-result: FAIL " << filename \
                     << ":" << t->name << ":" << *count << std::endl;
             } else {
@@ -365,7 +366,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 << t->audit_log + "";
             testRes->passed = false;
         } else {
-            if (test->m_automake_output) {
+            if (test.m_automake_output) {
                 std::cout << ":test-result: PASS " << filename \
                     << ":" << t->name << std::endl;
             } else  {
@@ -471,8 +472,8 @@ int main(int argc, char **argv)
         test_number++;
         if ((test.m_test_number == 0)
             || (test_number == test.m_test_number)) {
-            auto &tests = test[a];
-            perform_unit_test(&test, tests, &res, &counter);
+            const auto &tests = test[a];
+            perform_unit_test(test, tests, &res, &counter);
         }
     }
 
