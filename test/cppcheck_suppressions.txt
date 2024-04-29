@@ -1,3 +1,5 @@
+normalCheckLevelMaxBranches:*
+
 //
 // Ignore libinjection related stuff.
 //
