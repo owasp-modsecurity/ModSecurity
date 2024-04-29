@@ -38,7 +38,6 @@ class ValidateSchema : public Operator {
     /** @ingroup ModSecurity_Operator */
     explicit ValidateSchema(std::unique_ptr<RunTimeString> param)
         : Operator("ValidateSchema", std::move(param)) { }
-    ~ValidateSchema() { }
 #ifdef WITH_LIBXML2
 
     bool evaluate(Transaction *transaction, const std::string  &str) override;

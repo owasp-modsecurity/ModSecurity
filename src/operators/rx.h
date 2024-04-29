@@ -42,7 +42,7 @@ class Rx : public Operator {
             m_couldContainsMacro = true;
         }
 
-    ~Rx() {
+    ~Rx() override {
         if (m_string->m_containsMacro == false && m_re != NULL) {
             delete m_re;
             m_re = NULL;
