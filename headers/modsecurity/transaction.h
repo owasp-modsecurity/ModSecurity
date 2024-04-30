@@ -310,7 +310,7 @@ class TransactionSecMarkerManagement {
         if (m_marker) {
             return m_marker;
         } else {
-            throw;
+            throw; // cppcheck-suppress rethrowNoCurrentException
         }
     }
 

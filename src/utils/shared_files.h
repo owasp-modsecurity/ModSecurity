@@ -84,7 +84,7 @@ class SharedFiles {
         bool toBeCreated(false);
         bool err = false;
 
-        m_memKeyStructure = ftok(".", 1);
+        m_memKeyStructure = ftok(".", 1); // cppcheck-suppress useInitializationList
         if (m_memKeyStructure < 0) {
             err = true;
             goto err_mem_key;

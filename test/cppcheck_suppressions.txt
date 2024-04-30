@@ -30,10 +30,6 @@ shiftNegative:src/utils/msc_tree.cc
 // 
 // ModSecurity v3 code...
 // 
-useInitializationList:src/utils/shared_files.h:87
-rethrowNoCurrentException:headers/modsecurity/transaction.h:313
-rethrowNoCurrentException:src/rule_with_actions.cc:127
-
 variableScope:src/operators/rx.cc
 variableScope:src/operators/rx_global.cc
 
