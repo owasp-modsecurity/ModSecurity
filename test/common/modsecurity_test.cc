@@ -46,7 +46,7 @@ std::string ModSecurityTest<T>::header() {
 }
 
 template <class T>
-bool ModSecurityTest<T>::load_test_json(std::string file) {
+bool ModSecurityTest<T>::load_test_json(const std::string &file) {
     char errbuf[1024];
     yajl_val node;
 
@@ -76,13 +76,12 @@ bool ModSecurityTest<T>::load_test_json(std::string file) {
         u->filename = file;
 
         if (this->count(u->filename + ":" + u->name) == 0) {
-            std::vector<T *> *vector = new std::vector<T *>;
-            vector->push_back(u);
+            auto vec = new std::vector<T *>;
+            vec->push_back(u);
             std::string filename(u->filename + ":" + u->name);
-            std::pair<std::string, std::vector<T*>*> a(filename, vector);
-            this->insert(a);
+            this->insert({filename, vec});
         } else {
-            std::vector<T *> *vec = this->at(u->filename + ":" + u->name);
+            auto vec = this->at(u->filename + ":" + u->name);
             vec->push_back(u);
         }
     }
@@ -95,7 +94,7 @@ bool ModSecurityTest<T>::load_test_json(std::string file) {
 
 template <class T>
 std::pair<std::string, std::vector<T *>>*
-ModSecurityTest<T>::load_tests(std::string path) {
+ModSecurityTest<T>::load_tests(const std::string &path) {
     DIR *dir;
     struct dirent *ent;
     struct stat buffer;

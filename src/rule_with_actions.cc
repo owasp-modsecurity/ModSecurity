@@ -124,7 +124,7 @@ RuleWithActions::RuleWithActions(
                 delete a;
                 std::cout << "General failure, action: " << a->m_name;
                 std::cout << " has an unknown type." << std::endl;
-                throw;
+                throw; // cppcheck-suppress rethrowNoCurrentException
             }
         }
         delete actions;
@@ -241,7 +241,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, std::shared_ptr<RuleMessage> ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
+    for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck-suppress ctunullpointer
         if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }

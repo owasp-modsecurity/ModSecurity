@@ -202,7 +202,7 @@ void ModSecurity::serverLog(void *data, std::shared_ptr<RuleMessage> rm) {
     }
 
     if (m_logProperties & TextLogProperty) {
-        std::string &&d = rm->log();
+        auto d = rm->log();
         const void *a = static_cast<const void *>(d.c_str());
         m_logCb(data, a);
         return;

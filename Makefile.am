@@ -59,6 +59,7 @@ cppcheck:
 	@cppcheck -U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
 		-D MS_CPPCHECK_DISABLED_FOR_PARSER -U YY_USER_INIT \
 		--suppressions-list=./test/cppcheck_suppressions.txt \
+		--inline-suppr \
 		--enable=warning,style,performance,portability,unusedFunction,missingInclude \
 		--inconclusive \
 		--template="warning: {file},{line},{severity},{id},{message}" \
