@@ -25,7 +25,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y libfuzzy-dev libyajl-dev libgeoip-dev liblua5.2-dev liblmdb-dev cppcheck libmaxminddb-dev libcurl4-openssl-dev libpcre2-dev pcre2-utils
+          sudo apt-get install -y libfuzzy-dev libyajl-dev libgeoip-dev liblua5.2-dev liblmdb-dev libmaxminddb-dev libcurl4-openssl-dev libpcre2-dev pcre2-utils
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -38,8 +38,6 @@ jobs:
         run: make -j `nproc`
       - name: check
         run: make check
-      - name: check-static
-        run: make check-static
 
   build-macos:
     runs-on: ${{ matrix.os }}
@@ -125,3 +123,21 @@ jobs:
         working-directory: build\win32\build
         run: |
           ctest -C ${{ matrix.configuration }} --output-on-failure
+
+  cppcheck:
+    runs-on: [ubuntu-22.04]
+    steps:
+      - name: Setup Dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y cppcheck
+      - name: Get libModSecurity v3 source
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Configure libModSecurity
+        run: |
+          ./build.sh
+          ./configure
+      - name: Run cppcheck on libModSecurity
+        run: make check-static
