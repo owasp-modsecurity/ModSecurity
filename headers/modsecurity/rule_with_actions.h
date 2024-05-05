@@ -76,7 +76,7 @@ class RuleWithActions : public Rule {
     void performLogging(Transaction *trans,
         std::shared_ptr<RuleMessage> ruleMessage,
         bool lastLog = true,
-        bool chainedParentNull = false);
+        bool chainedParentNull = false) const;
 
     std::vector<actions::Action *> getActionsByName(const std::string& name,
         Transaction *t);

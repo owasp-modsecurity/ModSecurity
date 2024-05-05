@@ -57,7 +57,7 @@ typedef struct Rules_t RulesSet;
 #define ms_dbg(b, c) \
   do { \
       if (m_rules && m_rules->m_debugLog && m_rules->m_debugLog->m_debugLevel >= b) { \
-          m_rules->debug(b, *m_id.get(), m_uri, c); \
+          m_rules->debug(b, m_id, m_uri, c); \
       } \
   } while (0);
 #else
@@ -431,7 +431,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     /**
      * Holds the client IP address.
      */
-    std::shared_ptr<std::string> m_clientIpAddress;
+    std::string m_clientIpAddress;
 
     /**
      * Holds the HTTP version: 1.2, 2.0, 3.0 and so on....
@@ -441,12 +441,12 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     /**
      * Holds the server IP Address
      */
-    std::shared_ptr<std::string> m_serverIpAddress;
+    std::string m_serverIpAddress;
 
     /**
      * Holds the request's hostname
      */
-    std::shared_ptr<std::string> m_requestHostName;
+    std::string m_requestHostName;
 
     /**
      * Holds the raw URI that was requested.
@@ -456,7 +456,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     /**
      * Holds the URI that was requests (without the query string).
      */
-    std::shared_ptr<std::string> m_uri_no_query_string_decoded;
+    std::string m_uri_no_query_string_decoded;
 
     /**
      * Holds the combined size of all arguments, later used to fill the
@@ -568,7 +568,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      * Contains the unique ID of the transaction. Use by the variable
 	 * `UNIQUE_ID'. This unique id is also saved as part of the AuditLog.
      */
-    std::shared_ptr<std::string> m_id;
+    std::string m_id;
 
     /**
      * Holds the amount of rules that should be skipped. If bigger than 0 the

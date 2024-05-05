@@ -65,7 +65,7 @@ using MatchActions = std::vector<actions::Action *>;
 class Rule {
  public:
     Rule(std::unique_ptr<std::string> fileName, int lineNumber)
-        : m_fileName(std::make_shared<std::string>(*fileName)),
+        : m_fileName(*fileName),
         m_lineNumber(lineNumber),
         m_phase(modsecurity::Phases::RequestHeadersPhase) {
         }
@@ -81,7 +81,7 @@ class Rule {
     virtual bool evaluate(Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) = 0;
 
-    std::shared_ptr<std::string> getFileName() const {
+    const std::string& getFileName() const {
         return m_fileName;
     }
 
@@ -93,18 +93,15 @@ class Rule {
     void setPhase(int phase) { m_phase = phase; }
 
     virtual std::string getReference() {
-        if (m_fileName) {
-            return *m_fileName + ":" + std::to_string(m_lineNumber);
-        }
-        return "<<no file>>:" + std::to_string(m_lineNumber);
+        return m_fileName + ":" + std::to_string(m_lineNumber);
     }
 
 
     virtual bool isMarker() { return false; }
 
  private:
-    std::shared_ptr<std::string> m_fileName;
-    int m_lineNumber;
+    const std::string m_fileName;
+    const int m_lineNumber;
     // FIXME: phase may not be neede to SecMarker.
     int m_phase;
 };

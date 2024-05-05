@@ -155,8 +155,8 @@ class ReadingLogsViaRuleMessage {
         const modsecurity::RuleMessage *ruleMessage = \
             reinterpret_cast<const modsecurity::RuleMessage *>(ruleMessagev);
 
-        std::cout << "Rule Id: " << std::to_string(ruleMessage->m_ruleId);
-        std::cout << " phase: " << std::to_string(ruleMessage->m_phase);
+        std::cout << "Rule Id: " << std::to_string(ruleMessage->m_rule.m_ruleId);
+        std::cout << " phase: " << std::to_string(ruleMessage->getPhase());
         std::cout << std::endl;
         if (ruleMessage->m_isDisruptive) {
             std::cout << " * Disruptive action: ";
