@@ -105,11 +105,11 @@ class Action {
         }
 
         if (pos == std::string::npos) {
-            m_name = std::shared_ptr<std::string>(new std::string(data));
+            m_name = std::make_shared<std::string>(data);
             return;
         }
 
-        m_name = std::shared_ptr<std::string>(new std::string(data, 0, pos));
+        m_name = std::make_shared<std::string>(data, 0, pos);
         m_parser_payload = std::string(data, pos + 1, data.length());
 
         if (m_parser_payload.at(0) == '\'' && m_parser_payload.size() > 2) {
