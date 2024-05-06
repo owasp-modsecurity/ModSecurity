@@ -263,6 +263,10 @@ int geo_init(directory_config *dcfg, const char *dbfn, char **error_msg)
  */
 int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **error_msg)
 {
+    assert(msr != NULL);
+    assert(georec != NULL);
+    assert(target != NULL);
+    assert(error_msg != NULL);
     apr_sockaddr_t *addr;
     long ipnum = 0;
     char *targetip = NULL;

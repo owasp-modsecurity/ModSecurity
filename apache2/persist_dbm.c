@@ -21,6 +21,8 @@
 static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob, unsigned int blob_size,
     int log_vars)
 {
+    assert(msr != NULL);
+    assert(blob != NULL);
     apr_table_t *col = NULL;
     unsigned int blob_offset;
 
@@ -59,7 +61,7 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
         }
 
         blob_offset += 2;
-        if (var->name_len < 1 || blob_offset + var->name_len > blob_size) return NULL;
+        if (blob_offset + var->name_len > blob_size) return NULL;
         var->name = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->name_len - 1);
         blob_offset += var->name_len;
         var->name_len--;
@@ -67,7 +69,7 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
         var->value_len = (blob[blob_offset] << 8) + blob[blob_offset + 1];
         blob_offset += 2;
 
-        if (var->value_len < 1 || blob_offset + var->value_len > blob_size) return NULL;
+        if (blob_offset + var->value_len > blob_size) return NULL;
         var->value = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->value_len - 1);
         blob_offset += var->value_len;
         var->value_len--;
@@ -90,6 +92,8 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
 static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec *msr, const char *col_name,
     const char *col_key, int col_key_len)
 {
+    assert(msr != NULL);
+    assert(col_name != NULL);
     char *dbm_filename = NULL;
     apr_status_t rc;
     apr_sdbm_datum_t key;
@@ -100,18 +104,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     apr_table_entry_t *te;
     int expired = 0;
     int i;
-
-    /**
-     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
-     */
-    char *userinfo;
-    apr_uid_t uid;
-    apr_gid_t gid;
-    apr_uid_current(&uid, &gid, msr->mp);
-    rc = apr_uid_name_get(&userinfo, uid, msr->mp);
-    if (rc != APR_SUCCESS) {
-      userinfo = apr_psprintf(msr->mp, "%u", uid);
-    }
+    char *userinfo = get_username(msr->mp);
 
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "collection_retrieve_ex: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
@@ -357,6 +350,7 @@ cleanup:
 apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     const char *col_key, int col_key_len)
 {
+    assert(msr != NULL);
     apr_time_t time_before = apr_time_now();
     apr_table_t *rtable = NULL;
     
@@ -371,6 +365,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
  *
  */
 int collection_store(modsec_rec *msr, apr_table_t *col) {
+    assert(msr != NULL);
     char *dbm_filename = NULL;
     msc_string *var_name = NULL, *var_key = NULL;
     unsigned char *blob = NULL;
@@ -384,18 +379,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     int i;
     const apr_table_t *stored_col = NULL;
     const apr_table_t *orig_col = NULL;
-
-    /**
-     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
-     */
-    char *userinfo;
-    apr_uid_t uid;
-    apr_gid_t gid;
-    apr_uid_current(&uid, &gid, msr->mp);
-    rc = apr_uid_name_get(&userinfo, uid, msr->mp);
-    if (rc != APR_SUCCESS) {
-      userinfo = apr_psprintf(msr->mp, "%u", uid);
-    }
+    char *userinfo = get_username(msr->mp);
 
     var_name = (msc_string *)apr_table_get(col, "__name");
     if (var_name == NULL) {
@@ -669,6 +653,8 @@ error:
  *
  */
 int collections_remove_stale(modsec_rec *msr, const char *col_name) {
+    assert(msr != NULL);
+    assert(col_name != NULL);
     char *dbm_filename = NULL;
     apr_sdbm_datum_t key, value;
     apr_sdbm_t *dbm = NULL;
@@ -677,18 +663,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     char **keys;
     apr_time_t now = apr_time_sec(msr->request_time);
     int i;
-
-    /**
-     * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
-     */
-    char *userinfo;
-    apr_uid_t uid;
-    apr_gid_t gid;
-    apr_uid_current(&uid, &gid, msr->mp);
-    rc = apr_uid_name_get(&userinfo, uid, msr->mp);
-    if (rc != APR_SUCCESS) {
-      userinfo = apr_psprintf(msr->mp, "%u", uid);
-    }
+    char *userinfo = get_username(msr->mp);
 
     if (msr->txcfg->data_dir == NULL) {
         /* The user has been warned about this problem enough times already by now.

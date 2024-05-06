@@ -25,6 +25,8 @@
  * Sends a brigade with an error bucket down the filter chain.
  */
 apr_status_t send_error_bucket(modsec_rec *msr, ap_filter_t *f, int status) {
+    assert(msr != NULL);
+    assert(f != NULL);
     apr_bucket_brigade *brigade = NULL;
     apr_bucket *bucket = NULL;
 
@@ -61,6 +63,9 @@ apr_status_t send_error_bucket(modsec_rec *msr, ap_filter_t *f, int status) {
  * the "output" parameter.
  */
 int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char **output) {
+    assert(msr != NULL);
+    assert(command != NULL);
+
     apr_procattr_t *procattr = NULL;
     apr_proc_t *procnew = NULL;
     apr_status_t rc = APR_SUCCESS;
@@ -204,6 +209,9 @@ char *get_env_var(request_rec *r, char *name) {
 static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     int level, int fixup, const char *text, va_list ap)
 {
+    assert(r != NULL);
+    assert(msr != NULL);
+    assert(text != NULL);
     apr_size_t nbytes, nbytes_written;
     apr_file_t *debuglog_fd = NULL;
     int filter_debug_level = 0;
@@ -303,6 +311,8 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
  * Apache error log if the message is important enough.
  */
 void msr_log(modsec_rec *msr, int level, const char *text, ...) {
+    assert(msr != NULL);
+    assert(text != NULL);
     va_list ap;
 
     va_start(ap, text);
@@ -316,6 +326,8 @@ void msr_log(modsec_rec *msr, int level, const char *text, ...) {
  * Apache error log. This is intended for error callbacks.
  */
 void msr_log_error(modsec_rec *msr, const char *text, ...) {
+    assert(msr != NULL);
+    assert(text != NULL);
     va_list ap;
 
     va_start(ap, text);
@@ -330,6 +342,8 @@ void msr_log_error(modsec_rec *msr, const char *text, ...) {
  * The 'text' will first be escaped.
  */
 void msr_log_warn(modsec_rec *msr, const char *text, ...) {
+    assert(msr != NULL);
+    assert(text != NULL);
     va_list ap;
 
     va_start(ap, text);

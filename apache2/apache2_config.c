@@ -30,6 +30,15 @@
     APLOG_USE_MODULE(security2);
 #endif
 
+// Returns the rule id if existing, otherwise the file name & line number
+const char* id_log(msre_rule* rule) {
+    assert(rule != NULL);
+    assert(rule->actionset != NULL);
+    const char* id = rule->actionset->id;
+    if (!id || !*id || id == NOT_SET_P) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
+	return id;
+}
+
 /* -- Directory context creation and initialisation -- */
 
 /**
@@ -239,19 +248,19 @@ static void copy_rules_phase(apr_pool_t *mp,
 
             if (copy > 0) {
 #ifdef DEBUG_CONF
-                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, rule->actionset->id);
+                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, id_log(rule));
 #endif
 
                 /* Copy the rule. */
                 *(msre_rule **)apr_array_push(child_phase_arr) = rule;
-                if (rule->actionset && rule->actionset->is_chained) mode = 2;
+                if (rule->actionset->is_chained) mode = 2;
             } else {
-                if (rule->actionset && rule->actionset->is_chained) mode = 1;
+                if (rule->actionset->is_chained) mode = 1;
             }
         } else {
             if (mode == 2) {
 #ifdef DEBUG_CONF
-                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy chain %pp for rule %pp [id \"%s\"]", rule, rule->chain_starter, rule->chain_starter->actionset->id);
+                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy chain %pp for rule %pp [id \"%s\"]", rule, rule->chain_starter, id_log(rule->chain_starter));
 #endif
 
                 /* Copy the rule (it belongs to the chain we want to include. */
@@ -906,16 +915,14 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
      */
     rule->actionset = msre_actionset_merge(modsecurity->msre, cmd->pool, dcfg->tmp_default_actionset,
         rule->actionset, 1);
+    if (rule->actionset == NULL) return apr_psprintf(cmd->pool, "ModSecurity: cannot merge actionset (memory full?).");
 
     /* Keep track of the parent action for "block" */
-    if (rule->actionset) {
-        rule->actionset->parent_intercept_action_rec = dcfg->tmp_default_actionset->intercept_action_rec;
-        rule->actionset->parent_intercept_action = dcfg->tmp_default_actionset->intercept_action;
-    }
+    rule->actionset->parent_intercept_action_rec = dcfg->tmp_default_actionset->intercept_action_rec;
+    rule->actionset->parent_intercept_action = dcfg->tmp_default_actionset->intercept_action;
 
     /* Must NOT specify a disruptive action in logging phase. */
-    if ((rule->actionset != NULL)
-        && (rule->actionset->phase == PHASE_LOGGING)
+    if (   (rule->actionset->phase == PHASE_LOGGING)
         && (rule->actionset->intercept_action != ACTION_ALLOW)
         && (rule->actionset->intercept_action != ACTION_ALLOW_REQUEST)
         && (rule->actionset->intercept_action != ACTION_NONE)
@@ -926,9 +933,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     if (dcfg->tmp_chain_starter != NULL) {
         rule->chain_starter = dcfg->tmp_chain_starter;
-        if (rule->actionset) {
-            rule->actionset->phase = rule->chain_starter->actionset->phase;
-        }
+        rule->actionset->phase = rule->chain_starter->actionset->phase;
     }
 
     if (rule->actionset->is_chained != 1) {
@@ -967,8 +972,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     #ifdef DEBUG_CONF
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-        "Adding rule %pp phase=%d id=\"%s\".", rule, rule->actionset->phase, (rule->actionset->id == NOT_SET_P
-        ? "(none)" : rule->actionset->id));
+        "Adding rule %pp phase=%d id=\"%s\".", rule, rule->actionset->phase, id_log(rule));
     #endif
 
     /* Add rule to the recipe. */
@@ -1042,8 +1046,7 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg,
     for (p = PHASE_FIRST; p <= PHASE_LAST; p++) {
         #ifdef DEBUG_CONF
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "Adding marker %pp phase=%d id=\"%s\".", rule, p, (rule->actionset->id == NOT_SET_P
-            ? "(none)" : rule->actionset->id));
+            "Adding marker %pp phase=%d id=\"%s\".", rule, p, id_log(rule));
         #endif
 
         if (msre_ruleset_rule_add(dcfg->ruleset, rule, p) < 0) {
@@ -1091,11 +1094,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
         return NULL;
     }
 
-    /* Check the rule actionset */
-    /* ENH: Can this happen? */
-    if (rule->actionset == NULL) {
-        return apr_psprintf(cmd->pool, "ModSecurity: Attempt to update action for rule \"%s\" failed: Rule does not have an actionset.", p1);
-    }
+    assert(rule->actionset != NULL);
 
     /* Create a new actionset */
     new_actionset = msre_actionset_create(modsecurity->msre, cmd->pool, p2, &my_error_msg);
@@ -1117,9 +1116,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
         char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "Update rule %pp id=\"%s\" old action: \"%s\"",
-            rule,
-            (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
-            actions);
+            rule, id_log(rule), actions);
     }
     #endif
 
@@ -1127,6 +1124,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     /* ENH: Will this leak the old actionset? */
     rule->actionset = msre_actionset_merge(modsecurity->msre, cmd->pool, rule->actionset,
         new_actionset, 1);
+    if (rule->actionset == NULL) return apr_psprintf(cmd->pool, "ModSecurity: cannot merge actionset (memory full?).");
     msre_actionset_set_defaults(rule->actionset);
 
     /* Update the unparsed rule */
@@ -1137,9 +1135,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
         char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "Update rule %pp id=\"%s\" new action: \"%s\"",
-            rule,
-            (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
-            actions);
+            rule, id_log(rule), actions);
     }
     #endif
 
@@ -1746,6 +1742,9 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
 
     config_orig_path = apr_pstrndup(mp, filename,
         strlen(filename) - strlen(apr_filepath_name_get(filename)));
+    if (config_orig_path == NULL) {
+        return apr_psprintf(mp, "ModSecurity: failed to duplicate filename in parser_conn_limits_operator");
+    }
 
     apr_filepath_merge(&file, config_orig_path, param, APR_FILEPATH_TRUENAME,
         mp);
@@ -2452,8 +2451,12 @@ static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg,
                                          const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
-    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
     if (dcfg == NULL) return NULL;
+    rule_exception* re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
+    if (re == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP | APLOG_NOERRNO, 0, cmd->pool, "cmd_rule_remove_by_id: Cannot allocate memory");
+        return NULL;
+    }
 
     re->type = RULE_EXCEPTION_REMOVE_ID;
     re->param = p1;

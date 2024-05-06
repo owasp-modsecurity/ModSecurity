@@ -41,6 +41,8 @@ void msre_engine_reqbody_processor_register(msre_engine *engine,
  * Prepare to accept the request body (part 2).
  */
 static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     if(msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
@@ -80,6 +82,8 @@ static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr, char **
  * Prepare to accept the request body (part 1).
  */
 apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
     msr->msc_reqbody_length = 0;
     msr->stream_input_length = 0;
@@ -161,6 +165,8 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
 static apr_status_t modsecurity_request_body_store_disk(modsec_rec *msr,
     const char *data, apr_size_t length, char **error_msg)
 {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     apr_size_t i;
 
     *error_msg = NULL;
@@ -181,6 +187,8 @@ static apr_status_t modsecurity_request_body_store_disk(modsec_rec *msr,
 static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
     const char *data, apr_size_t length, char **error_msg)
 {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     /* Would storing this chunk mean going over the limit? */
@@ -309,6 +317,8 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
 apr_status_t modsecurity_request_body_store(modsec_rec *msr,
     const char *data, apr_size_t length, char **error_msg)
 {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     /* If we have a processor for this request body send
@@ -428,6 +438,8 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 }
 
 apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buffer, int buflen, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
 #ifndef MSC_LARGE_STREAM_INPUT
     char *stream_input_body = NULL;
     char *data = NULL;
@@ -541,6 +553,8 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
  * Replace a bunch of chunks holding a request body with a single large chunk.
  */
 static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     msc_data_chunk **chunks, *one_chunk;
     char *d;
     int i, sofar;
@@ -614,6 +628,8 @@ static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **err
  *
  */
 static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     int invalid_count = 0;
 
     *error_msg = NULL;
@@ -643,6 +659,8 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
  * Stops receiving the request body.
  */
 apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     /* Close open file descriptors, if any. */
@@ -753,6 +771,8 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
  * Prepares to forward the request body.
  */
 apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
@@ -821,6 +841,8 @@ apr_status_t modsecurity_request_body_retrieve_end(modsec_rec *msr) {
 apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
     msc_data_chunk **chunk, long int nbytes, char **error_msg)
 {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     msc_data_chunk **chunks;
 
     *error_msg = NULL;
@@ -922,6 +944,8 @@ apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
  *
  */
 apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
 
     /* Release memory we used to store request body data. */

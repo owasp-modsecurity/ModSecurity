@@ -475,6 +475,8 @@ static modsec_rec *retrieve_tx_context(request_rec *r) {
  * phases, redirections, or subrequests.
  */
 static void store_tx_context(modsec_rec *msr, request_rec *r) {
+    assert(msr != NULL);
+    assert(r != NULL);
     apr_table_setn(r->notes, NOTE_MSR, (void *)msr);
 }
 
@@ -491,7 +493,10 @@ static modsec_rec *create_tx_context(request_rec *r) {
     apr_allocator_create(&allocator);
     apr_allocator_max_free_set(allocator, 1024);
     apr_pool_create_ex(&msr->mp, r->pool, NULL, allocator);
-    if (msr->mp == NULL) return NULL;
+    if (msr->mp == NULL) {
+        apr_allocator_destroy(allocator);
+        return NULL;
+    }
     apr_allocator_owner_set(allocator, msr->mp);
 
     msr->modsecurity = modsecurity;
@@ -863,6 +868,9 @@ static int hook_request_early(request_rec *r) {
      */
     msr = create_tx_context(r);
     if (msr == NULL) return DECLINED;
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Context created after request failure.");
+    }
 
 #ifdef REQUEST_EARLY
 
@@ -1150,17 +1158,12 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
 #endif
     if (msr_ap_server) {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-        msr = create_tx_context((request_rec *)info->r);
+        msr = create_tx_context((request_rec*)info->r);
 #else
-        msr = create_tx_context((request_rec *)r);
+        msr = create_tx_context((request_rec*)r);
 #endif
-        if (msr != NULL && msr->txcfg->debuglog_level >= 9) {
-            if (msr == NULL) {
-                msr_log(msr, 9, "Failed to create context after request failure.");
-            }
-            else {
-                msr_log(msr, 9, "Context created after request failure.");
-            }
+        if (msr && msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Context created after request failure.");
         }
     }
     if (msr == NULL) return;
