@@ -59,8 +59,7 @@ class RuleScript : public RuleWithActions {
 
     bool init(std::string *err);
 
-    bool evaluate(Transaction *trans,
-        std::shared_ptr<RuleMessage> ruleMessage) override;
+    bool evaluate(Transaction *trans, RuleMessage &ruleMessage) override;
 
     std::string m_name;
     engine::Lua m_lua;

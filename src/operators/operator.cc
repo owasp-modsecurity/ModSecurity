@@ -71,8 +71,8 @@ namespace operators {
 
 
 bool Operator::evaluateInternal(Transaction *transaction,
-    RuleWithActions *rule, const std::string& a, std::shared_ptr<RuleMessage> rm) {
-    bool res = evaluate(transaction, rule, a, rm);
+    RuleWithActions *rule, const std::string& a, RuleMessage &ruleMessage) {
+    bool res = evaluate(transaction, rule, a, ruleMessage);
 
     if (m_negation) {
         return !res;
