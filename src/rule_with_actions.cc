@@ -59,9 +59,9 @@ using actions::transformations::Transformation;
 RuleWithActions::RuleWithActions(
     Actions *actions,
     Transformations *transformations,
-    std::unique_ptr<std::string> fileName,
+    const std::string &fileName,
     int lineNumber)
-    : Rule(std::move(fileName), lineNumber),
+    : Rule(fileName, lineNumber),
     m_rev(""),
     m_ver(""),
     m_accuracy(0),

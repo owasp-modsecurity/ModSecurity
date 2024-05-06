@@ -42,7 +42,7 @@ class RuleWithOperator : public RuleWithActions {
         variables::Variables *variables,
         std::vector<actions::Action *> *actions,
         Transformations *transformations,
-        std::unique_ptr<std::string> fileName,
+        const std::string &fileName,
         int lineNumber);
 
     ~RuleWithOperator() override;

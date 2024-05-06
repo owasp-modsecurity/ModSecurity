@@ -40,7 +40,7 @@ class RuleWithActions : public Rule {
     RuleWithActions(
         Actions *a,
         Transformations *t,
-        std::unique_ptr<std::string> fileName,
+        const std::string &fileName,
         int lineNumber);
 
     ~RuleWithActions() override;

@@ -47,9 +47,9 @@ class RuleScript : public RuleWithActions {
     RuleScript(const std::string &name,
         std::vector<Action *> *actions,
         Transformations *t,
-        std::unique_ptr<std::string> fileName,
+        const std::string &fileName,
         int lineNumber)
-            : RuleWithActions(actions, t, std::move(fileName), lineNumber),
+            : RuleWithActions(actions, t, fileName, lineNumber),
         m_name(name),
         m_lua() { }
 

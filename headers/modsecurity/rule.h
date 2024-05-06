@@ -64,8 +64,8 @@ using MatchActions = std::vector<actions::Action *>;
 
 class Rule {
  public:
-    Rule(std::unique_ptr<std::string> fileName, int lineNumber)
-        : m_fileName(*fileName),
+    Rule(const std::string &fileName, int lineNumber)
+        : m_fileName(fileName),
         m_lineNumber(lineNumber),
         m_phase(modsecurity::Phases::RequestHeadersPhase) {
         }
