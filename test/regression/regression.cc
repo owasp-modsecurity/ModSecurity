@@ -33,7 +33,7 @@
 #include "test/common/colors.h"
 #include "test/regression/regression_test.h"
 #include "test/common/modsecurity_test_results.h"
-#include "test/regression/custom_debug_log.h"
+#include "test/common/modsecurity_test_context.h"
 #include "src/utils/regex.h"
 
 using modsecurity_test::CustomDebugLog;
@@ -110,24 +110,11 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
     }
 }
 
-void logCb(void *data, const void *msgv) {
-    const char *msg = reinterpret_cast<const char*>(msgv);
-    std::stringstream *ss = (std::stringstream *) data;
-    *ss << msg << std::endl;
-}
-
-
 void perform_unit_test(ModSecurityTest<RegressionTest> *test,
     std::vector<RegressionTest *> *tests,
     ModSecurityTestResults<RegressionTestResult> *res, int *count) {
-
     for (RegressionTest *t : *tests) {
-        CustomDebugLog *debug_log = new CustomDebugLog();
-        modsecurity::ModSecurity *modsec = NULL;
-        modsecurity::RulesSet *modsec_rules = NULL;
-        modsecurity::Transaction *modsec_transaction = NULL;
         ModSecurityTestResults<RegressionTest> r;
-        std::stringstream serverLog;
         RegressionTestResult *testRes = new RegressionTestResult();
 
         testRes->test = t;
@@ -169,11 +156,8 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         unlink("./modsec-shared-collections-lock");
 #endif
 
-        modsec = new modsecurity::ModSecurity();
-        modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
+        modsecurity_test::ModSecurityTestContext context("ModSecurity-regression v0.0.1-alpha" \
             " (ModSecurity regression test utility)");
-        modsec->setServerLogCb(logCb);
-        modsec_rules = new modsecurity::RulesSet(debug_log);
 
         bool found = true;
         if (t->resource.empty() == false) {
@@ -196,15 +180,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             }
             res->push_back(testRes);
 
-            delete modsec_transaction;
-            delete modsec_rules;
-            delete modsec;
-
             continue;
         }
 
-        modsec_rules->load("SecDebugLogLevel 9");
-        if (modsec_rules->load(t->rules.c_str(), filename) < 0) {
+        context.m_modsec_rules.load("SecDebugLogLevel 9");
+        if (context.m_modsec_rules.load(t->rules.c_str(), filename) < 0) {
             /* Parser error */
             if (t->parser_error.empty() == true) {
                 /*
@@ -219,21 +199,17 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 }
                 testRes->reason << KRED << "parse failed." << RESET \
                     << std::endl;
-                testRes->reason << modsec_rules->getParserError() \
+                testRes->reason << context.m_modsec_rules.getParserError() \
                     << std::endl;
                 testRes->passed = false;
                 res->push_back(testRes);
-
-                delete modsec_transaction;
-                delete modsec_rules;
-                delete modsec;
 
                 continue;
             }
 
             Regex re(t->parser_error);
             SMatch match;
-            std::string s = modsec_rules->getParserError();
+            const auto s = context.m_modsec_rules.getParserError();
 
             if (regex_search(s, &match, re)) {
                 if (test->m_automake_output) {
@@ -246,10 +222,6 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 testRes->reason << KGRN << "passed!" << RESET << std::endl;
                 testRes->passed = true;
                 res->push_back(testRes);
-
-                delete modsec_transaction;
-                delete modsec_rules;
-                delete modsec;
 
                 continue;
             } else {
@@ -271,10 +243,6 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 testRes->passed = false;
                 res->push_back(testRes);
 
-                delete modsec_transaction;
-                delete modsec_rules;
-                delete modsec;
-
                 continue;
             }
         } else {
@@ -293,190 +261,136 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 testRes->passed = false;
                 res->push_back(testRes);
 
-                delete modsec_transaction;
-                delete modsec_rules;
-                delete modsec;
-
                 continue;
             }
         }
 
-        modsec_transaction = new modsecurity::Transaction(modsec, modsec_rules,
-            &serverLog);
+        auto modsec_transaction = context.create_transaction();
 
-        clearAuditLog(modsec_transaction->m_rules->m_auditLog->m_path1);
+        clearAuditLog(modsec_transaction.m_rules->m_auditLog->m_path1);
 
-        modsec_transaction->processConnection(t->clientIp.c_str(),
+        modsec_transaction.processConnection(t->clientIp.c_str(),
             t->clientPort, t->serverIp.c_str(), t->serverPort);
 
         if (t->hostname != "") {
-            modsec_transaction->setRequestHostName(t->hostname);
+            modsec_transaction.setRequestHostName(t->hostname);
         }
 
-        actions(&r, modsec_transaction, &serverLog);
-#if 0
-        if (r.status != 200) {
-             goto end;
-        }
-#endif
+        actions(&r, &modsec_transaction, &context.m_server_log);
 
-        modsec_transaction->processURI(t->uri.c_str(), t->method.c_str(),
+        modsec_transaction.processURI(t->uri.c_str(), t->method.c_str(),
             t->httpVersion.c_str());
 
-        actions(&r, modsec_transaction, &serverLog);
-#if 0
-        if (r.status != 200) {
-            goto end;
-        }
-#endif
+        actions(&r, &modsec_transaction, &context.m_server_log);
 
-        for (std::pair<std::string, std::string> headers :
-            t->request_headers) {
-            modsec_transaction->addRequestHeader(headers.first.c_str(),
+        for (const auto &headers : t->request_headers) {
+            modsec_transaction.addRequestHeader(headers.first.c_str(),
                 headers.second.c_str());
         }
 
-        modsec_transaction->processRequestHeaders();
-        actions(&r, modsec_transaction, &serverLog);
-#if 0
-        if (r.status != 200) {
-            goto end;
-        }
-#endif
+        modsec_transaction.processRequestHeaders();
+        actions(&r, &modsec_transaction, &context.m_server_log);
 
-        modsec_transaction->appendRequestBody(
+        modsec_transaction.appendRequestBody(
             (unsigned char *)t->request_body.c_str(),
             t->request_body.size());
-        modsec_transaction->processRequestBody();
-        actions(&r, modsec_transaction, &serverLog);
-#if 0
-        if (r.status != 200) {
-            goto end;
-        }
-#endif
+        modsec_transaction.processRequestBody();
+        actions(&r, &modsec_transaction, &context.m_server_log);
 
-        for (std::pair<std::string, std::string> headers :
-            t->response_headers) {
-            modsec_transaction->addResponseHeader(headers.first.c_str(),
+        for (const auto &headers : t->response_headers) {
+            modsec_transaction.addResponseHeader(headers.first.c_str(),
                 headers.second.c_str());
         }
 
-        modsec_transaction->processResponseHeaders(r.status,
+        modsec_transaction.processResponseHeaders(r.status,
             t->response_protocol);
-        actions(&r, modsec_transaction, &serverLog);
-#if 0
-        if (r.status != 200) {
-            goto end;
-        }
-#endif
+        actions(&r, &modsec_transaction, &context.m_server_log);
 
-        modsec_transaction->appendResponseBody(
+        modsec_transaction.appendResponseBody(
             (unsigned char *)t->response_body.c_str(),
             t->response_body.size());
-        modsec_transaction->processResponseBody();
-        actions(&r, modsec_transaction, &serverLog);
-#if 0
-        if (r.status != 200) {
-            goto end;
-        }
-#endif
+        modsec_transaction.processResponseBody();
+        actions(&r, &modsec_transaction, &context.m_server_log);
 
-#if 0
-end:
-#endif
-        modsec_transaction->processLogging();
+        modsec_transaction.processLogging();
 
-        CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
-            (modsec_rules->m_debugLog);
+        const auto *d = reinterpret_cast<CustomDebugLog *>(context.m_modsec_rules.m_debugLog);
 
-        if (d != NULL) {
-            if (!d->contains(t->debug_log)) {
-                if (test->m_automake_output) {
-                    std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << ":" << *count << std::endl;
-                } else {
-                    std::cout << KRED << "failed!" << RESET << std::endl;
-                }
-                testRes->reason << "Debug log was not matching the " \
-                    << "expected results." << std::endl;
-                testRes->reason << KWHT << "Expecting: " << RESET \
-                    << t->debug_log + "";
-                testRes->passed = false;
-            } else if (r.status != t->http_code) {
-                if (test->m_automake_output) {
-                    std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << ":" << *count << std::endl;
-                } else {
-                    std::cout << KRED << "failed!" << RESET << std::endl;
-                }
-                testRes->reason << "HTTP code mismatch. expecting: " + \
-                    std::to_string(t->http_code) + \
-                    " got: " + std::to_string(r.status) + "\n";
-                testRes->passed = false;
-            } else if (!contains(serverLog.str(), t->error_log)) {
-                if (test->m_automake_output) {
-                    std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << std::endl;
-                } else {
-                    std::cout << KRED << "failed!" << RESET << std::endl;
-                }
-                testRes->reason << "Error log was not matching the " \
-                    << "expected results." << std::endl;
-                testRes->reason << KWHT << "Expecting: " << RESET \
-                    << t->error_log + "";
-                testRes->passed = false;
-            } else if (!t->audit_log.empty()
-                && !contains(getAuditLogContent(modsec_transaction->m_rules->m_auditLog->m_path1), t->audit_log)) {
-                if (test->m_automake_output) {
-                    std::cout << ":test-result: FAIL " << filename \
-                        << ":" << t->name << ":" << *count << std::endl;
-                } else {
-                    std::cout << KRED << "failed!" << RESET << std::endl;
-                }
-                testRes->reason << "Audit log was not matching the " \
-                    << "expected results." << std::endl;
-                testRes->reason << KWHT << "Expecting: " << RESET \
-                    << t->audit_log + "";
-                testRes->passed = false;
+        if (!d->contains(t->debug_log)) {
+            if (test->m_automake_output) {
+                std::cout << ":test-result: FAIL " << filename \
+                    << ":" << t->name << ":" << *count << std::endl;
             } else {
-                if (test->m_automake_output) {
-                    std::cout << ":test-result: PASS " << filename \
-                        << ":" << t->name << std::endl;
-                } else {
-                    std::cout << KGRN << "passed!" << RESET << std::endl;
-                }
-                testRes->passed = true;
-                goto after_debug_log;
+                std::cout << KRED << "failed!" << RESET << std::endl;
             }
-
-            if (testRes->passed == false) {
-                testRes->reason << std::endl;
-                testRes->reason << KWHT << "Debug log:" << RESET << std::endl;
-                testRes->reason << d->log_messages() << std::endl;
-                testRes->reason << KWHT << "Error log:" << RESET << std::endl;
-                testRes->reason << serverLog.str() << std::endl;
-                testRes->reason << KWHT << "Audit log:" << RESET << std::endl;
-                testRes->reason << getAuditLogContent(modsec_transaction->m_rules->m_auditLog->m_path1) << std::endl;
+            testRes->reason << "Debug log was not matching the " \
+                << "expected results." << std::endl;
+            testRes->reason << KWHT << "Expecting: " << RESET
+                << t->debug_log + "";
+            testRes->passed = false;
+        } else if (r.status != t->http_code) {
+            if (test->m_automake_output) {
+                std::cout << ":test-result: FAIL " << filename \
+                    << ":" << t->name << ":" << *count << std::endl;
+            } else {
+                std::cout << KRED << "failed!" << RESET << std::endl;
             }
+            testRes->reason << "HTTP code mismatch. expecting: " +
+                std::to_string(t->http_code) +
+                " got: " + std::to_string(r.status) + "\n";
+            testRes->passed = false;
+        } else if (!contains(context.m_server_log.str(), t->error_log)) {
+            if (test->m_automake_output) {
+                std::cout << ":test-result: FAIL " << filename \
+                    << ":" << t->name << std::endl;
+            } else {
+                std::cout << KRED << "failed!" << RESET << std::endl;
+            }
+            testRes->reason << "Error log was not matching the " \
+                << "expected results." << std::endl;
+            testRes->reason << KWHT << "Expecting: " << RESET \
+                << t->error_log + "";
+            testRes->passed = false;
+        } else if (!t->audit_log.empty() && !contains(getAuditLogContent(modsec_transaction.m_rules->m_auditLog->m_path1), t->audit_log)) {
+            if (test->m_automake_output) {
+                std::cout << ":test-result: FAIL " << filename \
+                    << ":" << t->name << ":" << *count << std::endl;
+            } else {
+                std::cout << KRED << "failed!" << RESET << std::endl;
+            }
+            testRes->reason << "Audit log was not matching the " \
+                << "expected results." << std::endl;
+            testRes->reason << KWHT << "Expecting: " << RESET \
+                << t->audit_log + "";
+            testRes->passed = false;
+        } else {
+            if (test->m_automake_output) {
+                std::cout << ":test-result: PASS " << filename \
+                    << ":" << t->name << std::endl;
+            } else  {
+                std::cout << KGRN << "passed!" << RESET << std::endl;
+            }
+            testRes->passed = true;
         }
 
-
-after_debug_log:
-        if (d != NULL) {
-            r.log_raw_debug_log = d->log_messages();
+        if (testRes->passed == false) {
+            testRes->reason << std::endl;
+            testRes->reason << KWHT << "Debug log:" << RESET << std::endl;
+            testRes->reason << d->log_messages() << std::endl;
+            testRes->reason << KWHT << "Error log:" << RESET << std::endl;
+            testRes->reason << context.m_server_log.str() << std::endl;
+            testRes->reason << KWHT << "Audit log:" << RESET << std::endl;
+            testRes->reason << getAuditLogContent(modsec_transaction.m_rules->m_auditLog->m_path1) << std::endl;
         }
 
-        delete modsec_transaction;
-        delete modsec_rules;
-        delete modsec;
-        /* delete debug_log; */
+        r.log_raw_debug_log = d->log_messages();
 
         res->push_back(testRes);
     }
 }
 
-
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     ModSecurityTest<RegressionTest> test;
 
     std::string ver(MODSECURITY_VERSION);
@@ -541,7 +455,7 @@ int main(int argc, char **argv) {
     int counter = 0;
 
     std::list<std::string> keyList;
-    for (std::pair<std::string, std::vector<RegressionTest *> *> a : test) {
+    for (const auto &a : test) {
         keyList.push_back(a.first);
     }
     keyList.sort();
@@ -554,7 +468,7 @@ int main(int argc, char **argv) {
     ModSecurityTestResults<RegressionTestResult> res;
     for (const std::string &a : keyList) {
         test_number++;
-        if ((test.m_test_number == 0)
+        if ((test.m_test_number == 0) 
             || (test_number == test.m_test_number)) {
             std::vector<RegressionTest *> *tests = test[a];
             perform_unit_test(&test, tests, &res, &counter);
@@ -605,11 +519,11 @@ int main(int argc, char **argv) {
         }
 
         std::cout << KCYN << std::to_string(skipped) << " ";
-		std::cout << "skipped test(s). " << std::to_string(disabled) << " ";
+        std::cout << "skipped test(s). " << std::to_string(disabled) << " ";
         std::cout << "disabled test(s)." << RESET << std::endl;
     }
 
-    for (std::pair<std::string, std::vector<RegressionTest *> *> a : test) {
+    for (auto a : test) {
         std::vector<RegressionTest *> *vec = a.second;
         for (int i = 0; i < vec->size(); i++) {
             delete vec->at(i);
