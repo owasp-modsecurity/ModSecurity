@@ -65,6 +65,7 @@ int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
                     log_escape_ex(msr->mp, arg->value, arg->value_len));
         }
         msr->msc_reqbody_error = 1;
+        msr->json->yajl_error = apr_psprintf(msr->mp, "More than %ld JSON keys", msr->txcfg->arguments_limit);
         return 0;
     }
 
@@ -374,9 +375,12 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
 	if (msr->json->depth_limit_exceeded) {
            *error_msg = "JSON depth limit exceeded";
 	} else {
-           char *yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
-           *error_msg = apr_pstrdup(msr->mp, yajl_err);
-           yajl_free_error(msr->json->handle, yajl_err);
+        if (msr->json->yajl_error) *error_msg = msr->json->yajl_error;
+        else {
+            char* yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
+            *error_msg = apr_pstrdup(msr->mp, yajl_err);
+            yajl_free_error(msr->json->handle, yajl_err);
+        }
 	}
         return -1;
     }
