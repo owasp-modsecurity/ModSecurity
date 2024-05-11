@@ -77,6 +77,35 @@ ARG USE_ASAN=
 
 RUN C:\BuildTools\VC\Auxiliary\Build\vcvars64.bat && vcbuild.bat %BUILD_TYPE% %ARCH% %USE_ASAN%
 
+# test suite
+#
+
+# setup test environment
+RUN cmd.exe /C md \tmp
+RUN cmd.exe /C md \bin
+RUN cmd.exe /C copy "C:\Program Files\GIT\usr\bin" \bin > NUL
+RUN cmd.exe /C copy "C:\Program Files\GIT\usr\bin\echo.exe" \bin\echo > NUL
+
+# disable tests that don't work on windows
+ARG JQ_VERSION=1.7.1
+ARG JQ_BINARY=jq-windows-amd64.exe
+ARG JQ_URL=https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}/${JQ_BINARY}
+
+ARG JQ_BIN=C:\TEMP\jq.exe
+ADD ${JQ_URL} ${JQ_BIN}
+
+WORKDIR ${MOD_SECURITY_DIR}\test\test-cases\regression
+
+RUN %JQ_BIN% "map(if .title == \"Test match variable (1/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+RUN %JQ_BIN% "map(if .title == \"Test match variable (2/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+RUN %JQ_BIN% "map(if .title == \"Test match variable (3/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+RUN %JQ_BIN% "map(if .title == \"Variable offset - FILES_NAMES\" then .enabled = 0 else . end)" offset-variable.json > tmp.json && move /Y tmp.json offset-variable.json
+
+# run tests
+WORKDIR ${MOD_SECURITY_DIR}\build\win32\build
+
+RUN C:\BuildTools\VC\Auxiliary\Build\vcvars64.bat && ctest -C %BUILD_TYPE% --output-on-failure
+
 # setup container's entrypoint
 #
 

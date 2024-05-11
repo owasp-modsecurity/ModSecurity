@@ -151,6 +151,39 @@ add_regression_test_capability(WITH_CURL HAVE_CURL)
 add_regression_test_capability(WITH_LMDB HAVE_LMDB)
 add_regression_test_capability(WITH_MAXMIND HAVE_MAXMIND)
 
+enable_testing()
+
+file(READ ${BASE_DIR}/test/test-suite.in TEST_FILES_RAW)
+string(REPLACE "\n" ";" TEST_FILES ${TEST_FILES_RAW})
+
+foreach(TEST_FILE ${TEST_FILES})
+  # ignore comment lines
+  string(FIND ${TEST_FILE} "#" is_comment)
+  if(NOT is_comment EQUAL 0)
+    string(FIND ${TEST_FILE} "TESTS+=" is_valid_prefix)
+    if(NOT is_valid_prefix EQUAL 0)
+      message(FATAL_ERROR "Invalid prefix in line: ${TEST_FILE}")
+    endif()
+
+    # remove 'TESTS+=' prefix and 'test/' too because tests are launched
+    # from that directory
+    string(SUBSTRING ${TEST_FILE} 12 -1 TEST_FILE)
+
+    # test name
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
+
+    # determine test runner based on test path prefix
+    string(FIND ${TEST_FILE} "test-cases/regression/" is_regression_test)
+    if(is_regression_test EQUAL 0)
+        set(TEST_RUNNER "regression_tests")
+    else()
+        set(TEST_RUNNER "unit_tests")
+    endif()
+
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_RUNNER} ${TEST_FILE} WORKING_DIRECTORY ${BASE_DIR}/test)
+  endif()
+endforeach()
+
 # benchmark
 add_executable(benchmark ${BASE_DIR}/test/benchmark/benchmark.cc)
 setTestTargetProperties(benchmark)

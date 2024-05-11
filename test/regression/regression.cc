@@ -64,13 +64,11 @@ bool contains(const std::string &s, const std::string &pattern) {
 
 void clearAuditLog(const std::string &filename) {
     if (!filename.empty()) {
-        std::ifstream file;
-        file.open(filename.c_str(), std::ifstream::out | std::ifstream::trunc);
+        std::ofstream file{filename.c_str(), std::ofstream::out | std::ofstream::trunc};
         if (!file.is_open() || file.fail()) {
             std::cout << std::endl << "Failed to clear previous contents of audit log: " \
                 << filename << std::endl;
         }
-        file.close();
     }
 }
 std::string getAuditLogContent(const std::string &filename) {
@@ -510,6 +508,7 @@ int main(int argc, char **argv) {
 #ifdef NO_LOGS
     std::cout << "Test utility cannot work without logging support." \
         << std::endl;
+    return 0;
 #else
     test.cmd_options(argc, argv);
     if (!test.m_automake_output && !test.m_count_all) {
@@ -609,6 +608,6 @@ int main(int argc, char **argv) {
         delete vec;
     }
 
+    return failed;
 #endif
-    return 0;
 }

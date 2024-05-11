@@ -195,6 +195,10 @@ int main(int argc, char **argv) {
         std::cout << t->print() << std::endl;
     }
 
+    const int skp = std::count_if(results.cbegin(), results.cend(), [](const auto &i)
+                                    { return i->skipped; });
+    const int failed = results.size() - skp;
+
     if (!test.m_automake_output) {
         std::cout << std::endl;
 
@@ -202,13 +206,7 @@ int main(int argc, char **argv) {
         if (results.size() == 0) {
             std::cout << KGRN << "All tests passed" << RESET << std::endl;
         } else {
-            int skp = 0;
-            for (const auto &i : results) {
-                if (i->skipped == true) {
-                    skp++;
-                }
-            }
-            std::cout << KRED << results.size()-skp << " failed.";
+            std::cout << KRED << failed << " failed.";
             std::cout << RESET << std::endl;
             if (skp > 0) {
                 std::cout << " " << std::to_string(skp) << " ";
@@ -217,13 +215,12 @@ int main(int argc, char **argv) {
         }
     }
 
-    for (std::pair<std::string, std::vector<UnitTest *> *> a : test) {
-        std::vector<UnitTest *> *vec = a.second;
-        for (int i = 0; i < vec->size(); i++) {
-            delete vec->at(i);
-        }
+    for (auto a : test) {
+        auto *vec = a.second;
+        for(auto *t : *vec)
+            delete t;
         delete vec;
     }
+
+    return failed;
 }
-
-
