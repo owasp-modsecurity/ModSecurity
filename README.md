@@ -262,8 +262,9 @@ new issue, please check if there is one already opened on the same topic.
 
 ## Bindings
 
-The libModSecurity design allows the integration with bindings. There is an effort to avoid breaking API [binary] compatibility to make an easy integration with possible bindings. Currently, there are two notable projects maintained by the community:
+The libModSecurity design allows the integration with bindings. There is an effort to avoid breaking API [binary] compatibility to make an easy integration with possible bindings. Currently, there are a few notable projects maintained by the community:
    * Python - https://github.com/actions-security/pymodsecurity
+   * Rust - https://github.com/rkrishn7/rust-modsecurity
    * Varnish - https://github.com/xdecock/vmod-modsecurity
 
 ## Packaging
