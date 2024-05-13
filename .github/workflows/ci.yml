@@ -72,3 +72,49 @@ jobs:
         run: make -j `sysctl -n hw.logicalcpu`
       - name: check
         run: make check
+
+  build-windows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2022]
+        platform: [x86_64]
+        configuration: [Release]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Install Conan
+        run: |
+          pip3 install conan --upgrade
+          conan profile detect
+      - uses: ammaraskar/msvc-problem-matcher@master
+      - name: Build ${{ matrix.configuration }} ${{ matrix.platform }}
+        shell: cmd
+        run: vcbuild.bat ${{ matrix.configuration }} ${{ matrix.platform }}
+      - name: Set up test environment
+        working-directory: build\win32\build\${{ matrix.configuration }}
+        env:
+          BASE_DIR: ..\..\..\..
+        shell: cmd
+        run: |
+          copy unit_tests.exe %BASE_DIR%\test
+          copy regression_tests.exe %BASE_DIR%\test
+          copy libModSecurity.dll %BASE_DIR%\test
+          copy %BASE_DIR%\unicode.mapping %BASE_DIR%\test
+          md \tmp
+          md \bin
+          copy "C:\Program Files\Git\usr\bin\echo.exe" \bin
+          copy "C:\Program Files\Git\usr\bin\echo.exe" \bin\echo
+      - name: Disable tests that don't work on Windows
+        working-directory: test\test-cases\regression
+        shell: cmd
+        run: |
+          jq "map(if .title == \"Test match variable (1/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Test match variable (2/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Test match variable (3/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Variable offset - FILES_NAMES\" then .enabled = 0 else . end)" offset-variable.json > tmp.json && move /Y tmp.json offset-variable.json
+      - name: Run tests
+        working-directory: build\win32\build
+        run: |
+          ctest -C ${{ matrix.configuration }} --output-on-failure
