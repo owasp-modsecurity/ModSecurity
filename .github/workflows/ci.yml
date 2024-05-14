@@ -80,6 +80,12 @@ jobs:
         os: [windows-2022]
         platform: [x86_64]
         configuration: [Release]
+        configure:
+          - {label: "full",       opt: "" }
+          - {label: "wo lmdb",    opt: "-DWITHOUT_LMDB=ON" }
+          - {label: "wo lua",     opt: "-DWITHOUT_LUA=ON" }
+          - {label: "wo maxmind", opt: "-DWITHOUT_MAXMIND=ON" }
+          - {label: "wo curl",    opt: "-DWITHOUT_CURL=ON" }
     steps:
       - uses: actions/checkout@v4
         with:
@@ -89,9 +95,9 @@ jobs:
           pip3 install conan --upgrade
           conan profile detect
       - uses: ammaraskar/msvc-problem-matcher@master
-      - name: Build ${{ matrix.configuration }} ${{ matrix.platform }}
+      - name: Build ${{ matrix.configuration }} ${{ matrix.platform }} ${{ matrix.configure.label }}
         shell: cmd
-        run: vcbuild.bat ${{ matrix.configuration }} ${{ matrix.platform }}
+        run: vcbuild.bat ${{ matrix.configuration }} ${{ matrix.platform }} NO_ASAN "${{ matrix.configure.opt }}"
       - name: Set up test environment
         working-directory: build\win32\build\${{ matrix.configuration }}
         env:
