@@ -13,27 +13,13 @@
  *
  */
 
-#include "src/actions/transformations/remove_comments.h"
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "remove_comments.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
-std::string RemoveComments::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool RemoveComments::transform(std::string &value, const Transaction *trans) const {
     std::string ret;
     unsigned char *input;
 
@@ -103,10 +89,10 @@ std::string RemoveComments::evaluate(const std::string &value,
     ret.assign(reinterpret_cast<char *>(input), j);
     free(input);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

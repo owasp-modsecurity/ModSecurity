@@ -13,33 +13,19 @@
  *
  */
 
-#include "src/actions/transformations/normalise_path.h"
-
-#include <string.h>
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "normalise_path.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
+
 
 NormalisePath::NormalisePath(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }
 
-std::string NormalisePath::evaluate(const std::string &value,
-    Transaction *transaction) {
-    int changed = 0;
+bool NormalisePath::transform(std::string &value, const Transaction *trans) const {
+    int _changed = 0;
 
     char *tmp = reinterpret_cast<char *>(
         malloc(sizeof(char) * value.size() + 1));
@@ -47,13 +33,15 @@ std::string NormalisePath::evaluate(const std::string &value,
     tmp[value.size()] = '\0';
 
     int i = normalize_path_inplace((unsigned char *)tmp,
-        value.size(), 0, &changed);
+        value.size(), 0, &_changed);
 
     std::string ret("");
     ret.assign(tmp, i);
     free(tmp);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
@@ -223,6 +211,4 @@ length:
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

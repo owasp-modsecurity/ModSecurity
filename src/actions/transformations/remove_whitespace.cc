@@ -13,25 +13,17 @@
  *
  */
 
-#include "src/actions/transformations/remove_whitespace.h"
+#include "remove_whitespace.h"
 
-#include <string>
+namespace modsecurity::actions::transformations {
 
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
-
-
-namespace modsecurity {
-namespace actions {
-namespace transformations {
 
 RemoveWhitespace::RemoveWhitespace(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }
 
-std::string RemoveWhitespace::evaluate(const std::string &val,
-    Transaction *transaction) {
+bool RemoveWhitespace::transform(std::string &val, const Transaction *trans) const {
     std::string transformed_value;
     transformed_value.reserve(val.size());
 
@@ -52,10 +44,11 @@ std::string RemoveWhitespace::evaluate(const std::string &val,
         i++;
     }
 
-    return transformed_value;
+    const auto changed = transformed_value != val;
+    val = transformed_value;
+    return changed;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+
+}  // namespace modsecurity::actions::transformations
 

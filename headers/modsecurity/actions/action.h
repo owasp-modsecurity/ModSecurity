@@ -13,26 +13,19 @@
  *
  */
 
-#ifdef __cplusplus
-
-#include <string>
-#include <iostream>
-#include <memory>
-
-#endif
-
-#include "modsecurity/intervention.h"
-#include "modsecurity/rule.h"
-#include "modsecurity/rule_with_actions.h"
-
 #ifndef HEADERS_MODSECURITY_ACTIONS_ACTION_H_
 #define HEADERS_MODSECURITY_ACTIONS_ACTION_H_
 
 #ifdef __cplusplus
 
+#include <string>
+#include <memory>
+
 namespace modsecurity {
 class Transaction;
 class RuleWithOperator;
+class RuleWithActions;
+class RuleMessage;
 
 namespace actions {
 
@@ -74,8 +67,6 @@ class Action {
 
     virtual ~Action() { }
 
-    virtual std::string evaluate(const std::string &exp,
-        Transaction *transaction);
     virtual bool evaluate(RuleWithActions *rule, Transaction *transaction);
     virtual bool evaluate(RuleWithActions *rule, Transaction *transaction,
         std::shared_ptr<RuleMessage> ruleMessage) {
@@ -87,9 +78,9 @@ class Action {
 
     void set_name_and_payload(const std::string& data) {
         size_t pos = data.find(":");
-        std::string t = "t:";
+        const char t[] = "t:";
 
-        if (data.compare(0, t.length(), t) == 0) {
+        if (data.compare(0, std::size(t) - 1, t) == 0) {
             pos = data.find(":", 2);
         }
 

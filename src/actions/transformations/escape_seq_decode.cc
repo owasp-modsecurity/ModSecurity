@@ -13,23 +13,12 @@
  *
  */
 
-#include "src/actions/transformations/escape_seq_decode.h"
+#include "escape_seq_decode.h"
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
+
 
 EscapeSeqDecode::EscapeSeqDecode(const std::string &action) 
     : Transformation(action) {
@@ -140,8 +129,7 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 }
 
 
-std::string EscapeSeqDecode::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool EscapeSeqDecode::transform(std::string &value, const Transaction *trans) const {
 
     unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
         * value.size() + 1);
@@ -154,9 +142,10 @@ std::string EscapeSeqDecode::evaluate(const std::string &value,
     ret.assign(reinterpret_cast<char *>(tmp), size);
     free(tmp);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+
+}  // namespace modsecurity::actions::transformations

@@ -13,27 +13,15 @@
  *
  */
 
-#include "src/actions/transformations/hex_decode.h"
+#include "hex_decode.h"
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+
+namespace modsecurity::actions::transformations {
 
 
-std::string HexDecode::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool HexDecode::transform(std::string &value, const Transaction *trans) const {
     std::string ret;
     unsigned char *input;
     int size = 0;
@@ -52,7 +40,9 @@ std::string HexDecode::evaluate(const std::string &value,
     ret.assign(reinterpret_cast<char *>(input), size);
     free(input);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
@@ -74,6 +64,4 @@ int HexDecode::inplace(unsigned char *data, int len) {
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

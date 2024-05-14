@@ -13,31 +13,20 @@
  *
  */
 
-#include "src/actions/transformations/utf8_to_unicode.h"
+#include "utf8_to_unicode.h"
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 #include <cstring>
 
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
-std::string Utf8ToUnicode::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool Utf8ToUnicode::transform(std::string &value, const Transaction *trans) const {
     std::string ret;
     unsigned char *input;
-    int changed = 0;
+    int _changed = 0;
     char *out;
 
     input = reinterpret_cast<unsigned char *>
@@ -49,7 +38,7 @@ std::string Utf8ToUnicode::evaluate(const std::string &value,
 
     memcpy(input, value.c_str(), value.length()+1);
 
-    out = inplace(input, value.size() + 1, &changed);
+    out = inplace(input, value.size() + 1, &_changed);
     free(input);
     if (out != NULL) {
         ret.assign(reinterpret_cast<char *>(out),
@@ -57,7 +46,9 @@ std::string Utf8ToUnicode::evaluate(const std::string &value,
         free(out);
     }
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
@@ -313,6 +304,4 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

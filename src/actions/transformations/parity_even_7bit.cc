@@ -13,28 +13,17 @@
  *
  */
 
-#include "src/actions/transformations/parity_even_7bit.h"
+#include "parity_even_7bit.h"
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 #include <cstring>
 
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+
+namespace modsecurity::actions::transformations {
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+bool ParityEven7bit::transform(std::string &value, const Transaction *trans) const {
+    if (value.empty()) return false;
 
-
-std::string ParityEven7bit::evaluate(const std::string &value,
-    Transaction *transaction) {
-    std::string ret;
     unsigned char *input;
 
     input = reinterpret_cast<unsigned char *>
@@ -46,9 +35,9 @@ std::string ParityEven7bit::evaluate(const std::string &value,
 
     std::memcpy(input, value.c_str(), value.length()+1);
 
-    inplace(input, value.length());
+    const auto ret = inplace(input, value.length());
 
-    ret.assign(reinterpret_cast<char *>(input), value.length());
+    value.assign(reinterpret_cast<char *>(input), value.length());
     free(input);
 
     return ret;
@@ -76,7 +65,4 @@ bool ParityEven7bit::inplace(unsigned char *input, uint64_t input_len) {
 }
 
 
-
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

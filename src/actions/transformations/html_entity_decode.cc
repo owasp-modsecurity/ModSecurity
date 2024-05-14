@@ -13,32 +13,21 @@
  *
  */
 
-#include "src/actions/transformations/html_entity_decode.h"
+#include "html_entity_decode.h"
 
-#include <string.h>
+#include <cstring>
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "src/utils/string.h"
 
 #ifdef WIN32
 #include "src/compat/msvc.h"
 #endif
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
-std::string HtmlEntityDecode::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool HtmlEntityDecode::transform(std::string &value, const Transaction *trans) const {
     std::string ret;
     unsigned char *input;
 
@@ -56,7 +45,9 @@ std::string HtmlEntityDecode::evaluate(const std::string &value,
     ret.assign(reinterpret_cast<char *>(input), i);
     free(input);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
@@ -207,6 +198,5 @@ HTML_ENT_OUT:
     return count;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+
+}  // namespace modsecurity::actions::transformations

@@ -13,24 +13,15 @@
  *
  */
 
-#include "src/actions/transformations/sql_hex_decode.h"
+#include "sql_hex_decode.h"
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 #include <cstring>
 
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
+
 
 #ifndef VALID_HEX
 #define VALID_HEX(X) (((X >= '0') && (X <= '9')) \
@@ -41,8 +32,7 @@ namespace transformations {
 #define ISODIGIT(X) ((X >= '0') && (X <= '7'))
 #endif
 
-std::string SqlHexDecode::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool SqlHexDecode::transform(std::string &value, const Transaction *trans) const {
     std::string ret;
     unsigned char *input;
     int size = 0;
@@ -61,7 +51,9 @@ std::string SqlHexDecode::evaluate(const std::string &value,
     ret.assign(reinterpret_cast<char *>(input), size);
     free(input);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
@@ -107,7 +99,4 @@ int SqlHexDecode::inplace(unsigned char *data, int len) {
 }
 
 
-
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

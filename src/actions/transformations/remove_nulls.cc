@@ -13,23 +13,13 @@
  *
  */
 
-#include "src/actions/transformations/remove_nulls.h"
-
-#include <string.h>
-
-#include <string>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "remove_nulls.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
-std::string RemoveNulls::evaluate(const std::string &val,
-    Transaction *transaction) {
+bool RemoveNulls::transform(std::string &val, const Transaction *trans) const {
     size_t i = 0;
     std::string transformed_value;
     transformed_value.reserve(val.size());
@@ -43,10 +33,10 @@ std::string RemoveNulls::evaluate(const std::string &val,
         i++;
     }
 
-    return transformed_value;
+    const auto changed = transformed_value != val;
+    val = transformed_value;
+    return changed;
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

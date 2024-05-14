@@ -13,33 +13,16 @@
  *
  */
 
-#include "src/actions/transformations/url_decode_uni.h"
+#include "url_decode_uni.h"
 
-#include <string.h>
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
-
-#include "modsecurity/rules_set_properties.h"
 #include "modsecurity/rules_set.h"
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
-#include "src/utils/system.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
-std::string UrlDecodeUni::evaluate(const std::string &value,
-    Transaction *t) {
+bool UrlDecodeUni::transform(std::string &value, const Transaction *t) const {
     std::string ret;
     unsigned char *input;
 
@@ -57,7 +40,9 @@ std::string UrlDecodeUni::evaluate(const std::string &value,
     ret.assign(reinterpret_cast<char *>(input), i);
     free(input);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
@@ -66,7 +51,7 @@ std::string UrlDecodeUni::evaluate(const std::string &value,
  * IMP1 Assumes NUL-terminated
  */
 int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
-    Transaction *t) {
+    const Transaction *t) {
     unsigned char *d = input;
     int64_t i, count, fact, j, xv;
     int Code, hmap = -1;
@@ -190,6 +175,4 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

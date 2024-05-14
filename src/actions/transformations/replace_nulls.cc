@@ -13,25 +13,17 @@
  *
  */
 
-#include "src/actions/transformations/replace_nulls.h"
-
-#include <string>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "replace_nulls.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 ReplaceNulls::ReplaceNulls(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }
 
-std::string ReplaceNulls::evaluate(const std::string &val,
-    Transaction *transaction) {
+bool ReplaceNulls::transform(std::string &val, const Transaction *trans) const {
     int64_t i;
     std::string value(val);
 
@@ -44,9 +36,9 @@ std::string ReplaceNulls::evaluate(const std::string &val,
         }
     }
 
-    return value;
+    const auto changed = val != value;
+    val = value;
+    return changed;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

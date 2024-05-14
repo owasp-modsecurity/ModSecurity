@@ -13,13 +13,10 @@
  *
  */
 
-#include <string>
-
-#include "modsecurity/actions/action.h"
-#include "src/actions/transformations/transformation.h"
-
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_
+
+#include "transformation.h"
 
 #define UNICODE_ERROR_CHARACTERS_MISSING    -1
 #define UNICODE_ERROR_INVALID_ENCODING      -2
@@ -27,26 +24,19 @@
 #define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
 #define UNICODE_ERROR_DECODING_ERROR        -5
 
-namespace modsecurity {
-class Transaction;
-
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 class Utf8ToUnicode : public Transformation {
  public:
-    explicit Utf8ToUnicode(const std::string &action)  : Transformation(action) { }
+    explicit Utf8ToUnicode(const std::string &action)
+        : Transformation(action) { }
 
-    std::string evaluate(const std::string &exp,
-        Transaction *transaction) override;
+    bool transform(std::string &value, const Transaction *trans) const override;
 
     static char *inplace(unsigned char *input, uint64_t input_len,
         int *changed);
 };
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
-
+}  // namespace modsecurity::actions::transformations
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_

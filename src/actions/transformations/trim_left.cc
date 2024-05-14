@@ -13,23 +13,10 @@
  *
  */
 
-#include "src/actions/transformations/trim_left.h"
+#include "trim_left.h"
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
-#include "src/actions/transformations/trim.h"
-#include "modsecurity/actions/action.h"
-
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
 
@@ -38,12 +25,13 @@ TrimLeft::TrimLeft(const std::string &action)
     this->action_kind = 1;
 }
 
-std::string TrimLeft::evaluate(const std::string &val,
-    Transaction *transaction) {
-        std::string value(val);
-    return *ltrim(&value);
+bool TrimLeft::transform(std::string &value, const Transaction *trans) const {
+    std::string ret(value);
+    this->ltrim(&ret);
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+
+}  // namespace modsecurity::actions::transformations

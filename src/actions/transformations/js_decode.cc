@@ -13,29 +13,15 @@
  *
  */
 
-#include "src/actions/transformations/js_decode.h"
+#include "js_decode.h"
 
-#include <string.h>
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
-std::string JsDecode::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool JsDecode::transform(std::string &value, const Transaction *trans) const {
     std::string ret;
     unsigned char *input;
 
@@ -53,7 +39,9 @@ std::string JsDecode::evaluate(const std::string &value,
     ret.assign(reinterpret_cast<char *>(input), i);
     free(input);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
@@ -163,6 +151,5 @@ int JsDecode::inplace(unsigned char *input, uint64_t input_len) {
     return count;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+
+}  // namespace modsecurity::actions::transformations

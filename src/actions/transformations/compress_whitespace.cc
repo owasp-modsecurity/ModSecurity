@@ -13,30 +13,18 @@
  *
  */
 
-#include "src/actions/transformations/compress_whitespace.h"
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "compress_whitespace.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
+
 
 CompressWhitespace::CompressWhitespace(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }
 
-std::string CompressWhitespace::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool CompressWhitespace::transform(std::string &value, const Transaction *trans) const {
 
     std::string a;
     int inWhiteSpace = 0;
@@ -58,9 +46,10 @@ std::string CompressWhitespace::evaluate(const std::string &value,
         i++;
     }
 
-    return a;
+    const auto changed = a != value;
+    value = a;
+    return changed;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+
+}  // namespace modsecurity::actions::transformations

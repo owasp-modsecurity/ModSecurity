@@ -13,26 +13,13 @@
  *
  */
 
-#include "src/actions/transformations/cmd_line.h"
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "cmd_line.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
-std::string CmdLine::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool CmdLine::transform(std::string &value, const Transaction *trans) const {
     std::string ret;
     int space = 0;
 
@@ -77,11 +64,11 @@ std::string CmdLine::evaluate(const std::string &value,
         }
     }
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations
 

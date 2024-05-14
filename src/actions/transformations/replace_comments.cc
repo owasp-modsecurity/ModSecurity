@@ -13,31 +13,19 @@
  *
  */
 
-#include "src/actions/transformations/replace_comments.h"
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-#include <cstring>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
+#include "replace_comments.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
+
 
 ReplaceComments::ReplaceComments(const std::string &action) 
     : Transformation(action) {
     this->action_kind = 1;
 }
 
-std::string ReplaceComments::evaluate(const std::string &value,
-    Transaction *transaction) {
+
+bool ReplaceComments::transform(std::string &value, const Transaction *trans) const {
     uint64_t i, j, incomment;
 
     char *input = reinterpret_cast<char *>(
@@ -80,9 +68,10 @@ std::string ReplaceComments::evaluate(const std::string &value,
 
     free(input);
 
-    return resp;
+    const auto changed = resp != value;
+    value = resp;
+    return changed;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+
+}  // namespace modsecurity::actions::transformations

@@ -13,22 +13,10 @@
  *
  */
 
-#include "src/actions/transformations/trim.h"
+#include "trim.h"
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
 
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
-#include "modsecurity/actions/action.h"
-
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
 std::string *Trim::ltrim(std::string *s) {
@@ -66,14 +54,13 @@ Trim::Trim(const std::string &action)
 }
 
 
-std::string
-Trim::evaluate(const std::string &val,
-    Transaction *transaction) {
-    std::string value(val);
-    return *this->trim(&value);
+bool Trim::transform(std::string &value, const Transaction *trans) const {
+    std::string ret(value);
+    this->trim(&ret);
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

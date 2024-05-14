@@ -13,27 +13,19 @@
  *
  */
 
-#include "src/actions/transformations/upper_case.h"
 
-#include <algorithm>
-#include <string>
+#include "upper_case.h"
+
 #include <locale>
 
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
-#include "modsecurity/actions/action.h"
-
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
 UpperCase::UpperCase(const std::string &a)
     : Transformation(a) {
 }
 
-std::string UpperCase::evaluate(const std::string &val,
-    Transaction *transaction) {
+bool UpperCase::transform(std::string &val, const Transaction *trans) const {
     std::string value(val);
     std::locale loc;
 
@@ -41,9 +33,10 @@ std::string UpperCase::evaluate(const std::string &val,
         value[i] = std::toupper(value[i], loc);
     }
 
-    return value;
+    const auto changed = val != value;
+    val = value;
+    return changed;
 }
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+
+}  // namespace modsecurity::actions::transformations

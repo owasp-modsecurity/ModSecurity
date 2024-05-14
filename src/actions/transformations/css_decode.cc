@@ -13,29 +13,15 @@
  *
  */
 
-#include "src/actions/transformations/css_decode.h"
+#include "css_decode.h"
 
-#include <string.h>
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
-std::string CssDecode::evaluate(const std::string &value,
-    Transaction *transaction) {
+bool CssDecode::transform(std::string &value, const Transaction *trans) const {
 
     char *tmp = reinterpret_cast<char *>(
         malloc(sizeof(char) * value.size() + 1));
@@ -47,7 +33,10 @@ std::string CssDecode::evaluate(const std::string &value,
 
     std::string ret(tmp, 0, value.size());
     free(tmp);
-    return ret;
+
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
@@ -191,6 +180,4 @@ int CssDecode::css_decode_inplace(unsigned char *input, int64_t input_len) {
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations

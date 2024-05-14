@@ -296,10 +296,9 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             executeTransformations(trans, value, values);
 
             for (const auto &valueTemp : values) {
-                bool ret;
-                std::string valueAfterTrans = std::move(*valueTemp.first);
+                const auto &valueAfterTrans = valueTemp.first;
 
-                ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
+                const bool ret = executeOperatorAt(trans, key, valueAfterTrans, ruleMessage);
 
                 if (ret == true) {
                     ruleMessage->m_match = m_operator->resolveMatchMessage(trans,

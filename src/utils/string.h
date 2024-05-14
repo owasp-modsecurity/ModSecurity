@@ -235,18 +235,18 @@ inline unsigned char *c2x(unsigned what, unsigned char *where) {
 }
 
 
-inline std::string string_to_hex(const std::string& input) {
-    static const char* const lut = "0123456789ABCDEF";
-    size_t len = input.length();
+inline std::string string_to_hex(std::string_view input) {
+    static const char* const lut = "0123456789abcdef";
 
-    std::string output;
-    output.reserve(2 * len);
-    for (size_t i = 0; i < len; ++i) {
-        const unsigned char c = input[i];
-        output.push_back(lut[c >> 4]);
-        output.push_back(lut[c & 15]);
+    std::string a(input.size()*2, 0);
+    char *d = a.data();
+
+    for (const unsigned char c : input) {
+        *d++ = lut[c >> 4];
+        *d++ = lut[c & 15];
     }
-    return output;
+
+    return a;
 }
 
 

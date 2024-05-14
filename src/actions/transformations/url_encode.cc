@@ -13,22 +13,11 @@
  *
  */
 
-#include "src/actions/transformations/url_encode.h"
+#include "url_encode.h"
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-#include "modsecurity/transaction.h"
-#include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 
-namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace modsecurity::actions::transformations {
 
 
 UrlEncode::UrlEncode(const std::string &action) 
@@ -87,16 +76,15 @@ std::string UrlEncode::url_enc(const char *input,
 }
 
 
-std::string UrlEncode::evaluate(const std::string &value,
-    Transaction *transaction) {
-    int changed;
+bool UrlEncode::transform(std::string &value, const Transaction *trans) const {
+    int _changed;
 
-    std::string ret = url_enc(value.c_str(), value.size(), &changed);
+    std::string ret = url_enc(value.c_str(), value.size(), &_changed);
 
-    return ret;
+    const auto changed = ret != value;
+    value = ret;
+    return changed;
 }
 
 
-}  // namespace transformations
-}  // namespace actions
-}  // namespace modsecurity
+}  // namespace modsecurity::actions::transformations
