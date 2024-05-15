@@ -486,15 +486,12 @@ int main(int argc, char **argv) {
 #if defined(WITH_GEOIP) or defined(WITH_MAXMIND)
     resources.push_back("geoip-or-maxmind");
 #endif
-
 #if defined(WITH_MAXMIND)
     resources.push_back("maxmind");
 #endif
-
 #if defined(WITH_GEOIP)
     resources.push_back("geoip");
 #endif
-
 #ifdef WITH_CURL
     resources.push_back("curl");
 #endif
@@ -503,6 +500,9 @@ int main(int argc, char **argv) {
 #endif
 #ifdef WITH_LUA
     resources.push_back("lua");
+#endif
+#ifdef WITH_LIBXML2
+    resources.push_back("libxml2");
 #endif
 
 #ifdef NO_LOGS
