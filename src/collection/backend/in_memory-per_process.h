@@ -12,6 +12,7 @@
  * directly using the email address security@modsecurity.org.
  *
  */
+#include <pthread.h>
 
 
 #ifdef __cplusplus

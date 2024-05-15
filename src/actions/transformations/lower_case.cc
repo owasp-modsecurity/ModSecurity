@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <string>
+#include <locale>
 
 #include "modsecurity/transaction.h"
 #include "src/actions/transformations/transformation.h"

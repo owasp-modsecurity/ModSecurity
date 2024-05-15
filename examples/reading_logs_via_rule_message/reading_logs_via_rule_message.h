@@ -13,10 +13,11 @@
  *
  */
 
-#include <unistd.h>
-
 #include <string>
 #include <memory>
+#include <thread>
+#include <chrono>
+#include <pthread.h>
 
 
 #define NUM_THREADS 100
@@ -72,6 +73,11 @@ struct data_ms {
     modsecurity::RulesSet *rules;
 };
 
+#if defined _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4716)   // avoid error C4716: 'process_request': must return a value, as MSVC C++ compiler doesn't support [[noreturn]]
+#pragma warning(disable:4715)   // avoid warning c4715: 'process_request' : not all control paths return a value
+#endif
 
 [[noreturn]] static void *process_request(void *data) {
     struct data_ms *a = (struct data_ms *)data;
@@ -85,7 +91,7 @@ struct data_ms {
         modsecTransaction->processConnection(ip, 12345, "127.0.0.1", 80);
         modsecTransaction->processURI(request_uri, "GET", "1.1");
 
-        usleep(10);
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
         modsecTransaction->addRequestHeader("Host",
             "net.tutsplus.com");
         modsecTransaction->processRequestHeaders();
@@ -105,6 +111,9 @@ struct data_ms {
     pthread_exit(nullptr);
 }
 
+#if defined _MSC_VER
+#pragma warning(pop)
+#endif
 
 class ReadingLogsViaRuleMessage {
  public:
@@ -151,7 +160,7 @@ class ReadingLogsViaRuleMessage {
 		reinterpret_cast<void *>(&dms));
         }
 
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::microseconds(10000));
 
         for (i=0; i < NUM_THREADS; i++) {
             pthread_join(threads[i], &status);

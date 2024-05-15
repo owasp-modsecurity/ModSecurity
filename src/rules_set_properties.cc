@@ -19,6 +19,10 @@
 #include "src/utils/string.h"
 #include "src/variables/variable.h"
 
+#ifdef WIN32
+#include "src/compat/msvc.h"
+#endif
+
 namespace modsecurity {
 
 

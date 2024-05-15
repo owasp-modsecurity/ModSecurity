@@ -21,7 +21,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifndef WIN32
 #include <unistd.h>
+#else
+#include <io.h>
+#include "src/compat/msvc.h"
+#endif
 #include <list>
 #include <iostream>
 #include <string>
@@ -61,12 +66,11 @@ MultipartPartTmpFile::~MultipartPartTmpFile() {
 
 void MultipartPartTmpFile::Open() {
     struct tm timeinfo;
-    char tstr[300];
     time_t tt = time(NULL);
 
     localtime_r(&tt, &timeinfo);
 
-    memset(tstr, '\0', 300);
+    char tstr[300] {};
     strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
 
     std::string path = m_transaction->m_rules->m_uploadDirectory.m_value;
@@ -74,14 +78,23 @@ void MultipartPartTmpFile::Open() {
     path += "-file-XXXXXX";
 
     char* tmp = strdup(path.c_str());
+#ifndef WIN32
     m_tmp_file_fd = mkstemp(tmp);
+#else
+    _mktemp_s(tmp, path.length()+1);
+    m_tmp_file_fd = _open(tmp, _O_CREAT | _O_EXCL | _O_RDWR);
+#endif
     m_tmp_file_name.assign(tmp);
     free(tmp);
     ms_dbg_a(m_transaction, 4, "MultipartPartTmpFile: Create filename= " + m_tmp_file_name);
 
     int mode = m_transaction->m_rules->m_uploadFileMode.m_value;
     if ((m_tmp_file_fd != -1) && (mode != 0)) {
+#ifndef WIN32
         if (fchmod(m_tmp_file_fd, mode) == -1) {
+#else
+        if (_chmod(m_tmp_file_name.c_str(), mode) == -1) {
+#endif
             m_tmp_file_fd = -1;
         }
     }

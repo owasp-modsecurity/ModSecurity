@@ -2,7 +2,10 @@
 #
 #
 
-git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git owasp-v2
+git clone https://github.com/coreruleset/coreruleset.git owasp-v2
+cd owasp-v2
+git checkout 2.2.9 -b tag2.2.9
+cd -
 
 echo 'Include "owasp-v2/base_rules/*.conf"' >> basic_rules.conf
 echo 'Include "owasp-v2/optional_rules/*.conf"' >> basic_rules.conf

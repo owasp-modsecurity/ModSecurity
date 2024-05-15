@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git owasp-v3
+git clone https://github.com/coreruleset/coreruleset.git owasp-v3
 cd owasp-v3
 git checkout v3.0.2 -b tag3.0.2
 cd -
