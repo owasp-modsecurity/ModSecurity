@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo apt-get update -y -qq
           sudo apt-get install -y libfuzzy-dev libyajl-dev libgeoip-dev liblua5.2-dev liblmdb-dev libmaxminddb-dev libcurl4-openssl-dev libpcre2-dev pcre2-utils
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: build.sh
@@ -58,7 +58,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           brew install autoconf automake cppcheck lmdb libyaml lua ssdeep libmaxminddb bison
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: build.sh
