@@ -6,33 +6,66 @@ on:
 
 jobs:
   build-linux:
+    name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        platform: [x32, x64]
-        compiler: [gcc, clang]
+        platform:
+          - {label: "x64", arch: "amd64", configure: ""}
+          - {label: "x32", arch: "i386", configure: "PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"}
+        compiler:
+          - {label: "gcc", cc: "gcc", cxx: "g++"}
+          - {label: "clang", cc: "clang", cxx: "clang++"}
         configure:
           - {label: "with parser generation", opt: "--enable-parser-generation" }
           - {label: "wo curl",    opt: "--without-curl" }
-          - {label: "wo yajl",    opt: "--without-yajl" }
-          - {label: "wo geoip",   opt: "--without-geoip" }
-          - {label: "wo lmdb",    opt: "--without-lmdb" }
-          - {label: "with pcre2",  opt: "--with-pcre2" }
           - {label: "wo lua",     opt: "--without-lua" }
-          - {label: "without maxmind", opt: "--without-maxmind" }
+          - {label: "wo maxmind", opt: "--without-maxmind" }
+          - {label: "wo libxml",  opt: "--without-libxml" }
+          - {label: "wo geoip",   opt: "--without-geoip" }
+          - {label: "wo ssdeep",  opt: "--without-ssdeep" }
+          - {label: "with lmdb",  opt: "--with-lmdb" }
+          - {label: "with pcre2", opt: "--with-pcre2" }
+        exclude:
+          - platform: {label: "x32"}
+            configure: {label: "wo geoip"}
+          - platform: {label: "x32"}
+            configure: {label: "wo ssdeep"}
     steps:
-      - name: Setup Dependencies
+      - name: Setup Dependencies (common)
         run: |
+          sudo dpkg --add-architecture ${{ matrix.platform.arch }}
           sudo apt-get update -y -qq
-          sudo apt-get install -y libfuzzy-dev libyajl-dev libgeoip-dev liblua5.2-dev liblmdb-dev libmaxminddb-dev libcurl4-openssl-dev libpcre2-dev pcre2-utils
+          sudo apt-get install -y libyajl-dev:${{ matrix.platform.arch }} \
+                                  libcurl4-openssl-dev:${{ matrix.platform.arch }} \
+                                  liblmdb-dev:${{ matrix.platform.arch }} \
+                                  liblua5.2-dev:${{ matrix.platform.arch }} \
+                                  libmaxminddb-dev:${{ matrix.platform.arch }} \
+                                  libpcre2-dev:${{ matrix.platform.arch }} \
+                                  pcre2-utils:${{ matrix.platform.arch }} \
+                                  bison flex
+      - name: Setup Dependencies (x32)
+        if: ${{ matrix.platform.label == 'x32' }}
+        run: |
+          sudo apt-get install g++-multilib
+          sudo apt-get install -y libxml2-dev:${{ matrix.platform.arch }} \
+                                  libpcre3-dev:${{ matrix.platform.arch }}
+      - name: Setup Dependencies (x64)
+        if: ${{ matrix.platform.label == 'x64' }}
+        run: |
+          sudo apt-get install -y libgeoip-dev:${{ matrix.platform.arch }} \
+                                  libfuzzy-dev:${{ matrix.platform.arch }}
       - uses: actions/checkout@v4
         with:
           submodules: true
       - name: build.sh
         run: ./build.sh
-      - name: configure ${{ matrix.configure.label }}
-        run: ./configure ${{ matrix.configure.opt }}
+      - name: configure
+        env:
+          CC: ${{ matrix.compiler.cc }}
+          CXX: ${{ matrix.compiler.cxx }}
+        run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }}
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
         run: make -j `nproc`
@@ -40,30 +73,43 @@ jobs:
         run: make check
 
   build-macos:
+    name: macOS (${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-12]
-        compiler: [clang]
         configure:
           - {label: "with parser generation", opt: "--enable-parser-generation" }
           - {label: "wo curl",    opt: "--without-curl" }
-          - {label: "wo yajl",    opt: "--without-yajl" }
-          - {label: "wo geoip",   opt: "--without-geoip" }
-          - {label: "wo lmdb",    opt: "--without-lmdb" }
-          - {label: "wo ssdeep",  opt: "--without-ssdeep" }
           - {label: "wo lua",     opt: "--without-lua" }
           - {label: "wo maxmind", opt: "--without-maxmind" }
+          - {label: "wo libxml",  opt: "--without-libxml" }
+          - {label: "wo geoip",   opt: "--without-geoip" }
+          - {label: "wo ssdeep",  opt: "--without-ssdeep" }
+          - {label: "with lmdb",  opt: "--with-lmdb" }
+          - {label: "with pcre2", opt: "--with-pcre2" }
     steps:
       - name: Setup Dependencies
+        # autoconf, curl, pcre2 not installed because they're already
+        # included in the image
         run: |
-          brew install autoconf automake cppcheck lmdb libyaml lua ssdeep libmaxminddb bison
+          brew install automake \
+                       yajl \
+                       lmdb \
+                       lua \
+                       libmaxminddb \
+                       libxml2 \
+                       geoip \
+                       ssdeep \
+                       pcre \
+                       bison \
+                       flex
       - uses: actions/checkout@v4
         with:
           submodules: true
       - name: build.sh
         run: ./build.sh
-      - name: configure ${{ matrix.configure.label }}
+      - name: configure
         run: ./configure ${{ matrix.configure.opt }}
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
@@ -72,19 +118,21 @@ jobs:
         run: make check
 
   build-windows:
+    name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-2022]
-        platform: [x86_64]
+        platform:
+          - {label: "x64", arch: "x86_64"}
         configuration: [Release]
         configure:
           - {label: "full",       opt: "" }
+          - {label: "wo curl",    opt: "-DWITHOUT_CURL=ON" }
           - {label: "wo lmdb",    opt: "-DWITHOUT_LMDB=ON" }
           - {label: "wo lua",     opt: "-DWITHOUT_LUA=ON" }
-          - {label: "wo libxml2", opt: "-WITHOUT_LIBXML2=ON" }
           - {label: "wo maxmind", opt: "-DWITHOUT_MAXMIND=ON" }
-          - {label: "wo curl",    opt: "-DWITHOUT_CURL=ON" }
+          - {label: "wo libxml",  opt: "-WITHOUT_LIBXML2=ON" }
     steps:
       - uses: actions/checkout@v4
         with:
@@ -94,9 +142,9 @@ jobs:
           pip3 install conan --upgrade
           conan profile detect
       - uses: ammaraskar/msvc-problem-matcher@master
-      - name: Build ${{ matrix.configuration }} ${{ matrix.platform }} ${{ matrix.configure.label }}
+      - name: Build ${{ matrix.configuration }} ${{ matrix.platform.arch }} ${{ matrix.configure.label }}
         shell: cmd
-        run: vcbuild.bat ${{ matrix.configuration }} ${{ matrix.platform }} NO_ASAN "${{ matrix.configure.opt }}"
+        run: vcbuild.bat ${{ matrix.configuration }} ${{ matrix.platform.arch }} NO_ASAN "${{ matrix.configure.opt }}"
       - name: Set up test environment
         working-directory: build\win32\build\${{ matrix.configuration }}
         env:
