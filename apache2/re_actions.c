@@ -51,6 +51,7 @@ static void msre_engine_action_register(msre_engine *engine, const char *name,
 msre_var *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
     msre_rule *rule, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     apr_table_t *vartab = NULL;
     const apr_table_entry_t *te = NULL;
     const apr_array_header_t *arr = NULL;
@@ -108,6 +109,7 @@ msre_var *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t
 apr_table_t *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
     msre_rule *rule, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
     apr_table_t *vartab = NULL, *tvartab = NULL;
@@ -169,6 +171,8 @@ apr_table_t *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header
  * in the given variable.
  */
 int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp) {
+    assert(msr != NULL);
+    assert(var != NULL);
     char *data = NULL;
     apr_array_header_t *arr = NULL;
     char *p = NULL, *q = NULL, *t = NULL;
@@ -316,6 +320,7 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
  * value that is set.
  */
 apr_status_t collection_original_setvar(modsec_rec *msr, const char *col_name, const msc_string *orig_var) {
+    assert(msr != NULL);
     apr_table_t *table = NULL;
     msc_string *var = NULL;
     const char *var_name = NULL;
@@ -628,6 +633,8 @@ static apr_status_t msre_action_redirect_init(msre_engine *engine, apr_pool_t *m
 static apr_status_t msre_action_redirect_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     msc_string *var = NULL;
 
     var = apr_pcalloc(mptmp, sizeof(msc_string));
@@ -660,6 +667,8 @@ static apr_status_t msre_action_proxy_init(msre_engine *engine, apr_pool_t *mp, 
 static apr_status_t msre_action_proxy_execute(modsec_rec *msr, apr_pool_t *mptmp,
         msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     msc_string *var = NULL;
 
     var = apr_pcalloc(mptmp, sizeof(msc_string));
@@ -968,6 +977,8 @@ static apr_status_t msre_action_ctl_init(msre_engine *engine, apr_pool_t *mp, ms
 static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     char *name = NULL;
     char *value = NULL;
 
@@ -1236,13 +1247,21 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr_log(msr, 4, "Ctl: ruleRemoveTargetById id=%s targets=%s", p1, p2);
         }
         if (p2 == NULL) {
-            msr_log(msr, 1, "ModSecurity: Missing target for id \"%s\"", p1);
+            msr_log(msr, 1, "Ctl: ruleRemoveTargetById: Missing target for id \"%s\"", p1);
             return -1;
         }
 
     re = apr_pcalloc(msr->mp, sizeof(rule_exception));
+    if (re == NULL) {
+        msr_log(msr, 1, "Ctl: Memory allocation error");
+        return -1;
+    }
     re->type = RULE_EXCEPTION_REMOVE_ID;
     re->param = (const char *)apr_pstrdup(msr->mp, p1);
+    if (re->param == NULL) {
+        msr_log(msr, 1, "Ctl: Memory allocation error");
+        return -1;
+    }
     apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
     return 1;
     } else
@@ -1336,6 +1355,8 @@ static char *msre_action_xmlns_validate(msre_engine *engine, apr_pool_t *mp, msr
 static apr_status_t msre_action_sanitizeArg_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     const char *sargname = NULL;
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
@@ -1364,6 +1385,8 @@ static apr_status_t msre_action_sanitizeArg_execute(modsec_rec *msr, apr_pool_t 
 static apr_status_t msre_action_sanitizeMatched_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     const char *sargname = NULL;
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
@@ -1439,6 +1462,8 @@ static apr_status_t msre_action_sanitizeMatched_execute(modsec_rec *msr, apr_poo
 static apr_status_t msre_action_sanitizeRequestHeader_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     apr_table_set(msr->request_headers_to_sanitize, action->param, "1");
     return 1;
 }
@@ -1447,6 +1472,8 @@ static apr_status_t msre_action_sanitizeRequestHeader_execute(modsec_rec *msr, a
 static apr_status_t msre_action_sanitizeResponseHeader_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     apr_table_set(msr->response_headers_to_sanitize, action->param, "1");
     return 1;
 }
@@ -1455,6 +1482,8 @@ static apr_status_t msre_action_sanitizeResponseHeader_execute(modsec_rec *msr, 
 static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     char *data = apr_pstrdup(mptmp, action->param);
     char *env_name = NULL, *env_value = NULL;
     char *s = NULL;
@@ -1528,6 +1557,9 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
 apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, char *var_name, char *var_value)
 {
+    assert(msr != NULL);
+    assert(var_name != NULL);
+    assert(var_value != NULL);
     char *col_name = NULL;
     char *s = NULL;
     apr_table_t *target_col = NULL;
@@ -1549,9 +1581,13 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
     var->value_len = strlen(var->value);
     expand_macros(msr, var, rule, mptmp);
     var_name = log_escape_nq_ex(msr->mp, var->value, var->value_len);
+    if (var_name == NULL) {
+        msr_log(msr, 1, "Failed to allocate space to expand name macros");
+        return -1;
+    }
 
     /* Handle the exclamation mark. */
-    if (var_name != NULL && var_name[0] == '!') {
+    if (var_name[0] == '!') {
         var_name = var_name + 1;
         is_negated = 1;
     }
@@ -1711,6 +1747,8 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
 static apr_status_t msre_action_setvar_parse(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     char *data = apr_pstrdup(mptmp, action->param);
     char *var_name = NULL, *var_value = NULL;
     char *s = NULL;
@@ -1736,6 +1774,8 @@ static apr_status_t msre_action_setvar_parse(modsec_rec *msr, apr_pool_t *mptmp,
 static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     char *data = apr_pstrdup(mptmp, action->param);
     char *col_name = NULL, *var_name = NULL, *var_value = NULL;
     char *s = NULL;
@@ -1833,6 +1873,8 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
 static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     char *data = apr_pstrdup(mptmp, action->param);
     char *col_name = NULL, *var_name = NULL, *var_value = NULL;
     char *s = NULL;
@@ -1967,6 +2009,8 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
 static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     const char *col_name, const char *col_key, unsigned int col_key_len)
 {
+    assert(msr != NULL);
+    assert(real_col_name != NULL);
     apr_table_t *table = NULL;
     msc_string *var = NULL;
 
@@ -1980,7 +2024,6 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
 
     /* Init collection from storage. */
     table = collection_retrieve(msr, real_col_name, col_key, col_key_len);
-
     if (table == NULL) {
         /* Does not exist yet - create new. */
 
@@ -2101,6 +2144,8 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
 static apr_status_t msre_action_initcol_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     char *data = apr_pstrdup(msr->mp, action->param);
     char *col_name = NULL, *col_key = NULL;
     unsigned int col_key_len;
@@ -2132,6 +2177,8 @@ static apr_status_t msre_action_initcol_execute(modsec_rec *msr, apr_pool_t *mpt
 static apr_status_t msre_action_setsid_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     msc_string *var = NULL;
     char *real_col_name = NULL, *col_key = NULL;
     unsigned int col_key_len;
@@ -2156,6 +2203,8 @@ static apr_status_t msre_action_setsid_execute(modsec_rec *msr, apr_pool_t *mptm
 static apr_status_t msre_action_setuid_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     msc_string *var = NULL;
     char *real_col_name = NULL, *col_key = NULL;
     unsigned int col_key_len;
@@ -2180,6 +2229,8 @@ static apr_status_t msre_action_setuid_execute(modsec_rec *msr, apr_pool_t *mptm
 static apr_status_t msre_action_setrsc_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     msc_string *var = NULL;
     char *real_col_name = NULL, *col_key = NULL;
     unsigned int col_key_len;
@@ -2228,7 +2279,9 @@ static char *msre_action_exec_validate(msre_engine *engine, apr_pool_t *mp, msre
 static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
-    #if defined(WITH_LUA)
+    assert(msr != NULL);
+    assert(action != NULL);
+#if defined(WITH_LUA)
     if (action->param_data != NULL) { /* Lua */
         msc_script *script = (msc_script *)action->param_data;
         char *my_error_msg = NULL;
@@ -2256,6 +2309,8 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
 static apr_status_t msre_action_prepend_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     msc_string *var = NULL;
 
     /* Expand any macros in the text */
@@ -2276,6 +2331,8 @@ static apr_status_t msre_action_prepend_execute(modsec_rec *msr, apr_pool_t *mpt
 static apr_status_t msre_action_append_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    assert(msr != NULL);
+    assert(action != NULL);
     msc_string *var = NULL;
 
     /* Expand any macros in the text */

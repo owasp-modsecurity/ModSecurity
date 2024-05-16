@@ -21,6 +21,9 @@
 int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
                      apr_table_t *cookies, const char *delim)
 {
+    assert(msr != NULL);
+    assert(cookies != NULL);
+    assert(delim != NULL);
     char *attr_name = NULL, *attr_value = NULL;
     char *cookie_header;
     char *saveptr = NULL;
@@ -95,6 +98,8 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
 int parse_cookies_v1(modsec_rec *msr, char *_cookie_header,
         apr_table_t *cookies)
 {
+    assert(msr != NULL);
+    assert(cookies != NULL);
     char *attr_name = NULL, *attr_value = NULL, *p = NULL;
     char *prev_attr_name = NULL;
     char *cookie_header = NULL;
@@ -239,6 +244,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
         int argument_separator, const char *origin,
         apr_table_t *arguments, int *invalid_count)
 {
+    assert(msr != NULL);
     msc_arg *arg;
     apr_size_t i, j;
     char *value = NULL;
@@ -340,6 +346,9 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
  */
 void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg)
 {
+    assert(msr != NULL);
+    assert(arguments != NULL);
+    assert(arg != NULL);
     if (msr->txcfg->debuglog_level >= 5) {
         msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
                 arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),

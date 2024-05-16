@@ -18,7 +18,7 @@ AC_DEFUN([CHECK_APR],
 
 AC_ARG_WITH(
     apr,
-    [AC_HELP_STRING([--with-apr=PATH],[Path to apr prefix or config script])],
+    [AS_HELP_STRING([--with-apr=PATH],[Path to apr prefix or config script])],
     [test_paths="${with_apr}"],
     [test_paths="/usr/local/libapr /usr/local/apr /usr/local /opt/libapr /opt/apr /opt /usr"])
 

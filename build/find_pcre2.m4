@@ -17,7 +17,7 @@ AC_DEFUN([CHECK_PCRE2],
 
 AC_ARG_WITH(
     pcre2,
-    [AC_HELP_STRING([--with-pcre2=PATH],[Path to pcre2 prefix or config script])],
+    [AS_HELP_STRING([--with-pcre2=PATH],[Path to pcre2 prefix or config script])],
     , with_pcre2=no)
 
 AS_CASE(["${with_pcre2}"],

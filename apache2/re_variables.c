@@ -99,6 +99,10 @@ static char *var_generic_list_validate(msre_ruleset *ruleset, msre_var *var) {
 static int var_args_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -144,6 +148,10 @@ static int var_args_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_args_combined_size_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     unsigned int combined_size = 0;
@@ -171,6 +179,10 @@ static int var_args_combined_size_generate(modsec_rec *msr, msre_var *var, msre_
 static int var_args_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -214,6 +226,10 @@ static int var_args_names_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
 static int var_args_get_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -262,6 +278,10 @@ static int var_args_get_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 static int var_args_get_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -308,6 +328,10 @@ static int var_args_get_names_generate(modsec_rec *msr, msre_var *var, msre_rule
 static int var_args_post_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -356,6 +380,10 @@ static int var_args_post_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
 static int var_args_post_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -402,9 +430,13 @@ static int var_args_post_names_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(rule != NULL);
+    assert(rule->actionset != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_actionset *actionset = NULL;
-
-    if (rule == NULL) return 0;
 
     actionset = rule->actionset;
     if (rule->chain_starter != NULL) actionset = rule->chain_starter->actionset;
@@ -437,13 +469,13 @@ static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         return var_simple_generate(var, vartab, mptmp, value);
     }
 
-
     return 0;
 }
 
 /* ENV */
 
 static char *var_env_validate(msre_ruleset *ruleset, msre_var *var) {
+    assert(ruleset != NULL);
     if (var->param == NULL) {
         return apr_psprintf(ruleset->mp, "Parameter required for ENV.");
     }
@@ -458,6 +490,8 @@ static char *var_env_validate(msre_ruleset *ruleset, msre_var *var) {
 static int var_env_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
     char *value = get_env_var(msr->r, (char *)var->param);
     if (value != NULL) {
         return var_simple_generate(var, vartab, mptmp, value);
@@ -470,6 +504,7 @@ static int var_env_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_request_uri_raw_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->r->unparsed_uri);
 }
 
@@ -478,6 +513,8 @@ static int var_request_uri_raw_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_uniqueid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
     char *value = get_env_var(msr->r, "UNIQUE_ID");
     if (value != NULL) {
         return var_simple_generate(var, vartab, mptmp, value);
@@ -492,10 +529,18 @@ static int var_uniqueid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 static int var_request_uri_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp) /* dynamic */
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
     char *value = NULL;
 
     if (msr->r->parsed_uri.query == NULL) value = msr->r->parsed_uri.path;
-    else value = apr_pstrcat(mptmp,  msr->r->parsed_uri.path, "?", msr->r->parsed_uri.query, NULL);
+    else {
+        value = apr_pstrcat(mptmp, msr->r->parsed_uri.path, "?", msr->r->parsed_uri.query, NULL);
+        if (!value) {
+            msr_log(msr, 1, "REQUEST_URI: Memory allocation error");
+            return -1;
+        }
+    }
 
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -505,7 +550,12 @@ static int var_request_uri_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_reqbody_processor_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "REQBODY_PROCESSOR: Memory allocation error");
+        return -1;
+    }
 
     if (msr->msc_reqbody_processor == NULL) {
         rvar->value = apr_pstrdup(mptmp, "");
@@ -524,9 +574,22 @@ static int var_reqbody_processor_generate(modsec_rec *msr, msre_var *var, msre_r
 static int var_sdbm_delete_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "SDBM_DELETE_ERROR: Memory allocation error");
+        return -1;
+    }
 
     rvar->value = apr_psprintf(mptmp, "%d", msr->msc_sdbm_delete_error);
+    if (!rvar->value) {
+        msr_log(msr, 1, "SDBM_DELETE_ERROR: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -538,7 +601,12 @@ static int var_sdbm_delete_error_generate(modsec_rec *msr, msre_var *var, msre_r
 static int var_reqbody_processor_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "REQBODY_ERROR: Memory allocation error");
+        return -1;
+    }
 
     rvar->value = apr_psprintf(mptmp, "%d", msr->msc_reqbody_error);
     rvar->value_len = strlen(rvar->value);
@@ -552,7 +620,16 @@ static int var_reqbody_processor_error_generate(modsec_rec *msr, msre_var *var, 
 static int var_reqbody_processor_error_msg_generate(modsec_rec *msr, msre_var *var,
     msre_rule *rule, apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(rule != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "REQBODY_ERROR_MSG: Memory allocation error");
+        return -1;
+    }
 
     if (msr->msc_reqbody_error_msg == NULL) {
         rvar->value = apr_pstrdup(mptmp, "");
@@ -581,6 +658,13 @@ static char *var_xml_validate(msre_ruleset *ruleset, msre_var *var) {
 static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(var->name != NULL);
+    assert(rule != NULL);
+    assert(rule->actionset != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
     xmlXPathContextPtr xpathCtx;
@@ -667,9 +751,19 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
         content = (char *)xmlNodeGetContent(nodes->nodeTab[i]);
         if (content != NULL) {
-            rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
-            rvar->value = apr_pstrdup(mptmp, content);
             xmlFree(content);
+            rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "XML: Memory allocation error");
+                count = -1;
+                goto var_xml_generate_Error;
+            }
+            rvar->value = apr_pstrdup(mptmp, content);
+            if (!rvar->value) {
+                msr_log(msr, 1, "XML: Memory allocation error");
+                count = -1;
+                goto var_xml_generate_Error;
+            }
             rvar->value_len = strlen(rvar->value);
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -677,6 +771,7 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
          }
     }
 
+var_xml_generate_Error:
     xmlXPathFreeObject(xpathObj);
     xmlXPathFreeContext(xpathCtx);
 
@@ -688,6 +783,11 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_webserver_error_log_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(var->name != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     int i, count = 0;
 
@@ -698,7 +798,15 @@ static int var_webserver_error_log_generate(modsec_rec *msr, msre_var *var, msre
         fem = format_error_log_message(mptmp, em);
         if (fem != NULL) {
             rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "WEBSERVER_ERROR_LOG: Memory allocation error");
+                return -1;
+            }
             rvar->value = apr_pstrdup(mptmp, fem);
+            if (!rvar->value) {
+                msr_log(msr, 1, "WEBSERVER_ERROR_LOG: Memory allocation error");
+                return -1;
+            }
             rvar->value_len = strlen(rvar->value);
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -713,6 +821,7 @@ static int var_webserver_error_log_generate(modsec_rec *msr, msre_var *var, msre
 static int var_useragent_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->useragent_ip ? msr->useragent_ip : "0.0.0.0");
 }
 #endif
@@ -722,6 +831,7 @@ static int var_useragent_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_remote_addr_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
 #if !defined(MSC_TEST)
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
     if (ap_find_linked_module("mod_remoteip.c") != NULL) {
@@ -739,6 +849,7 @@ static int var_remote_addr_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_remote_host_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     const char *value1 = ap_get_remote_host(msr->r->connection, msr->r->per_dir_config,
         REMOTE_NAME, NULL);
     return var_simple_generate(var, vartab, mptmp, value1);
@@ -749,6 +860,7 @@ static int var_remote_host_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_remote_port_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     char *value = apr_psprintf(mptmp, "%u", msr->remote_port);
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -758,6 +870,7 @@ static int var_remote_port_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_remote_user_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->remote_user);
 }
 
@@ -766,6 +879,10 @@ static int var_remote_user_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_tx_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -792,10 +909,18 @@ static int var_tx_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "TX: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
             rvar->name = apr_psprintf(mptmp, "TX:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
+            if (!rvar->name) {
+                msr_log(msr, 1, "TX: Memory allocation error");
+                return -1;
+            }
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -810,6 +935,10 @@ static int var_tx_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_geo_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -863,6 +992,10 @@ static int var_highest_severity_generate(modsec_rec *msr, msre_var *var, msre_ru
 static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -911,6 +1044,8 @@ static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_matched_var_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->matched_var != NULL);
     return var_simple_generate_ex(var, vartab, mptmp,
                                   apr_pmemdup(mptmp,
                                       msr->matched_var->value,
@@ -923,6 +1058,8 @@ static int var_matched_var_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_matched_var_name_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->matched_var != NULL);
     return var_simple_generate_ex(var, vartab, mptmp,
                                   apr_pmemdup(mptmp,
                                       msr->matched_var->name,
@@ -935,6 +1072,10 @@ static int var_matched_var_name_generate(modsec_rec *msr, msre_var *var, msre_ru
 static int var_session_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -965,6 +1106,10 @@ static int var_session_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "SESSION: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
@@ -983,6 +1128,10 @@ static int var_session_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_user_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -1013,10 +1162,18 @@ static int var_user_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "USER: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
             rvar->name = apr_psprintf(mptmp, "USER:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
+            if (!rvar->name) {
+                msr_log(msr, 1, "USER: Memory allocation error");
+                return -1;
+            }
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -1031,6 +1188,10 @@ static int var_user_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_global_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -1079,6 +1240,10 @@ static int var_global_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_resource_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -1109,6 +1274,10 @@ static int var_resource_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "RESOURCE: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
@@ -1127,6 +1296,10 @@ static int var_resource_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
     msre_rule *rule, apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     multipart_part **parts = NULL;
     int i, count = 0;
 
@@ -1224,6 +1397,10 @@ files_tmp_content_not_enough_mem:
 static int var_files_tmpnames_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     multipart_part **parts = NULL;
     int i, count = 0;
 
@@ -1269,6 +1446,10 @@ static int var_files_tmpnames_generate(modsec_rec *msr, msre_var *var, msre_rule
 static int var_files_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     multipart_part **parts = NULL;
     int i, count = 0;
 
@@ -1314,6 +1495,10 @@ static int var_files_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_files_sizes_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     multipart_part **parts = NULL;
     int i, count = 0;
 
@@ -1359,6 +1544,10 @@ static int var_files_sizes_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_files_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     multipart_part **parts = NULL;
     int i, count = 0;
 
@@ -1368,6 +1557,10 @@ static int var_files_names_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
         if (parts[i]->type == MULTIPART_FILE) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "FILES_NAMES: Memory allocation error");
+                return count;
+            }
 
             rvar->value = parts[i]->name;
             rvar->value_len = strlen(rvar->value);
@@ -1387,6 +1580,9 @@ static int var_files_names_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_files_combined_size_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     multipart_part **parts = NULL;
     msre_var *rvar = NULL;
     unsigned int combined_size = 0;
@@ -1402,6 +1598,10 @@ static int var_files_combined_size_generate(modsec_rec *msr, msre_var *var, msre
     }
 
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "FILES_NAMES: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%u", combined_size);
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
@@ -1414,6 +1614,10 @@ static int var_files_combined_size_generate(modsec_rec *msr, msre_var *var, msre
 static int var_multipart_part_headers_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     multipart_part **parts = NULL;
     int i, j, count = 0;
 
@@ -1470,6 +1674,7 @@ static int var_modsec_build_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_multipart_filename_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->multipart_filename);
 }
 
@@ -1478,6 +1683,7 @@ static int var_multipart_filename_generate(modsec_rec *msr, msre_var *var, msre_
 static int var_multipart_name_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->multipart_name);
 }
 
@@ -1486,6 +1692,7 @@ static int var_multipart_name_generate(modsec_rec *msr, msre_var *var, msre_rule
 static int var_multipart_boundary_quoted_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_boundary_quoted != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1498,6 +1705,7 @@ static int var_multipart_boundary_quoted_generate(modsec_rec *msr, msre_var *var
 static int var_multipart_boundary_whitespace_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_boundary_whitespace != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1510,6 +1718,7 @@ static int var_multipart_boundary_whitespace_generate(modsec_rec *msr, msre_var 
 static int var_multipart_data_after_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_data_after != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1522,6 +1731,7 @@ static int var_multipart_data_after_generate(modsec_rec *msr, msre_var *var, msr
 static int var_multipart_data_before_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_data_before != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1534,6 +1744,7 @@ static int var_multipart_data_before_generate(modsec_rec *msr, msre_var *var, ms
 static int var_multipart_header_folding_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_header_folding != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1546,6 +1757,7 @@ static int var_multipart_header_folding_generate(modsec_rec *msr, msre_var *var,
 static int var_multipart_crlf_line_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_crlf_line != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1558,6 +1770,7 @@ static int var_multipart_crlf_line_generate(modsec_rec *msr, msre_var *var, msre
 static int var_multipart_crlf_lf_lines_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_lf_line != 0)&&(msr->mpd->flag_crlf_line != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1570,6 +1783,7 @@ static int var_multipart_crlf_lf_lines_generate(modsec_rec *msr, msre_var *var, 
 static int var_multipart_lf_line_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_lf_line != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1582,6 +1796,7 @@ static int var_multipart_lf_line_generate(modsec_rec *msr, msre_var *var, msre_r
 static int var_multipart_missing_semicolon_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_missing_semicolon != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1594,6 +1809,7 @@ static int var_multipart_missing_semicolon_generate(modsec_rec *msr, msre_var *v
 static int var_multipart_invalid_part_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_invalid_part != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1606,6 +1822,7 @@ static int var_multipart_invalid_part_generate(modsec_rec *msr, msre_var *var, m
 static int var_multipart_invalid_quoting_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_invalid_quoting != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1618,6 +1835,7 @@ static int var_multipart_invalid_quoting_generate(modsec_rec *msr, msre_var *var
 static int var_multipart_invalid_header_folding_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_invalid_header_folding != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1630,6 +1848,7 @@ static int var_multipart_invalid_header_folding_generate(modsec_rec *msr, msre_v
 static int var_multipart_file_limit_exceeded_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_file_limit_exceeded != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1642,6 +1861,7 @@ static int var_multipart_file_limit_exceeded_generate(modsec_rec *msr, msre_var 
 static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if (msr->mpd != NULL) {
         /* Respond positive if at least one of the multipart flags is raised. */
         if (  (msr->mpd->flag_error)
@@ -1669,6 +1889,7 @@ static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, m
 static int var_multipart_unmatched_boundary_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_unmatched_boundary != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1681,6 +1902,7 @@ static int var_multipart_unmatched_boundary_generate(modsec_rec *msr, msre_var *
 static int var_urlencoded_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if (msr->urlencoded_error) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1693,6 +1915,7 @@ static int var_urlencoded_error_generate(modsec_rec *msr, msre_var *var, msre_ru
 static int var_inbound_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if (msr->inbound_error) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1705,6 +1928,7 @@ static int var_inbound_error_generate(modsec_rec *msr, msre_var *var, msre_rule 
 static int var_outbound_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if (msr->outbound_error) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
@@ -1719,6 +1943,8 @@ static apr_time_t calculate_perf_combined(modsec_rec *msr) {
 }
 
 char *format_all_performance_variables(modsec_rec *msr, apr_pool_t *mp) {
+    assert(msr != NULL);
+    assert(mp != NULL);
     return apr_psprintf(mp, "combined=%" APR_TIME_T_FMT ", p1=%" APR_TIME_T_FMT
         ", p2=%" APR_TIME_T_FMT ", p3=%" APR_TIME_T_FMT ", p4=%" APR_TIME_T_FMT
         ", p5=%" APR_TIME_T_FMT ", sr=%" APR_TIME_T_FMT ", sw=%" APR_TIME_T_FMT
@@ -1731,6 +1957,10 @@ char *format_all_performance_variables(modsec_rec *msr, apr_pool_t *mp) {
 static int generate_performance_variable(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp, apr_time_t value)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert( vartab!= NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
 
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
@@ -1747,6 +1977,10 @@ static int generate_performance_variable(modsec_rec *msr, msre_var *var, msre_ru
 static int var_perf_all_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
 
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
@@ -1771,6 +2005,7 @@ static int var_perf_combined_generate(modsec_rec *msr, msre_var *var, msre_rule 
 static int var_perf_gc_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_gc);
 }
 
@@ -1779,6 +2014,7 @@ static int var_perf_gc_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_perf_phase1_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase1);
 }
 
@@ -1787,6 +2023,7 @@ static int var_perf_phase1_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_perf_phase2_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase2);
 }
 
@@ -1795,6 +2032,7 @@ static int var_perf_phase2_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_perf_phase3_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase3);
 }
 
@@ -1803,6 +2041,7 @@ static int var_perf_phase3_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_perf_phase4_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase4);
 }
 
@@ -1811,6 +2050,7 @@ static int var_perf_phase4_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_perf_phase5_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase5);
 }
 
@@ -1819,6 +2059,7 @@ static int var_perf_phase5_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_perf_sread_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_storage_read);
 }
 
@@ -1827,6 +2068,7 @@ static int var_perf_sread_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
 static int var_perf_swrite_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_storage_write);
 }
 
@@ -1835,6 +2077,7 @@ static int var_perf_swrite_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_perf_logging_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_logging);
 }
 
@@ -1844,6 +2087,10 @@ static int var_perf_logging_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_perf_rules_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -1887,9 +2134,16 @@ static int var_perf_rules_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
 static int var_duration_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    msre_var *rvar = NULL;
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
+    msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "DURATION: Memory allocation error");
+        return -1;
+    }
 
-    rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
     rvar->value = apr_psprintf(mptmp, "%" APR_TIME_T_FMT,
         (apr_time_now() - msr->r->request_time));
     rvar->value_len = strlen(rvar->value);
@@ -1903,6 +2157,10 @@ static int var_duration_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 static int var_time_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     struct tm *tm;
     time_t tc;
@@ -1910,10 +2168,18 @@ static int var_time_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "TIME: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%02d%02d%02d%02d%02d%02d%02d",
         (tm->tm_year / 100) + 19, (tm->tm_year % 100),
          tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min,
          tm->tm_sec);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -1925,6 +2191,10 @@ static int var_time_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_time_year_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     struct tm *tm;
     time_t tc;
@@ -1932,9 +2202,17 @@ static int var_time_year_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "TIME_YEAR: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%02d%02d",
         (tm->tm_year / 100) + 19,
          tm->tm_year % 100);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME_YEAR: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -1946,6 +2224,10 @@ static int var_time_year_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
 static int var_time_wday_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     struct tm *tm;
     time_t tc;
@@ -1953,7 +2235,15 @@ static int var_time_wday_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "TIME_WDAY: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%d", tm->tm_wday);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME_WDAY: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -1965,6 +2255,10 @@ static int var_time_wday_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
 static int var_time_sec_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     struct tm *tm;
     time_t tc;
@@ -1972,7 +2266,15 @@ static int var_time_sec_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "TIME_SEC: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%02d", tm->tm_sec);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME_SEC: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -1984,6 +2286,10 @@ static int var_time_sec_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 static int var_time_min_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     struct tm *tm;
     time_t tc;
@@ -1991,7 +2297,15 @@ static int var_time_min_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "TIME_MIN: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%02d", tm->tm_min);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME_MIN: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -2002,6 +2316,10 @@ static int var_time_min_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 static int var_time_hour_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     struct tm *tm;
     time_t tc;
@@ -2009,7 +2327,15 @@ static int var_time_hour_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "TIME_HOUR: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%02d", tm->tm_hour);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME_HOUR: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -2021,6 +2347,10 @@ static int var_time_hour_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
 static int var_time_mon_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     struct tm *tm;
     time_t tc;
@@ -2028,7 +2358,21 @@ static int var_time_mon_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+        assert(msr != NULL);
+    assert(msr->r != NULL);
+    assert(var != NULL);
+    assert(rule != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
+    if (!rvar) {
+        msr_log(msr, 1, "TIME_MON: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%02d", tm->tm_mon + 1);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME_MON: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -2040,6 +2384,11 @@ static int var_time_mon_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 static int var_time_day_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     struct tm *tm;
     time_t tc;
@@ -2047,7 +2396,15 @@ static int var_time_day_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "TIME_DAY: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%02d", tm->tm_mday);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME_DAY: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -2059,12 +2416,24 @@ static int var_time_day_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 static int var_time_epoch_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
     time_t tc;
 
     tc = time(NULL);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    if (!rvar) {
+        msr_log(msr, 1, "TIME_EPOCH: Memory allocation error");
+        return -1;
+    }
     rvar->value = apr_psprintf(mptmp, "%ld", (long)tc);
+    if (!rvar->value) {
+        msr_log(msr, 1, "TIME_EPOCH: Memory allocation error");
+        return -1;
+    }
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -2076,6 +2445,7 @@ static int var_time_epoch_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
 static int var_query_string_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->query_string);
 }
 
@@ -2084,6 +2454,8 @@ static int var_query_string_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_request_basename_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
     char *value = file_basename(mptmp, msr->r->parsed_uri.path);
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2155,6 +2527,10 @@ failed_measure_buffer:
 static int var_full_request_length_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     char *value = NULL;
     int headers_length = 0;
@@ -2173,6 +2549,7 @@ static int var_full_request_length_generate(modsec_rec *msr, msre_var *var, msre
 static int var_request_body_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if (msr->msc_reqbody_buffer != NULL) {
         return var_simple_generate_ex(var, vartab, mptmp,
             msr->msc_reqbody_buffer, msr->msc_reqbody_length);
@@ -2185,6 +2562,7 @@ static int var_request_body_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_request_body_length_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     char *value = apr_psprintf(mptmp, "%d", msr->msc_reqbody_length);
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2194,6 +2572,10 @@ static int var_request_body_length_generate(modsec_rec *msr, msre_var *var, msre
 static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -2259,6 +2641,10 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
 static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -2324,6 +2710,10 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -2348,11 +2738,19 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "REQUEST_COOKIES: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = te[i].val;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "REQUEST_COOKIES:%s",
                 log_escape_nq(mptmp, te[i].key));
+            if (!rvar->name) {
+                msr_log(msr, 1, "REQUEST_COOKIES: Memory allocation error");
+                return -1;
+            }
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -2367,6 +2765,10 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_request_cookies_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -2391,11 +2793,19 @@ static int var_request_cookies_names_generate(modsec_rec *msr, msre_var *var, ms
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "REQUEST_COOKIES_NAMES: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = te[i].key;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "REQUEST_COOKIES_NAMES:%s",
                 log_escape_nq(mptmp, te[i].key));
+            if (!rvar->name) {
+                msr_log(msr, 1, "REQUEST_COOKIES_NAMES: Memory allocation error");
+                return -1;
+            }
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -2410,6 +2820,10 @@ static int var_request_cookies_names_generate(modsec_rec *msr, msre_var *var, ms
 static int var_request_headers_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -2434,11 +2848,19 @@ static int var_request_headers_generate(modsec_rec *msr, msre_var *var, msre_rul
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "REQUEST_HEADERS: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = te[i].val;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "REQUEST_HEADERS:%s",
                 log_escape_nq(mptmp, te[i].key));
+            if (!rvar->name) {
+                msr_log(msr, 1, "REQUEST_HEADERS: Memory allocation error");
+                return -1;
+            }
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -2453,6 +2875,10 @@ static int var_request_headers_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -2477,11 +2903,19 @@ static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, ms
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "REQUEST_HEADERS_NAMES: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = te[i].key;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "REQUEST_HEADERS_NAMES:%s",
                 log_escape_nq(mptmp, te[i].key));
+            if (!rvar->name) {
+                msr_log(msr, 1, "REQUEST_HEADERS_NAMES: Memory allocation error");
+                return -1;
+            }
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -2496,6 +2930,7 @@ static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, ms
 static int var_request_filename_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->r->parsed_uri.path);
 }
 
@@ -2504,6 +2939,7 @@ static int var_request_filename_generate(modsec_rec *msr, msre_var *var, msre_ru
 static int var_request_line_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->request_line);
 }
 
@@ -2512,6 +2948,7 @@ static int var_request_line_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_request_method_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->request_method);
 }
 
@@ -2520,6 +2957,7 @@ static int var_request_method_generate(modsec_rec *msr, msre_var *var, msre_rule
 static int var_request_protocol_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->request_protocol);
 }
 
@@ -2528,6 +2966,7 @@ static int var_request_protocol_generate(modsec_rec *msr, msre_var *var, msre_ru
 static int var_server_addr_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->local_addr);
 }
 
@@ -2536,6 +2975,7 @@ static int var_server_addr_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_server_name_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->hostname);
 }
 
@@ -2544,7 +2984,12 @@ static int var_server_name_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_server_port_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     char *value = apr_psprintf(mptmp, "%u", msr->local_port);
+    if (!value) {
+        msr_log(msr, 1, "SERVER_PORT: Memory allocation error");
+        return -1;
+    }
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -2553,6 +2998,8 @@ static int var_server_port_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_script_basename_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
     char *value = file_basename(mptmp, msr->r->filename);
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2562,6 +3009,8 @@ static int var_script_basename_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_script_filename_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
     char *value = msr->r->filename;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2571,7 +3020,13 @@ static int var_script_filename_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_script_gid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
     char *value = apr_psprintf(mptmp, "%ld", (long)msr->r->finfo.group);
+    if (!value) {
+        msr_log(msr, 1, "SCRIPT_GID: Memory allocation error");
+        return -1;
+    }
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -2580,6 +3035,9 @@ static int var_script_gid_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
 static int var_script_groupname_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
+    assert(mptmp != NULL);
     char *value = NULL;
     if (apr_gid_name_get(&value, msr->r->finfo.group, mptmp) == APR_SUCCESS) {
         return var_simple_generate(var, vartab, mptmp, value);
@@ -2592,6 +3050,9 @@ static int var_script_groupname_generate(modsec_rec *msr, msre_var *var, msre_ru
 static int var_script_mode_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
+    assert(mptmp != NULL);
     char *value = apr_psprintf(mptmp, "%04x", msr->r->finfo.protection);
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2601,6 +3062,9 @@ static int var_script_mode_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_script_uid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
+    assert(mptmp != NULL);
     char *value = apr_psprintf(mptmp, "%ld", (long)msr->r->finfo.user);
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2610,6 +3074,9 @@ static int var_script_uid_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
 static int var_script_username_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
+    assert(mptmp != NULL);
     char *value = NULL;
     if (apr_uid_name_get(&value, msr->r->finfo.user, mptmp) == APR_SUCCESS) {
         return var_simple_generate(var, vartab, mptmp, value);
@@ -2622,6 +3089,7 @@ static int var_script_username_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_auth_type_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     char *value = msr->r->ap_auth_type;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2631,6 +3099,7 @@ static int var_auth_type_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
 static int var_path_info_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     const char *value = msr->r->path_info;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2640,6 +3109,7 @@ static int var_path_info_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
 static int var_stream_output_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if (msr->stream_output_data != NULL) {
         return var_simple_generate_ex(var, vartab, mptmp,
             msr->stream_output_data, msr->stream_output_length);
@@ -2653,6 +3123,7 @@ static int var_stream_output_generate(modsec_rec *msr, msre_var *var, msre_rule 
 static int var_stream_input_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if (msr->stream_input_data != NULL) {
         return var_simple_generate_ex(var, vartab, mptmp,
             msr->stream_input_data, msr->stream_input_length);
@@ -2666,6 +3137,7 @@ static int var_stream_input_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_response_body_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     if (msr->resbody_data != NULL) {
         return var_simple_generate_ex(var, vartab, mptmp,
             msr->resbody_data, msr->resbody_length);
@@ -2679,6 +3151,10 @@ static int var_response_body_generate(modsec_rec *msr, msre_var *var, msre_rule 
 static int var_response_headers_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -2705,11 +3181,19 @@ static int var_response_headers_generate(modsec_rec *msr, msre_var *var, msre_ru
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "RESPONSE_HEADERS: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = te[i].val;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "RESPONSE_HEADERS:%s",
                 log_escape_nq(mptmp, te[i].key));
+            if (!rvar->name) {
+                msr_log(msr, 1, "RESPONSE_HEADERS: Memory allocation error");
+                return -1;
+            }
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -2724,6 +3208,10 @@ static int var_response_headers_generate(modsec_rec *msr, msre_var *var, msre_ru
 static int var_response_headers_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     int i, count = 0;
@@ -2748,11 +3236,19 @@ static int var_response_headers_names_generate(modsec_rec *msr, msre_var *var, m
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            if (!rvar) {
+                msr_log(msr, 1, "RESPONSE_HEADERS_NAMES: Memory allocation error");
+                return -1;
+            }
 
             rvar->value = te[i].key;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "RESPONSE_HEADERS_NAMES:%s",
                 log_escape_nq(mptmp, te[i].key));
+            if (!rvar) {
+                msr_log(msr, 1, "RESPONSE_HEADERS_NAMES: Memory allocation error");
+                return -1;
+            }
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -2767,6 +3263,7 @@ static int var_response_headers_names_generate(modsec_rec *msr, msre_var *var, m
 static int var_status_line_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     const char *value = msr->status_line;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2776,6 +3273,7 @@ static int var_status_line_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_response_protocol_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     const char *value = msr->response_protocol;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2785,6 +3283,7 @@ static int var_response_protocol_generate(modsec_rec *msr, msre_var *var, msre_r
 static int var_response_status_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     const char *value = apr_psprintf(mptmp, "%u", msr->response_status);
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2794,6 +3293,8 @@ static int var_response_status_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_response_content_type(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->r->content_type);
 }
 
@@ -2802,6 +3303,8 @@ static int var_response_content_type(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_response_content_length(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->r != NULL);
     const char *value = apr_psprintf(mptmp, "%" APR_OFF_T_FMT, msr->r->clength);
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2811,6 +3314,7 @@ static int var_response_content_length(modsec_rec *msr, msre_var *var, msre_rule
 static int var_userid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     const char *value = msr->userid;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2820,6 +3324,7 @@ static int var_userid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_sessionid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     const char *value = msr->sessionid;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -2829,6 +3334,8 @@ static int var_sessionid_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
 static int var_webappid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(msr->txcfg != NULL);
     const char *value = msr->txcfg->webappid;
     return var_simple_generate(var, vartab, mptmp, value);
 }

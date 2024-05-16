@@ -154,6 +154,8 @@ static int l_log(lua_State *L) {
  *
  */
 static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, apr_pool_t *mp) {
+    assert(msr != NULL);
+    assert(mp != NULL);
     apr_array_header_t *tfn_arr = NULL;
     msre_tfn_metadata *tfn = NULL;
     char *name = NULL;
@@ -406,11 +408,13 @@ static const struct luaL_Reg mylib[] = {
  *
  */
 int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rule, char **error_msg) {
+    assert(script != NULL);
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     apr_time_t time_before;
     lua_State *L = NULL;
     int rc = 0;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     if (msr->txcfg->debuglog_level >= 8) {

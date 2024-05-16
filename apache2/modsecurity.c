@@ -41,6 +41,8 @@ int DSOLOCAL *unicode_map_table = NULL;
 const char * msc_alert_message(modsec_rec *msr, msre_actionset *actionset, const char *action_message,
     const char *rule_message)
 {
+    assert(msr != NULL);
+    assert(actionset != NULL);
     const char *message = NULL;
 
     if (rule_message == NULL) rule_message = "Unknown error.";
@@ -63,6 +65,8 @@ const char * msc_alert_message(modsec_rec *msr, msre_actionset *actionset, const
 void msc_alert(modsec_rec *msr, int level, msre_actionset *actionset, const char *action_message,
     const char *rule_message)
 {
+    assert(msr != NULL);
+    assert(actionset != NULL);
     const char *message = msc_alert_message(msr, actionset, action_message, rule_message);
 
     msr_log(msr, level, "%s", message);
@@ -125,6 +129,11 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
  */
 int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     apr_status_t rc;
+
+    msce->auditlog_lock = msce->geo_lock = NULL;
+#ifdef GLOBAL_COLLECTION_LOCK
+    msce->geo_lock = NULL;
+#endif
 
     /**
      * Notice that curl is initialized here but never cleaned up. First version
@@ -547,6 +556,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
  *
  */
 static int is_response_status_relevant(modsec_rec *msr, int status) {
+    assert(msr != NULL);
     char *my_error_msg = NULL;
     apr_status_t rc;
     char buf[32];
@@ -780,6 +790,7 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
  * in the modsec_rec structure.
  */
 apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
+    assert(msr != NULL);
     /* Check if we should run. */
     if ((msr->was_intercepted)&&(phase != PHASE_LOGGING)) {
         if (msr->txcfg->debuglog_level >= 4) {

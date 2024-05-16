@@ -20,6 +20,7 @@ const char *base_offset=NULL;
 
 int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
 {
+    assert(msr != NULL);
     msc_arg *arg = (msc_arg *) NULL;
 
     /**
@@ -86,6 +87,7 @@ int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
 static int yajl_map_key(void *ctx, const unsigned char *key, size_t length)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
     unsigned char *safe_key = (unsigned char *) NULL;
 
     /**
@@ -117,6 +119,7 @@ static int yajl_map_key(void *ctx, const unsigned char *key, size_t length)
 static int yajl_null(void *ctx)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
 
     return json_add_argument(msr, "", 0);
 }
@@ -127,6 +130,7 @@ static int yajl_null(void *ctx)
 static int yajl_boolean(void *ctx, int value)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
 
     if (value) {
         return json_add_argument(msr, "true", strlen("true"));
@@ -142,6 +146,7 @@ static int yajl_boolean(void *ctx, int value)
 static int yajl_string(void *ctx, const unsigned char *value, size_t length)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
 
     return json_add_argument(msr, value, length);
 }
@@ -154,12 +159,14 @@ static int yajl_string(void *ctx, const unsigned char *value, size_t length)
 static int yajl_number(void *ctx, const char *value, size_t length)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
 
     return json_add_argument(msr, value, length);
 }
 
 static int yajl_start_array(void *ctx) {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
 
     if (!msr->json->current_key && !msr->json->prefix) {
         msr->json->prefix = apr_pstrdup(msr->mp, "array");
@@ -189,6 +196,7 @@ static int yajl_start_array(void *ctx) {
 
 static int yajl_end_array(void *ctx) {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
     unsigned char *separator = (unsigned char *) NULL;
 
     /**
@@ -225,6 +233,7 @@ static int yajl_end_array(void *ctx) {
 static int yajl_start_map(void *ctx)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
 
     /**
      * If we do not have a current_key, this is a top-level hash, so we do not
@@ -263,6 +272,7 @@ static int yajl_start_map(void *ctx)
 static int yajl_end_map(void *ctx)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
+    assert(msr != NULL);
     unsigned char *separator = (unsigned char *) NULL;
 
     /**
@@ -298,6 +308,8 @@ static int yajl_end_map(void *ctx)
  * Initialise JSON parser.
  */
 int json_init(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     /**
      * yajl configuration and callbacks
      */
@@ -315,7 +327,6 @@ int json_init(modsec_rec *msr, char **error_msg) {
         yajl_end_array
     };
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     msr_log(msr, 4, "JSON parser initialization");
@@ -352,7 +363,8 @@ int json_init(modsec_rec *msr, char **error_msg) {
  * Feed one chunk of data to the JSON parser.
  */
 int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char **error_msg) {
-    if (error_msg == NULL) return -1;
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     *error_msg = NULL;
     base_offset=buf;
 
@@ -376,9 +388,10 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
  * Finalise JSON parsing.
  */
 int json_complete(modsec_rec *msr, char **error_msg) {
+    assert(msr != NULL);
+    assert(error_msg != NULL);
     char *json_data = (char *) NULL;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     /* Wrap up the parsing process */
