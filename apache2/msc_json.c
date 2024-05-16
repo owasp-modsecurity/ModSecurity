@@ -377,9 +377,9 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
 	} else {
         if (msr->json->yajl_error) *error_msg = msr->json->yajl_error;
         else {
-            char* yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
-            *error_msg = apr_pstrdup(msr->mp, yajl_err);
-            yajl_free_error(msr->json->handle, yajl_err);
+             char* yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
+             *error_msg = apr_pstrdup(msr->mp, yajl_err);
+             yajl_free_error(msr->json->handle, yajl_err);
         }
 	}
         return -1;
