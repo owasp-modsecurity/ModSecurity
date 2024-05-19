@@ -71,8 +71,7 @@ Details on distribution specific builds can be found in our Wiki:
 
 ### Windows
 
-Windows build is not ready yet.
-
+Windows build information can be found [here](build/win32/README.md).
 
 ## Dependencies
 
