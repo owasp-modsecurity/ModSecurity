@@ -15,10 +15,8 @@
 
 #include "modsecurity/transaction.h"
 
-#ifdef WITH_YAJL
 #include <yajl/yajl_tree.h>
 #include <yajl/yajl_gen.h>
-#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -38,9 +36,7 @@
 #include "modsecurity/modsecurity.h"
 #include "src/request_body_processor/multipart.h"
 #include "src/request_body_processor/xml.h"
-#ifdef WITH_YAJL
 #include "src/request_body_processor/json.h"
-#endif
 #include "modsecurity/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils/string.h"
@@ -145,11 +141,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
 #else
     m_xml(NULL),
 #endif
-#ifdef WITH_YAJL
     m_json(new RequestBodyProcessor::JSON(this)),
-#else
-    m_json(NULL),
-#endif
     m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
     m_variableDuration(""),
     m_variableEnvs(),
@@ -221,11 +213,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
 #else
     m_xml(NULL),
 #endif
-#ifdef WITH_YAJL
     m_json(new RequestBodyProcessor::JSON(this)),
-#else
-    m_json(NULL),
-#endif
     m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
     m_variableDuration(""),
     m_variableEnvs(),
@@ -264,9 +252,7 @@ Transaction::~Transaction() {
     intervention::free(&m_it);
     intervention::clean(&m_it);
 
-#ifdef WITH_YAJL
     delete m_json;
-#endif
 #ifdef WITH_LIBXML2
     delete m_xml;
 #endif
@@ -847,7 +833,6 @@ int Transaction::processRequestBody() {
             }
         }
 #endif
-#if WITH_YAJL
 #ifdef WITH_LIBXML2
     } else if (m_requestBodyProcessor == JSONRequestBody) {
 #else
@@ -877,12 +862,7 @@ int Transaction::processRequestBody() {
                 m_variableReqbodyProcessorError.set("0", m_variableOffset);
             }
         }
-#endif
-#if defined(WITH_LIBXML2) or defined(WITH_YAJL)
     } else if (m_requestBodyType == MultiPartRequestBody) {
-#else
-    if (m_requestBodyType == MultiPartRequestBody) {
-#endif
         std::string error;
         int reqbodyNoFilesLength = 0;
         if (a != NULL) {
@@ -1666,7 +1646,6 @@ std::string Transaction::toOldAuditLogFormat(int parts,
 
 
 std::string Transaction::toJSON(int parts) {
-#ifdef WITH_YAJL
     const unsigned char *buf;
     size_t len;
     yajl_gen g;
@@ -1852,10 +1831,6 @@ std::string Transaction::toJSON(int parts) {
     yajl_gen_free(g);
 
     return log;
-#else
-    return std::string("{\"error\":\"ModSecurity was " \
-        "not compiled with JSON support.\"}");
-#endif
 }
 
 

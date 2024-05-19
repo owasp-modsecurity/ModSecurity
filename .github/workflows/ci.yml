@@ -178,7 +178,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y cppcheck
+          sudo apt-get install -y cppcheck libyajl-dev
       - name: Get libModSecurity v3 source
         uses: actions/checkout@v4
         with:

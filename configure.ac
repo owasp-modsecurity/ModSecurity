@@ -81,9 +81,7 @@ AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(cd "test/test-cases/secrules-langu
 
 
 # Check for yajl
-PROG_YAJL
-
-AM_CONDITIONAL([YAJL_VERSION], [test "$YAJL_VERSION" != ""])
+CHECK_YAJL
 
 # Check for LibGeoIP
 PROG_GEOIP
@@ -318,24 +316,9 @@ if test $buildParser = true; then
     fi
 fi
 
-
-# Decide if we want to build the tests or not.
-buildTestUtilities=false
-if test "x$YAJL_FOUND" = "x1"; then
-    # Regression tests will not be able to run without the logging support.
-    # But we still have the unit tests.
-    # if test "$debugLogs" = "true"; then
-        buildTestUtilities=true
-    # fi
-fi
-
-
-AM_CONDITIONAL([TEST_UTILITIES], [test $buildTestUtilities = true])
-if test $buildTestUtilities = true; then
-    if test $debugLogs = true; then
-        if test -f ./test/test-list.sh; then
-            TEST_CASES=`./test/test-list.sh`
-        fi
+if test $debugLogs = true; then
+    if test -f ./test/test-list.sh; then
+        TEST_CASES=`./test/test-list.sh`
     fi
 fi
 
@@ -374,8 +357,7 @@ AC_CONFIG_FILES([\
     tools/rules-check/Makefile
     ])
 
-AM_COND_IF([TEST_UTILITIES],
-       [AC_CONFIG_FILES([test/Makefile test/benchmark/Makefile])])
+AC_CONFIG_FILES([test/Makefile test/benchmark/Makefile])
 
 AM_COND_IF([EXAMPLES],
        [AC_CONFIG_FILES([ \
@@ -423,6 +405,16 @@ echo " "
 echo "ModSecurity - ${MSC_GIT_VERSION} for $PLATFORM"
 echo " "
 echo " Mandatory dependencies"
+
+## YAJL
+AS_ECHO_N("   + YAJL                                          ....")
+if ! test "x$YAJL_VERSION" = "x"; then
+    echo "v${YAJL_VERSION}"
+else
+    echo ""
+fi
+echo "      ${YAJL_DISPLAY}"
+
 AS_ECHO_N("   + libInjection                                  ....")
 echo LIBINJECTION_VERSION
 AS_ECHO_N("   + SecLang tests                                 ....")
@@ -469,24 +461,6 @@ if test "x$CURL_FOUND" = "x1"; then
 fi
 if test "x$CURL_FOUND" = "x2"; then
     echo "   + LibCURL                                       ....disabled"
-fi
-
-
-## YAJL
-if test "x$YAJL_FOUND" = "x0"; then
-    echo "   + YAJL                                          ....not found"
-fi
-if test "x$YAJL_FOUND" = "x1"; then
-    AS_ECHO_N("   + YAJL                                          ....found ")
-    if ! test "x$YAJL_VERSION" = "x"; then
-        echo "v${YAJL_VERSION}"
-    else
-        echo ""
-    fi
-    echo "      ${YAJL_DISPLAY}"
-fi
-if test "x$YAJL_FOUND" = "x2"; then
-    echo "   + YAJL                                          ....disabled"
 fi
 
 
@@ -580,14 +554,10 @@ fi
 
 echo " "
 echo " Other Options"
-if test $buildTestUtilities = true; then
-    if test $debugLogs = true; then
-        echo "   + Test Utilities                                ....enabled"
-    else
-        echo "   + Test Utilities                                ....partially"
-    fi
+if test $debugLogs = true; then
+    echo "   + Test Utilities                                ....enabled"
 else
-    echo "   + Test Utilities                                ....disabled"
+    echo "   + Test Utilities                                ....partially"
 fi
 if test $debugLogs = true; then
     echo "   + SecDebugLog                                   ....enabled"

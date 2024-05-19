@@ -1,7 +1,5 @@
 
-if TEST_UTILITIES
 export MAYBE_TEST = test
-endif
 
 if EXAMPLES
 export MAYBE_EXAMPLES = examples

@@ -14,8 +14,6 @@
  */
 
 
-#ifdef WITH_YAJL
-
 #include "src/request_body_processor/json.h"
 
 #include <list>
@@ -314,7 +312,3 @@ int JSON::yajl_end_map(void *ctx) {
 
 }  // namespace RequestBodyProcessor
 }  // namespace modsecurity
-
-
-#endif  // WITH_YAJL
-
