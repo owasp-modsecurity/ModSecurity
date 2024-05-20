@@ -78,7 +78,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-12]
+        os: [macos-14]
         configure:
           - {label: "with parser generation", opt: "--enable-parser-generation" }
           - {label: "wo curl",    opt: "--without-curl" }
@@ -91,10 +91,12 @@ jobs:
           - {label: "with pcre2", opt: "--with-pcre2" }
     steps:
       - name: Setup Dependencies
-        # autoconf, curl, pcre2 not installed because they're already
+        # curl, pcre2 not installed because they're already
         # included in the image
         run: |
-          brew install automake \
+          brew install autoconf \
+                       automake \
+                       libtool \
                        yajl \
                        lmdb \
                        lua \

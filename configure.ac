@@ -164,8 +164,8 @@ AC_CHECK_HEADERS([iostream])
 AC_CHECK_HEADERS([sys/utsname.h])
 
 
-# ??
-LT_INIT([dlopen])
+# Initialize libtool
+LT_INIT
 
 # Identify platform
 AC_CANONICAL_HOST
