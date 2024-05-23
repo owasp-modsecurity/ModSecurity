@@ -129,6 +129,12 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
  */
 int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     apr_status_t rc;
+    apr_file_t *auditlog_lock_name;
+    apr_file_t *geo_lock_name;
+    apr_file_t *dbm_lock_name;
+
+    // use temp path template for lock files
+    char *path = apr_pstrcat(p, temp_dir, "/modsec-lock-tmp.XXXXXX", NULL);
 
     msce->auditlog_lock = msce->geo_lock = NULL;
 #ifdef GLOBAL_COLLECTION_LOCK
@@ -146,11 +152,12 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
     /* Serial audit log mutext */
-    tmpnam(auditlog_lock_name);
+    rc = apr_file_mktemp(&auditlog_lock_name, path, 0, p)
+    if (rc != APR_SUCCESS) {
+        return -1
+    }
     rc = apr_global_mutex_create(&msce->auditlog_lock, auditlog_lock_name, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
-        //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_auditlog_lock");
-        //return HTTP_INTERNAL_SERVER_ERROR;
         return -1;
     }
 
@@ -168,7 +175,10 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     }
 #endif /* SET_MUTEX_PERMS */
 
-    tmpnam(geo_lock_name);
+    rc = apr_file_mktemp(&geo_lock_name, path, 0, p)
+    if (rc != APR_SUCCESS) {
+        return -1
+    }
     rc = apr_global_mutex_create(&msce->geo_lock, geo_lock_name, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         return -1;
@@ -186,7 +196,10 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
 #endif /* SET_MUTEX_PERMS */
 
 #ifdef GLOBAL_COLLECTION_LOCK
-    tmpnam(dbm_lock_name);
+    rc = apr_file_mktemp(&dbm_lock_name, path, 0, p)
+    if (rc != APR_SUCCESS) {
+        return -1
+    }
     rc = apr_global_mutex_create(&msce->dbm_lock, dbm_lock_name, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         return -1;
