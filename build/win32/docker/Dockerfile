@@ -56,7 +56,7 @@ WORKDIR C:\
 RUN cmd.exe /C md %SRC_DIR%
 
 # libModSecurity
-WORKDIR C:\src
+WORKDIR ${SCR_DIR}
 
 ARG MOD_SECURITY_TAG=v3/master
 RUN git clone -c advice.detachedHead=false --depth 1 --branch %MOD_SECURITY_TAG% https://github.com/owasp-modsecurity/ModSecurity.git
