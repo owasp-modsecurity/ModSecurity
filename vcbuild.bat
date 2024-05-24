@@ -20,7 +20,7 @@ if "%3"=="USE_ASAN" (
 )
 
 cd build\win32
-conan install . -s compiler.cppstd=17 %CI_ASAN% --output-folder=build --build=missing --settings=build_type=%build_type% --settings=arch=%arch%
+conan install . -s compiler.cppstd=20 %CI_ASAN% --output-folder=build --build=missing --settings=build_type=%build_type% --settings=arch=%arch%
 cd build
 cmake --fresh .. -G "Visual Studio 17 2022" -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DUSE_ASAN=%ASAN_FLAG% %4 %5 %6 %7 %8 %9
 cmake --build . --config %build_type%
