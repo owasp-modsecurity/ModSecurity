@@ -30,7 +30,21 @@ endif()
 
 project(libinjection C)
 
-add_library(libinjection STATIC ${BASE_DIR}/others/libinjection/src/libinjection_sqli.c ${BASE_DIR}/others/libinjection/src/libinjection_xss.c ${BASE_DIR}/others/libinjection/src/libinjection_html5.c)
+set(LIBINJECTION_DIR ${BASE_DIR}/others/libinjection)
+
+add_library(libinjection STATIC ${LIBINJECTION_DIR}/src/libinjection_sqli.c ${LIBINJECTION_DIR}/src/libinjection_xss.c ${LIBINJECTION_DIR}/src/libinjection_html5.c)
+
+# get libinjection version with git describe
+execute_process(
+    COMMAND git describe
+    WORKING_DIRECTORY ${LIBINJECTION_DIR}
+    OUTPUT_VARIABLE LIBINJECTION_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+message("-- Detecting libinjection version - ${LIBINJECTION_VERSION}")
+
+target_compile_definitions(libinjection PRIVATE LIBINJECTION_VERSION="${LIBINJECTION_VERSION}")
 
 # mbedtls
 

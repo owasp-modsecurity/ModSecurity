@@ -75,6 +75,7 @@ AC_MSG_ERROR([\
 fi
 # Libinjection version
 AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git describe && cd ../..))
+AC_SUBST([LIBINJECTION_VERSION])
 
 # SecLang test version
 AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(cd "test/test-cases/secrules-language-tests" && git log -1 --format="%h" --abbrev-commit && cd ../../..))
