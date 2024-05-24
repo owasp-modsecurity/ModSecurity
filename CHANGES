@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Enhance logging
+   [Issue #3107 - @marcstern]
  * Fix possible segfault in collection_unpack
    [Issue #3072 - @twouters]
  * Set the minimum security protocol version for SecRemoteRules
