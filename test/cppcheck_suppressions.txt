@@ -6,9 +6,7 @@
 //
 // Lets ignore mbedtls.
 //
-*:others/mbedtls/base64.c
-*:others/mbedtls/md5.c
-*:others/mbedtls/sha1.c
+*:others/mbedtls/*
 
 
 //

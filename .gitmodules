@@ -7,3 +7,6 @@
 [submodule "bindings/python"]
 	path = bindings/python
 	url = https://github.com/owasp-modsecurity/ModSecurity-Python-bindings.git
+[submodule "others/mbedtls"]
+	path = others/mbedtls
+	url = https://github.com/Mbed-TLS/mbedtls.git
