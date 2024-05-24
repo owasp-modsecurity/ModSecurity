@@ -311,7 +311,6 @@ libmodsecurity_la_CFLAGS =
 
 
 libmodsecurity_la_CPPFLAGS = \
-	-std=c++17 \
 	-I.. \
 	-g \
 	-I../others \
