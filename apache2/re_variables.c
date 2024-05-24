@@ -21,9 +21,6 @@
 
 #include "libxml/xpathInternals.h"
 
-#ifdef WITH_PCRE2
-#define PCRE_ERROR_NOMATCH PCRE2_ERROR_NOMATCH
-#endif
 /**
  * Generates a variable from a string and a length.
  */
@@ -120,8 +117,7 @@ static int var_args_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 /* Run the regex against the argument name. */
-                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
-                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, arg->name, arg->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(arg->name, var->param) == 0) match = 1;
             }
@@ -198,8 +194,7 @@ static int var_args_names_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
-                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, arg->name, arg->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(arg->name, var->param) == 0) match = 1;
             }
@@ -250,8 +245,7 @@ static int var_args_get_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 /* Run the regex against the argument name. */
-                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
-                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, arg->name, arg->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(arg->name, var->param) == 0) match = 1;
             }
@@ -300,8 +294,7 @@ static int var_args_get_names_generate(modsec_rec *msr, msre_var *var, msre_rule
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
-                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, arg->name, arg->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(arg->name, var->param) == 0) match = 1;
             }
@@ -352,8 +345,7 @@ static int var_args_post_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 /* Run the regex against the argument name. */
-                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
-                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, arg->name, arg->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(arg->name, var->param) == 0) match = 1;
             }
@@ -402,8 +394,7 @@ static int var_args_post_names_generate(modsec_rec *msr, msre_var *var, msre_rul
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
-                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, arg->name, arg->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(arg->name, var->param) == 0) match = 1;
             }
@@ -899,8 +890,7 @@ static int var_tx_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    str->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, str->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -955,8 +945,7 @@ static int var_geo_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    str->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, str->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -1016,8 +1005,7 @@ static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    str->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, str->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -1096,8 +1084,7 @@ static int var_session_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    str->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, str->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -1152,8 +1139,7 @@ static int var_user_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    str->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, str->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -1212,8 +1198,7 @@ static int var_global_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    str->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, str->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -1264,8 +1249,7 @@ static int var_resource_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    str->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, str->name_len, &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -1324,12 +1308,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
                 {
                     /* Regex. */
                     char *my_error_msg = NULL;
-                    if (!(msc_regexec((msc_regex_t *)var->param_data,
-                        parts[i]->name, strlen(parts[i]->name),
-                        &my_error_msg) == PCRE_ERROR_NOMATCH)) 
-                    {
-                        match = 1;
-                    }
+                    if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
                 }
                 else
                 {
@@ -1416,8 +1395,7 @@ static int var_files_tmpnames_generate(modsec_rec *msr, msre_var *var, msre_rule
             else {
                 if (var->param_data != NULL) { /* Regex. */
                     char *my_error_msg = NULL;
-                    if (!(msc_regexec((msc_regex_t *)var->param_data, parts[i]->name,
-                        strlen(parts[i]->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                    if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
                 } else { /* Simple comparison. */
                     if (strcasecmp(parts[i]->name, var->param) == 0) match = 1;
                 }
@@ -1465,8 +1443,7 @@ static int var_files_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
             else {
                 if (var->param_data != NULL) { /* Regex. */
                     char *my_error_msg = NULL;
-                    if (!(msc_regexec((msc_regex_t *)var->param_data, parts[i]->name,
-                        strlen(parts[i]->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                    if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
                 } else { /* Simple comparison. */
                     if (strcasecmp(parts[i]->name, var->param) == 0) match = 1;
                 }
@@ -1514,8 +1491,7 @@ static int var_files_sizes_generate(modsec_rec *msr, msre_var *var, msre_rule *r
             else {
                 if (var->param_data != NULL) { /* Regex. */
                     char *my_error_msg = NULL;
-                    if (!(msc_regexec((msc_regex_t *)var->param_data, parts[i]->name,
-                        strlen(parts[i]->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                    if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
                 } else { /* Simple comparison. */
                     if (strcasecmp(parts[i]->name, var->param) == 0) match = 1;
                 }
@@ -1632,8 +1608,7 @@ static int var_multipart_part_headers_generate(modsec_rec *msr, msre_var *var, m
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, parts[i]->name,
-                    strlen(parts[i]->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(parts[i]->name, var->param) == 0) match = 1;
             }
@@ -2105,8 +2080,7 @@ static int var_perf_rules_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
-                                strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, te[i].key, strlen(te[i].key), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(te[i].key, var->param) == 0) match = 1;
             }
@@ -2591,8 +2565,7 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    strlen(str->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, strlen(str->name), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -2660,8 +2633,7 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                                strlen(str->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, str->name, strlen(str->name), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -2728,8 +2700,7 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
-                                strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, te[i].key, strlen(te[i].key), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(te[i].key, var->param) == 0) match = 1;
             }
@@ -2783,8 +2754,7 @@ static int var_request_cookies_names_generate(modsec_rec *msr, msre_var *var, ms
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
-                    strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, te[i].key, strlen(te[i].key), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(te[i].key, var->param) == 0) match = 1;
             }
@@ -2838,8 +2808,7 @@ static int var_request_headers_generate(modsec_rec *msr, msre_var *var, msre_rul
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
-                    strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, te[i].key, strlen(te[i].key), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(te[i].key, var->param) == 0) match = 1;
             }
@@ -2893,8 +2862,7 @@ static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, ms
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
-                    strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, te[i].key, strlen(te[i].key), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(te[i].key, var->param) == 0) match = 1;
             }
@@ -3171,8 +3139,7 @@ static int var_response_headers_generate(modsec_rec *msr, msre_var *var, msre_ru
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
-                    strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, te[i].key, strlen(te[i].key), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(te[i].key, var->param) == 0) match = 1;
             }
@@ -3226,8 +3193,7 @@ static int var_response_headers_names_generate(modsec_rec *msr, msre_var *var, m
         else {
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
-                if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
-                    strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                if (msc_regexec((msc_regex_t *)var->param_data, te[i].key, strlen(te[i].key), &my_error_msg) >= 0) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(te[i].key, var->param) == 0) match = 1;
             }
