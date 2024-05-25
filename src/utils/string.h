@@ -15,9 +15,12 @@
 
 #include <ctime>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <algorithm>
 #include <utility>
+#include <sstream>
+#include <iomanip>
 
 #ifndef SRC_UTILS_STRING_H_
 #define SRC_UTILS_STRING_H_
@@ -56,25 +59,197 @@ const char HEX2DEC[256] = {
 };
 
 
-std::string ascTime(time_t *t);
-std::string dash_if_empty(const char *str);
-std::string dash_if_empty(const std::string *str);
-std::string limitTo(int amount, const std::string &str);
-std::string removeBracketsIfNeeded(std::string a);
-std::string string_to_hex(const std::string& input);
-std::string toHexIfNeeded(const std::string &str, bool escape_spec = false);
-std::vector<std::string> ssplit(std::string str, char delimiter);
-std::pair<std::string, std::string> ssplit_pair(const std::string& str, char delimiter);
-std::vector<std::string> split(std::string str, char delimiter);
-void chomp(std::string *str);
-void replaceAll(std::string &str, std::string_view from,
-    std::string_view to);
-std::string removeWhiteSpacesIfNeeded(std::string a);
-std::string parserSanitizer(std::string a);
+inline std::string ascTime(time_t *t) {
+    std::string ts = std::ctime(t);
+    ts.pop_back();
+    return ts;
+}
 
-unsigned char x2c(const unsigned char *what);
-unsigned char xsingle2c(const unsigned char *what);
-unsigned char *c2x(unsigned what, unsigned char *where);
+
+inline std::string dash_if_empty(const std::string *str) {
+    if (str == NULL || str->empty()) {
+        return "-";
+    }
+
+    return *str;
+}
+
+
+inline std::string dash_if_empty(const char *str) {
+    if (str == NULL || std::strlen(str) == 0) {
+        return "-";
+    }
+
+    return std::string(str);
+}
+
+
+inline std::string limitTo(int amount, const std::string &str) {
+    std::string ret;
+
+    if (str.length() > amount) {
+        ret.assign(str, 0, amount);
+        ret = ret + " (" + std::to_string(str.length() - amount) + " " \
+            "characters omitted)";
+        return ret;
+    }
+
+    return str;
+}
+
+
+inline std::string toHexIfNeeded(const std::string &str, bool escape_spec = false) {
+    // escape_spec: escape special chars or not
+    // spec chars: '"' (quotation mark, ascii 34), '\' (backslash, ascii 92)
+    std::stringstream res;
+
+    for (int i = 0; i < str.size(); i++) {
+        int c = (unsigned char)str.at(i);
+        if (c < 32 || c > 126 || (escape_spec == true && (c == 34 || c == 92))) {
+            res << "\\x" << std::setw(2) << std::setfill('0') << std::hex << c;
+        } else {
+            res << str.at(i);
+        }
+    }
+
+    return res.str();
+}
+
+
+inline std::vector<std::string> ssplit(std::string str, char delimiter) {
+    std::vector<std::string> internal;
+    std::stringstream ss(str);  // Turn the string into a stream.
+    std::string tok;
+
+    while (getline(ss, tok, delimiter)) {
+        internal.push_back(tok);
+    }
+
+    return internal;
+}
+
+
+inline std::pair<std::string, std::string> ssplit_pair(const std::string& str, char delimiter) {
+    std::stringstream ss(str);  // Turn the string into a stream.
+    std::string key;
+    std::string value;
+
+    getline(ss, key, delimiter);
+    if (key.length() < str.length()) {
+        value = str.substr(key.length()+1);
+    }
+
+    return std::make_pair(key, value);
+}
+
+
+inline std::vector<std::string> split(std::string str, char delimiter) {
+    std::vector<std::string> internal = ssplit(str, delimiter);
+
+    if (internal.size() == 0) {
+        internal.push_back(str);
+    }
+
+    return internal;
+}
+
+
+inline void chomp(std::string *str) {
+    std::string::size_type pos = str->find_last_not_of("\n\r");
+    if (pos != std::string::npos) {
+        str->erase(pos+1, str->length()-pos-1);
+    }
+}
+
+
+inline void replaceAll(std::string &str, std::string_view from,
+    std::string_view to) {
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+}
+
+
+inline std::string removeWhiteSpacesIfNeeded(std::string a) {
+    while (a.size() > 1 && a.at(0) == ' ') {
+        a.erase(0, 1);
+    }
+    while (a.size() > 1 && a.at(a.length()-1) == ' ') {
+        a.pop_back();
+    }
+    return a;
+}
+
+
+inline std::string removeBracketsIfNeeded(std::string a) {
+    if (a.length() > 1 && a.at(0) == '"' && a.at(a.length()-1) == '"') {
+        a.pop_back();
+        a.erase(0, 1);
+    }
+    if (a.length() > 1 && a.at(0) == '\'' && a.at(a.length()-1) == '\'') {
+        a.pop_back();
+        a.erase(0, 1);
+    }
+    return a;
+}
+
+
+inline std::string parserSanitizer(std::string a) {
+    a = removeWhiteSpacesIfNeeded(a);
+    a = removeBracketsIfNeeded(a);
+    return a;
+}
+
+
+inline unsigned char x2c(const unsigned char *what) {
+    unsigned char digit;
+
+    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
+    digit *= 16;
+    digit += (what[1] >= 'A' ? ((what[1] & 0xdf) - 'A') + 10 : (what[1] - '0'));
+
+    return digit;
+}
+
+
+/**
+ * Converts a single hexadecimal digit into a decimal value.
+ */
+inline unsigned char xsingle2c(const unsigned char *what) {
+    unsigned char digit;
+
+    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
+
+    return digit;
+}
+
+
+inline unsigned char *c2x(unsigned what, unsigned char *where) {
+    static const char c2x_table[] = "0123456789abcdef";
+
+    what = what & 0xff;
+    *where++ = c2x_table[what >> 4];
+    *where++ = c2x_table[what & 0x0f];
+
+    return where;
+}
+
+
+inline std::string string_to_hex(const std::string& input) {
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i) {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
+}
 
 
 template<typename Operation>

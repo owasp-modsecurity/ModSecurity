@@ -253,7 +253,6 @@ UTILS = \
 	utils/random.cc \
 	utils/regex.cc \
 	utils/sha1.cc \
-	utils/string.cc \
 	utils/system.cc \
 	utils/shared_files.cc
 
