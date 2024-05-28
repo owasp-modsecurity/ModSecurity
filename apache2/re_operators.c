@@ -649,12 +649,8 @@ nextround:
         msr->stream_input_length = 0;
 #ifdef MSC_LARGE_STREAM_INPUT
         msr->stream_input_allocated_length  = 0;
-
-        msr->stream_input_data = (char *)malloc(size);
-#else
-        msr->stream_input_data = (char *)malloc(size+1);
 #endif
-
+        msr->stream_input_data = (char *)malloc(size+1);
         if(msr->stream_input_data == NULL)  {
             return -1;
         }
@@ -662,16 +658,11 @@ nextround:
         msr->stream_input_length = size;
 #ifdef MSC_LARGE_STREAM_INPUT
         msr->stream_input_allocated_length = size;
-        memset(msr->stream_input_data, 0x0, size);
-#else
-        memset(msr->stream_input_data, 0x0, size+1);
 #endif
         msr->if_stream_changed = 1;
 
         memcpy(msr->stream_input_data, data, size);
-#ifndef MSC_LARGE_STREAM_INPUT
         msr->stream_input_data[size] = '\0';
-#endif
 
         var->value_len = size;
         var->value = msr->stream_input_data;
