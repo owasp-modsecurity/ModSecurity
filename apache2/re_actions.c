@@ -1764,7 +1764,7 @@ static apr_status_t msre_action_setvar_parse(modsec_rec *msr, apr_pool_t *mptmp,
         var_value = s + 1;
         *s = '\0';
 
-        while ((*var_value != '\0')&&(isspace(*var_value))) var_value++;
+        while (isspace(*var_value)) var_value++;
     }
 
     return msre_action_setvar_execute(msr,mptmp,rule,var_name,var_value);
