@@ -252,22 +252,21 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     if(rule != NULL)    {
 
         target_list = strdup(p2);
-        if(target_list == NULL)
-            return apr_psprintf(ruleset->mp, "Error to update target - memory allocation");;
+        if (target_list == NULL) {
+            my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - memory allocation");
+            goto end;
+        }
 
-        if(p3 != NULL)  {
+        if (p3 != NULL)  {
             replace = strdup(p3);
-            if(replace == NULL) {
-                free(target_list);
-                target_list = NULL;
-                return apr_psprintf(ruleset->mp, "Error to update target - memory allocation");;
+            if (replace == NULL) {
+                my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - memory allocation");
+                goto end;
             }
         }
 
-        if(replace != NULL) {
-
+        if (replace != NULL) {
             opt = strchr(replace,'!');
-
             if(opt != NULL)  {
                 *opt = '\0';
                 opt++;
@@ -283,30 +282,21 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             }
 
             opt = strchr(param,':');
-
-            if(opt != NULL) {
+            if (opt != NULL) {
                 name = apr_strtok(param,":",&value);
             } else {
                 name = param;
             }
 
-            if(apr_table_get(ruleset->engine->variables, name) == NULL)   {
-                if(target_list != NULL)
-                    free(target_list);
-                if(replace != NULL)
-                    free(replace);
-                if(msr) {
-                    msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
-                }
-                return apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
+            if (apr_table_get(ruleset->engine->variables, name) == NULL) {
+                my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
+                goto end;
             }
 
             name_len = strlen(name);
+            if (value != NULL) value_len = strlen(value);
 
-            if(value != NULL)
-                value_len = strlen(value);
-
-            if(msr) {
+            if (msr) {
                 msr_log(msr, 9, "Trying to replace by variable name [%s] value [%s]", name, value);
             }
 #if !defined(MSC_TEST)
@@ -318,13 +308,13 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             targets = (msre_var **)rule->targets->elts;
             // TODO need a good way to remove the element from array, maybe change array by tables or rings
             for (i = 0; i < rule->targets->nelts; i++) {
-                if((strlen(targets[i]->name) == strlen(name)) &&
+                if ((strlen(targets[i]->name) == strlen(name)) &&
                         (strncasecmp(targets[i]->name,name,strlen(targets[i]->name)) == 0) &&
                         (targets[i]->is_negated == is_negated) &&
                         (targets[i]->is_counting == is_counting))    {
 
-                    if(value != NULL && targets[i]->param != NULL)  {
-                        if((strlen(targets[i]->param) == strlen(value)) &&
+                    if (value != NULL && targets[i]->param != NULL)  {
+                        if ((strlen(targets[i]->param) == strlen(value)) &&
                                 strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
                             memset(targets[i]->name,0,strlen(targets[i]->name));
                             memset(targets[i]->param,0,strlen(targets[i]->param));
@@ -346,9 +336,9 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
 
         p = apr_strtok(target_list, ",", &savedptr);
 
-        while(p != NULL) {
-            if(replace != NULL) {
-                if(match == 1)  {
+        while (p != NULL) {
+            if (replace != NULL) {
+                if (match == 1)  {
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
                         if(msr) {
@@ -361,7 +351,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
 #endif
                         goto end;
                     }
-                    if(msr) {
+                    if (msr) {
                         msr_log(msr, 9, "Successfully replaced variable");
                     }
 #if !defined(MSC_TEST)
@@ -370,30 +360,29 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     }
 #endif
                 var_appended = 1;
-
                 } else  {
-                    if(msr) {
+                    if (msr) {
                         msr_log(msr, 9, "Cannot find variable to replace");
                     }
 #if !defined(MSC_TEST)
                     else {
-                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find varibale to replace");
+                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find variable to replace");
                     }
 #endif
                     goto end;
                 }
             } else {
-
                 target = strdup(p);
-                if(target == NULL)
-                    return NULL;
+                if (target == NULL) {
+                    my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - memory allocation");
+                    goto end;
+                }
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
 
                 opt = strchr(target,'!');
-
-                if(opt != NULL)  {
+                if (opt != NULL)  {
                     *opt = '\0';
                     opt++;
                     param = opt;
@@ -408,30 +397,21 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 }
 
                 opt = strchr(param,':');
-
-                if(opt != NULL) {
+                if (opt != NULL) {
                     name = apr_strtok(param,":",&value);
                 } else {
                     name = param;
                 }
 
-                if(apr_table_get(ruleset->engine->variables, name) == NULL)   {
-                    if(target_list != NULL)
-                        free(target_list);
-                    if(replace != NULL)
-                        free(replace);
-                    if(msr) {
-                        msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
-                    }
-                    return apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
+                if (apr_table_get(ruleset->engine->variables, name) == NULL) {
+                    my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
+                    goto end;
                 }
 
                 name_len = strlen(name);
+                if (value != NULL) value_len = strlen(value);
 
-                if(value != NULL)
-                    value_len = strlen(value);
-
-                if(msr) {
+                if (msr) {
                     msr_log(msr, 9, "Trying to append variable name [%s] value [%s]", name, value);
                 }
 #if !defined(MSC_TEST)
@@ -461,12 +441,12 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     }
                 }
 
-                if(target != NULL)  {
+                if (target != NULL)  {
                     free(target);
                     target = NULL;
                 }
 
-                if(match == 0 ) {
+                if (match == 0 ) {
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
                         if(msr) {
@@ -495,7 +475,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             p = apr_strtok(NULL,",",&savedptr);
         }
 
-        if(var_appended == 1)  {
+        if (var_appended == 1)  {
             current_targets = msre_generate_target_string(ruleset->mp, rule);
             rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, current_targets, NULL, NULL);
             rule->p1 = apr_pstrdup(ruleset->mp, current_targets);
@@ -511,18 +491,10 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if(target_list != NULL) {
-        free(target_list);
-        target_list = NULL;
-    }
-    if(replace != NULL) {
-        free(replace);
-        replace = NULL;
-    }
-    if(target != NULL)  {
-        free(target);
-        target = NULL;
-    }
+    if (msr && my_error_msg) msr_log(msr, 9, my_error_msg);
+    if (target_list != NULL) free(target_list);
+    if (replace != NULL) free(replace);
+    if (target != NULL) free(target);
     return NULL;
 }
 
