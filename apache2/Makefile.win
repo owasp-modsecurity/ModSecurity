@@ -38,9 +38,6 @@ INCLUDES = -I. -I.. \
            -I$(LIBXML2)\include \
            -I$(APACHE)\include
 
-# Enables support for SecRemoteRules and external resources.
-DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
-
 # Lua is optional
 !IF "$(LUA)" != ""
 LIBS = $(LIBS) $(LUA)\lua5.1.lib
