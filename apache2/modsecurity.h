@@ -46,7 +46,6 @@ typedef struct msc_parm msc_parm;
 #include "msc_unicode.h"
 #include "re.h"
 #include "msc_crypt.h"
-#include "msc_remote_rules.h"
 
 #include "ap_config.h"
 #include "apr_md5.h"
