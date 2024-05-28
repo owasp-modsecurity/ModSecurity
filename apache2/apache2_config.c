@@ -2319,18 +2319,28 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 // Left for syntax compatibility
 static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_WARNING|APLOG_NOERRNO, 0, cmd->pool,
+        "ModSecurity: WARNING SecRemoteRulesFailAction is deprecated (%s:%d).",
+        cmd->directive->filename, cmd->directive->line_num);
     return NULL;
 }
 
+// Left for syntax compatibility
 static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
         const char *p2, const char *p3)
 {
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP | APLOG_WARNING | APLOG_NOERRNO, 0, cmd->pool,
+        "ModSecurity: WARNING SecRemoteRules is deprecated (%s:%d).",
+        cmd->directive->filename, cmd->directive->line_num); 
     return NULL;
 }
 
 // Left for syntax compatibility
 static const char *cmd_status_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP | APLOG_WARNING | APLOG_NOERRNO, 0, cmd->pool,
+        "ModSecurity: WARNING SecStatusEngine is deprecated (%s:%d).",
+        cmd->directive->filename, cmd->directive->line_num); 
     return NULL;
 }
 
