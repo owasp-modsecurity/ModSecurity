@@ -20,7 +20,6 @@ mod_security2_la_SOURCES = acmp.c \
     msc_parsers.c \
     msc_pcre.c \
     msc_release.c \
-    msc_remote_rules.c \
     msc_reqbody.c \
     msc_tree.c \
     msc_unicode.c \

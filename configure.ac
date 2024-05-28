@@ -921,12 +921,6 @@ AC_LINK_IFELSE(
 CFLAGS="$ORIG_CFLAGS"
 CPPFLAGS="$ORIG_CPPFLAGS"
 
-# Currently our unique download backend is curl, further we can support more.
-if test ! -z "${CURL_VERSION}"; then
-  AC_DEFINE([WITH_REMOTE_RULES], [1], [Enables SecRemoteRules support])
-  MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS -DWITH_REMOTE_RULES"
-fi
-
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tools/Makefile])
 if test "$build_alp2" -ne 0; then
@@ -946,7 +940,6 @@ AC_CONFIG_FILES([build/apxs-wrapper], [chmod +x build/apxs-wrapper])
 if test -e "$PERL"; then
     if test "$build_mlogc" -ne 0; then
         AC_CONFIG_FILES([mlogc/mlogc-batch-load.pl], [chmod +x mlogc/mlogc-batch-load.pl])
-        AC_CONFIG_FILES([tests/regression/misc/40-secRemoteRules.t])
         AC_CONFIG_FILES([tests/regression/misc/50-ipmatchfromfile-external.t])
         AC_CONFIG_FILES([tests/regression/misc/60-pmfromfile-external.t])
     fi

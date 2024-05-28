@@ -5,7 +5,6 @@ msc_test_SOURCES = msc_test.c \
     ../apache2/libinjection/libinjection_sqli.c \
     ../apache2/libinjection/libinjection_xss.c \
     ../apache2/modsecurity.c \
-    ../apache2/msc_remote_rules.c \
     ../apache2/msc_crypt.c \
     ../apache2/msc_geo.c \
     ../apache2/msc_gsb.c \
