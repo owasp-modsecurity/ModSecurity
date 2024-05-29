@@ -2480,8 +2480,6 @@ int read_line(char *buf, int len, FILE *fp)
         return -1;
     }
 
-    memset(buf, '\0', len*sizeof(char));
-
     if (fgets(buf, len, fp) == NULL)
     {
         *buf = '\0';
