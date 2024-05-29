@@ -495,7 +495,7 @@ end:
     if (target_list != NULL) free(target_list);
     if (replace != NULL) free(replace);
     if (target != NULL) free(target);
-    return NULL;
+    return my_error_msg;
 }
 
 int msre_ruleset_rule_matches_exception(msre_rule *rule, rule_exception *re)   {
