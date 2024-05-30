@@ -151,6 +151,18 @@ int acquire_global_lock(apr_global_mutex_t *lock, apr_pool_t *mp) {
         ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Could not create global mutex");
         return -1;
     }
+#if !defined(MSC_TEST)
+#ifdef __SET_MUTEX_PERMS
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    rc = ap_unixd_set_global_mutex_perms(lock);
+#else
+    rc = unixd_set_global_mutex_perms(lock);
+#endif
+    if (rc != APR_SUCCESS) {
+        return -1;
+    }
+#endif /* SET_MUTEX_PERMS */
+#endif /* MSC_TEST */
     return APR_SUCCESS;
 }
 /**
@@ -163,7 +175,7 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
 
     msce->auditlog_lock = msce->geo_lock = NULL;
 #ifdef GLOBAL_COLLECTION_LOCK
-    msce->geo_lock = NULL;
+    msce->dbm_lock = NULL;
 #endif
 
     /**
@@ -182,54 +194,17 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
         return -1;
     }
 
-#if !defined(MSC_TEST)
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->auditlog_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->auditlog_lock);
-#endif
-    if (rc != APR_SUCCESS) {
-        // ap_log_error(APLOG_MARK, APLOG_ERR, rc, s, "mod_security: Could not set permissions on modsec_auditlog_lock; check User and Group directives");
-        // return HTTP_INTERNAL_SERVER_ERROR;
-        return -1;
-    }
-#endif /* SET_MUTEX_PERMS */
-
     rc = acquire_global_lock(msce->geo_lock, mp);
     if (rc != APR_SUCCESS) {
         return -1;
     }
-
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->geo_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->geo_lock);
-#endif
-    if (rc != APR_SUCCESS) {
-        return -1;
-    }
-#endif /* SET_MUTEX_PERMS */
 
 #ifdef GLOBAL_COLLECTION_LOCK
     rc = acquire_global_lock(&msce->dbm_lock, mp);
     if (rc != APR_SUCCESS) {
         return -1;
     }
-
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->dbm_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->dbm_lock);
-#endif
-    if (rc != APR_SUCCESS) {
-        return -1;
-    }
-#endif /* SET_MUTEX_PERMS */
-#endif
-#endif
+#endif /* GLOBAL_COLLECTION_LOCK */
 
     return 1;
 }

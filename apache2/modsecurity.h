@@ -705,6 +705,9 @@ struct msc_parm {
     int                     pad_2;
 };
 
+/* Reusable functions */
+int acquire_global_lock(apr_global_mutex_t *lock, apr_pool_t *mp);
+
 /* Engine functions */
 
 msc_engine DSOLOCAL *modsecurity_create(apr_pool_t *mp, int processing_mode);
