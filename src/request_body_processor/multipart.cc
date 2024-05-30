@@ -70,22 +70,20 @@ void MultipartPartTmpFile::Open() {
 
     localtime_r(&tt, &timeinfo);
 
-    char tstr[300] {};
-    strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
+    char tstr[17];
+    strftime(tstr, std::size(tstr), "/%Y%m%d-%H%M%S", &timeinfo);
 
     std::string path = m_transaction->m_rules->m_uploadDirectory.m_value;
     path = path + tstr + "-" + *m_transaction->m_id.get();
     path += "-file-XXXXXX";
 
-    char* tmp = strdup(path.c_str());
 #ifndef WIN32
-    m_tmp_file_fd = mkstemp(tmp);
+    m_tmp_file_fd = mkstemp(path.data());
 #else
-    _mktemp_s(tmp, path.length()+1);
-    m_tmp_file_fd = _open(tmp, _O_CREAT | _O_EXCL | _O_RDWR);
+    _mktemp_s(path.data(), path.length()+1);
+    m_tmp_file_fd = _open(path.c_str(), _O_CREAT | _O_EXCL | _O_RDWR);
 #endif
-    m_tmp_file_name.assign(tmp);
-    free(tmp);
+    m_tmp_file_name = path;
     ms_dbg_a(m_transaction, 4, "MultipartPartTmpFile: Create filename= " + m_tmp_file_name);
 
     int mode = m_transaction->m_rules->m_uploadFileMode.m_value;
@@ -1271,22 +1269,10 @@ int Multipart::multipart_complete(std::string *error) {
 
 
 int Multipart::count_boundary_params(const std::string& str_header_value) {
-    std::string lower = utils::string::tolower(str_header_value);
-    const char *header_value = lower.c_str();
-    char *duplicate = NULL;
-    char *s = NULL;
     int count = 0;
 
-    if (header_value == NULL) {
-        return -1;
-    }
-
-    duplicate = strdup(header_value);
-    if (duplicate == NULL) {
-        return -1;
-    }
-
-    s = duplicate;
+    const auto lower = utils::string::tolower(str_header_value);
+    const char *s = lower.c_str();
     while ((s = strstr(s, "boundary")) != NULL) {
         s += 8;
 
@@ -1295,7 +1281,6 @@ int Multipart::count_boundary_params(const std::string& str_header_value) {
         }
     }
 
-    free(duplicate);
     return count;
 }
 
