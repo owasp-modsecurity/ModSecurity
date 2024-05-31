@@ -122,6 +122,49 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
     return msce;
 }
 
+int acquire_global_lock(apr_global_mutex_t *lock, apr_pool_t *mp) {
+    apr_status_t rc;
+    apr_file_t *lock_name;
+    const char *temp_dir;
+    const char *filename;
+
+    // get platform temp dir
+    rc = apr_temp_dir_get(&temp_dir, mp);
+    if (rc != APR_SUCCESS) {
+        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, "ModSecurity: Could not get temp dir");
+        return -1;
+    }
+
+    // use temp path template for lock files
+    char *path = apr_pstrcat(mp, temp_dir, GLOBAL_LOCK_TEMPLATE, NULL);
+
+    rc = apr_file_mktemp(&lock_name, path, 0, mp);
+    if (rc != APR_SUCCESS) {
+        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Could not create temporary file for global lock");
+        return -1;
+    }
+    // below func always return APR_SUCCESS
+    apr_file_name_get(&filename, lock_name);
+
+    rc = apr_global_mutex_create(&lock, filename, APR_LOCK_DEFAULT, mp);
+    if (rc != APR_SUCCESS) {
+        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Could not create global mutex");
+        return -1;
+    }
+#if !defined(MSC_TEST)
+#ifdef __SET_MUTEX_PERMS
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    rc = ap_unixd_set_global_mutex_perms(lock);
+#else
+    rc = unixd_set_global_mutex_perms(lock);
+#endif
+    if (rc != APR_SUCCESS) {
+        return -1;
+    }
+#endif /* SET_MUTEX_PERMS */
+#endif /* MSC_TEST */
+    return APR_SUCCESS;
+}
 /**
  * Initialise the modsecurity engine. This function must be invoked
  * after configuration processing is complete as Apache needs to know the
@@ -132,7 +175,7 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
 
     msce->auditlog_lock = msce->geo_lock = NULL;
 #ifdef GLOBAL_COLLECTION_LOCK
-    msce->geo_lock = NULL;
+    msce->dbm_lock = NULL;
 #endif
 
     /**
@@ -145,65 +188,23 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
 #ifdef WITH_CURL
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
-    /* Serial audit log mutext */
-    tmpnam(auditlog_lock_name);
-    rc = apr_global_mutex_create(&msce->auditlog_lock, auditlog_lock_name, APR_LOCK_DEFAULT, mp);
-    if (rc != APR_SUCCESS) {
-        //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_auditlog_lock");
-        //return HTTP_INTERNAL_SERVER_ERROR;
-        return -1;
-    }
-
-#if !defined(MSC_TEST)
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->auditlog_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->auditlog_lock);
-#endif
-    if (rc != APR_SUCCESS) {
-        // ap_log_error(APLOG_MARK, APLOG_ERR, rc, s, "mod_security: Could not set permissions on modsec_auditlog_lock; check User and Group directives");
-        // return HTTP_INTERNAL_SERVER_ERROR;
-        return -1;
-    }
-#endif /* SET_MUTEX_PERMS */
-
-    tmpnam(geo_lock_name);
-    rc = apr_global_mutex_create(&msce->geo_lock, geo_lock_name, APR_LOCK_DEFAULT, mp);
+    /* Serial audit log mutex */
+    rc = acquire_global_lock(msce->auditlog_lock, mp);
     if (rc != APR_SUCCESS) {
         return -1;
     }
 
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->geo_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->geo_lock);
-#endif
-    if (rc != APR_SUCCESS) {
-        return -1;
-    }
-#endif /* SET_MUTEX_PERMS */
-
-#ifdef GLOBAL_COLLECTION_LOCK
-    tmpnam(dbm_lock_name);
-    rc = apr_global_mutex_create(&msce->dbm_lock, dbm_lock_name, APR_LOCK_DEFAULT, mp);
+    rc = acquire_global_lock(msce->geo_lock, mp);
     if (rc != APR_SUCCESS) {
         return -1;
     }
 
-#ifdef __SET_MUTEX_PERMS
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(msce->dbm_lock);
-#else
-    rc = unixd_set_global_mutex_perms(msce->dbm_lock);
-#endif
+#ifdef GLOBAL_COLLECTION_LOCK
+    rc = acquire_global_lock(&msce->dbm_lock, mp);
     if (rc != APR_SUCCESS) {
         return -1;
     }
-#endif /* SET_MUTEX_PERMS */
-#endif
-#endif
+#endif /* GLOBAL_COLLECTION_LOCK */
 
     return 1;
 }
