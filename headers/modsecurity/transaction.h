@@ -724,6 +724,9 @@ int msc_process_logging(Transaction *transaction);
 /** @ingroup ModSecurity_C_API */
 int msc_update_status_code(Transaction *transaction, int status);
 
+/** @ingroup ModSecurity_C_API */
+const char *msc_get_transaction_variable(Transaction *transaction, const char *var_name);
+
 #ifdef __cplusplus
 }
 }  // namespace modsecurity
