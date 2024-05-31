@@ -75,15 +75,25 @@ Windows build information can be found [here](build/win32/README.md).
 
 ## Dependencies
 
-This library is written in C++ using the C++17 standards. It also uses Flex
-and Yacc to produce the “Sec Rules Language” parser. Other, mandatory dependencies include YAJL, as ModSecurity uses JSON for producing logs and its testing framework, libpcre (not yet mandatory) for processing regular expressions in SecRules, and libXML2 (not yet mandatory) which is used for parsing XML requests.
+This library is written in C++ using the C++17 standard.
 
-All others dependencies are related to operators specified within SecRules or configuration directives and may not be required for compilation. A short list of such dependencies is as follows:
+The following dependencies are used to build libModSecurity:
 
-* libinjection is needed for the operator @detectXSS and @detectSQL
-* curl is needed for the directive SecRemoteRules.
+ * Flex and Yacc to produce the “Sec Rules Language” parser.
+ * YAJL, as ModSecurity uses JSON for producing logs and its testing framework.
+ * PCRE or PCRE2 for processing regular expressions in SecRules.
+ * libinjection for the operators [@detectXSS](../../wiki/Reference-Manual-(v3.x)#detectxss) and [@detectSQL](../../wiki/Reference-Manual-(v3.x)#detectsqli).
+ * Mbed TLS for basic encoding/hashing functions (base64, md5 & sha1).
 
-If those libraries are missing ModSecurity will be compiled without the support for the operator @detectXSS and the configuration directive SecRemoteRules.
+All others dependencies are related to operators specified within SecRules or configuration directives and may not be required for compilation. If those libraries are missing ModSecurity will be compiled without the support for the associated operator or configuration directive.
+
+A short list of such dependencies is as follows:
+
+ * libXML2 which for parsing XML requests.
+ * curl is needed for the directive [SecRemoteRules](../../wiki/Reference-Manual-(v3.x)#user-content-SecRemoteRules).
+ * LUA is needed for the directive [SecRuleScript](../../wiki/Reference-Manual-(v3.x)#secrulescript).
+ * GeoIP/MaxMind to perform geolocation lookups using operator [geoLookup](../../wiki/Reference-Manual-(v3.x)%29#geolookup)
+ * ssdeep is needed for the operator [fuzzyHash](../../wiki/Reference-Manual-(v3.x)%29#fuzzyhash).
 
 # Library documentation
 
