@@ -54,58 +54,40 @@ void AnchoredVariable::unset() {
 
 void AnchoredVariable::set(const std::string &a, size_t offset,
     size_t offsetLen) {
-    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-
     m_offset = offset;
     m_value.assign(a.c_str(), a.size());
-    origin->m_offset = offset;
-    origin->m_length = offsetLen;
-    m_var->addOrigin(std::move(origin));
+    m_var->addOrigin(offsetLen, offset);
 }
 
 
 void AnchoredVariable::set(const std::string &a, size_t offset) {
-    std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
-
     m_offset = offset;
     m_value.assign(a.c_str(), a.size());
-    origin->m_offset = offset;
-    origin->m_length = m_value.size();
-    m_var->addOrigin(std::move(origin));
+    m_var->addOrigin(m_value.size(), offset);
 }
 
 
 void AnchoredVariable::append(const std::string &a, size_t offset,
     bool spaceSeparator) {
-    std::unique_ptr<VariableOrigin> origin(
-        new VariableOrigin());
-
     if (spaceSeparator && !m_value.empty()) {
         m_value.append(" " + a);
     } else {
         m_value.append(a);
     }
     m_offset = offset;
-    origin->m_offset = offset;
-    origin->m_length = a.size();
-    m_var->addOrigin(std::move(origin));
+    m_var->addOrigin(a.size(), offset);
 }
 
 
 void AnchoredVariable::append(const std::string &a, size_t offset,
-    bool spaceSeparator, int size) {
-    std::unique_ptr<VariableOrigin> origin(
-        new VariableOrigin());
-
+    bool spaceSeparator, size_t size) {
     if (spaceSeparator && !m_value.empty()) {
         m_value.append(" " + a);
     } else {
         m_value.append(a);
     }
     m_offset = offset;
-    origin->m_offset = offset;
-    origin->m_length = size;
-    m_var->addOrigin(std::move(origin));
+    m_var->addOrigin({size, offset});
 }
 
 

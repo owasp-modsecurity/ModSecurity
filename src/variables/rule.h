@@ -49,15 +49,12 @@ class Rule_DictElement : public VariableDictElement { \
         if (!r || r->m_ruleId == 0) {
             return;
         }
-        std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
         std::string *a = new std::string(std::to_string(r->m_ruleId));
         VariableValue *var = new VariableValue(&m_rule, &m_rule_id,
             a
         );
         delete a;
-        origin->m_offset = 0;
-        origin->m_length = 0;
-        var->addOrigin(std::move(origin));
+        var->addOrigin();
         l->push_back(var);
     }
 
@@ -75,15 +72,12 @@ class Rule_DictElement : public VariableDictElement { \
             return;
         }
 
-        std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
         std::string *a = new std::string(r->m_rev);
         VariableValue *var = new VariableValue(&m_rule, &m_rule_rev,
             a
         );
         delete a;
-        origin->m_offset = 0;
-        origin->m_length = 0;
-        var->addOrigin(std::move(origin));
+        var->addOrigin();
         l->push_back(var);
     }
 
@@ -98,15 +92,12 @@ class Rule_DictElement : public VariableDictElement { \
         }
 
         if (r && r->hasSeverity()) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             std::string *a = new std::string(std::to_string(r->severity()));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_severity,
                 a
             );
             delete a;
-            origin->m_offset = 0;
-            origin->m_length = 0;
-            var->addOrigin(std::move(origin));
+            var->addOrigin();
             l->push_back(var);
         }
     }
@@ -122,15 +113,12 @@ class Rule_DictElement : public VariableDictElement { \
         }
 
         if (r && r->hasLogData()) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             std::string *a = new std::string(r->logData(t));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_logdata,
                 a
             );
             delete a;
-            origin->m_offset = 0;
-            origin->m_length = 0;
-            var->addOrigin(std::move(origin));
+            var->addOrigin();
             l->push_back(var);
         }
     }
@@ -145,15 +133,12 @@ class Rule_DictElement : public VariableDictElement { \
         }
 
         if (r && r->hasMsg()) {
-            std::unique_ptr<VariableOrigin> origin(new VariableOrigin());
             std::string *a = new std::string(r->msg(t));
             VariableValue *var = new VariableValue(&m_rule, &m_rule_msg,
                 a
             );
             delete a;
-            origin->m_offset = 0;
-            origin->m_length = 0;
-            var->addOrigin(std::move(origin));
+            var->addOrigin();
             l->push_back(var);
         }
     }

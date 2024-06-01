@@ -63,7 +63,7 @@ class AnchoredVariable {
     void append(const std::string &a, size_t offset,
         bool spaceSeparator = false);
     void append(const std::string &a, size_t offset,
-        bool spaceSeparator, int size);
+        bool spaceSeparator, size_t size);
 
     void evaluate(std::vector<const VariableValue *> *l);
     std::string *  evaluate();
