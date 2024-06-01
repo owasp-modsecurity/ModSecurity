@@ -27,16 +27,8 @@ UrlDecode::UrlDecode(const std::string &action)
 }
 
 bool UrlDecode::transform(std::string &value, const Transaction *trans) const {
-    int invalid_count = 0;
-    int changed;
-    const auto new_len = utils::urldecode_nonstrict_inplace(
-        (unsigned char*)value.data(),
-        value.length(),
-        &invalid_count,
-        &changed);
-
-    value.resize(new_len);
-    return changed != 0;
+    int invalid_count;
+    return utils::urldecode_nonstrict_inplace(value, invalid_count);
 }
 
 
