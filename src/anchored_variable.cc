@@ -31,19 +31,9 @@ AnchoredVariable::AnchoredVariable(Transaction *t,
     const std::string &name)
     : m_transaction(t),
     m_offset(0),
-    m_name(""),
+    m_name(name),
     m_value(""),
-    m_var(NULL) {
-        m_name.append(name);
-        m_var = new VariableValue(&m_name);
-}
-
-
-AnchoredVariable::~AnchoredVariable() {
-    if (m_var) {
-        delete (m_var);
-        m_var = NULL;
-    }
+    m_var(&name) {
 }
 
 
@@ -56,38 +46,14 @@ void AnchoredVariable::set(const std::string &a, size_t offset,
     size_t offsetLen) {
     m_offset = offset;
     m_value.assign(a.c_str(), a.size());
-    m_var->addOrigin(offsetLen, offset);
+    m_var.addOrigin(offsetLen, offset);
 }
 
 
 void AnchoredVariable::set(const std::string &a, size_t offset) {
     m_offset = offset;
     m_value.assign(a.c_str(), a.size());
-    m_var->addOrigin(m_value.size(), offset);
-}
-
-
-void AnchoredVariable::append(const std::string &a, size_t offset,
-    bool spaceSeparator) {
-    if (spaceSeparator && !m_value.empty()) {
-        m_value.append(" " + a);
-    } else {
-        m_value.append(a);
-    }
-    m_offset = offset;
-    m_var->addOrigin(a.size(), offset);
-}
-
-
-void AnchoredVariable::append(const std::string &a, size_t offset,
-    bool spaceSeparator, size_t size) {
-    if (spaceSeparator && !m_value.empty()) {
-        m_value.append(" " + a);
-    } else {
-        m_value.append(a);
-    }
-    m_offset = offset;
-    m_var->addOrigin({size, offset});
+    m_var.addOrigin(m_value.size(), offset);
 }
 
 
@@ -96,9 +62,8 @@ void AnchoredVariable::evaluate(std::vector<const VariableValue *> *l) {
         return;
     }
 
-    m_var->setValue(m_value);
-    VariableValue *m_var2 = new VariableValue(m_var);
-    l->push_back(m_var2);
+    m_var.setValue(m_value);
+    l->push_back(new VariableValue(&m_var));
 }
 
 
@@ -111,9 +76,7 @@ std::unique_ptr<std::string> AnchoredVariable::resolveFirst() {
     if (m_value.empty()) {
         return nullptr;
     }
-    std::unique_ptr<std::string> a(new std::string());
-    a->append(m_value);
-    return a;
+    return std::make_unique<std::string>(m_value);
 }
 
 
