@@ -45,7 +45,7 @@ class RuleWithOperator : public RuleWithActions {
         std::unique_ptr<std::string> fileName,
         int lineNumber);
 
-    virtual ~RuleWithOperator();
+    ~RuleWithOperator() override;
 
     bool evaluate(Transaction *transaction,
         std::shared_ptr<RuleMessage> rm) override;

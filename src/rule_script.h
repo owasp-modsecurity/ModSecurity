@@ -14,6 +14,9 @@
  *
  */
 
+#ifndef SRC_RULE_SCRIPT_H_
+#define SRC_RULE_SCRIPT_H_
+
 #include <string>
 #include <memory>
 #include <vector>
@@ -33,9 +36,6 @@
 #include "src/actions/severity.h"
 #include "src/variables/variable.h"
 
-#ifndef SRC_RULE_SCRIPT_H_
-#define SRC_RULE_SCRIPT_H_
-
 
 namespace modsecurity {
 
@@ -53,12 +53,14 @@ class RuleScript : public RuleWithActions {
         m_name(name),
         m_lua() { }
 
-    RuleScript(const RuleWithActions& r) = delete;
+    RuleScript(const RuleScript& r) = delete;
+
+    RuleScript &operator=(const RuleScript &r) = delete;
 
     bool init(std::string *err);
+
     bool evaluate(Transaction *trans,
         std::shared_ptr<RuleMessage> ruleMessage) override;
-
 
     std::string m_name;
     engine::Lua m_lua;

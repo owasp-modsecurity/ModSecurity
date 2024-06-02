@@ -13,15 +13,6 @@
  *
  */
 
-#ifdef __cplusplus
-#include <stack>
-#include <vector>
-#include <string>
-#include <list>
-#include <memory>
-#include <utility>
-#endif
-
 #ifndef HEADERS_MODSECURITY_RULE_H_
 #define HEADERS_MODSECURITY_RULE_H_
 
@@ -30,6 +21,12 @@
 #include "modsecurity/variable_value.h"
 
 #ifdef __cplusplus
+
+#include <vector>
+#include <string>
+#include <list>
+#include <memory>
+#include <utility>
 
 namespace modsecurity {
 namespace variables {
@@ -73,18 +70,9 @@ class Rule {
         m_phase(modsecurity::Phases::RequestHeadersPhase) {
         }
 
-    Rule(const Rule &other) :
-        m_fileName(other.m_fileName),
-        m_lineNumber(other.m_lineNumber),
-        m_phase(other.m_phase)
-    { }
+    Rule(const Rule &other) = delete;
 
-    Rule &operator=(const Rule& other) {
-        m_fileName = other.m_fileName;
-        m_lineNumber = other.m_lineNumber;
-        m_phase = other.m_phase;
-        return *this;
-    }
+    Rule &operator=(const Rule &other) = delete;
 
     virtual ~Rule() {}
 
