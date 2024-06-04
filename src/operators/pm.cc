@@ -117,23 +117,56 @@ bool Pm::init(const std::string &file, std::string *error) {
     std::vector<std::string> vec;
     std::istringstream *iss;
     const char *err = NULL;
+    char *content = NULL;
+    char pm_custom_separator;
+    std::string tmp;
+    int start_separator,trail_separator;
 
 #ifdef MODSEC_MUTEX_ON_PM
     pthread_mutex_init(&m_lock, NULL);
 #endif
-    char *content = parse_pm_content(m_param.c_str(), m_param.length(), &err);
-    if (content == NULL) {
+
+    // Checking if Pm is required based on  a custom separator
+    // Example of the expected syntax: "@Pm PmCustomSeparator:| |htaccess|This is an error string| hi|"
+    // Emulating PmFromFile logic, it bypasses Snort-Suricata format parsing. It permits the match
+    // of the '|' symbol for piped commands matching or the usage of the pipe symbol as a separator.
+    // In order to provide the separator, a non-space character is required right after "PmCustomSeparator:".
+    if (m_param.compare(0, 18, "PmCustomSeparator:") == 0
+        && m_param.compare(18, 1, " ") != 0 
+        && m_param.size() > 19) {
+        pm_custom_separator=m_param.at(18);
+
+        start_separator=m_param.find(pm_custom_separator, 19);
+        trail_separator=m_param.rfind(pm_custom_separator);
+        if (start_separator == std::string::npos || trail_separator == std::string::npos) {
+            error->assign("Starting or trailing custom separator not found");
+            return false;
+        }
+        // Erase from the final separator up to the end
+        m_param.erase(trail_separator,m_param.size()-trail_separator);
+        // Erase up to the first separator
+        m_param.erase(0,start_separator+1);
+
         iss = new std::istringstream(m_param);
+        while (std::getline(*iss, tmp, pm_custom_separator)) {
+            acmp_add_pattern(m_p, tmp.c_str(), NULL, NULL, tmp.length());
+        }
+    // Usual Pm behaviour with Snort-Suricata format parsing if 'PmCustomSeparator:' is not found
     } else {
-        iss = new std::istringstream(content);
-    }
+        content = parse_pm_content(m_param.c_str(), m_param.length(), &err);
+        if (content == NULL) {
+            iss = new std::istringstream(m_param);
+        } else {
+            iss = new std::istringstream(content);
+        }
 
-    std::copy(std::istream_iterator<std::string>(*iss),
-        std::istream_iterator<std::string>(),
-        back_inserter(vec));
+        std::copy(std::istream_iterator<std::string>(*iss),
+            std::istream_iterator<std::string>(),
+            back_inserter(vec));
 
-    for (auto &a : vec) {
-        acmp_add_pattern(m_p, a.c_str(), NULL, NULL, a.length());
+        for (auto &a : vec) {
+            acmp_add_pattern(m_p, a.c_str(), NULL, NULL, a.length());
+        }
     }
 
     while (m_p->is_failtree_done == 0) {

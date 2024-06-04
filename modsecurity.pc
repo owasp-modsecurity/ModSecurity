@@ -1,0 +1,11 @@
+prefix=/usr/local/modsecurity
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: ModSecurity
+Description: ModSecurity API
+Version: 3.0.7
+Cflags: -I${prefix}/include
+Libs: -L${exec_prefix}/lib -lmodsecurity
+Libs.private: -lcurl    -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lxml2 -lz -lpthread -licucore -lm   -L/opt/homebrew/Cellar/pcre/8.45/lib -lpcre -lpcre  
