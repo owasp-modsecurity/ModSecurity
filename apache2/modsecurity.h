@@ -46,6 +46,7 @@ typedef struct msc_parm msc_parm;
 #include "msc_unicode.h"
 #include "re.h"
 #include "msc_crypt.h"
+#include "msc_remote_rules.h"
 
 #include "ap_config.h"
 #include "apr_md5.h"
@@ -152,6 +153,9 @@ extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 
 extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 
+#ifdef WITH_REMOTE_RULES
+extern DSOLOCAL msc_remote_rules_server *remote_rules_server;
+#endif
 extern DSOLOCAL int remote_rules_fail_action;
 extern DSOLOCAL char *remote_rules_fail_message;
 
@@ -645,6 +649,14 @@ struct directory_config {
 
     /* xml */
     int                 xml_external_entity;
+
+    /* This will be used whenever ModSecurity will be ready
+     * to ask the server for newer rules.
+     */
+#if 0
+    msc_remote_rules_server *remote_rules;
+    int remote_timeout;
+#endif
 };
 
 struct error_message_t {

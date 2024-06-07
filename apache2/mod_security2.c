@@ -33,6 +33,8 @@
 
 #include "apr_version.h"
 
+#include "msc_remote_rules.h"
+
 #if defined(WITH_LUA)
 #include "msc_lua.h"
 #endif
@@ -67,7 +69,11 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
-int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
+#ifdef WITH_REMOTE_RULES
+msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
+#endif
+int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
+char DSOLOCAL *remote_rules_fail_message = NULL;
 
 int DSOLOCAL conn_limits_filter_state = MODSEC_DISABLED;
 
@@ -775,7 +781,44 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                     "ModSecurity: Original server signature: %s",
                     real_server_signature);
         }
+
     }
+
+    /**
+     * Checking if it is not the first time that we are in this very function.
+     * We want to show the messages below during the start and the reload.
+     */
+#ifndef VERSION_IIS
+    if (first_time != 1)
+    {
+#ifdef WITH_REMOTE_RULES
+
+        if (remote_rules_server != NULL)
+        {
+            if (remote_rules_server->amount_of_rules == 1)
+            {
+                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                    "ModSecurity: Loaded %d rule from: '%s'.",
+                    remote_rules_server->amount_of_rules,
+                    remote_rules_server->uri);
+            }
+            else
+            {
+                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                    "ModSecurity: Loaded %d rules from: '%s'.",
+                    remote_rules_server->amount_of_rules,
+                    remote_rules_server->uri);
+            }
+        }
+#endif
+        if (remote_rules_fail_message != NULL)
+        {
+            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL, "ModSecurity: " \
+                "Problems loading external resources: %s",
+                remote_rules_fail_message);
+        }
+    }
+#endif
 
     srand((unsigned int)(time(NULL) * getpid()));
 

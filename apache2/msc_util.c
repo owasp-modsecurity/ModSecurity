@@ -30,6 +30,8 @@
 #include <apr_sha1.h>
 #include "modsecurity_config.h"
 
+#include "msc_remote_rules.h"
+
 #ifdef WITH_CURL
 #include "curl/curl.h"
 #endif

@@ -23,6 +23,7 @@
 #include "msc_util.h"
 #include "msc_tree.h"
 #include "msc_crypt.h"
+#include "msc_remote_rules.h"
 #include <apr_sha1.h>
 
 #if APR_HAVE_ARPA_INET_H
