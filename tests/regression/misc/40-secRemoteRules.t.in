@@ -40,4 +40,3 @@
 		"some_variable=-1' and 1=1 union/* foo */select load_file('/etc/passwd')--"
 	),
 },
-

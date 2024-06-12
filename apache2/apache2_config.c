@@ -2409,20 +2409,12 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
     return NULL;
 }
 
-
+// Left for syntax compatibility
 static const char *cmd_status_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
-    if (strcasecmp(p1, "on") == 0) {
-        status_engine_state = STATUS_ENGINE_ENABLED;
-    }
-    else if (strcasecmp(p1, "off") == 0) {
-        status_engine_state = STATUS_ENGINE_DISABLED;
-    }
-    else {
-        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
-                "SecStatusEngine: %s", p1);
-    }
-
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP | APLOG_WARNING | APLOG_NOERRNO, 0, cmd->pool,
+        "ModSecurity: WARNING SecStatusEngine is deprecated (%s:%d).",
+        cmd->directive->filename, cmd->directive->line_num); 
     return NULL;
 }
 

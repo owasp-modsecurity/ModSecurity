@@ -13,7 +13,6 @@
 */
 
 #include "msc_remote_rules.h"
-#include "msc_status_engine.h"
 
 #include <apr_thread_pool.h>
 
@@ -331,7 +330,7 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
             headers_chunk = curl_slist_append(headers_chunk, header_key);
         }
 
-        /* Make it TLS 1.2 at least. */
+        /* Make it TLS 1.2 only. */
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
 #ifdef WIN32

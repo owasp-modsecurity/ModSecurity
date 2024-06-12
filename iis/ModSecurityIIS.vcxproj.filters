@@ -115,9 +115,6 @@
     <ClCompile Include="..\apache2\msc_json.c">
       <Filter>ModSecurity</Filter>
     </ClCompile>
-    <ClCompile Include="..\apache2\msc_status_engine.c">
-      <Filter>ModSecurity</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="moduleconfig.h" />
@@ -196,9 +193,6 @@
       <Filter>ModSecurity\libinjection</Filter>
     </ClInclude>
     <ClInclude Include="..\apache2\msc_json.h">
-      <Filter>ModSecurity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\apache2\msc_status_engine.h">
       <Filter>ModSecurity</Filter>
     </ClInclude>
   </ItemGroup>

@@ -40,10 +40,6 @@
 
 #include "api.h"
 
-#ifdef WIN32
-#include "msc_status_engine.h"
-#endif
-
 extern void *modsecLogObj;
 extern void (*modsecLogHook)(void *obj, int level, char *str);
 extern int (*modsecDropAction)(request_rec *r);
@@ -704,47 +700,3 @@ void modsecSetDropAction(int (*func)(request_rec *r)) {
 const char *modsecIsServerSignatureAvailale(void) {
     return new_server_signature;
 }
-
-#ifdef VERSION_IIS
-void modsecStatusEngineCall()
-{
-    if (status_engine_state != STATUS_ENGINE_DISABLED) {
-        msc_status_engine_call();
-    }
-    else {
-        ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-            "Status engine is currently disabled, enable it by set " \
-            "SecStatusEngine to On.\n");
-    }
-}
-
-void modsecReportRemoteLoadedRules()
-{
-#ifdef WITH_REMOTE_RULES
-    if (remote_rules_server != NULL)
-    {
-        if (remote_rules_server->amount_of_rules == 1)
-        {
-            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-                "ModSecurity: Loaded %d rule from: '%s'.",
-                remote_rules_server->amount_of_rules,
-                remote_rules_server->uri);
-        }
-        else
-        {
-            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-                "ModSecurity: Loaded %d rules from: '%s'.",
-                remote_rules_server->amount_of_rules,
-                remote_rules_server->uri);
-        }
-    }
-#endif
-    if (remote_rules_fail_message != NULL)
-    {
-        ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL, "ModSecurity: " \
-            "Problems loading external resources: %s",
-            remote_rules_fail_message);
-    }
-
-}
-#endif

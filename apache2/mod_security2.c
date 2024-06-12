@@ -39,9 +39,6 @@
 #include "msc_lua.h"
 #endif
 
-#include "msc_status_engine.h"
-
-
 #ifdef WITH_YAJL
 #include <yajl/yajl_version.h>
 #endif /* WITH_YAJL */
@@ -77,8 +74,6 @@ msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
 #endif
 int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
 char DSOLOCAL *remote_rules_fail_message = NULL;
-
-int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 
 int DSOLOCAL conn_limits_filter_state = MODSEC_DISABLED;
 
@@ -787,16 +782,6 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                     real_server_signature);
         }
 
-#ifndef VERSION_IIS
-        if (status_engine_state != STATUS_ENGINE_DISABLED) {
-            msc_status_engine_call();
-        }
-        else {
-            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-                    "ModSecurity: Status engine is currently disabled, enable " \
-                    "it by set SecStatusEngine to On.");
-        }
-#endif
     }
 
     /**

@@ -256,7 +256,6 @@ net start W3SVC /y</Command>
     <ClCompile Include="..\apache2\libinjection\libinjection_xss.c" />
     <ClCompile Include="..\apache2\modsecurity.c" />
     <ClCompile Include="..\apache2\mod_security2.c" />
-    <ClCompile Include="..\apache2\msc_status_engine.c" />
     <ClCompile Include="..\apache2\msc_crypt.c" />
     <ClCompile Include="..\apache2\msc_geo.c" />
     <ClCompile Include="..\apache2\msc_gsb.c" />
@@ -306,7 +305,6 @@ net start W3SVC /y</Command>
     <ClInclude Include="..\apache2\modsecurity.h" />
     <ClInclude Include="..\apache2\modsecurity_config.h" />
     <ClInclude Include="..\apache2\modsecurity_config_auto.h" />
-    <ClInclude Include="..\apache2\msc_status_engine.h" />
     <ClInclude Include="..\apache2\msc_crypt.h" />
     <ClInclude Include="..\apache2\msc_geo.h" />
     <ClInclude Include="..\apache2\msc_gsb.h" />
