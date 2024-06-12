@@ -48,4 +48,5 @@ jobs:
       - name: start apache with module
         run: |
           sudo systemctl restart apache2.service
+          sudo cat /var/log/apache2/error.log
 
