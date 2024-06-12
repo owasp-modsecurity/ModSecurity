@@ -45,10 +45,12 @@ jobs:
           sudo cp unicode.mapping /etc/apache2/
           sudo mkdir -p /var/cache/modsecurity
           sudo chown -R www-data:www-data /var/cache/modsecurity
+      - name: first check config
+        run: |
+          sudo httpd -t
       - name: start apache with module
         run: |
           sudo systemctl restart apache2.service
-          sudo cat /var/log/apache2/error.log
-      - name: Always run
+      - name: Show httpd error.log
         if: always()
         run: sudo cat /var/log/apache2/error.log
