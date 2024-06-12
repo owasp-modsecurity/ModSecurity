@@ -21,12 +21,24 @@
 #include "apr_optional.h"
 #include "msc_pcre.h"
 
+#ifndef WIN32
+#define STATUS_ENGINE_DNS_IN_BETWEEN_DOTS 32
+#else
+#define STATUS_ENGINE_DNS_IN_BETWEEN_DOTS 30
+#endif
+
+#define STATUS_ENGINE_DNS_SUFFIX "status.modsecurity.org"
+
 #define MAX_MACHINE_NAME_SIZE 100
 
 #define MAC_ADDRESS_SIZE 20
 
 static const char msc_status_engine_basis_32[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
-int DSOLOCAL msc_status_engine_unique_id(unsigned char* digest);
+int msc_status_engine_call(void);
+
+int DSOLOCAL msc_status_engine_unique_id (unsigned char *digest);
+
+int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len);
 
 #endif

@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2022 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -45,18 +45,17 @@
 #include <sys/utsname.h>
 #endif
 
-//MST
 #ifdef APLOG_USE_MODULE
-APLOG_USE_MODULE(security2);
+    APLOG_USE_MODULE(security2);
 #endif
 
 // Bese32 encode, based on:
 // https://code.google.com/p/google-authenticator/source/browse/libpam/base32.c
-int DSOLOCAL msc_status_engine_base32_encode(char* encoded,
-    const char* data, int len) {
+int DSOLOCAL msc_status_engine_base32_encode(char *encoded,
+    const char *data, int len) {
     int buffer;
     int count = 0;
-    char* result = encoded;
+    char *result = encoded;
     int length = strlen(data);
 
     buffer = data[0];
@@ -76,8 +75,7 @@ int DSOLOCAL msc_status_engine_base32_encode(char* encoded,
                     buffer <<= 8;
                     buffer |= data[next++] & 0xff;
                     bitsLeft += 8;
-                }
-                else {
+                } else {
                     int pad = 5 - bitsLeft;
                     buffer <<= pad;
                     bitsLeft += pad;
@@ -98,8 +96,8 @@ int DSOLOCAL msc_status_engine_base32_encode(char* encoded,
     return count;
 }
 
-int DSOLOCAL msc_status_engine_fill_with_dots(char* encoded_with_dots,
-    const char* data, int len, int space)
+int DSOLOCAL msc_status_engine_fill_with_dots(char *encoded_with_dots,
+    const char *data, int len, int space)
 {
     int i;
     int count = 0;
@@ -113,7 +111,7 @@ int DSOLOCAL msc_status_engine_fill_with_dots(char* encoded_with_dots,
             goto return_length;
         }
 
-        count = len / space + len + 1;
+        count = len/space + len + 1;
         goto return_length;
     }
 
@@ -132,7 +130,7 @@ return_length:
 
 // Based on:
 // http://stackoverflow.com/questions/16858782/how-to-obtain-almost-unique-system-identifier-in-a-cross-platform-way
-int DSOLOCAL msc_status_engine_machine_name(char* machine_name, size_t len) {
+int DSOLOCAL msc_status_engine_machine_name(char *machine_name, size_t len) {
 #ifdef WIN32
     DWORD lenComputerName = len;
 #endif
@@ -146,13 +144,13 @@ int DSOLOCAL msc_status_engine_machine_name(char* machine_name, size_t len) {
 #endif
 
 #ifdef HAVE_SYS_UTSNAME_H
-    static struct utsname u;
+   static struct utsname u;
 
-    if (uname(&u) < 0) {
-        goto failed;
-    }
+   if ( uname( &u ) < 0 ) {
+      goto failed;
+   }
 
-    apr_snprintf(machine_name, len - 1, "%s", u.nodename);
+   apr_snprintf(machine_name, len-1, "%s", u.nodename);
 #endif
 
     return 0;
@@ -161,22 +159,22 @@ failed:
     return -1;
 }
 
-int DSOLOCAL msc_status_engine_mac_address(unsigned char* mac)
+int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
 {
 #ifdef DARWIN
     struct ifaddrs* ifaphead;
     struct ifaddrs* ifap;
     int i = 0;
 
-    if (getifaddrs(&ifaphead) != 0) {
+    if ( getifaddrs( &ifaphead ) != 0 ) {
         goto failed;
     }
 
     // iterate over the net interfaces
-    for (ifap = ifaphead; ifap; ifap = ifap->ifa_next) {
+    for ( ifap = ifaphead; ifap; ifap = ifap->ifa_next ) {
         struct sockaddr_dl* sdl = (struct sockaddr_dl*)ifap->ifa_addr;
-        if (sdl && (sdl->sdl_family == AF_LINK) && (sdl->sdl_type == IFT_ETHER)
-            && mac[0] && mac[1] && mac[2] && i < 6) {
+        if ( sdl && ( sdl->sdl_family == AF_LINK ) && ( sdl->sdl_type == IFT_ETHER )
+                && mac[0] && mac[1] && mac[2] && i < 6) {
 
             apr_snprintf(mac, MAC_ADDRESS_SIZE, "%02x:%02x:%02x:%02x:%02x:%02x",
                 (unsigned char)LLADDR(sdl)[0],
@@ -189,32 +187,32 @@ int DSOLOCAL msc_status_engine_mac_address(unsigned char* mac)
         }
     }
 
-    freeifaddrs(ifaphead);
+    freeifaddrs( ifaphead );
 #endif
 
 #if (defined(__linux__) || defined(__gnu_linux__))
     struct ifconf conf;
-    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP );
     struct ifreq* ifr;
-    if (sock < 0) {
+    if ( sock < 0 ) {
         goto failed;
     }
 
-    char ifconfbuf[128 * sizeof(struct ifreq)];
-    memset(ifconfbuf, 0, sizeof(ifconfbuf));
+    char ifconfbuf[ 128 * sizeof(struct ifreq) ];
+    memset( ifconfbuf, 0, sizeof( ifconfbuf ));
     conf.ifc_buf = ifconfbuf;
-    conf.ifc_len = sizeof(ifconfbuf);
-    if (ioctl(sock, SIOCGIFCONF, &conf)) {
+    conf.ifc_len = sizeof( ifconfbuf );
+    if ( ioctl( sock, SIOCGIFCONF, &conf )) {
         close(sock);
         goto failed;
     }
 
-    for (ifr = conf.ifc_req; ifr < conf.ifc_req + conf.ifc_len; ifr++) {
-        if (ioctl(sock, SIOCGIFFLAGS, ifr)) {
+    for ( ifr = conf.ifc_req; ifr < conf.ifc_req + conf.ifc_len; ifr++ ) {
+        if ( ioctl( sock, SIOCGIFFLAGS, ifr )) {
             continue;  // failed to get flags, skip it
         }
 
-        if (ioctl(sock, SIOCGIFHWADDR, ifr) == 0) {
+        if ( ioctl( sock, SIOCGIFHWADDR, ifr ) == 0 ) {
             int i = 0;
             if (!ifr->ifr_addr.sa_data[0] && !ifr->ifr_addr.sa_data[1]
                 && !ifr->ifr_addr.sa_data[2]) {
@@ -232,7 +230,7 @@ int DSOLOCAL msc_status_engine_mac_address(unsigned char* mac)
             goto end;
         }
     }
-    close(sock);
+    close( sock );
 #endif
 
 #if WIN32
@@ -240,15 +238,15 @@ int DSOLOCAL msc_status_engine_mac_address(unsigned char* mac)
     PIP_ADAPTER_INFO pAdapter = NULL;
     DWORD dwRetVal = 0;
 
-    ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
-    pAdapterInfo = (IP_ADAPTER_INFO*)malloc(sizeof(IP_ADAPTER_INFO));
+    ULONG ulOutBufLen = sizeof (IP_ADAPTER_INFO);
+    pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof (IP_ADAPTER_INFO));
     if (!pAdapterInfo) {
         goto failed;
     }
 
     if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) {
         free(pAdapterInfo);
-        pAdapterInfo = (IP_ADAPTER_INFO*)malloc(ulOutBufLen);
+        pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen);
         if (!pAdapterInfo) {
             goto failed;
         }
@@ -286,33 +284,33 @@ failed:
     return -1;
 }
 
-int DSOLOCAL msc_status_engine_unique_id(unsigned char* digest)
+int DSOLOCAL msc_status_engine_unique_id (unsigned char *digest)
 {
     unsigned char hex_digest[APR_SHA1_DIGESTSIZE];
-    unsigned char* mac_address = NULL;
-    char* machine_name = NULL;
+    unsigned char *mac_address = NULL;
+    char *machine_name = NULL;
     int ret = 0;
     int i = 0;
     apr_sha1_ctx_t context;
 
-    mac_address = malloc(sizeof(char) * (MAC_ADDRESS_SIZE));
+    mac_address = malloc(sizeof(char)*(MAC_ADDRESS_SIZE));
     if (!mac_address) {
         ret = -1;
         goto failed_mac_address;
     }
-    memset(mac_address, '\0', sizeof(char) * (MAC_ADDRESS_SIZE));
+    memset(mac_address, '\0', sizeof(char)*(MAC_ADDRESS_SIZE));
 
     if (msc_status_engine_mac_address(mac_address)) {
         ret = -1;
         goto failed_set_mac_address;
     }
 
-    machine_name = malloc(sizeof(char) * MAX_MACHINE_NAME_SIZE);
+    machine_name = malloc(sizeof(char)*MAX_MACHINE_NAME_SIZE);
     if (!machine_name) {
         ret = -1;
         goto failed_machine_name;
     }
-    memset(machine_name, '\0', sizeof(char) * (MAX_MACHINE_NAME_SIZE));
+    memset(machine_name, '\0', sizeof(char)*(MAX_MACHINE_NAME_SIZE));
     if (msc_status_engine_machine_name(machine_name, MAC_ADDRESS_SIZE)) {
         ret = -1;
         goto failed_set_machine_name;
@@ -334,5 +332,179 @@ failed_machine_name:
 failed_set_mac_address:
     free(mac_address);
 failed_mac_address:
+    return ret;
+}
+
+int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len) {
+    char *apr = NULL;
+    const char *apr_loaded = NULL;
+    char pcre[7];
+    const char *pcre_loaded = NULL;
+    char *lua = NULL;
+    char *libxml = NULL;
+    char *modsec = NULL;
+    const char *apache = NULL;
+    char id[(APR_SHA1_DIGESTSIZE*2) + 1];
+    int beacon_string_len = -1;
+
+    apr = APR_VERSION_STRING;
+    apr_loaded = apr_version_string();
+#ifdef WITH_PCRE2
+    apr_snprintf(pcre, 7, "%d.%d", PCRE2_MAJOR, PCRE2_MINOR);
+    pcre_loaded = ""; /* complete this if/when status reactivated */
+#else
+    apr_snprintf(pcre, 7, "%d.%d", PCRE_MAJOR, PCRE_MINOR);
+    pcre_loaded = pcre_version();
+#endif
+#ifdef WITH_LUA
+    lua = LUA_VERSION;
+#endif
+    libxml = LIBXML_DOTTED_VERSION;
+    modsec = MODSEC_VERSION;
+#ifdef VERSION_IIS
+    apache = "IIS";
+#elif VERSION_NGINX
+    apache = "nginx";
+#else
+    apache = real_server_signature;
+#endif
+
+    /* 6 represents: strlen("(null)") */
+    beacon_string_len = (modsec ? strlen(modsec) : 6) +
+        (apache ? strlen(apache) : 6) + (apr ? strlen(apr) : 6) +
+        (apr_loaded ? strlen(apr_loaded) : 6) + (pcre ? strlen(pcre) : 6) +
+        (pcre_loaded ? strlen(pcre_loaded) : 6) + (lua ? strlen(lua) : 6) +
+        (libxml ? strlen(libxml) : 6) + (APR_SHA1_DIGESTSIZE * 2);
+
+    beacon_string_len = beacon_string_len + /* null terminator: */ 1 +
+            /* comma: */ 6 +
+            /* slash: */ 2;
+
+    if (beacon_string == NULL || beacon_string_max_len == 0) {
+        goto return_length;
+    }
+
+    memset(id, '\0', sizeof(id));
+    if (msc_status_engine_unique_id(id)) {
+        sprintf(id, "no unique id");
+    }
+
+    apr_snprintf(beacon_string, beacon_string_max_len,
+        "%.25s,%.25s,%s/%s,%s/%s,%s,%s,%s",
+        modsec, apache, apr, apr_loaded, pcre, pcre_loaded, lua, libxml, id);
+
+return_length:
+    return beacon_string_len;
+}
+
+int DSOLOCAL msc_status_engine_prepare_hostname (char *hostname, const char *plain_data,
+        int max_length)
+{
+    int str_enc_len = 0;
+    int str_enc_spl_len = 0;
+    char *tmp = NULL;
+    int length = -1;
+    time_t ltime;
+
+    str_enc_len = msc_status_engine_base32_encode(NULL, plain_data, 0);
+
+    str_enc_spl_len = msc_status_engine_fill_with_dots(NULL, NULL, str_enc_len,
+            STATUS_ENGINE_DNS_IN_BETWEEN_DOTS);
+    if (str_enc_spl_len < 0) {
+        goto failed_enc_spl_len;
+    }
+
+    length = str_enc_spl_len + strlen(STATUS_ENGINE_DNS_SUFFIX) +
+        /* epoch: */ 10 + /* dots: */ 2 + /* terminator: */ 1 -
+        /* removed unsed terminators from str_enc and str_enc_spl: */ 2;
+
+    if (hostname == NULL || max_length == 0) {
+        goto return_length;
+    }
+
+    memset(hostname, '\0', sizeof(char) * max_length);
+
+    msc_status_engine_base32_encode(hostname, plain_data, str_enc_len);
+
+    tmp = strdup(hostname);
+    if (tmp == NULL) {
+        length = -1;
+        goto failed_strdup;
+    }
+
+    str_enc_spl_len = msc_status_engine_fill_with_dots(hostname, tmp, max_length,
+        STATUS_ENGINE_DNS_IN_BETWEEN_DOTS);
+    if (str_enc_spl_len < 0) {
+        length = -1;
+        goto failed_enc_spl;
+    }
+
+    time ( &ltime );
+    apr_snprintf(hostname, max_length, "%s.%ld.%s", hostname,
+            (long) ltime, STATUS_ENGINE_DNS_SUFFIX);
+
+failed_enc_spl:
+    free(tmp);
+failed_strdup:
+return_length:
+failed_enc_spl_len:
+    return length;
+}
+
+int msc_status_engine_call (void) {
+    char *beacon_str = NULL;
+    int beacon_str_len = 0;
+    char *hostname = NULL;
+    int hostname_len = 0;
+    int ret = -1;
+
+    /* Retrieve the beacon string */
+    beacon_str_len = msc_beacon_string(NULL, 0);
+
+    beacon_str = malloc(sizeof(char) * beacon_str_len);
+    if (beacon_str == NULL) {
+        goto failed_beacon_string_malloc;
+    }
+    msc_beacon_string(beacon_str, beacon_str_len);
+
+    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+            "ModSecurity: StatusEngine call: \"%s\"", beacon_str);
+
+    /* Get beacon string in the format of a hostname */
+    hostname_len = msc_status_engine_prepare_hostname(NULL, beacon_str, 0);
+    if (hostname_len < 0) {
+        goto failed_hostname_len;
+    }
+
+    hostname = malloc(sizeof(char) * hostname_len);
+    if (hostname == NULL) {
+        goto failed_hostname_malloc;
+    }
+    hostname_len = msc_status_engine_prepare_hostname(hostname, beacon_str,
+            hostname_len);
+    if (hostname_len < 0) {
+        goto failed_hostname;
+    }
+
+    /* Perform the DNS query. */
+    if (gethostbyname(hostname)) {
+        ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+            "ModSecurity: StatusEngine call successfully sent. For more " \
+            "information visit: http://%s/", STATUS_ENGINE_DNS_SUFFIX);
+    } else {
+        ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+            "ModSecurity: StatusEngine call failed. Query: %s",
+            hostname);
+    }
+
+    ret = 0;
+
+failed_hostname:
+    free(hostname);
+failed_hostname_malloc:
+failed_hostname_len:
+    free(beacon_str);
+failed_beacon_string_malloc:
+
     return ret;
 }
