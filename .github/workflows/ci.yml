@@ -47,7 +47,7 @@ jobs:
           sudo chown -R www-data:www-data /var/cache/modsecurity
       - name: first check config (to get syntax errors)
         run: |
-          sudo apache2 -t
+          sudo apachectl configtest
       - name: start apache with module
         run: |
           sudo systemctl restart apache2.service
