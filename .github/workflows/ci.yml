@@ -49,3 +49,6 @@ jobs:
         run: |
           sudo systemctl restart apache2.service
           sudo cat /var/log/apache2/error.log
+      - name: Always run
+        if: always()
+        run: sudo cat /var/log/apache2/error.log
