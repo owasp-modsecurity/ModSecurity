@@ -47,7 +47,7 @@ jobs:
           sudo chown -R www-data:www-data /var/cache/modsecurity
       - name: first check config
         run: |
-          sudo httpd -t
+          sudo apache -t
       - name: start apache with module
         run: |
           sudo systemctl restart apache2.service
