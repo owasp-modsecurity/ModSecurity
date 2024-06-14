@@ -54,7 +54,4 @@ jobs:
         run: sudo cat /var/log/apache2/error.log
       - name: Show mod_security2 audit log
         if: always()
-        run: |
-          pwd
-          ls -alR
-          sudo cat /var/log/apache2/modsec_audit.log
+        run: sudo cat /var/log/apache2/modsec_audit.log
