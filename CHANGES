@@ -1,6 +1,10 @@
 DD mmm YYYY - 2.9.x (to be released)
 -------------------
 
+ * Fixed msc_regexec() return code check
+   [PR #3150 @marcstern]
+ * Many NULL pointers checks
+   [PR #3120 @marcstern]
  * Enhance logging
    [Issue #3107 - @marcstern]
  * Fix possible segfault in collection_unpack
