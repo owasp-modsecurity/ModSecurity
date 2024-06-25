@@ -76,7 +76,7 @@ msre_var DSOLOCAL *generate_single_var(modsec_rec *msr, msre_var *var, apr_array
     msre_rule *rule, apr_pool_t *mptmp);
 
 #ifdef DEBUG_CONF
-char DSOLOCAL* msre_actionset_generate_action_string(apr_pool_t* pool, const msre_actionset* actionset);
+ char DSOLOCAL* msre_actionset_generate_action_string(apr_pool_t* pool, const msre_actionset* actionset);
 #endif
 
 #if defined(WITH_LUA)

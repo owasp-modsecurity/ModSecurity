@@ -237,15 +237,7 @@ static char *construct_auditlog_filename(apr_pool_t *mp, const char *uniqueid) {
      * This is required for mpm-itk & mod_ruid2, though should be harmless for other implementations 
      * It also changes the return statement.
      */
-    char *userinfo;
-    apr_status_t rc;
-    apr_uid_t uid;
-    apr_gid_t gid;
-    apr_uid_current(&uid, &gid, mp);
-    rc = apr_uid_name_get(&userinfo, uid, mp);
-    if (rc != APR_SUCCESS) {
-      userinfo = apr_psprintf(mp, "%u", uid);
-    }
+    char *userinfo = get_username(mp);
 
     apr_time_exp_lt(&t, apr_time_now());
 
@@ -1470,15 +1462,17 @@ void sec_audit_logger_json(modsec_rec *msr) {
      * as it does not need an index file.
      */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-
+      if (!msr->modsecurity->auditlog_lock) msr_log(msr, 1, "Audit log: Global mutex was not created");
+		    else {
         /* Unlock the mutex we used to serialise access to the audit log file. */
         rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
         if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s",
-                    get_apr_error(msr->mp, rc));
+            msr_log(msr, 1, "Audit log: Failed to unlock global mutex '%s': %s",
+			apr_global_mutex_lockfile(msr->modsecurity->auditlog_lock), get_apr_error(msr->mp, rc));
         }
 
         return;
+      }
     }
 
     /* From here on only concurrent-style processing. */
@@ -2254,8 +2248,8 @@ void sec_audit_logger_native(modsec_rec *msr) {
         /* Unlock the mutex we used to serialise access to the audit log file. */
         rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
         if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s",
-                    get_apr_error(msr->mp, rc));
+            msr_log(msr, 1, "Audit log: Failed to unlock global mutex '%s': %s",
+                    apr_global_mutex_lockfile(msr->modsecurity->auditlog_lock), get_apr_error(msr->mp, rc));
         }
 
         return;

@@ -21,8 +21,6 @@
 static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob, unsigned int blob_size,
     int log_vars)
 {
-    assert(msr != NULL);
-    assert(blob != NULL);
     apr_table_t *col = NULL;
     unsigned int blob_offset;
 
@@ -92,8 +90,6 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
 static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec *msr, const char *col_name,
     const char *col_key, int col_key_len)
 {
-    assert(msr != NULL);
-    assert(col_name != NULL);
     char *dbm_filename = NULL;
     apr_status_t rc;
     apr_sdbm_datum_t key;
@@ -350,7 +346,6 @@ cleanup:
 apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     const char *col_key, int col_key_len)
 {
-    assert(msr != NULL);
     apr_time_t time_before = apr_time_now();
     apr_table_t *rtable = NULL;
     
@@ -365,7 +360,6 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
  *
  */
 int collection_store(modsec_rec *msr, apr_table_t *col) {
-    assert(msr != NULL);
     char *dbm_filename = NULL;
     msc_string *var_name = NULL, *var_key = NULL;
     unsigned char *blob = NULL;
@@ -614,8 +608,8 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
     rc = apr_sdbm_store(dbm, key, value, APR_SDBM_REPLACE);
     if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s", dbm_filename,
-                get_apr_error(msr->mp, rc));
+        msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s (key=%s)", dbm_filename,
+                get_apr_error(msr->mp, rc), key.dptr);
         if (dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
             apr_sdbm_close(dbm);
@@ -653,8 +647,6 @@ error:
  *
  */
 int collections_remove_stale(modsec_rec *msr, const char *col_name) {
-    assert(msr != NULL);
-    assert(col_name != NULL);
     char *dbm_filename = NULL;
     apr_sdbm_datum_t key, value;
     apr_sdbm_t *dbm = NULL;
