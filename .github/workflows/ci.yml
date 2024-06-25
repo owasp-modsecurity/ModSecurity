@@ -55,3 +55,4 @@ jobs:
       - name: Show mod_security2 audit log
         if: always()
         run: sudo cat /var/log/apache2/modsec_audit.log
+        # For non-regression tests: /home/runner/work/ModSecurity/ModSecurity/tests/regression/server_root/logs/audit/audit.log
