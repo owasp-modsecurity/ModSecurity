@@ -162,7 +162,9 @@ static int var_args_combined_size_generate(modsec_rec *msr, msre_var *var, msre_
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+#ifndef ARGS_COMBINED_SIZE_VALUE_ONLY
         combined_size += arg->name_len;
+#endif
         combined_size += arg->value_len;
     }
 
@@ -1304,6 +1306,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    if (msr->mpd->parts == NULL) return 0;
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for (i = 0; i < msr->mpd->parts->nelts; i++)
@@ -1405,6 +1408,7 @@ static int var_files_tmpnames_generate(modsec_rec *msr, msre_var *var, msre_rule
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    if (msr->mpd->parts == NULL) return 0;
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
@@ -1454,6 +1458,7 @@ static int var_files_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    if (msr->mpd->parts == NULL) return 0;
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
@@ -1503,6 +1508,7 @@ static int var_files_sizes_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    if (msr->mpd->parts == NULL) return 0;
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
@@ -1552,6 +1558,7 @@ static int var_files_names_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    if (msr->mpd->parts == NULL) return 0;
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
@@ -1622,6 +1629,7 @@ static int var_multipart_part_headers_generate(modsec_rec *msr, msre_var *var, m
     int i, j, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    if (msr->mpd->parts == NULL) return 0;
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {

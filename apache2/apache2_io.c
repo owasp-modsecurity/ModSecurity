@@ -1047,7 +1047,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
             bucket_ci = apr_bucket_heap_create(msr->content_append,
                     msr->content_append_len, NULL, f->r->connection->bucket_alloc);
-            APR_BUCKET_INSERT_BEFORE(eos_bucket, bucket_ci);
+            if (eos_bucket) APR_BUCKET_INSERT_BEFORE(eos_bucket, bucket_ci);
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Content-Injection (b): Added content to bottom: %s",

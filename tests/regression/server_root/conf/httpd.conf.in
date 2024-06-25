@@ -25,7 +25,8 @@ LoadModule security2_module @MSC_BASE_DIR@/apache2/.libs/mod_security2.so
 ServerName localhost
 CoreDumpDirectory @MSC_REGRESSION_SERVERROOT_DIR@/tmp
 LogLevel debug
-ErrorLog @MSC_REGRESSION_LOGS_DIR@/error.log
+ErrorLog     @MSC_REGRESSION_LOGS_DIR@/error.log
+SecAuditLog  @MSC_REGRESSION_LOGS_DIR@/modsec_audit.log
 
 <IfDefine !CHROOT>
 	# File locations

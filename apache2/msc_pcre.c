@@ -148,9 +148,9 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
 
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
-                pe = pcre_study(regex->re, PCRE_STUDY_JIT_COMPILE, &errptr);
+                pe = pcre_study(regex->re, PCRE_STUDY_EXTRA_NEEDED|PCRE_STUDY_JIT_COMPILE, &errptr);
         #else
-                pe = pcre_study(regex->re, 0, &errptr);
+                pe = pcre_study(regex->re, PCRE_STUDY_EXTRA_NEEDED, &errptr);
         #endif
     #endif
 

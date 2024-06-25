@@ -57,7 +57,6 @@ static int msre_fn_cmdline_execute(apr_pool_t *mptmp, unsigned char *input,
                 /* replace some characters to space (only one) */
             case ' ':
             case ',':
-            case ';':
             case '\t':
             case '\r':
             case '\n':

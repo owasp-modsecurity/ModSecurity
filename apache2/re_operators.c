@@ -643,7 +643,6 @@ nextround:
     }
 
     if(msr->stream_input_data != NULL && input_body == 1) {
-        memset(msr->stream_input_data, 0x0, msr->stream_input_length);
         free(msr->stream_input_data);
         msr->stream_input_data = NULL;
         msr->stream_input_length = 0;
@@ -789,7 +788,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             *error_msg = "Internal Error: regex data is null.";
             return -1;
         } else  {
-
+            const char *pattern = NULL;
+            
             if(re_pattern == NULL)  {
                 *error_msg = "Internal Error: regex variable data is null.";
                 return -1;
@@ -800,8 +800,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
 
             expand_macros(msr, re_pattern, rule, msr->mp);
 
-            const char *pattern = log_escape_re(msr->mp, re_pattern->value);
             if (msr->txcfg->debuglog_level >= 6) {
+                pattern = log_escape_re(msr->mp, re_pattern->value);
                 msr_log(msr, 6, "Escaping pattern [%s]",pattern);
             }
 
@@ -1128,18 +1128,12 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         target_length = var->value_len;
     }
 
-    if (rule->actionset->actions) {
-        /* Are we supposed to capture subexpressions? */
+    /* Are we supposed to capture subexpressions? */
+    if (rule->actionset) {
         capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
-        matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
-        if (!matched_bytes)
-            matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
-
-        matched = apr_table_get(rule->actionset->actions, "sanitizeMatched") ? 1 : 0;
-        if (!matched)
-            matched = apr_table_get(rule->actionset->actions, "sanitiseMatched") ? 1 : 0;
+        matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
+        matched = apr_table_get(rule->actionset->actions, "sanitiseMatched") ? 1 : 0;
     }
-    else capture = 0;
 
     /* Show when the regex captures but "capture" is not set */
     if (msr->txcfg->debuglog_level >= 6) {
@@ -1575,10 +1569,10 @@ static const char *gsb_replace_tpath(apr_pool_t *pool, const char *domain, int l
     url = apr_palloc(pool, len + 1);
     data = apr_palloc(pool, len + 1);
 
-    memset(data, 0, len+1);
-    memset(url, 0, len+1);
-
+    data[0] = '\0';
+    
     memcpy(url, domain, len);
+    url[len] = 0;
 
     while(( pos = strstr(url , "/./" )) != NULL) {
         match = 1;
@@ -3036,10 +3030,8 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
              * and we are done.
              */
 
-            matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
-            if(!matched_bytes)
+            if (rule->actionset) {
                 matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
-
             if (apr_table_get(rule->actionset->actions, "capture")) {
                 for(; i < rc; i++) {
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -3082,6 +3074,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
                     }
 
                 }
+            }
             }
 
             /* Unset the remaining TX vars (from previous invocations). */
@@ -3368,8 +3361,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
              * and we are done.
              */
 
-            matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
-            if (!matched_bytes)
+            if (rule->actionset) {
                 matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
 
             if (apr_table_get(rule->actionset->actions, "capture")) {
@@ -3425,6 +3417,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             }
 
             break;
+        }
         }
     }
 
@@ -3690,10 +3683,8 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
              * and we are done.
              */
 
-            matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
-            if(!matched_bytes)
+            if (rule->actionset) {
                 matched_bytes = apr_table_get(rule->actionset->actions, "sanitiseMatchedBytes") ? 1 : 0;
-
             if (apr_table_get(rule->actionset->actions, "capture")) {
                 for(; i < rc; i++) {
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -3737,6 +3728,8 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                 }
             }
+            }
+
 
             /* Unset the remaining TX vars (from previous invocations). */
             for(; i <= 9; i++) {
@@ -4426,6 +4419,9 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
 
     /* Check every byte of the target to detect characters that are not allowed. */
 
+    /* Handle capture as tx.1=char */
+    int capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+    
     count = 0;
     for(i = 0; i < var->value_len; i++) {
         int x = ((unsigned char *)var->value)[i];
@@ -4434,6 +4430,17 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
                 msr_log(msr, 9, "Value %d in %s outside range: %s", x, var->name, rule->op_param);
             }
             count++;
+            /* Handle capture as tx.1=char */
+         			if (capture) {
+           				msc_string* s = (msc_string*)apr_pcalloc(msr->mp, sizeof(msc_string));
+           				s->name = apr_psprintf(msr->mp, "%d", count);
+           				s->name_len = strlen(s->name);
+           				s->value = apr_pcalloc(msr->mp, 2);
+           				s->value[0] = var->value[i];
+           				s->value[1] = '\0';
+           				s->value_len = 1;
+           				apr_table_setn(msr->tx_vars, s->name, (void*)s);
+         			}
         }
     }
 

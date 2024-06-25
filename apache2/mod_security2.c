@@ -665,6 +665,7 @@ static const char *modsec_var_log_handler(request_rec *r, char *name) {
 
     msr = retrieve_tx_context(r);
     if (msr == NULL) return NULL;
+    if (msr->msc_rule_mptmp == NULL) return NULL;
 
     return construct_single_var(msr, name);
 }
@@ -776,7 +777,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     /* Log our presence to the error log. */
     if (first_time) {
         ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "%s configured.", MODSEC_MODULE_NAME_FULL);
+                "%s configured.", MODSEC_MODULE_NAME_FULL2);
 
         version(mp);
 
@@ -791,11 +792,13 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         if (status_engine_state != STATUS_ENGINE_DISABLED) {
             msc_status_engine_call();
         }
+/*MST
         else {
             ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
                     "ModSecurity: Status engine is currently disabled, enable " \
                     "it by set SecStatusEngine to On.");
         }
+*/
 #endif
     }
 
@@ -855,6 +858,8 @@ static void hook_child_init(apr_pool_t *mp, server_rec *s) {
 static int hook_request_early(request_rec *r) {
     modsec_rec *msr = NULL;
     int rc = DECLINED;
+
+    apr_table_set(r->subprocess_env, "ModSecVersion", MODSEC_MODULE_VERSION);
 
     /* This function needs to run only once per transaction
      * (i.e. subrequests and redirects are excluded).

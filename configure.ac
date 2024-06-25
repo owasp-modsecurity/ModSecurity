@@ -561,6 +561,21 @@ AC_ARG_ENABLE(server-context-logging,
   log_server_context=''
 ])
 
+# Disable logging of server context
+AC_ARG_ENABLE(server-context-logging,
+              AS_HELP_STRING([--enable-args-combined-size-value-only],
+                             [Store only the length of ARGS values in ARGS_COMBINED_SIZE. The default is to also store length of ARGS names.]),
+[
+  if test "$enableval" != "no"; then
+    log_server_context=
+  else
+    log_server_context="-DARGS_COMBINED_SIZE_VALUE_ONLY"
+  fi
+],
+[
+  log_server_context=''
+])
+
 
 # Enable collection's global lock
 AC_ARG_ENABLE(collection-global-lock,
