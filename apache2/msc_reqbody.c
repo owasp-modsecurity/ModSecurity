@@ -461,8 +461,8 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
         if(data == NULL)
             return -1;
 
-        memset(data, 0, msr->stream_input_length + 1 - buflen);
         memcpy(data, msr->stream_input_data, msr->stream_input_length - buflen);
+        data[msr->stream_input_length - buflen] = '\0';
 
         stream_input_body = (char *)realloc(msr->stream_input_data, msr->stream_input_length + 1);
 
@@ -479,16 +479,15 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
         return -1;
     }
 
-    memset(msr->stream_input_data, 0, msr->stream_input_length+1);
-
-    if(first_pkt)   {
+    if (first_pkt)   {
         memcpy(msr->stream_input_data, buffer, msr->stream_input_length);
     } else {
         memcpy(msr->stream_input_data, data, msr->stream_input_length - buflen);
         memcpy(msr->stream_input_data+(msr->stream_input_length - buflen), buffer, buflen);
     }
+    msr->stream_input_data[msr->stream_input_length] = '\0';
 
-    if(data)    {
+    if (data)    {
         free(data);
         data = NULL;
     }

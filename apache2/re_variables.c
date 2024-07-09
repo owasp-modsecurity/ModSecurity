@@ -2491,7 +2491,7 @@ static int var_full_request_generate(modsec_rec *msr, msre_var *var,
         }
         goto failed_not_enough_mem;
     }
-    memset(full_request, '\0', sizeof(char)*msr->msc_full_request_length);
+    full_request[0] = '\0';
     msr->msc_full_request_buffer = full_request;
     msr->msc_full_request_length = full_request_length;
 

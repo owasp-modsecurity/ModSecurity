@@ -619,7 +619,6 @@ nextround:
 
     if(msr->stream_output_data != NULL && output_body == 1) {
 
-        memset(msr->stream_output_data, 0x0, msr->stream_output_length);
         free(msr->stream_output_data);
         msr->stream_output_data = NULL;
         msr->stream_output_length = 0;
@@ -631,7 +630,6 @@ nextround:
         }
 
         msr->stream_output_length = size;
-        memset(msr->stream_output_data, 0x0, size+1);
 
         msr->of_stream_changed = 1;
 
@@ -643,7 +641,6 @@ nextround:
     }
 
     if(msr->stream_input_data != NULL && input_body == 1) {
-        memset(msr->stream_input_data, 0x0, msr->stream_input_length);
         free(msr->stream_input_data);
         msr->stream_input_data = NULL;
         msr->stream_input_length = 0;
@@ -1575,10 +1572,8 @@ static const char *gsb_replace_tpath(apr_pool_t *pool, const char *domain, int l
     url = apr_palloc(pool, len + 1);
     data = apr_palloc(pool, len + 1);
 
-    memset(data, 0, len+1);
-    memset(url, 0, len+1);
-
     memcpy(url, domain, len);
+    url[len] = 0;
 
     while(( pos = strstr(url , "/./" )) != NULL) {
         match = 1;
@@ -1681,8 +1676,6 @@ static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned 
     const char *hash = NULL;
     const char *search = NULL;
 
-    memset(digest, 0, sizeof(digest));
-
     apr_md5_init(&ctx);
 
     if ((rc = apr_md5_update(&ctx, match, match_length)) != APR_SUCCESS)
@@ -1690,7 +1683,7 @@ static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned 
 
     apr_md5_final(digest, &ctx);
 
-    hash = apr_psprintf(msr->mp, "%s", bytes2hex(msr->mp, digest, 16));
+    hash = apr_psprintf(msr->mp, "%s", bytes2hex(msr->mp, digest, APR_MD5_DIGESTSIZE));
 
     if ((hash != NULL) && (gsb->gsb_table != NULL))   {
         search = apr_hash_get(gsb->gsb_table, hash, APR_HASH_KEY_STRING);
