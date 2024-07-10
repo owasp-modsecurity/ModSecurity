@@ -116,7 +116,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", userinfo, "-", col_name, NULL);
 
     if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "collection_retrieve_ex: collection_retrieve_ex: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
+        msr_log(msr, 9, "collection_retrieve_ex: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
                 log_escape(msr->mp, dbm_filename));
     }
 
