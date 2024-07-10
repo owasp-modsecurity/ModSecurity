@@ -75,6 +75,28 @@ AC_MSG_ERROR([\
 fi
 # Libinjection version
 AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git describe && cd ../..))
+AC_SUBST([LIBINJECTION_VERSION])
+
+# Check for Mbed TLS
+if ! test -f "${srcdir}/others/mbedtls/library/base64.c"; then
+AC_MSG_ERROR([\
+
+
+  Mbed TLS was not found within ModSecurity source directory.
+
+  Mbed TLS code is available as part of ModSecurity source code in a format
+  of a git-submodule. git-submodule allow us to specify the correct version of
+  Mbed TLS and still uses the Mbed TLS repository to download it.
+
+  You can download Mbed TLS using git:
+
+     $ git submodule init
+     $ git submodule update
+
+   ])
+fi
+# Mbed TLS version
+AC_DEFUN([MBEDTLS_VERSION], m4_esyscmd_s(cd "others/mbedtls" && git describe && cd ../..))
 
 # SecLang test version
 AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(cd "test/test-cases/secrules-language-tests" && git log -1 --format="%h" --abbrev-commit && cd ../../..))
@@ -425,6 +447,8 @@ echo " "
 echo " Mandatory dependencies"
 AS_ECHO_N("   + libInjection                                  ....")
 echo LIBINJECTION_VERSION
+AS_ECHO_N("   + Mbed TLS                                      ....")
+echo MBEDTLS_VERSION
 AS_ECHO_N("   + SecLang tests                                 ....")
 echo SECLANG_TEST_VERSION
 

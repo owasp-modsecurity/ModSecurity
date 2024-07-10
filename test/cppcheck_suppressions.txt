@@ -1,22 +1,12 @@
 //
 // Ignore libinjection related stuff.
 //
-*:others/libinjection/src/libinjection_html5.c
-*:others/libinjection/src/libinjection_sqli.c
-*:others/libinjection/src/libinjection_xss.c
-*:others/libinjection/src/reader.c
-*:others/libinjection/src/sqli_cli.c
-*:others/libinjection/src/testdriver.c
-*:others/libinjection/src/test_speed_sqli.c
-*:others/libinjection/src/test_speed_xss.c
-
+*:others/libinjection/src/*
 
 //
 // Lets ignore mbedtls.
 //
-*:others/mbedtls/base64.c
-*:others/mbedtls/md5.c
-*:others/mbedtls/sha1.c
+*:others/mbedtls/*
 
 
 //

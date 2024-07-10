@@ -14,7 +14,7 @@ option(USE_ASAN        "Build with Address Sanitizer" OFF)
 
 # NOTE: MBEDTLS_CONFIG_FILE is not only required to compile the mbedtls subset in others, but also
 # when their headers are included while compiling libModSecurity
-add_compile_definitions(WIN32 _CRT_SECURE_NO_WARNINGS MBEDTLS_CONFIG_FILE="mbed-tls-config.h")
+add_compile_definitions(WIN32 _CRT_SECURE_NO_WARNINGS MBEDTLS_CONFIG_FILE="mbedtls/mbedtls_config.h")
 
 # set standards conformance preprocessor & compiler to align with cross-compiled codebase
 # NOTE: otherwise visual c++'s default compiler/preprocessor behaviour generates C4067 warnings
@@ -30,15 +30,41 @@ endif()
 
 project(libinjection C)
 
-add_library(libinjection STATIC ${BASE_DIR}/others/libinjection/src/libinjection_sqli.c ${BASE_DIR}/others/libinjection/src/libinjection_xss.c ${BASE_DIR}/others/libinjection/src/libinjection_html5.c)
+set(LIBINJECTION_DIR ${BASE_DIR}/others/libinjection)
 
-# mbedtls
+add_library(libinjection STATIC ${LIBINJECTION_DIR}/src/libinjection_sqli.c ${LIBINJECTION_DIR}/src/libinjection_xss.c ${LIBINJECTION_DIR}/src/libinjection_html5.c)
 
-project(mbedtls C)
+# get libinjection version with git describe
+execute_process(
+    COMMAND git describe
+    WORKING_DIRECTORY ${LIBINJECTION_DIR}
+    OUTPUT_VARIABLE LIBINJECTION_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-add_library(mbedtls STATIC ${BASE_DIR}/others/mbedtls/base64.c ${BASE_DIR}/others/mbedtls/sha1.c ${BASE_DIR}/others/mbedtls/md5.c)
+message("-- Detecting libinjection version - ${LIBINJECTION_VERSION}")
 
-target_include_directories(mbedtls PRIVATE ${BASE_DIR}/others)
+target_compile_definitions(libinjection PRIVATE LIBINJECTION_VERSION="${LIBINJECTION_VERSION}")
+
+# mbedtls (mbedcrypto)
+
+project(mbedcrypto C)
+
+set(MBEDTLS_DIR ${BASE_DIR}/others/mbedtls)
+
+add_library(mbedcrypto STATIC ${MBEDTLS_DIR}/library/base64.c ${MBEDTLS_DIR}/library/sha1.c ${MBEDTLS_DIR}/library/md5.c ${MBEDTLS_DIR}/library/platform_util.c ${MBEDTLS_DIR}/library/constant_time.c)
+
+target_include_directories(mbedcrypto PRIVATE ${MBEDTLS_DIR}/include)
+
+# get mbedtls version with git describe
+execute_process(
+    COMMAND git describe
+    WORKING_DIRECTORY ${MBEDTLS_DIR}
+    OUTPUT_VARIABLE MBEDTLS_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+message("-- Detecting Mbed TLS version - ${MBEDTLS_VERSION}")
 
 #
 # libModSecurity
@@ -112,8 +138,8 @@ file(GLOB_RECURSE libModSecuritySources ${BASE_DIR}/src/*.cc)
 add_library(libModSecurity SHARED ${libModSecuritySources})
 
 target_compile_definitions(libModSecurity PRIVATE WITH_PCRE2)
-target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others)
-target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 pthreads4w::pthreads4w libinjection mbedtls Poco::Poco Iphlpapi.lib)
+target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include)
+target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 pthreads4w::pthreads4w libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
 
 macro(add_package_dependency project compile_definition link_library flag)
   if(${flag})
