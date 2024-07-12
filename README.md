@@ -57,7 +57,7 @@ As a dynamic library, don’t forget that libmodsecurity must be installed to a 
 
 ### Unix (Linux, MacOS, FreeBSD, …)
 
-On unix the project uses autotools to help the compilation process. Please note that if you work with `git`, do not forget to initialize submodules and update them. Here is a brief howto:
+On unix the project uses autotools to help the compilation process. Please note that if you are working with `git`, don't forget to initialize and update the submodules. Here's a quick how-to:
 ```shell
 $ git clone https://github.com/owasp-modsecurity/ModSecurity ModSecurity
 $ cd ModSecurity
@@ -65,7 +65,7 @@ $ git submodule init
 $ git submodule update
 ```
 
-After that, you can start the build process:
+You can then start the build process:
 
 ```shell
 $ ./build.sh
@@ -245,7 +245,9 @@ $ sudo make install
 
 ### Benchmarking
 
-The source tree has a Benchmark tool which can help to measure the library's performance. The tool is under the `test/benchmark/` directory. The build process also makes the binary here, so after the end of compiling you will have the tool.
+The source tree includes a Benchmark tool that can help measure library performance. The tool is located in the test/benchmark/ directory. The build process also creates the binary here, so you will have the tool after the compilation is finished.
+
+The source tree includes a Benchmark tool that can help measure library performance. The tool is located in the `test/benchmark/` directory. The build process also creates the binary here, so you will have the tool after the compilation is finished.
 
 To run, just type:
 
@@ -273,7 +275,7 @@ user	0m0.337s
 sys	0m0.022s
 ```
 
-This is very fast because the benchmark uses the minimal `modsecurity.conf.default` configuration, which has not so much rules:
+This is very fast because the benchmark uses the minimal `modsecurity.conf.default` configuration, which doesn't not too much rules:
 
 ```shell
 $ cat basic_rules.conf
@@ -282,7 +284,7 @@ Include "../../modsecurity.conf-recommended"
 
 ```
 
-To measure it with real rules, you should run one of the download scripts in the same directory:
+To measure with real rules, run one of the download scripts in the same directory:
 
 ```shell
 $ ./download-owasp-v3-rules.sh
@@ -309,13 +311,13 @@ Now the command will give much higher value.
 
 #### How the benchark works
 
-The tool is a simple embedding application which uses the library. It creates a ModSecurity and a RuleSet instance, then runs a loop with number of you passed. Creates a Transaction (object) and emulates real HTTP transactions.
+The tool is a simple wrapper application that uses the library. Creates a ModSecurity instance and a RuleSet instance, then runs a loop with the passed number. Creates a Transaction (object) and emulates real HTTP transactions.
 
-A transaction is a HTTP/1.1 GET request with a few GET parameters. Added common headers then the response: headers and an XML body. Between the phases it checks did any intervention happen or not. Every transaction is created with same data.
+The transaction is an HTTP/1.1 GET request with some GET parameters. Added common headers then the response: headers and an XML body. Between phases it checks whether an intervention has taken place or not. All transactions are created with same data.
 
-Note, that the tool does not call the last phase (logging).
+Note that the tool does not call the last phase (logging).
 
-Please don't forget to reset the `basic_rules.conf` content if you want to try it with another rule set.
+Please remember to reset `basic_rules.conf` if you want to try with a different ruleset.
 
 ## Reporting Issues
 
