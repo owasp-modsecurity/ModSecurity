@@ -245,8 +245,6 @@ $ sudo make install
 
 ### Benchmarking
 
-The source tree includes a Benchmark tool that can help measure library performance. The tool is located in the test/benchmark/ directory. The build process also creates the binary here, so you will have the tool after the compilation is finished.
-
 The source tree includes a Benchmark tool that can help measure library performance. The tool is located in the `test/benchmark/` directory. The build process also creates the binary here, so you will have the tool after the compilation is finished.
 
 To run, just type:
@@ -258,7 +256,7 @@ Doing 1000000 transactions...
 
 ```
 
-Okay, this is a bit much, but you can pass a lower value:
+You can also pass a lower value:
 
 ```shell
 $ ./benchmark 1000
@@ -275,7 +273,7 @@ user	0m0.337s
 sys	0m0.022s
 ```
 
-This is very fast because the benchmark uses the minimal `modsecurity.conf.default` configuration, which doesn't not too much rules:
+This is very fast because the benchmark uses the minimal `modsecurity.conf.default` configuration, which doesn't much too much rules:
 
 ```shell
 $ cat basic_rules.conf
