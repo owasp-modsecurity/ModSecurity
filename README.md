@@ -273,7 +273,7 @@ user	0m0.337s
 sys	0m0.022s
 ```
 
-This is very fast because the benchmark uses the minimal `modsecurity.conf.default` configuration, which doesn't much too much rules:
+This is very fast because the benchmark uses the minimal `modsecurity.conf.default` configuration, which doesn't include too many rules:
 
 ```shell
 $ cat basic_rules.conf
