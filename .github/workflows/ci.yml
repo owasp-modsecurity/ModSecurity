@@ -57,11 +57,9 @@ jobs:
           sudo apt-get install -y libgeoip-dev:${{ matrix.platform.arch }} \
                                   libfuzzy-dev:${{ matrix.platform.arch }}
       - uses: actions/checkout@v4
-      - name: get submodules
-        # get submodules manually for git describe to work during build
-        run: |
-          git submodule init
-          git submodule update
+        with:
+          submodules: true
+          fetch-depth: 0
       - name: build.sh
         run: ./build.sh
       - name: configure
@@ -108,11 +106,9 @@ jobs:
                        bison \
                        flex
       - uses: actions/checkout@v4
-      - name: get submodules
-        # get submodules manually for git describe to work during build
-        run: |
-          git submodule init
-          git submodule update
+        with:
+          submodules: true
+          fetch-depth: 0
       - name: build.sh
         run: ./build.sh
       - name: configure
@@ -141,11 +137,9 @@ jobs:
           - {label: "wo libxml",  opt: "-WITHOUT_LIBXML2=ON" }
     steps:
       - uses: actions/checkout@v4
-      - name: Get submodules
-        # get submodules manually for git describe to work during build
-        run: |
-          git submodule init
-          git submodule update
+        with:
+          submodules: true
+          fetch-depth: 0
       - name: Install Conan
         run: |
           pip3 install conan --upgrade
@@ -188,10 +182,11 @@ jobs:
         run: |
           sudo apt-get update -y -qq
           sudo apt-get install -y cppcheck
-      - name: Get libModSecurity v3 source
+      - name: Checkout source
         uses: actions/checkout@v4
         with:
           submodules: true
+          fetch-depth: 0
       - name: Configure libModSecurity
         run: |
           ./build.sh
