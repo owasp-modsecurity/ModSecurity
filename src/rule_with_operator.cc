@@ -317,8 +317,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 if (ret == true) {
                     ruleMessage->m_match = m_operator->resolveMatchMessage(trans,
                         key, value);
-                    for (auto &i : v->getOrigin()) {
-                        ruleMessage->m_reference.append(i->toText());
+                    for (const auto &i : v->getOrigin()) {
+                        ruleMessage->m_reference.append(i.toText());
                     }
 
                     ruleMessage->m_reference.append(*valueTemp.second);
