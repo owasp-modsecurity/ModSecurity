@@ -65,13 +65,13 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
     char *myvalue = NULL, *myname = NULL;
     int match = 0;
 
-    if(var == NULL)
+    if (var == NULL)
         return 0;
 
-    if(rule == NULL)
+    if (rule == NULL)
         return 0;
 
-    if(rule->actionset == NULL)
+    if (rule->actionset == NULL)
         return 0;
 
     assert(exceptions != NULL);
@@ -81,7 +81,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
         c = strchr(myvar,':');
 
-        if(c != NULL) {
+        if (c != NULL) {
             myname = apr_strtok(myvar,":",&myvalue);
         } else {
             myname = myvar;
@@ -91,7 +91,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
         targets = apr_pstrdup(msr->mp, exceptions);
 
-        if(targets != NULL) {
+        if (targets != NULL) {
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, id_log(rule));
             }
@@ -103,18 +103,18 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
                 c = strchr(variable,':');
 
-                if(c != NULL) {
+                if (c != NULL) {
                     name = apr_strtok(variable,":",&value);
                 } else {
                     name = variable;
                     value = NULL;
                 }
 
-                if((strlen(myname) == strlen(name)) &&
+                if ((strlen(myname) == strlen(name)) &&
                         (strncasecmp(myname, name,strlen(myname)) == 0))   {
 
-                    if(value != NULL && myvalue != NULL)  {
-                        if((strlen(myvalue) == strlen(value)) &&
+                    if (value != NULL && myvalue != NULL)  {
+                        if ((strlen(myvalue) == strlen(value)) &&
                                 strncasecmp(myvalue,value,strlen(myvalue)) == 0) {
                             if (msr->txcfg->debuglog_level >= 9) {
                                 msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
@@ -145,7 +145,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
     }
 
-    if(match == 1)
+    if (match == 1)
         return 1;
 
     return 0;
@@ -163,10 +163,10 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 char *msre_ruleset_rule_update_target_matching_exception(modsec_rec *msr, msre_ruleset *ruleset, rule_exception *re, const char *p2, const char *p3) {
     char *err;
 
-    if(ruleset == NULL)
+    if (ruleset == NULL)
         return NULL;
 
-    if(p2 == NULL)  {
+    if (p2 == NULL)  {
         return apr_psprintf(ruleset->mp, "Trying to update without a target");
     }
 
@@ -249,26 +249,24 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     char *target_list = NULL, *replace = NULL;
     int i, rc, match = 0, var_appended = 0;
 
-    if(rule != NULL)    {
-
+    if (rule != NULL)    {
         target_list = strdup(p2);
-        if(target_list == NULL)
-            return apr_psprintf(ruleset->mp, "Error to update target - memory allocation");;
+        if (target_list == NULL) {
+            my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - memory allocation");
+            goto end;
+        }
 
-        if(p3 != NULL)  {
+        if (p3 != NULL)  {
             replace = strdup(p3);
-            if(replace == NULL) {
-                free(target_list);
-                target_list = NULL;
-                return apr_psprintf(ruleset->mp, "Error to update target - memory allocation");;
+            if (replace == NULL) {
+                my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - memory allocation");
+                goto end;
             }
         }
 
-        if(replace != NULL) {
-
+        if (replace != NULL) {
             opt = strchr(replace,'!');
-
-            if(opt != NULL)  {
+            if (opt != NULL)  {
                 *opt = '\0';
                 opt++;
                 param = opt;
@@ -284,29 +282,22 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
 
             opt = strchr(param,':');
 
-            if(opt != NULL) {
+            if (opt != NULL) {
                 name = apr_strtok(param,":",&value);
             } else {
                 name = param;
             }
 
-            if(apr_table_get(ruleset->engine->variables, name) == NULL)   {
-                if(target_list != NULL)
-                    free(target_list);
-                if(replace != NULL)
-                    free(replace);
-                if(msr) {
-                    msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
-                }
-                return apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
+            if (apr_table_get(ruleset->engine->variables, name) == NULL)   {
+                my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
+                goto end;
             }
 
             name_len = strlen(name);
 
-            if(value != NULL)
-                value_len = strlen(value);
+            if (value != NULL) value_len = strlen(value);
 
-            if(msr) {
+            if (msr) {
                 msr_log(msr, 9, "Trying to replace by variable name [%s] value [%s]", name, value);
             }
 #if !defined(MSC_TEST)
@@ -318,13 +309,13 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             targets = (msre_var **)rule->targets->elts;
             // TODO need a good way to remove the element from array, maybe change array by tables or rings
             for (i = 0; i < rule->targets->nelts; i++) {
-                if((strlen(targets[i]->name) == strlen(name)) &&
+                if ((strlen(targets[i]->name) == strlen(name)) &&
                         (strncasecmp(targets[i]->name,name,strlen(targets[i]->name)) == 0) &&
                         (targets[i]->is_negated == is_negated) &&
                         (targets[i]->is_counting == is_counting))    {
 
-                    if(value != NULL && targets[i]->param != NULL)  {
-                        if((strlen(targets[i]->param) == strlen(value)) &&
+                    if (value != NULL && targets[i]->param != NULL)  {
+                        if ((strlen(targets[i]->param) == strlen(value)) &&
                                 strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
                             memset(targets[i]->name,0,strlen(targets[i]->name));
                             memset(targets[i]->param,0,strlen(targets[i]->param));
@@ -346,12 +337,12 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
 
         p = apr_strtok(target_list, ",", &savedptr);
 
-        while(p != NULL) {
-            if(replace != NULL) {
-                if(match == 1)  {
+        while (p != NULL) {
+            if (replace != NULL) {
+                if (match == 1)  {
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
-                        if(msr) {
+                        if (msr) {
                             msr_log(msr, 9, "Error parsing rule targets to replace variable");
                         }
 #if !defined(MSC_TEST)
@@ -361,7 +352,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
 #endif
                         goto end;
                     }
-                    if(msr) {
+                    if (msr) {
                         msr_log(msr, 9, "Successfully replaced variable");
                     }
 #if !defined(MSC_TEST)
@@ -372,28 +363,31 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 var_appended = 1;
 
                 } else  {
-                    if(msr) {
+                    if (msr) {
                         msr_log(msr, 9, "Cannot find variable to replace");
                     }
 #if !defined(MSC_TEST)
                     else {
-                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find varibale to replace");
+                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find variable to replace");
                     }
 #endif
                     goto end;
                 }
-            } else {
+            }
+            else {
 
                 target = strdup(p);
-                if(target == NULL)
-                    return NULL;
+				if (target == NULL) {
+					my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - memory allocation");
+					goto end;
+				}
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
 
                 opt = strchr(target,'!');
 
-                if(opt != NULL)  {
+                if (opt != NULL)  {
                     *opt = '\0';
                     opt++;
                     param = opt;
@@ -408,30 +402,22 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 }
 
                 opt = strchr(param,':');
-
-                if(opt != NULL) {
+                if (opt != NULL) {
                     name = apr_strtok(param,":",&value);
                 } else {
                     name = param;
                 }
 
-                if(apr_table_get(ruleset->engine->variables, name) == NULL)   {
-                    if(target_list != NULL)
-                        free(target_list);
-                    if(replace != NULL)
-                        free(replace);
-                    if(msr) {
-                        msr_log(msr, 9, "Error to update target - [%s] is not valid target", name);
-                    }
-                    return apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
+                if (apr_table_get(ruleset->engine->variables, name) == NULL) {
+                    my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
+                    goto end;
                 }
 
                 name_len = strlen(name);
 
-                if(value != NULL)
-                    value_len = strlen(value);
+                if (value != NULL) value_len = strlen(value);
 
-                if(msr) {
+                if (msr) {
                     msr_log(msr, 9, "Trying to append variable name [%s] value [%s]", name, value);
                 }
 #if !defined(MSC_TEST)
@@ -443,33 +429,32 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
 
                 targets = (msre_var **)rule->targets->elts;
                 for (i = 0; i < rule->targets->nelts; i++) {
-                    if((strlen(targets[i]->name) == strlen(name)) &&
+                    if ((strlen(targets[i]->name) == strlen(name)) &&
                             (strncasecmp(targets[i]->name,name,strlen(targets[i]->name)) == 0) &&
                             (targets[i]->is_negated == is_negated) &&
                             (targets[i]->is_counting == is_counting))    {
 
-                        if(value != NULL && targets[i]->param != NULL)  {
-                            if((strlen(targets[i]->param) == strlen(value)) &&
+                        if (value != NULL && targets[i]->param != NULL)  {
+                            if ((strlen(targets[i]->param) == strlen(value)) &&
                                     strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
                                 match = 1;
                             }
                         } else if (value == NULL && targets[i]->param == NULL){
                             match = 1;
-                        } else
-                            continue;
+                        } else continue;
 
                     }
                 }
 
-                if(target != NULL)  {
+                if (target != NULL)  {
                     free(target);
                     target = NULL;
                 }
 
-                if(match == 0 ) {
+                if (match == 0 ) {
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
-                        if(msr) {
+                        if (msr) {
                             msr_log(msr, 9, "Error parsing rule targets to append variable");
                         }
 #if !defined(MSC_TEST)
@@ -481,7 +466,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     }
                     var_appended = 1;
                 } else {
-                    if(msr) {
+                    if (msr) {
                         msr_log(msr, 9, "Skipping variable, already appended");
                     }
 #if !defined(MSC_TEST)
@@ -495,11 +480,11 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             p = apr_strtok(NULL,",",&savedptr);
         }
 
-        if(var_appended == 1)  {
+        if (var_appended == 1)  {
             current_targets = msre_generate_target_string(ruleset->mp, rule);
             rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, current_targets, NULL, NULL);
             rule->p1 = apr_pstrdup(ruleset->mp, current_targets);
-            if(msr) {
+            if (msr) {
                 msr_log(msr, 9, "Successfully appended variable");
             }
 #if !defined(MSC_TEST)
@@ -511,19 +496,11 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if(target_list != NULL) {
-        free(target_list);
-        target_list = NULL;
-    }
-    if(replace != NULL) {
-        free(replace);
-        replace = NULL;
-    }
-    if(target != NULL)  {
-        free(target);
-        target = NULL;
-    }
-    return NULL;
+    if (msr && my_error_msg) msr_log(msr, 9, my_error_msg);
+    if (target_list != NULL) free(target_list);
+    if (replace != NULL) free(replace);
+    if (target != NULL) free(target);
+    return my_error_msg;
 }
 
 int msre_ruleset_rule_matches_exception(msre_rule *rule, rule_exception *re)   {
@@ -567,7 +544,7 @@ int msre_ruleset_rule_matches_exception(msre_rule *rule, rule_exception *re)   {
 
                     for (act = 0; act < tarr->nelts; act++) {
                         msre_action *action = (msre_action *)telts[act].val;
-                        if((action != NULL) && (action->metadata != NULL) && (strcmp("tag", action->metadata->name) == 0))  {
+                        if ((action != NULL) && (action->metadata != NULL) && (strcmp("tag", action->metadata->name) == 0))  {
 
                             int rc = msc_regexec(re->param_data,
                                     action->param, strlen(action->param),
@@ -618,7 +595,7 @@ static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 
     for (i = 0; i < rule->targets->nelts; i++) {
 
-        if(targets[i]->name != NULL && strlen(targets[i]->name) > 0)    {
+        if (targets[i]->name != NULL && strlen(targets[i]->name) > 0)    {
             target_str = apr_pstrcat(pool,
                     (target_str == NULL) ? "" : apr_psprintf(pool, "%s|", target_str),
                     (targets[i]->is_negated == 0) ? "" : "!",
@@ -1558,12 +1535,12 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
 
                 if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
 
-                    if(i-1 >=0)
+                    if (i-1 >=0)
                         last_rule = rules[i-1];
                     else
                         last_rule = rules[0];
 
-                    if((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained && (saw_starter == 1)) {
+                    if ((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained && (saw_starter == 1)) {
                         mode = NEXT_RULE;
                         skipped = 1;
                         --i;
@@ -1655,7 +1632,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             for(j = 0; j < msr->removed_rules_msg->nelts; j++) {
                 re = ((rule_exception **)msr->removed_rules_msg->elts)[j];
 
-                if(rule->actionset->msg !=NULL)  {
+                if (rule->actionset->msg !=NULL)  {
 
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "Checking removal of rule msg=\"%s\" against: %s", rule->actionset->msg, re->param);
@@ -1674,7 +1651,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             for(j = 0; j < msr->removed_rules->nelts; j++) {
                 range = ((const char**)msr->removed_rules->elts)[j];
 
-                if(rule->actionset->id !=NULL)  {
+                if (rule->actionset->id !=NULL)  {
 
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "Checking removal of rule id=\"%s\" against: %s", rule->actionset->id, range);
@@ -1693,13 +1670,13 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             for (act = 0; act < tag_tarr->nelts; act++) {
                 msre_action *action = (msre_action *)tag_telts[act].val;
 
-                if((action != NULL) && (action->metadata != NULL ) && strcmp("tag", action->metadata->name) == 0)  {
+                if ((action != NULL) && (action->metadata != NULL ) && strcmp("tag", action->metadata->name) == 0)  {
 
                     for(j = 0; j < msr->removed_rules_tag->nelts; j++) {
                         re = ((rule_exception **)msr->removed_rules_tag->elts)[j];
 
 
-                        if(action->param != NULL)   {
+                        if (action->param != NULL)   {
                             /* Expand variables in the tag argument. */
                             msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
 
@@ -1745,7 +1722,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
 
-        if(msr->txcfg->is_enabled == MODSEC_DISABLED)   {
+        if (msr->txcfg->is_enabled == MODSEC_DISABLED)   {
             saw_starter = 0;
             skipped = 0;
             skip_after = NULL;
@@ -1825,12 +1802,12 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                     msr_log(msr, 9, "Match, intercepted -> returning.");
                 }
 
-                if(i-1 >= 0)
+                if (i-1 >= 0)
                     last_rule = rules[i-1];
                 else
                     last_rule = rules[0];
 
-                if((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained) {
+                if ((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained) {
 
                     int st = 0;
 
@@ -1838,8 +1815,8 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
 
                         rule_starter = rules[st];
 
-                        if(rule_starter != NULL && rule_starter->chain_starter != NULL)    {
-                            if((msr != NULL) && (msr->intercept_actionset != NULL) && (rule_starter->actionset != NULL))
+                        if (rule_starter != NULL && rule_starter->chain_starter != NULL)    {
+                            if ((msr != NULL) && (msr->intercept_actionset != NULL) && (rule_starter->actionset != NULL))
                                 msr->intercept_actionset->intercept_uri = rule_starter->actionset->intercept_uri;
                             break;
                         }
@@ -1863,7 +1840,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                 continue;
             }
 
-            if(skipped == 1)    {
+            if (skipped == 1)    {
                 mode = SKIP_RULES;
                 continue;
             }
@@ -2024,7 +2001,7 @@ static msre_rule * msre_ruleset_fetch_phase_rule(const msre_ruleset *ruleset, co
                 && (strcmp(rule->actionset->id, id) == 0))
         {
             /* Return rule that matched unless it is a placeholder */
-            if(offset == 0) {
+            if (offset == 0) {
                 return (rule->placeholder == RULE_PH_NONE) ? rule : NULL;
             }
             else    {
@@ -2121,7 +2098,7 @@ static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, 
 
                             for (act = 0; act < tarr->nelts; act++) {
                                 msre_action *action = (msre_action *)telts[act].val;
-                                if((action != NULL) && (action->metadata != NULL) && (strcmp("tag", action->metadata->name) == 0))  {
+                                if ((action != NULL) && (action->metadata != NULL) && (strcmp("tag", action->metadata->name) == 0))  {
 
                                     int rc = msc_regexec(re->param_data,
                                             action->param, strlen(action->param),
@@ -2653,7 +2630,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         if (rc > 0) {
             rc = fetch_target_exception(rule, msr, var, exceptions);
 
-            if(rc > 0)  {
+            if (rc > 0)  {
 
                 if (msr->txcfg->debuglog_level >= 4) {
                     msr_log(msr, 4, "Executing operator \"%s%s\" with param \"%s\" against %s skipped.",
@@ -2701,22 +2678,22 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         msr_log(msr, 4, "Operator completed in %" APR_TIME_T_FMT " usec.", (t1 - time_before_op));
     }
 
-    if(msr->txcfg->max_rule_time > 0)  {
+    if (msr->txcfg->max_rule_time > 0)  {
         apr_time_t t1 = apr_time_now();
         apr_time_t rule_time = 0;
         const char *rt_time = NULL;
 
-        if(rule->actionset->id != NULL) {
+        if (rule->actionset->id != NULL) {
             rt_time = apr_table_get(msr->perf_rules, rule->actionset->id);
-            if(rt_time == NULL) {
+            if (rt_time == NULL) {
                 rt_time = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (t1 - time_before_op));
                 rule_time = (apr_time_t)atoi(rt_time);
-                if(rule_time >= msr->txcfg->max_rule_time)
+                if (rule_time >= msr->txcfg->max_rule_time)
                     apr_table_setn(msr->perf_rules, rule->actionset->id, rt_time);
             } else  {
                 rule_time = (apr_time_t)atoi(rt_time);
                 rule_time += (t1 - time_before_op);
-                if(rule_time >= msr->txcfg->max_rule_time)  {
+                if (rule_time >= msr->txcfg->max_rule_time)  {
                     rt_time = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, rule_time);
                     apr_table_setn(msr->perf_rules, rule->actionset->id, rt_time);
                 }
@@ -2754,7 +2731,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         *(const msre_rule **)apr_array_push(msr->matched_rules) = rule;
 
         /* Save the last matched var data */
-        if(var != NULL && msr != NULL)   {
+        if (var != NULL && msr != NULL)   {
             msc_string *mvar = NULL;
 
             msr->matched_var->name = apr_pstrdup(msr->mp, var->name);
