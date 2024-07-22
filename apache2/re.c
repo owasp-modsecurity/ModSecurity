@@ -326,14 +326,14 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     if(value != NULL && targets[i]->param != NULL)  {
                         if((strlen(targets[i]->param) == strlen(value)) &&
                                 strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
-                            memset(targets[i]->name,0,strlen(targets[i]->name));
-                            memset(targets[i]->param,0,strlen(targets[i]->param));
+                            targets[i]->name[0] = '\0';
+                            targets[i]->param[0] = '\0'; 
                             targets[i]->is_counting = 0;
                             targets[i]->is_negated = 1;
                             match = 1;
                         }
                     } else if (value == NULL && targets[i]->param == NULL){
-                        memset(targets[i]->name,0,strlen(targets[i]->name));
+                        targets[i]->name[0] = '\0';
                         targets[i]->is_counting = 0;
                         targets[i]->is_negated = 1;
                         match = 1;
