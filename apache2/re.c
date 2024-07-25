@@ -297,10 +297,6 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
 
             if (value != NULL) value_len = strlen(value);
 
-            if (msr) {
-                msr_log(msr, 9, "Trying to replace by variable name [%s] value [%s]", name, value);
-            }
-
             targets = (msre_var **)rule->targets->elts;
             // TODO need a good way to remove the element from array, maybe change array by tables or rings
             for (i = 0; i < rule->targets->nelts; i++) {
@@ -372,10 +368,10 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             else {
 
                 target = strdup(p);
-				if (target == NULL) {
-					my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - memory allocation");
-					goto end;
-				}
+                if (target == NULL) {
+                    my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - memory allocation");
+                    goto end;
+                }
 
                 is_negated = is_counting = 0;
                 param = name = value = NULL;
@@ -491,7 +487,14 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     }
 
 end:
-    if (msr && my_error_msg) msr_log(msr, 9, my_error_msg);
+    if (my_error_msg) {
+        if (msr) msr_log(msr, 9, my_error_msg);
+#if !defined(MSC_TEST)
+        else {
+            ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Successfully appended variable");
+        }
+#endif
+    }
     if (target_list != NULL) free(target_list);
     if (replace != NULL) free(replace);
     if (target != NULL) free(target);
