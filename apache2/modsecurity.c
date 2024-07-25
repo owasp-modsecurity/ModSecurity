@@ -122,7 +122,7 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
     return msce;
 }
 
-int acquire_global_lock(apr_global_mutex_t *lock, apr_pool_t *mp) {
+int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
     apr_status_t rc;
     apr_file_t *lock_name;
     const char *temp_dir;
@@ -146,7 +146,7 @@ int acquire_global_lock(apr_global_mutex_t *lock, apr_pool_t *mp) {
     // below func always return APR_SUCCESS
     apr_file_name_get(&filename, lock_name);
 
-    rc = apr_global_mutex_create(&lock, filename, APR_LOCK_DEFAULT, mp);
+    rc = apr_global_mutex_create(lock, filename, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Could not create global mutex");
         return -1;
@@ -154,11 +154,12 @@ int acquire_global_lock(apr_global_mutex_t *lock, apr_pool_t *mp) {
 #if !defined(MSC_TEST)
 #ifdef __SET_MUTEX_PERMS
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    rc = ap_unixd_set_global_mutex_perms(lock);
+    rc = ap_unixd_set_global_mutex_perms(*lock);
 #else
-    rc = unixd_set_global_mutex_perms(lock);
+    rc = unixd_set_global_mutex_perms(*lock);
 #endif
     if (rc != APR_SUCCESS) {
+        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Could not set permissions on global mutex"); 
         return -1;
     }
 #endif /* SET_MUTEX_PERMS */
@@ -189,21 +190,15 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
     /* Serial audit log mutex */
-    rc = acquire_global_lock(msce->auditlog_lock, mp);
-    if (rc != APR_SUCCESS) {
-        return -1;
-    }
+    rc = acquire_global_lock(&msce->auditlog_lock, mp);
+    if (rc != APR_SUCCESS) return -1;
 
-    rc = acquire_global_lock(msce->geo_lock, mp);
-    if (rc != APR_SUCCESS) {
-        return -1;
-    }
+    rc = acquire_global_lock(&msce->geo_lock, mp);
+    if (rc != APR_SUCCESS) return -1;
 
 #ifdef GLOBAL_COLLECTION_LOCK
     rc = acquire_global_lock(&msce->dbm_lock, mp);
-    if (rc != APR_SUCCESS) {
-        return -1;
-    }
+    if (rc != APR_SUCCESS) return -1;
 #endif /* GLOBAL_COLLECTION_LOCK */
 
     return 1;
