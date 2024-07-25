@@ -300,11 +300,6 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             if (msr) {
                 msr_log(msr, 9, "Trying to replace by variable name [%s] value [%s]", name, value);
             }
-#if !defined(MSC_TEST)
-            else {
-                ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Trying to replace by variable name [%s] value [%s]", name, value);
-            }
-#endif
 
             targets = (msre_var **)rule->targets->elts;
             // TODO need a good way to remove the element from array, maybe change array by tables or rings
