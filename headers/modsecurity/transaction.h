@@ -393,6 +393,8 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     int processLogging();
     int updateStatusCode(int status);
 
+    int setRequestHostName(const std::string& hostname);
+
     bool intervention(ModSecurityIntervention *it);
 
     bool addArgument(const std::string& orig, const std::string& key,
@@ -442,6 +444,11 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      * Holds the server IP Address
      */
     std::shared_ptr<std::string> m_serverIpAddress;
+
+    /**
+     * Holds the request's hostname
+     */
+    std::shared_ptr<std::string> m_requestHostName;
 
     /**
      * Holds the raw URI that was requested.
@@ -723,6 +730,9 @@ int msc_process_logging(Transaction *transaction);
 
 /** @ingroup ModSecurity_C_API */
 int msc_update_status_code(Transaction *transaction, int status);
+
+/** @ingroup ModSecurity_C_API */
+int msc_set_request_hostname(Transaction *transaction, const unsigned char *hostname);
 
 #ifdef __cplusplus
 }
