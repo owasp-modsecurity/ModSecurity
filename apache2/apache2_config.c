@@ -34,6 +34,7 @@
 const char* id_log(msre_rule* rule) {
     assert(rule != NULL);
     assert(rule->actionset != NULL);
+    assert(rule->ruleset != NULL);
     const char* id = rule->actionset->id;
     if (!id || !*id || id == NOT_SET_P) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
 	return id;
@@ -188,6 +189,9 @@ static void copy_rules_phase(apr_pool_t *mp,
                              apr_array_header_t *child_phase_arr,
                              apr_array_header_t *exceptions_arr)
 {
+    assert(parent_phase_arr != NULL);
+    assert(child_phase_arr != NULL);
+    assert(exceptions_arr != NULL);
     rule_exception **exceptions;
     msre_rule **rules;
     int i, j;
@@ -196,11 +200,14 @@ static void copy_rules_phase(apr_pool_t *mp,
     rules = (msre_rule **)parent_phase_arr->elts;
     for(i = 0; i < parent_phase_arr->nelts; i++) {
         msre_rule *rule = (msre_rule *)rules[i];
+        assert(rule != NULL);
+        assert(rule->actionset != NULL);
         int copy = 1;
 
         if (mode == 0) {
             /* First rule in the chain. */
             exceptions = (rule_exception **)exceptions_arr->elts;
+            assert(exceptions != NULL);
             for(j = 0; j < exceptions_arr->nelts; j++) {
 
                 /* Process exceptions. */
@@ -290,13 +297,10 @@ static int copy_rules(apr_pool_t *mp, msre_ruleset *parent_ruleset,
                       msre_ruleset *child_ruleset,
                       apr_array_header_t *exceptions_arr)
 {
+    assert(parent_ruleset != NULL);
+    assert(child_ruleset != NULL);
+    assert(exceptions_arr != NULL);
     int ret = 0;
-
-    if (parent_ruleset == NULL || child_ruleset == NULL ||
-            exceptions_arr == NULL) {
-        ret = -1;
-        goto failed;
-    }
 
     copy_rules_phase(mp, parent_ruleset->phase_request_headers,
         child_ruleset->phase_request_headers, exceptions_arr);
@@ -318,6 +322,8 @@ failed:
  */
 void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 {
+    assert(_parent != NULL);
+    assert(_child != NULL);
     directory_config *parent = (directory_config *)_parent;
     directory_config *child = (directory_config *)_child;
     directory_config *merged = create_directory_config(mp, NULL);
@@ -785,11 +791,14 @@ void init_directory_config(directory_config *dcfg)
 static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
                             const char *p1, const char *p2, const char *p3)
 {
+    assert(cmd != NULL);
+    assert(dcfg != NULL);
     char *my_error_msg = NULL;
     //msre_rule *rule = NULL, *tmp_rule = NULL;
     char *rid = NULL;
     msre_rule *rule = NULL;
     extern msc_engine *modsecurity;
+    assert(modsecurity != NULL);
     int type_with_lua = 1;
     int type_rule;
     int rule_actionset;
@@ -1017,9 +1026,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 static const char *add_marker(cmd_parms *cmd, directory_config *dcfg,
                               const char *p1, const char *p2, const char *p3)
 {
+    assert(cmd != NULL);
+    assert(dcfg != NULL);
     char *my_error_msg = NULL;
     msre_rule *rule = NULL;
     extern msc_engine *modsecurity;
+    assert(modsecurity != NULL);
     int p;
 
     #ifdef DEBUG_CONF
@@ -1068,11 +1080,14 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg,
 static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
                                       const char *p1, const char *p2, int offset)
 {
+    assert(cmd != NULL);
+    assert(dcfg != NULL);
     char *my_error_msg = NULL;
     msre_rule *rule = NULL;
     msre_actionset *new_actionset = NULL;
     msre_ruleset *ruleset = dcfg->ruleset;
     extern msc_engine *modsecurity;
+    assert(modsecurity != NULL);
 
     /* Get the ruleset if one exists */
     if ((ruleset == NULL)||(ruleset == NOT_SET_P)) {
@@ -1151,6 +1166,7 @@ static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1)
 
 static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     const char *action = apr_pstrcat(dcfg->mp, SECMARKER_BASE_ACTIONS, p1, NULL);
     return add_marker(cmd, (directory_config *)_dcfg, SECMARKER_TARGETS, SECMARKER_ARGS, action);
@@ -1159,6 +1175,9 @@ static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1)
 static const char *cmd_cookiev0_separator(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     if (strlen(p1) != 1) {
@@ -1173,6 +1192,9 @@ static const char *cmd_cookiev0_separator(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     if (strlen(p1) != 1) {
@@ -1186,6 +1208,9 @@ static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg,
 
 static const char *cmd_audit_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = _dcfg;
 
     if (strcasecmp(p1, "On") == 0) dcfg->auditlog_flag = AUDITLOG_ON;
@@ -1202,6 +1227,9 @@ static const char *cmd_audit_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 
 static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = _dcfg;
 
     dcfg->auditlog_name = (char *)p1;
@@ -1239,6 +1267,9 @@ static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
 
 static const char *cmd_audit_log2(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = _dcfg;
 
     if (dcfg->auditlog_name == NOT_SET_P) {
@@ -1281,6 +1312,9 @@ static const char *cmd_audit_log2(cmd_parms *cmd, void *_dcfg, const char *p1)
 static const char *cmd_audit_log_parts(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = _dcfg;
 
     if (is_valid_parts_specification((char *)p1) != 1) {
@@ -1294,6 +1328,9 @@ static const char *cmd_audit_log_parts(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_audit_log_relevant_status(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = _dcfg;
 
 #ifdef WITH_PCRE2
@@ -1311,6 +1348,9 @@ static const char *cmd_audit_log_relevant_status(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_audit_log_type(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = _dcfg;
 
     if (strcasecmp(p1, "Serial") == 0) dcfg->auditlog_type = AUDITLOG_SERIAL;
@@ -1327,6 +1367,9 @@ static const char *cmd_audit_log_type(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_audit_log_mode(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = _dcfg;
 
     if (strcasecmp(p1, "JSON") == 0) dcfg->auditlog_format = AUDITLOGFORMAT_JSON;
@@ -1343,9 +1386,10 @@ static const char *cmd_audit_log_mode(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_audit_log_dirmode(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "default") == 0) {
         dcfg->auditlog_dirperms = NOT_SET;
@@ -1365,9 +1409,10 @@ static const char *cmd_audit_log_dirmode(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_audit_log_filemode(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "default") == 0) {
         dcfg->auditlog_fileperms = NOT_SET;
@@ -1387,6 +1432,9 @@ static const char *cmd_audit_log_filemode(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_audit_log_storage_dir(cmd_parms *cmd, void *_dcfg,
                                              const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = _dcfg;
 
     dcfg->auditlog_storage_dir = ap_server_root_relative(cmd->pool, p1);
@@ -1397,6 +1445,9 @@ static const char *cmd_audit_log_storage_dir(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_cookie_format(cmd_parms *cmd, void *_dcfg,
                                      const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     if (strcmp(p1, "0") == 0) dcfg->cookie_format = COOKIES_V0;
@@ -1411,6 +1462,8 @@ static const char *cmd_cookie_format(cmd_parms *cmd, void *_dcfg,
 
 static const char *cmd_chroot_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     char cwd[1025] = "";
 
     if (cmd->server->is_virtual) {
@@ -1442,6 +1495,8 @@ static const char *cmd_chroot_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 static const char *cmd_component_signature(cmd_parms *cmd, void *_dcfg,
                                            const char *p1)
 {
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     /* ENH Enforce "Name/VersionX.Y.Z (comment)" format. */
@@ -1452,14 +1507,17 @@ static const char *cmd_component_signature(cmd_parms *cmd, void *_dcfg,
 
 static const char *cmd_content_injection(cmd_parms *cmd, void *_dcfg, int flag)
 {
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
     dcfg->content_injection_enabled = flag;
     return NULL;
 }
 
 static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     if (cmd->server->is_virtual) {
@@ -1473,6 +1531,9 @@ static const char *cmd_data_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 
 static const char *cmd_debug_log(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     apr_status_t rc;
 
@@ -1503,6 +1564,9 @@ static const char *cmd_debug_log(cmd_parms *cmd, void *_dcfg, const char *p1)
 static const char *cmd_collection_timeout(cmd_parms *cmd, void *_dcfg,
                                        const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     dcfg->col_timeout = atoi(p1);
@@ -1515,6 +1579,9 @@ static const char *cmd_collection_timeout(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_debug_log_level(cmd_parms *cmd, void *_dcfg,
                                        const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     dcfg->debuglog_level = atoi(p1);
@@ -1526,6 +1593,8 @@ static const char *cmd_debug_log_level(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg,
                                       const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     extern msc_engine *modsecurity;
     char *my_error_msg = NULL;
@@ -1602,8 +1671,8 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg,
 
 static const char *cmd_disable_backend_compression(cmd_parms *cmd, void *_dcfg, int flag)
 {
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
     dcfg->disable_backend_compression = flag;
     return NULL;
 }
@@ -1611,6 +1680,8 @@ static const char *cmd_disable_backend_compression(cmd_parms *cmd, void *_dcfg, 
 static const char *cmd_guardian_log(cmd_parms *cmd, void *_dcfg,
                                     const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     extern char *guardianlog_name;
     extern apr_file_t *guardianlog_fd;
     extern char *guardianlog_condition;
@@ -1671,8 +1742,8 @@ static const char *cmd_guardian_log(cmd_parms *cmd, void *_dcfg,
 */
 static const char *cmd_stream_inbody_inspection(cmd_parms *cmd, void *_dcfg, int flag)
 {
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
     dcfg->stream_inbody_inspection = flag;
     return NULL;
 }
@@ -1690,8 +1761,8 @@ static const char *cmd_stream_inbody_inspection(cmd_parms *cmd, void *_dcfg, int
 */
 static const char *cmd_stream_outbody_inspection(cmd_parms *cmd, void *_dcfg, int flag)
 {
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
     dcfg->stream_outbody_inspection = flag;
     return NULL;
 }
@@ -1708,10 +1779,11 @@ static const char *cmd_stream_outbody_inspection(cmd_parms *cmd, void *_dcfg, in
 static const char *cmd_rule_perf_time(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
-
-    if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -1727,6 +1799,10 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
     TreeRoot **whitelist, TreeRoot **suspicious_list,
     const char *filename)
 {
+    assert(p2 != NULL);
+    assert(whitelist != NULL);
+    assert(suspicious_list != NULL);
+    assert(filename != NULL);
     int res = 0;
     char *config_orig_path;
     char *param = strchr(p2, ' ');
@@ -1801,10 +1877,11 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
 static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
-
-    if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX) || (limit == LONG_MIN) || (limit <= 0)) {
@@ -1829,6 +1906,7 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_read_state_limit(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "SecReadStateLimit is depricated, use SecConnReadStateLimit " \
             "instead.");
@@ -1850,10 +1928,11 @@ static const char *cmd_read_state_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_conn_write_state_limit(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
-
-    if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX) || (limit == LONG_MIN) || (limit <= 0)) {
@@ -1877,6 +1956,7 @@ static const char *cmd_conn_write_state_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_write_state_limit(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "SecWriteStateLimit is depricated, use SecConnWriteStateLimit " \
             "instead.");
@@ -1889,10 +1969,11 @@ static const char *cmd_write_state_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_request_body_inmemory_limit(cmd_parms *cmd, void *_dcfg,
                                                    const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
-
-    if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -1907,10 +1988,11 @@ static const char *cmd_request_body_inmemory_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_request_body_limit(cmd_parms *cmd, void *_dcfg,
                                           const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
-
-    if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -1925,10 +2007,11 @@ static const char *cmd_request_body_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_request_body_no_files_limit(cmd_parms *cmd, void *_dcfg,
                                                    const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
-
-    if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -1943,10 +2026,11 @@ static const char *cmd_request_body_no_files_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_request_body_json_depth_limit(cmd_parms *cmd, void *_dcfg,
                                                      const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
-
-    if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -1961,10 +2045,11 @@ static const char *cmd_request_body_json_depth_limit(cmd_parms *cmd, void *_dcfg
 static const char *cmd_arguments_limit(cmd_parms *cmd, void *_dcfg,
                                                      const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
-
-    if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -1979,9 +2064,11 @@ static const char *cmd_arguments_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_request_body_access(cmd_parms *cmd, void *_dcfg,
                                            const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     if (strcasecmp(p1, "on") == 0) dcfg->reqbody_access = 1;
     else
     if (strcasecmp(p1, "off") == 0) dcfg->reqbody_access = 0;
@@ -2004,9 +2091,11 @@ static const char *cmd_request_body_access(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_request_intercept_on_error(cmd_parms *cmd, void *_dcfg,
                                            const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     if (strcasecmp(p1, "on") == 0) dcfg->reqintercept_oe = 1;
     else
     if (strcasecmp(p1, "off") == 0) dcfg->reqintercept_oe = 0;
@@ -2020,11 +2109,10 @@ static const char *cmd_request_intercept_on_error(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_request_encoding(cmd_parms *cmd, void *_dcfg,
                                         const char *p1)
 {
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     /* ENH Validate encoding */
-
     dcfg->request_encoding = p1;
 
     return NULL;
@@ -2033,9 +2121,11 @@ static const char *cmd_request_encoding(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_response_body_access(cmd_parms *cmd, void *_dcfg,
                                             const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     if (strcasecmp(p1, "on") == 0) dcfg->resbody_access = 1;
     else
     if (strcasecmp(p1, "off") == 0) dcfg->resbody_access = 0;
@@ -2048,6 +2138,9 @@ static const char *cmd_response_body_access(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_response_body_limit(cmd_parms *cmd, void *_dcfg,
                                            const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
 
@@ -2068,9 +2161,11 @@ static const char *cmd_response_body_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_response_body_limit_action(cmd_parms *cmd, void *_dcfg,
                                                   const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     if (dcfg->is_enabled == MODSEC_DETECTION_ONLY)  {
         dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
         return NULL;
@@ -2098,9 +2193,11 @@ static const char *cmd_response_body_limit_action(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_resquest_body_limit_action(cmd_parms *cmd, void *_dcfg,
                                                   const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     if (dcfg->is_enabled == MODSEC_DETECTION_ONLY)  {
         dcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_PARTIAL;
         return NULL;
@@ -2118,6 +2215,9 @@ static const char *cmd_resquest_body_limit_action(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_response_body_mime_type(cmd_parms *cmd, void *_dcfg,
                                                const char *_p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(_p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     char *p1 = apr_pstrdup(cmd->pool, _p1);
 
@@ -2136,9 +2236,9 @@ static const char *cmd_response_body_mime_type(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_response_body_mime_types_clear(cmd_parms *cmd,
                                                       void *_dcfg)
 {
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     dcfg->of_mime_types_cleared = 1;
 
     if ((dcfg->of_mime_types != NULL)&&(dcfg->of_mime_types != NOT_SET_P)) {
@@ -2162,10 +2262,11 @@ static const char *cmd_response_body_mime_types_clear(cmd_parms *cmd,
 static const char *cmd_rule_update_target_by_id(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2, const char *p3)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
-    if (dcfg == NULL) return NULL;
-
+    
     if(p1 == NULL)  {
         return apr_psprintf(cmd->pool, "Updating target by ID with no ID");
     }
@@ -2199,10 +2300,11 @@ static const char *cmd_rule_update_target_by_id(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_rule_update_target_by_tag(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2, const char *p3)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
-    if (dcfg == NULL) return NULL;
-
+    
     if(p1 == NULL)  {
         return apr_psprintf(cmd->pool, "Updating target by tag with no tag");
     }
@@ -2234,10 +2336,12 @@ static const char *cmd_rule_update_target_by_tag(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_rule_update_target_by_msg(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2, const char *p3)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
-    if (dcfg == NULL) return NULL;
-
+    
     if(p1 == NULL)  {
         return apr_psprintf(cmd->pool, "Updating target by message with no message");
     }
@@ -2262,9 +2366,10 @@ static const char *cmd_rule(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_sever_conn_filters_engine(cmd_parms *cmd, void *_dcfg,
     const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "on") == 0)
     {
@@ -2289,9 +2394,10 @@ static const char *cmd_sever_conn_filters_engine(cmd_parms *cmd, void *_dcfg,
 
 static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "on") == 0)
     {
@@ -2318,8 +2424,11 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 
 static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
+    
     if (strncasecmp(p1, "warn", 4) == 0)
     {
         remote_rules_fail_action = REMOTE_RULES_WARN_ON_FAIL;
@@ -2340,6 +2449,9 @@ static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char
 static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
         const char *p2, const char *p3)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     char *error_msg = NULL;
     directory_config *dcfg = (directory_config *)_dcfg;
 #ifdef WITH_REMOTE_RULES
@@ -2347,8 +2459,6 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
     const char *uri = p2;
     const char *key = p1;
 #endif
-
-    if (dcfg == NULL) return NULL;
 
 #ifdef WITH_REMOTE_RULES
     if (strncasecmp(p1, "crypto", 6) == 0)
@@ -2412,6 +2522,8 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
 
 static const char *cmd_status_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     if (strcasecmp(p1, "on") == 0) {
         status_engine_state = STATUS_ENGINE_ENABLED;
     }
@@ -2429,8 +2541,8 @@ static const char *cmd_status_engine(cmd_parms *cmd, void *_dcfg, const char *p1
 
 static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag)
 {
+    assert(_dcfg != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
     dcfg->rule_inheritance = flag;
     return NULL;
 }
@@ -2438,7 +2550,9 @@ static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag)
 static const char *cmd_rule_script(cmd_parms *cmd, void *_dcfg,
                                    const char *p1, const char *p2)
 {
-    #if defined(WITH_LUA)
+    assert(cmd != NULL);
+    assert(p1 != NULL);
+#if defined(WITH_LUA)
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, filename, p2, NULL);
     #else
@@ -2450,8 +2564,10 @@ static const char *cmd_rule_script(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg,
                                          const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
     rule_exception* re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
     if (re == NULL) {
         ap_log_perror(APLOG_MARK, APLOG_STARTUP | APLOG_NOERRNO, 0, cmd->pool, "cmd_rule_remove_by_id: Cannot allocate memory");
@@ -2481,10 +2597,12 @@ static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_rule_remove_by_tag(cmd_parms *cmd, void *_dcfg,
                                           const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
-    if (dcfg == NULL) return NULL;
-
+    
     re->type = RULE_EXCEPTION_REMOVE_TAG;
     re->param = p1;
     re->param_data = msc_pregcomp(cmd->pool, p1, 0, NULL, NULL);
@@ -2506,10 +2624,12 @@ static const char *cmd_rule_remove_by_tag(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg,
                                           const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
-    if (dcfg == NULL) return NULL;
-
+    
     re->type = RULE_EXCEPTION_REMOVE_MSG;
     re->param = p1;
     re->param_data = msc_pregcomp(cmd->pool, p1, 0, NULL, NULL);
@@ -2531,6 +2651,8 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_rule_update_action_by_id(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     int offset = 0, rule_id = atoi(p1);
     char *opt = strchr(p1,':');
     char *savedptr = NULL;
@@ -2553,6 +2675,8 @@ static const char *cmd_rule_update_action_by_id(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_server_signature(cmd_parms *cmd, void *_dcfg,
                                         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     if (cmd->server->is_virtual) {
         return "ModSecurity: SecServerSignature not allowed in VirtualHost";
     }
@@ -2562,9 +2686,10 @@ static const char *cmd_server_signature(cmd_parms *cmd, void *_dcfg,
 
 static const char *cmd_tmp_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "none") == 0) dcfg->tmp_dir = NULL;
     else dcfg->tmp_dir = ap_server_root_relative(cmd->pool, p1);
@@ -2574,9 +2699,10 @@ static const char *cmd_tmp_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 
 static const char *cmd_upload_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "none") == 0) dcfg->upload_dir = NULL;
     else dcfg->upload_dir = ap_server_root_relative(cmd->pool, p1);
@@ -2587,9 +2713,10 @@ static const char *cmd_upload_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
 static const char *cmd_upload_file_limit(cmd_parms *cmd, void *_dcfg,
                                          const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "default") == 0) {
         dcfg->upload_file_limit = NOT_SET;
@@ -2604,9 +2731,10 @@ static const char *cmd_upload_file_limit(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_upload_filemode(cmd_parms *cmd, void *_dcfg,
                                        const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "default") == 0) {
         dcfg->upload_filemode = NOT_SET;
@@ -2626,9 +2754,10 @@ static const char *cmd_upload_filemode(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_upload_keep_files(cmd_parms *cmd, void *_dcfg,
                                          const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "on") == 0) {
         dcfg->upload_keep_files = KEEP_FILES_ON;
@@ -2648,9 +2777,10 @@ static const char *cmd_upload_keep_files(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_upload_save_tmp_files(cmd_parms *cmd, void *_dcfg,
     const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "on") == 0)
     {
@@ -2671,6 +2801,9 @@ static const char *cmd_upload_save_tmp_files(cmd_parms *cmd, void *_dcfg,
 
 static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     /* ENH enforce format (letters, digits, ., _, -) */
@@ -2681,6 +2814,9 @@ static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 
 static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
     /* ENH enforce format (letters, digits, ., _, -) */
@@ -2701,9 +2837,10 @@ static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 */
 static const char *cmd_xml_external_entity(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
     if (strcasecmp(p1, "on") == 0)  {
         dcfg->xml_external_entity = 1;
     }
@@ -2728,9 +2865,10 @@ static const char *cmd_xml_external_entity(cmd_parms *cmd, void *_dcfg, const ch
 */
 static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
     if (strcasecmp(p1, "on") == 0)  {
         dcfg->hash_is_enabled = HASH_ENABLED;
         dcfg->hash_enforcement = HASH_ENABLED;
@@ -2745,7 +2883,7 @@ static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 }
 
 /**
-* \brief Add SecHashPram configuration option
+* \brief Add SecHashParam configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -2755,11 +2893,11 @@ static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 */
 static const char *cmd_hash_param(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
-    if (dcfg == NULL) return NULL;
-
-    if (p1 == NULL) return NULL;
     dcfg->crypto_param_name = p1;
 
     return NULL;
@@ -2777,11 +2915,12 @@ static const char *cmd_hash_param(cmd_parms *cmd, void *_dcfg, const char *p1)
 */
 static const char *cmd_hash_key(cmd_parms *cmd, void *_dcfg, const char *_p1, const char *_p2)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(_p1 != NULL);
+    assert(_p2 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     char *p1 = NULL;
-
-    if (dcfg == NULL) return NULL;
-    if (_p1 == NULL) return NULL;
 
     if (strcasecmp(_p1, "Rand") == 0)    {
         p1 = apr_pstrdup(cmd->pool, getkey(cmd->pool));
@@ -2793,16 +2932,13 @@ static const char *cmd_hash_key(cmd_parms *cmd, void *_dcfg, const char *_p1, co
         dcfg->crypto_key_len = strlen(p1);
     }
 
-    if(_p2 == NULL)  {
-        return NULL;
-    } else    {
-        if (strcasecmp(_p2, "KeyOnly") == 0)
-            dcfg->crypto_key_add = HASH_KEYONLY;
-        else if (strcasecmp(_p2, "SessionID") == 0)
-            dcfg->crypto_key_add = HASH_SESSIONID;
-        else if (strcasecmp(_p2, "RemoteIP") == 0)
-            dcfg->crypto_key_add = HASH_REMOTEIP;
-    }
+    if (strcasecmp(_p2, "KeyOnly") == 0)
+        dcfg->crypto_key_add = HASH_KEYONLY;
+    else if (strcasecmp(_p2, "SessionID") == 0)
+        dcfg->crypto_key_add = HASH_SESSIONID;
+    else if (strcasecmp(_p2, "RemoteIP") == 0)
+        dcfg->crypto_key_add = HASH_REMOTEIP;
+
     return NULL;
 }
 
@@ -2820,14 +2956,16 @@ static const char *cmd_hash_key(cmd_parms *cmd, void *_dcfg, const char *_p1, co
 static const char *cmd_hash_method_pm(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
+    assert(p2 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(hash_method));
     const char *_p2 = apr_pstrdup(cmd->pool, p2);
     ACMP *p = NULL;
     const char *phrase = NULL;
     const char *next = NULL;
-
-    if (dcfg == NULL) return NULL;
 
     p = acmp_create(0, cmd->pool);
     if (p == NULL) return NULL;
@@ -2911,11 +3049,14 @@ static const char *cmd_hash_method_pm(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_hash_method_rx(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
+    assert(p2 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(hash_method));
     const char *_p2 = apr_pstrdup(cmd->pool, p2);
-    if (dcfg == NULL) return NULL;
-
+    
     if (strcasecmp(p1, "HashHref") == 0) {
         re->type = HASH_URL_HREF_HASH_RX;
         re->param = _p2;
@@ -2978,11 +3119,11 @@ static const char *cmd_hash_method_rx(cmd_parms *cmd, void *_dcfg,
 */
 static const char *cmd_httpBl_key(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
 
-    if (dcfg == NULL) return NULL;
-
-    if (p1 == NULL) return NULL;
     dcfg->httpBlkey = p1;
 
     return NULL;
@@ -2993,6 +3134,8 @@ static const char *cmd_httpBl_key(cmd_parms *cmd, void *_dcfg, const char *p1)
 static const char *cmd_pcre_match_limit(cmd_parms *cmd,
         void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     long val;
 
     if (cmd->server->is_virtual) {
@@ -3012,6 +3155,8 @@ static const char *cmd_pcre_match_limit(cmd_parms *cmd,
 static const char *cmd_pcre_match_limit_recursion(cmd_parms *cmd,
         void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     long val;
 
     if (cmd->server->is_virtual) {
@@ -3034,11 +3179,12 @@ static const char *cmd_pcre_match_limit_recursion(cmd_parms *cmd,
 static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
         const char *p1)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     char *error_msg;
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     if (geo_init(dcfg, filename, &error_msg) <= 0) {
         return error_msg;
     }
@@ -3060,6 +3206,8 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_unicode_codepage(cmd_parms *cmd,
                                         void *_dcfg, const char *p1)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     long val;
 
     val = atol(p1);
@@ -3085,12 +3233,14 @@ static const char *cmd_unicode_codepage(cmd_parms *cmd,
 static const char *cmd_unicode_map(cmd_parms *cmd, void *_dcfg,
                                      const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
+    assert(p2 != NULL);
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     char *error_msg;
     long val = 0;
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     if(p2 != NULL)  {
         val = atol(p2);
         if (val <= 0) {
@@ -3120,11 +3270,12 @@ static const char *cmd_unicode_map(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_gsb_lookup_db(cmd_parms *cmd, void *_dcfg,
                                      const char *p1)
 {
+    assert(cmd != NULL);
+    assert(p1 != NULL);
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     char *error_msg;
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
+    
     if (gsb_db_init(dcfg, filename, &error_msg) <= 0) {
         return error_msg;
     }
@@ -3137,9 +3288,10 @@ static const char *cmd_gsb_lookup_db(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
                                              const char *p1, const char *p2)
 {
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
     directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "on") == 0)
         dcfg->cache_trans = MODSEC_CACHE_ENABLED;

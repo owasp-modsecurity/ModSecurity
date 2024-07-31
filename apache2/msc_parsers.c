@@ -245,6 +245,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
         apr_table_t *arguments, int *invalid_count)
 {
     assert(msr != NULL);
+    assert(invalid_count != NULL);
     msc_arg *arg;
     apr_size_t i, j;
     char *value = NULL;

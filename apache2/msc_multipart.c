@@ -1317,6 +1317,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
  *
  */
 apr_status_t multipart_cleanup(modsec_rec *msr) {
+    assert(msr != NULL);
     int keep_files = 0;
 
     if (msr->mpd == NULL) return -1;

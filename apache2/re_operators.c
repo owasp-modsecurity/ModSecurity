@@ -44,6 +44,8 @@
 void msre_engine_op_register(msre_engine *engine, const char *name,
     fn_op_param_init_t fn1, fn_op_execute_t fn2)
 {
+    assert(engine != NULL);
+    assert(name != NULL);
     msre_op_metadata *metadata = (msre_op_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_op_metadata));
     if (metadata == NULL) return;
@@ -58,6 +60,7 @@ void msre_engine_op_register(msre_engine *engine, const char *name,
  *
  */
 msre_op_metadata *msre_engine_op_resolve(msre_engine *engine, const char *name) {
+    assert(engine != NULL);
     return (msre_op_metadata *)apr_table_get(engine->operators, name);
 }
 
@@ -101,13 +104,12 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
 * \retval 0 On Fail
 */
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(error_msg != NULL);
     char *param = NULL;
     int res = 0;
 
-    if (error_msg == NULL)
-        return -1;
-    else
-        *error_msg = NULL;
+    *error_msg = NULL;
 
     param = apr_pstrdup(rule->ruleset->mp, rule->op_param);
 
@@ -173,6 +175,8 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 * \retval 0 On Fail
 */
 static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(error_msg != NULL);
     const char *rootpath = NULL;
     const char *filepath = NULL;
     const char *ipfile_path = NULL;
@@ -300,6 +304,8 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule,
 /* rsub */
 
 static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
+    assert(rule != NULL);
+    assert(str != NULL);
     char *parm = apr_pcalloc(rule->ruleset->mp, len);
     char *ret = parm;
 
@@ -332,6 +338,9 @@ static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
  */
 #if !defined(MSC_TEST)
 static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
     ap_regex_t *regex;
 #else
@@ -349,7 +358,6 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     int ignore_case = 0;
     unsigned short int op_len = 0;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     line = rule->op_param;
@@ -686,6 +694,8 @@ nextround:
  * \retval 0 On fail
  */
 static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(error_msg != NULL);
     const char *errptr = NULL;
     int erroffset;
     msc_regex_t *regex;
@@ -961,6 +971,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
 /* rx */
 
 static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(error_msg != NULL);
     const char *errptr = NULL;
     int erroffset;
     msc_regex_t *regex;
@@ -1282,6 +1294,9 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 /* pm */
 
 static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
     ACMP *p;
     const char *phrase;
     const char *next;
@@ -1320,6 +1335,9 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
 /* pmFromFile */
 
 static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
     char errstr[1024];
     char buf[HUGE_STRING_LEN + 1];
     char *fn = NULL;
@@ -1567,7 +1585,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
  * \retval url On Success
  */
 static const char *gsb_replace_tpath(apr_pool_t *pool, const char *domain, int len)    {
-
+    assert(domain != NULL);
     char *pos = NULL, *data = NULL;
     char *url = NULL;
     int match = 0;
@@ -1605,7 +1623,7 @@ static const char *gsb_replace_tpath(apr_pool_t *pool, const char *domain, int l
  * \retval reduced On Success
  */
 static const char *gsb_reduce_char(apr_pool_t *pool, const char *domain) {
-
+    assert(domain != NULL);
     char *ptr = apr_pstrdup(pool, domain);
     char *data = NULL;
     char *reduced = NULL;
@@ -1712,6 +1730,8 @@ static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned 
  * \retval 0 On Fail
  */
 static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(error_msg != NULL);
     const char *errptr = NULL;
     int erroffset;
     int options = 0;
@@ -2095,6 +2115,10 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 /* within */
 
 static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    assert(msr != NULL);
+    assert(rule != NULL);
+    assert(var != NULL);
+    assert(error_msg != NULL);
     msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     const char *match = NULL;
     const char *target;
@@ -2255,7 +2279,6 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
     assert(rule->actionset != NULL);
     assert(rule->actionset->actions != NULL);
     assert(var != NULL);
-    assert(var != NULL);
     assert(error_msg != NULL);
     char fingerprint[8];
     int issqli;
@@ -2292,6 +2315,7 @@ static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     assert(rule != NULL);
     assert(rule->actionset != NULL);
     assert(rule->actionset->actions != NULL);
+    assert(var != NULL);
     assert(error_msg != NULL);
     int capture;
     int is_xss;
@@ -2554,6 +2578,8 @@ static int msre_op_beginsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
 static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     assert(msr != NULL);
     assert(rule != NULL);
+    assert(var != NULL);
+    assert(error_msg != NULL);
     const char *match = NULL;
     const char *target;
     unsigned int match_length;
@@ -2619,12 +2645,14 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 /* strmatch */
 
 static int msre_op_strmatch_param_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
     const apr_strmatch_pattern *compiled_pattern;
     char *processed = NULL;
     const char *pattern = rule->op_param;
     unsigned short int op_len;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     op_len = strlen(pattern);
@@ -2854,6 +2882,7 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
  * Luhn Mod-10 Method (ISO 2894/ANSI 4.13)
  */
 static int luhn_verify(const char *ccnumber, int len) {
+    assert(ccnumber != NULL);
     int sum[2] = { 0, 0 };
     int odd = 0;
     int digits = 0;
@@ -2887,6 +2916,9 @@ static int luhn_verify(const char *ccnumber, int len) {
 }
 
 static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
     const char *errptr = NULL;
     int erroffset;
     int options = 0;
@@ -2916,6 +2948,7 @@ static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
 static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     assert(msr != NULL);
     assert(rule != NULL);
+    assert(rule->actionset != NULL);
     assert(var != NULL);
     assert(error_msg != NULL);
     msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
@@ -3119,7 +3152,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
  * \retval 1 On Valid CPF
  */
 static int cpf_verify(const char *cpfnumber, int len) {
-
+    assert(cpfnumber != NULL);
     int factor, part_1, part_2, var_len = len;
     unsigned int sum = 0, i = 0, cpf_len = 11, c;
     int cpf[11];
@@ -3207,12 +3240,14 @@ static int cpf_verify(const char *cpfnumber, int len) {
  * \retval 1 On Success
  */
 static int msre_op_verifyCPF_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
     const char *errptr = NULL;
     int erroffset;
     int options = 0;
     msc_regex_t *regex;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
 #ifdef WITH_PCRE2
@@ -3527,6 +3562,9 @@ invalid:
 * \retval 1 On Success
 */
 static int msre_op_verifySSN_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
     const char *errptr = NULL;
     int erroffset;
     int options = 0;
@@ -4085,6 +4123,9 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
 /* fuzzyHash */
 static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
 {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
 #ifdef WITH_SSDEEP
     struct fuzzy_hash_param_data *param_data;
     struct fuzzy_hash_chunk *chunk, *t;
@@ -4104,11 +4145,6 @@ static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
     data = apr_pstrdup(rule->ruleset->mp, rule->op_param);
     threshold_str = data;
 #endif
-
-    if (error_msg == NULL)
-    {
-        return -1;
-    }
 
     *error_msg = NULL;
 
@@ -4241,9 +4277,11 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
 /* inspectFile */
 
 static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
     char *filename = (char *)rule->op_param;
 
-    if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     if ((filename == NULL)||(is_empty_string(filename))) {
@@ -4346,6 +4384,9 @@ static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_va
 /* validateByteRange */
 
 static int msre_op_validateByteRange_init(msre_rule *rule, char **error_msg) {
+    assert(rule != NULL);
+    assert(rule->ruleset != NULL);
+    assert(error_msg != NULL);
     char *p = NULL, *saveptr = NULL;
     char *table = NULL, *data = NULL;
 
@@ -4671,6 +4712,7 @@ static int msre_op_eq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 {
     assert(msr != NULL);
     assert(rule != NULL);
+    assert(var != NULL);
     assert(error_msg != NULL);
     msc_string str;
     int left, right;

@@ -30,6 +30,9 @@
 static int var_simple_generate_ex(msre_var *var, apr_table_t *vartab, apr_pool_t *mptmp,
     const char *value, int value_len)
 {
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = NULL;
 
     if (value == NULL) return 0;
@@ -57,6 +60,9 @@ static int var_simple_generate(msre_var *var, apr_table_t *vartab, apr_pool_t *m
  * care of the case when the parameter is a regular expression.
  */
 static char *var_generic_list_validate(msre_ruleset *ruleset, msre_var *var) {
+    assert(ruleset != NULL);
+    assert(var != NULL);
+    
     /* It's OK if there's no parameter. */
     if (var->param == NULL) return NULL;
 
@@ -112,6 +118,7 @@ static int var_args_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+        assert(arg != NULL);
         int match = 0;
 
         /* Figure out if we want to include this argument. */
@@ -162,6 +169,7 @@ static int var_args_combined_size_generate(modsec_rec *msr, msre_var *var, msre_
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+        assert(arg != NULL);
         combined_size += arg->name_len;
         combined_size += arg->value_len;
     }
@@ -191,6 +199,7 @@ static int var_args_names_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+        assert(arg != NULL);
         int match = 0;
 
         /* Figure out if we want to include this variable. */
@@ -239,6 +248,7 @@ static int var_args_get_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+        assert(arg != NULL);
         int match = 0;
 
         /* Only QUERY_STRING arguments */
@@ -290,6 +300,7 @@ static int var_args_get_names_generate(modsec_rec *msr, msre_var *var, msre_rule
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+        assert(arg != NULL);
         int match = 0;
 
         /* Only QUERY_STRING arguments */
@@ -341,6 +352,7 @@ static int var_args_post_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+        assert(arg != NULL);
         int match = 0;
 
         /* Only BODY arguments */
@@ -392,6 +404,7 @@ static int var_args_post_names_generate(modsec_rec *msr, msre_var *var, msre_rul
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_arg *arg = (msc_arg *)te[i].val;
+        assert(arg != NULL);
         int match = 0;
 
         /* Only BODY arguments */
@@ -476,6 +489,7 @@ static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
 static char *var_env_validate(msre_ruleset *ruleset, msre_var *var) {
     assert(ruleset != NULL);
+    assert(var != NULL);
     if (var->param == NULL) {
         return apr_psprintf(ruleset->mp, "Parameter required for ENV.");
     }
@@ -491,6 +505,7 @@ static int var_env_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->r != NULL);
     assert(var != NULL);
     char *value = get_env_var(msr->r, (char *)var->param);
     if (value != NULL) {
@@ -505,6 +520,7 @@ static int var_request_uri_raw_generate(modsec_rec *msr, msre_var *var, msre_rul
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->r != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->r->unparsed_uri);
 }
 
@@ -551,6 +567,8 @@ static int var_reqbody_processor_generate(modsec_rec *msr, msre_var *var, msre_r
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
     if (!rvar) {
         msr_log(msr, 1, "REQBODY_PROCESSOR: Memory allocation error");
@@ -575,7 +593,6 @@ static int var_sdbm_delete_error_generate(modsec_rec *msr, msre_var *var, msre_r
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
-    assert(msr->r != NULL);
     assert(var != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
@@ -602,6 +619,9 @@ static int var_reqbody_processor_error_generate(modsec_rec *msr, msre_var *var, 
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
     if (!rvar) {
         msr_log(msr, 1, "REQBODY_ERROR: Memory allocation error");
@@ -622,7 +642,6 @@ static int var_reqbody_processor_error_msg_generate(modsec_rec *msr, msre_var *v
 {
     assert(msr != NULL);
     assert(var != NULL);
-    assert(rule != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
@@ -647,6 +666,8 @@ static int var_reqbody_processor_error_msg_generate(modsec_rec *msr, msre_var *v
 /* XML */
 
 static char *var_xml_validate(msre_ruleset *ruleset, msre_var *var) {
+    assert(var != NULL);
+    
     /* It's OK if there's no parameter. */
     if (var->param == NULL) return NULL;
 
@@ -835,6 +856,8 @@ static int var_remote_addr_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 #if !defined(MSC_TEST)
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
     if (ap_find_linked_module("mod_remoteip.c") != NULL) {
+        assert(msr->r != NULL);
+        assert(msr->r->useragent_ip != NULL);
         if(msr->r->useragent_ip != NULL) msr->remote_addr = apr_pstrdup(msr->mp, msr->r->useragent_ip);
         return var_simple_generate(var, vartab, mptmp, msr->remote_addr);
     }
@@ -850,6 +873,7 @@ static int var_remote_host_generate(modsec_rec *msr, msre_var *var, msre_rule *r
         apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->r != NULL);
     const char *value1 = ap_get_remote_host(msr->r->connection, msr->r->per_dir_config,
         REMOTE_NAME, NULL);
     return var_simple_generate(var, vartab, mptmp, value1);
@@ -888,9 +912,11 @@ static int var_tx_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     int i, count = 0;
 
     arr = apr_table_elts(msr->tx_vars);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
         int match;
 
         /* Figure out if we want to include this variable. */
@@ -944,9 +970,11 @@ static int var_geo_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     int i, count = 0;
 
     arr = apr_table_elts(msr->geo_vars);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
         int match;
 
         /* Figure out if we want to include this variable. */
@@ -983,6 +1011,7 @@ static int var_geo_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 static int var_highest_severity_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
     return var_simple_generate(var, vartab, mptmp,
                                apr_psprintf(mptmp, "%d", msr->highest_severity));
 }
@@ -993,6 +1022,7 @@ static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->collections != NULL);
     assert(var != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
@@ -1005,9 +1035,11 @@ static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     if (target_col == NULL) return 0;
 
     arr = apr_table_elts(target_col);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
         int match;
 
         /* Figure out if we want to include this variable. */
@@ -1073,6 +1105,7 @@ static int var_session_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->collections != NULL);
     assert(var != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
@@ -1088,6 +1121,7 @@ static int var_session_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
         int match;
 
         /* Figure out if we want to include this variable. */
@@ -1129,6 +1163,7 @@ static int var_user_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->collections != NULL);
     assert(var != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
@@ -1144,6 +1179,7 @@ static int var_user_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
         int match;
 
         /* Figure out if we want to include this variable. */
@@ -1189,6 +1225,7 @@ static int var_global_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->collections != NULL);
     assert(var != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
@@ -1204,6 +1241,7 @@ static int var_global_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
         int match;
 
         /* Figure out if we want to include this variable. */
@@ -1241,6 +1279,7 @@ static int var_resource_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->collections != NULL);
     assert(var != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
@@ -1256,6 +1295,7 @@ static int var_resource_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
         int match;
 
         /* Figure out if we want to include this variable. */
@@ -1304,6 +1344,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for (i = 0; i < msr->mpd->parts->nelts; i++)
@@ -1405,9 +1446,11 @@ static int var_files_tmpnames_generate(modsec_rec *msr, msre_var *var, msre_rule
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
         if ((parts[i]->type == MULTIPART_FILE)&&(parts[i]->tmp_file_name != NULL)) {
             int match = 0;
 
@@ -1454,9 +1497,11 @@ static int var_files_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
         if (parts[i]->type == MULTIPART_FILE) {
             int match = 0;
 
@@ -1503,9 +1548,11 @@ static int var_files_sizes_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
         if (parts[i]->type == MULTIPART_FILE) {
             int match = 0;
 
@@ -1552,9 +1599,11 @@ static int var_files_names_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     int i, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
         if (parts[i]->type == MULTIPART_FILE) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
             if (!rvar) {
@@ -1591,6 +1640,7 @@ static int var_files_combined_size_generate(modsec_rec *msr, msre_var *var, msre
     if (msr->mpd != NULL) {
         parts = (multipart_part **)msr->mpd->parts->elts;
         for(i = 0; i < msr->mpd->parts->nelts; i++) {
+            assert(parts[i] != NULL);
             if (parts[i]->type == MULTIPART_FILE) {
                 combined_size += parts[i]->tmp_file_size;
             }
@@ -1622,9 +1672,11 @@ static int var_multipart_part_headers_generate(modsec_rec *msr, msre_var *var, m
     int i, j, count = 0;
 
     if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
 
     parts = (multipart_part **)msr->mpd->parts->elts;
     for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
         int match = 0;
 
         /* Figure out if we want to include this variable. */
@@ -1937,6 +1989,7 @@ static int var_outbound_error_generate(modsec_rec *msr, msre_var *var, msre_rule
 }
 
 static apr_time_t calculate_perf_combined(modsec_rec *msr) {
+    assert(msr != NULL);
     return msr->time_phase1 + msr->time_phase2 + msr->time_phase3 + msr->time_phase4
         + msr->time_phase5 + msr->time_storage_write /* time_storage_read is already
         included in phases */ + msr->time_logging + msr->time_gc;
@@ -1957,9 +2010,8 @@ char *format_all_performance_variables(modsec_rec *msr, apr_pool_t *mp) {
 static int generate_performance_variable(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp, apr_time_t value)
 {
-    assert(msr != NULL);
     assert(var != NULL);
-    assert( vartab!= NULL);
+    assert(vartab != NULL);
     assert(mptmp != NULL);
     msre_var *rvar = NULL;
 
@@ -1977,7 +2029,6 @@ static int generate_performance_variable(modsec_rec *msr, msre_var *var, msre_ru
 static int var_perf_all_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    assert(msr != NULL);
     assert(var != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
@@ -2096,6 +2147,7 @@ static int var_perf_rules_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
     int i, count = 0;
 
     arr = apr_table_elts(msr->perf_rules);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
@@ -2359,11 +2411,6 @@ static int var_time_mon_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
         assert(msr != NULL);
-    assert(msr->r != NULL);
-    assert(var != NULL);
-    assert(rule != NULL);
-    assert(vartab != NULL);
-    assert(mptmp != NULL);
     if (!rvar) {
         msr_log(msr, 1, "TIME_MON: Memory allocation error");
         return -1;
@@ -2385,7 +2432,6 @@ static int var_time_day_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
-    assert(msr->r != NULL);
     assert(var != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
@@ -2465,6 +2511,10 @@ static int var_request_basename_generate(modsec_rec *msr, msre_var *var, msre_ru
 static int var_full_request_generate(modsec_rec *msr, msre_var *var,
         msre_rule *rule, apr_table_t *vartab, apr_pool_t *mptmp)
 {
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
     const apr_array_header_t *arr = NULL;
     char *full_request = NULL;
     int full_request_length = 0;
@@ -2585,6 +2635,7 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
 
         /* Figure out if we want to include this variable. */
         if (var->param == NULL) match = 1;
@@ -2650,10 +2701,12 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
     int i, count = 0;
 
     arr = apr_table_elts(msr->matched_vars);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
         msc_string *str = (msc_string *)te[i].val;
+        assert(str != NULL);
 
         /* Figure out if we want to include this variable. */
         if (var->param == NULL) match = 1;
@@ -2719,6 +2772,7 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
     int i, count = 0;
 
     arr = apr_table_elts(msr->request_cookies);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
@@ -2726,6 +2780,7 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
         /* Figure out if we want to include this variable. */
         if (var->param == NULL) match = 1;
         else {
+            assert(te[i].key != NULL);
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
@@ -2774,6 +2829,7 @@ static int var_request_cookies_names_generate(modsec_rec *msr, msre_var *var, ms
     int i, count = 0;
 
     arr = apr_table_elts(msr->request_cookies);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
@@ -2781,6 +2837,7 @@ static int var_request_cookies_names_generate(modsec_rec *msr, msre_var *var, ms
         /* Figure out if we want to include this variable. */
         if (var->param == NULL) match = 1;
         else {
+            assert(te[i].key != NULL);
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
@@ -2829,6 +2886,7 @@ static int var_request_headers_generate(modsec_rec *msr, msre_var *var, msre_rul
     int i, count = 0;
 
     arr = apr_table_elts(msr->request_headers);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
@@ -2836,6 +2894,7 @@ static int var_request_headers_generate(modsec_rec *msr, msre_var *var, msre_rul
         /* Figure out if we want to include this variable. */
         if (var->param == NULL) match = 1;
         else {
+            assert(te[i].key != NULL);
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
@@ -2884,6 +2943,7 @@ static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, ms
     int i, count = 0;
 
     arr = apr_table_elts(msr->request_headers);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
@@ -2891,6 +2951,7 @@ static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, ms
         /* Figure out if we want to include this variable. */
         if (var->param == NULL) match = 1;
         else {
+            assert(te[i].key != NULL);
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
@@ -2931,6 +2992,7 @@ static int var_request_filename_generate(modsec_rec *msr, msre_var *var, msre_ru
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->r != NULL);
     return var_simple_generate(var, vartab, mptmp, msr->r->parsed_uri.path);
 }
 
@@ -3090,6 +3152,7 @@ static int var_auth_type_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->r != NULL);
     char *value = msr->r->ap_auth_type;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -3100,6 +3163,8 @@ static int var_path_info_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
+    assert(msr->r != NULL);
+    assert(mptmp != NULL);
     const char *value = msr->r->path_info;
     return var_simple_generate(var, vartab, mptmp, value);
 }
@@ -3162,6 +3227,7 @@ static int var_response_headers_generate(modsec_rec *msr, msre_var *var, msre_ru
     if (msr->response_headers == NULL) return 0;
 
     arr = apr_table_elts(msr->response_headers);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
@@ -3169,6 +3235,7 @@ static int var_response_headers_generate(modsec_rec *msr, msre_var *var, msre_ru
         /* Figure out if we want to include this variable. */
         if (var->param == NULL) match = 1;
         else {
+            assert(te[i].key != NULL);
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
@@ -3217,6 +3284,7 @@ static int var_response_headers_names_generate(modsec_rec *msr, msre_var *var, m
     int i, count = 0;
 
     arr = apr_table_elts(msr->response_headers);
+    assert(arr != NULL);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         int match = 0;
@@ -3224,6 +3292,7 @@ static int var_response_headers_names_generate(modsec_rec *msr, msre_var *var, m
         /* Figure out if we want to include this variable. */
         if (var->param == NULL) match = 1;
         else {
+            assert(te[i].key != NULL);
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
@@ -3350,6 +3419,7 @@ void msre_engine_variable_register(msre_engine *engine, const char *name,
     fn_var_validate_t validate, fn_var_generate_t generate,
     unsigned int is_cacheable, unsigned int availability)
 {
+    assert(engine != NULL);
     msre_var_metadata *metadata = (msre_var_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_var_metadata));
     if (metadata == NULL) return;
@@ -3370,6 +3440,7 @@ void msre_engine_variable_register(msre_engine *engine, const char *name,
  *
  */
 void msre_engine_register_default_variables(msre_engine *engine) {
+    assert(engine != NULL);
 
     /* ARGS */
     msre_engine_variable_register(engine,

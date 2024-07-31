@@ -654,6 +654,7 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
  * Produce an audit log entry in JSON format.
  */
 void sec_audit_logger_json(modsec_rec *msr) {
+    assert(msr != NULL);
     const apr_array_header_t *arr = NULL;
     apr_table_entry_t *te = NULL;
     const apr_array_header_t *tarr_pattern = NULL;
@@ -1547,6 +1548,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
  * Produce an audit log entry in native format.
  */
 void sec_audit_logger_native(modsec_rec *msr) {
+    assert(msr != NULL);
     const apr_array_header_t *arr = NULL;
     apr_table_entry_t *te = NULL;
     const apr_array_header_t *tarr_pattern = NULL;
@@ -2235,7 +2237,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
                 sec_auditlog_write(msr, text, strlen(text));
             } else  {
                 if ((rule != NULL) && (rule->actionset != NULL) && !rule->actionset->is_chained && (rule->chain_starter == NULL)) {
-                    text = apr_psprintf(msr->mp, "%s\n\n", rule->unparsed);
+                    text = apr_psprintf(msr->mp, "%s\n", rule->unparsed);
                     sec_auditlog_write(msr, text, strlen(text));
                 }
             }
@@ -2327,6 +2329,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
  */
 void sec_audit_logger(modsec_rec *msr) {
     #ifdef WITH_YAJL
+    assert(msr != NULL);
     if (msr->txcfg->auditlog_format == AUDITLOGFORMAT_JSON) {
         sec_audit_logger_json(msr);
     } else {

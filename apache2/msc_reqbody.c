@@ -25,6 +25,7 @@
 void msre_engine_reqbody_processor_register(msre_engine *engine,
     const char *name, void *fn_init, void *fn_process, void *fn_complete)
 {
+    assert(engine != NULL);
     msre_reqbody_processor_metadata *metadata = 
         (msre_reqbody_processor_metadata *)apr_pcalloc(engine->mp,
             sizeof(msre_reqbody_processor_metadata));
@@ -440,6 +441,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buffer, int buflen, char **error_msg) {
     assert(msr != NULL);
     assert(error_msg != NULL);
+    assert(buffer != NULL || buflen == 0);
 #ifndef MSC_LARGE_STREAM_INPUT
     char *stream_input_body = NULL;
     char *data = NULL;
@@ -819,6 +821,7 @@ apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **err
  *
  */
 apr_status_t modsecurity_request_body_retrieve_end(modsec_rec *msr) {
+    assert(msr != NULL);
     if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
         if (msr->msc_reqbody_fd > 0) {
             close(msr->msc_reqbody_fd);
