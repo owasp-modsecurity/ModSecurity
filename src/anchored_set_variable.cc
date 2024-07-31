@@ -99,12 +99,11 @@ void AnchoredSetVariable::resolve(const std::string &key,
 
 std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
     const std::string &key) {
-    auto range = equal_range(key);
-    for (auto it = range.first; it != range.second; ++it) {
-        std::unique_ptr<std::string> b(new std::string());
-        b->assign(it->second->getValue());
-        return b;
+
+    if (auto search = this->find(key); search != this->end()) {
+        return std::make_unique<std::string>(search->second->getValue());
     }
+
     return nullptr;
 }
 
