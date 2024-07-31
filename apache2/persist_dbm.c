@@ -638,9 +638,9 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 #endif
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "collection_store: Persisted collection (name \"%s\", key \"%s\").",
+        msr_log(msr, 4, "collection_store: Persisted collection (name \"%s\", key \"%s\", length=%d).",
             log_escape_ex(msr->mp, var_name->value, var_name->value_len),
-            log_escape_ex(msr->mp, var_key->value, var_key->value_len));
+            log_escape_ex(msr->mp, var_key->value, var_key->value_len), value.dsize);
     }
 
     return 0;
