@@ -59,10 +59,8 @@ As a dynamic library, don’t forget that libmodsecurity must be installed to a 
 
 On unix the project uses autotools to help the compilation process. Please note that if you are working with `git`, don't forget to initialize and update the submodules. Here's a quick how-to:
 ```shell
-$ git clone https://github.com/owasp-modsecurity/ModSecurity ModSecurity
+$ git clone --recursive https://github.com/owasp-modsecurity/ModSecurity ModSecurity
 $ cd ModSecurity
-$ git submodule init
-$ git submodule update
 ```
 
 You can then start the build process:
@@ -307,11 +305,11 @@ Include "owasp-v3/rules/*.conf"
 
 Now the command will give much higher value.
 
-#### How the benchark works
+#### How the benchmark works
 
-The tool is a simple wrapper application that uses the library. Creates a ModSecurity instance and a RuleSet instance, then runs a loop with the passed number. Creates a Transaction (object) and emulates real HTTP transactions.
+The tool is a straightforward wrapper application that utilizes the library. It creates a ModSecurity instance and a RuleSet instance, then runs a loop based on the specified number. Within this loop, it creates a Transaction object to emulate real HTTP transactions.
 
-The transaction is an HTTP/1.1 GET request with some GET parameters. Added common headers then the response: headers and an XML body. Between phases it checks whether an intervention has taken place or not. All transactions are created with same data.
+Each transaction is an HTTP/1.1 GET request with some GET parameters. Common headers are added, followed by the response headers and an XML body. Between phases, the tool checks whether an intervention has occurred. All transactions are created with the same data.
 
 Note that the tool does not call the last phase (logging).
 
