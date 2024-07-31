@@ -57,7 +57,13 @@ As a dynamic library, don’t forget that libmodsecurity must be installed to a 
 
 ### Unix (Linux, MacOS, FreeBSD, …)
 
-On unix the project uses autotools to help the compilation process.
+On unix the project uses autotools to help the compilation process. Please note that if you are working with `git`, don't forget to initialize and update the submodules. Here's a quick how-to:
+```shell
+$ git clone --recursive https://github.com/owasp-modsecurity/ModSecurity ModSecurity
+$ cd ModSecurity
+```
+
+You can then start the build process:
 
 ```shell
 $ ./build.sh
@@ -235,6 +241,79 @@ $ make
 $ sudo make install
 ```
 
+### Benchmarking
+
+The source tree includes a Benchmark tool that can help measure library performance. The tool is located in the `test/benchmark/` directory. The build process also creates the binary here, so you will have the tool after the compilation is finished.
+
+To run, just type:
+
+```shell
+cd test/benchmark
+$ ./benchmark
+Doing 1000000 transactions...
+
+```
+
+You can also pass a lower value:
+
+```shell
+$ ./benchmark 1000
+Doing 1000 transactions...
+```
+
+To measure the time:
+```shell
+$ time ./benchmark 1000
+Doing 1000 transactions...
+
+real	0m0.351s
+user	0m0.337s
+sys	0m0.022s
+```
+
+This is very fast because the benchmark uses the minimal `modsecurity.conf.default` configuration, which doesn't include too many rules:
+
+```shell
+$ cat basic_rules.conf
+
+Include "../../modsecurity.conf-recommended"
+
+```
+
+To measure with real rules, run one of the download scripts in the same directory:
+
+```shell
+$ ./download-owasp-v3-rules.sh
+Cloning into 'owasp-v3'...
+remote: Enumerating objects: 33007, done.
+remote: Counting objects: 100% (2581/2581), done.
+remote: Compressing objects: 100% (907/907), done.
+remote: Total 33007 (delta 2151), reused 2004 (delta 1638), pack-reused 30426
+Receiving objects: 100% (33007/33007), 9.02 MiB | 16.21 MiB/s, done.
+Resolving deltas: 100% (25927/25927), done.
+Switched to a new branch 'tag3.0.2'
+/path/to/ModSecurity/test/benchmark
+Done.
+
+$ cat basic_rules.conf
+
+Include "../../modsecurity.conf-recommended"
+
+Include "owasp-v3/crs-setup.conf.example"
+Include "owasp-v3/rules/*.conf"
+```
+
+Now the command will give much higher value.
+
+#### How the benchmark works
+
+The tool is a straightforward wrapper application that utilizes the library. It creates a ModSecurity instance and a RuleSet instance, then runs a loop based on the specified number. Within this loop, it creates a Transaction object to emulate real HTTP transactions.
+
+Each transaction is an HTTP/1.1 GET request with some GET parameters. Common headers are added, followed by the response headers and an XML body. Between phases, the tool checks whether an intervention has occurred. All transactions are created with the same data.
+
+Note that the tool does not call the last phase (logging).
+
+Please remember to reset `basic_rules.conf` if you want to try with a different ruleset.
 
 ## Reporting Issues
 
