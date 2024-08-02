@@ -309,6 +309,10 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         modsec_transaction->processConnection(t->clientIp.c_str(),
             t->clientPort, t->serverIp.c_str(), t->serverPort);
 
+        if (t->hostname != "") {
+            modsec_transaction->setRequestHostName(t->hostname);
+        }
+
         actions(&r, modsec_transaction, &serverLog);
 #if 0
         if (r.status != 200) {

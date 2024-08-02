@@ -107,6 +107,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
      m_clientIpAddress(std::make_shared<std::string>("")),
     m_httpVersion(""),
     m_serverIpAddress(std::make_shared<std::string>("")),
+    m_requestHostName(std::make_shared<std::string>("")),
     m_uri(""),
     m_uri_no_query_string_decoded(std::make_shared<std::string>("")),
     m_ARGScombinedSizeDouble(0),
@@ -183,6 +184,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_clientIpAddress(std::make_shared<std::string>("")),
     m_httpVersion(""),
     m_serverIpAddress(std::make_shared<std::string>("")),
+    m_requestHostName(std::make_shared<std::string>("")),
     m_uri(""),
     m_uri_no_query_string_decoded(std::make_shared<std::string>("")),
     m_ARGScombinedSizeDouble(0),
@@ -319,6 +321,7 @@ int Transaction::processConnection(const char *client, int cPort,
     const char *server, int sPort) {
     m_clientIpAddress = std::unique_ptr<std::string>(new std::string(client));
     m_serverIpAddress = std::unique_ptr<std::string>(new std::string(server));
+    m_requestHostName = std::unique_ptr<std::string>(new std::string(server));
     this->m_clientPort = cPort;
     this->m_serverPort = sPort;
     ms_dbg(4, "Transaction context created.");
@@ -2355,6 +2358,53 @@ extern "C" int msc_process_logging(Transaction *transaction) {
  */
 extern "C" int msc_update_status_code(Transaction *transaction, int status) {
     return transaction->updateStatusCode(status);
+}
+
+
+/**
+ * @name    setRequestHostName
+ * @brief   Set request's host name
+ *
+ * With this method it is possible to set the request's hostname.
+ *
+ * @note This function expects a NULL terminated string.
+ *
+ * @param hostname hostname.
+ *
+ * @returns If the operation was successful or not.
+ * @retval true Operation was successful.
+ * @retval false Operation failed.
+ *
+ */
+int Transaction::setRequestHostName(const std::string& hostname) {
+
+    if (hostname != "") {
+        m_requestHostName = std::unique_ptr<std::string>(new std::string(hostname));
+    }
+
+    return true;
+}
+
+
+/**
+ * @name    msc_set_request_hostname
+ * @brief   Set request's host name
+ *
+ * With this method it is possible to set request's hostname.
+ *
+ * @note This function expects a NULL terminated string.
+ *
+ * @param transaction ModSecurity transaction.
+ * @param hostname hostname.
+ *
+ * @returns If the operation was successful or not.
+ * @retval 1 Operation was successful.
+ * @retval 0 Operation failed.
+ *
+ */
+extern "C" int msc_set_request_hostname(Transaction *transaction,
+    const unsigned char *hostname) {
+    return transaction->setRequestHostName(reinterpret_cast<const char *>(hostname));
 }
 
 
