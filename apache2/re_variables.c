@@ -766,13 +766,12 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     }
 
     /* Create one variable for each node in the result. */
+    char* content = NULL;
     for(i = 0; i < nodes->nodeNr; i++) {
         msre_var *rvar = NULL;
-        char *content = NULL;
 
         content = (char *)xmlNodeGetContent(nodes->nodeTab[i]);
         if (content != NULL) {
-            xmlFree(content);
             rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
             if (!rvar) {
                 msr_log(msr, 1, "XML: Memory allocation error");
@@ -787,12 +786,15 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
             }
             rvar->value_len = strlen(rvar->value);
             apr_table_addn(vartab, rvar->name, (void *)rvar);
+            xmlFree(content);
+            content = NULL;
 
             count++;
          }
     }
 
 var_xml_generate_Error:
+    if (content != NULL) xmlFree(content);
     xmlXPathFreeObject(xpathObj);
     xmlXPathFreeContext(xpathCtx);
 
