@@ -51,7 +51,7 @@ jobs:
         run: sudo systemctl restart apache2.service
       - name: Search for errors/warnings in error log
         run: |
-          errors="$(grep -E ":(?error|warn)[]]" /var/log/apache2/error.log)"
+          errors=$(grep -E ':(?error|warn)[]]' /var/log/apache2/error.log)
           if [ -n "${errors}" ]; then
             echo "Found errors/warnings in error.log"
             echo "${errors}"
