@@ -1,6 +1,77 @@
-DD mmm YYYY - 2.9.x (to be released)
+DD mmm YYYY - 2.9.8 (to be released)
 -------------------
 
+ * Move xmlFree() call to the right place
+   [Issue #3199 - @airween]
+ * Add collection size in log in case of writing error
+   [Issue #3198 - @marcstern]
+ * Passing address of lock instead of lock in acquire_global_lock()
+   [Issue #3188 - @marcstern]
+ * Invalid pointer access in case rule id == NOT_SET_P
+   [Issue #3187 - @marcstern]
+ * Show error.log after httpd start in CI
+   [Issue #3171 - @marcstern]
+ * chore: add pull request template
+   [Issue #3159 - @fzipi]
+ * chore: add gitignore file
+   [Issue #3158 - @fzipi]
+ * Possible double free
+   [Issue #3155 - @marcstern]
+ * Set 'jit' variable's initial value
+   [Issue #3154 - @marcstern]
+ * Missing null byte + optimization
+   [Issue #3153 - @marcstern]
+ * fix: remove usage of insecure tmpnam
+   [Issue #3149 - @fzipi]
+ * docs: update copyright
+   [Issue #3148 - @fzipi]
+ * Enhanced logging [Issue #3107]
+   [Issue #3139 - @marcstern]
+ * Check for null pointer dereference (almost) everywhere
+   [Issue #3120 - @marcstern]
+ * Fix possible segfault in collection_unpack
+   [Issue #3099 - @twouters]
+ * fix: Replace obsolote macros
+   [Issue #3094 - @airween]
+ * chore: update bug-report-for-version-2-x.md
+   [Issue #3087 - @fzipi]
+ * feat: Add more steps: install built module and restart the server
+   [Issue #3078 - @airween]
+ * Add new flag: --without-lua
+   [Issue #3076 - @airween]
+ * Initial release of CI worklow
+   [Issue #3075 - @airween]
+ * V2/fixbuildissue
+   [Issue #3074 - @airween]
+ * ; incorrectly replaced by space in cmdline
+   [Issue #3051 - @marcstern]
+ * Detailed error message when writing collections
+   [Issue #3050 - @marcstern]
+ * docs: Fix organization name in references and security e-mail (v2)
+   [Issue #3043 - @airween]
+ * ctl:ruleRemoveByTag isn't executed if no rule id is present in the rule
+   [Issue #3012 - @marcstern]
+ * Suppress useless loop on tag matching
+   [Issue #3009 - @marcstern]
+ * Optimization: Avoid last loop and storing an empty value in case nothing
+     after last %{..} macro
+   [Issue #3004 - @marcstern]
+ * Ignore (consistently) empty actions
+   [Issue #3003 - @marcstern]
+ * Add context info to error message
+   [Issue #2997 - @marcstern]
+ * Implement msre_action_phase_validate()
+   [Issue #2994 - @marcstern]
+ * Avoid some useless code and memory allocation in case no macro is present
+   [Issue #2992 - @marcstern]
+ * 'jit' variable not initialized when WITH_PCRE2 is defined
+   [Issue #2987 - @marcstern]
+ * Configure: do not check for pcre1 if pcre2 requested
+   [Issue #2975 - @martinhsv]
+ * Double memory allocation
+   [Issue #2969 - @marcstern]
+ * Fix for DEBUG_CONF compile flag
+   [Issue #2963 - @marcstern]
  * Enhance logging
    [Issue #3107 - @marcstern]
  * Fix possible segfault in collection_unpack
