@@ -13,7 +13,7 @@ jobs:
         os: [ubuntu-22.04]
         platform:
           - {label: "x64", arch: "amd64", configure: "--enable-assertions=yes"}
-          - {label: "x32", arch: "i386", configure: "PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS= -m32--enable-assertions=yes"}
+          - {label: "x32", arch: "i386", configure: "PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS= -m32 --enable-assertions=yes"}
         compiler:
           - {label: "gcc", cc: "gcc", cxx: "g++"}
           - {label: "clang", cc: "clang", cxx: "clang++"}
