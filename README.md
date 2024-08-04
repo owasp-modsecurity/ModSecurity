@@ -236,10 +236,16 @@ CFLAGS to disable the compilation optimization parameters:
 ```shell
 $ export CFLAGS="-g -O0"
 $ ./build.sh
-$ ./configure
+$ ./configure --enable-assertions=yes
 $ make
 $ sudo make install
 ```
+"Assertions allow us to document assumptions and to spot violations early in the
+development process. What is more, assertions allow us to spot violations with a
+minimum of effort." https://dl.acm.org/doi/pdf/10.1145/240964.240969
+
+It is recommended to use assertions where applicable, and to enable them with
+'--enable-assertions=yes' during the testing and debugging workflow.
 
 ### Benchmarking
 
