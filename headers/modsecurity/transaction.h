@@ -14,6 +14,7 @@
  */
 
 #ifdef __cplusplus
+#include <cassert>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -307,11 +308,8 @@ class TransactionSecMarkerManagement {
     }
 
     std::shared_ptr<std::string> getCurrentMarker() const {
-        if (m_marker) {
-            return m_marker;
-        } else {
-            throw; // cppcheck-suppress rethrowNoCurrentException
-        }
+        assert((m_marker != nullptr) && "You might have forgotten to call and evaluate isInsideAMarker() before calling getCurrentMarker().");
+        return m_marker;
     }
 
     void removeMarker() {
