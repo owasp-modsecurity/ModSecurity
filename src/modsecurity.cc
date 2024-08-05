@@ -202,7 +202,7 @@ void ModSecurity::serverLog(void *data, std::shared_ptr<RuleMessage> rm) {
     }
 
     if (m_logProperties & TextLogProperty) {
-        std::string &&d = rm->log();
+        auto d = rm->log();
         const void *a = static_cast<const void *>(d.c_str());
         m_logCb(data, a);
         return;
@@ -210,10 +210,6 @@ void ModSecurity::serverLog(void *data, std::shared_ptr<RuleMessage> rm) {
 
     if (m_logProperties & RuleMessageLogProperty) {
         const void *a = static_cast<const void *>(rm.get());
-        if (m_logProperties & IncludeFullHighlightLogProperty) {
-            m_logCb(data, a);
-            return;
-        }
         m_logCb(data, a);
         return;
     }
@@ -258,14 +254,11 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             strlen("highlight"));
 
         yajl_gen_array_open(g);
-    while (vars.size() > 3) {
-        std::string value;
+    for(auto [it, pending] = std::tuple{vars.rbegin(), vars.size()}; pending > 3; pending -= 3) {
         yajl_gen_map_open(g);
-        vars.pop_back();
-        const std::string &startingAt = vars.back().str();
-        vars.pop_back();
-        const std::string &size = vars.back().str();
-        vars.pop_back();
+        it++;
+        const std::string &startingAt = it->str(); it++;
+        const std::string &size = it->str(); it++;
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("startingAt"),
             strlen("startingAt"));
@@ -284,7 +277,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             return -1;
         }
 
-        value = std::string(content, stoi(startingAt), stoi(size));
+        const auto value = std::string(content, stoi(startingAt), stoi(size));
         if (varValue.size() > 0) {
             varValue.append(" " + value);
         } else {
@@ -340,16 +333,13 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
     yajl_gen_map_open(g);
 
-    while (ops.size() > 3) {
-        std::string value;
+    for(auto [it, pending] = std::tuple{ops.rbegin(), ops.size()}; pending > 3; pending -= 3) {
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("highlight"),
             strlen("highlight"));
         yajl_gen_map_open(g);
-        ops.pop_back();
-        std::string startingAt = ops.back().str();
-        ops.pop_back();
-        std::string size = ops.back().str();
-        ops.pop_back();
+        it++;
+        const std::string &startingAt = it->str(); it++;
+        const std::string &size = ops.back().str(); it++;
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("startingAt"),
             strlen("startingAt"));
@@ -371,7 +361,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             reinterpret_cast<const unsigned char*>("value"),
             strlen("value"));
 
-        value = std::string(varValue, stoi(startingAt), stoi(size));
+        const auto value = std::string(varValue, stoi(startingAt), stoi(size));
 
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>(value.c_str()),

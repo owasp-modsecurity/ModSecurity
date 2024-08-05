@@ -21,7 +21,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifndef WIN32
 #include <unistd.h>
+#else
+#include <io.h>
+#include "src/compat/msvc.h"
+#endif
 #include <stdlib.h>
 
 #include <fstream>
@@ -118,7 +123,7 @@ bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
         log = transaction->toOldAuditLogFormat(parts, "-" + boundary + "--");
     }
 
-    std::string logPath = m_audit->m_storage_dir;
+    const auto &logPath = m_audit->m_storage_dir;
     fileName = logPath + fileName + "-" + *transaction->m_id.get();
 
     if (logPath.empty()) {

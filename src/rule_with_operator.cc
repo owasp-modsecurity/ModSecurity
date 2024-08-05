@@ -92,6 +92,7 @@ void RuleWithOperator::updateMatchedVars(Transaction *trans, const std::string &
 
 void RuleWithOperator::cleanMatchedVars(Transaction *trans) {
     ms_dbg_a(trans, 9, "Matched vars cleaned.");
+    // cppcheck-suppress ctunullpointer
     trans->m_variableMatchedVar.unset();
     trans->m_variableMatchedVars.unset();
     trans->m_variableMatchedVarName.unset();
@@ -132,7 +133,7 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &
 
 void RuleWithOperator::getVariablesExceptions(Transaction *t,
     variables::Variables *exclusion, variables::Variables *addition) {
-    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) {
+    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) { // cppcheck-suppress ctunullpointer
         if (containsTag(*a.first.get(), t) == false) {
             continue;
         }
@@ -146,7 +147,7 @@ void RuleWithOperator::getVariablesExceptions(Transaction *t,
         }
     }
 
-    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_msg) {
+    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_msg) {
         if (containsMsg(*a.first.get(), t) == false) {
             continue;
         }
@@ -160,7 +161,7 @@ void RuleWithOperator::getVariablesExceptions(Transaction *t,
         }
     }
 
-    for (auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
+    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
         if (m_ruleId != a.first) {
             continue;
         }
@@ -316,8 +317,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 if (ret == true) {
                     ruleMessage->m_match = m_operator->resolveMatchMessage(trans,
                         key, value);
-                    for (auto &i : v->getOrigin()) {
-                        ruleMessage->m_reference.append(i->toText());
+                    for (const auto &i : v->getOrigin()) {
+                        ruleMessage->m_reference.append(i.toText());
                     }
 
                     ruleMessage->m_reference.append(*valueTemp.second);

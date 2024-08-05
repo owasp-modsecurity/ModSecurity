@@ -315,6 +315,7 @@ libmodsecurity_la_CPPFLAGS = \
 	-I.. \
 	-g \
 	-I../others \
+	-I../others/mbedtls/include \
 	-fPIC \
 	-O3 \
 	-I../headers \

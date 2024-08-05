@@ -30,6 +30,10 @@
 
 #include "modsecurity/transaction.h"
 
+#ifdef WIN32
+#include "src/compat/msvc.h"
+#endif
+
 namespace modsecurity {
 namespace variables {
 
