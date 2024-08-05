@@ -1,6 +1,8 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - remove 'this throw' call in transaction
+    [PR #3207 - @gberkes]
   - New API function: set hostname for log
     [PR #3203 - @airween]
   - Fixing typo in Dockerfile
