@@ -18,6 +18,9 @@
 
 
 #include <stdio.h>
+#ifdef WIN32
+#include <Windows.h>
+#endif
 
 #include <unordered_map>
 #include <string>
@@ -53,6 +56,9 @@ private:
 
      struct handler_info {
          FILE* fp;
+#ifdef WIN32
+         HANDLE hMutex;
+#endif
          unsigned int cnt;
      };
 
