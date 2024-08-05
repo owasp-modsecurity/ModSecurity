@@ -482,7 +482,12 @@ int main(int argc, char **argv) {
     std::string ver(MODSECURITY_VERSION);
     std::string envvar("ModSecurity " + ver + " regression tests");
 
+#ifndef WIN32
     setenv("MODSECURITY", envvar.c_str(), 1);
+#else
+    _putenv_s("MODSECURITY", envvar.c_str());
+#endif
+
 #ifndef NO_LOGS
     int test_number = 0;
 #endif
