@@ -1492,9 +1492,8 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
         it->status = m_it.status;
 
         if (m_it.log != NULL) {
-            std::string log("");
-            log.append(m_it.log);
-            utils::string::replaceAll(&log, std::string("%d"),
+            std::string log(m_it.log);
+            utils::string::replaceAll(log, "%d",
                 std::to_string(it->status));
             it->log = strdup(log.c_str());
         } else {
