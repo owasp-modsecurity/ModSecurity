@@ -724,6 +724,9 @@ void msc_transaction_cleanup(Transaction *transaction);
 int msc_intervention(Transaction *transaction, ModSecurityIntervention *it);
 
 /** @ingroup ModSecurity_C_API */
+void msc_intervention_cleanup(ModSecurityIntervention *it);
+
+/** @ingroup ModSecurity_C_API */
 int msc_process_logging(Transaction *transaction);
 
 /** @ingroup ModSecurity_C_API */

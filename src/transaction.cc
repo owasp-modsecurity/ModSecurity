@@ -2274,6 +2274,22 @@ extern "C" int msc_intervention(Transaction *transaction,
 
 
 /**
+ * @name    msc_intervention_cleanup
+ * @brief   Removes all the resources allocated by a given Intervention.
+ *
+ * This is a helper function to free any allocated buffers owned by the
+ * intervention.
+ *
+ * @param it ModSecurity intervention.
+ *
+ */
+extern "C" void msc_intervention_cleanup(ModSecurityIntervention *it) {
+    intervention::free(it);
+    intervention::clean(it);
+}
+
+
+/**
  * @name    msc_get_response_body
  * @brief   Retrieve a buffer with the updated response body.
  *
