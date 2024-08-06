@@ -1,6 +1,10 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Add cleanup methods to complete C based ABI
+    [PR #3209 - @eduar-hte]
+  - Build on macOS with Apple silicon (arm64)
+    [PR #3208 - @eduar-hte]
   - remove 'this throw' call in transaction
     [PR #3207 - @gberkes]
   - New API function: set hostname for log
