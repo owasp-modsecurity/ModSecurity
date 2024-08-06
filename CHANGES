@@ -1,6 +1,8 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Fixed shared files deadlock in a multi-threaded Windows application
+    [PR #3210 - @eduar-hte]
   - Add cleanup methods to complete C based ABI
     [PR #3209 - @eduar-hte]
   - Build on macOS with Apple silicon (arm64)
