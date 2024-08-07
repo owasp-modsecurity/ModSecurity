@@ -153,7 +153,7 @@ void RuleWithOperator::getVariablesExceptions(Transaction *t,
         }
     }
 
-    for (const auto &[id, v] : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
+    for (const auto &[id, v] : t->m_rules->m_exceptions.m_variable_update_target_by_id) { // cppcheck-suppress unassignedVariable
         if (m_ruleId == id) {
             if (Variable *b{v.get()};dynamic_cast<variables::VariableModificatorExclusion *>(b)) {
                 exclusion->push_back(dynamic_cast<variables::VariableModificatorExclusion *>(b)->m_base.get());
