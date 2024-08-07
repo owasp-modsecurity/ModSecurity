@@ -1565,7 +1565,7 @@ static const char *gsb_replace_tpath(apr_pool_t *pool, const char *domain, int l
     data = apr_palloc(pool, len + 1);
     if (!data) return NULL;
 
-    url[len] = 0;
+    url[len] = '\0';
 
     while(( pos = strstr(url , "/./" )) != NULL) {
         match = 1;
