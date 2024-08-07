@@ -1,6 +1,14 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Refactor: used the init-statement to declare "pos" inside the
+    if statement
+    [PR #3214 - @gberkes]
+  - Refactor: moved 3 #include directives to the top of the file.
+    [PR #3213 - @gberkes]
+  - Fix SecRemoteRules regression test not to depend on a
+    specific error message
+    [PR #3211 - @eduar-hte]
   - Fixed shared files deadlock in a multi-threaded Windows application
     [PR #3210 - @eduar-hte]
   - Add cleanup methods to complete C based ABI
