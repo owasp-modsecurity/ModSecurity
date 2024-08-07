@@ -110,7 +110,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/ConfigureChecks.cmake)
 configure_file(config.h.cmake ${BASE_DIR}/src/config.h)
 
 find_package(PCRE2 REQUIRED)
-find_package(PThreads4W REQUIRED)
 find_package(Poco REQUIRED)
 find_package(dirent REQUIRED)		# used only by tests (check dirent::dirent refernces)
 
@@ -139,7 +138,7 @@ add_library(libModSecurity SHARED ${libModSecuritySources})
 
 target_compile_definitions(libModSecurity PRIVATE WITH_PCRE2)
 target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include)
-target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 pthreads4w::pthreads4w libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
+target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
 
 macro(add_package_dependency project compile_definition link_library flag)
   if(${flag})
@@ -255,7 +254,6 @@ setExampleTargetProperties(using_bodies_in_chunks)
 # reading_logs_via_rule_message
 add_executable(reading_logs_via_rule_message ${BASE_DIR}/examples/reading_logs_via_rule_message/simple_request.cc)
 setExampleTargetProperties(reading_logs_via_rule_message)
-target_link_libraries(reading_logs_via_rule_message PRIVATE libModSecurity pthreads4w::pthreads4w)
 
 # reading_logs_with_offset
 add_executable(reading_logs_with_offset ${BASE_DIR}/examples/reading_logs_with_offset/read.cc)

@@ -20,6 +20,7 @@
 #include <list>
 #include <memory>
 #include <utility>
+#include <mutex>
 
 #include "src/operators/operator.h"
 #include "src/utils/acmp.h"
@@ -56,7 +57,7 @@ class Pm : public Operator {
 #ifdef MODSEC_MUTEX_ON_PM
 
  private:
-    pthread_mutex_t m_lock;
+    std::mutex m_mutex;
 #endif
 };
 

@@ -39,9 +39,6 @@ Pm::~Pm() {
 
     free(m_p);
     m_p = NULL;
-#ifdef MODSEC_MUTEX_ON_PM
-    pthread_mutex_destroy(&m_lock);
-#endif
 }
 
 
@@ -89,11 +86,12 @@ bool Pm::evaluate(Transaction *transaction, RuleWithActions *rule,
     pt.ptr = NULL;
     const char *match = NULL;
 #ifdef MODSEC_MUTEX_ON_PM
-    pthread_mutex_lock(&m_lock);
+    {
+    const std::lock_guard lock(m_mutex);
 #endif
     rc = acmp_process_quick(&pt, &match, input.c_str(), input.length());
 #ifdef MODSEC_MUTEX_ON_PM
-    pthread_mutex_unlock(&m_lock);
+    }
 #endif
 
     if (rc >= 0 && transaction) {
@@ -118,9 +116,6 @@ bool Pm::init(const std::string &file, std::string *error) {
     std::istringstream *iss;
     const char *err = NULL;
 
-#ifdef MODSEC_MUTEX_ON_PM
-    pthread_mutex_init(&m_lock, NULL);
-#endif
     char *content = parse_pm_content(m_param.c_str(), m_param.length(), &err);
     if (content == NULL) {
         iss = new std::istringstream(m_param);
