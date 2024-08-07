@@ -49,4 +49,14 @@ jobs:
         run: |
           sudo systemctl restart apache2.service
           sudo cat /var/log/apache2/error.log
-
+      - name: Check error.log
+        run: |
+          # Send requests & check log format
+          # Valid request
+          curl -s http://127.0.01/ > /dev/null || echo $?
+          # Invalid request
+          curl -s http://127.0.01/%2e%2f > /dev/null || echo $? 
+          # Check log format
+          grep -F ModSecurity < /var/log/apache2/error.log | grep -vP "^\[[^\]]+\] \[security2:[a-z]+\] \[pid [0-9]+:tid [0-9]+\] (?:\[client [0-9.:]+\] )?ModSecurity" || exit 0
+          # grep -v succeeded => found some lines with invalid format
+          exit 1
