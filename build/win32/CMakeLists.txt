@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.24)
 
 set(BASE_DIR ${CMAKE_CURRENT_LIST_DIR}/../..)
 
-option(WITHOUT_LMDB    "Include LMDB support"    OFF)
-option(WITHOUT_LUA     "Include LUA support"     OFF)
-option(WITHOUT_LIBXML2 "Include LibXML2 support" OFF)
-option(WITHOUT_MAXMIND "Include MaxMind support" OFF)
-option(WITHOUT_CURL    "Include CURL support"    OFF)
+option(WITH_LMDB    "Include LMDB support"    OFF)
+option(WITH_LUA     "Include LUA support"     ON)
+option(WITH_LIBXML2 "Include LibXML2 support" ON)
+option(WITH_MAXMIND "Include MaxMind support" ON)
+option(WITH_CURL    "Include CURL support"    ON)
 
-option(USE_ASAN        "Build with Address Sanitizer" OFF)
+option(USE_ASAN     "Build with Address Sanitizer" OFF)
 
 # common compiler settings
 
@@ -93,17 +93,17 @@ set(HAVE_SSDEEP   0)    # should always be zero, no conan package available
 
 macro(enable_feature flag option)
   if(${option})
-    set(${flag} 0)
+    set(${flag} 1)  # ON
   else()
-    set(${flag} 1)
+    set(${flag} 0)  # OFF
   endif()
 endmacro()
 
-enable_feature(HAVE_LMDB ${WITHOUT_LMDB})
-enable_feature(HAVE_LUA ${WITHOUT_LUA})
-enable_feature(HAVE_LIBXML2 ${WITHOUT_LIBXML2})
-enable_feature(HAVE_MAXMIND ${WITHOUT_MAXMIND})
-enable_feature(HAVE_CURL ${WITHOUT_CURL})
+enable_feature(HAVE_LMDB ${WITH_LMDB})
+enable_feature(HAVE_LUA ${WITH_LUA})
+enable_feature(HAVE_LIBXML2 ${WITH_LIBXML2})
+enable_feature(HAVE_MAXMIND ${WITH_MAXMIND})
+enable_feature(HAVE_CURL ${WITH_CURL})
 
 include(${CMAKE_CURRENT_LIST_DIR}/ConfigureChecks.cmake)
 
