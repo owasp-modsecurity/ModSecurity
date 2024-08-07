@@ -1037,10 +1037,6 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     assert(var != NULL);
     assert(error_msg != NULL);
     msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
-    if (!regex) {
-        msr_log(msr, 1, "rx: Memory allocation error");
-        return -1;
-    }
     msc_string *re_pattern = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     if (!re_pattern) {
         msr_log(msr, 1, "rx: Memory allocation error");
