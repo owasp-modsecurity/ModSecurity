@@ -133,45 +133,33 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &
 
 void RuleWithOperator::getVariablesExceptions(Transaction *t,
     variables::Variables *exclusion, variables::Variables *addition) {
-    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_tag) { // cppcheck-suppress ctunullpointer
-        if (containsTag(*a.first.get(), t) == false) {
-            continue;
-        }
-        Variable *b = a.second.get();
-        if (dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
-            exclusion->push_back(
-                dynamic_cast<variables::VariableModificatorExclusion*>(
-                    b)->m_base.get());
-        } else {
-            addition->push_back(b);
+    for (const auto &[tag, v] : t->m_rules->m_exceptions.m_variable_update_target_by_tag) { // cppcheck-suppress ctunullpointer
+        if (containsTag(*tag.get(), t)) {
+            if (Variable *b{v.get()};dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
+                exclusion->push_back(dynamic_cast<variables::VariableModificatorExclusion*>(b)->m_base.get());
+            } else {
+                addition->push_back(b);
+            }
         }
     }
 
-    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_msg) {
-        if (containsMsg(*a.first.get(), t) == false) {
-            continue;
-        }
-        Variable *b = a.second.get();
-        if (dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
-            exclusion->push_back(
-                dynamic_cast<variables::VariableModificatorExclusion*>(
-                    b)->m_base.get());
-        } else {
-            addition->push_back(b);
+    for (const auto &[msg, v] : t->m_rules->m_exceptions.m_variable_update_target_by_msg) {
+        if (containsMsg(*msg.get(), t)) {
+            if (Variable *b{v.get()}; dynamic_cast<variables::VariableModificatorExclusion *>(b)) {
+                exclusion->push_back(dynamic_cast<variables::VariableModificatorExclusion *>(b)->m_base.get());
+            } else {
+                addition->push_back(b);
+            }
         }
     }
 
-    for (const auto &a : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
-        if (m_ruleId != a.first) {
-            continue;
-        }
-        Variable *b = a.second.get();
-        if (dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
-            exclusion->push_back(
-                dynamic_cast<variables::VariableModificatorExclusion*>(
-                    b)->m_base.get());
-        } else {
-            addition->push_back(b);
+    for (const auto &[id, v] : t->m_rules->m_exceptions.m_variable_update_target_by_id) {
+        if (m_ruleId == id) {
+            if (Variable *b{v.get()};dynamic_cast<variables::VariableModificatorExclusion *>(b)) {
+                exclusion->push_back(dynamic_cast<variables::VariableModificatorExclusion *>(b)->m_base.get());
+            } else {
+                addition->push_back(b);
+            }
         }
     }
 }
