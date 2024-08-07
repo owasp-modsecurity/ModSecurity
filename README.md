@@ -109,24 +109,46 @@ Below some are illustrated:
 ###  Simple example using C++
 
 ```c++
-using ModSecurity::ModSecurity;
-using ModSecurity::Rules;
-using ModSecurity::Transaction;
+#include "modsecurity/modsecurity.h"
+#include "modsecurity/rules_set.h"
+#include "modsecurity/transaction.h"
 
-ModSecurity *modsec;
-ModSecurity::Rules *rules;
+using modsecurity::ModSecurity;
+using modsecurity::RulesSet;
+using modsecurity::Transaction;
+using modsecurity::ModSecurityIntervention;
 
-modsec = new ModSecurity();
+int main() {
+    ModSecurity *modsec;
+    RulesSet *rules;
 
-rules = new Rules();
+    modsec = new ModSecurity();
 
-rules->loadFromUri(rules_file);
+    rules = new RulesSet();
 
-Transaction *modsecTransaction = new Transaction(modsec, rules);
+    if (rules->load("SecRule REMOTE_ADDR \"@ipMatch 127.0.0.1\" \"id:1,phase:1,deny\"") < 0) {
+        std::cout << "Problems loading the rules..." << std::endl;
+        std::cout << rules->getParserError() << std::endl;
+        return -1;
+    }
 
-modsecTransaction->processConnection("127.0.0.1");
-if (modsecTransaction->intervention()) {
-   std::cout << "There is an intervention" << std::endl;
+    Transaction *modsecTransaction = new Transaction(modsec, rules, nullptr);
+
+    // connection
+    modsecTransaction->processConnection("127.0.0.1", 12345, "127.0.0.1", 80);
+    // uri
+    modsecTransaction->processURI("/", "GET", "1.1");
+    // add headers
+    modsecTransaction->addRequestHeader("User-Agent", "ModSecurity/v3");
+    // check headers
+    modsecTransaction->processRequestHeaders();
+    // check intervention
+    ModSecurityIntervention intervention;
+    intervention.disruptive = 0;
+    if (modsecTransaction->intervention(&intervention)) {
+        std::cout << "There is an intervention" << std::endl;
+    }
+    return 0;
 }
 ```
 
@@ -134,34 +156,45 @@ if (modsecTransaction->intervention()) {
 
 ```c
 #include "modsecurity/modsecurity.h"
+#include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
-
-
-char main_rule_uri[] = "basic_rules.conf";
 
 int main (int argc, char **argv)
 {
     ModSecurity *modsec = NULL;
     Transaction *transaction = NULL;
-    Rules *rules = NULL;
+    RulesSet *rules = NULL;
 
     modsec = msc_init();
 
     rules = msc_create_rules_set();
-    msc_rules_add_file(rules, main_rule_uri);
+    const char* error;
+    if (msc_rules_add(rules, "SecRule REMOTE_ADDR \"@ipMatch 127.0.0.1\" \"id:1,phase:1,deny\"", &error) < 0)  {
+        fprintf(stderr, "Problems loading the rules...\n");
+        fprintf(stderr, "%s\n", error);
+        return 0;
+    }
 
-    transaction = msc_new_transaction(modsec, rules);
+    transaction = msc_new_transaction(modsec, rules, NULL);
 
-    msc_process_connection(transaction, "127.0.0.1");
-    msc_process_uri(transaction, "http://www.modsecurity.org/test?key1=value1&key2=value2&key3=value3&test=args&test=test");
+    // connection
+    msc_process_connection(transaction, "127.0.0.1", 12345, "127.0.0.1", 80);
+    // uri
+    msc_process_uri(transaction, "/", "GET", "1.1");
+    // add headers
+    msc_add_request_header(transaction, "User-Agent", "ModSecurity/v3");
+    // check headers
     msc_process_request_headers(transaction);
-    msc_process_request_body(transaction);
-    msc_process_response_headers(transaction);
-    msc_process_response_body(transaction);
+
+    ModSecurityIntervention intervention;
+    intervention.disruptive = 0;
+    if (msc_intervention(transaction, &intervention)) {
+        fprintf(stderr, "There is an intervention\n");
+        return -1;
+    }
 
     return 0;
 }
-
 ```
 
 # Contributing
