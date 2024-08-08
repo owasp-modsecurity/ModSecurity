@@ -131,32 +131,15 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &
 }
 
 
-void RuleWithOperator::getVariablesExceptions(Transaction *t,
-    variables::Variables *exclusion, variables::Variables *addition) {
-    for (const auto &[tag, v] : t->m_rules->m_exceptions.m_variable_update_target_by_tag) { // cppcheck-suppress ctunullpointer
-        if (containsTag(*tag.get(), t)) {
-            if (Variable *b{v.get()};dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
-                exclusion->push_back(dynamic_cast<variables::VariableModificatorExclusion*>(b)->m_base.get());
-            } else {
-                addition->push_back(b);
-            }
-        }
-    }
-
-    for (const auto &[msg, v] : t->m_rules->m_exceptions.m_variable_update_target_by_msg) {
-        if (containsMsg(*msg.get(), t)) {
-            if (Variable *b{v.get()}; dynamic_cast<variables::VariableModificatorExclusion *>(b)) {
-                exclusion->push_back(dynamic_cast<variables::VariableModificatorExclusion *>(b)->m_base.get());
-            } else {
-                addition->push_back(b);
-            }
-        }
-    }
-
-    for (const auto &[id, v] : t->m_rules->m_exceptions.m_variable_update_target_by_id) { // cppcheck-suppress unassignedVariable
-        if (m_ruleId == id) {
-            if (Variable *b{v.get()};dynamic_cast<variables::VariableModificatorExclusion *>(b)) {
-                exclusion->push_back(dynamic_cast<variables::VariableModificatorExclusion *>(b)->m_base.get());
+template<typename MapType, typename Operation>
+void getVariablesExceptionsHelper(
+    variables::Variables *exclusion, variables::Variables *addition,
+    const MapType &map, Operation op) {
+    for (const auto &[x, v] : map) {
+        if (op(x)) {
+            auto b = v.get();
+            if (auto vme = dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
+                exclusion->push_back(vme->m_base.get());
             } else {
                 addition->push_back(b);
             }
@@ -165,10 +148,26 @@ void RuleWithOperator::getVariablesExceptions(Transaction *t,
 }
 
 
+void RuleWithOperator::getVariablesExceptions(Transaction &t,
+    variables::Variables *exclusion, variables::Variables *addition) {
+    getVariablesExceptionsHelper(exclusion, addition,
+        t.m_rules->m_exceptions.m_variable_update_target_by_tag, 
+        [this, &t](const auto &tag) { return containsTag(*tag.get(), &t); });
+
+    getVariablesExceptionsHelper(exclusion, addition,
+        t.m_rules->m_exceptions.m_variable_update_target_by_msg,
+        [this, &t](const auto &msg) { return containsMsg(*msg.get(), &t); });
+
+    getVariablesExceptionsHelper(exclusion, addition,
+        t.m_rules->m_exceptions.m_variable_update_target_by_id,
+        [this](const auto &id) { return m_ruleId == id; });
+}
+
+
 inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
     variables::Variables *exclusion, Transaction *trans) {
     variables::Variables addition;
-    getVariablesExceptions(trans, exclusion, &addition);
+    getVariablesExceptions(*trans, exclusion, &addition); // cppcheck-suppress ctunullpointer
 
     for (int i = 0; i < m_variables->size(); i++) {
         Variable *variable = m_variables->at(i);

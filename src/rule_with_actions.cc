@@ -99,17 +99,16 @@ RuleWithActions::RuleWithActions(
                     } else if (dynamic_cast<actions::MultiMatch *>(a)) {
                         m_containsMultiMatchAction = true;
                         delete a;
-                    } else if (dynamic_cast<actions::Severity *>(a)) {
-                        m_severity = dynamic_cast<actions::Severity *>(a);
-                    } else if (dynamic_cast<actions::LogData *>(a)) {
-                        m_logData = dynamic_cast<actions::LogData*>(a);
-                    } else if (dynamic_cast<actions::Msg *>(a)) {
-                        m_msg = dynamic_cast<actions::Msg*>(a);
-                    } else if (dynamic_cast<actions::SetVar *>(a)) {
-                        m_actionsSetVar.push_back(
-                            dynamic_cast<actions::SetVar *>(a));
-                    } else if (dynamic_cast<actions::Tag *>(a)) {
-                        m_actionsTag.push_back(dynamic_cast<actions::Tag *>(a));
+                    } else if (auto sa = dynamic_cast<actions::Severity *>(a)) {
+                        m_severity = sa;
+                    } else if (auto lda = dynamic_cast<actions::LogData *>(a)) {
+                        m_logData = lda;
+                    } else if (auto ma = dynamic_cast<actions::Msg *>(a)) {
+                        m_msg = ma;
+                    } else if (auto sva = dynamic_cast<actions::SetVar *>(a)) {
+                        m_actionsSetVar.push_back(sva);
+                    } else if (auto ta = dynamic_cast<actions::Tag *>(a)) {
+                        m_actionsTag.push_back(ta);
                     } else if (dynamic_cast<actions::Block *>(a)) {
                         m_actionsRuntimePos.push_back(a);
                         m_containsStaticBlockAction = true;
