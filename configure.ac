@@ -309,10 +309,10 @@ fi
 
 AC_ARG_ENABLE(assertions,
               AS_HELP_STRING([--enable-assertions],
-                             [Turn on assertions checks (undefine NDEBUG)]),
+                             [Turn on assertions checks (undefine NDEBUG, define _GLIBCXX_ASSERTIONS  & _FORTIFY_SOURCE)]),
 [
   if test "${enableval}" = "yes"; then
-      assertions='-UNDEBUG'
+      assertions='-UNDEBUG -D_FORTIFY_SOURCE=3 -D_GLIBCXX_ASSERTIONS'
   else
       assertions='-DNDEBUG'
   fi
