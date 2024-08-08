@@ -68,8 +68,8 @@ std::vector<std::string> ssplit(std::string str, char delimiter);
 std::pair<std::string, std::string> ssplit_pair(const std::string& str, char delimiter);
 std::vector<std::string> split(std::string str, char delimiter);
 void chomp(std::string *str);
-void replaceAll(std::string *str, const std::string& from,
-    const std::string& to);
+void replaceAll(std::string &str, std::string_view from,
+    std::string_view to);
 std::string removeWhiteSpacesIfNeeded(std::string a);
 std::string parserSanitizer(std::string a);
 

@@ -1469,31 +1469,40 @@ int Transaction::processLogging() {
  * @brief   Check if ModSecurity has anything to ask to the server.
  *
  * Intervention can generate a log event and/or perform a disruptive action.
+ * 
+ * If the return value is true, all fields in the ModSecurityIntervention
+ * parameter have been initialized and are safe to access.
+ * If the return value is false, no changes to the ModSecurityIntervention
+ * parameter have been made.
  *
- * @param Pointer ModSecurityIntervention structure
+ * @param it Pointer to ModSecurityIntervention structure
  * @retval true  A intervention should be made.
  * @retval false Nothing to be done.
  *
  */
 bool Transaction::intervention(ModSecurityIntervention *it) {
+    const auto disruptive = m_it.disruptive;
     if (m_it.disruptive) {
         if (m_it.url) {
             it->url = strdup(m_it.url);
+        } else {
+            it->url = NULL;
         }
         it->disruptive = m_it.disruptive;
         it->status = m_it.status;
 
         if (m_it.log != NULL) {
-            std::string log("");
-            log.append(m_it.log);
-            utils::string::replaceAll(&log, std::string("%d"),
+            std::string log(m_it.log);
+            utils::string::replaceAll(log, "%d",
                 std::to_string(it->status));
             it->log = strdup(log.c_str());
+        } else {
+            it->log = NULL;
         }
         intervention::reset(&m_it);
     }
 
-    return it->disruptive;
+    return disruptive;
 }
 
 
@@ -2260,11 +2269,16 @@ extern "C" void msc_transaction_cleanup(Transaction *transaction) {
  *
  * Intervention can generate a log event and/or perform a disruptive action.
  *
- * @param transaction ModSecurity transaction.
+ * If the return value is not zero, all fields in the ModSecurityIntervention
+ * parameter have been initialized and are safe to access.
+ * If the return value is zero, no changes to the ModSecurityIntervention
+ * parameter have been made.
  *
- * @return Pointer to ModSecurityIntervention structure
- * @retval >0   A intervention should be made.
- * @retval NULL Nothing to be done.
+ * @param transaction ModSecurity transaction.
+ * @param it Pointer to ModSecurityIntervention structure
+ * @returns If an intervention should be made
+ * @retval >0 A intervention should be made.
+ * @retval 0  Nothing to be done.
  *
  */
 extern "C" int msc_intervention(Transaction *transaction,
