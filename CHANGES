@@ -1,6 +1,9 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - V3/sonarcloud replace this declaration by a structured
+    binding declaration
+    [PR #3217 - @gberkes]
   - Do not assume ModSecurityIntervention argument to
     transaction::intervention has been initialized/cleaned
     [PR #3212 - @eduar-hte]
