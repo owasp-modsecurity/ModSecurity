@@ -1,6 +1,8 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - fix: Sonarcloud reported memleak fixes
+    [PR #3114 - @airween]
   - V3/sonarcloud replace this declaration by a structured
     binding declaration
     [PR #3217 - @gberkes]
