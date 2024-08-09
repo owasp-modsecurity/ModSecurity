@@ -327,24 +327,24 @@ inline void RuleWithActions::executeTransformation(
     const actions::transformations::Transformation &a,
     std::string &value,
     const Transaction *trans,
-    TransformationResults *ret,
-    std::string *path,
-    int *nth) const {
+    TransformationResults &ret,
+    std::string &path,
+    int &nth) const {
 
     if (a.transform(value, trans) &&
         m_containsMultiMatchAction) {
         ret.emplace_back(value, a.m_name);
-        (*nth)++;
+        nth++;
     }
 
-    if (path->empty()) {
-        path->append(*a.m_name.get());
+    if (path.empty()) {
+        path.append(*a.m_name.get());
     } else {
-        path->append("," + *a.m_name.get());
+        path.append("," + *a.m_name.get());
     }
 
     ms_dbg_a(trans, 9, " T (" + \
-        std::to_string(*nth) + ") " + \
+        std::to_string(nth) + ") " + \
         *a.m_name.get() + ": \"" + \
         utils::string::limitTo(80, value) +"\"");
 }
@@ -353,7 +353,7 @@ void RuleWithActions::executeTransformations(
     const Transaction *trans, const std::string &in, TransformationResults &ret) {
     int none = 0;
     int transformations = 0;
-    std::string path("");
+    std::string path;
     auto value = in;
 
     if (m_containsMultiMatchAction == true) {
@@ -381,16 +381,16 @@ void RuleWithActions::executeTransformations(
             // FIXME: here the object needs to be a transformation already.
             auto t = dynamic_cast<const Transformation*>(a.get());
             assert(t != nullptr);
-            executeTransformation(*t, value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(*t, value, trans, ret, path,
+                transformations);
         }
     }
 
     for (const Transformation *a : m_transformations) {
         assert(a != nullptr);
         if (none == 0) {
-            executeTransformation(*a, value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(*a, value, trans, ret, path,
+                transformations);
         }
         if (a->m_isNone) {
             none--;
@@ -419,8 +419,8 @@ void RuleWithActions::executeTransformations(
         auto a = dynamic_cast<const Transformation*>(b.second.get());
         assert(a != nullptr);
         if (none == 0) {
-            executeTransformation(*a, value, trans, &ret, &path,
-                &transformations);
+            executeTransformation(*a, value, trans, ret, path,
+                transformations);
         }
         if (a->m_isNone) {
             none--;

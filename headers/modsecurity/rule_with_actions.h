@@ -161,9 +161,9 @@ class RuleWithActions : public Rule {
         const actions::transformations::Transformation &a,
         std::string &value,
         const Transaction *trans,
-        TransformationResults *ret,
-        std::string *path,
-        int *nth) const;
+        TransformationResults &ret,
+        std::string &path,
+        int &nth) const;
 
     /* actions */
     actions::Action *m_disruptiveAction;
