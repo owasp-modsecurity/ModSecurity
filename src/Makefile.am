@@ -219,7 +219,6 @@ OPERATORS = \
 	operators/no_match.cc \
 	operators/operator.cc \
 	operators/pm.cc \
-	operators/pm_f.cc \
 	operators/pm_from_file.cc \
 	operators/rbl.cc \
 	operators/rsub.cc \

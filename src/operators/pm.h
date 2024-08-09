@@ -17,7 +17,6 @@
 #define SRC_OPERATORS_PM_H_
 
 #include <string>
-#include <list>
 #include <memory>
 #include <utility>
 #include <mutex>
