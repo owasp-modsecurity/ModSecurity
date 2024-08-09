@@ -53,12 +53,6 @@ class Pm : public Operator {
 
  protected:
     ACMP *m_p;
-
-#ifdef MODSEC_MUTEX_ON_PM
-
- private:
-    std::mutex m_mutex;
-#endif
 };
 
 

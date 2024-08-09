@@ -85,14 +85,7 @@ bool Pm::evaluate(Transaction *transaction, RuleWithActions *rule,
     pt.parser = m_p;
     pt.ptr = NULL;
     const char *match = NULL;
-#ifdef MODSEC_MUTEX_ON_PM
-    {
-    const std::lock_guard lock(m_mutex);
-#endif
     rc = acmp_process_quick(&pt, &match, input.c_str(), input.length());
-#ifdef MODSEC_MUTEX_ON_PM
-    }
-#endif
 
     if (rc >= 0 && transaction) {
         std::string match_(match?match:"");
