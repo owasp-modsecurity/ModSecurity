@@ -48,7 +48,7 @@ std::string UrlEncode::url_enc(const char *input,
     len = input_len * 3 + 1;
     d = rval = reinterpret_cast<char *>(malloc(len));
     if (rval == NULL) {
-        return NULL;
+        return {};
     }
 
     /* ENH Only encode the characters that really need to be encoded. */
