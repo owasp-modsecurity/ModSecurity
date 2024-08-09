@@ -75,15 +75,6 @@ inline std::string dash_if_empty(const std::string *str) {
 }
 
 
-inline std::string dash_if_empty(const char *str) {
-    if (str == NULL || std::strlen(str) == 0) {
-        return "-";
-    }
-
-    return std::string(str);
-}
-
-
 inline std::string limitTo(int amount, const std::string &str) {
     std::string ret;
 
