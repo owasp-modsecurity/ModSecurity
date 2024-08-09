@@ -1,6 +1,13 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Creating a std::string with a null pointer\
+    is undefined behaviour
+    [PR #3220 - @eduar-hte]
+  - Simplifiy configuration to build using std C++17
+    [PR #3219 - @eduar-hte]
+  - Remove unnecessary dynamic casts
+    [PR #3218 - @eduar-hte]
   - fix: Sonarcloud reported memleak fixes
     [PR #3114 - @airween]
   - V3/sonarcloud replace this declaration by a structured
