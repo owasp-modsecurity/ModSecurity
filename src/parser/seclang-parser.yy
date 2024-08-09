@@ -1086,8 +1086,9 @@ expression:
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$4.get()) {
-            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
-              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            if (auto pt = dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(pt);
+              i.release();
             } else {
               a->push_back(i.release());
             }
@@ -1135,8 +1136,9 @@ expression:
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$2.get()) {
-            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
-              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            if (auto pt = dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(pt);
+              i.release();
             } else {
               a->push_back(i.release());
             }
@@ -1155,8 +1157,9 @@ expression:
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
         for (auto &i : *$2.get()) {
-            if (dynamic_cast<actions::transformations::Transformation *>(i.get())) {
-              t->push_back(dynamic_cast<actions::transformations::Transformation *>(i.release()));
+            if (auto pt = dynamic_cast<actions::transformations::Transformation *>(i.get())) {
+              t->push_back(pt);
+              i.release();
             } else {
               a->push_back(i.release());
             }

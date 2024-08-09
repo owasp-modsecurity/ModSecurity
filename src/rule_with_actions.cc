@@ -99,17 +99,16 @@ RuleWithActions::RuleWithActions(
                     } else if (dynamic_cast<actions::MultiMatch *>(a)) {
                         m_containsMultiMatchAction = true;
                         delete a;
-                    } else if (dynamic_cast<actions::Severity *>(a)) {
-                        m_severity = dynamic_cast<actions::Severity *>(a);
-                    } else if (dynamic_cast<actions::LogData *>(a)) {
-                        m_logData = dynamic_cast<actions::LogData*>(a);
-                    } else if (dynamic_cast<actions::Msg *>(a)) {
-                        m_msg = dynamic_cast<actions::Msg*>(a);
-                    } else if (dynamic_cast<actions::SetVar *>(a)) {
-                        m_actionsSetVar.push_back(
-                            dynamic_cast<actions::SetVar *>(a));
-                    } else if (dynamic_cast<actions::Tag *>(a)) {
-                        m_actionsTag.push_back(dynamic_cast<actions::Tag *>(a));
+                    } else if (auto sa = dynamic_cast<actions::Severity *>(a)) {
+                        m_severity = sa;
+                    } else if (auto lda = dynamic_cast<actions::LogData *>(a)) {
+                        m_logData = lda;
+                    } else if (auto ma = dynamic_cast<actions::Msg *>(a)) {
+                        m_msg = ma;
+                    } else if (auto sva = dynamic_cast<actions::SetVar *>(a)) {
+                        m_actionsSetVar.push_back(sva);
+                    } else if (auto ta = dynamic_cast<actions::Tag *>(a)) {
+                        m_actionsTag.push_back(ta);
                     } else if (dynamic_cast<actions::Block *>(a)) {
                         m_actionsRuntimePos.push_back(a);
                         m_containsStaticBlockAction = true;
@@ -213,7 +212,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         if (m_ruleId != b.first) {
             continue;
         }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        actions::Action *a = b.second.get();
         if (a->isDisruptive() == true && *a->m_name.get() == "block") {
             ms_dbg_a(trans, 9, "Rule contains a `block' action");
                 *containsBlock = true;
@@ -266,7 +265,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         if (m_ruleId != b.first) {
             continue;
         }
-        actions::Action *a = dynamic_cast<actions::Action*>(b.second.get());
+        actions::Action *a = b.second.get();
         executeAction(trans, containsBlock, ruleMessage, a, false);
         disruptiveAlreadyExecuted = true;
     }
@@ -394,8 +393,7 @@ void RuleWithActions::executeTransformations(
 
     for (Transformation *a : m_transformations) {
         if (none == 0) {
-            Transformation *t = dynamic_cast<Transformation *>(a);
-            executeTransformation(t, &value, trans, &ret, &path,
+            executeTransformation(a, &value, trans, &ret, &path,
                 &transformations);
         }
         if (a->m_isNone) {
@@ -423,8 +421,7 @@ void RuleWithActions::executeTransformations(
         }
         Transformation *a = dynamic_cast<Transformation*>(b.second.get());
         if (none == 0) {
-            Transformation *t = dynamic_cast<Transformation *>(a);
-            executeTransformation(t, &value, trans, &ret, &path,
+            executeTransformation(a, &value, trans, &ret, &path,
                 &transformations);
         }
         if (a->m_isNone) {
@@ -479,7 +476,7 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
         if (m_ruleId != b.first) {
             continue;
         }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+        actions::Action *z = b.second.get();
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
@@ -489,7 +486,7 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
         if (m_ruleId != b.first) {
             continue;
         }
-        actions::Action *z = dynamic_cast<actions::Action*>(b.second.get());
+        actions::Action *z = b.second.get();
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
