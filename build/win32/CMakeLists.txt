@@ -259,6 +259,10 @@ setExampleTargetProperties(reading_logs_via_rule_message)
 add_executable(reading_logs_with_offset ${BASE_DIR}/examples/reading_logs_with_offset/read.cc)
 setExampleTargetProperties(reading_logs_with_offset)
 
+# multithread
+add_executable(multithread ${BASE_DIR}/examples/multithread/multithread.cc)
+setExampleTargetProperties(multithread)
+
 # tools
 #
 

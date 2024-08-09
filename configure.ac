@@ -423,6 +423,7 @@ AM_COND_IF([EXAMPLES],
             examples/Makefile \
             examples/simple_example_using_c/Makefile \
             examples/multiprocess_c/Makefile \
+            examples/multithread/Makefile \
             examples/reading_logs_with_offset/Makefile \
             examples/reading_logs_via_rule_message/Makefile \
             examples/using_bodies_in_chunks/Makefile \

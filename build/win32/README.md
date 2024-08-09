@@ -51,6 +51,7 @@ Built files will be located in the directory: `build\win32\build\[build_configur
     * `using_bodies_in_chunks.exe`
     * `reading_logs_via_rule_message.exe`
     * `reading_logs_with_offset.exe`
+    * `multithread.exe`
  * Executable files for tools
     * `rules_check.exe`
 
