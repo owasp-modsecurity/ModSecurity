@@ -34,12 +34,13 @@ template <class T> class ModSecurityTest :
     ModSecurityTest()
         : m_test_number(0),
         m_automake_output(false),
-        m_count_all(false) { }
+        m_count_all(false),
+        m_test_multithreaded(false) { }
 
     std::string header();
     void cmd_options(int, char **);
-    std::pair<std::string, std::vector<T *>>* load_tests();
-    std::pair<std::string, std::vector<T *>>* load_tests(const std::string &path);
+    void load_tests();
+    void load_tests(const std::string &path);
     bool load_test_json(const std::string &file);
 
     std::string target;
@@ -48,6 +49,7 @@ template <class T> class ModSecurityTest :
     int m_test_number;
     bool m_automake_output;
     bool m_count_all;
+    bool m_test_multithreaded;
 };
 
 }  // namespace modsecurity_test
