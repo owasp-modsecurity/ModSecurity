@@ -489,11 +489,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
 end:
     if (my_error_msg) {
         if (msr) msr_log(msr, 9, my_error_msg);
-#if !defined(MSC_TEST)
-        else {
-            ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Successfully appended variable");
-        }
-#endif
+        else ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, my_error_msg);
     }
     if (target_list != NULL) free(target_list);
     if (replace != NULL) free(replace);
