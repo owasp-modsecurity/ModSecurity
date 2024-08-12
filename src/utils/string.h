@@ -21,6 +21,11 @@
 #include <utility>
 #include <sstream>
 #include <iomanip>
+#include <time.h>
+
+#ifdef WIN32
+#include "src/compat/msvc.h"
+#endif
 
 #ifndef SRC_UTILS_STRING_H_
 #define SRC_UTILS_STRING_H_
@@ -60,9 +65,11 @@ const char HEX2DEC[256] = {
 
 
 inline std::string ascTime(const time_t *t) {
-    std::string ts = std::ctime(t);
-    ts.pop_back();
-    return ts;
+    struct tm timeinfo;
+    localtime_r(t, &timeinfo);
+    char tstr[std::size("Www Mmm dd hh:mm:ss yyyy")];
+    strftime(tstr, std::size(tstr), "%c", &timeinfo);
+    return tstr;
 }
 
 
