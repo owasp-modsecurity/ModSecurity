@@ -855,7 +855,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
             }
 
             new_value = std::string(data);
-            utils::string::chomp(&new_value);
+            utils::string::chomp(new_value);
 
             /* update the header value in the table */
             header_value = m_mpp->m_headers.at(
@@ -924,7 +924,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 i++;
             }
             header_value = std::string(data);
-            utils::string::chomp(&header_value);
+            utils::string::chomp(header_value);
 
             /* error if the name already exists */
             if (m_mpp->m_headers.count(header_name) > 0) {

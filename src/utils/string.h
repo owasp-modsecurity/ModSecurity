@@ -59,7 +59,7 @@ const char HEX2DEC[256] = {
 };
 
 
-inline std::string ascTime(time_t *t) {
+inline std::string ascTime(const time_t *t) {
     std::string ts = std::ctime(t);
     ts.pop_back();
     return ts;
@@ -67,7 +67,7 @@ inline std::string ascTime(time_t *t) {
 
 
 inline std::string dash_if_empty(const std::string *str) {
-    if (str == NULL || str->empty()) {
+    if (str == nullptr || str->empty()) {
         return "-";
     }
 
@@ -107,7 +107,7 @@ inline std::string toHexIfNeeded(const std::string &str, bool escape_spec = fals
 }
 
 
-inline std::vector<std::string> ssplit(std::string str, char delimiter) {
+inline std::vector<std::string> ssplit(const std::string &str, char delimiter) {
     std::vector<std::string> internal;
     std::stringstream ss(str);  // Turn the string into a stream.
     std::string tok;
@@ -134,10 +134,10 @@ inline std::pair<std::string, std::string> ssplit_pair(const std::string& str, c
 }
 
 
-inline std::vector<std::string> split(std::string str, char delimiter) {
+inline std::vector<std::string> split(const std::string &str, char delimiter) {
     std::vector<std::string> internal = ssplit(str, delimiter);
 
-    if (internal.size() == 0) {
+    if (internal.empty()) {
         internal.push_back(str);
     }
 
@@ -145,10 +145,10 @@ inline std::vector<std::string> split(std::string str, char delimiter) {
 }
 
 
-inline void chomp(std::string *str) {
-    std::string::size_type pos = str->find_last_not_of("\n\r");
+inline void chomp(std::string &str) {
+    std::string::size_type pos = str.find_last_not_of("\n\r");
     if (pos != std::string::npos) {
-        str->erase(pos+1, str->length()-pos-1);
+        str.erase(pos+1, str.length()-pos-1);
     }
 }
 
@@ -194,17 +194,6 @@ inline std::string parserSanitizer(std::string a) {
 }
 
 
-inline unsigned char x2c(const unsigned char *what) {
-    unsigned char digit;
-
-    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
-    digit *= 16;
-    digit += (what[1] >= 'A' ? ((what[1] & 0xdf) - 'A') + 10 : (what[1] - '0'));
-
-    return digit;
-}
-
-
 /**
  * Converts a single hexadecimal digit into a decimal value.
  */
@@ -212,6 +201,17 @@ inline unsigned char xsingle2c(const unsigned char *what) {
     unsigned char digit;
 
     digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
+
+    return digit;
+}
+
+
+inline unsigned char x2c(const unsigned char *what) {
+    unsigned char digit;
+
+    digit = xsingle2c(what);
+    digit *= 16;
+    digit += xsingle2c(what+1);
 
     return digit;
 }
