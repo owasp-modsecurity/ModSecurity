@@ -65,12 +65,12 @@ MultipartPartTmpFile::~MultipartPartTmpFile() {
 }
 
 void MultipartPartTmpFile::Open() {
-    struct tm timeinfo;
-    time_t tt = time(NULL);
+    time_t tt = time(nullptr);
 
+    struct tm timeinfo;
     localtime_r(&tt, &timeinfo);
 
-    char tstr[17];
+    char tstr[std::size("/yyyymmdd-hhmmss")];
     strftime(tstr, std::size(tstr), "/%Y%m%d-%H%M%S", &timeinfo);
 
     std::string path = m_transaction->m_rules->m_uploadDirectory.m_value;

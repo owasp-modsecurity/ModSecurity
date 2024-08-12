@@ -40,19 +40,13 @@ namespace variables {
 void TimeMon::evaluate(Transaction *transaction,
     RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
-    char tstr[200];
-    struct tm timeinfo;
     time_t timer;
-
     time(&timer);
-    memset(tstr, '\0', 200);
 
+    struct tm timeinfo;
     localtime_r(&timer, &timeinfo);
-    strftime(tstr, 200, "%m", &timeinfo);
-    int a = atoi(tstr);
-    a--;
 
-    transaction->m_variableTimeMin.assign(std::to_string(a));
+    transaction->m_variableTimeMin.assign(std::to_string(timeinfo.tm_mon));
 
     l->push_back(new VariableValue(&m_retName,
         &transaction->m_variableTimeMin));
