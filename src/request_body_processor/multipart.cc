@@ -918,6 +918,18 @@ int Multipart::process_part_header(std::string *error, int offset) {
                  return false;
             }
 
+            /* check if multipart header contains any invalid characters */
+            for (const auto& ch : header_name) {
+                if (ch < 33 || ch > 126) {
+                    ms_dbg_a(m_transaction, 1,
+                        "Multipart: Invalid part header " \
+                        "(contains invalid character).");
+                    error->assign("Multipart: Invalid part header "\
+                        "(contains invalid character).");
+                    return false;
+                }
+            }
+
             /* extract the value value */
             data++;
             i++;
