@@ -1,6 +1,11 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Prevent concurrent access to data in InMemoryPerProcess'
+    resolveXXX methods
+    [PR #3216 - @eduar-hte]
+  - Remove several string copies and unnecessary heap allocations
+    [PR #3222 - @eduar-hte]
   - Creating a std::string with a null pointer\
     is undefined behaviour
     [PR #3220 - @eduar-hte]
