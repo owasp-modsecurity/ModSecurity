@@ -616,7 +616,6 @@ static int var_reqbody_processor_error_msg_generate(modsec_rec *msr, msre_var *v
 {
     assert(msr != NULL);
     assert(var != NULL);
-    assert(rule != NULL);
     assert(vartab != NULL);
     assert(mptmp != NULL);
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
