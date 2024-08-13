@@ -1,6 +1,10 @@
 DD mmm YYYY - 2.9.8 (to be released)
 -------------------
 
+ * Use standard httpd logging format in error log
+   [PR #3192 - @marcstern]
+ * fix msc_regexec() != PCRE_ERROR_NOMATCH strict check
+   [PR #3194 - @marcstern]
  * Move xmlFree() call to the right place
    [Issue #3199 - @airween]
  * Add collection size in log in case of writing error
