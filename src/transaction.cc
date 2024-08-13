@@ -1520,7 +1520,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << utils::string::dash_if_empty(
        m_variableRequestHeaders.resolveFirst("Host").get())
         << " ";
-    ss << utils::string::dash_if_empty(this->m_clientIpAddress->c_str()) << " ";
+    ss << utils::string::dash_if_empty(this->m_clientIpAddress.get()) << " ";
     /** TODO: Check variable */
     variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
     std::vector<const VariableValue *> l;
@@ -1531,7 +1531,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     delete r;
 
     ss << utils::string::dash_if_empty(
-        m_variableRemoteUser.c_str());
+        &m_variableRemoteUser);
     ss << " ";
     /** TODO: Check variable */
     //ss << utils::string::dash_if_empty(

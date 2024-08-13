@@ -35,7 +35,7 @@ namespace variables {
 class Rule_DictElement : public VariableDictElement { \
  public:
     explicit Rule_DictElement(const std::string &dictElement)
-        : VariableDictElement(std::string("RULE"), dictElement) { }
+        : VariableDictElement(m_rule, dictElement) { }
 
     static void id(Transaction *t,
         RuleWithActions *rule,
@@ -49,13 +49,8 @@ class Rule_DictElement : public VariableDictElement { \
         if (!r || r->m_ruleId == 0) {
             return;
         }
-        std::string *a = new std::string(std::to_string(r->m_ruleId));
-        VariableValue *var = new VariableValue(&m_rule, &m_rule_id,
-            a
-        );
-        delete a;
-        var->addOrigin();
-        l->push_back(var);
+
+        addVariableOrigin(m_rule_id, std::to_string(r->m_ruleId), l);
     }
 
 
@@ -72,13 +67,7 @@ class Rule_DictElement : public VariableDictElement { \
             return;
         }
 
-        std::string *a = new std::string(r->m_rev);
-        VariableValue *var = new VariableValue(&m_rule, &m_rule_rev,
-            a
-        );
-        delete a;
-        var->addOrigin();
-        l->push_back(var);
+        addVariableOrigin(m_rule_rev, r->m_rev, l);
     }
 
 
@@ -92,13 +81,7 @@ class Rule_DictElement : public VariableDictElement { \
         }
 
         if (r && r->hasSeverity()) {
-            std::string *a = new std::string(std::to_string(r->severity()));
-            VariableValue *var = new VariableValue(&m_rule, &m_rule_severity,
-                a
-            );
-            delete a;
-            var->addOrigin();
-            l->push_back(var);
+            addVariableOrigin(m_rule_severity, std::to_string(r->severity()), l);
         }
     }
 
@@ -113,13 +96,7 @@ class Rule_DictElement : public VariableDictElement { \
         }
 
         if (r && r->hasLogData()) {
-            std::string *a = new std::string(r->logData(t));
-            VariableValue *var = new VariableValue(&m_rule, &m_rule_logdata,
-                a
-            );
-            delete a;
-            var->addOrigin();
-            l->push_back(var);
+            addVariableOrigin(m_rule_logdata, r->logData(t), l);
         }
     }
 
@@ -133,36 +110,30 @@ class Rule_DictElement : public VariableDictElement { \
         }
 
         if (r && r->hasMsg()) {
-            std::string *a = new std::string(r->msg(t));
-            VariableValue *var = new VariableValue(&m_rule, &m_rule_msg,
-                a
-            );
-            delete a;
-            var->addOrigin();
-            l->push_back(var);
+            addVariableOrigin(m_rule_msg, r->msg(t), l);
         }
     }
 
     void evaluate(Transaction *t,
         RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
-        if (m_dictElement == "id") {
+        if (m_dictElement == m_rule_id) {
             id(t, rule, l);
             return;
         }
-        if (rule && m_dictElement == "rev") {
+        if (rule && m_dictElement == m_rule_rev) {
             rev(t, rule, l);
             return;
         }
-        if (rule && m_dictElement == "severity") {
+        if (rule && m_dictElement == m_rule_severity) {
             severity(t, rule, l);
             return;
         }
-        if (m_dictElement == "logdata") {
+        if (m_dictElement == m_rule_logdata) {
             logData(t, rule, l);
             return;
         }
-        if (m_dictElement == "msg") {
+        if (m_dictElement == m_rule_msg) {
             msg(t, rule, l);
             return;
         }
@@ -174,6 +145,18 @@ class Rule_DictElement : public VariableDictElement { \
     static const std::string m_rule_severity;
     static const std::string m_rule_logdata;
     static const std::string m_rule_msg;
+
+private:
+
+    static inline void addVariableOrigin(const std::string &key,
+        const std::string &value,
+        std::vector<const VariableValue *> *l) {
+        auto var = new VariableValue(&m_rule, &key,
+            &value
+        );
+        var->addOrigin();
+        l->push_back(var);
+    }
 };
 
 
