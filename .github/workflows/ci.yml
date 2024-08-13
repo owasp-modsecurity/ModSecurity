@@ -132,11 +132,11 @@ jobs:
         configuration: [Release]
         configure:
           - {label: "full",       opt: "" }
-          - {label: "wo curl",    opt: "-DWITHOUT_CURL=ON" }
-          - {label: "wo lmdb",    opt: "-DWITHOUT_LMDB=ON" }
-          - {label: "wo lua",     opt: "-DWITHOUT_LUA=ON" }
-          - {label: "wo maxmind", opt: "-DWITHOUT_MAXMIND=ON" }
-          - {label: "wo libxml",  opt: "-WITHOUT_LIBXML2=ON" }
+          - {label: "wo curl",    opt: "-DWITH_CURL=OFF" }
+          - {label: "wo lua",     opt: "-DWITH_LUA=OFF" }
+          - {label: "wo maxmind", opt: "-DWITH_MAXMIND=OFF" }
+          - {label: "wo libxml",  opt: "-DWITH_LIBXML2=OFF" }
+          - {label: "with lmdb",  opt: "-DWITH_LMDB=ON" }
     steps:
       - uses: actions/checkout@v4
         with:

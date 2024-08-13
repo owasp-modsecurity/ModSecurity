@@ -27,8 +27,6 @@
 #include <string>
 #include <memory>
 
-#include <pthread.h>
-
 #include "modsecurity/variable_value.h"
 #include "src/utils/regex.h"
 #include "src/variables/variable.h"

@@ -1,23 +1,23 @@
 
 
-noinst_PROGRAMS = read
+noinst_PROGRAMS = multithread
 
-read_SOURCES = \
-	read.cc
+multithread_SOURCES = \
+	multithread.cc
 
-read_LDADD = \
+multithread_LDADD = \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
-	$(MAXMIND_LDADD) \
 	$(GLOBAL_LDADD) \
 	$(LIBXML2_LDADD) \
 	$(LMDB_LDADD) \
+	$(MAXMIND_LDADD) \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(SSDEEP_LDADD) \
 	$(YAJL_LDADD)
 
-read_LDFLAGS = \
+multithread_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
 	$(GEOIP_LDFLAGS) \
 	-lmodsecurity \
@@ -25,11 +25,11 @@ read_LDFLAGS = \
 	-lstdc++ \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
-	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
+	$(SSDEEP_LDFLAGS) \
 	$(YAJL_LDFLAGS)
 
-read_CPPFLAGS = \
+multithread_CPPFLAGS = \
 	$(GLOBAL_CFLAGS) \
 	-I$(top_builddir)/headers \
 	-I$(top_builddir) \
@@ -39,7 +39,6 @@ read_CPPFLAGS = \
 	-O3 \
 	$(CURL_CFLAGS) \
 	$(GEOIP_CFLAGS) \
-	$(MAXMIND_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(YAJL_CFLAGS) \

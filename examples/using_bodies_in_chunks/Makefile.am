@@ -21,12 +21,10 @@ simple_request_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
 	$(GEOIP_LDFLAGS) \
 	-lmodsecurity \
-	-lpthread \
 	-lm \
 	-lstdc++ \
 	$(MAXMIND_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
-	-lpthread \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(YAJL_LDFLAGS)
