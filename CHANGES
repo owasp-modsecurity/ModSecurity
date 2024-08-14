@@ -1,5 +1,9 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
+
+  - Replace usage of std::ctime, which is not safe in
+    multithread contexts
+    [PR #3228 - @eduar-hte]
   - Removed unnecessary lock to call acmp_process_quick in Pm::evaluate
     [PR #3227 - @eduar-hte]
   - feat: Check if the MP header contains invalid character
