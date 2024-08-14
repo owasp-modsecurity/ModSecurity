@@ -402,7 +402,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
             if (msr->mpd->mpp->last_header_line != NULL) {
                 *(char **)apr_array_push(msr->mpd->mpp->header_lines) = msr->mpd->mpp->last_header_line;
                 msr_log(msr, 9, "Multipart: Added part header line \"%s\"", msr->mpd->mpp->last_header_line);
-	    }
+            }
 
             data = msr->mpd->buf;
 
@@ -422,6 +422,16 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid part header (header name missing).");
 
                  return -1;
+            }
+
+            /* check if multipart header contains any invalid characters */
+            char *ch = header_name;
+            while(*ch != '\0') {
+                if (*ch < 33 || *ch > 126) {
+                    *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid part header (contains invalid character).");
+                    return -1;
+                }
+                ch++;
             }
 
             /* extract the value value */
