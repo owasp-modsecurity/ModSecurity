@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.8 (to be released)
 -------------------
 
+ * Removed useless code
+   [PR #3193 - @marcstern]
  * feat: Check if the MP header contains invalid character
    [PR #3226 - @airween]
  * Use standard httpd logging format in error log
