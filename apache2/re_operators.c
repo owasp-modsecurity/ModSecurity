@@ -106,6 +106,11 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     assert(rule != NULL);
     assert(error_msg != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, rule->ruleset->mp, NULL, "msre_op_ipmatch_param_init: error_msg is NULL");
+        return -1;
+    }
     char *param = NULL;
     int res = 0;
 
@@ -341,6 +346,11 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     assert(rule != NULL);
     assert(rule->ruleset != NULL);
     assert(error_msg != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, rule->ruleset->mp, NULL, "msre_op_rsub_param_init: error_msg is NULL");
+        return -1;
+    }
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
     ap_regex_t *regex;
 #else
@@ -2576,6 +2586,11 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     assert(rule != NULL);
     assert(var != NULL);
     assert(error_msg != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, rule->ruleset->mp, NULL, "msre_op_endsWith_execute: error_msg is NULL");
+        return -1;
+    }
     const char *match = NULL;
     const char *target;
     unsigned int match_length;
@@ -3239,6 +3254,10 @@ static int msre_op_verifyCPF_init(msre_rule *rule, char **error_msg) {
     assert(rule != NULL);
     assert(rule->ruleset != NULL);
     assert(error_msg != NULL);
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, rule->ruleset->mp, NULL, "msre_op_verifyCPF_init: error_msg is NULL");
+        return -1;
+    }
     const char *errptr = NULL;
     int erroffset;
     int options = 0;
@@ -4122,6 +4141,10 @@ static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
     assert(rule != NULL);
     assert(rule->ruleset != NULL);
     assert(error_msg != NULL);
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, rule->ruleset->mp, NULL, ":msre_op_fuzzy_hash_init error_msg is NULL");
+        return -1;
+    }
 #ifdef WITH_SSDEEP
     struct fuzzy_hash_param_data *param_data;
     struct fuzzy_hash_chunk *chunk, *t;
@@ -4276,6 +4299,10 @@ static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
     assert(rule != NULL);
     assert(rule->ruleset != NULL);
     assert(error_msg != NULL);
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, rule->ruleset->mp, NULL, "msre_op_inspectFile_init: error_msg is NULL");
+        return -1;
+    }
     char *filename = (char *)rule->op_param;
 
     *error_msg = NULL;
