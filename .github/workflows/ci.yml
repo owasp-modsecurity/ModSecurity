@@ -54,7 +54,7 @@ jobs:
           # '|| :' handles the case grep doesn't match, otherwise the script exits with 1 (error)
           errors=$(grep -E ':(?error|warn)[]]' /var/log/apache2/error.log) || :
           if [[ -z "${errors}" ]]; then exit 0; fi
-          echo "Found errors/warnings in error.log"
+          echo "::error Found errors/warnings in error.log"
           echo "${errors}"
           exit 1
       - name: Show httpd error log
