@@ -461,8 +461,8 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
         if(data == NULL)
             return -1;
 
-        memset(data, 0, msr->stream_input_length + 1 - buflen);
         memcpy(data, msr->stream_input_data, msr->stream_input_length - buflen);
+        data[msr->stream_input_length - buflen] = '\0';
 
         stream_input_body = (char *)realloc(msr->stream_input_data, msr->stream_input_length + 1);
 
@@ -470,16 +470,11 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
     }
 
     if (msr->stream_input_data == NULL) {
-        if(data)    {
-            free(data);
-            data = NULL;
-        }
+        if (data) free(data);
         *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
                 msr->stream_input_length + 1);
         return -1;
     }
-
-    memset(msr->stream_input_data, 0, msr->stream_input_length+1);
 
     if(first_pkt)   {
         memcpy(msr->stream_input_data, buffer, msr->stream_input_length);
@@ -487,11 +482,9 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
         memcpy(msr->stream_input_data, data, msr->stream_input_length - buflen);
         memcpy(msr->stream_input_data+(msr->stream_input_length - buflen), buffer, buflen);
     }
+    msr->stream_input_data[msr->stream_input_length] = '\0';
 
-    if(data)    {
-        free(data);
-        data = NULL;
-    }
+    if (data) free(data);
 #else
     if (msr->stream_input_data == NULL)  {
         // Is the request body length known beforehand? (requests that are not Transfer-Encoding: chunked)
