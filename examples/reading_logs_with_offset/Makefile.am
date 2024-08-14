@@ -21,6 +21,7 @@ read_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
 	$(GEOIP_LDFLAGS) \
 	-lmodsecurity \
+	-lpthread \
 	-lm \
 	-lstdc++ \
 	$(LMDB_LDFLAGS) \
