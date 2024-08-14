@@ -102,15 +102,15 @@ std::string UnitTest::print() {
     i << "  \"param\": \"" << this->param << "\"" << std::endl;
     i << "  \"output\": \"" << this->output << "\"" << std::endl;
     i << "}" << std::endl;
-    if (this->ret != this->obtained) {
+    if (this->ret != this->result.ret) {
         i << "Expecting: \"" << this->ret << "\" - returned: \"";
-        i << this->obtained << "\"" << std::endl;
+        i << this->result.ret << "\"" << std::endl;
     }
-    if (this->output != this->obtainedOutput) {
+    if (this->output != this->result.output) {
         i << "Expecting: \"";
         i << modsecurity::utils::string::toHexIfNeeded(this->output);
         i << "\" - returned: \"";
-        i << modsecurity::utils::string::toHexIfNeeded(this->obtainedOutput);
+        i << modsecurity::utils::string::toHexIfNeeded(this->result.output);
         i << "\"";
         i << std::endl;
     }
