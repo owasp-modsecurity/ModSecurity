@@ -40,15 +40,14 @@ namespace variables {
 void TimeMin::evaluate(Transaction *transaction,
     RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
-    char tstr[200];
-    struct tm timeinfo;
     time_t timer;
-
     time(&timer);
-    memset(tstr, '\0', 200);
 
+    struct tm timeinfo;
     localtime_r(&timer, &timeinfo);
-    strftime(tstr, 200, "%M", &timeinfo);
+
+    char tstr[std::size("mm")];
+    strftime(tstr, std::size(tstr), "%M", &timeinfo);
 
     transaction->m_variableTimeMin.assign(tstr);
 
