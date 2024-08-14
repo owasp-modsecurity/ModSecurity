@@ -2659,6 +2659,11 @@ static int msre_op_strmatch_param_init(msre_rule *rule, char **error_msg) {
     assert(rule != NULL);
     assert(rule->ruleset != NULL);
     assert(error_msg != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, rule->ruleset->mp, NULL, "msre_op_strmatch_param_init: error_msg is NULL");
+        return -1;
+    }
     const apr_strmatch_pattern *compiled_pattern;
     char *processed = NULL;
     const char *pattern = rule->op_param;
@@ -2691,6 +2696,11 @@ static int msre_op_strmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     assert(rule != NULL);
     assert(var != NULL);
     assert(error_msg != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, rule->ruleset->mp, NULL, "msre_op_strmatch_execute: error_msg is NULL");
+        return -1;
+    }
     apr_strmatch_pattern *compiled_pattern = (apr_strmatch_pattern *)rule->op_param_data;
     const char *target;
     unsigned int target_length;
