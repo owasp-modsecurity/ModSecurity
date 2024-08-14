@@ -1,6 +1,8 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - feat: Check if the MP header contains invalid character
+    [PR #3225 - @airween]
   - Prevent concurrent access to data in InMemoryPerProcess'
     resolveXXX methods
     [PR #3216 - @eduar-hte]
