@@ -12,6 +12,7 @@
 * directly using the email address security@modsecurity.org.
 */
 
+#include <assert.h>
 #include "msc_geo.h"
 
 
@@ -244,6 +245,7 @@ static int field_length(const char *field, int maxlen)
  */
 int geo_init(directory_config *dcfg, const char *dbfn, char **error_msg)
 {
+    assert(dcfg != NULL);
     *error_msg = NULL;
 
     if ((dcfg->geo == NULL) || (dcfg->geo == NOT_SET_P)) {

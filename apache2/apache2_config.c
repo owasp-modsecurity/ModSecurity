@@ -2781,6 +2781,10 @@ static const char *cmd_rule_remove_by_tag(cmd_parms *cmd, void *_dcfg,
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_remove_by_tag: _dcfg is NULL");
         return NULL;
     }
+    if (p1 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_remove_by_tag: p1 is NULL");
+        return NULL;
+    }
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
     
@@ -3165,6 +3169,10 @@ static const char *cmd_hash_key(cmd_parms *cmd, void *_dcfg, const char *_p1, co
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_key: _dcfg is NULL");
         return NULL;
     }
+    if (_p1 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_key: _p1 is NULL");
+        return NULL;
+    }
     directory_config *dcfg = (directory_config *)_dcfg;
     char *p1 = NULL;
 
@@ -3209,6 +3217,10 @@ static const char *cmd_hash_method_pm(cmd_parms *cmd, void *_dcfg,
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_method_pm: _dcfg is NULL");
+        return NULL;
+    }
+    if (p1 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_method_pm: p1 is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3383,6 +3395,10 @@ static const char *cmd_httpBl_key(cmd_parms *cmd, void *_dcfg, const char *p1)
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_httpBl_key: _dcfg is NULL");
         return NULL;
     }
+    if (p1 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_httpBl_key: p1 is NULL");
+        return NULL;
+    }
     directory_config *dcfg = (directory_config *)_dcfg;
 
     dcfg->httpBlkey = p1;
@@ -3397,6 +3413,11 @@ static const char *cmd_pcre_match_limit(cmd_parms *cmd,
 {
     assert(cmd != NULL);
     assert(p1 != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (p1 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_pcre_match_limit: p1 is NULL");
+        return NULL;
+    }
     long val;
 
     if (cmd->server->is_virtual) {
@@ -3418,6 +3439,11 @@ static const char *cmd_pcre_match_limit_recursion(cmd_parms *cmd,
 {
     assert(cmd != NULL);
     assert(p1 != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (p1 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_pcre_match_limit_recursion: p1 is NULL");
+        return NULL;
+    }
     long val;
 
     if (cmd->server->is_virtual) {
@@ -3442,6 +3468,16 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
 {
     assert(cmd != NULL);
     assert(p1 != NULL);
+    assert(_dcfg != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (_dcfg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_geo_lookup_db: _dcfg is NULL");
+        return NULL;
+    }
+    if (p1 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_geo_lookup_db: p1 is NULL");
+        return NULL;
+    }
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     char *error_msg;
     directory_config *dcfg = (directory_config *)_dcfg;
