@@ -3141,6 +3141,10 @@ static const char *cmd_hash_param(cmd_parms *cmd, void *_dcfg, const char *p1)
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_param: _dcfg is NULL");
         return NULL;
     }
+    if (p1 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_param: p1 is NULL");
+        return NULL;
+    }
     directory_config *dcfg = (directory_config *)_dcfg;
 
     dcfg->crypto_param_name = p1;
@@ -3171,6 +3175,10 @@ static const char *cmd_hash_key(cmd_parms *cmd, void *_dcfg, const char *_p1, co
     }
     if (_p1 == NULL) {
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_key: _p1 is NULL");
+        return NULL;
+    }
+    if (_p2 == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_key: _p2 is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3533,6 +3541,11 @@ static const char *cmd_unicode_map(cmd_parms *cmd, void *_dcfg,
     assert(cmd != NULL);
     assert(p1 != NULL);
     assert(p2 != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (_dcfg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_unicode_map: _dcfg is NULL");
+        return NULL;
+    }
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     char *error_msg;
     long val = 0;
