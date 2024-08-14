@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.8 (to be released)
 -------------------
 
+ * feat: Check if the MP header contains invalid character
+   [PR #3226 - @airween]
  * Use standard httpd logging format in error log
    [PR #3192 - @marcstern]
  * fix msc_regexec() != PCRE_ERROR_NOMATCH strict check
