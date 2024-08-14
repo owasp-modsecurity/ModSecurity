@@ -1,6 +1,7 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
-
+  - Removed unnecessary lock to call acmp_process_quick in Pm::evaluate
+    [PR #3227 - @eduar-hte]
   - feat: Check if the MP header contains invalid character
     [PR #3225 - @airween]
   - Prevent concurrent access to data in InMemoryPerProcess'
