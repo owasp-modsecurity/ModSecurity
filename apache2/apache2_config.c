@@ -2134,6 +2134,11 @@ static const char *cmd_arguments_limit(cmd_parms *cmd, void *_dcfg,
     assert(cmd != NULL);
     assert(_dcfg != NULL);
     assert(p1 != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (_dcfg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_arguments_limit: _dcfg is NULL");
+        return NULL;
+    }
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
 
