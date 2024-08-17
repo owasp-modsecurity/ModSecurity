@@ -17,9 +17,9 @@
 #include "modsecurity/modsecurity.h"
 #include "src/utils/string.h"
 
+using namespace modsecurity::utils::string;
 
-namespace modsecurity {
-namespace utils {
+namespace modsecurity::utils {
 
 
 bool urldecode_nonstrict_inplace(std::string &val,
@@ -112,5 +112,4 @@ std::string uri_decode(const std::string & sSrc) {
 }
 
 
-}  // namespace utils
-}  // namespace modsecurity
+}  // namespace modsecurity::utils

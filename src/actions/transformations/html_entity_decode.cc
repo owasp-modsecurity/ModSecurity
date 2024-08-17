@@ -23,6 +23,7 @@
 #include "src/compat/msvc.h"
 #endif
 
+using namespace modsecurity::utils::string;
 
 namespace modsecurity::actions::transformations {
 

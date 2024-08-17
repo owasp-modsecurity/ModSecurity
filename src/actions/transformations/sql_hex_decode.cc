@@ -19,6 +19,7 @@
 
 #include "src/utils/string.h"
 
+using namespace modsecurity::utils::string;
 
 namespace modsecurity::actions::transformations {
 
