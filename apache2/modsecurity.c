@@ -670,6 +670,7 @@ static apr_status_t modsecurity_process_phase_response_headers(modsec_rec *msr) 
  *
  */
 static apr_status_t modsecurity_process_phase_response_body(modsec_rec *msr) {
+    assert(msr != NULL);
     apr_time_t time_before;
     apr_status_t rc = 0;
     
@@ -701,6 +702,7 @@ static apr_status_t modsecurity_process_phase_response_body(modsec_rec *msr) {
  *
  */
 static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
+    assert(msr != NULL);
     apr_time_t time_before, time_after;
 
     if (msr->txcfg->debuglog_level >= 4) {

@@ -203,6 +203,7 @@ char *msre_ruleset_phase_rule_update_target_matching_exception(modsec_rec *msr, 
         const char *p3)
 {
     assert(ruleset != NULL);
+    assert(phase_arr != NULL);
     msre_rule **rules;
     int i, j, mode;
     char *err;
@@ -212,7 +213,10 @@ char *msre_ruleset_phase_rule_update_target_matching_exception(modsec_rec *msr, 
     rules = (msre_rule **)phase_arr->elts;
     for (i = 0; i < phase_arr->nelts; i++) {
         msre_rule *rule = (msre_rule *)rules[i];
+        assert(rule != NULL);
+
         if (mode == 0) { /* Looking for next rule. */
+            assert(rule->actionset != NULL);
             if (msre_ruleset_rule_matches_exception(rule, re)) {
                 err = update_rule_target_ex(msr, ruleset, rule, p2, p3);
                 if (err) return err;
@@ -527,10 +531,12 @@ end:
 }
 
 int msre_ruleset_rule_matches_exception(msre_rule *rule, rule_exception *re)   {
+    assert(rule != NULL);
     int match = 0;
 
     /* Only remove non-placeholder rules */
     if (rule->placeholder == RULE_PH_NONE) {
+        assert(re != NULL);
         switch(re->type) {
             case RULE_EXCEPTION_REMOVE_ID :
                 if ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) {
@@ -1468,6 +1474,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
+        assert(rule != NULL);
         rule->execution_time = 0;
     }
 
@@ -1480,6 +1487,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
+        assert(rule != NULL);
 
         /* Ignore markers, which are never processed. */
         if (rule->placeholder == RULE_PH_MARKER) continue;
@@ -1498,6 +1506,8 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
 #else
     apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
 #endif
+        assert(ruleset != NULL);
+        assert(msr != NULL);
         apr_array_header_t *arr = NULL;
         msre_rule **rules;
         apr_status_t rc;
@@ -1542,10 +1552,11 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
         rules = (msre_rule **)arr->elts;
         for (i = 0; i < arr->nelts; i++) {
             msre_rule *rule = rules[i];
+            assert(rule != NULL);
+            assert(rule->actionset != NULL);
 #if defined(PERFORMANCE_MEASUREMENT)
             apr_time_t time1 = 0;
 #endif
-            assert(rule->actionset != NULL);
 
             /* Reset the rule interception flag */
             msr->rule_was_intercepted = 0;
@@ -1974,6 +1985,9 @@ msre_ruleset *msre_ruleset_create(msre_engine *engine, apr_pool_t *mp) {
  * Adds one rule to the given phase of the ruleset.
  */
 int msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase) {
+    assert(ruleset != NULL);
+    assert(rule != NULL);
+    assert(rule->actionset != NULL);
     apr_array_header_t *arr = NULL;
 
     switch (phase) {
@@ -2011,6 +2025,8 @@ int msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase) {
 static msre_rule * msre_ruleset_fetch_phase_rule(const msre_ruleset *ruleset, const char *id,
         const apr_array_header_t *phase_arr, int offset)
 {
+    assert(id != NULL);
+    assert(phase_arr != NULL);
     msre_rule **rules = (msre_rule **)phase_arr->elts;
     int i;
 
@@ -2067,6 +2083,7 @@ msre_rule * msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id, int o
 static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re,
         apr_array_header_t *phase_arr)
 {
+    assert(phase_arr != NULL);
     msre_rule **rules;
     int i, j, mode, removed_count;
 
@@ -2084,6 +2101,7 @@ static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, 
 
             /* Only remove non-placeholder rules */
             if (rule->placeholder == RULE_PH_NONE) {
+                assert(re != NULL);
                 switch(re->type) {
                     case RULE_EXCEPTION_REMOVE_ID :
                         if (rule->actionset->id != NULL) {
@@ -2304,6 +2322,7 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
 char * msre_rule_generate_unparsed(apr_pool_t *pool,  const msre_rule *rule, const char *targets,
         const char *args, const char *actions)
 {
+    assert(rule != NULL);
     char *unparsed = NULL;
     const char *r_targets = targets;
     const char *r_args = args;
@@ -2363,12 +2382,19 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset, int type,
         const char *fn, int line, const char *targets,
         const char *args, const char *actions, char **error_msg)
 {
+    assert(ruleset != NULL);
+    assert(args != NULL);
+    assert(error_msg != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (error_msg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, ruleset->mp, NULL, "msre_rule_create: error_msg is NULL");
+        return NULL;
+    }
     msre_rule *rule;
     char *my_error_msg;
     const char *argsp;
     int rc;
 
-    if (error_msg == NULL) return NULL;
     *error_msg = NULL;
 
     rule = (msre_rule *)apr_pcalloc(ruleset->mp, sizeof(msre_rule));
@@ -2521,6 +2547,8 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
 {
     assert(msr != NULL);
     assert(actionset != NULL);
+    assert(actionset->intercept_action_rec != NULL);
+    assert(actionset->intercept_action_rec->metadata != NULL);
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
     int i;
@@ -2534,6 +2562,7 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
     telts = (const apr_table_entry_t*)tarr->elts;
     for (i = 0; i < tarr->nelts; i++) {
         msre_action *action = (msre_action *)telts[i].val;
+        assert(action->metadata != NULL);
         if (action->metadata->type == ACTION_DISRUPTIVE) {
             if (action->metadata->execute != NULL) {
                 action->metadata->execute(msr, mptmp, rule, action);
@@ -2797,6 +2826,11 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
  * Executes rule against the given transaction.
  */
 static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
+    assert(rule != NULL);
+    assert(rule->actionset != NULL);
+    assert(rule->targets != NULL);
+    assert(msr != NULL);
+    assert(msr->txcfg != NULL);
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     msre_actionset *acting_actionset = NULL;
@@ -3343,6 +3377,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
  *
  */
 static apr_status_t msre_rule_process_lua(msre_rule *rule, modsec_rec *msr) {
+    assert(rule != NULL);
+    assert(msr != NULL);
     msre_actionset *acting_actionset = NULL;
     char *my_error_msg = NULL;
     int rc;
@@ -3380,6 +3416,7 @@ static apr_status_t msre_rule_process_lua(msre_rule *rule, modsec_rec *msr) {
  *
  */
 static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
+    assert(msr != NULL);
     /* Use a fresh memory sub-pool for processing each rule */
     if (msr->msc_rule_mptmp == NULL) {
         if (apr_pool_create(&msr->msc_rule_mptmp, msr->mp) != APR_SUCCESS) {
