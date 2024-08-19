@@ -22,41 +22,19 @@
 namespace modsecurity::actions::transformations {
 
 
-bool UrlDecodeUni::transform(std::string &value, const Transaction *t) const {
-    std::string ret;
-    unsigned char *input;
-
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    memcpy(input, value.c_str(), value.length()+1);
-
-    size_t i = inplace(input, value.length(), t);
-
-    ret.assign(reinterpret_cast<char *>(input), i);
-    free(input);
-
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
-}
-
-
 /**
  *
  * IMP1 Assumes NUL-terminated
  */
-int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
+static inline bool inplace(std::string &value,
     const Transaction *t) {
-    unsigned char *d = input;
-    int64_t i, count, fact, j, xv;
-    int Code, hmap = -1;
+    bool changed = false;
+    auto d = reinterpret_cast<unsigned char*>(value.data());
+    const unsigned char *input = d;
+    const auto input_len = value.length();
 
-    if (input == NULL) return -1;
+    std::string::size_type i, count, fact, j, xv;
+    int Code, hmap = -1;
 
     i = count = 0;
     while (i < input_len) {
@@ -116,19 +94,17 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
                             }
                         }
                         d++;
-                        count++;
                         i += 6;
+                        changed = true;
                     } else {
                         /* Invalid data, skip %u. */
                         *d++ = input[i++];
                         *d++ = input[i++];
-                        count += 2;
                     }
                 } else {
                     /* Not enough bytes (4 data bytes), skip %u. */
                     *d++ = input[i++];
                     *d++ = input[i++];
-                    count += 2;
                 }
             } else {
                 /* Standard URL encoding. */
@@ -143,8 +119,8 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
 
                     if (VALID_HEX(c1) && VALID_HEX(c2)) {
                         *d++ = utils::string::x2c(&input[i + 1]);
-                        count++;
                         i += 3;
+                        changed = true;
                     } else {
                         /* Not a valid encoding, skip this % */
                         *d++ = input[i++];
@@ -153,25 +129,31 @@ int UrlDecodeUni::inplace(unsigned char *input, uint64_t input_len,
                 } else {
                     /* Not enough bytes available, skip this % */
                     *d++ = input[i++];
-                    count++;
                 }
             }
         } else {
             /* Character is not a percent sign. */
             if (input[i] == '+') {
                 *d++ = ' ';
+                changed = true;
             } else {
                 *d++ = input[i];
             }
 
-            count++;
             i++;
         }
     }
 
     *d = '\0';
 
-    return count;
+    value.resize(d - input);
+    return changed;
+}
+
+
+
+bool UrlDecodeUni::transform(std::string &value, const Transaction *trans) const {
+    return inplace(value, trans);
 }
 
 

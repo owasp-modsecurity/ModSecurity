@@ -27,25 +27,16 @@ UrlDecode::UrlDecode(const std::string &action)
 }
 
 bool UrlDecode::transform(std::string &value, const Transaction *trans) const {
-    unsigned char *val(NULL);
     int invalid_count = 0;
-    int _changed;
+    int changed;
+    const auto new_len = utils::urldecode_nonstrict_inplace(
+        (unsigned char*)value.data(),
+        value.length(),
+        &invalid_count,
+        &changed);
 
-    val = (unsigned char *) malloc(sizeof(char) * value.size() + 1);
-    memcpy(val, value.c_str(), value.size() + 1);
-    val[value.size()] = '\0';
-
-    int size = utils::urldecode_nonstrict_inplace(val, value.size(),
-        &invalid_count, &_changed);
-    std::string out;
-
-    out.append((const char *)val, size);
-
-    free(val);
-
-    const auto changed = out != value;
-    value = out;
-    return changed;
+    value.resize(new_len);
+    return changed != 0;
 }
 
 

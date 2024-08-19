@@ -26,64 +26,42 @@ UrlEncode::UrlEncode(const std::string &action)
 }
 
 
-std::string UrlEncode::url_enc(const char *input,
-    unsigned int input_len, int *changed) {
-    char *rval, *d;
-    unsigned int i, len;
-    int count = 0;
+static inline bool url_enc(std::string &value) {
+    const auto len = value.size() * 3 + 1;
+    std::string ret(len, {});
 
-    *changed = 0;
-
-    len = input_len * 3 + 1;
-    d = rval = reinterpret_cast<char *>(malloc(len));
-    if (rval == NULL) {
-        return {};
-    }
+    bool changed = false;
 
     /* ENH Only encode the characters that really need to be encoded. */
 
-    for (i = 0; i < input_len; i++) {
-        unsigned char c = input[i];
-
+    char *d = ret.data();
+    for (const auto c : value) {
         if (c == ' ') {
             *d++ = '+';
-            *changed = 1;
-            count++;
+            changed = true;
         } else {
             if ( (c == 42) || ((c >= 48) && (c <= 57))
                 || ((c >= 65) && (c <= 90))
                 || ((c >= 97) && (c <= 122))) {
                 *d++ = c;
-                count++;
-            } else {
+            }
+            else
+            {
                 *d++ = '%';
-                count++;
-                utils::string::c2x(c, (unsigned char *)d);
-                d += 2;
-                count++;
-                count++;
-                *changed = 1;
+                d = (char *)utils::string::c2x(c, (unsigned char *)d);
+                changed = true;
             }
         }
     }
 
-    *d = '\0';
-
-    std::string ret("");
-    ret.append(rval, count);
-    free(rval);
-    return ret;
+    ret.resize(d - ret.c_str());
+    std::swap(value, ret);
+    return changed;
 }
 
 
 bool UrlEncode::transform(std::string &value, const Transaction *trans) const {
-    int _changed;
-
-    std::string ret = url_enc(value.c_str(), value.size(), &_changed);
-
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
+    return url_enc(value);
 }
 
 

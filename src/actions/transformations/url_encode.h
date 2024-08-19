@@ -25,9 +25,6 @@ class UrlEncode : public Transformation {
     explicit UrlEncode(const std::string &action);
 
     bool transform(std::string &value, const Transaction *trans) const override;
-
-    static std::string url_enc(const char *input,
-        unsigned int input_len, int *changed);
 };
 
 }  // namespace modsecurity::actions::transformations
