@@ -22,24 +22,7 @@ namespace modsecurity::actions::transformations {
 
 
 bool NormalisePathWin::transform(std::string &value, const Transaction *trans) const {
-    int _changed;
-
-    char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
-
-    int i = NormalisePath::normalize_path_inplace(
-        reinterpret_cast<unsigned char *>(tmp),
-        value.size(), 1, &_changed);
-
-    std::string ret("");
-    ret.assign(tmp, i);
-    free(tmp);
-
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
+    return NormalisePath::normalize_path_inplace(value, true);
 }
 
 

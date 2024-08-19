@@ -25,23 +25,7 @@ NormalisePath::NormalisePath(const std::string &action)
 }
 
 bool NormalisePath::transform(std::string &value, const Transaction *trans) const {
-    int _changed = 0;
-
-    char *tmp = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
-
-    int i = normalize_path_inplace((unsigned char *)tmp,
-        value.size(), 0, &_changed);
-
-    std::string ret("");
-    ret.assign(tmp, i);
-    free(tmp);
-
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
+    return normalize_path_inplace(value, false);
 }
 
 
@@ -49,21 +33,22 @@ bool NormalisePath::transform(std::string &value, const Transaction *trans) cons
  *
  * IMP1 Assumes NUL-terminated
  */
-int NormalisePath::normalize_path_inplace(unsigned char *input, int input_len,
-    int win, int *changed) {
+bool NormalisePath::normalize_path_inplace(std::string &val, const bool win) {
     unsigned char *src;
     unsigned char *dst;
     unsigned char *end;
-    int ldst = 0;
     int hitroot = 0;
     int done = 0;
     int relative;
     int trailing;
 
-    *changed = 0;
+    bool changed = false;
 
     /* Need at least one byte to normalize */
-    if (input_len <= 0) return 0;
+    if(val.empty()) return false;
+
+    auto input = reinterpret_cast<unsigned char*>(val.data());
+    const auto input_len = val.length();
 
     /*
      * ENH: Deal with UNC and drive letters?
@@ -71,7 +56,6 @@ int NormalisePath::normalize_path_inplace(unsigned char *input, int input_len,
 
     src = dst = input;
     end = input + (input_len - 1);
-    ldst = 1;
 
     relative = ((*input == '/') || (win && (*input == '\\'))) ? 0 : 1;
     trailing = ((*end == '/') || (win && (*end == '\\'))) ? 1 : 0;
@@ -82,11 +66,11 @@ int NormalisePath::normalize_path_inplace(unsigned char *input, int input_len,
         if (win) {
             if (*src == '\\') {
                 *src = '/';
-                *changed = 1;
+                changed = true;
             }
             if ((src < end) && (*(src + 1) == '\\')) {
                 *(src + 1) = '/';
-                *changed = 1;
+                changed = true;
             }
         }
 
@@ -104,7 +88,7 @@ int NormalisePath::normalize_path_inplace(unsigned char *input, int input_len,
         /* Could it be an empty path segment? */
         if ((src != end) && *src == '/') {
             /* Ignore */
-            *changed = 1;
+            changed = true;
             goto copy; /* Copy will take care of this. */
         } else if (*src == '.') {
         /* Could it be a back or self reference? */
@@ -141,25 +125,25 @@ int NormalisePath::normalize_path_inplace(unsigned char *input, int input_len,
                     }
                 }
 
-                if (done) goto length; /* Skip the copy. */
+                if (done) goto skip_copy; /* Skip the copy. */
                 src++;
 
-                *changed = 1;
+                changed = true;
             } else if (dst == input) {
                 /* Relative Self-reference? */
-                *changed = 1;
+                changed = true;
 
                 /* Ignore. */
 
-                if (done) goto length; /* Skip the copy. */
+                if (done) goto skip_copy; /* Skip the copy. */
                 src++;
             } else if (*(dst - 1) == '/') {
             /* Self-reference? */
-                *changed = 1;
+                changed = true;
 
                 /* Ignore. */
 
-                if (done) goto length; /* Skip the copy. */
+                if (done) goto skip_copy; /* Skip the copy. */
                 dst--;
                 src++;
             }
@@ -179,7 +163,7 @@ copy:
                 && ((*(src + 1) == '/') || (win && (*(src + 1) == '\\'))) ) {
                 src++;
             }
-            if (oldsrc != src) *changed = 1;
+            if (oldsrc != src) changed = true;
 
             /* Do not copy the forward slash to the root
              * if it is not a relative path.  Instead
@@ -187,27 +171,27 @@ copy:
              */
             if (relative && (dst == input)) {
                 src++;
-                goto length; /* Skip the copy */
+                goto skip_copy; /* Skip the copy */
             }
         }
 
         *(dst++) = *(src++);
 
-length:
-        ldst = (dst - input);
+skip_copy:
+        ;   // nop for the goto label to work
     }
     /* Make sure that there is not a trailing slash in the
      * normalized form if there was not one in the original form.
      */
     if (!trailing && (dst > input) && *(dst - 1) == '/') {
-        ldst--;
         dst--;
     }
 
     /* Always NUL terminate */
     *dst = '\0';
 
-    return ldst;
+    val.resize(dst - input);
+    return changed;
 }
 
 

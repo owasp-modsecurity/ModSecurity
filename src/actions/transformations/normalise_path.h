@@ -26,8 +26,7 @@ class NormalisePath : public Transformation {
 
     bool transform(std::string &value, const Transaction *trans) const override;
 
-    static int normalize_path_inplace(unsigned char *input, int input_len,
-        int win, int *changed);
+    static bool normalize_path_inplace(std::string &val, const bool win);
 };
 
 }  // namespace modsecurity::actions::transformations
