@@ -21,46 +21,26 @@
 namespace modsecurity::actions::transformations {
 
 
-bool HexDecode::transform(std::string &value, const Transaction *trans) const {
-    std::string ret;
-    unsigned char *input;
-    int size = 0;
+static inline int inplace(std::string &value) {
+    if (value.empty()) return false;
 
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
+    const auto len = value.length();
+    auto d = reinterpret_cast<unsigned char *>(value.data());
+    const auto data = d;
 
-    if (input == NULL) {
-        return "";
+    for (int i = 0; i <= len - 2; i += 2) {
+        *d++ = utils::string::x2c(&data[i]);
     }
 
-    memcpy(input, value.c_str(), value.length()+1);
+    *d = '\0';
 
-    size = inplace(input, value.length());
-
-    ret.assign(reinterpret_cast<char *>(input), size);
-    free(input);
-
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
+    value.resize(d - data);
+    return true;
 }
 
 
-int HexDecode::inplace(unsigned char *data, int len) {
-    unsigned char *d = data;
-    int count = 0;
-
-    if ((data == NULL) || (len == 0)) {
-        return 0;
-    }
-
-    for (int i = 0;i <= len - 2;i += 2) {
-        *d++ = utils::string::x2c(&data[i]);
-        count++;
-    }
-    *d = '\0';
-
-    return count;
+bool HexDecode::transform(std::string &value, const Transaction *trans) const {
+    return inplace(value);
 }
 
 

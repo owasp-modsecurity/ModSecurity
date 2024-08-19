@@ -26,8 +26,6 @@ class HexDecode : public Transformation {
         : Transformation(action) { }
 
     bool transform(std::string &value, const Transaction *trans) const override;
-
-    static int inplace(unsigned char *data, int len);
 };
 
 }  // namespace modsecurity::actions::transformations
