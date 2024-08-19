@@ -21,35 +21,13 @@
 namespace modsecurity::actions::transformations {
 
 
-bool JsDecode::transform(std::string &value, const Transaction *trans) const {
-    std::string ret;
-    unsigned char *input;
+static inline int inplace(std::string &value) {
+    auto d = reinterpret_cast<unsigned char*>(value.data());
+    const unsigned char *input = d;
+    const auto input_len = value.length();
 
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    memcpy(input, value.c_str(), value.length()+1);
-
-    size_t i = inplace(input, value.length());
-
-    ret.assign(reinterpret_cast<char *>(input), i);
-    free(input);
-
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
-}
-
-
-int JsDecode::inplace(unsigned char *input, uint64_t input_len) {
-    unsigned char *d = (unsigned char *)input;
-    int64_t i, count;
-
-    i = count = 0;
+    bool changed = false;
+    std::string::size_type i = 0;
     while (i < input_len) {
         if (input[i] == '\\') {
             /* Character is an escape. */
@@ -70,14 +48,14 @@ int JsDecode::inplace(unsigned char *input, uint64_t input_len) {
                 }
 
                 d++;
-                count++;
                 i += 6;
+                changed = true;
             } else if ((i + 3 < input_len) && (input[i + 1] == 'x')
                     && VALID_HEX(input[i + 2]) && VALID_HEX(input[i + 3])) {
                 /* \xHH */
                 *d++ = utils::string::x2c(&input[i + 2]);
-                count++;
                 i += 4;
+                changed = true;
             } else if ((i + 1 < input_len) && ISODIGIT(input[i + 1])) {
                 /* \OOO (only one byte, \000 - \377) */
                 char buf[4];
@@ -98,7 +76,7 @@ int JsDecode::inplace(unsigned char *input, uint64_t input_len) {
                     }
                     *d++ = (unsigned char)strtol(buf, NULL, 8);
                     i += 1 + j;
-                    count++;
+                    changed = true;
                 }
             } else if (i + 1 < input_len) {
                 /* \C */
@@ -132,23 +110,27 @@ int JsDecode::inplace(unsigned char *input, uint64_t input_len) {
 
                 *d++ = c;
                 i += 2;
-                count++;
+                changed = true;
             } else {
                 /* Not enough bytes */
                 while (i < input_len) {
                     *d++ = input[i++];
-                    count++;
                 }
             }
         } else {
             *d++ = input[i++];
-            count++;
         }
     }
 
     *d = '\0';
 
-    return count;
+    value.resize(d - input);
+    return changed;
+}
+
+
+bool JsDecode::transform(std::string &value, const Transaction *trans) const {
+    return inplace(value);
 }
 
 

@@ -26,7 +26,6 @@ class JsDecode : public Transformation {
         : Transformation(action) { }
 
     bool transform(std::string &value, const Transaction *trans) const override;
-    static int inplace(unsigned char *input, uint64_t input_len);
 };
 
 }  // namespace modsecurity::actions::transformations
