@@ -26,8 +26,6 @@ class CssDecode : public Transformation {
         : Transformation(action) { }
 
     bool transform(std::string &value, const Transaction *trans) const override;
-
-    static int css_decode_inplace(unsigned char *input, int64_t input_len);
 };
 
 }  // namespace modsecurity::actions::transformations
