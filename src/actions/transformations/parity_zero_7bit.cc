@@ -15,45 +15,23 @@
 
 #include "parity_zero_7bit.h"
 
-#include <cstring>
-
 
 namespace modsecurity::actions::transformations {
 
 
-bool ParityZero7bit::transform(std::string &value, const Transaction *trans) const {
+static inline bool inplace(std::string &value) {
     if (value.empty()) return false;
 
-    unsigned char *input;
-
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    memcpy(input, value.c_str(), value.length()+1);
-
-    const auto ret = inplace(input, value.length());
-
-    value.assign(reinterpret_cast<char *>(input), value.length());
-    free(input);
-
-    return ret;
-}
-
-
-bool ParityZero7bit::inplace(unsigned char *input, uint64_t input_len) {
-    uint64_t i;
-
-    i = 0;
-    while (i < input_len) {
-        input[i] &= 0x7f;
-        i++;
+    for(auto &c : value) {
+        ((unsigned char&)c) &= 0x7f;
     }
 
     return true;
+}
+
+
+bool ParityZero7bit::transform(std::string &value, const Transaction *trans) const {
+    return inplace(value);
 }
 
 

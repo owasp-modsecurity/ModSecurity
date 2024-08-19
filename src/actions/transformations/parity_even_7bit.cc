@@ -15,53 +15,12 @@
 
 #include "parity_even_7bit.h"
 
-#include <cstring>
-
 
 namespace modsecurity::actions::transformations {
 
 
 bool ParityEven7bit::transform(std::string &value, const Transaction *trans) const {
-    if (value.empty()) return false;
-
-    unsigned char *input;
-
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    std::memcpy(input, value.c_str(), value.length()+1);
-
-    const auto ret = inplace(input, value.length());
-
-    value.assign(reinterpret_cast<char *>(input), value.length());
-    free(input);
-
-    return ret;
-}
-
-bool ParityEven7bit::inplace(unsigned char *input, uint64_t input_len) {
-    uint64_t i;
-
-    i = 0;
-    while (i < input_len) {
-        unsigned int x = input[i];
-
-        input[i] ^= input[i] >> 4;
-        input[i] &= 0xf;
-
-        if ((0x6996 >> input[i]) & 1) {
-            input[i] = x | 0x80;
-        } else {
-            input[i] = x & 0x7f;
-        }
-        i++;
-    }
-
-    return true;
+    return ParityEven7bit::inplace<true>(value);
 }
 
 

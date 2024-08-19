@@ -26,7 +26,28 @@ class ParityEven7bit : public Transformation {
         : Transformation(action) { }
 
     bool transform(std::string &value, const Transaction *trans) const override;
-    static bool inplace(unsigned char *input, uint64_t input_len);
+
+    template<bool even>
+    static bool inplace(std::string &value) {
+        if (value.empty()) return false;
+
+        for(auto &c : value) {
+            auto &uc = reinterpret_cast<unsigned char&>(c);
+            unsigned int x = uc;
+
+            uc ^= uc >> 4;
+            uc &= 0xf;
+
+            const bool condition = (0x6996 >> uc) & 1;
+            if (even ? condition : !condition) {
+                uc = x | 0x80;
+            } else {
+                uc = x & 0x7f;
+            }
+        }
+
+        return true;
+    }
 };
 
 }  // namespace modsecurity::actions::transformations
