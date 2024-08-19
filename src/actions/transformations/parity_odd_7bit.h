@@ -22,8 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class ParityOdd7bit : public Transformation {
  public:
-    explicit ParityOdd7bit(const std::string &action)
-        : Transformation(action) { }
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

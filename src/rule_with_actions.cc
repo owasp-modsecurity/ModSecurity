@@ -89,11 +89,11 @@ RuleWithActions::RuleWithActions(
     if (actions) {
         for (Action *a : *actions) {
             switch (a->action_kind) {
-                case Action::ConfigurationKind:
+                case Action::Kind::ConfigurationKind:
                     a->evaluate(this, NULL);
                     delete a;
                     break;
-                case Action::RunTimeOnlyIfMatchKind:
+                case Action::Kind::RunTimeOnlyIfMatchKind:
                     if (dynamic_cast<actions::Capture *>(a)) {
                         m_containsCaptureAction = true;
                         delete a;
@@ -247,7 +247,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool disruptiveAlreadyExecuted = false;
 
     for (const auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck-suppress ctunullpointer
-        if (a.get()->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
+        if (a.get()->action_kind != actions::Action::Kind::RunTimeOnlyIfMatchKind) {
             continue;
         }
         if (!a.get()->isDisruptive()) {
@@ -374,7 +374,7 @@ void RuleWithActions::executeTransformations(
     if (none == 0) {
         for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
             if (a->action_kind \
-                != actions::Action::RunTimeBeforeMatchAttemptKind) {
+                != actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
                 continue;
             }
 

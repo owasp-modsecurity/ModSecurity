@@ -22,7 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class NormalisePath : public Transformation {
  public:
-    explicit NormalisePath(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 

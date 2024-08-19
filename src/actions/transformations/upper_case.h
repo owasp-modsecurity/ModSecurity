@@ -22,7 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class UpperCase : public Transformation {
  public:
-    explicit UpperCase(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

@@ -20,12 +20,6 @@
 namespace modsecurity::actions::transformations {
 
 
-EscapeSeqDecode::EscapeSeqDecode(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
-
 static inline int ansi_c_sequences_decode_inplace(std::string &value) {
     auto d = reinterpret_cast<unsigned char *>(value.data());
     const unsigned char* input = d;

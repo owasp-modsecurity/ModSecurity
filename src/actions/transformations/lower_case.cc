@@ -22,10 +22,6 @@
 namespace modsecurity::actions::transformations {
 
 
-LowerCase::LowerCase(const std::string &a)
-    : Transformation(a) {
-}
-
 bool LowerCase::transform(std::string &value, const Transaction *trans) const {
     return convert(value, [](auto c) {
                     return std::tolower(c); });

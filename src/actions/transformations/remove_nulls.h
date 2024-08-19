@@ -24,8 +24,7 @@ namespace modsecurity::actions::transformations {
 
 class RemoveNulls : public Transformation {
  public:
-    explicit RemoveNulls(const std::string &action) 
-        : Transformation(action) { }
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 

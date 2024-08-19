@@ -23,10 +23,7 @@ namespace modsecurity::actions::transformations {
 class Transformation : public Action {
  public:
     explicit Transformation(const std::string& _action)
-        : Action(_action, RunTimeBeforeMatchAttemptKind) { }
-
-    explicit Transformation(const std::string& _action, int kind)
-        : Action(_action, kind) { }
+        : Action(_action, Kind::RunTimeBeforeMatchAttemptKind) { }
 
     static Transformation* instantiate(std::string a);
 

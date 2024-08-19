@@ -22,7 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class HexEncode : public Transformation {
  public:
-    explicit HexEncode(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

@@ -19,11 +19,6 @@
 namespace modsecurity::actions::transformations {
 
 
-CompressWhitespace::CompressWhitespace(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
 bool CompressWhitespace::transform(std::string &value, const Transaction *trans) const {
     bool inWhiteSpace = false;
 

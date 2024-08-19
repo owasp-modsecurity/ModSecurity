@@ -14,19 +14,14 @@
  */
 
 #include "trim_left.h"
+#include "trim.h"
 
 
 namespace modsecurity::actions::transformations {
 
 
-
-TrimLeft::TrimLeft(const std::string &action) 
-    : Trim(action) {
-    this->action_kind = 1;
-}
-
 bool TrimLeft::transform(std::string &value, const Transaction *trans) const {
-    return ltrim(value);
+    return Trim::ltrim(value);
 }
 
 

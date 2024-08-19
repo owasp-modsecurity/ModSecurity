@@ -18,10 +18,6 @@
 
 namespace modsecurity::actions::transformations {
 
-ReplaceNulls::ReplaceNulls(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 bool ReplaceNulls::transform(std::string &value, const Transaction *trans) const {
     bool changed = false;

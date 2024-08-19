@@ -18,10 +18,6 @@
 
 namespace modsecurity::actions::transformations {
 
-RemoveCommentsChar::RemoveCommentsChar(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 bool RemoveCommentsChar::transform(std::string &value, const Transaction *trans) const {
     char *d = value.data();

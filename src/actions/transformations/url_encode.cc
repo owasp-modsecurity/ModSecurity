@@ -20,12 +20,6 @@
 namespace modsecurity::actions::transformations {
 
 
-UrlEncode::UrlEncode(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
-
 static inline bool url_enc(std::string &value) {
     const auto len = value.size() * 3 + 1;
     std::string ret(len, {});

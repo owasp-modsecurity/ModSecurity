@@ -21,11 +21,6 @@
 namespace modsecurity::actions::transformations {
 
 
-UrlDecode::UrlDecode(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
 bool UrlDecode::transform(std::string &value, const Transaction *trans) const {
     int invalid_count;
     return utils::urldecode_nonstrict_inplace(value, invalid_count);

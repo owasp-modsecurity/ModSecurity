@@ -24,7 +24,7 @@ namespace modsecurity::actions::transformations {
 
 class LowerCase : public Transformation {
  public:
-    explicit LowerCase(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 

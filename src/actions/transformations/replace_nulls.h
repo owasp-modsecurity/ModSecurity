@@ -22,7 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class ReplaceNulls : public Transformation {
  public:
-    explicit ReplaceNulls(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

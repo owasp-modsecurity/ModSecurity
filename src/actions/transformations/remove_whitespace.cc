@@ -20,11 +20,6 @@
 namespace modsecurity::actions::transformations {
 
 
-RemoveWhitespace::RemoveWhitespace(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
 bool RemoveWhitespace::transform(std::string &value, const Transaction *trans) const {
     const char nonBreakingSpaces = 0xa0;
     const char nonBreakingSpaces2 = 0xc2;

@@ -20,10 +20,6 @@
 
 namespace modsecurity::actions::transformations {
 
-HexEncode::HexEncode(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 bool HexEncode::transform(std::string &value, const Transaction *trans) const {
     if (value.empty()) return false;

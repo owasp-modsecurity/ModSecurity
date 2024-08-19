@@ -19,11 +19,6 @@
 namespace modsecurity::actions::transformations {
 
 
-NormalisePath::NormalisePath(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
 bool NormalisePath::transform(std::string &value, const Transaction *trans) const {
     return normalize_path_inplace(value, false);
 }

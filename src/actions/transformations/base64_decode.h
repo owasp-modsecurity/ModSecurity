@@ -22,8 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class Base64Decode : public Transformation {
  public:
-    explicit Base64Decode(const std::string &action)
-        : Transformation(action) { }
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

@@ -59,12 +59,6 @@ static inline bool inplace(std::string &value) {
 }
 
 
-ReplaceComments::ReplaceComments(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
-
 bool ReplaceComments::transform(std::string &value, const Transaction *trans) const {
     return inplace(value);
 }

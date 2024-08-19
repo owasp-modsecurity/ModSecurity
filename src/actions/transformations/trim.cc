@@ -55,12 +55,6 @@ bool Trim::trim(std::string &s) {
 }
 
 
-Trim::Trim(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
-
 bool Trim::transform(std::string &value, const Transaction *trans) const {
     return trim(value);
 }

@@ -32,15 +32,47 @@ namespace actions {
 
 class Action {
  public:
+    /**
+     *
+     * Define the action kind regarding to the execution time.
+     * 
+     * 
+     */
+    enum class Kind {
+    /**
+     *
+     * Action that are executed while loading the configuration. For instance
+     * the rule ID or the rule phase.
+     *
+     */
+     ConfigurationKind,
+    /**
+     *
+     * Those are actions that demands to be executed before call the operator.
+     * For instance the tranformations.
+     *
+     *
+     */
+     RunTimeBeforeMatchAttemptKind,
+    /**
+     *
+     * Actions that are executed after the execution of the operator, only if
+     * the operator returned Match (or True). For instance the disruptive
+     * actions.
+     *
+     */
+     RunTimeOnlyIfMatchKind,
+    };
+
     explicit Action(const std::string& _action)
         : m_isNone(false),
         temporaryAction(false),
-        action_kind(2),
+        action_kind(Kind::RunTimeOnlyIfMatchKind),
         m_name(nullptr),
         m_parser_payload("") {
             set_name_and_payload(_action);
         }
-    explicit Action(const std::string& _action, int kind)
+    explicit Action(const std::string& _action, Kind kind)
         : m_isNone(false),
         temporaryAction(false),
         action_kind(kind),
@@ -100,41 +132,9 @@ class Action {
 
     bool m_isNone;
     bool temporaryAction;
-    int action_kind;
+    Kind action_kind;
     std::shared_ptr<std::string> m_name;
     std::string m_parser_payload;
-
-    /**
-     *
-     * Define the action kind regarding to the execution time.
-     * 
-     * 
-     */
-    enum Kind {
-    /**
-     *
-     * Action that are executed while loading the configuration. For instance
-     * the rule ID or the rule phase.
-     *
-     */
-     ConfigurationKind,
-    /**
-     *
-     * Those are actions that demands to be executed before call the operator.
-     * For instance the tranformations.
-     *
-     *
-     */
-     RunTimeBeforeMatchAttemptKind,
-    /**
-     *
-     * Actions that are executed after the execution of the operator, only if
-     * the operator returned Match (or True). For instance the disruptive
-     * actions.
-     *
-     */
-     RunTimeOnlyIfMatchKind,
-    };
  };
 
 

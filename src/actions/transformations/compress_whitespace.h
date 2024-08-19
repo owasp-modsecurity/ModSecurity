@@ -22,7 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class CompressWhitespace : public Transformation {
  public:
-    explicit CompressWhitespace(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

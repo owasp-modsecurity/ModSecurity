@@ -22,7 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class Sha1 : public Transformation {
  public:
-    explicit Sha1(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

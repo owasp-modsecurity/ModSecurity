@@ -22,8 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class RemoveComments : public Transformation {
  public:
-    explicit RemoveComments(const std::string &action)
-        : Transformation(action) { }
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

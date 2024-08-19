@@ -17,13 +17,12 @@
 #define SRC_ACTIONS_TRANSFORMATIONS_TRIM_RIGHT_H_
 
 #include "transformation.h"
-#include "trim.h"
 
 namespace modsecurity::actions::transformations {
 
-class TrimRight : public Trim {
+class TrimRight : public Transformation {
  public:
-    explicit TrimRight(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

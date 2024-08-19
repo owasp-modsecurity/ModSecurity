@@ -22,8 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class CssDecode : public Transformation {
  public:
-    explicit CssDecode(const std::string &action) 
-        : Transformation(action) { }
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

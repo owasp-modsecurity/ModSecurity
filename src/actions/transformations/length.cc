@@ -19,11 +19,6 @@
 namespace modsecurity::actions::transformations {
 
 
-Length::Length(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
-
 bool Length::transform(std::string &value, const Transaction *trans) const {
     value = std::to_string(value.size());
     return true;

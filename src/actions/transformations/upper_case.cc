@@ -24,10 +24,6 @@
 namespace modsecurity::actions::transformations {
 
 
-UpperCase::UpperCase(const std::string &a)
-    : Transformation(a) {
-}
-
 bool UpperCase::transform(std::string &value, const Transaction *trans) const {
     return LowerCase::convert(value, [](auto c)
                               { return std::toupper(c); });

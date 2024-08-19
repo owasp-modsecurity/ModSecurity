@@ -22,7 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class ReplaceComments : public Transformation {
  public:
-    explicit ReplaceComments(const std::string &action);
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };

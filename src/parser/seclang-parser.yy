@@ -1199,8 +1199,8 @@ expression:
                 definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
                 delete phase;
-            } else if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind ||
-                a->action_kind == actions::Action::RunTimeBeforeMatchAttemptKind) {
+            } else if (a->action_kind == actions::Action::Kind::RunTimeOnlyIfMatchKind ||
+                a->action_kind == actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
                                 actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
                 if (none != NULL) {
                     driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");

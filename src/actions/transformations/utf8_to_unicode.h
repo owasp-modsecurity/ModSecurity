@@ -22,8 +22,7 @@ namespace modsecurity::actions::transformations {
 
 class Utf8ToUnicode : public Transformation {
  public:
-    explicit Utf8ToUnicode(const std::string &action)
-        : Transformation(action) { }
+    using Transformation::Transformation;
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };
