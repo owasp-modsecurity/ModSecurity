@@ -16,7 +16,10 @@
 
 #include "upper_case.h"
 
-#include <locale>
+#include <cctype>
+
+#include "lower_case.h"
+
 
 namespace modsecurity::actions::transformations {
 
@@ -25,17 +28,9 @@ UpperCase::UpperCase(const std::string &a)
     : Transformation(a) {
 }
 
-bool UpperCase::transform(std::string &val, const Transaction *trans) const {
-    std::string value(val);
-    std::locale loc;
-
-    for (std::string::size_type i=0; i < value.length(); ++i) {
-        value[i] = std::toupper(value[i], loc);
-    }
-
-    const auto changed = val != value;
-    val = value;
-    return changed;
+bool UpperCase::transform(std::string &value, const Transaction *trans) const {
+    return LowerCase::convert(value, [](auto c)
+                              { return std::toupper(c); });
 }
 
 

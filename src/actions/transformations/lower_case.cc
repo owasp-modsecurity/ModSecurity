@@ -16,7 +16,7 @@
 
 #include "lower_case.h"
 
-#include <locale>
+#include <cctype>
 
 
 namespace modsecurity::actions::transformations {
@@ -26,17 +26,9 @@ LowerCase::LowerCase(const std::string &a)
     : Transformation(a) {
 }
 
-bool LowerCase::transform(std::string &val, const Transaction *trans) const {
-    std::locale loc;
-    std::string value(val);
-
-    for (std::string::size_type i=0; i < value.length(); ++i) {
-        value[i] = std::tolower(value[i], loc);
-    }
-
-    const auto changed = val != value;
-    val = value;
-    return changed;
+bool LowerCase::transform(std::string &value, const Transaction *trans) const {
+    return convert(value, [](auto c) {
+                    return std::tolower(c); });
 }
 
 
