@@ -26,11 +26,7 @@ TrimLeft::TrimLeft(const std::string &action)
 }
 
 bool TrimLeft::transform(std::string &value, const Transaction *trans) const {
-    std::string ret(value);
-    this->ltrim(&ret);
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
+    return ltrim(value);
 }
 
 

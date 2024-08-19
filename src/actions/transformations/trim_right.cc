@@ -25,11 +25,7 @@ TrimRight::TrimRight(const std::string &action)
 }
 
 bool TrimRight::transform(std::string &value, const Transaction *trans) const {
-    std::string ret(value);
-    this->rtrim(&ret);
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
+    return rtrim(value);
 }
 
 

@@ -26,9 +26,11 @@ class Trim : public Transformation {
 
     bool transform(std::string &value, const Transaction *trans) const override;
 
-    static std::string *ltrim(std::string *s);
-    static std::string *rtrim(std::string *s);
-    static std::string *trim(std::string *s);
+ protected:
+
+    static bool ltrim(std::string &s);
+    static bool rtrim(std::string &s);
+    static bool trim(std::string &s);
 };
 
 }  // namespace modsecurity::actions::transformations
