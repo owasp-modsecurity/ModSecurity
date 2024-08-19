@@ -18,12 +18,6 @@
 
 #include "transformation.h"
 
-#define UNICODE_ERROR_CHARACTERS_MISSING    -1
-#define UNICODE_ERROR_INVALID_ENCODING      -2
-#define UNICODE_ERROR_OVERLONG_CHARACTER    -3
-#define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
-#define UNICODE_ERROR_DECODING_ERROR        -5
-
 namespace modsecurity::actions::transformations {
 
 class Utf8ToUnicode : public Transformation {
@@ -32,9 +26,6 @@ class Utf8ToUnicode : public Transformation {
         : Transformation(action) { }
 
     bool transform(std::string &value, const Transaction *trans) const override;
-
-    static char *inplace(unsigned char *input, uint64_t input_len,
-        int *changed);
 };
 
 }  // namespace modsecurity::actions::transformations
