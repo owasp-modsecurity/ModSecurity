@@ -23,21 +23,16 @@ ReplaceNulls::ReplaceNulls(const std::string &action)
     this->action_kind = 1;
 }
 
-bool ReplaceNulls::transform(std::string &val, const Transaction *trans) const {
-    int64_t i;
-    std::string value(val);
+bool ReplaceNulls::transform(std::string &value, const Transaction *trans) const {
+    bool changed = false;
 
-    i = 0;
-    while (i < value.size()) {
-        if (value.at(i) == '\0') {
-            value[i] = ' ';
-        } else {
-            i++;
+    for(auto &c : value) {
+        if (c == '\0') {
+            c = ' ';
+            changed = true;
         }
     }
 
-    const auto changed = val != value;
-    val = value;
     return changed;
 }
 
