@@ -26,15 +26,6 @@ class SqlHexDecode : public Transformation {
         : Transformation(action) { }
 
     bool transform(std::string &value, const Transaction *trans) const override;
-
-    static int inplace(unsigned char *data, int len);
-
-    static int mytolower(int ch) {
-        if (ch >= 'A' && ch <= 'Z')
-            return ('a' + ch - 'A');
-        else
-            return ch;
-    }
 };
 
 }  // namespace modsecurity::actions::transformations
