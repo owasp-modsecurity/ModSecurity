@@ -1156,8 +1156,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             return -1;
         }
 
-        memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
         memcpy(msr->stream_output_data, xmlOutputBufferGetContent(output_buf), msr->stream_output_length);
+        msr->stream_output_data[msr->stream_output_length] = '\0';
 
         if (msr->txcfg->debuglog_level >= 4)
             msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%zu] bytes.", xmlOutputBufferGetSize(output_buf));
@@ -1187,8 +1187,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             return -1;
         }
 
-        memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
         memcpy(msr->stream_output_data, xmlOutputBufferGetContent(output_buf), msr->stream_output_length);
+        msr->stream_output_data[msr->stream_output_length] = '\0';
 
         if (msr->txcfg->debuglog_level >= 4)
             msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%zu] bytes.", xmlOutputBufferGetSize(output_buf));
@@ -1222,9 +1222,9 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             return -1;
         }
 
-        memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
         memcpy(msr->stream_output_data, (char *)xmlBufferContent(output_buf->buffer), msr->stream_output_length);
         //memcpy(msr->stream_output_data, output_buf->buffer->content, msr->stream_output_length);
+        msr->stream_output_data[msr->stream_output_length] = '\0';
 
         if (msr->txcfg->debuglog_level >= 4)
             msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", msr->stream_output_length);
@@ -1254,9 +1254,9 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             return -1;
         }
 
-        memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
         memcpy(msr->stream_output_data, (char *)xmlBufferContent(output_buf->conv), msr->stream_output_length);
         //memcpy(msr->stream_output_data, output_buf->conv->content, msr->stream_output_length);
+        msr->stream_output_data[msr->stream_output_length] = '\0';
 
         if (msr->txcfg->debuglog_level >= 4)
             msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", msr->stream_output_length);

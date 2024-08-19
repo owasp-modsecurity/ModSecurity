@@ -140,6 +140,8 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
  * Frees the resources used for XML parsing.
  */
 apr_status_t xml_cleanup(modsec_rec *msr) {
+    assert(msr != NULL);
+    assert(msr->xml != NULL);
     if (msr->xml->parsing_ctx != NULL) {
         if (msr->xml->parsing_ctx->myDoc) {
             xmlFreeDoc(msr->xml->parsing_ctx->myDoc);
