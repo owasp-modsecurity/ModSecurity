@@ -19,41 +19,34 @@
 namespace modsecurity::actions::transformations {
 
 
-bool RemoveComments::transform(std::string &value, const Transaction *trans) const {
-    std::string ret;
-    unsigned char *input;
+static inline int inplace(std::string &value) {
+    auto input = reinterpret_cast<unsigned char*>(value.data());
+    const auto input_len = value.length();
+    bool changed = false, incomment = false;
+    std::string::size_type i = 0, j = 0;
 
-    input = reinterpret_cast<unsigned char *>
-        (malloc(sizeof(char) * value.length()+1));
-
-    if (input == NULL) {
-        return "";
-    }
-
-    memcpy(input, value.c_str(), value.length()+1);
-
-    uint64_t input_len = value.size();
-    uint64_t i, j, incomment;
-
-    i = j = incomment = 0;
     while (i < input_len) {
-        if (incomment == 0) {
+        if (!incomment) {
             if ((input[i] == '/') && (i + 1 < input_len)
                 && (input[i + 1] == '*')) {
-                incomment = 1;
+                incomment = true;
+                changed = true;
                 i += 2;
             } else if ((input[i] == '<') && (i + 1 < input_len)
                 && (input[i + 1] == '!') && (i + 2 < input_len)
                 && (input[i+2] == '-') && (i + 3 < input_len)
                 && (input[i + 3] == '-')) {
-                incomment = 1;
+                incomment = true;
+                changed = true;
                 i += 4;
             } else if ((input[i] == '-') && (i + 1 < input_len)
                 && (input[i + 1] == '-')) {
                 input[i] = ' ';
+                changed = true;
                 break;
             } else if (input[i] == '#') {
                 input[i] = ' ';
+                changed = true;
                 break;
             } else {
                 input[j] = input[i];
@@ -63,7 +56,7 @@ bool RemoveComments::transform(std::string &value, const Transaction *trans) con
         } else {
             if ((input[i] == '*') && (i + 1 < input_len)
                 && (input[i + 1] == '/')) {
-                incomment = 0;
+                incomment = false;
                 i += 2;
                 input[j] = input[i];
                 i++;
@@ -71,7 +64,7 @@ bool RemoveComments::transform(std::string &value, const Transaction *trans) con
             } else if ((input[i] == '-') && (i + 1 < input_len)
                 && (input[i + 1] == '-') && (i + 2 < input_len)
                 && (input[i+2] == '>'))   {
-                incomment = 0;
+                incomment = false;
                 i += 3;
                 input[j] = input[i];
                 i++;
@@ -86,12 +79,13 @@ bool RemoveComments::transform(std::string &value, const Transaction *trans) con
         input[j++] = ' ';
     }
 
-    ret.assign(reinterpret_cast<char *>(input), j);
-    free(input);
-
-    const auto changed = ret != value;
-    value = ret;
+    value.resize(j);
     return changed;
+}
+
+
+bool RemoveComments::transform(std::string &value, const Transaction *trans) const {
+    return inplace(value);
 }
 
 

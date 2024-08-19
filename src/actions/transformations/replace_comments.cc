@@ -19,36 +19,28 @@
 namespace modsecurity::actions::transformations {
 
 
-ReplaceComments::ReplaceComments(const std::string &action) 
-    : Transformation(action) {
-    this->action_kind = 1;
-}
+static inline bool inplace(std::string &value) {
+    auto input = reinterpret_cast<unsigned char*>(value.data());
+    const auto input_len = value.length();
+    bool changed = false, incomment = false;
+    std::string::size_type i = 0, j = 0;
 
-
-bool ReplaceComments::transform(std::string &value, const Transaction *trans) const {
-    uint64_t i, j, incomment;
-
-    char *input = reinterpret_cast<char *>(
-        malloc(sizeof(char) * value.size() + 1));
-    memcpy(input, value.c_str(), value.size() + 1);
-    input[value.size()] = '\0';
-
-    i = j = incomment = 0;
-    while (i < value.size()) {
-        if (incomment == 0) {
-            if ((input[i] == '/') && (i + 1 < value.size())
+    while (i < input_len) {
+        if (!incomment) {
+            if ((input[i] == '/') && (i + 1 < input_len)
                 && (input[i + 1] == '*')) {
-                incomment = 1;
+                incomment = true;
                 i += 2;
+                changed = true;
             } else {
                 input[j] = input[i];
                 i++;
                 j++;
             }
         } else {
-            if ((input[i] == '*') && (i + 1 < value.size())
+            if ((input[i] == '*') && (i + 1 < input_len)
                 && (input[i + 1] == '/')) {
-                incomment = 0;
+                incomment = false;
                 i += 2;
                 input[j] = ' ';
                 j++;
@@ -62,15 +54,19 @@ bool ReplaceComments::transform(std::string &value, const Transaction *trans) co
         input[j++] = ' ';
     }
 
-
-    std::string resp;
-    resp.append(reinterpret_cast<char *>(input), j);
-
-    free(input);
-
-    const auto changed = resp != value;
-    value = resp;
+    value.resize(j);
     return changed;
+}
+
+
+ReplaceComments::ReplaceComments(const std::string &action) 
+    : Transformation(action) {
+    this->action_kind = 1;
+}
+
+
+bool ReplaceComments::transform(std::string &value, const Transaction *trans) const {
+    return inplace(value);
 }
 
 
