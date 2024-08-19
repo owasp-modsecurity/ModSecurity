@@ -26,12 +26,13 @@ EscapeSeqDecode::EscapeSeqDecode(const std::string &action)
 }
 
 
-int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
-    int input_len) {
-    unsigned char *d = input;
-    int i, count;
+static inline int ansi_c_sequences_decode_inplace(std::string &value) {
+    auto d = reinterpret_cast<unsigned char *>(value.data());
+    const unsigned char* input = d;
+    const auto input_len = value.length();
 
-    i = count = 0;
+    bool changed = false;
+    std::string::size_type i = 0;
     while (i < input_len) {
         if ((input[i] == '\\') && (i + 1 < input_len)) {
             int c = -1;
@@ -109,42 +110,28 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
             if (c == -1) {
                 /* Didn't recognise encoding, copy raw bytes. */
                 *d++ = input[i + 1];
-                count++;
                 i += 2;
             } else {
                 /* Converted the encoding. */
                 *d++ = c;
-                count++;
             }
+
+            changed = true;
         } else {
             /* Input character not a backslash, copy it. */
             *d++ = input[i++];
-            count++;
         }
     }
 
     *d = '\0';
 
-    return count;
+    value.resize(d - input);
+    return changed;
 }
 
 
 bool EscapeSeqDecode::transform(std::string &value, const Transaction *trans) const {
-
-    unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
-        * value.size() + 1);
-    memcpy(tmp, value.c_str(), value.size() + 1);
-    tmp[value.size()] = '\0';
-
-    int size = ansi_c_sequences_decode_inplace(tmp, value.size());
-
-    std::string ret("");
-    ret.assign(reinterpret_cast<char *>(tmp), size);
-    free(tmp);
-
-    const auto changed = ret != value;
-    value = ret;
-    return changed;
+    return ansi_c_sequences_decode_inplace(value);
 }
 
 
