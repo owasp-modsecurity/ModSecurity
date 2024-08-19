@@ -18,6 +18,8 @@
 
 #include "transformation.h"
 
+#include <algorithm>
+
 namespace modsecurity::actions::transformations {
 
 class RemoveNulls : public Transformation {
@@ -26,6 +28,18 @@ class RemoveNulls : public Transformation {
         : Transformation(action) { }
 
     bool transform(std::string &value, const Transaction *trans) const override;
+
+    template<typename Pred>
+    static bool remove_if(std::string &val, Pred pred) {
+        const auto old_size = val.size();
+
+        val.erase(
+            std::remove_if(
+                val.begin(), val.end(), pred),
+            val.end());
+
+        return val.size() != old_size;
+    }
 };
 
 }  // namespace modsecurity::actions::transformations

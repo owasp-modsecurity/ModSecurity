@@ -15,6 +15,8 @@
 
 #include "remove_whitespace.h"
 
+#include "remove_nulls.h"
+
 namespace modsecurity::actions::transformations {
 
 
@@ -23,30 +25,18 @@ RemoveWhitespace::RemoveWhitespace(const std::string &action)
     this->action_kind = 1;
 }
 
-bool RemoveWhitespace::transform(std::string &val, const Transaction *trans) const {
-    std::string transformed_value;
-    transformed_value.reserve(val.size());
-
-    size_t i = 0;
+bool RemoveWhitespace::transform(std::string &value, const Transaction *trans) const {
     const char nonBreakingSpaces = 0xa0;
     const char nonBreakingSpaces2 = 0xc2;
 
-    // loop through all the chars
-    while (i < val.size()) {
+    auto pred = [](const auto c) {
         // remove whitespaces and non breaking spaces (NBSP)
-        if (std::isspace(static_cast<unsigned char>(val[i]))
-            || (val[i] == nonBreakingSpaces)
-            || val[i] == nonBreakingSpaces2) {
-            // don't copy; continue on to next char in original val
-        } else {
-            transformed_value += val.at(i);
-        }
-        i++;
-    }
+        return std::isspace(static_cast<unsigned char>(c))
+            || c == nonBreakingSpaces
+            || c == nonBreakingSpaces2;
+    };
 
-    const auto changed = transformed_value != val;
-    val = transformed_value;
-    return changed;
+    return RemoveNulls::remove_if(value, pred);
 }
 
 

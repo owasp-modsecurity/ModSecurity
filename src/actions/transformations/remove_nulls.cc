@@ -19,23 +19,8 @@
 namespace modsecurity::actions::transformations {
 
 
-bool RemoveNulls::transform(std::string &val, const Transaction *trans) const {
-    size_t i = 0;
-    std::string transformed_value;
-    transformed_value.reserve(val.size());
-
-    while (i < val.size()) {
-        if (val.at(i) == '\0') {
-            // do nothing; continue on to next char in original val
-        } else {
-            transformed_value += val.at(i);
-        }
-        i++;
-    }
-
-    const auto changed = transformed_value != val;
-    val = transformed_value;
-    return changed;
+bool RemoveNulls::transform(std::string &value, const Transaction *trans) const {
+    return remove_if(value, [](const auto c) { return c == '\0'; });
 }
 
 
