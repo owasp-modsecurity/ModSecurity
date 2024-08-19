@@ -25,29 +25,27 @@ CompressWhitespace::CompressWhitespace(const std::string &action)
 }
 
 bool CompressWhitespace::transform(std::string &value, const Transaction *trans) const {
+    bool inWhiteSpace = false;
 
-    std::string a;
-    int inWhiteSpace = 0;
-    int i = 0;
+    auto d = value.data();
 
-    while (i < value.size()) {
-        if (isspace(value[i])) {
+    for(const auto c : value) {
+        if (isspace(c)) {
             if (inWhiteSpace) {
-                i++;
                 continue;
             } else {
-                inWhiteSpace = 1;
-                a.append(" ", 1);
+                inWhiteSpace = true;
+                *d++ = ' ';
             }
         } else {
-            inWhiteSpace = 0;
-            a.append(&value.at(i), 1);
+            inWhiteSpace = false;
+            *d++ = c;
         }
-        i++;
     }
 
-    const auto changed = a != value;
-    value = a;
+    const auto new_len = d - value.c_str();
+    const auto changed = new_len != value.length();
+    value.resize(new_len);
     return changed;
 }
 
