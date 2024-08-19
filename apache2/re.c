@@ -333,14 +333,8 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 if (match == 1)  {
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
-                        if (msr) {
-                            msr_log(msr, 9, "Error parsing rule targets to replace variable");
-                        }
-#if !defined(MSC_TEST)
-                        else {
-                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parsing rule targets to replace variable");
-                        }
-#endif
+                        if (my_error_msg) my_error_msg = apr_psprintf(ruleset->mp, "Error parsing rule targets to replace variable: %s", my_error_msg);
+                        else my_error_msg = apr_psprintf(ruleset->mp, "Error parsing rule targets to replace variable");
                         goto end;
                     }
                     if (msr) {
@@ -354,14 +348,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 var_appended = 1;
 
                 } else  {
-                    if (msr) {
-                        msr_log(msr, 9, "Cannot find variable to replace");
-                    }
-#if !defined(MSC_TEST)
-                    else {
-                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Cannot find variable to replace");
-                    }
-#endif
+                    my_error_msg = apr_psprintf(ruleset->mp, "Cannot find variable to replace");
                     goto end;
                 }
             }
@@ -445,14 +432,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 if (match == 0 ) {
                     rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                     if (rc < 0) {
-                        if (msr) {
-                            msr_log(msr, 9, "Error parsing rule targets to append variable");
-                        }
-#if !defined(MSC_TEST)
-                        else {
-                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parsing rule targets to append variable");
-                        }
-#endif
+                        my_error_msg = apr_psprintf(ruleset->mp, "Error parsing rule targets to append variable");
                         goto end;
                     }
                     var_appended = 1;
