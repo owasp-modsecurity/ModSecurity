@@ -629,7 +629,6 @@ static int flatten_response_body(modsec_rec *msr) {
             return -1;
         }
 
-        memset(msr->stream_output_data, 0, msr->stream_output_length+1);
         memcpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
         msr->stream_output_data[msr->stream_output_length] = '\0';
     } else if (msr->txcfg->stream_outbody_inspection && msr->txcfg->hash_is_enabled == HASH_ENABLED)    {
@@ -662,7 +661,6 @@ static int flatten_response_body(modsec_rec *msr) {
                 return -1;
             }
 
-            memset(msr->stream_output_data, 0, msr->stream_output_length+1);
             memcpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
             msr->stream_output_data[msr->stream_output_length] = '\0';
         }

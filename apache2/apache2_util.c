@@ -286,19 +286,16 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
 	ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r,
-            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->useragent_ip ? r->useragent_ip : r->connection->client_ip, str1,
-            hostname, log_escape(msr->mp, r->uri), unique_id);
+            "ModSecurity: %s%s [uri \"%s\"]%s", str1, hostname, log_escape(msr->mp, r->uri), unique_id);
 #else
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-                "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", msr->remote_addr ? msr->remote_addr : r->connection->remote_ip, str1,
-                hostname, log_escape(msr->mp, r->uri), unique_id);
+            "ModSecurity: %s%s [uri \"%s\"]%s", str1, hostname, log_escape(msr->mp, r->uri), unique_id);
 #endif
 
         /* Add this message to the list. */
         if (msr != NULL) {
             /* Force relevency if this is an alert */
             msr->is_relevant++;
-
             *(const char **)apr_array_push(msr->alerts) = apr_pstrdup(msr->mp, str1);
         }
     }
