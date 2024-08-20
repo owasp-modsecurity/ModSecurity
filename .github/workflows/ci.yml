@@ -45,10 +45,18 @@ jobs:
           sudo cp unicode.mapping /etc/apache2/
           sudo mkdir -p /var/cache/modsecurity
           sudo chown -R www-data:www-data /var/cache/modsecurity
+      - name: first check config (to get syntax errors)
+        run: sudo apachectl configtest
       - name: start apache with module
+        run: sudo systemctl restart apache2.service
+      - name: Search for errors/warnings in error log
         run: |
-          sudo systemctl restart apache2.service
-          sudo cat /var/log/apache2/error.log
+          # '|| :' handles the case grep doesn't match, otherwise the script exits with 1 (error)
+          errors=$(grep -E ':(?error|warn)[]]' /var/log/apache2/error.log) || :
+          if [[ -z "${errors}" ]]; then exit 0; fi
+          echo "::error:: Found errors/warnings in error.log"
+          echo "${errors}"
+          exit 1
       - name: Check error.log
         run: |
           # Send requests & check log format
@@ -60,3 +68,9 @@ jobs:
           grep -F ModSecurity < /var/log/apache2/error.log | grep -vP "^\[[^\]]+\] \[security2:[a-z]+\] \[pid [0-9]+:tid [0-9]+\] (?:\[client [0-9.:]+\] )?ModSecurity" || exit 0
           # grep -v succeeded => found some lines with invalid format
           exit 1
+      - name: Show httpd error log
+        if: always()
+        run: sudo cat /var/log/apache2/error.log
+      - name: Show mod_security2 audit log
+        if: always()
+        run: sudo cat /var/log/apache2/modsec_audit.log
