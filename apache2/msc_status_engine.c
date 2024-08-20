@@ -369,12 +369,13 @@ int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len) 
     apache = real_server_signature;
 #endif
 
-    /* 6 represents: strlen("(null)") */
-    beacon_string_len = (modsec ? strlen(modsec) : 6) +
-        (apache ? strlen(apache) : 6) + (apr ? strlen(apr) : 6) +
-        (apr_loaded ? strlen(apr_loaded) : 6) + (pcre ? strlen(pcre) : 6) +
-        (pcre_loaded ? strlen(pcre_loaded) : 6) + (lua ? strlen(lua) : 6) +
-        (libxml ? strlen(libxml) : 6) + (APR_SHA1_DIGESTSIZE * 2);
+    if (!modsec) modsec = "unknown";
+    if (!apache) apache = "unknown";
+    if (!apr_loaded) apr_loaded = "unknown";
+    if (!pcre_loaded) pcre_loaded = "unknown";
+    if (!lua) lua = "unknown";
+    if (!libxml) libxml = "unknown";
+    beacon_string_len = strlen(modsec) + strlen(apache) + strlen(apr) + strlen(apr_loaded) + strlen(pcre) + strlen(pcre_loaded) + strlen(lua) + strlen(libxml) + (APR_SHA1_DIGESTSIZE * 2);
 
     beacon_string_len = beacon_string_len + /* null terminator: */ 1 +
             /* comma: */ 6 +
@@ -384,7 +385,7 @@ int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len) 
         goto return_length;
     }
 
-    memset(id, '\0', sizeof(id));
+    *id = '\0';
     if (msc_status_engine_unique_id(id)) {
         sprintf(id, "no unique id");
     }

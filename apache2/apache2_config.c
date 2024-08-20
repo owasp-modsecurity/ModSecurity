@@ -302,9 +302,9 @@ static void copy_rules(apr_pool_t *mp, msre_ruleset *parent_ruleset,
     assert(exceptions_arr != NULL);
     // Normally useless code, left to be safe for the moment
     if (parent_ruleset == NULL || child_ruleset == NULL || exceptions_arr == NULL) {
-        if (parent_ruleset == NULL) ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, 0, 0, mp, "copy_rules: parent_ruleset is NULL");
-        if (child_ruleset  == NULL) ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, 0, mp, "copy_rules: child_ruleset is NULL");
-        if (exceptions_arr == NULL) ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, 0, mp, "copy_rules: exceptions_arr is NULL");
+        if (parent_ruleset == NULL) ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, mp, "copy_rules: parent_ruleset is NULL");
+        if (child_ruleset  == NULL) ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, mp, "copy_rules: child_ruleset is NULL");
+        if (exceptions_arr == NULL) ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, mp, "copy_rules: exceptions_arr is NULL");
         return;
     }
     
@@ -1170,7 +1170,7 @@ static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_marker: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_marker: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1186,7 +1186,7 @@ static const char *cmd_cookiev0_separator(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_cookiev0_separator: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_cookiev0_separator: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1208,7 +1208,7 @@ static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_argument_separator: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_argument_separator: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1407,7 +1407,7 @@ static const char *cmd_audit_log_dirmode(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_audit_log_dirmode: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_audit_log_dirmode: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1435,7 +1435,7 @@ static const char *cmd_audit_log_filemode(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_audit_log_filemode: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_audit_log_filemode: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1525,7 +1525,7 @@ static const char *cmd_component_signature(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_component_signature: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_component_signature: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1541,7 +1541,7 @@ static const char *cmd_content_injection(cmd_parms *cmd, void *_dcfg, int flag)
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_content_injection: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_content_injection: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1710,7 +1710,7 @@ static const char *cmd_disable_backend_compression(cmd_parms *cmd, void *_dcfg, 
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_disable_backend_compression: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_disable_backend_compression: _dcfg is NULL");
         return NULL;
     }
     directory_config* dcfg = (directory_config*)_dcfg;
@@ -1786,7 +1786,7 @@ static const char *cmd_stream_inbody_inspection(cmd_parms *cmd, void *_dcfg, int
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_stream_inbody_inspection: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_stream_inbody_inspection: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1810,7 +1810,7 @@ static const char *cmd_stream_outbody_inspection(cmd_parms *cmd, void *_dcfg, in
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_stream_outbody_inspection: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_stream_outbody_inspection: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1835,7 +1835,7 @@ static const char *cmd_rule_perf_time(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_perf_time: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_perf_time: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1938,7 +1938,7 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_conn_read_state_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_conn_read_state_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1994,7 +1994,7 @@ static const char *cmd_conn_write_state_limit(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_conn_write_state_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_conn_write_state_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2040,7 +2040,7 @@ static const char *cmd_request_body_inmemory_limit(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_request_body_inmemory_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_request_body_inmemory_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2064,7 +2064,7 @@ static const char *cmd_request_body_limit(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_request_body_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_request_body_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2088,7 +2088,7 @@ static const char *cmd_request_body_no_files_limit(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_request_body_no_files_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_request_body_no_files_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2112,7 +2112,7 @@ static const char *cmd_request_body_json_depth_limit(cmd_parms *cmd, void *_dcfg
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_request_body_json_depth_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_request_body_json_depth_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2136,7 +2136,7 @@ static const char *cmd_arguments_limit(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_arguments_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_arguments_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2160,7 +2160,7 @@ static const char *cmd_request_body_access(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_request_body_access: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_request_body_access: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2192,7 +2192,7 @@ static const char *cmd_request_intercept_on_error(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_request_intercept_on_error: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_request_intercept_on_error: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2213,7 +2213,7 @@ static const char *cmd_request_encoding(cmd_parms *cmd, void *_dcfg,
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_request_encoding: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_request_encoding: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2232,7 +2232,7 @@ static const char *cmd_response_body_access(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_response_body_access: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_response_body_access: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2254,7 +2254,7 @@ static const char *cmd_response_body_limit(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_response_body_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_response_body_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2282,7 +2282,7 @@ static const char *cmd_response_body_limit_action(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_response_body_limit_action: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_response_body_limit_action: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2319,7 +2319,7 @@ static const char *cmd_resquest_body_limit_action(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_resquest_body_limit_action: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_resquest_body_limit_action: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2346,7 +2346,7 @@ static const char *cmd_response_body_mime_type(cmd_parms *cmd, void *_dcfg,
     assert(_p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_response_body_mime_type: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_response_body_mime_type: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2370,7 +2370,7 @@ static const char *cmd_response_body_mime_types_clear(cmd_parms *cmd,
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_response_body_mime_types_clear: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_response_body_mime_types_clear: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2402,7 +2402,7 @@ static const char *cmd_rule_update_target_by_id(cmd_parms *cmd, void *_dcfg,
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_update_target_by_id: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_update_target_by_id: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2445,7 +2445,7 @@ static const char *cmd_rule_update_target_by_tag(cmd_parms *cmd, void *_dcfg,
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_update_target_by_tag: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_update_target_by_tag: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2487,7 +2487,7 @@ static const char *cmd_rule_update_target_by_msg(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_update_target_by_msg: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_update_target_by_msg: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2522,7 +2522,7 @@ static const char *cmd_sever_conn_filters_engine(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_sever_conn_filters_engine: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_sever_conn_filters_engine: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2555,7 +2555,7 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_engine: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_engine: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2590,7 +2590,7 @@ static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_remote_rules_fail: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_remote_rules_fail: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2621,7 +2621,7 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
     char *error_msg = NULL;
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_remote_rules: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_remote_rules: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2715,7 +2715,7 @@ static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag)
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_inheritance: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_inheritance: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2745,7 +2745,7 @@ static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_remove_by_id: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_remove_by_id: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2783,11 +2783,11 @@ static const char *cmd_rule_remove_by_tag(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_remove_by_tag: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_remove_by_tag: _dcfg is NULL");
         return NULL;
     }
     if (p1 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_remove_by_tag: p1 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_remove_by_tag: p1 is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2819,7 +2819,7 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_rule_remove_by_msg: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_rule_remove_by_msg: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2886,7 +2886,7 @@ static const char *cmd_tmp_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_tmp_dir: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_tmp_dir: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2904,7 +2904,7 @@ static const char *cmd_upload_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_upload_dir: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_upload_dir: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2923,7 +2923,7 @@ static const char *cmd_upload_file_limit(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_upload_file_limit: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_upload_file_limit: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2946,7 +2946,7 @@ static const char *cmd_upload_filemode(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_upload_filemode: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_upload_filemode: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2974,7 +2974,7 @@ static const char *cmd_upload_keep_files(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_upload_keep_files: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_upload_keep_files: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3002,7 +3002,7 @@ static const char *cmd_upload_save_tmp_files(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_upload_save_tmp_files: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_upload_save_tmp_files: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3031,7 +3031,7 @@ static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_web_app_id: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_web_app_id: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3049,7 +3049,7 @@ static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_sensor_id: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_sensor_id: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3077,7 +3077,7 @@ static const char *cmd_xml_external_entity(cmd_parms *cmd, void *_dcfg, const ch
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_xml_external_entity: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_xml_external_entity: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3110,7 +3110,7 @@ static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_engine: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_engine: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3143,11 +3143,11 @@ static const char *cmd_hash_param(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_param: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_param: _dcfg is NULL");
         return NULL;
     }
     if (p1 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_param: p1 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_param: p1 is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3175,15 +3175,15 @@ static const char *cmd_hash_key(cmd_parms *cmd, void *_dcfg, const char *_p1, co
     assert(_p2 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_key: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_key: _dcfg is NULL");
         return NULL;
     }
     if (_p1 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_key: _p1 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_key: _p1 is NULL");
         return NULL;
     }
     if (_p2 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_key: _p2 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_key: _p2 is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3229,11 +3229,11 @@ static const char *cmd_hash_method_pm(cmd_parms *cmd, void *_dcfg,
     assert(p2 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_method_pm: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_method_pm: _dcfg is NULL");
         return NULL;
     }
     if (p1 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_method_pm: p1 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_method_pm: p1 is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3331,7 +3331,7 @@ static const char *cmd_hash_method_rx(cmd_parms *cmd, void *_dcfg,
     assert(p2 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_hash_method_rx: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_method_rx: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3405,11 +3405,11 @@ static const char *cmd_httpBl_key(cmd_parms *cmd, void *_dcfg, const char *p1)
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_httpBl_key: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_httpBl_key: _dcfg is NULL");
         return NULL;
     }
     if (p1 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_httpBl_key: p1 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_httpBl_key: p1 is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3428,7 +3428,7 @@ static const char *cmd_pcre_match_limit(cmd_parms *cmd,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (p1 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_pcre_match_limit: p1 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_pcre_match_limit: p1 is NULL");
         return NULL;
     }
     long val;
@@ -3454,7 +3454,7 @@ static const char *cmd_pcre_match_limit_recursion(cmd_parms *cmd,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (p1 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_pcre_match_limit_recursion: p1 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_pcre_match_limit_recursion: p1 is NULL");
         return NULL;
     }
     long val;
@@ -3484,11 +3484,11 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
     assert(_dcfg != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_geo_lookup_db: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_geo_lookup_db: _dcfg is NULL");
         return NULL;
     }
     if (p1 == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_geo_lookup_db: p1 is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_geo_lookup_db: p1 is NULL");
         return NULL;
     }
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
@@ -3548,7 +3548,7 @@ static const char *cmd_unicode_map(cmd_parms *cmd, void *_dcfg,
     assert(p2 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_unicode_map: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_unicode_map: _dcfg is NULL");
         return NULL;
     }
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
@@ -3608,7 +3608,7 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, NULL, "cmd_cache_transformations: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_cache_transformations: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
