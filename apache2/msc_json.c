@@ -21,6 +21,7 @@ const char *base_offset=NULL;
 int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
 {
     assert(msr != NULL);
+    assert(msr->json != NULL);
     msc_arg *arg = (msc_arg *) NULL;
 
     /**
@@ -89,6 +90,7 @@ static int yajl_map_key(void *ctx, const unsigned char *key, size_t length)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
     assert(msr != NULL);
+    assert(msr->json != NULL);
     unsigned char *safe_key = (unsigned char *) NULL;
 
     /**
@@ -168,6 +170,7 @@ static int yajl_number(void *ctx, const char *value, size_t length)
 static int yajl_start_array(void *ctx) {
     modsec_rec *msr = (modsec_rec *) ctx;
     assert(msr != NULL);
+    assert(msr->json != NULL);
 
     if (!msr->json->current_key && !msr->json->prefix) {
         msr->json->prefix = apr_pstrdup(msr->mp, "array");
@@ -198,6 +201,7 @@ static int yajl_start_array(void *ctx) {
 static int yajl_end_array(void *ctx) {
     modsec_rec *msr = (modsec_rec *) ctx;
     assert(msr != NULL);
+    assert(msr->json != NULL);
     unsigned char *separator = (unsigned char *) NULL;
 
     /**
@@ -235,6 +239,7 @@ static int yajl_start_map(void *ctx)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
     assert(msr != NULL);
+    assert(msr->json != NULL);
 
     /**
      * If we do not have a current_key, this is a top-level hash, so we do not
@@ -274,6 +279,7 @@ static int yajl_end_map(void *ctx)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
     assert(msr != NULL);
+    assert(msr->json != NULL);
     unsigned char *separator = (unsigned char *) NULL;
 
     /**
@@ -365,6 +371,7 @@ int json_init(modsec_rec *msr, char **error_msg) {
  */
 int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char **error_msg) {
     assert(msr != NULL);
+    assert(msr->json != NULL);
     assert(error_msg != NULL);
     *error_msg = NULL;
     base_offset=buf;
@@ -393,6 +400,7 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
  */
 int json_complete(modsec_rec *msr, char **error_msg) {
     assert(msr != NULL);
+    assert(msr->json != NULL);
     assert(error_msg != NULL);
     char *json_data = (char *) NULL;
 
@@ -419,6 +427,8 @@ int json_complete(modsec_rec *msr, char **error_msg) {
  * Frees the resources used for JSON parsing.
  */
 apr_status_t json_cleanup(modsec_rec *msr) {
+    assert(msr != NULL);
+    assert(msr->json != NULL);
     msr_log(msr, 4, "JSON: Cleaning up JSON results");
     if (msr->json->handle != NULL) {
         yajl_free(msr->json->handle);
