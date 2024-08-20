@@ -29,7 +29,7 @@ jobs:
       - name: flawfinder_scan
         uses: david-a-wheeler/flawfinder@8e4a779ad59dbfaee5da586aa9210853b701959c
         with:
-          arguments: '--sarif ./'
+          arguments: '--sarif ${{github.workspace}}/'
           output: 'flawfinder_results.sarif'
 
       - name: Upload analysis results to GitHub Security tab
