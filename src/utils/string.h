@@ -257,7 +257,7 @@ inline std::string string_to_hex(std::string_view input) {
 
 
 template<typename Operation>
-inline std::string toCaseHelper(std::string str, Operation op) {
+inline std::string toCaseHelper(std::string str, Operation op) { // cppcheck-suppress syntaxError ; false positive
     std::transform(str.begin(),
             str.end(),
             str.begin(),

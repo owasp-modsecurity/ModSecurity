@@ -102,9 +102,9 @@ RuleWithActions::RuleWithActions(
                         delete a;
                     } else if (auto sa = dynamic_cast<actions::Severity *>(a)) {
                         m_severity = sa;
-                    } else if (auto lda = dynamic_cast<actions::LogData *>(a)) {
+                    } else if (auto lda = dynamic_cast<actions::LogData *>(a)) { // cppcheck-suppress unreadVariable ; false positive
                         m_logData = lda;
-                    } else if (auto ma = dynamic_cast<actions::Msg *>(a)) {
+                    } else if (auto ma = dynamic_cast<actions::Msg *>(a)) { // cppcheck-suppress unreadVariable ; false positive
                         m_msg = ma;
                     } else if (auto sva = dynamic_cast<actions::SetVar *>(a)) {
                         m_actionsSetVar.push_back(sva);
