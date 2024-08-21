@@ -63,7 +63,11 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
     char *c = NULL, *name = NULL, *value = NULL;
     char *variable = NULL, *myvar = NULL;
     char *myvalue = NULL, *myname = NULL;
+    msc_regex_t *regex;
+    char *errptr;
+    int erroffset;
     int match = 0;
+    size_t value_len;
 
     if(var == NULL)
         return 0;
@@ -110,23 +114,59 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
                     value = NULL;
                 }
 
+                value_len = 0;
+                if (value != NULL) {
+                    value_len = strlen(value);
+                }
+
                 if((strlen(myname) == strlen(name)) &&
-                        (strncasecmp(myname, name,strlen(myname)) == 0))   {
+                        (strncasecmp(myname, name, strlen(myname)) == 0))   {
 
                     if(value != NULL && myvalue != NULL)  {
-                        if((strlen(myvalue) == strlen(value)) &&
+                        if(value_len > 2 && value[0] == '/' && value[value_len - 1] == '/') {
+                            value[value_len - 1] = '\0';
+#ifdef WITH_PCRE2
+                            regex = msc_pregcomp(msr->mp, value + 1,
+                                        PCRE2_DOTALL | PCRE2_CASELESS | PCRE2_DOLLAR_ENDONLY, (const char **)&errptr, &erroffset);
+#else
+                            regex = msc_pregcomp(msr->mp, value + 1,
+                                        PCRE_DOTALL | PCRE_CASELESS | PCRE_DOLLAR_ENDONLY, (const char **)&errptr, &erroffset);
+#endif
+                            if (regex == NULL) {
+                                if (msr->txcfg->debuglog_level >= 9) {
+#ifdef WITH_PCRE2
+                                    // in case of PCRE2 the errptr won't fill
+                                    msr_log(msr, 9, "fetch_target_exception: Regexp /%s/ failed to compile at pos %d.",
+                                            value + 1, erroffset);
+                                    ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: exclusion regexp /%s/ failed to compile at pos %d.",
+                                            value + 1, erroffset);
+#else
+                                    msr_log(msr, 9, "fetch_target_exception: Regexp /%s/ failed to compile at pos %d: %s.",
+                                            value + 1, erroffset, errptr);
+                                    ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: exclusion regexp /%s/ failed to compile at pos %d: %s.",
+                                            value + 1, erroffset, errptr);
+#endif
+                                }
+                            } else {
+#ifdef WITH_PCRE2
+                                if (!(msc_regexec(regex, myvalue, strlen(myvalue), &errptr) == PCRE2_ERROR_NOMATCH)) {
+#else
+                                if (!(msc_regexec(regex, myvalue, strlen(myvalue), &errptr) == PCRE_ERROR_NOMATCH)) {
+#endif
+                                    if (msr->txcfg->debuglog_level >= 9) {
+                                        msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", var->name);
+                                    }
+                                    match = 1;
+                                }
+                            }
+                        } else if((strlen(myvalue) == value_len) &&
                                 strncasecmp(myvalue,value,strlen(myvalue)) == 0) {
                             if (msr->txcfg->debuglog_level >= 9) {
                                 msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
                             }
                             match = 1;
                         }
-                    } else if (value == NULL && myvalue == NULL)    {
-                        if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
-                        }
-                        match = 1;
-                    } else if (value == NULL && myvalue != NULL)   {
+                    } else {
                         if (msr->txcfg->debuglog_level >= 9) {
                             msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
                         }
