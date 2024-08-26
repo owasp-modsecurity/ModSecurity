@@ -275,10 +275,10 @@ int main(int argc, char **argv) {
 
     if (!test.m_automake_output) {
         std::cout << "Total >> "  << total << std::endl;
-    }
 
-    for (const auto t : results) {
-        std::cout << t->print() << std::endl;
+        for (const auto t : results) {
+            std::cout << t->print() << std::endl;
+        }
     }
 
     const int skp = std::count_if(results.cbegin(), results.cend(), [](const auto &i)
