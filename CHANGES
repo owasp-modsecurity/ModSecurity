@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.8 (to be released)
 -------------------
 
+ * Fixed ap_log_perror() usage
+   [PR #3241 - @marcstern]
  * Memory leaks + enhanced logging
    [PR #3191 - @marcstern]
  * CI improvement: First check syntax & always display error/audit logs
