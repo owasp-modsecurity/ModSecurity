@@ -149,6 +149,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 p++;
             }
             if (*p != '\'') {
+                msr->mpd->flag_invalid_quoting = 1;
                 return -17; // Single quote for end-of-language not found
             }
             p++;
