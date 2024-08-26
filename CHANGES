@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.8 (to be released)
 -------------------
 
+ * Memory leaks + enhanced logging
+   [PR #3191 - @marcstern]
  * CI improvement: First check syntax & always display error/audit logs
    [PR #3190 - @marcstern]
  * Fixed assert() usage
