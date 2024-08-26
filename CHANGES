@@ -1,6 +1,8 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Unit tests results should not be displayed in 'automake output' mode
+    [PR #3232 - @eduar-hte]
   - Replace usage of std::ctime, which is not safe in
     multithread contexts
     [PR #3228 - @eduar-hte]
