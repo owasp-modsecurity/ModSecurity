@@ -134,7 +134,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
          */
 
         char quote = '\0';
-        if (name == "filename*") {
+        if (strcmp(name, "filename*") == 0) {
             /* filename*=charset'[optional-language]'filename */
             /* Read beyond the charset and the optional language*/
             const char* start_of_charset = p;
