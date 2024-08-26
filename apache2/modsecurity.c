@@ -131,7 +131,7 @@ int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
     // get platform temp dir
     rc = apr_temp_dir_get(&temp_dir, mp);
     if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, "ModSecurity: Could not get temp dir");
+        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, "ModSecurity: Could not get temp dir");
         return -1;
     }
 
@@ -140,7 +140,7 @@ int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
 
     rc = apr_file_mktemp(&lock_name, path, 0, mp);
     if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Could not create temporary file for global lock");
+        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not create temporary file for global lock");
         return -1;
     }
     // below func always return APR_SUCCESS
@@ -148,7 +148,7 @@ int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
 
     rc = apr_global_mutex_create(lock, filename, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Could not create global mutex");
+        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not create global mutex");
         return -1;
     }
 #if !defined(MSC_TEST)
@@ -159,7 +159,7 @@ int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
     rc = unixd_set_global_mutex_perms(*lock);
 #endif
     if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Could not set permissions on global mutex"); 
+        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not set permissions on global mutex"); 
         return -1;
     }
 #endif /* SET_MUTEX_PERMS */

@@ -2338,7 +2338,7 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset, int type,
     assert(error_msg != NULL);
     // Normally useless code, left to be safe for the moment
     if (error_msg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, ruleset->mp, NULL, "msre_rule_create: error_msg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, ruleset->mp, "msre_rule_create: error_msg is NULL");
         return NULL;
     }
     msre_rule *rule;

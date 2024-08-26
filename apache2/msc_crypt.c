@@ -1093,8 +1093,10 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         }
     }
 
-    if (msr->txcfg->debuglog_level >= 4)
+    if (msr->txcfg->debuglog_level >= 4) {
+        encoding = "unknown"; // 'encoding' is no more used except in log
         msr_log(msr, 4, "inject_hashed_response_body: Detected encoding type [%s].", encoding);
+    }
 
     if (handler == NULL)
         handler = xmlFindCharEncodingHandler("UTF-8");
