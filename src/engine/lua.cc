@@ -185,7 +185,7 @@ int Lua::run(Transaction *t, const std::string &str) {
 
     lua_getglobal(L, "main");
 
-    ms_dbg_a(t, 1, str);
+    ms_dbg_a(t, 9, str);
 
     /* Put the parameter on the stack. */
     if (!str.empty() ) {
