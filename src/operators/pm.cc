@@ -22,6 +22,7 @@
 #include "src/utils/acmp.h"
 #include "src/utils/string.h"
 
+using namespace modsecurity::utils::string;
 
 static inline std::string parse_pm_content(const std::string &op_parm) {
     auto offset = op_parm.find_first_not_of(" \t");
