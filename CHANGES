@@ -1,6 +1,8 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Adjust reference to modsecurity::utils::string::VALID_HEX
+    [PR #3243 - @eduar-hte]
   - Lua::run: Move logging of str parameter to higher log level.
     [PR #3240 - @frozenice]
   - Remove unnecessary heap allocated copies in Transformation actions
