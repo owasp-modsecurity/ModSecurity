@@ -1,6 +1,10 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Remove unnecessary heap allocated copies in Transformation actions
+    [PR #3231 - @eduar-hte]
+  - Removed multiple heap-allocated copies in Pm::init & parse_pm_content
+    [PR #3233 - @eduar-hte]
   - Unit tests results should not be displayed in 'automake output' mode
     [PR #3232 - @eduar-hte]
   - Replace usage of std::ctime, which is not safe in
