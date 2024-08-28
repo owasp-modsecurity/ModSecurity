@@ -247,11 +247,9 @@ UTILS = \
 	utils/geo_lookup.cc \
 	utils/https_client.cc \
 	utils/ip_tree.cc \
-	utils/md5.cc \
 	utils/msc_tree.cc \
 	utils/random.cc \
 	utils/regex.cc \
-	utils/sha1.cc \
 	utils/system.cc \
 	utils/shared_files.cc
 

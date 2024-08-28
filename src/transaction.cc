@@ -348,46 +348,22 @@ bool Transaction::extractArguments(const std::string &orig,
     if (m_rules->m_secArgumentSeparator.m_set) {
         sep1 = m_rules->m_secArgumentSeparator.m_value.at(0);
     }
-    std::vector<std::string> key_value_sets = utils::string::ssplit(buf, sep1);
+    const auto key_value_sets = utils::string::ssplit(buf, sep1);
 
-    for (std::string t : key_value_sets) {
-        char sep2 = '=';
-        size_t key_s = 0;
-        size_t value_s = 0;
-        int invalid = 0;
-        int changed = 0;
+    for (const auto &t : key_value_sets) {
+        const auto sep2 = '=';
+        auto [key, value] = utils::string::ssplit_pair(t, sep2);
 
-        std::string key;
-        std::string value;
-        std::pair<std::string, std::string> key_value_pair = utils::string::ssplit_pair(t, sep2);
-        key = key_value_pair.first;
-        value = key_value_pair.second;
+        int invalid_count;
+        utils::urldecode_nonstrict_inplace(key, invalid_count);
+        utils::urldecode_nonstrict_inplace(value, invalid_count);
 
-        key_s = (key.length() + 1);
-        value_s = (value.length() + 1);
-        unsigned char *key_c = reinterpret_cast<unsigned char *>(
-            calloc(sizeof(char), key_s));
-        unsigned char *value_c = reinterpret_cast<unsigned char *>(
-            calloc(sizeof(char), value_s));
-
-        memcpy(key_c, key.c_str(), key_s);
-        memcpy(value_c, value.c_str(), value_s);
-
-        key_s = utils::urldecode_nonstrict_inplace(key_c, key_s,
-            &invalid, &changed);
-        value_s = utils::urldecode_nonstrict_inplace(value_c, value_s,
-            &invalid, &changed);
-
-        if (invalid) {
+        if (invalid_count > 0) {
             m_variableUrlEncodedError.set("1", m_variableOffset);
         }
 
-        addArgument(orig, std::string(reinterpret_cast<char *>(key_c), key_s-1),
-            std::string(reinterpret_cast<char *>(value_c), value_s-1), offset);
+        addArgument(orig, key, value, offset);
         offset = offset + t.size() + 1;
-
-        free(key_c);
-        free(value_c);
     }
 
     return true;

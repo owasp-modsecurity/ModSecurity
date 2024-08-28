@@ -89,8 +89,10 @@ struct TransformationTest {
         return tfn;
     }
 
-    static UnitTestResult eval(ItemType &tfn, const UnitTest &t) {
-        return {1, tfn.evaluate(t.input, nullptr)};
+    static UnitTestResult eval(const ItemType &tfn, const UnitTest &t) {
+        std::string ret = t.input;
+        tfn.transform(ret, nullptr);
+        return {1, ret};
     }
 
     static bool check(const UnitTestResult &result, const UnitTest &t) {

@@ -13,6 +13,9 @@
  *
  */
 
+#ifndef SRC_UTILS_STRING_H_
+#define SRC_UTILS_STRING_H_
+
 #include <ctime>
 #include <string>
 #include <cstring>
@@ -27,18 +30,21 @@
 #include "src/compat/msvc.h"
 #endif
 
-#ifndef SRC_UTILS_STRING_H_
-#define SRC_UTILS_STRING_H_
+namespace modsecurity::utils::string {
 
-#define VALID_HEX(X) (((X >= '0') && (X <= '9')) || \
-    ((X >= 'a') && (X <= 'f')) || ((X >= 'A') && (X <= 'F')))
-#define ISODIGIT(X) ((X >= '0') && (X <= '7'))
-#define NBSP 160
+template<typename CharT>
+constexpr bool VALID_HEX(CharT X) {
+    return ((X >= '0') && (X <= '9')) 
+        || ((X >= 'a') && (X <= 'f'))
+        || ((X >= 'A') && (X <= 'F'));
+}
 
+template<typename CharT>
+constexpr bool ISODIGIT(CharT X) {
+    return (X >= '0') && (X <= '7');
+}
 
-namespace modsecurity {
-namespace utils {
-namespace string {
+constexpr unsigned char NBSP = 160;
 
 const char HEX2DEC[256] = {
     /*       0  1  2  3   4  5  6  7   8  9  A  B   C  D  E  F */
@@ -235,18 +241,18 @@ inline unsigned char *c2x(unsigned what, unsigned char *where) {
 }
 
 
-inline std::string string_to_hex(const std::string& input) {
-    static const char* const lut = "0123456789ABCDEF";
-    size_t len = input.length();
+inline std::string string_to_hex(std::string_view input) {
+    static const char* const lut = "0123456789abcdef";
 
-    std::string output;
-    output.reserve(2 * len);
-    for (size_t i = 0; i < len; ++i) {
-        const unsigned char c = input[i];
-        output.push_back(lut[c >> 4]);
-        output.push_back(lut[c & 15]);
+    std::string a(input.size()*2, 0);
+    char *d = a.data();
+
+    for (const unsigned char c : input) {
+        *d++ = lut[c >> 4];
+        *d++ = lut[c & 15];
     }
-    return output;
+
+    return a;
 }
 
 
@@ -271,8 +277,6 @@ inline std::string toupper(std::string str) { // cppcheck-suppress passedByValue
 }
 
 
-}  // namespace string
-}  // namespace utils
-}  // namespace modsecurity
+}  // namespace modsecurity::utils::string
 
 #endif  // SRC_UTILS_STRING_H_
