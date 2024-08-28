@@ -1,6 +1,8 @@
 v3.0.13 - YYYY-MMM-DD
 ---------------------
 
+  - Lua::run: Move logging of str parameter to higher log level.
+    [PR #3240 - @frozenice]
   - Remove unnecessary heap allocated copies in Transformation actions
     [PR #3231 - @eduar-hte]
   - Removed multiple heap-allocated copies in Pm::init & parse_pm_content
