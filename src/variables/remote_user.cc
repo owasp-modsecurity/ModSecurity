@@ -56,8 +56,7 @@ void RemoteUser::evaluate(Transaction *transaction,
 
         base64 = Utils::Base64::decode(base64);
 
-        const auto pos = base64.find(":");
-        if (pos != std::string::npos) {
+        if (const auto pos{base64.find(":")}; pos != std::string::npos) {
             transaction->m_variableRemoteUser.assign(std::string(base64, 0, pos));
 
             auto var = std::make_unique<VariableValue>(&v->getKeyWithCollection(),

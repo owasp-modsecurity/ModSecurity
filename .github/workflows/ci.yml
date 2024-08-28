@@ -66,7 +66,7 @@ jobs:
         env:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
-        run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }}
+        run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
         run: make -j `nproc`
@@ -78,7 +78,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-12]
+        os: [macos-14]
         configure:
           - {label: "with parser generation", opt: "--enable-parser-generation" }
           - {label: "wo curl",    opt: "--without-curl" }
@@ -91,10 +91,12 @@ jobs:
           - {label: "with pcre2", opt: "--with-pcre2" }
     steps:
       - name: Setup Dependencies
-        # autoconf, curl, pcre2 not installed because they're already
+        # curl, pcre2 not installed because they're already
         # included in the image
         run: |
-          brew install automake \
+          brew install autoconf \
+                       automake \
+                       libtool \
                        yajl \
                        lmdb \
                        lua \
@@ -112,7 +114,7 @@ jobs:
       - name: build.sh
         run: ./build.sh
       - name: configure
-        run: ./configure ${{ matrix.configure.opt }}
+        run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
         run: make -j `sysctl -n hw.logicalcpu`
@@ -130,11 +132,11 @@ jobs:
         configuration: [Release]
         configure:
           - {label: "full",       opt: "" }
-          - {label: "wo curl",    opt: "-DWITHOUT_CURL=ON" }
-          - {label: "wo lmdb",    opt: "-DWITHOUT_LMDB=ON" }
-          - {label: "wo lua",     opt: "-DWITHOUT_LUA=ON" }
-          - {label: "wo maxmind", opt: "-DWITHOUT_MAXMIND=ON" }
-          - {label: "wo libxml",  opt: "-WITHOUT_LIBXML2=ON" }
+          - {label: "wo curl",    opt: "-DWITH_CURL=OFF" }
+          - {label: "wo lua",     opt: "-DWITH_LUA=OFF" }
+          - {label: "wo maxmind", opt: "-DWITH_MAXMIND=OFF" }
+          - {label: "wo libxml",  opt: "-DWITH_LIBXML2=OFF" }
+          - {label: "with lmdb",  opt: "-DWITH_LMDB=ON" }
     steps:
       - uses: actions/checkout@v4
         with:

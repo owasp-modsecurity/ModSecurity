@@ -348,46 +348,22 @@ bool Transaction::extractArguments(const std::string &orig,
     if (m_rules->m_secArgumentSeparator.m_set) {
         sep1 = m_rules->m_secArgumentSeparator.m_value.at(0);
     }
-    std::vector<std::string> key_value_sets = utils::string::ssplit(buf, sep1);
+    const auto key_value_sets = utils::string::ssplit(buf, sep1);
 
-    for (std::string t : key_value_sets) {
-        char sep2 = '=';
-        size_t key_s = 0;
-        size_t value_s = 0;
-        int invalid = 0;
-        int changed = 0;
+    for (const auto &t : key_value_sets) {
+        const auto sep2 = '=';
+        auto [key, value] = utils::string::ssplit_pair(t, sep2);
 
-        std::string key;
-        std::string value;
-        std::pair<std::string, std::string> key_value_pair = utils::string::ssplit_pair(t, sep2);
-        key = key_value_pair.first;
-        value = key_value_pair.second;
+        int invalid_count;
+        utils::urldecode_nonstrict_inplace(key, invalid_count);
+        utils::urldecode_nonstrict_inplace(value, invalid_count);
 
-        key_s = (key.length() + 1);
-        value_s = (value.length() + 1);
-        unsigned char *key_c = reinterpret_cast<unsigned char *>(
-            calloc(sizeof(char), key_s));
-        unsigned char *value_c = reinterpret_cast<unsigned char *>(
-            calloc(sizeof(char), value_s));
-
-        memcpy(key_c, key.c_str(), key_s);
-        memcpy(value_c, value.c_str(), value_s);
-
-        key_s = utils::urldecode_nonstrict_inplace(key_c, key_s,
-            &invalid, &changed);
-        value_s = utils::urldecode_nonstrict_inplace(value_c, value_s,
-            &invalid, &changed);
-
-        if (invalid) {
+        if (invalid_count > 0) {
             m_variableUrlEncodedError.set("1", m_variableOffset);
         }
 
-        addArgument(orig, std::string(reinterpret_cast<char *>(key_c), key_s-1),
-            std::string(reinterpret_cast<char *>(value_c), value_s-1), offset);
+        addArgument(orig, key, value, offset);
         offset = offset + t.size() + 1;
-
-        free(key_c);
-        free(value_c);
     }
 
     return true;
@@ -1469,49 +1445,57 @@ int Transaction::processLogging() {
  * @brief   Check if ModSecurity has anything to ask to the server.
  *
  * Intervention can generate a log event and/or perform a disruptive action.
+ * 
+ * If the return value is true, all fields in the ModSecurityIntervention
+ * parameter have been initialized and are safe to access.
+ * If the return value is false, no changes to the ModSecurityIntervention
+ * parameter have been made.
  *
- * @param Pointer ModSecurityIntervention structure
+ * @param it Pointer to ModSecurityIntervention structure
  * @retval true  A intervention should be made.
  * @retval false Nothing to be done.
  *
  */
 bool Transaction::intervention(ModSecurityIntervention *it) {
+    const auto disruptive = m_it.disruptive;
     if (m_it.disruptive) {
         if (m_it.url) {
             it->url = strdup(m_it.url);
+        } else {
+            it->url = NULL;
         }
         it->disruptive = m_it.disruptive;
         it->status = m_it.status;
 
         if (m_it.log != NULL) {
-            std::string log("");
-            log.append(m_it.log);
-            utils::string::replaceAll(&log, std::string("%d"),
+            std::string log(m_it.log);
+            utils::string::replaceAll(log, "%d",
                 std::to_string(it->status));
             it->log = strdup(log.c_str());
+        } else {
+            it->log = NULL;
         }
         intervention::reset(&m_it);
     }
 
-    return it->disruptive;
+    return disruptive;
 }
 
 
 std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     double size, const std::string &md5) {
     std::stringstream ss;
-    struct tm timeinfo;
-    char tstr[300];
 
-    memset(tstr, '\0', 300);
+    struct tm timeinfo;
     localtime_r(&this->m_timeStamp, &timeinfo);
 
-    strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
+    char tstr[std::size("[dd/Mmm/yyyy:hh:mm:ss shhmm]")];
+    strftime(tstr, std::size(tstr), "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
 
     ss << utils::string::dash_if_empty(
        m_variableRequestHeaders.resolveFirst("Host").get())
         << " ";
-    ss << utils::string::dash_if_empty(this->m_clientIpAddress->c_str()) << " ";
+    ss << utils::string::dash_if_empty(this->m_clientIpAddress.get()) << " ";
     /** TODO: Check variable */
     variables::RemoteUser *r = new variables::RemoteUser("REMOTE_USER");
     std::vector<const VariableValue *> l;
@@ -1522,7 +1506,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     delete r;
 
     ss << utils::string::dash_if_empty(
-        m_variableRemoteUser.c_str());
+        &m_variableRemoteUser);
     ss << " ";
     /** TODO: Check variable */
     //ss << utils::string::dash_if_empty(
@@ -1563,14 +1547,14 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
 std::string Transaction::toOldAuditLogFormat(int parts,
     const std::string &trailer) {
     std::stringstream audit_log;
-    struct tm timeinfo;
-    char tstr[300];
 
-    memset(tstr, '\0', 300);
+    struct tm timeinfo;
     localtime_r(&this->m_timeStamp, &timeinfo);
 
+    char tstr[std::size("[dd/Mmm/yyyy:hh:mm:ss shhmm]")];
+    strftime(tstr, std::size(tstr), "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
+
     audit_log << "--" << trailer << "-" << "A--" << std::endl;
-    strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
     audit_log << tstr;
     audit_log << " " << m_id->c_str();
     audit_log << " " << this->m_clientIpAddress->c_str();
@@ -2260,16 +2244,37 @@ extern "C" void msc_transaction_cleanup(Transaction *transaction) {
  *
  * Intervention can generate a log event and/or perform a disruptive action.
  *
- * @param transaction ModSecurity transaction.
+ * If the return value is not zero, all fields in the ModSecurityIntervention
+ * parameter have been initialized and are safe to access.
+ * If the return value is zero, no changes to the ModSecurityIntervention
+ * parameter have been made.
  *
- * @return Pointer to ModSecurityIntervention structure
- * @retval >0   A intervention should be made.
- * @retval NULL Nothing to be done.
+ * @param transaction ModSecurity transaction.
+ * @param it Pointer to ModSecurityIntervention structure
+ * @returns If an intervention should be made
+ * @retval >0 A intervention should be made.
+ * @retval 0  Nothing to be done.
  *
  */
 extern "C" int msc_intervention(Transaction *transaction,
     ModSecurityIntervention *it) {
     return transaction->intervention(it);
+}
+
+
+/**
+ * @name    msc_intervention_cleanup
+ * @brief   Removes all the resources allocated by a given Intervention.
+ *
+ * This is a helper function to free any allocated buffers owned by the
+ * intervention.
+ *
+ * @param it ModSecurity intervention.
+ *
+ */
+extern "C" void msc_intervention_cleanup(ModSecurityIntervention *it) {
+    intervention::free(it);
+    intervention::clean(it);
 }
 
 

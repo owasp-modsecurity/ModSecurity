@@ -19,6 +19,14 @@
 
 #include "src/operators/operator.h"
 
+
+constexpr int UNICODE_ERROR_CHARACTERS_MISSING   = -1;
+constexpr int UNICODE_ERROR_INVALID_ENCODING     = -2;
+constexpr int UNICODE_ERROR_OVERLONG_CHARACTER   = -3;
+constexpr int UNICODE_ERROR_RESTRICTED_CHARACTER = -4;
+constexpr int UNICODE_ERROR_DECODING_ERROR       = -5;
+
+
 namespace modsecurity {
 namespace operators {
 

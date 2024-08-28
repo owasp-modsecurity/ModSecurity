@@ -300,7 +300,6 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
     while (!trans.empty()) {
         modsecurity::actions::transformations::Transformation *t;
-        std::string varValueRes;
         yajl_gen_map_open(g);
         yajl_gen_string(g,
             reinterpret_cast<const unsigned char*>("transformation"),
@@ -312,8 +311,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
 
         t = modsecurity::actions::transformations::Transformation::instantiate(
             trans.back().str().c_str());
-        varValueRes = t->evaluate(varValue, NULL);
-        varValue.assign(varValueRes);
+        t->transform(varValue, nullptr);
         trans.pop_back();
 
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("value"),

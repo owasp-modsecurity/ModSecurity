@@ -17,8 +17,7 @@
 
 #include <fcntl.h>
 #ifdef WIN32
-#include <windows.h>
-#include <io.h>
+#include <algorithm>
 #endif
 
 
@@ -34,7 +33,32 @@ SharedFiles::handlers_map::iterator SharedFiles::add_new_handler(
         return m_handlers.end();
     }
 
-    return m_handlers.insert({ fileName, {fp, 0} }).first;
+#ifdef WIN32
+    // replace invalid characters for a Win32 named object
+    auto tmp = fileName;
+    std::replace(tmp.begin(), tmp.end(), '\\', '_');
+    std::replace(tmp.begin(), tmp.end(), '/', '_');
+
+    // use named mutex for multi-process locking support
+    const auto mutexName = "Global\\ModSecurity_" + tmp;
+
+    HANDLE hMutex = CreateMutex(NULL, FALSE, mutexName.c_str());
+    if (hMutex == NULL) {
+        error->assign("Failed to create mutex for shared file: " + fileName);
+        fclose(fp);
+        return m_handlers.end();
+    }
+#endif
+
+    auto handler = handler_info {
+        fp,
+#ifdef WIN32
+        hMutex,
+#endif
+        0
+    };
+    // cppcheck-suppress resourceLeak ; false positive, fp is closed in SharedFiles::close
+    return m_handlers.insert({ fileName, handler }).first;
 }
 
 
@@ -69,6 +93,9 @@ void SharedFiles::close(const std::string& fileName) {
     if (it->second.cnt == 0)
     {
         fclose(it->second.fp);
+#ifdef WIN32
+        CloseHandle(it->second.hMutex);
+#endif
 
         m_handlers.erase(it);
     }
@@ -92,9 +119,11 @@ bool SharedFiles::write(const std::string& fileName,
     lock.l_type = F_WRLCK;
     fcntl(fileno(it->second.fp), F_SETLKW, &lock);
 #else
-    auto handle = reinterpret_cast<HANDLE>(_get_osfhandle(fileno(it->second.fp)));
-    OVERLAPPED overlapped = { 0 };
-    ::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
+    DWORD dwWaitResult = WaitForSingleObject(it->second.hMutex, INFINITE);
+    if (dwWaitResult != WAIT_OBJECT_0) {
+        error->assign("couldn't lock shared file: " + fileName);
+        return false;
+    }
 #endif
 
     auto wrote = fwrite(msg.c_str(), 1, msg.size(), it->second.fp);
@@ -109,8 +138,7 @@ bool SharedFiles::write(const std::string& fileName,
     lock.l_type = F_UNLCK;
     fcntl(fileno(it->second.fp), F_SETLKW, &lock);
 #else
-    overlapped = { 0 };
-    ::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
+    ::ReleaseMutex(it->second.hMutex);
 #endif
 
     return ret;

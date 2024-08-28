@@ -38,10 +38,10 @@
  *     std::cout << "There is an intervention" << std::endl;
  * }
  *
- * ...      
+ * ...
  *
  * @endcode
- * 
+ *
  */
 
 /**
@@ -79,6 +79,11 @@
 #include <string>
 #include <memory>
 #endif
+
+
+#include "modsecurity/intervention.h"
+#include "modsecurity/transaction.h"
+#include "modsecurity/debug_log.h"
 
 
 #ifndef HEADERS_MODSECURITY_MODSECURITY_H_
@@ -160,7 +165,7 @@ namespace modsecurity {
      LoggingPhase,
     /**
      * Just a marking for the expected number of phases.
-     * 
+     *
      */
      NUMBER_OF_PHASES,
     };
@@ -169,11 +174,6 @@ namespace modsecurity {
 }  // namespace modsecurity
 #endif
 
-
-
-#include "modsecurity/intervention.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/debug_log.h"
 
 /**
  * TAG_NUM:

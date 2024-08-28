@@ -29,7 +29,7 @@
       ]
     },
     "expected":{
-      "http_code": 200,
+      "http_code": 403,
       "debug_log": "[hostname: \"modsecurity.org\"]"
     },
     "rules":[

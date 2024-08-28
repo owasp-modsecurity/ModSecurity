@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.24)
 
 set(BASE_DIR ${CMAKE_CURRENT_LIST_DIR}/../..)
 
-option(WITHOUT_LMDB    "Include LMDB support"    OFF)
-option(WITHOUT_LUA     "Include LUA support"     OFF)
-option(WITHOUT_LIBXML2 "Include LibXML2 support" OFF)
-option(WITHOUT_MAXMIND "Include MaxMind support" OFF)
-option(WITHOUT_CURL    "Include CURL support"    OFF)
+option(WITH_LMDB    "Include LMDB support"    OFF)
+option(WITH_LUA     "Include LUA support"     ON)
+option(WITH_LIBXML2 "Include LibXML2 support" ON)
+option(WITH_MAXMIND "Include MaxMind support" ON)
+option(WITH_CURL    "Include CURL support"    ON)
 
-option(USE_ASAN        "Build with Address Sanitizer" OFF)
+option(USE_ASAN     "Build with Address Sanitizer" OFF)
 
 # common compiler settings
 
@@ -93,24 +93,23 @@ set(HAVE_SSDEEP   0)    # should always be zero, no conan package available
 
 macro(enable_feature flag option)
   if(${option})
-    set(${flag} 0)
+    set(${flag} 1)  # ON
   else()
-    set(${flag} 1)
+    set(${flag} 0)  # OFF
   endif()
 endmacro()
 
-enable_feature(HAVE_LMDB ${WITHOUT_LMDB})
-enable_feature(HAVE_LUA ${WITHOUT_LUA})
-enable_feature(HAVE_LIBXML2 ${WITHOUT_LIBXML2})
-enable_feature(HAVE_MAXMIND ${WITHOUT_MAXMIND})
-enable_feature(HAVE_CURL ${WITHOUT_CURL})
+enable_feature(HAVE_LMDB ${WITH_LMDB})
+enable_feature(HAVE_LUA ${WITH_LUA})
+enable_feature(HAVE_LIBXML2 ${WITH_LIBXML2})
+enable_feature(HAVE_MAXMIND ${WITH_MAXMIND})
+enable_feature(HAVE_CURL ${WITH_CURL})
 
 include(${CMAKE_CURRENT_LIST_DIR}/ConfigureChecks.cmake)
 
 configure_file(config.h.cmake ${BASE_DIR}/src/config.h)
 
 find_package(PCRE2 REQUIRED)
-find_package(PThreads4W REQUIRED)
 find_package(Poco REQUIRED)
 find_package(dirent REQUIRED)		# used only by tests (check dirent::dirent refernces)
 
@@ -139,7 +138,7 @@ add_library(libModSecurity SHARED ${libModSecuritySources})
 
 target_compile_definitions(libModSecurity PRIVATE WITH_PCRE2)
 target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include)
-target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 pthreads4w::pthreads4w libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
+target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
 
 macro(add_package_dependency project compile_definition link_library flag)
   if(${flag})
@@ -255,11 +254,14 @@ setExampleTargetProperties(using_bodies_in_chunks)
 # reading_logs_via_rule_message
 add_executable(reading_logs_via_rule_message ${BASE_DIR}/examples/reading_logs_via_rule_message/simple_request.cc)
 setExampleTargetProperties(reading_logs_via_rule_message)
-target_link_libraries(reading_logs_via_rule_message PRIVATE libModSecurity pthreads4w::pthreads4w)
 
 # reading_logs_with_offset
 add_executable(reading_logs_with_offset ${BASE_DIR}/examples/reading_logs_with_offset/read.cc)
 setExampleTargetProperties(reading_logs_with_offset)
+
+# multithread
+add_executable(multithread ${BASE_DIR}/examples/multithread/multithread.cc)
+setExampleTargetProperties(multithread)
 
 # tools
 #

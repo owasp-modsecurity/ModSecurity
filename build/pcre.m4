@@ -27,30 +27,41 @@ else
 
     AC_MSG_CHECKING([for libpcre config script])
 
-    for x in ${test_paths}; do
-        dnl # Determine if the script was specified and use it directly
-        if test ! -d "$x" -a -e "$x"; then
-            PCRE_CONFIG=$x
-            pcre_path="no"
-            break
-        fi
+    AC_CHECK_PROG([PCRE_CONFIG_IN_ENV], [pcre-config], [yes], [no])
 
-        dnl # Try known config script names/locations
-        for PCRE_CONFIG in pcre-config; do
-            if test -e "${x}/bin/${PCRE_CONFIG}"; then
-                pcre_path="${x}/bin"
+    if test "$PCRE_CONFIG_IN_ENV" = "yes"; then
+        AC_MSG_NOTICE([pcre-config found in envinronment])
+
+        PCRE_CONFIG=pcre-config
+        pcre_path="no"
+    else
+        AC_MSG_NOTICE([pcre-config not found in environment. checking known paths])
+
+        for x in ${test_paths}; do
+            dnl # Determine if the script was specified and use it directly
+            if test ! -d "$x" -a -e "$x"; then
+                PCRE_CONFIG=$x
+                pcre_path="no"
                 break
-            elif test -e "${x}/${PCRE_CONFIG}"; then
-                pcre_path="${x}"
+            fi
+
+            dnl # Try known config script names/locations
+            for PCRE_CONFIG in pcre-config; do
+                if test -e "${x}/bin/${PCRE_CONFIG}"; then
+                    pcre_path="${x}/bin"
+                    break
+                elif test -e "${x}/${PCRE_CONFIG}"; then
+                    pcre_path="${x}"
+                    break
+                else
+                    pcre_path=""
+                fi
+            done
+            if test -n "$pcre_path"; then
                 break
-            else
-                pcre_path=""
             fi
         done
-        if test -n "$pcre_path"; then
-            break
-        fi
-    done
+    fi
 
     if test -n "${pcre_path}"; then
         if test "${pcre_path}" != "no"; then
