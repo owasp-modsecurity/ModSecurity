@@ -1,4 +1,4 @@
-DD mmm YYYY - 2.9.8 (to be released)
+03 Sep 2024 - 2.9.8
 -------------------
 
  * Fixed ap_log_perror() usage
