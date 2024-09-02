@@ -1,4 +1,4 @@
-v3.0.13 - YYYY-MMM-DD
+v3.0.13 - 2024-Sep-03
 ---------------------
 
   - Adjust reference to modsecurity::utils::string::VALID_HEX
