@@ -37,7 +37,7 @@
    [Issue #3154 - @marcstern]
  * Missing null byte + optimization
    [Issue #3153 - @marcstern]
- * fix: remove usage of insecure tmpnam
+ * fix: remove usage of insecure tmpname
    [Issue #3149 - @fzipi]
  * docs: update copyright
    [Issue #3148 - @fzipi]
@@ -47,7 +47,7 @@
    [Issue #3120 - @marcstern]
  * Fix possible segfault in collection_unpack
    [Issue #3099 - @twouters]
- * fix: Replace obsolote macros
+ * fix: Replace obsolete macros
    [Issue #3094 - @airween]
  * chore: update bug-report-for-version-2-x.md
    [Issue #3087 - @fzipi]
