@@ -102,90 +102,23 @@ namespace modsecurity {
  * @endcode
  *
  */
-Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
-    : m_creationTimeStamp(utils::cpu_seconds()),
-    m_clientIpAddress(""),
-    m_httpVersion(""),
-    m_serverIpAddress(""),
-    m_requestHostName(""),
-    m_uri(""),
-    m_uri_no_query_string_decoded(""),
-    m_ARGScombinedSizeDouble(0),
-    m_clientPort(0),
-    m_highestSeverityAction(255),
-    m_httpCodeReturned(200),
-    m_serverPort(0),
-    m_ms(ms),
-    m_requestBodyType(UnknownFormat),
-    m_requestBodyProcessor(UnknownFormat),
-    m_rules(rules),
-    m_ruleRemoveById(),
-    m_ruleRemoveByIdRange(),
-    m_ruleRemoveByTag(),
-    m_ruleRemoveTargetByTag(),
-    m_ruleRemoveTargetById(),
-    m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
-    m_auditLogModifier(),
-    m_ctlAuditEngine(AuditLog::AuditLogStatus::NotSetLogStatus),
-    m_rulesMessages(),
-    m_requestBody(),
-    m_responseBody(),
-    /* m_id(), */
-    m_skip_next(0),
-    m_allowType(modsecurity::actions::disruptive::NoneAllowType),
-    m_uri_decoded(""),
-    m_actions(),
-    m_it(),
-    m_timeStamp(std::time(NULL)),
-    m_collections(ms->m_global_collection, ms->m_ip_collection,
-        ms->m_session_collection, ms->m_user_collection,
-        ms->m_resource_collection),
-    m_matched(),
-#ifdef WITH_LIBXML2
-    m_xml(new RequestBodyProcessor::XML(this)),
-#else
-    m_xml(NULL),
-#endif
-#ifdef WITH_YAJL
-    m_json(new RequestBodyProcessor::JSON(this)),
-#else
-    m_json(NULL),
-#endif
-    m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
-    m_variableDuration(""),
-    m_variableEnvs(),
-    m_variableHighestSeverityAction(""),
-    m_variableRemoteUser(""),
-    m_variableTime(""),
-    m_variableTimeDay(""),
-    m_variableTimeEpoch(""),
-    m_variableTimeHour(""),
-    m_variableTimeMin(""),
-    m_variableTimeSec(""),
-    m_variableTimeWDay(""),
-    m_variableTimeYear(""),
-    m_logCbData(logCbData),
-    TransactionAnchoredVariables(this) {
-    m_id = std::to_string(m_timeStamp) +
-           std::to_string(modsecurity::utils::generate_transaction_unique_id());
 
-    m_variableUrlEncodedError.set("0", 0);
-    m_variableMscPcreError.set("0", 0);
-    m_variableMscPcreLimitsExceeded.set("0", 0);
-
-    ms_dbg(4, "Initializing transaction");
-
-    intervention::clean(&m_it);
+static std::string get_id(const char *id, const time_t timestamp) {
+    return (id == nullptr) ?
+        std::to_string(timestamp) +
+            std::to_string(modsecurity::utils::generate_transaction_unique_id())
+        : id;
 }
 
-Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCbData)
+Transaction::Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData)
+    : Transaction(ms, rules, nullptr, logCbData) { }
+
+Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id, void *logCbData)
+    : Transaction(ms, rules, id, logCbData, std::time(nullptr)) { }
+
+Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
+    void *logCbData, const time_t timestamp)
     : m_creationTimeStamp(utils::cpu_seconds()),
-    m_clientIpAddress(""),
-    m_httpVersion(""),
-    m_serverIpAddress(""),
-    m_requestHostName(""),
-    m_uri(""),
-    m_uri_no_query_string_decoded(""),
     m_ARGScombinedSizeDouble(0),
     m_clientPort(0),
     m_highestSeverityAction(255),
@@ -195,54 +128,28 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, char *id, void *logCb
     m_requestBodyType(UnknownFormat),
     m_requestBodyProcessor(UnknownFormat),
     m_rules(rules),
-    m_ruleRemoveById(),
-    m_ruleRemoveByIdRange(),
-    m_ruleRemoveByTag(),
-    m_ruleRemoveTargetByTag(),
-    m_ruleRemoveTargetById(),
     m_requestBodyAccess(RulesSet::PropertyNotSetConfigBoolean),
-    m_auditLogModifier(),
     m_ctlAuditEngine(AuditLog::AuditLogStatus::NotSetLogStatus),
-    m_rulesMessages(),
-    m_requestBody(),
-    m_responseBody(),
-    m_id(id),
+    m_id(get_id(id, timestamp)),
     m_skip_next(0),
     m_allowType(modsecurity::actions::disruptive::NoneAllowType),
-    m_uri_decoded(""),
-    m_actions(),
-    m_it(),
-    m_timeStamp(std::time(NULL)),
+    m_timeStamp(timestamp),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
-    m_matched(),
 #ifdef WITH_LIBXML2
     m_xml(new RequestBodyProcessor::XML(this)),
 #else
-    m_xml(NULL),
+    m_xml(nullptr),
 #endif
 #ifdef WITH_YAJL
     m_json(new RequestBodyProcessor::JSON(this)),
 #else
-    m_json(NULL),
+    m_json(nullptr),
 #endif
     m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
-    m_variableDuration(""),
-    m_variableEnvs(),
-    m_variableHighestSeverityAction(""),
-    m_variableRemoteUser(""),
-    m_variableTime(""),
-    m_variableTimeDay(""),
-    m_variableTimeEpoch(""),
-    m_variableTimeHour(""),
-    m_variableTimeMin(""),
-    m_variableTimeSec(""),
-    m_variableTimeWDay(""),
-    m_variableTimeYear(""),
     m_logCbData(logCbData),
     TransactionAnchoredVariables(this) {
-
     m_variableUrlEncodedError.set("0", 0);
     m_variableMscPcreError.set("0", 0);
     m_variableMscPcreLimitsExceeded.set("0", 0);
@@ -1904,7 +1811,7 @@ extern "C" Transaction *msc_new_transaction(ModSecurity *ms,
     return new Transaction(ms, rules, logCbData);
 }
 extern "C" Transaction *msc_new_transaction_with_id(ModSecurity *ms,
-    RulesSet *rules, char *id, void *logCbData) {
+    RulesSet *rules, const char *id, void *logCbData) {
     return new Transaction(ms, rules, id, logCbData);
 }
 

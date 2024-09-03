@@ -49,7 +49,7 @@ Parallel::~Parallel() {
 }
 
 
-inline std::string Parallel::logFilePath(time_t *t,
+inline std::string Parallel::logFilePath(const time_t *t,
     int part) {
     std::string name;
 

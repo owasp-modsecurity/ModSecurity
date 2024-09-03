@@ -13,6 +13,9 @@
  *
  */
 
+#ifndef HEADERS_MODSECURITY_TRANSACTION_H_
+#define HEADERS_MODSECURITY_TRANSACTION_H_
+
 #ifdef __cplusplus
 #include <cassert>
 #include <ctime>
@@ -32,9 +35,6 @@
 
 #include <stdlib.h>
 #include <stddef.h>
-
-#ifndef HEADERS_MODSECURITY_TRANSACTION_H_
-#define HEADERS_MODSECURITY_TRANSACTION_H_
 
 #ifndef __cplusplus
 typedef struct ModSecurity_t ModSecurity;
@@ -327,8 +327,8 @@ class TransactionSecMarkerManagement {
 /** @ingroup ModSecurity_CPP_API */
 class Transaction : public TransactionAnchoredVariables, public TransactionSecMarkerManagement {
  public:
-    Transaction(ModSecurity *transaction, RulesSet *rules, void *logCbData);
-    Transaction(ModSecurity *transaction, RulesSet *rules, char *id,
+    Transaction(ModSecurity *ms, RulesSet *rules, void *logCbData);
+    Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
         void *logCbData);
     ~Transaction();
 
@@ -426,7 +426,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 	 *       need to be filled if there is no rule using the variable
 	 *       `duration'.
      */
-    clock_t m_creationTimeStamp;
+    const clock_t m_creationTimeStamp;
 
     /**
      * Holds the client IP address.
@@ -505,7 +505,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     /**
      * Rules object utilized during this specific transaction.
      */
-    RulesSet *m_rules;
+    RulesSet * const m_rules;
 
     /**
      *
@@ -568,7 +568,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      * Contains the unique ID of the transaction. Use by the variable
 	 * `UNIQUE_ID'. This unique id is also saved as part of the AuditLog.
      */
-    std::string m_id;
+    const std::string m_id;
 
     /**
      * Holds the amount of rules that should be skipped. If bigger than 0 the
@@ -600,7 +600,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      * TODO: m_timeStamp and m_creationTimeStamp may be merged into a single
      *       variable.
      */
-    time_t m_timeStamp;
+    const time_t m_timeStamp;
 
 
     /**
@@ -636,6 +636,10 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     std::vector<std::shared_ptr<RequestBodyProcessor::MultipartPartTmpFile>> m_multipartPartTmpFiles;
 
  private:
+
+    Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
+        void *logCbData, const time_t timestamp);
+
     /**
      * Pointer to the callback function that will be called to fill
      * the web server (connector) log.
@@ -656,7 +660,7 @@ Transaction *msc_new_transaction(ModSecurity *ms,
 
 /** @ingroup ModSecurity_C_API */
 Transaction *msc_new_transaction_with_id(ModSecurity *ms,
-    RulesSet *rules, char *id, void *logCbData);
+    RulesSet *rules, const char *id, void *logCbData);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_connection(Transaction *transaction,
