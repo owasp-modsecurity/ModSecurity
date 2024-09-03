@@ -23,7 +23,7 @@ v3.0.13 - 2024-Sep-03
     [PR #3216 - @eduar-hte]
   - Remove several string copies and unnecessary heap allocations
     [PR #3222 - @eduar-hte]
-  - Creating a std::string with a null pointer\
+  - Creating a std::string with a null pointer
     is undefined behaviour
     [PR #3220 - @eduar-hte]
   - Simplifiy configuration to build using std C++17
