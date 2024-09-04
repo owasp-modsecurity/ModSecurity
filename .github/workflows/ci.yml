@@ -32,7 +32,7 @@ jobs:
       - name: autogen.sh
         run: ./autogen.sh
       - name: configure ${{ matrix.configure.label }}
-        run: ./configure --enable-assertions ${{ matrix.configure.opt }}
+        run: ./configure --enable-assertions ${{ matrix.configure.opt }} 'CFLAGS=-Werror=format-security'
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
         run: make -j `nproc`
