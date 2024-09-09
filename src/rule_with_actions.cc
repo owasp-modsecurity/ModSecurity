@@ -59,9 +59,9 @@ using actions::transformations::Transformation;
 RuleWithActions::RuleWithActions(
     Actions *actions,
     Transformations *transformations,
-    std::unique_ptr<std::string> fileName,
+    const std::string &fileName,
     int lineNumber)
-    : Rule(std::move(fileName), lineNumber),
+    : Rule(fileName, lineNumber),
     m_rev(""),
     m_ver(""),
     m_accuracy(0),
@@ -179,7 +179,7 @@ RuleWithActions::~RuleWithActions() {
 
 
 bool RuleWithActions::evaluate(Transaction *transaction) {
-    return evaluate(transaction, std::make_shared<RuleMessage>(this, transaction));
+    return evaluate(transaction, std::make_shared<RuleMessage>(*this, *transaction));
 }
 
 
@@ -494,7 +494,7 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
 void RuleWithActions::performLogging(Transaction *trans,
     std::shared_ptr<RuleMessage> ruleMessage,
     bool lastLog,
-    bool chainedParentNull) {
+    bool chainedParentNull) const {
 
     /* last rule in the chain. */
     bool isItToBeLogged = ruleMessage->m_saveMessage;
@@ -551,7 +551,7 @@ void RuleWithActions::performLogging(Transaction *trans,
                 trans->serverLog(ruleMessage);
             }
 
-            RuleMessage *rm = new RuleMessage(this, trans);
+            RuleMessage *rm = new RuleMessage(*this, *trans);
             rm->m_saveMessage = ruleMessage->m_saveMessage;
             ruleMessage.reset(rm);
         }

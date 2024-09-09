@@ -43,11 +43,10 @@ Driver::~Driver() {
 }
 
 
-int Driver::addSecMarker(const std::string& marker, std::unique_ptr<std::string> fileName, int lineNumber) {
+int Driver::addSecMarker(const std::string& marker, const std::string &fileName, int lineNumber) {
     // FIXME: we might move this to the parser.
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        RuleMarker *r = new RuleMarker(marker, std::unique_ptr<std::string>(new std::string(*fileName)), lineNumber);
-        std::unique_ptr<RuleMarker> rule(r);
+        auto rule = std::make_unique<RuleMarker>(marker, fileName, lineNumber);
         rule->setPhase(i);
         m_rulesSetPhases.insert(std::move(rule));
     }

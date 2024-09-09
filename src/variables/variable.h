@@ -379,7 +379,7 @@ class VariableMonkeyResolution {
 
     static std::string stringMatchResolve(Transaction *t,
         const std::string &variable) {
-        std::unique_ptr<std::string> vv = nullptr;
+        std::unique_ptr<std::string> vv;
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
             collection = variable.find(":");
