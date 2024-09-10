@@ -31,8 +31,8 @@ namespace modsecurity_test {
 
     private:
         static void logCb(void *data, const void *msgv) {
-            const char *msg = reinterpret_cast<const char *>(msgv);
-            std::stringstream *ss = (std::stringstream *)data;
+            auto msg = reinterpret_cast<const char *>(msgv);
+            auto ss = reinterpret_cast<std::stringstream *>(data);
             *ss << msg << std::endl;
         }
     };

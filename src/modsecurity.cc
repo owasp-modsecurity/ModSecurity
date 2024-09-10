@@ -199,13 +199,13 @@ void ModSecurity::serverLog(void *data, const RuleMessage &rm) {
 
     if (m_logProperties & TextLogProperty) {
         auto d = rm.log();
-        const void *a = static_cast<const void *>(d.c_str());
+        auto a = static_cast<const void *>(d.c_str());
         m_logCb(data, a);
         return;
     }
 
     if (m_logProperties & RuleMessageLogProperty) {
-        const void *a = static_cast<const void *>(&rm);
+        auto a = static_cast<const void *>(&rm);
         m_logCb(data, a);
         return;
     }

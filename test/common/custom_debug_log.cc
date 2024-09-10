@@ -23,8 +23,6 @@
 
 namespace modsecurity_test {
 
-    CustomDebugLog::~CustomDebugLog() {}
-
     void CustomDebugLog::write(int level, const std::string &message) {
         m_log << "[" << level << "] " << message << std::endl;
     }
@@ -36,13 +34,13 @@ namespace modsecurity_test {
         m_log << msgf << std::endl;
     }
 
-    bool const CustomDebugLog::contains(const std::string &pattern) const {
+    bool CustomDebugLog::contains(const std::string &pattern) const {
         modsecurity::Utils::Regex re(pattern);
         std::string s = m_log.str();
         return modsecurity::Utils::regex_search(s, re);
     }
 
-    std::string const CustomDebugLog::log_messages() const {
+    std::string CustomDebugLog::log_messages() const {
         return m_log.str();
     }
 

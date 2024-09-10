@@ -97,15 +97,15 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
         if (it.status != 0) {
             r->status = it.status;
         }
-        if (it.url != NULL) {
+        if (it.url != nullptr) {
             r->location.append(it.url);
 	    free(it.url);
-	    it.url = NULL;
+	    it.url = nullptr;
         }
-        if (it.log != NULL) {
+        if (it.log != nullptr) {
             *serverLog << it.log;
             free(it.log);
-            it.log = NULL;
+            it.log = nullptr;
         }
     }
 }
@@ -283,9 +283,9 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
 
         actions(&r, &modsec_transaction, &context.m_server_log);
 
-        for (const auto &headers : t->request_headers) {
-            modsec_transaction.addRequestHeader(headers.first.c_str(),
-                headers.second.c_str());
+        for (const auto &[name, value] : t->request_headers) {
+            modsec_transaction.addRequestHeader(name.c_str(),
+                value.c_str());
         }
 
         modsec_transaction.processRequestHeaders();
@@ -297,9 +297,9 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         modsec_transaction.processRequestBody();
         actions(&r, &modsec_transaction, &context.m_server_log);
 
-        for (const auto &headers : t->response_headers) {
-            modsec_transaction.addResponseHeader(headers.first.c_str(),
-                headers.second.c_str());
+        for (const auto &[name, value] : t->response_headers) {
+            modsec_transaction.addResponseHeader(name.c_str(),
+                value.c_str());
         }
 
         modsec_transaction.processResponseHeaders(r.status,
@@ -314,7 +314,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
 
         modsec_transaction.processLogging();
 
-        const auto *d = reinterpret_cast<CustomDebugLog *>(context.m_modsec_rules.m_debugLog);
+        const auto *d = static_cast<CustomDebugLog *>(context.m_modsec_rules.m_debugLog);
 
         if (!d->contains(t->debug_log)) {
             if (test->m_automake_output) {
@@ -455,8 +455,8 @@ int main(int argc, char **argv)
     int counter = 0;
 
     std::list<std::string> keyList;
-    for (const auto &a : test) {
-        keyList.push_back(a.first);
+    for (const auto &[name, tests] : test) {
+        keyList.push_back(name);
     }
     keyList.sort();
 
