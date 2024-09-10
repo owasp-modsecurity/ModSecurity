@@ -111,13 +111,14 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
 }
 
 void perform_unit_test(ModSecurityTest<RegressionTest> *test,
-    std::vector<RegressionTest *> *tests,
-    ModSecurityTestResults<RegressionTestResult> *res, int *count) {
-    for (RegressionTest *t : *tests) {
+    std::vector<std::unique_ptr<RegressionTest>> &tests,
+    ModSecurityTestResults<RegressionTestResult> *res, int *count)
+{
+    for (auto &t : tests) {
         ModSecurityTestResults<RegressionTest> r;
         RegressionTestResult *testRes = new RegressionTestResult();
 
-        testRes->test = t;
+        testRes->test = t.get();
         r.status = 200;
         (*count)++;
 
@@ -468,9 +469,9 @@ int main(int argc, char **argv)
     ModSecurityTestResults<RegressionTestResult> res;
     for (const std::string &a : keyList) {
         test_number++;
-        if ((test.m_test_number == 0) 
+        if ((test.m_test_number == 0)
             || (test_number == test.m_test_number)) {
-            std::vector<RegressionTest *> *tests = test[a];
+            auto &tests = test[a];
             perform_unit_test(&test, tests, &res, &counter);
         }
     }
@@ -521,14 +522,6 @@ int main(int argc, char **argv)
         std::cout << KCYN << std::to_string(skipped) << " ";
         std::cout << "skipped test(s). " << std::to_string(disabled) << " ";
         std::cout << "disabled test(s)." << RESET << std::endl;
-    }
-
-    for (auto a : test) {
-        std::vector<RegressionTest *> *vec = a.second;
-        for (int i = 0; i < vec->size(); i++) {
-            delete vec->at(i);
-        }
-        delete vec;
     }
 
     return failed;

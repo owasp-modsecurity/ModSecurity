@@ -250,8 +250,8 @@ int main(int argc, char **argv) {
     }
 
     for (auto& [filename, tests] : test) {
-        total += tests->size();
-        for (auto t : *tests) {
+        total += tests.size();
+        for (auto &t : tests) {
             ModSecurityTestResults<UnitTest> r;
 
             if (!test.m_automake_output) {
@@ -309,13 +309,6 @@ int main(int argc, char **argv) {
                 std::cout << "skipped.";
             }
         }
-    }
-
-    for (auto a : test) {
-        auto vec = a.second;
-        for(auto t : *vec)
-            delete t;
-        delete vec;
     }
 
     return failed;
