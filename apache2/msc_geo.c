@@ -357,13 +357,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     if (rec_val == geo->ctry_offset) {
         *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\").", log_escape(msr->mp, target));
         msr_log(msr, 4, "%s", *error_msg);
-
-        ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
-        if (ret != APR_SUCCESS) {
-            msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
-                    get_apr_error(msr->mp, ret));
-        }
-
+        msr_global_mutex_unlock(msr, msr->modsecurity->geo_lock, "Geo Lookup");
         return 0;
     }
 
@@ -373,13 +367,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         if ((country <= 0) || (country > GEO_COUNTRY_LAST)) {
             *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\" (country %d).", log_escape(msr->mp, target), country);
             msr_log(msr, 4, "%s", *error_msg);
-
-            ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
-            if (ret != APR_SUCCESS) {
-                msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
-                        get_apr_error(msr->mp, ret));
-            }
-
+            msr_global_mutex_unlock(msr, msr->modsecurity->geo_lock, "Geo Lookup");
             return 0;
         }
 
@@ -404,13 +392,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         if ((country <= 0) || (country > GEO_COUNTRY_LAST)) {
             *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\" (country %d).", log_escape(msr->mp, target), country);
             msr_log(msr, 4, "%s", *error_msg);
-
-            ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
-            if (ret != APR_SUCCESS) {
-                msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
-                        get_apr_error(msr->mp, ret));
-            }
-
+            msr_global_mutex_unlock(msr, msr->modsecurity->geo_lock, "Geo Lookup");
             return 0;
         }
         if (msr->txcfg->debuglog_level >= 9) {
@@ -499,13 +481,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     }
 
     *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded.", log_escape(msr->mp, target));
-
-    ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
-    if (ret != APR_SUCCESS) {
-        msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
-                get_apr_error(msr->mp, ret));
-    }
-
+    msr_global_mutex_unlock(msr, msr->modsecurity->geo_lock, "Geo Lookup");
     return 1;
 }
 

@@ -708,6 +708,7 @@ struct msc_parm {
 /* Reusable functions */
 int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp);
 int msr_global_mutex_lock(modsec_rec* msr, apr_global_mutex_t* lock, const char* fct);
+int msr_global_mutex_unlock(modsec_rec* msr, apr_global_mutex_t* lock, const char* fct);
 
 /* Engine functions */
 
