@@ -325,11 +325,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08lx). %lu", targetip, ipnum, ipnum);
     }
 
-    ret = apr_global_mutex_lock(msr->modsecurity->geo_lock);
-    if (ret != APR_SUCCESS) {
-        msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
-                get_apr_error(msr->mp, ret));
-    }
+    msr_global_mutex_lock(msr, msr->modsecurity->geo_lock, "Geo lookup");
 
     for (level = 31; level >= 0; level--) {
         /* Read the record */
