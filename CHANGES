@@ -1,3 +1,9 @@
+(to be released) - 2.9.x 
+------------------------
+
+ * handle errors from apr_global_mutex_lock
+   [PR #3257 - @marcstern]
+
 03 Sep 2024 - 2.9.8
 -------------------
 
