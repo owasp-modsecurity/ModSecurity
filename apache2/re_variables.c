@@ -12,6 +12,7 @@
 * directly using the email address security@modsecurity.org.
 */
 
+#include <time.h>
 #include "http_core.h"
 
 #include "modsecurity.h"
