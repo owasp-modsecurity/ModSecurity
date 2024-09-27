@@ -175,7 +175,7 @@ int msr_global_mutex_lock(modsec_rec* msr, apr_global_mutex_t* lock, const char*
     assert(msr->modsecurity); // lock is msr->modsecurity->..._lock
     assert(msr->mp);
     if (!lock) {
-        msr_log(msr, 1, "%s: Global mutex was not created", fct);
+        msr_log(msr, 1, "%s: Global mutex not initialised", fct);
         return -1;
     }
 
