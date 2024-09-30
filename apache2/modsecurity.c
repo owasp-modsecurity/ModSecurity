@@ -179,7 +179,7 @@ int msr_global_mutex_lock(modsec_rec* msr, apr_global_mutex_t* lock, const char*
         return -1;
     }
 
-    int rc = apr_global_mutex_lock(msr->modsecurity->auditlog_lock);
+    int rc = apr_global_mutex_lock(lock);
     if (rc != APR_SUCCESS) msr_log(msr, 1, "Audit log: Failed to lock global mutex: %s", get_apr_error(msr->mp, rc));
     return rc;
 }
@@ -195,7 +195,7 @@ int msr_global_mutex_unlock(modsec_rec* msr, apr_global_mutex_t* lock, const cha
         return -1;
     }
 
-    int rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
+    int rc = apr_global_mutex_unlock(lock);
     // We should have get the warning at lock time, so ignore it here
     // if (rc != APR_SUCCESS) msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s", get_apr_error(msr->mp, rc));
     return rc;

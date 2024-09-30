@@ -1465,7 +1465,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
      */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
         /* Unlock the mutex we used to serialise access to the audit log file. */
-        msr_global_mutex_lock(msr, msr->modsecurity->auditlog_lock, "Audit log");
+        msr_global_mutex_unlock(msr, msr->modsecurity->auditlog_lock, "Audit log");
         return;
     }
 
@@ -2236,7 +2236,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
         sec_auditlog_write(msr, "\n", 1);
         /* Unlock the mutex we used to serialise access to the audit log file. */
-        msr_global_mutex_lock(msr, msr->modsecurity->auditlog_lock, "Audit log");
+        msr_global_mutex_unlock(msr, msr->modsecurity->auditlog_lock, "Audit log");
         return;
     }
 
