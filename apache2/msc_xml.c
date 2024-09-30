@@ -14,6 +14,108 @@
 
 #include "msc_xml.h"
 
+static void msc_xml_on_start_elementns(
+    void *ctx,
+    const xmlChar *localname,
+    const xmlChar *prefix,
+    const xmlChar *URI,
+    int nb_namespaces,
+    const xmlChar **namespaces,
+    int nb_attributes,
+    int nb_defaulted,
+    const xmlChar **attributes
+) {
+
+    // get the length of XML tag (localname)
+    size_t taglen = strlen((const char *)localname);
+    modsec_rec * msr = (modsec_rec *)ctx;
+    msc_xml_parser_state * xml_parser_state = msr->xml->xml_parser_state;
+
+    // pathlen contains the concatenated strings of tags with '.'
+    // eg xml.root.level1.leaf
+    xml_parser_state->pathlen += (taglen + 1);
+    char *newpath = apr_pstrcat(msr->mp, xml_parser_state->currpath, ".", (char *)localname, NULL);
+    xml_parser_state->currpath = newpath;
+
+    int *new_stack_item = (int *)apr_array_push(xml_parser_state->has_child_stack);
+    *new_stack_item = 0;
+    xml_parser_state->depth++;
+
+    // if there is an item before the current one we set that has a child
+    if (xml_parser_state->depth > 1) {
+        int *parent_stack_item = &((int *)xml_parser_state->has_child_stack->elts)[xml_parser_state->has_child_stack->nelts - 2];
+        *parent_stack_item = 1;
+    }
+
+}
+
+static void msc_xml_on_end_elementns(
+    void* ctx,
+    const xmlChar* localname,
+    const xmlChar* prefix,
+    const xmlChar* URI
+) {
+
+    size_t taglen = strlen((const char *)localname);
+    modsec_rec * msr = (modsec_rec *)ctx;
+    msc_xml_parser_state * xml_parser_state = msr->xml->xml_parser_state;
+
+    // if the node is a leaf we add it as argument
+    // get the top item from the stack which tells this info
+    int * top_stack_item = apr_array_pop(xml_parser_state->has_child_stack);
+    if (*top_stack_item == 0) {
+
+        if (apr_table_elts(msr->arguments)->nelts >= msr->txcfg->arguments_limit) {
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Skipping request argument, over limit (XML): name \"%s\", value \"%s\"",
+                        log_escape_ex(msr->mp, xml_parser_state->currpath, strlen(xml_parser_state->currpath)),
+                        log_escape_ex(msr->mp, xml_parser_state->currval, strlen(xml_parser_state->currval)));
+            }
+            msr->msc_reqbody_error = 1;
+            msr->xml->xml_error = apr_psprintf(msr->mp, "More than %ld XML keys", msr->txcfg->arguments_limit);
+            xmlStopParser((xmlParserCtxtPtr)msr->xml->parsing_ctx_arg);
+        }
+        else {
+
+            msc_arg * arg = (msc_arg *) apr_pcalloc(msr->mp, sizeof(msc_arg));
+
+            arg->name = xml_parser_state->currpath;
+            arg->name_len = strlen(arg->name);
+            arg->value = xml_parser_state->currval;
+            arg->value_len = strlen(xml_parser_state->currval);
+            arg->value_origin_len = arg->value_len;
+            //arg->value_origin_offset = value-base_offset;
+            arg->origin = "XML";
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Adding XML argument '%s' with value '%s'",
+                    xml_parser_state->currpath, xml_parser_state->currval);
+            }
+
+            apr_table_addn(msr->arguments,
+                log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *) arg);
+        } // end else
+    } // end top_stack_item == 0
+
+    // decrease the length of current path length - +1 because of the '\0'
+    xml_parser_state->pathlen -= (taglen + 1);
+
+    // -1 need because we don't need the '.'
+    char * newpath = apr_pstrndup(msr->mp, xml_parser_state->currpath, xml_parser_state->pathlen - 1);
+    xml_parser_state->currpath = newpath;
+
+    xml_parser_state->depth--;
+}
+
+static void msc_xml_on_characters(void *ctx, const xmlChar *ch, int len) {
+
+    modsec_rec * msr = (modsec_rec *)ctx;
+    msc_xml_parser_state * xml_parser_state = msr->xml->xml_parser_state;
+
+    xml_parser_state->currval = apr_pstrndup(msr->mp, (const char *)ch, len);
+}
+
+
 static xmlParserInputBufferPtr
 xml_unload_external_entity(const char *URI, xmlCharEncoding enc)    {
     return NULL;
@@ -35,6 +137,33 @@ int xml_init(modsec_rec *msr, char **error_msg) {
 
     if(msr->txcfg->xml_external_entity == 0)    {
         entity = xmlParserInputBufferCreateFilenameDefault(xml_unload_external_entity);
+    }
+
+    if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_OFF) {
+
+        msr->xml->sax_handler = (xmlSAXHandler *)apr_pcalloc(msr->mp, sizeof(xmlSAXHandler));
+        memset(msr->xml->sax_handler, 0, sizeof(xmlSAXHandler));
+        if (msr->xml->sax_handler == NULL) {
+            *error_msg = apr_psprintf(msr->mp, "XML: Failed to create SAX handler.");
+            return -1;
+        }
+
+        msr->xml->sax_handler->initialized = XML_SAX2_MAGIC;
+        msr->xml->sax_handler->startElementNs = msc_xml_on_start_elementns;
+        msr->xml->sax_handler->endElementNs = msc_xml_on_end_elementns;
+        msr->xml->sax_handler->characters = msc_xml_on_characters;
+
+        // set the parser state struct
+        msr->xml->xml_parser_state                  = apr_pcalloc(msr->mp, sizeof(msc_xml_parser_state));
+        msr->xml->xml_parser_state->depth           = 0;
+        msr->xml->xml_parser_state->pathlen         = 4; // "xml\0"
+        msr->xml->xml_parser_state->currpath        = apr_pstrdup(msr->mp, "xml");
+        msr->xml->xml_parser_state->currval         = NULL;
+        msr->xml->xml_parser_state->currpathbufflen = 4;
+        // initialize the stack with item of 10
+        // this will store the information about nodes
+        // 10 is just an initial value, it can be automatically incremented
+        msr->xml->xml_parser_state->has_child_stack = apr_array_make(msr->mp, 10, sizeof(int));
     }
 
     return 1;
@@ -68,7 +197,7 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
      * enable us to pass it the first chunk of data so that
      * it can attempt to auto-detect the encoding.
      */
-    if (msr->xml->parsing_ctx == NULL) {
+    if (msr->xml->parsing_ctx == NULL && msr->xml->parsing_ctx_arg == NULL) {
 
         /* First invocation. */
 
@@ -86,18 +215,50 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
 
         */
 
-        msr->xml->parsing_ctx = xmlCreatePushParserCtxt(NULL, NULL, buf, size, "body.xml");
-        if (msr->xml->parsing_ctx == NULL) {
-            *error_msg = apr_psprintf(msr->mp, "XML: Failed to create parsing context.");
-            return -1;
+        if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
+            msr->xml->parsing_ctx = xmlCreatePushParserCtxt(NULL, NULL, buf, size, "body.xml");
+            if (msr->xml->parsing_ctx == NULL) {
+                *error_msg = apr_psprintf(msr->mp, "XML: Failed to create parsing context.");
+                return -1;
+            }
+        }
+        if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_OFF) {
+            msr->xml->parsing_ctx_arg = xmlCreatePushParserCtxt(
+                msr->xml->sax_handler,
+                msr,
+                buf,
+                size,
+                NULL);
+            if (msr->xml->parsing_ctx_arg == NULL) {
+                *error_msg = apr_psprintf(msr->mp, "XML: Failed to create parsing context for ARGS.");
+                return -1;
+            }
         }
     } else {
 
         /* Not a first invocation. */
+        msr_log(msr, 4, "XML: Continue parsing.");
+        if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
+            xmlParseChunk(msr->xml->parsing_ctx, buf, size, 0);
+            if (msr->xml->parsing_ctx->wellFormed != 1) {
+                *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document.");
+                return -1;
+            }
+        }
 
-        xmlParseChunk(msr->xml->parsing_ctx, buf, size, 0);
-        if (msr->xml->parsing_ctx->wellFormed != 1) {
-            *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document.");
+        if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_OFF) {
+            if (xmlParseChunk(msr->xml->parsing_ctx_arg, buf, size, 0) != 0) {
+                if (msr->xml->xml_error) {
+                    *error_msg = msr->xml->xml_error;
+                }
+                else {
+                    *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document for ARGS.");
+                }
+                return -1;
+            }
+        }
+        if (msr->xml->xml_error) {
+            *error_msg = msr->xml->xml_error;
             return -1;
         }
     }
@@ -114,23 +275,42 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
     *error_msg = NULL;
 
     /* Only if we have a context, meaning we've done some work. */
-    if (msr->xml->parsing_ctx != NULL) {
-        /* This is how we signalise the end of parsing to libxml. */
-        xmlParseChunk(msr->xml->parsing_ctx, NULL, 0, 1);
+    if (msr->xml->parsing_ctx != NULL || msr->xml->parsing_ctx_arg != NULL) {
+        if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
+            /* This is how we signalise the end of parsing to libxml. */
+            xmlParseChunk(msr->xml->parsing_ctx, NULL, 0, 1);
 
-        /* Preserve the results for our reference. */
-        msr->xml->well_formed = msr->xml->parsing_ctx->wellFormed;
-        msr->xml->doc = msr->xml->parsing_ctx->myDoc;
+            /* Preserve the results for our reference. */
+            msr->xml->well_formed = msr->xml->parsing_ctx->wellFormed;
+            msr->xml->doc = msr->xml->parsing_ctx->myDoc;
 
-        /* Clean up everything else. */
-        xmlFreeParserCtxt(msr->xml->parsing_ctx);
-        msr->xml->parsing_ctx = NULL;
-        msr_log(msr, 4, "XML: Parsing complete (well_formed %u).", msr->xml->well_formed);
+            /* Clean up everything else. */
+            xmlFreeParserCtxt(msr->xml->parsing_ctx);
+            msr->xml->parsing_ctx = NULL;
+            msr_log(msr, 4, "XML: Parsing complete (well_formed %u).", msr->xml->well_formed);
 
-        if (msr->xml->well_formed != 1) {
-            *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document.");
-            return -1;
+            if (msr->xml->well_formed != 1) {
+                *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document.");
+                return -1;
+            }
         }
+
+        if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_OFF) {
+            if (xmlParseChunk(msr->xml->parsing_ctx_arg, NULL, 0, 1) != 0) {
+                if (msr->xml->xml_error) {
+                    *error_msg = msr->xml->xml_error;
+                }
+                else {
+                    *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document for ARGS.");
+                }
+                xmlFreeParserCtxt(msr->xml->parsing_ctx_arg);
+                msr->xml->parsing_ctx_arg = NULL;
+                return -1;
+            }
+            xmlFreeParserCtxt(msr->xml->parsing_ctx_arg);
+            msr->xml->parsing_ctx_arg = NULL;
+        }
+
     }
 
     return 1;
@@ -151,6 +331,15 @@ apr_status_t xml_cleanup(modsec_rec *msr) {
         }
         xmlFreeParserCtxt(msr->xml->parsing_ctx);
         msr->xml->parsing_ctx = NULL;
+    }
+    if (msr->xml->parsing_ctx_arg != NULL) {
+
+        if (msr->xml->parsing_ctx_arg->myDoc) {
+            xmlFreeDoc(msr->xml->parsing_ctx_arg->myDoc);
+        }
+
+        xmlFreeParserCtxt(msr->xml->parsing_ctx_arg);
+        msr->xml->parsing_ctx_arg = NULL;
     }
     if (msr->xml->doc != NULL) {
         xmlFreeDoc(msr->xml->doc);
