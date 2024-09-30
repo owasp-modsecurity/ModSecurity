@@ -126,7 +126,7 @@ int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
     apr_status_t rc;
     apr_file_t *lock_name;
     const char *temp_dir;
-    const char *filename;
+    const char *filename = NULL;
 
     // get platform temp dir
     rc = apr_temp_dir_get(&temp_dir, mp);
