@@ -140,7 +140,7 @@ bool Operator::evaluate(Transaction *transaction, const std::string& a) {
 
 Operator *Operator::instantiate(const std::string& op, const std::string& param_str) {
     std::string op_ = utils::string::tolower(op);
-    std::unique_ptr<RunTimeString> param(new RunTimeString());
+    auto param = std::make_unique<RunTimeString>();
     param->appendText(param_str);
 
     IF_MATCH(beginswith) { return new BeginsWith(std::move(param)); }

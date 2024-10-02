@@ -178,7 +178,7 @@ std::unique_ptr<std::string> LMDB::resolveFirst(const std::string& var) {
 
     collectionData.setFromSerialized(reinterpret_cast<char *>(mdb_value_ret.mv_data), mdb_value_ret.mv_size);
     if ((!collectionData.isExpired()) && (collectionData.hasValue())) {
-        ret = std::unique_ptr<std::string>(new std::string(collectionData.getValue()));
+        ret = std::make_unique<std::string>(collectionData.getValue());
     }
 
 end_get:
