@@ -125,19 +125,15 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
 
     if (existing_dbm == NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
-        rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "collection_retrieve_ex: Failed to lock proc mutex: %s",
-                    get_apr_error(msr->mp, rc));
-            goto cleanup;
-        }
+        rc = msr_global_mutex_lock(msr, msr->modsecurity->dbm_lock, "collection_retrieve_ex");
+        if (rc != APR_SUCCESS) goto cleanup;
 #endif
         rc = apr_sdbm_open(&dbm, dbm_filename, APR_READ | APR_SHARELOCK,
             CREATEMODE, msr->mp);
         if (rc != APR_SUCCESS) {
             dbm = NULL;
 #ifdef GLOBAL_COLLECTION_LOCK
-            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+            msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_retrieve_ex");
 #endif
             goto cleanup;
         }
@@ -173,7 +169,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     if (existing_dbm == NULL) {
         apr_sdbm_close(dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+        msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_retrieve_ex");
 #endif
         dbm = NULL;
     }
@@ -222,12 +218,8 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     if (apr_table_get(col, "KEY") == NULL) {
         if (existing_dbm == NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
-            rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
-            if (rc != APR_SUCCESS) {
-                msr_log(msr, 1, "collection_retrieve_ex: Failed to lock proc mutex: %s",
-                        get_apr_error(msr->mp, rc));
-                goto cleanup;
-            }
+            rc = msr_global_mutex_lock(msr, msr->modsecurity->dbm_lock, "collection_retrieve_ex");
+            if (rc != APR_SUCCESS) goto cleanup;
 #endif
             rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
                 CREATEMODE, msr->mp);
@@ -236,7 +228,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
                     log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
                 dbm = NULL;
 #ifdef GLOBAL_COLLECTION_LOCK
-                apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+                msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_retrieve_ex");
 #endif
                 goto cleanup;
             }
@@ -261,7 +253,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         if (existing_dbm == NULL) {
             apr_sdbm_close(dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
-            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+            msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_retrieve_ex");
 #endif
             dbm = NULL;
         }
@@ -326,7 +318,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
 
         apr_sdbm_close(dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+        msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_retrieve_ex");
 #endif
     }
 
@@ -337,7 +329,7 @@ cleanup:
     if ((existing_dbm == NULL) && dbm) {
         apr_sdbm_close(dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+        msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_retrieve_ex");
 #endif
     }
 
@@ -408,12 +400,8 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
 #ifdef GLOBAL_COLLECTION_LOCK
     /* Need to lock to pull in the stored data again and apply deltas. */
-    rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_store: Failed to lock proc mutex: %s",
-                get_apr_error(msr->mp, rc));
-        goto error;
-    }
+    int ret = msr_global_mutex_lock(msr, msr->modsecurity->dbm_lock, "collection_store");
+    if (ret != APR_SUCCESS) goto error;
 #endif
 
     /* Delete IS_NEW on store. */
@@ -473,7 +461,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         CREATEMODE, msr->mp);
     if (rc != APR_SUCCESS) {
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+        msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_store");
 #endif
         msr_log(msr, 1, "collection_store: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
             get_apr_error(msr->mp, rc));
@@ -556,7 +544,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         if (dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
             apr_sdbm_close(dbm);
-            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+            msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_store");
 #else
             apr_sdbm_unlock(dbm);
             apr_sdbm_close(dbm);
@@ -619,7 +607,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         if (dbm != NULL) {
 #ifdef GLOBAL_COLLECTION_LOCK
             apr_sdbm_close(dbm);
-            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+            msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_store");
 #else
             apr_sdbm_unlock(dbm);
             apr_sdbm_close(dbm);
@@ -631,7 +619,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
 #ifdef GLOBAL_COLLECTION_LOCK
     apr_sdbm_close(dbm);
-    apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+    msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collection_store");
 #else
     apr_sdbm_unlock(dbm);
     apr_sdbm_close(dbm);
@@ -684,19 +672,15 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     }
 
 #ifdef GLOBAL_COLLECTION_LOCK
-    rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collections_remove_stale: Failed to lock proc mutex: %s",
-                get_apr_error(msr->mp, rc));
-        goto error;
-    }
+    rc = msr_global_mutex_lock(msr, msr->modsecurity->dbm_lock, "collections_remove_stale");
+    if (rc != APR_SUCCESS) goto error;
 #endif
 
     rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
             CREATEMODE, msr->mp);
     if (rc != APR_SUCCESS) {
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+        msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collections_remove_stale");
 #endif
         msr_log(msr, 1, "collections_remove_stale: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
                 get_apr_error(msr->mp, rc));
@@ -799,7 +783,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
 
     apr_sdbm_close(dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
-    apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+    msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collections_remove_stale");
 #endif
     return 1;
 
@@ -808,7 +792,7 @@ error:
     if (dbm) {
         apr_sdbm_close(dbm);
 #ifdef GLOBAL_COLLECTION_LOCK
-        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+        msr_global_mutex_unlock(msr, msr->modsecurity->dbm_lock, "collections_remove_stale");
 #endif
     }
 

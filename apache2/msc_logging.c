@@ -757,14 +757,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
 
     /* Lock the mutex, but only if we are using serial format. */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-        if (!msr->modsecurity->auditlog_lock) msr_log(msr, 1, "Audit log: Global mutex was not created");
-        else {
-            rc = apr_global_mutex_lock(msr->modsecurity->auditlog_lock);
-            if (rc != APR_SUCCESS) {
-                msr_log(msr, 1, "Audit log: Failed to lock global mutex: %s",
-                    get_apr_error(msr->mp, rc));
-            }
-        }
+        msr_global_mutex_lock(msr, msr->modsecurity->auditlog_lock, "Audit log");
     }
 
     /**
@@ -1471,15 +1464,8 @@ void sec_audit_logger_json(modsec_rec *msr) {
      * as it does not need an index file.
      */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-
         /* Unlock the mutex we used to serialise access to the audit log file. */
-        rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Audit log: Failed to unlock global mutex '%s': %s",
-                    apr_global_mutex_lockfile(msr->modsecurity->auditlog_lock),
-                    get_apr_error(msr->mp, rc));
-        }
-
+        msr_global_mutex_unlock(msr, msr->modsecurity->auditlog_lock, "Audit log");
         return;
     }
 
@@ -1650,11 +1636,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
 
     /* Lock the mutex, but only if we are using serial format. */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-        rc = apr_global_mutex_lock(msr->modsecurity->auditlog_lock);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Audit log: Failed to lock global mutex: %s",
-                get_apr_error(msr->mp, rc));
-        }
+        msr_global_mutex_lock(msr, msr->modsecurity->auditlog_lock, "Audit log");
     }
 
 
@@ -2253,15 +2235,8 @@ void sec_audit_logger_native(modsec_rec *msr) {
      */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
         sec_auditlog_write(msr, "\n", 1);
-
         /* Unlock the mutex we used to serialise access to the audit log file. */
-        rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Audit log: Failed to unlock global mutex '%s': %s",
-                    apr_global_mutex_lockfile(msr->modsecurity->auditlog_lock),
-                    get_apr_error(msr->mp, rc));
-        }
-
+        msr_global_mutex_unlock(msr, msr->modsecurity->auditlog_lock, "Audit log");
         return;
     }
 
