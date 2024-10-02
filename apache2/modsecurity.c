@@ -123,30 +123,7 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
 }
 
 int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
-    apr_status_t rc;
-    apr_file_t *lock_name;
-    const char *temp_dir;
-    const char *filename;
-
-    // get platform temp dir
-    rc = apr_temp_dir_get(&temp_dir, mp);
-    if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, "ModSecurity: Could not get temp dir");
-        return -1;
-    }
-
-    // use temp path template for lock files
-    char *path = apr_pstrcat(mp, temp_dir, GLOBAL_LOCK_TEMPLATE, NULL);
-
-    rc = apr_file_mktemp(&lock_name, path, 0, mp);
-    if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not create temporary file for global lock");
-        return -1;
-    }
-    // below func always return APR_SUCCESS
-    apr_file_name_get(&filename, lock_name);
-
-    rc = apr_global_mutex_create(lock, filename, APR_LOCK_DEFAULT, mp);
+    apr_status_t rc = apr_global_mutex_create(lock, NULL, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not create global mutex");
         return -1;
@@ -166,6 +143,41 @@ int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
 #endif /* MSC_TEST */
     return APR_SUCCESS;
 }
+
+/**
+ * handle errors from apr_global_mutex_lock
+ */
+int msr_global_mutex_lock(modsec_rec* msr, apr_global_mutex_t* lock, const char* fct) {
+    assert(msr);
+    assert(msr->modsecurity); // lock is msr->modsecurity->..._lock
+    assert(msr->mp);
+    if (!lock) {
+        msr_log(msr, 1, "%s: Global mutex was not created", fct);
+        return -1;
+    }
+
+    int rc = apr_global_mutex_lock(lock);
+    if (rc != APR_SUCCESS) msr_log(msr, 1, "Audit log: Failed to lock global mutex: %s", get_apr_error(msr->mp, rc));
+    return rc;
+}
+/**
+ * handle errors from apr_global_mutex_unlock
+ */
+int msr_global_mutex_unlock(modsec_rec* msr, apr_global_mutex_t* lock, const char* fct) {
+    assert(msr);
+    assert(msr->modsecurity); // lock is msr->modsecurity->..._lock
+    assert(msr->mp);
+    if (!lock) {
+        msr_log(msr, 1, "%s: Global mutex was not created", fct);
+        return -1;
+    }
+
+    int rc = apr_global_mutex_unlock(lock);
+    // We should have get the warning at lock time, so ignore it here
+    // if (rc != APR_SUCCESS) msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s", get_apr_error(msr->mp, rc));
+    return rc;
+}
+
 /**
  * Initialise the modsecurity engine. This function must be invoked
  * after configuration processing is complete as Apache needs to know the

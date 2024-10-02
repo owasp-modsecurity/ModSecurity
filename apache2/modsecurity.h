@@ -135,8 +135,6 @@ typedef struct msc_parm msc_parm;
 
 #define FATAL_ERROR "ModSecurity: Fatal error (memory allocation or unexpected internal error)!"
 
-#define GLOBAL_LOCK_TEMPLATE "/modsec-lock-tmp.XXXXXX"
-
 extern DSOLOCAL char *new_server_signature;
 extern DSOLOCAL char *real_server_signature;
 extern DSOLOCAL char *chroot_dir;
@@ -707,6 +705,8 @@ struct msc_parm {
 
 /* Reusable functions */
 int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp);
+int msr_global_mutex_lock(modsec_rec* msr, apr_global_mutex_t* lock, const char* fct);
+int msr_global_mutex_unlock(modsec_rec* msr, apr_global_mutex_t* lock, const char* fct);
 
 /* Engine functions */
 
