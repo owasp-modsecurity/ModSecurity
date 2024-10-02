@@ -30,16 +30,6 @@
     APLOG_USE_MODULE(security2);
 #endif
 
-// Returns the rule id if existing, otherwise the file name & line number
-const char* id_log(msre_rule* rule) {
-    assert(rule != NULL);
-    assert(rule->actionset != NULL);
-    assert(rule->ruleset != NULL);
-    const char* id = rule->actionset->id;
-    if (!id || id == NOT_SET_P || !*id) id = apr_psprintf(rule->ruleset->mp, "%s (%d)", rule->filename, rule->line_num);
-	return id;
-}
-
 /* -- Directory context creation and initialisation -- */
 
 /**
