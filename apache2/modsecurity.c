@@ -123,30 +123,7 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
 }
 
 int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
-    apr_status_t rc;
-    apr_file_t *lock_name;
-    const char *temp_dir;
-    const char *filename;
-
-    // get platform temp dir
-    rc = apr_temp_dir_get(&temp_dir, mp);
-    if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, "ModSecurity: Could not get temp dir");
-        return -1;
-    }
-
-    // use temp path template for lock files
-    char *path = apr_pstrcat(mp, temp_dir, GLOBAL_LOCK_TEMPLATE, NULL);
-
-    rc = apr_file_mktemp(&lock_name, path, 0, mp);
-    if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not create temporary file for global lock");
-        return -1;
-    }
-    // below func always return APR_SUCCESS
-    apr_file_name_get(&filename, lock_name);
-
-    rc = apr_global_mutex_create(lock, filename, APR_LOCK_DEFAULT, mp);
+    apr_status_t rc = apr_global_mutex_create(lock, NULL, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not create global mutex");
         return -1;
