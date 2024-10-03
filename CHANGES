@@ -1,6 +1,8 @@
 (to be released) - 2.9.x 
 ------------------------
 
+ * Fixed apr_global_mutex_create() usage (no filename)
+   [PR #3268 - @marcstern]
  * handle errors from apr_global_mutex_lock
    [PR #3257 - @marcstern]
 
