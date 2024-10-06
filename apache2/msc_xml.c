@@ -19,6 +19,9 @@ xml_unload_external_entity(const char *URI, xmlCharEncoding enc)    {
     return NULL;
 }
 
+static void xml_error_func(void *ctx, const char *msg, ...) {
+    //modsec_rec *msr = (modsec_rec *)ctx;
+}
 
 /**
  * Initialise XML parser.
@@ -32,6 +35,8 @@ int xml_init(modsec_rec *msr, char **error_msg) {
 
     msr->xml = apr_pcalloc(msr->mp, sizeof(xml_data));
     if (msr->xml == NULL) return -1;
+
+    xmlSetGenericErrorFunc(msr, xml_error_func);
 
     if(msr->txcfg->xml_external_entity == 0)    {
         entity = xmlParserInputBufferCreateFilenameDefault(xml_unload_external_entity);
