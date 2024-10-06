@@ -100,7 +100,7 @@ bool VerifySSN::verify(const char *ssnumber, int len) {
         goto invalid;
 
     /* More tests */
-    if (area >= 740 || area == 666)
+    if (area == 666)
         goto invalid;
 
     return true;
