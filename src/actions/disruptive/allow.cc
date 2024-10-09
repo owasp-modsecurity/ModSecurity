@@ -55,6 +55,9 @@ bool Allow::evaluate(RuleWithActions *rule, Transaction *transaction) {
         + allowTypeToName(m_allowType));
 
     transaction->m_allowType = m_allowType;
+    if (rule->hasSeverity()) {
+        transaction->m_it.severity = rule->severity();
+    }
 
     return true;
 }

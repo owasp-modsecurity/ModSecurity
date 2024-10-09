@@ -41,6 +41,9 @@ bool Deny::evaluate(RuleWithActions *rule, Transaction *transaction,
     rm->m_isDisruptive = true;
     transaction->m_it.log = strdup(
         rm->log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
+    if (rule->hasSeverity()) {
+        transaction->m_it.severity = rule->severity();
+    }
 
     return true;
 }
