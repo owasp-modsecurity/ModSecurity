@@ -53,7 +53,7 @@ PKG_PROG_PKG_CONFIG
 
 
 # Set C++ standard version and check if compiler supports it.
-AX_CXX_COMPILE_STDCXX(17, noext, mandatory)
+AX_CXX_COMPILE_STDCXX(20, noext, mandatory)
 
 # Check for libinjection
 if ! test -f "${srcdir}/others/libinjection/src/libinjection_html5.c"; then
