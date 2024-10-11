@@ -1735,6 +1735,7 @@ static void register_hooks(apr_pool_t *mp) {
 
     /* Logging */
     ap_hook_error_log(hook_error_log, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_open_logs(modsec_open_logs, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_log_transaction(hook_log_transaction, NULL, transaction_afterme_list, APR_HOOK_MIDDLE);
 
     /* Filter hooks */

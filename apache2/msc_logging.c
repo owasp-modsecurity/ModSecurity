@@ -2316,3 +2316,55 @@ void sec_audit_logger(modsec_rec *msr) {
     }
     #endif
 }
+
+static int open_audit_log(char *auditlog_name, unsigned char primary, apr_file_t **auditlog_fd,
+                          apr_fileperms_t *auditlog_fileperms, apr_pool_t *p) {
+    if (auditlog_name == NOT_SET_P) {
+        return OK;
+    }
+    if (auditlog_name[0] == '|') {
+        const char *pipe_name = auditlog_name + 1;
+        piped_log *pipe_log;
+
+        pipe_log = ap_open_piped_log(p, pipe_name);
+        if (pipe_log == NULL) {
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
+                         "ModSecurity: Failed to open the %saudit log pipe: %s",
+                         primary ? "" : "secondary ", pipe_name);
+            return primary ? DONE : OK;
+        }
+        *auditlog_fd = ap_piped_log_write_fd(pipe_log);
+    }
+    else {
+        const char *file_name = ap_server_root_relative(p, auditlog_name);
+        apr_status_t rc;
+
+        if (*auditlog_fileperms == NOT_SET) {
+            *auditlog_fileperms = CREATEMODE;
+        }
+        rc = apr_file_open(auditlog_fd, file_name,
+                APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
+                *auditlog_fileperms, p);
+
+        if (rc != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
+                         "ModSecurity: Failed to open the %saudit log file: %s",
+                         primary ? "" : "secondary ", file_name);
+            return primary ? DONE : OK;
+        }
+    }
+
+    return OK;
+}
+
+int modsec_open_logs(apr_pool_t *pconf, apr_pool_t *p, apr_pool_t *ptemp, server_rec *s_main) {
+    directory_config *dcfg = ap_get_module_config(s_main->lookup_defaults, &security2_module);
+
+    int primary_log_rc = open_audit_log(dcfg->auditlog_name, 1,
+                                        &dcfg->auditlog_fd, &dcfg->auditlog_fileperms, p);
+    if (primary_log_rc != OK) {
+        return primary_log_rc;
+    }
+    return open_audit_log(dcfg->auditlog2_name, 0,
+                          &dcfg->auditlog2_fd, &dcfg->auditlog_fileperms, p);
+}
