@@ -407,7 +407,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 #ifndef NO_LOGS
     void debug(int, const std::string &) const; // cppcheck-suppress functionStatic
 #endif
-    void serverLog(std::shared_ptr<RuleMessage> rm);
+    void serverLog(const RuleMessage &rm);
 
     int getRuleEngineState() const;
 

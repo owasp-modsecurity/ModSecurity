@@ -160,13 +160,13 @@ class ReadingLogsViaRuleMessage {
         std::cout << std::endl;
         if (ruleMessage->m_isDisruptive) {
             std::cout << " * Disruptive action: ";
-            std::cout << modsecurity::RuleMessage::log(ruleMessage);
+            std::cout << modsecurity::RuleMessage::log(*ruleMessage);
             std::cout << std::endl;
             std::cout << " ** %d is meant to be informed by the webserver.";
             std::cout << std::endl;
         } else {
             std::cout << " * Match, but no disruptive action: ";
-            std::cout << modsecurity::RuleMessage::log(ruleMessage);
+            std::cout << modsecurity::RuleMessage::log(*ruleMessage);
             std::cout << std::endl;
         }
     }

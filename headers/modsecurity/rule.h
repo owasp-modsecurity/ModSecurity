@@ -78,8 +78,7 @@ class Rule {
 
     virtual bool evaluate(Transaction *transaction) = 0;
 
-    virtual bool evaluate(Transaction *transaction,
-        std::shared_ptr<RuleMessage> rm) = 0;
+    virtual bool evaluate(Transaction *transaction, RuleMessage &ruleMessage) = 0;
 
     const std::string& getFileName() const {
         return m_fileName;
