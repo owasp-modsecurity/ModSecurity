@@ -77,6 +77,14 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
         if (_erroffset != NULL) {
             *_erroffset = (int)error_offset;
         }
+        PCRE2_UCHAR buffer[256];
+        // Get the error message from the error code
+        pcre2_get_error_message(error_number, buffer, sizeof(buffer));
+#ifdef DEBUG_CONF
+        * _errptr = apr_psprintf(pool, "%s - pattern = %s", buffer, pattern);
+#else
+        * _errptr = apr_pstrdup(pool, buffer);
+#endif
         return NULL;
     }
 
