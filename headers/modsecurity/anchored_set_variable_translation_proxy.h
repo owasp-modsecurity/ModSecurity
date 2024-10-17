@@ -100,13 +100,9 @@ class AnchoredSetVariableTranslationProxy {
             return nullptr;
         }
 
-        std::unique_ptr<std::string> ret(new std::string(""));
+        auto ret = std::make_unique<std::string>(l[0]->getValue());
 
-        ret->assign(l.at(0)->getValue());
-
-        while (!l.empty()) {
-            auto &a = l.back();
-            l.pop_back();
+        for(auto a : l) {
             delete a;
         }
 

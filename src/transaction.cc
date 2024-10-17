@@ -405,7 +405,7 @@ int Transaction::processURI(const char *uri, const char *method,
 
     std::string parsedURI = m_uri_decoded;
     // The more popular case is without domain
-    if (!m_uri_decoded.empty() && m_uri_decoded.at(0) != '/') {
+    if (!m_uri_decoded.empty() && m_uri_decoded[0] != '/') {
         bool fullDomain = true;
         size_t scheme = m_uri_decoded.find(":")+1;
         if (scheme == std::string::npos) {
@@ -540,7 +540,7 @@ int Transaction::addRequestHeader(const std::string& key,
             }
 
             // ltrim the key - following the modsec v2 way
-            while (ckey.empty() == false && isspace(ckey.at(0))) {
+            while (ckey.empty() == false && isspace(ckey[0])) {
                 ckey.erase(0, 1);
                 localOffset++;
             }

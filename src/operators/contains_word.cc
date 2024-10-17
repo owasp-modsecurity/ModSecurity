@@ -23,13 +23,14 @@
 namespace modsecurity {
 namespace operators {
 
-bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {
+inline bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {
     if (a.size() - 1 < pos) {
         return false;
     }
 
-    if ((a.at(pos) >= 65 && a.at(pos) <= 90) ||
-        (a.at(pos) >= 97 && a.at(pos) <= 122)) {
+    const auto ch = a[pos];
+    if ((ch >= 65 && ch <= 90) ||
+        (ch >= 97 && ch <= 122)) {
         return false;
     }
 

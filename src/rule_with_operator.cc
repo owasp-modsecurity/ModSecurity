@@ -194,8 +194,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
         vars->push_back(variable);
     }
 
-    for (int i = 0; i < addition.size(); i++) {
-        Variable *variable = addition.at(i);
+    for (auto *variable : addition) {
         vars->push_back(variable);
     }
 }
