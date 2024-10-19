@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
             }
 
             if (const auto *rwo = dynamic_cast<modsecurity::RuleWithOperator *>(z.get())) {
-                const auto op = rwo->getOperatorName();
+                const auto &op = rwo->getOperatorName();
                 if (operators.count(op) > 0) {
                     operators[op] = 1 + operators[op];
                 } else {
