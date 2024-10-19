@@ -41,9 +41,9 @@ namespace modsecurity {
 class Rules {
  public:
     void dump() const {
-        for (int j = 0; j < m_rules.size(); j++) {
-            std::cout << "    Rule ID: " << m_rules.at(j)->getReference();
-            std::cout << "--" << m_rules.at(j) << std::endl;
+        for (const auto &r : m_rules) {
+            std::cout << "    Rule ID: " << r->getReference();
+            std::cout << "--" << r << std::endl;
         }
     }
 

@@ -32,7 +32,7 @@ static inline std::string parse_pm_content(const std::string &op_parm) {
 
     auto size = op_parm.size() - offset;
     if (size >= 2 &&
-        op_parm.at(offset) == '\"' && op_parm.back() == '\"') {
+        op_parm[offset] == '\"' && op_parm.back() == '\"') {
         offset++;
         size -= 2;
     }
