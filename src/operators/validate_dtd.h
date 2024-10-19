@@ -28,6 +28,7 @@
 #include <utility>
 
 #include "src/operators/operator.h"
+#include "validate_schema.h"
 
 
 namespace modsecurity {
@@ -62,40 +63,22 @@ class ValidateDTD : public Operator {
 
 
     static void error_runtime(void *ctx, const char *msg, ...) {
-        const Transaction *t = reinterpret_cast<Transaction *>(ctx);
-        char buf[1024];
-        std::string s;
         va_list args;
-
         va_start(args, msg);
-        int len = vsnprintf(buf, sizeof(buf), msg, args);
+        ValidateSchema::callback_func(ctx, ValidateSchema::log_msg, ValidateSchema::PREFIX_ERROR, msg, args);
         va_end(args);
-
-        if (len > 0) {
-            s = "XML Error: " + std::string(buf);
-        }
-        ms_dbg_a(t, 4, s);
     }
 
 
     static void warn_runtime(void *ctx, const char *msg, ...) {
-        const Transaction *t = reinterpret_cast<Transaction *>(ctx);
-        char buf[1024];
-        std::string s;
         va_list args;
-
         va_start(args, msg);
-        int len = vsnprintf(buf, sizeof(buf), msg, args);
+        ValidateSchema::callback_func(ctx, ValidateSchema::log_msg, ValidateSchema::PREFIX_WARNING, msg, args);
         va_end(args);
-
-        if (len > 0) {
-            s = "XML Warning: " + std::string(buf);
-        }
-        ms_dbg_a(t, 4, s);
     }
 
 
-    static void null_error(void *ctx, const char *msg, ...) { // cppcheck-suppress[constParameterPointer,constParameterCallback]
+    static void null_error(void *, const char *, ...) { // cppcheck-suppress[constParameterPointer,constParameterCallback]
     }
 
  private:
