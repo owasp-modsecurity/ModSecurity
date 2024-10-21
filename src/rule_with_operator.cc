@@ -203,7 +203,6 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
 bool RuleWithOperator::evaluate(Transaction *trans,
     RuleMessage &ruleMessage) {
     bool globalRet = false;
-    const variables::Variables *variables = this->m_variables; // cppcheck-suppress unreadVariable ; false positive
     bool recursiveGlobalRet;
     bool containsBlock = hasBlockAction();
     std::string eparam;
@@ -246,12 +245,12 @@ bool RuleWithOperator::evaluate(Transaction *trans,
         + "\" with param " \
         + eparam \
         + " against " \
-        + variables + ".");
+        + m_variables + ".");
     } else {
         ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
             + ") Executing operator \"" + getOperatorName() \
             + " against " \
-            + variables + ".");
+            + m_variables + ".");
     }
 
 
