@@ -33,10 +33,8 @@ void ConfigUnicodeMap::loadConfig(std::string f, double configCodePage,
     const char *p = NULL;
     char *savedptr = NULL;
     const char *ucode = NULL;
-    int code = 0;
     int found = 0;
     int length = 0;
-    int Map = 0;
     int processing = 0;
 
     driver->m_unicodeMapTable.m_set = true;
@@ -102,10 +100,10 @@ void ConfigUnicodeMap::loadConfig(std::string f, double configCodePage,
 
             if (mapping != NULL) {
                 ucode = strtok_r(mapping, ":", &hmap);
-                sscanf(ucode, "%x", &code); // cppcheck-suppress invalidScanfArgType_int
-                sscanf(hmap, "%x", &Map);   // cppcheck-suppress invalidScanfArgType_int
+                int code = strtol(ucode, nullptr, 16);
+                int map = strtol(hmap, nullptr, 16);
                 if (code >= 0 && code <= 65535)    {
-                    driver->m_unicodeMapTable.m_unicodeMapTable->change(code, Map);
+                    driver->m_unicodeMapTable.m_unicodeMapTable->change(code, map);
                 }
 
                 free(mapping);
