@@ -105,82 +105,44 @@ int swap_int32(int x) {
  */
 char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed) {
     int unicode_len = 0, length = 0;
-    unsigned int d = 0, count = 0;
+    unsigned int d = 0;
     unsigned char c, *utf;
     char *rval, *data;
     unsigned int i, len, j;
     unsigned int bytes_left = input_len;
     unsigned char *unicode = NULL;
 
+    if (input == NULL) return NULL;
+
     *changed = 0;
     /* RFC3629 states that UTF-8 are encoded using sequences of 1 to 4 octets. */
-    /* Max size per character should fit in 4 bytes */
-    len = input_len * 4 + 1;
+    /* Max size per character should fit in 4 bytes (%u01020304) */
+    len = input_len * 10 + 1;
     data = rval = apr_palloc(mp, len);
     if (rval == NULL) return NULL;
 
-
-    if (input == NULL) return NULL;
-
-    for(i = 0; i < bytes_left;)  {
+    for (i = 0; i < bytes_left;) {
         unicode_len = 0; d = 0;
         utf = (unsigned char *)&input[i];
-
         c = *utf;
 
-        /* If first byte begins with binary 0 it is single byte encoding */
+        /* If first byte begins with binary 0 it may be single byte encoding */
         if ((c & 0x80) == 0) {
-            /* single byte unicode (7 bit ASCII equivilent) has no validation */
-            count++;
-            if(count <= len)    {
-                if(c == 0)
-                    *data = x2c(&c);
-                else
-                    *data++ = c;
+            if (c == 0) {
+                unicode_len = 2;
+                d = utf[1];
             }
-
         }
         /* If first byte begins with binary 110 it is two byte encoding*/
         else if ((c & 0xE0) == 0xC0) {
             /* check we have at least two bytes */
             if (bytes_left < 2) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
             /* check second byte starts with binary 10 */
-            else if (((*(utf + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+            else if ((utf[1] & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
             else {
                 unicode_len = 2;
-                count+=6;
-                if(count <= len) {
-                    /* compute character number */
-                    d = ((c & 0x1F) << 6) | (*(utf + 1) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    unicode = apr_psprintf(mp, "%x", d);
-                    length = strlen(unicode);
-
-                    switch(length)  {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for(j=0; j<length; j++) {
-                        *data++ = unicode[j];
-                    }
-
-                    *changed = 1;
-                }
+                /* compute character number */
+                d = ((c & 0x1F) << 6) | (utf[1] & 0x3F);
             }
         }
         /* If first byte begins with binary 1110 it is three byte encoding */
@@ -188,142 +150,56 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
             /* check we have at least three bytes */
             if (bytes_left < 3) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
             /* check second byte starts with binary 10 */
-            else if (((*(utf + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+            else if ((utf[1] & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
             /* check third byte starts with binary 10 */
             else if (((*(utf + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
             else {
                 unicode_len = 3;
-                count+=6;
-                if(count <= len) {
-                    /* compute character number */
-                    d = ((c & 0x0F) << 12) | ((*(utf + 1) & 0x3F) << 6) | (*(utf + 2) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    unicode = apr_psprintf(mp, "%x", d);
-                    length = strlen(unicode);
-
-                    switch(length)  {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for(j=0; j<length; j++) {
-                        *data++ = unicode[j];
-                    }
-
-                    *changed = 1;
-
-                }
+                /* compute character number */
+                d = ((c & 0x0F) << 12) | ((utf[1] & 0x3F) << 6) | (*(utf + 2) & 0x3F);
             }
         }
         /* If first byte begins with binary 11110 it is four byte encoding */
         else if ((c & 0xF8) == 0xF0) {
             /* restrict characters to UTF-8 range (U+0000 - U+10FFFF)*/
-            if (c >= 0xF5) {
-                *data++ = c;
-            }
+            if (c >= 0xF5) unicode_len = UNICODE_ERROR_RESTRICTED_CHARACTER;
             /* check we have at least four bytes */
-            if (bytes_left < 4) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
+            else if (bytes_left < 4) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
             /* check second byte starts with binary 10 */
-            else if (((*(utf + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+            else if ((utf[1] & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
             /* check third byte starts with binary 10 */
             else if (((*(utf + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
             /* check forth byte starts with binary 10 */
             else if (((*(utf + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
             else {
                 unicode_len = 4;
-                count+=7;
-                if(count <= len) {
-                    /* compute character number */
-                    d = ((c & 0x07) << 18) | ((*(utf + 1) & 0x3F) << 12) | ((*(utf + 2) & 0x3F) << 6) | (*(utf + 3) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    unicode = apr_psprintf(mp, "%x", d);
-                    length = strlen(unicode);
-
-                    switch(length)  {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for(j=0; j<length; j++) {
-                        *data++ = unicode[j];
-                    }
-
-                    *changed = 1;
-
-                }
+                /* compute character number */
+                d = ((c & 0x07) << 18) | ((utf[1] & 0x3F) << 12) | ((*(utf + 2) & 0x3F) << 6) | (*(utf + 3) & 0x3F);
             }
         }
-        /* any other first byte is invalid (RFC 3629) */
-        else {
-            count++;
-            if(count <= len)
-                *data++ = c;
-        }
-
         /* invalid UTF-8 character number range (RFC 3629) */
-        if ((d >= 0xD800) && (d <= 0xDFFF)) {
-            count++;
-            if(count <= len)
-                *data++ = c;
-        }
-
+        if ((d >= 0xD800) && (d <= 0xDFFF)) unicode_len = UNICODE_ERROR_RESTRICTED_CHARACTER;
         /* check for overlong */
-        if ((unicode_len == 4) && (d < 0x010000)) {
-            /* four byte could be represented with less bytes */
-            count++;
-            if(count <= len)
-                *data++ = c;
-        }
-        else if ((unicode_len == 3) && (d < 0x0800)) {
-            /* three byte could be represented with less bytes */
-            count++;
-            if(count <= len)
-                *data++ = c;
-        }
-        else if ((unicode_len == 2) && (d < 0x80)) {
-            /* two byte could be represented with less bytes */
-            count++;
-            if(count <= len)
-                *data++ = c;
-        }
+        if ((unicode_len == 4) && (d < 0x010000)) unicode_len = UNICODE_ERROR_OVERLONG_CHARACTER;
+        /* three byte could be represented with less bytes */
+        if ((unicode_len == 3) && (d < 0x0800)) unicode_len = UNICODE_ERROR_OVERLONG_CHARACTER;
+        /* two byte could be represented with less bytes */
+        if ((unicode_len == 2) && (d < 0x80)) unicode_len = UNICODE_ERROR_OVERLONG_CHARACTER;
 
-        if(unicode_len > 0) {
+        if (unicode_len > 0) {
             i += unicode_len;
-        } else {
+            sprintf(data, "%%u%04x", d);
+            data += 6;
+            *changed = 1;
+        }
+        else {
+            /* any other first byte is invalid (RFC 3629), so assume it's an ASCII character */
+            *data++ = c;
             i++;
         }
     }
 
-    *data ='\0';
-
+    *data = '\0';
     return rval;
 }
 
