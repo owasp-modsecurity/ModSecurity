@@ -45,7 +45,7 @@ class VerifyCC : public Operator {
         m_pc(NULL),
         m_pce(NULL) { }
 #endif
-    ~VerifyCC();
+    ~VerifyCC() override;
 
     bool evaluate(Transaction *t, RuleWithActions *rule,
         const std::string& input,

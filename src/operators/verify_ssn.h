@@ -35,13 +35,8 @@ class VerifySSN : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit VerifySSN(std::unique_ptr<RunTimeString> param)
-        : Operator("VerifySSN", std::move(param)) {
-        m_re = new Regex(m_param);
-    }
-
-    ~VerifySSN() {
-        delete m_re;
-    }
+        : Operator("VerifySSN", std::move(param))
+        , m_re(std::make_unique<Regex>(m_param)) { }
 
     bool operator=(const VerifySSN &a) = delete;
     VerifySSN(const VerifySSN &a) = delete;
@@ -56,7 +51,7 @@ class VerifySSN : public Operator {
     static bool verify(const char *ssnumber, int len);
     static int convert_to_int(const char c);
 
-    Regex *m_re;
+    std::unique_ptr<Regex> m_re;
 };
 
 }  // namespace operators

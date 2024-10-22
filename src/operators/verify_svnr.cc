@@ -24,7 +24,7 @@ int VerifySVNR::convert_to_int(const char c) {
 }
 
 
-bool VerifySVNR::verify(const char *svnrnumber, int len) {
+bool VerifySVNR::verify(const char *svnrnumber, int len) const {
     int var_len = len;
     int sum = 0;
     unsigned int i = 0, svnr_len = 10;
@@ -64,7 +64,7 @@ bool VerifySVNR::verify(const char *svnrnumber, int len) {
     }
     //Laufnummer mit 3, 7, 9
     //Geburtsdatum mit 5, 8, 4, 2, 1, 6
-    sum = svnr[0] * 3 + svnr[1] * 7 + svnr[2] * 9 + svnr[4] * 5 + svnr[5] * 8 + svnr[6] * 4 + svnr[7] * 2 + svnr[8] * 1 + svnr[9] * 6; // cppcheck-suppress uninitvar
+    sum = svnr[0] * 3 + svnr[1] * 7 + svnr[2] * 9 + svnr[4] * 5 + svnr[5] * 8 + svnr[6] * 4 + svnr[7] * 2 + svnr[8] * 1 + svnr[9] * 6;
     sum %= 11;
     if(sum == 10){
     	sum = 0;
@@ -84,7 +84,7 @@ bool VerifySVNR::evaluate(Transaction *t, RuleWithActions *rule,
     int i;
 
     if (m_param.empty()) {
-        return is_svnr; // cppcheck-suppress knownConditionTrueFalse
+        return is_svnr;
     }
 
     for (i = 0; i < input.size() - 1 && is_svnr == false; i++) {

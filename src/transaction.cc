@@ -1175,7 +1175,7 @@ int Transaction::processResponseBody() {
 int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_responseBody.tellp();
 
-    std::set<std::string> &bi = \
+    const std::set<std::string> &bi = \
         this->m_rules->m_responseBodyTypeToBeInspected.m_value;
     auto t = bi.find(m_variableResponseContentType.m_value);
     if (t == bi.end() && bi.empty() == false) {
@@ -1677,7 +1677,7 @@ std::string Transaction::toJSON(int parts) {
             strlen("components"));
 
         yajl_gen_array_open(g);
-        for (auto a : m_rules->m_components) {
+        for (const auto &a : m_rules->m_components) {
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>
                     (a.c_str()), a.length());
@@ -2197,7 +2197,7 @@ extern "C" void msc_intervention_cleanup(ModSecurityIntervention *it) {
  * @retval NULL Nothing was updated.
  *
  */
-extern "C" const char *msc_get_response_body(Transaction *transaction) {
+extern "C" const char *msc_get_response_body(const Transaction *transaction) {
     return transaction->getResponseBody();
 }
 

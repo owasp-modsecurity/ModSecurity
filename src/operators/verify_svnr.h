@@ -21,13 +21,8 @@ class VerifySVNR : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit VerifySVNR(std::unique_ptr<RunTimeString> param)
-        : Operator("VerifySVNR", std::move(param)) {
-        m_re = new Regex(m_param);
-    }
-
-    ~VerifySVNR() {
-        delete m_re;
-    }
+        : Operator("VerifySVNR", std::move(param))
+        , m_re(std::make_unique<Regex>(m_param)) { }
 
     bool operator=(const VerifySVNR &a) = delete;
     VerifySVNR(const VerifySVNR &a) = delete;
@@ -36,10 +31,10 @@ class VerifySVNR : public Operator {
         const std::string& input,
         RuleMessage &ruleMessage) override;
 
-    bool verify(const char *ssnumber, int len);
+    bool verify(const char *ssnumber, int len) const;
 
  private:
-    Regex *m_re;
+    std::unique_ptr<Regex> m_re;
     static int convert_to_int(const char c);
     const char bad_svnr[12][11] = { "0000000000",
         "0123456789",

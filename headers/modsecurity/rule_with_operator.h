@@ -62,7 +62,7 @@ class RuleWithOperator : public RuleWithActions {
     static void cleanMatchedVars(Transaction *trasn);
 
 
-    std::string getOperatorName() const;
+    const std::string& getOperatorName() const;
 
     virtual std::string getReference() override {
         return std::to_string(m_ruleId);

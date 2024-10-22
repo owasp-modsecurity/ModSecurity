@@ -136,7 +136,7 @@ class Operator {
 
     std::string m_match_message;
     bool m_negation;
-    std::string m_op;
+    const std::string m_op;
     std::string m_param;
     std::unique_ptr<RunTimeString> m_string;
     bool m_couldContainsMacro;

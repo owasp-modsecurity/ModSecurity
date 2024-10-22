@@ -92,7 +92,7 @@ struct TransformationTest {
         return tfn;
     }
 
-    static UnitTestResult eval(const ItemType &tfn, const UnitTest &t, modsecurity::Transaction &transaction) {
+    static UnitTestResult eval(const ItemType &tfn, const UnitTest &t, const modsecurity::Transaction &transaction) {
         auto ret = t.input;
         tfn.transform(ret, &transaction);
         return {1, ret};
@@ -105,7 +105,7 @@ struct TransformationTest {
 
 
 template<typename TestType>
-UnitTestResult perform_unit_test_once(const UnitTest &t, modsecurity::Transaction &transaction) {
+UnitTestResult perform_unit_test_once(const UnitTest &t, modsecurity::Transaction &transaction) { // cppcheck-suppress constParameterReference ; transaction can be const for transformations but not for operators
     std::unique_ptr<typename TestType::ItemType> item(TestType::init(t));
     assert(item.get() != nullptr);
 

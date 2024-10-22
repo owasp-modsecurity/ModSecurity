@@ -102,9 +102,9 @@ RuleWithActions::RuleWithActions(
                         delete a;
                     } else if (auto sa = dynamic_cast<actions::Severity *>(a)) {
                         m_severity = sa;
-                    } else if (auto lda = dynamic_cast<actions::LogData *>(a)) {
+                    } else if (auto lda = dynamic_cast<actions::LogData *>(a)) { // cppcheck-suppress unreadVariable ; false positive
                         m_logData = lda;
-                    } else if (auto ma = dynamic_cast<actions::Msg *>(a)) {
+                    } else if (auto ma = dynamic_cast<actions::Msg *>(a)) { // cppcheck-suppress unreadVariable ; false positive
                         m_msg = ma;
                     } else if (auto sva = dynamic_cast<actions::SetVar *>(a)) {
                         m_actionsSetVar.push_back(sva);
@@ -363,7 +363,7 @@ void RuleWithActions::executeTransformations(
                        std::make_shared<std::string>(path));
     }
 
-    for (Action *a : m_transformations) {
+    for (const Action *a : m_transformations) {
         if (a->m_isNone) {
             none++;
         }
@@ -457,7 +457,7 @@ bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
 
 
 std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::string& name,
-    Transaction *trans) {
+    const Transaction *trans) {
     std::vector<actions::Action *> ret;
     for (auto &z : m_actionsRuntimePos) {
         if (*z->m_name.get() == name) {
