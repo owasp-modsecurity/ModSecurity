@@ -85,7 +85,7 @@ Windows build information can be found [here](build/win32/README.md).
 
 ## Dependencies
 
-This library is written in C++ using the C++17 standards. It also uses Flex
+This library is written in C++ using the C++20 standards. It also uses Flex
 and Yacc to produce the “Sec Rules Language” parser. Other, mandatory dependencies include YAJL, as ModSecurity uses JSON for producing logs and its testing framework, libpcre (not yet mandatory) for processing regular expressions in SecRules, and libXML2 (not yet mandatory) which is used for parsing XML requests.
 
 All others dependencies are related to operators specified within SecRules or configuration directives and may not be required for compilation. A short list of such dependencies is as follows:
