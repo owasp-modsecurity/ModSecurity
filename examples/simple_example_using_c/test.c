@@ -47,7 +47,7 @@ int main (int argc, char **argv)
     msc_rules_dump(rules);
 
     ret = msc_rules_add_remote(rules, "test",
-        "https://www.modsecurity.org/modsecurity-regression-test-secremoterules.txt",
+        "https://gist.githubusercontent.com/zimmerle/a4c1ec028999f7df71d0cc80f4f271ca/raw/4c74363bf4eae974180f1a82007196e58729dd16/modsecurity-regression-test-secremoterules.txt",
         &error);
     if (ret < 0) {
         fprintf(stderr, "Problems loading the rules --\n");
