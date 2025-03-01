@@ -1300,7 +1300,7 @@ static const char *cmd_audit_log_relevant_status(cmd_parms *cmd, void *_dcfg,
 {
     directory_config *dcfg = _dcfg;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     dcfg->auditlog_relevant_regex = msc_pregcomp(cmd->pool, p1, PCRE2_DOTALL, NULL, NULL);
 #else
     dcfg->auditlog_relevant_regex = msc_pregcomp(cmd->pool, p1, PCRE_DOTALL, NULL, NULL);

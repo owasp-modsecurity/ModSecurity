@@ -386,7 +386,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                 case HASH_URL_HREF_HASH_RX:
                     if(em[i]->type == HASH_URL_HREF_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
 #else
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
@@ -419,7 +419,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                 msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
 #else
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -449,7 +449,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                 case HASH_URL_FACTION_HASH_RX:
                     if(em[i]->type == HASH_URL_FACTION_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
 #else
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
@@ -482,7 +482,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                 msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
 #else
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -512,7 +512,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                 case HASH_URL_LOCATION_HASH_RX:
                     if(em[i]->type == HASH_URL_LOCATION_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
 #else
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
@@ -545,7 +545,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                 msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
 #else
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -575,7 +575,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                 case HASH_URL_IFRAMESRC_HASH_RX:
                     if(em[i]->type == HASH_URL_IFRAMESRC_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
 #else
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
@@ -608,7 +608,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                 msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
 #else
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -638,7 +638,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                 case HASH_URL_FRAMESRC_HASH_RX:
                     if(em[i]->type == HASH_URL_FRAMESRC_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
 #else
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
@@ -671,7 +671,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
                                 msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
                         if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
 #else
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */

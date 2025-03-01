@@ -21,7 +21,7 @@
 
 #include "libxml/xpathInternals.h"
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 #define PCRE_ERROR_NOMATCH PCRE2_ERROR_NOMATCH
 #endif
 /**
@@ -73,7 +73,7 @@ static char *var_generic_list_validate(msre_ruleset *ruleset, msre_var *var) {
         pattern = apr_pstrmemdup(ruleset->mp, var->param + 1, strlen(var->param + 1) - 1);
         if (pattern == NULL) return FATAL_ERROR;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         options = PCRE2_DOTALL | PCRE2_CASELESS | PCRE2_DOLLAR_ENDONLY;
 #else
         options = PCRE_DOTALL | PCRE_CASELESS | PCRE_DOLLAR_ENDONLY;

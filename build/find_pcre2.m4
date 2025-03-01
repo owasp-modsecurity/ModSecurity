@@ -18,26 +18,22 @@ AC_DEFUN([CHECK_PCRE2],
 AC_ARG_WITH(
     pcre2,
     [AC_HELP_STRING([--with-pcre2=PATH],[Path to pcre2 prefix or config script])],
-    , with_pcre2=no)
+    [test_paths="${with_pcre2}"],
+    [test_paths="/usr/local/libpcre2 /usr/local/pcre2 /usr/local /opt/libpcre2 /opt/pcre2 /opt /usr"])
 
-AS_CASE(["${with_pcre2}"],
-  [no], [test_paths=],
-  [yes], [test_paths="/usr/local/libpcre2 /usr/local/pcre2 /usr/local /opt/libpcre2 /opt/pcre2 /opt /usr"],
-  [test_paths="${with_pcre2}"])
-
-if test "x${with_pcre2}" = "x" || test "x${with_pcre2}" = "xno"; then
-    AC_MSG_NOTICE([pcre2 not specified; omitting check])
+if test "x${with_pcre}" != "x" && test "x${with_pcre}" != "xno"; then
+AC_MSG_NOTICE([pcre specified; omitting check for pcre2])
 else
 
     AC_MSG_CHECKING([for libpcre2 config script])
 
     for x in ${test_paths}; do
         dnl # Determine if the script was specified and use it directly
-        if test ! -d "$x" -a -e "$x"; then
-            PCRE2_CONFIG=$x
-            pcre2_path="no"
-            break
-        fi
+         if test ! -d "$x" -a -e "$x"; then
+             PCRE2_CONFIG=$x
+             pcre2_path="no"
+             break
+         fi
 
         dnl # Try known config script names/locations
         for PCRE2_CONFIG in pcre2-config; do
