@@ -19,7 +19,12 @@ AC_ARG_WITH(
     pcre2,
     [AC_HELP_STRING([--with-pcre2=PATH],[Path to pcre2 prefix or config script])],
     [test_paths="${with_pcre2}"],
-    [test_paths="/usr/local/libpcre2 /usr/local/pcre2 /usr/local /opt/libpcre2 /opt/pcre2 /opt /usr"])
+    [with_pcre2="yes"])
+
+AS_CASE(["${with_pcre2}"],
+    [no], [test_paths=],
+    [yes], [test_paths="/usr/local/libpcre2 /usr/local/pcre2 /usr/local /opt/libpcre2 /opt/pcre2 /opt /usr"],
+    [test_paths="${with_pcre2}"])
 
 if test "x${with_pcre}" != "x" && test "x${with_pcre}" != "xno"; then
 AC_MSG_NOTICE([pcre specified; omitting check for pcre2])
@@ -82,8 +87,8 @@ else
         ifelse([$2], , AC_MSG_ERROR([pcre2 library is required]), $2)
     else
         AC_MSG_NOTICE([using pcre2 v${PCRE2_VERSION}])
-        PCRE2_CFLAGS="-DWITH_PCRE2 ${PCRE2_CFLAGS}"
-        ifelse([$1], , , $1) 
-    fi 
+        PCRE2_CFLAGS="${PCRE2_CFLAGS}"
+        ifelse([$1], , , $1)
+    fi
 fi
 ])

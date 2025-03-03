@@ -17,12 +17,14 @@ AC_DEFUN([CHECK_PCRE],
 
 AC_ARG_WITH(
     pcre,
-    [AC_HELP_STRING([--with-pcre=PATH],[Path to pcre prefix or config script])])
+    [AC_HELP_STRING([--with-pcre=PATH],[Path to pcre prefix or config script])],
+    [test_paths="${with_pcre}"],
+    [with_pcre="no"])
 
-    AS_CASE(["${with_pcre}"],
-      [no], [test_paths=],
-      [yes], [test_paths="/usr/local/libpcre /usr/local/pcre /usr/local /opt/libpcre /opt/pcre /opt /usr"],
-      [test_paths="${with_pcre}"])
+AS_CASE(["${with_pcre}"],
+    [no], [test_paths=],
+    [yes], [test_paths="/usr/local/libpcre /usr/local/pcre /usr/local /opt/libpcre /opt/pcre /opt /usr"],
+    [test_paths="${with_pcre}"])
 
 if test "x${with_pcre}" = "x" || test "x${with_pcre}" = "xno"; then
     AC_MSG_NOTICE([pcre not specified; omitting check for pcre])
@@ -81,7 +83,7 @@ else
 
     if test -z "${PCRE_VERSION}"; then
         AC_MSG_NOTICE([*** pcre library not found.])
-        else
+    else
         AC_MSG_NOTICE([using pcre v${PCRE_VERSION}])
         PCRE_CFLAGS="-DWITH_PCRE ${PCRE_CFLAGS}"
         ifelse([$1], , , $1)
