@@ -39,12 +39,12 @@ AC_ARG_WITH(
 #    )
 
 
-if test "x${with_geoip}" == "xno"; then
+if test "x${with_geoip}" = "xno"; then
     AC_DEFINE(HAVE_GEOIP, 0, [Support for GeoIP was disabled by the utilization of --without-geoip or --with-geoip=no])
     AC_MSG_NOTICE([Support for GeoIP was disabled by the utilization of --without-geoip or --with-geoip=no])
     GEOIP_DISABLED=yes
 else
-    if test "x${with_geoip}" == "xyes"; then
+    if test "x${with_geoip}" = "xyes"; then
         GEOIP_MANDATORY=yes
         AC_MSG_NOTICE([GeoIP support was marked as mandatory by the utilization of --with-geoip=yes])
     fi
@@ -55,8 +55,8 @@ else
 #            fi
 #        done
 
-#    if test "x${with_geoip}" != "xyes" or test "x${with_geoip}" == "xyes"; then
-        if test "x${with_geoip}" == "x" || test "x${with_geoip}" == "xyes"; then
+#    if test "x${with_geoip}" != "xyes" or test "x${with_geoip}" = "xyes"; then
+        if test "x${with_geoip}" = "x" || test "x${with_geoip}" = "xyes"; then
             # Nothing about GeoIP was informed, using the pkg-config to figure things out.
             if test -n "${PKG_CONFIG}"; then
                 GEOIP_PKG_NAME=""
@@ -170,13 +170,13 @@ AC_DEFUN([CHECK_FOR_GEOIP_AT], [
     fi
 
 
-    if test -n "${geoip_inc_path}" -a -n "${geoip_lib_path}"; then
+    if test -n "${geoip_inc_path}" && test -n "${geoip_lib_path}"; then
 
         AC_MSG_NOTICE([GeoIP headers found at: ${geoip_inc_path}])
         AC_MSG_NOTICE([GeoIP library found at: ${geoip_lib_file}])
     fi
 
-    if test -n "${geoip_lib_path}" -a -n "${geoip_inc_path}"; then
+    if test -n "${geoip_lib_path}" && test -n "${geoip_inc_path}"; then
         # TODO: Compile a piece of code to check the version.
         GEOIP_CFLAGS="-I${geoip_inc_path}"
         GEOIP_LDADD="-l${geoip_lib_name}"

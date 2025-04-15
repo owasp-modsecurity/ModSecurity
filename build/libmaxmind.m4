@@ -39,12 +39,12 @@ AC_ARG_WITH(
 #    )
 
 
-if test "x${with_maxmind}" == "xno"; then
+if test "x${with_maxmind}" = "xno"; then
     AC_DEFINE(HAVE_MAXMIND, 0, [Support for MaxMind was disabled by the utilization of --without-maxmind or --with-maxmind=no])
     AC_MSG_NOTICE([Support for MaxMind was disabled by the utilization of --without-maxmind or --with-maxmind=no])
     MAXMIND_DISABLED=yes
 else
-    if test "x${with_maxmind}" == "xyes"; then
+    if test "x${with_maxmind}" = "xyes"; then
         MAXMIND_MANDATORY=yes
         AC_MSG_NOTICE([MaxMind support was marked as mandatory by the utilization of --with-maxmind=yes])
     fi
@@ -55,8 +55,8 @@ else
 #            fi
 #        done
 
-#    if test "x${with_maxmind}" != "xyes" or test "x${with_maxmind}" == "xyes"; then
-        if test "x${with_maxmind}" == "x" || test "x${with_maxmind}" == "xyes"; then
+#    if test "x${with_maxmind}" != "xyes" or test "x${with_maxmind}" = "xyes"; then
+        if test "x${with_maxmind}" = "x" || test "x${with_maxmind}" = "xyes"; then
             # Nothing about MaxMind was informed, using the pkg-config to figure things out.
             if test -n "${PKG_CONFIG}"; then
                 MAXMIND_PKG_NAME=""
@@ -171,13 +171,13 @@ AC_DEFUN([CHECK_FOR_MAXMIND_AT], [
     fi
 
 
-    if test -n "${maxmind_inc_path}" -a -n "${maxmind_lib_path}"; then
+    if test -n "${maxmind_inc_path}" && test -n "${maxmind_lib_path}"; then
 
         AC_MSG_NOTICE([MaxMind headers found at: ${maxmind_inc_path}])
         AC_MSG_NOTICE([MaxMind library found at: ${maxmind_lib_file}])
     fi
 
-    if test -n "${maxmind_lib_path}" -a -n "${maxmind_inc_path}"; then
+    if test -n "${maxmind_lib_path}" && test -n "${maxmind_inc_path}"; then
         # TODO: Compile a piece of code to check the version.
         MAXMIND_CFLAGS="-I${maxmind_inc_path}"
         MAXMIND_LDADD="-l${maxmind_lib_name}"

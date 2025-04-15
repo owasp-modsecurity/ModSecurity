@@ -26,12 +26,12 @@ AC_ARG_WITH(
 )
 
 
-if test "x${with_ssdeep}" == "xno"; then
+if test "x${with_ssdeep}" = "xno"; then
     AC_DEFINE(HAVE_SSDEEP, 0, [Support for SSDEEP was disabled by the utilization of --without-ssdeep or --with-ssdeep=no])
     AC_MSG_NOTICE([Support for SSDEEP was disabled by the utilization of --without-ssdeep or --with-ssdeep=no])
     SSDEEP_DISABLED=yes
 else
-    if test "x${with_ssdeep}" == "xyes"; then
+    if test "x${with_ssdeep}" = "xyes"; then
         SSDEEP_MANDATORY=yes
         AC_MSG_NOTICE([SSDEEP support was marked as mandatory by the utilization of --with-ssdeep=yes])
     else
@@ -47,7 +47,7 @@ fi
 
 
 if test -z "${SSDEEP_CFLAGS}"; then
-    if test -z "${SSDEEP_MANDATORY}" || test "x${SSDEEP_MANDATORY}" == "xno"; then
+    if test -z "${SSDEEP_MANDATORY}" || test "x${SSDEEP_MANDATORY}" = "xno"; then
         if test -z "${SSDEEP_DISABLED}"; then
             AC_MSG_NOTICE([SSDEEP library was not found])
             SSDEEP_FOUND=0
@@ -131,7 +131,7 @@ AC_DEFUN([CHECK_FOR_SSDEEP_AT], [
         AC_MSG_NOTICE([SSDEEP headers found at: ${ssdeep_inc_path}])
     fi
 
-    if test -n "${ssdeep_lib_path}" -a -n "${ssdeep_inc_path}"; then
+    if test -n "${ssdeep_lib_path}" && test -n "${ssdeep_inc_path}"; then
         # TODO: Compile a piece of code to check the version.
         SSDEEP_CFLAGS="-I${ssdeep_inc_path}"
         SSDEEP_LDADD="-l${ssdeep_lib_name}"

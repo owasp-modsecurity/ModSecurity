@@ -21,7 +21,7 @@ AC_ARG_WITH(
     [test_paths="${with_pcre}"],
     [test_paths="/usr/local/libpcre /usr/local/pcre /usr/local /opt/libpcre /opt/pcre /opt /usr /opt/local"])
 
-if test "x${with_pcre}" == "x" && test "x${with_pcre}" != "xno"; then
+if test "x${with_pcre}" = "x" && test "x${with_pcre}" != "xno"; then
     AC_MSG_NOTICE([Support for pcre not requested; omitting check for pcre])
 else
 
@@ -39,7 +39,7 @@ else
 
         for x in ${test_paths}; do
             dnl # Determine if the script was specified and use it directly
-            if test ! -d "$x" -a -e "$x"; then
+            if test ! -d "$x" && test -e "$x"; then
                 PCRE_CONFIG=$x
                 pcre_path="no"
                 break

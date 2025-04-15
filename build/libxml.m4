@@ -10,7 +10,7 @@ AC_MSG_CHECKING([for libxml2 config script])
 
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
-    if test ! -d "$x" -a -e "$x"; then
+    if test ! -d "$x" && test -e "$x"; then
         LIBXML2_CONFIG=$x
         libxml2_path="no"
         break
@@ -104,7 +104,7 @@ AC_SUBST(LIBXML2_LDADD)
 AC_SUBST(LIBXML2_LDFLAGS)
 
 
-if test "x${with_libxml}" == "xno"; then
+if test "x${with_libxml}" = "xno"; then
     LIBXML2_DISABLED=yes
 else
     if test "x${with_libxml}" != "x"; then

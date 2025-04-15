@@ -26,12 +26,12 @@ AC_ARG_WITH(
 )
 
 
-if test "x${with_lua}" == "xno"; then
+if test "x${with_lua}" = "xno"; then
     AC_DEFINE(HAVE_LUA, 0, [Support for LUA was disabled by the utilization of --without-lua or --with-lua=no])
     AC_MSG_NOTICE([Support for LUA was disabled by the utilization of --without-lua or --with-lua=no])
     LUA_DISABLED=yes
 else
-    if test "x${with_lua}" == "xyes"; then
+    if test "x${with_lua}" = "xyes"; then
         LUA_MANDATORY=yes
         AC_MSG_NOTICE([LUA support was marked as mandatory by the utilization of --with-lua=yes])
     else
@@ -77,7 +77,7 @@ fi
 
 
 if test -z "${LUA_CFLAGS}"; then
-    if test -z "${LUA_MANDATORY}" || test "x${LUA_MANDATORY}" == "xno"; then
+    if test -z "${LUA_MANDATORY}" || test "x${LUA_MANDATORY}" = "xno"; then
         if test -z "${LUA_DISABLED}"; then
             AC_MSG_NOTICE([LUA library was not found])
             LUA_FOUND=0
@@ -89,7 +89,7 @@ if test -z "${LUA_CFLAGS}"; then
        LUA_FOUND=-1
     fi
 else
-    if test -z "${LUA_MANDATORY}" || test "x${LUA_MANDATORY}" == "xno"; then
+    if test -z "${LUA_MANDATORY}" || test "x${LUA_MANDATORY}" = "xno"; then
         LUA_FOUND=1
         AC_MSG_NOTICE([using LUA ${LUA_LDADD}])
         LUA_CFLAGS="-DWITH_LUA ${LUA_CFLAGS}"
@@ -185,7 +185,7 @@ AC_DEFUN([CHECK_FOR_LUA_AT], [
     if test -n "${lua_inc_path}"; then
         AC_MSG_NOTICE([LUA headers found at: ${lua_inc_path}])
     fi
-    if test -n "${lua_lib_path}" -a -n "${lua_inc_path}"; then
+    if test -n "${lua_lib_path}" && test -n "${lua_inc_path}"; then
            LUA_CFLAGS="-I${lua_inc_path}"
            LUA_LDADD="-l${lua_lib_name}"
            LUA_LDFLAGS="-L${lua_lib_path}"

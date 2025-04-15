@@ -24,12 +24,12 @@ AC_ARG_WITH(
     [AS_HELP_STRING([--with-lmdb=PATH],[Path to lmdb prefix or config script])]
 )
 
-if test "x${with_lmdb}" == "xno"; then
+if test "x${with_lmdb}" = "xno"; then
     AC_DEFINE(HAVE_LMDB, 0, [Support for LMDB was disabled by the utilization of --without-lmdb or --with-lmdb=no])
     AC_MSG_NOTICE([Support for LMDB was disabled by the utilization of --without-lmdb or --with-lmdb=no])
     LMDB_DISABLED=yes
 else
-    if test "x${with_lmdb}" == "xyes"; then
+    if test "x${with_lmdb}" = "xyes"; then
         LMDB_MANDATORY=yes
         AC_MSG_NOTICE([LMDB support was marked as mandatory by the utilization of --with-lmdb=yes])
     fi
@@ -40,8 +40,8 @@ else
 #            fi
 #        done
 
-#    if test "x${with_lmdb}" != "xyes" or test "x${with_lmdb}" == "xyes"; then
-        if test "x${with_lmdb}" == "x" || test "x${with_lmdb}" == "xyes"; then
+#    if test "x${with_lmdb}" != "xyes" or test "x${with_lmdb}" = "xyes"; then
+        if test "x${with_lmdb}" = "x" || test "x${with_lmdb}" = "xyes"; then
             # Nothing about LMDB was informed, using the pkg-config to figure things out.
             if test -n "${PKG_CONFIG}"; then
                 LMDB_PKG_NAME=""
@@ -170,7 +170,7 @@ AC_DEFUN([CHECK_FOR_LMDB_AT], [
         AC_MSG_NOTICE([LMDB headers found at: ${lmdb_inc_path}])
     fi
 
-    if test -n "${lmdb_lib_path}" -a -n "${lmdb_inc_path}"; then
+    if test -n "${lmdb_lib_path}" && test -n "${lmdb_inc_path}"; then
         # TODO: Compile a piece of code to check the version.
         LMDB_CFLAGS="-I${lmdb_inc_path}"
         LMDB_LDADD="-l${lmdb_lib_name}"
