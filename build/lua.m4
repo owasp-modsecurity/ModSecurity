@@ -6,7 +6,7 @@ AC_DEFUN([CHECK_LUA],
 [dnl
 
 # Possible names for the lua library/package (pkg-config)
-LUA_POSSIBLE_LIB_NAMES="lua54 lua5.4 lua-5.4 lua53 lua5.3 lua-5.3 lua52 lua5.2 lua-5.2 lua51 lua5.1 lua-5.1 lua"
+LUA_POSSIBLE_LIB_NAMES="lua54 lua5.4 lua-5.4 lua53 lua5.3 lua-5.3 lua52 lua5.2 lua-5.2 lua51 lua5.1 lua-5.1 luajit lua"
 
 # Possible extensions for the library
 LUA_POSSIBLE_EXTENSIONS="so la sl dll dylib"
@@ -175,6 +175,9 @@ AC_DEFUN([CHECK_FOR_LUA_AT], [
 	LUA_VERSION=501
     elif test -e "${path}/include/luajit-2.0/lua.h"; then
         lua_inc_path="${path}/include/luajit-2.0"
+	LUA_VERSION=501
+	elif test -e "${path}/include/luajit-2.1/lua.h"; then
+        lua_inc_path="${path}/include/luajit-2.1"
 	LUA_VERSION=501
     fi
 
