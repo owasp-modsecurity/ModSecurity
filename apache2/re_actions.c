@@ -1024,7 +1024,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, apr_pool_t *mp, msre_
         return apr_psprintf(mp, "Invalid setting for ctl name HashEngine: %s", value);
      }
      else
-        if (strcasecmp(name, "parseXMLintoArgs") == 0) {
+        if (strcasecmp(name, "parseXmlIntoArgs") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         if (strcasecmp(value, "onlyargs") == 0) return NULL;
