@@ -99,7 +99,7 @@ static void msc_xml_on_end_elementns(
     // decrease the length of current path length - +1 because of the '\0'
     xml_parser_state->pathlen -= (taglen + 1);
 
-    // -1 need because we don't need the '.'
+    // -1 is needed because we don't need the last '.'
     char * newpath = apr_pstrndup(msr->mp, xml_parser_state->currpath, xml_parser_state->pathlen - 1);
     xml_parser_state->currpath = newpath;
 
