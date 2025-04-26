@@ -253,7 +253,7 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
                     *error_msg = msr->xml->xml_error;
                 }
                 else {
-                    *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document for ARGS.");
+                    *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document for ARGS.");
                 }
                 return -1;
             }
