@@ -292,7 +292,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
             msr_log(msr, 4, "XML: Parsing complete (well_formed %u).", msr->xml->well_formed);
 
             if (msr->xml->well_formed != 1) {
-                *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document.");
+                *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document.");
                 return -1;
             }
         }
