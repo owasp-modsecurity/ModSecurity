@@ -3719,7 +3719,7 @@ static const char *cmd_parse_xml_into_args(cmd_parms *cmd, void *_dcfg, const ch
     assert(p1 != NULL);
     // Normally useless code, left to be safe for the moment
     if (_dcfg == NULL) {
-        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_hash_engine: _dcfg is NULL");
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_parse_xml_into_args: _dcfg is NULL");
         return NULL;
     }
     directory_config *dcfg = (directory_config *)_dcfg;
