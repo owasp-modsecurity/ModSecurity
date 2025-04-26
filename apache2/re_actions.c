@@ -1386,7 +1386,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
         return 1;
     } else
-    if (strcasecmp(name, "parseXMLintoArgs") == 0) {
+    if (strcasecmp(name, "parseXmlIntoArgs") == 0) {
 
         if (strcasecmp(value, "on") == 0) {
             msr->txcfg->parse_xml_into_args   = MSC_XML_ARGS_ON;
