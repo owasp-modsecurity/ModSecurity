@@ -1028,7 +1028,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, apr_pool_t *mp, msre_
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         if (strcasecmp(value, "onlyargs") == 0) return NULL;
-        return apr_psprintf(mp, "Invalid setting for ctl name parseXMLintoArgs: %s", value);
+        return apr_psprintf(mp, "Invalid setting for ctl name parseXmlIntoArgs: %s", value);
      } else {
             return apr_psprintf(mp, "Invalid ctl name setting: %s", name);
      }
