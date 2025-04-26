@@ -279,7 +279,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
     if (msr->xml->parsing_ctx != NULL || msr->xml->parsing_ctx_arg != NULL) {
         if (msr->xml->parsing_ctx != NULL &&
             msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
-            /* This is how we signalise the end of parsing to libxml. */
+            /* This is how we signal the end of parsing to libxml. */
             xmlParseChunk(msr->xml->parsing_ctx, NULL, 0, 1);
 
             /* Preserve the results for our reference. */
