@@ -84,7 +84,6 @@ static void msc_xml_on_end_elementns(
             arg->value = xml_parser_state->currval;
             arg->value_len = strlen(xml_parser_state->currval);
             arg->value_origin_len = arg->value_len;
-            //arg->value_origin_offset = value-base_offset;
             arg->origin = "XML";
 
             if (msr->txcfg->debuglog_level >= 9) {
