@@ -304,7 +304,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
                     *error_msg = msr->xml->xml_error;
                 }
                 else {
-                    *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document for ARGS.");
+                    *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document for ARGS.");
                 }
                 xmlFreeParserCtxt(msr->xml->parsing_ctx_arg);
                 msr->xml->parsing_ctx_arg = NULL;
