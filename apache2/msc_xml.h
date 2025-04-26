@@ -46,7 +46,7 @@ struct xml_data {
     /* error reporting and XML array flag */
     char                   *xml_error;
 
-    /* another parser context for arguments */
+    /* additional parser context for arguments */
     xmlParserCtxtPtr        parsing_ctx_arg;
     /* parser state for SAX parser */
     msc_xml_parser_state    *xml_parser_state;
