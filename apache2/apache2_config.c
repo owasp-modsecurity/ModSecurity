@@ -3709,8 +3709,8 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
 * \param _dcfg Pointer to directory configuration
 * \param p1 Pointer to configuration option
 *
-* \retval NULL On failure
-* \retval apr_psprintf On Success
+* \retval NULL On Success
+* \retval apr_psprintf On error
 */
 static const char *cmd_parse_xml_into_args(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
