@@ -72,7 +72,7 @@ static void msc_xml_on_end_elementns(
                         log_escape_ex(msr->mp, xml_parser_state->currval, strlen(xml_parser_state->currval)));
             }
             msr->msc_reqbody_error = 1;
-            msr->xml->xml_error = apr_psprintf(msr->mp, "More than %ld XML keys", msr->txcfg->arguments_limit);
+            msr->xml->xml_error = apr_psprintf(msr->mp, "More than %ld ARGS (GET + XML)", msr->txcfg->arguments_limit);
             xmlStopParser((xmlParserCtxtPtr)msr->xml->parsing_ctx_arg);
         }
         else {
