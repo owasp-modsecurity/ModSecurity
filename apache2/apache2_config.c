@@ -3703,7 +3703,7 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
 }
 
 /**
-* \brief Add SecParseXMLIntoArgs configuration option
+* \brief Add SecParseXmlIntoArgs configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -3726,7 +3726,7 @@ static const char *cmd_parse_xml_into_args(cmd_parms *cmd, void *_dcfg, const ch
     if (strcasecmp(p1, "on") == 0)       { dcfg->parse_xml_into_args = MSC_XML_ARGS_ON; }
     else if (strcasecmp(p1, "off") == 0) { dcfg->parse_xml_into_args = MSC_XML_ARGS_OFF; }
     else if (strcasecmp(p1, "onlyargs") == 0) { dcfg->parse_xml_into_args = MSC_XML_ARGS_ONLYARGS; }
-    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecParseXMLIntoArgs: %s", p1);
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecParseXmlIntoArgs: %s", p1);
 
     return NULL;
 }
@@ -4499,7 +4499,7 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
-        "SecParseXMLintoArgs",
+        "SecParseXmlIntoArgs",
         cmd_parse_xml_into_args,
         NULL,
         CMD_SCOPE_ANY,
