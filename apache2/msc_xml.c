@@ -40,6 +40,10 @@ static void msc_xml_on_start_elementns(
     int *new_stack_item = (int *)apr_array_push(xml_parser_state->has_child_stack);
     *new_stack_item = 0;
     xml_parser_state->depth++;
+    // set null to the current value
+    // this is necessary because if there is any text between the tags (new line, etc)
+    // it will be added to the current value
+    xml_parser_state->currval = NULL;
 
     // if there is an item before the current one we set that has a child
     if (xml_parser_state->depth > 1) {
@@ -104,6 +108,7 @@ static void msc_xml_on_end_elementns(
     xml_parser_state->currpath = newpath;
 
     xml_parser_state->depth--;
+    xml_parser_state->currval = NULL;
 }
 
 static void msc_xml_on_characters(void *ctx, const xmlChar *ch, int len) {
@@ -111,7 +116,19 @@ static void msc_xml_on_characters(void *ctx, const xmlChar *ch, int len) {
     modsec_rec * msr = (modsec_rec *)ctx;
     msc_xml_parser_state * xml_parser_state = msr->xml->xml_parser_state;
 
-    xml_parser_state->currval = apr_pstrndup(msr->mp, (const char *)ch, len);
+    // libxml2 SAX parser will call this function multiple times
+    // during the parsing of a single node, if the value has multibyte
+    // characters, so we need to concatenate the values
+    xml_parser_state->currval = apr_pstrcat(msr->mp,
+                                            ((xml_parser_state->currval != NULL) ? xml_parser_state->currval : ""),
+                                            apr_pstrndup(msr->mp, (const char *)ch, len),
+                                            NULL);
+    // check if the memory allocation was successful
+    if (xml_parser_state->currval == NULL) {
+        msr->xml->xml_error = apr_psprintf(msr->mp, "Failed to allocate memory for XML value.");
+        xmlStopParser((xmlParserCtxtPtr)msr->xml->parsing_ctx_arg);
+    }
+
 }
 
 
