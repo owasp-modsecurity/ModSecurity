@@ -40,7 +40,7 @@ static void msc_xml_on_start_elementns(
     int *new_stack_item = (int *)apr_array_push(xml_parser_state->has_child_stack);
     *new_stack_item = 0;
     xml_parser_state->depth++;
-    // set null to the current value
+    // set the current value to null
     // this is necessary because if there is any text between the tags (new line, etc)
     // it will be added to the current value
     xml_parser_state->currval = NULL;
