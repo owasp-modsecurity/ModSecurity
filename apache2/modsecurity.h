@@ -243,6 +243,10 @@ extern DSOLOCAL int *unicode_map_table;
 #define RULE_EXCEPTION_REMOVE_MSG       4
 #define RULE_EXCEPTION_REMOVE_TAG       5
 
+#define MSC_XML_ARGS_OFF                0
+#define MSC_XML_ARGS_ON                 1
+#define MSC_XML_ARGS_ONLYARGS           2
+
 #define NBSP                            160
 
 struct rule_exception {
@@ -643,6 +647,7 @@ struct directory_config {
 
     /* xml */
     int                 xml_external_entity;
+    int                 parse_xml_into_args;
 
     /* This will be used whenever ModSecurity will be ready
      * to ask the server for newer rules.

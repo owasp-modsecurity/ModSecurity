@@ -166,6 +166,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     /* xml external entity */
     dcfg->xml_external_entity = NOT_SET;
+    dcfg->parse_xml_into_args = NOT_SET;
 
     return dcfg;
 }
@@ -640,6 +641,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     /* xml external entity */
     merged->xml_external_entity = (child->xml_external_entity == NOT_SET
         ? parent->xml_external_entity : child->xml_external_entity);
+    merged->parse_xml_into_args = (child->parse_xml_into_args == NOT_SET
+        ? parent->parse_xml_into_args : child->parse_xml_into_args);
 
     return merged;
 }
@@ -773,6 +776,7 @@ void init_directory_config(directory_config *dcfg)
 
     /* xml external entity */
     if (dcfg->xml_external_entity == NOT_SET) dcfg->xml_external_entity = 0;
+    if (dcfg->parse_xml_into_args == NOT_SET) dcfg->parse_xml_into_args = 0;
 
 }
 
@@ -3698,6 +3702,34 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+/**
+* \brief Add SecParseXmlIntoArgs configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On Success
+* \retval apr_psprintf On error
+*/
+static const char *cmd_parse_xml_into_args(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    assert(cmd != NULL);
+    assert(_dcfg != NULL);
+    assert(p1 != NULL);
+    // Normally useless code, left to be safe for the moment
+    if (_dcfg == NULL) {
+        ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_parse_xml_into_args: _dcfg is NULL");
+        return NULL;
+    }
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (strcasecmp(p1, "on") == 0)       { dcfg->parse_xml_into_args = MSC_XML_ARGS_ON; }
+    else if (strcasecmp(p1, "off") == 0) { dcfg->parse_xml_into_args = MSC_XML_ARGS_OFF; }
+    else if (strcasecmp(p1, "onlyargs") == 0) { dcfg->parse_xml_into_args = MSC_XML_ARGS_ONLYARGS; }
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecParseXmlIntoArgs: %s", p1);
+
+    return NULL;
+}
 
 /* -- Configuration directives definitions -- */
 
@@ -4464,6 +4496,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "Set Hash parameter"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecParseXmlIntoArgs",
+        cmd_parse_xml_into_args,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On, Off or OnlyArgs"
     ),
 
     { NULL }

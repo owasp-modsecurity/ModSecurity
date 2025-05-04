@@ -1022,6 +1022,13 @@ static char *msre_action_ctl_validate(msre_engine *engine, apr_pool_t *mp, msre_
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         return apr_psprintf(mp, "Invalid setting for ctl name HashEngine: %s", value);
+     }
+     else
+        if (strcasecmp(name, "parseXmlIntoArgs") == 0) {
+        if (strcasecmp(value, "on") == 0) return NULL;
+        if (strcasecmp(value, "off") == 0) return NULL;
+        if (strcasecmp(value, "onlyargs") == 0) return NULL;
+        return apr_psprintf(mp, "Invalid setting for ctl name parseXmlIntoArgs: %s", value);
      } else {
             return apr_psprintf(mp, "Invalid ctl name setting: %s", name);
      }
@@ -1377,6 +1384,29 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             return -1;
         }
         apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
+        return 1;
+    } else
+    if (strcasecmp(name, "parseXmlIntoArgs") == 0) {
+
+        if (strcasecmp(value, "on") == 0) {
+            msr->txcfg->parse_xml_into_args   = MSC_XML_ARGS_ON;
+            msr->usercfg->parse_xml_into_args = MSC_XML_ARGS_ON;
+        }
+        else
+        if (strcasecmp(value, "off") == 0) {
+            msr->txcfg->parse_xml_into_args   = MSC_XML_ARGS_OFF;
+            msr->usercfg->parse_xml_into_args = MSC_XML_ARGS_OFF;
+        }
+        else
+        if (strcasecmp(value, "onlyargs") == 0) {
+            msr->txcfg->parse_xml_into_args   = MSC_XML_ARGS_ONLYARGS;
+            msr->usercfg->parse_xml_into_args = MSC_XML_ARGS_ONLYARGS;
+        }
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set parseXmlIntoArgs to %s.", value);
+        }
+
         return 1;
     }
 

@@ -20,8 +20,21 @@ typedef struct xml_data xml_data;
 #include "modsecurity.h"
 #include <libxml/xmlschemas.h>
 #include <libxml/xpath.h>
+#include <libxml/SAX.h>
 
 /* Structures */
+
+struct msc_xml_parser_state {
+    apr_array_header_t * has_child_stack;
+    unsigned int         depth;
+    unsigned int         pathlen;
+    char               * currpath;
+    char               * currval;
+    size_t               currpathbufflen;
+    apr_pool_t         * mp;
+};
+
+typedef struct msc_xml_parser_state msc_xml_parser_state;
 
 struct xml_data {
     xmlSAXHandler           *sax_handler;
@@ -29,6 +42,14 @@ struct xml_data {
     xmlDocPtr               doc;
 
     unsigned int            well_formed;
+
+    /* error reporting and XML array flag */
+    char                   *xml_error;
+
+    /* additional parser context for arguments */
+    xmlParserCtxtPtr        parsing_ctx_arg;
+    /* parser state for SAX parser */
+    msc_xml_parser_state    *xml_parser_state;
 };
 
 /* Functions */
