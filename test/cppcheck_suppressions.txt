@@ -21,7 +21,12 @@ shiftNegative:src/utils/msc_tree.cc
 
 // 
 // ModSecurity v3 code...
-// 
+//
+
+functionConst:src/utils/shared_files.h:60
+useInitializationList:src/utils/shared_files.h:88
+
+
 variableScope:src/operators/rx.cc
 variableScope:src/operators/rx_global.cc
 
