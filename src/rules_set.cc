@@ -325,6 +325,25 @@ extern "C" void msc_rules_error_cleanup(const char *error) {
     free((void*) error);
 }
 
+extern "C" int msc_rules_reopen_audit_log(RulesSet *rules, const char **error) {
+    bool succeeded = true;
+    std::string errorStr;
+
+    if (rules->m_auditLog != NULL) {
+        succeeded = rules->m_auditLog->reopen(&errorStr);
+    }
+
+    if (!succeeded) {
+        if (!errorStr.empty()) {
+            *error = strdup(errorStr.c_str());
+        } else {
+            // Guarantee an error message is always assigned in the event of a failure
+            *error = strdup("Unknown error reopening audit log");
+        }
+    }
+
+    return succeeded ? 0 : -1;
+}
 
 extern "C" int msc_rules_cleanup(RulesSet *rules) {
     delete rules;

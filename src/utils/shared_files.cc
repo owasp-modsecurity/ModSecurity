@@ -14,7 +14,7 @@
  */
 
 #include "src/utils/shared_files.h"
-
+#include <cstring>
 #include <fcntl.h>
 #ifdef WIN32
 #include <algorithm>
@@ -101,6 +101,23 @@ void SharedFiles::close(const std::string& fileName) {
     }
 }
 
+bool SharedFiles::reopen(const std::string& fileName, std::string *error) {
+    auto it = m_handlers.find(fileName);
+    if (it == m_handlers.end()) {
+        return open(fileName, error);
+    }
+
+    FILE* new_fp = fopen(fileName.c_str(), "a+");
+    if (new_fp == nullptr) {
+        error->assign("Failed to reopen file: " + fileName + " - " + strerror(errno));
+        return false;
+    }
+
+    fclose(it->second.fp);
+    it->second.fp = new_fp;
+
+    return true;
+}
 
 bool SharedFiles::write(const std::string& fileName,
     const std::string &msg, std::string *error) {
