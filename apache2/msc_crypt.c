@@ -64,7 +64,6 @@ char *normalize_path(modsec_rec *msr, char *input) {
 
         if(uri->path)   {
             char *Uri = NULL;
-            int bytes = 0;
             /*int i;*/
             char *abs_link = NULL;
             char *filename = NULL;
@@ -1079,22 +1078,18 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
     if (ctype && encoding == NULL) {
         if (ctype && (p = m_strcasestr(ctype, "charset=") , p != NULL)) {
             p += 8 ;
-            if (encoding = apr_pstrndup(msr->mp, p, strcspn(p, " ;") ), encoding) {
-                xmlCharEncoding enc;
-                enc = xmlParseCharEncoding(encoding);
-                handler = xmlFindCharEncodingHandler(encoding);
-            }
+            encoding = apr_pstrndup(msr->mp, p, strcspn(p, " ;"));
+            handler = xmlFindCharEncodingHandler(encoding);
         }
     } else  {
         if(encoding != NULL)    {
-            xmlCharEncoding enc;
-            enc = xmlParseCharEncoding(encoding);
             handler = xmlFindCharEncodingHandler(encoding);
         }
     }
 
     if (msr->txcfg->debuglog_level >= 4)
-        msr_log(msr, 4, "inject_hashed_response_body: Detected encoding type [%s].", encoding);
+        msr_log(msr, 4, "inject_hashed_response_body: Detected encoding type [%s].",
+                encoding ? encoding : "(none)");
 
     if (handler == NULL)
         handler = xmlFindCharEncodingHandler("UTF-8");

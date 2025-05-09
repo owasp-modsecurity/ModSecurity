@@ -797,7 +797,6 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     int type_with_lua = 1;
     int type_rule;
     int rule_actionset;
-    int offset = 0;
 
     #ifdef DEBUG_CONF
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
@@ -1935,7 +1934,6 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_conn_read_state_limit: _dcfg is NULL");
         return NULL;
     }
-    directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
 
     limit = strtol(p1, NULL, 10);
@@ -1991,7 +1989,6 @@ static const char *cmd_conn_write_state_limit(cmd_parms *cmd, void *_dcfg,
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_conn_write_state_limit: _dcfg is NULL");
         return NULL;
     }
-    directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
 
     limit = strtol(p1, NULL, 10);
@@ -2519,7 +2516,6 @@ static const char *cmd_sever_conn_filters_engine(cmd_parms *cmd, void *_dcfg,
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_sever_conn_filters_engine: _dcfg is NULL");
         return NULL;
     }
-    directory_config *dcfg = (directory_config *)_dcfg;
 
     if (strcasecmp(p1, "on") == 0)
     {
@@ -2587,7 +2583,6 @@ static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char
         ap_log_perror(APLOG_MARK, APLOG_EMERG, 0, cmd->pool, "cmd_remote_rules_fail: _dcfg is NULL");
         return NULL;
     }
-    directory_config *dcfg = (directory_config *)_dcfg;
     
     if (strncasecmp(p1, "warn", 4) == 0)
     {

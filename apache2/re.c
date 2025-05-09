@@ -205,10 +205,9 @@ char *msre_ruleset_phase_rule_update_target_matching_exception(modsec_rec *msr, 
     assert(ruleset != NULL);
     assert(phase_arr != NULL);
     msre_rule **rules;
-    int i, j, mode;
+    int i, mode;
     char *err;
 
-    j = 0;
     mode = 0;
     rules = (msre_rule **)phase_arr->elts;
     for (i = 0; i < phase_arr->nelts; i++) {
@@ -247,7 +246,6 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     char *my_error_msg = NULL, *target = NULL;
     char *p = NULL, *savedptr = NULL;
     unsigned int is_negated = 0, is_counting = 0;
-    int name_len = 0, value_len = 0;
     char *name = NULL, *value = NULL;
     char *opt = NULL, *param = NULL;
     char *target_list = NULL, *replace = NULL;
@@ -296,10 +294,6 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                 my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
                 goto end;
             }
-
-            name_len = strlen(name);
-
-            if (value != NULL) value_len = strlen(value);
 
             targets = (msre_var **)rule->targets->elts;
             // TODO need a good way to remove the element from array, maybe change array by tables or rings
@@ -394,10 +388,6 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                     my_error_msg = apr_psprintf(ruleset->mp, "Error to update target - [%s] is not valid target", name);
                     goto end;
                 }
-
-                name_len = strlen(name);
-
-                if (value != NULL) value_len = strlen(value);
 
                 if (msr) {
                     msr_log(msr, 9, "Trying to append variable name [%s] value [%s]", name, value);

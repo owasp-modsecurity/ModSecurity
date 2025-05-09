@@ -1134,8 +1134,6 @@ void sec_audit_logger_json(modsec_rec *msr) {
     /* AUDITLOG_PART_TRAILER */
 
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_TRAILER) != NULL) {
-        apr_time_t now = apr_time_now();
-
         /* Messages */
         been_opened = 0;
         if (msr->alerts->nelts > 0) {

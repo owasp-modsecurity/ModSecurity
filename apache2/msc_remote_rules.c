@@ -719,9 +719,7 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
         if (plain_text[len]  == '\n')
         {
             const char *rule = NULL;
-            int tmp = len;
             char *cmd_name = NULL;
-            char *word = NULL;
             const command_rec *cmd;
 
             ap_directive_t *newdir;
@@ -792,6 +790,7 @@ next:
     {
         msc_remote_clean_chunk(&downloaded_content);
     }
+    return 0;
 #else
     *error_msg = "SecRemoteRules was not enabled during ModSecurity " \
         "compilation.";

@@ -104,13 +104,12 @@ int swap_int32(int x) {
  * \retval rval On Success
  */
 char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed) {
-    int unicode_len = 0, length = 0;
+    int unicode_len = 0;
     unsigned int d = 0;
     unsigned char c, *utf;
     char *rval, *data;
-    unsigned int i, len, j;
+    unsigned int i, len;
     unsigned int bytes_left = input_len;
-    unsigned char *unicode = NULL;
 
     assert(input != NULL);
 
@@ -2497,10 +2496,7 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
     apr_pool_t *mp, char **error_msg)
 {
     TreeNode *tnode = NULL;
-    apr_status_t rc;
     int line = 0;
-    apr_file_t *fd;
-    char *start;
     int res;
 
     struct msc_curl_memory_buffer_t chunk;
