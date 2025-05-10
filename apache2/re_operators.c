@@ -37,6 +37,7 @@
 
 #include "libinjection/libinjection.h"
 
+#ifdef WITH_PCRE2
 /**
  * @brief Set the JIT compile return code and JIT compile status.
  * \param regex regex structure
@@ -52,6 +53,7 @@ static void msc_op_set_jitrc(msc_regex_t *regex, int *rc, int *jit) {
     }
     return;
 }
+#endif
 
 /**
  *
