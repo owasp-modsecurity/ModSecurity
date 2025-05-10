@@ -81,7 +81,7 @@ char DSOLOCAL *real_server_signature = NULL;
 int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
 char DSOLOCAL *remote_rules_fail_message = NULL;
 module AP_MODULE_DECLARE_DATA security2_module = {
-    NULL,
+    STANDARD20_MODULE_STUFF,
     NULL,
     NULL,
     NULL,
