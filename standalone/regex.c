@@ -61,7 +61,11 @@ AP_DECLARE(ap_regex_t *) ap_pregcomp(apr_pool_t *p, const char *pattern,
 
 AP_DECLARE(void) ap_regfree(ap_regex_t *preg)
 {
+#ifdef WITH_PCRE2
+(pcre2_code_free)(preg->re_pcre);
+#else
 (pcre_free)(preg->re_pcre);
+#endif
 }
 
 AP_DECLARE(int) ap_regcomp(ap_regex_t *preg, const char *pattern, int cflags)
@@ -71,6 +75,23 @@ int erroffset;
 int options = 0;
 int nsub = 0;
 
+#ifdef WITH_PCRE2
+if ((cflags & AP_REG_ICASE) != 0) options |= PCRE2_CASELESS;
+if ((cflags & AP_REG_NEWLINE) != 0) options |= PCRE2_MULTILINE;
+int error_number = 0;
+PCRE2_SIZE error_offset = 0;
+PCRE2_SPTR pcre2_pattern = (PCRE2_SPTR)pattern;
+
+preg->re_pcre = pcre2_compile(pcre2_pattern, PCRE2_ZERO_TERMINATED,
+  options, &error_number, &error_offset, NULL);
+preg->re_erroffset = error_offset;
+
+if (preg->re_pcre == NULL) return AP_REG_INVARG;
+
+pcre2_pattern_info((const pcre2_code *)preg->re_pcre, PCRE2_INFO_CAPTURECOUNT, &nsub);
+preg->re_nsub = nsub;
+
+#else
 if ((cflags & AP_REG_ICASE) != 0) options |= PCRE_CASELESS;
 if ((cflags & AP_REG_NEWLINE) != 0) options |= PCRE_MULTILINE;
 
@@ -81,6 +102,7 @@ if (preg->re_pcre == NULL) return AP_REG_INVARG;
 
 pcre_fullinfo((const pcre *)preg->re_pcre, NULL, PCRE_INFO_CAPTURECOUNT, &nsub);
 preg->re_nsub = nsub;
+#endif  // end of WITH_PCRE
 return 0;
 }
 
@@ -98,8 +120,13 @@ int *ovector = NULL;
 int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
 int allocated_ovector = 0;
 
+#ifdef WITH_PCRE2
+if ((eflags & AP_REG_NOTBOL) != 0) options |= PCRE2_NOTBOL;
+if ((eflags & AP_REG_NOTEOL) != 0) options |= PCRE2_NOTEOL;
+#else
 if ((eflags & AP_REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
 if ((eflags & AP_REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
+#endif
 
 ((ap_regex_t *)preg)->re_erroffset = (apr_size_t)(-1);  /* Only has meaning after compile */
 
@@ -117,8 +144,38 @@ if (nmatch > 0)
     }
   }
 
+#ifdef WITH_PCRE2
+{
+  PCRE2_SPTR pcre2_s;
+  int pcre2_ret;
+  pcre2_match_data *match_data;
+  PCRE2_SIZE *pcre2_ovector = NULL;
+
+  pcre2_s = (PCRE2_SPTR)string;
+  match_data = pcre2_match_data_create_from_pattern(preg->re_pcre, NULL);
+  pcre2_match_context *match_context = pcre2_match_context_create(NULL);
+
+  pcre2_ret = pcre2_match((const pcre2_code *)preg->re_pcre, pcre2_s, (int)strlen(string),
+      0, (uint32_t)options, match_data, match_context);
+
+  if (match_data != NULL) {
+      pcre2_ovector = pcre2_get_ovector_pointer(match_data);
+      if (pcre2_ovector != NULL) {
+          for (int i = 0; ((i < pcre2_ret) && ((i*2) <= nmatch * 3)); i++) {
+              if ((i*2) < nmatch * 3) {
+                  ovector[2*i] = pcre2_ovector[2*i];
+                  ovector[2*i+1] = pcre2_ovector[2*i+1];
+              }
+          }
+      }
+      pcre2_match_data_free(match_data);
+      pcre2_match_context_free(match_context);
+  }
+}
+#else
 rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string, (int)strlen(string),
   0, options, ovector, nmatch * 3);
+#endif
 
 if (rc == 0) rc = nmatch;    /* All captured slots were filled in */
 
@@ -140,6 +197,23 @@ else
   if (allocated_ovector) free(ovector);
   switch(rc)
     {
+#ifdef WITH_PCRE2
+    case PCRE2_ERROR_NOMATCH: return AP_REG_NOMATCH;
+    case PCRE2_ERROR_NULL: return AP_REG_INVARG;
+    case PCRE2_ERROR_BADOPTION: return AP_REG_INVARG;
+    case PCRE2_ERROR_BADMAGIC: return AP_REG_INVARG;
+    // case PCRE2_ERROR_UNKNOWN_NODE: return AP_REG_ASSERT; not defined in PCRE2
+    case PCRE2_ERROR_NOMEMORY: return AP_REG_ESPACE;
+#ifdef PCRE2_ERROR_MATCHLIMIT
+    case PCRE2_ERROR_MATCHLIMIT: return AP_REG_ESPACE;
+#endif
+#ifdef PCRE2_ERROR_BADUTF8
+    case PCRE2_ERROR_BADUTF8: return AP_REG_INVARG;
+#endif
+#ifdef PCRE2_ERROR_BADUTF8_OFFSET
+    case PCRE2_ERROR_BADUTF8_OFFSET: return AP_REG_INVARG;
+#endif
+#else // with old PCRE
     case PCRE_ERROR_NOMATCH: return AP_REG_NOMATCH;
     case PCRE_ERROR_NULL: return AP_REG_INVARG;
     case PCRE_ERROR_BADOPTION: return AP_REG_INVARG;
@@ -155,6 +229,7 @@ else
 #ifdef PCRE_ERROR_BADUTF8_OFFSET
     case PCRE_ERROR_BADUTF8_OFFSET: return AP_REG_INVARG;
 #endif
+#endif // end of WITH_PCRE
     default: return AP_REG_ASSERT;
     }
   }
