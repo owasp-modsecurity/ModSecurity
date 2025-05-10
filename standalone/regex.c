@@ -91,7 +91,7 @@ if (preg->re_pcre == NULL) return AP_REG_INVARG;
 pcre2_pattern_info((const pcre2_code *)preg->re_pcre, PCRE2_INFO_CAPTURECOUNT, &nsub);
 preg->re_nsub = nsub;
 
-#else
+#else // otherwise use PCRE
 if ((cflags & AP_REG_ICASE) != 0) options |= PCRE_CASELESS;
 if ((cflags & AP_REG_NEWLINE) != 0) options |= PCRE_MULTILINE;
 
