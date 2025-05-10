@@ -725,6 +725,10 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
             #ifdef WITH_PCRE_JIT
                 #ifdef WITH_PCRE2
         rc = regex->jit_compile_rc;
+        if (rc == 0) {
+            msc_fullinfo(regex, PCRE2_INFO_JITSIZE, &jit);
+            jit = (jit > 0) ? 1 : 0;
+        }
                 #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
                 #endif
@@ -831,6 +835,10 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             if (msr->txcfg->debuglog_level >= 4) {
                     #ifdef WITH_PCRE2
                 rc = regex->jit_compile_rc;
+                if (rc == 0) {
+                    msc_fullinfo(regex, PCRE2_INFO_JITSIZE, &jit);
+                    jit = (jit > 0) ? 1 : 0;
+                }
                     #else
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
                     #endif
@@ -1002,6 +1010,10 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
             #ifdef WITH_PCRE_JIT
                 #ifdef WITH_PCRE2
         rc = regex->jit_compile_rc;
+        if (rc == 0) {
+            msc_fullinfo(regex, PCRE2_INFO_JITSIZE, &jit);
+            jit = (jit > 0) ? 1 : 0;
+        }
                 #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
                 #endif
@@ -1100,6 +1112,10 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             if (msr->txcfg->debuglog_level >= 4) {
                     #ifdef WITH_PCRE2
                 rc = regex->jit_compile_rc;
+                if (rc == 0) {
+                    msc_fullinfo(regex, PCRE2_INFO_JITSIZE, &jit);
+                    jit = (jit > 0) ? 1 : 0;
+                }
                     #else
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
                     #endif
@@ -2991,6 +3007,10 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     if (msr->txcfg->debuglog_level >= 4) {
             #ifdef WITH_PCRE2
         rc = regex->jit_compile_rc;
+        if (rc == 0) {
+            msc_fullinfo(regex, PCRE2_INFO_JITSIZE, &jit);
+            jit = (jit > 0) ? 1 : 0;
+        }
             #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
             #endif
@@ -3330,6 +3350,10 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     if (msr->txcfg->debuglog_level >= 4) {
             #ifdef WITH_PCRE2
         rc = regex->jit_compile_rc;
+        if (rc == 0) {
+            msc_fullinfo(regex, PCRE2_INFO_JITSIZE, &jit);
+            jit = (jit > 0) ? 1 : 0;
+        }
             #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
             #endif
@@ -3655,6 +3679,10 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     if (msr->txcfg->debuglog_level >= 4) {
             #ifdef WITH_PCRE2
         rc = regex->jit_compile_rc;
+        if (rc == 0) {
+            msc_fullinfo(regex, PCRE2_INFO_JITSIZE, &jit);
+            jit = (jit > 0) ? 1 : 0;
+        }
             #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
             #endif
