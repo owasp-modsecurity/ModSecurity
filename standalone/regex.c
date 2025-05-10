@@ -171,6 +171,11 @@ if (nmatch > 0)
       pcre2_match_data_free(match_data);
       pcre2_match_context_free(match_context);
   }
+  /*
+    pcre2_match() returns one more than the highest numbered capturing pair
+    that has been set (for example, 1 if there are no captures) - see pcre2_match's manual
+  */
+  rc = pcre2_ret - 1;
 }
 #else
 rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string, (int)strlen(string),
