@@ -57,7 +57,6 @@ mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ \
 mod_security2_la_LIBADD = @APR_LDADD@ \
     @APU_LDADD@ \
     @CURL_LDADD@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
@@ -70,7 +69,6 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @CURL_LDFLAGS@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -85,7 +83,6 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @CURL_LDFLAGS@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -100,7 +97,6 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @CURL_LDFLAGS@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -115,7 +111,6 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @CURL_LDFLAGS@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -130,7 +125,6 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version -R @PCRE_LD_PATH
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @CURL_LDFLAGS@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -145,7 +139,6 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @CURL_LDFLAGS@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -160,7 +153,6 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @CURL_LDFLAGS@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -175,7 +167,6 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @CURL_LDFLAGS@ \
-    @LIBXML2_CFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
