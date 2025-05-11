@@ -40,16 +40,18 @@ msc_test_CFLAGS = @APR_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
+    @PCRE2_CFLAGS@ \
     @YAJL_CFLAGS@ \
     @SSDEEP_CFLAGS@
-    
+
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
     @APR_CPPFLAGS@ \
     @CURL_CPPFLAGS@ \
     @LIBXML2_CFLAGS@ \
     @LIBXML2_CPPFLAGS@ \
-    @PCRE_CPPFLAGS@
-    
+    @PCRE_CPPFLAGS@ \
+    @PCRE2_CPPFLAGS@
+
 msc_test_LDADD = @APR_LDADD@ \
     @APU_LDADD@ \
     @CURL_LDADD@ \
@@ -57,6 +59,7 @@ msc_test_LDADD = @APR_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
+    @PCRE2_LDADD@ \
     @YAJL_LDADD@ \
     @SSDEEP_CFLAGS@
 
@@ -67,6 +70,7 @@ msc_test_LDFLAGS = @APR_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PCRE2_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 
