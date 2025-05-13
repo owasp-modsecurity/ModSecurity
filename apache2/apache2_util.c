@@ -302,8 +302,8 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
             hostname, log_escape(msr->mp, r->uri), unique_id);
   #else
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-                "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", msr->remote_addr ? msr->remote_addr : r->connection->remote_ip, str1,
-                hostname, log_escape(msr->mp, r->uri), unique_id);
+            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", msr->remote_addr ? msr->remote_addr : r->connection->remote_ip, str1,
+            hostname, log_escape(msr->mp, r->uri), unique_id);
   #endif
 #endif
 
