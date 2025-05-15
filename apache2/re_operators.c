@@ -39,7 +39,7 @@
 
 #ifdef WITH_PCRE_STUDY
 #ifdef WITH_PCRE_JIT
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 /**
  * @brief Set the JIT compile return code and JIT compile status.
  * \param regex regex structure
@@ -730,7 +730,7 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
 
     /* Compile pattern */
     if(strstr(pattern,"%{") == NULL)    {
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         int options = PCRE2_DOTALL | PCRE2_DOLLAR_ENDONLY;
 #else
         int options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
@@ -744,7 +744,7 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
 
         #ifdef WITH_PCRE_STUDY
             #ifdef WITH_PCRE_JIT
-                #ifdef WITH_PCRE2
+                #ifndef WITH_PCRE
         msc_op_set_jitrc(regex, &rc, &jit);
                 #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
@@ -834,7 +834,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
                 msr_log(msr, 6, "Escaping pattern [%s]",pattern);
             }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
             options = PCRE2_DOTALL | PCRE2_DOLLAR_ENDONLY;
 #else
             options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
@@ -850,7 +850,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             #ifdef WITH_PCRE_STUDY
                 #ifdef WITH_PCRE_JIT
             if (msr->txcfg->debuglog_level >= 4) {
-                    #ifdef WITH_PCRE2
+                    #ifndef WITH_PCRE
                 msc_op_set_jitrc(regex, &rc, &jit);
                     #else
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
@@ -888,7 +888,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
      * and no memory has to be allocated for any backreferences.
      */
     rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
 #else
     if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
@@ -922,7 +922,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
         return -1;
     }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
 #else
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -1007,7 +1007,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
 
     /* Compile pattern */
     if(strstr(pattern,"%{") == NULL)    {
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         int options = PCRE2_DOTALL | PCRE2_DOLLAR_ENDONLY;
 #else
         int options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
@@ -1021,7 +1021,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
 
         #ifdef WITH_PCRE_STUDY
             #ifdef WITH_PCRE_JIT
-                #ifdef WITH_PCRE2
+                #ifndef WITH_PCRE
         msc_op_set_jitrc(regex, &rc, &jit);
                 #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
@@ -1104,7 +1104,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                 msr_log(msr, 6, "Expanded-macro pattern [%s]",pattern);
             }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         options = PCRE2_DOTALL | PCRE2_DOLLAR_ENDONLY;
 #else
         options = PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
@@ -1119,7 +1119,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             #ifdef WITH_PCRE_STUDY
                 #ifdef WITH_PCRE_JIT
             if (msr->txcfg->debuglog_level >= 4) {
-                    #ifdef WITH_PCRE2
+                    #ifndef WITH_PCRE
                 msc_op_set_jitrc(regex, &rc, &jit);
                     #else
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
@@ -1171,7 +1171,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     /* Show when the regex captures but "capture" is not set */
     if (msr->txcfg->debuglog_level >= 6) {
         int capcount = 0;
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         rc = msc_fullinfo(regex, PCRE2_INFO_CAPTURECOUNT, &capcount);
 #else
         rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
@@ -1187,7 +1187,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
      * and no memory has to be allocated for any backreferences.
      */
     rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
 #else
     if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
@@ -1282,7 +1282,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         }
     }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     if (rc != PCRE2_ERROR_NOMATCH) { /* Match. */
 #else
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -1752,7 +1752,7 @@ static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
     *error_msg = NULL;
 
     /* Compile rule->op_param */
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     options = PCRE2_DOTALL | PCRE2_MULTILINE;
 #else
     options = PCRE_DOTALL | PCRE_MULTILINE;
@@ -1830,7 +1830,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
     memcpy(data,var->value,var->value_len);
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     options = PCRE2_NOTEMPTY;
 #else
     options = PCRE_NOTEMPTY;
@@ -2953,7 +2953,7 @@ static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     options = PCRE2_DOTALL | PCRE2_MULTILINE;
 #else
     options = PCRE_DOTALL | PCRE_MULTILINE;
@@ -3010,7 +3010,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
     if (msr->txcfg->debuglog_level >= 4) {
-            #ifdef WITH_PCRE2
+            #ifndef WITH_PCRE
         msc_op_set_jitrc(regex, &rc, &jit);
             #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
@@ -3050,7 +3050,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
             }
         }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         options = PCRE2_NOTEMPTY;
 #else
         options = PCRE_NOTEMPTY;
@@ -3058,7 +3058,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         rc = msc_regexec_ex(regex, target, target_length, offset, options, ovector, 30, &my_error_msg);
 
         /* If there was no match, then we are done. */
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         if (rc == PCRE2_ERROR_NOMATCH) {
 #else
         if (rc == PCRE_ERROR_NOMATCH) {
@@ -3280,7 +3280,7 @@ static int msre_op_verifyCPF_init(msre_rule *rule, char **error_msg) {
 
     *error_msg = NULL;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     options = PCRE2_DOTALL | PCRE2_MULTILINE;
 #else
     options = PCRE_DOTALL | PCRE_MULTILINE;
@@ -3349,7 +3349,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
     if (msr->txcfg->debuglog_level >= 4) {
-            #ifdef WITH_PCRE2
+            #ifndef WITH_PCRE
         msc_op_set_jitrc(regex, &rc, &jit);
             #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
@@ -3388,7 +3388,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             }
         }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         options = PCRE2_NOTEMPTY;
 #else
         options = PCRE_NOTEMPTY;
@@ -3396,7 +3396,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
         rc = msc_regexec_ex(regex, target, target_length, offset, options, ovector, 30, &my_error_msg);
 
         /* If there was no match, then we are done. */
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         if (rc == PCRE2_ERROR_NOMATCH) {
 #else
         if (rc == PCRE_ERROR_NOMATCH) {
@@ -3603,7 +3603,7 @@ static int msre_op_verifySSN_init(msre_rule *rule, char **error_msg) {
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     options = PCRE2_DOTALL | PCRE2_MULTILINE;
 #else
     options = PCRE_DOTALL | PCRE_MULTILINE;
@@ -3674,7 +3674,7 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
     if (msr->txcfg->debuglog_level >= 4) {
-            #ifdef WITH_PCRE2
+            #ifndef WITH_PCRE
         msc_op_set_jitrc(regex, &rc, &jit);
             #else
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
@@ -3713,7 +3713,7 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             }
         }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         options = PCRE2_NOTEMPTY;
 #else
         options = PCRE_NOTEMPTY;
@@ -3721,7 +3721,7 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
         rc = msc_regexec_ex(regex, target, target_length, offset, options, ovector, 30, &my_error_msg);
 
         /* If there was no match, then we are done. */
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         if (rc == PCRE2_ERROR_NOMATCH) {
 #else
         if (rc == PCRE_ERROR_NOMATCH) {

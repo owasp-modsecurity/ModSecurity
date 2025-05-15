@@ -17,7 +17,7 @@
 
 typedef struct msc_regex_t msc_regex_t;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include "pcre2.h"
 #else
@@ -42,7 +42,7 @@ typedef struct msc_regex_t msc_regex_t;
 #include "modsecurity.h"
 
 struct msc_regex_t {
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     pcre2_code          *re;
     pcre2_match_context *match_context;
 #ifdef WITH_PCRE_JIT

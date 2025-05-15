@@ -20,7 +20,7 @@
  */
 static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
     if (regex != NULL) {
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         if (regex->match_context != NULL) {
             pcre2_match_context_free(regex->match_context);
             regex->match_context = NULL;
@@ -55,7 +55,7 @@ static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
 void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
                       const char **_errptr, int *_erroffset,
                       int match_limit, int match_limit_recursion)
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 {
     msc_regex_t *regex = NULL;
     PCRE2_SPTR pcre2_pattern;
@@ -239,7 +239,7 @@ int msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
     if (error_msg == NULL) return -1000; /* To differentiate from PCRE as it already uses -1. */
     *error_msg = NULL;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     {
         PCRE2_SPTR pcre2_s;
         int pcre2_ret;
@@ -319,7 +319,7 @@ int msc_regexec(msc_regex_t *regex, const char *s, unsigned int slen,
  */
 int msc_fullinfo(msc_regex_t *regex, int what, void *where)
 {
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     return pcre2_pattern_info(regex->re, (uint32_t)what, where);
 #else
     return pcre_fullinfo(regex->re, regex->pe, what, where);

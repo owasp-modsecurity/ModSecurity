@@ -349,7 +349,7 @@ int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len) 
 
     apr = APR_VERSION_STRING;
     apr_loaded = apr_version_string();
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     apr_snprintf(pcre, 7, "%d.%d", PCRE2_MAJOR, PCRE2_MINOR);
     pcre_loaded = ""; /* complete this if/when status reactivated */
 #else

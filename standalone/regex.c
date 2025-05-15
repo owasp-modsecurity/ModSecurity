@@ -61,7 +61,7 @@ AP_DECLARE(ap_regex_t *) ap_pregcomp(apr_pool_t *p, const char *pattern,
 
 AP_DECLARE(void) ap_regfree(ap_regex_t *preg)
 {
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 (pcre2_code_free)(preg->re_pcre);
 #else
 (pcre_free)(preg->re_pcre);
@@ -75,7 +75,7 @@ int erroffset;
 int options = 0;
 int nsub = 0;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 if ((cflags & AP_REG_ICASE) != 0) options |= PCRE2_CASELESS;
 if ((cflags & AP_REG_NEWLINE) != 0) options |= PCRE2_MULTILINE;
 int error_number = 0;
@@ -120,7 +120,7 @@ int *ovector = NULL;
 int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
 int allocated_ovector = 0;
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 if ((eflags & AP_REG_NOTBOL) != 0) options |= PCRE2_NOTBOL;
 if ((eflags & AP_REG_NOTEOL) != 0) options |= PCRE2_NOTEOL;
 #else
@@ -144,7 +144,7 @@ if (nmatch > 0)
     }
   }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 {
   PCRE2_SPTR pcre2_s;
   int pcre2_ret;
@@ -202,7 +202,7 @@ else
   if (allocated_ovector) free(ovector);
   switch(rc)
     {
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     case PCRE2_ERROR_NOMATCH: return AP_REG_NOMATCH;
     case PCRE2_ERROR_NULL: return AP_REG_INVARG;
     case PCRE2_ERROR_BADOPTION: return AP_REG_INVARG;
