@@ -26,7 +26,7 @@ AS_CASE(["${with_pcre2}"],
     [yes], [test_paths="/usr/local/libpcre2 /usr/local/pcre2 /usr/local /opt/libpcre2 /opt/pcre2 /opt /usr"],
     [test_paths="${with_pcre2}"])
 
-if test "x${with_pcre}" != "x" || test "x${with_pcre}" != "xno"; then
+if test "x${with_pcre}" != "x" && test "x${with_pcre}" != "xno"; then
     AC_MSG_NOTICE([pcre specified; omitting check for pcre2])
 else
     AC_MSG_CHECKING([for libpcre2 config script])
