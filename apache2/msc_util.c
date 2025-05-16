@@ -2310,9 +2310,11 @@ int msc_headers_to_buffer(const apr_array_header_t *arr, char *buffer,
     int write_to_buffer = 0;
     int i = 0;
     const apr_table_entry_t *te = NULL;
+    char *ptr = NULL;
 
     if (buffer != NULL && buffer_length > 0) {
         write_to_buffer = 1;
+        ptr = buffer;
     }
 
     te = (apr_table_entry_t *)arr->elts;
@@ -2328,7 +2330,9 @@ int msc_headers_to_buffer(const apr_array_header_t *arr, char *buffer,
                     goto not_enough_memory;
                 }
 
-                sprintf(buffer, "%s%s: %s\n", buffer, key, value);
+                assert(ptr && ptr < buffer + buffer_length);
+                sprintf(ptr, "%s: %s\n", key, value);
+                ptr = buffer + headers_length; /* for the next entry. */
             }
     }
 
