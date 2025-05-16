@@ -125,7 +125,7 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
 int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
     apr_status_t rc = apr_global_mutex_create(lock, NULL, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not create global mutex");
+        ap_log_perror(APLOG_MARK, APLOG_ERR, rc, mp, " ModSecurity: Could not create global mutex");
         return -1;
     }
 #if !defined(MSC_TEST)
@@ -136,7 +136,7 @@ int acquire_global_lock(apr_global_mutex_t **lock, apr_pool_t *mp) {
     rc = unixd_set_global_mutex_perms(*lock);
 #endif
     if (rc != APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, mp, " ModSecurity: Could not set permissions on global mutex"); 
+        ap_log_perror(APLOG_MARK, APLOG_ERR, rc, mp, " ModSecurity: Could not set permissions on global mutex"); 
         return -1;
     }
 #endif /* SET_MUTEX_PERMS */
