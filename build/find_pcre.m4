@@ -29,7 +29,7 @@ AS_CASE(["${with_pcre}"],
 if test "x${with_pcre}" = "x" || test "x${with_pcre}" = "xno"; then
     AC_MSG_NOTICE([pcre not specified; omitting check for pcre])
 else
-    AC_MSG_CHECKING([for libpcre configig script])
+    AC_MSG_CHECKING([for libpcre config script])
 
     for x in ${test_paths}; do
         dnl # Determine if the script was specified and use it directly
