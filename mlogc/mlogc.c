@@ -28,7 +28,7 @@
 #if APR_HAVE_UNISTD_H
 #include <unistd.h>         /* for getpid() */
 #endif
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 #else
@@ -152,7 +152,7 @@ static int                    keep_alive = 150;           /* Not used yet. */
 static int                    keep_alive_timeout = 300;   /* Not used yet. */
 static int                    keep_entries = 0;
 static const char            *log_repository = NULL;
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
 static pcre2_code            *logline_regex = NULL;
 static pcre2_code            *requestline_regex = NULL;
 #else
@@ -1218,7 +1218,7 @@ static void logc_init(void)
     int i, erroffset;
     /* cURL major, minor and patch version */
     short cmaj, cmin, cpat = 0;
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     int pcre2_errorcode = 0;
     PCRE2_SIZE pcre2_erroffset = 0;
 #endif
@@ -1325,7 +1325,7 @@ static void logc_init(void)
     	error_log(LOG_DEBUG2, NULL, "TLSv1.2 is unsupported in cURL %d.%d.%d",  cmaj, cmin, cpat);
     }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     logline_regex = pcre2_compile(logline_pattern, PCRE2_ZERO_TERMINATED, PCRE2_CASELESS,
                                  &pcre2_errorcode, &pcre2_erroffset, NULL);
 #else
@@ -1338,7 +1338,7 @@ static void logc_init(void)
         logc_shutdown(1);
     }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     requestline_regex = pcre2_compile(requestline_pattern, PCRE2_ZERO_TERMINATED, PCRE2_CASELESS,
                                      &pcre2_errorcode, &pcre2_erroffset, NULL);
 #else
@@ -1455,7 +1455,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
     apr_status_t rc;
     apr_finfo_t finfo;
     int capturevector[CAPTUREVECTORSIZE];
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     pcre2_match_data *pcre2_match_data = NULL;
 #endif
     int take_new = 1;
@@ -1563,7 +1563,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
             num_requests++;
         }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
         pcre2_match_data  = pcre2_match_data_create_from_pattern(logline_regex, NULL);
         rc = pcre2_match(logline_regex, entry->line, entry->line_size, 0, 0,
             pcre2_match_data, NULL);
@@ -2334,7 +2334,7 @@ static void usage(void) {
  * Version text.
  */
 static void version(void) {
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     char pcre2_loaded_version_buffer[80] ={0};
     char *pcre_loaded_version = pcre2_loaded_version_buffer;
     pcre2_config(PCRE2_CONFIG_VERSION, pcre_loaded_version);
@@ -2346,7 +2346,7 @@ static void version(void) {
             "loaded=\"%s\"\n", APR_VERSION_STRING, apr_version_string());
     fprintf(stderr,
             "  PCRE: compiled=\"%d.%d\"; "
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
             "loaded=\"%s\"\n", PCRE2_MAJOR, PCRE2_MINOR, pcre_loaded_version);
 #else
             "loaded=\"%s\"\n", PCRE_MAJOR, PCRE_MINOR, pcre_version());

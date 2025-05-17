@@ -116,7 +116,7 @@ static void version(apr_pool_t *mp, server_rec* s) {
         ap_log_error(APLOG_MARK, APLOG_WARNING, 0, s, "ModSecurity: Loaded APR do not match with compiled!");
     }
 
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     pcre_vrs = apr_psprintf(mp,"%d.%d ", PCRE2_MAJOR, PCRE2_MINOR);
     pcre_loaded_vrs = pcre2_loaded_vrs_buffer;
     pcre2_config(PCRE2_CONFIG_VERSION, pcre2_loaded_vrs_buffer);
@@ -126,7 +126,7 @@ static void version(apr_pool_t *mp, server_rec* s) {
 #endif
 
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
             "ModSecurity: PCRE2 compiled version=\"%s\"; "
 #else
             "ModSecurity: PCRE compiled version=\"%s\"; "

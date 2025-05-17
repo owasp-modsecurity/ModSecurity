@@ -584,7 +584,7 @@ static int is_response_status_relevant(modsec_rec *msr, int status) {
 
     rc = msc_regexec(msr->txcfg->auditlog_relevant_regex, buf, strlen(buf), &my_error_msg);
     if (rc >= 0) return 1;
-#ifdef WITH_PCRE2
+#ifndef WITH_PCRE
     if (rc == PCRE2_ERROR_NOMATCH) return 0;
 #else
     if (rc == PCRE_ERROR_NOMATCH) return 0;

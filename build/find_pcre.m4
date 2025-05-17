@@ -19,19 +19,17 @@ AC_ARG_WITH(
     pcre,
     [AS_HELP_STRING([--with-pcre=PATH],[Path to pcre prefix or config script])],
     [test_paths="${with_pcre}"],
-    [test_paths="/usr/local/libpcre /usr/local/pcre /usr/local /opt/libpcre /opt/pcre /opt /usr"])
+    [with_pcre="no"])
 
-if test "x${with_pcre2}" != "x" && test "x${with_pcre2}" != "xno"; then
-    AC_MSG_NOTICE([pcre2 specified; omitting check for pcre])
+AS_CASE(["${with_pcre}"],
+    [no], [test_paths=],
+    [yes], [test_paths="/usr/local/libpcre /usr/local/pcre /usr/local /opt/libpcre /opt/pcre /opt /usr"],
+    [test_paths="${with_pcre}"])
+
+if test "x${with_pcre}" = "x" || test "x${with_pcre}" = "xno"; then
+    AC_MSG_NOTICE([pcre not specified; omitting check for pcre])
 else
     AC_MSG_CHECKING([for libpcre config script])
-
-    dnl # Determine pcre lib directory
-    if test -z "${with_pcre}"; then
-        test_paths="/usr/local/pcre /usr/local /usr"
-    else
-        test_paths="${with_pcre}"
-    fi
 
     for x in ${test_paths}; do
         dnl # Determine if the script was specified and use it directly
@@ -87,7 +85,8 @@ else
         AC_MSG_NOTICE([*** pcre library not found.])
     else
         AC_MSG_NOTICE([using pcre v${PCRE_VERSION}])
-        ifelse([$1], , , $1) 
-    fi 
+        PCRE_CFLAGS="-DWITH_PCRE ${PCRE_CFLAGS}"
+        ifelse([$1], , , $1)
+    fi
 fi
 ])
