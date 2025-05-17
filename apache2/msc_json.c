@@ -402,7 +402,6 @@ int json_complete(modsec_rec *msr, char **error_msg) {
     assert(msr != NULL);
     assert(msr->json != NULL);
     assert(error_msg != NULL);
-    char *json_data = (char *) NULL;
 
     *error_msg = NULL;
 

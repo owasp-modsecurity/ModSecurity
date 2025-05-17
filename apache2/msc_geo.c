@@ -279,7 +279,6 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     apr_size_t nbytes;
     unsigned int rec_val = 0;
     apr_off_t seekto = 0;
-    apr_status_t ret;
     int rc;
     int country = 0;
     int level;

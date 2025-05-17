@@ -251,18 +251,6 @@ static void acmp_add_node_to_parent(acmp_node_t *parent, acmp_node_t *child) {
     }
 }
 
-/**
- * Copies values from one node to another, without child/sibling/fail pointers
- * and without state variables.
- */
-static void acmp_clone_node_no_state(acmp_node_t *from, acmp_node_t *to) {
-    memcpy(to, from, sizeof(acmp_node_t));
-    to->child = NULL;
-    to->sibling = NULL;
-    to->fail = NULL;
-    to->hit_count = 0;
-}
-
 static inline acmp_node_t *acmp_btree_find(acmp_node_t *node, acmp_utf8_char_t letter) {
     acmp_btree_node_t *bnode = node->btree;
     for (;;) {

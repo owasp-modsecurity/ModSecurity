@@ -215,10 +215,6 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
     apr_size_t nbytes, nbytes_written;
     apr_file_t *debuglog_fd = NULL;
     int filter_debug_level = 0;
-    char *remote = NULL;
-    char *parse_remote = NULL;
-    char *saved = NULL;
-    char *str = NULL;
     char str1[1024] = "";
     char str2[1256] = "";
 

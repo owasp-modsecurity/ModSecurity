@@ -833,7 +833,7 @@ TreeNode *CPTIpMatch(modsec_rec *msr, unsigned char *ipdata, CPTTree *tree, int 
 }
 
 TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
-    unsigned long ip, ret;
+    unsigned long ret;
     unsigned char netmask_v4 = NETMASK_32, netmask_v6 = NETMASK_128;
     char ip_strv4[NETMASK_32], ip_strv6[NETMASK_128];
     struct in_addr addr4;

@@ -164,7 +164,6 @@ int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
 #ifdef DARWIN
     struct ifaddrs* ifaphead;
     struct ifaddrs* ifap;
-    int i = 0;
 
     if ( getifaddrs( &ifaphead ) != 0 ) {
         goto failed;
@@ -213,7 +212,6 @@ int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
         }
 
         if ( ioctl( sock, SIOCGIFHWADDR, ifr ) == 0 ) {
-            int i = 0;
             if (!ifr->ifr_addr.sa_data[0] && !ifr->ifr_addr.sa_data[1]
                 && !ifr->ifr_addr.sa_data[2]) {
                 continue;
@@ -287,7 +285,7 @@ failed:
 int DSOLOCAL msc_status_engine_unique_id (unsigned char *digest)
 {
     unsigned char hex_digest[APR_SHA1_DIGESTSIZE];
-    unsigned char *mac_address = NULL;
+    unsigned char *mac_address = NULL, *digptr;
     char *machine_name = NULL;
     int ret = 0;
     int i = 0;
@@ -321,9 +319,10 @@ int DSOLOCAL msc_status_engine_unique_id (unsigned char *digest)
     apr_sha1_update(&context, mac_address, strlen(mac_address));
     apr_sha1_final(hex_digest, &context);
 
-    for (i = 0; i < APR_SHA1_DIGESTSIZE; i++)
+    for (i = 0, digptr = digest; i < APR_SHA1_DIGESTSIZE; i++)
     {
-        sprintf(digest, "%s%02x", digest, hex_digest[i]);
+        sprintf(digptr, "%02x", hex_digest[i]);
+        digptr += 2;
     }
 
 failed_set_machine_name:
@@ -372,7 +371,7 @@ int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len) 
     /* 6 represents: strlen("(null)") */
     beacon_string_len = (modsec ? strlen(modsec) : 6) +
         (apache ? strlen(apache) : 6) + (apr ? strlen(apr) : 6) +
-        (apr_loaded ? strlen(apr_loaded) : 6) + (pcre ? strlen(pcre) : 6) +
+        (apr_loaded ? strlen(apr_loaded) : 6) + strlen(pcre) +
         (pcre_loaded ? strlen(pcre_loaded) : 6) + (lua ? strlen(lua) : 6) +
         (libxml ? strlen(libxml) : 6) + (APR_SHA1_DIGESTSIZE * 2);
 

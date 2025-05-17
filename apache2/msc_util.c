@@ -104,13 +104,12 @@ int swap_int32(int x) {
  * \retval rval On Success
  */
 char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed) {
-    int unicode_len = 0, length = 0;
+    int unicode_len = 0;
     unsigned int d = 0;
     unsigned char c, *utf;
     char *rval, *data;
-    unsigned int i, len, j;
+    unsigned int i, len;
     unsigned int bytes_left = input_len;
-    unsigned char *unicode = NULL;
 
     assert(input != NULL);
 
@@ -2311,9 +2310,11 @@ int msc_headers_to_buffer(const apr_array_header_t *arr, char *buffer,
     int write_to_buffer = 0;
     int i = 0;
     const apr_table_entry_t *te = NULL;
+    char *ptr = NULL;
 
     if (buffer != NULL && buffer_length > 0) {
         write_to_buffer = 1;
+        ptr = buffer;
     }
 
     te = (apr_table_entry_t *)arr->elts;
@@ -2329,7 +2330,9 @@ int msc_headers_to_buffer(const apr_array_header_t *arr, char *buffer,
                     goto not_enough_memory;
                 }
 
-                sprintf(buffer, "%s%s: %s\n", buffer, key, value);
+                assert(ptr && ptr < buffer + buffer_length);
+                sprintf(ptr, "%s: %s\n", key, value);
+                ptr = buffer + headers_length; /* for the next entry. */
             }
     }
 
@@ -2497,10 +2500,7 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
     apr_pool_t *mp, char **error_msg)
 {
     TreeNode *tnode = NULL;
-    apr_status_t rc;
     int line = 0;
-    apr_file_t *fd;
-    char *start;
     int res;
 
     struct msc_curl_memory_buffer_t chunk;
