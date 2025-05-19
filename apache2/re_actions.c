@@ -1527,8 +1527,9 @@ static apr_status_t msre_action_sanitizeMatched_execute(modsec_rec *msr, apr_poo
             for (i = 0; i < tarr->nelts; i++) {
                 msc_arg *arg = (msc_arg *)telts[i].val;
                 assert(arg != NULL);
-                if (strcasecmp(sargname, arg->name) == 0) {
+                if (arg->marked_for_sanitization == 0 && strcasecmp(sargname, arg->name) == 0) {
                     apr_table_addn(msr->arguments_to_sanitize, arg->name, (void *)arg);
+                    arg->marked_for_sanitization = 1;
                 }
             }
             break;
