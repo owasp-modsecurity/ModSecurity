@@ -1,9 +1,43 @@
-(to be released) - 2.9.x 
+(to be released) - 2.9.x
 ------------------------
 
+ * chore: log error codes for global mutex failure modes.
+   [Issue #3387 - @airween]
+ * chore: refactor build system to use PCRE2
+   [Issue #3383 - @airween]
+ * feat: add 'make test' to v2's workflow
+   [Issue #3379 - @airween]
+ * fix: 'make test' is able to run again
+   [Issue #3378 - @airween]
+ * fix: add PCRE2 capability to standalone module
+   [Issue #3377 - @airween]
+ * chore: remove unnecessary @LIBXML2_CFLAGS@ from linker flags
+   [Issue #3376 - @airween]
+ * fix: add msc_fullinfo() to check JIT compilation
+   [Issue #3375 - @airween]
+ * Fix error logging for standalone module
+   [Issue #3374 - @RedXanadu]
+ * Fix compiler warnings from GCC
+   [Issue #3372 - @notroj]
+ * feat: improved XMLArgs processing
+   [Issue #3358 - @airween]
+ * Incorrect utf8toUnicode transformation for 00xx
+   [Issue #3284 - @marcstern]
+ * Fixed PCRE2 error message
+   [Issue #3279 - @marcstern]
+ * make rootpath and incpath consts for apr_filepath_root
+   [Issue #3270 - @Marcool04]
+ * Fix apr_global_mutex_create() usage
+   [Issue #3269 - @marcstern]
+ * chore: add 'log' action to rule 200005 (v2/master)
+   [Issue #3267 - @airween]
+ * Move id_log() to msc_util to fix unit tests; it is declared on msc_ut…
+   [Issue #3265 - @rainerjung]
+ * Missing #include <time.h>
+   [Issue #3262 - @marcstern]
  * Fixed apr_global_mutex_create() usage (no filename)
    [PR #3269 - @marcstern]
-* handle errors from apr_global_mutex_lock
+ * handle errors from apr_global_mutex_lock
    [PR #3257 - @marcstern]
 
 03 Sep 2024 - 2.9.8
