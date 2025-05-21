@@ -693,6 +693,7 @@ struct msc_arg {
     unsigned int             value_origin_offset;
     unsigned int             value_origin_len;
     const char              *origin;
+    unsigned int             marked_for_sanitization;
 };
 
 struct msc_string {

@@ -70,6 +70,7 @@ int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
         return 0;
     }
 
+    arg->marked_for_sanitization = 0;
     apr_table_addn(msr->arguments,
         log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *) arg);
 

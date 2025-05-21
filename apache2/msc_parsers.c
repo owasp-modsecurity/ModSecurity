@@ -350,6 +350,7 @@ void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg)
     assert(msr != NULL);
     assert(arguments != NULL);
     assert(arg != NULL);
+    arg->marked_for_sanitization = 0;
     if (msr->txcfg->debuglog_level >= 5) {
         msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
                 arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
