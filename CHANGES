@@ -1,6 +1,8 @@
-(to be released) - 2.9.x
-------------------------
+21 May 2025 - 2.9.9
+-------------------
 
+ * fix: DoS vulnerability
+   [PR from private repo - @theseion, @fzipi, @airween; fixed CVE-2025-47947]
  * chore: log error codes for global mutex failure modes.
    [Issue #3387 - @airween]
  * chore: refactor build system to use PCRE2
