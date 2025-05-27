@@ -182,7 +182,7 @@ int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
                 (unsigned char)LLADDR(sdl)[3],
                 (unsigned char)LLADDR(sdl)[4],
                 (unsigned char)LLADDR(sdl)[5]);
-            goto end;
+            break;
         }
     }
 
@@ -225,7 +225,7 @@ int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
                 (unsigned char)ifr->ifr_addr.sa_data[4],
                 (unsigned char)ifr->ifr_addr.sa_data[5]);
 
-            goto end;
+            break;
         }
     }
     close( sock );
@@ -268,7 +268,7 @@ int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
                 (unsigned char)pAdapter->Address[3],
                 (unsigned char)pAdapter->Address[4],
                 (unsigned char)pAdapter->Address[5]);
-            goto end;
+            break;
         }
         pAdapter = pAdapter->Next;
     }
@@ -276,7 +276,6 @@ int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
     free(pAdapterInfo);
 #endif
 
-end:
     return 0;
 failed:
     return -1;
