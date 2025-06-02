@@ -1,3 +1,9 @@
+02 Jun 2025 - 2.9.10
+--------------------
+
+ * fix: DoS vulnerability
+   [PR from private repo - @theseion, @fzipi, @airween; fixed CVE-2025-48866]
+
 21 May 2025 - 2.9.9
 -------------------
 
