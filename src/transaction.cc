@@ -1565,7 +1565,7 @@ std::string Transaction::toJSON(int parts) {
     size_t len;
     yajl_gen g;
     std::string log;
-    std::string ts = utils::string::ascTime(&m_timeStamp).c_str();
+    std::string ts = utils::string::ascTime(&m_timeStamp);
     std::string uniqueId = UniqueId::uniqueId();
 
     g = yajl_gen_alloc(NULL);
@@ -1583,13 +1583,13 @@ std::string Transaction::toJSON(int parts) {
 
     yajl_gen_map_open(g);
     /* Part: A (header mandatory) */
-    LOGFY_ADD("client_ip", m_clientIpAddress.c_str());
-    LOGFY_ADD("time_stamp", ts.c_str());
-    LOGFY_ADD("server_id", uniqueId.c_str());
+    LOGFY_ADD("client_ip", m_clientIpAddress);
+    LOGFY_ADD("time_stamp", ts);
+    LOGFY_ADD("server_id", uniqueId);
     LOGFY_ADD_NUM("client_port", m_clientPort);
-    LOGFY_ADD("host_ip", m_serverIpAddress.c_str());
+    LOGFY_ADD("host_ip", m_serverIpAddress);
     LOGFY_ADD_NUM("host_port", m_serverPort);
-    LOGFY_ADD("unique_id", m_id.c_str());
+    LOGFY_ADD("unique_id", m_id);
 
     /* request */
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("request"),
@@ -1598,14 +1598,15 @@ std::string Transaction::toJSON(int parts) {
 
     LOGFY_ADD("method",
         utils::string::dash_if_empty(
-            m_variableRequestMethod.evaluate()).c_str());
+            m_variableRequestMethod.evaluate()));
 
-    LOGFY_ADD_INT("http_version", m_httpVersion.c_str());
-    LOGFY_ADD("uri", this->m_uri.c_str());
+    LOGFY_ADD("http_version", m_httpVersion);
+    LOGFY_ADD("hostname", m_requestHostName);
+    LOGFY_ADD("uri", this->m_uri);
 
     if (parts & audit_log::AuditLog::CAuditLogPart) {
         // FIXME: check for the binary content size.
-        LOGFY_ADD("body", this->m_requestBody.str().c_str());
+        LOGFY_ADD("body", this->m_requestBody.str());
     }
 
     /* request headers */
@@ -1617,7 +1618,7 @@ std::string Transaction::toJSON(int parts) {
 
         m_variableRequestHeaders.resolve(&l);
         for (auto &h : l) {
-            LOGFY_ADD(h->getKey().c_str(), h->getValue().c_str());
+            LOGFY_ADD(h->getKey().c_str(), h->getValue());
             delete h;
         }
 
@@ -1634,7 +1635,7 @@ std::string Transaction::toJSON(int parts) {
     yajl_gen_map_open(g);
 
     if (parts & audit_log::AuditLog::EAuditLogPart) {
-        LOGFY_ADD("body", this->m_responseBody.str().c_str());
+        LOGFY_ADD("body", this->m_responseBody.str());
     }
     LOGFY_ADD_NUM("http_code", m_httpCodeReturned);
 
@@ -1647,7 +1648,7 @@ std::string Transaction::toJSON(int parts) {
 
         m_variableResponseHeaders.resolve(&l);
         for (auto &h : l) {
-            LOGFY_ADD(h->getKey().c_str(), h->getValue().c_str());
+            LOGFY_ADD(h->getKey().c_str(), h->getValue());
             delete h;
         }
 
@@ -1664,10 +1665,10 @@ std::string Transaction::toJSON(int parts) {
         yajl_gen_map_open(g);
 
         /* producer > libmodsecurity */
-        LOGFY_ADD("modsecurity", m_ms->whoAmI().c_str());
+        LOGFY_ADD("modsecurity", m_ms->whoAmI());
 
         /* producer > connector */
-        LOGFY_ADD("connector", m_ms->getConnectorInformation().c_str());
+        LOGFY_ADD("connector", m_ms->getConnectorInformation());
 
         /* producer > engine state */
         LOGFY_ADD("secrules_engine",
@@ -1683,7 +1684,7 @@ std::string Transaction::toJSON(int parts) {
         for (const auto &a : m_rules->m_components) {
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>
-                    (a.c_str()), a.length());
+                    (a.data()), a.length());
         }
         yajl_gen_array_close(g);
 
@@ -1697,20 +1698,20 @@ std::string Transaction::toJSON(int parts) {
         yajl_gen_array_open(g);
         for (auto a : m_rulesMessages) {
             yajl_gen_map_open(g);
-            LOGFY_ADD("message", a.m_message.c_str());
+            LOGFY_ADD("message", a.m_message);
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>("details"),
                 strlen("details"));
             yajl_gen_map_open(g);
-            LOGFY_ADD("match", a.m_match.c_str());
-            LOGFY_ADD("reference", a.m_reference.c_str());
-            LOGFY_ADD("ruleId", std::to_string(a.m_rule.m_ruleId).c_str());
-            LOGFY_ADD("file", a.m_rule.getFileName().c_str());
-            LOGFY_ADD("lineNumber", std::to_string(a.m_rule.getLineNumber()).c_str());
-            LOGFY_ADD("data", a.m_data.c_str());
-            LOGFY_ADD("severity", std::to_string(a.m_severity).c_str());
-            LOGFY_ADD("ver", a.m_rule.m_ver.c_str());
-            LOGFY_ADD("rev", a.m_rule.m_rev.c_str());
+            LOGFY_ADD("match", a.m_match);
+            LOGFY_ADD("reference", a.m_reference);
+            LOGFY_ADD("ruleId", std::to_string(a.m_rule.m_ruleId));
+            LOGFY_ADD("file", a.m_rule.getFileName());
+            LOGFY_ADD("lineNumber", std::to_string(a.m_rule.getLineNumber()));
+            LOGFY_ADD("data", a.m_data);
+            LOGFY_ADD("severity", std::to_string(a.m_severity));
+            LOGFY_ADD("ver", a.m_rule.m_ver);
+            LOGFY_ADD("rev", a.m_rule.m_rev);
 
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>("tags"),
@@ -1718,13 +1719,13 @@ std::string Transaction::toJSON(int parts) {
             yajl_gen_array_open(g);
             for (auto b : a.m_tags) {
                 yajl_gen_string(g,
-                    reinterpret_cast<const unsigned char*>(b.c_str()),
-                    strlen(b.c_str()));
+                    reinterpret_cast<const unsigned char*>(b.data()),
+                    b.length());
             }
             yajl_gen_array_close(g);
 
-            LOGFY_ADD("maturity", std::to_string(a.m_rule.m_maturity).c_str());
-            LOGFY_ADD("accuracy", std::to_string(a.m_rule.m_accuracy).c_str());
+            LOGFY_ADD("maturity", std::to_string(a.m_rule.m_maturity));
+            LOGFY_ADD("accuracy", std::to_string(a.m_rule.m_accuracy));
             yajl_gen_map_close(g);
             yajl_gen_map_close(g);
         }
