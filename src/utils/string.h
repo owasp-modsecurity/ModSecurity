@@ -74,7 +74,11 @@ inline std::string ascTime(const time_t *t) {
     struct tm timeinfo;
     localtime_r(t, &timeinfo);
     char tstr[std::size("Www Mmm dd hh:mm:ss yyyy")];
-    strftime(tstr, std::size(tstr), "%a %b %d %H:%M:%S %Y", &timeinfo);
+    // `%c` is equivalent to `%a %b %e %T %Y` with a fixed length, even though zero-padded
+    // month of day is optional, depending on the locale. This would lead to an empty space, e.g.,
+    // `Sat Jun  7 11:46:23 2025` (notice the two spaces before the day of month).
+    // Use `%d` instead and enforce padding.
+    strftime(tstr, std::size(tstr), "%a %b %d %T %Y", &timeinfo);
     return tstr;
 }
 
