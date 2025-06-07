@@ -74,7 +74,7 @@ inline std::string ascTime(const time_t *t) {
     struct tm timeinfo;
     localtime_r(t, &timeinfo);
     char tstr[std::size("Www Mmm dd hh:mm:ss yyyy")];
-    strftime(tstr, std::size(tstr), "%c", &timeinfo);
+    strftime(tstr, std::size(tstr), "%a %b %d %H:%M:%S %Y", &timeinfo);
     return tstr;
 }
 
