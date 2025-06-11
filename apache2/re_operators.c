@@ -2898,6 +2898,7 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
 
     xmlSchemaFree(schema);
     xmlSchemaFreeValidCtxt(validCtx);
+    xmlSchemaFreeParserCtxt(parserCtx);
 
     return 0;
 }
