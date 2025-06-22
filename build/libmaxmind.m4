@@ -130,31 +130,31 @@ AC_DEFUN([CHECK_FOR_MAXMIND_AT], [
     for y in ${MAXMIND_POSSIBLE_EXTENSIONS}; do
         for z in ${MAXMIND_POSSIBLE_LIB_NAMES}; do
            if test -e "${path}/${z}.${y}"; then
-               maxmind_lib_path="${path}/"
+               maxmind_lib_path="${path}"
                maxmind_lib_name="${z}"
                maxmind_lib_file="${maxmind_lib_path}/${z}.${y}"
                break
            fi
            if test -e "${path}/lib${z}.${y}"; then
-               maxmind_lib_path="${path}/"
+               maxmind_lib_path="${path}"
                maxmind_lib_name="${z}"
                maxmind_lib_file="${maxmind_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/lib${z}.${y}"; then
-               maxmind_lib_path="${path}/lib/"
+               maxmind_lib_path="${path}/lib"
                maxmind_lib_name="${z}"
                maxmind_lib_file="${maxmind_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib64/lib${z}.${y}"; then
-               maxmind_lib_path="${path}/lib64/"
+               maxmind_lib_path="${path}/lib64"
                maxmind_lib_name="${z}"
                maxmind_lib_file="${maxmind_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/x86_64-linux-gnu/lib${z}.${y}"; then
-               maxmind_lib_path="${path}/lib/x86_64-linux-gnu/"
+               maxmind_lib_path="${path}/lib/x86_64-linux-gnu"
                maxmind_lib_name="${z}"
                maxmind_lib_file="${maxmind_lib_path}/lib${z}.${y}"
                break

@@ -121,31 +121,37 @@ AC_DEFUN([CHECK_FOR_LUA_AT], [
     for y in ${LUA_POSSIBLE_EXTENSIONS}; do
         for z in ${LUA_POSSIBLE_LIB_NAMES}; do
            if test -e "${path}/${z}.${y}"; then
-               lua_lib_path="${path}/"
+               lua_lib_path="${path}"
                lua_lib_name="${z}"
                lua_lib_file="${lua_lib_path}/${z}.${y}"
                break
            fi
            if test -e "${path}/lib${z}.${y}"; then
-               lua_lib_path="${path}/"
+               lua_lib_path="${path}"
                lua_lib_name="${z}"
                lua_lib_file="${lua_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/lib${z}.${y}"; then
-               lua_lib_path="${path}/lib/"
+               lua_lib_path="${path}/lib"
+               lua_lib_name="${z}"
+               lua_lib_file="${lua_lib_path}/lib${z}.${y}"
+               break
+           fi
+           if test -e "${path}/lib64/lib${z}.${y}"; then
+               lua_lib_path="${path}/lib64"
                lua_lib_name="${z}"
                lua_lib_file="${lua_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/x86_64-linux-gnu/lib${z}.${y}"; then
-               lua_lib_path="${path}/lib/x86_64-linux-gnu/"
+               lua_lib_path="${path}/lib/x86_64-linux-gnu"
                lua_lib_name="${z}"
                lua_lib_file="${lua_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/i386-linux-gnu/lib${z}.${y}"; then
-               lua_lib_path="${path}/lib/i386-linux-gnu/"
+               lua_lib_path="${path}/lib/i386-linux-gnu"
                lua_lib_name="${z}"
                lua_lib_file="${lua_lib_path}/lib${z}.${y}"
                break
