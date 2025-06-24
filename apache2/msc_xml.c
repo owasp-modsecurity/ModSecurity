@@ -44,6 +44,7 @@ static void msc_xml_on_start_elementns(
     // this is necessary because if there is any text between the tags (new line, etc)
     // it will be added to the current value
     xml_parser_state->currval = NULL;
+    xml_parser_state->currpathbufflen = 0;
 
     // if there is an item before the current one we set that has a child
     if (xml_parser_state->depth > 1) {
@@ -73,7 +74,11 @@ static void msc_xml_on_end_elementns(
             if (msr->txcfg->debuglog_level >= 4) {
                 msr_log(msr, 4, "Skipping request argument, over limit (XML): name \"%s\", value \"%s\"",
                         log_escape_ex(msr->mp, xml_parser_state->currpath, strlen(xml_parser_state->currpath)),
-                        log_escape_ex(msr->mp, xml_parser_state->currval, strlen(xml_parser_state->currval)));
+                        log_escape_ex(msr->mp,
+                                      (xml_parser_state->currval == NULL ? apr_pstrndup(msr->mp, "", 1) : xml_parser_state->currval),
+                                      (xml_parser_state->currvalbufflen == 0 ? 1 : xml_parser_state->currvalbufflen)
+                                     )
+                        );
             }
             msr->msc_reqbody_error = 1;
             msr->xml->xml_error = apr_psprintf(msr->mp, "More than %ld ARGS (GET + XML)", msr->txcfg->arguments_limit);
@@ -86,7 +91,7 @@ static void msc_xml_on_end_elementns(
             arg->name = xml_parser_state->currpath;
             arg->name_len = strlen(arg->name);
             arg->value = (xml_parser_state->currval == NULL) ? apr_pstrndup(msr->mp, "", 1) : xml_parser_state->currval;
-            arg->value_len = (xml_parser_state->currval == NULL) ? 0 : strlen(xml_parser_state->currval);
+            arg->value_len = (xml_parser_state->currvalbufflen == 0) ? 1 : xml_parser_state->currvalbufflen;
             arg->value_origin_len = arg->value_len;
             arg->origin = "XML";
 
@@ -123,6 +128,7 @@ static void msc_xml_on_characters(void *ctx, const xmlChar *ch, int len) {
                                             ((xml_parser_state->currval != NULL) ? xml_parser_state->currval : ""),
                                             apr_pstrndup(msr->mp, (const char *)ch, len),
                                             NULL);
+    xml_parser_state->currvalbufflen += len;
     // check if the memory allocation was successful
     if (xml_parser_state->currval == NULL) {
         msr->xml->xml_error = apr_psprintf(msr->mp, "Failed to allocate memory for XML value.");
@@ -175,6 +181,7 @@ int xml_init(modsec_rec *msr, char **error_msg) {
         msr->xml->xml_parser_state->pathlen         = 4; // "xml\0"
         msr->xml->xml_parser_state->currpath        = apr_pstrdup(msr->mp, "xml");
         msr->xml->xml_parser_state->currval         = NULL;
+        msr->xml->xml_parser_state->currvalbufflen  = 0;
         msr->xml->xml_parser_state->currpathbufflen = 4;
         // initialize the stack with item of 10
         // this will store the information about nodes
