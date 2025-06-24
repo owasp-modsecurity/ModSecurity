@@ -112,7 +112,7 @@ static void msc_xml_on_end_elementns(
     // -1 is needed because we don't need the last '.'
     char * newpath = apr_pstrndup(msr->mp, xml_parser_state->currpath, xml_parser_state->pathlen - 1);
     xml_parser_state->currpath = newpath;
-    xml_parser_state->currpathbufflen = xml_parser_state->pathlen - 2; // -2 because of the '\0' and the last '.'
+    xml_parser_state->currpathbufflen = xml_parser_state->pathlen - 1;
 
     xml_parser_state->depth--;
     xml_parser_state->currval = NULL;
