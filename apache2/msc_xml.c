@@ -85,14 +85,14 @@ static void msc_xml_on_end_elementns(
 
             arg->name = xml_parser_state->currpath;
             arg->name_len = strlen(arg->name);
-            arg->value = xml_parser_state->currval;
-            arg->value_len = strlen(xml_parser_state->currval);
+            arg->value = (xml_parser_state->currval == NULL) ? apr_pstrndup(msr->mp, "", 1) : xml_parser_state->currval;
+            arg->value_len = (xml_parser_state->currval == NULL) ? 0 : strlen(xml_parser_state->currval);
             arg->value_origin_len = arg->value_len;
             arg->origin = "XML";
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Adding XML argument '%s' with value '%s'",
-                    xml_parser_state->currpath, xml_parser_state->currval);
+                    xml_parser_state->currpath, arg->value);
             }
 
             apr_table_addn(msr->arguments,
