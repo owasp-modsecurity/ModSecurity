@@ -36,6 +36,7 @@ static void msc_xml_on_start_elementns(
     xml_parser_state->pathlen += (taglen + 1);
     char *newpath = apr_pstrcat(msr->mp, xml_parser_state->currpath, ".", (char *)localname, NULL);
     xml_parser_state->currpath = newpath;
+    xml_parser_state->currpathbufflen += taglen;
 
     int *new_stack_item = (int *)apr_array_push(xml_parser_state->has_child_stack);
     *new_stack_item = 0;
@@ -44,7 +45,7 @@ static void msc_xml_on_start_elementns(
     // this is necessary because if there is any text between the tags (new line, etc)
     // it will be added to the current value
     xml_parser_state->currval = NULL;
-    xml_parser_state->currpathbufflen = 0;
+    xml_parser_state->currvalbufflen = 0;
 
     // if there is an item before the current one we set that has a child
     if (xml_parser_state->depth > 1) {
@@ -73,7 +74,7 @@ static void msc_xml_on_end_elementns(
         if (apr_table_elts(msr->arguments)->nelts >= msr->txcfg->arguments_limit) {
             if (msr->txcfg->debuglog_level >= 4) {
                 msr_log(msr, 4, "Skipping request argument, over limit (XML): name \"%s\", value \"%s\"",
-                        log_escape_ex(msr->mp, xml_parser_state->currpath, strlen(xml_parser_state->currpath)),
+                        log_escape_ex(msr->mp, xml_parser_state->currpath, xml_parser_state->currpathbufflen),
                         log_escape_ex(msr->mp,
                                       (xml_parser_state->currval == NULL ? apr_pstrndup(msr->mp, "", 1) : xml_parser_state->currval),
                                       (xml_parser_state->currvalbufflen == 0 ? 1 : xml_parser_state->currvalbufflen)
@@ -89,7 +90,7 @@ static void msc_xml_on_end_elementns(
             msc_arg * arg = (msc_arg *) apr_pcalloc(msr->mp, sizeof(msc_arg));
 
             arg->name = xml_parser_state->currpath;
-            arg->name_len = strlen(arg->name);
+            arg->name_len = xml_parser_state->currpathbufflen;
             arg->value = (xml_parser_state->currval == NULL) ? apr_pstrndup(msr->mp, "", 1) : xml_parser_state->currval;
             arg->value_len = (xml_parser_state->currvalbufflen == 0) ? 1 : xml_parser_state->currvalbufflen;
             arg->value_origin_len = arg->value_len;
@@ -111,9 +112,11 @@ static void msc_xml_on_end_elementns(
     // -1 is needed because we don't need the last '.'
     char * newpath = apr_pstrndup(msr->mp, xml_parser_state->currpath, xml_parser_state->pathlen - 1);
     xml_parser_state->currpath = newpath;
+    xml_parser_state->currpathbufflen = xml_parser_state->pathlen - 2; // -2 because of the '\0' and the last '.'
 
     xml_parser_state->depth--;
     xml_parser_state->currval = NULL;
+    xml_parser_state->currvalbufflen = 0;
 }
 
 static void msc_xml_on_characters(void *ctx, const xmlChar *ch, int len) {
@@ -180,9 +183,9 @@ int xml_init(modsec_rec *msr, char **error_msg) {
         msr->xml->xml_parser_state->depth           = 0;
         msr->xml->xml_parser_state->pathlen         = 4; // "xml\0"
         msr->xml->xml_parser_state->currpath        = apr_pstrdup(msr->mp, "xml");
+        msr->xml->xml_parser_state->currpathbufflen = 3; // "xml"
         msr->xml->xml_parser_state->currval         = NULL;
         msr->xml->xml_parser_state->currvalbufflen  = 0;
-        msr->xml->xml_parser_state->currpathbufflen = 4;
         // initialize the stack with item of 10
         // this will store the information about nodes
         // 10 is just an initial value, it can be automatically incremented
