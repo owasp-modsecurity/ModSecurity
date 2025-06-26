@@ -36,7 +36,7 @@ static void msc_xml_on_start_elementns(
     xml_parser_state->pathlen += (taglen + 1);
     char *newpath = apr_pstrcat(msr->mp, xml_parser_state->currpath, ".", (char *)localname, NULL);
     xml_parser_state->currpath = newpath;
-    xml_parser_state->currpathbufflen += taglen;
+    xml_parser_state->currpathbufflen += taglen + 1;
 
     int *new_stack_item = (int *)apr_array_push(xml_parser_state->has_child_stack);
     *new_stack_item = 0;
@@ -98,7 +98,7 @@ static void msc_xml_on_end_elementns(
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Adding XML argument '%s' with value '%s'",
-                    xml_parser_state->currpath, arg->value);
+                    arg->name, arg->value);
             }
 
             apr_table_addn(msr->arguments,
