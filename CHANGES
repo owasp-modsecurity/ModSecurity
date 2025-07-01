@@ -1,3 +1,15 @@
+01 Jul 2025 - 2.9.11
+--------------------
+
+ * fix: prevent segmentation fault if the XML node is empty
+   [PR from private repo - @theseion, @fzipi, @RedXanadu, @airween; fixed CVE-2025-52891]
+ * Plug memory leak when msre_op_validateSchema_execute() exits normally (validateSchema)
+   [Issue #3401 - @nic-prgs]
+ * chore: bump version in MSI installer.wxs
+   [Issue #3400 - @airween]
+ * Fix resource leaks in `msc_status_engine_mac_address`
+   [Issue #3391 - @amezin]
+
 02 Jun 2025 - 2.9.10
 --------------------
 
