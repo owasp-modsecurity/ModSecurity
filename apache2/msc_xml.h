@@ -31,6 +31,7 @@ struct msc_xml_parser_state {
     char               * currpath;
     char               * currval;
     size_t               currpathbufflen;
+    size_t               currvalbufflen;
     apr_pool_t         * mp;
 };
 
