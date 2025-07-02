@@ -173,7 +173,7 @@ int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
     for ( ifap = ifaphead; ifap; ifap = ifap->ifa_next ) {
         struct sockaddr_dl* sdl = (struct sockaddr_dl*)ifap->ifa_addr;
         if ( sdl && ( sdl->sdl_family == AF_LINK ) && ( sdl->sdl_type == IFT_ETHER )
-                && mac[0] && mac[1] && mac[2] && i < 6) {
+                && mac[0] && mac[1] && mac[2]) {
 
             apr_snprintf(mac, MAC_ADDRESS_SIZE, "%02x:%02x:%02x:%02x:%02x:%02x",
                 (unsigned char)LLADDR(sdl)[0],
