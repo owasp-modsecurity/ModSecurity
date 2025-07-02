@@ -76,8 +76,8 @@ static void msc_xml_on_end_elementns(
                 msr_log(msr, 4, "Skipping request argument, over limit (XML): name \"%s\", value \"%s\"",
                         log_escape_ex(msr->mp, xml_parser_state->currpath, xml_parser_state->currpathbufflen),
                         log_escape_ex(msr->mp,
-                                      (xml_parser_state->currval == NULL ? apr_pstrndup(msr->mp, "", 1) : xml_parser_state->currval),
-                                      (xml_parser_state->currvalbufflen == 0 ? 1 : xml_parser_state->currvalbufflen)
+                                      (xml_parser_state->currval == NULL ? apr_pstrndup(msr->mp, "", 0) : xml_parser_state->currval),
+                                      xml_parser_state->currvalbufflen
                                      )
                         );
             }
@@ -91,8 +91,8 @@ static void msc_xml_on_end_elementns(
 
             arg->name = xml_parser_state->currpath;
             arg->name_len = xml_parser_state->currpathbufflen;
-            arg->value = (xml_parser_state->currval == NULL) ? apr_pstrndup(msr->mp, "", 1) : xml_parser_state->currval;
-            arg->value_len = (xml_parser_state->currvalbufflen == 0) ? 1 : xml_parser_state->currvalbufflen;
+            arg->value = (xml_parser_state->currval == NULL) ? apr_pstrndup(msr->mp, "", 0) : xml_parser_state->currval;
+            arg->value_len = xml_parser_state->currvalbufflen;
             arg->value_origin_len = arg->value_len;
             arg->origin = "XML";
 
