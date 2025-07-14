@@ -355,6 +355,9 @@ end_exec:
 
     /* last rule in the chain. */
     performLogging(trans, ruleMessage, true, true);
+    if (m_ruleId > 0) {
+        cleanMatchedVars(trans);
+    }
     return true;
 }
 
