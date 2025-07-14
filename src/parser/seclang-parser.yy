@@ -1609,12 +1609,20 @@ expression:
     | CONFIG_DIR_REQ_BODY_LIMIT
       {
         driver.m_requestBodyLimit.m_set = true;
-        driver.m_requestBodyLimit.m_value = atoi($1.c_str());
+        if (modsecurity::utils::string::parse_unsigned_int($1, &driver.m_requestBodyLimit.m_value) != 1) {
+          std::stringstream ss;
+          ss << "Failed to parse SecRequestBodyLimit value as an unsigned integer.";
+          driver.error(@0, ss.str());
+        }
       }
     | CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
       {
         driver.m_requestBodyNoFilesLimit.m_set = true;
-        driver.m_requestBodyNoFilesLimit.m_value = atoi($1.c_str());
+        if (modsecurity::utils::string::parse_unsigned_int($1, &driver.m_requestBodyNoFilesLimit.m_value) != 1) {
+          std::stringstream ss;
+          ss << "Failed to parse SecRequestBodyNoFilesLimit value as an unsigned integer.";
+          driver.error(@0, ss.str());
+        }
       }
     | CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
       {

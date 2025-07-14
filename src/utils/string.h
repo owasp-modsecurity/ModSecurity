@@ -25,6 +25,7 @@
 #include <sstream>
 #include <iomanip>
 #include <time.h>
+#include <climits>
 
 #ifdef WIN32
 #include "src/compat/msvc.h"
@@ -276,6 +277,30 @@ inline std::string toupper(std::string str) { // cppcheck-suppress passedByValue
     return toCaseHelper(str, ::toupper);
 }
 
+inline int parse_unsigned_int(std::string a, unsigned int *res) {
+    char *endptr = NULL;
+    errno = 0;
+
+    unsigned long val = strtoul(a.c_str(), &endptr, 10);
+
+    if (a.c_str() == endptr) {
+        // no number
+        return 0;
+    }
+
+    if (*endptr != '\0') {
+        // broken conversion
+        return 0;
+    }
+
+    if (errno == ERANGE || val > UINT_MAX) {
+        // unsigned int overflow
+        return 0;
+    }
+
+    *res = static_cast<unsigned int>(val);
+    return 1;
+}
 
 }  // namespace modsecurity::utils::string
 
