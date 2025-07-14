@@ -85,6 +85,22 @@ class ConfigInt {
     }
 };
 
+class ConfigUnsignedInt {
+ public:
+    ConfigUnsignedInt() : m_set(false), m_value(0) { }
+    bool m_set;
+    unsigned int m_value;
+
+    void merge(const ConfigUnsignedInt *from) {
+        if (m_set == true || from->m_set == false) {
+            return;
+        }
+        m_set = true;
+        m_value = from->m_value;
+        return;
+    }
+};
+
 
 class ConfigDouble {
  public:
@@ -506,9 +522,9 @@ class RulesSetProperties {
     ConfigBoolean m_uploadKeepFiles;
     ConfigDouble m_argumentsLimit;
     ConfigDouble m_requestBodyJsonDepthLimit;
-    ConfigDouble m_requestBodyLimit;
-    ConfigDouble m_requestBodyNoFilesLimit;
-    ConfigDouble m_responseBodyLimit;
+    ConfigUnsignedInt m_requestBodyLimit;
+    ConfigUnsignedInt m_requestBodyNoFilesLimit;
+    ConfigUnsignedInt m_responseBodyLimit;
     ConfigInt m_pcreMatchLimit;
     ConfigInt m_uploadFileLimit;
     ConfigInt m_uploadFileMode;
