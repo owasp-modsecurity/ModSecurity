@@ -283,7 +283,7 @@
       "SecRuleEngine On",
       "SecRule ARGS \"@rx 1\" \"id:1,phase:1,pass\"",
       "SecRule ARGS \"@rx 2\" \"id:2,phase:1,deny,status:403,chain\"",
-      "SecRule MATCHED_VAR_NAME \"@strEq ARGS:baz\""
+      "SecRule MATCHED_VAR_NAME \"@within ARGS:baz ARGS:bar\""
     ]
   }
 ]
