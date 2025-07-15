@@ -277,7 +277,7 @@ inline std::string toupper(std::string str) { // cppcheck-suppress passedByValue
     return toCaseHelper(str, ::toupper);
 }
 
-inline int parse_unsigned_int(std::string a, unsigned int *res) {
+inline int parse_unsigned_int(const std::string &a, unsigned int *res) {
     char *endptr = NULL;
     errno = 0;
 
