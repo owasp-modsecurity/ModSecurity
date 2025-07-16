@@ -278,7 +278,7 @@ inline std::string toupper(std::string str) { // cppcheck-suppress passedByValue
 }
 
 inline int parse_unsigned_int(const std::string &a, unsigned int *res) {
-    char *endptr = NULL;
+    char *endptr = nullptr;
     errno = 0;
 
     unsigned long val = strtoul(a.c_str(), &endptr, 10);

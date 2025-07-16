@@ -71,9 +71,9 @@ using modsecurity::audit_log::AuditLog;
 /** @ingroup ModSecurity_CPP_API */
 class ConfigInt {
  public:
-    ConfigInt() : m_set(false), m_value(0) { }
-    bool m_set;
-    int m_value;
+    bool m_set = false;
+    int m_value = 0;
+    ConfigInt() = default;
 
     void merge(const ConfigInt *from) {
         if (m_set == true || from->m_set == false) {
@@ -87,9 +87,9 @@ class ConfigInt {
 
 class ConfigUnsignedInt {
  public:
-    ConfigUnsignedInt() : m_set(false), m_value(0) { }
-    bool m_set;
-    unsigned int m_value;
+    bool m_set = false;
+    unsigned int m_value = 0;
+    ConfigUnsignedInt() = default;
 
     void merge(const ConfigUnsignedInt *from) {
         if (m_set == true || from->m_set == false) {
@@ -104,9 +104,9 @@ class ConfigUnsignedInt {
 
 class ConfigDouble {
  public:
-    ConfigDouble() : m_set(false), m_value(0) { }
-    bool m_set;
-    double m_value;
+    bool m_set = false;
+    double m_value = 0.0;
+    ConfigDouble() = default;
 
     void merge(const ConfigDouble *from) {
         if (m_set == true || from->m_set == false) {
@@ -121,9 +121,9 @@ class ConfigDouble {
 
 class ConfigString {
  public:
-    ConfigString() : m_set(false), m_value("") { }
-    bool m_set;
-    std::string m_value;
+    bool m_set = false;
+    std::string m_value = "";
+    ConfigString() = default;
 
     void merge(const ConfigString *from) {
         if (m_set == true || from->m_set == false) {
@@ -138,10 +138,10 @@ class ConfigString {
 
 class ConfigSet {
  public:
-    ConfigSet() : m_set(false), m_clear(false) { }
-    bool m_set;
-    bool m_clear;
+    bool m_set = false;
+    bool m_clear = false;
     std::set<std::string> m_value;
+    ConfigSet() = default;
 };
 
 
