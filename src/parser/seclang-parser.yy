@@ -831,13 +831,19 @@ audit_log:
       }
     | CONFIG_UPLOAD_FILE_LIMIT
       {
-        driver.m_uploadFileLimit.m_set = true;
-        driver.m_uploadFileLimit.m_value = strtol($1.c_str(), NULL, 10);
+        std::string errmsg = "";
+        if (driver.m_uploadFileLimit.parse(std::string($1), &errmsg) != true) {
+          driver.error(@0, "Failed to parse SecUploadFileLimit: " + errmsg);
+          YYERROR;
+        }
       }
     | CONFIG_UPLOAD_FILE_MODE
       {
-        driver.m_uploadFileMode.m_set = true;
-        driver.m_uploadFileMode.m_value = strtol($1.c_str(), NULL, 8);
+        std::string errmsg = "";
+        if (driver.m_uploadFileMode.parse(std::string($1), &errmsg) != true) {
+          driver.error(@0, "Failed to parse SecUploadFileMode: " + errmsg);
+          YYERROR;
+        }
       }
     | CONFIG_UPLOAD_DIR
       {
@@ -1608,13 +1614,19 @@ expression:
     /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT
       {
-        driver.m_requestBodyLimit.m_set = true;
-        driver.m_requestBodyLimit.m_value = atoi($1.c_str());
+        std::string errmsg = "";
+        if (driver.m_requestBodyLimit.parse(std::string($1), &errmsg) != true) {
+          driver.error(@0, "Failed to parse SecRequestBodyLimit: " + errmsg);
+          YYERROR;
+        }
       }
     | CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
       {
-        driver.m_requestBodyNoFilesLimit.m_set = true;
-        driver.m_requestBodyNoFilesLimit.m_value = atoi($1.c_str());
+        std::string errmsg = "";
+        if (driver.m_requestBodyNoFilesLimit.parse(std::string($1), &errmsg) != true) {
+          driver.error(@0, "Failed to parse SecRequestsBodyNoFilesLimit: " + errmsg);
+          YYERROR;
+        }
       }
     | CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
       {
@@ -1627,8 +1639,11 @@ expression:
       }
     | CONFIG_DIR_RES_BODY_LIMIT
       {
-        driver.m_responseBodyLimit.m_set = true;
-        driver.m_responseBodyLimit.m_value = atoi($1.c_str());
+        std::string errmsg = "";
+        if (driver.m_responseBodyLimit.parse(std::string($1), &errmsg) != true) {
+          driver.error(@0, "Failed to parse SecResponseBodyLimit: " + errmsg);
+          YYERROR;
+        }
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
@@ -1661,8 +1676,11 @@ expression:
 */
     | CONFIG_DIR_PCRE_MATCH_LIMIT
       {
-        driver.m_pcreMatchLimit.m_set = true;
-        driver.m_pcreMatchLimit.m_value = atoi($1.c_str());
+        std::string errmsg = "";
+        if (driver.m_pcreMatchLimit.parse(std::string($1), &errmsg) != true) {
+          driver.error(@0, "Failed to parse SecPcreMatchLimit: " + errmsg);
+          YYERROR;
+        }
       }
     | CONGIG_DIR_RESPONSE_BODY_MP
       {

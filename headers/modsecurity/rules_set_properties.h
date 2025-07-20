@@ -22,6 +22,7 @@
 #include <list>
 #include <set>
 #include <cstring>
+#include <limits>
 #endif
 
 
@@ -68,29 +69,130 @@ class Driver;
 using modsecurity::debug_log::DebugLog;
 using modsecurity::audit_log::AuditLog;
 
-/** @ingroup ModSecurity_CPP_API */
-class ConfigInt {
- public:
-    ConfigInt() : m_set(false), m_value(0) { }
-    bool m_set;
-    int m_value;
+// template for different numeric int types
+template <typename T>
+class ConfigValue {
+public:
+    bool m_set = false;
+    T m_value = 0;
 
-    void merge(const ConfigInt *from) {
-        if (m_set == true || from->m_set == false) {
-            return;
-        }
+    ConfigValue() = default;
+
+    void merge(const ConfigValue<T>* from) {
+        if (m_set || !from->m_set) return;
         m_set = true;
         m_value = from->m_value;
-        return;
+    }
+
+    // default parser
+    bool parse(const std::string& a, std::string* errmsg = nullptr) {
+
+        // use an alias type because the template can convert both signed and unsigned int
+        using LimitSigned = std::conditional_t<std::is_signed<T>::value, long long, unsigned long long>;
+        LimitSigned val;
+
+        // clear errno variable, wee need that later
+        errno = 0;
+
+        try {
+            if constexpr (std::is_signed<T>::value) {
+                val = std::stoll(a);
+            } else {
+                val = std::stoull(a);
+            }
+        } catch (...) {
+            // we don't need to handle all exceptions, the engine's BISON parser
+            // does not allow other symbols than numbers
+            if (errmsg) *errmsg = "An unknown error occurred while parsed the value.";
+            return false;
+        }
+
+        if (
+            // first condition will be true if the value is bigger than ull max value
+            // the second condition checks if the value is fit as ull, but not fit for
+            // designed type, eg. unsigned int; in that case the errno will be 0, but
+            // we must check the value is not bigger than the given maxValue at the type class
+            (errno == ERANGE && val == static_cast<unsigned long long>(maxValue()))
+            ||
+            (val > static_cast<unsigned long long>(maxValue()))
+
+        ) {
+            if (errmsg) *errmsg = "Value is too big.";
+            return false;
+        }
+
+        if constexpr (std::is_unsigned_v<T>) {
+            // we should split the check of minValue
+            // because if the type is signed, then the casted value
+            // will be a problem
+            if (
+                // same as above
+                (errno == ERANGE && val == static_cast<unsigned long long>(minValue()))
+                ||
+                (val < static_cast<unsigned long long>(minValue()))
+            ) {
+                if (errmsg) *errmsg = "Value is too small.";
+                return false;
+            }
+        }
+        else {
+            if (
+                // same as above
+                // but cast to not unsigned
+                (errno == ERANGE && val == static_cast<long long>(minValue()))
+                ||
+                (val < static_cast<long long>(minValue()))
+            ) {
+                if (errmsg) *errmsg = "Value is too small.";
+                return false;
+            }
+        }
+
+
+        m_value = static_cast<T>(val);
+        m_set = true;
+        return true;
+
+    }
+
+protected:
+    // derived classes must implement the maxValue
+    virtual T maxValue() const = 0;
+    // minValue is optional
+    virtual T minValue() const { return 0; }
+};
+
+/** @ingroup ModSecurity_CPP_API */
+
+class ConfigInt : public ConfigValue<signed int> {
+protected:
+    signed int minValue() const override {
+        return std::numeric_limits<signed int>::min();
+    }
+    signed int maxValue() const override {
+        return std::numeric_limits<signed int>::max();
     }
 };
 
+class ConfigUnsignedInt : public ConfigValue<unsigned int> {
+protected:
+    unsigned int maxValue() const override {
+        return std::numeric_limits<unsigned int>::max();
+    }
+};
+
+class ConfigUnsignedLong : public ConfigValue<unsigned long> {
+protected:
+    unsigned long maxValue() const override {
+        return std::numeric_limits<unsigned long>::max();
+    }
+};
 
 class ConfigDouble {
  public:
-    ConfigDouble() : m_set(false), m_value(0) { }
-    bool m_set;
-    double m_value;
+    bool m_set = false;
+    double m_value = 0.0;
+    ConfigDouble() = default;
 
     void merge(const ConfigDouble *from) {
         if (m_set == true || from->m_set == false) {
@@ -105,9 +207,9 @@ class ConfigDouble {
 
 class ConfigString {
  public:
-    ConfigString() : m_set(false), m_value("") { }
-    bool m_set;
-    std::string m_value;
+    bool m_set = false;
+    std::string m_value = "";
+    ConfigString() = default;
 
     void merge(const ConfigString *from) {
         if (m_set == true || from->m_set == false) {
@@ -122,10 +224,10 @@ class ConfigString {
 
 class ConfigSet {
  public:
-    ConfigSet() : m_set(false), m_clear(false) { }
-    bool m_set;
-    bool m_clear;
+    bool m_set = false;
+    bool m_clear = false;
     std::set<std::string> m_value;
+    ConfigSet() = default;
 };
 
 
@@ -506,12 +608,12 @@ class RulesSetProperties {
     ConfigBoolean m_uploadKeepFiles;
     ConfigDouble m_argumentsLimit;
     ConfigDouble m_requestBodyJsonDepthLimit;
-    ConfigDouble m_requestBodyLimit;
-    ConfigDouble m_requestBodyNoFilesLimit;
-    ConfigDouble m_responseBodyLimit;
-    ConfigInt m_pcreMatchLimit;
-    ConfigInt m_uploadFileLimit;
-    ConfigInt m_uploadFileMode;
+    ConfigUnsignedLong m_requestBodyLimit;
+    ConfigUnsignedLong m_requestBodyNoFilesLimit;
+    ConfigUnsignedLong m_responseBodyLimit;
+    ConfigUnsignedInt m_pcreMatchLimit;
+    ConfigUnsignedInt m_uploadFileLimit;
+    ConfigUnsignedInt m_uploadFileMode;
     DebugLog *m_debugLog;
     OnFailedRemoteRulesAction m_remoteRulesActionOnFailed;
     RuleEngine m_secRuleEngine;
