@@ -13,6 +13,14 @@
  *
  */
 
+#ifdef WIN32
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
+#endif
 
 #ifdef __cplusplus
 #include <ctime>
