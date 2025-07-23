@@ -96,19 +96,29 @@ public:
     bool parse(const std::string& a, std::string* errmsg = nullptr) {
 
         // use an alias type because the template can convert both signed and unsigned int
-        using LimitSigned = std::conditional_t<std::is_signed<T>::value, long long, unsigned long long>;
+        using LimitSigned = std::conditional_t<std::is_signed_v<T>, long long, unsigned long long>;
         LimitSigned val;
 
         // clear errno variable, wee need that later
         errno = 0;
 
         try {
-            if constexpr (std::is_signed<T>::value) {
+            if constexpr (std::is_signed_v<T>) {
                 val = std::stoll(a);
             } else {
                 val = std::stoull(a);
             }
-        } catch (...) {
+        }
+        catch (const std::invalid_argument&) {
+            // probably can't occur, but we handle it anyway
+            if (errmsg) *errmsg = "Invalid number format (not numeric)";
+            return false;
+        }
+        catch (const std::out_of_range&) {
+            if (errmsg) *errmsg = "Number out of range";
+            return false;
+        }
+        catch (...) {
             // we don't need to handle all exceptions, the engine's BISON parser
             // does not allow other symbols than numbers
             if (errmsg) *errmsg = "An unknown error occurred while parsed the value.";
