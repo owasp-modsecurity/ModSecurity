@@ -111,17 +111,18 @@ public:
         }
         catch (const std::invalid_argument&) {
             // probably can't occur, but we handle it anyway
-            if (errmsg) *errmsg = "Invalid number format (not numeric)";
+            set_error(errmsg, "Invalid number format (not numeric)");
             return false;
         }
         catch (const std::out_of_range&) {
-            if (errmsg) *errmsg = "Number out of range";
+            // the value is out of range, we can not handle it
+            set_error(errmsg, "Number out of range");
             return false;
         }
         catch (...) {
             // we don't need to handle all exceptions, the engine's BISON parser
             // does not allow other symbols than numbers
-            if (errmsg) *errmsg = "An unknown error occurred while parsed the value.";
+            set_error(errmsg, "An unknown error occurred while parsed the value.");
             return false;
         }
 
@@ -135,7 +136,7 @@ public:
             (val > static_cast<unsigned long long>(maxValue()))
 
         ) {
-            if (errmsg) *errmsg = "Value is too big.";
+            set_error(errmsg, "Value is too big.");
             return false;
         }
 
@@ -149,7 +150,7 @@ public:
                 ||
                 (val < static_cast<unsigned long long>(minValue()))
             ) {
-                if (errmsg) *errmsg = "Value is too small.";
+                set_error(errmsg, "Value is too small.");
                 return false;
             }
         }
@@ -161,7 +162,7 @@ public:
                 ||
                 (val < static_cast<long long>(minValue()))
             ) {
-                if (errmsg) *errmsg = "Value is too small.";
+                set_error(errmsg, "Value is too small.");
                 return false;
             }
         }
@@ -178,6 +179,11 @@ protected:
     virtual T maxValue() const = 0;
     // minValue is optional
     virtual T minValue() const { return 0; }
+
+private:
+    static inline void set_error(std::string* err, const char* msg) {
+        if (err) *err = msg;
+    }
 };
 
 /** @ingroup ModSecurity_CPP_API */
