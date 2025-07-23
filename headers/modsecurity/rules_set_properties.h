@@ -119,7 +119,7 @@ public:
             set_error(errmsg, "Number out of range");
             return false;
         }
-        catch (...) {
+        catch (...) { // NOSONAR
             // we don't need to handle all exceptions, the engine's BISON parser
             // does not allow other symbols than numbers
             set_error(errmsg, "An unknown error occurred while parsed the value.");
