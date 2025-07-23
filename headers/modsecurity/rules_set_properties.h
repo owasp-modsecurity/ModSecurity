@@ -614,8 +614,8 @@ class RulesSetProperties {
     ConfigXMLParseXmlIntoArgs m_secXMLParseXmlIntoArgs;
     ConfigBoolean m_tmpSaveUploadedFiles;
     ConfigBoolean m_uploadKeepFiles;
-    ConfigDouble m_argumentsLimit;
-    ConfigDouble m_requestBodyJsonDepthLimit;
+    ConfigUnsignedInt m_argumentsLimit;
+    ConfigUnsignedInt m_requestBodyJsonDepthLimit;
     ConfigUnsignedLong m_requestBodyLimit;
     ConfigUnsignedLong m_requestBodyNoFilesLimit;
     ConfigUnsignedLong m_responseBodyLimit;
