@@ -14,7 +14,7 @@
 	conf => sub {
 		# Open the minimal conf file, substituting the
 		# relative log paths with full paths.
-		open(C, "<$ENV{DIST_ROOT}/modsecurity.conf-minimal") or die "$!\n";
+		open(C, "<$ENV{DIST_ROOT}/tests/modsecurity.conf-minimal") or die "$!\n";
 		(my $conf = join('', <C>)) =~ s#Log logs/#Log $ENV{TEST_SERVER_ROOT}/logs/#g;
 		close C;
 
