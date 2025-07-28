@@ -109,3 +109,15 @@ Makefile
 
 # IDEs
 .idea
+
+# tests
+tests/regression/server_root/conf/*t*.conf
+tests/regression/server_root/upload/*-file-*
+tests/regression/server_root/data/*-ip.*
+tests/regression/server_root/logs/*.log
+tests/regression/server_root/logs/audit/*/
+tests/*.pl
+tests/*.trs
+tests/*.log
+
+
