@@ -55,7 +55,7 @@
 		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction\./, 1 ],
 	},
 	match_file => {
-		"$ENV{DATA_DIR}/ip.pag" => qr/\x00\x06dummy\x00\x00\x021\x00/,
+		"$ENV{DATA_DIR}/$ENV{RUNASUSER}-ip.pag" => qr/\x00\x06dummy\x00\x00\x021\x00/,
 	},
 	match_response => {
 		status => qr/^200$/,

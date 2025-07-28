@@ -132,6 +132,7 @@ unless (defined $opt{S}) {
     HTTPD_CONF => $opt{C},
     HTDOCS => $opt{H},
     USER_AGENT => $UA_NAME,
+    RUNASUSER => $ENV{USER} || $ENV{LOGNAME} || $ENV{USERNAME} || 'unknown',
 );
 
 #dbg("OPTIONS: ", \%opt);
