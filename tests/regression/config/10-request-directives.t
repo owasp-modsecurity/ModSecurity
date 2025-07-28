@@ -578,10 +578,10 @@
 		SecRequestBodyLimit 131072
 	),
 	match_log => {
-		-debug => [ qr/Request body is larger than the configured limit/, 1],
+		error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^500$/,
 	},
 	request => normalize_raw_request_data(
 		qq(
