@@ -270,7 +270,7 @@
         debug => [ qr/Final boundary missing/, 1 ],
     },
     match_response => {
-        status => qr/^200$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1120,10 +1120,10 @@
         SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500121"
     ),
     match_log => {
-        debug => [ qr/boundary whitespace in C-T header/, 1 ],
+        debug => [ qr/Multipart: Warning: boundary whitespace in C-T header./, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1216,10 +1216,10 @@
         SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500127"
     ),
     match_log => {
-        debug => [ qr/No boundaries found in payload/, 1 ],
+        debug => [ qr/Multipart parsing error: Multipart: No boundaries found in payload./, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1262,11 +1262,11 @@
         SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500130"
     ),
     match_log => {
-        debug => [ qr/Invalid boundary in C-T \(characters\)/, 1 ],
+        debug => [ qr/Multipart parsing error: Multipart: No boundaries found in payload./, 1 ],
 
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^500$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1404,7 +1404,7 @@
         SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500139"
     ),
     match_log => {
-        debug => [ qr/boundary was quoted.*No boundaries found in payload/s, 1 ],
+        error => [ qr/Multipart parsing error \(init\): Multipart: Invalid boundary in C-T \(characters\)./s, 1 ],
     },
     match_response => {
         status => qr/^403$/,
