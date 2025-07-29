@@ -169,13 +169,13 @@
 		        phase:2,deny,id:12345"
 	),
 	match_log => {
-		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*validation failed because content is not well formed/s, 1 ],
-		-debug => [ qr/Failed to load|Successfully validated/, 1 ],
-		-error => [ qr/Failed to load|Successfully validated/, 1 ],
-		audit => [ qr/^Message: .*Failed parsing document.*\nMessage:/m, 1 ],
+		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error: XML: Failed to parse document./s, 1 ],
+		debug => [ qr/XML parser error: XML: Failed to parse document./, 1 ],
+		error => [ qr/XML parser error: XML: Failed to parse document./, 1 ],
+		audit => [ qr/XML parser error: XML: Failed to parse document./m, 1 ],
 	},
 	match_response => {
-		status => qr/^403$/,
+		status => qr/^500$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -350,6 +350,8 @@
         SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
+		SecAuditEngine RelevantOnly
+		SecAuditLog "$ENV{AUDIT_LOG}"
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500026, \\
 		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500027
@@ -357,12 +359,12 @@
 		        phase:2,deny,id:12345"
 	),
 	match_log => {
-		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*validation failed because content is not well formed/s, 1 ],
-		-debug => [ qr/Failed to load|Successfully validated/, 1 ],
-		-error => [ qr/Failed to load|Successfully validated/, 1 ],
+		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error: XML: Failed to parse document./s, 1 ],
+		debug => [ qr/XML parser error: XML: Failed to parse document./, 1 ],
+		audit => [ qr/^Message: .*Failed to parse document.*\nMessage:/m, 1 ],
 	},
 	match_response => {
-		status => qr/^403$/,
+		status => qr/^500$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",

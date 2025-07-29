@@ -11,7 +11,7 @@
 use strict;
 use Time::HiRes qw(gettimeofday sleep);
 use POSIX qw(WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG);
-use File::Spec qw(rel2abs);
+use File::Spec::Functions qw(rel2abs);
 use File::Basename qw(basename dirname);
 use FileHandle;
 use IPC::Open2 qw(open2);
@@ -54,7 +54,7 @@ $SIG{TERM} = $SIG{INT} = \&handle_interrupt;
 my $platform = "apache";
 
 my %opt;
-getopts('A:E:D:C:T:H:a:p:dvh', \%opt);
+getopts('A:E:D:C:T:H:S:a:p:dvh', \%opt);
 
 if ($opt{d}) {
     $Data::Dumper::Indent = 1;
@@ -125,13 +125,14 @@ unless (defined $opt{S}) {
     LOGS_DIR => $FILES_DIR,
     SCRIPT_DIR => $SCRIPT_DIR,
     REGRESSION_DIR => $REG_DIR,
-    DIST_ROOT => File::Spec->rel2abs(dirname("$SCRIPT_DIR/../../..")),
+    DIST_ROOT => File::Spec->rel2abs(dirname("$SCRIPT_DIR/../..")),
     AUDIT_LOG => $opt{A},
     DEBUG_LOG => $opt{D},
     ERROR_LOG => $opt{E},
     HTTPD_CONF => $opt{C},
     HTDOCS => $opt{H},
     USER_AGENT => $UA_NAME,
+    RUNASUSER => $ENV{USER} || $ENV{LOGNAME} || $ENV{USERNAME} || 'unknown',
 );
 
 #dbg("OPTIONS: ", \%opt);
