@@ -407,8 +407,10 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
                 CPTData *prefix_data = CPTCreateCPTData(netmask);
                 CPTAppendToCPTDataList(prefix_data, &prefix->prefix_data);
 
-                if(CheckBitmask(netmask, ip_bitmask))
+                if(CheckBitmask(netmask, ip_bitmask)) {
+                    free(prefix);
                     return node;
+                }
 
                 parent = node->parent;
                 while (parent != NULL && netmask < (parent->bit + 1)) {
@@ -423,6 +425,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
                 if ((node->count -1) == 0) {
                     node->netmasks[0] = netmask;
+                    free(prefix);
                     return new_node;
                 }
 
@@ -449,8 +452,10 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
     new_node = CPTCreateNode();
 
-    if(new_node == NULL)
+    if(new_node == NULL) {
+        free(prefix);
         return NULL;
+    }
 
     new_node->prefix = prefix;
     new_node->bit = prefix->bitlen;
