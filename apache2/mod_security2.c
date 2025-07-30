@@ -1032,56 +1032,15 @@ static int hook_request_late(request_rec *r) {
     }
 
     rc = read_request_body(msr, &my_error_msg);
-    if (rc < 0 && msr->txcfg->is_enabled == MODSEC_ENABLED) {
-        switch(rc) {
-            case -1 :
-                if (my_error_msg != NULL) {
-                    msr_log(msr, 1, "%s", my_error_msg);
-                }
-                return HTTP_INTERNAL_SERVER_ERROR;
-                break;
-            case -4 : /* Timeout. */
-                if (my_error_msg != NULL) {
-                    msr_log(msr, 4, "%s", my_error_msg);
-                }
-                r->connection->keepalive = AP_CONN_CLOSE;
-                return HTTP_REQUEST_TIME_OUT;
-                break;
-            case -5 : /* Request body limit reached. */
-                msr->inbound_error = 1;
-                if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))    {
-                    r->connection->keepalive = AP_CONN_CLOSE;
-                    if (my_error_msg != NULL) {
-                        msr_log(msr, 1, "%s. Deny with code (%d)", my_error_msg, HTTP_REQUEST_ENTITY_TOO_LARGE);
-                    }
-                    return HTTP_REQUEST_ENTITY_TOO_LARGE;
-                } else  {
-                    if (my_error_msg != NULL) {
-                        msr_log(msr, 1, "%s", my_error_msg);
-                    }
-                }
-                break;
-            case -6 : /* EOF when reading request body. */
-                if (my_error_msg != NULL) {
-                    msr_log(msr, 4, "%s", my_error_msg);
-                }
-                r->connection->keepalive = AP_CONN_CLOSE;
-                return HTTP_BAD_REQUEST;
-                break;
-            case -7 : /* Partial recieved */
-                if (my_error_msg != NULL) {
-                    msr_log(msr, 4, "%s", my_error_msg);
-                }
-                r->connection->keepalive = AP_CONN_CLOSE;
-                return HTTP_BAD_REQUEST;
-                break;
-            default :
-                /* allow through */
-                break;
+    if (rc != OK) {
+        if (my_error_msg != NULL) {
+            msr_log(msr, 1, "%s", my_error_msg);
         }
-
-        msr->msc_reqbody_error = 1;
-        msr->msc_reqbody_error_msg = my_error_msg;
+        if (rc == HTTP_REQUEST_ENTITY_TOO_LARGE) {
+            msr->inbound_error = 1;
+        }
+        r->connection->keepalive = AP_CONN_CLOSE;
+        return rc;
     }
 
     /* Update the request headers. They might have changed after
