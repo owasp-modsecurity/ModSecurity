@@ -1,3 +1,13 @@
+05 Aug 2025 - 2.9.12
+--------------------
+
+ * fix: Improper error handling
+   [PR from private repo - @orangetw, @pgajdos, @ylavic, @theseion, @fzipi, @airween
+    fixed CVE-2025-54571]
+ * fix: mod_security2's regression tests [Issue #3425 - @airween]
+ * fix: remove unused condition from msc_status_engine.c [Issue #3412 - @airween]
+ * fix: remove unwanted '\0' string terminator from argument's value [Issue #3411 - @airween]
+
 01 Jul 2025 - 2.9.11
 --------------------
 
