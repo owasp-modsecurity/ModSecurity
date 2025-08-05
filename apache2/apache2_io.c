@@ -192,27 +192,29 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input filter: This request does not have a body.");
         }
-        return 0;
+        return APR_SUCCESS;
     }
 
     if (msr->txcfg->reqbody_access != 1) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input filter: Request body access not enabled.");
         }
-        return 0;
+        return APR_SUCCESS;
     }
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Input filter: Reading request body.");
     }
     if (modsecurity_request_body_start(msr, error_msg) < 0) {
-        return -1;
+        return HTTP_INTERNAL_SERVER_ERROR;
     }
 
     finished_reading = 0;
     msr->if_seen_eos = 0;
     bb_in = apr_brigade_create(msr->mp, r->connection->bucket_alloc);
-    if (bb_in == NULL) return -1;
+    if (bb_in == NULL) {
+        return HTTP_INTERNAL_SERVER_ERROR;
+    }
     do {
         apr_status_t rc;
 
@@ -222,25 +224,17 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
              *      too large and APR_EGENERAL when the client disconnects.
              */
             switch(rc) {
-                case APR_INCOMPLETE :
-                    *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
-                    return -7;
-                case APR_EOF :
-                    *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
-                    return -6;
-                case APR_TIMEUP :
-                    *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
-                    return -4;
                 case AP_FILTER_ERROR :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: HTTP Error 413 - Request entity too large. (Most likely.)");
-                    return -3;
+                    break;
                 case APR_EGENERAL :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: Client went away.");
-                    return -2;
+                    break;
                 default :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
-                    return -1;
+                    break;
             }
+            return ap_map_http_request_error(rc, HTTP_BAD_REQUEST);
         }
 
         /* Loop through the buckets in the brigade in order
@@ -256,7 +250,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             rc = apr_bucket_read(bucket, &buf, &buflen, APR_BLOCK_READ);
             if (rc != APR_SUCCESS) {
                 *error_msg = apr_psprintf(msr->mp, "Failed reading input / bucket (%d): %s", rc, get_apr_error(msr->mp, rc));
-                return -1;
+                return HTTP_INTERNAL_SERVER_ERROR;
             }
 
             if (msr->txcfg->debuglog_level >= 9) {
@@ -269,7 +263,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                 if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
                     *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
                             "configured limit (%ld).", msr->txcfg->reqbody_limit);
-                    return -5;
+                    return HTTP_REQUEST_ENTITY_TOO_LARGE;
                 } else if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
 
                     *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
@@ -290,7 +284,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                     *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
                             "configured limit (%ld).", msr->txcfg->reqbody_limit);
 
-                    return -5;
+                    return HTTP_REQUEST_ENTITY_TOO_LARGE;
                 }
             }
 
@@ -300,7 +294,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                 modsecurity_request_body_to_stream(msr, buf, buflen, error_msg);
 #else
                 if (modsecurity_request_body_to_stream(msr, buf, buflen, error_msg) < 0) {
-                    return -1;
+                    return HTTP_INTERNAL_SERVER_ERROR;
                 }
 #endif
             }
@@ -319,7 +313,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                         if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
                             *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                                     "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                            return -5;
+                            return HTTP_REQUEST_ENTITY_TOO_LARGE;
                         } else if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
                             *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                                     "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
@@ -329,12 +323,12 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                         } else {
                             *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                                     "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                            return -5;
+                            return HTTP_REQUEST_ENTITY_TOO_LARGE;
                         }
                     }
 
                     if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))
-                        return -1;
+                        return HTTP_INTERNAL_SERVER_ERROR;
                 }
 
             }
@@ -357,7 +351,13 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
     msr->if_status = IF_STATUS_WANTS_TO_RUN;
 
-    return rcbe;
+    if (rcbe == -5) {
+        return HTTP_REQUEST_ENTITY_TOO_LARGE;
+    }
+    if (rcbe < 0) {
+        return HTTP_INTERNAL_SERVER_ERROR;
+    }
+    return APR_SUCCESS;
 }
 
 
