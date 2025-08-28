@@ -85,6 +85,8 @@ OBJS4 = libinjection_html5.obj \
 	libinjection_sqli.obj \
 	libinjection_xss.obj
 
+OBJS5 = ModSecurityIISMessage.res
+
 all: $(DLL)
 
 dll: $(DLL)
@@ -101,12 +103,21 @@ $(OBJS2): ..\standalone\$*.c
 .cpp.obj:
         $(CC) $(CFLAGS) -c $< -Fo$@
 
-$(DLL): $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)
-        $(LINK) $(LDFLAGS) $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(LIBS)
+$(DLL): $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5)
+        $(LINK) $(LDFLAGS) $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5) $(LIBS)
         IF EXIST $(DLL).manifest $(MT) -manifest $(DLL).manifest -outputresource:$(DLL);#1
+
+$(OBJS5): ModSecurityIISMessage.rc
+        rc /r ModSecurityIISMessage.rc
+
+ModSecurityIISMessage.rc: ModSecurityIISMessage.mc
+        mc -U ModSecurityIISMessage.mc
 
 clean:
 	del /f *.obj
 	del /f *.dll
 	del /f *.exp
 	del /f *.lib
+        del /f *.rc
+        del /f *.bin
+        del /f *.res

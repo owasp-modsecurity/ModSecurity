@@ -402,6 +402,9 @@
 					Source="Release\amd64\zlib1.dll" />
 				<File Id="_64_FUZZY" Name="fuzzy.dll"
 					Source="Release\amd64\fuzzy.dll" />
+                <util:EventSource Name="ModSecurity" Log="Application" 
+                    EventMessageFile="[inetsrv64]ModSecurityIIS.dll" 
+                    KeyPath="yes" />
 			</Component> </DirectoryRef> <DirectoryRef
 			Id="inetsrv32"> <Component Id="ModSec32" DiskId="1"
 				Guid="514A81F0-2413-42EF-B19F-E2613125ECE7"
@@ -480,6 +483,9 @@
 					Source="Release\x86\zlib1.dll" /> <File
 					Id="_32_FUZZY" Name="fuzzy.dll"
 					Source="Release\x86\fuzzy.dll" />
+                <util:EventSource Name="ModSecurity" Log="Application" 
+                    EventMessageFile="[inetsrv32]ModSecurityIIS.dll" 
+                    KeyPath="yes" />
 			</Component> </DirectoryRef> <DirectoryRef
 			Id="SystemFolderConfigSchema32"> <Component
 				Id="ConfigSchema32"
