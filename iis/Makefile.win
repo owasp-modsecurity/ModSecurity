@@ -118,6 +118,6 @@ clean:
 	del /f *.dll
 	del /f *.exp
 	del /f *.lib
-        del /f *.rc
-        del /f *.bin
-        del /f *.res
+	del /f *.rc
+	del /f *.bin
+	del /f *.res
