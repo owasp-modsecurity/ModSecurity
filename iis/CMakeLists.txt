@@ -4,6 +4,7 @@ project(ModSecurityIIS C CXX)
 find_package(LibXml2 CONFIG REQUIRED)
 find_package(PCRE2 CONFIG REQUIRED)
 find_package(CURL CONFIG REQUIRED)
+find_package(APR CONFIG REQUIRED)
 
 # iis/CMakeLists.txt
 set(IIS_MODULE_NAME "modsecurityiis")  # Name should match the original output
@@ -125,9 +126,10 @@ target_include_directories(${IIS_MODULE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../apache2
     ${CMAKE_CURRENT_SOURCE_DIR}/../apache2/libinjection
     ${LIBXML2_INCLUDE_DIR}/libxml
-    ${PCRE_INCLUDE_DIRS}
+    ${PCRE2_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_BINARY_DIR}  # 添加构建目录以访问生成的头文件
+    ${APR_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Include standalone directory if it exists
@@ -139,6 +141,12 @@ endif()
 
 # Apache-specific includes
 if(APACHE_ROOT)
+    if(NOT EXISTS "${APACHE_ROOT}")
+        message(FATAL_ERROR "APACHE_ROOT is defined but the directory '${APACHE_ROOT}' does not exist. Please set APACHE_ROOT to a valid Apache installation directory.")
+    endif()
+    if(NOT EXISTS "${APACHE_ROOT}/lib")
+        message(FATAL_ERROR "APACHE_ROOT/lib directory does not exist. Expected: '${APACHE_ROOT}/lib'. Please ensure Apache libraries are available.")
+    endif()
     target_include_directories(${IIS_MODULE_NAME} PRIVATE
         ${APACHE_ROOT}/include
     )
@@ -166,24 +174,15 @@ if(WITH_LUA)
     target_include_directories(${IIS_MODULE_NAME} PRIVATE ${LUA_INCLUDE_DIR})
 endif()
 
-# Default Apache root based on architecture
-if(NOT APACHE_ROOT)
-    if(ARCHITECTURE STREQUAL "x64")
-        set(APACHE_ROOT "C:/Apache24_x64" CACHE PATH "Path to Apache x64 installation")
-    else()
-        set(APACHE_ROOT "C:/Apache24_x86" CACHE PATH "Path to Apache x86 installation")
-    endif()
-endif()
-
 option(WITH_YAJL "Enable YAJL support" OFF)
 if(WITH_YAJL)
     # Manually find YAJL if config.cmake is not available (e.g., from vcpkg)
     find_path(YAJL_INCLUDE_DIR yajl/yajl_common.h
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_installed/${ARCHITECTURE}-windows/include"
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build/vcpkg_installed/${ARCHITECTURE}-windows/include"
         NO_DEFAULT_PATH
     )
     find_library(YAJL_LIBRARY NAMES yajl
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_installed/${ARCHITECTURE}-windows/lib"
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build/vcpkg_installed/${ARCHITECTURE}-windows/lib"
         NO_DEFAULT_PATH
     )
 
@@ -193,7 +192,7 @@ if(WITH_YAJL)
         target_compile_definitions(${IIS_MODULE_NAME} PRIVATE WITH_YAJL)
         target_include_directories(${IIS_MODULE_NAME} PRIVATE ${YAJL_INCLUDE_DIRS})
     else()
-        message(WARNING "YAJL not found. Please ensure yajl is installed via vcpkg in the iis/vcpkg_installed directory. Disabling YAJL support.")
+        message(WARNING "YAJL not found. YAJL_INCLUDE_DIR: '${YAJL_INCLUDE_DIR}', YAJL_LIBRARY: '${YAJL_LIBRARY}'. Please ensure yajl is installed via vcpkg in the vcpkg_installed directory. Disabling YAJL support.")
         option(WITH_YAJL "Enable YAJL support" OFF) # Disable if not found
     endif() 
 endif()
@@ -203,7 +202,7 @@ if(WITH_SSDEEP)
 
     set(SSDEEP_ROOT "" CACHE PATH "Path to manually built ssdeep")
     if(NOT SSDEEP_ROOT OR NOT EXISTS "${SSDEEP_ROOT}")
-        message(WARNING "SSDEEP_ROOT is not defined or path does not exist. Please set SSDEEP_ROOT to the ssdeep installation directory. Disabling SSDEEP support.")
+        message(WARNING "SSDEEP_ROOT is not defined or path does not exist. Current SSDEEP_ROOT: '${SSDEEP_ROOT}'. Please set SSDEEP_ROOT to the ssdeep installation directory. Disabling SSDEEP support.")
         set(WITH_SSDEEP OFF CACHE BOOL "Enable SSDEEP support" FORCE)
     else()
         message(STATUS "SSDEEP_ROOT: ${SSDEEP_ROOT}")

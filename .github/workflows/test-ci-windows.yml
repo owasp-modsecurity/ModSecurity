@@ -9,73 +9,54 @@ on:
       - v2/test-ci-windows
 
 jobs:
-  inspect-apache:
+  build:
     runs-on: windows-latest
-    
+
     steps:
-    - name: Check Apache24 bin directory
+    - name: Create test files (MSYS2)
+      uses: msys2/setup-msys2@v2
+      shell: msys2 {0}
       run: |
-        $binPath = "C:\tools\Apache24\bin"
-        Write-Host "=== Apache24 bin Directory Contents ==="
-        if (Test-Path $binPath) {
-          Write-Host "Directory exists at: $binPath"
-          Write-Host "Files and subdirectories:"
-          Get-ChildItem -Path $binPath -Recurse | ForEach-Object {
-            if ($_.PSIsContainer) {
-              Write-Host "  [DIR]  $($_.FullName)"
-            } else {
-              Write-Host "  [FILE] $($_.FullName) ($($_.Length) bytes)"
-            }
-          }
-        } else {
-          Write-Host "Bin directory does not exist at: $binPath"
-        }
-      shell: pwsh
-
-    - name: Check Apache24 include directory
+        # 创建测试目录和文件
+        mkdir -p test-files
+        echo "This is a test file" > test-files/test.txt
+        echo "fuzzy definition file" > test-files/fuzzy.def
+        
+        # 复制到工作区目录
+        mkdir -p ${{ github.workspace }}/artifacts
+        cp -r test-files/* ${{ github.workspace }}/artifacts/
+        
+        # 验证文件已复制
+        echo "Files in artifacts directory:"
+        ls -la ${{ github.workspace }}/artifacts/
+    
+    - name: Verify file transfer (PowerShell)
+      shell: powershell
       run: |
-        $includePath = "C:\tools\Apache24\include"
-        Write-Host "=== Apache24 include Directory Contents ==="
-        if (Test-Path $includePath) {
-          Write-Host "Directory exists at: $includePath"
-          Write-Host "Files and subdirectories:"
-          Get-ChildItem -Path $includePath -Recurse | ForEach-Object {
-            if ($_.PSIsContainer) {
-              Write-Host "  [DIR]  $($_.FullName)"
-            } else {
-              Write-Host "  [FILE] $($_.FullName) ($($_.Length) bytes)"
-            }
-          }
-          
-          # 特别检查 APR 头文件
-          Write-Host "`n=== APR Header Files ==="
-          Get-ChildItem -Path $includePath -Filter "apr*.h" -Recurse | ForEach-Object {
-            Write-Host "  $($_.FullName)"
-          }
-          
-          # 检查是否存在 apr_perms_set.h
-          $permsSetPath = Join-Path $includePath "apr_perms_set.h"
-          if (Test-Path $permsSetPath) {
-            Write-Host "`nFOUND: apr_perms_set.h exists at $permsSetPath"
-          } else {
-            Write-Host "`nMISSING: apr_perms_set.h not found in $includePath"
-          }
+        Write-Host "Checking transferred files in PowerShell:"
+        Get-ChildItem -Path "${{ github.workspace }}\artifacts" -Recurse
+        
+        # 验证文件内容
+        Write-Host "Content of test.txt:"
+        Get-Content "${{ github.workspace }}\artifacts\test.txt"
+        
+        Write-Host "Content of fuzzy.def:"
+        Get-Content "${{ github.workspace }}\artifacts\fuzzy.def"
+        
+        # 检查文件是否存在
+        $testFile = "${{ github.workspace }}\artifacts\test.txt"
+        $fuzzyFile = "${{ github.workspace }}\artifacts\fuzzy.def"
+        
+        if (Test-Path $testFile -PathType Leaf) {
+            Write-Host "✓ test.txt successfully transferred"
         } else {
-          Write-Host "Include directory does not exist at: $includePath"
+            Write-Host "✗ test.txt not found"
+            exit 1
         }
-      shell: pwsh
-
-    - name: Check Apache24 directory structure
-      run: |
-        $apachePath = "C:\tools\Apache24"
-        Write-Host "=== Apache24 Overall Structure ==="
-        if (Test-Path $apachePath) {
-          Write-Host "Apache24 directory exists at: $apachePath"
-          Write-Host "Top-level directories:"
-          Get-ChildItem -Path $apachePath -Directory | ForEach-Object {
-            Write-Host "  - $($_.Name)"
-          }
+        
+        if (Test-Path $fuzzyFile -PathType Leaf) {
+            Write-Host "✓ fuzzy.def successfully transferred"
         } else {
-          Write-Host "Apache24 directory does not exist at: $apachePath"
+            Write-Host "✗ fuzzy.def not found"
+            exit 1
         }
-      shell: pwsh
