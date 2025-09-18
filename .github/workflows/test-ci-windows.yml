@@ -50,7 +50,7 @@ jobs:
         -DAPACHE_ROOT="C:\tools\Apache24" `
         -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install" `
         -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\install" `
-        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
         -DWITH_SSDEEP=ON `
         -DWITH_LUA=ON `
         -DWITH_YAJL=ON `
