@@ -1,4 +1,4 @@
-name: File Generation and Reading Test
+name: CI/CD for IIS Module
 
 on:
   push:
@@ -8,67 +8,62 @@ on:
     branches:
       - v2/test-ci-windows
 
-
 jobs:
-  file-test:
-    runs-on: windows-latest  # 使用 Windows 运行器
-    
+  build:
+    runs-on: windows-latest
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Generate test files (Step 1)
-      shell: powershell
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        install: >
+          git
+          make
+          autoconf
+          automake
+          libtool
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-pkg-config
+
+    - name: Clone and build ssdeep
+      shell: msys2 {0}
       run: |
-        # 创建工作目录
-        $testDir = "${{ github.workspace }}\test-files"
-        New-Item -ItemType Directory -Path $testDir -Force
-        
-        # 创建几个测试文件
-        "This is a test content for file1.txt" | Out-File -FilePath "$testDir\file1.txt"
-        "fuzzy.def test content" | Out-File -FilePath "$testDir\fuzzy.def"
-        
-        # 创建一个包含文件列表的 JSON 文件
-        $files = Get-ChildItem -Path $testDir
-        $fileInfo = @()
-        foreach ($file in $files) {
-            $fileInfo += @{
-                Name = $file.Name
-                Path = $file.FullName
-                Size = $file.Length
-                LastWriteTime = $file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
-            }
-        }
-        $fileInfo | ConvertTo-Json | Out-File -FilePath "$testDir\files.json"
-        
-        # 输出生成的文件信息
-        Write-Host "Generated files:"
-        Get-ChildItem -Path $testDir | Format-Table Name, Length
-        
-    - name: Read test files (Step 2)
-      shell: powershell
+        git clone https://github.com/ssdeep-project/ssdeep.git --depth 1
+        cd ssdeep
+        autoreconf -i
+        ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
+        make dll
+        mkdir -p ${{ github.workspace }}/ssdeep-install/bin
+        mkdir -p ${{ github.workspace }}/ssdeep-install/include
+        cp fuzzy.dll ${{ github.workspace }}/ssdeep-install/bin/
+        cp fuzzy.h ${{ github.workspace }}/ssdeep-install/include/
+        cp fuzzy.def ${{ github.workspace }}/ssdeep-install/
+
+    - name: Configure CMake for IIS Module
       run: |
-        $testDir = "${{ github.workspace }}\test-files"
-        
-        # 检查目录是否存在
-        if (-not (Test-Path -Path $testDir)) {
-            Write-Error "Test directory does not exist!"
-            exit 1
-        }
-        
-        # 读取文件列表
-        $filesJson = Get-Content -Path "$testDir\files.json" -Raw | ConvertFrom-Json
-        Write-Host "Files found:"
-        $filesJson | Format-Table Name, Size
-        
-        # 读取特定文件内容
-        Write-Host "Content of fuzzy.def:"
-        Get-Content -Path "$testDir\fuzzy.def"
-        
-        # 验证文件存在
-        if (Test-Path -Path "$testDir\fuzzy.def") {
-            Write-Host "SUCCESS: fuzzy.def file exists and is accessible!"
-        } else {
-            Write-Error "ERROR: fuzzy.def file not found!"
-            exit 1
-        }
+        cmake `
+        -DAPACHE_ROOT="C:\tools\Apache24" `
+        -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install" `
+        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\install" `
+        -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+        -DWITH_SSDEEP=ON `
+        -DWITH_LUA=ON `
+        -DWITH_YAJL=ON `
+        -S IIS -B iis\build
+
+    - name: Build IIS Module
+      shell: pwsh
+      run: |
+        cmake --build iis\build --config Release
+
+    # - name: Package IIS Module with WiX
+    #   shell: pwsh
+    #   run: |
+    #     $CURRENT_DIR = "${{ github.workspace }}/iis/wix"
+    #     candle.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wxs" -out "$CURRENT_DIR\installer.wixobj" -arch x64
+    #     light.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wixobj" -out "$CURRENT_DIR\installer-64.msi"
