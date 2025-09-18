@@ -1,62 +1,68 @@
-name: CI/CD for IIS Module
+name: File Generation and Reading Test
 
 on:
-  push:
-    branches:
-      - v2/test-ci-windows
-  pull_request:
-    branches:
-      - v2/test-ci-windows
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
-  build:
-    runs-on: windows-latest
-
-    steps:
-    - name: Create test files (MSYS2)
-      uses: msys2/setup-msys2@v2
-      shell: msys2 {0}
-      run: |
-        # 创建测试目录和文件
-        mkdir -p test-files
-        echo "This is a test file" > test-files/test.txt
-        echo "fuzzy definition file" > test-files/fuzzy.def
-        
-        # 复制到工作区目录
-        mkdir -p ${{ github.workspace }}/artifacts
-        cp -r test-files/* ${{ github.workspace }}/artifacts/
-        
-        # 验证文件已复制
-        echo "Files in artifacts directory:"
-        ls -la ${{ github.workspace }}/artifacts/
+  file-test:
+    runs-on: windows-latest  # 使用 Windows 运行器
     
-    - name: Verify file transfer (PowerShell)
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Generate test files (Step 1)
       shell: powershell
       run: |
-        Write-Host "Checking transferred files in PowerShell:"
-        Get-ChildItem -Path "${{ github.workspace }}\artifacts" -Recurse
+        # 创建工作目录
+        $testDir = "${{ github.workspace }}\test-files"
+        New-Item -ItemType Directory -Path $testDir -Force
         
-        # 验证文件内容
-        Write-Host "Content of test.txt:"
-        Get-Content "${{ github.workspace }}\artifacts\test.txt"
+        # 创建几个测试文件
+        "This is a test content for file1.txt" | Out-File -FilePath "$testDir\file1.txt"
+        "fuzzy.def test content" | Out-File -FilePath "$testDir\fuzzy.def"
         
-        Write-Host "Content of fuzzy.def:"
-        Get-Content "${{ github.workspace }}\artifacts\fuzzy.def"
+        # 创建一个包含文件列表的 JSON 文件
+        $files = Get-ChildItem -Path $testDir
+        $fileInfo = @()
+        foreach ($file in $files) {
+            $fileInfo += @{
+                Name = $file.Name
+                Path = $file.FullName
+                Size = $file.Length
+                LastWriteTime = $file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+            }
+        }
+        $fileInfo | ConvertTo-Json | Out-File -FilePath "$testDir\files.json"
         
-        # 检查文件是否存在
-        $testFile = "${{ github.workspace }}\artifacts\test.txt"
-        $fuzzyFile = "${{ github.workspace }}\artifacts\fuzzy.def"
+        # 输出生成的文件信息
+        Write-Host "Generated files:"
+        Get-ChildItem -Path $testDir | Format-Table Name, Length
         
-        if (Test-Path $testFile -PathType Leaf) {
-            Write-Host "✓ test.txt successfully transferred"
-        } else {
-            Write-Host "✗ test.txt not found"
+    - name: Read test files (Step 2)
+      shell: powershell
+      run: |
+        $testDir = "${{ github.workspace }}\test-files"
+        
+        # 检查目录是否存在
+        if (-not (Test-Path -Path $testDir)) {
+            Write-Error "Test directory does not exist!"
             exit 1
         }
         
-        if (Test-Path $fuzzyFile -PathType Leaf) {
-            Write-Host "✓ fuzzy.def successfully transferred"
+        # 读取文件列表
+        $filesJson = Get-Content -Path "$testDir\files.json" -Raw | ConvertFrom-Json
+        Write-Host "Files found:"
+        $filesJson | Format-Table Name, Size
+        
+        # 读取特定文件内容
+        Write-Host "Content of fuzzy.def:"
+        Get-Content -Path "$testDir\fuzzy.def"
+        
+        # 验证文件存在
+        if (Test-Path -Path "$testDir\fuzzy.def") {
+            Write-Host "SUCCESS: fuzzy.def file exists and is accessible!"
         } else {
-            Write-Host "✗ fuzzy.def not found"
+            Write-Error "ERROR: fuzzy.def file not found!"
             exit 1
         }
