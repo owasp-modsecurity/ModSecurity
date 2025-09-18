@@ -3,10 +3,10 @@ name: CI/CD for IIS Module
 on:
   push:
     branches:
-      - main
+      - v2/test-ci-windows
   pull_request:
     branches:
-      - main
+      - v2/test-ci-windows
 
 jobs:
   build:
