@@ -4,6 +4,7 @@
     "libxml2",
     "lua",
     "pcre2",
-    "yajl"
+    "yajl",
+    "apr"
   ]
 }
