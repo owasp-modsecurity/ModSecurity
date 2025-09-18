@@ -1,0 +1,69 @@
+name: CI/CD for IIS Module
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        install: >
+          git
+          make
+          autoconf
+          automake
+          libtool
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-pkg-config
+
+    - name: Clone and build ssdeep
+      shell: msys2 {0}
+      run: |
+        git clone https://github.com/ssdeep-project/ssdeep.git --depth 1
+        cd ssdeep
+        autoreconf -i
+        ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
+        make dll
+        mkdir -p ${{ github.workspace }}/ssdeep-install/bin
+        mkdir -p ${{ github.workspace }}/ssdeep-install/include
+        cp fuzzy.dll ${{ github.workspace }}/ssdeep-install/bin/
+        cp fuzzy.h ${{ github.workspace }}/ssdeep-install/include/
+        cp fuzzy.def ${{ github.workspace }}/ssdeep-install/
+
+    - name: Configure CMake for IIS Module
+      run: |
+        cmake \
+        -DAPACHE_ROOT="C:/tools/Apache24" \
+        -DSSDEEP_ROOT="${{ github.workspace }}/ssdeep-install" \
+        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" \
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
+        -DWITH_SSDEEP=ON \
+        -DWITH_LUA=ON \
+        -DWITH_YAJL=ON \
+        -S IIS -B iis/build
+
+    - name: Build IIS Module
+      shell: pwsh
+      run: |
+        cmake --build iis/build --config Release
+
+    # - name: Package IIS Module with WiX
+    #   shell: pwsh
+    #   run: |
+    #     $CURRENT_DIR = "${{ github.workspace }}/iis/wix"
+    #     candle.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wxs" -out "$CURRENT_DIR\installer.wixobj" -arch x64
+    #     light.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wixobj" -out "$CURRENT_DIR\installer-64.msi"
