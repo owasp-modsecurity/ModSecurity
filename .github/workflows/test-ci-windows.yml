@@ -9,37 +9,71 @@ on:
       - v2/test-ci-windows
 
 jobs:
-  check-apache-structure:
+  inspect-apache:
     runs-on: windows-latest
     
     steps:
+    - name: Check Apache24 bin directory
+      run: |
+        $binPath = "C:\tools\Apache24\bin"
+        Write-Host "=== Apache24 bin Directory Contents ==="
+        if (Test-Path $binPath) {
+          Write-Host "Directory exists at: $binPath"
+          Write-Host "Files and subdirectories:"
+          Get-ChildItem -Path $binPath -Recurse | ForEach-Object {
+            if ($_.PSIsContainer) {
+              Write-Host "  [DIR]  $($_.FullName)"
+            } else {
+              Write-Host "  [FILE] $($_.FullName) ($($_.Length) bytes)"
+            }
+          }
+        } else {
+          Write-Host "Bin directory does not exist at: $binPath"
+        }
+      shell: pwsh
+
+    - name: Check Apache24 include directory
+      run: |
+        $includePath = "C:\tools\Apache24\include"
+        Write-Host "=== Apache24 include Directory Contents ==="
+        if (Test-Path $includePath) {
+          Write-Host "Directory exists at: $includePath"
+          Write-Host "Files and subdirectories:"
+          Get-ChildItem -Path $includePath -Recurse | ForEach-Object {
+            if ($_.PSIsContainer) {
+              Write-Host "  [DIR]  $($_.FullName)"
+            } else {
+              Write-Host "  [FILE] $($_.FullName) ($($_.Length) bytes)"
+            }
+          }
+          
+          # 特别检查 APR 头文件
+          Write-Host "`n=== APR Header Files ==="
+          Get-ChildItem -Path $includePath -Filter "apr*.h" -Recurse | ForEach-Object {
+            Write-Host "  $($_.FullName)"
+          }
+          
+          # 检查是否存在 apr_perms_set.h
+          $permsSetPath = Join-Path $includePath "apr_perms_set.h"
+          if (Test-Path $permsSetPath) {
+            Write-Host "`nFOUND: apr_perms_set.h exists at $permsSetPath"
+          } else {
+            Write-Host "`nMISSING: apr_perms_set.h not found in $includePath"
+          }
+        } else {
+          Write-Host "Include directory does not exist at: $includePath"
+        }
+      shell: pwsh
+
     - name: Check Apache24 directory structure
       run: |
         $apachePath = "C:\tools\Apache24"
-        
+        Write-Host "=== Apache24 Overall Structure ==="
         if (Test-Path $apachePath) {
           Write-Host "Apache24 directory exists at: $apachePath"
-          Write-Host "Subdirectories:"
+          Write-Host "Top-level directories:"
           Get-ChildItem -Path $apachePath -Directory | ForEach-Object {
             Write-Host "  - $($_.Name)"
-          }
-          
-          Write-Host "`nChecking for APR headers in include directory:"
-          $includePath = Join-Path $apachePath "include"
-          if (Test-Path $includePath) {
-            Get-ChildItem -Path $includePath -Filter "apr*.h" | Select-Object -First 10 | ForEach-Object {
-              Write-Host "  - $($_.Name)"
-            }
-            
-            # 特别检查 apr_perms_set.h
-            $permsSetPath = Join-Path $includePath "apr_perms_set.h"
-            if (Test-Path $permsSetPath) {
-              Write-Host "`nFOUND: apr_perms_set.h exists at $permsSetPath"
-            } else {
-              Write-Host "`nMISSING: apr_perms_set.h not found in $includePath"
-            }
-          } else {
-            Write-Host "  Include directory not found at $includePath"
           }
         } else {
           Write-Host "Apache24 directory does not exist at: $apachePath"
