@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(VCPKG_BUILD_TYPE release)
-
 project(ModSecurityIIS C CXX)
 
 find_package(LibXml2 CONFIG REQUIRED)
@@ -150,6 +148,27 @@ if(APACHE_ROOT)
     if(NOT EXISTS "${APACHE_ROOT}/lib")
         message(FATAL_ERROR "APACHE_ROOT/lib directory does not exist. Expected: '${APACHE_ROOT}/lib'. Please ensure Apache libraries are available.")
     endif()
+
+    # Create imported targets for Apache libraries
+    add_library(Apache::httpd SHARED IMPORTED)
+    set_target_properties(Apache::httpd PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${APACHE_ROOT}/include"
+        IMPORTED_IMPLIB "${APACHE_ROOT}/lib/libhttpd.lib"
+        IMPORTED_LOCATION "${APACHE_ROOT}/bin/libhttpd.dll"
+    )
+
+    add_library(Apache::apr SHARED IMPORTED)
+    set_target_properties(Apache::apr PROPERTIES
+        IMPORTED_IMPLIB "${APACHE_ROOT}/lib/libapr-1.lib"
+        IMPORTED_LOCATION "${APACHE_ROOT}/bin/libapr-1.dll"
+    )
+
+    add_library(Apache::aprutil SHARED IMPORTED)
+    set_target_properties(Apache::aprutil PROPERTIES
+        IMPORTED_IMPLIB "${APACHE_ROOT}/lib/libaprutil-1.lib"
+        IMPORTED_LOCATION "${APACHE_ROOT}/bin/libaprutil-1.dll"
+    )
+
     target_include_directories(${IIS_MODULE_NAME} PRIVATE
         ${APACHE_ROOT}/include
     )
@@ -228,6 +247,7 @@ if(WITH_SSDEEP)
                 set(WITH_SSDEEP OFF CACHE BOOL "Enable SSDEEP support" FORCE)
             else()
                 set(SSDEEP_GENERATED_LIB "${CMAKE_CURRENT_BINARY_DIR}/fuzzy.lib")
+                set(SSDEEP_GENERATED_dll "${CMAKE_CURRENT_BINARY_DIR}/bin/fuzzy.dll")
                 
                 # 添加自定义命令生成 fuzzy.lib
                 add_custom_command(
@@ -250,7 +270,14 @@ if(WITH_SSDEEP)
                 # 使主目标依赖于 fuzzy.lib 的生成
                 add_dependencies(${IIS_MODULE_NAME} generate_ssdeep_lib)
                 
-            endif()
+                add_library(SSDEEP::fuzzy SHARED IMPORTED)
+                set_target_properties(SSDEEP::fuzzy PROPERTIES
+                    INTERFACE_INCLUDE_DIRECTORIES "${SSDEEP_INCLUDE_DIR}"
+                    IMPORTED_LOCATION "${SSDEEP_GENERATED_dll}"
+                    IMPORTED_IMPLIB "${SSDEEP_GENERATED_LIB}"
+                )
+                 
+             endif()
         else()
             message(WARNING "SSDEEP include (fuzzy.h) not found at ${SSDEEP_ROOT}/include. Disabling SSDEEP support.")
             set(WITH_SSDEEP OFF CACHE BOOL "Enable SSDEEP support" FORCE)
@@ -300,10 +327,12 @@ target_link_libraries(${IIS_MODULE_NAME} PRIVATE
 # Apache-specific libraries
 if(APACHE_ROOT)
     target_link_libraries(${IIS_MODULE_NAME} PRIVATE
-        ${APACHE_ROOT}/lib/libhttpd.lib
-        ${APACHE_ROOT}/lib/libapr-1.lib
-        ${APACHE_ROOT}/lib/libaprutil-1.lib
+        Apache::httpd
+        Apache::apr
+        Apache::aprutil
     )
+else()
+    message(WARNING "APACHE_ROOT is not defined or path does not exist. Current APACHE_ROOT: '${APACHE_ROOT}'. Please set APACHE_ROOT to the Apache installation directory.")
 endif()
 
 # Optional link libraries
@@ -316,17 +345,58 @@ if(WITH_YAJL)
 endif()
 
 if(WITH_SSDEEP AND SSDEEP_INCLUDE_DIR AND SSDEEP_GENERATED_LIB)
-    target_link_libraries(${IIS_MODULE_NAME} PRIVATE ${SSDEEP_GENERATED_LIB})
+    target_link_libraries(${IIS_MODULE_NAME} PRIVATE SSDEEP::fuzzy)
 else()
     message(WARNING "SSDEEP library not found or generated. Disabling SSDEEP support.")
     option(WITH_SSDEEP "Enable SSDEEP support" OFF) # Disable if library not found
 endif()
+
+if(APACHE_ROOT AND EXISTS "${APACHE_ROOT}/bin")
+    add_custom_command(TARGET ${IIS_MODULE_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${APACHE_ROOT}/bin/libhttpd.dll"
+            $<TARGET_FILE_DIR:${IIS_MODULE_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${APACHE_ROOT}/bin/libaprutil-1.dll"
+            $<TARGET_FILE_DIR:${IIS_MODULE_NAME}>
+        COMMENT "Copying Apache DLLs to output directory"
+    )
+else()
+    message(WARNING "APACHE_ROOT is not defined or path does not exist. Current APACHE_ROOT: '${APACHE_ROOT}'. Please set APACHE_ROOT to the Apache installation directory.")
+endif()
+
+if(WITH_SSDEEP AND SSDEEP_ROOT AND EXISTS "${SSDEEP_ROOT}/bin/fuzzy.dll")
+    add_custom_command(TARGET ${IIS_MODULE_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${SSDEEP_ROOT}/bin/fuzzy.dll"
+            $<TARGET_FILE_DIR:${IIS_MODULE_NAME}>
+        COMMENT "Copying SSDEEP DLL to output directory"
+    )
+else()
+    message(WARNING "SSDEEP_ROOT is not defined or path does not exist. Current SSDEEP_ROOT: '${SSDEEP_ROOT}'. Please set SSDEEP_ROOT to the SSDEEP installation directory.")
+endif()
+
 
 # Install target - copy to release files directory
 install(TARGETS ${IIS_MODULE_NAME}
     RUNTIME DESTINATION .
     LIBRARY DESTINATION .
 )
+
+if(APACHE_ROOT AND EXISTS "${APACHE_ROOT}/bin")
+    install(FILES
+        "${APACHE_ROOT}/bin/libhttpd.dll"
+        "${APACHE_ROOT}/bin/libaprutil-1.dll"
+        DESTINATION .
+    )
+endif()
+
+if(WITH_SSDEEP AND SSDEEP_ROOT AND EXISTS "${SSDEEP_ROOT}/bin/fuzzy.dll")
+    install(FILES
+        "${SSDEEP_ROOT}/bin/fuzzy.dll"
+        DESTINATION .
+    )
+endif()
 
 # Also install the PDB file if it's generated
 install(FILES $<TARGET_PDB_FILE:${IIS_MODULE_NAME}> DESTINATION . OPTIONAL)
