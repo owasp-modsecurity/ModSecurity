@@ -42,11 +42,11 @@ jobs:
         ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
         make dll
 
-        mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/bin
-        mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/include
-        cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install/bin/
-        cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install/include/
-        cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install/
+        mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/bin"
+        mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/include"
+        cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install/bin/"
+        cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install/include/"
+        cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install/"
 
     - name: Configure CMake for IIS Module
       run: |
