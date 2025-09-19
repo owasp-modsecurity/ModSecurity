@@ -40,26 +40,27 @@ jobs:
         make dll
         mkdir -p ${{ github.workspace }}/ssdeep-install/bin
         mkdir -p ${{ github.workspace }}/ssdeep-install/include
-        cp fuzzy.dll ${{ github.workspace }}/ssdeep-install/bin/
-        cp fuzzy.h ${{ github.workspace }}/ssdeep-install/include/
-        cp fuzzy.def ${{ github.workspace }}/ssdeep-install/
+        cp -v fuzzy.dll ${{ github.workspace }}/ssdeep-install/bin/
+        cp -v fuzzy.h ${{ github.workspace }}/ssdeep-install/include/
+        cp -v fuzzy.def ${{ github.workspace }}/ssdeep-install/
 
-    - name: Configure CMake for IIS Module
-      run: |
-        cmake `
-        -DAPACHE_ROOT="C:\tools\Apache24" `
-        -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install" `
-        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\install" `
-        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
-        -DWITH_SSDEEP=ON `
-        -DWITH_LUA=ON `
-        -DWITH_YAJL=ON `
-        -S IIS -B iis\build
+    # - name: Configure CMake for IIS Module
+    #   run: |
+    #     Test-Path "${{ github.workspace }}\ssdeep-install\bin\fuzzy.dll"
+    #     cmake `
+    #     -DAPACHE_ROOT="C:\tools\Apache24" `
+    #     -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install" `
+    #     -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\install" `
+    #     -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
+    #     -DWITH_SSDEEP=ON `
+    #     -DWITH_LUA=ON `
+    #     -DWITH_YAJL=ON `
+    #     -S IIS -B iis\build
 
-    - name: Build IIS Module
-      shell: pwsh
-      run: |
-        cmake --build iis\build --config Release
+    # - name: Build IIS Module
+    #   shell: pwsh
+    #   run: |
+    #     cmake --build iis\build --config Release
 
     # - name: Package IIS Module with WiX
     #   shell: pwsh
