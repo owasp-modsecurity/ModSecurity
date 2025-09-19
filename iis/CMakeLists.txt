@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
+
+set(VCPKG_BUILD_TYPE release)
+
 project(ModSecurityIIS C CXX)
 
 find_package(LibXml2 CONFIG REQUIRED)

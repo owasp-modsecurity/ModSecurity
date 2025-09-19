@@ -11,6 +11,11 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    
+    # For Caching
+    permissions:
+      actions: read
+      contents: read
 
     steps:
     - name: Checkout code
@@ -48,7 +53,17 @@ jobs:
         cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install/include/"
         cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install/"
 
+    - name: Restore vcpkg cache
+      id: vcpkg-cache
+      uses: TAServers/vcpkg-cache@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        prefix: vcpkg-iis-module/
+
     - name: Configure CMake for IIS Module
+      env:
+        VCPKG_FEATURE_FLAGS: "binarycaching"
+        VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
       run: |
         cmake `
         -DAPACHE_ROOT="C:\tools\Apache24" `
