@@ -172,7 +172,7 @@ if(APACHE_ROOT)
     )
 
     add_library(Apache::apriconv SHARED IMPORTED)
-    set_target_properties(Apache::apriconv SHARED IMPORTED PROPERTIES
+    set_target_properties(Apache::apriconv PROPERTIES
         IMPORTED_IMPLIB "${APACHE_ROOT}/lib/libapriconv-1.lib"
         IMPORTED_LOCATION "${APACHE_ROOT}/bin/libapriconv-1.dll"
     )
