@@ -9,178 +9,177 @@ on:
       - v2/test-ci-windows
 
 jobs:
-  # build:
-  #   strategy:
-  #     matrix:
-  #       arch: [x86, x64]
-  #   runs-on: windows-latest
-    
-  #   # For Caching
-  #   permissions:
-  #     actions: read
-  #     contents: read
-
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v5
-
-  #   - name: Install Apache for x86
-  #     if: matrix.arch == 'x86'
-  #     shell: pwsh
-  #     run: |
-  #       $apachePath = "${{ github.workspace }}\apache-x86"
-  #       New-Item -ItemType Directory -Path $apachePath -Force
-  #       choco install apache-httpd -y --force --forcex86 --no-progress -r --params="`"/installLocation:$apachePath /noService`""
-  #       echo "APACHE_ROOT=$apachePath\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-  #   - name: Set Apache path for x64
-  #     if: matrix.arch == 'x64'
-  #     shell: pwsh
-  #     run: |
-  #       echo "APACHE_ROOT=C:\tools\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-  #   - name: Setup MSYS2
-  #     uses: msys2/setup-msys2@v2
-  #     with:
-  #       msystem: ${{ matrix.arch == 'x86' && 'MINGW32' || 'UCRT64' }}
-  #       update: true
-  #       install: >
-  #         git
-  #         make
-  #         autoconf
-  #         automake
-  #         libtool
-  #         ${{ matrix.arch == 'x86' && 'mingw-w64-i686-gcc' || 'mingw-w64-ucrt-x86_64-gcc' }}
-  #         ${{ matrix.arch == 'x86' && 'mingw-w64-i686-pkg-config' || 'mingw-w64-ucrt-x86_64-pkg-config' }}
-
-  #   - name: Clone and build ssdeep
-  #     shell: msys2 {0}
-  #     run: |
-  #       MSYS2_WORKSPACE=$(cygpath -u '${{ github.workspace }}')
-  #       echo "Converted workspace path: $MSYS2_WORKSPACE"
-
-  #       git clone https://github.com/ssdeep-project/ssdeep.git --depth 1
-  #       cd ssdeep
-  #       autoreconf -i
-        
-  #       if [ "${{ matrix.arch }}" = "x86" ]; then
-  #         ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3" --build=i686-pc-mingw32
-  #       else
-  #         ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
-  #       fi
-        
-  #       make dll
-
-  #       mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/bin"
-  #       mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/include"
-  #       cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/bin/"
-  #       cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/include/"
-  #       cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/"
-
-  #   - name: Restore vcpkg cache
-  #     id: vcpkg-cache
-  #     uses: TAServers/vcpkg-cache@v3
-  #     with:
-  #       token: ${{ secrets.GITHUB_TOKEN }}
-  #       prefix: vcpkg-iis-module-${{ matrix.arch }}/
-
-  #   - name: Configure CMake for IIS Module
-  #     env:
-  #       VCPKG_FEATURE_FLAGS: "binarycaching"
-  #       VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
-  #       VCPKG_DEFAULT_TRIPLET: ${{ matrix.arch }}-windows
-  #     run: |
-  #       $archFlag = "${{ matrix.arch }}"
-  #       $cmakeArch = if ($archFlag -eq "x86") { "Win32" } else { "x64" }
-  #       $installDir = if ($archFlag -eq "x86") { "x86" } else { "amd64" }
-
-  #       cmake `
-  #       -DAPACHE_ROOT="$env:APACHE_ROOT" `
-  #       -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install-${{ matrix.arch }}" `
-  #       -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\iis\release\$installDir" `
-  #       -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
-  #       -A $cmakeArch `
-  #       -DWITH_SSDEEP=ON `
-  #       -DWITH_LUA=ON `
-  #       -DWITH_YAJL=ON `
-  #       -S IIS -B "iis\build-${{ matrix.arch }}"
-
-  #   - name: Build IIS Module
-  #     shell: pwsh
-  #     run: |
-  #       cmake --build "iis\build-${{ matrix.arch }}" --config Release
-
-  #   - name: Upload artifacts
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: iis-module-${{ matrix.arch }}
-  #       path: iis/build-${{ matrix.arch }}/Release/
-    
-  # package:
-  #   needs: build
-  #   runs-on: windows-latest
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v5
-
-  #   - name: Download x64 artifacts
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #       name: iis-module-x64
-  #       path: iis/release/amd64/
-
-  #   - name: Download x86 artifacts
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #       name: iis-module-x86
-  #       path: iis/release/x86/
-
-  #   - name: Generate wxs files
-  #     shell: pwsh
-  #     run: |
-  #       heat dir "iis\release\amd64" -cg ModSec64Components -dr inetsrv64 -gg -sreg -srd -var var.ModSecurityIISRelease64 -out "iis\ModSec64.wxs"
-  #       heat dir "iis\release\x86" -cg ModSec32Components -dr inetsrv32 -gg -sreg -srd -var var.ModSecurityIISRelease32 -out "iis\ModSec32.wxs"
-
-  #   - name: Compile wxs files
-  #     shell: pwsh
-  #     run: |
-  #       candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wxs" "iis\ModSec64.wxs" -arch x64 -dModSecurityIISRelease64="iis\release\amd64\" -out iis\
-  #       candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\ModSec32.wxs" -arch x86 -dModSecurityIISRelease32="iis\release\x86\" -out iis\
-
-  #   - name: Link wixobj files into MSI
-  #     shell: pwsh
-  #     run: |
-  #       light.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wixobj" "iis\ModSec32.wixobj" "iis\ModSec64.wixobj" -out "iis\modsecurityiis.msi"
-
-  #   - name: Upload artifacts
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: modsecurityiis-installers
-  #       path: iis/modsecurityiis.msi
-
-  test:
-#     needs: package
+  build:
+    strategy:
+      matrix:
+        arch: [x86, x64]
     runs-on: windows-latest
+    
+    # For Caching
+    permissions:
+      actions: read
+      contents: read
+
     steps:
-    - name: Enable IIS Feature
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Install Apache for x86
+      if: matrix.arch == 'x86'
       shell: pwsh
       run: |
-        $iisStatus = Get-WindowsFeature -Name Web-Server
-        if ($iisStatus.Installed -eq $false) {
-          Write-Host "IIS is not installed. Installing now..."
-          Install-WindowsFeature -Name Web-Server -IncludeManagementTools
-        } else {
-          Write-Host "IIS is already installed."
-        }
-        Install-WindowsFeature -name Web-Server -IncludeManagementTools
-        Install-WindowsFeature -name Web-Server, Web-ASP, Web-Mgmt-Tools, Web-WebSockets
+        $apachePath = "${{ github.workspace }}\apache-x86"
+        New-Item -ItemType Directory -Path $apachePath -Force
+        choco install apache-httpd -y --force --forcex86 --no-progress -r --params="'/installLocation:$apachePath /noService'"
+        echo "APACHE_ROOT=$apachePath\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    # - name: Download MSI
-    #   uses: actions/download-artifact@v4
+    - name: Set Apache path for x64
+      if: matrix.arch == 'x64'
+      shell: pwsh
+      run: |
+        echo "APACHE_ROOT=C:\tools\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    # - name: Setup MSYS2
+    #   uses: msys2/setup-msys2@v2
     #   with:
-    #     name: modsecurityiis-installers
-    #     path: iis/
+    #     msystem: ${{ matrix.arch == 'x86' && 'MINGW32' || 'UCRT64' }}
+    #     update: true
+    #     install: >
+    #       git
+    #       make
+    #       autoconf
+    #       automake
+    #       libtool
+    #       ${{ matrix.arch == 'x86' && 'mingw-w64-i686-gcc' || 'mingw-w64-ucrt-x86_64-gcc' }}
+    #       ${{ matrix.arch == 'x86' && 'mingw-w64-i686-pkg-config' || 'mingw-w64-ucrt-x86_64-pkg-config' }}
 
-    # - name: Install MSI
-    #   shell: pwsh
+    # - name: Clone and build ssdeep
+    #   shell: msys2 {0}
     #   run: |
+    #     MSYS2_WORKSPACE=$(cygpath -u '${{ github.workspace }}')
+    #     echo "Converted workspace path: $MSYS2_WORKSPACE"
+
+    #     git clone https://github.com/ssdeep-project/ssdeep.git --depth 1
+    #     cd ssdeep
+    #     autoreconf -i
+        
+    #     if [ "${{ matrix.arch }}" = "x86" ]; then
+    #       ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3" --build=i686-pc-mingw32
+    #     else
+    #       ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
+    #     fi
+        
+    #     make dll
+
+    #     mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/bin"
+    #     mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/include"
+    #     cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/bin/"
+    #     cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/include/"
+    #     cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/"
+
+    - name: Restore vcpkg cache
+      id: vcpkg-cache
+      uses: TAServers/vcpkg-cache@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        prefix: vcpkg-iis-module-${{ matrix.arch }}/
+
+    - name: Configure CMake for IIS Module
+      env:
+        VCPKG_FEATURE_FLAGS: "binarycaching"
+        VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
+        VCPKG_DEFAULT_TRIPLET: ${{ matrix.arch }}-windows
+      run: |
+        $archFlag = "${{ matrix.arch }}"
+        $cmakeArch = if ($archFlag -eq "x86") { "Win32" } else { "x64" }
+        $installDir = if ($archFlag -eq "x86") { "x86" } else { "amd64" }
+
+        cmake `
+        -DAPACHE_ROOT="$env:APACHE_ROOT" `
+        # -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install-${{ matrix.arch }}" `
+        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\iis\release\$installDir" `
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
+        -A $cmakeArch `
+        # -DWITH_SSDEEP=ON `
+        -DWITH_LUA=ON `
+        -DWITH_YAJL=ON `
+        -S IIS -B "iis\build-${{ matrix.arch }}"
+
+    - name: Build IIS Module
+      shell: pwsh
+      run: |
+        cmake --build "iis\build-${{ matrix.arch }}" --config Release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: iis-module-${{ matrix.arch }}
+        path: iis/build-${{ matrix.arch }}/Release/
+    
+  package:
+    needs: build
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Download x64 artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: iis-module-x64
+        path: iis/release/amd64/
+
+    - name: Download x86 artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: iis-module-x86
+        path: iis/release/x86/
+
+    - name: Generate wxs files
+      shell: pwsh
+      run: |
+        heat dir "iis\release\amd64" -cg ModSec64Components -dr inetsrv64 -gg -sreg -srd -var var.ModSecurityIISRelease64 -out "iis\ModSec64.wxs"
+        heat dir "iis\release\x86" -cg ModSec32Components -dr inetsrv32 -gg -sreg -srd -var var.ModSecurityIISRelease32 -out "iis\ModSec32.wxs"
+
+    - name: Compile wxs files
+      shell: pwsh
+      run: |
+        candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wxs" "iis\ModSec64.wxs" -arch x64 -dModSecurityIISRelease64="iis\release\amd64\" -out iis\
+        candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\ModSec32.wxs" -arch x86 -dModSecurityIISRelease32="iis\release\x86\" -out iis\
+
+    - name: Link wixobj files into MSI
+      shell: pwsh
+      run: |
+        light.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wixobj" "iis\ModSec32.wixobj" "iis\ModSec64.wixobj" -out "iis\modsecurityiis.msi"
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: modsecurityiis-installers
+        path: iis/modsecurityiis.msi
+
+  test:
+    needs: package
+    runs-on: windows-latest
+    steps:
+    - name: Download MSI
+      uses: actions/download-artifact@v4
+      with:
+        name: modsecurityiis-installers
+        path: ${{ github.workspace }}\
+
+    - name: Install MSI
+      shell: pwsh
+      run: |
+        msiexec /i modsecurityiis.msi /qn /norestart
+
+    - name: ReStart IIS Feature
+      shell: pwsh
+      run: |
+        Restart-Service W3SVC
+
+    - name: Test IIS Module
+      shell: pwsh
+      run: |
+        curl -I http://localhost/
+        Get-EventLog -LogName Application -Newest 10

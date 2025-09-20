@@ -171,6 +171,12 @@ if(APACHE_ROOT)
         IMPORTED_LOCATION "${APACHE_ROOT}/bin/libaprutil-1.dll"
     )
 
+    add_library(Apache::apriconv SHARED IMPORTED)
+    set_target_properties(Apache::apriconv SHARED IMPORTED PROPERTIES
+        IMPORTED_IMPLIB "${APACHE_ROOT}/lib/libapriconv-1.lib"
+        IMPORTED_LOCATION "${APACHE_ROOT}/bin/libapriconv-1.dll"
+    )
+
     target_include_directories(${IIS_MODULE_NAME} PRIVATE
         ${APACHE_ROOT}/include
     )
@@ -283,9 +289,6 @@ if(WITH_SSDEEP)
                 )
                  
              endif()
-        else()
-            message(WARNING "SSDEEP include (fuzzy.h) not found at ${SSDEEP_ROOT}/include. Disabling SSDEEP support.")
-            set(WITH_SSDEEP OFF CACHE BOOL "Enable SSDEEP support" FORCE)
         endif()
     endif()
 endif()
@@ -335,6 +338,7 @@ if(APACHE_ROOT)
         Apache::httpd
         Apache::apr
         Apache::aprutil
+        Apache::apriconv
     )
 else()
     message(WARNING "APACHE_ROOT is not defined or path does not exist. Current APACHE_ROOT: '${APACHE_ROOT}'. Please set APACHE_ROOT to the Apache installation directory.")
@@ -351,9 +355,6 @@ endif()
 
 if(WITH_SSDEEP AND SSDEEP_INCLUDE_DIR AND SSDEEP_GENERATED_LIB)
     target_link_libraries(${IIS_MODULE_NAME} PRIVATE SSDEEP::fuzzy)
-else()
-    message(WARNING "SSDEEP library not found or generated. Disabling SSDEEP support.")
-    option(WITH_SSDEEP "Enable SSDEEP support" OFF) # Disable if library not found
 endif()
 
 if(APACHE_ROOT AND EXISTS "${APACHE_ROOT}/bin")
@@ -363,6 +364,9 @@ if(APACHE_ROOT AND EXISTS "${APACHE_ROOT}/bin")
             $<TARGET_FILE_DIR:${IIS_MODULE_NAME}>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${APACHE_ROOT}/bin/libaprutil-1.dll"
+            $<TARGET_FILE_DIR:${IIS_MODULE_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${APACHE_ROOT}/bin/libapriconv-1.dll"
             $<TARGET_FILE_DIR:${IIS_MODULE_NAME}>
         COMMENT "Copying Apache DLLs to output directory"
     )
@@ -377,8 +381,6 @@ if(WITH_SSDEEP AND SSDEEP_ROOT AND EXISTS "${SSDEEP_ROOT}/bin/fuzzy.dll")
             $<TARGET_FILE_DIR:${IIS_MODULE_NAME}>
         COMMENT "Copying SSDEEP DLL to output directory"
     )
-else()
-    message(WARNING "SSDEEP_ROOT is not defined or path does not exist. Current SSDEEP_ROOT: '${SSDEEP_ROOT}'. Please set SSDEEP_ROOT to the SSDEEP installation directory.")
 endif()
 
 
@@ -392,6 +394,7 @@ if(APACHE_ROOT AND EXISTS "${APACHE_ROOT}/bin")
     install(FILES
         "${APACHE_ROOT}/bin/libhttpd.dll"
         "${APACHE_ROOT}/bin/libaprutil-1.dll"
+        "${APACHE_ROOT}/bin/libapriconv-1.dll"
         DESTINATION .
     )
 endif()
