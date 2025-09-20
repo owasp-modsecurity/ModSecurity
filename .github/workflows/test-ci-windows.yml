@@ -96,14 +96,15 @@ jobs:
 
         cmake `
         -DAPACHE_ROOT="$env:APACHE_ROOT" `
-        # -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install-${{ matrix.arch }}" `
         -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\iis\release\$installDir" `
         -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
         -A $cmakeArch `
-        # -DWITH_SSDEEP=ON `
         -DWITH_LUA=ON `
         -DWITH_YAJL=ON `
         -S IIS -B "iis\build-${{ matrix.arch }}"
+
+      # -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install-${{ matrix.arch }}" `
+      # -DWITH_SSDEEP=ON `
 
     - name: Build IIS Module
       shell: pwsh
