@@ -144,7 +144,7 @@ jobs:
     - name: Compile wxs files
       shell: pwsh
       run: |
-        candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wxs" "iis\ModSec64.wxs" -arch x64 -dModSecurityIISRelease64="iis\release\amd64\"
+        candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wxs" "iis\ModSec64.wxs" -arch x64 -dModSecurityIISRelease64="iis\release\amd64\" -out iis\
         candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\ModSec32.wxs" -arch x86 -dModSecurityIISRelease32="iis\release\x86\" -out iis\
 
     - name: Link wixobj files into MSI
