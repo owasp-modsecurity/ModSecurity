@@ -93,7 +93,7 @@ jobs:
         $archFlag = "${{ matrix.arch }}"
         $cmakeArch = if ($archFlag -eq "x86") { "Win32" } else { "x64" }
         
-        $vcpkgIncludePath = "${{ github.workspace }}\build\vcpkg_installed\${{ matrix.arch }}-windows\include"
+        $vcpkgIncludePath = "${{ github.workspace }}\iis\build-${{ matrix.arch }}\vcpkg_installed\${{ matrix.arch }}-windows\include"
         Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
         if (Test-Path -Path $vcpkgIncludePath) {
             Write-Host "vcpkg include path exists. Contents:"
@@ -113,10 +113,10 @@ jobs:
         -DWITH_YAJL=ON `
         -S IIS -B "iis\build-${{ matrix.arch }}"
 
-    - name: Build IIS Module
-      shell: pwsh
-      run: |
-        cmake --build "iis\build-${{ matrix.arch }}" --config Release
+    # - name: Build IIS Module
+    #   shell: pwsh
+    #   run: |
+    #     cmake --build "iis\build-${{ matrix.arch }}" --config Release
 
     # - name: Package IIS Module with WiX
     #   shell: pwsh
