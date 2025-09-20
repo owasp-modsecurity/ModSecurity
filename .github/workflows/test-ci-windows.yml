@@ -104,54 +104,10 @@ jobs:
         -DWITH_YAJL=ON `
         -S IIS -B "iis\build-${{ matrix.arch }}"
 
-        $vcpkgIncludePath = "${{ github.workspace }}\iis\build-${{ matrix.arch }}\vcpkg_installed\${{ matrix.arch }}-windows\include"
-        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
-        if (Test-Path -Path $vcpkgIncludePath) {
-            Write-Host "vcpkg include path exists. Contents:"
-            Get-ChildItem -Path $vcpkgIncludePath
-        } else {
-            Write-Host "vcpkg include path does not exist."
-        }
-
-        $vcpkgIncludePath = "${{ github.workspace }}\iis\build\vcpkg_installed\${{ matrix.arch }}-windows\include"
-        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
-        if (Test-Path -Path $vcpkgIncludePath) {
-            Write-Host "vcpkg include path exists. Contents:"
-            Get-ChildItem -Path $vcpkgIncludePath
-        } else {
-            Write-Host "vcpkg include path does not exist."
-        }
-
-        $vcpkgIncludePath = "${{ github.workspace }}\build-${{ matrix.arch }}\vcpkg_installed\${{ matrix.arch }}-windows\include"
-        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
-        if (Test-Path -Path $vcpkgIncludePath) {
-            Write-Host "vcpkg include path exists. Contents:"
-            Get-ChildItem -Path $vcpkgIncludePath
-        } else {
-            Write-Host "vcpkg include path does not exist."
-        }
-
-        $vcpkgIncludePath = "${{ github.workspace }}\build\vcpkg_installed\${{ matrix.arch }}-windows\include"
-        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
-        if (Test-Path -Path $vcpkgIncludePath) {
-            Write-Host "vcpkg include path exists. Contents:"
-            Get-ChildItem -Path $vcpkgIncludePath
-        } else {
-            Write-Host "vcpkg include path does not exist."
-        }
-
-        $vcpkgIncludePath = "${{ github.workspace }}\iis\vcpkg_installed\${{ matrix.arch }}-windows\include"
-        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
-        if (Test-Path -Path $vcpkgIncludePath) {
-            Write-Host "vcpkg include path exists. Contents:"
-            Get-ChildItem -Path $vcpkgIncludePath
-        } else {
-            Write-Host "vcpkg include path does not exist."
-        }
-    # - name: Build IIS Module
-    #   shell: pwsh
-    #   run: |
-    #     cmake --build "iis\build-${{ matrix.arch }}" --config Release
+    - name: Build IIS Module
+      shell: pwsh
+      run: |
+        cmake --build "iis\build-${{ matrix.arch }}" --config Release
 
     # - name: Package IIS Module with WiX
     #   shell: pwsh
