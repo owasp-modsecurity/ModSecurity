@@ -159,7 +159,7 @@ jobs:
   #       path: iis/modsecurityiis.msi
 
   test:
-    needs: package
+#     needs: package
     runs-on: windows-latest
     steps:
     - name: Enable IIS Feature
