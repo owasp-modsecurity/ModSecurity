@@ -52,8 +52,8 @@ jobs:
           autoconf
           automake
           libtool
-          ${{ matrix.arch == 'x86' && 'mingw-w64-ucrt-i686-gcc' || 'mingw-w64-ucrt-x86_64-gcc' }}
-          ${{ matrix.arch == 'x86' && 'mingw-w64-ucrt-i686-pkg-config' || 'mingw-w64-ucrt-x86_64-pkg-config' }}
+          ${{ matrix.arch == 'x86' && 'mingw-w64-i686-gcc' || 'mingw-w64-ucrt-x86_64-gcc' }}
+          ${{ matrix.arch == 'x86' && 'mingw-w64-i686-pkg-config' || 'mingw-w64-ucrt-x86_64-pkg-config' }}
 
     - name: Clone and build ssdeep
       shell: msys2 {0}
