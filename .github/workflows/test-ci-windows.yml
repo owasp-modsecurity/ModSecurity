@@ -123,30 +123,43 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v5
 
+    - name: Download x64 artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: iis-module-x64
+        path: iis/release/amd64/
+
     - name: Download x86 artifacts
       uses: actions/download-artifact@v4
       with:
         name: iis-module-x86
         path: iis/release/x86/
 
-
-    - name: Download x64 artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: iis-module-x64
-        path: iis/release/amd64/
-    
-    - name: Package IIS Module with WiX
+    - name: Generate wxs files
       shell: pwsh
       run: |
-        $CURRENT_DIR = "${{ github.workspace }}\iis\"
-        candle.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wxs" -out "$CURRENT_DIR\installer.wixobj" -arch x64
-        light.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wixobj" -out "$CURRENT_DIR\installer\modsecurityiis-x64.msi"
-        candle.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wxs" -out "$CURRENT_DIR\installer.wixobj" -arch x86
-        light.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wixobj" -out "$CURRENT_DIR\installer\modsecurityiis-x86.msi"     
+        heat dir "iis\release\amd64" -cg ModSec64Components -dr inetsrv64 -gg -sreg -srd -var var.ModSecurityIISRelease64 -out "iis\ModSec64.wxs"
+        heat dir "iis\release\x86" -cg ModSec32Components -dr inetsrv32 -gg -sreg -srd -var var.ModSecurityIISRelease32 -out "iis\ModSec32.wxs"
+
+    - name: Compile wxs files
+      shell: pwsh
+      run: |
+        candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wxs" "iis\ModSec64.wxs" -arch x64 -dModSecurityIISRelease64="iis\release\amd64\"
+        candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\ModSec32.wxs" -arch x86 -dModSecurityIISRelease32="iis\release\x86\"
+
+    - name: Link wixobj files into MSI
+      shell: pwsh
+      run: |
+        light.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wixobj" "iis\ModSec32.wixobj" "iis\ModSec64.wixobj" -out "iis\modsecurityiis.msi"
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: modsecurityiis-installers
-        path: iis/installer/*.msi
+        path: iis/installer/modsecurityiis.msi
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: modsecurityiis-installers
+        path: iis/installer/modsecurityiis.msi
