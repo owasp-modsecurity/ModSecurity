@@ -9,76 +9,102 @@ on:
       - v2/test-ci-windows
 
 jobs:
-  build:
-    runs-on: windows-latest
+  test-winget:
+    name: Test winget availability
+    runs-on: windows-latest  # 使用最新的 Windows Server 运行器
     
-    # For Caching
-    permissions:
-      actions: read
-      contents: read
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
-
-    - name: Setup MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: UCRT64
-        update: true
-        install: >
-          git
-          make
-          autoconf
-          automake
-          libtool
-          mingw-w64-ucrt-x86_64-gcc
-          mingw-w64-ucrt-x86_64-pkg-config
-
-    - name: Clone and build ssdeep
-      shell: msys2 {0}
+    - name: Check if winget is installed
       run: |
-        MSYS2_WORKSPACE=$(cygpath -u '${{ github.workspace }}')
-        echo "Converted workspace path: $MSYS2_WORKSPACE"
-
-        git clone https://github.com/ssdeep-project/ssdeep.git --depth 1
-        cd ssdeep
-        autoreconf -i
-        ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
-        make dll
-
-        mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/bin"
-        mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/include"
-        cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install/bin/"
-        cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install/include/"
-        cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install/"
-
-    - name: Restore vcpkg cache
-      id: vcpkg-cache
-      uses: TAServers/vcpkg-cache@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        prefix: vcpkg-iis-module/
-
-    - name: Configure CMake for IIS Module
-      env:
-        VCPKG_FEATURE_FLAGS: "binarycaching"
-        VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
+        # 检查 winget 是否可用
+        winget --version
+        if ($LASTEXITCODE -eq 0) {
+          Write-Host "✅ winget is installed and working correctly"
+        } else {
+          Write-Error "❌ winget is not available or not functioning properly"
+          exit 1
+        }
+      shell: pwsh  # 使用 PowerShell 作为 shell
+      
+    - name: Optional - List installed packages (if winget is available)
+      if: success()
       run: |
-        cmake `
-        -DAPACHE_ROOT="C:\tools\Apache24" `
-        -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install" `
-        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\install" `
-        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
-        -DWITH_SSDEEP=ON `
-        -DWITH_LUA=ON `
-        -DWITH_YAJL=ON `
-        -S IIS -B iis\build
-
-    - name: Build IIS Module
+        # 列出已安装的包以验证 winget 功能
+        winget list --name "Microsoft Visual C++"
+        Write-Host "winget functionality verified successfully"
       shell: pwsh
-      run: |
-        cmake --build iis\build --config Release
+      
+# jobs:
+#   build:
+#     runs-on: windows-latest
+    
+#     # For Caching
+#     permissions:
+#       actions: read
+#       contents: read
+
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v5
+
+#     - name: Setup MSYS2
+#       uses: msys2/setup-msys2@v2
+#       with:
+#         msystem: UCRT64
+#         update: true
+#         install: >
+#           git
+#           make
+#           autoconf
+#           automake
+#           libtool
+#           mingw-w64-ucrt-x86_64-gcc
+#           mingw-w64-ucrt-x86_64-pkg-config
+
+#     - name: Clone and build ssdeep
+#       shell: msys2 {0}
+#       run: |
+#         MSYS2_WORKSPACE=$(cygpath -u '${{ github.workspace }}')
+#         echo "Converted workspace path: $MSYS2_WORKSPACE"
+
+#         git clone https://github.com/ssdeep-project/ssdeep.git --depth 1
+#         cd ssdeep
+#         autoreconf -i
+#         ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
+#         make dll
+
+#         mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/bin"
+#         mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/include"
+#         cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install/bin/"
+#         cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install/include/"
+#         cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install/"
+
+#     - name: Restore vcpkg cache
+#       id: vcpkg-cache
+#       uses: TAServers/vcpkg-cache@v3
+#       with:
+#         token: ${{ secrets.GITHUB_TOKEN }}
+#         prefix: vcpkg-iis-module/
+
+#     - name: Configure CMake for IIS Module
+#       env:
+#         VCPKG_FEATURE_FLAGS: "binarycaching"
+#         VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
+#       run: |
+#         cmake `
+#         -DAPACHE_ROOT="C:\tools\Apache24" `
+#         -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install" `
+#         -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\install" `
+#         -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
+#         -DWITH_SSDEEP=ON `
+#         -DWITH_LUA=ON `
+#         -DWITH_YAJL=ON `
+#         -S IIS -B iis\build
+
+#     - name: Build IIS Module
+#       shell: pwsh
+#       run: |
+#         cmake --build iis\build --config Release
 
     # - name: Package IIS Module with WiX
     #   shell: pwsh
