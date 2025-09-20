@@ -149,6 +149,8 @@ if(APACHE_ROOT)
         message(FATAL_ERROR "APACHE_ROOT/lib directory does not exist. Expected: '${APACHE_ROOT}/lib'. Please ensure Apache libraries are available.")
     endif()
 
+    file(TO_CMAKE_PATH "${APACHE_ROOT}" APACHE_ROOT)
+
     # Create imported targets for Apache libraries
     add_library(Apache::httpd SHARED IMPORTED)
     set_target_properties(Apache::httpd PROPERTIES
@@ -227,6 +229,9 @@ if(WITH_SSDEEP)
         message(WARNING "SSDEEP_ROOT is not defined or path does not exist. Current SSDEEP_ROOT: '${SSDEEP_ROOT}'. Please set SSDEEP_ROOT to the ssdeep installation directory. Disabling SSDEEP support.")
         set(WITH_SSDEEP OFF CACHE BOOL "Enable SSDEEP support" FORCE)
     else()
+
+        file(TO_CMAKE_PATH "${SSDEEP_ROOT}" SSDEEP_ROOT)
+
         message(STATUS "SSDEEP_ROOT: ${SSDEEP_ROOT}")
 
         # 查找头文件

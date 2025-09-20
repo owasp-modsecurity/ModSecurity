@@ -92,11 +92,12 @@ jobs:
       run: |
         $archFlag = "${{ matrix.arch }}"
         $cmakeArch = if ($archFlag -eq "x86") { "Win32" } else { "x64" }
+        $installDir = if ($archFlag -eq "x86") { "x86" } else { "amd64" }
 
         cmake `
         -DAPACHE_ROOT="$env:APACHE_ROOT" `
         -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install-${{ matrix.arch }}" `
-        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\install-${{ matrix.arch }}" `
+        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\iis\release\$installDir" `
         -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
         -A $cmakeArch `
         -DWITH_SSDEEP=ON `
@@ -109,11 +110,43 @@ jobs:
       run: |
         cmake --build "iis\build-${{ matrix.arch }}" --config Release
 
-    # - name: Package IIS Module with WiX
-    #   shell: pwsh
-    #   run: |
-    #     $CURRENT_DIR = "${{ github.workspace }}/iis/wix"
-    #     $arch = "${{ matrix.arch }}"
-    #     $wixArch = if ($arch -eq "x86") { "x86" } else { "x64" }
-    #     candle.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wxs" -out "$CURRENT_DIR\installer.wixobj" -arch $wixArch
-    #     light.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wixobj" -out "$CURRENT_DIR\installer-$arch.msi"
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: iis-module-${{ matrix.arch }}
+        path: iis/build-${{ matrix.arch }}/Release/
+    
+  package:
+    needs: build
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Download x86 artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: iis-module-x86
+        path: iis/release/x86/
+
+
+    - name: Download x64 artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: iis-module-x64
+        path: iis/release/amd64/
+    
+    - name: Package IIS Module with WiX
+      shell: pwsh
+      run: |
+        $CURRENT_DIR = "${{ github.workspace }}\iis\"
+        candle.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wxs" -out "$CURRENT_DIR\installer.wixobj" -arch x64
+        light.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wixobj" -out "$CURRENT_DIR\installer\modsecurityiis-x64.msi"
+        candle.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wxs" -out "$CURRENT_DIR\installer.wixobj" -arch x86
+        light.exe -ext WixUtilExtension -ext WixUIExtension "$CURRENT_DIR\installer.wixobj" -out "$CURRENT_DIR\installer\modsecurityiis-x86.msi"     
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: modsecurityiis-installers
+        path: iis/installer/*.msi
