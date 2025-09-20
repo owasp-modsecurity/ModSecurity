@@ -31,14 +31,12 @@ jobs:
         $apachePath = "${{ github.workspace }}\apache-x86"
         New-Item -ItemType Directory -Path $apachePath -Force
         choco install apache-httpd -y --force --forcex86 --params="`"/installLocation:$apachePath /noService`""
-        # 设置环境变量供后续步骤使用
         echo "APACHE_ROOT=$apachePath\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Set Apache path for x64
       if: matrix.arch == 'x64'
       shell: pwsh
       run: |
-        # 对于 x64，使用预装的 Apache
         echo "APACHE_ROOT=C:\tools\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Setup MSYS2
@@ -95,6 +93,15 @@ jobs:
         $archFlag = "${{ matrix.arch }}"
         $cmakeArch = if ($archFlag -eq "x86") { "Win32" } else { "x64" }
         
+        $vcpkgIncludePath = "${{ github.workspace }}\build\vcpkg_installed\${{ matrix.arch }}-windows\include"
+        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
+        if (Test-Path -Path $vcpkgIncludePath) {
+            Write-Host "vcpkg include path exists. Contents:"
+            Get-ChildItem -Path $vcpkgIncludePath
+        } else {
+            Write-Host "vcpkg include path does not exist."
+        }
+
         cmake `
         -DAPACHE_ROOT="$env:APACHE_ROOT" `
         -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install-${{ matrix.arch }}" `

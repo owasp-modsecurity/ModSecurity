@@ -199,6 +199,7 @@ endif()
 option(WITH_YAJL "Enable YAJL support" OFF)
 if(WITH_YAJL)
     # Manually find YAJL if config.cmake is not available (e.g., from vcpkg)
+    message(Finding YAJL in ${CMAKE_CURRENT_SOURCE_DIR}/build/vcpkg_installed/${ARCHITECTURE}-windows/include)
     find_path(YAJL_INCLUDE_DIR yajl/yajl_common.h
         PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build/vcpkg_installed/${ARCHITECTURE}-windows/include"
         NO_DEFAULT_PATH
