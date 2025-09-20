@@ -30,7 +30,7 @@ jobs:
       run: |
         $apachePath = "${{ github.workspace }}\apache-x86"
         New-Item -ItemType Directory -Path $apachePath -Force
-        choco install apache-httpd -y --force --forcex86 --params="`"/installLocation:$apachePath /noService`""
+        choco install apache-httpd -y --force --forcex86 --no-progress -r --params="`"/installLocation:$apachePath /noService`""
         echo "APACHE_ROOT=$apachePath\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Set Apache path for x64
@@ -92,15 +92,6 @@ jobs:
       run: |
         $archFlag = "${{ matrix.arch }}"
         $cmakeArch = if ($archFlag -eq "x86") { "Win32" } else { "x64" }
-        
-        $vcpkgIncludePath = "${{ github.workspace }}\iis\build-${{ matrix.arch }}\vcpkg_installed\${{ matrix.arch }}-windows\include"
-        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
-        if (Test-Path -Path $vcpkgIncludePath) {
-            Write-Host "vcpkg include path exists. Contents:"
-            Get-ChildItem -Path $vcpkgIncludePath
-        } else {
-            Write-Host "vcpkg include path does not exist."
-        }
 
         cmake `
         -DAPACHE_ROOT="$env:APACHE_ROOT" `
@@ -113,6 +104,50 @@ jobs:
         -DWITH_YAJL=ON `
         -S IIS -B "iis\build-${{ matrix.arch }}"
 
+        $vcpkgIncludePath = "${{ github.workspace }}\iis\build-${{ matrix.arch }}\vcpkg_installed\${{ matrix.arch }}-windows\include"
+        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
+        if (Test-Path -Path $vcpkgIncludePath) {
+            Write-Host "vcpkg include path exists. Contents:"
+            Get-ChildItem -Path $vcpkgIncludePath
+        } else {
+            Write-Host "vcpkg include path does not exist."
+        }
+
+        $vcpkgIncludePath = "${{ github.workspace }}\iis\build\vcpkg_installed\${{ matrix.arch }}-windows\include"
+        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
+        if (Test-Path -Path $vcpkgIncludePath) {
+            Write-Host "vcpkg include path exists. Contents:"
+            Get-ChildItem -Path $vcpkgIncludePath
+        } else {
+            Write-Host "vcpkg include path does not exist."
+        }
+
+        $vcpkgIncludePath = "${{ github.workspace }}\build-${{ matrix.arch }}\vcpkg_installed\${{ matrix.arch }}-windows\include"
+        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
+        if (Test-Path -Path $vcpkgIncludePath) {
+            Write-Host "vcpkg include path exists. Contents:"
+            Get-ChildItem -Path $vcpkgIncludePath
+        } else {
+            Write-Host "vcpkg include path does not exist."
+        }
+
+        $vcpkgIncludePath = "${{ github.workspace }}\build\vcpkg_installed\${{ matrix.arch }}-windows\include"
+        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
+        if (Test-Path -Path $vcpkgIncludePath) {
+            Write-Host "vcpkg include path exists. Contents:"
+            Get-ChildItem -Path $vcpkgIncludePath
+        } else {
+            Write-Host "vcpkg include path does not exist."
+        }
+
+        $vcpkgIncludePath = "${{ github.workspace }}\iis\vcpkg_installed\${{ matrix.arch }}-windows\include"
+        Write-Host "Checking vcpkg include path: $vcpkgIncludePath"
+        if (Test-Path -Path $vcpkgIncludePath) {
+            Write-Host "vcpkg include path exists. Contents:"
+            Get-ChildItem -Path $vcpkgIncludePath
+        } else {
+            Write-Host "vcpkg include path does not exist."
+        }
     # - name: Build IIS Module
     #   shell: pwsh
     #   run: |
