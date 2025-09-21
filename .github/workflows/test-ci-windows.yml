@@ -155,6 +155,9 @@ jobs:
     needs: package
     runs-on: windows-latest
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
     - name: Install MSI
       uses: actions/download-artifact@v4
       with:
@@ -164,11 +167,131 @@ jobs:
     - name: Install MSI
       shell: pwsh
       run: |
-        msiexec /i modsecurityiis.msi /qn /norestart
-        Restart-Service W3SVC
+        $msiPath = "${{ github.workspace }}\modsecurityiis.msi"
+        if (-not (Test-Path $msiPath)) {
+          Write-Error "MSI file not found at $msiPath"
+          exit 1
+        }
         
+        # Install with logging for debugging
+        $installLog = "${{ github.workspace }}\install.log"
+        $installResult = Start-Process -FilePath "msiexec.exe" -ArgumentList @(
+          "/i", "`"$msiPath`"",
+          "/qn",
+          "/norestart",
+          "/l*", "`"$installLog`""
+        ) -Wait -PassThru
+        
+        if ($installResult.ExitCode -ne 0) {
+          Write-Error "MSI installation failed with exit code $($installResult.ExitCode)"
+          Get-Content $installLog | Write-Host
+          exit 1
+        }
+        
+        $installDir = "C:\Program Files\ModSecurity IIS"
+        $requiredFiles = @(
+          "modsecurity.conf",
+          "modsecurity_iis.conf"
+        )
+        
+        foreach ($file in $requiredFiles) {
+          $filePath = Join-Path $installDir $file
+          if (-not (Test-Path $filePath)) {
+            Write-Error "Required file $file not found in installation directory"
+            exit 1
+          }
+        }
+
+    - name: Install OWASP Core Rules
+      shell: pwsh
+      run: |
+        $crsVersion = "v4.18.0"
+        $crsUrl = "https://github.com/coreruleset/coreruleset/archive/refs/tags/$crsVersion.tar.gz"
+        $crsDir = "C:\Program Files\ModSecurity IIS\coreruleset"
+        $modSecurityConfigDir = "C:\Program Files\ModSecurity IIS"
+
+        try {
+          New-Item -ItemType Directory -Path $crsDir -Force
+          Invoke-WebRequest -Uri $crsUrl -OutFile "$crsDir\$crsVersion.tar.gz"
+          tar -xzf "$crsDir\$crsVersion.tar.gz" -C $crsDir --strip-components=1
+
+          Get-ChildItem "$crsDir" -Recurse -Filter "*.example" | ForEach-Object {
+              $newName = $_.Name.Replace(".example", "")
+              Rename-Item -Path $_.FullName -NewName $newName
+          }
+          
+          $modSecurityConfigFile = "$modSecurityConfigDir\modsecurity_iis.conf"
+
+          $crsRules = @(
+            "Include coreruleset/crs-setup.conf",
+            "Include coreruleset/rules/*.conf",
+            "Include coreruleset/plugins/*-config.conf",
+            "Include coreruleset/plugins/*-before.conf",
+            "Include coreruleset/rules/*.conf",
+            "Include coreruleset/plugins/*-after.conf"
+          )
+
+          Add-Content -Path $modSecurityConfigFile -Value $crsRules
+
+          (Get-Content -Path $modSecurityConfigDir\modsecurity.conf) -replace 'SecRuleEngine DetectionOnly', 'SecRuleEngine On' | Set-Content -Path $modSecurityConfigDir\modsecurity.conf
+
+        }
+        catch {
+            Write-Error "Failed to install OWASP Core Rules: $($_.Exception.Message)"
+            exit 1
+        }
+
     - name: Test IIS Module
       shell: pwsh
       run: |
-        curl -I http://localhost/
-        Get-EventLog -LogName Application -Newest 10
+        $iisConfigDir = "C:\Program Files\ModSecurity IIS\"
+
+        Restart-Service W3SVC -Force
+
+        $modules = & "$env:SystemRoot\system32\inetsrv\appcmd.exe" list modules
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "appcmd failed with exit code $LASTEXITCODE"
+            exit 1
+        }
+
+        if (-not ($modules -match "ModSecurity")) {
+            Write-Error "ModSecurity module not found in IIS modules"
+            Write-Host "IIS modules: $modules"
+            exit 1
+        }
+
+        $testCases = @(
+            @{Url = "http://localhost/"; Description = "Normal request"; ExpectedCode = 200},
+            @{Url = "http://localhost/?id=1' OR '1'='1"; Description = "SQL injection attempt"; ExpectedCode = 403},
+            @{Url = "http://localhost/?q=<script>alert('test')</script>"; Description = "XSS attempt"; ExpectedCode = 403}
+        )
+        
+        foreach ($test in $testCases) {
+            try {
+                $response = Invoke-WebRequest $test.Url -UseBasicParsing -SkipHttpErrorCheck -TimeoutSec 30
+                
+                if ($response.StatusCode -eq $test.ExpectedCode) {
+                    Write-Host "PASS: $($test.Description) - returned $($response.StatusCode)"
+                }
+                else {
+                    Write-Host "FAIL: $($test.Description) - expected $($test.ExpectedCode) but got $($response.StatusCode)"
+                }
+            }
+            catch {
+                Write-Host "ERROR: $($test.Description) - request failed: $($_.Exception.Message)"
+            }
+        }
+        
+
+        # Check event log
+        $badMessagePattern = 'Failed to find the RegisterModule entrypoint|The description for Event ID|The data is the error|dll failed to load'
+
+        $events = Get-EventLog -LogName Application -Newest 100 |
+            Where-Object { $_.Message -match $badMessagePattern } |
+            Where-Object { $_.Source -match 'IIS|W3SVC|mscor|IIS-W3SVC|IIS-W3WP|ModSecurity' }
+
+        if ($events -and $events.Count -gt 0) {
+            Write-Host '::error:: Found errors in event log'
+            $events | Select-Object TimeGenerated, Source, EntryType, EventID, Message | Format-List
+            Exit 1
+        }
