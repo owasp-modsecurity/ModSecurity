@@ -158,7 +158,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v5
 
-    - name: Install MSI
+    - name: Download MSI files
       uses: actions/download-artifact@v4
       with:
         name: modsecurityiis-installers
@@ -295,3 +295,5 @@ jobs:
             $events | Select-Object TimeGenerated, Source, EntryType, EventID, Message | Format-List
             Exit 1
         }
+
+        Get-EventLog -LogName Application -Source ModSecurity -Newest 10
