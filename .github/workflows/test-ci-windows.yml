@@ -160,10 +160,13 @@ jobs:
       with:
         name: modsecurityiis-installers
         path: ${{ github.workspace }}\
+
+    - name: Install MSI
+      shell: pwsh
       run: |
         msiexec /i modsecurityiis.msi /qn /norestart
         Restart-Service W3SVC
-
+        
     - name: Test IIS Module
       shell: pwsh
       run: |
