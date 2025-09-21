@@ -62,6 +62,7 @@ set(IIS_MODULE_SOURCES
     main.cpp
     moduleconfig.cpp
     mymodule.cpp
+    mymodule.def
 )
 
 
