@@ -57,15 +57,6 @@ set(IIS_STANDALONE_SOURCES
     ../standalone/server.c
 )
 
-# Source files for IIS-specific components
-set(IIS_MODULE_SOURCES
-    main.cpp
-    moduleconfig.cpp
-    mymodule.cpp
-    mymodule.def
-)
-
-
 # Determine architecture
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCHITECTURE "x64")
@@ -91,19 +82,18 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set(MC_GENERATED_RES "${CMAKE_CURRENT_BINARY_DIR}/ModSecurityIISMessage.res")
-add_custom_command(
-    OUTPUT ${MC_GENERATED_RES}
-    COMMAND rc.exe
-    ARGS /fo "${MC_GENERATED_RES}" "${MC_GENERATED_RC}"
-    DEPENDS ${MC_GENERATED_RC}
-    COMMENT "Building resource file: ${MC_GENERATED_RES}"
+# Source files for IIS-specific components
+set(IIS_MODULE_SOURCES
+    main.cpp
+    moduleconfig.cpp
+    mymodule.cpp
+    mymodule.def
+    ${MC_GENERATED_RC}
 )
 
 set_source_files_properties(
     ${MC_GENERATED_RC}
     ${MC_GENERATED_H}
-    ${MC_GENERATED_RES}
     PROPERTIES GENERATED TRUE
 )
 
@@ -111,7 +101,6 @@ add_library(${IIS_MODULE_NAME} SHARED
     ${IIS_APACHE_SOURCES}
     ${IIS_STANDALONE_SOURCES}
     ${IIS_MODULE_SOURCES}
-    ${MC_GENERATED_RES}
 )
 
 # Set the output name and extension
@@ -209,11 +198,11 @@ option(WITH_YAJL "Enable YAJL support" OFF)
 if(WITH_YAJL)
     # Manually find YAJL if config.cmake is not available (e.g., from vcpkg)
     find_path(YAJL_INCLUDE_DIR yajl/yajl_common.h
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build-${ARCHITECTURE}/vcpkg_installed/${ARCHITECTURE}-windows/include"
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build/vcpkg_installed/${ARCHITECTURE}-windows/include"
         NO_DEFAULT_PATH
     )
     find_library(YAJL_LIBRARY NAMES yajl
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build-${ARCHITECTURE}/vcpkg_installed/${ARCHITECTURE}-windows/lib"
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build/vcpkg_installed/${ARCHITECTURE}-windows/lib"
         NO_DEFAULT_PATH
     )
 
@@ -241,7 +230,6 @@ if(WITH_SSDEEP)
 
         message(STATUS "SSDEEP_ROOT: ${SSDEEP_ROOT}")
 
-        # 查找头文件
         find_path(SSDEEP_INCLUDE_DIR fuzzy.h
             PATHS "${SSDEEP_ROOT}/include"
             NO_DEFAULT_PATH
@@ -252,7 +240,6 @@ if(WITH_SSDEEP)
             target_compile_definitions(${IIS_MODULE_NAME} PRIVATE WITH_SSDEEP)
             target_include_directories(${IIS_MODULE_NAME} PRIVATE ${SSDEEP_INCLUDE_DIR})
 
-            # 检查 fuzzy.def 文件是否存在
             set(SSDEEP_DEF_FILE "${SSDEEP_ROOT}/fuzzy.def")
             if(NOT EXISTS "${SSDEEP_DEF_FILE}")
                 message(WARNING "fuzzy.def not found at ${SSDEEP_DEF_FILE}. Disabling SSDEEP support.")
@@ -261,7 +248,6 @@ if(WITH_SSDEEP)
                 set(SSDEEP_GENERATED_LIB "${CMAKE_CURRENT_BINARY_DIR}/fuzzy.lib")
                 set(SSDEEP_GENERATED_dll "${CMAKE_CURRENT_BINARY_DIR}/bin/fuzzy.dll")
                 
-                # 添加自定义命令生成 fuzzy.lib
                 add_custom_command(
                     OUTPUT ${SSDEEP_GENERATED_LIB}
                     COMMAND lib.exe /machine:${ARCHITECTURE} /def:${SSDEEP_DEF_FILE} /out:${SSDEEP_GENERATED_LIB}
@@ -270,16 +256,13 @@ if(WITH_SSDEEP)
                     VERBATIM
                 )
                 
-                # 确保自定义命令的输出被标记为生成文件
                 set_source_files_properties(${SSDEEP_GENERATED_LIB} PROPERTIES GENERATED TRUE)
                 
-                # 添加自定义目标确保生成 fuzzy.lib
                 add_custom_target(generate_ssdeep_lib ALL
                     DEPENDS ${SSDEEP_GENERATED_LIB}
                     COMMENT "Ensuring ssdeep lib is generated"
                 )
                 
-                # 使主目标依赖于 fuzzy.lib 的生成
                 add_dependencies(${IIS_MODULE_NAME} generate_ssdeep_lib)
                 
                 add_library(SSDEEP::fuzzy SHARED IMPORTED)

@@ -136,21 +136,13 @@ jobs:
         name: iis-module-x86
         path: iis/release/x86/
 
-    - name: Generate wxs files
+    - name: Generate MSI files
       shell: pwsh
       run: |
         heat dir "iis\release\amd64" -cg ModSec64Components -dr inetsrv64 -gg -sreg -srd -var var.ModSecurityIISRelease64 -out "iis\ModSec64.wxs"
         heat dir "iis\release\x86" -cg ModSec32Components -dr inetsrv32 -gg -sreg -srd -var var.ModSecurityIISRelease32 -out "iis\ModSec32.wxs"
-
-    - name: Compile wxs files
-      shell: pwsh
-      run: |
         candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wxs" "iis\ModSec64.wxs" -arch x64 -dModSecurityIISRelease64="iis\release\amd64\" -out iis\
         candle.exe -ext WixUtilExtension -ext WixUIExtension "iis\ModSec32.wxs" -arch x86 -dModSecurityIISRelease32="iis\release\x86\" -out iis\
-
-    - name: Link wixobj files into MSI
-      shell: pwsh
-      run: |
         light.exe -ext WixUtilExtension -ext WixUIExtension "iis\installer.wixobj" "iis\ModSec32.wixobj" "iis\ModSec64.wixobj" -out "iis\modsecurityiis.msi"
 
     - name: Upload artifacts
@@ -163,20 +155,13 @@ jobs:
     needs: package
     runs-on: windows-latest
     steps:
-    - name: Download MSI
+    - name: Install MSI
       uses: actions/download-artifact@v4
       with:
         name: modsecurityiis-installers
         path: ${{ github.workspace }}\
-
-    - name: Install MSI
-      shell: pwsh
       run: |
         msiexec /i modsecurityiis.msi /qn /norestart
-
-    - name: ReStart IIS Feature
-      shell: pwsh
-      run: |
         Restart-Service W3SVC
 
     - name: Test IIS Module
