@@ -138,25 +138,31 @@ AC_DEFUN([CHECK_FOR_YAJL_AT], [
     for y in ${YAJL_POSSIBLE_EXTENSIONS}; do
         for z in ${YAJL_POSSIBLE_LIB_NAMES}; do
            if test -e "${path}/${z}.${y}"; then
-               yajl_lib_path="${path}/"
+               yajl_lib_path="${path}"
                yajl_lib_name="${z}"
                yajl_lib_file="${yajl_lib_path}/${z}.${y}"
                break
            fi
            if test -e "${path}/lib${z}.${y}"; then
-               yajl_lib_path="${path}/"
+               yajl_lib_path="${path}"
                yajl_lib_name="${z}"
                yajl_lib_file="${yajl_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/lib${z}.${y}"; then
-               yajl_lib_path="${path}/lib/"
+               yajl_lib_path="${path}/lib"
+               yajl_lib_name="${z}"
+               yajl_lib_file="${yajl_lib_path}/lib${z}.${y}"
+               break
+           fi
+           if test -e "${path}/lib64/lib${z}.${y}"; then
+               yajl_lib_path="${path}/lib64"
                yajl_lib_name="${z}"
                yajl_lib_file="${yajl_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/x86_64-linux-gnu/lib${z}.${y}"; then
-               yajl_lib_path="${path}/lib/x86_64-linux-gnu/"
+               yajl_lib_path="${path}/lib/x86_64-linux-gnu"
                yajl_lib_name="${z}"
                yajl_lib_file="${yajl_lib_path}/lib${z}.${y}"
                break

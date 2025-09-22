@@ -129,31 +129,31 @@ AC_DEFUN([CHECK_FOR_GEOIP_AT], [
     for y in ${GEOIP_POSSIBLE_EXTENSIONS}; do
         for z in ${GEOIP_POSSIBLE_LIB_NAMES}; do
            if test -e "${path}/${z}.${y}"; then
-               geoip_lib_path="${path}/"
+               geoip_lib_path="${path}"
                geoip_lib_name="${z}"
                geoip_lib_file="${geoip_lib_path}/${z}.${y}"
                break
            fi
            if test -e "${path}/lib${z}.${y}"; then
-               geoip_lib_path="${path}/"
+               geoip_lib_path="${path}"
                geoip_lib_name="${z}"
                geoip_lib_file="${geoip_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/lib${z}.${y}"; then
-               geoip_lib_path="${path}/lib/"
+               geoip_lib_path="${path}/lib"
                geoip_lib_name="${z}"
                geoip_lib_file="${geoip_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib64/lib${z}.${y}"; then
-               geoip_lib_path="${path}/lib64/"
+               geoip_lib_path="${path}/lib64"
                geoip_lib_name="${z}"
                geoip_lib_file="${geoip_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/x86_64-linux-gnu/lib${z}.${y}"; then
-               geoip_lib_path="${path}/lib/x86_64-linux-gnu/"
+               geoip_lib_path="${path}/lib/x86_64-linux-gnu"
                geoip_lib_name="${z}"
                geoip_lib_file="${geoip_lib_path}/lib${z}.${y}"
                break

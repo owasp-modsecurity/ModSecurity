@@ -127,31 +127,37 @@ AC_DEFUN([CHECK_FOR_PCRE2_AT], [
     for y in ${PCRE2_POSSIBLE_EXTENSIONS}; do
         for z in ${PCRE2_POSSIBLE_LIB_NAMES}; do
            if test -e "${path}/${z}.${y}"; then
-               pcre2_lib_path="${path}/"
+               pcre2_lib_path="${path}"
                pcre2_lib_name="${z}"
                pcre2_lib_file="${pcre2_lib_path}/${z}.${y}"
                break
            fi
            if test -e "${path}/lib${z}.${y}"; then
-               pcre2_lib_path="${path}/"
+               pcre2_lib_path="${path}"
                pcre2_lib_name="${z}"
                pcre2_lib_file="${pcre2_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/lib${z}.${y}"; then
-               pcre2_lib_path="${path}/lib/"
+               pcre2_lib_path="${path}/lib"
+               pcre2_lib_name="${z}"
+               pcre2_lib_file="${pcre2_lib_path}/lib${z}.${y}"
+               break
+           fi
+           if test -e "${path}/lib64/lib${z}.${y}"; then
+               pcre2_lib_path="${path}/lib64"
                pcre2_lib_name="${z}"
                pcre2_lib_file="${pcre2_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/x86_64-linux-gnu/lib${z}.${y}"; then
-               pcre2_lib_path="${path}/lib/x86_64-linux-gnu/"
+               pcre2_lib_path="${path}/lib/x86_64-linux-gnu"
                pcre2_lib_name="${z}"
                pcre2_lib_file="${pcre2_lib_path}/lib${z}.${y}"
                break
            fi
            if test -e "${path}/lib/i386-linux-gnu/lib${z}.${y}"; then
-               pcre2_lib_path="${path}/lib/i386-linux-gnu/"
+               pcre2_lib_path="${path}/lib/i386-linux-gnu"
                pcre2_lib_name="${z}"
                pcre2_lib_file="${pcre2_lib_path}/lib${z}.${y}"
                break
