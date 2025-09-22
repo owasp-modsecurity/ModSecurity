@@ -224,7 +224,6 @@ jobs:
 
           $crsRules = @(
             "Include coreruleset/crs-setup.conf",
-            "Include coreruleset/rules/*.conf",
             "Include coreruleset/plugins/*-config.conf",
             "Include coreruleset/plugins/*-before.conf",
             "Include coreruleset/rules/*.conf",
