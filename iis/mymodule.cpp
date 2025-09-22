@@ -17,6 +17,9 @@
 #undef inline
 #define inline inline
 
+#include "winsock2.h"
+#include <Ws2tcpip.h>
+
 //  IIS7 Server API header file
 #include <Windows.h>
 #include <sal.h>
@@ -29,8 +32,6 @@
 
 #include "api.h"
 #include "moduleconfig.h"
-
-#include "winsock2.h"
 
 
 class REQUEST_STORED_CONTEXT : public IHttpStoredContext
@@ -90,63 +91,84 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 {
-	const char *format = "%15[0-9.]:%5[0-9]";
-	char ip[16] = { 0 };  // ip4 addresses have max len 15
-	char port[6] = { 0 }; // port numbers are 16bit, ie 5 digits max
-
-	DWORD len = 50;
-	char *buf = (char *)apr_palloc(pool, len);
-
-	if(buf == NULL)
+	if (pAddr == NULL) {
 		return "";
-
-	buf[0] = 0;
-
-	WSAAddressToString(pAddr, sizeof(SOCKADDR), NULL, buf, &len);
-
-	// test for IPV4 with port on the end
-	if (sscanf(buf, format, ip, port) == 2) {
-		// IPV4 but with port - remove the port
-		char* input = ":";
-		char* ipv4 = strtok(buf, input);
-		return ipv4;
 	}
 
-	return buf;
+	char ipbuf[INET6_ADDRSTRLEN] = {0};
+	const char *res = "";
+
+	switch (pAddr->sa_family) {
+	case AF_INET:
+		{
+			SOCKADDR_IN *sin = (SOCKADDR_IN *)pAddr;
+			if (InetNtopA(AF_INET, &sin->sin_addr, ipbuf, sizeof(ipbuf)) != NULL) {
+				res = (const char *)apr_pstrdup(pool, ipbuf);
+			} else {
+				res = "";
+			}
+		}
+		break;
+	case AF_INET6:
+		{
+			SOCKADDR_IN6 *sin6 = (SOCKADDR_IN6 *)pAddr;
+			if (InetNtopA(AF_INET6, &sin6->sin6_addr, ipbuf, sizeof(ipbuf)) != NULL) {
+				res = (const char *)apr_pstrdup(pool, ipbuf);
+			} else {
+				res = "";
+			}
+		}
+		break;
+	default:
+		res = "";
+		break;
+	}
+
+	return (char *)res;
 }
 
 apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 {
-    apr_sockaddr_t *addr = (apr_sockaddr_t *)apr_palloc(pool, sizeof(apr_sockaddr_t));
-	int adrlen = 16, iplen = 4;
+	apr_sockaddr_t *addr = (apr_sockaddr_t *)apr_palloc(pool, sizeof(apr_sockaddr_t));
 
-	if(pAddr->sa_family == AF_INET6)
-	{
-		adrlen = 46;
-		iplen = 16;
+    addr->pool = pool;
+    addr->hostname = "unknown";
+    addr->servname = addr->hostname;
+    addr->family = AF_UNSPEC;
+    addr->addr_str_len = 0;
+    addr->ipaddr_len = 0;
+    addr->ipaddr_ptr = NULL;
+    addr->salen = 0;
+    addr->port = 0;
+
+	if (pAddr == NULL) {
+		return addr;
 	}
 
-	addr->addr_str_len = adrlen;
 	addr->family = pAddr->sa_family;
 
-	addr->hostname = "unknown";
-#ifdef WIN32
-    addr->ipaddr_len = sizeof(IN_ADDR);
-#else
-    addr->ipaddr_len = sizeof(struct in_addr);
-#endif
-    addr->ipaddr_ptr = &addr->sa.sin.sin_addr;
-    addr->pool = pool;
-    addr->port = 80;
-#ifdef WIN32
-	memcpy(&addr->sa.sin.sin_addr.S_un.S_addr, pAddr->sa_data, iplen);
-#else
-    memcpy(&addr->sa.sin.sin_addr.s_addr, pAddr->sa_data, iplen);
-#endif
-	addr->sa.sin.sin_family = pAddr->sa_family;
-    addr->sa.sin.sin_port = 80;
-    addr->salen = sizeof(addr->sa);
-	addr->servname = addr->hostname;
+	if (pAddr->sa_family == AF_INET) {
+		SOCKADDR_IN *sin = (SOCKADDR_IN *)pAddr;
+		addr->addr_str_len = INET_ADDRSTRLEN;
+		addr->ipaddr_len = sizeof(struct in_addr);
+		addr->ipaddr_ptr = &addr->sa.sin.sin_addr;
+		addr->sa.sin.sin_family = AF_INET;
+		addr->sa.sin.sin_port = sin->sin_port; /* keep network byte order */
+		/* copy address */
+		memcpy(&addr->sa.sin.sin_addr, &sin->sin_addr, sizeof(struct in_addr));
+		addr->salen = sizeof(addr->sa);
+		addr->port = ntohs(sin->sin_port);
+	} else if (pAddr->sa_family == AF_INET6) {
+		SOCKADDR_IN6 *sin6 = (SOCKADDR_IN6 *)pAddr;
+		addr->addr_str_len = INET6_ADDRSTRLEN;
+		addr->ipaddr_len = sizeof(struct in6_addr);
+		addr->ipaddr_ptr = &addr->sa.sin6.sin6_addr;
+		addr->sa.sin6.sin6_family = AF_INET6;
+		addr->sa.sin6.sin6_port = sin6->sin6_port;
+		memcpy(&addr->sa.sin6.sin6_addr, &sin6->sin6_addr, sizeof(struct in6_addr));
+		addr->salen = sizeof(addr->sa);
+		addr->port = ntohs(sin6->sin6_port);
+	}
 
 	return addr;
 }
