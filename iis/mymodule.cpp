@@ -91,40 +91,22 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 {
-	if (pAddr == NULL) {
-		return "";
-	}
-
-	char ipbuf[INET6_ADDRSTRLEN] = {0};
-	const char *res = "";
-
-	switch (pAddr->sa_family) {
-	case AF_INET:
-		{
-			SOCKADDR_IN *sin = (SOCKADDR_IN *)pAddr;
-			if (InetNtopA(AF_INET, &sin->sin_addr, ipbuf, sizeof(ipbuf)) != NULL) {
-				res = (const char *)apr_pstrdup(pool, ipbuf);
-			} else {
-				res = "";
-			}
-		}
-		break;
-	case AF_INET6:
-		{
-			SOCKADDR_IN6 *sin6 = (SOCKADDR_IN6 *)pAddr;
-			if (InetNtopA(AF_INET6, &sin6->sin6_addr, ipbuf, sizeof(ipbuf)) != NULL) {
-				res = (const char *)apr_pstrdup(pool, ipbuf);
-			} else {
-				res = "";
-			}
-		}
-		break;
-	default:
-		res = "";
-		break;
-	}
-
-	return (char *)res;
+    if (pAddr == NULL) {
+        return "";
+    }
+    
+    DWORD addrSize = pAddr->sa_family == AF_INET ? sizeof(SOCKADDR_IN) : sizeof(SOCKADDR_IN6);
+    char* buf = (char*)apr_palloc(pool, NI_MAXHOST);
+    if (buf == NULL) {
+        return "";
+    }
+    buf[0] = '\0';
+    
+    if (GetNameInfo(pAddr, addrSize, buf, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) != 0) {
+        return "";
+    }
+    
+    return buf;
 }
 
 apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
