@@ -296,4 +296,4 @@ jobs:
             Exit 1
         }
 
-        Get-EventLog -LogName Application -Source ModSecurity -Newest 10
+        Get-EventLog -LogName Application -Source ModSecurity | Format-List
