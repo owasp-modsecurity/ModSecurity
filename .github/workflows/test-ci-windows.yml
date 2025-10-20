@@ -306,6 +306,13 @@ jobs:
         $testRuleDir = "C:\Program Files\ModSecurity IIS\coreruleset\tests\regression\tests"
 
         go install github.com/coreruleset/go-ftw@latest
-        cd go\bin
-        & go-ftw.exe -d $testRuleDir --cloud -e 920380-1 --show-failures-only
+        $goBinPath = ""
+        if ($env:GOBIN) {
+            $goBinPath = $env:GOBIN
+        } elseif ($env:GOPATH) {
+            $goBinPath = Join-Path $env:GOPATH "bin"
+        } else {
+            $goBinPath = Join-Path $env:USERPROFILE "go\bin"
+        }
+        & "$goBinPath\go-ftw.exe" -d $testRuleDir --cloud -e 920380-1 --show-failures-only
 
