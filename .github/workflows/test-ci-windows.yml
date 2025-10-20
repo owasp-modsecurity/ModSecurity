@@ -299,3 +299,13 @@ jobs:
         }
 
         Get-EventLog -LogName Application -Source ModSecurity | Format-List
+
+    - name: Test ModSecurity Rules
+      shell: pwsh
+      run: |
+        $testRuleDir = "C:\Program Files\ModSecurity IIS\coreruleset\tests\regression\tests"
+
+        go install github.com/coreruleset/go-ftw@latest
+        cd go\bin
+        & go-ftw.exe -d $testRuleDir --cloud -e 920380-1 --show-failures-only
+
