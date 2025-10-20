@@ -84,6 +84,8 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         prefix: vcpkg-iis-module-${{ matrix.arch }}/
 
+    - uses: ammaraskar/msvc-problem-matcher@master
+
     - name: Configure CMake for IIS Module
       env:
         VCPKG_FEATURE_FLAGS: "binarycaching"
@@ -248,6 +250,7 @@ jobs:
         Restart-Service W3SVC -Force
 
         $modules = & "$env:SystemRoot\system32\inetsrv\appcmd.exe" list modules
+        Write-Host "IIS modules: $modules"
         if ($LASTEXITCODE -ne 0) {
             Write-Error "appcmd failed with exit code $LASTEXITCODE"
             exit 1
