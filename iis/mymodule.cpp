@@ -90,46 +90,46 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 
 char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 {
-	if (pAddr == NULL) {
-		return "";
-	}
-	
-	DWORD addrSize = pAddr->sa_family == AF_INET ? sizeof(SOCKADDR_IN) : sizeof(SOCKADDR_IN6);
-	char* buf = (char*)apr_palloc(pool, NI_MAXHOST);
-	if (buf == NULL) {
-		return "";
-	}
-	buf[0] = '\0';
-	
-	if (GetNameInfo(pAddr, addrSize, buf, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) != 0) {
-		return "";
-	}
-	
-	return buf;
+    if (pAddr == nullptr) {
+        return apr_pstrdup(pool, "");
+    }
+    
+    DWORD addrSize = pAddr->sa_family == AF_INET ? sizeof(SOCKADDR_IN) : sizeof(SOCKADDR_IN6);
+    auto buf = (char*)apr_palloc(pool, NI_MAXHOST);
+    if (buf == nullptr) {
+        return apr_pstrdup(pool, "");
+    }
+    buf[0] = '\0';
+    
+    if (GetNameInfo(pAddr, addrSize, buf, NI_MAXHOST, nullptr, 0, NI_NUMERICHOST) != 0) {
+        return apr_pstrdup(pool, "");
+    }
+    
+    return buf;
 }
 
 apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 {
 	apr_sockaddr_t *addr = (apr_sockaddr_t *)apr_palloc(pool, sizeof(apr_sockaddr_t));
 
-	addr->pool = pool;
-	addr->hostname = "unknown";
-	addr->servname = addr->hostname;
-	addr->family = AF_UNSPEC;
-	addr->addr_str_len = 0;
-	addr->ipaddr_len = 0;
-	addr->ipaddr_ptr = NULL;
-	addr->salen = 0;
-	addr->port = 0;
+    addr->pool = pool;
+    addr->hostname = "unknown";
+    addr->servname = addr->hostname;
+    addr->family = AF_UNSPEC;
+    addr->addr_str_len = 0;
+    addr->ipaddr_len = 0;
+    addr->ipaddr_ptr = nullptr;
+    addr->salen = 0;
+    addr->port = 0;
 
-	if (pAddr == NULL) {
+	if (pAddr == nullptr) {
 		return addr;
 	}
 
 	addr->family = pAddr->sa_family;
 
 	if (pAddr->sa_family == AF_INET) {
-		SOCKADDR_IN *sin = (SOCKADDR_IN *)pAddr;
+		auto sin = (SOCKADDR_IN *)pAddr;
 		addr->addr_str_len = INET_ADDRSTRLEN;
 		addr->ipaddr_len = sizeof(struct in_addr);
 		addr->ipaddr_ptr = &addr->sa.sin.sin_addr;
@@ -140,7 +140,7 @@ apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 		addr->salen = sizeof(addr->sa);
 		addr->port = ntohs(sin->sin_port);
 	} else if (pAddr->sa_family == AF_INET6) {
-		SOCKADDR_IN6 *sin6 = (SOCKADDR_IN6 *)pAddr;
+		auto sin6 = (SOCKADDR_IN6 *)pAddr;
 		addr->addr_str_len = INET6_ADDRSTRLEN;
 		addr->ipaddr_len = sizeof(struct in6_addr);
 		addr->ipaddr_ptr = &addr->sa.sin6.sin6_addr;
