@@ -175,8 +175,6 @@ endif()
 # Compile definitions to match the original Makefile.win
 set(MODSECURITY_VERSION_FLAG "VERSION_IIS") # Define the version flag string
 target_compile_definitions(${IIS_MODULE_NAME} PRIVATE
-    WIN32
-    WINNT
     inline=APR_INLINE
     AP_DECLARE_STATIC
     WITH_CURL
@@ -198,11 +196,11 @@ option(WITH_YAJL "Enable YAJL support" OFF)
 if(WITH_YAJL)
     # Manually find YAJL if config.cmake is not available (e.g., from vcpkg)
     find_path(YAJL_INCLUDE_DIR yajl/yajl_common.h
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build-${ARCHITECTURE}/vcpkg_installed/${ARCHITECTURE}-windows/include"
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build/vcpkg_installed/${ARCHITECTURE}-windows/include"
         NO_DEFAULT_PATH
     )
     find_library(YAJL_LIBRARY NAMES yajl
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build-${ARCHITECTURE}/vcpkg_installed/${ARCHITECTURE}-windows/lib"
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/build/vcpkg_installed/${ARCHITECTURE}-windows/lib"
         NO_DEFAULT_PATH
     )
 
@@ -281,17 +279,10 @@ endif()
 if(MSVC)
     target_compile_options(${IIS_MODULE_NAME} PRIVATE
         /nologo
-        /O2
         /W3
         /wd4244
         /wd4018
-        /MD
-        /Zi
-    )
-    
-    # Linker options to match the original Makefile.win
-    set_target_properties(${IIS_MODULE_NAME} PROPERTIES
-        LINK_FLAGS "/DEBUG /OPT:REF /OPT:ICF"
+  
     )
 endif()
 

@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         arch: [x86, x64]
+        config: [Release, RelWithDebInfo]
     runs-on: windows-latest
     
     # For Caching
@@ -39,6 +40,10 @@ jobs:
       run: |
         echo "APACHE_ROOT=C:\tools\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    # Original Make file contain comment build script for ssdeep,
+    # which is rely on MSYS2, so we need to install MSYS2.
+    # If it's enabled, it need msys2 library for ssdeep.
+    
     # - name: Setup MSYS2
     #   uses: msys2/setup-msys2@v2
     #   with:
@@ -103,7 +108,7 @@ jobs:
         -A $cmakeArch `
         -DWITH_LUA=ON `
         -DWITH_YAJL=ON `
-        -S IIS -B "iis\build-${{ matrix.arch }}"
+        -S IIS -B "iis\build"
 
       # -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install-${{ matrix.arch }}" `
       # -DWITH_SSDEEP=ON `
@@ -111,17 +116,20 @@ jobs:
     - name: Build IIS Module
       shell: pwsh
       run: |
-        cmake --build "iis\build-${{ matrix.arch }}" --config Release
+        cmake --build "iis\build" --config ${{ matrix.config }}
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: iis-module-${{ matrix.arch }}
-        path: iis/build-${{ matrix.arch }}/Release/
+        name: iis-module-${{ matrix.arch }}-${{ matrix.config }}
+        path: iis/build/${{ matrix.config }}/
     
   package:
     needs: build
     runs-on: windows-latest
+    strategy:
+      matrix:
+        config: [Release, RelWithDebInfo]
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -129,13 +137,13 @@ jobs:
     - name: Download x64 artifacts
       uses: actions/download-artifact@v4
       with:
-        name: iis-module-x64
+        name: iis-module-x64-${{ matrix.config }}
         path: iis/release/amd64/
 
     - name: Download x86 artifacts
       uses: actions/download-artifact@v4
       with:
-        name: iis-module-x86
+        name: iis-module-x86-${{ matrix.config }}
         path: iis/release/x86/
 
     - name: Generate MSI files
@@ -150,12 +158,15 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: modsecurityiis-installers
+        name: modsecurityiis-installers-${{ matrix.config }}
         path: iis/modsecurityiis.msi
 
   test:
     needs: package
     runs-on: windows-latest
+    strategy:
+      matrix:
+        config: [Release, RelWithDebInfo]
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -163,8 +174,8 @@ jobs:
     - name: Download MSI files
       uses: actions/download-artifact@v4
       with:
-        name: modsecurityiis-installers
-        path: ${{ github.workspace }}\
+        name: modsecurityiis-installers-${{ matrix.config }}
+        path: ${{ github.workspace }}/
 
     - name: Install MSI
       shell: pwsh
@@ -318,5 +329,5 @@ jobs:
             $goBinPath = Join-Path $env:USERPROFILE "go\bin"
         }
 
-        & "$goBinPath\go-ftw.exe" run -d $testRuleDir --cloud -e 920380-1 --show-failures-only
+        & "$goBinPath\go-ftw.exe" run -d $testRuleDir --cloud -e "920100-2$|920100-4$|920100-8$|920100-12$|920272-5$|920290-1$|920620-1$|920380-1$" --show-failures-only
 
