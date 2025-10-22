@@ -7,7 +7,7 @@
     lightArgs: 
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-    <Product Id="22B04FDB-9BAB-46B0-87B8-A39544ECECD3" Name="ModSecurity IIS" Language="1033" Version="2.9.12" Manufacturer="ModSecurity" UpgradeCode="82F09489-1678-4C38-ADCB-08C3757653DB">
+    <Product Id="22B04FDB-9BAB-46B0-87B8-A39544ECECD3" Name="ModSecurity IIS" Language="1033" Version="2.9.13" Manufacturer="ModSecurity" UpgradeCode="82F09489-1678-4C38-ADCB-08C3757653DB">
         <Package Description="ModSecurityISS" Comments="none" InstallerVersion="405" Compressed="yes" InstallPrivileges="elevated" InstallScope="perMachine" />
         <?define ProductName = "ModSecurity IIS" ?>
         <?if $(sys.BUILDARCH) = x64 ?>
@@ -25,11 +25,11 @@
             <RegistrySearch Id="ConfigureIISRegistrySearch" Type="raw" Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity" Name="ModSecurityConfigureIIS" Win64="no" />
         </Property>
         <?endif?>
-        <!-- 检测 IIS 的主要版本 -->
+        <!-- Detect the major version of IIS -->
         <Property Id="IIS">
             <RegistrySearch Id="IISInstalledVersion" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Type="raw" Name="MajorVersion" />
         </Property>
-        <!-- 检测 ModSecurity IIS 模块及其依赖 DLL 文件是否存在 -->
+        <!-- Detect if ModSecurity IIS module and its dependent DLL files exist -->
         <Property Id="FILEEXISTS" Secure="yes">
             <DirectorySearch Id="CheckFileDir1" Path="C:\Windows\System32\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile1" Name="ModSecurityIIS.dll" />
@@ -89,18 +89,18 @@
                 <FileSearch Id="CheckFile19" Name="fuzzy.dll" />
             </DirectorySearch>
         </Property>
-        <!-- 检测 IIS 的 WWW 根目录 -->
+        <!-- Detect the WWW root directory of IIS -->
         <Property Id="WWWROOT">
             <RegistrySearch Id="FindInetPubFolder" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Name="PathWWWRoot" Type="directory" />
         </Property>
-        <!-- 定义 MSI 属性，启用 MSI 的真实管理员检测，在“程序和功能”中禁用修复、修改选项 -->
+        <!-- Define MSI properties, enable real administrator detection for MSI, and disable repair and modify options in "Programs and Features" -->
         <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
-        <!-- 定义安装条件 -->
+        <!-- Define installation conditions -->
         <Condition Message="This setup requires IIS 7.0, 8.0 or 10.0. If that's the case, please ensure that the installer is running as administrator or try running it from the 'Apps and features' or 'Add/Remove Programs' menu"><![CDATA[(IIS="#7") OR (IIS="#8") OR (IIS="#10")]]></Condition>
         <!-- Version 2.7.5 had an uninstall issue that leaves some files behind. Asking the user to manually hash this out. -->
         <Condition Message="A older version of ModSecurityIIS was found in your computer. Please complete uninstall by removing the following file: [FILEEXISTS]. You may have to remove ModSecurity module from IIS, use the IIS Manager to do so."><![CDATA[(NOT FILEEXISTS) OR (Installed)]]></Condition>
         <Condition Message="64-bit operating system was detected, please use the 64-bit installer.">
-        <!--    - 通过条件编译定义了 64/32位 ModSecurity IIS 模块及其依赖 DLL 文件组件及 IIS 配置 Schema 目录。 -->
+        <!--    - Defines 64/32-bit ModSecurity IIS module and its dependent DLL file components and IIS configuration Schema directory through conditional compilation. -->
         <?if $(var.Win64) = "yes" ?>
             VersionNT64
             <?else?>
@@ -108,9 +108,9 @@
             <?endif?></Condition>
         <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" />
         <Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
-        <!-- 定义安装包的媒体信息 -->
+        <!-- Define media information for the installation package -->
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
-        <!-- 定义安装包的目录结构 -->
+        <!-- Define the directory structure of the installation package -->
         <Directory Id="TARGETDIR" Name="SourceDir">
             <?if $(var.Win64) = "yes" ?>
             <Directory Id="SystemFolder" Name="SystemFolder">
@@ -152,7 +152,7 @@
                 </Directory>
             </Directory>
         </Directory>
-        <!-- 12. 安装文件和 IIS 配置 -->
+        <!-- 12. Installation files and IIS configuration -->
         <DirectoryRef Id="INSTALLFOLDER">
             <Component Id="ModSecCommon" DiskId="1" Guid="980270DF-81AB-469B-AB0E-64FA3BA160B6" Location="local">
                 <File Id="README.TXT" Name="README.TXT" Source="wix\README.TXT" />
@@ -194,7 +194,7 @@
                 <File Id="_64_ConfigSchema" Name="ModSecurity.xml" Source="ModSecurity.xml" />
             </Component>
         </DirectoryRef>
-        <!-- 14. 功能组件 (Features) 定义了默认安装功能，包含 ModSecurity 的通用文件和配置 Schema。 -->
+        <!-- 14. Features define default installation features, including common ModSecurity files and configuration Schema. -->
         <Feature Id="DefaultFeature" Title="ModSecurity IIS Common files" Level="1" InstallDefault="local" Absent="disallow" Display="expand" AllowAdvertise="no" Description="Configuration
 		and common files">
             <ComponentRef Id="ModSecCommon" />
