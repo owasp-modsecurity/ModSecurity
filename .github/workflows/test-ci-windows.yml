@@ -74,12 +74,12 @@ jobs:
 
     - name: Restore vcpkg cache
       id: vcpkg-cache
-      uses: TAServers/vcpkg-cache@v3
+      uses: TAServers/vcpkg-cache@e848939f754daf406a06006be2e05eb5b17cc481
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         prefix: vcpkg-iis-module-${{ matrix.arch }}/
 
-    - uses: ammaraskar/msvc-problem-matcher@master
+    - uses: ammaraskar/msvc-problem-matcher@1ebcb382869bfdc2cc645e8a2a43b6d319ea1cc0
 
     - name: Configure CMake for IIS Module
       env:
