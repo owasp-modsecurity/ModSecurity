@@ -2,11 +2,7 @@ name: CI/CD for IIS Module
 
 on:
   push:
-    branches:
-      - v2/test-ci-windows
   pull_request:
-    branches:
-      - v2/test-ci-windows
 
 jobs:
   build:
@@ -39,48 +35,42 @@ jobs:
       shell: pwsh
       run: |
         echo "APACHE_ROOT=C:\tools\Apache24" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-    # Original Make file contain comment build script for ssdeep,
-    # which is rely on MSYS2, so we need to install MSYS2.
-    # If it's enabled, it need msys2 library for ssdeep.
     
-    # - name: Setup MSYS2
-    #   uses: msys2/setup-msys2@v2
-    #   with:
-    #     msystem: ${{ matrix.arch == 'x86' && 'MINGW32' || 'UCRT64' }}
-    #     update: true
-    #     install: >
-    #       git
-    #       make
-    #       autoconf
-    #       automake
-    #       libtool
-    #       ${{ matrix.arch == 'x86' && 'mingw-w64-i686-gcc' || 'mingw-w64-ucrt-x86_64-gcc' }}
-    #       ${{ matrix.arch == 'x86' && 'mingw-w64-i686-pkg-config' || 'mingw-w64-ucrt-x86_64-pkg-config' }}
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.arch == 'x86' && 'MINGW32' || 'UCRT64' }}
+        update: true
+        install: >
+          git
+          make
+          autoconf
+          automake
+          libtool
+          ${{ matrix.arch == 'x86' && 'mingw-w64-i686-gcc' || 'mingw-w64-ucrt-x86_64-gcc' }}
+          ${{ matrix.arch == 'x86' && 'mingw-w64-i686-pkg-config' || 'mingw-w64-ucrt-x86_64-pkg-config' }}
 
-    # - name: Clone and build ssdeep
-    #   shell: msys2 {0}
-    #   run: |
-    #     MSYS2_WORKSPACE=$(cygpath -u '${{ github.workspace }}')
-    #     echo "Converted workspace path: $MSYS2_WORKSPACE"
+    - name: Clone and build ssdeep
+      shell: msys2 {0}
+      run: |
+        MSYS2_WORKSPACE=$(cygpath -u '${{ github.workspace }}')
 
-    #     git clone https://github.com/ssdeep-project/ssdeep.git --depth 1
-    #     cd ssdeep
-    #     autoreconf -i
+        git clone https://github.com/ssdeep-project/ssdeep.git --depth 1
+        cd ssdeep
+        autoreconf -i
         
-    #     if [ "${{ matrix.arch }}" = "x86" ]; then
-    #       ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3" --build=i686-pc-mingw32
-    #     else
-    #       ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
-    #     fi
+        if [ "${{ matrix.arch }}" = "x86" ]; then
+          ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3" --build=i686-pc-mingw32
+        else
+          ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
+        fi
         
-    #     make dll
+        make dll
 
-    #     mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/bin"
-    #     mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/include"
-    #     cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/bin/"
-    #     cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/include/"
-    #     cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install-${{ matrix.arch }}/"
+        mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/"
+        cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install/"
+        cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install/"
+        cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install/"
 
     - name: Restore vcpkg cache
       id: vcpkg-cache
@@ -105,13 +95,12 @@ jobs:
         -DAPACHE_ROOT="$env:APACHE_ROOT" `
         -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\iis\release\$installDir" `
         -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
+        -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install" `
+        -DWITH_SSDEEP=ON `
         -A $cmakeArch `
         -DWITH_LUA=ON `
         -DWITH_YAJL=ON `
         -S IIS -B "iis\build"
-
-      # -DSSDEEP_ROOT="${{ github.workspace }}\ssdeep-install-${{ matrix.arch }}" `
-      # -DWITH_SSDEEP=ON `
 
     - name: Build IIS Module
       shell: pwsh
@@ -316,6 +305,9 @@ jobs:
       run: |
         go install github.com/coreruleset/go-ftw@latest
 
+    # Certain rules are disabled due to specific IIS behavior patterns.
+    # Using go-ftw in cloud mode as the IIS connector does not generate logs in file format.
+    # Technically, Event logs can be streamed to files, but this requires implementing rate limits to avoid log overflow.
     - name: Test ModSecurity Rules
       shell: pwsh
       run: |

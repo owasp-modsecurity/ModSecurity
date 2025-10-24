@@ -7,10 +7,8 @@ find_package(PCRE2 CONFIG REQUIRED)
 find_package(CURL CONFIG REQUIRED)
 find_package(APR CONFIG REQUIRED)
 
-# iis/CMakeLists.txt
-set(IIS_MODULE_NAME "modsecurityiis")  # Name should match the original output
+set(IIS_MODULE_NAME "modsecurityiis")
 
-# Source files for IIS module (reusing Apache sources)
 set(IIS_APACHE_SOURCES
     ../apache2/mod_security2.c
     ../apache2/apache2_config.c
@@ -46,7 +44,6 @@ set(IIS_APACHE_SOURCES
     ../apache2/libinjection/libinjection_xss.c
 )
 
-# Source files for standalone components (if they exist in the project)
 set(IIS_STANDALONE_SOURCES
     ../standalone/api.c
     ../standalone/buckets.c
@@ -57,16 +54,10 @@ set(IIS_STANDALONE_SOURCES
     ../standalone/server.c
 )
 
-# Determine architecture
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCHITECTURE "x64")
 else()
     set(ARCHITECTURE "x86")
-endif()
-
-# Check if standalone directory exists, if not, exclude those sources
-if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../standalone)
-    set(IIS_STANDALONE_SOURCES "")
 endif()
 
 set(IIS_RESOURCE_MC "${CMAKE_CURRENT_SOURCE_DIR}/ModSecurityIISMessage.mc")
@@ -110,27 +101,19 @@ set_target_properties(${IIS_MODULE_NAME} PROPERTIES
     SUFFIX ".dll"
 )
 
-# Include directories
 target_include_directories(${IIS_MODULE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}/../apache2
     ${CMAKE_CURRENT_SOURCE_DIR}/../apache2/libinjection
     ${LIBXML2_INCLUDE_DIR}/libxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/../standalone
     ${PCRE2_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${APR_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# Include standalone directory if it exists
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../standalone)
-    target_include_directories(${IIS_MODULE_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../standalone
-    )
-endif()
-
-# Apache-specific includes
 if(APACHE_ROOT)
     if(NOT EXISTS "${APACHE_ROOT}")
         message(FATAL_ERROR "APACHE_ROOT is defined but the directory '${APACHE_ROOT}' does not exist. Please set APACHE_ROOT to a valid Apache installation directory.")
@@ -172,7 +155,6 @@ if(APACHE_ROOT)
     )
 endif()
 
-# Compile definitions to match the original Makefile.win
 set(MODSECURITY_VERSION_FLAG "VERSION_IIS") # Define the version flag string
 target_compile_definitions(${IIS_MODULE_NAME} PRIVATE
     inline=APR_INLINE
@@ -181,11 +163,10 @@ target_compile_definitions(${IIS_MODULE_NAME} PRIVATE
     WITH_REMOTE_RULES
     MSC_LARGE_STREAM_INPUT
     WITH_YAJL
-    ${MODSECURITY_VERSION_FLAG}  # Use the defined version flag
+    ${MODSECURITY_VERSION_FLAG}
 )
 
 option(WITH_LUA "Enable Lua support" OFF)
-# Optional compile definitions
 if(WITH_LUA)
     find_package(Lua CONFIG REQUIRED)
     target_compile_definitions(${IIS_MODULE_NAME} PRIVATE WITH_LUA)
@@ -211,30 +192,26 @@ if(WITH_YAJL)
         target_include_directories(${IIS_MODULE_NAME} PRIVATE ${YAJL_INCLUDE_DIRS})
     else()
         message(WARNING "YAJL not found. YAJL_INCLUDE_DIR: '${YAJL_INCLUDE_DIR}', YAJL_LIBRARY: '${YAJL_LIBRARY}'. Please ensure yajl is installed via vcpkg in the vcpkg_installed directory. Disabling YAJL support.")
-        option(WITH_YAJL "Enable YAJL support" OFF) # Disable if not found
+        option(WITH_YAJL "Enable YAJL support" OFF)
     endif() 
 endif()
 
 option(WITH_SSDEEP "Enable SSDEEP support" OFF)
 if(WITH_SSDEEP)
 
-    set(SSDEEP_ROOT "" CACHE PATH "Path to manually built ssdeep")
-    if(NOT SSDEEP_ROOT OR NOT EXISTS "${SSDEEP_ROOT}")
+    if(NOT EXISTS "${SSDEEP_ROOT}")
         message(WARNING "SSDEEP_ROOT is not defined or path does not exist. Current SSDEEP_ROOT: '${SSDEEP_ROOT}'. Please set SSDEEP_ROOT to the ssdeep installation directory. Disabling SSDEEP support.")
         set(WITH_SSDEEP OFF CACHE BOOL "Enable SSDEEP support" FORCE)
     else()
 
         file(TO_CMAKE_PATH "${SSDEEP_ROOT}" SSDEEP_ROOT)
 
-        message(STATUS "SSDEEP_ROOT: ${SSDEEP_ROOT}")
-
         find_path(SSDEEP_INCLUDE_DIR fuzzy.h
-            PATHS "${SSDEEP_ROOT}/include"
+            PATHS "${SSDEEP_ROOT}"
             NO_DEFAULT_PATH
         )
         
         if(SSDEEP_INCLUDE_DIR)
-            message(STATUS "Found manually built ssdeep include: ${SSDEEP_INCLUDE_DIR}")
             target_compile_definitions(${IIS_MODULE_NAME} PRIVATE WITH_SSDEEP)
             target_include_directories(${IIS_MODULE_NAME} PRIVATE ${SSDEEP_INCLUDE_DIR})
 
@@ -244,7 +221,7 @@ if(WITH_SSDEEP)
                 set(WITH_SSDEEP OFF CACHE BOOL "Enable SSDEEP support" FORCE)
             else()
                 set(SSDEEP_GENERATED_LIB "${CMAKE_CURRENT_BINARY_DIR}/fuzzy.lib")
-                set(SSDEEP_GENERATED_dll "${CMAKE_CURRENT_BINARY_DIR}/bin/fuzzy.dll")
+                set(SSDEEP_GENERATED_dll "${CMAKE_CURRENT_BINARY_DIR}/fuzzy.dll")
                 
                 add_custom_command(
                     OUTPUT ${SSDEEP_GENERATED_LIB}
@@ -271,43 +248,30 @@ if(WITH_SSDEEP)
                 )
                  
              endif()
+        else()
+             message(WARNING "fuzzy.h not found at ${SSDEEP_INCLUDE_DIR}. Disabling SSDEEP support.")
+             set(WITH_SSDEEP OFF CACHE BOOL "Enable SSDEEP support" FORCE)
         endif()
     endif()
 endif()
 
-# Compiler-specific options for MSVC to match the original Makefile.win
 if(MSVC)
     target_compile_options(${IIS_MODULE_NAME} PRIVATE
         /nologo
         /W3
         /wd4244
         /wd4018
-  
     )
 endif()
 
-# Link libraries to match the original Makefile.win
 target_link_libraries(${IIS_MODULE_NAME} PRIVATE
     LibXml2::LibXml2
     PCRE2::8BIT
     CURL::libcurl
-    kernel32
-    user32
-    gdi32
-    winspool
-    comdlg32
-    advapi32
-    shell32
-    ole32
-    oleaut32
-    uuid
-    odbc32
-    odbccp32
     ws2_32
     iphlpapi
 )
 
-# Apache-specific libraries
 if(APACHE_ROOT)
     target_link_libraries(${IIS_MODULE_NAME} PRIVATE
         Apache::httpd
@@ -319,7 +283,6 @@ else()
     message(WARNING "APACHE_ROOT is not defined or path does not exist. Current APACHE_ROOT: '${APACHE_ROOT}'. Please set APACHE_ROOT to the Apache installation directory.")
 endif()
 
-# Optional link libraries
 if(WITH_LUA)
     target_link_libraries(${IIS_MODULE_NAME} PRIVATE ${LUA_LIBRARIES})
 endif()
@@ -349,10 +312,10 @@ else()
     message(WARNING "APACHE_ROOT is not defined or path does not exist. Current APACHE_ROOT: '${APACHE_ROOT}'. Please set APACHE_ROOT to the Apache installation directory.")
 endif()
 
-if(WITH_SSDEEP AND SSDEEP_ROOT AND EXISTS "${SSDEEP_ROOT}/bin/fuzzy.dll")
+if(WITH_SSDEEP AND SSDEEP_ROOT AND EXISTS "${SSDEEP_ROOT}/fuzzy.dll")
     add_custom_command(TARGET ${IIS_MODULE_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${SSDEEP_ROOT}/bin/fuzzy.dll"
+            "${SSDEEP_ROOT}/fuzzy.dll"
             $<TARGET_FILE_DIR:${IIS_MODULE_NAME}>
         COMMENT "Copying SSDEEP DLL to output directory"
     )
@@ -374,9 +337,9 @@ if(APACHE_ROOT AND EXISTS "${APACHE_ROOT}/bin")
     )
 endif()
 
-if(WITH_SSDEEP AND SSDEEP_ROOT AND EXISTS "${SSDEEP_ROOT}/bin/fuzzy.dll")
+if(WITH_SSDEEP AND SSDEEP_ROOT AND EXISTS "${SSDEEP_ROOT}/fuzzy.dll")
     install(FILES
-        "${SSDEEP_ROOT}/bin/fuzzy.dll"
+        "${SSDEEP_ROOT}/fuzzy.dll"
         DESTINATION .
     )
 endif()
