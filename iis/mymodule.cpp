@@ -17,6 +17,8 @@
 #undef inline
 #define inline inline
 
+#include "winsock2.h"
+
 //  IIS7 Server API header file
 #include <Windows.h>
 #include <sal.h>
@@ -29,8 +31,6 @@
 
 #include "api.h"
 #include "moduleconfig.h"
-
-#include "winsock2.h"
 
 
 class REQUEST_STORED_CONTEXT : public IHttpStoredContext

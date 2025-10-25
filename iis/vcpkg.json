@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "curl",
+    "libxml2",
+    "lua",
+    "pcre2",
+    "yajl",
+    "apr"
+  ]
+}

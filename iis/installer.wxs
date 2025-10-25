@@ -17,17 +17,19 @@
         <Property Id="IIS_SETUP">
             <RegistrySearch Id="ConfigureIISRegistrySearch" Type="raw" Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity" Name="ModSecurityConfigureIIS" Win64="yes" />
         </Property>
-        <?else ?>
+        <?else?>
         <?define Win64 = "no" ?>
         <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
         <?define ConfigFile = "[inetsrv32]Config\applicationHost.config" ?>
         <Property Id="IIS_SETUP">
             <RegistrySearch Id="ConfigureIISRegistrySearch" Type="raw" Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity" Name="ModSecurityConfigureIIS" Win64="no" />
         </Property>
-        <?endif ?>
+        <?endif?>
+        <!-- Detect the major version of IIS -->
         <Property Id="IIS">
             <RegistrySearch Id="IISInstalledVersion" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Type="raw" Name="MajorVersion" />
         </Property>
+        <!-- Detect if ModSecurity IIS module and its dependent DLL files exist -->
         <Property Id="FILEEXISTS" Secure="yes">
             <DirectorySearch Id="CheckFileDir1" Path="C:\Windows\System32\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile1" Name="ModSecurityIIS.dll" />
@@ -87,24 +89,28 @@
                 <FileSearch Id="CheckFile19" Name="fuzzy.dll" />
             </DirectorySearch>
         </Property>
+        <!-- Detect the WWW root directory of IIS -->
         <Property Id="WWWROOT">
             <RegistrySearch Id="FindInetPubFolder" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Name="PathWWWRoot" Type="directory" />
         </Property>
+        <!-- Define MSI properties, enable real administrator detection for MSI, and disable repair and modify options in "Programs and Features" -->
         <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
+        <!-- Define installation conditions -->
         <Condition Message="This setup requires IIS 7.0, 8.0 or 10.0. If that's the case, please ensure that the installer is running as administrator or try running it from the 'Apps and features' or 'Add/Remove Programs' menu"><![CDATA[(IIS="#7") OR (IIS="#8") OR (IIS="#10")]]></Condition>
         <!-- Version 2.7.5 had an uninstall issue that leaves some files behind. Asking the user to manually hash this out. -->
         <Condition Message="A older version of ModSecurityIIS was found in your computer. Please complete uninstall by removing the following file: [FILEEXISTS]. You may have to remove ModSecurity module from IIS, use the IIS Manager to do so."><![CDATA[(NOT FILEEXISTS) OR (Installed)]]></Condition>
         <Condition Message="64-bit operating system was detected, please use the 64-bit installer.">
-            <?if $(var.Win64) = "yes" ?>
-        VersionNT64
-        <?else ?>
-        NOT VersionNT64
-	<?endif ?></Condition>
-
-<Property Id="ARPNOREPAIR" Value="yes" Secure="yes" /> 
-<Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
-
+        <!--    - Defines 64/32-bit ModSecurity IIS module and its dependent DLL file components and IIS configuration Schema directory through conditional compilation. -->
+        <?if $(var.Win64) = "yes" ?>
+            VersionNT64
+            <?else?>
+            NOT VersionNT64
+            <?endif?></Condition>
+        <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" />
+        <Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
+        <!-- Define media information for the installation package -->
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <!-- Define the directory structure of the installation package -->
         <Directory Id="TARGETDIR" Name="SourceDir">
             <?if $(var.Win64) = "yes" ?>
             <Directory Id="SystemFolder" Name="SystemFolder">
@@ -121,7 +127,7 @@
                     </Directory>
                 </Directory>
             </Directory>
-            <?else ?>
+            <?else?>
             <Directory Id="SystemFolder" Name="SystemFolder">
                 <Directory Id="inetsrv32" Name="inetsrv">
                     <Directory Id="SystemFolderConfig32" Name="config">
@@ -129,437 +135,112 @@
                     </Directory>
                 </Directory>
             </Directory>
-	    <?endif ?>
+            <?endif?>
             <Directory Id="$(var.PlatformProgramFilesFolder)">
-		    <Directory Id="INSTALLFOLDER" Name="ModSecurity IIS">
-			    <!--
-                        <Component Id="OWASP_CRS_V_3_0_2_SETUP" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6500">
- 			   <File Id="CRS_SETUP.CONF.EXAMPLE" Name="crs-setup.conf.example" Source="release\owasp_crs\crs-setup.conf.example" />
-			</Component>
-			-->
-	    <!--
-                    <Directory Id="OWASP_CRS" Name="owasp_crs">
-                        <Component Id="OWASP_CRS_V_3_0_2" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6502">
-                            <File Id="CHANGES" Name="CHANGES" Source="release\owasp_crs\CHANGES" />
-                            <File Id="CONTRIBUTORS" Name="CONTRIBUTORS" Source="release\owasp_crs\CONTRIBUTORS" />
-                            <File Id="IDNUMBERING" Name="IDNUMBERING" Source="release\owasp_crs\IDNUMBERING" />
-                            <File Id="INSTALL" Name="INSTALL" Source="release\owasp_crs\INSTALL" />
-                            <File Id="LICENSE" Name="LICENSE" Source="release\owasp_crs\LICENSE" />
-                            <File Id="KNOWN_BUGS" Name="KNOWN_BUGS" Source="release\owasp_crs\KNOWN_BUGS" />
-                            <File Id="README.MD" Name="README.md" Source="release\owasp_crs\README.md" />
-                        </Component>
-                        <Directory Id="DOCUMENTATION" Name="documentation">
-                            <Component Id="README" DiskId="1" Guid="F06FC044-52E6-412E-80E6-6644486A522B">
-                                <File Id="README" Name="README" Source="release\owasp_crs\documentation\README" />
-                            </Component>
-                            <Directory Id="OWASP_CRS_DOCUMENTATION" Name="OWASP-CRS-Documentation">
-                            </Directory>
-                        </Directory>
-                        <Directory Id="ID_RENUMBERING" Name="id_renumbering">
-                            <Component Id="ID_NUMBERING" DiskId="1" Guid="F06FC044-52E6-412E-80E6-6644486A522D">
-                                <File Id="IDNUMBERING_1" Name="IDNUMBERING" Source="release\owasp_crs\id_renumbering\IDNUMBERING" />
-                                <File Id="IDNUMBERING.CSV" Name="IdNumbering.csv" Source="release\owasp_crs\id_renumbering\IdNumbering.csv" />
-                                <File Id="UPDATE.PY" Name="update.py" Source="release\owasp_crs\id_renumbering\update.py" />
-                            </Component>
-                        </Directory>
-                        <Directory Id="RULES" Name="rules">
-                            <Component Id="RULES" DiskId="1" Guid="66EB7DE9-E12D-4360-B096-75CAB0498E88">
-                                <File Id="CRAWLERS_USER_AGENTS.DATA" Name="crawlers-user-agents.data" Source="release\owasp_crs\rules\crawlers-user-agents.data" />
-                                <File Id="IIS_ERRORS.DATA" Name="iis-errors.data" Source="release\owasp_crs\rules\iis-errors.data" />
-                                <File Id="JAVA_CODE_LEAKAGES.DATA" Name="java-code-leakages.data" Source="release\owasp_crs\rules\java-code-leakages.data" />
-                                <File Id="JAVA_ERRORS.DATA" Name="java-errors.data" Source="release\owasp_crs\rules\java-errors.data" />
-                                <File Id="LFI_OS_FILES.DATA" Name="lfi-os-files.data" Source="release\owasp_crs\rules\lfi-os-files.data" />
-                                <File Id="PHP_CONFIG_DIRECTIVES.DATA" Name="php-config-directives.data" Source="release\owasp_crs\rules\php-config-directives.data" />
-                                <File Id="PHP_ERRORS.DATA" Name="php-errors.data" Source="release\owasp_crs\rules\php-errors.data" />
-                                <File Id="PHP_FUNCTION_NAMES_933150.DATA" Name="php-function-names-933150.data" Source="release\owasp_crs\rules\php-function-names-933150.data" />
-                                <File Id="PHP_FUNCTION_NAMES_933151.DATA" Name="php-function-names-933151.data" Source="release\owasp_crs\rules\php-function-names-933151.data" />
-                                <File Id="PHP_VARIABLES.DATA" Name="php-variables.data" Source="release\owasp_crs\rules\php-variables.data" />
-                                <File Id="REQUEST_900_EXCLUSION_RULES_BEFORE_CRS.conf.example" Name="REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf" Source="release\owasp_crs\rules\REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf" />
-                                <File Id="REQUEST_901_INITIALIZATION.conf" Name="REQUEST-901-INITIALIZATION.conf" Source="release\owasp_crs\rules\REQUEST-901-INITIALIZATION.conf" />
-                                <File Id="REQUEST_903.9001_DRUPAL_EXCLUSION_RULES.conf" Name="REQUEST-903.9001-DRUPAL-EXCLUSION-RULES.conf" Source="release\owasp_crs\rules\REQUEST-903.9001-DRUPAL-EXCLUSION-RULES.conf" />
-                                <File Id="REQUEST_903.9002_WORDPRESS_EXCLUSION_RULES.conf" Name="REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES.conf" Source="release\owasp_crs\rules\REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES.conf" />
-                                <File Id="REQUEST_905_COMMON_EXCEPTIONS.conf" Name="REQUEST-905-COMMON-EXCEPTIONS.conf" Source="release\owasp_crs\rules\REQUEST-905-COMMON-EXCEPTIONS.conf" />
-                                <File Id="REQUEST_910_IP_REPUTATION.conf" Name="REQUEST-910-IP-REPUTATION.conf" Source="release\owasp_crs\rules\REQUEST-910-IP-REPUTATION.conf" />
-                                <File Id="REQUEST_911_METHOD_ENFORCEMENT.conf" Name="REQUEST-911-METHOD-ENFORCEMENT.conf" Source="release\owasp_crs\rules\REQUEST-911-METHOD-ENFORCEMENT.conf" />
-                                <File Id="REQUEST_912_DOS_PROTECTION.conf" Name="REQUEST-912-DOS-PROTECTION.conf" Source="release\owasp_crs\rules\REQUEST-912-DOS-PROTECTION.conf" />
-                                <File Id="REQUEST_913_SCANNER_DETECTION.conf" Name="REQUEST-913-SCANNER-DETECTION.conf" Source="release\owasp_crs\rules\REQUEST-913-SCANNER-DETECTION.conf" />
-                                <File Id="REQUEST_920_PROTOCOL_ENFORCEMENT.conf" Name="REQUEST-920-PROTOCOL-ENFORCEMENT.conf" Source="release\owasp_crs\rules\REQUEST-920-PROTOCOL-ENFORCEMENT.conf" />
-                                <File Id="REQUEST_921_PROTOCOL_ATTACK.conf" Name="REQUEST-921-PROTOCOL-ATTACK.conf" Source="release\owasp_crs\rules\REQUEST-921-PROTOCOL-ATTACK.conf" />
-                                <File Id="REQUEST_930_APPLICATION_ATTACK_LFI.conf" Name="REQUEST-930-APPLICATION-ATTACK-LFI.conf" Source="release\owasp_crs\rules\REQUEST-930-APPLICATION-ATTACK-LFI.conf" />
-                                <File Id="REQUEST_931_APPLICATION_ATTACK_RFI.conf" Name="REQUEST-931-APPLICATION-ATTACK-RFI.conf" Source="release\owasp_crs\rules\REQUEST-931-APPLICATION-ATTACK-RFI.conf" />
-                                <File Id="REQUEST_932_APPLICATION_ATTACK_RCE.conf" Name="REQUEST-932-APPLICATION-ATTACK-RCE.conf" Source="release\owasp_crs\rules\REQUEST-932-APPLICATION-ATTACK-RCE.conf" />
-                                <File Id="REQUEST_933_APPLICATION_ATTACK_PHP.conf" Name="REQUEST-933-APPLICATION-ATTACK-PHP.conf" Source="release\owasp_crs\rules\REQUEST-933-APPLICATION-ATTACK-PHP.conf" />
-                                <File Id="REQUEST_941_APPLICATION_ATTACK_XSS.conf" Name="REQUEST-941-APPLICATION-ATTACK-XSS.conf" Source="release\owasp_crs\rules\REQUEST-941-APPLICATION-ATTACK-XSS.conf" />
-                                <File Id="REQUEST_942_APPLICATION_ATTACK_SQLI.conf" Name="REQUEST-942-APPLICATION-ATTACK-SQLI.conf" Source="release\owasp_crs\rules\REQUEST-942-APPLICATION-ATTACK-SQLI.conf" />
-                                <File Id="REQUEST_943_APPLICATION_ATTACK_SESSION_FIXATION.conf" Name="REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf" Source="release\owasp_crs\rules\REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf" />
-                                <File Id="REQUEST_949_BLOCKING_EVALUATION.conf" Name="REQUEST-949-BLOCKING-EVALUATION.conf" Source="release\owasp_crs\rules\REQUEST-949-BLOCKING-EVALUATION.conf" />
-                                <File Id="RESPONSE_950_DATA_LEAKAGES.conf" Name="RESPONSE-950-DATA-LEAKAGES.conf" Source="release\owasp_crs\rules\RESPONSE-950-DATA-LEAKAGES.conf" />
-                                <File Id="RESPONSE_951_DATA_LEAKAGES_SQL.conf" Name="RESPONSE-951-DATA-LEAKAGES-SQL.conf" Source="release\owasp_crs\rules\RESPONSE-951-DATA-LEAKAGES-SQL.conf" />
-                                <File Id="RESPONSE_952_DATA_LEAKAGES_JAVA.conf" Name="RESPONSE-952-DATA-LEAKAGES-JAVA.conf" Source="release\owasp_crs\rules\RESPONSE-952-DATA-LEAKAGES-JAVA.conf" />
-                                <File Id="RESPONSE_953_DATA_LEAKAGES_PHP.conf" Name="RESPONSE-953-DATA-LEAKAGES-PHP.conf" Source="release\owasp_crs\rules\RESPONSE-953-DATA-LEAKAGES-PHP.conf" />
-                                <File Id="RESPONSE_954_DATA_LEAKAGES_IIS.conf" Name="RESPONSE-954-DATA-LEAKAGES-IIS.conf" Source="release\owasp_crs\rules\RESPONSE-954-DATA-LEAKAGES-IIS.conf" />
-                                <File Id="RESPONSE_959_BLOCKING_EVALUATION.conf" Name="RESPONSE-959-BLOCKING-EVALUATION.conf" Source="release\owasp_crs\rules\RESPONSE-959-BLOCKING-EVALUATION.conf" />
-                                <File Id="RESPONSE_980_CORRELATION.conf" Name="RESPONSE-980-CORRELATION.conf" Source="release\owasp_crs\rules\RESPONSE-980-CORRELATION.conf" />
-                                <File Id="RESPONSE_999_EXCLUSION_RULES_AFTER_CRS.conf" Name="RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf" Source="release\owasp_crs\rules\RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf" />
-                                <File Id="RESTRICTED_FILES.DATA" Name="restricted-files.data" Source="release\owasp_crs\rules\restricted-files.data" />
-                                <File Id="SCANNERS_HEADERS.DATA" Name="scanners-headers.data" Source="release\owasp_crs\rules\scanners-headers.data" />
-                                <File Id="SCANNERS_URLS.DATA" Name="scanners-urls.data" Source="release\owasp_crs\rules\scanners-urls.data" />
-                                <File Id="SCANNERS_USER_AGENTS.DATA" Name="scanners-user-agents.data" Source="release\owasp_crs\rules\scanners-user-agents.data" />
-                                <File Id="SCRIPTING_USER_AGENTS.DATA" Name="scripting-user-agents.data" Source="release\owasp_crs\rules\scripting-user-agents.data" />
-                                <File Id="SQL_ERRORS.DATA" Name="sql-errors.data" Source="release\owasp_crs\rules\sql-errors.data" />
-                                <File Id="SQL_FUNCTION_NAMES.DATA" Name="sql-function-names.data" Source="release\owasp_crs\rules\sql-function-names.data" />
-                                <File Id="UNIX_SHELL.DATA" Name="unix-shell.data" Source="release\owasp_crs\rules\unix-shell.data" />
-                                <File Id="WINDOWS_POWERSHELL_COMMANDS.DATA" Name="windows-powershell-commands.data" Source="release\owasp_crs\rules\windows-powershell-commands.data" />
-                            </Component>
-			</Directory>
-                        <Directory Id="UTIL" Name="util">
-                            <Component Id="UTIL" DiskId="1" Guid="A95D50D7-4E87-4A87-BAD1-12370B8F5B9B">
-                                <File Id="ID_RANGE" Name="id-range" Source="release\owasp_crs\util\id-range" />
-                                <File Id="README_1" Name="README" Source="release\owasp_crs\util\README" />
-                                <File Id="UPGRADE.PY" Name="upgrade.py" Source="release\owasp_crs\util\upgrade.py" />
-                                <File Id="VERIFY.RB" Name="verify.rb" Source="release\owasp_crs\util\verify.rb" />
-                            </Component>
-                            <Directory Id="AV_SCANNING" Name="av-scanning">
-                                <Component Id="RUNAV" DiskId="1" Guid="398B0257-F78A-4F8C-B313-90D0F61581A9">
-                                    <File Id="RUNAV.PL" Name="runav.pl" Source="release\owasp_crs\util\av-scanning\runav.pl" />
-                                </Component>
-                                <Directory Id="RUNAV" Name="runAV">
-                                    <Component Id="RUNAV_RUNAV" DiskId="1" Guid="3EA0484E-5E42-43C3-B89B-71BCC89DBB4F">
-                                        <File Id="COMMON.C" Name="common.c" Source="release\owasp_crs\util\av-scanning\runAV\common.c" />
-                                        <File Id="COMMON.H" Name="common.h" Source="release\owasp_crs\util\av-scanning\runAV\common.h" />
-                                        <File Id="COMP" Name="comp" Source="release\owasp_crs\util\av-scanning\runAV\comp" />
-                                        <File Id="RUNAV_CLAMD.C" Name="runAV-clamd.c" Source="release\owasp_crs\util\av-scanning\runAV\runAV-clamd.c" />
-                                        <File Id="RUNAV.C" Name="runAV.c" Source="release\owasp_crs\util\av-scanning\runAV\runAV.c" />
-                                    </Component>
-                                </Directory>
-                            </Directory>
-                            <Directory Id="BROWSER_TOOLS" Name="browser-tools">
-                                <Component Id="BROWSER_TOOLS" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045A7">
-                                    <File Id="JS_OVERRIDES.JS" Name="js-overrides.js" Source="release\owasp_crs\util\browser-tools\js-overrides.js" />
-                                </Component>
-                            </Directory>
-                            <Directory Id="DEBUG" Name="debug">
-                                <Component Id="DEBUG" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045A8">
-                                    <File Id="RESPONSE_981_DEBUG.CONF" Name="RESPONSE-981-DEBUG.conf" Source="release\owasp_crs\util\debug\RESPONSE-981-DEBUG.conf" />
-                                </Component>
-                            </Directory>
-                            <Directory Id="GEO_LOCATION" Name="geo-location">
-                                <Component Id="GEO_LOCATION" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045A9">
-                                    <File Id="README_2" Name="README" Source="release\owasp_crs\util\geo-location\README" />
-                                </Component>
-                            </Directory>    
-                            <Directory Id="INTEGRATION" Name="integration">
-                                <Component Id="INTEGRATION" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045B0">
-                                    <File Id="FORMAT_TESTS.PY" Name="format_tests.py" Source="release\owasp_crs\util\integration\format_tests.py" />
-                                    <File Id="REQUIREMENTS.TXT" Name="requirements.txt" Source="release\owasp_crs\util\integration\requirements.txt" />
-                                </Component>
-                            </Directory>
-                            <Directory Id="JOIN_MULTILINE_RULES" Name="join-multiline-rules">
-                                <Component Id="JOIN_MULTILINE_RULES" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045B1">
-                                    <File Id="JOIN.PY" Name="join.py" Source="release\owasp_crs\util\join-multiline-rules\join.py" />
-                                </Component>
-                            </Directory>
-                            <Directory Id="REGEXP_ASSEMBLE" Name="regexp-assemble">
-                                <Component Id="REGEXP_ASSEMBLE" DiskId="1" Guid="A81D4319-9C26-4E29-A0BD-FC2DED0045B2">
-                                    <File Id="REGEXP_932130.DATA" Name="regexp-932130.data" Source="release\owasp_crs\util\regexp-assemble\regexp-932130.data" />
-                                    <File Id="REGEXP_932140.DATA" Name="regexp-932140.data" Source="release\owasp_crs\util\regexp-assemble\regexp-932140.data" />
-                                    <File Id="REGEXP_933131.DATA" Name="regexp-933131.data" Source="release\owasp_crs\util\regexp-assemble\regexp-933131.data" />
-                                    <File Id="REGEXP_933160.DATA" Name="regexp-933160.data" Source="release\owasp_crs\util\regexp-assemble\regexp-933160.data" />
-                                    <File Id="REGEXP_933161.DATA" Name="regexp-933161.data" Source="release\owasp_crs\util\regexp-assemble\regexp-933161.data" />
-                                    <File Id="REGEXP_ASSEMBLE.PL" Name="regexp-assemble.pl" Source="release\owasp_crs\util\regexp-assemble\regexp-assemble.pl" />
-                                    <File Id="REGEXP_932100.TXT" Name="regexp-932100.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932100.txt" />
-                                    <File Id="REGEXP_932105.TXT" Name="regexp-932105.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932105.txt" />
-                                    <File Id="REGEXP_932110.TXT" Name="regexp-932110.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932110.txt" />
-                                    <File Id="REGEXP_932115.TXT" Name="regexp-932115.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932115.txt" />
-                                    <File Id="REGEXP_932150.TXT" Name="regexp-932150.txt" Source="release\owasp_crs\util\regexp-assemble\regexp-932150.txt" />
-                                    <File Id="REGEXP_CMDLINE.PY" Name="regexp-cmdline.py" Source="release\owasp_crs\util\regexp-assemble\regexp-cmdline.py" />
-                                </Component>
-                            </Directory>    
-                            <Directory Id="HONEYPOT_SENSOR" Name="honeypot-sensor">
-                                <Component Id="HONEYPOT_SENSOR" DiskId="1" Guid="3D3DD51F-70FF-41CE-A756-2C2935A71BA8">
-                                    <File Id="MLOGC_HONEYPOT_SENSOR.CONF" Name="mlogc-honeypot-sensor.conf" Source="release\owasp_crs\util\honeypot-sensor\mlogc-honeypot-sensor.conf" />
-                                    <File Id="MODSECURITY_CRS_10_HONEYPOT.CONF" Name="modsecurity_crs_10_honeypot.conf" Source="release\owasp_crs\util\honeypot-sensor\modsecurity_crs_10_honeypot.conf" />
-                                    <File Id="README.MD_1" Name="README.md" Source="release\owasp_crs\util\honeypot-sensor\README.md" />
-                                </Component>
-                            </Directory>
-                            <Directory Id="REGRESSION_TESTS" Name="regression-tests">
-                                <Component Id="REGRESSION_TESTS" DiskId="1" Guid="02AF3C5A-DCF9-4DB6-A1C8-B1EF140C8EBC">
-                                    <File Id="README_3" Name="README" Source="release\owasp_crs\util\regression-tests\README" />
-                                </Component>
-                                <Directory Id="OWASP_CRS_REGRESSIONS" Name="OWASP-CRS-regressions">
-                                </Directory>
-                            </Directory>
-                            <Directory Id="VIRTUAL_PATCHING" Name="virtual-patching">
-                                <Component Id="VIRTUAL_PATCHING" DiskId="1" Guid="DDDD3A2B-CEC1-42B3-9984-2987CA5BA311">
-                                    <File Id="ARACHNI2MODSEC.PL" Name="arachni2modsec.pl" Source="release\owasp_crs\util\virtual-patching\arachni2modsec.pl" />
-                                    <File Id="ZAP2MODSEC.PL" Name="zap2modsec.pl" Source="release\owasp_crs\util\virtual-patching\zap2modsec.pl" />
-                                </Component>
-                            </Directory>
-                        </Directory>
-                    </Directory>
-	    -->
-                </Directory>
-	    </Directory>
+                <Directory Id="INSTALLFOLDER" Name="ModSecurity IIS"></Directory>
+            </Directory>
             <Directory Id="ProgramMenuFolder">
                 <Directory Id="ProgramMenuDir" Name="ModSecurity IIS">
                     <Component Id="StartMenuShortcuts" Guid="43C26B13-C4D8-42F8-8715-3AF78E66C902">
                         <util:InternetShortcut Id="WebsiteShortcut" Name="ModSecurity" Target="http://www.modsecurity.org/" />
-			<!--<util:InternetShortcut Id="CSR" Name="OWASP ModSecurity Core Rule Set" Target="http://spIderlabs.github.io/owasp-modsecurity-crs/" />-->
                         <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
                         <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the ModSecurity IIS" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
                         <Shortcut Id="EULA" Name="EULA" Description="EULA" Target="[INSTALLFOLDER]EULA.rtf" WorkingDirectory="INSTALLFOLDER" />
                         <Shortcut Id="Readme" Name="EULA" Description="EULA" Target="[INSTALLFOLDER]README.TXT" WorkingDirectory="INSTALLFOLDER" />
-                        <?if $(var.Win64) = "yes" ?>
-                        <Shortcut Id="List_Dependencies" Name="List Dependencies (Debug)" Description="Check for missing dependencies" Target="[INSTALLFOLDER]list_dependencies.bat" Arguments="&quot;[inetsrv64]libapr-1.dll&quot; &quot;[inetsrv64]libapriconv-1.dll&quot; &quot;[inetsrv64]libaprutil-1.dll&quot; &quot;[inetsrv64]libcurl.dll&quot; &quot;[inetsrv64]libxml2.dll&quot; &quot;[inetsrv64]lua5.1.dll&quot; &quot;[inetsrv64]mlogc.exe&quot; &quot;[inetsrv64]ModSecurityIIS.dll&quot; &quot;[inetsrv64]pcre.dll&quot; &quot;[inetsrv64]zlib1.dll&quot; &quot;[inetsrv64]fuzzy.dll&quot; &quot;[inetsrv32]libapr-1.dll&quot; &quot;[inetsrv32]libapriconv-1.dll&quot; &quot;[inetsrv32]libaprutil-1.dll&quot; &quot;[inetsrv32]libcurl.dll&quot; &quot;[inetsrv32]libxml2.dll&quot; &quot;[inetsrv32]lua5.1.dll&quot; &quot;[inetsrv32]mlogc.exe&quot; &quot;[inetsrv32]ModSecurityIIS.dll&quot; &quot;[inetsrv32]pcre.dll&quot; &quot;[inetsrv32]zlib1.dll&quot;  &quot;[inetsrv32]fuzzy.dll&quot;" WorkingDirectory="INSTALLFOLDER" />
-                        <?else ?>
-                        <Shortcut Id="List_Dependencies" Name="List Dependencies (Debug)" Description="Check for missing dependencies" Target="[INSTALLFOLDER]list_dependencies.bat" Arguments="&quot;[inetsrv32]libapr-1.dll&quot; &quot;[inetsrv32]libapriconv-1.dll&quot; &quot;[inetsrv32]libaprutil-1.dll&quot; &quot;[inetsrv32]libcurl.dll&quot; &quot;[inetsrv32]libxml2.dll&quot; &quot;[inetsrv32]lua5.1.dll&quot; &quot;[inetsrv32]mlogc.exe&quot; &quot;[inetsrv32]ModSecurityIIS.dll&quot; &quot;[inetsrv32]pcre.dll&quot; &quot;[inetsrv32]zlib1.dll&quot; &quot;[inetsrv32]fuzzy.dll&quot;" WorkingDirectory="INSTALLFOLDER" />
-                        <?endif ?>
                     </Component>
                 </Directory>
             </Directory>
         </Directory>
-	<DirectoryRef Id="INSTALLFOLDER"> <Component Id="ModSecCommon"
-			DiskId="1" Guid="980270DF-81AB-469B-AB0E-64FA3BA160B6"
-			Location="local"> <File Id="README.TXT"
-				Name="README.TXT" Source="wix\README.TXT" />
-			<File Id="EULA.RTF" Name="EULA.rtf"
-				Source="wix\EULA.rtf" /> <File
-				Id="modsecurity.conf" Name="modsecurity.conf"
-				Source="wix\modsecurity.conf" />
-		<File Id="modsecurity_iis.conf" Name="modsecurity_iis.conf"
-			Source="wix\modsecurity_iis.conf" /> <File
-			Id="unicode.mapping" Name="unicode.mapping"
-			Source="wix\unicode.mapping" />
-	<!-- <File Id="modsecurity_crs_10_setup.conf"
-		Name="modsecurity_crs_10_setup.conf"
-		Source="wix\modsecurity_crs_10_setup.conf" /> --> <File
-		Id="LIST_DEPENDENCIES.BAT" Name="list_dependencies.bat"
-		Source="wix\list_dependencies.bat" /> <File
-		Id="ModSecurity.xml" Name="ModSecurity.xml"
-		Source="ModSecurity.xml" />
-		<!-- Modify ApplicationHost.config --> <util:XmlConfig
-			Id="appHostEntry" File="$(var.ConfigFile)"
-			Action="create"
-			ElementPath="//configuration/configSections/sectionGroup[\[]@name='system.webServer'[\]]"
-			VerifyPath="section[\[]@name='ModSecurity'[\]]"
-			Name="section" Node="element" Sequence="1" On="install"
-			/> <util:XmlConfig Id="appHostEntryName"
-			File="$(var.ConfigFile)" ElementPath="appHostEntry"
-			Name="name" Value="ModSecurity" Sequence="2" />
-		<util:XmlConfig Id="appHostEntryOverrideMode"
-			File="$(var.ConfigFile)" ElementPath="appHostEntry"
-			Name="overrideModeDefault" Value="Allow" Sequence="3"
-			/> <util:XmlConfig Id="appHostEntryAllowDefinition"
-			File="$(var.ConfigFile)" ElementPath="appHostEntry"
-			Name="allowDefinition" Value="Everywhere" Sequence="4"
-			/> <util:XmlConfig Id="removeAppHostEntry"
-			File="$(var.ConfigFile)" Action="delete"
-			ElementPath="/configuration/configSections/sectionGroup[\[]@name='system.webServer'[\]]"
-			Node="element"
-			VerifyPath="section[\[]@name='ModSecurity'[\]]"
-			On="uninstall" Sequence="1" /> <util:XmlConfig
-			Id="removeAppHostEntry2" File="$(var.ConfigFile)"
-			Action="delete"
-			ElementPath="/configuration/system.webServer"
-			Node="element"
-			VerifyPath="/configuration/system.webServer/ModSecurity"
-			Name="section" On="uninstall" Sequence="2" />
-		<RegistryKey Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity"
-			Action="createAndRemoveOnUninstall"> <RegistryValue
-				Type="string" Name="ModSecurityConfigureIIS"
-				Value="[IIS_SETUP]" KeyPath="yes" />
-		</RegistryKey> </Component> </DirectoryRef> <?if $(var.Win64) =
-		"yes" ?> <DirectoryRef Id="inetsrv64"> <Component Id="ModSec64"
-				DiskId="1"
-				Guid="514A81F0-2413-42EF-B19F-E2613125ECE0"
-				Win64="yes" Location="local"> <File
-					Id="_64_LIBAPR_1" Name="libapr-1.dll"
-					Source="Release\amd64\libapr-1.dll" />
-				<File Id="_64_LIBAPRICONV_1"
-					Name="libapriconv-1.dll"
-					Source="Release\amd64\libapriconv-1.dll"
-					/> <File Id="_64_LIBAPRUTIL_1"
-					Name="libaprutil-1.dll"
-					Source="Release\amd64\libaprutil-1.dll"
-					/> <File Id="_64_LIBCURL"
-					Name="libcurl.dll"
-					Source="Release\amd64\libcurl.dll" />
-				<File Id="_64_LIBXML2" Name="libxml2.dll"
-					Source="Release\amd64\libxml2.dll" />
-				<File Id="_64_LUA5.1" Name="lua5.1.dll"
-					Source="Release\amd64\lua5.1.dll" />
-				<File Id="_64_YAJL" Name="yajl.dll"
-					Source="Release\amd64\yajl.dll" />
-				<File Id="_64_MLOGC" Name="mlogc.exe"
-					Source="Release\amd64\mlogc.exe" />
-				<File Id="_64_MODSECURITYIIS"
-					Name="ModSecurityIIS.dll"
-					Source="Release\amd64\ModSecurityIIS.dll"
-					/> <File Id="_64_PCRE" Name="pcre.dll"
-					Source="Release\amd64\pcre.dll" />
-				<File Id="_64_ZLIB1" Name="zlib1.dll"
-					Source="Release\amd64\zlib1.dll" />
-				<File Id="_64_FUZZY" Name="fuzzy.dll"
-					Source="Release\amd64\fuzzy.dll" />
-                <util:EventSource Name="ModSecurity" Log="Application" 
-                    EventMessageFile="[inetsrv64]ModSecurityIIS.dll" 
-                    KeyPath="yes" />
-			</Component> </DirectoryRef> <DirectoryRef
-			Id="inetsrv32"> <Component Id="ModSec32" DiskId="1"
-				Guid="514A81F0-2413-42EF-B19F-E2613125ECE7"
-				Win64="no" Location="local"> <File
-					Id="_32_LIBAPR_1" Name="libapr-1.dll"
-					Source="Release\x86\libapr-1.dll" />
-				<File Id="_32_LIBAPRICONV_1"
-					Name="libapriconv-1.dll"
-					Source="Release\x86\libapriconv-1.dll"
-					/> <File Id="_32_LIBAPRUTIL_1"
-					Name="libaprutil-1.dll"
-					Source="Release\x86\libaprutil-1.dll"
-					/> <File Id="_32_LIBCURL"
-					Name="libcurl.dll"
-					Source="Release\x86\libcurl.dll" />
-				<File Id="_32_LIBXML2" Name="libxml2.dll"
-					Source="Release\x86\libxml2.dll" />
-				<File Id="_32_LUA5.1" Name="lua5.1.dll"
-					Source="Release\x86\lua5.1.dll" />
-				<File Id="_32_YAJL" Name="yajl.dll"
-					Source="Release\x86\yajl.dll" /> <File
-					Id="_32_MLOGC" Name="mlogc.exe"
-					Source="Release\x86\mlogc.exe" /> <File
-					Id="_32_MODSECURITYIIS"
-					Name="ModSecurityIIS.dll"
-					Source="Release\x86\ModSecurityIIS.dll"
-					/> <File Id="_32_PCRE" Name="pcre.dll"
-					Source="Release\x86\pcre.dll" /> <File
-					Id="_32_ZLIB1" Name="zlib1.dll"
-					Source="Release\x86\zlib1.dll" /> <File
-					Id="_32_FUZZY" Name="fuzzy.dll"
-					Source="Release\x86\fuzzy.dll" />
-			</Component> </DirectoryRef> <DirectoryRef
-			Id="SystemFolderConfigSchema32"> <Component
-				Id="ConfigSchema32"
-				Guid="514A81F0-2413-42EF-B19F-E2613125EC11"
-				Location="local" Win64="no"> <File
-					Id="_32_ConfigSchema"
-					Name="ModSecurity.xml"
-					Source="ModSecurity.xml" />
-		</Component> </DirectoryRef> <DirectoryRef
-		Id="SystemFolderConfigSchema64"> <Component Id="ConfigSchema64"
-			Guid="514A81F0-2413-42EF-B19F-E2613125EC22"
-			Location="local" Win64="yes"> <File
-				Id="_64_ConfigSchema" Name="ModSecurity.xml"
-				Source="ModSecurity.xml" /> </Component>
-			</DirectoryRef> <?else ?> <DirectoryRef Id="inetsrv32">
-			<Component Id="ModSec32" DiskId="1"
-				Guid="514A81F0-2413-42EF-B19F-E2613125ECE1"
-				Win64="no" Location="local"> <File
-					Id="_32_LIBAPR_1" Name="libapr-1.dll"
-					Source="Release\x86\libapr-1.dll" />
-				<File Id="_32_LIBAPRICONV_1"
-					Name="libapriconv-1.dll"
-					Source="Release\x86\libapriconv-1.dll"
-					/> <File Id="_32_LIBAPRUTIL_1"
-					Name="libaprutil-1.dll"
-					Source="Release\x86\libaprutil-1.dll"
-					/> <File Id="_32_LIBCURL"
-					Name="libcurl.dll"
-					Source="Release\x86\libcurl.dll" />
-				<File Id="_32_LIBXML2" Name="libxml2.dll"
-					Source="Release\x86\libxml2.dll" />
-				<File Id="_32_LUA5.1" Name="lua5.1.dll"
-					Source="Release\x86\lua5.1.dll" />
-				<File Id="_32_YAJL" Name="yajl.dll"
-					Source="Release\x86\yajl.dll" /> <File
-					Id="_32_MLOGC" Name="mlogc.exe"
-					Source="Release\x86\mlogc.exe" /> <File
-					Id="_32_MODSECURITYIIS"
-					Name="ModSecurityIIS.dll"
-					Source="Release\x86\ModSecurityIIS.dll"
-					/> <File Id="_32_PCRE" Name="pcre.dll"
-					Source="Release\x86\pcre.dll" /> <File
-					Id="_32_ZLIB1" Name="zlib1.dll"
-					Source="Release\x86\zlib1.dll" /> <File
-					Id="_32_FUZZY" Name="fuzzy.dll"
-					Source="Release\x86\fuzzy.dll" />
-                <util:EventSource Name="ModSecurity" Log="Application" 
-                    EventMessageFile="[inetsrv32]ModSecurityIIS.dll" 
-                    KeyPath="yes" />
-			</Component> </DirectoryRef> <DirectoryRef
-			Id="SystemFolderConfigSchema32"> <Component
-				Id="ConfigSchema32"
-				Guid="514A81F0-2413-42EF-B19F-E2613125EC11"
-				Location="local" Win64="no"> <File
-					Id="_32_ConfigSchema"
-					Name="ModSecurity.xml"
-					Source="ModSecurity.xml" />
-		</Component> </DirectoryRef> <?endif ?> <Feature
-		Id="DefaultFeature" Title="ModSecurity IIS Common files"
-		Level="1" InstallDefault="local" Absent="disallow"
-		Display="expand" AllowAdvertise="no" Description="Configuration
-		and common files"> <ComponentRef Id="ModSecCommon" />
-		<ComponentRef Id="ConfigSchema32" /> <?if $(var.Win64) = "yes"
-		?> <ComponentRef Id="ConfigSchema64" /> <?endif ?>
-		<ComponentRef Id="StartMenuShortcuts" />
-	    <!--
-	    <Feature Id="OWASP_ModSecurity_CRS_v3.0.2" Level="1" Title="OWASP
-	    ModSecurity CRS v3.0.2" InstallDefault="local" Display="expand"
-	    AllowAdvertise="no" Description="Install OWASP CRS v3.0.2">
-	    <ComponentRef Id="OWASP_CRS_V_3_0_2" /> <ComponentRef
-	    Id="OWASP_CRS_V_3_0_2_SETUP" />
-		    
-                <ComponentRef Id="ID_NUMBERING" />
-                <ComponentRef Id="README" />
-                <ComponentRef Id="RULES" />
-                <ComponentRef Id="UTIL" />
-                <ComponentRef Id="RUNAV" />
-                <ComponentRef Id="RUNAV_RUNAV" />
-                <ComponentRef Id="BROWSER_TOOLS" />
-                <ComponentRef Id="DEBUG" />
-                <ComponentRef Id="GEO_LOCATION" />
-                <ComponentRef Id="INTEGRATION" />
-                <ComponentRef Id="JOIN_MULTILINE_RULES" />
-                <ComponentRef Id="REGEXP_ASSEMBLE" />
-                <ComponentRef Id="HONEYPOT_SENSOR" />
-                <ComponentRef Id="REGRESSION_TESTS" />
-                <ComponentRef Id="VIRTUAL_PATCHING" />
-            </Feature>
-	-->
-	</Feature>
+        <!-- 12. Installation files and IIS configuration -->
+        <DirectoryRef Id="INSTALLFOLDER">
+            <Component Id="ModSecCommon" DiskId="1" Guid="980270DF-81AB-469B-AB0E-64FA3BA160B6" Location="local">
+                <File Id="README.TXT" Name="README.TXT" Source="wix\README.TXT" />
+                <File Id="EULA.RTF" Name="EULA.rtf" Source="wix\EULA.rtf" />
+                <File Id="modsecurity.conf" Name="modsecurity.conf" Source="wix\modsecurity.conf" />
+                <File Id="modsecurity_iis.conf" Name="modsecurity_iis.conf" Source="wix\modsecurity_iis.conf" />
+                <File Id="unicode.mapping" Name="unicode.mapping" Source="wix\unicode.mapping" />
+                <File Id="LIST_DEPENDENCIES.BAT" Name="list_dependencies.bat" Source="wix\list_dependencies.bat" />
+                <File Id="ModSecurity.xml" Name="ModSecurity.xml" Source="ModSecurity.xml" />
+                <!-- Modify ApplicationHost.config -->
+                <util:XmlConfig Id="appHostEntry" File="$(var.ConfigFile)" Action="create" ElementPath="//configuration/configSections/sectionGroup[\[]@name='system.webServer'[\]]" VerifyPath="section[\[]@name='ModSecurity'[\]]" Name="section" Node="element" Sequence="1" On="install" />
+                <util:XmlConfig Id="appHostEntryName" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="name" Value="ModSecurity" Sequence="2" />
+                <util:XmlConfig Id="appHostEntryOverrideMode" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="overrideModeDefault" Value="Allow" Sequence="3" />
+                <util:XmlConfig Id="appHostEntryAllowDefinition" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="allowDefinition" Value="Everywhere" Sequence="4" />
+                <util:XmlConfig Id="removeAppHostEntry" File="$(var.ConfigFile)" Action="delete" ElementPath="/configuration/configSections/sectionGroup[\[]@name='system.webServer'[\]]" Node="element" VerifyPath="section[\[]@name='ModSecurity'[\]]" On="uninstall" Sequence="1" />
+                <util:XmlConfig Id="removeAppHostEntry2" File="$(var.ConfigFile)" Action="delete" ElementPath="/configuration/system.webServer" Node="element" VerifyPath="/configuration/system.webServer/ModSecurity" Name="section" On="uninstall" Sequence="2" />
+                <RegistryKey Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity" Action="createAndRemoveOnUninstall">
+                    <RegistryValue Type="string" Name="ModSecurityConfigureIIS" Value="[IIS_SETUP]" KeyPath="yes" />
+                </RegistryKey>
+            </Component>
+        </DirectoryRef>
+        <DirectoryRef Id="inetsrv64">
+            <Component Id="ModSec64" DiskId="1" Guid="514A81F0-2413-42EF-B19F-E2613125ECE0" Win64="yes" Location="local">
+                <util:EventSource Name="ModSecurity" Log="Application" EventMessageFile="[inetsrv64]ModSecurityIIS.dll" KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+        <DirectoryRef Id="inetsrv32">
+            <Component Id="ModSec32" DiskId="1" Guid="514A81F0-2413-42EF-B19F-E2613125ECE1" Win64="no" Location="local">
+                <util:EventSource Name="ModSecurity" Log="Application" EventMessageFile="[inetsrv32]ModSecurityIIS.dll" KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+        <DirectoryRef Id="SystemFolderConfigSchema32">
+            <Component Id="ConfigSchema32" Guid="514A81F0-2413-42EF-B19F-E2613125EC11" Location="local" Win64="no">
+                <File Id="_32_ConfigSchema" Name="ModSecurity.xml" Source="ModSecurity.xml" />
+            </Component>
+        </DirectoryRef>
+        <DirectoryRef Id="SystemFolderConfigSchema64">
+            <Component Id="ConfigSchema64" Guid="514A81F0-2413-42EF-B19F-E2613125EC22" Location="local" Win64="yes">
+                <File Id="_64_ConfigSchema" Name="ModSecurity.xml" Source="ModSecurity.xml" />
+            </Component>
+        </DirectoryRef>
+        <!-- 14. Features define default installation features, including common ModSecurity files and configuration Schema. -->
+        <Feature Id="DefaultFeature" Title="ModSecurity IIS Common files" Level="1" InstallDefault="local" Absent="disallow" Display="expand" AllowAdvertise="no" Description="Configuration
+		and common files">
+            <ComponentRef Id="ModSecCommon" />
+            <ComponentRef Id="ConfigSchema32" />
+            <?if $(var.Win64) = "yes"
+		?>
+            <ComponentRef Id="ConfigSchema64" />
+            <?endif?>
+            <ComponentRef Id="StartMenuShortcuts" />
+        </Feature>
         <Feature Id="VCRedist" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
             <?if $(var.Win64) = "yes" ?>
             <MergeRef Id="VCRedist110_64" />
             <MergeRef Id="VCRedist120_64" />
             <MergeRef Id="VCRedist110_32" />
             <MergeRef Id="VCRedist120_32" />
-            <?else ?>
+            <?else?>
             <MergeRef Id="VCRedist110_32" />
             <MergeRef Id="VCRedist120_32" />
-            <?endif ?>
+            <?endif?>
         </Feature>
         <?if $(var.Win64) = "yes" ?>
         <Feature Id="ModSec64" Title="ModSecurity IIS (64 bits)" Level="1" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="This option will install ModSecurityIIS 64bits with all the necessary dependencies.">
             <ComponentRef Id="ModSec64" />
+            <ComponentGroupRef Id="ModSec64Components" />
         </Feature>
         <Feature Id="ModSec32" Title="ModSecurity IIS (32 bits)" Level="1" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="ModSecurityIIS 32bits with all the necessary dependencies. Application pools can be configured to run into 32bits mode even in a 64bits Windows. It is safe to keep both versions of ModSecurity (32 and 64bits) installed.">
             <ComponentRef Id="ModSec32" />
+            <ComponentGroupRef Id="ModSec32Components" />
         </Feature>
-        <?else ?>
+        <?else?>
         <Feature Id="ModSec32" Title="ModSecurity IIS (32 bits)" Level="1" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="This option will install ModSecurityIIS 32bits with all the necessary dependencies.">
             <ComponentRef Id="ModSec32" />
+            <ComponentGroupRef Id="ModSec32Components" />
         </Feature>
-        <?endif ?>
+        <?endif?>
         <UI Id="WixUI_FeatureTreeCustom">
             <Dialog Id="CustomizeDlgModSec" Width="370" Height="270" Title="!(loc.CustomizeDlg_Title)" TrackDiskSpace="yes">
                 <Control Id="Tree" Type="SelectionTree" X="25" Y="85" Width="175" Height="115" Property="_BrowseProperty" Sunken="yes" TabSkip="no" Text="!(loc.CustomizeDlgTree)">
                     <?if $(var.Win64) = "yes" ?>
                     <Publish Property="DisableButton" Value="1">(NOT &amp;ModSec64=3) AND (NOT &amp;ModSec32=3)</Publish>
                     <Publish Property="DisableButton" Value="0">&amp;ModSec64=3 OR &amp;ModSec32=3</Publish>
-                    <?else ?>
+                    <?else?>
                     <Publish Property="DisableButton" Value="1">(NOT &amp;ModSec32=3)</Publish>
                     <Publish Property="DisableButton" Value="0">&amp;ModSec32=3</Publish>
-                    <?endif ?>
+                    <?endif?>
                 </Control>
                 <Control Id="Browse" Type="PushButton" X="294" Y="210" Width="66" Height="17" Text="!(loc.CustomizeDlgBrowse)">
                     <Publish Event="SelectionBrowse" Value="BrowseDlg">1</Publish>
@@ -649,9 +330,9 @@
             <?if $(var.Win64) = "yes" ?>
             <Publish Dialog="CustomizeDlgModSec" Control="Next" Event="NewDialog" Value="RegisterDlg">&amp;ModSec64=3 OR &amp;ModSec32=3</Publish>
             <Publish Dialog="CustomizeDlgModSec" Control="Next" Event="NewDialog" Value="CustomizeDlgModSec">(NOT &amp;ModSec64=3) AND (NOT &amp;ModSec32=3)</Publish>
-            <?else ?>
+            <?else?>
             <Publish Dialog="CustomizeDlgModSec" Control="Next" Event="NewDialog" Value="RegisterDlg">&amp;ModSec32=3</Publish>
-            <?endif ?>
+            <?endif?>
             <Publish Dialog="RegisterDlg" Control="Back" Event="NewDialog" Value="CustomizeDlgModSec" Order="1">NOT Installed OR WixUI_InstallMode = "Change"</Publish>
             <Publish Dialog="RegisterDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">NOT Installed OR WixUI_InstallMode = "Change"</Publish>
             <Publish Dialog="RegisterDlg" Control="Next" Event="NewDialog" Value="WelcomeDlg" Order="3">Installed AND PATCH</Publish>
@@ -686,12 +367,12 @@
             <Custom Action="UninstallConf" Before="RemoveFiles"><![CDATA[Installed AND IIS_SETUP]]></Custom>
             <Custom Action="UninstallModule32" Before="UninstallConf"><![CDATA[Installed AND IIS_SETUP]]></Custom>
             <Custom Action="UninstallModule64" Before="UninstallModule32"><![CDATA[Installed AND IIS_SETUP]]></Custom>
-            <?else ?>
+            <?else?>
             <Custom Action="InstallModule32" Before="InstallFinalize"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallConf" After="InstallModule32"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="UninstallConf" Before="RemoveFiles"><![CDATA[Installed AND IIS_SETUP]]></Custom>
             <Custom Action="UninstallModule32" After="UninstallConf"><![CDATA[Installed AND IIS_SETUP]]></Custom>
-            <?endif ?>
+            <?endif?>
         </InstallExecuteSequence>
         <!-- Cleanup: older versions left some settings behind. This is needed to remove -->
         <!--          that old stuff before install this brand new version of ModSecurity. -->
@@ -701,45 +382,45 @@
         <CustomAction Id="Cleanup3" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (64bits)&quot;" />
         <CustomAction Id="Cleanup4" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS&quot;" />
         <CustomAction Id="Cleanup5" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurityIIS&quot;" />
-        <?else ?>
+        <?else?>
         <CustomAction Id="Cleanup1" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
         <CustomAction Id="Cleanup2" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (32bits)&quot;" />
         <CustomAction Id="Cleanup3" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (64bits)&quot;" />
         <CustomAction Id="Cleanup4" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS&quot;" />
         <CustomAction Id="Cleanup5" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurityIIS&quot;" />
-        <?endif ?>
+        <?endif?>
         <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (64bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness64&quot;" />
         <CustomAction Id="InstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness32&quot;" />
-        <?else ?>
+        <?else?>
         <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot;" />
-        <?endif ?>
+        <?endif?>
         <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="UninstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (32bits)&quot;" />
         <CustomAction Id="UninstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (64bits)&quot;" />
-        <?else ?>
+        <?else?>
         <CustomAction Id="UninstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (32bits)&quot;" />
-        <?endif ?>
+        <?endif?>
         <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="InstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; set config /section:&quot;system.webServer/ModSecurity&quot; /&quot;enabled:true&quot; /&quot;configFile:[INSTALLFOLDER]modsecurity_iis.conf&quot;" />
-        <?else ?>
+        <?else?>
         <CustomAction Id="InstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; set config /section:&quot;system.webServer/ModSecurity&quot; /&quot;enabled:true&quot; /&quot;configFile:[INSTALLFOLDER]modsecurity_iis.conf&quot;" />
-        <?endif ?>
+        <?endif?>
         <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="UninstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
-        <?else ?>
+        <?else?>
         <CustomAction Id="UninstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
-        <?endif ?>
+        <?endif?>
         <DirectoryRef Id="TARGETDIR">
             <?if $(var.Win64) = "yes" ?>
             <Merge Id="VCRedist120_64" SourceFile="wix\Microsoft_VC120_CRT_x64.msm" DiskId="1" Language="0" />
             <Merge Id="VCRedist110_64" SourceFile="wix\Microsoft_VC110_CRT_x64.msm" DiskId="1" Language="0" />
             <Merge Id="VCRedist120_32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
             <Merge Id="VCRedist110_32" SourceFile="wix\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0" />
-            <?else ?>
+            <?else?>
             <Merge Id="VCRedist120_32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
             <Merge Id="VCRedist110_32" SourceFile="wix\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0" />
-            <?endif ?>
+            <?endif?>
         </DirectoryRef>
     </Product>
 </Wix>
