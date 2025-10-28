@@ -20,7 +20,7 @@ typedef struct xml_data xml_data;
 #include "modsecurity.h"
 #include <libxml/xmlschemas.h>
 #include <libxml/xpath.h>
-#include <libxml/SAX.h>
+#include <libxml/SAX2.h>
 
 /* Structures */
 
