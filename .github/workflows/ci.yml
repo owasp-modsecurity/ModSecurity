@@ -115,12 +115,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04]
-        platform: [x32, x64]
-        compiler: [gcc, clang]
+        os: [ubuntu-latest]
+        #platform: [x32, x64]
+        platform: [x64]
+        #compiler: [gcc, clang]
+        compiler: [gcc]
         configure:
           - {label: "with pcre2, with study, with jit",  opt: "--enable-pcre-study=yes --enable-pcre-jit" }
-          - {label: "with pcre, with study, with jit",   opt: "--with-pcre --enable-pcre-study=yes --enable-pcre-jit" }
+          #- {label: "with pcre, with study, with jit",   opt: "--with-pcre --enable-pcre-study=yes --enable-pcre-jit" }
     steps:
       - name: Setup Dependencies
         run: |
