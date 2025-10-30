@@ -125,7 +125,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl
+          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl ssdeep libfuzzy-dev libfuzzy2
       - uses: actions/checkout@v2
       - name: autogen.sh
         run: ./autogen.sh
