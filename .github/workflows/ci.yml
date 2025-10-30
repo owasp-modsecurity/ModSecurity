@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
         platform: [x32, x64]
         compiler: [gcc, clang]
         configure:
@@ -27,7 +27,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev pkg-config libyajl-dev apache2 apache2-bin apache2-data
+          sudo apt-get install -y apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data
       - uses: actions/checkout@v2
       - name: autogen.sh
         run: ./autogen.sh
@@ -79,7 +79,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
         platform: [x32, x64]
         compiler: [gcc, clang]
         configure:
@@ -97,7 +97,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev pkg-config libyajl-dev apache2 apache2-bin apache2-data
+          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data
       - uses: actions/checkout@v2
       - name: autogen.sh
         run: ./autogen.sh
@@ -115,7 +115,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
         #platform: [x32, x64]
         platform: [x64]
         #compiler: [gcc, clang]
@@ -127,7 +127,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl ssdeep libfuzzy-dev libfuzzy2
+          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl ssdeep libfuzzy-dev libfuzzy2
       - uses: actions/checkout@v2
       - name: autogen.sh
         run: ./autogen.sh
