@@ -1091,14 +1091,22 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         msr_log(msr, 4, "inject_hashed_response_body: Detected encoding type [%s].",
                 encoding ? encoding : "(none)");
 
-    if (handler == NULL)
+    if (handler == NULL) {
         handler = xmlFindCharEncodingHandler("UTF-8");
-    if (handler == NULL)
+        encoding = apr_pstrdup(msr->mp, "UTF-8");
+    }
+    if (handler == NULL) {
         handler = xmlFindCharEncodingHandler("ISO-8859-1");
-    if (handler == NULL)
+        encoding = apr_pstrdup(msr->mp, "ISO-8859-1");
+    }
+    if (handler == NULL) {
         handler = xmlFindCharEncodingHandler("HTML");
-    if (handler == NULL)
+        encoding = apr_pstrdup(msr->mp, "HTML");
+    }
+    if (handler == NULL) {
         handler = xmlFindCharEncodingHandler("ascii");
+        encoding = apr_pstrdup(msr->mp, "ascii");
+    }
 
     if(handler == NULL) {
         xmlFreeDoc(msr->crypto_html_tree);
@@ -1106,11 +1114,11 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
     }
 
     apr_table_unset(msr->r->headers_out,"Content-Type");
-    new_ct = (char*)apr_psprintf(msr->mp, "text/html;%s",handler->name);
+    new_ct = (char*)apr_psprintf(msr->mp, "text/html;%s",encoding);
     apr_table_set(msr->r->err_headers_out,"Content-Type",new_ct);
 
     if (msr->txcfg->debuglog_level >= 4)
-        msr_log(msr, 4, "inject_hashed_response_body: Using content-type [%s].", handler->name);
+        msr_log(msr, 4, "inject_hashed_response_body: Using content-type [%s].", encoding);
 
     output_buf = xmlAllocOutputBuffer(handler);
     if (output_buf == NULL) {
