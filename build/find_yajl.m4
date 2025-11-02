@@ -89,10 +89,14 @@ else
                 yajl_lib_path="${x}/"
                 yajl_lib_name="yajl"
                 break
-            else
+           elif test -e "${x}/lib/libyajl.${y}"; then
+                yajl_lib_path="${x}/lib/"
+                yajl_lib_name="yajl"
+                break
+           else
                 yajl_lib_path=""
                 yajl_lib_name=""
-            fi
+           fi
         done
         if test -n "$yajl_lib_path"; then
             break
