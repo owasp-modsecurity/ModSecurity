@@ -474,8 +474,6 @@ sub match_log {
             #dbg("Match \"$re\" in $name \"$$rbuf\" ($n)");
             if ($$rbuf =~ m/$re/m) {
                 $rc = $&;
-                # clear buffer
-                $$rbuf =~ s/.*$re//sm;
                 last;
             }
             unless ($nbytes == $BUFSIZ) {
