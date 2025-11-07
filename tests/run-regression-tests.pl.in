@@ -536,7 +536,8 @@ sub dbg {
     my $out = join "", map {
         (ref $_ ne "" ? Dumper($_) : $_)
     } @_;
-    $out =~ s/^/DBG: /mg;
+    my $t = gettimeofday;
+    $out =~ s/^/DBG\[$t\]: /mg;
     print STDOUT "$out\n";
 }
 
