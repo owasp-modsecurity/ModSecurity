@@ -139,4 +139,4 @@ jobs:
       - name: install module
         run: sudo make install
       - name: run regression tests
-        run: make test-regression
+        run: cd tests; time for f in `find regression/ -maxdepth 2 -mindepth 2 -name "*.t" | tr "\012" " "`; do time ./run-regression-tests.pl -S . ${f}; done
