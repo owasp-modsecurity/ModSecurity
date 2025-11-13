@@ -1622,7 +1622,7 @@ std::string Transaction::toJSON(int parts) {
 
         m_variableRequestHeaders.resolve(&l);
         for (auto &h : l) {
-            LOGFY_ADD(h->getKey().c_str(), h->getValue());
+            LOGFY_ADD(utils::string::toHexIfNeeded(h->getKey().c_str()).c_str(), utils::string::toHexIfNeeded(h->getValue()));
             delete h;
         }
 
