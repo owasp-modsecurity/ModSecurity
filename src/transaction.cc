@@ -1610,7 +1610,7 @@ std::string Transaction::toJSON(int parts) {
 
     if (parts & audit_log::AuditLog::CAuditLogPart) {
         // FIXME: check for the binary content size.
-        LOGFY_ADD("body", this->m_requestBody.str());
+        LOGFY_ADD("body", utils::string::toHexIfNeeded(this->m_requestBody.str()));
     }
 
     /* request headers */
@@ -1622,7 +1622,7 @@ std::string Transaction::toJSON(int parts) {
 
         m_variableRequestHeaders.resolve(&l);
         for (auto &h : l) {
-            LOGFY_ADD(h->getKey().c_str(), h->getValue());
+            LOGFY_ADD(utils::string::toHexIfNeeded(h->getKey().c_str()).c_str(), utils::string::toHexIfNeeded(h->getValue()));
             delete h;
         }
 
@@ -1712,7 +1712,7 @@ std::string Transaction::toJSON(int parts) {
             LOGFY_ADD("ruleId", std::to_string(a.m_rule.m_ruleId));
             LOGFY_ADD("file", a.m_rule.getFileName());
             LOGFY_ADD("lineNumber", std::to_string(a.m_rule.getLineNumber()));
-            LOGFY_ADD("data", a.m_data);
+            LOGFY_ADD("data", utils::string::toHexIfNeeded(a.m_data));
             LOGFY_ADD("severity", std::to_string(a.m_severity));
             LOGFY_ADD("ver", a.m_rule.m_ver);
             LOGFY_ADD("rev", a.m_rule.m_rev);
