@@ -195,7 +195,7 @@ bool RulesExceptions::contains(int a) {
         }
     }
 
-    for (auto z : m_ranges) {
+    for (auto& z : m_ranges) {
         if (z.first <= a && z.second >= a) {
             return true;
         }
@@ -212,7 +212,7 @@ bool RulesExceptions::merge(RulesExceptions *from) {
             return ret;
         }
     }
-    for (auto b : from->m_ranges) {
+    for (auto& b : from->m_ranges) {
         bool ret = addRange(b.first, b.second);
         if (ret == false) {
             return ret;

@@ -1700,7 +1700,7 @@ std::string Transaction::toJSON(int parts) {
             reinterpret_cast<const unsigned char*>("messages"),
             strlen("messages"));
         yajl_gen_array_open(g);
-        for (auto a : m_rulesMessages) {
+        for (auto& a : m_rulesMessages) {
             yajl_gen_map_open(g);
             LOGFY_ADD("message", a.m_message);
             yajl_gen_string(g,
@@ -1721,7 +1721,7 @@ std::string Transaction::toJSON(int parts) {
                 reinterpret_cast<const unsigned char*>("tags"),
                 strlen("tags"));
             yajl_gen_array_open(g);
-            for (auto b : a.m_tags) {
+            for (auto& b : a.m_tags) {
                 yajl_gen_string(g,
                     reinterpret_cast<const unsigned char*>(b.data()),
                     b.length());
