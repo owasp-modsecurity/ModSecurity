@@ -188,7 +188,7 @@ Transaction::~Transaction() {
  *
  * Debug logs are important during the rules creation phase, this method can be
  * used to print message on this debug log.
- * 
+ *
  * @param level Debug level, current supported from 0 to 9.
  * @param message Message to be logged.
  *
@@ -665,7 +665,7 @@ int Transaction::addRequestHeader(const unsigned char *key, size_t key_n,
  * @note It is necessary to "append" the request body prior to the execution
  *       of this function.
  * @note Remember to check for a possible intervention.
- * 
+ *
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
  * @retval false Operation failed.
@@ -685,11 +685,11 @@ int Transaction::processRequestBody() {
 
     /*
      * Process the request body even if there is nothing to be done.
-     * 
+     *
      * if (m_requestBody.tellp() <= 0) {
      *     return true;
      * }
-     * 
+     *
      */
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
@@ -878,7 +878,7 @@ int Transaction::processRequestBody() {
  *
  * With this method it is possible to feed ModSecurity with data for
  * inspection regarding the request body. There are two possibilities here:
- * 
+ *
  * 1 - Adds the buffer in a row;
  * 2 - Adds it in chunks;
  *
@@ -983,7 +983,7 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
  *
  * @param code The returned http code.
  * @param proto Protocol used on the response.
- * 
+ *
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
  * @retval false Operation failed.
@@ -1079,7 +1079,7 @@ int Transaction::addResponseHeader(const unsigned char *key,
  * @param key_n   header name size.
  * @param value   header value.
  * @param value_n header value size.
- * 
+ *
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
  * @retval false Operation failed.
@@ -1164,7 +1164,7 @@ int Transaction::processResponseBody() {
  * With this method it is possible to feed ModSecurity with data for
  * inspection regarding the response body. ModSecurity can also update the
  * contents of the response body, this is not quite ready yet on this version
- * of the API. 
+ * of the API.
  *
  * @note If the content is updated, the client cannot receive the content
  *       length header filled, at least not with the old values. Otherwise
@@ -1312,7 +1312,7 @@ int Transaction::processLogging() {
     this->m_rules->evaluate(modsecurity::LoggingPhase, this);
 
     /* If relevant, save this transaction information at the audit_logs */
-    if (m_rules != NULL && m_rules->m_auditLog != NULL) {
+    if (m_rules->m_auditLog != NULL) {
         int parts = this->m_rules->m_auditLog->getParts();
         ms_dbg(8, "Checking if this request is suitable to be " \
             "saved as an audit log.");
@@ -1352,7 +1352,7 @@ int Transaction::processLogging() {
  * @brief   Check if ModSecurity has anything to ask to the server.
  *
  * Intervention can generate a log event and/or perform a disruptive action.
- * 
+ *
  * If the return value is true, all fields in the ModSecurityIntervention
  * parameter have been initialized and are safe to access.
  * If the return value is false, no changes to the ModSecurityIntervention
@@ -1801,7 +1801,7 @@ int Transaction::updateStatusCode(int code) {
  *
  * The transaction is the unit that will be used the inspect every request. It holds
  * all the information for a given request.
- * 
+ *
  * @note Remember to cleanup the transaction when the transaction is complete.
  *
  * @param ms ModSecurity core pointer.
@@ -1913,7 +1913,7 @@ extern "C" int msc_process_request_headers(Transaction *transaction) {
  * @note Remember to check for a possible intervention.
  *
  * @param transaction ModSecurity transaction.
- * 
+ *
  * @returns If the operation was successful or not.
  * @retval 1 Operation was successful.
  * @retval 0 Operation failed.
@@ -1930,7 +1930,7 @@ extern "C" int msc_process_request_body(Transaction *transaction) {
  *
  * With this function it is possible to feed ModSecurity with data for
  * inspection regarding the request body. There are two possibilities here:
- * 
+ *
  * 1 - Adds the buffer in a row;
  * 2 - Adds it in chunks;
  *
@@ -1944,7 +1944,7 @@ extern "C" int msc_process_request_body(Transaction *transaction) {
  *       in this case is upon the rules.
  *
  * @param transaction ModSecurity transaction.
- * 
+ *
  * @returns If the operation was successful or not.
  * @retval 1 Operation was successful.
  * @retval 0 Operation failed.
@@ -2015,7 +2015,7 @@ extern "C" int msc_process_response_body(Transaction *transaction) {
  * With this function it is possible to feed ModSecurity with data for
  * inspection regarding the response body. ModSecurity can also update the
  * contents of the response body, this is not quite ready yet on this version
- * of the API. 
+ * of the API.
  *
  * @note If the content is updated, the client cannot receive the content
  *       length header filled, at least not with the old values. Otherwise
@@ -2122,7 +2122,7 @@ extern "C" int msc_add_response_header(Transaction *transaction,
  * @param key_len header name size.
  * @param value   header value.
  * @param val_len header value size.
- * 
+ *
  * @returns If the operation was successful or not.
  * @retval 1 Operation was successful.
  * @retval 0 Operation failed.
