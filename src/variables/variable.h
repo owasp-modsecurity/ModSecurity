@@ -155,7 +155,7 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
     }
 
     bool toOmit(std::string a) {
-        for (auto &z : *this) {
+        for (const auto& z : *this) {
             if (z->match(a)) {
                 return true;
             }

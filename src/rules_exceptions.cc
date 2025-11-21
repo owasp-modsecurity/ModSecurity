@@ -195,7 +195,7 @@ bool RulesExceptions::contains(int a) {
         }
     }
 
-    for (auto& z : m_ranges) {
+    for (const auto& z : m_ranges) {
         if (z.first <= a && z.second >= a) {
             return true;
         }
@@ -212,42 +212,42 @@ bool RulesExceptions::merge(RulesExceptions *from) {
             return ret;
         }
     }
-    for (auto& b : from->m_ranges) {
+    for (const auto& b : from->m_ranges) {
         bool ret = addRange(b.first, b.second);
         if (ret == false) {
             return ret;
         }
     }
 
-    for (auto &p : from->m_variable_update_target_by_tag) {
+    for (const auto &p : from->m_variable_update_target_by_tag) {
         m_variable_update_target_by_tag.emplace(
             std::pair<std::shared_ptr<std::string>,
             std::shared_ptr<variables::Variable>>(p.first,
                 p.second));
     }
 
-    for (auto &p : from->m_variable_update_target_by_msg) {
+    for (const auto &p : from->m_variable_update_target_by_msg) {
         m_variable_update_target_by_msg.emplace(
             std::pair<std::shared_ptr<std::string>,
             std::shared_ptr<variables::Variable>>(p.first,
                 p.second));
     }
 
-    for (auto &p : from->m_variable_update_target_by_id) {
+    for (const auto &p : from->m_variable_update_target_by_id) {
         m_variable_update_target_by_id.emplace(
             std::pair<double,
                 std::shared_ptr<variables::Variable>>(p.first,
                     p.second));
     }
 
-    for (auto &p : from->m_action_pos_update_target_by_id) {
+    for (const auto &p : from->m_action_pos_update_target_by_id) {
         m_action_pos_update_target_by_id.emplace(
             std::pair<double,
                 std::shared_ptr<actions::Action>>(p.first,
                     p.second));
     }
 
-    for (auto &p : from->m_action_pre_update_target_by_id) {
+    for (const auto &p : from->m_action_pre_update_target_by_id) {
         m_action_pre_update_target_by_id.emplace(
             std::pair<double,
                 std::shared_ptr<actions::Action>>(p.first,

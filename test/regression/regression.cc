@@ -115,7 +115,7 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
     const std::vector<std::unique_ptr<RegressionTest>> &tests,
     ModSecurityTestResults<RegressionTestResult> *res, int *count)
 {
-    for (auto &t : tests) {
+    for (const auto &t : tests) {
         ModSecurityTestResults<RegressionTest> r;
         RegressionTestResult *testRes = new RegressionTestResult();
 

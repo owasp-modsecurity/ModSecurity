@@ -249,9 +249,9 @@ int main(int argc, char **argv) {
         test.load_tests("test-cases/secrules-language-tests/transformations");
     }
 
-    for (auto& [filename, tests] : test) {
+    for (const auto& [filename, tests] : test) {
         total += tests.size();
-        for (auto &t : tests) {
+        for (const auto &t : tests) {
             ModSecurityTestResults<UnitTest> r;
 
             if (!test.m_automake_output) {
@@ -286,7 +286,7 @@ int main(int argc, char **argv) {
     if (!test.m_automake_output) {
         std::cout << "Total >> "  << total << std::endl;
 
-        for (const auto t : results) {
+        for (const auto& t : results) {
             std::cout << t->print() << std::endl;
         }
     }

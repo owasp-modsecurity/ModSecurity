@@ -297,7 +297,7 @@ int Lua::getvars(lua_State *L) {
     variables::Variable::stringMatchResolveMulti(t, varname, &l);
 
     lua_newtable(L);
-    for (auto* i : l) {
+    for (const auto *i : l) {
         lua_pushnumber(L, idx);
         lua_newtable(L);
 
