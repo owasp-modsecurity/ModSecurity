@@ -100,8 +100,8 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
         }
         if (it.url != nullptr) {
             r->location.append(it.url);
-	    free(it.url);
-	    it.url = nullptr;
+            free(it.url);
+            it.url = nullptr;
         }
         if (it.log != nullptr) {
             *serverLog << it.log;
@@ -294,7 +294,7 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
         actions(&r, &modsec_transaction, &context.m_server_log);
 
         modsec_transaction.appendRequestBody(
-            (unsigned char *)t->request_body.c_str(),
+            reinterpret_cast<const unsigned char*>(t->request_body.c_str()),
             t->request_body.size());
         modsec_transaction.processRequestBody();
         actions(&r, &modsec_transaction, &context.m_server_log);
@@ -309,7 +309,7 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
         actions(&r, &modsec_transaction, &context.m_server_log);
 
         modsec_transaction.appendResponseBody(
-            (unsigned char *)t->response_body.c_str(),
+            reinterpret_cast<const unsigned char*>(t->response_body.c_str()),
             t->response_body.size());
         modsec_transaction.processResponseBody();
         actions(&r, &modsec_transaction, &context.m_server_log);
