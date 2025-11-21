@@ -205,7 +205,7 @@ bool RulesExceptions::contains(int a) {
 }
 
 
-bool RulesExceptions::merge(RulesExceptions *from) {
+bool RulesExceptions::merge(const RulesExceptions *from) {
     for (int a : from->m_numbers) {
         bool ret = addNumber(a);
         if (ret == false) {
