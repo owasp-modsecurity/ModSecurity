@@ -61,7 +61,7 @@ struct OperatorTest {
     using ItemType = Operator;
 
     static ItemType* init(const UnitTest &t) {
-        auto op = Operator::instantiate(t.name, t.param);
+        auto *op = Operator::instantiate(t.name, t.param);
         assert(op != nullptr);
 
         std::string error;
@@ -86,7 +86,7 @@ struct TransformationTest {
     using ItemType = Transformation;
 
     static ItemType* init(const UnitTest &t) {
-        auto tfn = Transformation::instantiate("t:" + t.name);
+        auto *tfn = Transformation::instantiate("t:" + t.name);
         assert(tfn != nullptr);
 
         return tfn;
@@ -264,7 +264,7 @@ int main(int argc, char **argv) {
                 if (r.size() == 0) {
                     std::cout << KGRN << "0 tests failed.";
                 } else {
-                    for (const auto &i : r) {
+                    for (const auto *i : r) {
                         if (i->skipped == true) {
                             skp++;
                         }
