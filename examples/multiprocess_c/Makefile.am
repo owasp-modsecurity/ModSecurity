@@ -1,4 +1,4 @@
-
+MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
 
 noinst_PROGRAMS = multi
 
@@ -9,7 +9,8 @@ multi_LDADD = \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
 	$(MAXMIND_LDADD) \
-	$(GLOBAL_LDADD)
+	$(GLOBAL_LDADD) \
+	$(MBEDTLS_CRYPTO_LIB)
 
 multi_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
