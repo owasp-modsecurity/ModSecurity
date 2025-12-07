@@ -17,7 +17,7 @@ noinst_HEADERS = \
 	libinjection/src/libinjection_xss.h \
 	mbedtls/tf-psa-crypto/include/mbedtls/base64.h \
 	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/check_config.h \
-	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/mbedtls_config.h \
+	mbedtls/include/mbedtls/mbedtls_config.h \
 	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/md5.h \
 	mbedtls/tf-psa-crypto/include/mbedtls/platform.h \
 	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/sha1.h
