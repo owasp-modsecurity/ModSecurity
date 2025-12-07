@@ -77,8 +77,8 @@ fi
 AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git describe && cd ../..))
 AC_SUBST([LIBINJECTION_VERSION])
 
-# Check for Mbed TLS
-if ! test -f "${srcdir}/others/mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/src/base64.c"; then
+# Check for Mbed TLS 
+if ! test -f "${srcdir}/others/mbedtls/tf-psa-crypto/drivers/builtin/mbedtls/src/base64.c"; then
 AC_MSG_ERROR([\
 
 
