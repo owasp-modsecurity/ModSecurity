@@ -44,19 +44,20 @@ jobs:
                                   libmaxminddb-dev:${{ matrix.platform.arch }} \
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
-                                  bison flex \
-                                  libmbedtls-dev:${{ matrix.platform.arch }}
+                                  bison flex
       - name: Setup Dependencies (x32)
         if: ${{ matrix.platform.label == 'x32' }}
         run: |
           sudo apt-get install g++-multilib
           sudo apt-get install -y libxml2-dev:${{ matrix.platform.arch }} \
-                                  libpcre3-dev:${{ matrix.platform.arch }}
+                                  libpcre3-dev:${{ matrix.platform.arch }} \
+                                  libmbedtls-dev:${{ matrix.platform.arch }}
       - name: Setup Dependencies (x64)
         if: ${{ matrix.platform.label == 'x64' }}
         run: |
           sudo apt-get install -y libgeoip-dev:${{ matrix.platform.arch }} \
-                                  libfuzzy-dev:${{ matrix.platform.arch }}
+                                  libfuzzy-dev:${{ matrix.platform.arch }} \
+                                  libmbedtls-dev:${{ matrix.platform.arch }}
       - uses: actions/checkout@v6
         with:
           submodules: true
