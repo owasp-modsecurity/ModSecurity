@@ -50,8 +50,7 @@ jobs:
         run: |
           sudo apt-get install g++-multilib
           sudo apt-get install -y libxml2-dev:${{ matrix.platform.arch }} \
-                                  libpcre3-dev:${{ matrix.platform.arch }} \
-                                  libmbedtls-dev:${{ matrix.platform.arch }}
+                                  libpcre3-dev:${{ matrix.platform.arch }}
       - name: Setup Dependencies (x64)
         if: ${{ matrix.platform.label == 'x64' }}
         run: |
