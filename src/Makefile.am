@@ -345,5 +345,5 @@ libmodsecurity_la_LIBADD = \
 	$(PCRE2_LDADD) \
 	$(MAXMIND_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
-
+	$(YAJL_LDADD) \
+	-lmbedcrypto 
