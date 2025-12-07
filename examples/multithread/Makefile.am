@@ -5,6 +5,8 @@ noinst_PROGRAMS = multithread
 multithread_SOURCES = \
 	multithread.cc
 
+MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
+
 multithread_LDADD = \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
@@ -16,7 +18,8 @@ multithread_LDADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(MBEDTLS_CRYPTO_LIB
 
 multithread_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
