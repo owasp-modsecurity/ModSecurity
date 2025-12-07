@@ -44,7 +44,7 @@ jobs:
                                   libmaxminddb-dev:${{ matrix.platform.arch }} \
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
-                                  bison flex
+                                  bison flex \
                                   libmbedtls-dev:${{ matrix.platform.arch }}
       - name: Setup Dependencies (x32)
         if: ${{ matrix.platform.label == 'x32' }}
