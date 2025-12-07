@@ -23,10 +23,10 @@ noinst_HEADERS = \
 	mbedtls/include/mbedtls/sha1.h
 
 libmbedtls_la_SOURCES = \
-	mbedtls/library/base64.c \
-	mbedtls/library/md5.c \
-	mbedtls/library/sha1.c \
-	mbedtls/library/platform_util.c
+	mbedtls/tf-psa-crypto/drivers/builtin/src/base64.c \
+	mbedtls/tf-psa-crypto/drivers/builtin/src/md5.c \
+	mbedtls/tf-psa-crypto/drivers/builtin/src/sha1.c \
+	mbedtls/tf-psa-crypto/drivers/builtin/src/platform_util.c
 
 libmbedtls_la_CFLAGS = -DMBEDTLS_CONFIG_FILE=\"mbedtls/mbedtls_config.h\" -I$(top_srcdir)/others/mbedtls/include
 libmbedtls_la_CPPFLAGS =
