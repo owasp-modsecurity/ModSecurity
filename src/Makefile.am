@@ -13,6 +13,8 @@ libmodsecurity_ladir = $(prefix)/include
 libmodsecurity_includesub_collectiondir = $(pkgincludedir)/collection/
 libmodsecurity_includesub_actionsdir = $(pkgincludedir)/actions/
 
+MBEDTLS_CRYPTO_LIB = ../others/mbedtls/build/library/libmbedcrypto.a
+
 
 # pregenerated parser + parser sources
 EXTRA_DIST = \
