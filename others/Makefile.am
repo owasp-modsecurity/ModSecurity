@@ -15,11 +15,11 @@ noinst_HEADERS = \
 	libinjection/src/libinjection_sqli.h \
 	libinjection/src/libinjection_sqli_data.h \
 	libinjection/src/libinjection_xss.h \
-	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/base64.h \
+	mbedtls/tf-psa-crypto/include/mbedtls/base64.h \
 	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/check_config.h \
 	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/mbedtls_config.h \
 	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/md5.h \
-	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/platform.h \
+	mbedtls/tf-psa-crypto/include/mbedtls/platform.h \
 	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/sha1.h
 
 libmbedtls_la_SOURCES = \
