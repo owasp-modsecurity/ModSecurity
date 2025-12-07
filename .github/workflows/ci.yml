@@ -119,7 +119,6 @@ jobs:
                        lua \
                        libmaxminddb \
                        pcre2 \
-                       geoip \
                        ssdeep \
                        pcre \
                        bison \
