@@ -1,4 +1,4 @@
-
+MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
 
 noinst_PROGRAMS = read
 
@@ -16,7 +16,8 @@ read_LDADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(MBEDTLS_CRYPTO_LIB)
 
 read_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
