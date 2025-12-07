@@ -21,7 +21,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "mbedtls/include/mbedtls/tf-psa-crypto/include/mbedtls/base64.h"
+#include "mbedtls/base64.h"
 
 
 template<typename Operation>
