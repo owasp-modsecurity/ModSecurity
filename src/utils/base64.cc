@@ -10,7 +10,7 @@
  * If any of the files related to licensing are missing or if you have any
  * other questions related to licensing please contact Trustwave Holdings, Inc.
  * directly using the email address security@modsecurity.org.
- *
+ *#include "mbedtls/base64.h"
  */
 
 #include "src/utils/base64.h"
@@ -21,7 +21,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "mbedtls/base64.h"
+#include "mbedtls/include/mbedtls/tf-psa-crypto/include/mbedtls/base64.h"
+
 
 template<typename Operation>
 inline std::string base64Helper(const char *data, const unsigned int len, Operation op) { // cppcheck-suppress syntaxError ; false positive
