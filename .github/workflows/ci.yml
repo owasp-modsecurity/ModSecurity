@@ -45,6 +45,7 @@ jobs:
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
                                   bison flex
+                                  libmbedtls-dev:${{ matrix.platform.arch }}
       - name: Setup Dependencies (x32)
         if: ${{ matrix.platform.label == 'x32' }}
         run: |
@@ -81,6 +82,7 @@ jobs:
         env:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
+          LDFLAGS: "-lmbedcrypto"
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
 
       - uses: ammaraskar/gcc-problem-matcher@master
@@ -122,7 +124,8 @@ jobs:
                        ssdeep \
                        pcre \
                        bison \
-                       flex
+                       flex \
+                       mbedtls
       - uses: actions/checkout@v6
         with:
           submodules: true
