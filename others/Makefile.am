@@ -15,12 +15,12 @@ noinst_HEADERS = \
 	libinjection/src/libinjection_sqli.h \
 	libinjection/src/libinjection_sqli_data.h \
 	libinjection/src/libinjection_xss.h \
-	mbedtls/include/mbedtls/base64.h \
-	mbedtls/include/mbedtls/check_config.h \
-	mbedtls/include/mbedtls/mbedtls_config.h \
-	mbedtls/include/mbedtls/md5.h \
-	mbedtls/include/mbedtls/platform.h \
-	mbedtls/include/mbedtls/sha1.h
+	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/base64.h \
+	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/check_config.h \
+	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/mbedtls_config.h \
+	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/md5.h \
+	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/platform.h \
+	mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private/sha1.h
 
 libmbedtls_la_SOURCES = \
 	mbedtls/tf-psa-crypto/drivers/builtin/src/base64.c \
@@ -28,6 +28,6 @@ libmbedtls_la_SOURCES = \
 	mbedtls/tf-psa-crypto/drivers/builtin/src/sha1.c \
 	mbedtls/tf-psa-crypto/drivers/builtin/src/platform_util.c
 
-libmbedtls_la_CFLAGS = -DMBEDTLS_CONFIG_FILE=\"mbedtls/mbedtls_config.h\" -I$(top_srcdir)/others/mbedtls/include
+libmbedtls_la_CFLAGS = -DMBEDTLS_CONFIG_FILE=\"mbedtls/mbedtls_config.h\" -I$(top_srcdir)/others/mbedtls
 libmbedtls_la_CPPFLAGS =
 libmbedtls_la_LIBADD =
