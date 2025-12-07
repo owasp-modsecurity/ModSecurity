@@ -66,11 +66,23 @@ jobs:
           git submodule update --init --recursive --force
       - name: build.sh
         run: ./build.sh
+
+      - name: Debug mbedtls layout
+        run: |
+          pwd
+          echo "=== others ==="
+          ls -l others || echo "others fehlt"
+          echo "=== others/mbedtls ==="
+          ls -R others/mbedtls | head -n 200 || echo "others/mbedtls fehlt"
+          echo "=== Suche nach base64.c ==="
+          find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
+
       - name: configure
         env:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
+
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
         run: make -j `nproc`
@@ -132,8 +144,20 @@ jobs:
           make install
       - name: build.sh
         run: ./build.sh
+
+      - name: Debug mbedtls layout
+        run: |
+          pwd
+          echo "=== others ==="
+          ls -l others || echo "others fehlt"
+          echo "=== others/mbedtls ==="
+          ls -R others/mbedtls | head -n 200 || echo "others/mbedtls fehlt"
+          echo "=== Suche nach base64.c ==="
+          find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
+
       - name: configure
         run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes
+
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
         run: make -j `sysctl -n hw.logicalcpu`
@@ -194,10 +218,22 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
-      - name: configure
+      - name: build.sh
+        run: ./build.sh
+
+      - name: Debug mbedtls layout
         run: |
-          ./build.sh
-          ./configure
+          pwd
+          echo "=== others ==="
+          ls -l others || echo "others fehlt"
+          echo "=== others/mbedtls ==="
+          ls -R others/mbedtls | head -n 200 || echo "others/mbedtls fehlt"
+          echo "=== Suche nach base64.c ==="
+          find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
+
+      - name: configure
+        run: ./configure
+
       - name: cppcheck
         run: make check-static
 
@@ -221,9 +257,21 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
-      - name: configure
+      - name: build.sh
+        run: ./build.sh
+
+      - name: Debug mbedtls layout
         run: |
-          ./build.sh
-          ./configure
+          pwd
+          echo "=== others ==="
+          ls -l others || echo "others fehlt"
+          echo "=== others/mbedtls ==="
+          ls -R others/mbedtls | head -n 200 || echo "others/mbedtls fehlt"
+          echo "=== Suche nach base64.c ==="
+          find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
+
+      - name: configure
+        run: ./configure
+
       - name: cppcheck
         run: make check-static
