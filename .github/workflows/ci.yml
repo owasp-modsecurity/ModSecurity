@@ -40,7 +40,7 @@ jobs:
           sudo apt-get install -y libyajl-dev:${{ matrix.platform.arch }} \
                                   libcurl4-openssl-dev:${{ matrix.platform.arch }} \
                                   liblmdb-dev:${{ matrix.platform.arch }} \
-                                  liblua5.2-dev:${{ matrix.platform.arch }} \
+                                  liblua5.3-dev:${{ matrix.platform.arch }} \
                                   libmaxminddb-dev:${{ matrix.platform.arch }} \
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
