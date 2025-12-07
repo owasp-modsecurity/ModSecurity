@@ -17,8 +17,7 @@ modsec_rules_check_LDADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD) \
-	-lmbedcrypto 
+	$(YAJL_LDADD)
 
 modsec_rules_check_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
