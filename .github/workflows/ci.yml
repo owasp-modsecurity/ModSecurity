@@ -55,8 +55,7 @@ jobs:
         if: ${{ matrix.platform.label == 'x64' }}
         run: |
           sudo apt-get install -y libgeoip-dev:${{ matrix.platform.arch }} \
-                                  libfuzzy-dev:${{ matrix.platform.arch }} \
-                                  libmbedtls-dev:${{ matrix.platform.arch }}
+                                  libfuzzy-dev:${{ matrix.platform.arch }} 
       - uses: actions/checkout@v6
         with:
           submodules: true
