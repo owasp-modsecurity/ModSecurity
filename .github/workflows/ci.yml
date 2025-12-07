@@ -81,7 +81,6 @@ jobs:
         env:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
-          LDFLAGS: "-lmbedcrypto"
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
 
       - uses: ammaraskar/gcc-problem-matcher@master
