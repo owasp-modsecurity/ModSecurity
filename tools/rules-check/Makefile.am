@@ -5,6 +5,8 @@ bin_PROGRAMS = modsec-rules-check
 modsec_rules_check_SOURCES = \
         rules-check.cc
 
+MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
+
 modsec_rules_check_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.la \
 	$(CURL_LDADD) \
@@ -17,7 +19,8 @@ modsec_rules_check_LDADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(MBEDTLS_CRYPTO_LIB)
 
 modsec_rules_check_LDFLAGS = \
 	$(GEOIP_LDFLAGS) \
