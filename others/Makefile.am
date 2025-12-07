@@ -28,6 +28,6 @@ libmbedtls_la_SOURCES = \
 	mbedtls/tf-psa-crypto/drivers/builtin/src/sha1.c \
 	mbedtls/tf-psa-crypto/drivers/builtin/src/platform_util.c
 
-libmbedtls_la_CFLAGS = -DMBEDTLS_CONFIG_FILE=\"mbedtls/mbedtls_config.h\" -I$(top_srcdir)/others/mbedtls/include -I$(top_srcdir)/others/mbedtls/tf-psa-crypto/include
+libmbedtls_la_CFLAGS = -DMBEDTLS_CONFIG_FILE=\"mbedtls/mbedtls_config.h\" -I$(top_srcdir)/others/mbedtls/include -I$(top_srcdir)/others/mbedtls/tf-psa-crypto/include -I$(top_srcdir)/others/mbedtls/tf-psa-crypto/drivers/builtin/include
 libmbedtls_la_CPPFLAGS =
 libmbedtls_la_LIBADD =
