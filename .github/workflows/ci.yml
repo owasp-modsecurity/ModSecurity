@@ -104,7 +104,7 @@ jobs:
           brew install \
                        yajl \
                        lmdb \
-                       lua@5.2 \
+                       lua \
                        libmaxminddb \
                        pcre2 \
                        geoip \
