@@ -67,16 +67,6 @@ jobs:
       - name: build_on_linux.sh
         run: ./build_on_linux.sh
 
-      - name: Debug mbedtls layout
-        run: |
-          pwd
-          echo "=== others ==="
-          ls -l others || echo "others fehlt"
-          echo "=== others/mbedtls ==="
-          ls -R others/mbedtls | head -n 200 || echo "others/mbedtls fehlt"
-          echo "=== Suche nach base64.c ==="
-          find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
-
       - name: configure
         env:
           CC: ${{ matrix.compiler.cc }}
@@ -145,16 +135,6 @@ jobs:
         run: chmod +x build_on_macos.sh
       - name: build_on_macos.sh
         run: ./build_on_macos.sh
-
-      - name: Debug mbedtls layout
-        run: |
-          pwd
-          echo "=== others ==="
-          ls -l others || echo "others fehlt"
-          echo "=== others/mbedtls ==="
-          ls -R others/mbedtls | head -n 200 || echo "others/mbedtls fehlt"
-          echo "=== Suche nach base64.c ==="
-          find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
 
       - name: configure
         run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes --disable-dependency-tracking
@@ -228,15 +208,6 @@ jobs:
       - name: build_on_linux.sh
         run: ./build_on_linux.sh
 
-      - name: Debug mbedtls layout
-        run: |
-          pwd
-          echo "=== others ==="
-          ls -l others || echo "others fehlt"
-          echo "=== others/mbedtls ==="
-          ls -R others/mbedtls | head -n 200 || echo "others/mbedtls fehlt"
-          echo "=== Suche nach base64.c ==="
-          find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
 
       - name: configure
         run: ./configure --disable-dependency-tracking
@@ -268,16 +239,6 @@ jobs:
         run: chmod +x build_on_macos.sh
       - name: build_on_macos.sh
         run: ./build_on_macos.sh
-
-      - name: Debug mbedtls layout
-        run: |
-          pwd
-          echo "=== others ==="
-          ls -l others || echo "others fehlt"
-          echo "=== others/mbedtls ==="
-          ls -R others/mbedtls | head -n 200 || echo "others/mbedtls fehlt"
-          echo "=== Suche nach base64.c ==="
-          find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
 
       - name: configure
         run: ./configure --disable-dependency-tracking
