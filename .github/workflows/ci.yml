@@ -61,6 +61,9 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --force
 
+      - name: Build-Script ausführbar machen
+        run: chmod +x build_on_linux.sh
+
       - name: build_on_linux.sh
         run: ./build_on_linux.sh
 
@@ -128,19 +131,6 @@ jobs:
                       cmake \
                       mbedtls
 
-      - name: Setup Python venv with jinja2
-        run: |
-          python3 -m venv .venv
-          . .venv/bin/activate
-          pip install jinja2
-          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
-          echo "PATH=$PWD/.venv/bin:$PATH" >> $GITHUB_ENV
-          python - << 'EOF'
-          import sys, jinja2
-          print("Python:", sys.executable)
-          print("jinja2:", jinja2.__version__, "from", jinja2.__file__)
-          EOF
-
       - uses: actions/checkout@v6
         with:
           submodules: true
@@ -151,6 +141,8 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --force
 
+      - name: Build-Script ausführbar machen
+        run: chmod +x build_on_macos.sh
       - name: build_on_macos.sh
         run: ./build_on_macos.sh
 
@@ -212,7 +204,7 @@ jobs:
 
   cppcheck-linux:
     name: cppcheck (Linux)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Setup Dependencies
         run: |
@@ -230,6 +222,9 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
+      - name: Build-Script ausführbar machen
+        run: chmod +x build_on_linux.sh
+
       - name: build_on_linux.sh
         run: ./build_on_linux.sh
 
@@ -269,6 +264,8 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
+      - name: Build-Script ausführbar machen
+        run: chmod +x build_on_macos.sh
       - name: build_on_macos.sh
         run: ./build_on_macos.sh
 
