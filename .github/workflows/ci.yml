@@ -30,27 +30,25 @@ jobs:
 
     steps:
       - name: Setup Dependencies (common)
-          # kein dpkg --add-architecture mehr, nur native amd64-Pakete
         run: |
+          sudo dpkg --add-architecture ${{ matrix.platform.arch }}
           sudo apt-get update -y -qq
-          sudo apt-get install -y \
-            libyajl-dev \
-            libcurl4-openssl-dev \
-            liblmdb-dev \
-            liblua5.3-dev \
-            libmaxminddb-dev \
-            libpcre2-dev \
-            pcre2-utils \
-            bison flex cmake
-
+          sudo apt-get install -y libyajl-dev:${{ matrix.platform.arch }} \
+                                  libcurl4-openssl-dev:${{ matrix.platform.arch }} \
+                                  liblmdb-dev:${{ matrix.platform.arch }} \
+                                  liblua5.3-dev:${{ matrix.platform.arch }} \
+                                  libmaxminddb-dev:${{ matrix.platform.arch }} \
+                                  libpcre2-dev:${{ matrix.platform.arch }} \
+                                  pcre2-utils:${{ matrix.platform.arch }} \
+                                  libpcre3-dev:${{ matrix.platform.arch }} \
+                                  bison flex cmake
       # x32-Setup fällt komplett weg
 
       - name: Setup Dependencies (x64)
         if: ${{ matrix.platform.label == 'x64' }}
         run: |
-          sudo apt-get install -y \
-            libgeoip-dev \
-            libfuzzy-dev
+          sudo apt-get install -y libgeoip-dev:${{ matrix.platform.arch }} \
+                                  libfuzzy-dev:${{ matrix.platform.arch }} 
 
       - uses: actions/checkout@v6
         with:
@@ -89,7 +87,6 @@ jobs:
       - name: check
         run: make check
 
-
   build-macos:
     name: macOS (${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
@@ -106,6 +103,7 @@ jobs:
           - {label: "wo ssdeep",  opt: "--without-ssdeep --without-geoip" }
           - {label: "with lmdb",  opt: "--with-lmdb --without-geoip" }
           - {label: "with pcre", opt: "--with-pcre --without-geoip" }
+
     steps:
       - name: Setup Homebrew
         run: |
@@ -126,22 +124,20 @@ jobs:
                       bison \
                       flex \
                       mbedtls \
-                      cmake \
-                      pipx
+                      cmake
 
-      # 🔧 NEU: Python-Dependency für mbedtls-Skripte
-      - name: Install Python dependencies (jinja2)
+      - name: Setup Python venv with jinja2
         run: |
-          # Nur im User-Space installieren, das ist mit PEP 668 erlaubt
-          python3 -m pip install --user jinja2
-
-          # Debug-Ausgabe, um sicher zu sein, dass es klappt
-          python3 - << 'EOF'
-          import jinja2, sys
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install jinja2
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+          echo "PATH=$PWD/.venv/bin:$PATH" >> $GITHUB_ENV
+          python - << 'EOF'
+          import sys, jinja2
           print("Python:", sys.executable)
           print("jinja2:", jinja2.__version__, "from", jinja2.__file__)
           EOF
-
 
       - uses: actions/checkout@v6
         with:
@@ -176,6 +172,7 @@ jobs:
 
       - name: check
         run: make check
+
 
   build-windows:
     name: Windows (${{ matrix.configure.label }})
