@@ -19,7 +19,7 @@ multithread_LDADD = \
 	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
 	$(YAJL_LDADD) \
-	$(MBEDTLS_CRYPTO_LIB
+	$(MBEDTLS_CRYPTO_LIB)
 
 multithread_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
