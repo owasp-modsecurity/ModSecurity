@@ -133,16 +133,6 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
-      - name: Build GeoIP
-        run: |
-          git clone --depth 1 --no-checkout https://github.com/maxmind/geoip-api-c.git
-          cd geoip-api-c
-          git fetch --tags
-          # Check out the last release, v1.6.12
-          git checkout 4b526e7331ca1d692b74a0509ddcc725622ed31a
-          autoreconf --install
-          ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew
-          make install
       - name: build.sh
         run: ./build.sh
 
