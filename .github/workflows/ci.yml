@@ -61,8 +61,8 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --force
 
-      - name: build.sh
-        run: ./build.sh
+      - name: build_on_linux.sh
+        run: ./build_on_linux.sh
 
       - name: Debug mbedtls layout
         run: |
@@ -151,8 +151,8 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --force
 
-      - name: build.sh
-        run: ./build.sh
+      - name: build_on_macos.sh
+        run: ./build_on_macos.sh
 
       - name: Debug mbedtls layout
         run: |
@@ -230,8 +230,8 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
-      - name: build.sh
-        run: ./build.sh
+      - name: build_on_linux.sh
+        run: ./build_on_linux.sh
 
       - name: Debug mbedtls layout
         run: |
@@ -269,8 +269,8 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
-      - name: build.sh
-        run: ./build.sh
+      - name: build_on_macos.sh
+        run: ./build_on_macos.sh
 
       - name: Debug mbedtls layout
         run: |
