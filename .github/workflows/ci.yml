@@ -130,10 +130,16 @@ jobs:
       # 🔧 NEU: Python-Dependency für mbedtls-Skripte
       - name: Install Python dependencies (jinja2)
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install jinja2
-          # falls das Skript "python" statt "python3" nutzt:
-          python -m pip install jinja2 || true
+          # Nur im User-Space installieren, das ist mit PEP 668 erlaubt
+          python3 -m pip install --user jinja2
+
+          # Debug-Ausgabe, um sicher zu sein, dass es klappt
+          python3 - << 'EOF'
+          import jinja2, sys
+          print("Python:", sys.executable)
+          print("jinja2:", jinja2.__version__, "from", jinja2.__file__)
+          EOF
+
 
       - uses: actions/checkout@v6
         with:

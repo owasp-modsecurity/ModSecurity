@@ -41,6 +41,7 @@ noinst_HEADERS = \
        unit/*.h \
        regression/*.h
 
+MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
 
 unit_tests_LDADD = \
 	$(CURL_LDADD) \
@@ -53,7 +54,8 @@ unit_tests_LDADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(MBEDTLS_CRYPTO_LIB)
 
 
 unit_tests_LDFLAGS = \
@@ -108,7 +110,8 @@ regression_tests_LDADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(MBEDTLS_CRYPTO_LIB)
 
 
 regression_tests_LDFLAGS = \
@@ -162,7 +165,8 @@ rules_optimization_LDADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDADD) \
+	$(MBEDTLS_CRYPTO_LIB)
 
 rules_optimization_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
