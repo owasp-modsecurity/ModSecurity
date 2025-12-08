@@ -1,4 +1,4 @@
-
+MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
 
 noinst_PROGRAMS = benchmark
 
@@ -16,7 +16,8 @@ benchmark_LDADD = \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
 	$(LIBXML2_LDADD) \
-	$(GLOBAL_LDADD)
+	$(GLOBAL_LDADD) \
+	$(MBEDTLS_CRYPTO_LIB)
 
 benchmark_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \

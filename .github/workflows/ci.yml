@@ -110,29 +110,41 @@ jobs:
         run: |
           echo "PATH=/opt/homebrew/bin:$PATH" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig:/opt/homebrew/opt/openssl/lib/pkgconfig:/opt/homebrew/opt/pcre/lib/pkgconfig:/opt/homebrew/opt/pcre2/lib/pkgconfig:/opt/homebrew/opt/libxml2/lib/pkgconfig:/opt/homebrew/opt/curl/lib/pkgconfig:/opt/homebrew/opt/icu4c/lib/pkgconfig:/opt/homebrew/opt/openssl@3/lib/pkgconfig" >> $GITHUB_ENV
+
       - name: Install Dependencies
         run: |
           brew update
           brew install \
-                       yajl \
-                       lmdb \
-                       lua \
-                       libmaxminddb \
-                       pcre2 \
-                       ssdeep \
-                       pcre \
-                       bison \
-                       flex \
-                       mbedtls\
-                       cmake
+                      yajl \
+                      lmdb \
+                      lua \
+                      libmaxminddb \
+                      pcre2 \
+                      ssdeep \
+                      pcre \
+                      bison \
+                      flex \
+                      mbedtls \
+                      cmake
+
+      # 🔧 NEU: Python-Dependency für mbedtls-Skripte
+      - name: Install Python dependencies (jinja2)
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install jinja2
+          # falls das Skript "python" statt "python3" nutzt:
+          python -m pip install jinja2 || true
+
       - uses: actions/checkout@v6
         with:
           submodules: true
           fetch-depth: 0
+
       - name: Init git submodules
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
+
       - name: build.sh
         run: ./build.sh
 
@@ -150,8 +162,10 @@ jobs:
         run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes --disable-dependency-tracking
 
       - uses: ammaraskar/gcc-problem-matcher@master
+
       - name: make
         run: make -j `sysctl -n hw.logicalcpu`
+
       - name: check
         run: make check
 
