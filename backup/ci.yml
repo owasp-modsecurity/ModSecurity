@@ -10,9 +10,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-24.04]
+        os: [ubuntu-22.04]
         platform:
-          - {label: "x64", arch: "amd64", configure: ""}   # nur noch x64
+          - {label: "x64", arch: "amd64", configure: ""}
+          - {label: "x32", arch: "i386", configure: "PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"}
         compiler:
           - {label: "gcc", cc: "gcc", cxx: "g++"}
           - {label: "clang", cc: "clang", cxx: "clang++"}
@@ -26,42 +27,43 @@ jobs:
           - {label: "wo ssdeep",  opt: "--without-ssdeep" }
           - {label: "with lmdb",  opt: "--with-lmdb" }
           - {label: "with pcre", opt: "--with-pcre" }
-      # keine excludes mehr nötig – es gibt kein x32
-
+        exclude:
+          - platform: {label: "x32"}
+            configure: {label: "wo geoip"}
+          - platform: {label: "x32"}
+            configure: {label: "wo ssdeep"}
     steps:
       - name: Setup Dependencies (common)
-          # kein dpkg --add-architecture mehr, nur native amd64-Pakete
         run: |
+          sudo dpkg --add-architecture ${{ matrix.platform.arch }}
           sudo apt-get update -y -qq
-          sudo apt-get install -y \
-            libyajl-dev \
-            libcurl4-openssl-dev \
-            liblmdb-dev \
-            liblua5.3-dev \
-            libmaxminddb-dev \
-            libpcre2-dev \
-            pcre2-utils \
-            bison flex cmake
-
-      # x32-Setup fällt komplett weg
-
+          sudo apt-get install -y libyajl-dev:${{ matrix.platform.arch }} \
+                                  libcurl4-openssl-dev:${{ matrix.platform.arch }} \
+                                  liblmdb-dev:${{ matrix.platform.arch }} \
+                                  liblua5.3-dev:${{ matrix.platform.arch }} \
+                                  libmaxminddb-dev:${{ matrix.platform.arch }} \
+                                  libpcre2-dev:${{ matrix.platform.arch }} \
+                                  pcre2-utils:${{ matrix.platform.arch }} \
+                                  bison flex cmake
+      - name: Setup Dependencies (x32)
+        if: ${{ matrix.platform.label == 'x32' }}
+        run: |
+          sudo apt-get install g++-multilib
+          sudo apt-get install -y libxml2-dev:${{ matrix.platform.arch }} \
+                                  libpcre3-dev:${{ matrix.platform.arch }}
       - name: Setup Dependencies (x64)
         if: ${{ matrix.platform.label == 'x64' }}
         run: |
-          sudo apt-get install -y \
-            libgeoip-dev \
-            libfuzzy-dev
-
+          sudo apt-get install -y libgeoip-dev:${{ matrix.platform.arch }} \
+                                  libfuzzy-dev:${{ matrix.platform.arch }} 
       - uses: actions/checkout@v6
         with:
           submodules: true
           fetch-depth: 0
-
       - name: Init git submodules
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --force
-
       - name: build.sh
         run: ./build.sh
 
@@ -79,16 +81,13 @@ jobs:
         env:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
-        run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes --disable-dependency-tracking
+        run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes --disable-dependency-tracking
 
       - uses: ammaraskar/gcc-problem-matcher@master
-
       - name: make
         run: make -j `nproc`
-
       - name: check
         run: make check
-
 
   build-macos:
     name: macOS (${{ matrix.configure.label }})
