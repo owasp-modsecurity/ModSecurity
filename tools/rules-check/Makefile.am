@@ -5,7 +5,7 @@ bin_PROGRAMS = modsec-rules-check
 modsec_rules_check_SOURCES = \
         rules-check.cc
 
-MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
+MBEDTLS_CRYPTO_LIB = @MBEDTLS_CRYPTO_LIB@
 
 modsec_rules_check_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.la \

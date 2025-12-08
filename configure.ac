@@ -77,6 +77,34 @@ fi
 AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git describe && cd ../..))
 AC_SUBST([LIBINJECTION_VERSION])
 
+# ============================================================
+#  Check for Mbed TLS / mbedcrypto (PSA)
+# ============================================================
+
+AC_MSG_CHECKING([for mbedcrypto (PSA crypto library)])
+
+MBEDTLS_CRYPTO_LIB=""
+
+# 1. Erst versuchen wir die System-Lib: -lmbedcrypto
+AC_CHECK_LIB([mbedcrypto], [psa_crypto_init],
+  [MBEDTLS_CRYPTO_LIB="-lmbedcrypto"
+   AC_MSG_RESULT([using system libmbedcrypto (-lmbedcrypto)])],
+  [
+    # 2. Fallback: vendored libmbedcrypto.a aus others/mbedtls
+    AC_MSG_RESULT([system libmbedcrypto not found, trying vendored mbedtls])
+
+    AC_CHECK_FILE([others/mbedtls/build/library/libmbedcrypto.a],
+      [MBEDTLS_CRYPTO_LIB='$(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a'
+       AC_MSG_RESULT([using vendored libmbedcrypto.a])],
+      [AC_MSG_ERROR([Could not find mbedcrypto:
+  - install libmbedtls-dev / Homebrew mbedtls (libmbedcrypto),
+    or
+  - build others/mbedtls before running configure])])
+  ])
+
+AC_SUBST([MBEDTLS_CRYPTO_LIB])
+
+
 # Check for Mbed TLS 
 if ! test -f "${srcdir}/others/mbedtls/tf-psa-crypto/drivers/builtin/src/base64.c"; then
 AC_MSG_ERROR([\

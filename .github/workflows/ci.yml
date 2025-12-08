@@ -41,7 +41,8 @@ jobs:
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
                                   libpcre3-dev:${{ matrix.platform.arch }} \
-                                  bison flex cmake
+                                  bison flex cmake \
+                                  libmbedtls-dev:${{ matrix.platform.arch }}
       # x32-Setup fällt komplett weg
 
       - name: Setup Dependencies (x64)
@@ -124,7 +125,8 @@ jobs:
                       bison \
                       flex \
                       mbedtls \
-                      cmake
+                      cmake \
+                      mbedtls
 
       - name: Setup Python venv with jinja2
         run: |

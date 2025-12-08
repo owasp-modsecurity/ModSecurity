@@ -41,7 +41,7 @@ noinst_HEADERS = \
        unit/*.h \
        regression/*.h
 
-MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
+MBEDTLS_CRYPTO_LIB = @MBEDTLS_CRYPTO_LIB@
 
 unit_tests_LDADD = \
 	$(CURL_LDADD) \

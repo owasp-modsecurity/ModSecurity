@@ -1,4 +1,4 @@
-MBEDTLS_CRYPTO_LIB = $(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a
+MBEDTLS_CRYPTO_LIB = @MBEDTLS_CRYPTO_LIB@
 
 noinst_PROGRAMS = test
 
