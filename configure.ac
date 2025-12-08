@@ -78,31 +78,38 @@ AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git de
 AC_SUBST([LIBINJECTION_VERSION])
 
 # ============================================================
-#  Check for Mbed TLS / mbedcrypto (PSA)
+#  Check for PSA crypto lib (Mbed TLS / TF-PSA-Crypto)
 # ============================================================
 
-AC_MSG_CHECKING([for mbedcrypto (PSA crypto library)])
+AC_MSG_CHECKING([for PSA crypto library (Mbed TLS / TF-PSA-Crypto)])
 
 MBEDTLS_CRYPTO_LIB=""
 
-# 1. Erst versuchen wir die System-Lib: -lmbedcrypto
-AC_CHECK_LIB([mbedcrypto], [psa_crypto_init],
-  [MBEDTLS_CRYPTO_LIB="-lmbedcrypto"
-   AC_MSG_RESULT([using system libmbedcrypto (-lmbedcrypto)])],
+# 1. Mbed TLS 4 / TF-PSA-Crypto: libtfpsacrypto
+AC_CHECK_LIB([tfpsacrypto], [psa_crypto_init],
+  [MBEDTLS_CRYPTO_LIB="-ltfpsacrypto"
+   AC_MSG_RESULT([using system libtfpsacrypto (-ltfpsacrypto)])],
   [
-    # 2. Fallback: vendored libmbedcrypto.a aus others/mbedtls
-    AC_MSG_RESULT([system libmbedcrypto not found, trying vendored mbedtls])
+    # 2. Legacy-Name: libmbedcrypto (Mbed TLS <= 3 oder Distros, die das so bereitstellen)
+    AC_CHECK_LIB([mbedcrypto], [psa_crypto_init],
+      [MBEDTLS_CRYPTO_LIB="-lmbedcrypto"
+       AC_MSG_RESULT([using system libmbedcrypto (-lmbedcrypto)])],
+      [
+        # 3. Fallback: vendored libmbedcrypto.a aus others/mbedtls
+        AC_MSG_RESULT([no system PSA crypto lib found, trying vendored mbedtls])
 
-    AC_CHECK_FILE([others/mbedtls/build/library/libmbedcrypto.a],
-      [MBEDTLS_CRYPTO_LIB='$(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a'
-       AC_MSG_RESULT([using vendored libmbedcrypto.a])],
-      [AC_MSG_ERROR([Could not find mbedcrypto:
-  - install libmbedtls-dev / Homebrew mbedtls (libmbedcrypto),
+        AC_CHECK_FILE([others/mbedtls/build/library/libmbedcrypto.a],
+          [MBEDTLS_CRYPTO_LIB='$(top_builddir)/others/mbedtls/build/library/libmbedcrypto.a'
+           AC_MSG_RESULT([using vendored libmbedcrypto.a])],
+          [AC_MSG_ERROR([Could not find PSA crypto library:
+  - install Mbed TLS / TF-PSA-Crypto (providing libtfpsacrypto or libmbedcrypto),
     or
   - build others/mbedtls before running configure])])
+      ])
   ])
 
 AC_SUBST([MBEDTLS_CRYPTO_LIB])
+
 
 
 # Check for Mbed TLS 
