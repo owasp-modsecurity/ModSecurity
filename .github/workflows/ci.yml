@@ -107,19 +107,19 @@ jobs:
       - name: Install Dependencies
         run: |
           brew update
-          brew install \
-                      yajl \
-                      lmdb \
-                      lua \
-                      libmaxminddb \
-                      pcre2 \
-                      ssdeep \
-                      pcre \
-                      bison \
-                      flex \
-                      mbedtls \
-                      cmake \
-                      mbedtls
+          brew install autoconf \
+                       automake \
+                       libtool \
+                       yajl \
+                       lmdb \
+                       lua \
+                       libmaxminddb \
+                       libxml2 \
+                       ssdeep \
+                       pcre \
+                       bison \
+                       flex \
+                       mbedtls
 
       - uses: actions/checkout@v6
         with:
