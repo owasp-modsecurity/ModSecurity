@@ -81,7 +81,7 @@ jobs:
         env:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
-        run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
+        run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes --disable-dependency-tracking
 
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
@@ -96,15 +96,15 @@ jobs:
       matrix:
         os: [macos-14]
         configure:
-          - {label: "with parser generation", opt: "--enable-parser-generation" }
-          - {label: "wo curl",    opt: "--without-curl" }
-          - {label: "wo lua",     opt: "--without-lua" }
-          - {label: "wo maxmind", opt: "--without-maxmind" }
-          - {label: "wo libxml",  opt: "--without-libxml" }
+          - {label: "with parser generation", opt: "--enable-parser-generation --without-geoip" }
+          - {label: "wo curl",    opt: "--without-curl --without-geoip" }
+          - {label: "wo lua",     opt: "--without-lua --without-geoip" }
+          - {label: "wo maxmind", opt: "--without-maxmind --without-geoip" }
+          - {label: "wo libxml",  opt: "--without-libxml --without-geoip" }
           - {label: "wo geoip",   opt: "--without-geoip" }
-          - {label: "wo ssdeep",  opt: "--without-ssdeep" }
-          - {label: "with lmdb",  opt: "--with-lmdb" }
-          - {label: "with pcre", opt: "--with-pcre" }
+          - {label: "wo ssdeep",  opt: "--without-ssdeep --without-geoip" }
+          - {label: "with lmdb",  opt: "--with-lmdb --without-geoip" }
+          - {label: "with pcre", opt: "--with-pcre --without-geoip" }
     steps:
       - name: Setup Homebrew
         run: |
@@ -157,7 +157,7 @@ jobs:
           find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
 
       - name: configure
-        run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes
+        run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes --disable-dependency-tracking
 
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: make
@@ -233,7 +233,7 @@ jobs:
           find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
 
       - name: configure
-        run: ./configure
+        run: ./configure --disable-dependency-tracking
 
       - name: cppcheck
         run: make check-static
@@ -272,7 +272,7 @@ jobs:
           find others/mbedtls -name 'base64.c' -maxdepth 8 || echo "keine base64.c gefunden"
 
       - name: configure
-        run: ./configure
+        run: ./configure --disable-dependency-tracking
 
       - name: cppcheck
         run: make check-static
