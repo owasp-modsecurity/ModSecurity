@@ -55,8 +55,13 @@ parser:
 
 
 
+# Anzahl der cppcheck-Jobs, von außen überschreibbar: JOBS=8 make check-static
+JOBS ?= 1
+
 cppcheck:
-	@cppcheck -U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
+	@echo "Running cppcheck with $(JOBS) jobs..."
+	@cppcheck -j $(JOBS) \
+		-U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
 		-D MS_CPPCHECK_DISABLED_FOR_PARSER -U YY_USER_INIT \
 		--suppressions-list=./test/cppcheck_suppressions.txt \
 		--inline-suppr \
@@ -69,7 +74,6 @@ cppcheck:
 		-i others \
 		--std=c++17 \
 		--force --verbose .
-
 
 check-static: cppcheck
 

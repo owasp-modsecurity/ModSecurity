@@ -188,6 +188,7 @@ jobs:
   cppcheck-linux:
     name: cppcheck (Linux)
     runs-on: ubuntu-24.04
+    timeout-minutes: 120
     steps:
       - name: Setup Dependencies
         run: |
@@ -216,7 +217,7 @@ jobs:
         run: ./configure --disable-dependency-tracking
 
       - name: cppcheck
-        run: make check-static -j$(nproc)
+        run: make check-static JOBS=$(nproc)
 
   cppcheck-macos:
     name: cppcheck (macOS)
