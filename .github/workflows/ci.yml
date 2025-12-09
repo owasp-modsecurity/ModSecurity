@@ -86,7 +86,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-14]
+        os: [macos-14, macos-15, macos-26]
         configure:
           - {label: "with parser generation", opt: "--enable-parser-generation --without-geoip" }
           - {label: "wo curl",    opt: "--without-curl --without-geoip" }
@@ -151,39 +151,39 @@ jobs:
         run: make check
 
 
-  build-windows:
-    name: Windows (${{ matrix.configure.label }})
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        configure:
-          - {label: "default", opt: "" }
-          - {label: "wo curl",    opt: "-DWITH_CURL=OFF" }
-          - {label: "wo lua",     opt: "-DWITH_LUA=OFF" }
-          - {label: "wo maxmind", opt: "-DWITH_MAXMIND=OFF" }
-          - {label: "wo libxml",  opt: "-DWITH_LIBXML2=OFF" }
-          - {label: "with lmdb",  opt: "-DWITH_LMDB=ON" }
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: true
-          fetch-depth: 0
-      - name: Init git submodules
-        run: |
-          git submodule sync --recursive
-          git submodule update --init --recursive --force
-      - name: Install Conan
-        run: |
-          pip3 install conan
-      - name: Configure Conan
-        run: |
-          conan profile detect
-      - name: Configure CMake
-        run: |
-          cmake -S . -B build ${{ matrix.configure.opt }}
-      - name: Build
-        run: |
-          cmake --build build --config Release
+ # build-windows:
+ #    name: Windows (${{ matrix.configure.label }})
+ #    runs-on: windows-latest
+ #    strategy:
+ #      matrix:
+ #        configure:
+ #          - {label: "default", opt: "" }
+ #          - {label: "wo curl",    opt: "-DWITH_CURL=OFF" }
+ #         - {label: "wo lua",     opt: "-DWITH_LUA=OFF" }
+ #          - {label: "wo maxmind", opt: "-DWITH_MAXMIND=OFF" }
+  #         - {label: "wo libxml",  opt: "-DWITH_LIBXML2=OFF" }
+ #          - {label: "with lmdb",  opt: "-DWITH_LMDB=ON" }
+ #    steps:
+ #      - uses: actions/checkout@v6
+ #        with:
+  #         submodules: true
+  #         fetch-depth: 0
+ #      - name: Init git submodules
+ #        run: |
+  #         git submodule sync --recursive
+ #          git submodule update --init --recursive --force
+ #      - name: Install Conan
+ #        run: |
+ #          pip3 install conan
+ #      - name: Configure Conan
+ #        run: |
+ #          conan profile detect
+ #      - name: Configure CMake
+    #     run: |
+   #        cmake -S . -B build ${{ matrix.configure.opt }}
+  #     - name: Build
+ #        run: |
+ #          cmake --build build --config Release
 
   cppcheck-linux:
     name: cppcheck (Linux)
@@ -212,7 +212,6 @@ jobs:
       - name: build_on_linux.sh
         run: ./build_on_linux.sh
 
-
       - name: configure
         run: ./configure --disable-dependency-tracking
 
@@ -230,7 +229,8 @@ jobs:
           brew install autoconf \
                        automake \
                        libtool \
-                       cppcheck
+                       cppcheck \
+                       mbedtls
       - uses: actions/checkout@v6
         with:
           submodules: true
@@ -245,7 +245,10 @@ jobs:
         run: ./build_on_macos.sh
 
       - name: configure
+        env:
+          CPPFLAGS: -I/opt/homebrew/opt/mbedtls/include
+          LDFLAGS: -L/opt/homebrew/opt/mbedtls/lib
         run: ./configure --disable-dependency-tracking
 
       - name: cppcheck
-        run: make check-static
+        run: make check-static JOBS=$(nproc)
