@@ -2,11 +2,20 @@
 
 set -e  # bei Fehler abbrechen
 
+##
+## Parallel-Jobs bestimmen (nur Linux)
+## Überschreibbar mit: JOBS=4 ./bootstrap.sh
+##
+if [ -z "$JOBS" ]; then
+  JOBS=$(nproc)
+fi
+echo "==> Using $JOBS parallel build jobs"
+
 rm -rf autom4te.cache
 rm -f aclocal.m4
 
 ##
-## 1. headers.mk erzeugen (wie bisher)
+## 1. headers.mk erzeugen
 ##
 cd src
 rm -f headers.mk
@@ -39,31 +48,25 @@ if [ -d "others/mbedtls" ]; then
 
     mkdir -p build
 
-    # Laut offizieller CMake-Options:
-    # - ENABLE_PROGRAMS=ON  -> Tools/Beispiele bauen
-    # - ENABLE_TESTING=ON   -> Test-Binaries + CTest
     cmake -S . -B build \
       -DENABLE_PROGRAMS=ON \
       -DENABLE_TESTING=ON
 
-    cmake --build build --config Release
+    # Parallel bauen
+    cmake --build build --config Release --parallel "$JOBS"
 
     echo "==> Running Mbed TLS tests..."
     cd build
-    ctest --output-on-failure
+    ctest --output-on-failure -j"$JOBS"
   )
 else
   echo "WARNUNG: others/mbedtls nicht gefunden – Mbed TLS wird NICHT gebaut/getestet!"
 fi
 
 ##
-## 3. Autotools für ModSecurity initialisieren
+## 3. Autotools für ModSecurity initialisieren (nur Linux)
 ##
-case `uname` in
-  Darwin*) glibtoolize --force --copy ;;
-  *)       libtoolize  --force --copy ;;
-esac
-
+libtoolize --force --copy
 autoreconf --install
 autoheader
 automake --add-missing --foreign --copy --force-missing
