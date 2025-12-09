@@ -216,8 +216,8 @@ jobs:
         run: ./configure --disable-dependency-tracking
 
       - name: cppcheck
-        run: make check-static JOBS=$(nproc)
-
+        run: make check-static -j$(nproc)
+        
   cppcheck-macos:
     name: cppcheck (macOS)
     runs-on: macos-14
@@ -251,4 +251,4 @@ jobs:
         run: ./configure --disable-dependency-tracking
 
       - name: cppcheck
-        run: make check-static JOBS=$(nproc)
+        run: make check-static -j$(nproc)
