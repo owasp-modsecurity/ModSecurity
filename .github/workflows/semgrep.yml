@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload SARIF
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: semgrep.sarif
           category: semgrep

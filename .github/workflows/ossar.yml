@@ -15,7 +15,7 @@ jobs:
     continue-on-error: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -26,7 +26,7 @@ jobs:
 
       - name: Upload SARIF (if present)
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: .gdn/msdo.sarif
           category: ossar

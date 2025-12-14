@@ -194,8 +194,9 @@ jobs:
           brew install autoconf \
                        automake \
                        libtool \
-                       cppcheck
-      - uses: actions/checkout@v4
+                       cppcheck \
+                       mbedtls
+      - uses: actions/checkout@v6
         with:
           submodules: true
           fetch-depth: 0
