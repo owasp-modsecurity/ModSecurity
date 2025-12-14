@@ -1,5 +1,6 @@
 name: CodeQL_on_linux
 
+
 on:
   workflow_dispatch:
   push:
@@ -9,6 +10,7 @@ on:
   schedule:
     - cron: "19 3 * * 1"
     
+
 permissions:
   actions: read
   contents: read
@@ -31,7 +33,7 @@ jobs:
         with:
           languages: c-cpp
           build-mode: manual
-          queries: security-extended
+          config-file: ./.github/codeql/codeql-config.yml
 
       - name: Install build dependencies
         run: |

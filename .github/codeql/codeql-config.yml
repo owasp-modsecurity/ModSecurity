@@ -1,0 +1,20 @@
+name: "CodeQL config"
+
+queries:
+  - uses: security-extended
+
+paths-ignore:
+  - tests/**
+  - test/**
+  - **/*test*
+
+  # Third-party / submodules
+  - others/**
+  - bindings/**
+  - examples/**
+  - doc/**
+
+  # Build & generated files
+  - build/**
+  - **/*.png
+  - **/*.md
