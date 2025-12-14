@@ -19,14 +19,21 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Run OSSAR
-        id: ossar
-        continue-on-error: true
-        uses: github/ossar-action@v1
+      - name: Reduce SARIF to a single run (GitHub Code Scanning requirement)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f ".gdn/msdo.sarif" ]; then
+            jq '.runs = [ .runs[0] ]' .gdn/msdo.sarif > msdo.single.sarif
+          else
+            echo "No .gdn/msdo.sarif found"
+            exit 1
+          fi
 
-      - name: Upload SARIF (if present)
-        if: always()
+
+      - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: .gdn/msdo.sarif
+          sarif_file: msdo.single.sarif
           category: ossar
+

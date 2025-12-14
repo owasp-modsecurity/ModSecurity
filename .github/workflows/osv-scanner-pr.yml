@@ -1,7 +1,6 @@
 name: OSV Scanner (PR)
 
 on:
-  workflow_dispatch:
   pull_request:
   merge_group:
 
@@ -13,3 +12,5 @@ permissions:
 jobs:
   scan-pr:
     uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.3.1
+    with:
+      allow-no-lockfiles: true

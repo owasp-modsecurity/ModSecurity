@@ -202,9 +202,13 @@ jobs:
           fetch-depth: 0
       - name: Build-Script ausführbar machen
         run: chmod +x build_on_macos.sh
+      - name: build_on_macos.sh
+        run: ./build_on_macos.sh
       - name: configure
-        run: |
-          ./build_on_macos.sh
+        env:
+          CPPFLAGS: -I/opt/homebrew/opt/mbedtls/include
+          LDFLAGS: -L/opt/homebrew/opt/mbedtls/lib
+        run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes --disable-dependency-tracking
           ./configure
       - name: cppcheck
         run: make check-static
