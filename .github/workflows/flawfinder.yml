@@ -86,13 +86,11 @@ jobs:
           fi
 
           echo "Flawfinder version:"
-          flawfinder --version || true
+          flawfinder --version
 
-          # Run flawfinder. IMPORTANT: no --quiet here.
           set +e
           xargs -a /tmp/flawfinder-headers-files.txt \
             flawfinder --sarif --minlevel=1 \
-            --exclude-dir=vendor --exclude-dir=third_party --exclude-dir=deps --exclude-dir=external --exclude-dir=mbedtls \
             > flawfinder-headers.sarif \
             2> flawfinder-headers.stderr
           rc=$?
@@ -106,15 +104,14 @@ jobs:
           fi
 
           echo "SARIF size: $(wc -c < flawfinder-headers.sarif) bytes"
-          head -c 200 flawfinder-headers.sarif | cat -v || true
 
-          # Validate JSON. If invalid => write minimal valid SARIF with a run.
+          # Validate SARIF JSON
           if ! python3 -c 'import json; json.load(open("flawfinder-headers.sarif","r",encoding="utf-8"))' 2>/dev/null; then
             echo "Writing minimal SARIF because flawfinder output was not valid SARIF JSON."
             echo '{"$schema":"https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0.json","version":"2.1.0","runs":[{"tool":{"driver":{"name":"flawfinder","informationUri":"https://dwheeler.com/flawfinder/"}},"results":[]}]}' > flawfinder-headers.sarif
           fi
 
-          # 16 = findings found => don't fail job
+          # 16 = findings found → OK
           if [[ $rc -ne 0 && $rc -ne 16 ]]; then
             exit $rc
           fi
