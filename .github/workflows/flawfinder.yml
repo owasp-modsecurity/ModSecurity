@@ -66,27 +66,33 @@ jobs:
       - name: Build Flawfinder file list (headers only)
         shell: bash
         run: |
-          git ls-files headers '*.h' > /tmp/flawfinder-headers-files.txt
+          set -euo pipefail
+          git ls-files 'headers/**' \
+            | grep -E '\.(h|hh|hpp|hxx)$' \
+            > /tmp/flawfinder-headers-files.txt || true
+
+          echo "Header files to scan: $(wc -l < /tmp/flawfinder-headers-files.txt || echo 0)"
+
 
       - name: Run Flawfinder (SARIF, headers strict)
         shell: bash
         run: |
+          set -euo pipefail
+
           if [[ ! -s /tmp/flawfinder-headers-files.txt ]]; then
             echo "Skipping flawfinder headers: no files."
-            echo '{"version":"2.1.0","runs":[]}' > flawfinder-headers.sarif
+            echo '{"$schema":"https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0.json","version":"2.1.0","runs":[{"tool":{"driver":{"name":"flawfinder","informationUri":"https://dwheeler.com/flawfinder/"}},"results":[]}]}' > flawfinder-headers.sarif
             exit 0
           fi
 
-          # Defensive: remove empty lines
-          sed -i '/^\s*$/d' /tmp/flawfinder-headers-files.txt
+          echo "Flawfinder version:"
+          flawfinder --version || true
 
+          # Run flawfinder. IMPORTANT: no --quiet here.
           set +e
-          flawfinder \
-            --sarif \
-            --quiet \
-            --minlevel=1 \
-            --exclude-dir=vendor,third_party,deps,external,mbedtls \
-            $(cat /tmp/flawfinder-headers-files.txt) \
+          xargs -a /tmp/flawfinder-headers-files.txt \
+            flawfinder --sarif --minlevel=1 \
+            --exclude-dir=vendor --exclude-dir=third_party --exclude-dir=deps --exclude-dir=external --exclude-dir=mbedtls \
             > flawfinder-headers.sarif \
             2> flawfinder-headers.stderr
           rc=$?
@@ -99,27 +105,19 @@ jobs:
             echo "---------------------------"
           fi
 
-          # If output isn't valid JSON (SARIF), fall back to empty SARIF so upload doesn't fail
-          if ! python3 - <<'PY'
-          import json, sys
-          p="flawfinder-headers.sarif"
-          try:
-              with open(p,"r",encoding="utf-8") as f:
-                  json.load(f)
-          except Exception as e:
-              print("SARIF parse failed:", e)
-              sys.exit(1)
-          sys.exit(0)
-          PY
-              then
-                echo "Writing empty SARIF because flawfinder output was not valid SARIF JSON."
-                echo '{"version":"2.1.0","runs":[]}' > flawfinder-headers.sarif
-              fi
+          echo "SARIF size: $(wc -c < flawfinder-headers.sarif) bytes"
+          head -c 200 flawfinder-headers.sarif | cat -v || true
 
-              # Treat "findings found" as success
-              if [[ $rc -ne 0 && $rc -ne 16 ]]; then
-                exit $rc
-              fi
+          # Validate JSON. If invalid => write minimal valid SARIF with a run.
+          if ! python3 -c 'import json; json.load(open("flawfinder-headers.sarif","r",encoding="utf-8"))' 2>/dev/null; then
+            echo "Writing minimal SARIF because flawfinder output was not valid SARIF JSON."
+            echo '{"$schema":"https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0.json","version":"2.1.0","runs":[{"tool":{"driver":{"name":"flawfinder","informationUri":"https://dwheeler.com/flawfinder/"}},"results":[]}]}' > flawfinder-headers.sarif
+          fi
+
+          # 16 = findings found => don't fail job
+          if [[ $rc -ne 0 && $rc -ne 16 ]]; then
+            exit $rc
+          fi
 
 
       - name: Upload SARIF
