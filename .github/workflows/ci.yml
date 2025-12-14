@@ -199,9 +199,11 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+      - name: Build-Script ausführbar machen
+        run: chmod +x build_on_macos.sh
       - name: configure
         run: |
-          ./build.sh
+          ./build_on_macos.sh
           ./configure
       - name: cppcheck
         run: make check-static
