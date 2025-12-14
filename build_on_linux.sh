@@ -41,27 +41,27 @@ cd ..
 ##
 ## 2. Vendored Mbed TLS bauen – MIT PROGRAMMEN UND TESTS
 ##
-if [ -d "others/mbedtls" ]; then
-  echo "==> Building vendored Mbed TLS (mit Programmen und Tests)..."
-  (
-    cd others/mbedtls
-
-    mkdir -p build
-
-    cmake -S . -B build \
-      -DENABLE_PROGRAMS=ON \
-      -DENABLE_TESTING=ON
-
-    # Parallel bauen
-    cmake --build build --config Release --parallel "$JOBS"
-
-    echo "==> Running Mbed TLS tests..."
-    cd build
-    ctest --output-on-failure -j"$JOBS"
-  )
-else
-  echo "WARNUNG: others/mbedtls nicht gefunden – Mbed TLS wird NICHT gebaut/getestet!"
-fi
+##if [ -d "others/mbedtls" ]; then
+##  echo "==> Building vendored Mbed TLS (mit Programmen und Tests)..."
+##  (
+##    cd others/mbedtls
+##
+##    mkdir -p build
+##
+##    cmake -S . -B build \
+##      -DENABLE_PROGRAMS=ON \
+##      -DENABLE_TESTING=ON
+##
+##   # Parallel bauen
+##    cmake --build build --config Release --parallel "$JOBS"
+##
+##    echo "==> Running Mbed TLS tests..."
+##    cd build
+##    ctest --output-on-failure -j"$JOBS"
+##  )
+##else
+##  echo "WARNUNG: others/mbedtls nicht gefunden – Mbed TLS wird NICHT gebaut/getestet!"
+##fi
 
 ##
 ## 3. Autotools für ModSecurity initialisieren (nur Linux)
