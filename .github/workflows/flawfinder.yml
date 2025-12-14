@@ -77,6 +77,7 @@ jobs:
             exit 0
           fi
 
+          set +e
           flawfinder \
             --sarif \
             --quiet \
@@ -84,9 +85,14 @@ jobs:
             --exclude-dir=vendor,third_party,deps,external,mbedtls \
             $(cat /tmp/flawfinder-headers-files.txt) \
             > flawfinder-headers.sarif
+          rc=$?
+          set -e
 
-
-
+          # 16 = findings found (nicht als Workflow-Fehler behandeln)
+          if [[ $rc -ne 0 && $rc -ne 16 ]]; then
+            echo "flawfinder failed with exit code $rc"
+            exit $rc
+          fi
 
       - name: Upload SARIF
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false

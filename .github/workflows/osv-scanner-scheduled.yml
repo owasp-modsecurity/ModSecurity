@@ -15,5 +15,4 @@ permissions:
 jobs:
   scan:
     uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.1
-    with:
-      allow-no-lockfiles: true
+
