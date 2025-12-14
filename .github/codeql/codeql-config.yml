@@ -1,20 +1,21 @@
-name: "CodeQL config"
+name: "CodeQL config for ModSecurity"
 
 queries:
   - uses: security-extended
 
 paths-ignore:
-  - tests/**
-  - test/**
-  - **/*test*
+  # Tests
+  - "tests/**"
+  - "test/**"
+  - "**/*test*"
 
   # Third-party / submodules
-  - others/**
-  - bindings/**
-  - examples/**
-  - doc/**
+  - "others/**"
+  - "bindings/**"
+  - "examples/**"
+  - "doc/**"
 
   # Build & generated files
-  - build/**
-  - **/*.png
-  - **/*.md
+  - "build/**"
+  - "**/*.png"
+  - "**/*.md"
