@@ -3,7 +3,8 @@ name: OSV Scanner (PR)
 on:
   pull_request:
   merge_group:
-
+  workflow_dispatch:
+    
 permissions:
   contents: read
   security-events: write

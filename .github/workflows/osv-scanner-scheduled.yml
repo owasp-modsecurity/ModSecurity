@@ -1,6 +1,7 @@
 name: OSV Scanner (Scheduled)
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "30 3 * * 1"
   push:
