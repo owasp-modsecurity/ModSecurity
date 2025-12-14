@@ -1,4 +1,4 @@
-name: CodeQL
+name: CodeQL_on_linux
 
 on:
   workflow_dispatch:
@@ -45,11 +45,12 @@ jobs:
             libpcre2-dev \
             libcurl4-openssl-dev \
             zlib1g-dev \
+            libmbedtls-dev \
             ca-certificates
 
       - name: Build (required for CodeQL C/C++)
         run: |
-          ./build.sh
+          ./build_on_linux.sh
           ./configure --disable-dependency-tracking
           make -j"$(nproc)"
 
