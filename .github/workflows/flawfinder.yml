@@ -1,0 +1,44 @@
+name: Flawfinder (C/C++)
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [ "main", "master" ]
+  schedule:
+    - cron: "20 2 * * 1"   # Weekly (reduziert PR-Noise)
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  flawfinder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (inkl. Submodules)
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install Flawfinder
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flawfinder
+
+      - name: Run Flawfinder (SARIF)
+        run: |
+          EXCLUDES=$(sed 's/^/--exclude /' .github/security-scan-excludes.txt | tr '\n' ' ')
+          flawfinder \
+            --sarif \
+            --output flawfinder.sarif \
+            $EXCLUDES \
+            .
+
+      - name: Upload SARIF
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: flawfinder.sarif
+          category: flawfinder

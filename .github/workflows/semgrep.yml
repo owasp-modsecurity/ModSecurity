@@ -1,0 +1,46 @@
+name: Semgrep (C/C++ SAST)
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [ "main", "master" ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (inkl. Submodules)
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install Semgrep
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install semgrep
+
+      - name: Fetch OSS C/C++ rules
+        run: |
+          git clone --depth 1 https://github.com/0xdea/semgrep-rules .semgrep-rules
+
+      - name: Run Semgrep (SARIF)
+        run: |
+          EXCLUDES=$(sed 's/^/--exclude /' .github/security-scan-excludes.txt | tr '\n' ' ')
+          semgrep scan \
+            --config .semgrep-rules \
+            $EXCLUDES \
+            --sarif -o semgrep.sarif \
+            .
+
+      - name: Upload SARIF
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep

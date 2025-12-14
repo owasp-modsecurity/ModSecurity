@@ -1,0 +1,32 @@
+name: OSSAR
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [ "main", "master" ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  ossar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 2
+
+      - name: Run OSSAR
+        id: ossar
+        uses: github/ossar-action@v1
+
+      - name: Upload SARIF
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.ossar.outputs.sarifFile }}
+          category: ossar

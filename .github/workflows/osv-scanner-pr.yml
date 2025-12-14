@@ -1,0 +1,15 @@
+name: OSV Scanner (PR)
+
+on:
+  workflow_dispatch:
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  scan-pr:
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.3.1
