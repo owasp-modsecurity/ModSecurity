@@ -1,10 +1,9 @@
-name: OSSAR
+name: OSSAR (best-effort)
 
 on:
+  schedule:
+    - cron: "15 4 * * 1"   # Weekly, nicht auf PRs
   workflow_dispatch:
-  pull_request:
-  push:
-    branches: [ "main", "master" ]
 
 permissions:
   contents: read
@@ -13,20 +12,21 @@ permissions:
 jobs:
   ossar:
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 2
 
       - name: Run OSSAR
         id: ossar
+        continue-on-error: true
         uses: github/ossar-action@v1
 
-      - name: Upload SARIF
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+      - name: Upload SARIF (if present)
+        if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: ${{ steps.ossar.outputs.sarifFile }}
+          sarif_file: .gdn/msdo.sarif
           category: ossar

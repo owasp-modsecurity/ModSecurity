@@ -6,7 +6,7 @@ on:
   push:
     branches: [ "main", "master" ]
   schedule:
-    - cron: "20 2 * * 1"   # Weekly (reduziert PR-Noise)
+    - cron: "20 2 * * 1"   # Weekly
 
 permissions:
   contents: read
@@ -27,14 +27,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y flawfinder
 
+      - name: Build source file list (with excludes)
+        run: |
+          grep -v '^\s*#' .github/security-scan-excludes.txt \
+            | sed 's|^|./|' > /tmp/excludes.txt
+
+          find . \
+            \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
+            -type f \
+            | grep -v -F -f /tmp/excludes.txt \
+            > /tmp/flawfinder-files.txt
+
       - name: Run Flawfinder (SARIF)
         run: |
-          EXCLUDES=$(sed 's/^/--exclude /' .github/security-scan-excludes.txt | tr '\n' ' ')
           flawfinder \
             --sarif \
-            --output flawfinder.sarif \
-            $EXCLUDES \
-            .
+            --quiet \
+            --minlevel=1 \
+            $(cat /tmp/flawfinder-files.txt) \
+            > flawfinder.sarif
 
       - name: Upload SARIF
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
