@@ -29,9 +29,24 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/0xdea/semgrep-rules .semgrep-rules
 
-      - name: Run Semgrep (SARIF)
+      - name: Run Semgrep (SARIF, robust excludes)
+        shell: bash
         run: |
-          EXCLUDES=$(sed 's/^/--exclude /' .github/security-scan-excludes.txt | tr '\n' ' ')
+          set -euo pipefail
+
+          EXCLUDE_FILE=".github/security-scan-excludes.txt"
+          EXCLUDES=""
+
+          if [[ -f "$EXCLUDE_FILE" ]]; then
+            while IFS= read -r line; do
+              # Skip comments and empty lines
+              [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+              EXCLUDES+=" --exclude $line"
+            done < "$EXCLUDE_FILE"
+          fi
+
+          echo "Semgrep excludes: $EXCLUDES"
+
           semgrep scan \
             --config .semgrep-rules \
             $EXCLUDES \

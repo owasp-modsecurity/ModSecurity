@@ -27,25 +27,53 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y flawfinder
 
-      - name: Build source file list (with excludes)
+      - name: Build source file list (robust excludes)
+        shell: bash
         run: |
-          grep -v '^\s*#' .github/security-scan-excludes.txt \
-            | sed 's|^|./|' > /tmp/excludes.txt
+          set -euo pipefail
 
+          EXCLUDE_FILE=".github/security-scan-excludes.txt"
+          EXCLUDE_TMP="/tmp/excludes.txt"
+
+          # 1) Excludes vorbereiten (falls Datei fehlt/leer ist -> leere exclude list)
+          if [[ -f "$EXCLUDE_FILE" ]]; then
+            # Kommentare/Leerzeilen entfernen, "./" davor setzen
+            grep -vE '^\s*#|^\s*$' "$EXCLUDE_FILE" | sed 's|^|./|' > "$EXCLUDE_TMP" || true
+          else
+            : > "$EXCLUDE_TMP"
+          fi
+
+          # 2) Relevante Quellfiles finden
           find . \
-            \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
             -type f \
-            | grep -v -F -f /tmp/excludes.txt \
-            > /tmp/flawfinder-files.txt
+            \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' -o -name '*.cxx' -o -name '*.h' -o -name '*.hh' -o -name '*.hpp' -o -name '*.hxx' \) \
+            > /tmp/all-src.txt
+
+          # 3) Excludes anwenden (wenn exclude list leer -> einfach alles nehmen)
+          if [[ -s "$EXCLUDE_TMP" ]]; then
+            grep -v -F -f "$EXCLUDE_TMP" /tmp/all-src.txt > /tmp/flawfinder-files.txt || true
+          else
+            cp /tmp/all-src.txt /tmp/flawfinder-files.txt
+          fi
+
+          # 4) Falls nix übrig bleibt, nicht failen – nur warnen
+          if [[ ! -s /tmp/flawfinder-files.txt ]]; then
+            echo "No source files to scan after excludes."
+          else
+            echo "Files to scan: $(wc -l < /tmp/flawfinder-files.txt)"
+          fi
 
       - name: Run Flawfinder (SARIF)
+        shell: bash
         run: |
-          flawfinder \
-            --sarif \
-            --quiet \
-            --minlevel=1 \
-            $(cat /tmp/flawfinder-files.txt) \
-            > flawfinder.sarif
+          if [[ ! -s /tmp/flawfinder-files.txt ]]; then
+            echo "Skipping flawfinder: no files."
+            echo '{"version":"2.1.0","runs":[]}' > flawfinder.sarif
+            exit 0
+          fi
+
+          flawfinder --sarif --quiet --minlevel=1 $(cat /tmp/flawfinder-files.txt) > flawfinder.sarif
+
 
       - name: Upload SARIF
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
