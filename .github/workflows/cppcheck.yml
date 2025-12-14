@@ -2,14 +2,18 @@ name: Quality Assurance - cppcheck
 
 on:
   workflow_dispatch:
+    inputs:
+      full:
+        description: "Run FULL cppcheck (make check-static). If false: only changed files."
+        required: true
+        default: "false"
   push:
     branches: ["master", "main"]
   pull_request:
     branches: ["master", "main"]
   schedule:
-    # z.B. täglich nachts (kannst du auch wöchentlich machen)
-    #- cron: "15 2 * * *"
-    - cron: "15 2 * * 1" # montags
+    #- cron: "15 2 * * 1" # montags 02:15 UTC (anpassen wenn du willst)
+    - cron: "15 2 * * 1"  # montags
 
 jobs:
   cppcheck-linux:
@@ -47,14 +51,14 @@ jobs:
       - name: configure
         run: ./configure --disable-dependency-tracking
 
-      # Full scan nur im scheduled run
-      - name: cppcheck (full - scheduled)
-        if: github.event_name == 'schedule'
+      # FULL scan: scheduled ODER workflow_dispatch(full=true)
+      - name: cppcheck (full)
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full == 'true')
         run: make check-static JOBS=$(nproc)
 
-      # PR/Push: schneller Scan nur für geänderte Dateien
-      - name: cppcheck (changed files - PR/Push)
-        if: github.event_name != 'schedule'
+      # FAST scan: Push/PR oder workflow_dispatch(full=false)
+      - name: cppcheck (changed files)
+        if: github.event_name != 'schedule' && !(github.event_name == 'workflow_dispatch' && inputs.full == 'true')
         run: |
           BASE_REF="${{ github.base_ref }}"
           if [ -z "$BASE_REF" ]; then
@@ -107,12 +111,14 @@ jobs:
           LDFLAGS: -L/opt/homebrew/opt/mbedtls/lib
         run: ./configure --disable-dependency-tracking
 
-      - name: cppcheck (full - scheduled)
-        if: github.event_name == 'schedule'
+      # FULL scan: scheduled ODER workflow_dispatch(full=true)
+      - name: cppcheck (full)
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full == 'true')
         run: make check-static JOBS=$(sysctl -n hw.ncpu)
 
-      - name: cppcheck (changed files - PR/Push)
-        if: github.event_name != 'schedule'
+      # FAST scan: Push/PR oder workflow_dispatch(full=false)
+      - name: cppcheck (changed files)
+        if: github.event_name != 'schedule' && !(github.event_name == 'workflow_dispatch' && inputs.full == 'true')
         run: |
           BASE_REF="${{ github.base_ref }}"
           if [ -z "$BASE_REF" ]; then
