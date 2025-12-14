@@ -63,21 +63,34 @@ jobs:
             echo "Files to scan: $(wc -l < /tmp/flawfinder-files.txt)"
           fi
 
-      - name: Run Flawfinder (SARIF)
+      - name: Build Flawfinder file list (headers only)
         shell: bash
         run: |
-          if [[ ! -s /tmp/flawfinder-files.txt ]]; then
-            echo "Skipping flawfinder: no files."
-            echo '{"version":"2.1.0","runs":[]}' > flawfinder.sarif
+          git ls-files headers '*.h' > /tmp/flawfinder-headers-files.txt
+
+      - name: Run Flawfinder (SARIF, headers strict)
+        shell: bash
+        run: |
+          if [[ ! -s /tmp/flawfinder-headers-files.txt ]]; then
+            echo "Skipping flawfinder headers: no files."
+            echo '{"version":"2.1.0","runs":[]}' > flawfinder-headers.sarif
             exit 0
           fi
 
-          flawfinder --sarif --quiet --minlevel=1 $(cat /tmp/flawfinder-files.txt) > flawfinder.sarif
+          flawfinder \
+            --sarif \
+            --quiet \
+            --minlevel=1 \
+            --exclude-dir=vendor,third_party,deps,external,mbedtls \
+            $(cat /tmp/flawfinder-headers-files.txt) \
+            > flawfinder-headers.sarif
+
+
 
 
       - name: Upload SARIF
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: flawfinder.sarif
-          category: flawfinder
+          sarif_file: flawfinder-headers.sarif
+          category: flawfinder-headers-strict

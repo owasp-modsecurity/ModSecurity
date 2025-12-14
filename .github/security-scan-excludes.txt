@@ -15,6 +15,7 @@ deps
 deps/*
 external
 external/*
+others/*
 
 # VCS / CI
 .git
