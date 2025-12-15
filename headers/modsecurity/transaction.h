@@ -205,12 +205,9 @@ class TransactionAnchoredVariables {
         m_variableFilesTmpNames(t, "FILES_TMPNAMES"),
         m_variableMultipartPartHeaders(t, "MULTIPART_PART_HEADERS"),
         m_variableOffset(0),
-        m_pVariableArgsNames(std::make_unique<AnchoredSetVariableTranslationProxy>("ARGS_NAMES", &m_variableArgs)),
-        m_variableArgsNames(*m_pVariableArgsNames),
-        m_pVariableArgsGetNames(std::make_unique<AnchoredSetVariableTranslationProxy>("ARGS_GET_NAMES", &m_variableArgsGet)),
-        m_variableArgsGetNames(*m_pVariableArgsGetNames),
-        m_pVariableArgsPostNames(std::make_unique<AnchoredSetVariableTranslationProxy>("ARGS_POST_NAMES", &m_variableArgsPost)),
-        m_variableArgsPostNames(*m_pVariableArgsPostNames)
+        m_variableArgsNames("ARGS_NAMES", &m_variableArgs),
+        m_variableArgsGetNames("ARGS_GET_NAMES", &m_variableArgsGet),
+        m_variableArgsPostNames("ARGS_POST_NAMES", &m_variableArgsPost)
         { }
 
     AnchoredSetVariable m_variableRequestHeadersNames;
@@ -294,12 +291,9 @@ class TransactionAnchoredVariables {
 
     int m_variableOffset;
 
-    std::unique_ptr<AnchoredSetVariableTranslationProxy> m_pVariableArgsNames;
-    AnchoredSetVariableTranslationProxy &m_variableArgsNames;
-    std::unique_ptr<AnchoredSetVariableTranslationProxy> m_pVariableArgsGetNames;
-    AnchoredSetVariableTranslationProxy &m_variableArgsGetNames;
-    std::unique_ptr<AnchoredSetVariableTranslationProxy> m_pVariableArgsPostNames;
-    AnchoredSetVariableTranslationProxy &m_variableArgsPostNames;
+    AnchoredSetVariableTranslationProxy m_variableArgsNames;
+    AnchoredSetVariableTranslationProxy m_variableArgsGetNames;
+    AnchoredSetVariableTranslationProxy m_variableArgsPostNames;
 };
 
 class TransactionSecMarkerManagement {
