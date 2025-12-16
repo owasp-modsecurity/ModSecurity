@@ -56,7 +56,9 @@
 #endif
 #include <string.h>
 
-#include "src/utils/sha1.h"
+/*#include "src/utils/sha1.h"*/
+#include "src/utils/sha256.h"
+
 
 namespace modsecurity {
 
@@ -72,7 +74,9 @@ void UniqueId::fillUniqueId() {
 
     data = macAddress + name;
 
-    this->uniqueId_str = Utils::Sha1::hexdigest(data);
+    /*this->uniqueId_str = Utils::Sha1::hexdigest(data);*/
+    this->uniqueId_str = Utils::Sha256::hexdigest(data);
+
 }
 
 // Based on:

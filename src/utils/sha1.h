@@ -10,69 +10,85 @@
 
 #include <string>
 #include <string_view>
-#include <cassert>
+#include <mutex>      // NEW: std::once_flag, std::call_once
 
 #include "src/utils/string.h"
 
-// NEU: PSA statt mbedtls/sha1.h
+// PSA statt mbedtls/sha1.h
 #include <psa/crypto.h>
 
 namespace modsecurity::Utils {
 
 using DigestOp = int (*)(const unsigned char *, size_t, unsigned char []);
 
+// Gemeinsamer, thread-sicherer PSA-Init für alle Digests
+namespace detail {
+inline bool ensure_psa_init() {
+    static std::once_flag once;
+    static psa_status_t init_status = PSA_ERROR_GENERIC_ERROR;
+
+    std::call_once(once, []() {
+        init_status = psa_crypto_init();
+    });
+
+    return init_status == PSA_SUCCESS;
+}
+}  // namespace detail
+
 
 template<DigestOp digestOp, int DigestSize>
 class DigestImpl {
  public:
     static std::string digest(const std::string& input) {
-        return digestHelper(input, [](const auto digest) {
+        return digestHelper(input, [](std::string_view digest) {
             return std::string(digest);
         });
     }
 
     static void digestReplace(std::string& value) {
-        digestHelper(value, [&value](const auto digest) mutable {
-            value = digest;
+        digestHelper(value, [&value](std::string_view digest) mutable {
+            value.assign(digest.data(), digest.size());
         });
     }
 
     static std::string hexdigest(const std::string &input) {
-        return digestHelper(input, [](const auto digest) {
+        return digestHelper(input, [](std::string_view digest) {
             return utils::string::string_to_hex(digest);
         });
     }
 
  private:
     template<typename ConvertOp>
-    static auto digestHelper(const std::string &input,
-                             ConvertOp convertOp) -> auto {
-        char digest[DigestSize];
+    static auto digestHelper(const std::string &input, ConvertOp convertOp)
+        -> decltype(convertOp(std::string_view{})) {
 
-        const auto ret = (*digestOp)(
-            reinterpret_cast<const unsigned char *>(input.c_str()),
+        unsigned char digest[DigestSize];
+
+        const int ret = (*digestOp)(
+            reinterpret_cast<const unsigned char *>(input.data()),
             input.size(),
-            reinterpret_cast<unsigned char *>(digest)
+            digest
         );
-        assert(ret == 0);
 
-        return convertOp(std::string_view(digest, DigestSize));
+        // NEW: kein assert-only; in Release sonst potentiell UB.
+        if (ret != 0) {
+            return convertOp(std::string_view{}); // leerer Digest signalisiert Fehler
+        }
+
+        return convertOp(std::string_view(
+            reinterpret_cast<const char*>(digest), DigestSize
+        ));
     }
 };
 
-// NEU: Wrapper, der die PSA-API in die alte Signatur presst.
+
+// PSA-Wrapper mit alter Signatur
 inline int modsec_psa_sha1(const unsigned char *input,
                            size_t ilen,
                            unsigned char output[20])
 {
-    static bool psa_initialized = false;
-
-    if (!psa_initialized) {
-        psa_status_t init_status = psa_crypto_init();
-        if (init_status != PSA_SUCCESS) {
-            return -1;
-        }
-        psa_initialized = true;
+    if (!detail::ensure_psa_init()) {
+        return -1;
     }
 
     size_t out_len = 0;
@@ -85,16 +101,10 @@ inline int modsec_psa_sha1(const unsigned char *input,
         &out_len
     );
 
-    if (status != PSA_SUCCESS || out_len != 20) {
-        return -1;
-    }
-
-    return 0;
+    return (status == PSA_SUCCESS && out_len == 20) ? 0 : -1;
 }
 
-// Statt &mbedtls_sha1 nehmen wir jetzt unseren PSA-Wrapper
-class Sha1 : public DigestImpl<&modsec_psa_sha1, 20> {
-};
+class Sha1 : public DigestImpl<&modsec_psa_sha1, 20> {};
 
 }  // namespace modsecurity::Utils
 

@@ -8,27 +8,20 @@
 #ifndef SRC_UTILS_MD5_H_
 #define SRC_UTILS_MD5_H_
 
-#include "src/utils/sha1.h"   // bringt DigestImpl und psa/crypto.h rein
+#include "src/utils/sha1.h"   // nutzt DigestImpl + detail::ensure_psa_init()
 #include <string>
+
+#include <psa/crypto.h>       // optional (weil sha1.h es schon inkludiert), aber ok
 
 namespace modsecurity::Utils {
 
-// Wrapper mit gleicher Signatur wie mbedtls_md5,
-// intern aber PSA-API.
+// PSA-Wrapper mit alter Signatur
 inline int modsec_psa_md5(const unsigned char *input,
                           size_t ilen,
                           unsigned char output[16])
 {
-    // sha1.h macht bereits ein lazy psa_crypto_init() in modsec_psa_sha1,
-    // aber falls MD5 vor SHA1 benutzt wird, sorgen wir hier auch nochmal vor.
-    static bool psa_initialized = false;
-
-    if (!psa_initialized) {
-        psa_status_t init_status = psa_crypto_init();
-        if (init_status != PSA_SUCCESS) {
-            return -1;
-        }
-        psa_initialized = true;
+    if (!detail::ensure_psa_init()) {
+        return -1;
     }
 
     size_t out_len = 0;
@@ -41,16 +34,10 @@ inline int modsec_psa_md5(const unsigned char *input,
         &out_len
     );
 
-    if (status != PSA_SUCCESS || out_len != 16) {
-        return -1;
-    }
-
-    return 0;
+    return (status == PSA_SUCCESS && out_len == 16) ? 0 : -1;
 }
 
-// Statt &mbedtls_md5 benutzen wir jetzt &modsec_psa_md5.
-class Md5 : public DigestImpl<&modsec_psa_md5, 16> {
-};
+class Md5 : public DigestImpl<&modsec_psa_md5, 16> {};
 
 }  // namespace modsecurity::Utils
 
