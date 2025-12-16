@@ -138,12 +138,14 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
 #ifdef WITH_LIBXML2
-    m_xml(new RequestBodyProcessor::XML(this)),
+    m_xml(new RequestBodyProcessor::XML(this,
+        this->m_rules->m_requestBodyLimitAction != RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction)),
 #else
     m_xml(nullptr),
 #endif
 #ifdef WITH_YAJL
-    m_json(new RequestBodyProcessor::JSON(this)),
+    m_json(new RequestBodyProcessor::JSON(this,
+        this->m_rules->m_requestBodyLimitAction == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction)),
 #else
     m_json(nullptr),
 #endif

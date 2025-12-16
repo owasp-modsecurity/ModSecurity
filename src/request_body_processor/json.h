@@ -57,7 +57,7 @@ class JSONContainerMap : public JSONContainer {
 
 class JSON {
  public:
-    explicit JSON(Transaction *transaction);
+    explicit JSON(Transaction *transaction, unsigned int allow_partial_values = 0);
     ~JSON();
 
     static bool init();
