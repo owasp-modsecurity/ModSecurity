@@ -109,7 +109,7 @@
       "headers":{
         "Host":"localhost",
         "Restricted":"attack",
-	      "Other": "Value"
+        "Other": "Value"
       },
       "uri":"/",
       "method":"GET"
