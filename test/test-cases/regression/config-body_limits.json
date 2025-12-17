@@ -310,6 +310,290 @@
   {
     "enabled":1,
     "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded, bad value before limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "11"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body": [
+        "a=bad_value"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 11",
+      "SecRule ARGS \"bad_value\" \"id:'200001',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded, bad value after limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "12"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body": [
+        "aa=bad_value"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 11",
+      "SecRule ARGS \"bad_value\" \"id:'200001',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - json, bad value before limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "17",
+        "Content-Type": "application/json"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body": [
+        "{\"a\":\"bad_value\"}"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 16",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS \"bad_value\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - json, bad value after limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "17",
+        "Content-Type": "application/json"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body": [
+        "{\"a\":\"bad_value\"}"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 15",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS \"bad_value\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - xml, bad value before limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "17",
+        "Content-Type": "application/xml"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body": [
+        "<a>bad_value</a>"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 12",
+      "SecRule REQUEST_HEADERS:Content-Type \"(?:application(?:/soap\\+|/)|text/)xml\" \"id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML\"",
+      "SecRule XML:/* \"bad_value\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - xml, bad value after limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "17",
+        "Content-Type": "application/xml"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body": [
+        "<a>bad_value</a>"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 11",
+      "SecRule REQUEST_HEADERS:Content-Type \"(?:application(?:/soap\\+|/)|text/)xml\" \"id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML\"",
+      "SecRule XML:/* \"bad_value\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
     "title":"SecResponseBodyLimitAction Reject - Engine Disabled",
     "client":{
       "ip":"200.249.12.31",
