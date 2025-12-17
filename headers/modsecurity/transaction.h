@@ -614,8 +614,8 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      */
     std::list<std::string> m_matched;
 
-    RequestBodyProcessor::XML *m_xml;
-    RequestBodyProcessor::JSON *m_json;
+    std::unique_ptr<RequestBodyProcessor::XML> m_xml;
+    std::unique_ptr<RequestBodyProcessor::JSON> m_json;
 
     int m_secRuleEngine;
     int m_secXMLParseXmlIntoArgs;
