@@ -1,5 +1,5 @@
-[  
-  {  
+[
+  {
     "enabled":1,
     "version_min":300000,
     "version_max":0,
@@ -38,13 +38,13 @@
         "test"
       ]
     },
-    "expected":{  
+    "expected":{
       "audit_log":"",
       "debug_log":".*",
       "error_log":"",
       "http_code": 403
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecComponentSignature \"OWASP_CRS/2.2.9\"",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny,status:403,auditlog\""

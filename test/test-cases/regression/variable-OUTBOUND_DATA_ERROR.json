@@ -1,18 +1,18 @@
-[  
-  {  
+[
+  {
     "enabled":1,
     "version_min":300000,
     "title":"Testing Variables :: OUTBOUND_DATA_ERROR (1/2)",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -20,39 +20,39 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"0\" \\(Variable: OUTBOUND_DATA_ERROR\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecResponseBodyAccess On",
       "SecRule OUTBOUND_DATA_ERROR \"@eq 1\" \"id:1,phase:4,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "title":"Testing Variables :: OUTBOUND_DATA_ERROR (2/2)",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
@@ -62,7 +62,7 @@
       },
       "uri":"/",
       "method":"POST",
-      "body":[  
+      "body":[
         "--------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",
         "",
@@ -80,13 +80,13 @@
         "--------------------------756b6d74fa1a8ee2--"
       ]
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "--------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",
         "",
@@ -104,10 +104,10 @@
         "--------------------------756b6d74fa1a8ee2--"
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"1\" \\(Variable: OUTBOUND_DATA_ERROR\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecResponseBodyAccess On",
       "SecResponseBodyLimit 2",

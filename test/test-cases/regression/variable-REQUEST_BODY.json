@@ -1,18 +1,18 @@
-[  
-  {  
+[
+  {
     "enabled":1,
     "version_min":300000,
     "title":"Testing Variables :: REQUEST_BODY",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
@@ -22,7 +22,7 @@
       },
       "uri":"/",
       "method":"POST",
-      "body":[  
+      "body":[
         "--------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",
         "",
@@ -40,20 +40,20 @@
         "--------------------------756b6d74fa1a8ee2--"
       ]
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"--------------------------756b6d74fa1a8ee2\\x0aContent-Disposition: form-data; na"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRule REQUEST_BODY \"@contains small_text_file.txt\" \"id:1,phase:3,pass,t:trim\""

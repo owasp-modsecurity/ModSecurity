@@ -1,19 +1,19 @@
-[  
-  {  
+[
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:LONGITUDE [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -21,41 +21,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"-118.403999\" \\(Variable: GEO:LONGITUDE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:COUNTRY_NAME [maxmind]",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -63,41 +63,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"Brazil\" \\(Variable: GEO:COUNTRY_NAME\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:LATITUDE [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -105,41 +105,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"33.916401\" \\(Variable: GEO:LATITUDE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:COUNTRY_CODE3 [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -147,41 +147,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"USA\" \\(Variable: GEO:COUNTRY_CODE3\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:COUNTRY_CODE [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -189,41 +189,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"US\" \\(Variable: GEO:COUNTRY_CODE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:COUNTRY_CONTINENT [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -231,41 +231,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"NA\" \\(Variable: GEO:COUNTRY_CONTINENT\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:AREA_CODE [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -273,41 +273,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"310\" \\(Variable: GEO:AREA_CODE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:DMA_CODE [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -315,41 +315,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"803\" \\(Variable: GEO:DMA_CODE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:POSTAL_CODE [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -357,41 +357,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"90245\" \\(Variable: GEO:POSTAL_CODE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:REGION [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -399,41 +399,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"California\" \\(Variable: GEO:REGION\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:CITY [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -441,41 +441,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"El Segundo\" \\(Variable: GEO:CITY\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"geoip",
     "title":"Testing Variables :: GEO:LONGITUDE [GeoIP]",
-    "client":{  
+    "client":{
       "ip":"64.17.254.216",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -483,41 +483,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"-118.403999\" \\(Variable: GEO:LONGITUDE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:COUNTRY_NAME [maxmind]",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -525,41 +525,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"Brazil\" \\(Variable: GEO:COUNTRY_NAME\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:LATITUDE [maxmind]",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -567,41 +567,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"-8.051502\" \\(Variable: GEO:LATITUDE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:COUNTRY_CODE [maxmind]",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -609,41 +609,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"BR\" \\(Variable: GEO:COUNTRY_CODE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:COUNTRY_CONTINENT [maxmind]",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -651,41 +651,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"South America\" \\(Variable: GEO:COUNTRY_CONTINENT\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:POSTAL_CODE [maxmind]",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -693,41 +693,41 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"50040090\" \\(Variable: GEO:POSTAL_CODE\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
       "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "resource":"maxmind",
     "title":"Testing Variables :: GEO:CITY [maxmind]",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{ 
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*"
@@ -735,20 +735,20 @@
       "uri":"/?key=value&key=other_value",
       "method":"GET"
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"Recife\" \\(Variable: GEO:CITY\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecGeoLookupDb test-cases\/data\/GeoIP2-City-Test.mmdb",
       "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",

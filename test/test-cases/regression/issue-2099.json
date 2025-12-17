@@ -190,6 +190,6 @@
         "SecRule REQUEST_URI \"@contains /test.php\" \"id:100,phase:1,nolog,pass,ctl:ruleRemoveTargetByTag=attack-injection-php;ARGS:a,ctl:ruleRemoveTargetByTag=attack-rce;ARGS:a\"",
         "SecRule ARGS \"@contains a\" \"id:4400000,tag:'attack-injection-php',phase:2,t:none,msg:'test rule',drop\""
     ]
-  }  
+  }
 ]
 

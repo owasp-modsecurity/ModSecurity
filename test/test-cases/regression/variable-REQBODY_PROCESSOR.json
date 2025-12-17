@@ -1,18 +1,18 @@
-[  
-  {  
+[
+  {
     "enabled":1,
     "version_min":300000,
     "title":"Testing Variables :: REQBODY_PROCESSOR (1/3)",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
@@ -58,39 +58,39 @@
         "</bookstore>"
       ]
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"XML\" \\(Variable: REQBODY_PROCESSOR\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecRule REQUEST_HEADERS:Content-Type \"^(?:application(?:/soap\\+|/)|text/)xml\" \"id:500005,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
       "SecRule REQBODY_PROCESSOR \"@contains test\" \"id:1,pass,phase:2,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "title":"Testing Variables :: REQBODY_PROCESSOR (2/3)",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
@@ -117,38 +117,38 @@
         "--------------------------756b6d74fa1a8ee2--"
       ]
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"MULTIPART\" \\(Variable: REQBODY_PROCESSOR\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecRule REQBODY_PROCESSOR \"@contains test\" \"id:1,pass,t:trim\""
     ]
   },
-  {  
+  {
     "enabled":1,
     "version_min":300000,
     "title":"Testing Variables :: REQBODY_PROCESSOR (3/3)",
-    "client":{  
+    "client":{
       "ip":"200.249.12.31",
       "port":123
     },
-    "server":{  
+    "server":{
       "ip":"200.249.12.31",
       "port":80
     },
-    "request":{  
-      "headers":{  
+    "request":{
+      "headers":{
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
@@ -161,20 +161,20 @@
         "param1=value1&param2=value2"
       ]
     },
-    "response":{  
-      "headers":{  
+    "response":{
+      "headers":{
         "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
         "Content-Type":"text/html"
       },
-      "body":[  
+      "body":[
         "no need."
       ]
     },
-    "expected":{  
+    "expected":{
       "debug_log":"Target value: \"URLENCODED\" \\(Variable: REQBODY_PROCESSOR\\)"
     },
-    "rules":[  
+    "rules":[
       "SecRuleEngine On",
       "SecRule REQBODY_PROCESSOR \"@contains test\" \"id:1,pass,t:trim\""
     ]
