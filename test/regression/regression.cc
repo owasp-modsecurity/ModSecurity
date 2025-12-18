@@ -311,6 +311,7 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
         modsec_transaction.appendResponseBody(
             (unsigned char *)t->response_body.c_str(),
             t->response_body.size());
+
         modsec_transaction.processResponseBody();
         actions(&r, &modsec_transaction, &context.m_server_log);
 

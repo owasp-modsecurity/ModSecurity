@@ -149,8 +149,8 @@ extern "C" {
     }
 }
 
-XML::XML(Transaction *transaction, bool require_well_formed)
-    : m_transaction(transaction), m_require_well_formed(require_well_formed) {
+XML::XML(Transaction *transaction)
+    : m_transaction(transaction), m_require_well_formed(false) {
     m_data.doc = NULL;
     m_data.parsing_ctx = NULL;
     m_data.sax_handler = NULL;
@@ -171,7 +171,8 @@ XML::~XML() {
     }
 }
 
-bool XML::init() {
+bool XML::init(bool require_well_formed) {
+    m_require_well_formed = require_well_formed;
     //xmlParserInputBufferCreateFilenameFunc entity;
     if (m_transaction->m_rules->m_secXMLExternalEntity
         == RulesSetProperties::TrueConfigBoolean) {

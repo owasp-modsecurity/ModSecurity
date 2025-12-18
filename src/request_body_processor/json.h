@@ -57,10 +57,10 @@ class JSONContainerMap : public JSONContainer {
 
 class JSON {
  public:
-    explicit JSON(Transaction *transaction, unsigned int allow_partial_values = 0);
+    explicit JSON(Transaction *transaction);
     ~JSON();
 
-    static bool init();
+    bool init(unsigned int allow_partial_values = 0);
     bool processChunk(const char *buf, unsigned int size, std::string *err);
     bool complete(std::string *err);
 

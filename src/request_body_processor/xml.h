@@ -85,9 +85,9 @@ typedef struct xml_data xml_data;
 
 class XML {
  public:
-    explicit XML(Transaction *transaction, bool require_well_formed = true);
+    explicit XML(Transaction *transaction);
     ~XML();
-    bool init();
+    bool init(bool require_well_formed = true);
     bool processChunk(const char *buf, unsigned int size, std::string *err);
     bool complete(std::string *err);
     static xmlParserInputBufferPtr unloadExternalEntity(const char *URI,

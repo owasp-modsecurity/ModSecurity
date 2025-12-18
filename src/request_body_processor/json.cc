@@ -29,7 +29,7 @@ namespace RequestBodyProcessor {
 static const double json_depth_limit_default = 10000.0;
 static const char* json_depth_limit_exceeded_msg = ". Parsing depth limit exceeded";
 
-JSON::JSON(Transaction *transaction, unsigned int allow_partial_values)
+JSON::JSON(Transaction *transaction)
     : m_transaction(transaction),
     m_handle(NULL),
     m_current_key(""),
@@ -69,8 +69,6 @@ JSON::JSON(Transaction *transaction, unsigned int allow_partial_values)
      * TODO: make UTF8 validation optional, as it depends on Content-Encoding
      */
     m_handle = yajl_alloc(&callbacks, NULL, this);
-
-    yajl_config(m_handle, yajl_allow_partial_values, allow_partial_values);
 }
 
 
@@ -84,7 +82,8 @@ JSON::~JSON() {
 }
 
 
-bool JSON::init() {
+bool JSON::init(unsigned int allow_partial_values) {
+    yajl_config(m_handle, yajl_allow_partial_values, allow_partial_values);
     return true;
 }
 

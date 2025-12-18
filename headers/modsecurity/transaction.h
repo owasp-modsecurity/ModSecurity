@@ -645,6 +645,11 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      * the web server (connector) log.
      */
     void *m_logCbData;
+
+    /**
+     * Whether the request body was bigger than RequestBodyLimit.
+     */
+    bool m_requestBodyLimitExceeded;
 };
 
 
