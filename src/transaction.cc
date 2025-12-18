@@ -138,12 +138,12 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
 #ifdef WITH_LIBXML2
-    m_xml(std::make_unique<RequestBodyProcessor::XML>(this)),
+    m_xml(new RequestBodyProcessor::XML(this)),
 #else
     m_xml(nullptr),
 #endif
 #ifdef WITH_YAJL
-    m_json(std::make_unique<RequestBodyProcessor::JSON>(this)),
+    m_json(new RequestBodyProcessor::JSON(this)),
 #else
     m_json(nullptr),
 #endif
@@ -173,6 +173,13 @@ Transaction::~Transaction() {
 
     intervention::free(&m_it);
     intervention::clean(&m_it);
+
+#ifdef WITH_YAJL
+    delete m_json;
+#endif
+#ifdef WITH_LIBXML2
+    delete m_xml;
+#endif
 }
 
 
