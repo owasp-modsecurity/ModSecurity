@@ -428,3 +428,96 @@
 		),
 	),
 },
+{
+	type => "rule",
+	comment => "xml ProcessPartial, bad value and whole body before limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 61
+		SecXmlExternalEntity Off
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
+		SecRule XML:/* "bad_value" "id:'500007',phase:2,t:none,deny"
+	),
+	match_log => {
+        error => [ qr/Access denied with code 403 \(phase 2\). Pattern match "bad_value" at XML\./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+		],
+		normalize_raw_request_data(
+			q(<?xml version="1.0" encoding="utf-8"?><a><b>bad_value</b></a>),
+		),
+	),
+},
+{
+	type => "rule",
+	comment => "xml ProcessPartial, bad value before limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 61
+		SecXmlExternalEntity Off
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
+		SecRule XML:/* "bad_value" "id:'500007',phase:2,t:none,deny"
+	),
+	match_log => {
+        error => [ qr/Access denied with code 403 \(phase 2\). Pattern match "bad_value" at XML\./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+		],
+		normalize_raw_request_data(
+			q(<?xml version="1.0" encoding="utf-8"?><a><b>bad_value</b><c>ok_value</c></a>),
+		),
+	),
+},
+{
+	type => "rule",
+	comment => "xml ProcessPartial, bad value after limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 61
+		SecXmlExternalEntity Off
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
+		SecRule XML:/* "bad_value" "id:'500007',phase:2,t:none,deny"
+	),
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+		],
+		normalize_raw_request_data(
+			q(<?xml version="1.0" encoding="utf-8"?><a><b>12</b><c>bad_value</c></a>),
+		),
+	),
+},

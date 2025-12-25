@@ -267,7 +267,7 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
         if (msr->xml->parsing_ctx != NULL &&
             msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
             xmlParseChunk(msr->xml->parsing_ctx, buf, size, 0);
-            if (msr->xml->parsing_ctx->wellFormed != 1) {
+            if (!msr->xml->allow_ill_formed && msr->xml->parsing_ctx->wellFormed != 1) {
                 *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document.");
                 return -1;
             }
@@ -318,7 +318,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
             msr->xml->parsing_ctx = NULL;
             msr_log(msr, 4, "XML: Parsing complete (well_formed %u).", msr->xml->well_formed);
 
-            if (msr->xml->well_formed != 1) {
+            if (!msr->xml->allow_ill_formed && msr->xml->well_formed != 1) {
                 *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document.");
                 return -1;
             }

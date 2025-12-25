@@ -1054,7 +1054,7 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                 }
             }
 
-            if (msr->mpd->is_complete == 0) {
+            if (msr->mpd->is_complete == 0 && msr->mpd->allow_process_partial == 0) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Final boundary missing.");
                 return -1;
             }

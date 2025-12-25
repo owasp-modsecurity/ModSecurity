@@ -48,6 +48,8 @@ struct json_data {
 
 int DSOLOCAL json_init(modsec_rec *msr, char **error_msg);
 
+void DSOLOCAL json_allow_partial_values(modsec_rec *msr);
+
 int DSOLOCAL json_process(modsec_rec *msr, const char *buf,
     unsigned int size, char **error_msg);
 

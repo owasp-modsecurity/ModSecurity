@@ -124,6 +124,7 @@ struct multipart_data {
 
     int                      seen_data;
     int                      is_complete;
+    int                      allow_process_partial;
 
     int                      flag_error;
     int                      flag_data_before;

@@ -258,6 +258,195 @@
 			),
 		),
 	),
-}
-
-
+},
+{
+	type => "rule",
+	comment => "LimitAction ProcessPartial, bad value and whole body before limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyNoFilesLimit 26
+		SecRequestBodyLimit 26
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "application/json" \\
+		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 403 \(phase 2\)\. Pattern match "bad_value" at ARGS:b\./, 1 ],
+		debug => [ qr/Adding JSON argument 'b' with value 'bad_value'|JSON support was not enabled/, 1 ],
+		-debug => [ qr/JSON set reqbody_limit_exceeded|JSON support was not enabled/, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		q({"a":1234,"b":"bad_value"}),
+	),
+},
+{
+	type => "rule",
+	comment => "LimitAction ProcessPartial, bad value before limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyNoFilesLimit 26
+		SecRequestBodyLimit 26
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "application/json" \\
+		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 403 \(phase 2\)\. Pattern match "bad_value" at ARGS:b\./, 1 ],
+		debug => [ qr/JSON set reqbody_limit_exceeded|JSON support was not enabled/, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		q({"a":12345,"b":"bad_value"}),
+	),
+},
+{
+	type => "rule",
+	comment => "LimitAction ProcessPartial, bad value after limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyNoFilesLimit 26
+		SecRequestBodyLimit 26
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "application/json" \\
+		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+	),
+	match_log => {
+		debug => [ qr/JSON set reqbody_limit_exceeded|JSON support was not enabled/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		q({"a":123456,"b":"bad_value"}),
+	),
+},
+{
+	type => "rule",
+	comment => "LimitAction Reject, bad value and whole body before limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction Reject
+		SecRequestBodyNoFilesLimit 26
+		SecRequestBodyLimit 26
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "application/json" \\
+		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 403 \(phase 2\)\. Pattern match "bad_value" at ARGS:b\./, 1 ],
+		debug => [ qr/Adding JSON argument 'b' with value 'bad_value'|JSON support was not enabled/, 1 ],
+		-debug => [ qr/JSON set reqbody_limit_exceeded|JSON support was not enabled/, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		q({"a":1234,"b":"bad_value"}),
+	),
+},
+{
+	type => "rule",
+	comment => "LimitAction Reject, bad value before limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction Reject
+		SecRequestBodyNoFilesLimit 26
+		SecRequestBodyLimit 26
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "application/json" \\
+		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Request body \(Content-Length\) is larger than the configured limit \(26\)\./, 1 ],
+	},
+	match_response => {
+		status => qr/^413$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		q({"a":12345,"b":"bad_value"}),
+	),
+},
+{
+	type => "rule",
+	comment => "LimitAction Reject, bad value after limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction Reject
+		SecRequestBodyNoFilesLimit 26
+		SecRequestBodyLimit 26
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "application/json" \\
+		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Request body \(Content-Length\) is larger than the configured limit \(26\)\./, 1 ],
+	},
+	match_response => {
+		status => qr/^413$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		q({"a":123456,"b":"bad_value"}),
+	),
+},

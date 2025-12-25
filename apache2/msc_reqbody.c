@@ -413,12 +413,13 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
             msr_log(msr, 1, "%s", *error_msg);
         }
 
-        msr->msc_reqbody_error = 1;
+        if (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)
+            msr->msc_reqbody_error = 1;
 
-        if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))   {
+        if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
             return -5;
-        } else if (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)  {
-            if(msr->txcfg->is_enabled == MODSEC_ENABLED)
+        } else if (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL) {
+            if (msr->txcfg->is_enabled == MODSEC_ENABLED)
                 return -5;
         }
     }
@@ -436,6 +437,24 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
     *error_msg = apr_psprintf(msr->mp, "Internal error, unknown value for msc_reqbody_storage: %u",
         msr->msc_reqbody_storage);
     return -1;
+}
+
+/**
+ * Enable partial processing of request body data.
+ */
+void modsecurity_request_body_enable_partial_processing(modsec_rec *msr) {
+    if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
+        msr->mpd->allow_process_partial = 1;
+        msr_log(msr, 4, "Multipart: Allow partial processing of request body");
+    }
+    else if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
+        msr->xml->allow_ill_formed = 1;
+        msr_log(msr, 4, "XML: Allow partial processing of request body");
+    }
+    else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
+        json_allow_partial_values(msr);
+        msr_log(msr, 4, "JSON: Allow partial processing of request body");
+    }
 }
 
 apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buffer, int buflen, char **error_msg) {

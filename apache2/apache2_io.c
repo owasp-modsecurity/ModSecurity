@@ -299,15 +299,16 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 #endif
             }
 
+            if (msr->reqbody_length + buflen > (apr_size_t)msr->txcfg->reqbody_limit && msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL) {
+                buflen = (apr_size_t)msr->txcfg->reqbody_limit - msr->reqbody_length;
+                finished_reading = 1;
+                modsecurity_request_body_enable_partial_processing(msr);
+            }
+
             msr->reqbody_length += buflen;
 
             if (buflen != 0) {
                 int rcbs = modsecurity_request_body_store(msr, buf, buflen, error_msg);
-
-                if (msr->reqbody_length > (apr_size_t)msr->txcfg->reqbody_limit && msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL) {
-                    finished_reading = 1;
-                }
-
                 if (rcbs < 0) {
                     if (rcbs == -5) {
                         if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
@@ -351,11 +352,13 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
     msr->if_status = IF_STATUS_WANTS_TO_RUN;
 
-    if (rcbe == -5) {
-        return HTTP_REQUEST_ENTITY_TOO_LARGE;
-    }
-    if (rcbe < 0) {
-        return HTTP_INTERNAL_SERVER_ERROR;
+    if (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT) {
+        if (rcbe == -5) {
+            return HTTP_REQUEST_ENTITY_TOO_LARGE;
+        }
+        if (rcbe < 0) {
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
     }
     return APR_SUCCESS;
 }

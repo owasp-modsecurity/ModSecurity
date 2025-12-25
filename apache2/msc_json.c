@@ -367,6 +367,10 @@ int json_init(modsec_rec *msr, char **error_msg) {
     return 1;
 }
 
+void json_allow_partial_values(modsec_rec *msr) {
+    (void)yajl_config(msr->json->handle, yajl_allow_partial_values, 1);
+}
+
 /**
  * Feed one chunk of data to the JSON parser.
  */
