@@ -217,7 +217,7 @@ the utilities, follow the commands listed below:
 
 ```shell
 $ cd /path/to/your/ModSecurity
-$ git submodule foreach git pull
+$ git submodule update --init --recursive
 $ make check
  ```
 

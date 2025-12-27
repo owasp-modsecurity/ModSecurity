@@ -68,8 +68,7 @@ AC_MSG_ERROR([\
 
   You can download libInjection using git:
 
-     $ git submodule init
-     $ git submodule update
+     $ git submodule update --init --recursive
 
    ])
 fi
@@ -90,8 +89,7 @@ AC_MSG_ERROR([\
 
   You can download Mbed TLS using git:
 
-     $ git submodule init
-     $ git submodule update
+     $ git submodule update --init --recursive
 
    ])
 fi
