@@ -143,6 +143,9 @@ void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
     if (std::getenv("AUTOMAKE_TESTS")) {
         m_automake_output = true;
     }
+    if (std::getenv("ALWAYS_SHOW_LOG")) {
+        m_always_show_log = true;
+    }
 
     if (argc > i && argv[i]) {
         this->target = argv[i];

@@ -35,7 +35,8 @@ template <class T> class ModSecurityTest :
         : m_test_number(0),
         m_automake_output(false),
         m_count_all(false),
-        m_test_multithreaded(false) { }
+        m_test_multithreaded(false),
+        m_always_show_log(false) { }
 
     std::string header();
     void cmd_options(int, char **);
@@ -50,6 +51,7 @@ template <class T> class ModSecurityTest :
     bool m_automake_output;
     bool m_count_all;
     bool m_test_multithreaded;
+    bool m_always_show_log;
 };
 
 }  // namespace modsecurity_test

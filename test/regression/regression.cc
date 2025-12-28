@@ -376,7 +376,7 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
             testRes->passed = true;
         }
 
-        if (testRes->passed == false) {
+        if (!testRes->passed || test.m_always_show_log) {
             testRes->reason << std::endl;
             testRes->reason << KWHT << "Debug log:" << RESET << std::endl;
             testRes->reason << d->log_messages() << std::endl;
@@ -508,6 +508,17 @@ int main(int argc, char **argv)
                 std::cout << r->reason.str() << std::endl;
             }
             failed++;
+        } else if (test.m_always_show_log && r->passed) {
+            if (!test.m_automake_output) {
+                std::cout << KGRN << "Test passed." << RESET << KWHT \
+                    << " From: " \
+                    << RESET << r->test->filename << "." << std::endl;
+                std::cout << KWHT << "Test name: " << RESET \
+                    << r->test->name \
+                    << "." << std::endl;
+                std::cout << KWHT << "Logs: " << RESET << std::endl;
+                std::cout << r->reason.str() << std::endl;
+            }
         }
         delete r;
     }
