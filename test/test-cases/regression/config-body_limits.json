@@ -647,10 +647,11 @@
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
       "SecRule ARGS \"bad_value\" \"id:'200002',phase:2,t:none,deny"
     ]
-  },  
+  },
   {
     "enabled":1,
     "version_min":300000,
+    "resource":"libxml2",
     "title":"SecRequestBodyLimitAction ProcessPartial - xml, bad value before limit",
     "client":{
       "ip":"200.249.12.31",
@@ -700,6 +701,7 @@
   {
     "enabled":1,
     "version_min":300000,
+    "resource":"libxml2",
     "title":"SecRequestBodyLimitAction ProcessPartial - xml, bad value after limit",
     "client":{
       "ip":"200.249.12.31",
@@ -749,6 +751,7 @@
   {
     "enabled":1,
     "version_min":300000,
+    "resource":"libxml2",
     "title":"SecRequestBodyLimitAction ProcessPartial - xml, ill-formed, but well-formed before limit",
     "client":{
       "ip":"200.249.12.31",
@@ -797,6 +800,7 @@
   {
     "enabled":1,
     "version_min":300000,
+    "resource":"libxml2",
     "title":"SecRequestBodyLimitAction ProcessPartial - xml, ill-formed starts just before limit",
     "client":{
       "ip":"200.249.12.31",
@@ -845,6 +849,7 @@
   {
     "enabled":1,
     "version_min":300000,
+    "resource":"libxml2",
     "title":"SecRequestBodyLimitAction ProcessPartial - RequestBodyNoFilesLimit ignored",
     "client":{
       "ip":"200.249.12.31",
