@@ -28,7 +28,7 @@
       "uri": "\/test.pl?parm1=test1&parm2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "expected": {
       "audit_log": "--A--",

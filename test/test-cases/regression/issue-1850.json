@@ -30,7 +30,7 @@
       "uri": "\/test.pl?foo=£&bar=%C2%A3",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {

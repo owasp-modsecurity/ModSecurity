@@ -28,7 +28,7 @@
       "uri":"\/test.pl?resource=whee",
       "method":"GET",
       "http_version":1.1,
-      "body":""
+      "body":"\n"
     },
     "response":{
       "headers":{
@@ -80,7 +80,7 @@
       "uri":"\/test.pl?resource=whee",
       "method":"GET",
       "http_version":1.1,
-      "body":""
+      "body":"\n"
     },
     "response":{
       "headers":{

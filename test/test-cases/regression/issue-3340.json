@@ -29,13 +29,13 @@
       "uri": "/",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
         "Content-Type": "text\/xml; charset=utf-8"
       },
-      "body": "<html><body>OK</bod></html>"
+      "body": "<html><body>OK</bod></html>\n"
     },
     "expected": {
       "http_code": 403

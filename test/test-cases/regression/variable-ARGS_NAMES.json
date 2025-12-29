@@ -27,7 +27,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -66,7 +66,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -100,7 +100,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -110,7 +110,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -144,7 +144,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -154,7 +154,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -189,15 +189,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name1\"\r",
-                "\r",
-                "content1\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name2\"\r",
-                "\r",
-                "content2\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name1\"\r\n",
+                "\r\n",
+                "content1\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name2\"\r\n",
+                "\r\n",
+                "content2\r\n",
+                "--0000--\r\n"
       ]
     },
     "response":{
@@ -205,7 +205,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

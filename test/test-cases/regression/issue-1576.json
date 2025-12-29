@@ -20,17 +20,17 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "{",
-        "   \"foo\":\"bar\",",
-        "   \"mod\":\"sec\",",
-        "   \"ops\": [",
-        "       [\"um\", \"um e meio\"], ",
-        "       \"dois\",",
-        "       \"tres\",",
-        "       { \"eins\": [\"zwei\", \"drei\"] }",
-        "    ],",
-        "   \"whee\": \"lhebs\"",
-        "}"
+        "{\n",
+        "   \"foo\":\"bar\",\n",
+        "   \"mod\":\"sec\",\n",
+        "   \"ops\": [\n",
+        "       [\"um\", \"um e meio\"], \n",
+        "       \"dois\",\n",
+        "       \"tres\",\n",
+        "       { \"eins\": [\"zwei\", \"drei\"] }\n",
+        "    ],\n",
+        "   \"whee\": \"lhebs\"\n",
+        "}\n"
       ]
     },
     "server":{
@@ -68,11 +68,11 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "[",
-        "   \"one\",",
-        "   \"two\",",
-        "   \"three\"",
-        "]"
+        "[\n",
+        "   \"one\",\n",
+        "   \"two\",\n",
+        "   \"three\"\n",
+        "]\n"
       ]
     },
     "server":{
@@ -110,20 +110,20 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "{",
-        "   \"foo\":\"bar\",",
-        "   \"mod\":\"sec\",",
-        "   \"ops\": {",
-        "       \"um\": \"um e meio\", ",
-        "       \"dois\": \"tres\",",
-        "       \"quatro\": \"cinco\",",
-        "       \"seis\": {",
-        "           \"dez\": \"onze\",",
-        "           \"doze\": \"treze\"",
-        "       }",
-        "    },",
-        "   \"whee\": \"lhebs\"",
-        "}"
+        "{\n",
+        "   \"foo\":\"bar\",\n",
+        "   \"mod\":\"sec\",\n",
+        "   \"ops\": {\n",
+        "       \"um\": \"um e meio\", \n",
+        "       \"dois\": \"tres\",\n",
+        "       \"quatro\": \"cinco\",\n",
+        "       \"seis\": {\n",
+        "           \"dez\": \"onze\",\n",
+        "           \"doze\": \"treze\"\n",
+        "       }\n",
+        "    },\n",
+        "   \"whee\": \"lhebs\"\n",
+        "}\n"
       ]
     },
     "server":{

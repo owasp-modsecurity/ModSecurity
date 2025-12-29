@@ -27,7 +27,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -66,7 +66,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -100,7 +100,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value12%&param2=value2%2"
+        "param1=value12%&param2=value2%2\n"
       ]
     },
     "response":{
@@ -110,7 +110,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -144,7 +144,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2&a=b5%2a\n"
+        "param1=value1&param2=value2&a=b5%2a\n\n"
       ]
     },
     "response":{
@@ -154,7 +154,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -188,7 +188,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "a=%EC%A7%84%20%EB%A7%88%EC%9D%BC%20%EB%A6%AC"
+        "a=%EC%A7%84%20%EB%A7%88%EC%9D%BC%20%EB%A6%AC\n"
       ]
     },
     "response":{
@@ -198,7 +198,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -239,7 +239,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -280,7 +280,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

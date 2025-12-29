@@ -23,20 +23,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
       ]
     },
     "response":{
@@ -46,7 +46,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -84,15 +84,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response":{
@@ -102,7 +102,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -140,15 +140,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response":{
@@ -158,7 +158,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -196,15 +196,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--------------------------------------------------boundary\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "--------------------------------------------------boundary\r",
-                "Content-Disposition: form-data; name=\"b\"\r",
-                "\r",
-                "2\r",
-                "--------------------------------------------------boundary--\r"
+                "--------------------------------------------------boundary\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "--------------------------------------------------boundary\r\n",
+                "Content-Disposition: form-data; name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "--------------------------------------------------boundary--\r\n"
       ]
     },
     "response":{
@@ -214,7 +214,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -252,15 +252,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "----------0xKhTmLbOuNdArY\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "----------0xKhTmLbOuNdArY\r",
-                "Content-Disposition: form-data; name=\"b\"\r",
-                "\r",
-                "2\r",
-                "----------0xKhTmLbOuNdArY--\r"
+                "----------0xKhTmLbOuNdArY\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "----------0xKhTmLbOuNdArY\r\n",
+                "Content-Disposition: form-data; name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "----------0xKhTmLbOuNdArY--\r\n"
       ]
     },
     "response":{
@@ -270,7 +270,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -308,15 +308,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "--test\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"b\"\r",
-                "\r",
-                "--\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "--test\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"b\"\r\n",
+                "\r\n",
+                "--\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
 
       ]
     },
@@ -327,7 +327,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -364,14 +364,14 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"b\"\r",
-                "\r",
-                "2\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n"
       ]
     },
     "response":{
@@ -381,7 +381,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -417,13 +417,13 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response":{
@@ -433,7 +433,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -469,15 +469,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data name=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response":{
@@ -487,7 +487,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -523,15 +523,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response":{
@@ -541,7 +541,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -577,17 +577,17 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                ":\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                ":\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response":{
@@ -597,7 +597,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -633,17 +633,17 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                " name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                "    name=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                " name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                "    name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
         ]
     },
     "response":{
@@ -653,7 +653,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -691,17 +691,17 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                "       name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                "               name=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                "       name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                "               name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
         ]
     },
     "response":{
@@ -711,7 +711,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -749,16 +749,16 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                "               name=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                "               name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
         ]
     },
     "response":{
@@ -768,7 +768,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -806,16 +806,16 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                "\fname=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                "\fname=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
         ]
     },
     "response":{
@@ -825,7 +825,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -863,16 +863,16 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data;\r",
-                "\f\tname=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data;\r\n",
+                "\f\tname=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
         ]
     },
     "response":{
@@ -882,7 +882,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -920,16 +920,16 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646--\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"b\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"b\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
         ]
     },
     "response":{
@@ -939,7 +939,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -975,15 +975,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=\"a\"\r",
-                "\r",
-                "1\r",
-                "-----------------------------69343412719991675451336310646\r",
-                "Content-Disposition: form-data; name=';filename=\"dummy';name=b;\"\r",
-                "\r",
-                "2\r",
-                "-----------------------------69343412719991675451336310646--\r"
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=\"a\"\r\n",
+                "\r\n",
+                "1\r\n",
+                "-----------------------------69343412719991675451336310646\r\n",
+                "Content-Disposition: form-data; name=';filename=\"dummy';name=b;\"\r\n",
+                "\r\n",
+                "2\r\n",
+                "-----------------------------69343412719991675451336310646--\r\n"
 
         ]
     },
@@ -994,7 +994,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1032,20 +1032,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1055,7 +1055,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1093,20 +1093,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1116,7 +1116,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1153,20 +1153,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1176,7 +1176,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1214,20 +1214,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1237,7 +1237,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1275,20 +1275,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1298,7 +1298,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1336,20 +1336,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1359,7 +1359,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1397,20 +1397,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1420,7 +1420,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1457,20 +1457,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1480,7 +1480,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1518,20 +1518,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1541,7 +1541,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1578,20 +1578,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1601,7 +1601,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1639,20 +1639,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1662,7 +1662,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1700,20 +1700,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1723,7 +1723,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1761,20 +1761,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1784,7 +1784,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1822,20 +1822,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1845,7 +1845,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1883,20 +1883,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1906,7 +1906,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1944,20 +1944,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -1967,7 +1967,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2005,20 +2005,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--00\"00\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--00\"00\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--00\"00\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--00\"00--\r"
+                "--00\"00\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--00\"00\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--00\"00\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--00\"00--\r\n"
         ]
     },
     "response":{
@@ -2028,7 +2028,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2066,20 +2066,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--00\"00\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--00\"00\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--00\"00\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--00\"00--\r"
+                "--00\"00\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--00\"00\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--00\"00\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--00\"00--\r\n"
         ]
     },
     "response":{
@@ -2089,7 +2089,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2127,20 +2127,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -2150,7 +2150,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2188,20 +2188,20 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -2211,7 +2211,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2249,30 +2249,30 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: attachment\r",
-                "Content-Type: multipart/mixed; boundary=BbC04y\r",
-                "\r",
-                "--BbC04y\r",
-                "Content-Disposition: file; filename=\"file1.txt\"\r",
-                "Content-Type: text/plain\r",
-                "\r",
-                "... contents of file1.txt ...\r",
-                "--BbC04y\r",
-                "Content-Disposition: file; filename=\"file2.gif\r",
-                "Content-Type: image/jpeg\r",
-                "Content-Transfer-Encoding: binary\r",
-                "\r",
-                "...contents of file2.gif...\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: attachment\r\n",
+                "Content-Type: multipart/mixed; boundary=BbC04y\r\n",
+                "\r\n",
+                "--BbC04y\r\n",
+                "Content-Disposition: file; filename=\"file1.txt\"\r\n",
+                "Content-Type: text/plain\r\n",
+                "\r\n",
+                "... contents of file1.txt ...\r\n",
+                "--BbC04y\r\n",
+                "Content-Disposition: file; filename=\"file2.gif\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "Content-Transfer-Encoding: binary\r\n",
+                "\r\n",
+                "...contents of file2.gif...\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -2282,7 +2282,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2320,29 +2320,29 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Type: multipart/mixed; boundary=BbC04y\r",
-                "\r",
-                "--BbC04y\r",
-                "Content-Disposition: file; filename=\"file1.txt\"\r",
-                "Content-Type: text/plain\r",
-                "\r",
-                "... contents of file1.txt ...\r",
-                "--BbC04y\r",
-                "Content-Disposition: file; filename=\"file2.gif\r",
-                "Content-Type: image/jpeg\r",
-                "Content-Transfer-Encoding: binary\r",
-                "\r",
-                "...contents of file2.gif...\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Type: multipart/mixed; boundary=BbC04y\r\n",
+                "\r\n",
+                "--BbC04y\r\n",
+                "Content-Disposition: file; filename=\"file1.txt\"\r\n",
+                "Content-Type: text/plain\r\n",
+                "\r\n",
+                "... contents of file1.txt ...\r\n",
+                "--BbC04y\r\n",
+                "Content-Disposition: file; filename=\"file2.gif\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "Content-Transfer-Encoding: binary\r\n",
+                "\r\n",
+                "...contents of file2.gif...\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -2352,7 +2352,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2390,34 +2390,34 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name\"\r",
-                "\r",
-                "Brian Rectanus\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"email\"\r",
-                "\r",
-                "brian.rectanus@breach.com\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image1\"; filename=\"image1.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA1\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image2\"; filename=\"image2.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA2\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"image3\"; filename=\"image3.jpg\"\r",
-                "Content-Type: image/jpeg\r",
-                "\r",
-                "BINARYDATA3\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"test\"\r",
-                "\r",
-                "This is test data.\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name\"\r\n",
+                "\r\n",
+                "Brian Rectanus\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"email\"\r\n",
+                "\r\n",
+                "brian.rectanus@breach.com\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image1\"; filename=\"image1.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA1\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image2\"; filename=\"image2.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA2\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"image3\"; filename=\"image3.jpg\"\r\n",
+                "Content-Type: image/jpeg\r\n",
+                "\r\n",
+                "BINARYDATA3\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"test\"\r\n",
+                "\r\n",
+                "This is test data.\r\n",
+                "--0000--\r\n"
         ]
     },
     "response":{
@@ -2427,7 +2427,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2473,26 +2473,26 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "9e433de44c9e9b4ce19603269aa34edb\r",
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332273--\r"
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "9e433de44c9e9b4ce19603269aa34edb\r\n",
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332273--\r\n"
         ]
     },
     "response":{
@@ -2502,7 +2502,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2537,26 +2537,26 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "9e433de44c9e9b4ce19603269aa34edb\r",
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332273--\r"
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "9e433de44c9e9b4ce19603269aa34edb\r\n",
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332273--\r\n"
         ]
     },
     "response":{
@@ -2566,7 +2566,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2602,26 +2602,26 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332274\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "9e433de44c9e9b4ce19603269aa34edb\r",
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332273--\r"
+              "-------------------------------8842564605616207552020332274\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "9e433de44c9e9b4ce19603269aa34edb\r\n",
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332273--\r\n"
         ]
     },
     "response":{
@@ -2631,7 +2631,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2667,26 +2667,26 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "9e433de44c9e9b4ce19603269aa34edb\r",
-              "-------------------------------8842564605616207552020332274\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332273--\r"
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "9e433de44c9e9b4ce19603269aa34edb\r\n",
+              "-------------------------------8842564605616207552020332274\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332273--\r\n"
         ]
     },
     "response":{
@@ -2696,7 +2696,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2732,26 +2732,26 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "9e433de44c9e9b4ce19603269aa34edb\r",
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332274--\r"
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "9e433de44c9e9b4ce19603269aa34edb\r\n",
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332274--\r\n"
         ]
     },
     "response":{
@@ -2761,7 +2761,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2797,22 +2797,22 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332274\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332273--\r"
+              "-------------------------------8842564605616207552020332274\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332273--\r\n"
         ]
     },
     "response":{
@@ -2822,7 +2822,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2858,22 +2858,22 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332274--\r"
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332274--\r\n"
         ]
     },
     "response":{
@@ -2883,7 +2883,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2919,36 +2919,36 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-----------------------------3163850615828140691827348175\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "3eeb646795ba8db63b05ba77df2a0b2c\r",
-              "-----------------------------3163850615828140691827348175\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"multipart_text.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "Content-Type: multipart/alternative; boundary=\"00000000000041382f056d9314e6\"\r",
-              "\r",
-              "--00000000000041382f056d9314e6\r",
-              "Content-Type: text/plain; charset=\"UTF-8\"\r",
-              "Content-Transfer-Encoding: quoted-printable\r",
-              "\r",
-              "Hi,\r",
-              "\r",
-              "...\r",
-              "\r",
-              "--00000000000041382f056d9314e6\r",
-              "Content-Type: text/html; charset=\"UTF-8\"\r",
-              "Content-Transfer-Encoding: quoted-printable\r",
-              "\r",
-              "<div ...>\r",
-              "...\r",
-              "</div>\r",
-              "\r",
-              "--00000000000041382f056d9314e6--\r",
-              "\r",
-              "\r",
-              "-----------------------------3163850615828140691827348175--\r"
+              "-----------------------------3163850615828140691827348175\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "3eeb646795ba8db63b05ba77df2a0b2c\r\n",
+              "-----------------------------3163850615828140691827348175\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"multipart_text.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "Content-Type: multipart/alternative; boundary=\"00000000000041382f056d9314e6\"\r\n",
+              "\r\n",
+              "--00000000000041382f056d9314e6\r\n",
+              "Content-Type: text/plain; charset=\"UTF-8\"\r\n",
+              "Content-Transfer-Encoding: quoted-printable\r\n",
+              "\r\n",
+              "Hi,\r\n",
+              "\r\n",
+              "...\r\n",
+              "\r\n",
+              "--00000000000041382f056d9314e6\r\n",
+              "Content-Type: text/html; charset=\"UTF-8\"\r\n",
+              "Content-Transfer-Encoding: quoted-printable\r\n",
+              "\r\n",
+              "<div ...>\r\n",
+              "...\r\n",
+              "</div>\r\n",
+              "\r\n",
+              "--00000000000041382f056d9314e6--\r\n",
+              "\r\n",
+              "\r\n",
+              "-----------------------------3163850615828140691827348175--\r\n"
         ]
     },
     "response":{
@@ -2958,7 +2958,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -2994,26 +2994,26 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "9e433de44c9e9b4ce19603269aa34edb\r",
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332273--\r"
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "9e433de44c9e9b4ce19603269aa34edb\r\n",
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332273--\r\n"
         ]
     },
     "response":{
@@ -3023,7 +3023,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -3059,26 +3059,26 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332274\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "9e433de44c9e9b4ce19603269aa34edb\r",
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332273--\r"
+              "-------------------------------8842564605616207552020332274\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "9e433de44c9e9b4ce19603269aa34edb\r\n",
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332273--\r\n"
         ]
     },
     "response":{
@@ -3088,7 +3088,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -3124,26 +3124,26 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-------------------------------8842564605616207552020332273\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "9e433de44c9e9b4ce19603269aa34edb\r",
-              "-------------------------------8842564605616207552020332274\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "----ea520cef1a2937d8e928e357992c8fdd\r",
-              "Content-Transfer-Encoding: 7bit\r",
-              "Content-Type: text/plain; charset=US-ASCII;\r",
-              " format=flowed\r",
-              "\r",
-              "Test message, the txt file had been attached.\r",
-              "\r",
-              "--\r",
-              "Ervin\r",
-              "\r",
-              "\r",
-              "-------------------------------8842564605616207552020332273--\r"
+              "-------------------------------8842564605616207552020332273\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "9e433de44c9e9b4ce19603269aa34edb\r\n",
+              "-------------------------------8842564605616207552020332274\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"msg.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "----ea520cef1a2937d8e928e357992c8fdd\r\n",
+              "Content-Transfer-Encoding: 7bit\r\n",
+              "Content-Type: text/plain; charset=US-ASCII;\r\n",
+              " format=flowed\r\n",
+              "\r\n",
+              "Test message, the txt file had been attached.\r\n",
+              "\r\n",
+              "--\r\n",
+              "Ervin\r\n",
+              "\r\n",
+              "\r\n",
+              "-------------------------------8842564605616207552020332273--\r\n"
         ]
     },
     "response":{
@@ -3153,7 +3153,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -3189,36 +3189,36 @@
       "uri":"/",
       "method":"POST",
       "body":[
-              "-----------------------------3163850615828140691827348175\r",
-              "Content-Disposition: form-data; name=\"_token\"\r",
-              "\r",
-              "3eeb646795ba8db63b05ba77df2a0b2c\r",
-              "-----------------------------3163850615828140691827348175\r",
-              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"multipart_text.txt\"\r",
-              "Content-Type: text/plain\r",
-              "\r",
-              "Content-Type: multipart/alternative; boundary=\"00000000000041382f056d9314e6\"\r",
-              "\r",
-              "--00000000000041382f056d9314e6\r",
-              "Content-Type: text/plain; charset=\"UTF-8\"\r",
-              "Content-Transfer-Encoding: quoted-printable\r",
-              "\r",
-              "Hi,\r",
-              "\r",
-              "...\r",
-              "\r",
-              "--00000000000041382f056d9314e6\r",
-              "Content-Type: text/html; charset=\"UTF-8\"\r",
-              "Content-Transfer-Encoding: quoted-printable\r",
-              "\r",
-              "<div ...>\r",
-              "...\r",
-              "</div>\r",
-              "\r",
-              "--00000000000041382f056d9314e6--\r",
-              "\r",
-              "\r",
-              "-----------------------------3163850615828140691827348175--\r"
+              "-----------------------------3163850615828140691827348175\r\n",
+              "Content-Disposition: form-data; name=\"_token\"\r\n",
+              "\r\n",
+              "3eeb646795ba8db63b05ba77df2a0b2c\r\n",
+              "-----------------------------3163850615828140691827348175\r\n",
+              "Content-Disposition: form-data; name=\"_attachments[]\"; filename=\"multipart_text.txt\"\r\n",
+              "Content-Type: text/plain\r\n",
+              "\r\n",
+              "Content-Type: multipart/alternative; boundary=\"00000000000041382f056d9314e6\"\r\n",
+              "\r\n",
+              "--00000000000041382f056d9314e6\r\n",
+              "Content-Type: text/plain; charset=\"UTF-8\"\r\n",
+              "Content-Transfer-Encoding: quoted-printable\r\n",
+              "\r\n",
+              "Hi,\r\n",
+              "\r\n",
+              "...\r\n",
+              "\r\n",
+              "--00000000000041382f056d9314e6\r\n",
+              "Content-Type: text/html; charset=\"UTF-8\"\r\n",
+              "Content-Transfer-Encoding: quoted-printable\r\n",
+              "\r\n",
+              "<div ...>\r\n",
+              "...\r\n",
+              "</div>\r\n",
+              "\r\n",
+              "--00000000000041382f056d9314e6--\r\n",
+              "\r\n",
+              "\r\n",
+              "-----------------------------3163850615828140691827348175--\r\n"
         ]
     },
     "response":{
@@ -3228,7 +3228,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -3264,15 +3264,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--00000000\r",
-                "Content-Disposition: form-data; name=\"namea\"\r",
-                "\r",
-                "111\r",
-                "--00000000\r",
-                "Content-Disposition: form-data; name=\"nameb\"\r",
-                "\r",
-                "222\r",
-                "--00000000--\r"
+                "--00000000\r\n",
+                "Content-Disposition: form-data; name=\"namea\"\r\n",
+                "\r\n",
+                "111\r\n",
+                "--00000000\r\n",
+                "Content-Disposition: form-data; name=\"nameb\"\r\n",
+                "\r\n",
+                "222\r\n",
+                "--00000000--\r\n"
       ]
     },
     "response":{
@@ -3282,7 +3282,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -3319,12 +3319,12 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "--a\r",
-        "\u000eContent-Disposition\u000e: form-data; name=\"file\"; filename=\"1.jsp\"\r",
-        "Content-Disposition: form-data; name=\"post\";\r",
-        "\r",
-        "<%out.print(123)%>\r",
-        "--a--\r"
+        "--a\r\n",
+        "\u000eContent-Disposition\u000e: form-data; name=\"file\"; filename=\"1.jsp\"\r\n",
+        "Content-Disposition: form-data; name=\"post\";\r\n",
+        "\r\n",
+        "<%out.print(123)%>\r\n",
+        "--a--\r\n"
       ]
     },
     "response":{
@@ -3334,7 +3334,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

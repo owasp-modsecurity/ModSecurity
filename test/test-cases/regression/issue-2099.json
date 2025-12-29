@@ -18,7 +18,7 @@
       },
       "uri":"/remote.php/webdav?bar=foo",
       "method":"GET",
-      "body": ""
+      "body": "\n"
     },
     "server":{
       "ip":"200.249.12.31",
@@ -50,7 +50,7 @@
       },
       "uri":"/remote.php?bar=foo",
       "method":"GET",
-      "body": ""
+      "body": "\n"
     },
     "server":{
       "ip":"200.249.12.31",
@@ -82,7 +82,7 @@
       },
       "uri":"/remote.php/webdav?bar=foo",
       "method":"GET",
-      "body": ""
+      "body": "\n"
     },
     "server":{
       "ip":"200.249.12.31",
@@ -114,7 +114,7 @@
       },
       "uri":"/remote.php?bar=foo",
       "method":"GET",
-      "body": ""
+      "body": "\n"
     },
     "server":{
       "ip":"200.249.12.31",
@@ -146,7 +146,7 @@
       },
       "uri":"/test.php?a=a",
       "method":"GET",
-      "body": ""
+      "body": "\n"
     },
     "server":{
       "ip":"200.249.12.31",
@@ -178,7 +178,7 @@
       },
       "uri":"/index.php?a=a",
       "method":"GET",
-      "body": ""
+      "body": "\n"
     },
     "server":{
       "ip":"200.249.12.31",

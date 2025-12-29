@@ -27,7 +27,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -67,7 +67,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -100,21 +100,21 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body":[
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -124,7 +124,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -157,21 +157,21 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body":[
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -181,7 +181,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -214,21 +214,21 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body":[
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -238,7 +238,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -273,21 +273,21 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body":[
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -297,7 +297,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -332,7 +332,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "a=bad_value"
+        "a=bad_value\n"
       ]
     },
     "response":{
@@ -342,7 +342,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -379,7 +379,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "aa=bad_value"
+        "aa=bad_value\n"
       ]
     },
     "response":{
@@ -389,7 +389,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -426,7 +426,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "{\"a\":\"bad_value\"}"
+        "{\"a\":\"bad_value\"}\n"
       ]
     },
     "response":{
@@ -436,7 +436,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -475,7 +475,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "{\"a\":\"bad_value\"}"
+        "{\"a\":\"bad_value\"}\n"
       ]
     },
     "response":{
@@ -485,7 +485,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -524,7 +524,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "{\"a\":1}}"
+        "{\"a\":1}}\n"
       ]
     },
     "response":{
@@ -534,7 +534,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -573,7 +573,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "{\"a\":1}}"
+        "{\"a\":1}}\n"
       ]
     },
     "response":{
@@ -583,7 +583,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -622,7 +622,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "{\"a\":1}}"
+        "{\"a\":1}}\n"
       ]
     },
     "response":{
@@ -632,7 +632,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -672,7 +672,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<a>bad_value</a>"
+        "<a>bad_value</a>\n"
       ]
     },
     "response":{
@@ -682,7 +682,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -722,7 +722,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<a>bad_value</a>"
+        "<a>bad_value</a>\n"
       ]
     },
     "response":{
@@ -732,7 +732,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -772,7 +772,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<a></a></b>"
+        "<a></a></b>\n"
       ]
     },
     "response":{
@@ -782,7 +782,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -821,7 +821,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<a></a></b>"
+        "<a></a></b>\n"
       ]
     },
     "response":{
@@ -831,7 +831,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -870,7 +870,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<a></a></b>"
+        "<a></a></b>\n"
       ]
     },
     "response":{
@@ -880,7 +880,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -924,7 +924,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -964,7 +964,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -999,7 +999,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2&param3=value3"
+        "param1=value1&param2=value2&param3=value3\n"
       ]
     },
     "response":{
@@ -1009,7 +1009,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1046,7 +1046,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2&param3=value3"
+        "param1=value1&param2=value2&param3=value3\n"
       ]
     },
     "response":{
@@ -1056,7 +1056,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1092,7 +1092,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "{\"param1\":{\"param2\":\"value2\",\"param3\":\"value3\"}}"
+        "{\"param1\":{\"param2\":\"value2\",\"param3\":\"value3\"}}\n"
       ]
     },
     "response":{
@@ -1102,7 +1102,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1140,7 +1140,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "{\"param1\":{\"param2\":\"value2\",\"param3\":\"value3\"}}"
+        "{\"param1\":{\"param2\":\"value2\",\"param3\":\"value3\"}}\n"
       ]
     },
     "response":{
@@ -1150,7 +1150,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1188,7 +1188,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><aaa><bbb>ccc</bbb><ddd>eee</ddd></aaa>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><aaa><bbb>ccc</bbb><ddd>eee</ddd></aaa>\n"
       ]
     },
     "response":{
@@ -1198,7 +1198,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1237,7 +1237,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><aaa><bbb>ccc</bbb><ddd>eee</ddd></aaa>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><aaa><bbb>ccc</bbb><ddd>eee</ddd></aaa>\n"
       ]
     },
     "response":{
@@ -1247,7 +1247,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1284,15 +1284,15 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "--0000",
-        "Content-Disposition: form-data; name=\"a\"",
-        "",
-        "1",
-        "--0000",
-        "Content-Disposition: form-data; name=\"b\"; filename=\"c.txt\"",
-        "",
-        "2222222222222222222222222222222222222222222222222222222222222222222222",
-        "--0000--"
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"a\"\n",
+        "\n",
+        "1\n",
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"b\"; filename=\"c.txt\"\n",
+        "\n",
+        "2222222222222222222222222222222222222222222222222222222222222222222222\n",
+        "--0000--\n"
       ]
     },
     "response":{
@@ -1302,7 +1302,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -1339,15 +1339,15 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "--0000",
-        "Content-Disposition: form-data; name=\"a\"",
-        "",
-        "1",
-        "--0000",
-        "Content-Disposition: form-data; name=\"b\"; filename=\"c.txt\"",
-        "",
-        "2222222222222222222222222222222222222222222222222222222222222222222222",
-        "--0000--"
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"a\"\n",
+        "\n",
+        "1\n",
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"b\"; filename=\"c.txt\"\n",
+        "\n",
+        "2222222222222222222222222222222222222222222222222222222222222222222222\n",
+        "--0000--\n"
       ]
     },
     "response":{
@@ -1357,7 +1357,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

@@ -17,13 +17,13 @@
   "request": {
     "uri":"/?x=foo%3d",
     "headers": "",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
   "expected": {
     "debug_log": "Rule returned 1",
@@ -53,13 +53,13 @@
   "request": {
     "uri":"/?x=foo=",
     "headers": "",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
   "expected": {
     "debug_log": "Rule returned 1",

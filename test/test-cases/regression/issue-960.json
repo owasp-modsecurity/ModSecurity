@@ -19,13 +19,13 @@
         "Host": "www.google.com"
       },
     "uri": "\/test.pl?param1=   test   &param2=test2",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
     "expected": {
       "audit_log": "",
@@ -59,13 +59,13 @@
         "Host": "www.google.com"
       },
     "uri": "\/test.pl?param1=   test   &param2=test2",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
     "expected": {
       "audit_log": "",
@@ -100,13 +100,13 @@
         "Host": "www.google.com"
       },
     "uri": "\/test.pl?param1=   test   &param2=test2",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
     "expected": {
       "audit_log": "",

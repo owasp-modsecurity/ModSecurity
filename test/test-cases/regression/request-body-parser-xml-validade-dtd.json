@@ -22,15 +22,15 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
-        "    <!DOCTYPE Envelope SYSTEM \"SoapEnvelope.dtd\">",
-        "    <Envelope>",
-        "        <Body>",
-        "            <getInput>",
-        "                <id type=\"string\">12123</id>",
-        "            </getInput>",
-        "        </Body>",
-        "    </Envelope>"
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n",
+        "    <!DOCTYPE Envelope SYSTEM \"SoapEnvelope.dtd\">\n",
+        "    <Envelope>\n",
+        "        <Body>\n",
+        "            <getInput>\n",
+        "                <id type=\"string\">12123</id>\n",
+        "            </getInput>\n",
+        "        </Body>\n",
+        "    </Envelope>\n"
       ]
     },
     "server":{
@@ -69,15 +69,15 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
-        "    <!DOCTYPE Envelope SYSTEM \"SoapEnvelope.dtd\">",
-        "        <Envelope>",
-        "            <xBody>",
-        "                <getInput>",
-        "                    <id type=\"string\">12123</id>",
-        "                </getInput>",
-        "            </xBody>",
-        "        </Envelope>"
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n",
+        "    <!DOCTYPE Envelope SYSTEM \"SoapEnvelope.dtd\">\n",
+        "        <Envelope>\n",
+        "            <xBody>\n",
+        "                <getInput>\n",
+        "                    <id type=\"string\">12123</id>\n",
+        "                </getInput>\n",
+        "            </xBody>\n",
+        "        </Envelope>\n"
       ]
     },
     "server":{
@@ -116,15 +116,15 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
-        "<!DOCTYPE Envelope SYSTEM \"SoapEnvelope.dtd\">",
-        "    <Envelop>",
-        "        <Body>",
-        "            <getInput>",
-        "                <id type=\"string\">12123</id>",
-        "            </getInput>",
-        "        </Body>",
-        "    </Envelope>"
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n",
+        "<!DOCTYPE Envelope SYSTEM \"SoapEnvelope.dtd\">\n",
+        "    <Envelop>\n",
+        "        <Body>\n",
+        "            <getInput>\n",
+        "                <id type=\"string\">12123</id>\n",
+        "            </getInput>\n",
+        "        </Body>\n",
+        "    </Envelope>\n"
       ]
     },
     "server":{
@@ -163,15 +163,15 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
-        "    <!DOCTYPE Envelope SYSTEM \"SoapEnvelope.dtd\">",
-        "        <Envelope>",
-        "            <Body>",
-        "                <getInput>",
-        "                    <id type=\"string\">12123</id>",
-        "                </getInput>",
-        "            </Body>",
-        "        </Envelope>"
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n",
+        "    <!DOCTYPE Envelope SYSTEM \"SoapEnvelope.dtd\">\n",
+        "        <Envelope>\n",
+        "            <Body>\n",
+        "                <getInput>\n",
+        "                    <id type=\"string\">12123</id>\n",
+        "                </getInput>\n",
+        "            </Body>\n",
+        "        </Envelope>\n"
       ]
     },
     "server":{

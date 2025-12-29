@@ -22,7 +22,7 @@
       "uri":"/one/two/three",
       "method":"POST",
       "body":[
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -32,7 +32,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -66,7 +66,7 @@
       "uri":"/one/two/three?key=value",
       "method":"POST",
       "body":[
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -76,7 +76,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -110,7 +110,7 @@
       "uri":"/one/two/%20/three?key=value",
       "method":"POST",
       "body":[
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -120,7 +120,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -154,7 +154,7 @@
       "uri":"/one/t%3fo/three?key=value",
       "method":"POST",
       "body":[
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -164,7 +164,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

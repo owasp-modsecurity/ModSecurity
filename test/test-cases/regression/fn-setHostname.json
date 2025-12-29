@@ -25,7 +25,7 @@
         "Content-Type":"text/plain"
       },
       "body":[
-        "denystring"
+        "denystring\n"
       ]
     },
     "expected":{

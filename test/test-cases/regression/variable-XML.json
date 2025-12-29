@@ -21,14 +21,14 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -64,14 +64,14 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -108,14 +108,14 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -152,14 +152,14 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -196,14 +196,14 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -240,14 +240,14 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -284,14 +284,14 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -328,14 +328,14 @@
       "uri":"/?q=xml",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -373,14 +373,14 @@
       "uri":"/?q=xml",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -418,14 +418,14 @@
       "uri":"/?q=xml",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -463,14 +463,14 @@
       "uri":"/?q=xml",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
 
     },
@@ -509,14 +509,14 @@
       "uri":"/?q=xml",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -554,14 +554,14 @@
       "uri":"/?q=xml",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<some-tag>aaa</some-tag><some-tag>bbb</some-tag>\n",
+        "</bookstore>\n"
       ]
     },
     "server":{
@@ -599,9 +599,9 @@
       "uri":"/?q=xml",
       "method":"POST",
       "body": [
-        "<pizza>",
-        "<has>pineapple</has><has>🍍</has>",
-        "</pizza>"
+        "<pizza>\n",
+        "<has>pineapple</has><has>🍍</has>\n",
+        "</pizza>\n"
       ]
     },
     "server":{

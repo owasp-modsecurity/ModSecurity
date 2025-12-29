@@ -23,7 +23,7 @@
       "uri":"/a=urlencoded",
       "method":"POST",
       "body":[
-                "param1=value1\r"
+                "param1=value1\r\n"
       ]
     },
     "response":{
@@ -33,7 +33,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -71,7 +71,7 @@
       "uri":"/a=urlencoded",
       "method":"POST",
       "body":[
-                "param1=value1\r"
+                "param1=value1\r\n"
       ]
     },
     "response":{
@@ -81,7 +81,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

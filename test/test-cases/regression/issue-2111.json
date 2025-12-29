@@ -18,7 +18,7 @@
       },
       "uri":"index.php?foo=bar&z=xxx",
       "method":"GET",
-      "body": ""
+      "body": "\n"
     },
     "server":{
       "ip":"127.0.0.1",

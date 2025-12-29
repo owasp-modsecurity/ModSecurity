@@ -19,13 +19,13 @@
         "Host": "www.google.com"
       },
     "uri": "\/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
     "expected": {
       "audit_log": "",
@@ -57,13 +57,13 @@
         "Host": "www.google.com"
       },
     "uri": "\/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
     "expected": {
       "audit_log": "",
@@ -95,13 +95,13 @@
         "Host": "www.google.com"
       },
     "uri": "\/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
     "expected": {
       "audit_log": "",
@@ -133,13 +133,13 @@
         "Host": "www.google.com"
       },
     "uri": "\/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
     "expected": {
       "audit_log": "",
@@ -171,13 +171,13 @@
         "Host": "www.google.com"
       },
     "uri": "\/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
     "expected": {
       "audit_log": "",

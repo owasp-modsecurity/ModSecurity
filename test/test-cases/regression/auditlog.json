@@ -28,14 +28,14 @@
       "uri": "\/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
         "Content-Type": "plain\/text\n\r"
       },
       "body": [
-        "test"
+        "test\n"
       ]
     },
     "expected": {
@@ -85,14 +85,14 @@
       "uri": "\/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
         "Content-Type": "plain\/text\n\r"
       },
       "body": [
-        "test"
+        "test\n"
       ]
     },
     "expected": {
@@ -143,14 +143,14 @@
       "uri": "\/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
         "Content-Type": "plain\/text\n\r"
       },
       "body": [
-        "test"
+        "test\n"
       ]
     },
     "expected": {
@@ -201,14 +201,14 @@
       "uri": "\/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
         "Content-Type": "plain\/text\n\r"
       },
       "body": [
-        "test"
+        "test\n"
       ]
     },
     "expected": {
@@ -260,7 +260,7 @@
       "uri": "\/test.pl?param1=test&param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "expected": {
       "audit_log": "id \"1556",
@@ -309,7 +309,7 @@
       "uri": "\/test.pl?param1=test&param2=tEst2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "expected": {
       "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
@@ -358,7 +358,7 @@
       "uri": "\/test.pl?param1=test&param2=%20tEst2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "expected": {
       "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
@@ -407,7 +407,7 @@
       "uri": "\/test.pl?param1=test&param2=tEst2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "expected": {
       "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
@@ -457,7 +457,7 @@
       "uri": "\/test.pl?param1=test&param2=%20tEst2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "expected": {
       "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
@@ -507,14 +507,14 @@
       "uri": "\/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
         "Content-Type": "plain\/text\n\r"
       },
       "body": [
-        "test"
+        "test\n"
       ]
     },
     "expected": {
@@ -566,14 +566,14 @@
       "uri": "\/?%ADd+allow%3d1+%ADd+auto",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
         "Content-Type": "plain\/text\n\r"
       },
       "body": [
-        "test"
+        "test\n"
       ]
     },
     "expected": {
@@ -628,7 +628,7 @@
       "method": "POST",
       "http_version": 1.1,
       "body": [
-        "\u00ad=\u00ad"
+        "\u00ad=\u00ad\n"
       ]
     },
     "response": {
@@ -636,7 +636,7 @@
         "Content-Type": "plain\/text\n\r"
       },
       "body": [
-        "test"
+        "test\n"
       ]
     },
     "expected": {
@@ -692,7 +692,7 @@
       "method": "POST",
       "http_version": 1.1,
       "body": [
-        "\u00ad=\u00ad"
+        "\u00ad=\u00ad\n"
       ]
     },
     "response": {
@@ -700,7 +700,7 @@
         "Content-Type": "plain\/text\n\r"
       },
       "body": [
-        "test"
+        "test\n"
       ]
     },
     "expected": {

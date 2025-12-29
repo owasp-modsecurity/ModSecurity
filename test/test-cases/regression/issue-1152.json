@@ -30,7 +30,7 @@
       "uri": "\/test.pl?foo=bar",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
@@ -78,7 +78,7 @@
       "uri": "\/test.pl?foo=bar",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
@@ -128,7 +128,7 @@
       "uri": "\/test.pl?foo=bar",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {
@@ -178,7 +178,7 @@
       "uri": "\/test.pl?a=test&b=test&c=test&d=test",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": "\n"
     },
     "response": {
       "headers": {

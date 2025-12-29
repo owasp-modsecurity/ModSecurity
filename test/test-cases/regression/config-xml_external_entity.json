@@ -22,14 +22,14 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book (#PCDATA)>",
-        "<!ENTITY js \"Jo Smith\">",
-        "]>",
-        "<bookstore>",
-        "<book category=\"WEB\"> &js;</book>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book (#PCDATA)>\n",
+        "<!ENTITY js \"Jo Smith\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<book category=\"WEB\"> &js;</book>\n",
+        "</bookstore>\n"
       ]
 
     },
@@ -69,14 +69,14 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<book category=\"WEB\"> &js;</book>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<book category=\"WEB\"> &js;</book>\n",
+        "</bookstore>\n"
       ]
 
     },
@@ -117,14 +117,14 @@
       "uri":"/?key=value&key=other_value",
       "method":"POST",
       "body": [
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<!DOCTYPE author [",
-        "<!ELEMENT book ANY>",
-        "<!ENTITY js SYSTEM \"/etc/passwd\">",
-        "]>",
-        "<bookstore>",
-        "<book category=\"WEB\"> &js;</book>",
-        "</bookstore>"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<!DOCTYPE author [\n",
+        "<!ELEMENT book ANY>\n",
+        "<!ENTITY js SYSTEM \"/etc/passwd\">\n",
+        "]>\n",
+        "<bookstore>\n",
+        "<book category=\"WEB\"> &js;</book>\n",
+        "</bookstore>\n"
       ]
 
     },

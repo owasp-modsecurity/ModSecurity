@@ -18,7 +18,7 @@
       },
       "uri":"index.php?foo=bar&a=xxx",
       "method":"GET",
-      "body": ""
+      "body": "\n"
     },
     "expected": {
       "http_code": 200,

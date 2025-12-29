@@ -22,7 +22,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -32,7 +32,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -66,7 +66,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -76,7 +76,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -110,7 +110,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -120,7 +120,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -154,7 +154,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -164,7 +164,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -198,7 +198,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -208,7 +208,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -242,7 +242,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -252,7 +252,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -286,7 +286,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=value1&param2=value2"
+        "param1=value1&param2=value2\n"
       ]
     },
     "response":{
@@ -296,7 +296,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

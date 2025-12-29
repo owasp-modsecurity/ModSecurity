@@ -22,7 +22,7 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "param1=224-88-2046&param2=value2"
+        "param1=224-88-2046&param2=value2\n"
       ]
     },
     "response":{
@@ -32,7 +32,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

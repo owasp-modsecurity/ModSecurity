@@ -22,13 +22,13 @@
       "Content-Length": "1539",
       "Cookie": "__utma=1.32168570.12572608.1259628772.2&__utmb=1.4.10.1259628772&"
     },
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
   "expected": {
     "debug_log": "Rule returned 0."
@@ -61,13 +61,13 @@
       "Content-Length": "1539",
       "Cookie": "__utma=1.32168570.12572608.1259628772.2&__utmb=1.4.10.1259628772&"
     },
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
   "expected": {
     "debug_log": "Rule returned 1."
@@ -100,13 +100,13 @@
       "Content-Length": "1539",
       "Cookie": "__utma=1.32168570.12572608.1259628772.2&__utmb=1.4.10.1259628772&"
     },
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
   "expected": {
     "debug_log": "Variable: REQUEST_HEADERS:Content-Length"

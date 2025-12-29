@@ -26,7 +26,7 @@
     "response":{
       "headers":{},
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -68,7 +68,7 @@
     "response":{
       "headers":{},
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -110,7 +110,7 @@
     "response":{
       "headers":{},
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -152,7 +152,7 @@
     "response":{
       "headers":{},
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -194,7 +194,7 @@
     "response":{
       "headers":{},
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -236,7 +236,7 @@
     "response":{
       "headers":{},
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -278,7 +278,7 @@
     "response":{
       "headers":{},
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

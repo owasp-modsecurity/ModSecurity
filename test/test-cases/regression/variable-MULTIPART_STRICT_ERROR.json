@@ -23,21 +23,21 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -47,7 +47,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -82,21 +82,21 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -106,7 +106,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -141,21 +141,21 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--whee."
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2--whee.\n"
       ]
     },
     "response":{
@@ -165,7 +165,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -200,21 +200,21 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "----------------------------756b6d74fa1a8ee2--"
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -224,7 +224,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -259,21 +259,21 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name='filedata'; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name='filedata'; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -283,7 +283,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -318,11 +318,11 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "--0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '()+_,-./:=?",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "1",
-        "--0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '()+_,-./:=?--"
+        "--0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '()+_,-./:=?\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "1\n",
+        "--0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz '()+_,-./:=?--\n"
       ]
     },
     "response":{
@@ -332,7 +332,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -367,21 +367,21 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=file'data; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "----------------------------756b6d74fa1a8ee2--"
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=file'data; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -391,7 +391,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{
@@ -427,21 +427,21 @@
       "uri":"/",
       "method":"POST",
       "body":[
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"name\"",
-        "",
-        "test",
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"file'data\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is a very small test file..",
-        "----------------------------756b6d74fa1a8ee2",
-        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
-        "Content-Type: text/plain",
-        "",
-        "This is another very small test file..",
-        "----------------------------756b6d74fa1a8ee2--"
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"file'data\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is another very small test file..\n",
+        "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
     "response":{
@@ -451,7 +451,7 @@
         "Content-Type":"text/html"
       },
       "body":[
-        "no need."
+        "no need.\n"
       ]
     },
     "expected":{

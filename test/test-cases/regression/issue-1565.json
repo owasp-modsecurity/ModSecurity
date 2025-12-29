@@ -21,13 +21,13 @@
       "Accept":"*/*",
       "Content-Length": "1539"
     },
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
   "expected": {
     "debug_log": "Rule returned 0."
@@ -59,13 +59,13 @@
       "Accept":"*/*",
       "Content-Length": "1539"
     },
-    "body": "",
+    "body": "\n",
     "method": "GET",
     "http_version": 1.1
   },
   "response": {
     "headers": "",
-    "body": ""
+    "body": "\n"
   },
   "expected": {
     "debug_log": "Rule returned 1"
