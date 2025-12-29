@@ -637,7 +637,7 @@ sub httpd_stop {
         -d => $opt{S},
         -f => $opt{C},
         (map { (-c => $_) } ("Listen localhost:$opt{p}", @_)),
-        -k => "graceful-shutdown",
+        -k => "graceful-stop",
     );
 
     my $httpd_out;
