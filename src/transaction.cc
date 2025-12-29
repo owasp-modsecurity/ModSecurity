@@ -788,6 +788,10 @@ int Transaction::processRequestBody() {
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
+                m.m_allow_partial = is_process_partial && m_requestBodyLimitExceeded;
+                if (m.m_allow_partial) {
+                    ms_dbg(4, "Multipart: Allow partial processing of request body");
+                }
                 m.process(m_requestBody.str(), &error, m_variableOffset);
             }
             reqbodyNoFilesLength = m.m_reqbody_no_files_length;

@@ -1197,7 +1197,7 @@ int Multipart::multipart_complete(std::string *error) {
                 }
             }
 
-            if (m_is_complete == 0) {
+            if (m_is_complete == 0 && !m_allow_partial) {
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: Final boundary missing.");
                 error->assign("Multipart: Final boundary missing.");

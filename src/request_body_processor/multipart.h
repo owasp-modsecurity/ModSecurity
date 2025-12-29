@@ -228,6 +228,7 @@ class Multipart {
 
     int m_seen_data;
     int m_is_complete;
+    bool m_allow_partial;
 
     int m_flag_error;
     int m_flag_data_before;
