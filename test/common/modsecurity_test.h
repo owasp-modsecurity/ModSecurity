@@ -52,6 +52,7 @@ template <class T> class ModSecurityTest :
     bool m_count_all;
     bool m_test_multithreaded;
     bool m_always_show_log;
+    bool m_show_request_body_size;
 };
 
 }  // namespace modsecurity_test

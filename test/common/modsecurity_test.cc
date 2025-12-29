@@ -146,6 +146,9 @@ void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
     if (std::getenv("ALWAYS_SHOW_LOG")) {
         m_always_show_log = true;
     }
+    if (std::getenv("SHOW_REQUEST_BODY_SIZE")) {
+        m_show_request_body_size = true;
+    }
 
     if (argc > i && argv[i]) {
         this->target = argv[i];
