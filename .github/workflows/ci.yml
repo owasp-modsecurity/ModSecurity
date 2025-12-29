@@ -139,4 +139,4 @@ jobs:
       - name: install module
         run: sudo make install
       - name: run regression tests
-        run: cd tests; time ./run-regression-tests.pl -S .
+        run: make test-regression
