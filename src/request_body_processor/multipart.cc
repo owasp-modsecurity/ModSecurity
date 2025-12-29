@@ -1174,7 +1174,7 @@ int Multipart::multipart_complete(std::string *error) {
                         }
                         m_transaction->m_variableMultipartStrictError.set(
                             std::to_string(m_flag_lf_line) , m_transaction->m_variableOffset);
-		    }
+                    }
                     if ((m_mpp_substate_part_data_read == 0) && (m_flag_invalid_part != 1)) {
                         // it looks like the final boundary, but it's where part data should begin
                         m_flag_invalid_part = 1;
@@ -1563,7 +1563,7 @@ bool Multipart::process(const std::string& data, std::string *error,
                         m_boundary.size()) == 0)) {
                     if (m_crlf_state_buf_end == 2) {
                         m_flag_lf_line = 1;
-		    }
+                    }
                     if ((m_mpp_substate_part_data_read == 0) && (m_boundary_count > 0)) {
                         /* string matches our boundary, but it's where part data should begin */
                         m_flag_invalid_part = 1;
