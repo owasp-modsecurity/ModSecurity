@@ -721,6 +721,9 @@ int Transaction::processRequestBody() {
         if (!requestBodyNoFilesLimitExceeded || is_process_partial) {
             std::string error;
             bool require_well_formed = !(is_process_partial && m_requestBodyLimitExceeded);
+            if (!require_well_formed) {
+                ms_dbg(4, "XML: Allow partial processing of request body");
+            }
             if (m_xml->init(require_well_formed) == true) {
                 m_xml->processChunk(m_requestBody.str().c_str(),
                     m_requestBody.str().size(),
@@ -753,6 +756,9 @@ int Transaction::processRequestBody() {
                 m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
             }
             unsigned int allow_partial_values = is_process_partial && m_requestBodyLimitExceeded;
+            if (allow_partial_values) {
+                ms_dbg(4, "JSON: Allow partial processing of request body");
+            }
             if (m_json->init(allow_partial_values) == true) {
                 m_json->processChunk(m_requestBody.str().c_str(),
                     m_requestBody.str().size(),
