@@ -279,7 +279,7 @@
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 2\)\. Pattern match "bad_value" at ARGS:b\./, 1 ],
 		debug => [ qr/Adding JSON argument 'b' with value 'bad_value'|JSON support was not enabled/, 1 ],
-		-debug => [ qr/JSON set reqbody_limit_exceeded|JSON support was not enabled/, 1 ],
+		-debug => [ qr/JSON: Allow partial processing of request body|JSON support was not enabled/, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -311,7 +311,7 @@
 	),
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 2\)\. Pattern match "bad_value" at ARGS:b\./, 1 ],
-		debug => [ qr/JSON set reqbody_limit_exceeded|JSON support was not enabled/, 1 ],
+		debug => [ qr/JSON: Allow partial processing of request body|JSON support was not enabled/, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -342,7 +342,7 @@
         SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
 	),
 	match_log => {
-		debug => [ qr/JSON set reqbody_limit_exceeded|JSON support was not enabled/, 1 ],
+		debug => [ qr/JSON: Allow partial processing of request body|JSON support was not enabled/, 1 ],
 	},
 	match_response => {
 		status => qr/^200$/,
@@ -375,7 +375,7 @@
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 2\)\. Pattern match "bad_value" at ARGS:b\./, 1 ],
 		debug => [ qr/Adding JSON argument 'b' with value 'bad_value'|JSON support was not enabled/, 1 ],
-		-debug => [ qr/JSON set reqbody_limit_exceeded|JSON support was not enabled/, 1 ],
+		-debug => [ qr/JSON: Allow partial processing of request body|JSON support was not enabled/, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
