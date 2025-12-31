@@ -643,7 +643,283 @@
 #	),
 #},
 
+# SecRequestBodyLimitAction ProcessPartial
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/just limit - bad_name)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 296
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_NAME "bad_name" "id:'200002',phase:2,t:none,deny
+	),
+	match_log => {
+		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="name1"
 
+                value1
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="bad_name2"
+
+                value2
+                -----------------------------69343412719991675451336310646--),
+        ),
+    ),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/greater - bad_name)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 295
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_NAME "bad_name" "id:'200002',phase:2,t:none,deny
+	),
+	match_log => {
+		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="name1"
+
+                value1
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="bad_name2"
+
+                value2
+                -----------------------------69343412719991675451336310646--),
+        ),
+    ),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/no epilogue)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 176
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="name1"
+
+                value1
+                -----------------------------69343412719991675451336310646--),
+        ),
+    ),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CR after limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 176
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="name1"
+
+                value1
+                -----------------------------69343412719991675451336310646--) . "\r",
+        ),
+    ),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CR just in limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 177
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		-error => [ qr/"Multipart: Invalid epilogue after final boundary."/, 1],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="name1"
+
+                value1
+                -----------------------------69343412719991675451336310646--) . "\r",
+        ),
+    ),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF across limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 177
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="name1"
+
+                value1
+                -----------------------------69343412719991675451336310646--
+			),
+        ),
+    ),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CR before limit, non-LF after)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 177
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="name1"
+
+                value1
+                -----------------------------69343412719991675451336310646--) . "\rbad epilogue after just CR",
+        ),
+    ),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/empty epilogue just in limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 178
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+        ],
+        normalize_raw_request_data(
+            q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="name1"
+
+                value1
+                -----------------------------69343412719991675451336310646--
+			),
+        ),
+    ),
+},
 
 
 

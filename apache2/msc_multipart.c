@@ -1023,13 +1023,44 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
              * processed yet) in the buffer.
              */
             if (msr->mpd->buf_contains_line) {
-                if ( ((unsigned int)(MULTIPART_BUF_SIZE - msr->mpd->bufleft) == (4 + strlen(msr->mpd->boundary)))
+                /*
+                 * Note that the buffer may end with the final boundary followed by only CR,
+                 * coming from the [CRLF epilogue], when allow_process_partial == 1 (which is
+                 * set when SecRequestBodyLimitAction is ProcessPartial and the request body
+                 * length exceeds SecRequestBodyLimit).
+                 *
+                 * The following definitions are copied from RFC 2046:
+                 *
+                 * dash-boundary := "--" boundary
+                 *
+                 * delimiter := CRLF dash-boundary
+                 *
+                 * close-delimiter := delimiter "--"
+                 *
+                 * multipart-body := [preamble CRLF]
+                 *                   dash-boundary transport-padding CRLF
+                 *                   body-part *encapsulation
+                 *                   close-delimiter transport-padding
+                 *                   [CRLF epilogue]
+                 */
+                unsigned int buf_data_len = (unsigned int)(MULTIPART_BUF_SIZE - msr->mpd->bufleft);
+                size_t final_boundary_len = 4 + strlen(msr->mpd->boundary);
+                if ( (buf_data_len >= final_boundary_len)
                     && (*(msr->mpd->buf) == '-')
                     && (*(msr->mpd->buf + 1) == '-')
                     && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
                     && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) == '-')
                     && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary) + 1) == '-') )
                 {
+                    /* If body fits in limit and ends with final boundary plus just CR, reject it. */
+                    if ( (msr->mpd->allow_process_partial == 0)
+                        && (buf_data_len == final_boundary_len + 1)
+                        && (*(msr->mpd->buf + final_boundary_len) == '\r') )
+                    {
+                        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid epilogue after final boundary.");
+                        return -1;
+                    }
+
                     if ((msr->mpd->crlf_state_buf_end == 2) && (msr->mpd->flag_lf_line != 1)) {
                         msr->mpd->flag_lf_line = 1;
                         if (msr->mpd->flag_crlf_line) {
