@@ -1327,10 +1327,10 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
             if (c == 0x0a) {
                 if (msr->mpd->crlf_state == 1) {
                     msr->mpd->crlf_state = 3;
-	        } else {
+                } else {
                     msr->mpd->crlf_state = 2;
-	        }
-	    }
+                }
+            }
             msr->mpd->crlf_state_buf_end = msr->mpd->crlf_state;
         }
 
