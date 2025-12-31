@@ -121,6 +121,7 @@ Multipart::Multipart(const std::string &header, Transaction *transaction)
     m_reserve{0},
     m_seen_data(0),
     m_is_complete(0),
+    m_allow_partial(false),
     m_flag_error(0),
     m_flag_data_before(0),
     m_flag_data_after(0),

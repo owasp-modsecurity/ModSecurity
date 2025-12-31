@@ -36,7 +36,8 @@ template <class T> class ModSecurityTest :
         m_automake_output(false),
         m_count_all(false),
         m_test_multithreaded(false),
-        m_always_show_log(false) { }
+        m_always_show_log(false),
+        m_show_request_body_size(false) { }
 
     std::string header();
     void cmd_options(int, char **);
