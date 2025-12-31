@@ -1151,14 +1151,44 @@ int Multipart::multipart_complete(std::string *error) {
              * processed yet) in the buffer.
              */
             if (m_buf_contains_line) {
-                if (((unsigned int)(MULTIPART_BUF_SIZE - m_bufleft)
-                        == (4 + m_boundary.size()))
+                /*
+                 * Note that the buffer may end with the final boundary followed by only CR,
+                 * coming from the [CRLF epilogue], when allow_process_partial == 1 (which is
+                 * set when SecRequestBodyLimitAction is ProcessPartial and the request body
+                 * length exceeds SecRequestBodyLimit).
+                 *
+                 * The following definitions are copied from RFC 2046:
+                 *
+                 * dash-boundary := "--" boundary
+                 *
+                 * delimiter := CRLF dash-boundary
+                 *
+                 * close-delimiter := delimiter "--"
+                 *
+                 * multipart-body := [preamble CRLF]
+                 *                   dash-boundary transport-padding CRLF
+                 *                   body-part *encapsulation
+                 *                   close-delimiter transport-padding
+                 *                   [CRLF epilogue]
+                 */
+                unsigned int buf_data_len = (unsigned int)(MULTIPART_BUF_SIZE - m_bufleft);
+                size_t final_boundary_len = 4 + m_boundary.size();
+                if ((buf_data_len >= final_boundary_len)
                     && (*(m_buf) == '-')
                     && (*(m_buf + 1) == '-')
                     && (strncmp(m_buf + 2, m_boundary.c_str(),
                         m_boundary.size()) == 0)
                     && (*(m_buf + 2 + m_boundary.size()) == '-')
                     && (*(m_buf + 2 + m_boundary.size() + 1) == '-')) {
+                    /* If body fits in limit and ends with final boundary plus just CR, reject it. */
+                    if ( (m_allow_partial == 0)
+                        && (buf_data_len == final_boundary_len + 1)
+                        && (*(m_buf + final_boundary_len) == '\r') ) {
+                        ms_dbg_a(m_transaction, 1,
+                            "Multipart: Invalid epilogue after final boundary.");
+                        error->assign("Multipart: Invalid epilogue after final boundary.");
+                        return false;
+                    }
                     // these next two checks may result in repeating work from earlier in this fn
                     // ignore the duplication for now to minimize refactoring
                     if ((m_crlf_state_buf_end == 2) && (m_flag_lf_line != 1)) {

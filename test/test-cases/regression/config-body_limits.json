@@ -1583,6 +1583,307 @@
       "SecRequestBodyNoFilesLimit 120",
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
     ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/no epilogue",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "176",
+        "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "-----------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=\"name1\"\r\n",
+        "\r\n",
+        "value1\r\n",
+        "-----------------------------69343412719991675451336310646--"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 176",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR after limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "177",
+        "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "-----------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=\"name1\"\r\n",
+        "\r\n",
+        "value1\r\n",
+        "-----------------------------69343412719991675451336310646--\r"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 176",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR just in limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "177",
+        "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "-----------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=\"name1\"\r\n",
+        "\r\n",
+        "value1\r\n",
+        "-----------------------------69343412719991675451336310646--\r"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":400,
+      "error_log": "Multipart: Invalid epilogue after final boundary."
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 177",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF across limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "178",
+        "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "-----------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=\"name1\"\r\n",
+        "\r\n",
+        "value1\r\n",
+        "-----------------------------69343412719991675451336310646--\r\n"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 177",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR before limit, non-LF after",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "203",
+        "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "-----------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=\"name1\"\r\n",
+        "\r\n",
+        "value1\r\n",
+        "-----------------------------69343412719991675451336310646--\rbad epilogue after just CR"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 177",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/empty epilogue just in limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "143",
+        "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "-----------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=\"name1\"\r\n",
+        "\r\n",
+        "value1\r\n",
+        "-----------------------------69343412719991675451336310646--\r\n"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 178",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
   }
 ]
 
