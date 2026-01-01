@@ -646,79 +646,61 @@
 # SecRequestBodyLimitAction ProcessPartial
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/just limit - bad_name)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/bad_name before limit)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 296
+		SecRequestBodyLimit 59
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 		SecRule MULTIPART_NAME "bad_name" "id:'200002',phase:2,t:none,deny
 	),
-	match_log => {
-		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
-	},
 	match_response => {
 		status => qr/^403$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
-        ],
-        normalize_raw_request_data(
-            q(
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="name1"
-
-                value1
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="bad_name2"
-
-                value2
-                -----------------------------69343412719991675451336310646--),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="bad_name"
+			),
+		) . "\r\n" . "a",
+	),
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/greater - bad_name)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/bad_name after limit)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 295
+		SecRequestBodyLimit 58
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 		SecRule MULTIPART_NAME "bad_name" "id:'200002',phase:2,t:none,deny
 	),
-	match_log => {
-		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
-	},
 	match_response => {
-		status => qr/^403$/,
+		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
-        ],
-        normalize_raw_request_data(
-            q(
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="name1"
-
-                value1
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="bad_name2"
-
-                value2
-                -----------------------------69343412719991675451336310646--),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="bad_name"
+			),
+		) . "\r\n",
+	),
 },
 {
 	type => "config",
@@ -738,20 +720,20 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
-        ],
-        normalize_raw_request_data(
-            q(
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="name1"
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="name1"
 
-                value1
-                -----------------------------69343412719991675451336310646--),
-        ),
-    ),
+				value1
+				-----------------------------69343412719991675451336310646--),
+		),
+	),
 },
 {
 	type => "config",
@@ -771,20 +753,20 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
-        ],
-        normalize_raw_request_data(
-            q(
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="name1"
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="name1"
 
-                value1
-                -----------------------------69343412719991675451336310646--) . "\r",
-        ),
-    ),
+				value1
+				-----------------------------69343412719991675451336310646--) . "\r",
+		),
+	),
 },
 {
 	type => "config",
@@ -804,20 +786,20 @@
 	match_response => {
 		status => qr/^400$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
-        ],
-        normalize_raw_request_data(
-            q(
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="name1"
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="name1"
 
-                value1
-                -----------------------------69343412719991675451336310646--) . "\r",
-        ),
-    ),
+				value1
+				-----------------------------69343412719991675451336310646--) . "\r",
+		),
+	),
 },
 {
 	type => "config",
@@ -837,21 +819,21 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
-        ],
-        normalize_raw_request_data(
-            q(
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="name1"
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="name1"
 
-                value1
-                -----------------------------69343412719991675451336310646--
+				value1
+				-----------------------------69343412719991675451336310646--
 			),
-        ),
-    ),
+		),
+	),
 },
 {
 	type => "config",
@@ -871,20 +853,20 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
-        ],
-        normalize_raw_request_data(
-            q(
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="name1"
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="name1"
 
-                value1
-                -----------------------------69343412719991675451336310646--) . "\rbad epilogue after just CR",
-        ),
-    ),
+				value1
+				-----------------------------69343412719991675451336310646--) . "\rbad epilogue after just CR",
+		),
+	),
 },
 {
 	type => "config",
@@ -904,21 +886,21 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
-        ],
-        normalize_raw_request_data(
-            q(
-                -----------------------------69343412719991675451336310646
-                Content-Disposition: form-data; name="name1"
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="name1"
 
-                value1
-                -----------------------------69343412719991675451336310646--
+				value1
+				-----------------------------69343412719991675451336310646--
 			),
-        ),
-    ),
+		),
+	),
 },
 {
 	type => "config",
@@ -939,15 +921,15 @@
 	match_response => {
 		status => qr/^403$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/x-www-form-urlencoded",
-        ],
-        normalize_raw_request_data(
-            q(a=1&bad_name=2&c=3),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(a=1&bad_name=2&c=3),
+		),
+	),
 },
 {
 	type => "config",
@@ -968,15 +950,15 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/x-www-form-urlencoded",
-        ],
-        normalize_raw_request_data(
-            q(a=1&bad_name=2&c=3),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(a=1&bad_name=2&c=3),
+		),
+	),
 },
 {
 	type => "config",
@@ -997,15 +979,15 @@
 	match_response => {
 		status => qr/^403$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/x-www-form-urlencoded",
-        ],
-        normalize_raw_request_data(
-            q(a=1&b=bad_value&c=3),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(a=1&b=bad_value&c=3),
+		),
+	),
 },
 {
 	type => "config",
@@ -1026,15 +1008,15 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/x-www-form-urlencoded",
-        ],
-        normalize_raw_request_data(
-            q(a=1&b=bad_value&c=3),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(a=1&b=bad_value&c=3),
+		),
+	),
 },
 {
 	type => "config",
@@ -1053,15 +1035,15 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/json",
-        ],
-        normalize_raw_request_data(
-            q({"bad_name":1}),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q({"bad_name":1}),
+		),
+	),
 },
 {
 	type => "config",
@@ -1080,15 +1062,15 @@
 	match_response => {
 		status => qr/^403$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/json",
-        ],
-        normalize_raw_request_data(
-            q({"bad_name":1}),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q({"bad_name":1}),
+		),
+	),
 },
 {
 	type => "config",
@@ -1107,15 +1089,15 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/json",
-        ],
-        normalize_raw_request_data(
-            q({"a":"bad_value"}),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q({"a":"bad_value"}),
+		),
+	),
 },
 {
 	type => "config",
@@ -1134,15 +1116,15 @@
 	match_response => {
 		status => qr/^403$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/json",
-        ],
-        normalize_raw_request_data(
-            q({"a":"bad_value"}),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q({"a":"bad_value"}),
+		),
+	),
 },
 {
 	type => "config",
@@ -1161,15 +1143,15 @@
 	match_response => {
 		status => qr/^403$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/json",
-        ],
-        normalize_raw_request_data(
-            q({"a":"bad_value"}]),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q({"a":"bad_value"}]),
+		),
+	),
 },
 {
 	type => "config",
@@ -1188,15 +1170,15 @@
 	match_response => {
 		status => qr/^400$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/json",
-        ],
-        normalize_raw_request_data(
-            q({"a":"bad_value"}]),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q({"a":"bad_value"}]),
+		),
+	),
 },
 {
 	type => "config",
@@ -1215,15 +1197,15 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/xml",
-        ],
-        normalize_raw_request_data(
-            q(<a>bad_value</a>),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+		],
+		normalize_raw_request_data(
+			q(<a>bad_value</a>),
+		),
+	),
 },
 {
 	type => "config",
@@ -1242,15 +1224,15 @@
 	match_response => {
 		status => qr/^403$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/xml",
-        ],
-        normalize_raw_request_data(
-            q(<a>bad_value</a>),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+		],
+		normalize_raw_request_data(
+			q(<a>bad_value</a>),
+		),
+	),
 },
 {
 	type => "config",
@@ -1269,15 +1251,15 @@
 	match_response => {
 		status => qr/^403$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/xml",
-        ],
-        normalize_raw_request_data(
-            q(<a>bad_value</a></b>),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+		],
+		normalize_raw_request_data(
+			q(<a>bad_value</a></b>),
+		),
+	),
 },
 {
 	type => "config",
@@ -1296,15 +1278,15 @@
 	match_response => {
 		status => qr/^400$/,
 	},
-    request => new HTTP::Request(
-        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-        [
-            "Content-Type" => "application/xml",
-        ],
-        normalize_raw_request_data(
-            q(<a>bad_value</a></b>),
-        ),
-    ),
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+		],
+		normalize_raw_request_data(
+			q(<a>bad_value</a></b>),
+		),
+	),
 },
 
 # SecCookieFormat
