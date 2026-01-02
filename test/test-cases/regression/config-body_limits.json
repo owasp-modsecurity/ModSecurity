@@ -711,7 +711,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/bad_name before limit",
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_name without value",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -725,13 +725,13 @@
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": "18"
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/",
+      "uri":"/test.txt",
       "method":"POST",
-      "body": [
-        "a=1&bad_name=2&c=3"
+      "body":[
+        "bad_name"
       ]
     },
     "response":{
@@ -750,7 +750,7 @@
     "rules":[
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
-      "SecRequestBodyLimit 12",
+      "SecRequestBodyLimit 8",
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
       "SecRule ARGS_NAMES \"bad_name\" \"id:'200002',phase:2,t:none,deny"
     ]
@@ -758,7 +758,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/bad_name after limit",
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name without value without delimeter before limit",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -772,13 +772,295 @@
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": "18"
+        "Content-Length": "9",
+        "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/",
+      "uri":"/test.txt",
       "method":"POST",
-      "body": [
-        "a=1&bad_name=2&c=3"
+      "body":[
+        "bad_nameX"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 8",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule ARGS_NAMES \"bad_name\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name without value with delimiter before limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "10",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "bad_name&X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 9",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule ARGS_NAMES \"bad_name\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_name with value",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "10",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "bad_name=1"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 10",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule ARGS_NAMES \"bad_name\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name with value without delimeter before limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "11",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "bad_name=1X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 10",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule ARGS_NAMES \"bad_name\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name with value with delimiter before limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "12",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "bad_name=1&X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 11",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule ARGS_NAMES \"bad_name\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_value",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "11",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "a=bad_value"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 11",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule ARGS \"bad_value\" \"id:'200002',phase:2,t:none,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_value without delimeter before limit",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "12",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "a=bad_valueX"
       ]
     },
     "response":{
@@ -799,13 +1081,13 @@
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 11",
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
-      "SecRule ARGS_NAMES \"bad_name\" \"id:'200002',phase:2,t:none,deny"
+      "SecRule ARGS \"bad_value\" \"id:'200002',phase:2,t:none,deny"
     ]
   },
   {
     "enabled":1,
     "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/bad_value before limit",
+    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_value with delimeter before limit",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -819,13 +1101,13 @@
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": "19"
+        "Content-Length": "13",
+        "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/",
+      "uri":"/test.txt",
       "method":"POST",
-      "body": [
-        "a=1&b=bad_value&c=3"
+      "body":[
+        "a=bad_value&X"
       ]
     },
     "response":{
@@ -844,54 +1126,7 @@
     "rules":[
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
-      "SecRequestBodyLimit 15",
-      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
-      "SecRule ARGS \"bad_value\" \"id:'200002',phase:2,t:none,deny"
-    ]
-  },
-  {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/bad_value after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
-    },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
-    },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": "19"
-      },
-      "uri":"/",
-      "method":"POST",
-      "body": [
-        "a=1&b=bad_value&c=3"
-      ]
-    },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
-      },
-      "body":[
-        "no need.\n"
-      ]
-    },
-    "expected":{
-      "http_code":200
-    },
-    "rules":[
-      "SecRuleEngine On",
-      "SecRequestBodyLimitAction ProcessPartial",
-      "SecRequestBodyLimit 14",
+      "SecRequestBodyLimit 12",
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
       "SecRule ARGS \"bad_value\" \"id:'200002',phase:2,t:none,deny"
     ]
