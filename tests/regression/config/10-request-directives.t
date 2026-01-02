@@ -704,6 +704,64 @@
 },
 {
 	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/bad_filename before limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 81
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_FILENAME "bad_filename" "id:'200002',phase:2,t:none,deny
+	),
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="bad_filename"
+			),
+		) . "\r\n" . "a",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/bad_filename after limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 80
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_FILENAME "bad_filename" "id:'200002',phase:2,t:none,deny
+	),
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="bad_filename"
+			),
+		) . "\r\n",
+	),
+},
+{
+	type => "config",
 	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/no epilogue)",
 	conf => qq(
 		SecRuleEngine On
@@ -904,20 +962,17 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/bad_name before limit)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/entire/bad_name without value)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 12
+		SecRequestBodyLimit 8
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
 	),
-	match_log => {
-		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
-	},
 	match_response => {
 		status => qr/^403$/,
 	},
@@ -927,13 +982,117 @@
 			"Content-Type" => "application/x-www-form-urlencoded",
 		],
 		normalize_raw_request_data(
-			q(a=1&bad_name=2&c=3),
+			q(bad_name),
 		),
 	),
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/bad_name after limit)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/partial/bad_name without value without delimeter before limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 8
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
+	),
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(bad_nameX),
+		),
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/partial/bad_name without value with delimiter before limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 9
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
+	),
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(bad_name&X),
+		),
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/entire/bad_name with value)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 10
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
+	),
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(bad_name=1),
+		),
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/partial/bad_name with value without delimeter before limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 10
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
+	),
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(bad_name=1X),
+		),
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/partial/bad_name with value with delimiter before limit)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -944,38 +1103,6 @@
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
 	),
-	match_log => {
-		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "application/x-www-form-urlencoded",
-		],
-		normalize_raw_request_data(
-			q(a=1&bad_name=2&c=3),
-		),
-	),
-},
-{
-	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/bad_value before limit)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 15
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS "bad_value" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
-	},
 	match_response => {
 		status => qr/^403$/,
 	},
@@ -985,26 +1112,49 @@
 			"Content-Type" => "application/x-www-form-urlencoded",
 		],
 		normalize_raw_request_data(
-			q(a=1&b=bad_value&c=3),
+			q(bad_name=1&X),
 		),
 	),
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/bad_value after limit)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/entire/bad_value)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 14
+		SecRequestBodyLimit 11
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 		SecRule ARGS "bad_value" "id:'200002',phase:2,t:none,deny
 	),
-	match_log => {
-		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
+	match_response => {
+		status => qr/^403$/,
 	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(a=bad_value),
+		),
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/partial/bad_value without delimeter before limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 11
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule ARGS "bad_value" "id:'200002',phase:2,t:none,deny
+	),
 	match_response => {
 		status => qr/^200$/,
 	},
@@ -1014,11 +1164,36 @@
 			"Content-Type" => "application/x-www-form-urlencoded",
 		],
 		normalize_raw_request_data(
-			q(a=1&b=bad_value&c=3),
+			q(a=bad_valueX),
 		),
 	),
 },
 {
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/partial/bad_value with delimeter before limit)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 12
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule ARGS "bad_value" "id:'200002',phase:2,t:none,deny
+	),
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		normalize_raw_request_data(
+			q(a=bad_value&X),
+		),
+	),
+},{
 	type => "config",
 	comment => "SecRequestBodyLimitAction ProcessPartial (json/bad_name after limit)",
 	conf => qq(
