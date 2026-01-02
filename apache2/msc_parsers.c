@@ -313,7 +313,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
                 value = &buf[j];
             }
         }
-        else {
+        else if (i < inputlength || msr->reqbody_partial_proessing_enabled == 0) {
             arg->value_len = urldecode_nonstrict_inplace_ex((unsigned char *)value, arg->value_origin_len, invalid_count, &changed);
             arg->value = apr_pstrmemdup(msr->mp, value, arg->value_len);
 
@@ -330,7 +330,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
     }
 
     /* the last parameter was empty */
-    if (status == 1) {
+    if (status == 1 && msr->reqbody_partial_proessing_enabled == 0) {
         arg->value_len = 0;
         arg->value = "";
 

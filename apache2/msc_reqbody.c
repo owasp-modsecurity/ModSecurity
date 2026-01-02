@@ -443,6 +443,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
  * Enable partial processing of request body data.
  */
 void modsecurity_request_body_enable_partial_processing(modsec_rec *msr) {
+    msr->reqbody_partial_proessing_enabled = 1;
     if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
         msr->mpd->allow_process_partial = 1;
         msr_log(msr, 4, "Multipart: Allow partial processing of request body");
@@ -454,6 +455,9 @@ void modsecurity_request_body_enable_partial_processing(modsec_rec *msr) {
     else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
         json_allow_partial_values(msr);
         msr_log(msr, 4, "JSON: Allow partial processing of request body");
+    }
+    else if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
+        msr_log(msr, 4, "URLENCODED: Allow partial processing of request body");
     }
 }
 
