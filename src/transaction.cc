@@ -253,12 +253,15 @@ int Transaction::processConnection(const char *client, int cPort,
 
 
 bool Transaction::extractArguments(const std::string &orig,
-    const std::string& buf, size_t offset) {
+    const std::string& buf, size_t offset, bool partial_processing_enabled) {
     char sep1 = '&';
     if (m_rules->m_secArgumentSeparator.m_set) {
         sep1 = m_rules->m_secArgumentSeparator.m_value.at(0);
     }
-    const auto key_value_sets = utils::string::ssplit(buf, sep1);
+    auto key_value_sets = utils::string::ssplit(buf, sep1);
+    if (partial_processing_enabled && (buf.empty() || buf.back() != sep1)) {
+        key_value_sets.pop_back();
+    }
 
     for (const auto &t : key_value_sets) {
         const auto sep2 = '=';
@@ -818,9 +821,10 @@ int Transaction::processRequestBody() {
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         m_variableOffset++;
         // large size might cause issues in the parsing itself; omit if exceeded
-        if (!requestBodyNoFilesLimitExceeded) {
-            extractArguments("POST", m_requestBody.str(), m_variableOffset);
-	}
+        if (!requestBodyNoFilesLimitExceeded || is_process_partial) {
+            bool partial_processing_enabled = is_process_partial && m_requestBodyLimitExceeded;
+            extractArguments("POST", m_requestBody.str(), m_variableOffset, partial_processing_enabled);
+	    }
     } else if (m_requestBodyType != UnknownFormat) {
         /**
          * FIXME: double check to see if that is a valid scenario...

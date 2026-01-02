@@ -397,7 +397,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     bool addArgument(const std::string& orig, const std::string& key,
         const std::string& value, size_t offset);
     bool extractArguments(const std::string &orig, const std::string& buf,
-        size_t offset);
+        size_t offset, bool partial_processing_enabled = false);
 
     const char *getResponseBody() const;
     size_t getResponseBodyLength();
