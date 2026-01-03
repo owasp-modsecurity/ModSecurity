@@ -997,7 +997,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part across limit #2)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #1)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1012,7 +1012,7 @@
 		debug => [ qr/Input filter: Bucket type HEAP contains 116 bytes./, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1032,7 +1032,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/parital/bad-header in part across limit #3)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/parital/bad-header in part before limit #2)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1047,7 +1047,7 @@
 		debug => [ qr/Input filter: Bucket type HEAP contains 117 bytes./, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1067,7 +1067,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #1)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #3)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1103,7 +1103,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #2)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #4)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1139,7 +1139,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #3)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #5)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1190,7 +1190,7 @@
 		debug => [ qr/Input filter: Bucket type HEAP contains 117 bytes./, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1260,7 +1260,7 @@
 		debug => [ qr/Input filter: Bucket type HEAP contains 206 bytes./, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1325,7 +1325,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/invalid final boundary before limit #1)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/invalid boundary before limit #1)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1337,6 +1337,7 @@
 	),
 	match_log => {
 		debug => [ qr/Input filter: Bucket type HEAP contains 119 bytes./, 1],
+		error => [ qr/Multipart parsing error: Multipart: Invalid boundary./, 1],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -1353,13 +1354,13 @@
 				Content-Type: text/plain
 
 				value
-				--0000!),
+				--0000!)
 		) . "X",
 	),
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/invalid final boundary before limit #2)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/invalid boundary before limit #2)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1371,6 +1372,42 @@
 	),
 	match_log => {
 		debug => [ qr/Input filter: Bucket type HEAP contains 120 bytes./, 1],
+		error => [ qr/Multipart parsing error: Multipart: Invalid boundary./, 1],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: text/plain
+
+				value
+				--0000)
+		) . "\r!" . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/invalid final boundary before limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 119
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 120 bytes./, 1],
+		error => [ qr/Multipart parsing error: Multipart: Invalid final boundary./, 1],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -1427,7 +1464,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/bad-header in part across limit #2)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/bad-header in part before limit #1)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1442,7 +1479,7 @@
 		debug => [ qr/Input filter: Bucket type HEAP contains 111 bytes./, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1461,7 +1498,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #1)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #2)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1495,7 +1532,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #2)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #3)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1530,7 +1567,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #3)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #4)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1580,7 +1617,7 @@
 		debug => [ qr/Input filter: Bucket type HEAP contains 112 bytes./, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1648,7 +1685,7 @@
 		debug => [ qr/Input filter: Bucket type HEAP contains 196 bytes./, 1],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1711,7 +1748,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/invalid final boundary before limit #1)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/invalid boundary before limit #1)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1723,6 +1760,7 @@
 	),
 	match_log => {
 		debug => [ qr/Input filter: Bucket type HEAP contains 114 bytes./, 1],
+		error => [ qr/Multipart parsing error: Multipart: Invalid boundary./, 1],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -1744,7 +1782,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/invalid final boundary before limit #2)",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/invalid final boundary before limit #1)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -1756,6 +1794,7 @@
 	),
 	match_log => {
 		debug => [ qr/Input filter: Bucket type HEAP contains 115 bytes./, 1],
+		error => [ qr/Multipart parsing error: Multipart: Invalid final boundary./, 1],
 	},
 	match_response => {
 		status => qr/^400$/,
