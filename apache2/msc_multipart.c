@@ -421,7 +421,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
             if (data == msr->mpd->buf) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid part header (header name missing).");
 
-                 return -1;
+                return -1;
             }
 
             /* check if multipart header contains any invalid characters */
