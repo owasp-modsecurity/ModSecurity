@@ -1083,6 +1083,22 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                     /* The payload is complete after all. */
                     msr->mpd->is_complete = 1;
                 }
+                else if (msr->mpd->allow_process_partial == 1
+                        && (buf_data_len >= 2 + strlen(msr->mpd->boundary))
+                        && (*(msr->mpd->buf) == '-')
+                        && (*(msr->mpd->buf + 1) == '-')
+                        && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) )
+                {
+                    if ( ((buf_data_len >= 3 + strlen(msr->mpd->boundary))
+                            && ((*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) != '-')
+                                && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) != '\r')))
+                        || ((buf_data_len >= final_boundary_len)
+                            && *(msr->mpd->buf + 2 + strlen(msr->mpd->boundary) + 1) != '-') )
+                    {
+                        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid final boundary.");
+                        return -1;
+                    }
+                }
             }
 
             if (msr->mpd->is_complete == 0 && msr->mpd->allow_process_partial == 0) {
