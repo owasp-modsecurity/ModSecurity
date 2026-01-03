@@ -1226,7 +1226,6 @@ int Multipart::multipart_complete(std::string *error) {
                         /* The payload is complete after all. */
                         m_is_complete = 1;
                     } else if (m_allow_partial) {
-                        int is_final = 0;
                         if (buf_data_len >= 2 + m_boundary.size() + 1) {
                             if (*(m_buf + 2 + m_boundary.size()) == '-') {
                                 if ((buf_data_len >= 2 + m_boundary.size() + 2)
@@ -1236,7 +1235,6 @@ int Multipart::multipart_complete(std::string *error) {
                                     error->assign("Multipart: Invalid final boundary.");
                                     return false;
                                 }
-                                is_final = 1;
                             } else if ((*(m_buf + 2 + m_boundary.size()) != '\r') 
                                 || ((buf_data_len >= 2 + m_boundary.size() + 2)
                                     && (*(m_buf + 2 + m_boundary.size() + 1) != '\n'))) {
@@ -1246,8 +1244,8 @@ int Multipart::multipart_complete(std::string *error) {
                                 return false;
                             }
                         }
-
-                        if (process_boundary(is_final) < 0) {
+                        /* process it as a non-final boundary to avoid building a new part. */
+                        if (process_boundary(0) < 0) {
                             m_flag_error = 1;
                             return -1;
                         }
