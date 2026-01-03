@@ -1086,7 +1086,6 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                         msr->mpd->is_complete = 1;
                     }
                     else if (msr->mpd->allow_process_partial == 1) {
-                        int is_final = 0;
                         if (buf_data_len >= 2 + boundary_len + 1) {
                             if (*(msr->mpd->buf + 2 + boundary_len) == '-') {
                                 if ( (buf_data_len >= 2 + boundary_len + 2)
@@ -1094,7 +1093,6 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                                     *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid final boundary.");
                                     return -1;
                                 }
-                                is_final = 1;
                             }
                             else if ( (*(msr->mpd->buf + 2 + boundary_len) != '\r')
                                 || ((buf_data_len >= 2 + boundary_len + 2)
@@ -1103,8 +1101,8 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                                 return -1;
                             }
                         }
-
-                        if (multipart_process_boundary(msr, is_final, error_msg) < 0) {
+                        /* process it as a non-final boundary to avoid building a new part. */
+                        if (multipart_process_boundary(msr, 0, error_msg) < 0) {
                             msr->mpd->flag_error = 1;
                             return -1;
                         }
