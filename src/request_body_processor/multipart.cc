@@ -1225,6 +1225,22 @@ int Multipart::multipart_complete(std::string *error) {
 
                     /* The payload is complete after all. */
                     m_is_complete = 1;
+                } else if (m_allow_partial
+                    && (buf_data_len >= 2 + m_boundary.size())
+                    && (*(m_buf) == '-')
+                    && (*(m_buf + 1) == '-')
+                    && (strncmp(m_buf + 2, m_boundary.c_str(),
+                        m_boundary.size()) == 0)) {
+                    if (((buf_data_len >= 3 + m_boundary.size())
+                            && (*(m_buf + 2 + m_boundary.size()) != '-')
+                            && (*(m_buf + 2 + m_boundary.size()) != '\r'))
+                        || ((buf_data_len >= final_boundary_len)
+                            && (*(m_buf + 2 + m_boundary.size() + 1) != '-'))) {
+                        ms_dbg_a(m_transaction, 1,
+                            "Multipart: Invalid final boundary.");
+                        error->assign("Multipart: Invalid final boundary.");
+                        return false;
+                    }
                 }
             }
 
