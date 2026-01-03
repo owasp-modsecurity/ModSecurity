@@ -962,6 +962,821 @@
 },
 {
 	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part across limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 114
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 115 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: bad_type
+
+				value
+				--000),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part across limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 115
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 116 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: bad_type
+
+				value
+				--0000),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/parital/bad-header in part across limit #3)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 116
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 117 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: bad_type
+
+				value
+				--0000),
+		) . "\rX",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 117
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 118 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: bad_type
+
+				value
+				--0000
+			)
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 118
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 119 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: bad_type
+
+				value
+				--0000
+			)
+		) . q(C) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in part before limit #3)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 160
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 161 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: bad_type
+
+				value
+				--0000
+			)
+		) . q(Content-Disposition: form-data; name="name2) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in final part across limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 116
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 117 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: bad_type
+
+				value
+				--0000-),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in final part before limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 117
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 118 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: bad_type
+
+				value
+				--0000--),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in final part across limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 205
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 206 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: text/plain
+
+				value
+				--0000
+				Content-Disposition: form-data; name="name2"
+				Content-Type: bad_type
+
+				value
+				--0000-),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/bad-header in final part before limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 206
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 207 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: text/plain
+
+				value
+				--0000
+				Content-Disposition: form-data; name="name2"
+				Content-Type: bad_type
+
+				value
+				--0000--),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/invalid final boundary before limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 118
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 119 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: text/plain
+
+				value
+				--0000!),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/CRLF/partial/invalid final boundary before limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 119
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 120 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		normalize_raw_request_data(
+			q(
+				--0000
+				Content-Disposition: form-data; name="name1"; filename="name1.txt"
+				Content-Type: text/plain
+
+				value
+				--0000-!),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/bad-header in part across limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 109
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 110 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--000),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/bad-header in part across limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 110
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 111 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--0000),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 111
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 112 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--0000),
+		) . "\n" . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 112
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 113 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--0000),
+			q(C),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/parital/bad-header in part before limit #3)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 154
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS:name1 "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 155 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--0000),
+			q(Content-Disposition: form-data; name="name2),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/bad-header in final part across limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 111
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 112 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--0000-),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/bad-header in final part before limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 112
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 113 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--0000--),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/bad-header in final part across limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 195
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 196 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: text/plain),
+			q(),
+			q(value),
+			q(--0000),
+			q(Content-Disposition: form-data; name="name2"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--0000-),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/bad-header in final part before limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 196
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule MULTIPART_PART_HEADERS "content-type:.*bad_type" "id:'200002',phase:2,t:none,t:lowercase,deny
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 197 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: text/plain),
+			q(),
+			q(value),
+			q(--0000),
+			q(Content-Disposition: form-data; name="name2"),
+			q(Content-Type: bad_type),
+			q(),
+			q(value),
+			q(--0000--),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/invalid final boundary before limit #1)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 113
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 114 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: text/plain),
+			q(),
+			q(value),
+			q(--0000!),
+		) . "X",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/LF/partial/invalid final boundary before limit #2)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 114
+		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+	),
+	match_log => {
+		debug => [ qr/Input filter: Bucket type HEAP contains 115 bytes./, 1],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=0000",
+		],
+		join("\n",
+			q(--0000),
+			q(Content-Disposition: form-data; name="name1"; filename="name1.txt"),
+			q(Content-Type: text/plain),
+			q(),
+			q(value),
+			q(--0000-!),
+		) . "X",
+	),
+},
+{
+	type => "config",
 	comment => "SecRequestBodyLimitAction ProcessPartial (url-encoded/entire/bad_name without value)",
 	conf => qq(
 		SecRuleEngine On
