@@ -1044,59 +1044,70 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                  *                   [CRLF epilogue]
                  */
                 unsigned int buf_data_len = (unsigned int)(MULTIPART_BUF_SIZE - msr->mpd->bufleft);
-                size_t final_boundary_len = 4 + strlen(msr->mpd->boundary);
-                if ( (buf_data_len >= final_boundary_len)
+                size_t boundary_len = strlen(msr->mpd->boundary);
+                if ( (buf_data_len >= 2 + boundary_len)
                     && (*(msr->mpd->buf) == '-')
                     && (*(msr->mpd->buf + 1) == '-')
-                    && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
-                    && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) == '-')
-                    && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary) + 1) == '-') )
+                    && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, boundary_len) == 0) )
                 {
-                    /* If body fits in limit and ends with final boundary plus just CR, reject it. */
-                    if ( (msr->mpd->allow_process_partial == 0)
-                        && (buf_data_len == final_boundary_len + 1)
-                        && (*(msr->mpd->buf + final_boundary_len) == '\r') )
+                    if ( (buf_data_len >= 2 + boundary_len + 2)
+                        && (*(msr->mpd->buf + 2 + boundary_len) == '-')
+                        && (*(msr->mpd->buf + 2 + boundary_len + 1) == '-') )
                     {
-                        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid epilogue after final boundary.");
-                        return -1;
-                    }
-
-                    if ((msr->mpd->crlf_state_buf_end == 2) && (msr->mpd->flag_lf_line != 1)) {
-                        msr->mpd->flag_lf_line = 1;
-                        if (msr->mpd->flag_crlf_line) {
-                            msr_log(msr, 4, "Multipart: Warning: mixed line endings used (CRLF/LF).");
-                        } else {
-                            msr_log(msr, 4, "Multipart: Warning: incorrect line endings used (LF).");
+                        /* If body fits in limit and ends with final boundary plus just CR, reject it. */
+                        if ( (msr->mpd->allow_process_partial == 0)
+                            && (buf_data_len == 2 + boundary_len + 2 + 1)
+                            && (*(msr->mpd->buf + 2 + boundary_len + 2) == '\r') )
+                        {
+                            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid epilogue after final boundary.");
+                            return -1;
                         }
-                    }
-                    if (msr->mpd->mpp_substate_part_data_read == 0) {
-                        /* it looks like the final boundary, but it's where part data should begin */
-                        msr->mpd->flag_invalid_part = 1;
-                        msr_log(msr, 4, "Multipart: Warning: Invalid part (data contains final boundary)");
-                    }
-                    /* Looks like the final boundary - process it. */
-                    if (multipart_process_boundary(msr, 1 /* final */, error_msg) < 0) {
-                        msr->mpd->flag_error = 1;
-                        return -1;
-                    }
 
-                    /* The payload is complete after all. */
-                    msr->mpd->is_complete = 1;
-                }
-                else if (msr->mpd->allow_process_partial == 1
-                        && (buf_data_len >= 2 + strlen(msr->mpd->boundary))
-                        && (*(msr->mpd->buf) == '-')
-                        && (*(msr->mpd->buf + 1) == '-')
-                        && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) )
-                {
-                    if ( ((buf_data_len >= 3 + strlen(msr->mpd->boundary))
-                            && ((*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) != '-')
-                                && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) != '\r')))
-                        || ((buf_data_len >= final_boundary_len)
-                            && *(msr->mpd->buf + 2 + strlen(msr->mpd->boundary) + 1) != '-') )
-                    {
-                        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid final boundary.");
-                        return -1;
+                        if ((msr->mpd->crlf_state_buf_end == 2) && (msr->mpd->flag_lf_line != 1)) {
+                            msr->mpd->flag_lf_line = 1;
+                            if (msr->mpd->flag_crlf_line) {
+                                msr_log(msr, 4, "Multipart: Warning: mixed line endings used (CRLF/LF).");
+                            } else {
+                                msr_log(msr, 4, "Multipart: Warning: incorrect line endings used (LF).");
+                            }
+                        }
+                        if (msr->mpd->mpp_substate_part_data_read == 0) {
+                            /* it looks like the final boundary, but it's where part data should begin */
+                            msr->mpd->flag_invalid_part = 1;
+                            msr_log(msr, 4, "Multipart: Warning: Invalid part (data contains final boundary)");
+                        }
+                        /* Looks like the final boundary - process it. */
+                        if (multipart_process_boundary(msr, 1 /* final */, error_msg) < 0) {
+                            msr->mpd->flag_error = 1;
+                            return -1;
+                        }
+
+                        /* The payload is complete after all. */
+                        msr->mpd->is_complete = 1;
+                    }
+                    else if (msr->mpd->allow_process_partial == 1) {
+                        int is_final = 0;
+                        if (buf_data_len >= 2 + boundary_len + 1) {
+                            if (*(msr->mpd->buf + 2 + boundary_len) == '-') {
+                                if ( (buf_data_len >= 2 + boundary_len + 2)
+                                    && (*(msr->mpd->buf + 2 + boundary_len + 1) != '-') ) {
+                                    *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid final boundary.");
+                                    return -1;
+                                }
+                                is_final = 1;
+                            }
+                            else if ( (*(msr->mpd->buf + 2 + boundary_len) != '\r')
+                                || ((buf_data_len >= 2 + boundary_len + 2)
+                                    && (*(msr->mpd->buf + 2 + boundary_len + 1) != '\n')) ) {
+                                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary.");
+                                return -1;
+                            }
+                        }
+
+                        if (multipart_process_boundary(msr, is_final, error_msg) < 0) {
+                            msr->mpd->flag_error = 1;
+                            return -1;
+                        }
                     }
                 }
             }
