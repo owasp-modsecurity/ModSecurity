@@ -711,6 +711,1224 @@
   {
     "enabled":1,
     "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part across limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--000X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 115 bytes. Limit set to: 114",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 114",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part across limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 116 bytes. Limit set to: 115",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 115",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part across limit #3",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000\rX"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 117 bytes. Limit set to: 116",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 116",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000\r\n",
+        "X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 118 bytes. Limit set to: 117",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 117",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000\r\n",
+        "CX"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 119 bytes. Limit set to: 118",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 118",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #3",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name2X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 161 bytes. Limit set to: 160",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 160",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part across limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000-X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 117 bytes. Limit set to: 116",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 116",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part before limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000--X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 118 bytes. Limit set to: 117",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 117",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part across limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: text/plain\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name2\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000-X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 206 bytes. Limit set to: 205",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 205",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part before limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: text/plain\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name2\"\r\n",
+        "Content-Type: bad_type\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000--X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 207 bytes. Limit set to: 206",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 206",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/invalid final boundary before limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: text/plain\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000!X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 119 bytes. Limit set to: 118",
+      "http_code":400
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 118",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/invalid final boundary before limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
+        "Content-Type: text/plain\r\n",
+        "\r\n",
+        "value\r\n",
+        "--0000-!X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 120 bytes. Limit set to: 119",
+      "http_code":400
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 119",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part across limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--000X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 110 bytes. Limit set to: 109",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 109",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part across limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--0000X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 111 bytes. Limit set to: 110",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 110",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--0000\n",
+        "X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 112 bytes. Limit set to: 111",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 111",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--0000\n",
+        "CX"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 113 bytes. Limit set to: 112",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 112",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #3",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name2X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 155 bytes. Limit set to: 154",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 154",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS:name1 \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part across limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--0000-X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 112 bytes. Limit set to: 111",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 111",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part before limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--0000--X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 113 bytes. Limit set to: 112",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 112",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part across limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "value\n",
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name2\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--0000-X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 196 bytes. Limit set to: 195",
+      "http_code":200
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 195",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part before limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "value\n",
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name2\"\n",
+        "Content-Type: bad_type\n",
+        "\n",
+        "value\n",
+        "--0000--X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 197 bytes. Limit set to: 196",
+      "http_code":403
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 196",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\"",
+      "SecRule MULTIPART_PART_HEADERS \"content-type:.*bad_type\" \"id:'200002',phase:2,t:none,t:lowercase,deny"
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/invalid final boundary before limit #1",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "value\n",
+        "--0000!X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 114 bytes. Limit set to: 113",
+      "http_code":400
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 113",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/invalid final boundary before limit #2",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Type": "multipart/form-data; boundary=0000"
+      },
+      "uri":"/test.txt",
+      "method":"POST",
+      "body":[
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "value\n",
+        "--0000-!X"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need.\n"
+      ]
+    },
+    "expected":{
+      "debug_log":"Appending request body: 115 bytes. Limit set to: 114",
+      "http_code":400
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecRequestBodyLimitAction ProcessPartial",
+      "SecRequestBodyLimit 114",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
     "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_name without value",
     "client":{
       "ip":"200.249.12.31",
