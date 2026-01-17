@@ -116,9 +116,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-24.04]
-        #platform: [x32, x64]
         platform: [x64]
-        #compiler: [gcc, clang]
         compiler: [gcc]
         configure:
           - {label: "with pcre2, with study, with jit",  opt: "--enable-pcre-study=yes --enable-pcre-jit" }
