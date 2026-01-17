@@ -130,7 +130,7 @@ jobs:
         run: ./autogen.sh
       - name: configure ${{ matrix.configure.label }}
         run: ./configure ${{ matrix.configure.opt }} 'CFLAGS=-Werror=format-security'
-      - uses: ammaraskar/gcc-problem-matcher@master
+      - uses: ammaraskar/gcc-problem-matcher@0f9c86f9e693db67dacf53986e1674de5f2e5f28 #v0.3.0
       - name: make
         run: make -j `nproc`
       - name: install module
