@@ -120,7 +120,6 @@ jobs:
         compiler: [gcc]
         configure:
           - {label: "with pcre2, with study, with jit",  opt: "--enable-pcre-study=yes --enable-pcre-jit" }
-          #- {label: "with pcre, with study, with jit",   opt: "--with-pcre --enable-pcre-study=yes --enable-pcre-jit" }
     steps:
       - name: Setup Dependencies
         run: |
