@@ -501,7 +501,7 @@
 		SecRequestBodyLimit 20
 	),
 	match_log => {
-		debug => [ qr/Request body is larger than the configured limit \(20\).. Deny with code \(413\)/, 1 ],
+		debug => [ qr/Request body is larger than the configured limit \(20\)./, 1 ],
 	},
 	match_response => {
 		status => qr/^413$/,

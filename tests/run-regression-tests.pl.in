@@ -476,8 +476,12 @@ sub match_log {
                 $rc = $&;
                 last;
             }
-            # TODO: Use select()/poll()
-            sleep 0.1 unless ($nbytes == $BUFSIZ);
+            unless ($nbytes == $BUFSIZ) {
+                # wait until we can read from the file but max 0.1 secs
+                my $rin = '';
+                vec($rin, fileno($fh), 1) = 1;
+                select($rin, undef, undef, 0.1);
+            }
             if ($graph and $opt{d}) {
                 $i++;
                 if ($i == 10) {
@@ -532,7 +536,8 @@ sub dbg {
     my $out = join "", map {
         (ref $_ ne "" ? Dumper($_) : $_)
     } @_;
-    $out =~ s/^/DBG: /mg;
+    my $t = gettimeofday;
+    $out =~ s/^/DBG\[$t\]: /mg;
     print STDOUT "$out\n";
 }
 
@@ -632,7 +637,7 @@ sub httpd_stop {
         -d => $opt{S},
         -f => $opt{C},
         (map { (-c => $_) } ("Listen localhost:$opt{p}", @_)),
-        -k => "stop",
+        -k => "graceful-stop",
     );
 
     my $httpd_out;
