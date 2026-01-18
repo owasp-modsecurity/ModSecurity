@@ -484,7 +484,7 @@ sub match_log {
             }
             if ($graph and $opt{d}) {
                 $i++;
-                if ($i == 1000) {
+                if ($i == 10) {
                     $graphed++;
                     $i=0;
                     print STDERR $graph if ($graphed == 1);
