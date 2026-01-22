@@ -750,3 +750,42 @@
 	),
 },
 
+# SecRequestBodyNoFilesLimit
+{
+	type => "config",
+	comment => "SecRequestBodyNoFilesLimit - length is equal to limit",
+	conf => q(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyNoFilesLimit 16
+	),
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		"a=0123456789ABCD",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyNoFilesLimit - length is larger than limit",
+	conf => q(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyNoFilesLimit 16
+	),
+	match_response => {
+		status => qr/^413$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		"a=0123456789ABCDE",
+	),
+},

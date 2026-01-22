@@ -406,7 +406,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
     }
 
     /* Check that we are not over the request body no files limit. */
-    if (msr->msc_reqbody_no_files_length >= (unsigned long) msr->txcfg->reqbody_no_files_limit) {
+    if (msr->msc_reqbody_no_files_length > (unsigned long) msr->txcfg->reqbody_no_files_limit) {
         *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                 "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
         if (msr->txcfg->debuglog_level >= 1) {
@@ -671,7 +671,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
 
 
     /* Check that we are not over the request body no files limit. */
-    if (msr->msc_reqbody_no_files_length >= (unsigned long)msr->txcfg->reqbody_no_files_limit) {
+    if (msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit) {
         *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
             "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
         if (msr->txcfg->debuglog_level >= 1) {
