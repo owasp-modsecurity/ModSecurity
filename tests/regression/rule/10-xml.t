@@ -445,7 +445,7 @@
 		SecRule XML:/* "bad_value" "id:'500007',phase:2,t:none,deny"
 	),
 	match_log => {
-        error => [ qr/Access denied with code 403 \(phase 2\). Pattern match "bad_value" at XML\./, 1 ],
+		error => [ qr/Access denied with code 403 \(phase 2\). Pattern match "bad_value" at XML\./, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -477,7 +477,7 @@
 		SecRule XML:/* "bad_value" "id:'500007',phase:2,t:none,deny"
 	),
 	match_log => {
-        error => [ qr/Access denied with code 403 \(phase 2\). Pattern match "bad_value" at XML\./, 1 ],
+        	error => [ qr/Access denied with code 403 \(phase 2\). Pattern match "bad_value" at XML\./, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,

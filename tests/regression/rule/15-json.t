@@ -339,7 +339,7 @@
 		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 		SecRule REQBODY_ERROR "!\@eq 0" \\
 			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+		SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
 	),
 	match_log => {
 		debug => [ qr/JSON: Allow partial processing of request body|JSON support was not enabled/, 1 ],
@@ -370,7 +370,7 @@
 		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 		SecRule REQBODY_ERROR "!\@eq 0" \\
 			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+		SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
 	),
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 2\)\. Pattern match "bad_value" at ARGS:b\./, 1 ],
@@ -403,7 +403,7 @@
 		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 		SecRule REQBODY_ERROR "!\@eq 0" \\
 			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+		SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
 	),
 	match_log => {
 		error => [ qr/Request body \(Content-Length\) is larger than the configured limit \(26\)\./, 1 ],
@@ -434,7 +434,7 @@
 		     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 		SecRule REQBODY_ERROR "!\@eq 0" \\
 			"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-        SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
+		SecRule ARGS "bad_value" "id:'200003',phase:2,t:none,deny"
 	),
 	match_log => {
 		error => [ qr/Request body \(Content-Length\) is larger than the configured limit \(26\)\./, 1 ],
