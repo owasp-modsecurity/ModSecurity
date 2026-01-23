@@ -38,7 +38,7 @@ class Rule_DictElement : public VariableDictElement { \
         : VariableDictElement(m_rule, dictElement) { }
 
     static void id(Transaction *t,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
         const RuleWithActions *r = rule;
 
@@ -72,7 +72,7 @@ class Rule_DictElement : public VariableDictElement { \
 
 
     static void severity(Transaction *t,
-        RuleWithActions *rule,
+        const RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
         const RuleWithActions *r = rule;
 
