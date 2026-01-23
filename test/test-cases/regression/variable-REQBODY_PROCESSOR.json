@@ -94,7 +94,7 @@
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2"
+        "Content-Type": "multipart/form-data; boundary=------------------------756b6d74fa1a8ee2"
       },
       "uri":"/?key=value&key=other_value",
       "http_version":1.1,
