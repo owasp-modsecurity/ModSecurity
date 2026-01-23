@@ -279,7 +279,7 @@ struct modsec_rec {
     unsigned int         if_started_forwarding;
 
     apr_size_t           reqbody_length;
-    unsigned int         reqbody_partial_proessing_enabled;
+    unsigned int         reqbody_partial_processing_enabled;
 
     apr_bucket_brigade  *of_brigade;
     unsigned int         of_status;
