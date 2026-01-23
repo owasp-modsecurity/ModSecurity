@@ -499,6 +499,23 @@
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction Reject
 		SecRequestBodyLimit 20
+		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" \\
+			"id:'200003',phase:2,t:none,log,deny,status:400, \\
+			msg:'Multipart request body failed strict validation: \\
+			PE %{REQBODY_PROCESSOR_ERROR}, \\
+			BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
+			BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
+			DB %{MULTIPART_DATA_BEFORE}, \\
+			DA %{MULTIPART_DATA_AFTER}, \\
+			HF %{MULTIPART_HEADER_FOLDING}, \\
+			LF %{MULTIPART_LF_LINE}, \\
+			SM %{MULTIPART_MISSING_SEMICOLON}, \\
+			IQ %{MULTIPART_INVALID_QUOTING}, \\
+			IP %{MULTIPART_INVALID_PART}, \\
+			IH %{MULTIPART_INVALID_HEADER_FOLDING}, \\
+			FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecRule MULTIPART_UNMATCHED_BOUNDARY "!\@eq 0" \\
+			"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 	),
 	match_log => {
 		debug => [ qr/Request body is larger than the configured limit \(20\)./, 1 ],
@@ -576,6 +593,23 @@
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction ProcessPartial
 		SecRequestBodyLimit 131072
+		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" \\
+			"id:'200003',phase:2,t:none,log,deny,status:400, \\
+			msg:'Multipart request body failed strict validation: \\
+			PE %{REQBODY_PROCESSOR_ERROR}, \\
+			BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
+			BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
+			DB %{MULTIPART_DATA_BEFORE}, \\
+			DA %{MULTIPART_DATA_AFTER}, \\
+			HF %{MULTIPART_HEADER_FOLDING}, \\
+			LF %{MULTIPART_LF_LINE}, \\
+			SM %{MULTIPART_MISSING_SEMICOLON}, \\
+			IQ %{MULTIPART_INVALID_QUOTING}, \\
+			IP %{MULTIPART_INVALID_PART}, \\
+			IH %{MULTIPART_INVALID_HEADER_FOLDING}, \\
+			FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecRule MULTIPART_UNMATCHED_BOUNDARY "!\@eq 0" \\
+			"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 	),
 	match_log => {
 		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
