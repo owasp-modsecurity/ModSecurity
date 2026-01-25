@@ -16,16 +16,21 @@
       "headers": {
         "Host": "net.tutsplus.com"
       },
-      "uri": "\/test.pl?param1=something`somenthing",
+      "uri": "/test.pl?param1=something`somenthing",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "text\/xml; charset=utf-8\n\r",
+        "Content-Type": "text/xml; charset=utf-8\n\r",
         "Content-Length": "length\n\r"
-      }
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "debug_log": "Rule returned 1",
@@ -53,19 +58,23 @@
       "headers": {
         "Host": "net.tutsplus.com"
       },
-      "uri": "\/test.pl?param1=`somenthing",
+      "uri": "/test.pl?param1=`somenthing",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "text\/xml; charset=utf-8\n\r",
+        "Content-Type": "text/xml; charset=utf-8\n\r",
         "Content-Length": "length\n\r"
-      }
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
-      "debug_log": "",
       "http_code": 500
     },
     "rules": [
@@ -90,16 +99,21 @@
       "headers": {
         "Host": "net.tutsplus.com"
       },
-      "uri": "\/test.pl?param1=a",
+      "uri": "/test.pl?param1=a",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "text\/xml; charset=utf-8\n\r",
+        "Content-Type": "text/xml; charset=utf-8\n\r",
         "Content-Length": "length\n\r"
-      }
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "debug_log": "Rule returned 1",
@@ -127,16 +141,21 @@
       "headers": {
         "Host": "net.tutsplus.com"
       },
-      "uri": "\/test.pl?param1=a`b",
+      "uri": "/test.pl?param1=a`b",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "text\/xml; charset=utf-8\n\r",
+        "Content-Type": "text/xml; charset=utf-8\n\r",
         "Content-Length": "length\n\r"
-      }
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "debug_log": "Rule returned 1",
@@ -164,16 +183,21 @@
       "headers": {
         "Host": "net.tutsplus.com"
       },
-      "uri": "\/test.pl?param1=123",
+      "uri": "/test.pl?param1=123",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "text\/xml; charset=utf-8\n\r",
+        "Content-Type": "text/xml; charset=utf-8\n\r",
         "Content-Length": "length\n\r"
-      }
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "debug_log": "Rule returned 1",
@@ -201,16 +225,21 @@
       "headers": {
         "Host": "net.tutsplus.com"
       },
-      "uri": "\/test.pl?param1=abc",
+      "uri": "/test.pl?param1=abc",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "text\/xml; charset=utf-8\n\r",
+        "Content-Type": "text/xml; charset=utf-8\n\r",
         "Content-Length": "length\n\r"
-      }
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "debug_log": "Rule returned 0",

@@ -1,28 +1,28 @@
-[  
-  {  
-    "enabled":1,
-    "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (1/7)",
-    "client":{  
-      "ip":"200.249.12.31",
-      "port":123
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart Content-Disposition should allow filename* field (1/7)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{  
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{  
-      "headers":{  
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length":"330",
-        "Content-Type":"multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
-        "Expect":"100-continue"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "330",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
       },
-      "uri":"/",
-      "method":"POST",
-      "body":[  
+      "uri": "/",
+      "method": "POST",
+      "body": [
         "----------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -35,42 +35,47 @@
         "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{  
-      "headers":"", 
-      "body":""  
+    "response": {
+      "headers": {
+
+      },
+      "body": [
+        ""
+      ]
     },
-    "expected":{  
-      "debug_log":"Target value: \"03CB1664.txt\" \\(Variable: MULTIPART_FILENAME"
+    "expected": {
+      "debug_log": "Target value: \"03CB1664.txt\" \\(Variable: MULTIPART_FILENAME",
+      "http_code": 200
     },
-    "rules":[  
+    "rules": [
       "SecRuleEngine On",
       "SecRule MULTIPART_FILENAME \"@contains 0\" \"id:1,phase:2,pass,t:trim\""
     ]
   },
-  {  
-    "enabled":1,
-    "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (2/7)",
-    "client":{  
-      "ip":"200.249.12.31",
-      "port":123
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart Content-Disposition should allow filename* field (2/7)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{  
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{  
-      "headers":{  
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length":"330",
-        "Content-Type":"multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
-        "Expect":"100-continue"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "330",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
       },
-      "uri":"/",
-      "method":"POST",
-      "body":[  
+      "uri": "/",
+      "method": "POST",
+      "body": [
         "----------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -83,42 +88,47 @@
         "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{  
-      "headers":"", 
-      "body":""  
+    "response": {
+      "headers": {
+
+      },
+      "body": [
+        ""
+      ]
     },
-    "expected":{  
-      "debug_log":"Target value: \"ab0-_xy.txt\" \\(Variable: MULTIPART_FILENAME"
+    "expected": {
+      "debug_log": "Target value: \"ab0-_xy.txt\" \\(Variable: MULTIPART_FILENAME",
+      "http_code": 200
     },
-    "rules":[  
+    "rules": [
       "SecRuleEngine On",
       "SecRule MULTIPART_FILENAME \"@contains 0\" \"id:1,phase:2,pass,t:trim\""
     ]
   },
-  {  
-    "enabled":1,
-    "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (3/7)",
-    "client":{  
-      "ip":"200.249.12.31",
-      "port":123
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart Content-Disposition should allow filename* field (3/7)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{  
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{  
-      "headers":{  
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length":"330",
-        "Content-Type":"multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
-        "Expect":"100-continue"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "330",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
       },
-      "uri":"/",
-      "method":"POST",
-      "body":[  
+      "uri": "/",
+      "method": "POST",
+      "body": [
         "----------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -131,42 +141,47 @@
         "----------------------------756b6d74fa1a8ee2--\r\n"
       ]
     },
-    "response":{  
-      "headers":"", 
-      "body":""  
+    "response": {
+      "headers": {
+
+      },
+      "body": [
+        ""
+      ]
     },
-    "expected":{  
-      "debug_log":"Warning: no filename= but filename*"
+    "expected": {
+      "debug_log": "Warning: no filename= but filename*",
+      "http_code": 200
     },
-    "rules":[  
+    "rules": [
       "SecRuleEngine On",
       "SecRule MULTIPART_FILENAME \"@contains 0\" \"id:1,phase:2,pass,t:trim\""
     ]
   },
-  {  
-    "enabled":1,
-    "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (4/7)",
-    "client":{  
-      "ip":"200.249.12.31",
-      "port":123
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart Content-Disposition should allow filename* field (4/7)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{  
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{  
-      "headers":{  
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length":"330",
-        "Content-Type":"multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
-        "Expect":"100-continue"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "330",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
       },
-      "uri":"/",
-      "method":"POST",
-      "body":[  
+      "uri": "/",
+      "method": "POST",
+      "body": [
         "----------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -179,42 +194,47 @@
         "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{  
-      "headers":"", 
-      "body":""  
+    "response": {
+      "headers": {
+
+      },
+      "body": [
+        ""
+      ]
     },
-    "expected":{  
-      "debug_log":"Multipart: Invalid Content-Disposition header \\(-16"
+    "expected": {
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(-16",
+      "http_code": 200
     },
-    "rules":[  
+    "rules": [
       "SecRuleEngine On",
       "SecRule MULTIPART_FILENAME \"@contains 0\" \"id:1,phase:2,pass,t:trim\""
     ]
   },
-  {  
-    "enabled":1,
-    "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (5/7)",
-    "client":{  
-      "ip":"200.249.12.31",
-      "port":123
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart Content-Disposition should allow filename* field (5/7)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{  
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{  
-      "headers":{  
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length":"330",
-        "Content-Type":"multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
-        "Expect":"100-continue"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "330",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
       },
-      "uri":"/",
-      "method":"POST",
-      "body":[  
+      "uri": "/",
+      "method": "POST",
+      "body": [
         "----------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -227,42 +247,47 @@
         "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{  
-      "headers":"", 
-      "body":""  
+    "response": {
+      "headers": {
+
+      },
+      "body": [
+        ""
+      ]
     },
-    "expected":{  
-      "debug_log":"Multipart: Invalid Content-Disposition header \\(-17"
+    "expected": {
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(-17",
+      "http_code": 200
     },
-    "rules":[  
+    "rules": [
       "SecRuleEngine On",
       "SecRule MULTIPART_FILENAME \"@contains 0\" \"id:1,phase:2,pass,t:trim\""
     ]
   },
-  {  
-    "enabled":1,
-    "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (6/7)",
-    "client":{  
-      "ip":"200.249.12.31",
-      "port":123
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart Content-Disposition should allow filename* field (6/7)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{  
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{  
-      "headers":{  
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length":"330",
-        "Content-Type":"multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
-        "Expect":"100-continue"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "330",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
       },
-      "uri":"/",
-      "method":"POST",
-      "body":[  
+      "uri": "/",
+      "method": "POST",
+      "body": [
         "----------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -275,42 +300,47 @@
         "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{  
-      "headers":"", 
-      "body":""  
+    "response": {
+      "headers": {
+
+      },
+      "body": [
+        ""
+      ]
     },
-    "expected":{  
-      "debug_log":"Multipart: Invalid Content-Disposition header \\(-18"
+    "expected": {
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(-18",
+      "http_code": 200
     },
-    "rules":[  
+    "rules": [
       "SecRuleEngine On",
       "SecRule MULTIPART_FILENAME \"@contains 0\" \"id:1,phase:2,pass,t:trim\""
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"multipart Content-Disposition should allow filename* field (7/7)",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart Content-Disposition should allow filename* field (7/7)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length":"330",
-        "Content-Type":"multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
-        "Expect":"100-continue"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "330",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
       },
-      "uri":"/",
-      "method":"POST",
-      "body":[
+      "uri": "/",
+      "method": "POST",
+      "body": [
         "----------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -323,17 +353,20 @@
         "----------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{  
-      "headers":"",
-      "body":""
+    "response": {
+      "headers": {
+
+      },
+      "body": [
+        ""
+      ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:1,phase:2,deny,status:403\""
     ]
   }
 ]
-

