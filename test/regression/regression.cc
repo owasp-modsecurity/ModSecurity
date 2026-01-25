@@ -41,6 +41,7 @@ using modsecurity_test::CustomDebugLog;
 using modsecurity_test::ModSecurityTest;
 using modsecurity_test::ModSecurityTestResults;
 using modsecurity_test::RegressionTest;
+using modsecurity_test::RegressionTests;
 using modsecurity_test::RegressionTestResult;
 
 using modsecurity::Utils::regex_search;
@@ -436,6 +437,32 @@ int main(int argc, char **argv)
     return 0;
 #else
     test.cmd_options(argc, argv);
+
+    if (test.m_format) {
+#ifdef WITH_YAJL
+        std::cout << "start formatting test case JSON files" << std::endl;
+        ModSecurityTest<RegressionTests> test;
+        test.cmd_options(argc, argv);
+        test.load_tests();
+        for (const auto &[name, tests] : test) {
+            std::ofstream ofs{name};
+            if (!ofs.is_open()) {
+                std::cerr << "cannot open " << name << " for writing." << std::endl;
+                return 1;
+            }
+            ofs << tests[0]->toJSON();
+            ofs.close();
+            std::cout << "written formatted JSON to " << name << std::endl;
+        }
+        std::cout << "finished formatting files." << std::endl;
+        return 0;
+#else
+        std::cout << "Test utility cannot format test case JSON files without being built with YAJL." \
+            << std::endl;
+        return 1;
+#endif
+    }
+
     if (!test.m_automake_output && !test.m_count_all) {
         std::cout << test.header();
     }

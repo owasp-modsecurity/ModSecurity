@@ -68,18 +68,25 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
         return false;
     }
 
-    size_t num_tests = node->u.array.len;
-    for ( int i = 0; i < num_tests; i++ ) {
-        yajl_val obj = node->u.array.values[i];
-
-        auto u = std::unique_ptr<T>(T::from_yajl_node(obj));
+    if (m_format) {
+        auto u = std::unique_ptr<T>(T::from_yajl_node(node));
         u->filename = file;
 
-        const auto key = u->filename + ":" + u->name;
-        (*this)[key].push_back(std::move(u));
-    }
+        (*this)[file].push_back(std::move(u));
+    } else {
+        size_t num_tests = node->u.array.len;
+        for ( int i = 0; i < num_tests; i++ ) {
+            yajl_val obj = node->u.array.values[i];
 
-    yajl_tree_free(node);
+            auto u = std::unique_ptr<T>(T::from_yajl_node(obj));
+            u->filename = file;
+
+            const auto key = u->filename + ":" + u->name;
+            (*this)[key].push_back(std::move(u));
+        }
+
+        yajl_tree_free(node);
+    }
 
     return true;
 }
@@ -139,6 +146,10 @@ void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
     if (argc > i && strcmp(argv[i], "mtstress") == 0) {
         i++;
         m_test_multithreaded = true;
+    }
+    if (argc > i && strcmp(argv[i], "format") == 0) {
+        i++;
+        m_format = true;
     }
     if (std::getenv("AUTOMAKE_TESTS")) {
         m_automake_output = true;

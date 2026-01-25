@@ -78,6 +78,19 @@ class RegressionTest {
     std::string redirect_url;
 };
 
+class RegressionTests {
+ public:
+    RegressionTests(const yajl_val &node) : node{node} {}
+    ~RegressionTests();
+    static RegressionTests *from_yajl_node(const yajl_val &);
+    std::string toJSON();
+
+    std::string filename;
+    std::string name;
+
+    std::vector<RegressionTest> tests;
+    const yajl_val node;
+};
 
 class RegressionTestResult {
  public:
