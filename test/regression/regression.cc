@@ -450,6 +450,9 @@ int main(int argc, char **argv)
                 std::cerr << "cannot open " << name << " for writing." << std::endl;
                 return 1;
             }
+            if (test.m_update_content_length) {
+                tests[0]->update_content_lengths();
+            }
             ofs << tests[0]->toJSON();
             ofs.close();
             std::cout << "written formatted JSON to " << name << std::endl;

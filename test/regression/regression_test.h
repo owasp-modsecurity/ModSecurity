@@ -83,11 +83,13 @@ class RegressionTest {
     std::vector<std::string> request_body_lines;
     std::vector<std::string> response_body_lines;
     std::vector<std::string> rules_lines;
+    void update_content_lengths();
 };
 
 class RegressionTests {
  public:
     static RegressionTests *from_yajl_node(const yajl_val &);
+    void update_content_lengths();
     std::string toJSON();
 
     std::string filename;

@@ -20,6 +20,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <string>
+#include <algorithm>
 
 #ifdef WITH_YAJL
 #include <yajl/yajl_gen.h>
@@ -225,6 +226,49 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
     return u;
 }
 
+constexpr char ascii_tolower(char c) {
+    return 'A' <= c && c <= 'Z' ? (c + ('a' - 'A')) : c;
+}
+
+bool iequals_ascii(std::string_view a, std::string_view b) {
+    return a.size() == b.size() &&
+        std::equal(a.begin(), a.end(), b.begin(), b.end(),
+            [](char x, char y) {
+                return ascii_tolower(x) == ascii_tolower(y);
+            });
+}
+
+static bool has_chunked_header(const std::vector<std::pair<std::string, std::string>> &headers) {
+    for (const auto &header : headers) {
+        if (iequals_ascii(header.first, "Transfer-Encoding") && iequals_ascii(header.second, "chunked")) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void update_content_length(std::vector<std::pair<std::string, std::string>> &headers, size_t length) {
+    if (has_chunked_header(headers)) {
+        return;
+    }
+
+    bool has_content_length = false;
+    for (auto &header : headers) {
+        if (iequals_ascii(header.first, "Content-Length")) {
+            header.second = std::to_string(length);
+            has_content_length = true;
+        }
+    }
+    if (!has_content_length) {
+        headers.push_back(std::pair{"Content-Length", std::to_string(length)});
+    }
+}
+
+void RegressionTest::update_content_lengths() {
+    update_content_length(request_headers, request_body.size());
+    update_content_length(response_headers, response_body.size());
+}
+
 RegressionTests *RegressionTests::from_yajl_node(const yajl_val &node) {
     RegressionTests *u = new RegressionTests();
     size_t num_tests = node->u.array.len;
@@ -233,6 +277,12 @@ RegressionTests *RegressionTests::from_yajl_node(const yajl_val &node) {
         u->tests.emplace_back(*RegressionTest::from_yajl_node(obj));
     }
     return u;
+}
+
+void RegressionTests::update_content_lengths() {
+    for (auto & test : tests) {
+        test.update_content_lengths();
+    }
 }
 
 #ifdef WITH_YAJL

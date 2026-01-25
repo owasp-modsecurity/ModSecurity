@@ -151,6 +151,9 @@ void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
         i++;
         m_format = true;
     }
+    if (std::getenv("UPDATE_CONTENT_LENGTH")) {
+        m_update_content_length = true;
+    }
     if (std::getenv("AUTOMAKE_TESTS")) {
         m_automake_output = true;
     }
