@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <optional>
 
 #ifndef TEST_REGRESSION_REGRESSION_TEST_H_
 #define TEST_REGRESSION_REGRESSION_TEST_H_
@@ -43,8 +44,8 @@ class RegressionTest {
     std::string url;
     int enabled;
     int version_min;
-    int version_max;
-    int github_issue;
+    std::optional<int> version_max;
+    std::optional<int> github_issue;
 
     std::vector<std::pair<std::string, std::string>> request_headers;
     std::vector<std::pair<std::string, std::string>> response_headers;
@@ -76,12 +77,16 @@ class RegressionTest {
 
     int http_code;
     std::string redirect_url;
+
+    // fields for formatting JSON
+
+    std::vector<std::string> request_body_lines;
+    std::vector<std::string> response_body_lines;
+    std::vector<std::string> rules_lines;
 };
 
 class RegressionTests {
  public:
-    RegressionTests(const yajl_val &node) : node{node} {}
-    ~RegressionTests();
     static RegressionTests *from_yajl_node(const yajl_val &);
     std::string toJSON();
 
@@ -89,7 +94,6 @@ class RegressionTests {
     std::string name;
 
     std::vector<RegressionTest> tests;
-    const yajl_val node;
 };
 
 class RegressionTestResult {

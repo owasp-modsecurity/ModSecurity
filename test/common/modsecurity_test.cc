@@ -84,9 +84,9 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
             const auto key = u->filename + ":" + u->name;
             (*this)[key].push_back(std::move(u));
         }
-
-        yajl_tree_free(node);
     }
+
+    yajl_tree_free(node);
 
     return true;
 }

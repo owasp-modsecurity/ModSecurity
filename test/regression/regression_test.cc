@@ -162,6 +162,7 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
                 }
                 if (strcmp(key2, "body") == 0) {
                     u->request_body = yajl_array_to_str(val2);
+                    u->request_body_lines = yajl_array_to_vec_str(val2);
                 }
             }
         }
@@ -175,6 +176,7 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
                 }
                 if (strcmp(key2, "body") == 0) {
                     u->response_body = yajl_array_to_str(val2);
+                    u->response_body_lines = yajl_array_to_vec_str(val2);
                 }
                 if (strcmp(key2, "protocol") == 0) {
                     u->response_protocol = YAJL_GET_STRING(val2);
@@ -214,6 +216,7 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
                 si << keyj << "\n";
             }
             u->rules = si.str();
+            u->rules_lines = yajl_array_to_vec_str(val);
         }
     }
 
@@ -223,7 +226,7 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
 }
 
 RegressionTests *RegressionTests::from_yajl_node(const yajl_val &node) {
-    RegressionTests *u = new RegressionTests(node);
+    RegressionTests *u = new RegressionTests();
     size_t num_tests = node->u.array.len;
     for ( int i = 0; i < num_tests; i++ ) {
         yajl_val obj = node->u.array.values[i];
@@ -232,94 +235,82 @@ RegressionTests *RegressionTests::from_yajl_node(const yajl_val &node) {
     return u;
 }
 
-RegressionTests::~RegressionTests() {
-#ifdef WITH_YAJL
-    yajl_tree_free(node);
-#endif
-}
-
 #ifdef WITH_YAJL
 
-static yajl_gen_status jayl_gen_string_view(yajl_gen g, std::string_view s) {
+static yajl_gen_status gen_string_view(yajl_gen g, std::string_view s) {
     return yajl_gen_string(g, reinterpret_cast<const unsigned char *>(s.data()), s.length());
 }
 
-static yajl_gen_status jayl_gen_key_val(yajl_gen g, std::string_view key, std::string_view val) {
-    auto s = jayl_gen_string_view(g, key);
-    if (s != yajl_gen_status_ok) {
+static yajl_gen_status gen_key_str(yajl_gen g, std::string_view key, std::string_view val) {
+    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
         return s;
     }
-    return jayl_gen_string_view(g, val);
+    return gen_string_view(g, val);
 }
 
-static yajl_gen_status copy_number(yajl_gen g, std::string_view key, yajl_val val) {
-    if (!YAJL_IS_NUMBER(val)) {
-        std::cerr << "error: " << key << " must be number.\n";
-        exit(1);
+static yajl_gen_status gen_key_str_if_non_empty(yajl_gen g, std::string_view key, std::string_view val) {
+    if (val.empty()) {
+        return yajl_gen_status_ok;
     }
-    auto s = jayl_gen_string_view(g, key);
-    if (s != yajl_gen_status_ok) {
+    return gen_key_str(g, key, val);
+}
+
+static yajl_gen_status gen_key_int(yajl_gen g, std::string_view key, int val) {
+    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
         return s;
     }
-    return yajl_gen_number(g,
-        reinterpret_cast<const char *>(val->u.number.r),
-        strlen(val->u.number.r));
+    return yajl_gen_integer(g, val);
 }
 
-static yajl_gen_status copy_string(yajl_gen g, std::string_view key, yajl_val val) {
-    if (!YAJL_IS_STRING(val)) {
-        std::cerr << "error: " << key << " must be string.\n";
-        exit(1);
+static yajl_gen_status gen_key_opt_int(yajl_gen g, std::string_view key, std::optional<int> val) {
+    if (!val) {
+        return yajl_gen_status_ok;
     }
-    return jayl_gen_key_val(g, key, val->u.string);
+    return gen_key_int(g, key, val.value());
 }
 
-static void ensure_obj(std::string_view key, yajl_val obj) {
-    if (!YAJL_IS_OBJECT(obj)) {
-        std::cerr << "error: " << key << " must be object.\n";
-        exit(1);
+static yajl_gen_status gen_key_int_if_non_zero(yajl_gen g, std::string_view key, int val) {
+    if (val == 0) {
+        return yajl_gen_status_ok;
     }
+    return gen_key_int(g, key, val);
 }
 
-static void copy_str_map(yajl_gen g, std::string_view key, yajl_val val) {
-    if (!YAJL_IS_OBJECT(val)) {
-        std::cerr << "error: " << key << " must be object.\n";
-        exit(1);
+static yajl_gen_status gen_key_number(yajl_gen g, std::string_view key, std::string_view raw_val) {
+    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
+        return s;
     }
-    jayl_gen_string_view(g, key);
-    yajl_gen_map_open(g);
-    for (size_t i = 0; i < val->u.object.len; ++i) {
-        const char *key2 = val->u.object.keys[i];
-        yajl_val val2 = val->u.object.values[i];
-        copy_string(g, key2, val2);
-    }
-    yajl_gen_map_close(g);
+    return yajl_gen_number(g, reinterpret_cast<const char *>(raw_val.data()), raw_val.length());
 }
 
-static void copy_str_array(yajl_gen g, std::string_view key, yajl_val val) {
-    if (!YAJL_IS_ARRAY(val)) {
-        std::cerr << "error: " << key << " must be array.\n";
-        exit(1);
+static yajl_gen_status gen_key_str_array(yajl_gen g, std::string_view key, const std::vector<std::string> &lines) {
+    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
+        return s;
     }
-    jayl_gen_string_view(g, key);
-    yajl_gen_array_open(g);
-    for (size_t i = 0; i < val->u.array.len; ++i) {
-        yajl_val val2 = val->u.array.values[i];
-        if (!YAJL_IS_STRING(val2)) {
-            std::cerr << "error: array element of " << key << " must be string.\n";
-            exit(1);
+    if (auto s{yajl_gen_array_open(g)}; s != yajl_gen_status_ok) {
+        return s;
+    }
+    for (const auto &line : lines) {
+        if (auto s{gen_string_view(g, line)}; s != yajl_gen_status_ok) {
+            return s;
         }
-        jayl_gen_string_view(g, val2->u.string);
     }
-    yajl_gen_array_close(g);
+    return yajl_gen_array_close(g);
 }
 
-static void copy_body(yajl_gen g, std::string_view key, yajl_val val) {
-    if (YAJL_IS_STRING(val)) {
-        jayl_gen_key_val(g, key, val->u.string);
-    } else {
-        copy_str_array(g, key, val);
+static yajl_gen_status gen_key_headers(yajl_gen g, std::string_view key, const std::vector<std::pair<std::string, std::string>> &headers) {
+    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
+        return s;
     }
+    if (auto s{yajl_gen_map_open(g)}; s != yajl_gen_status_ok) {
+        return s;
+    }
+    for (const auto &header : headers) {
+        if (auto s{gen_key_str(g, header.first, header.second)}; s != yajl_gen_status_ok) {
+            return s;
+        }
+    }
+    return yajl_gen_map_close(g);
 }
 
 std::string RegressionTests::toJSON() {
@@ -332,115 +323,73 @@ std::string RegressionTests::toJSON() {
         return "";
     }
     yajl_gen_config(g, yajl_gen_beautify, 1);
-
-    if (!YAJL_IS_ARRAY(node)) {
-        std::cerr << "error: toplevel must be array.\n";
-        exit(1);
-    }
+    yajl_gen_config(g, yajl_gen_indent_string, "  ");
 
     yajl_gen_array_open(g);
-    for (size_t i = 0; i < node->u.array.len; ++i) {
-        yajl_val test_obj = node->u.array.values[i];
-        ensure_obj("test", test_obj);
+    for (const auto & test : tests) {
         yajl_gen_map_open(g);
-        for (size_t j = 0; j < test_obj->u.object.len; ++j) {
-            const char *key = test_obj->u.object.keys[j];
-            yajl_val val = test_obj->u.object.values[j];
-            if (strcmp(key, "enabled") == 0
-                || strcmp(key, "version_min") == 0
-                || strcmp(key, "version_max") == 0
-                || strcmp(key, "github_issue") == 0) {
-                copy_number(g, key, val);
-            } else if (strcmp(key, "title") == 0
-                || strcmp(key, "url") == 0
-                || strcmp(key, "resource") == 0) {
-                copy_string(g, key, val);
-            } else if (strcmp(key, "client") == 0) {
-                ensure_obj("client", val);
-                jayl_gen_string_view(g, "client");
-                yajl_gen_map_open(g);
-                for (size_t k = 0; k < val->u.object.len; ++k) {
-                    const char *key2 = val->u.object.keys[k];
-                    yajl_val val2 = val->u.object.values[k];
-                    if (strcmp(key2, "ip") == 0) {
-                        copy_string(g, key2, val2);
-                    } else if (strcmp(key2, "port") == 0) {
-                        copy_number(g, key2, val2);
-                    }
-                }
-                yajl_gen_map_close(g);
-            } else if (strcmp(key, "server") == 0) {
-                ensure_obj("server", val);
-                jayl_gen_string_view(g, "server");
-                yajl_gen_map_open(g);
-                for (size_t k = 0; k < val->u.object.len; ++k) {
-                    const char *key2 = val->u.object.keys[k];
-                    yajl_val val2 = val->u.object.values[k];
-                    if (strcmp(key2, "ip") == 0
-                        || strcmp(key2, "hostname") == 0) {
-                        copy_string(g, key2, val2);
-                    } else if (strcmp(key2, "port") == 0) {
-                        copy_number(g, key2, val2);
-                    }
-                }
-                yajl_gen_map_close(g);
-            } else if (strcmp(key, "request") == 0) {
-                ensure_obj("request", val);
-                jayl_gen_string_view(g, "request");
-                yajl_gen_map_open(g);
-                for (size_t k = 0; k < val->u.object.len; ++k) {
-                    const char *key2 = val->u.object.keys[k];
-                    yajl_val val2 = val->u.object.values[k];
-                    if (strcmp(key2, "url") == 0
-                        || strcmp(key2, "method") == 0) {
-                        copy_string(g, key2, val2);
-                    } else if (strcmp(key2, "http_version") == 0) {
-                        copy_number(g, key2, val2);
-                    } else if (strcmp(key2, "headers") == 0) {
-                        copy_str_map(g, key2, val2);
-                    } else if (strcmp(key2, "body") == 0) {
-                        copy_body(g, key2, val2);
-                    }
-                }
-                yajl_gen_map_close(g);
-            } else if (strcmp(key, "response") == 0) {
-                ensure_obj("response", val);
-                jayl_gen_string_view(g, "response");
-                yajl_gen_map_open(g);
-                for (size_t k = 0; k < val->u.object.len; ++k) {
-                    const char *key2 = val->u.object.keys[k];
-                    yajl_val val2 = val->u.object.values[k];
-                    if (strcmp(key2, "protocol") == 0) {
-                        copy_string(g, key2, val2);
-                    } else if (strcmp(key2, "headers") == 0) {
-                        copy_str_map(g, key2, val2);
-                    } else if (strcmp(key2, "body") == 0) {
-                        copy_body(g, key2, val2);
-                    }
-                }
-                yajl_gen_map_close(g);
-            } else if (strcmp(key, "expected") == 0) {
-                ensure_obj("expected", val);
-                jayl_gen_string_view(g, "expected");
-                yajl_gen_map_open(g);
-                for (size_t k = 0; k < val->u.object.len; ++k) {
-                    const char *key2 = val->u.object.keys[k];
-                    yajl_val val2 = val->u.object.values[k];
-                    if (strcmp(key2, "audit_log") == 0
-                        || strcmp(key2, "debug_log") == 0
-                        || strcmp(key2, "error_log") == 0
-                        || strcmp(key2, "redirect_url") == 0
-                        || strcmp(key2, "parser_error") == 0) {
-                        copy_string(g, key2, val2);
-                    } else if (strcmp(key2, "http_code") == 0) {
-                        copy_number(g, key2, val2);
-                    }
-                }
-                yajl_gen_map_close(g);
-            } else if (strcmp(key, "rules") == 0) {
-                copy_str_array(g, key, val);
-            }
+        gen_key_int(g, "enabled", test.enabled);
+        gen_key_int(g, "version_min", test.version_min);
+        gen_key_opt_int(g, "version_max", test.version_max);
+        gen_key_str(g, "title", test.title);
+        gen_key_str_if_non_empty(g, "url", test.url);
+        gen_key_str_if_non_empty(g, "resource", test.resource);
+        gen_key_opt_int(g, "github_issue", test.github_issue);
+
+        gen_string_view(g, "client");
+        yajl_gen_map_open(g);
+        gen_key_str(g, "ip", test.clientIp);
+        gen_key_int(g, "port", test.clientPort);
+        yajl_gen_map_close(g);
+
+        gen_string_view(g, "server");
+        yajl_gen_map_open(g);
+        gen_key_str(g, "ip", test.serverIp);
+        gen_key_int(g, "port", test.serverPort);
+        yajl_gen_map_close(g);
+
+        gen_string_view(g, "request");
+        yajl_gen_map_open(g);
+        gen_key_headers(g, "headers", test.request_headers);
+        gen_key_str(g, "uri", test.uri);
+        gen_key_str(g, "method", test.method);
+        if (!test.httpVersion.empty()) {
+            gen_key_number(g, "http_version", test.httpVersion);
         }
+
+        auto request_body_lines{test.request_body_lines};
+        if (request_body_lines.empty()) {
+            request_body_lines.push_back("");
+        }
+        gen_key_str_array(g, "body", request_body_lines);
+
+        yajl_gen_map_close(g);
+
+        gen_string_view(g, "response");
+        yajl_gen_map_open(g);
+        gen_key_headers(g, "headers", test.response_headers);
+
+        auto response_body_lines{test.response_body_lines};
+        if (response_body_lines.empty()) {
+            response_body_lines.push_back("");
+        }
+        gen_key_str_array(g, "body", response_body_lines);
+
+        gen_key_str_if_non_empty(g, "protocol", test.response_protocol);
+        yajl_gen_map_close(g);
+
+        gen_string_view(g, "expected");
+        yajl_gen_map_open(g);
+        gen_key_str_if_non_empty(g, "audit_log", test.audit_log);
+        gen_key_str_if_non_empty(g, "debug_log", test.debug_log);
+        gen_key_str_if_non_empty(g, "error_log", test.error_log);
+        gen_key_int(g, "http_code", test.http_code);
+        gen_key_str_if_non_empty(g, "redirect_url", test.redirect_url);
+        gen_key_str_if_non_empty(g, "parser_error", test.parser_error);
+        yajl_gen_map_close(g);
+
+        gen_key_str_array(g, "rules", test.rules_lines);
+
         yajl_gen_map_close(g);
     }
     yajl_gen_array_close(g);
