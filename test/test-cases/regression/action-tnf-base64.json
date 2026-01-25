@@ -36,7 +36,7 @@
       ]
     },
     "expected":{
-      "debug_log": "t:base64encode: \"dmFsdWUyCg==\""
+      "debug_log": "t:base64encode: \"dmFsdWUy\""
     },
     "rules":[
       "SecRuleEngine On",

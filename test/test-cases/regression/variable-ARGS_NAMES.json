@@ -189,15 +189,15 @@
       "uri":"/",
       "method":"POST",
       "body":[
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name1\"\r",
-                "\r",
-                "content1\r",
-                "--0000\r",
-                "Content-Disposition: form-data; name=\"name2\"\r",
-                "\r",
-                "content2\r",
-                "--0000--\r"
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name1\"\r\n",
+                "\r\n",
+                "content1\r\n",
+                "--0000\r\n",
+                "Content-Disposition: form-data; name=\"name2\"\r\n",
+                "\r\n",
+                "content2\r\n",
+                "--0000--\r\n"
       ]
     },
     "response":{

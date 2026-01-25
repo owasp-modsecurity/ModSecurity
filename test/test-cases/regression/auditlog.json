@@ -640,7 +640,7 @@
       ]
     },
     "expected": {
-      "audit_log": "\"body\":\"\\\\\\\\xc2\\\\\\\\xad=\\\\\\\\xc2\\\\\\\\xad\\\\\\\\x0a",
+      "audit_log": "\"body\":\"\\\\\\\\xc2\\\\\\\\xad=\\\\\\\\xc2\\\\\\\\xad",
       "debug_log": "",
       "error_log": "",
       "http_code": 403

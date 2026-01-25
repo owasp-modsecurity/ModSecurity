@@ -32,7 +32,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"9\" \\(Variable: RESPONSE_CONTENT_LENGTH\\)"
+      "debug_log":"Target value: \"8\" \\(Variable: RESPONSE_CONTENT_LENGTH\\)"
     },
     "rules":[  
       "SecRuleEngine On",

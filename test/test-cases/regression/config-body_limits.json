@@ -698,15 +698,15 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "--0000",
-        "Content-Disposition: form-data; name=\"a\"",
-        "",
-        "1",
-        "--0000",
-        "Content-Disposition: form-data; name=\"b\"; filename=\"c.txt\"",
-        "",
-        "2222222222222222222222222222222222222222222222222222222222222222222222",
-        "--0000--"
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"a\"\n",
+        "\n",
+        "1\n",
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"b\"; filename=\"c.txt\"\n",
+        "\n",
+        "2222222222222222222222222222222222222222222222222222222222222222222222\n",
+        "--0000--\n"
       ]
     },
     "response":{
@@ -753,15 +753,15 @@
       "uri":"/",
       "method":"POST",
       "body": [
-        "--0000",
-        "Content-Disposition: form-data; name=\"a\"",
-        "",
-        "1",
-        "--0000",
-        "Content-Disposition: form-data; name=\"b\"; filename=\"c.txt\"",
-        "",
-        "2222222222222222222222222222222222222222222222222222222222222222222222",
-        "--0000--"
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"a\"\n",
+        "\n",
+        "1\n",
+        "--0000\n",
+        "Content-Disposition: form-data; name=\"b\"; filename=\"c.txt\"\n",
+        "\n",
+        "2222222222222222222222222222222222222222222222222222222222222222222222\n",
+        "--0000--\n"
       ]
     },
     "response":{
