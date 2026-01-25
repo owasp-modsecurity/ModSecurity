@@ -16,7 +16,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=1",
@@ -27,7 +27,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -59,7 +59,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=0",
@@ -70,7 +70,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -102,7 +102,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=whee",
@@ -113,7 +113,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -146,7 +146,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=whee",
@@ -157,7 +157,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -190,7 +190,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=whee",
@@ -201,7 +201,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -234,7 +234,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=whee",
@@ -245,7 +245,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -279,7 +279,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=whee",
@@ -290,7 +290,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -324,7 +324,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=whee&z=z&d=e",
@@ -335,7 +335,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -369,7 +369,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=whee&z=z&d=e",
@@ -380,7 +380,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -414,7 +414,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/whee?res=whee&z=z&d=e",
@@ -425,7 +425,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."

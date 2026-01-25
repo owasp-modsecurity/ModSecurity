@@ -17,7 +17,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "0"
       },
       "uri": "/wp-login.php?whee&pwd=lhebs",
       "method": "GET",
@@ -27,7 +28,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -60,7 +61,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "0"
       },
       "uri": "/wp-login.php?whee=something&pwd=lhebs",
       "method": "GET",
@@ -70,7 +72,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -103,7 +105,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "0"
       },
       "uri": "/wp-login.php?whee=something&pwd=lhebs",
       "method": "GET",
@@ -113,7 +116,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -146,7 +149,8 @@
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
         "Content-Type": "text/xml",
-        "Referer": "This is an attack"
+        "Referer": "This is an attack",
+        "Content-Length": "0"
       },
       "uri": "/index.html",
       "method": "GET",
@@ -156,7 +160,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -190,7 +194,8 @@
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
         "Content-Type": "text/xml",
-        "referer": "This is an attack"
+        "referer": "This is an attack",
+        "Content-Length": "0"
       },
       "uri": "/index.html",
       "method": "GET",
@@ -200,7 +205,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

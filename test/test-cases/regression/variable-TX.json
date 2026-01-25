@@ -16,7 +16,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/one/two/three?key1=value1&key2=v%20a%20l%20u%20e%202",
@@ -29,7 +29,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "13"
       },
       "body": [
         "whee test 123"
@@ -61,7 +62,8 @@
     },
     "request": {
       "headers": {
-        "Cookie": "USER_TOKEN=Yes; a=z; t=b"
+        "Cookie": "USER_TOKEN=Yes; a=z; t=b",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -73,7 +75,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -103,7 +106,7 @@
     },
     "request": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "uri": "/?key=aadd",
       "method": "GET",
@@ -115,7 +118,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -145,7 +149,7 @@
     },
     "request": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "uri": "/?key=aadd",
       "method": "GET",
@@ -157,7 +161,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -187,7 +192,7 @@
     },
     "request": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "uri": "/?key=_abc123_",
       "method": "GET",
@@ -199,7 +204,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -228,7 +234,7 @@
     },
     "request": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "uri": "/?key=a:5a:8a:9",
       "method": "GET",
@@ -240,7 +246,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."

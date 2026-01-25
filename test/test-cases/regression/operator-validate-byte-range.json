@@ -16,7 +16,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/%D0%A2%D0%B0%D1%80%D0%B0%D0%B1%D0%B0%D0%BD",
@@ -27,7 +27,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "8"
       },
       "body": [
         "no need."

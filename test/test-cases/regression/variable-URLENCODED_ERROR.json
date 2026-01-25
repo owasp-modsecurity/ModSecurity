@@ -15,7 +15,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value%2",
       "method": "GET",
@@ -27,7 +28,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -58,7 +60,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value&a=b%2a",
       "method": "GET",
@@ -70,7 +73,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -102,7 +106,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "31",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/",
@@ -115,7 +119,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -147,7 +152,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "28",
+        "Content-Length": "36",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/",
@@ -160,7 +165,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -192,7 +198,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "44",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/",
@@ -205,7 +211,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -237,7 +244,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/?z=%EC%A7%84%20%EB%A7%88%EC%9D%BC%20%EB%A6%A%AC",
@@ -250,7 +257,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -282,7 +290,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "0",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/?z=진 마일 리",
@@ -295,7 +303,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."

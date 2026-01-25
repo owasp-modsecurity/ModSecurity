@@ -17,7 +17,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "330",
+        "Content-Length": "658",
         "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
         "Expect": "100-continue"
       },
@@ -47,7 +47,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -85,7 +85,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "330",
+        "Content-Length": "639",
         "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
         "Expect": "100-continue"
       },
@@ -115,7 +115,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

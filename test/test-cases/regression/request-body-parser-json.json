@@ -17,7 +17,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Content-Length": "39"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -30,7 +31,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -65,7 +66,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Content-Length": "68"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -81,7 +83,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -116,7 +118,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -126,7 +129,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -161,7 +164,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Content-Length": "1"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -171,7 +175,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -204,7 +208,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Content-Length": "70"
       },
       "uri": "/?foo=bar",
       "method": "POST",
@@ -224,7 +229,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -257,7 +262,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Content-Length": "70"
       },
       "uri": "/?foo=bar",
       "method": "POST",
@@ -277,7 +283,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

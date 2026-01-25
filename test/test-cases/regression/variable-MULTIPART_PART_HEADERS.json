@@ -16,7 +16,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "330",
+        "Content-Length": "302",
         "Content-Type": "multipart/form-data; boundary=-----------------------------69343412719991675451336310646",
         "Expect": "100-continue"
       },
@@ -39,7 +39,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -71,7 +72,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "330",
+        "Content-Length": "302",
         "Content-Type": "multipart/form-data; boundary=-----------------------------69343412719991675451336310646",
         "Expect": "100-continue"
       },
@@ -94,7 +95,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -126,7 +128,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "330",
+        "Content-Length": "292",
         "Content-Type": "multipart/form-data; boundary=-----------------------------69343412719991675451336310646",
         "Expect": "100-continue"
       },
@@ -149,7 +151,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -180,7 +183,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "249",
+        "Content-Length": "241",
         "Content-Type": "multipart/form-data; boundary=-----------------------------69343412719991675451336310646",
         "Expect": "100-continue"
       },
@@ -199,7 +202,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."

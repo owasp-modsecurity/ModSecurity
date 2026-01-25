@@ -15,7 +15,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/?key=value",
       "method": "GET",
@@ -25,7 +26,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -58,7 +59,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/?key=value",
       "method": "GET",
@@ -68,7 +70,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -101,7 +103,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/?key=value",
       "method": "GET",
@@ -111,7 +114,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -144,7 +147,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/?key=value",
       "method": "GET",
@@ -154,7 +158,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

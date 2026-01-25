@@ -15,7 +15,8 @@
     "request": {
       "headers": {
         "Host": "localhost",
-        "Transfer-Encoding": "deflate"
+        "Transfer-Encoding": "deflate",
+        "Content-Length": "0"
       },
       "uri": "/match-this",
       "method": "GET",
@@ -25,7 +26,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -57,7 +58,8 @@
     "request": {
       "headers": {
         "Host": "localhost",
-        "Transfer-Encoding": "deflate"
+        "Transfer-Encoding": "deflate",
+        "Content-Length": "0"
       },
       "uri": "/match-this",
       "method": "GET",
@@ -67,7 +69,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -99,7 +101,8 @@
     "request": {
       "headers": {
         "Host": "localhost",
-        "Transfer-Encoding": "deflate"
+        "Transfer-Encoding": "deflate",
+        "Content-Length": "0"
       },
       "uri": "/match-this",
       "method": "GET",
@@ -109,7 +112,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -142,7 +145,8 @@
       "headers": {
         "Host": "localhost",
         "Restricted": "attack",
-        "Other": "Value"
+        "Other": "Value",
+        "Content-Length": "0"
       },
       "uri": "/",
       "method": "GET",
@@ -152,7 +156,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

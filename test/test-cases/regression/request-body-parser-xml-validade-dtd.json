@@ -18,7 +18,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "234"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -36,7 +37,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -73,7 +74,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "264"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -91,7 +93,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -128,7 +130,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "229"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -146,7 +149,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -183,7 +186,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "262"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -201,7 +205,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

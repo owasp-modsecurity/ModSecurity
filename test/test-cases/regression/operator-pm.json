@@ -14,7 +14,8 @@
     },
     "request": {
       "headers": {
-        "Host": "net.tutsplus.com"
+        "Host": "net.tutsplus.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=something`somenthing",
       "method": "GET",
@@ -26,7 +27,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -56,7 +57,8 @@
     },
     "request": {
       "headers": {
-        "Host": "net.tutsplus.com"
+        "Host": "net.tutsplus.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=`somenthing",
       "method": "GET",
@@ -68,7 +70,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -97,7 +99,8 @@
     },
     "request": {
       "headers": {
-        "Host": "net.tutsplus.com"
+        "Host": "net.tutsplus.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=a",
       "method": "GET",
@@ -109,7 +112,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -139,7 +142,8 @@
     },
     "request": {
       "headers": {
-        "Host": "net.tutsplus.com"
+        "Host": "net.tutsplus.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=a`b",
       "method": "GET",
@@ -151,7 +155,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -181,7 +185,8 @@
     },
     "request": {
       "headers": {
-        "Host": "net.tutsplus.com"
+        "Host": "net.tutsplus.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=123",
       "method": "GET",
@@ -193,7 +198,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -223,7 +228,8 @@
     },
     "request": {
       "headers": {
-        "Host": "net.tutsplus.com"
+        "Host": "net.tutsplus.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=abc",
       "method": "GET",
@@ -235,7 +241,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""

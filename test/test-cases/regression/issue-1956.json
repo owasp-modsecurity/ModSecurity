@@ -15,7 +15,8 @@
     },
     "request": {
       "headers": {
-        "Host": "www.google.com"
+        "Host": "www.google.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
       "method": "GET",
@@ -26,7 +27,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -57,7 +58,8 @@
     },
     "request": {
       "headers": {
-        "Host": "www.google.com"
+        "Host": "www.google.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
       "method": "GET",
@@ -68,7 +70,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -99,7 +101,8 @@
     },
     "request": {
       "headers": {
-        "Host": "www.google.com"
+        "Host": "www.google.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
       "method": "GET",
@@ -110,7 +113,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -141,7 +144,8 @@
     },
     "request": {
       "headers": {
-        "Host": "www.google.com"
+        "Host": "www.google.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
       "method": "GET",
@@ -152,7 +156,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -183,7 +187,8 @@
     },
     "request": {
       "headers": {
-        "Host": "www.google.com"
+        "Host": "www.google.com",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=<a href=\"javascript:alert(1)\">)",
       "method": "GET",
@@ -194,7 +199,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

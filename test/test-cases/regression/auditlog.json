@@ -23,7 +23,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
@@ -34,7 +35,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "plain/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
         "test"
@@ -80,7 +82,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
@@ -91,7 +94,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "plain/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
         "test"
@@ -138,7 +142,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
@@ -149,7 +154,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "plain/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
         "test"
@@ -196,7 +202,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
@@ -207,7 +214,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "plain/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
         "test"
@@ -255,7 +263,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=test&param2=test2",
       "method": "GET",
@@ -266,7 +275,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -313,7 +322,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=test&param2=tEst2",
       "method": "GET",
@@ -324,7 +334,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -371,7 +381,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=test&param2=%20tEst2",
       "method": "GET",
@@ -382,7 +393,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -429,7 +440,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=test&param2=tEst2",
       "method": "GET",
@@ -440,7 +452,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -488,7 +500,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=test&param2=%20tEst2",
       "method": "GET",
@@ -499,7 +512,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -547,7 +560,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
@@ -558,7 +572,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "plain/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
         "test"
@@ -606,7 +621,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/?%ADd+allow%3d1+%ADd+auto",
       "method": "GET",
@@ -617,7 +633,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "plain/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
         "test"
@@ -667,7 +684,7 @@
         "Pragma": "no-cache",
         "Cache-Control": "no-cache",
         "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": "3"
+        "Content-Length": "5"
       },
       "uri": "/?attack=true",
       "method": "POST",
@@ -678,7 +695,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "plain/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
         "test"
@@ -728,7 +746,7 @@
         "Pragma": "no-cache",
         "Cache-Control": "no-cache",
         "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": "3",
+        "Content-Length": "5",
         "X-­-custom": "Some ­ value"
       },
       "uri": "/?attack=true",
@@ -740,7 +758,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "plain/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
         "test"

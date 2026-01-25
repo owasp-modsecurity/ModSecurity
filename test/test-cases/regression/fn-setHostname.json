@@ -13,7 +13,8 @@
     },
     "request": {
       "headers": {
-        "Host": "www.modsecurity.org"
+        "Host": "www.modsecurity.org",
+        "Content-Length": "0"
       },
       "uri": "/foo?q=attack",
       "method": "",
@@ -26,7 +27,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/plain"
+        "Content-Type": "text/plain",
+        "Content-Length": "10"
       },
       "body": [
         "denystring"

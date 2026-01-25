@@ -17,7 +17,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -34,7 +35,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -68,7 +69,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/",
       "method": "POST",
@@ -85,7 +87,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -120,7 +122,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/",
       "method": "POST",
@@ -137,7 +140,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -172,7 +175,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/",
       "method": "POST",
@@ -189,7 +193,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -224,7 +228,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/",
       "method": "POST",
@@ -241,7 +246,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -276,7 +281,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/",
       "method": "POST",
@@ -293,7 +299,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -328,7 +334,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/",
       "method": "POST",
@@ -345,7 +352,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -380,7 +387,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/?q=xml",
       "method": "POST",
@@ -397,7 +405,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -433,7 +441,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/?q=xml",
       "method": "POST",
@@ -450,7 +459,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -486,7 +495,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/?q=xml",
       "method": "POST",
@@ -503,7 +513,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -539,7 +549,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/?q=xml",
       "method": "POST",
@@ -556,7 +567,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -592,7 +603,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/?q=xml",
       "method": "POST",
@@ -609,7 +621,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -645,7 +657,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "181"
       },
       "uri": "/?q=xml",
       "method": "POST",
@@ -662,7 +675,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -698,7 +711,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "50"
       },
       "uri": "/?q=xml",
       "method": "POST",
@@ -710,7 +724,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

@@ -17,7 +17,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "text/xml"
+        "Content-Type": "text/xml",
+        "Content-Length": "736"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -60,7 +61,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -94,7 +96,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2"
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Content-Length": "469"
       },
       "uri": "/?key=value&key=other_value",
       "method": "POST",
@@ -120,7 +123,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."

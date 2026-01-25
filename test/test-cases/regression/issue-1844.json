@@ -16,7 +16,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "26",
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
       },
@@ -30,7 +30,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -63,7 +64,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "12",
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
       },
@@ -77,7 +78,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -110,7 +112,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "12",
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
       },
@@ -124,7 +126,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -157,7 +160,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "12",
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
       },
@@ -171,7 +174,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -204,7 +208,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "12",
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
       },
@@ -218,7 +222,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -251,7 +256,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "27",
+        "Content-Length": "12",
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
       },
@@ -265,7 +270,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."

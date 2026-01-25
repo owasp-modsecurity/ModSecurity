@@ -15,7 +15,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Content-Length": "86"
       },
       "uri": "/?foo=bar",
       "method": "POST",
@@ -31,7 +32,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -65,7 +66,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Content-Length": "86"
       },
       "uri": "/?foo=bar",
       "method": "POST",
@@ -81,7 +83,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

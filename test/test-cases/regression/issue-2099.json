@@ -15,7 +15,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/remote.php/webdav?bar=foo",
       "method": "GET",
@@ -25,7 +26,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -57,7 +58,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/remote.php?bar=foo",
       "method": "GET",
@@ -67,7 +69,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -99,7 +101,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/remote.php/webdav?bar=foo",
       "method": "GET",
@@ -109,7 +112,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -141,7 +144,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/remote.php?bar=foo",
       "method": "GET",
@@ -151,7 +155,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -183,7 +187,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/test.php?a=a",
       "method": "GET",
@@ -193,7 +198,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -225,7 +230,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/index.php?a=a",
       "method": "GET",
@@ -235,7 +241,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

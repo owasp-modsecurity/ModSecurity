@@ -18,7 +18,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "1539"
+        "Content-Length": "0"
       },
       "uri": "",
       "method": "GET",
@@ -29,7 +29,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -63,7 +63,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "1539"
+        "Content-Length": "0"
       },
       "uri": "",
       "method": "GET",
@@ -74,7 +74,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

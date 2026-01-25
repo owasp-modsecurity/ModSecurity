@@ -24,7 +24,8 @@
         "Connection": "keep-alive",
         "Cookie": "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/",
       "method": "GET",
@@ -35,7 +36,8 @@
     },
     "response": {
       "headers": {
-        "Content-Type": "text/xml; charset=utf-8"
+        "Content-Type": "text/xml; charset=utf-8",
+        "Content-Length": "0"
       },
       "body": [
         ""

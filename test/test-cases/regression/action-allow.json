@@ -17,7 +17,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "User-Agent": "My sweet little browser",
-        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -27,7 +28,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -61,7 +62,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "User-Agent": "My sweet little browser",
-        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -71,7 +73,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -104,7 +106,8 @@
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
         "User-Agent": "My sweet little browser",
-        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120"
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -114,7 +117,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

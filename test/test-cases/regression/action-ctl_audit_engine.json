@@ -23,7 +23,8 @@
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?parm1=test1&parm2=test2",
       "method": "GET",
@@ -34,7 +35,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

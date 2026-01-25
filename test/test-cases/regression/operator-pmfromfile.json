@@ -14,7 +14,8 @@
     },
     "request": {
       "headers": {
-        "Host": "foobar.com"
+        "Host": "foobar.com",
+        "Content-Length": "0"
       },
       "uri": "/test.php?param1=pattern2",
       "method": "GET",
@@ -26,7 +27,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/html; charset=utf-8\n\r",
-        "Content-Length": "10\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""

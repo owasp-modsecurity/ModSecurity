@@ -15,7 +15,7 @@
     },
     "request": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "uri": "/?x=foo%3d",
       "method": "GET",
@@ -26,7 +26,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -58,7 +58,7 @@
     },
     "request": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "uri": "/?x=foo=",
       "method": "GET",
@@ -69,7 +69,7 @@
     },
     "response": {
       "headers": {
-
+        "Content-Length": "0"
       },
       "body": [
         ""

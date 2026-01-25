@@ -16,7 +16,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Cookie": "USER_TOKEN=Yes; a=z; t=b"
+        "Cookie": "USER_TOKEN=Yes; a=z; t=b",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -28,7 +29,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -60,7 +62,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Cookie": "USER_TOKEN=Yes; a=z; t=b"
+        "Cookie": "USER_TOKEN=Yes; a=z; t=b",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -72,7 +75,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -104,7 +108,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Cookie": "USER_TOKEN=Yes; a=z; t=b"
+        "Cookie": "USER_TOKEN=Yes; a=z; t=b",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -116,7 +121,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -148,7 +154,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Cookie": "USER_TOKEN=Yes; a=z; t=b;  foo= bar"
+        "Cookie": "USER_TOKEN=Yes; a=z; t=b;  foo= bar",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -160,7 +167,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -192,7 +200,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Cookie": "USER_TOKEN=Yes; a=z; t=b;  foo= bar; = ; = = ; baz=value1=insert here something"
+        "Cookie": "USER_TOKEN=Yes; a=z; t=b;  foo= bar; = ; = = ; baz=value1=insert here something",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -204,7 +213,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
@@ -236,7 +246,8 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Cookie": "aaa=bbb;abc=def  "
+        "Cookie": "aaa=bbb;abc=def  ",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -248,7 +259,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."

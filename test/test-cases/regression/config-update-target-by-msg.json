@@ -15,7 +15,8 @@
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
       "uri": "/?key=value&key=other_value",
       "method": "GET",
@@ -27,7 +28,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."

@@ -25,7 +25,8 @@
         "Connection": "keep-alive",
         "Cookie": "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?foo=bar",
       "method": "GET",
@@ -37,7 +38,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -78,7 +79,8 @@
         "Connection": "keep-alive",
         "Cookie": "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?foo=bar",
       "method": "GET",
@@ -90,7 +92,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -131,7 +133,8 @@
         "Connection": "keep-alive",
         "Cookie": "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?foo=bar",
       "method": "GET",
@@ -143,7 +146,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""
@@ -184,7 +187,8 @@
         "Connection": "keep-alive",
         "Cookie": "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
       "uri": "/test.pl?a=test&b=test&c=test&d=test",
       "method": "GET",
@@ -196,7 +200,7 @@
     "response": {
       "headers": {
         "Content-Type": "text/xml; charset=utf-8\n\r",
-        "Content-Length": "length\n\r"
+        "Content-Length": "0"
       },
       "body": [
         ""

@@ -18,7 +18,8 @@
         "Accept-Language": "en-us,en;q=0.5",
         "Accept": "*/*",
         "Keep-Alive": "300",
-        "Range": "bytes=1-10,11-20,21-30,31-40,41-50,51-60"
+        "Range": "bytes=1-10,11-20,21-30,31-40,41-50,51-60",
+        "Content-Length": "0"
       },
       "uri": "/",
       "method": "GET",
@@ -30,7 +31,8 @@
       "headers": {
         "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
         "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
       "body": [
         "no need."
