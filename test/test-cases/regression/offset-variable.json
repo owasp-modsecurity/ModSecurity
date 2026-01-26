@@ -906,7 +906,7 @@
       ]
     },
     "expected": {
-      "error_log": "o0,9v89,9t:trim",
+      "error_log": "o0,9v88,9t:trim",
       "http_code": 200
     },
     "rules": [
@@ -950,7 +950,7 @@
       ]
     },
     "expected": {
-      "error_log": "o14,3v163,33t:trim",
+      "error_log": "o14,3v162,33t:trim",
       "http_code": 200
     },
     "rules": [
@@ -994,7 +994,7 @@
       ]
     },
     "expected": {
-      "error_log": "o0,5v162,5t:trim",
+      "error_log": "o0,5v161,5t:trim",
       "http_code": 200
     },
     "rules": [
@@ -1127,7 +1127,7 @@
       ]
     },
     "expected": {
-      "error_log": "o1,2v216,3t:lowercase",
+      "error_log": "o1,2v215,3t:lowercase",
       "http_code": 200
     },
     "rules": [
@@ -1172,7 +1172,7 @@
       ]
     },
     "expected": {
-      "error_log": "o0,1v223,1t:lowercase",
+      "error_log": "o0,1v222,1t:lowercase",
       "http_code": 200
     },
     "rules": [
@@ -1217,7 +1217,7 @@
       ]
     },
     "expected": {
-      "error_log": "o0,1v228,1t:lowercase,t:trim",
+      "error_log": "o0,1v227,1t:lowercase,t:trim",
       "http_code": 200
     },
     "rules": [
@@ -1262,7 +1262,7 @@
       ]
     },
     "expected": {
-      "error_log": "o0,1v226,1",
+      "error_log": "o0,1v225,1",
       "http_code": 200
     },
     "rules": [
@@ -1309,7 +1309,7 @@
       ]
     },
     "expected": {
-      "error_log": "o0,7v198,30t:trim",
+      "error_log": "o0,7v197,30t:trim",
       "http_code": 200
     },
     "rules": [

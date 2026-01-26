@@ -15,8 +15,8 @@
     "request": {
       "headers": {
         "Host": "localhost",
-        "Transfer-Encoding": "deflate",
-        "Content-Length": "0"
+        "Content-Length": "0",
+        "Transfer-Encoding": "deflate"
       },
       "uri": "/match-this",
       "method": "GET",
@@ -58,8 +58,8 @@
     "request": {
       "headers": {
         "Host": "localhost",
-        "Transfer-Encoding": "deflate",
-        "Content-Length": "0"
+        "Content-Length": "0",
+        "Transfer-Encoding": "deflate"
       },
       "uri": "/match-this",
       "method": "GET",
@@ -101,8 +101,8 @@
     "request": {
       "headers": {
         "Host": "localhost",
-        "Transfer-Encoding": "deflate",
-        "Content-Length": "0"
+        "Content-Length": "0",
+        "Transfer-Encoding": "deflate"
       },
       "uri": "/match-this",
       "method": "GET",

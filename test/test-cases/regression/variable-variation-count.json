@@ -50,7 +50,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Target value: \"10\" \\(Variable: REQUEST_HEADERS\\)",
+      "debug_log": "Target value: \"11\" \\(Variable: REQUEST_HEADERS\\)",
       "http_code": 200
     },
     "rules": [
