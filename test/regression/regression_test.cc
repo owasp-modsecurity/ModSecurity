@@ -85,7 +85,6 @@ inline std::vector<std::pair<std::string, std::string>>
     return vec;
 }
 
-
 std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &node) {
     size_t nelem = node->u.object.len;
     auto u = std::make_unique<RegressionTest>();
@@ -117,108 +116,22 @@ std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &n
             u->github_issue = YAJL_GET_INTEGER(val);
         }
         if (strcmp(key, "client") == 0) {
-            for (int j = 0; j < val->u.object.len; j++) {
-                const char *key2 = val->u.object.keys[j];
-                yajl_val val2 = val->u.object.values[j];
-
-                if (strcmp(key2, "ip") == 0) {
-                    u->clientIp = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "port") == 0) {
-                    u->clientPort = YAJL_GET_INTEGER(val2);
-                }
-            }
+            u->update_client_from_yajl_node(val);
         }
         if (strcmp(key, "server") == 0) {
-            for (int j = 0; j < val->u.object.len; j++) {
-                const char *key2 = val->u.object.keys[j];
-                yajl_val val2 = val->u.object.values[j];
-
-                if (strcmp(key2, "ip") == 0) {
-                    u->serverIp = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "port") == 0) {
-                    u->serverPort = YAJL_GET_INTEGER(val2);
-                }
-                if (strcmp(key2, "hostname") == 0) {
-                    u->hostname = YAJL_GET_STRING(val2);
-                }
-            }
+            u->update_server_from_yajl_node(val);
         }
         if (strcmp(key, "request") == 0) {
-            for (int j = 0; j < val->u.object.len; j++) {
-                const char *key2 = val->u.object.keys[j];
-                yajl_val val2 = val->u.object.values[j];
-
-                if (strcmp(key2, "uri") == 0) {
-                   u->uri = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "method") == 0) {
-                   u->method = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "http_version") == 0) {
-                   u->httpVersion = YAJL_GET_NUMBER(val2);
-                }
-                if (strcmp(key2, "headers") == 0) {
-                    u->request_headers = yajl_array_to_map(val2);
-                }
-                if (strcmp(key2, "body") == 0) {
-                    u->request_body = yajl_array_to_str(val2);
-                    u->request_body_lines = yajl_array_to_vec_str(val2);
-                }
-            }
+            u->update_request_from_yajl_node(val);
         }
         if (strcmp(key, "response") == 0) {
-            for (int j = 0; j < val->u.object.len; j++) {
-                const char *key2 = val->u.object.keys[j];
-                yajl_val val2 = val->u.object.values[j];
-
-                if (strcmp(key2, "headers") == 0) {
-                    u->response_headers = yajl_array_to_map(val2);
-                }
-                if (strcmp(key2, "body") == 0) {
-                    u->response_body = yajl_array_to_str(val2);
-                    u->response_body_lines = yajl_array_to_vec_str(val2);
-                }
-                if (strcmp(key2, "protocol") == 0) {
-                    u->response_protocol = YAJL_GET_STRING(val2);
-                }
-            }
+            u->update_response_from_yajl_node(val);
         }
         if (strcmp(key, "expected") == 0) {
-            for (int j = 0; j < val->u.object.len; j++) {
-                const char *key2 = val->u.object.keys[j];
-                yajl_val val2 = val->u.object.values[j];
-
-                if (strcmp(key2, "audit_log") == 0) {
-                    u->audit_log = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "debug_log") == 0) {
-                    u->debug_log = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "error_log") == 0) {
-                    u->error_log = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "http_code") == 0) {
-                    u->http_code = YAJL_GET_INTEGER(val2);
-                }
-                if (strcmp(key2, "redirect_url") == 0) {
-                    u->redirect_url = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "parser_error") == 0) {
-                    u->parser_error = YAJL_GET_STRING(val2);
-                }
-            }
+            u->update_expected_from_yajl_node(val);
         }
         if (strcmp(key, "rules") == 0) {
-            std::stringstream si;
-            for (int j = 0; j < val->u.array.len; j++) {
-                yajl_val val2 = val->u.array.values[ j ];
-                const char *keyj = YAJL_GET_STRING(val2);
-                si << keyj << "\n";
-            }
-            u->rules = si.str();
-            u->rules_lines = yajl_array_to_vec_str(val);
+            u->update_rules_from_yajl_node(val);
         }
     }
 
@@ -226,6 +139,117 @@ std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &n
 
     return u;
 }
+
+void RegressionTest::update_client_from_yajl_node(const yajl_val &val) {
+    for (int j = 0; j < val->u.object.len; j++) {
+        const char *key2 = val->u.object.keys[j];
+        yajl_val val2 = val->u.object.values[j];
+
+        if (strcmp(key2, "ip") == 0) {
+            clientIp = YAJL_GET_STRING(val2);
+        }
+        if (strcmp(key2, "port") == 0) {
+            clientPort = YAJL_GET_INTEGER(val2);
+        }
+    }
+}
+
+void RegressionTest::update_server_from_yajl_node(const yajl_val &val) {
+    for (int j = 0; j < val->u.object.len; j++) {
+        const char *key2 = val->u.object.keys[j];
+        yajl_val val2 = val->u.object.values[j];
+
+        if (strcmp(key2, "ip") == 0) {
+            serverIp = YAJL_GET_STRING(val2);
+        }
+        if (strcmp(key2, "port") == 0) {
+            serverPort = YAJL_GET_INTEGER(val2);
+        }
+        if (strcmp(key2, "hostname") == 0) {
+            hostname = YAJL_GET_STRING(val2);
+        }
+    }
+}
+
+void RegressionTest::update_request_from_yajl_node(const yajl_val &val) {
+    for (int j = 0; j < val->u.object.len; j++) {
+        const char *key2 = val->u.object.keys[j];
+        yajl_val val2 = val->u.object.values[j];
+
+        if (strcmp(key2, "uri") == 0) {
+            uri = YAJL_GET_STRING(val2);
+        }
+        if (strcmp(key2, "method") == 0) {
+            method = YAJL_GET_STRING(val2);
+        }
+        if (strcmp(key2, "http_version") == 0) {
+            httpVersion = YAJL_GET_NUMBER(val2);
+        }
+        if (strcmp(key2, "headers") == 0) {
+            request_headers = yajl_array_to_map(val2);
+        }
+        if (strcmp(key2, "body") == 0) {
+            request_body = yajl_array_to_str(val2);
+            request_body_lines = yajl_array_to_vec_str(val2);
+        }
+    }
+}
+
+void RegressionTest::update_response_from_yajl_node(const yajl_val &val) {
+    for (int j = 0; j < val->u.object.len; j++) {
+        const char *key2 = val->u.object.keys[j];
+        yajl_val val2 = val->u.object.values[j];
+
+        if (strcmp(key2, "headers") == 0) {
+            response_headers = yajl_array_to_map(val2);
+        }
+        if (strcmp(key2, "body") == 0) {
+            response_body = yajl_array_to_str(val2);
+            response_body_lines = yajl_array_to_vec_str(val2);
+        }
+        if (strcmp(key2, "protocol") == 0) {
+            response_protocol = YAJL_GET_STRING(val2);
+        }
+    }
+}
+
+void RegressionTest::update_expected_from_yajl_node(const yajl_val &val) {
+    for (int j = 0; j < val->u.object.len; j++) {
+        const char *key2 = val->u.object.keys[j];
+        yajl_val val2 = val->u.object.values[j];
+
+        if (strcmp(key2, "audit_log") == 0) {
+            audit_log = YAJL_GET_STRING(val2);
+        }
+        if (strcmp(key2, "debug_log") == 0) {
+            debug_log = YAJL_GET_STRING(val2);
+        }
+        if (strcmp(key2, "error_log") == 0) {
+            error_log = YAJL_GET_STRING(val2);
+        }
+        if (strcmp(key2, "http_code") == 0) {
+            http_code = YAJL_GET_INTEGER(val2);
+        }
+        if (strcmp(key2, "redirect_url") == 0) {
+            redirect_url = YAJL_GET_STRING(val2);
+        }
+        if (strcmp(key2, "parser_error") == 0) {
+            parser_error = YAJL_GET_STRING(val2);
+        }
+    }
+}
+
+void RegressionTest::update_rules_from_yajl_node(const yajl_val &val) {
+    std::stringstream si;
+    for (int j = 0; j < val->u.array.len; j++) {
+        yajl_val val2 = val->u.array.values[ j ];
+        const char *keyj = YAJL_GET_STRING(val2);
+        si << keyj << "\n";
+    }
+    rules = si.str();
+    rules_lines = yajl_array_to_vec_str(val);
+}
+
 
 constexpr char ascii_tolower(char c) {
     return 'A' <= c && c <= 'Z' ? (c + ('a' - 'A')) : c;

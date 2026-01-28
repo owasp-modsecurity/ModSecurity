@@ -85,6 +85,14 @@ class RegressionTest {
     std::vector<std::string> response_body_lines;
     std::vector<std::string> rules_lines;
     void update_content_lengths();
+
+private:
+   void update_client_from_yajl_node(const yajl_val &val);
+   void update_server_from_yajl_node(const yajl_val &val);
+   void update_request_from_yajl_node(const yajl_val &val);
+   void update_response_from_yajl_node(const yajl_val &val);
+   void update_expected_from_yajl_node(const yajl_val &val);
+   void update_rules_from_yajl_node(const yajl_val &val);
 };
 
 class RegressionTests {
