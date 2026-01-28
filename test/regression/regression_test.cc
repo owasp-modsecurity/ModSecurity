@@ -313,7 +313,7 @@ static yajl_gen_status gen_key_int(yajl_gen g, std::string_view key, int val) {
 }
 
 static yajl_gen_status gen_key_opt_int(yajl_gen g, std::string_view key, std::optional<int> val) {
-    if (!val) {
+    if (!val.has_value()) {
         return yajl_gen_status_ok;
     }
     return gen_key_int(g, key, val.value());
