@@ -69,7 +69,7 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
     }
 
     if (m_format) {
-        auto u = std::unique_ptr<T>(T::from_yajl_node(node));
+        auto u = T::from_yajl_node(node);
         u->filename = file;
 
         (*this)[file].push_back(std::move(u));
@@ -78,7 +78,7 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
         for ( int i = 0; i < num_tests; i++ ) {
             yajl_val obj = node->u.array.values[i];
 
-            auto u = std::unique_ptr<T>(T::from_yajl_node(obj));
+            auto u = T::from_yajl_node(obj);
             u->filename = file;
 
             const auto key = u->filename + ":" + u->name;

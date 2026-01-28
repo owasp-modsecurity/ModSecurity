@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <string>
 #include <algorithm>
+#include <memory>
 
 #ifdef WITH_YAJL
 #include <yajl/yajl_gen.h>
@@ -85,9 +86,9 @@ inline std::vector<std::pair<std::string, std::string>>
 }
 
 
-RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
+std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &node) {
     size_t nelem = node->u.object.len;
-    RegressionTest *u = new RegressionTest();
+    auto u = std::make_unique<RegressionTest>();
     u->http_code = 200;
 
     for (int i = 0; i < nelem; i++) {
@@ -269,12 +270,12 @@ void RegressionTest::update_content_lengths() {
     update_content_length(response_headers, response_body.size());
 }
 
-RegressionTests *RegressionTests::from_yajl_node(const yajl_val &node) {
-    RegressionTests *u = new RegressionTests();
+std::unique_ptr<RegressionTests> RegressionTests::from_yajl_node(const yajl_val &node) {
+    auto u = std::make_unique<RegressionTests>();
     size_t num_tests = node->u.array.len;
-    for ( int i = 0; i < num_tests; i++ ) {
+    for (int i = 0; i < num_tests; i++) {
         yajl_val obj = node->u.array.values[i];
-        u->tests.emplace_back(*RegressionTest::from_yajl_node(obj));
+        u->tests.emplace_back(*std::move(RegressionTest::from_yajl_node(obj)));
     }
     return u;
 }

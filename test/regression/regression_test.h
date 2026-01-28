@@ -23,6 +23,7 @@
 #include <string>
 #include <utility>
 #include <optional>
+#include <memory>
 
 #ifndef TEST_REGRESSION_REGRESSION_TEST_H_
 #define TEST_REGRESSION_REGRESSION_TEST_H_
@@ -32,7 +33,7 @@ namespace modsecurity_test {
 
 class RegressionTest {
  public:
-    static RegressionTest *from_yajl_node(const yajl_val &);
+    static std::unique_ptr<RegressionTest> from_yajl_node(const yajl_val &);
 
     static std::string print();
     std::string filename;
@@ -88,7 +89,7 @@ class RegressionTest {
 
 class RegressionTests {
  public:
-    static RegressionTests *from_yajl_node(const yajl_val &);
+    static std::unique_ptr<RegressionTests> from_yajl_node(const yajl_val &);
     void update_content_lengths();
     std::string toJSON() const;
 

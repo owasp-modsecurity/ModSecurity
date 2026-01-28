@@ -19,6 +19,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <memory>
 
 #ifndef TEST_UNIT_UNIT_TEST_H_
 #define TEST_UNIT_UNIT_TEST_H_
@@ -33,7 +34,7 @@ class UnitTestResult {
 
 class UnitTest {
  public:
-    static UnitTest *from_yajl_node(const yajl_val &);
+    static std::unique_ptr<UnitTest> from_yajl_node(const yajl_val &);
 
     std::string print() const;
 
