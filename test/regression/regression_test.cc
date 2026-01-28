@@ -260,7 +260,7 @@ static void update_content_length(std::vector<std::pair<std::string, std::string
         }
     }
     if (!has_content_length) {
-        headers.push_back(std::pair{"Content-Length", std::to_string(length)});
+        headers.emplace_back(std::pair{"Content-Length", std::to_string(length)});
     }
 }
 
@@ -409,7 +409,7 @@ std::string RegressionTests::toJSON() const {
 
         auto request_body_lines{t.request_body_lines};
         if (request_body_lines.empty()) {
-            request_body_lines.push_back("");
+            request_body_lines.emplace_back("");
         }
         gen_key_str_array(g, "body", request_body_lines);
 
@@ -421,7 +421,7 @@ std::string RegressionTests::toJSON() const {
 
         auto response_body_lines{t.response_body_lines};
         if (response_body_lines.empty()) {
-            response_body_lines.push_back("");
+            response_body_lines.emplace_back("");
         }
         gen_key_str_array(g, "body", response_body_lines);
 
