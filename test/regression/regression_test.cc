@@ -85,6 +85,24 @@ inline std::vector<std::pair<std::string, std::string>>
     return vec;
 }
 
+static inline void set_int_from_yajl(int &dest, std::string_view want_key, std::string_view key, const yajl_val &val) {
+    if (key == want_key) {
+        dest = YAJL_GET_INTEGER(val);
+    }
+}
+
+static inline void set_opt_int_from_yajl(std::optional<int> &dest, std::string_view want_key, std::string_view key, const yajl_val &val) {
+    if (key == want_key) {
+        dest = YAJL_GET_INTEGER(val);
+    }
+}
+
+static inline void set_string_from_yajl(std::string &dest, std::string_view want_key, std::string_view key, const yajl_val &val) {
+    if (key == want_key) {
+        dest = YAJL_GET_STRING(val);
+    }
+}
+
 std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &node) {
     size_t nelem = node->u.object.len;
     auto u = std::make_unique<RegressionTest>();
@@ -94,27 +112,13 @@ std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &n
         const char *key = node->u.object.keys[ i ];
         yajl_val val = node->u.object.values[ i ];
 
-        if (strcmp(key, "enabled") == 0) {
-           u->enabled = YAJL_GET_INTEGER(val);
-        }
-        if (strcmp(key, "version_min") == 0) {
-            u->version_min = YAJL_GET_INTEGER(val);
-        }
-        if (strcmp(key, "version_max") == 0) {
-            u->version_max = YAJL_GET_INTEGER(val);
-        }
-        if (strcmp(key, "title") == 0) {
-           u->title = YAJL_GET_STRING(val);
-        }
-        if (strcmp(key, "url") == 0) {
-           u->url = YAJL_GET_STRING(val);
-        }
-        if (strcmp(key, "resource") == 0) {
-           u->resource = YAJL_GET_STRING(val);
-        }
-        if (strcmp(key, "github_issue") == 0) {
-            u->github_issue = YAJL_GET_INTEGER(val);
-        }
+        set_int_from_yajl(u->enabled, "enabled", key, val);
+        set_int_from_yajl(u->version_min, "version_min", key, val);
+        set_opt_int_from_yajl(u->version_max, "version_max", key, val);
+        set_string_from_yajl(u->title, "title", key, val);
+        set_string_from_yajl(u->url, "url", key, val);
+        set_string_from_yajl(u->resource, "resource", key, val);
+        set_opt_int_from_yajl(u->github_issue, "github_issue", key, val);
         if (strcmp(key, "client") == 0) {
             u->update_client_from_yajl_node(val);
         }
@@ -145,12 +149,8 @@ void RegressionTest::update_client_from_yajl_node(const yajl_val &val) {
         const char *key2 = val->u.object.keys[j];
         yajl_val val2 = val->u.object.values[j];
 
-        if (strcmp(key2, "ip") == 0) {
-            clientIp = YAJL_GET_STRING(val2);
-        }
-        if (strcmp(key2, "port") == 0) {
-            clientPort = YAJL_GET_INTEGER(val2);
-        }
+        set_string_from_yajl(clientIp, "ip", key2, val2);
+        set_int_from_yajl(clientPort, "port", key2, val2);
     }
 }
 
@@ -159,15 +159,9 @@ void RegressionTest::update_server_from_yajl_node(const yajl_val &val) {
         const char *key2 = val->u.object.keys[j];
         yajl_val val2 = val->u.object.values[j];
 
-        if (strcmp(key2, "ip") == 0) {
-            serverIp = YAJL_GET_STRING(val2);
-        }
-        if (strcmp(key2, "port") == 0) {
-            serverPort = YAJL_GET_INTEGER(val2);
-        }
-        if (strcmp(key2, "hostname") == 0) {
-            hostname = YAJL_GET_STRING(val2);
-        }
+        set_string_from_yajl(serverIp, "ip", key2, val2);
+        set_int_from_yajl(serverPort, "port", key2, val2);
+        set_string_from_yajl(hostname, "hostname", key2, val2);
     }
 }
 
@@ -176,12 +170,8 @@ void RegressionTest::update_request_from_yajl_node(const yajl_val &val) {
         const char *key2 = val->u.object.keys[j];
         yajl_val val2 = val->u.object.values[j];
 
-        if (strcmp(key2, "uri") == 0) {
-            uri = YAJL_GET_STRING(val2);
-        }
-        if (strcmp(key2, "method") == 0) {
-            method = YAJL_GET_STRING(val2);
-        }
+        set_string_from_yajl(uri, "uri", key2, val2);
+        set_string_from_yajl(method, "method", key2, val2);
         if (strcmp(key2, "http_version") == 0) {
             httpVersion = YAJL_GET_NUMBER(val2);
         }
@@ -207,9 +197,7 @@ void RegressionTest::update_response_from_yajl_node(const yajl_val &val) {
             response_body = yajl_array_to_str(val2);
             response_body_lines = yajl_array_to_vec_str(val2);
         }
-        if (strcmp(key2, "protocol") == 0) {
-            response_protocol = YAJL_GET_STRING(val2);
-        }
+        set_string_from_yajl(response_protocol, "protocol", key2, val2);
     }
 }
 
@@ -218,24 +206,12 @@ void RegressionTest::update_expected_from_yajl_node(const yajl_val &val) {
         const char *key2 = val->u.object.keys[j];
         yajl_val val2 = val->u.object.values[j];
 
-        if (strcmp(key2, "audit_log") == 0) {
-            audit_log = YAJL_GET_STRING(val2);
-        }
-        if (strcmp(key2, "debug_log") == 0) {
-            debug_log = YAJL_GET_STRING(val2);
-        }
-        if (strcmp(key2, "error_log") == 0) {
-            error_log = YAJL_GET_STRING(val2);
-        }
-        if (strcmp(key2, "http_code") == 0) {
-            http_code = YAJL_GET_INTEGER(val2);
-        }
-        if (strcmp(key2, "redirect_url") == 0) {
-            redirect_url = YAJL_GET_STRING(val2);
-        }
-        if (strcmp(key2, "parser_error") == 0) {
-            parser_error = YAJL_GET_STRING(val2);
-        }
+        set_string_from_yajl(audit_log, "audit_log", key2, val2);
+        set_string_from_yajl(debug_log, "debug_log", key2, val2);
+        set_string_from_yajl(error_log, "error_log", key2, val2);
+        set_int_from_yajl(http_code, "http_code", key2, val2);
+        set_string_from_yajl(redirect_url, "redirect_url", key2, val2);
+        set_string_from_yajl(parser_error, "parser_error", key2, val2);
     }
 }
 
