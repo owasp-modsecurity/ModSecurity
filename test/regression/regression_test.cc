@@ -239,8 +239,8 @@ bool iequals_ascii(std::string_view a, std::string_view b) {
 }
 
 static bool has_chunked_header(const std::vector<std::pair<std::string, std::string>> &headers) {
-    for (const auto &header : headers) {
-        if (iequals_ascii(header.first, "Transfer-Encoding") && iequals_ascii(header.second, "chunked")) {
+    for (const auto &[name, value] : headers) {
+        if (iequals_ascii(name, "Transfer-Encoding") && iequals_ascii(value, "chunked")) {
             return true;
         }
     }
@@ -253,9 +253,9 @@ static void update_content_length(std::vector<std::pair<std::string, std::string
     }
 
     bool has_content_length = false;
-    for (auto &header : headers) {
-        if (iequals_ascii(header.first, "Content-Length")) {
-            header.second = std::to_string(length);
+    for (auto &[name, value] : headers) {
+        if (iequals_ascii(name, "Content-Length")) {
+            value = std::to_string(length);
             has_content_length = true;
         }
     }
@@ -355,8 +355,8 @@ static yajl_gen_status gen_key_headers(yajl_gen g, std::string_view key, const s
     if (auto s{yajl_gen_map_open(g)}; s != yajl_gen_status_ok) {
         return s;
     }
-    for (const auto &header : headers) {
-        if (auto s{gen_key_str(g, header.first, header.second)}; s != yajl_gen_status_ok) {
+    for (const auto &[name, value] : headers) {
+        if (auto s{gen_key_str(g, name, value)}; s != yajl_gen_status_ok) {
             return s;
         }
     }
