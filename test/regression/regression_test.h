@@ -90,7 +90,7 @@ class RegressionTests {
  public:
     static RegressionTests *from_yajl_node(const yajl_val &);
     void update_content_lengths();
-    std::string toJSON();
+    std::string toJSON() const;
 
     std::string filename;
     std::string name;

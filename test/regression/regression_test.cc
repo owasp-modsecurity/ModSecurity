@@ -363,7 +363,7 @@ static yajl_gen_status gen_key_headers(yajl_gen g, std::string_view key, const s
     return yajl_gen_map_close(g);
 }
 
-std::string RegressionTests::toJSON() {
+std::string RegressionTests::toJSON() const {
     const unsigned char *buf;
     size_t len;
     yajl_gen g;
