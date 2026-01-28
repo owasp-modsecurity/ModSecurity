@@ -31,7 +31,7 @@ namespace modsecurity_test {
 template <class T> class ModSecurityTest :
     public std::unordered_map<std::string, std::vector<std::unique_ptr<T>>> {
  public:
-    ModSecurityTest() {}
+    ModSecurityTest() = default;
 
     std::string header();
     void cmd_options(int, char **);
