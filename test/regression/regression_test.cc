@@ -240,12 +240,11 @@ bool iequals_ascii(std::string_view a, std::string_view b) {
 }
 
 static bool has_chunked_header(const std::vector<std::pair<std::string, std::string>> &headers) {
-    for (const auto &[name, value] : headers) {
-        if (iequals_ascii(name, "Transfer-Encoding") && iequals_ascii(value, "chunked")) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(std::begin(headers), std::end(headers),
+        [](const auto &header) {
+            const auto &[name, value]{header};
+            return iequals_ascii(name, "Transfer-Encoding") && iequals_ascii(value, "chunked");
+        });
 }
 
 static void update_content_length(std::vector<std::pair<std::string, std::string>> &headers, size_t length) {
