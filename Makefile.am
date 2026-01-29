@@ -41,7 +41,6 @@ test-regression-nginx:
 
 cppcheck:
 	@cppcheck \
-	    -j `nproc` \
 	    --enable=all \
 	    --force \
 	    --verbose \
