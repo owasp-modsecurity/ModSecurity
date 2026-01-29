@@ -151,7 +151,11 @@ jobs:
                        pcre2 \
                        pkg-config \
                        apr \
-                       apr-util
+                       apr-util \
+                       libxml2 \
+                       lua \
+                       yajl \
+                       ssdeep
       - uses: actions/checkout@v4
         with:
           submodules: false
@@ -162,11 +166,19 @@ jobs:
           PCRE2_PATH=$(brew --prefix pcre2)
           APR_PATH=$(brew --prefix apr)
           APU_PATH=$(brew --prefix apr-util)
+          XML_PATH=$(brew --prefix libxml2)
+          LUA_PATH=$(brew --prefix lua)
+          YAJL_PATH=$(brew --prefix yajl)
+          SSDEEP_PATH=$(brew --prefix ssdeep)
           ./autogen.sh
           ./configure \
             --with-apxs=$APXS_PATH \
             --with-pcre2=$PCRE2_PATH \
             --with-apr=$APR_PATH \
-            --with-apr-util=$APU_PATH
+            --with-apu=$APU_PATH \
+            --with-libxml=$XML_PATH \
+            --with-lua=$LUA_PATH \
+            --with-yajl=$YAJL_PATH \
+            --with-ssdeep=$SSDEEP_PATH
       - name: cppcheck
         run: make check-static
