@@ -148,7 +148,8 @@ jobs:
                        libtool \
                        cppcheck \
                        httpd
-          echo "$(brew --prefix httpd)/bin" >> $GITHUB_PATH
+          APXS_PATH=$(brew --prefix httpd)/bin/apxs
+          ./configure --with-apxs=$APXS_PATH
       - uses: actions/checkout@v4
         with:
           submodules: false
