@@ -137,3 +137,23 @@ jobs:
         run: sudo make install
       - name: run regression tests
         run: make test-regression
+
+  cppcheck:
+    runs-on: [macos-14]
+    steps:
+      - name: Setup Dependencies
+        run: |
+          brew install autoconf \
+                       automake \
+                       libtool \
+                       cppcheck
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
+      - name: configure
+        run: |
+          ./autogen.sh
+          ./configure
+      - name: cppcheck
+        run: make check-static

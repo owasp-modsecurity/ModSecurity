@@ -86,22 +86,40 @@ void modsecSetLogHook(void *obj, void (*hook)(void *obj, int level, char *str));
 
 static inline void 
 modsecSetBodyBrigade(request_rec *r, apr_bucket_brigade *b) {
+#ifdef __cplusplus
+    apr_table_setn(r->notes, NOTE_MSR_BRIGADE_REQUEST, reinterpret_cast<char *>(b));
+#else
     apr_table_setn(r->notes, NOTE_MSR_BRIGADE_REQUEST, (char *)b);
+#endif
 };
 
-static inline apr_bucket_brigade * 
-modsecGetBodyBrigade(request_rec *r) {
+static inline apr_bucket_brigade * modsecGetBodyBrigade(const request_rec *r) {
+#ifdef __cplusplus
+    return reinterpret_cast<apr_bucket_brigade *>(
+        const_cast<char *>(apr_table_get(r->notes, NOTE_MSR_BRIGADE_REQUEST))
+    );
+#else
     return (apr_bucket_brigade *)apr_table_get(r->notes, NOTE_MSR_BRIGADE_REQUEST);
+#endif
 };
 
 static inline void 
 modsecSetResponseBrigade(request_rec *r, apr_bucket_brigade *b) {
+#ifdef __cplusplus
+    apr_table_setn(r->notes, NOTE_MSR_BRIGADE_RESPONSE, reinterpret_cast<char *>(b));
+#else
     apr_table_setn(r->notes, NOTE_MSR_BRIGADE_RESPONSE, (char *)b);
+#endif
 };
 
-static inline apr_bucket_brigade * 
-modsecGetResponseBrigade(request_rec *r) {
+static inline apr_bucket_brigade * modsecGetResponseBrigade(const request_rec *r) {
+#ifdef __cplusplus
+    return reinterpret_cast<apr_bucket_brigade *>(
+        const_cast<char *>(apr_table_get(r->notes, NOTE_MSR_BRIGADE_RESPONSE))
+    );
+#else
     return (apr_bucket_brigade *)apr_table_get(r->notes, NOTE_MSR_BRIGADE_RESPONSE);
+#endif
 };
 
 void modsecSetReadBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos));

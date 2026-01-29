@@ -57,7 +57,7 @@ AP_DECLARE(apr_status_t) ap_pass_brigade(ap_filter_t *next,
                                          apr_bucket_brigade *bb)
 {
     if (next) {
-        apr_bucket *e;
+        const apr_bucket *e;
         if ((e = APR_BRIGADE_LAST(bb)) && APR_BUCKET_IS_EOS(e) && next->r) {
             /* This is only safe because HTTP_HEADER filter is always in
              * the filter stack.   This ensures that there is ALWAYS a
@@ -89,7 +89,7 @@ AP_DECLARE(apr_status_t) ap_save_brigade(ap_filter_t *f,
                                          apr_bucket_brigade **b, apr_pool_t *p)
 {
     apr_bucket *e;
-    apr_status_t rv, srv = APR_SUCCESS;
+    apr_status_t srv = APR_SUCCESS;
 
     /* If have never stored any data in the filter, then we had better
      * create an empty bucket brigade so that we can concat.
@@ -98,11 +98,12 @@ AP_DECLARE(apr_status_t) ap_save_brigade(ap_filter_t *f,
         *saveto = apr_brigade_create(p, f->c->bucket_alloc);
     }
 
-    for (e = APR_BRIGADE_FIRST(*b);
-         e != APR_BRIGADE_SENTINEL(*b);
+    const apr_bucket_brigade *bb = *b;
+    for (e = APR_BRIGADE_FIRST(bb);
+         e != APR_BRIGADE_SENTINEL(bb);
          e = APR_BUCKET_NEXT(e))
     {
-        rv = apr_bucket_setaside(e, p);
+        apr_status_t rv = apr_bucket_setaside(e, p);
 
         /* If the bucket type does not implement setaside, then
          * (hopefully) morph it into a bucket type which does, and set

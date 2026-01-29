@@ -40,7 +40,26 @@ test-regression-nginx:
 
 
 cppcheck:
-	cppcheck . --enable=all --force 2>&1 | sed 's/^/warning: /g' 1>&2;
+	@cppcheck \
+	    -j `nproc` \
+	    --enable=all \
+	    --force \
+	    --verbose \
+	    --library=gnu \
+	    --library=posix \
+	    -I ./apache2 \
+	    -I /usr/include/apache2 \
+	    -I /usr/include/apr-1.0 \
+	    -I /usr/include/libxml2 \
+	    --std=c++17 \
+	    --suppressions-list=./tests/cppcheck_suppressions.txt \
+	    --inline-suppr \
+	    --inconclusive \
+	    --template="warning: {file},{line},{severity},{id},{message}" \
+	    --error-exitcode=1 \
+	    standalone/
+
+check-static: cppcheck
 
 check-coding-style:
 	for i in `(find . -iname "*.c" ; find . -iname "*.h")`; \
