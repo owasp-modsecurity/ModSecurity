@@ -146,7 +146,9 @@ jobs:
           brew install autoconf \
                        automake \
                        libtool \
-                       cppcheck
+                       cppcheck \
+                       httpd
+          echo "$(brew --prefix httpd)/bin" >> $GITHUB_PATH
       - uses: actions/checkout@v4
         with:
           submodules: false
