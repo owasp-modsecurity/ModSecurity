@@ -149,7 +149,9 @@ jobs:
                        cppcheck \
                        httpd \
                        pcre2 \
-                       pkg-config
+                       pkg-config \
+                       apr \
+                       apr-util
       - uses: actions/checkout@v4
         with:
           submodules: false
@@ -158,7 +160,13 @@ jobs:
         run: |
           APXS_PATH=$(brew --prefix httpd)/bin/apxs
           PCRE2_PATH=$(brew --prefix pcre2)
+          APR_PATH=$(brew --prefix apr)
+          APU_PATH=$(brew --prefix apr-util)
           ./autogen.sh
-          ./configure --with-apxs=$APXS_PATH --with-pcre2=$PCRE2_PATH
+          ./configure \
+            --with-apxs=$APXS_PATH \
+            --with-pcre2=$PCRE2_PATH \
+            --with-apr=$APR_PATH \
+            --with-apr-util=$APU_PATH
       - name: cppcheck
         run: make check-static
