@@ -46,9 +46,7 @@ cppcheck:
 	    --verbose \
 	    --library=gnu \
 	    --library=posix \
-        -D"AP_DECLARE(x)=x" \
-	    -D"AP_DECLARE_NONSTD(x)=x" \
-	    -D"AP_DECLARE_DATA= " \
+
 	    -I ./apache2 \
 	    -I /usr/include/apache2 \
 	    -I /usr/include/apr-1.0 \

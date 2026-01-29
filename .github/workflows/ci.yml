@@ -163,6 +163,8 @@ jobs:
       - name: configure
         run: |
           APXS_PATH=$(brew --prefix httpd)/bin/apxs
+          HTTPD_PREFIX=$(brew --prefix httpd)
+          HTTPD_INCLUDES="$HTTPD_PREFIX/include/httpd"
           PCRE2_PATH=$(brew --prefix pcre2)
           APR_PATH=$(brew --prefix apr)
           APU_PATH=$(brew --prefix apr-util)
@@ -179,6 +181,7 @@ jobs:
             --with-libxml=$XML_PATH \
             --with-lua=$LUA_PATH \
             --with-yajl=$YAJL_PATH \
-            --with-ssdeep=$SSDEEP_PATH
+            --with-ssdeep=$SSDEEP_PATH \
+            CPPFLAGS="-I$HTTPD_INCLUDES"
       - name: cppcheck
         run: make check-static

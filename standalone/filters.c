@@ -210,7 +210,7 @@ AP_DECLARE(ap_filter_t *) ap_add_output_filter(const char *name, void *ctx,
                           r ? &r->proto_output_filters : NULL, &c->output_filters);
 }
 
-static void remove_any_filter(ap_filter_t *f, ap_filter_t **r_filt, ap_filter_t **p_filt,
+static void remove_any_filter(const ap_filter_t *f, ap_filter_t **r_filt, ap_filter_t **p_filt,
                               ap_filter_t **c_filt)
 {
     ap_filter_t **curr = r_filt ? r_filt : c_filt;

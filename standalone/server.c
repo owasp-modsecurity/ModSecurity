@@ -633,12 +633,11 @@ AP_DECLARE(char **) ap_create_environment(apr_pool_t *p, const apr_table_t *t)
     const apr_table_entry_t *elts = (const apr_table_entry_t *) env_arr->elts;
     char **env = (char **) apr_palloc(p, (env_arr->nelts + 2) * sizeof(char *));
     int i, j;
-    char *tz;
     char *whack;
 
     j = 0;
     if (!apr_table_get(t, "TZ")) {
-        tz = getenv("TZ");
+        char * tz = getenv("TZ");
         if (tz != NULL) {
             env[j++] = apr_pstrcat(p, "TZ=", tz, (char *)NULL);
         }

@@ -171,7 +171,7 @@ server_rec *modsecInit()    {
     return server;
 }
 
-static apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
+apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         ap_input_mode_t mode, apr_read_type_e block,
         apr_off_t readbytes)    {
     char *tmp = NULL;
@@ -226,7 +226,7 @@ static apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out
     return APR_SUCCESS;
 }
 
-static apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
+apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
     apr_bucket_brigade *bb_out = (apr_bucket_brigade *)f->ctx;
 
     APR_BRIGADE_CONCAT(bb_out, b);
