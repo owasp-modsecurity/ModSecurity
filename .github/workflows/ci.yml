@@ -149,7 +149,6 @@ jobs:
                        cppcheck \
                        httpd
           APXS_PATH=$(brew --prefix httpd)/bin/apxs
-          ./configure --with-apxs=$APXS_PATH
       - uses: actions/checkout@v4
         with:
           submodules: false
@@ -157,6 +156,6 @@ jobs:
       - name: configure
         run: |
           ./autogen.sh
-          ./configure
+          ./configure --with-apxs=$APXS_PATH
       - name: cppcheck
         run: make check-static
