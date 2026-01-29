@@ -46,7 +46,6 @@ cppcheck:
 	    --verbose \
 	    --library=gnu \
 	    --library=posix \
-
 	    -I ./apache2 \
 	    -I /usr/include/apache2 \
 	    -I /usr/include/apr-1.0 \
