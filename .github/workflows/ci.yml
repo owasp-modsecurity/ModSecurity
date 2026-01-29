@@ -147,7 +147,9 @@ jobs:
                        automake \
                        libtool \
                        cppcheck \
-                       httpd
+                       httpd \
+                       pcre2 \
+                       pkg-config
       - uses: actions/checkout@v4
         with:
           submodules: false
@@ -155,7 +157,8 @@ jobs:
       - name: configure
         run: |
           APXS_PATH=$(brew --prefix httpd)/bin/apxs
+          PCRE2_PATH=$(brew --prefix pcre2)
           ./autogen.sh
-          ./configure --with-apxs=$APXS_PATH
+          ./configure --with-apxs=$APXS_PATH --with-pcre2=$PCRE2_PATH
       - name: cppcheck
         run: make check-static
