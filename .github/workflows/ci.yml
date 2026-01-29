@@ -148,13 +148,13 @@ jobs:
                        libtool \
                        cppcheck \
                        httpd
-          APXS_PATH=$(brew --prefix httpd)/bin/apxs
       - uses: actions/checkout@v4
         with:
           submodules: false
           fetch-depth: 0
       - name: configure
         run: |
+          APXS_PATH=$(brew --prefix httpd)/bin/apxs
           ./autogen.sh
           ./configure --with-apxs=$APXS_PATH
       - name: cppcheck
