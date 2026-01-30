@@ -139,11 +139,14 @@ jobs:
         run: make test-regression
 
   cppcheck:
-    runs-on: [macos-14]
+    runs-on: [ubuntu-24.04]
+    container:
+      image: neszt/cppcheck-docker:latest
     steps:
       - name: Setup Dependencies
         run: |
-          brew install autoconf \
+          apt update -y -qq
+          apt install -y autoconf \
                        automake \
                        libtool \
                        cppcheck \
@@ -162,34 +165,8 @@ jobs:
           fetch-depth: 0
       - name: configure
         run: |
-          APXS_PATH=$(brew --prefix httpd)/bin/apxs
-          HTTPD_PREFIX=$(brew --prefix httpd)
-          HTTPD_INCLUDES="$HTTPD_PREFIX/include/httpd"
-          PCRE2_PATH=$(brew --prefix pcre2)
-          APR_PATH=$(brew --prefix apr)
-          APU_PATH=$(brew --prefix apr-util)
-          XML_PATH=$(brew --prefix libxml2)
-          LUA_PATH=$(brew --prefix lua)
-          YAJL_PATH=$(brew --prefix yajl)
-          SSDEEP_PATH=$(brew --prefix ssdeep)
           ./autogen.sh
-          ./configure \
-            --with-apxs=$APXS_PATH \
-            --with-pcre2=$PCRE2_PATH \
-            --with-apr=$APR_PATH \
-            --with-apu=$APU_PATH \
-            --with-libxml=$XML_PATH \
-            --with-lua=$LUA_PATH \
-            --with-yajl=$YAJL_PATH \
-            --with-ssdeep=$SSDEEP_PATH \
-            CPPFLAGS="-I$HTTPD_INCLUDES"
+          ./configure
       - name: cppcheck
         run: |
-          APXS_BIN=$(brew --prefix httpd)/bin/apxs
-          VAL_APACHE_INC=$($APXS_BIN -q INCLUDEDIR)
-          VAL_APR_INC=$($APXS_BIN -q APR_INCLUDEDIR)
-          VAL_APU_INC=$($APXS_BIN -q APU_INCLUDEDIR)
-          make check-static \
-              APACHE_INCLUDES="$VAL_APACHE_INC" \
-              APR_INCLUDES="$VAL_APR_INC" \
-              APU_INCLUDES="$VAL_APU_INC"
+          make check-static
