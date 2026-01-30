@@ -56,6 +56,9 @@ cppcheck:
 	    --inconclusive \
 	    --template="warning: {file},{line},{severity},{id},{message}" \
 	    --error-exitcode=1 \
+		-I "$(APACHE_INCLUDES)" \
+	    -I "$(APR_INCLUDES)" \
+	    -I "$(APU_INCLUDES)" \
 	    standalone/
 
 check-static: cppcheck
