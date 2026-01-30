@@ -145,8 +145,8 @@ jobs:
     steps:
       - name: Setup Dependencies
         run: |
-          apt update -y -qq
-          apt install -y autoconf \
+          apt-get update -y -qq
+          apt-get install -y autoconf \
                        automake \
                        libtool \
                        cppcheck \
