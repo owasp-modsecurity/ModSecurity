@@ -173,13 +173,5 @@ jobs:
           ./configure --with-apxs=/usr/bin/apxs
       - name: cppcheck
         run: |
-          APXS_BIN=/usr/bin/apxs
-          VAL_APACHE_INC=$($APXS_BIN -q INCLUDEDIR)
-          VAL_APR_INC=$($APXS_BIN -q APR_INCLUDEDIR)
-          VAL_APU_INC=$($APXS_BIN -q APU_INCLUDEDIR)
-
-          make check-static \
-              APACHE_INCLUDES="$VAL_APACHE_INC" \
-              APR_INCLUDES="$VAL_APR_INC" \
-              APU_INCLUDES="$VAL_APU_INC"
+          make check-static
 

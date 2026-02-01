@@ -248,17 +248,17 @@ AP_DECLARE(char *) ap_escape_html(apr_pool_t *p, const char *s)
 }
 #endif
 
-AP_DECLARE(const char *) ap_psignature(const char *prefix, const request_rec *r)
+AP_DECLARE(const char *) ap_psignature(const char *prefix, request_rec *r) // cppcheck-suppress constParameterPointer
 {
 	return prefix;
 }
 
-AP_DECLARE(const char *) ap_document_root(const request_rec *r) /* Don't use this! */
+AP_DECLARE(const char *) ap_document_root(request_rec *r) /* Don't use this! */ // cppcheck-suppress constParameterPointer
 {
 	return "\\";
 }
 
-AP_DECLARE(apr_port_t) ap_get_server_port(const request_rec *r)
+AP_DECLARE(apr_port_t) ap_get_server_port(const request_rec *r) // cppcheck-suppress constParameterPointer
 {
 	return 80;
 }
@@ -378,7 +378,7 @@ AP_DECLARE(const char *) ap_get_server_name(request_rec *r)
 	return r->server->server_hostname;
 }
 
-AP_DECLARE(void) ap_add_version_component(const apr_pool_t *pconf, const char *component)
+AP_DECLARE(void) ap_add_version_component(apr_pool_t *pconf, const char *component) // cppcheck-suppress constParameterPointer
 {
 	// appends string to server description string
 	//
@@ -408,7 +408,7 @@ AP_DECLARE(worker_score *) ap_get_scoreboard_worker_from_indexes(int x, int y)
     return &ap_scoreboard_image->servers[x][y];
 }
 
-AP_DECLARE(worker_score *) ap_get_scoreboard_worker(const ap_sb_handle_t *sbh)
+AP_DECLARE(worker_score *) ap_get_scoreboard_worker(ap_sb_handle_t *sbh) // cppcheck-suppress constParameterPointer
 {
     //if (!sbh)
     //    return NULL;
@@ -615,13 +615,13 @@ AP_DECLARE(char *) ap_server_root_relative(apr_pool_t *p, const char *file)
     }
 }
 
-AP_DECLARE(piped_log *) ap_open_piped_log(const apr_pool_t *p, const char *program)
+AP_DECLARE(piped_log *) ap_open_piped_log(apr_pool_t *p, const char *program) // cppcheck-suppress constParameterPointer
 {
 	return NULL;
 }
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
-AP_DECLARE(apr_file_t *) ap_piped_log_write_fd(const piped_log *pl)
+AP_DECLARE(apr_file_t *) ap_piped_log_write_fd(piped_log *pl) // cppcheck-suppress constParameterPointer
 {
  return NULL;
 }
