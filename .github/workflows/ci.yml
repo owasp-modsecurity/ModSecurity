@@ -146,8 +146,7 @@ jobs:
       - name: Setup Dependencies
         run: |
               apt-get update -y -qq
-              apt-get install -y --no-install-recommends\
-              build-essential \
+              apt-get install -y --no-install-recommends build-essential \
               autoconf \
               automake \
               libtool \
