@@ -158,9 +158,7 @@ jobs:
               apr-util-dev \
               libxml2-dev \
               lua5.3-dev \
-              yajl-dev \
-              ssdeep-dev \
-              ssdeep
+              yajl-dev
       - uses: actions/checkout@v4
         with:
           submodules: false
