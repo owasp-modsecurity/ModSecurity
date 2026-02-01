@@ -41,22 +41,21 @@ test-regression-nginx:
 
 cppcheck:
 	@cppcheck \
+	    -j `getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu || echo 1` \
 	    --enable=all \
 	    --force \
 	    --verbose \
 	    --library=gnu \
 	    --library=posix \
-	    -I ./apache2 \
-	    -I /usr/include/apache2 \
-	    -I /usr/include/apr-1.0 \
-	    -I /usr/include/libxml2 \
 	    --std=c++17 \
 	    --suppressions-list=./tests/cppcheck_suppressions.txt \
 	    --inline-suppr \
 	    --inconclusive \
 	    --template="warning: {file},{line},{severity},{id},{message}" \
 	    --error-exitcode=1 \
-		-I "$(APACHE_INCLUDES)" \
+	    -I ./apache2 \
+	    -I /usr/include/libxml2 \
+	    -I "$(APACHE_INCLUDES)" \
 	    -I "$(APR_INCLUDES)" \
 	    -I "$(APU_INCLUDES)" \
 	    standalone/

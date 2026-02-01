@@ -141,24 +141,29 @@ jobs:
   cppcheck:
     runs-on: [ubuntu-24.04]
     container:
-      image: neszt/cppcheck-docker:latest
+      image: debian:sid
     steps:
       - name: Setup Dependencies
         run: |
-          apk update
-          apk add \
-              build-base \
+              apt-get update -y -qq
+              apt-get install -y --no-install-recommends\
+              build-essential \
               autoconf \
               automake \
               libtool \
-              pkgconf \
+              pkg-config \
+              cppcheck \
               apache2-dev \
-              pcre2-dev \
-              apr-dev \
-              apr-util-dev \
+              libpcre2-dev \
+              libapr1-dev \
+              libaprutil1-dev \
               libxml2-dev \
-              lua5.3-dev \
-              yajl-dev
+              liblua5.3-dev \
+              libyajl-dev \
+              libfuzzy-dev \
+              ssdeep \
+              curl \
+              ca-certificates
       - uses: actions/checkout@v4
         with:
           submodules: false
@@ -166,7 +171,16 @@ jobs:
       - name: configure
         run: |
           ./autogen.sh
-          ./configure
+          ./configure --with-apxs=/usr/bin/apxs
       - name: cppcheck
         run: |
-          make check-static
+          APXS_BIN=/usr/bin/apxs
+          VAL_APACHE_INC=$($APXS_BIN -q INCLUDEDIR)
+          VAL_APR_INC=$($APXS_BIN -q APR_INCLUDEDIR)
+          VAL_APU_INC=$($APXS_BIN -q APU_INCLUDEDIR)
+
+          make check-static \
+              APACHE_INCLUDES="$VAL_APACHE_INC" \
+              APR_INCLUDES="$VAL_APR_INC" \
+              APU_INCLUDES="$VAL_APU_INC"
+
