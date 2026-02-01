@@ -145,20 +145,22 @@ jobs:
     steps:
       - name: Setup Dependencies
         run: |
-          sudo apt-get update -y -qq
-          sudo apt-get install -y autoconf \
-                       automake \
-                       libtool \
-                       cppcheck \
-                       httpd \
-                       pcre2 \
-                       pkg-config \
-                       apr \
-                       apr-util \
-                       libxml2 \
-                       lua \
-                       yajl \
-                       ssdeep
+          apt-get update -y -qq
+          apt-get install -y \
+              autoconf \
+              automake \
+              libtool \
+              pkg-config \
+              make \
+              apache2-dev \
+              libpcre2-dev \
+              libapr1-dev \
+              libaprutil1-dev \
+              libxml2-dev \
+              liblua5.3-dev \
+              libyajl-dev \
+              libfuzzy-dev \
+              ssdeep
       - uses: actions/checkout@v4
         with:
           submodules: false
