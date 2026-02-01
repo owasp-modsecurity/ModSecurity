@@ -145,21 +145,21 @@ jobs:
     steps:
       - name: Setup Dependencies
         run: |
-          apt-get update -y -qq
-          apt-get install -y \
+          apk update
+          apk add \
+              build-base \
               autoconf \
               automake \
               libtool \
-              pkg-config \
-              make \
+              pkgconf \
               apache2-dev \
-              libpcre2-dev \
-              libapr1-dev \
-              libaprutil1-dev \
+              pcre2-dev \
+              apr-dev \
+              apr-util-dev \
               libxml2-dev \
-              liblua5.3-dev \
-              libyajl-dev \
-              libfuzzy-dev \
+              lua5.3-dev \
+              yajl-dev \
+              ssdeep-dev \
               ssdeep
       - uses: actions/checkout@v4
         with:
