@@ -144,7 +144,7 @@ void parseargs(int argc, char *argv[])
 	}
 }
 
-void log(const void *obj, int level, const char *str)
+void log(const void *obj, int level, const char *str) //NOSONAR
 {
 	printf("%s\n", str);
 }
@@ -265,7 +265,7 @@ void main(int argc, char *argv[])
 	if(url_file != NULL)
 	{
 		FILE *fr = fopen(url_file, "rb");
-		if(fr != NULL){
+		if(fr != nullptr){
 			int i = 0;
 			while(fgets(urls[i],4096,fr) != NULL)
 			{
@@ -321,7 +321,7 @@ void main(int argc, char *argv[])
 
 			char *method = event_file_lines[j];
 			char *url = strchr(method, 32);
-			char *proto = NULL;
+			char *proto = nullptr;
 			if(*(url + 1) != '\0')
 				proto = strchr(url + 1, 32);
 

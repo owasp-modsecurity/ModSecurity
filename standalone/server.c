@@ -695,7 +695,8 @@ AP_DECLARE(int) ap_find_path_info(const char *uri, const char *path_info)
  */
 static char *original_uri(request_rec *r)
 {
-    const char *first, *last;
+    const char *first;
+    const char *last;
 
     if (r->the_request == NULL) {
         return (char *) apr_pcalloc(r->pool, 1);
