@@ -87,7 +87,7 @@ void modsecSetLogHook(void *obj, void (*hook)(void *obj, int level, char *str));
 static inline void 
 modsecSetBodyBrigade(request_rec *r, apr_bucket_brigade *b) {
 #ifdef __cplusplus
-    apr_table_setn(r->notes, NOTE_MSR_BRIGADE_REQUEST, dynamic_cast<char *>(b)); //NOSONAR
+    apr_table_setn(r->notes, NOTE_MSR_BRIGADE_REQUEST, reinterpret_cast<char *>(b)); //NOSONAR
 #else
     apr_table_setn(r->notes, NOTE_MSR_BRIGADE_REQUEST, (char *)b);
 #endif
@@ -106,7 +106,7 @@ static inline apr_bucket_brigade * modsecGetBodyBrigade(const request_rec *r) {
 static inline void 
 modsecSetResponseBrigade(request_rec *r, apr_bucket_brigade *b) {
 #ifdef __cplusplus
-    apr_table_setn(r->notes, NOTE_MSR_BRIGADE_RESPONSE, dynamic_cast<char *>(b)); //NOSONAR
+    apr_table_setn(r->notes, NOTE_MSR_BRIGADE_RESPONSE, reinterpret_cast<char *>(b)); //NOSONAR
 #else
     apr_table_setn(r->notes, NOTE_MSR_BRIGADE_RESPONSE, (char *)b);
 #endif
