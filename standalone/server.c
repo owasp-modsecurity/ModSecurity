@@ -523,8 +523,7 @@ AP_DECLARE(void) ap_str_tolower(char *str)
 
 AP_DECLARE(const char *) ap_get_remote_host(conn_rec *conn, void *dir_config, int type, int *str_is_ip)
 {
-    //int hostname_lookups = HOSTNAME_LOOKUP_OFF;
-    int hostname_lookups = 0;
+    int hostname_lookups = HOSTNAME_LOOKUP_OFF;
     int ignored_str_is_ip;
 
     if (!str_is_ip) { /* caller doesn't want to know */
@@ -1006,8 +1005,6 @@ AP_DECLARE(gid_t) ap_gname2id(const char *name)
 
 AP_DECLARE(void) unixd_pre_config(apr_pool_t *ptemp)
 {
-    //apr_finfo_t wrapper;
-
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     unixd_config.user_name = DEFAULT_USER;
     unixd_config.user_id = ap_uname2id(DEFAULT_USER);
@@ -1019,15 +1016,6 @@ AP_DECLARE(void) unixd_pre_config(apr_pool_t *ptemp)
     ap_unixd_config.group_id = ap_gname2id(DEFAULT_GROUP);
     ap_unixd_config.suexec_enabled = 0;
 #endif
-
-/*    if ((apr_stat(&wrapper, SUEXEC_BIN,
-                  APR_FINFO_NORM, ptemp)) != APR_SUCCESS) {
-        return;
-    }
-
-    if ((wrapper.protection & APR_USETID) && wrapper.user == 0) {
-        unixd_config.suexec_enabled = 1;
-    }*/
 }
 
 /* XXX move to APR and externalize (but implement differently :) ) */
