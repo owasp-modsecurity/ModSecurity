@@ -137,7 +137,7 @@ static const char * const status_lines[RESPONSE_CODES] =
 
 AP_DECLARE(int) ap_index_of_response(int status)
 {
-    static int shortcut[6] = {0, LEVEL_200, LEVEL_300, LEVEL_400,
+    static const int shortcut[6] = {0, LEVEL_200, LEVEL_300, LEVEL_400,
     LEVEL_500, RESPONSE_CODES};
     int i, pos;
 
@@ -230,7 +230,7 @@ AP_DECLARE(char *) ap_escape_html2(apr_pool_t *p, const char *s, int toasc)
             j += 5;
         }
         else if (toasc && !apr_isascii(s[i])) {
-            char *esc = apr_psprintf(p, "&#%3.3d;", (unsigned char)s[i]);
+            const char *esc = apr_psprintf(p, "&#%3.3d;", (unsigned char)s[i]);
             memcpy(&x[j], esc, 6);
             j += 5;
         }
@@ -248,17 +248,17 @@ AP_DECLARE(char *) ap_escape_html(apr_pool_t *p, const char *s)
 }
 #endif
 
-AP_DECLARE(const char *) ap_psignature(const char *prefix, request_rec *r)
+AP_DECLARE(const char *) ap_psignature(const char *prefix, request_rec *r) // cppcheck-suppress constParameterPointer
 {
 	return prefix;
 }
 
-AP_DECLARE(const char *) ap_document_root(request_rec *r) /* Don't use this! */
+AP_DECLARE(const char *) ap_document_root(request_rec *r) /* Don't use this! */ // cppcheck-suppress constParameterPointer
 {
 	return "\\";
 }
 
-AP_DECLARE(apr_port_t) ap_get_server_port(const request_rec *r)
+AP_DECLARE(apr_port_t) ap_get_server_port(const request_rec *r) // cppcheck-suppress constParameterPointer
 {
 	return 80;
 }
@@ -378,7 +378,7 @@ AP_DECLARE(const char *) ap_get_server_name(request_rec *r)
 	return r->server->server_hostname;
 }
 
-AP_DECLARE(void) ap_add_version_component(apr_pool_t *pconf, const char *component)
+AP_DECLARE(void) ap_add_version_component(apr_pool_t *pconf, const char *component) // cppcheck-suppress constParameterPointer
 {
 	// appends string to server description string
 	//
@@ -408,7 +408,7 @@ AP_DECLARE(worker_score *) ap_get_scoreboard_worker_from_indexes(int x, int y)
     return &ap_scoreboard_image->servers[x][y];
 }
 
-AP_DECLARE(worker_score *) ap_get_scoreboard_worker(ap_sb_handle_t *sbh)
+AP_DECLARE(worker_score *) ap_get_scoreboard_worker(ap_sb_handle_t *sbh) // cppcheck-suppress constParameterPointer
 {
     //if (!sbh)
     //    return NULL;
@@ -544,8 +544,7 @@ AP_DECLARE(const char *) ap_get_remote_host(conn_rec *conn, void *dir_config, in
 
     if (type != REMOTE_NOLOOKUP
         && conn->remote_host == NULL
-        && (type == REMOTE_DOUBLE_REV
-        || hostname_lookups != HOSTNAME_LOOKUP_OFF)) {
+        && type == REMOTE_DOUBLE_REV) {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
         if (apr_getnameinfo(&conn->remote_host, conn->remote_addr, 0)
             == APR_SUCCESS) {
@@ -615,39 +614,38 @@ AP_DECLARE(char *) ap_server_root_relative(apr_pool_t *p, const char *file)
     }
 }
 
-AP_DECLARE(piped_log *) ap_open_piped_log(apr_pool_t *p, const char *program)
+AP_DECLARE(piped_log *) ap_open_piped_log(apr_pool_t *p, const char *program) // cppcheck-suppress constParameterPointer
 {
 	return NULL;
 }
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
-AP_DECLARE(apr_file_t *) ap_piped_log_write_fd(piped_log *pl)
+AP_DECLARE(apr_file_t *) ap_piped_log_write_fd(piped_log *pl) // cppcheck-suppress constParameterPointer
 {
  return NULL;
 }
 #endif
 
-AP_DECLARE(char **) ap_create_environment(apr_pool_t *p, apr_table_t *t)
+AP_DECLARE(char **) ap_create_environment(apr_pool_t *p, const apr_table_t *t)
 {
     const apr_array_header_t *env_arr = apr_table_elts(t);
     const apr_table_entry_t *elts = (const apr_table_entry_t *) env_arr->elts;
     char **env = (char **) apr_palloc(p, (env_arr->nelts + 2) * sizeof(char *));
     int i, j;
-    char *tz;
     char *whack;
 
     j = 0;
     if (!apr_table_get(t, "TZ")) {
-        tz = getenv("TZ");
+        char * tz = getenv("TZ");
         if (tz != NULL) {
-            env[j++] = apr_pstrcat(p, "TZ=", tz, NULL);
+            env[j++] = apr_pstrcat(p, "TZ=", tz, (char *)NULL);
         }
     }
     for (i = 0; i < env_arr->nelts; ++i) {
         if (!elts[i].key) {
             continue;
         }
-        env[j] = apr_pstrcat(p, elts[i].key, "=", elts[i].val, NULL);
+        env[j] = apr_pstrcat(p, elts[i].key, "=", elts[i].val, (char *)NULL);
         whack = env[j];
         if (apr_isdigit(*whack)) {
             *whack++ = '_';
@@ -696,7 +694,8 @@ AP_DECLARE(int) ap_find_path_info(const char *uri, const char *path_info)
  */
 static char *original_uri(request_rec *r)
 {
-    char *first, *last;
+    const char *first;
+    const char *last;
 
     if (r->the_request == NULL) {
         return (char *) apr_pcalloc(r->pool, 1);
@@ -780,10 +779,10 @@ AP_DECLARE(void) ap_add_cgi_vars(request_rec *r)
 AP_DECLARE(void) ap_add_common_vars(request_rec *r)
 {
     apr_table_t *e;
-    server_rec *s = r->server;
+    const server_rec *s = r->server;
     conn_rec *c = r->connection;
     //const char *rem_logname;
-    char *env_path;
+    const char *env_path;
 #if defined(WIN32) || defined(OS2) || defined(BEOS)
     char *env_temp;
 #endif
@@ -914,7 +913,7 @@ AP_DECLARE(void) ap_add_common_vars(request_rec *r)
         apr_table_addn(e, "REMOTE_USER", r->user);
     }
     else if (r->prev) {
-        request_rec *back = r->prev;
+        const request_rec *back = r->prev;
 
         while (back) {
             if (back->user) {
@@ -957,46 +956,55 @@ unixd_config_rec ap_unixd_config;
 #endif
 const char *ap_server_argv0 = "nginx";
 
+
 #ifdef HAVE_GETPWNAM
 AP_DECLARE(uid_t) ap_uname2id(const char *name)
 {
-    struct passwd *ent;
+    struct passwd pwd;
+    struct passwd *result;
+    char buf[4096];
+    int s;
 
     if (name[0] == '#')
         return (atoi(&name[1]));
 
-    if (!(ent = getpwnam(name))) {
+    s = getpwnam_r(name, &pwd, buf, sizeof(buf), &result);
+
+    if (s != 0 || result == NULL) {
         ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
                      "%s: bad user name %s", ap_server_argv0, name);
         exit(1);
     }
 
-    return (ent->pw_uid);
+    return (result->pw_uid);
 }
 #endif
 
 #ifdef HAVE_GETGRNAM
 AP_DECLARE(gid_t) ap_gname2id(const char *name)
 {
-    struct group *ent;
+    struct group grp;
+    struct group *result;
+    char buf[4096];
+    int s;
 
     if (name[0] == '#')
         return (atoi(&name[1]));
 
-    if (!(ent = getgrnam(name))) {
+    s = getgrnam_r(name, &grp, buf, sizeof(buf), &result);
+
+    if (s != 0 || result == NULL) {
         ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
                      "%s: bad group name %s", ap_server_argv0, name);
         exit(1);
     }
 
-    return (ent->gr_gid);
+    return (result->gr_gid);
 }
 #endif
 
 AP_DECLARE(void) unixd_pre_config(apr_pool_t *ptemp)
 {
-    apr_finfo_t wrapper;
-
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     unixd_config.user_name = DEFAULT_USER;
     unixd_config.user_id = ap_uname2id(DEFAULT_USER);
@@ -1008,15 +1016,6 @@ AP_DECLARE(void) unixd_pre_config(apr_pool_t *ptemp)
     ap_unixd_config.group_id = ap_gname2id(DEFAULT_GROUP);
     ap_unixd_config.suexec_enabled = 0;
 #endif
-
-/*    if ((apr_stat(&wrapper, SUEXEC_BIN,
-                  APR_FINFO_NORM, ptemp)) != APR_SUCCESS) {
-        return;
-    }
-
-    if ((wrapper.protection & APR_USETID) && wrapper.user == 0) {
-        unixd_config.suexec_enabled = 1;
-    }*/
 }
 
 /* XXX move to APR and externalize (but implement differently :) ) */
@@ -1123,9 +1122,9 @@ AP_DECLARE(apr_status_t) ap_unixd_set_proc_mutex_perms(apr_proc_mutex_t *pmutex)
             apr_os_proc_mutex_t ospmutex;
 #if !APR_HAVE_UNION_SEMUN
             union semun {
-                long val;
+                //long val;
                 struct semid_ds *buf;
-                unsigned short *array;
+                //unsigned short *array;
             };
 #endif
             union semun ick;

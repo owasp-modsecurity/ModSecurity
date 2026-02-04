@@ -180,7 +180,6 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
     int is_eos = 0;
     apr_bucket_brigade *bb_in;
     apr_bucket *after;
-    apr_status_t rv;
 
     bb_in = modsecGetBodyBrigade(f->r);
 
@@ -191,7 +190,7 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
             APR_BRIGADE_INSERT_TAIL(bb_in, e);
         }
 
-        rv = apr_brigade_partition(bb_in, readbytes, &after);
+        apr_status_t rv = apr_brigade_partition(bb_in, readbytes, &after);
         if (rv != APR_SUCCESS && rv != APR_INCOMPLETE) {
             return rv;
         }
@@ -278,15 +277,15 @@ const char *modsecProcessConfig(directory_config *config, const char *file, cons
 
 		if(dir[li] != '/' && dir[li] != '\\')
 #ifdef	WIN32
-			file = apr_pstrcat(config->mp, dir, "\\", file, NULL);
+			file = apr_pstrcat(config->mp, dir, "\\", file, (char *)NULL);
 #else
-			file = apr_pstrcat(config->mp, dir, "/", file, NULL);
+			file = apr_pstrcat(config->mp, dir, "/", file, (char *)NULL);
 #endif
 		else
-			file = apr_pstrcat(config->mp, dir, file, NULL);
+			file = apr_pstrcat(config->mp, dir, file, (char *)NULL);
 	}
 	else if (APR_EBADPATH == status) {
-		return apr_pstrcat(config->mp, "Config file has a bad path, ", file, NULL);
+		return apr_pstrcat(config->mp, "Config file has a bad path, ", file, (char *)NULL);
 	}
 
 	apr_pool_create(&ptemp, config->mp);
@@ -403,7 +402,7 @@ request_rec *modsecNewRequest(conn_rec *connection, directory_config *config)   
 
 static modsec_rec *retrieve_msr(request_rec *r) {
     modsec_rec *msr = NULL;
-    request_rec *rx = NULL;
+    const request_rec *rx = NULL;
 
     /* Look in the current request first. */
     msr = (modsec_rec *)apr_table_get(r->notes, NOTE_MSR);
