@@ -40,7 +40,27 @@ test-regression-nginx:
 
 
 cppcheck:
-	cppcheck . --enable=all --force 2>&1 | sed 's/^/warning: /g' 1>&2;
+	@cppcheck \
+	    -j `getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu || echo 1` \
+	    --enable=all \
+	    --force \
+	    --verbose \
+	    --library=gnu \
+	    --library=posix \
+	    --std=c++17 \
+		-I ./apache2 \
+	    -I /usr/include/libxml2 \
+		-I @APXS_INCLUDEDIR@ \
+	    -I @APR_INCLUDEDIR@ \
+	    -I @APU_INCLUDEDIR@ \
+	    --suppressions-list=./tests/cppcheck_suppressions.txt \
+	    --inline-suppr \
+	    --inconclusive \
+	    --template="warning: {file},{line},{severity},{id},{message}" \
+	    --error-exitcode=1 \
+	    standalone/
+
+check-static: cppcheck
 
 check-coding-style:
 	for i in `(find . -iname "*.c" ; find . -iname "*.h")`; \
