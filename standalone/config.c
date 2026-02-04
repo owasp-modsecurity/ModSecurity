@@ -533,7 +533,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
     const char *errmsg = NULL;
 
     if ((parms->override & cmd->req_override) == 0)
-        return apr_pstrcat(parms->pool, cmd->name, " not allowed here", NULL);
+        return apr_pstrcat(parms->pool, cmd->name, " not allowed here", (char *)NULL);
 
     parms->info = cmd->cmd_data;
     parms->cmd = cmd;
@@ -565,7 +565,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
     case NO_ARGS:
         if (*args != 0)
             return apr_pstrcat(parms->pool, cmd->name, " takes no arguments",
-                               NULL);
+                               (char *)NULL);
 
         return cmd->AP_NO_ARGS(parms, mconfig);
 
@@ -574,7 +574,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
 
         if (*w == '\0' || *args != 0)
             return apr_pstrcat(parms->pool, cmd->name, " takes one argument",
-                               cmd->errmsg ? ", " : NULL, cmd->errmsg, NULL);
+                               cmd->errmsg ? ", " : NULL, cmd->errmsg, (char *)NULL);
 
         return cmd->AP_TAKE1(parms, mconfig, w);
 
@@ -584,7 +584,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
 
         if (*w == '\0' || *w2 == '\0' || *args != 0)
             return apr_pstrcat(parms->pool, cmd->name, " takes two arguments",
-                               cmd->errmsg ? ", " : NULL, cmd->errmsg, NULL);
+                               cmd->errmsg ? ", " : NULL, cmd->errmsg, (char *)NULL);
 
         return cmd->AP_TAKE2(parms, mconfig, w, w2);
 
@@ -594,7 +594,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
 
         if (*w == '\0' || *args != 0)
             return apr_pstrcat(parms->pool, cmd->name, " takes 1-2 arguments",
-                               cmd->errmsg ? ", " : NULL, cmd->errmsg, NULL);
+                               cmd->errmsg ? ", " : NULL, cmd->errmsg, (char *)NULL);
 
         return cmd->AP_TAKE2(parms, mconfig, w, *w2 ? w2 : NULL);
 
@@ -605,7 +605,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
 
         if (*w == '\0' || *w2 == '\0' || *w3 == '\0' || *args != 0)
             return apr_pstrcat(parms->pool, cmd->name, " takes three arguments",
-                               cmd->errmsg ? ", " : NULL, cmd->errmsg, NULL);
+                               cmd->errmsg ? ", " : NULL, cmd->errmsg, (char *)NULL);
 
         return cmd->AP_TAKE3(parms, mconfig, w, w2, w3);
 
@@ -617,7 +617,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
         if (*w == '\0' || *w2 == '\0' || *args != 0)
             return apr_pstrcat(parms->pool, cmd->name,
                                " takes two or three arguments",
-                               cmd->errmsg ? ", " : NULL, cmd->errmsg, NULL);
+                               cmd->errmsg ? ", " : NULL, cmd->errmsg, (char *)NULL);
 
         return cmd->AP_TAKE3(parms, mconfig, w, w2, w3);
 
@@ -629,7 +629,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
         if (*w == '\0' || *args != 0)
             return apr_pstrcat(parms->pool, cmd->name,
                                " takes one, two or three arguments",
-                               cmd->errmsg ? ", " : NULL, cmd->errmsg, NULL);
+                               cmd->errmsg ? ", " : NULL, cmd->errmsg, (char *)NULL);
 
         return cmd->AP_TAKE3(parms, mconfig, w, w2, w3);
 
@@ -641,7 +641,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
         if (*w == '\0' || (w2 && *w2 && !w3) || *args != 0)
             return apr_pstrcat(parms->pool, cmd->name,
                                " takes one or three arguments",
-                               cmd->errmsg ? ", " : NULL, cmd->errmsg, NULL);
+                               cmd->errmsg ? ", " : NULL, cmd->errmsg, (char *)NULL);
 
         return cmd->AP_TAKE3(parms, mconfig, w, w2, w3);
 
@@ -662,7 +662,7 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
         if (*w == '\0' || *args == 0)
             return apr_pstrcat(parms->pool, cmd->name,
                                " requires at least two arguments",
-                               cmd->errmsg ? ", " : NULL, cmd->errmsg, NULL);
+                               cmd->errmsg ? ", " : NULL, cmd->errmsg, (char *)NULL);
 
         while (*(w2 = ap_getword_conf(parms->pool, &args)) != '\0') {
 
@@ -679,14 +679,14 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
 
         if (*w == '\0' || (strcasecmp(w, "on") && strcasecmp(w, "off")))
             return apr_pstrcat(parms->pool, cmd->name, " must be On or Off",
-                               NULL);
+                               (char *)NULL);
 
         return cmd->AP_FLAG(parms, mconfig, strcasecmp(w, "off") != 0);
 
     default:
         return apr_pstrcat(parms->pool, cmd->name,
                            " is improperly configured internally (server bug)",
-                           NULL);
+                           (char *)NULL);
     }
 }
 
@@ -797,13 +797,9 @@ static const char *process_resource_config_nofnmatch(const char *fname,
 													 unsigned depth,
                                                      int optional)
 {
-    const char *error;
-    apr_status_t rv;
-
     if (ap_is_directory(ptemp, fname)) {
         apr_dir_t *dirp;
         apr_finfo_t dirent;
-        int current;
         apr_array_header_t *candidates = NULL;
         fnames *fnew;
         char *path = apr_pstrdup(ptemp, fname);
@@ -820,7 +816,7 @@ static const char *process_resource_config_nofnmatch(const char *fname,
          * entries here and store 'em away. Recall we need full pathnames
          * for this.
          */
-        rv = apr_dir_open(&dirp, path, ptemp);
+        apr_status_t rv = apr_dir_open(&dirp, path, ptemp);
         if (rv != APR_SUCCESS) {
             char errmsg[120];
             return apr_psprintf(p, "Could not open config directory %s: %s",
@@ -846,9 +842,9 @@ static const char *process_resource_config_nofnmatch(const char *fname,
              * Now recurse these... we handle errors and subdirectories
              * via the recursion, which is nice
              */
-            for (current = 0; current < candidates->nelts; ++current) {
+            for (int current = 0; current < candidates->nelts; ++current) {
                 fnew = &((fnames *) candidates->elts)[current];
-                error = process_resource_config_nofnmatch(fnew->fname,
+                const char *error = process_resource_config_nofnmatch(fnew->fname,
                                                           ari, p, ptemp,
                                                           depth, optional);
                 if (error) {
@@ -877,7 +873,6 @@ static const char *process_resource_config_fnmatch(const char *path,
     apr_finfo_t dirent;
     apr_array_header_t *candidates = NULL;
     fnames *fnew;
-    int current;
 
     /* find the first part of the filename */
     rest = ap_strchr_c(fname, '/');
@@ -947,7 +942,7 @@ static const char *process_resource_config_fnmatch(const char *path,
          * Now recurse these... we handle errors and subdirectories
          * via the recursion, which is nice
          */
-        for (current = 0; current < candidates->nelts; ++current) {
+        for (int current = 0; current < candidates->nelts; ++current) {
             fnew = &((fnames *) candidates->elts)[current];
             if (!rest) {
                 error = process_resource_config_nofnmatch(fnew->fname,
@@ -993,10 +988,10 @@ AP_DECLARE(const char *) process_fnmatch_configs(apr_array_header_t *ari,
 
         /* we allow APR_SUCCESS and APR_EINCOMPLETE */
         if (APR_ERELATIVE == status) {
-            return apr_pstrcat(p, "Include must have an absolute path, ", fname, NULL);
+            return apr_pstrcat(p, "Include must have an absolute path, ", fname, (char *)NULL);
         }
         else if (APR_EBADPATH == status) {
-            return apr_pstrcat(p, "Include has a bad path, ", fname, NULL);
+            return apr_pstrcat(p, "Include has a bad path, ", fname, (char *)NULL);
         }
 
         /* walk the filepath */
@@ -1056,7 +1051,7 @@ const char *process_command_config(server_rec *s,
 			if(status != APR_SUCCESS)
 			{
 				apr_array_pop(arr);
-				errmsg = apr_pstrcat(p, "Cannot open config file: ", fn, NULL);
+				errmsg = apr_pstrcat(p, "Cannot open config file: ", fn, (char *)NULL);
 				goto Exit;
 			}
 		}
@@ -1098,7 +1093,7 @@ ProcessInclude:
 				if (*w == '\0' || *args != 0)
 				{
 					ap_cfg_closefile(parms->config_file);
-					errmsg = apr_pstrcat(parms->pool, "Include takes one argument", NULL);
+					errmsg = apr_pstrcat(parms->pool, "Include takes one argument", (char *)NULL);
 					goto Exit;
 				}
 
@@ -1115,11 +1110,11 @@ ProcessInclude:
 					while(li >= 0 && configfilepath[li] != '/' && configfilepath[li] != '\\')
 						configfilepath[li--] = 0;
 
-					w = apr_pstrcat(p, configfilepath, w, NULL);
+					w = apr_pstrcat(p, configfilepath, w, (char *)NULL);
 				}
 				else if (APR_EBADPATH == status) {
 					ap_cfg_closefile(parms->config_file);
-					errmsg = apr_pstrcat(p, "Include file has a bad path, ", w, NULL);
+					errmsg = apr_pstrcat(p, "Include file has a bad path, ", w, (char *)NULL);
 					goto Exit;
 				}
 
@@ -1143,7 +1138,7 @@ ProcessInclude:
 				// unknown command, should error
 				//
 				ap_cfg_closefile(parms->config_file);
-				errmsg = apr_pstrcat(p, "Unknown command in config: ", cmd_name, NULL);
+				errmsg = apr_pstrcat(p, "Unknown command in config: ", cmd_name, (char *)NULL);
 				goto Exit;
 			}
 
