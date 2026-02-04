@@ -137,3 +137,41 @@ jobs:
         run: sudo make install
       - name: run regression tests
         run: make test-regression
+
+  cppcheck:
+    runs-on: [ubuntu-24.04]
+    container:
+      image: debian:sid
+    steps:
+      - name: Setup Dependencies
+        run: |
+              apt-get update -y -qq
+              apt-get install -y --no-install-recommends build-essential \
+              autoconf \
+              automake \
+              libtool \
+              pkg-config \
+              cppcheck \
+              apache2-dev \
+              libpcre2-dev \
+              libapr1-dev \
+              libaprutil1-dev \
+              libxml2-dev \
+              liblua5.3-dev \
+              libyajl-dev \
+              libfuzzy-dev \
+              ssdeep \
+              curl \
+              ca-certificates
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
+      - name: configure
+        run: |
+          ./autogen.sh
+          ./configure --with-apxs=/usr/bin/apxs
+      - name: cppcheck
+        run: |
+          make check-static
+
