@@ -63,6 +63,12 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
         std::string res;
         std::string openstr;
 
+        // SECURITY HARDENING NOTE:
+        // popen() executes via shell with concatenated arguments.
+        // Current inputs are engine-controlled, but replacing this
+        // with argv-based exec/spawn would remove shell parsing risk.
+
+        
         openstr.append(m_param);
         openstr.append(" ");
         openstr.append(str);
