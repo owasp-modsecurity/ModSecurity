@@ -16,7 +16,6 @@
 #include <yajl/yajl_tree.h>
 
 #include <iostream>
-#include <unordered_map>
 #include <vector>
 #include <string>
 #include <memory>

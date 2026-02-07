@@ -17,7 +17,7 @@
 #include <utility>
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <map>
 
 #ifndef TEST_COMMON_MODSECURITY_TEST_H_
 #define TEST_COMMON_MODSECURITY_TEST_H_
@@ -29,7 +29,7 @@ extern std::string default_test_path;
 namespace modsecurity_test {
 
 template <class T> class ModSecurityTest :
-    public std::unordered_map<std::string, std::vector<std::unique_ptr<T>>> {
+    public std::map<std::string, std::vector<std::unique_ptr<T>>> {
  public:
     ModSecurityTest() = default;
 
