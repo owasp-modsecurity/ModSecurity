@@ -274,14 +274,14 @@ std::unique_ptr<RegressionTests> RegressionTests::from_yajl_node(const yajl_val 
     size_t num_tests = node->u.array.len;
     for (int i = 0; i < num_tests; i++) {
         yajl_val obj = node->u.array.values[i];
-        u->tests.emplace_back(*std::move(RegressionTest::from_yajl_node(obj)));
+        u->tests.emplace_back(std::move(RegressionTest::from_yajl_node(obj)));
     }
     return u;
 }
 
 void RegressionTests::update_content_lengths() {
     for (auto & test : tests) {
-        test.update_content_lengths();
+        test->update_content_lengths();
     }
 }
 
@@ -378,36 +378,36 @@ std::string RegressionTests::toJSON() const {
     yajl_gen_array_open(g);
     for (const auto &t : tests) {
         yajl_gen_map_open(g);
-        gen_key_int(g, "enabled", t.enabled);
-        gen_key_int(g, "version_min", t.version_min);
-        gen_key_opt_int(g, "version_max", t.version_max);
-        gen_key_str(g, "title", t.title);
-        gen_key_str_if_non_empty(g, "url", t.url);
-        gen_key_str_if_non_empty(g, "resource", t.resource);
-        gen_key_opt_int(g, "github_issue", t.github_issue);
+        gen_key_int(g, "enabled", t->enabled);
+        gen_key_int(g, "version_min", t->version_min);
+        gen_key_opt_int(g, "version_max", t->version_max);
+        gen_key_str(g, "title", t->title);
+        gen_key_str_if_non_empty(g, "url", t->url);
+        gen_key_str_if_non_empty(g, "resource", t->resource);
+        gen_key_opt_int(g, "github_issue", t->github_issue);
 
         gen_string_view(g, "client");
         yajl_gen_map_open(g);
-        gen_key_str(g, "ip", t.clientIp);
-        gen_key_int(g, "port", t.clientPort);
+        gen_key_str(g, "ip", t->clientIp);
+        gen_key_int(g, "port", t->clientPort);
         yajl_gen_map_close(g);
 
         gen_string_view(g, "server");
         yajl_gen_map_open(g);
-        gen_key_str(g, "ip", t.serverIp);
-        gen_key_int(g, "port", t.serverPort);
+        gen_key_str(g, "ip", t->serverIp);
+        gen_key_int(g, "port", t->serverPort);
         yajl_gen_map_close(g);
 
         gen_string_view(g, "request");
         yajl_gen_map_open(g);
-        gen_key_headers(g, "headers", t.request_headers);
-        gen_key_str(g, "uri", t.uri);
-        gen_key_str(g, "method", t.method);
-        if (!t.httpVersion.empty()) {
-            gen_key_number(g, "http_version", t.httpVersion);
+        gen_key_headers(g, "headers", t->request_headers);
+        gen_key_str(g, "uri", t->uri);
+        gen_key_str(g, "method", t->method);
+        if (!t->httpVersion.empty()) {
+            gen_key_number(g, "http_version", t->httpVersion);
         }
 
-        auto request_body_lines{t.request_body_lines};
+        auto request_body_lines{t->request_body_lines};
         if (request_body_lines.empty()) {
             request_body_lines.emplace_back("");
         }
@@ -417,28 +417,28 @@ std::string RegressionTests::toJSON() const {
 
         gen_string_view(g, "response");
         yajl_gen_map_open(g);
-        gen_key_headers(g, "headers", t.response_headers);
+        gen_key_headers(g, "headers", t->response_headers);
 
-        auto response_body_lines{t.response_body_lines};
+        auto response_body_lines{t->response_body_lines};
         if (response_body_lines.empty()) {
             response_body_lines.emplace_back("");
         }
         gen_key_str_array(g, "body", response_body_lines);
 
-        gen_key_str_if_non_empty(g, "protocol", t.response_protocol);
+        gen_key_str_if_non_empty(g, "protocol", t->response_protocol);
         yajl_gen_map_close(g);
 
         gen_string_view(g, "expected");
         yajl_gen_map_open(g);
-        gen_key_str_if_non_empty(g, "audit_log", t.audit_log);
-        gen_key_str_if_non_empty(g, "debug_log", t.debug_log);
-        gen_key_str_if_non_empty(g, "error_log", t.error_log);
-        gen_key_int(g, "http_code", t.http_code);
-        gen_key_str_if_non_empty(g, "redirect_url", t.redirect_url);
-        gen_key_str_if_non_empty(g, "parser_error", t.parser_error);
+        gen_key_str_if_non_empty(g, "audit_log", t->audit_log);
+        gen_key_str_if_non_empty(g, "debug_log", t->debug_log);
+        gen_key_str_if_non_empty(g, "error_log", t->error_log);
+        gen_key_int(g, "http_code", t->http_code);
+        gen_key_str_if_non_empty(g, "redirect_url", t->redirect_url);
+        gen_key_str_if_non_empty(g, "parser_error", t->parser_error);
         yajl_gen_map_close(g);
 
-        gen_key_str_array(g, "rules", t.rules_lines);
+        gen_key_str_array(g, "rules", t->rules_lines);
 
         yajl_gen_map_close(g);
     }

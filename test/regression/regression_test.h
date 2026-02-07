@@ -103,7 +103,7 @@ class RegressionTests {
     std::string filename;
     std::string name;
 
-    std::vector<RegressionTest> tests;
+    std::vector<std::unique_ptr<RegressionTest>> tests;
 };
 
 class RegressionTestResult {
