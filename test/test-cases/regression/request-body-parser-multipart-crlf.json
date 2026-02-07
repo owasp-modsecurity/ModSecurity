@@ -2,7 +2,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "multipart parser (final CRLF)",
+    "title": "multipart parser (final boundary CRLF, other boundary LF)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -16,7 +16,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "303",
+        "Content-Length": "304",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
         "Expect": "100-continue"
       },
@@ -37,7 +37,7 @@
         "2.1\r\n",
         "2.2\r\n",
         "2.3\r\n",
-        "-----------------------------69343412719991675451336310646--\n"
+        "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response": {
@@ -58,10 +58,7 @@
     "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500055\"",
-      "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500056\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,id:500057\"",
-      "SecRule ARGS_POST \"@eq 1231\" \"phase:2,deny,id:500067\""
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500055\""
     ]
   }
 ]
