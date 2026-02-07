@@ -280,7 +280,7 @@ std::unique_ptr<RegressionTests> RegressionTests::from_yajl_node(const yajl_val 
 }
 
 void RegressionTests::update_content_lengths() {
-    for (const auto &test : tests) {
+    for (auto & test : tests) {
         test->update_content_lengths();
     }
 }
