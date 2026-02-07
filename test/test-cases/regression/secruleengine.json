@@ -15,8 +15,8 @@
       "headers": {
         "Content-Length": "0"
       },
-      "uri": "",
-      "method": "",
+      "uri": "/",
+      "method": "GET",
       "body": [
         ""
       ]
