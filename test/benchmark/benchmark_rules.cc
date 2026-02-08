@@ -21,6 +21,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
+#include "modsec_fixture.h"
 
 using modsecurity::ModSecurity;
 using modsecurity::RulesSet;
@@ -48,44 +49,6 @@ static const std::vector<std::pair<std::string, std::string>> TEST_HEADERS = {
 static const char* TEST_URI = "/api/users?id=123&name=test&action=update";
 static const char* TEST_CLIENT_IP = "203.0.113.45";
 static const char* TEST_SERVER_IP = "192.0.2.1";
-
-// Helper class to manage ModSecurity lifecycle
-class ModSecFixture {
-public:
-    ModSecurity* modsec;
-    RulesSet* rules;
-
-    ModSecFixture() {
-        modsec = new ModSecurity();
-        modsec->setConnectorInformation("ModSecurity-benchmark v1.0");
-        rules = new RulesSet();
-    }
-
-    ~ModSecFixture() {
-        delete rules;
-        delete modsec;
-    }
-
-    bool loadRules(const std::string& ruleConfig) {
-        // Create a temporary rules object for this configuration
-        RulesSet* tempRules = new RulesSet();
-        int result = tempRules->load(ruleConfig.c_str());
-
-        if (result < 0) {
-            delete tempRules;
-            return false;
-        }
-
-        // Replace old rules
-        delete rules;
-        rules = tempRules;
-        return true;
-    }
-
-    Transaction* createTransaction() {
-        return new Transaction(modsec, rules, nullptr);
-    }
-};
 
 // Helper to run a complete transaction
 static void runTransaction(Transaction* trans) {

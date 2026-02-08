@@ -19,6 +19,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
+#include "modsec_fixture.h"
 
 using modsecurity::ModSecurity;
 using modsecurity::RulesSet;
@@ -49,45 +50,6 @@ static const char* MY_REQUEST_BODY = R"({
     "age": 25,
     "tags": ["tag1", "tag2"]
 })";
-
-// ============================================================================
-// HELPER CLASSES (Same as benchmark_rules.cc)
-// ============================================================================
-
-class ModSecFixture {
-public:
-    ModSecurity* modsec;
-    RulesSet* rules;
-
-    ModSecFixture() {
-        modsec = new ModSecurity();
-        modsec->setConnectorInformation("ModSecurity-custom-benchmark v1.0");
-        rules = new RulesSet();
-    }
-
-    ~ModSecFixture() {
-        delete rules;
-        delete modsec;
-    }
-
-    bool loadRules(const std::string& ruleConfig) {
-        RulesSet* tempRules = new RulesSet();
-        int result = tempRules->load(ruleConfig.c_str());
-
-        if (result < 0) {
-            delete tempRules;
-            return false;
-        }
-
-        delete rules;
-        rules = tempRules;
-        return true;
-    }
-
-    Transaction* createTransaction() {
-        return new Transaction(modsec, rules, nullptr);
-    }
-};
 
 // ============================================================================
 // EXAMPLE 1: Benchmark testing a specific header
