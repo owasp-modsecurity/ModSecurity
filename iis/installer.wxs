@@ -381,6 +381,7 @@
             <Custom Action="Cleanup3" Before="Cleanup2"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="Cleanup4" Before="Cleanup3"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="Cleanup5" Before="Cleanup4"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
+            <Custom Action="CreateModSecurityDirs" After="Cleanup1"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <?if $(var.Win64) = "yes" ?>
             <Custom Action="InstallModule64" Before="InstallFinalize"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallModule32" After="InstallModule64"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
@@ -410,6 +411,8 @@
         <CustomAction Id="Cleanup4" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS&quot;" />
         <CustomAction Id="Cleanup5" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurityIIS&quot;" />
         <?endif?>
+        <!-- Create required directories for ModSecurity -->
+        <CustomAction Id="CreateModSecurityDirs" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="cmd.exe /c &quot;if not exist c:\inetpub\temp mkdir c:\inetpub\temp &amp; if not exist c:\inetpub\logs mkdir c:\inetpub\logs&quot;" />
         <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (64bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness64&quot;" />
         <CustomAction Id="InstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness32&quot;" />
