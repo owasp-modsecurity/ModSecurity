@@ -53,7 +53,7 @@
                 <FileSearch Id="CheckFile7" Name="lua5.1.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir8" Path="C:\Windows\System32\inetsrv" Depth="0">
-                <FileSearch Id="CheckFile8" Name="pcre.dll" />
+                <FileSearch Id="CheckFile8" Name="pcre2-8.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir9" Path="C:\Windows\System32\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile9" Name="zlib1.dll" />
@@ -80,7 +80,7 @@
                 <FileSearch Id="CheckFile16" Name="lua5.1.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir17" Path="C:\Windows\System32\inetsrv" Depth="0">
-                <FileSearch Id="CheckFile17" Name="pcre.dll" />
+                <FileSearch Id="CheckFile17" Name="pcre2-8.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir18" Path="C:\Windows\System32\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile18" Name="zlib1.dll" />
@@ -205,15 +205,12 @@
             <?endif?>
             <ComponentRef Id="StartMenuShortcuts" />
         </Feature>
-        <Feature Id="VCRedist" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+        <Feature Id="VCRedist" Title="Visual C++ 14.2 Runtime (VS2019)" AllowAdvertise="no" Display="hidden" Level="1">
             <?if $(var.Win64) = "yes" ?>
-            <MergeRef Id="VCRedist110_64" />
-            <MergeRef Id="VCRedist120_64" />
-            <MergeRef Id="VCRedist110_32" />
-            <MergeRef Id="VCRedist120_32" />
+            <MergeRef Id="VCRedist142_64" />
+            <MergeRef Id="VCRedist142_32" />
             <?else?>
-            <MergeRef Id="VCRedist110_32" />
-            <MergeRef Id="VCRedist120_32" />
+            <MergeRef Id="VCRedist142_32" />
             <?endif?>
         </Feature>
         <?if $(var.Win64) = "yes" ?>
@@ -413,13 +410,10 @@
         <?endif?>
         <DirectoryRef Id="TARGETDIR">
             <?if $(var.Win64) = "yes" ?>
-            <Merge Id="VCRedist120_64" SourceFile="wix\Microsoft_VC120_CRT_x64.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist110_64" SourceFile="wix\Microsoft_VC110_CRT_x64.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist120_32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist110_32" SourceFile="wix\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist142_64" SourceFile="wix\Microsoft_VC142_CRT_x64.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist142_32" SourceFile="wix\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0" />
             <?else?>
-            <Merge Id="VCRedist120_32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist110_32" SourceFile="wix\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist142_32" SourceFile="wix\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0" />
             <?endif?>
         </DirectoryRef>
     </Product>
