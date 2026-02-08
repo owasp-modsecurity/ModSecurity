@@ -29,6 +29,25 @@
         <Property Id="IIS">
             <RegistrySearch Id="IISInstalledVersion" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Type="raw" Name="MajorVersion" />
         </Property>
+        <!-- Detect Visual C++ 2019 Redistributable (VC142) -->
+        <?if $(var.Win64) = "yes" ?>
+        <Property Id="VC142X64INSTALLED">
+            <RegistrySearch Id="FindVC142X64" Root="HKLM"
+                Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64"
+                Name="Installed" Type="raw" Win64="yes" />
+        </Property>
+        <Property Id="VC142X86INSTALLED">
+            <RegistrySearch Id="FindVC142X86" Root="HKLM"
+                Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86"
+                Name="Installed" Type="raw" Win64="yes" />
+        </Property>
+        <?else?>
+        <Property Id="VC142X86INSTALLED">
+            <RegistrySearch Id="FindVC142X86" Root="HKLM"
+                Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86"
+                Name="Installed" Type="raw" Win64="no" />
+        </Property>
+        <?endif?>
         <!-- Detect if ModSecurity IIS module and its dependent DLL files exist -->
         <Property Id="FILEEXISTS" Secure="yes">
             <DirectorySearch Id="CheckFileDir1" Path="C:\Windows\System32\inetsrv" Depth="0">
@@ -97,6 +116,19 @@
         <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
         <!-- Define installation conditions -->
         <Condition Message="This setup requires IIS 7.0, 8.0 or 10.0. If that's the case, please ensure that the installer is running as administrator or try running it from the 'Apps and features' or 'Add/Remove Programs' menu"><![CDATA[(IIS="#7") OR (IIS="#8") OR (IIS="#10")]]></Condition>
+        <!-- Check for required Visual C++ 2019 Redistributables -->
+        <?if $(var.Win64) = "yes" ?>
+        <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x64). Please download and install from: https://aka.ms/vs/17/release/vc_redist.x64.exe">
+            <![CDATA[Installed OR VC142X64INSTALLED]]>
+        </Condition>
+        <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x86) for 32-bit support. Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe">
+            <![CDATA[Installed OR VC142X86INSTALLED]]>
+        </Condition>
+        <?else?>
+        <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x86). Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe">
+            <![CDATA[Installed OR VC142X86INSTALLED]]>
+        </Condition>
+        <?endif?>
         <!-- Version 2.7.5 had an uninstall issue that leaves some files behind. Asking the user to manually hash this out. -->
         <Condition Message="A older version of ModSecurityIIS was found in your computer. Please complete uninstall by removing the following file: [FILEEXISTS]. You may have to remove ModSecurity module from IIS, use the IIS Manager to do so."><![CDATA[(NOT FILEEXISTS) OR (Installed)]]></Condition>
         <Condition Message="64-bit operating system was detected, please use the 64-bit installer.">
@@ -204,14 +236,6 @@
             <ComponentRef Id="ConfigSchema64" />
             <?endif?>
             <ComponentRef Id="StartMenuShortcuts" />
-        </Feature>
-        <Feature Id="VCRedist" Title="Visual C++ 14.2 Runtime (VS2019)" AllowAdvertise="no" Display="hidden" Level="1">
-            <?if $(var.Win64) = "yes" ?>
-            <MergeRef Id="VCRedist142_64" />
-            <MergeRef Id="VCRedist142_32" />
-            <?else?>
-            <MergeRef Id="VCRedist142_32" />
-            <?endif?>
         </Feature>
         <?if $(var.Win64) = "yes" ?>
         <Feature Id="ModSec64" Title="ModSecurity IIS (64 bits)" Level="1" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="This option will install ModSecurityIIS 64bits with all the necessary dependencies.">
@@ -408,13 +432,5 @@
         <?else?>
         <CustomAction Id="UninstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
         <?endif?>
-        <DirectoryRef Id="TARGETDIR">
-            <?if $(var.Win64) = "yes" ?>
-            <Merge Id="VCRedist142_64" SourceFile="wix\Microsoft_VC142_CRT_x64.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist142_32" SourceFile="wix\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0" />
-            <?else?>
-            <Merge Id="VCRedist142_32" SourceFile="wix\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0" />
-            <?endif?>
-        </DirectoryRef>
     </Product>
 </Wix>
