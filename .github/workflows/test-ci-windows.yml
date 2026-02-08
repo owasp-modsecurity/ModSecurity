@@ -102,6 +102,7 @@ jobs:
         -A $cmakeArch `
         -DWITH_LUA=ON `
         -DWITH_YAJL=ON `
+        -DWITH_PCRE_JIT=ON `
         -S IIS -B "iis\build"
 
     - name: Build IIS Module
