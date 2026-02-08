@@ -5,48 +5,127 @@ So the build process was refactored to make it easier for users to create their 
 * build_msi.bat -> Creates the MSI self-installer for easy deploy / removal / distribution
 
 * build_dependencies.bat -> Sets (and downloads if needed) all required dependencies
-* build_modsecurity.bat -> Builds ModSecurity (requires all depenedencies being set)
+* build_modsecurity.bat -> Builds ModSecurity (requires all dependencies being set)
 
 * download_files.bat -> Downloads all required dependencies to the default Downloads folder
 ** This script is disabled by default. If you want to enable it, uncomment the "@call download_files.bat" line on build_dependencies.bat
 
-The dependencies folder also includes a set o batch scripts which sets each dependency
+The dependencies folder also includes a set of batch scripts which sets each dependency
 on its own. These scripts are called by the build_dependencies.bat script.
 
-Using the same versions of libraries as listed below is  recommended.
+Using the same versions of libraries as listed below is recommended.
 --------------------------------------
 Compilation Prerequisites:
 
-* Windows 7 x86_x64 (Should work on newer versions of Windows too)
-* Vistual Studio 2013 Express (Other versions should work, but you need to set the correct path for vcvars.bat scripts)
-* IIS enabled/installed
-* 7-Zip
+* Windows 10/11 or Windows Server 2016+ (64-bit recommended)
+* Visual Studio 2019 or 2022 with C++ development tools
+  - Desktop development with C++
+  - Windows 10/11 SDK
+  - MSVC v142 (VS2019) or v143 (VS2022) build tools
+  - C++ ATL for latest build tools
+* IIS 7.0 or later enabled/installed
+* 7-Zip (for dependency extraction)
+* WiX Toolset 3.x (for building MSI installer)
+
+--------------------------------------
+
+Runtime Prerequisites (for installer deployment):
+
+* Microsoft Visual C++ 2019 Redistributable (x64): https://aka.ms/vs/17/release/vc_redist.x64.exe
+* Microsoft Visual C++ 2019 Redistributable (x86): https://aka.ms/vs/17/release/vc_redist.x86.exe
+  - Both x64 and x86 are required on 64-bit systems for 32-bit application pool support
+  - The MSI installer will check for these prerequisites and provide download links if missing
+
+Note: The installer now uses redistributable packages instead of merge modules,
+following Microsoft's recommended deployment practices. This allows Windows Update
+to automatically patch security vulnerabilities in the Visual C++ runtime.
 
 --------------------------------------
 
 The latest versions of ModSecurity dependencies known to work well are the following:
 
-cmake-3.8.2-win32-x86
-pcre-8.40 (patch required and included on file "patch-pcre-8.40.vbs")
-zlib-1.2.11
-libxml2-2.9.4
-lua-5.3.4
-curl-7.54.1
-httpd-2.4.27 (bin-VC11)
+cmake-3.8.2-win32-x86 (or later)
+pcre2-10.x (PCRE2 is now the default, PCRE 8.x is deprecated)
+  - Note: PCRE2 provides better performance and is actively maintained
+zlib-1.2.11 (or later)
+libxml2-2.9.4 (or later)
+lua-5.3.4 (or later)
+curl-7.54.1 (or later)
+httpd-2.4.27 (bin-VC15 or later for VS2019/2022)
 yajl-2.1.0
-ssdeep-2.13
+ssdeep-2.13 (or later)
 
 --------------------------------------
 
-1. Create working directory (e.g. c:\work) and drop the latest clone from ModSecurity's 2.x Github (https://github.com/owasp-modsecurity/ModSecurity/archive/v2/master.zip)
-2. Make sure the prerequisites mentioned above are all set
-3. If you haven't download the dependency files before, uncomment the "@call download_files.bat" line on build_dependencies.bat to have them downloaded prior
-4. Open a command prompt (cmd.exe) and head to the "iis" folder inside ModSecurity tree working directory (e.g. cd c:\work\ModSecurity\iis)
-5. If you need to modify anything (e.g. paths, versions etc), carefully edit the batch files.
-6. Run build_release.bat
-7. When done, the binaries, lib and pdb files should appear under c:\work\ModSecurity\iis\release\x86 (32-bit) and c:\work\ModSecurity\iis\release\amd64 (64-bit)
-* At this point, if you had a previous installation of ModSecurity and would like to test you can place the x86 files to "C:\Windows\SysWOW64\inetsrv" and x64 files to "C:\Windows\System32\inetsrv" 
+Build Instructions:
 
-8. If all went well, you can build the MSI installer by running the build_msi.bat script.
+1. Create working directory (e.g. c:\work) and clone/extract ModSecurity v2 from GitHub:
+   https://github.com/owasp-modsecurity/ModSecurity/archive/v2/master.zip
 
-* The built installable package places the files to the correct folders, automatically configures the ModSecurity IIS native module and configures web.config to enable ModSecurity for all IIS sites.
+2. Initialize git submodules (important for dependencies like libinjection):
+   git submodule update --init --recursive
+
+3. Make sure the prerequisites mentioned above are all set:
+   - Visual Studio 2019/2022 installed with C++ tools
+   - IIS enabled/installed
+   - 7-Zip available in PATH
+   - WiX Toolset installed (for MSI building)
+
+4. If you haven't downloaded the dependency files before, uncomment the
+   "@call download_files.bat" line in build_dependencies.bat to have them
+   downloaded automatically.
+
+5. Open a Visual Studio Developer Command Prompt (recommended) or regular
+   command prompt and navigate to the "iis" folder inside ModSecurity working
+   directory:
+   cd c:\work\ModSecurity\iis
+
+6. If you need to modify anything (e.g. paths, versions, etc.), carefully
+   edit the batch files. Key files to review:
+   - build_dependencies.bat (dependency paths/versions)
+   - build_modsecurity.bat (compiler settings)
+   - build_msi.bat (MSI configuration)
+
+7. Run the main build script:
+   build_release.bat
+
+8. When done, the binaries, lib and pdb files should appear under:
+   - c:\work\ModSecurity\iis\release\x86 (32-bit)
+   - c:\work\ModSecurity\iis\release\amd64 (64-bit)
+
+   * At this point, if you have a previous installation of ModSecurity and
+     would like to test, you can manually place:
+     - x86 files to "C:\Windows\SysWOW64\inetsrv"
+     - x64 files to "C:\Windows\System32\inetsrv"
+
+9. If all went well, you can build the MSI installer by running:
+   build_msi.bat
+
+   The MSI will be created in the release folder.
+
+--------------------------------------
+
+MSI Installer Features:
+
+* Automatically places files to the correct system folders
+* Configures the ModSecurity IIS native module for both 32-bit and 64-bit
+* Registers the module with IIS application configuration
+* Checks for required Visual C++ 2019 Redistributables
+* Provides clear error messages with download links if prerequisites are missing
+* Supports both x86 and x64 architectures
+* Allows selective installation of 32-bit and/or 64-bit modules
+
+--------------------------------------
+
+Troubleshooting:
+
+* If the installer fails with missing DLL errors, ensure the VC++ 2019
+  Redistributables are installed (see Runtime Prerequisites above)
+
+* Use the included list_dependencies.bat script in the wix folder to check:
+  - VC++ 2019 Redistributable installation status
+  - ModSecurity DLL dependencies
+  - Missing libraries
+
+* For detailed troubleshooting, see:
+  https://github.com/owasp-modsecurity/ModSecurity/wiki/IIS-Troubleshooting
