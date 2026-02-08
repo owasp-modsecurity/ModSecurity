@@ -94,8 +94,8 @@ Note: PCRE2 with JIT support provides better performance and fixes stack overflo
     CD C:\work\lua-5.4.8\src
     CL /Ox /arch:SSE2 /GF /GL /Gy /FD /EHsc /MD  /Zi /TC /wd4005 /D "_MBCS" /D "LUA_CORE" /D "LUA_BUILD_AS_DLL" /D "_CRT_SECURE_NO_WARNINGS" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_WIN32" /D "_WINDLL" /c *.c
     DEL lua.obj luac.obj
-    LINK /DLL /LTCG /DEBUG /OUT:lua5.1.dll *.obj
-    IF EXIST lua5.1.dll.manifest MT  -manifest lua5.1.dll.manifest -outputresource:lua5.1.dll;2
+    LINK /DLL /LTCG /DEBUG /OUT:lua54.dll *.obj
+    IF EXIST lua54.dll.manifest MT  -manifest lua54.dll.manifest -outputresource:lua54.dll;2
 
 ### cURL-8.18.0
 
@@ -113,7 +113,7 @@ Note: PCRE2 with JIT support provides better performance and fixes stack overflo
 Copy these files to ``C:\Apache2466\bin``:
 
     C:\work\pcre2-10.47\pcre2-8.dll C:\Apache2466\bin\
-    C:\work\lua-5.4.8\src\lua5.1.dll C:\Apache2466\bin\
+    C:\work\lua-5.4.8\src\lua54.dll C:\Apache2466\bin\
     C:\work\libxml2-2.15.1\win32\bin.msvc\libxml2.dll C:\Apache2466\bin\
     C:\work\curl-8.18.0\builds\libcurl-vc-x64-release-dll-zlib-dll-ipv6-sspi-schannel-obj-lib\libcurl.dll C:\Apache2466\bin\
     C:\work\mod_security\apache2\mlogc-src\mlogc.exe C:\Apache2466\bin\

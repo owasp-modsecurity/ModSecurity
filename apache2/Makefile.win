@@ -43,7 +43,7 @@ DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
 
 # Lua is optional
 !IF "$(LUA)" != ""
-LIBS = $(LIBS) $(LUA)\lua5.1.lib
+LIBS = $(LIBS) $(LUA)\lua54.lib
 DEFS=$(DEFS) -DWITH_LUA
 INCLUDES = $(INCLUDES) -I$(LUA)\include -I$(LUA) \
 !ENDIF

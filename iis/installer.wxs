@@ -69,7 +69,7 @@
                 <FileSearch Id="CheckFile6" Name="libxml2.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir7" Path="C:\Windows\System32\inetsrv" Depth="0">
-                <FileSearch Id="CheckFile7" Name="lua5.1.dll" />
+                <FileSearch Id="CheckFile7" Name="lua54.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir8" Path="C:\Windows\System32\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile8" Name="pcre2-8.dll" />
@@ -96,7 +96,7 @@
                 <FileSearch Id="CheckFile15" Name="libxml2.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir16" Path="C:\Windows\System32\inetsrv" Depth="0">
-                <FileSearch Id="CheckFile16" Name="lua5.1.dll" />
+                <FileSearch Id="CheckFile16" Name="lua54.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir17" Path="C:\Windows\System32\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile17" Name="pcre2-8.dll" />
