@@ -126,6 +126,15 @@ typedef struct msc_parm msc_parm;
 
 #ifdef WIN32
 #include <direct.h>
+/* Use ISO C++ conformant names for POSIX functions on Windows */
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#define chdir _chdir
+/* Disable warnings about "unsafe" CRT functions (getenv, strcpy, etc.) */
+/* These functions are safe in ModSecurity's usage and required for portability */
+#pragma warning(disable: 4996)
+#endif
 #else
 #include <sys/types.h>
 #include <unistd.h>
