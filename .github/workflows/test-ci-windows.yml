@@ -175,6 +175,23 @@ jobs:
         name: modsecurityiis-installers-${{ matrix.config }}
         path: ${{ github.workspace }}/
 
+    - name: Install VC++ 2019 Redistributables (Prerequisites)
+      shell: pwsh
+      run: |
+        Write-Host "Installing Visual C++ 2019 Redistributable (x64)..."
+        $vc_x64_url = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+        $vc_x64_installer = "${{ github.workspace }}\vc_redist.x64.exe"
+        Invoke-WebRequest -Uri $vc_x64_url -OutFile $vc_x64_installer
+        Start-Process -FilePath $vc_x64_installer -ArgumentList "/install", "/quiet", "/norestart" -Wait
+
+        Write-Host "Installing Visual C++ 2019 Redistributable (x86)..."
+        $vc_x86_url = "https://aka.ms/vs/17/release/vc_redist.x86.exe"
+        $vc_x86_installer = "${{ github.workspace }}\vc_redist.x86.exe"
+        Invoke-WebRequest -Uri $vc_x86_url -OutFile $vc_x86_installer
+        Start-Process -FilePath $vc_x86_installer -ArgumentList "/install", "/quiet", "/norestart" -Wait
+
+        Write-Host "VC++ 2019 Redistributables installed successfully"
+
     - name: Install MSI
       shell: pwsh
       run: |
@@ -183,7 +200,7 @@ jobs:
           Write-Error "MSI file not found at $msiPath"
           exit 1
         }
-        
+
         # Install with logging for debugging
         $installLog = "${{ github.workspace }}\install.log"
         $installResult = Start-Process -FilePath "msiexec.exe" -ArgumentList @(
@@ -192,7 +209,7 @@ jobs:
           "/norestart",
           "/l*", "`"$installLog`""
         ) -Wait -PassThru
-        
+
         if ($installResult.ExitCode -ne 0) {
           Write-Error "MSI installation failed with exit code $($installResult.ExitCode)"
           Get-Content $installLog | Write-Host
