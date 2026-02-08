@@ -307,7 +307,7 @@ jobs:
       shell: pwsh
       run: |
         $crsVersion = "4.23.0"
-        $crsUrl = "https://github.com/coreruleset/coreruleset/releases/download/v$crsVersion/coreruleset-$crsVersion-minimal.tar.gz"
+        $crsUrl = "https://github.com/coreruleset/coreruleset/releases/download/v$crsVersion/coreruleset-$crsVersion.tar.gz"
         $crsDir = 'C:\Program Files\ModSecurity IIS\coreruleset'
         $modSecurityConfigDir = 'C:\Program Files\ModSecurity IIS'
 
