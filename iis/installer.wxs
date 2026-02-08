@@ -115,7 +115,7 @@
         <!-- Define MSI properties, enable real administrator detection for MSI, and disable repair and modify options in "Programs and Features" -->
         <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
         <!-- Define installation conditions -->
-        <Condition Message="This setup requires IIS 7.0, 8.0 or 10.0. If that's the case, please ensure that the installer is running as administrator or try running it from the 'Apps and features' or 'Add/Remove Programs' menu"><![CDATA[(IIS="#7") OR (IIS="#8") OR (IIS="#10")]]></Condition>
+        <Condition Message="This setup requires IIS 7.0 or later. If that's the case, please ensure that the installer is running as administrator or try running it from the 'Apps and features' or 'Add/Remove Programs' menu"><![CDATA[(IIS="#7") OR (IIS="#8") OR (IIS="#10") OR (IIS="#11")]]></Condition>
         <!-- Check for required Visual C++ 2019 Redistributables -->
         <?if $(var.Win64) = "yes" ?>
         <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x64). Please download and install from: https://aka.ms/vs/17/release/vc_redist.x64.exe">
