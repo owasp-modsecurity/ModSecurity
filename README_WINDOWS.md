@@ -20,10 +20,10 @@ Microsoft Visual Studio C++ | Visual Studio 2019 (aka VS16) |
 
 ## Before building
 
-The directory where you build software from source ( ``C:\work`` in this exmaple)
-must contain the Apache source you used to build the Apache web serverand the mod_security source
+The directory where you build software from source ( ``C:\work`` in this example)
+must contain the Apache source you used to build the Apache web server and the mod_security source
 
-    Apache source is in             C:\work\httpd-2.4.27    in this example.
+    Apache source is in             C:\work\httpd-2.4.66    in this example.
     Apache has been installed to    C:\Apache2466           in this example.
     Mod_security source is in       C:\work\mod_security    in this example.
 
@@ -53,7 +53,7 @@ must contain the Apache source you used to build the Apache web serverand the mo
 3. Set an environment variable to the Apache source code directory:
 
 ```
-    SET HTTPD_BUILD=C:\work\httpd-2.4.27
+    SET HTTPD_BUILD=C:\work\httpd-2.4.66
 ```
 
 ### Optional:
@@ -180,7 +180,7 @@ Create a new command file ``C:\Apache2466\bin\mlogc.bat`` with one line:
 Create a new configuration file ``C:\Apache2466\conf\mlogc.conf`` to control the piped-logging program ``mlogc.exe``.
 Here is an example ``conf\mlogc.conf``:
 
-    CollectorRoot       "C:/Apache2427/logs"
+    CollectorRoot       "C:/Apache2466/logs"
     ConsoleURI          "https://localhost:8888/rpc/auditLogReceiver"
     SensorUsername      "test"
     SensorPassword      "testtest"
@@ -200,4 +200,4 @@ Here is an example ``conf\mlogc.conf``:
 
 Change the SecAuditLog directive in ``conf\httpd.conf`` to pipe the log data to mlogc instead of writing them to a file:
 
-    SecAuditLog |C:/Apache2427/bin/mlogc.bat
+    SecAuditLog |C:/Apache2466/bin/mlogc.bat
