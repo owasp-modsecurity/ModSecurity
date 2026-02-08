@@ -80,31 +80,31 @@
             <DirectorySearch Id="CheckFileDir10" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile10" Name="ModSecurityIIS.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir11" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir11" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile11" Name="libapr-1.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir12" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir12" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile12" Name="libapriconv-1.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir13" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir13" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile13" Name="libaprutil-1.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir14" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir14" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile14" Name="libcurl.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir15" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir15" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile15" Name="libxml2.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir16" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir16" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile16" Name="lua54.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir17" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir17" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile17" Name="pcre2-8.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir18" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir18" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile18" Name="zlib1.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir19" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir19" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile19" Name="fuzzy.dll" />
             </DirectorySearch>
         </Property>

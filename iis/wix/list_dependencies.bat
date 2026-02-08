@@ -32,7 +32,7 @@ if %errorlevel% equ 0 (
 )
 
 REM Check for Visual C++ 2019 Redistributable (x86)
-reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" /v Installed 2>nul | find "0x1" >nul
+reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" /v Installed /reg:32 2>nul | find "0x1" >nul
 if %errorlevel% equ 0 (
     echo [OK] Visual C++ 2019 Redistributable ^(x86^) is installed
 ) else (
@@ -64,7 +64,7 @@ if %errorlevel% equ 0 (
     echo          Download from: https://aka.ms/vs/17/release/vc_redist.x64.exe >> "%log_file%"
 )
 
-reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" /v Installed 2>nul | find "0x1" >nul
+reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" /v Installed /reg:32 2>nul | find "0x1" >nul
 if %errorlevel% equ 0 (
     echo [OK] Visual C++ 2019 Redistributable (x86) is installed >> "%log_file%"
 ) else (
@@ -125,11 +125,11 @@ if "%DUMPBIN_X86:~1,-1%" == "" (
 	echo Using dumpbin x86: %DUMPBIN_X86%
 	echo Using dumpbin x86: %DUMPBIN_X86% >> %log_file%
 	echo. >> %log_file%
-	if exist "%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll" (
+	if exist "%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll" (
 		echo ================================================ >> %log_file%
 		echo 32-bit ModSecurityIIS.dll dependencies: >> %log_file%
 		echo ================================================ >> %log_file%
-		%DUMPBIN_X86% /imports /dependents "%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll" >> %log_file% 2>&1
+		%DUMPBIN_X86% /imports /dependents "%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll" >> %log_file% 2>&1
 	)
 	if not "%*" == "" (
 		echo. >> %log_file%
@@ -150,11 +150,11 @@ if "%DUMPBIN_X64:~1,-1%" == "" (
 	echo Using dumpbin x64: %DUMPBIN_X64%
 	echo Using dumpbin x64: %DUMPBIN_X64% >> %log_file%
 	echo. >> %log_file%
-	if exist "%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll" (
+	if exist "%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll" (
 		echo ================================================ >> %log_file%
 		echo 64-bit ModSecurityIIS.dll dependencies: >> %log_file%
 		echo ================================================ >> %log_file%
-		%DUMPBIN_X64% /imports /dependents "%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll" >> %log_file% 2>&1
+		%DUMPBIN_X64% /imports /dependents "%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll" >> %log_file% 2>&1
 	)
 	if not "%*" == "" (
 		echo. >> %log_file%
