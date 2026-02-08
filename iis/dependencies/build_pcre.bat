@@ -23,7 +23,7 @@ copy /y "%WORK_DIR%\pcre2\pcre2-8.lib" "%OUTPUT_DIR%"
 @if not exist "%WORK_DIR%\pcre2\include" mkdir "%WORK_DIR%\pcre2\include"
 xcopy /y "%WORK_DIR%\pcre2\src\pcre2*.h" "%WORK_DIR%\pcre2\include\" >nul 2>&1
 copy /y "%WORK_DIR%\pcre2\pcre2.h" "%WORK_DIR%\pcre2\include\" >nul 2>&1
-echo "a"
+@echo PCRE2 build and deployment completed successfully.
 @exit /B 0
 
 :file_not_found_bin

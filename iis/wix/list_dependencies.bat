@@ -46,30 +46,30 @@ pause
 :LOOP_FILE
 SET /a log_file=%RANDOM%+100000
 SET log_file=%TEMP%\ModSecurityIIS-dependencies-%log_file:~-5%.TXT
-IF EXIST %log_file% GOTO LOOP_FILE
+IF EXIST "%log_file%" GOTO LOOP_FILE
 
 echo Saving logs at: %log_file%
 echo.
 
 REM Log prerequisite checks to file
-echo ================================================ >> %log_file%
-echo Visual C++ 2019 Redistributable Check >> %log_file%
-echo ================================================ >> %log_file%
+echo ================================================ >> "%log_file%"
+echo Visual C++ 2019 Redistributable Check >> "%log_file%"
+echo ================================================ >> "%log_file%"
 
 reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" /v Installed 2>nul | find "0x1" >nul
 if %errorlevel% equ 0 (
-    echo [OK] Visual C++ 2019 Redistributable (x64) is installed >> %log_file%
+    echo [OK] Visual C++ 2019 Redistributable (x64) is installed >> "%log_file%"
 ) else (
-    echo [MISSING] Visual C++ 2019 Redistributable (x64) is NOT installed >> %log_file%
-    echo          Download from: https://aka.ms/vs/17/release/vc_redist.x64.exe >> %log_file%
+    echo [MISSING] Visual C++ 2019 Redistributable (x64) is NOT installed >> "%log_file%"
+    echo          Download from: https://aka.ms/vs/17/release/vc_redist.x64.exe >> "%log_file%"
 )
 
 reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" /v Installed 2>nul | find "0x1" >nul
 if %errorlevel% equ 0 (
-    echo [OK] Visual C++ 2019 Redistributable (x86) is installed >> %log_file%
+    echo [OK] Visual C++ 2019 Redistributable (x86) is installed >> "%log_file%"
 ) else (
-    echo [MISSING] Visual C++ 2019 Redistributable (x86) is NOT installed >> %log_file%
-    echo          Download from: https://aka.ms/vs/17/release/vc_redist.x86.exe >> %log_file%
+    echo [MISSING] Visual C++ 2019 Redistributable (x86) is NOT installed >> "%log_file%"
+    echo          Download from: https://aka.ms/vs/17/release/vc_redist.x86.exe >> "%log_file%"
 )
 echo. >> %log_file%
 

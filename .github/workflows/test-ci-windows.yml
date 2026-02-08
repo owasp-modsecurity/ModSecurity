@@ -243,7 +243,7 @@ jobs:
 
         # Check VC++ redistributables
         $vc142x64 = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" -Name "Installed" -ErrorAction SilentlyContinue).Installed
-        $vc142x86 = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" -Name "Installed" -ErrorAction SilentlyContinue).Installed
+        $vc142x86 = (Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" -Name "Installed" -ErrorAction SilentlyContinue).Installed
         Write-Host "VC++ 2019 x64 installed: $vc142x64"
         Write-Host "VC++ 2019 x86 installed: $vc142x86"
 

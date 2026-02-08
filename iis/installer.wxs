@@ -122,7 +122,7 @@
             <![CDATA[Installed OR VC142X64INSTALLED]]>
         </Condition>
         <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x86) for 32-bit support. Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe">
-            <![CDATA[Installed OR VC142X86INSTALLED]]>
+            <![CDATA[Installed OR (&ModSec32 <> 3) OR VC142X86INSTALLED]]>
         </Condition>
         <?else?>
         <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x86). Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe">
