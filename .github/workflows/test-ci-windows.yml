@@ -307,9 +307,9 @@ jobs:
       shell: pwsh
       run: |
         $crsVersion = "4.23.0"
-        $crsUrl = "https://github.com/coreruleset/coreruleset/releases/download/v$crsVersion/coreruleset-$crsVersion-minimal.tar.gz
-        $crsDir = "C:\Program Files\ModSecurity IIS\coreruleset"
-        $modSecurityConfigDir = "C:\Program Files\ModSecurity IIS"
+        $crsUrl = "https://github.com/coreruleset/coreruleset/releases/download/v$crsVersion/coreruleset-$crsVersion-minimal.tar.gz"
+        $crsDir = 'C:\Program Files\ModSecurity IIS\coreruleset'
+        $modSecurityConfigDir = 'C:\Program Files\ModSecurity IIS'
 
         try {
           New-Item -ItemType Directory -Path $crsDir -Force
@@ -320,7 +320,7 @@ jobs:
               $newName = $_.Name.Replace(".example", "")
               Rename-Item -Path $_.FullName -NewName $newName
           }
-          
+
           $modSecurityConfigFile = "$modSecurityConfigDir\modsecurity_iis.conf"
 
           $crsRules = @(
@@ -333,7 +333,7 @@ jobs:
 
           Add-Content -Path $modSecurityConfigFile -Value $crsRules
 
-          (Get-Content -Path $modSecurityConfigDir\modsecurity.conf) -replace 'SecRuleEngine DetectionOnly', 'SecRuleEngine On' | Set-Content -Path $modSecurityConfigDir\modsecurity.conf
+          (Get-Content -Path "$modSecurityConfigDir\modsecurity.conf") -replace 'SecRuleEngine DetectionOnly', 'SecRuleEngine On' | Set-Content -Path "$modSecurityConfigDir\modsecurity.conf"
 
         }
         catch {
