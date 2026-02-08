@@ -178,43 +178,115 @@ jobs:
     - name: Install VC++ 2019 Redistributables (Prerequisites)
       shell: pwsh
       run: |
-        Write-Host "Installing Visual C++ 2019 Redistributable (x64)..."
+        Write-Host "=== Checking Pre-Existing VC++ Installations ==="
+        Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*", "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
+          Where-Object { $_.DisplayName -like "*Visual C++*" -or $_.DisplayName -like "*Microsoft Visual Studio*Runtime*" } |
+          Select-Object DisplayName, DisplayVersion, PSChildName |
+          Format-Table -AutoSize
+
+        Write-Host "`n=== Installing Visual C++ 2019 Redistributable (x64) ==="
         $vc_x64_url = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
         $vc_x64_installer = "${{ github.workspace }}\vc_redist.x64.exe"
         Invoke-WebRequest -Uri $vc_x64_url -OutFile $vc_x64_installer
-        Start-Process -FilePath $vc_x64_installer -ArgumentList "/install", "/quiet", "/norestart" -Wait
+        $x64Process = Start-Process -FilePath $vc_x64_installer -ArgumentList "/install", "/quiet", "/norestart" -Wait -PassThru
+        Write-Host "VC++ x64 installer exit code: $($x64Process.ExitCode)"
+        # Exit codes: 0 = success, 1638 = already installed (newer version), 3010 = success (reboot required)
+        if ($x64Process.ExitCode -notin @(0, 1638, 3010)) {
+          Write-Error "VC++ x64 installation failed with exit code $($x64Process.ExitCode)"
+          exit 1
+        }
 
-        Write-Host "Installing Visual C++ 2019 Redistributable (x86)..."
+        Write-Host "`n=== Installing Visual C++ 2019 Redistributable (x86) ==="
         $vc_x86_url = "https://aka.ms/vs/17/release/vc_redist.x86.exe"
         $vc_x86_installer = "${{ github.workspace }}\vc_redist.x86.exe"
         Invoke-WebRequest -Uri $vc_x86_url -OutFile $vc_x86_installer
-        Start-Process -FilePath $vc_x86_installer -ArgumentList "/install", "/quiet", "/norestart" -Wait
+        $x86Process = Start-Process -FilePath $vc_x86_installer -ArgumentList "/install", "/quiet", "/norestart" -Wait -PassThru
+        Write-Host "VC++ x86 installer exit code: $($x86Process.ExitCode)"
+        # Exit codes: 0 = success, 1638 = already installed (newer version), 3010 = success (reboot required)
+        if ($x86Process.ExitCode -notin @(0, 1638, 3010)) {
+          Write-Error "VC++ x86 installation failed with exit code $($x86Process.ExitCode)"
+          exit 1
+        }
 
         Write-Host "VC++ 2019 Redistributables installed successfully"
+
+        # Verify installations
+        Write-Host "`nVerifying VC++ installations in registry..."
+        $vc142x64 = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" -Name "Installed" -ErrorAction SilentlyContinue).Installed
+        $vc142x86 = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" -Name "Installed" -ErrorAction SilentlyContinue).Installed
+        Write-Host "VC++ 2019 x64 in registry: $vc142x64"
+        Write-Host "VC++ 2019 x86 in registry: $vc142x86"
+
+        if (-not $vc142x64 -or -not $vc142x86) {
+          Write-Error "VC++ redistributables not properly registered. x64=$vc142x64, x86=$vc142x86"
+          exit 1
+        }
 
     - name: Install MSI
       shell: pwsh
       run: |
+        Write-Host "=== Pre-Installation Debug Info ==="
+
+        # Check MSI file
         $msiPath = "${{ github.workspace }}\modsecurityiis.msi"
         if (-not (Test-Path $msiPath)) {
           Write-Error "MSI file not found at $msiPath"
           exit 1
         }
+        Write-Host "MSI file found: $msiPath"
+        Write-Host "MSI file size: $((Get-Item $msiPath).Length) bytes"
 
-        # Install with logging for debugging
+        # Check IIS version
+        $iisVersion = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\InetStp" -Name "MajorVersion" -ErrorAction SilentlyContinue).MajorVersion
+        Write-Host "IIS Version: $iisVersion"
+
+        # Check VC++ redistributables
+        $vc142x64 = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" -Name "Installed" -ErrorAction SilentlyContinue).Installed
+        $vc142x86 = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" -Name "Installed" -ErrorAction SilentlyContinue).Installed
+        Write-Host "VC++ 2019 x64 installed: $vc142x64"
+        Write-Host "VC++ 2019 x86 installed: $vc142x86"
+
+        Write-Host "`n=== Starting MSI Installation ==="
+
+        # Install with verbose logging
         $installLog = "${{ github.workspace }}\install.log"
         $installResult = Start-Process -FilePath "msiexec.exe" -ArgumentList @(
           "/i", "`"$msiPath`"",
           "/qn",
           "/norestart",
-          "/l*", "`"$installLog`""
+          "/l*vx", "`"$installLog`""
         ) -Wait -PassThru
 
+        Write-Host "Installation process completed with exit code: $($installResult.ExitCode)"
+
+        # Check if log file was created
+        if (Test-Path $installLog) {
+          $logSize = (Get-Item $installLog).Length
+          Write-Host "Install log created: $installLog ($logSize bytes)"
+
+          Write-Host "`n=== Installation Log Contents ==="
+          if ($logSize -gt 0) {
+            Get-Content $installLog -Raw | Write-Host
+          } else {
+            Write-Host "WARNING: Log file is empty!"
+          }
+        } else {
+          Write-Host "WARNING: Install log was not created at $installLog"
+        }
+
         if ($installResult.ExitCode -ne 0) {
+          Write-Host "`n=== Installation Failed ==="
+          Write-Host "Exit code: $($installResult.ExitCode)"
+          Write-Host "Common MSI error codes:"
+          Write-Host "  1603 - Fatal error during installation"
+          Write-Host "  1619 - Package could not be opened"
+          Write-Host "  1620 - Package could not be opened (corrupt)"
+          Write-Host "  1633 - Platform not supported"
           Write-Error "MSI installation failed with exit code $($installResult.ExitCode)"
-          Get-Content $installLog | Write-Host
           exit 1
         }
+
+        Write-Host "`n=== Installation Successful ==="
         
         $installDir = "C:\Program Files\ModSecurity IIS"
         $requiredFiles = @(
