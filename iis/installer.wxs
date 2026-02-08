@@ -201,7 +201,7 @@
                 <util:XmlConfig Id="appHostEntryAllowDefinition" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="allowDefinition" Value="Everywhere" Sequence="4" />
                 <util:XmlConfig Id="removeAppHostEntry" File="$(var.ConfigFile)" Action="delete" ElementPath="/configuration/configSections/sectionGroup[\[]@name='system.webServer'[\]]" Node="element" VerifyPath="section[\[]@name='ModSecurity'[\]]" On="uninstall" Sequence="1" />
                 <util:XmlConfig Id="removeAppHostEntry2" File="$(var.ConfigFile)" Action="delete" ElementPath="/configuration/system.webServer" Node="element" VerifyPath="/configuration/system.webServer/ModSecurity" Name="section" On="uninstall" Sequence="2" />
-                <RegistryKey Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity" Action="createAndRemoveOnUninstall">
+                <RegistryKey Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity">
                     <RegistryValue Type="string" Name="ModSecurityConfigureIIS" Value="[IIS_SETUP]" KeyPath="yes" />
                 </RegistryKey>
             </Component>
