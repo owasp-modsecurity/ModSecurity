@@ -230,11 +230,11 @@ jobs:
           }
         }
 
-    - name: Install OWASP Core Rules
+    - name: Install OWASP CRS
       shell: pwsh
       run: |
-        $crsVersion = "v4.18.0"
-        $crsUrl = "https://github.com/coreruleset/coreruleset/archive/refs/tags/$crsVersion.tar.gz"
+        $crsVersion = "4.23.0"
+        $crsUrl = "https://github.com/coreruleset/coreruleset/releases/download/v$crsVersion/coreruleset-$crsVersion-minimal.tar.gz
         $crsDir = "C:\Program Files\ModSecurity IIS\coreruleset"
         $modSecurityConfigDir = "C:\Program Files\ModSecurity IIS"
 
