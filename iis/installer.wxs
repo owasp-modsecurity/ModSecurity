@@ -39,7 +39,7 @@
         <Property Id="VC142X86INSTALLED">
             <RegistrySearch Id="FindVC142X86" Root="HKLM"
                 Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86"
-                Name="Installed" Type="raw" Win64="yes" />
+                Name="Installed" Type="raw" Win64="no" />
         </Property>
         <?else?>
         <Property Id="VC142X86INSTALLED">
