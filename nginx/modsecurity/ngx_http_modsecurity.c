@@ -81,7 +81,7 @@ static ngx_command_t  ngx_http_modsecurity_commands[] =  {
         |NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
     ngx_http_modsecurity_enable,
     NGX_HTTP_LOC_CONF_OFFSET,
-    offsetof(ngx_http_modsecurity_loc_conf_t, enable),
+    offsetof(ngx_http_modsecurity_loc_conf_t, enable),  // cppcheck-suppress syntaxError
     NULL },
   ngx_null_command
 };
@@ -210,9 +210,9 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     size_t                       root;
     ngx_str_t                    path;
     ngx_uint_t                   port;
-    struct sockaddr_in          *sin;
+    const struct sockaddr_in    *sin;
 #if (NGX_HAVE_INET6)
-    struct sockaddr_in6         *sin6;
+    const struct sockaddr_in6   *sin6;
 #endif
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
@@ -616,11 +616,9 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
     ngx_http_modsecurity_ctx_t  *ctx;
     char                        *data;
     request_rec                 *req;
-    ngx_http_variable_value_t   *vv;
-    ngx_list_part_t             *part;
+    const ngx_list_part_t       *part;
     ngx_table_elt_t             *h;
     ngx_uint_t                   i;
-    char                        *key, *value;
     u_char                      *buf = NULL;
     size_t                       size = 0;
 
@@ -651,11 +649,11 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
             return NGX_ERROR;
         }
 
-        key = (char *)buf;
+        char *key = (char *)buf;
         buf = ngx_cpymem(buf, h[i].key.data, h[i].key.len);
         *buf++ = '\0';
 
-        value = (char *)buf;
+        char *value = (char *)buf;
         buf = ngx_cpymem(buf, h[i].value.data, h[i].value.len);
         *buf++ = '\0';
 
@@ -668,7 +666,7 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
 
     for (i = 0; special_headers_out[i].name; i++) {
 
-        vv = ngx_http_get_variable(r, &special_headers_out[i].variable_name,
+        ngx_http_variable_value_t   *vv = ngx_http_get_variable(r, &special_headers_out[i].variable_name,
                                    ngx_hash_key(special_headers_out[i].variable_name.data,
                                                 special_headers_out[i].variable_name.len));
 
@@ -892,7 +890,7 @@ modsec_pcre_malloc(size_t size)
 }
 
 static void
-modsec_pcre_free(void *ptr)
+modsec_pcre_free(const void *ptr)
 {
 }
 
@@ -928,7 +926,7 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 
 
 static void
-ngx_http_modsecurity_terminate(ngx_cycle_t *cycle)
+ngx_http_modsecurity_terminate(const ngx_cycle_t *cycle)
 {
     if (modsec_server) {
         modsecTerminate();
@@ -981,7 +979,7 @@ ngx_http_modsecurity_init_process(ngx_cycle_t *cycle)
 static ngx_int_t
 ngx_http_modsecurity_handler(ngx_http_request_t *r)
 {
-    ngx_http_modsecurity_loc_conf_t *cf;
+    const ngx_http_modsecurity_loc_conf_t *cf;
     ngx_http_modsecurity_ctx_t      *ctx;
     ngx_int_t                        rc;
 
@@ -1089,11 +1087,9 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
 
 static ngx_int_t
 ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
-    ngx_http_modsecurity_loc_conf_t *cf;
+    const ngx_http_modsecurity_loc_conf_t *cf;
     ngx_http_modsecurity_ctx_t      *ctx;
-    const char                      *location;
-    ngx_table_elt_t                 *h;
-
+    
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
@@ -1103,13 +1099,13 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
                && r->err_status < 308) {
 
         /* 3XX load redirect location header so that we can do redirect in phase 3,4 */
-        location = apr_table_get(ctx->req->headers_out, "Location");
+        const char *location = apr_table_get(ctx->req->headers_out, "Location");
 
         if (location == NULL) {
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        h = ngx_list_push(&r->headers_out.headers);
+        ngx_table_elt_t *h = ngx_list_push(&r->headers_out.headers);
         if (h == NULL) {
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -1137,12 +1133,12 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
 static ngx_int_t
 ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
-    ngx_http_modsecurity_loc_conf_t *cf;
-    ngx_http_modsecurity_ctx_t      *ctx;
-    ngx_int_t                        rc;
-    apr_off_t                        content_length;
-    ngx_chain_t                     *cl, *out;
-    ngx_int_t                        last_buf = 0;
+    const ngx_http_modsecurity_loc_conf_t   *cf;
+    ngx_http_modsecurity_ctx_t              *ctx;
+    ngx_int_t                                rc;
+    apr_off_t                                content_length;
+    ngx_chain_t                             *cl, *out;
+    ngx_int_t                                last_buf = 0;
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
