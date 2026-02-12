@@ -1,5 +1,6 @@
 # ModSecurity configure.ac
 
+AC_PREREQ([2.72])
 
 # Get the hash of the last commit, to be used if it is not an
 # official release.
@@ -48,7 +49,14 @@ AM_INIT_AUTOMAKE([-Wall foreign subdir-objects])
 # Check for dependencies (C++, AR, Lex, Yacc and Make)
 AC_PROG_CXX
 AM_PROG_AR
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+AC_PROG_MKDIR_P
 PKG_PROG_PKG_CONFIG
 
 
@@ -111,7 +119,6 @@ PROG_GEOIP
 # Check for MaxMind
 PROG_MAXMIND
 
-
 # Check for LMDB
 PROG_LMDB
 
@@ -155,7 +162,34 @@ fi
 AC_CHECK_HEADERS([string])
 AC_CHECK_HEADERS([iostream])
 AC_CHECK_HEADERS([sys/utsname.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h libintl.h malloc.h netdb.h netinet/in.h stdint.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h])
 
+
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_CHECK_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
+AC_TYPE_INT8_T
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
+AC_TYPE_UINT8_T
+AC_CHECK_TYPES([ptrdiff_t])
+AC_CHECK_TYPES([time_t])
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_FUNC_FORK
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([alarm clock_gettime gethostname gettimeofday inet_ntoa localtime_r memmove memset mkdir select setenv socket strcasecmp strchr strdup strerror strncasecmp strspn strstr strtol strtoul strtoull uname])
 
 # Initialize libtool
 LT_INIT
@@ -241,73 +275,17 @@ AC_SUBST([MSC_VERSION])
 MSC_GIT_VERSION=msc_version_git
 AC_SUBST([MSC_GIT_VERSION])
 
-AC_ARG_ENABLE(assertions,
-    [AS_HELP_STRING([--enable-assertions],[Turn on assertions feature: undefine NDEBUG])],
-
-    [case "${enableval}" in
-        yes) assertions=true ;;
-        no)  assertions=false ;;
-        *) AC_MSG_ERROR(bad value ${enableval} for --enable-assertions) ;;
-        esac],
-
-        [assertions=false]
-        )
-
-AC_ARG_ENABLE(debug-logs,
-    [AS_HELP_STRING([--disable-debug-logs],[Turn off the SecDebugLog feature])],
-
-    [case "${enableval}" in
-        yes) debugLogs=true ;;
-        no)  debugLogs=false ;;
-        *) AC_MSG_ERROR(bad value ${enableval} for --enable-debug-logs) ;;
-    esac],
-
-    [debugLogs=true]
-    )
+MSC_ARG_ENABLE_BOOL([assertions], [Turn on assertions feature: undefine NDEBUG], [false], [assertions])
+MSC_ARG_ENABLE_BOOL([debug-logs], [Turn off the SecDebugLog feature], [true], [debugLogs])
 if test "$debugLogs" != "true"; then
     MODSEC_NO_LOGS="-DNO_LOGS=1"
     AC_SUBST(MODSEC_NO_LOGS)
 fi
 
-
-# Fuzzer
-AC_ARG_ENABLE(afl-fuzz,
-    [AS_HELP_STRING([--enable-afl-fuzz],[Turn on the afl fuzzer compilation utilities])],
-
-    [case "${enableval}" in
-        yes) aflFuzzer=true ;;
-        no)  aflFuzzer=false ;;
-        *) AC_MSG_ERROR(bad value ${enableval} for --enable-afl-fuzz) ;;
-    esac],
-
-    [aflFuzzer=false]
-    )
-
-# Examples
-AC_ARG_ENABLE(examples,
-    [AS_HELP_STRING([--enable-examples],[Turn on the examples compilation (default option)])],
-
-    [case "${enableval}" in
-        yes) buildExamples=true ;;
-        no)  buildExamples=false ;;
-        *) AC_MSG_ERROR(bad value ${enableval} for --enable-examples) ;;
-    esac],
-
-    [buildExamples=true]
-    )
-
-# Parser
-AC_ARG_ENABLE(parser-generation,
-    [AS_HELP_STRING([--enable-parser-generation],[Enables parser generation during the build])],
-
-    [case "${enableval}" in
-        yes) buildParser=true ;;
-        no)  buildParser=false ;;
-        *) AC_MSG_ERROR(bad value ${enableval} for --enable-parser-generation) ;;
-    esac],
-
-    [buildParser=false]
-    )
+MSC_ARG_ENABLE_BOOL([afl-fuzz], [Turn on the afl fuzzer compilation utilities], [false], [aflFuzzer])
+MSC_ARG_ENABLE_BOOL([examples], [Turn on the examples compilation (default option)], [true], [buildExamples])
+MSC_ARG_ENABLE_BOOL([parser-generation], [Enables parser generation during the build], [false], [buildParser])
+MSC_ARG_ENABLE_BOOL([mutex-on-pm], [Treat pm operations as critical section], [false], [mutexPm])
 
 
 if test $buildParser = true; then
@@ -453,12 +431,12 @@ echo " Optional dependencies"
 
 
 
-## GeoIP - MaxMind
+## GeoIP - MaxMind (combined display)
 if test "x$GEOIP_FOUND" = "x0" && test "x$MAXMIND_FOUND" = "x0"; then
     echo "   + GeoIP/MaxMind                                 ....not found"
 fi
 if test "x$GEOIP_FOUND" = "x1" || test "x$MAXMIND_FOUND" = "x1"; then
-    AS_ECHO_N("   + GeoIP/MaxMind                                 ....found ")
+    AS_ECHO_N(["   + GeoIP/MaxMind                                 ....found "])
     echo ""
     if test "x$MAXMIND_FOUND" = "x1"; then
         echo "      * (MaxMind) v${MAXMIND_VERSION}"
@@ -473,141 +451,25 @@ if test "x$GEOIP_FOUND" = "x2" && test "x$MAXMIND_FOUND" = "x2"; then
     echo "   + GeoIP/MaxMind                                 ....disabled"
 fi
 
+MSC_STATUS_LIB([LibCURL                                      ], [CURL])
+MSC_STATUS_LIB([YAJL                                         ], [YAJL])
+MSC_STATUS_LIB([LMDB                                         ], [LMDB])
+MSC_STATUS_LIB([LibXML2                                      ], [LIBXML2])
+MSC_STATUS_LIB([SSDEEP                                       ], [SSDEEP])
+MSC_STATUS_LIB([LUA                                          ], [LUA])
 
-## LibCurl
-if test "x$CURL_FOUND" = "x0"; then
-    echo "   + LibCURL                                       ....not found"
-fi
-if test "x$CURL_FOUND" = "x1"; then
-    AS_ECHO_N("   + LibCURL                                       ....found ")
-    if ! test "x$CURL_VERSION" = "x"; then
-        echo "v${CURL_VERSION}"
+## PCRE (only shown when explicitly requested)
+if test "x${with_pcre}" != "x" && test "x${with_pcre}" != "xno"; then
+    if test -n "${PCRE_VERSION}"; then
+        echo "   + PCRE                                          ....found "
+        echo "     using pcre v${PCRE_VERSION}"
+        echo "      ${PCRE_LDADD}, ${PCRE_CFLAGS}"
     else
-        echo ""
+        AC_MSG_NOTICE([*** pcre library not found.])
     fi
-    echo "      ${CURL_DISPLAY}"
-fi
-if test "x$CURL_FOUND" = "x2"; then
-    echo "   + LibCURL                                       ....disabled"
 fi
 
-
-## YAJL
-if test "x$YAJL_FOUND" = "x0"; then
-    echo "   + YAJL                                          ....not found"
-fi
-if test "x$YAJL_FOUND" = "x1"; then
-    AS_ECHO_N("   + YAJL                                          ....found ")
-    if ! test "x$YAJL_VERSION" = "x"; then
-        echo "v${YAJL_VERSION}"
-    else
-        echo ""
-    fi
-    echo "      ${YAJL_DISPLAY}"
-fi
-if test "x$YAJL_FOUND" = "x2"; then
-    echo "   + YAJL                                          ....disabled"
-fi
-
-
-## LMDB
-if test "x$LMDB_FOUND" = "x0"; then
-    echo "   + LMDB                                          ....not found"
-fi
-if test "x$LMDB_FOUND" = "x1"; then
-    AS_ECHO_N("   + LMDB                                          ....found ")
-    if ! test "x$LMDB_VERSION" = "x"; then
-        echo "v${LMDB_VERSION}"
-    else
-        echo ""
-    fi
-    echo "      ${LMDB_DISPLAY}"
-fi
-if test "x$LMDB_FOUND" = "x2"; then
-    echo "   + LMDB                                          ....disabled"
-fi
-
-
-## libxml2
-if test "x$LIBXML2_FOUND" = "x0"; then
-    echo "   + LibXML2                                       ....not found"
-fi
-if test "x$LIBXML2_FOUND" = "x1"; then
-    AS_ECHO_N("   + LibXML2                                       ....found ")
-    if ! test "x$LIBXML2_VERSION" = "x"; then
-        echo "v${LIBXML2_VERSION}"
-    else
-        echo ""
-    fi
-    echo "      ${LIBXML2_DISPLAY}"
-fi
-if test "x$LIBXML2_FOUND" = "x2"; then
-    echo "   + LibXML2                                       ....disabled"
-fi
-
-
-## SSDEEP
-if test "x$SSDEEP_FOUND" = "x0"; then
-    echo "   + SSDEEP                                        ....not found"
-fi
-if test "x$SSDEEP_FOUND" = "x1"; then
-    AS_ECHO_N("   + SSDEEP                                        ....found ")
-    if ! test "x$SSDEEP_VERSION" = "x"; then
-        echo "v${SSDEEP_VERSION}"
-    else
-        echo ""
-    fi
-    echo "      ${SSDEEP_DISPLAY}"
-fi
-if test "x$SSDEEP_FOUND" = "x2"; then
-    echo "   + SSDEEP                                        ....disabled"
-fi
-
-## LUA
-if test "x$LUA_FOUND" = "x0"; then
-    echo "   + LUA                                           ....not found"
-fi
-if test "x$LUA_FOUND" = "x1"; then
-    AS_ECHO_N("   + LUA                                           ....found ")
-    if ! test "x$LUA_VERSION" = "x"; then
-        echo "v${LUA_VERSION}"
-    else
-        echo ""
-    fi
-    echo "      ${LUA_DISPLAY}"
-fi
-if test "x$LUA_FOUND" = "x2"; then
-    echo "   + LUA                                           ....disabled"
-fi
-
-##PCRE
-if test "x${with_pcre}" != "x" \
-   && test "x${with_pcre}" != "xno" \
-   && test "x${PCRE_VERSION}" == "x"; then
-    AC_MSG_NOTICE([*** pcre library not found.])
-else
-    echo "   + PCRE                                          ....found "
-    echo "     using pcre v${PCRE_VERSION}"
-    echo "      ${PCRE_LDADD}, ${PCRE_CFLAGS}"
-fi
-
-
-## PCRE2
-if test "x$PCRE2_FOUND" = "x0"; then
-    echo "   + PCRE2                                          ....not found"
-fi
-if test "x$PCRE2_FOUND" = "x1"; then
-    AS_ECHO_N("   + PCRE2                                          ....found ")
-    if ! test "x$PCRE2_VERSION" = "x"; then
-        echo "v${PCRE2_VERSION}"
-    else
-        echo ""
-    fi
-    echo "      ${PCRE2_DISPLAY}"
-fi
-if test "x$PCRE2_FOUND" = "x2"; then
-    echo "   + PCRE2                                          ....disabled"
-fi
+MSC_STATUS_LIB([PCRE2                                         ], [PCRE2])
 
 echo " "
 echo " Other Options"
