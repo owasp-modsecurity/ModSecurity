@@ -54,7 +54,6 @@ static apr_status_t nginx_bucket_read(apr_bucket *b, const char **str,
     apr_bucket_nginx *n = b->data;
     ngx_buf_t        *buf = n->buf;
     u_char           *data;
-    ssize_t           size;
 
     if (buf->pos == NULL && ngx_buf_size(buf) != 0) {
         data = apr_bucket_alloc(ngx_buf_size(buf), b->list);
@@ -62,7 +61,7 @@ static apr_status_t nginx_bucket_read(apr_bucket *b, const char **str,
             return APR_EGENERAL;
         }
 
-        size = ngx_read_file(buf->file, data, ngx_buf_size(buf), buf->file_pos);
+        ssize_t size = ngx_read_file(buf->file, data, ngx_buf_size(buf), buf->file_pos);
         if (size != ngx_buf_size(buf)) {
             apr_bucket_free(data);
             return APR_EGENERAL;
@@ -80,9 +79,9 @@ static apr_status_t nginx_bucket_read(apr_bucket *b, const char **str,
 static void nginx_bucket_destroy(void *data)
 {
     apr_bucket_nginx *n = data;
-    ngx_buf_t *buf = n->buf;
 
     if (apr_bucket_shared_destroy(n)) {
+        ngx_buf_t *buf = n->buf;
         if (!ngx_buf_in_memory(buf) && buf->pos != NULL) {
             apr_bucket_free(buf->pos);
             buf->pos = NULL;
@@ -92,8 +91,7 @@ static void nginx_bucket_destroy(void *data)
 }
 
 ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
-    ngx_buf_t         *buf, *b;
-    apr_bucket_nginx  *n;
+    ngx_buf_t         *buf;
     ngx_uint_t         len;
     u_char            *data;
 
@@ -102,8 +100,8 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
     }
 
     if (e->type == &apr_bucket_type_nginx) {
-        n = e->data;
-        b = n->buf;
+        apr_bucket_nginx *n = e->data;
+        ngx_buf_t *b = n->buf;
 
         /* whole buf */
         if (e->length == (apr_size_t)ngx_buf_size(b)) {
@@ -156,7 +154,6 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
 ngx_int_t
 move_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf) {
     apr_bucket         *e;
-    ngx_chain_t        *cl;
 
     while (chain) {
         e = ngx_buf_to_apr_bucket(chain->buf, bb->p, bb->bucket_alloc);
@@ -171,7 +168,7 @@ move_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *po
             chain->buf->last_buf = 0;
             return NGX_OK;
         }
-        cl = chain;
+        ngx_chain_t *cl = chain;
         chain = chain->next;
         ngx_free_chain(pool, cl);
     }

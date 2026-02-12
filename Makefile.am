@@ -58,7 +58,8 @@ cppcheck:
 	    --inconclusive \
 	    --template="warning: {file},{line},{severity},{id},{message}" \
 	    --error-exitcode=1 \
-	    standalone/
+		standalone/ \
+	    nginx/
 
 check-static: cppcheck
 
