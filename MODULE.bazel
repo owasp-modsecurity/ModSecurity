@@ -1,0 +1,7 @@
+module (
+  name = "modsecurity",
+  compatibility_level = 1,
+)
+
+bazel_dep(name = "rules_cc", version = "0.2.14")
+bazel_dep(name = "platforms", version = "1.0.0")

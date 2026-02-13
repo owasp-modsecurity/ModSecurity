@@ -1,0 +1,5 @@
+# Default options
+build --cxxopt='-std=c++17'
+build --host_cxxopt='-std=c++17'
+build --cxxopt='-O2'
+build --experimental_scale_timeouts=10.0

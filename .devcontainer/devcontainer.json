@@ -1,0 +1,17 @@
+{
+  "name": "libtraceable-dev",
+  "image": "ghcr.io/traceableai/native-build-images/ubuntu-20.04:0.1.98", 
+  "mounts": [
+      "source=${env:HOME}/.ssh,target=/home/builder/.ssh,type=bind,consistency=cached"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bazelbuild.vscode-bazel",
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack"   
+      ]
+    }
+  },
+  "remoteUser": "builder"
+}

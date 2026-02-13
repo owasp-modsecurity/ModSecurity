@@ -1,0 +1,16 @@
+cc_binary (
+    name = "main",
+    srcs = ["main.cc"],
+    deps = ["//:modsecurity", "@rules_cc//cc/runfiles"],
+    data = ["basic_rules.conf"],
+    linkopts = [
+        "-l:libpcre2-8.a",
+        "-ldl",
+        "-lstdc++fs",
+        "-lstdc++",
+        # "Ws2_32.lib",
+        # "Iphlpapi.lib",
+        # "pcre2-8-static.lib",
+        # "PocoFoundationmd.lib"
+    ]
+)

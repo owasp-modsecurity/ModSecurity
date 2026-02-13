@@ -1,0 +1,27 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+
+cc_library(
+    name = "modsecurity",
+    srcs = glob(
+        [
+            "src/**/*.h",
+            "src/**/*.hh",
+            "src/**/*.cc",
+        ],
+    ),
+    hdrs = glob([
+        "headers/**/*.h",
+    ]),
+    includes = ["headers", "others"],
+    strip_include_prefix = "headers",
+    linkopts = select({
+        "@platforms//os:linux": ["-lpthread"],
+        "@platforms//os:macos": ["-lpthread"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//others:mbedtls",
+        "//others:libinjection",
+    ],
+)

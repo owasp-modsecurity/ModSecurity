@@ -1,0 +1,32 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+
+cc_library(
+    name = "mbedtls",
+    srcs = glob(
+        [
+            "mbedtls/library/**/*.h",
+            "mbedtls/library/**/*.c",
+        ],
+    ),
+    hdrs = glob([
+        "mbedtls/include/**/*.h",
+    ]),
+    includes = ["mbedtls/include"],
+    strip_include_prefix = "mbedtls/include",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "libinjection",
+    srcs = glob(
+        [
+            "libinjection/src/**/*.h",
+            "libinjection/src/**/*.c",
+        ],
+    ),
+    hdrs = glob([
+        "libinjection/src/**/*.h",
+    ]),
+    visibility = ["//visibility:public"],
+    defines = ["LIBINJECTION_VERSION=2"],
+)
