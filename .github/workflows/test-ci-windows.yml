@@ -322,6 +322,7 @@ jobs:
           }
 
           $modSecurityConfigFile = "$modSecurityConfigDir\modsecurity_iis.conf"
+          $modsecConf = "$modSecurityConfigDir\modsecurity.conf"
 
           $crsRules = @(
             "Include coreruleset/crs-setup.conf",
@@ -333,8 +334,7 @@ jobs:
 
           Add-Content -Path $modSecurityConfigFile -Value $crsRules
 
-          (Get-Content -Path "$modSecurityConfigDir\modsecurity.conf") -replace 'SecRuleEngine DetectionOnly', 'SecRuleEngine On' | Set-Content -Path "$modSecurityConfigDir\modsecurity.conf"
-
+          (Get-Content -Path $modsecConf) -replace 'SecRuleEngine DetectionOnly', 'SecRuleEngine On' | Set-Content -Path $modsecConf
         }
         catch {
             Write-Error "Failed to install OWASP Core Rules: $($_.Exception.Message)"
