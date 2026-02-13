@@ -1,6 +1,6 @@
 # ModSecurity configure.ac
 
-AC_PREREQ([2.72])
+AC_PREREQ([2.69])
 
 # Get the hash of the last commit, to be used if it is not an
 # official release.
