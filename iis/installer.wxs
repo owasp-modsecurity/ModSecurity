@@ -381,7 +381,7 @@
             <Custom Action="Cleanup3" Before="Cleanup2"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="Cleanup4" Before="Cleanup3"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="Cleanup5" Before="Cleanup4"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
-            <Custom Action="CreateModSecurityDirs" After="Cleanup1"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
+            <Custom Action="CreateModSecurityDirs" After="InstallFiles"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <?if $(var.Win64) = "yes" ?>
             <Custom Action="InstallModule64" Before="InstallFinalize"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallModule32" After="InstallModule64"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
