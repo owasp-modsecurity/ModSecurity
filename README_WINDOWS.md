@@ -142,7 +142,7 @@ Add configuration directives to your Apache conf\httpd.conf:
         Include conf/owasp_crs/crs-setup.conf
         Include conf/owasp_crs/rules/*.conf
         SecAuditEngine RelevantOnly
-        SecAuditLogRelevantStatus "^(?:5|4\d[^4])"
+        SecAuditLogRelevantStatus "^(?:5|4(?!04))"
         SecAuditLogType Serial
         SecAuditLogParts ABCDEFGHZ
         SecAuditLog logs/modsecurity.log
@@ -171,7 +171,7 @@ Build the ``mlogc.exe`` program:
         CD  C:\work\mod_security_trunk\mlogc
         NMAKE -f Makefile.win
 
-Copy ``mlocg.exe`` to ``C:\Apache2466\bin\``
+Copy ``mlogc.exe`` to ``C:\Apache2466\bin\``
 
 Create a new command file ``C:\Apache2466\bin\mlogc.bat`` with one line:
 

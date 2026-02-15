@@ -265,17 +265,20 @@ jobs:
           $logSize = (Get-Item $installLog).Length
           Write-Host "Install log created: $installLog ($logSize bytes)"
 
-          Write-Host "`n=== Installation Log Contents ==="
-          if ($logSize -gt 0) {
-            Get-Content $installLog -Raw | Write-Host
-          } else {
-            Write-Host "WARNING: Log file is empty!"
-          }
         } else {
           Write-Host "WARNING: Install log was not created at $installLog"
         }
 
         if ($installResult.ExitCode -ne 0) {
+          Write-Host "`n=== Full Installation Log (installation failed) ==="
+          if (Test-Path $installLog) {
+            $logSize = (Get-Item $installLog).Length
+            if ($logSize -gt 0) {
+              Get-Content $installLog -Raw | Write-Host
+            } else {
+              Write-Host "WARNING: Log file is empty!"
+            }
+          }
           Write-Host "`n=== Installation Failed ==="
           Write-Host "Exit code: $($installResult.ExitCode)"
           Write-Host "Common MSI error codes:"

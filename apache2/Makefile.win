@@ -1,6 +1,6 @@
 ###########################################################################
 #
-# Usage:   NMAKE -f Makefile.win APACHE={httpd installion dir}  PCRE={pcre2 dir} LIBXML2={LibXML2 dir} [   LUA={Lua dir} ]
+# Usage:   NMAKE -f Makefile.win APACHE={httpd installation dir}  PCRE={pcre2 dir} LIBXML2={LibXML2 dir} [   LUA={Lua dir} ]
 # Note: ModSecurity v2 uses PCRE2 by default (not legacy PCRE). Set PCRE to your pcre2 build directory.
 #
 !IF "$(APACHE)" == "" || "$(PCRE)" == "" || "$(LIBXML2)" == "" || "$(CURL)" == ""

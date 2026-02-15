@@ -2,7 +2,7 @@
 
 cd "%WORK_DIR%"
 
-@if NOT EXIST "%SOURCE_DIR%\%APACHE_BIN%" goto file_not_found_bin
+@if NOT EXIST "%SOURCE_DIR%\%PCRE%" goto file_not_found_bin
 
 7z.exe x "%SOURCE_DIR%\%PCRE%"
 set PCRE_DIR=%PCRE:~0,-4%

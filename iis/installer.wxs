@@ -201,7 +201,7 @@
                 <util:XmlConfig Id="appHostEntryAllowDefinition" File="$(var.ConfigFile)" ElementPath="appHostEntry" Name="allowDefinition" Value="Everywhere" Sequence="4" />
                 <util:XmlConfig Id="removeAppHostEntry" File="$(var.ConfigFile)" Action="delete" ElementPath="/configuration/configSections/sectionGroup[\[]@name='system.webServer'[\]]" Node="element" VerifyPath="section[\[]@name='ModSecurity'[\]]" On="uninstall" Sequence="1" />
                 <util:XmlConfig Id="removeAppHostEntry2" File="$(var.ConfigFile)" Action="delete" ElementPath="/configuration/system.webServer" Node="element" VerifyPath="/configuration/system.webServer/ModSecurity" Name="section" On="uninstall" Sequence="2" />
-                <RegistryKey Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity">
+                <RegistryKey Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity" Action="createAndRemoveOnUninstall">
                     <RegistryValue Type="string" Name="ModSecurityConfigureIIS" Value="[IIS_SETUP]" KeyPath="yes" />
                 </RegistryKey>
             </Component>
@@ -412,7 +412,7 @@
         <CustomAction Id="Cleanup5" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurityIIS&quot;" />
         <?endif?>
         <!-- Create required directories for ModSecurity with proper permissions for IIS -->
-        <CustomAction Id="CreateModSecurityDirs" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="powershell.exe -NoProfile -ExecutionPolicy Bypass -Command &quot;New-Item -ItemType Directory -Path 'c:\inetpub\temp', 'c:\inetpub\logs' -Force | Out-Null; icacls 'c:\inetpub\temp' /grant 'IIS_IUSRS:(OI)(CI)M' /T /Q | Out-Null; icacls 'c:\inetpub\logs' /grant 'IIS_IUSRS:(OI)(CI)M' /T /Q | Out-Null&quot;" />
+        <CustomAction Id="CreateModSecurityDirs" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;New-Item -ItemType Directory -Path 'c:\inetpub\temp', 'c:\inetpub\logs' -Force | Out-Null; icacls 'c:\inetpub\temp' /grant 'IIS_IUSRS:(OI)(CI)M' /T /Q | Out-Null; icacls 'c:\inetpub\logs' /grant 'IIS_IUSRS:(OI)(CI)M' /T /Q | Out-Null&quot;" />
         <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (64bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness64&quot;" />
         <CustomAction Id="InstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness32&quot;" />
