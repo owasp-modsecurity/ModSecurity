@@ -1,106 +1,117 @@
 [
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecResponseBodyLimitAction Reject",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecResponseBodyLimitAction Reject",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"GET"
-    },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
-      },
-      "body":[
-        "no need.\n"
+      "uri": "/?key=value&key=other_value",
+      "method": "GET",
+      "body": [
+        ""
       ]
     },
-    "expected":{
-      "http_code":403
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
     },
-    "rules":[
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
       "SecRuleEngine On",
       "SecResponseBodyLimitAction Reject",
       "SecResponseBodyLimit 5"
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecResponseBodyLimitAction ProcessPartial",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecResponseBodyLimitAction ProcessPartial",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"GET"
-    },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
-      },
-      "body":[
-        "no need.\n"
+      "uri": "/?key=value&key=other_value",
+      "method": "GET",
+      "body": [
+        ""
       ]
     },
-    "expected":{
-      "http_code":200
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
     },
-    "rules":[
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
       "SecRuleEngine On",
       "SecResponseBodyLimitAction ProcessPartial",
       "SecResponseBodyLimit 5"
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction Reject",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction Reject",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=------------------------756b6d74fa1a8ee2"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=------------------------756b6d74fa1a8ee2",
+        "Content-Length": "508"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"POST",
-      "body":[
+      "uri": "/?key=value&key=other_value",
+      "method": "POST",
+      "body": [
         "--------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -118,47 +129,49 @@
         "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction Reject",
       "SecRequestBodyLimit 5"
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction Reject - Engine Disabled",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction Reject - Engine Disabled",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=------------------------756b6d74fa1a8ee2"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=------------------------756b6d74fa1a8ee2",
+        "Content-Length": "508"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"POST",
-      "body":[
+      "uri": "/?key=value&key=other_value",
+      "method": "POST",
+      "body": [
         "--------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -176,47 +189,49 @@
         "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine Off",
       "SecRequestBodyLimitAction Reject",
       "SecRequestBodyLimit 5"
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction Reject - Engine Detection Only",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction Reject - Engine Detection Only",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=------------------------756b6d74fa1a8ee2"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=------------------------756b6d74fa1a8ee2",
+        "Content-Length": "508"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"POST",
-      "body":[
+      "uri": "/?key=value&key=other_value",
+      "method": "POST",
+      "body": [
         "--------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -234,48 +249,49 @@
         "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine DetectionOnly",
       "SecRequestBodyLimitAction Reject",
       "SecRequestBodyLimit 5"
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "multipart/form-data; boundary=------------------------756b6d74fa1a8ee2",
         "Content-Length": "508"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"POST",
-      "body":[
+      "uri": "/?key=value&key=other_value",
+      "method": "POST",
+      "body": [
         "--------------------------756b6d74fa1a8ee2\n",
         "Content-Disposition: form-data; name=\"name\"\n",
         "\n",
@@ -293,68 +309,70 @@
         "--------------------------756b6d74fa1a8ee2--\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 508"
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/bad_name before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/bad_name before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "60",
         "Content-Type": "multipart/form-data; boundary=0000"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"bad_name\"\r\n",
         "\r\n",
         "a"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 59",
@@ -363,47 +381,48 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/bad_name after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/bad_name after limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "59",
         "Content-Type": "multipart/form-data; boundary=0000"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"bad_name\"\r\n",
         "\r\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 58",
@@ -412,28 +431,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/no epilogue",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/no epilogue",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "176",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -441,20 +460,21 @@
         "-----------------------------69343412719991675451336310646--"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 176",
@@ -462,28 +482,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CR after limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "177",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -491,20 +511,21 @@
         "-----------------------------69343412719991675451336310646--\r"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 176",
@@ -512,28 +533,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR just in limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CR just in limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "177",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -541,20 +562,21 @@
         "-----------------------------69343412719991675451336310646--\r"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":400
+    "expected": {
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 177",
@@ -562,28 +584,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF across limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF across limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "178",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -591,20 +613,21 @@
         "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 177",
@@ -612,28 +635,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR before limit, non-LF after",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CR before limit, non-LF after",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "203",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -641,20 +664,21 @@
         "-----------------------------69343412719991675451336310646--\rbad epilogue after just CR"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 177",
@@ -662,28 +686,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/empty epilogue just in limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/empty epilogue just in limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "178",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -691,20 +715,21 @@
         "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 178",
@@ -712,27 +737,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part across limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part across limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "115"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: bad_type\r\n",
@@ -741,21 +767,22 @@
         "--000X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 115 bytes. Limit set to: 114",
-      "http_code":200
+    "expected": {
+      "debug_log": "Appending request body: 115 bytes. Limit set to: 114",
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 114",
@@ -764,27 +791,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "116"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: bad_type\r\n",
@@ -793,21 +821,22 @@
         "--0000X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 116 bytes. Limit set to: 115",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 116 bytes. Limit set to: 115",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 115",
@@ -816,27 +845,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #2",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "117"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: bad_type\r\n",
@@ -845,21 +875,22 @@
         "--0000\rX"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 117 bytes. Limit set to: 116",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 117 bytes. Limit set to: 116",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 116",
@@ -868,27 +899,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #3",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #3",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "118"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: bad_type\r\n",
@@ -898,21 +930,22 @@
         "X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 118 bytes. Limit set to: 117",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 118 bytes. Limit set to: 117",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 117",
@@ -921,27 +954,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #4",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #4",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "119"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: bad_type\r\n",
@@ -951,21 +985,22 @@
         "CX"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 119 bytes. Limit set to: 118",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 119 bytes. Limit set to: 118",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 118",
@@ -974,27 +1009,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #5",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in part before limit #5",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "161"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: bad_type\r\n",
@@ -1004,21 +1040,22 @@
         "Content-Disposition: form-data; name=\"name2X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 161 bytes. Limit set to: 160",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 161 bytes. Limit set to: 160",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 160",
@@ -1027,27 +1064,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part across limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part across limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "117"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: bad_type\r\n",
@@ -1056,21 +1094,22 @@
         "--0000-X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 117 bytes. Limit set to: 116",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 117 bytes. Limit set to: 116",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 116",
@@ -1079,27 +1118,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part before limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part before limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "118"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: bad_type\r\n",
@@ -1108,21 +1148,22 @@
         "--0000--X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 118 bytes. Limit set to: 117",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 118 bytes. Limit set to: 117",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 117",
@@ -1131,27 +1172,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part across limit #2",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part across limit #2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "206"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: text/plain\r\n",
@@ -1165,21 +1207,22 @@
         "--0000-X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 206 bytes. Limit set to: 205",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 206 bytes. Limit set to: 205",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 205",
@@ -1188,27 +1231,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part before limit #2",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/bad-header in final part before limit #2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "207"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: text/plain\r\n",
@@ -1222,21 +1266,22 @@
         "--0000--X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 207 bytes. Limit set to: 206",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 207 bytes. Limit set to: 206",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 206",
@@ -1245,27 +1290,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/invalid boundary before limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/invalid boundary before limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "119"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: text/plain\r\n",
@@ -1274,22 +1320,23 @@
         "--0000!X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 119 bytes. Limit set to: 118",
-      "error_log":"Multipart parsing error: Multipart: Invalid boundary.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Appending request body: 119 bytes. Limit set to: 118",
+      "error_log": "Multipart parsing error: Multipart: Invalid boundary.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 118",
@@ -1297,27 +1344,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/invalid boundary before limit #2",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/invalid boundary before limit #2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "120"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: text/plain\r\n",
@@ -1326,22 +1374,23 @@
         "--0000\r!X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 120 bytes. Limit set to: 119",
-      "error_log":"Multipart parsing error: Multipart: Invalid boundary.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Appending request body: 120 bytes. Limit set to: 119",
+      "error_log": "Multipart parsing error: Multipart: Invalid boundary.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 119",
@@ -1349,27 +1398,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/invalid final boundary before limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF/partial/invalid final boundary before limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "120"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\r\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\r\n",
         "Content-Type: text/plain\r\n",
@@ -1378,22 +1428,23 @@
         "--0000-!X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 120 bytes. Limit set to: 119",
-      "error_log":"Multipart parsing error: Multipart: Invalid final boundary.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Appending request body: 120 bytes. Limit set to: 119",
+      "error_log": "Multipart parsing error: Multipart: Invalid final boundary.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 119",
@@ -1401,27 +1452,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part across limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part across limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "110"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: bad_type\n",
@@ -1430,21 +1482,22 @@
         "--000X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 110 bytes. Limit set to: 109",
-      "http_code":200
+    "expected": {
+      "debug_log": "Appending request body: 110 bytes. Limit set to: 109",
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 109",
@@ -1453,27 +1506,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "111"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: bad_type\n",
@@ -1482,21 +1536,22 @@
         "--0000X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 111 bytes. Limit set to: 110",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 111 bytes. Limit set to: 110",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 110",
@@ -1505,27 +1560,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #2",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "112"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: bad_type\n",
@@ -1535,21 +1591,22 @@
         "X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 112 bytes. Limit set to: 111",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 112 bytes. Limit set to: 111",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 111",
@@ -1558,27 +1615,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #3",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #3",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "113"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: bad_type\n",
@@ -1588,21 +1646,22 @@
         "CX"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 113 bytes. Limit set to: 112",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 113 bytes. Limit set to: 112",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 112",
@@ -1611,27 +1670,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #4",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in part before limit #4",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "155"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: bad_type\n",
@@ -1641,21 +1701,22 @@
         "Content-Disposition: form-data; name=\"name2X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 155 bytes. Limit set to: 154",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 155 bytes. Limit set to: 154",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 154",
@@ -1664,27 +1725,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part across limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part across limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "112"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: bad_type\n",
@@ -1693,21 +1755,22 @@
         "--0000-X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 112 bytes. Limit set to: 111",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 112 bytes. Limit set to: 111",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 111",
@@ -1716,27 +1779,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part before limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part before limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "113"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: bad_type\n",
@@ -1745,21 +1809,22 @@
         "--0000--X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 113 bytes. Limit set to: 112",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 113 bytes. Limit set to: 112",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 112",
@@ -1768,27 +1833,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part across limit #2",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part across limit #2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "196"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: text/plain\n",
@@ -1802,21 +1868,22 @@
         "--0000-X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 196 bytes. Limit set to: 195",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 196 bytes. Limit set to: 195",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 195",
@@ -1825,27 +1892,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part before limit #2",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/bad-header in final part before limit #2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "197"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: text/plain\n",
@@ -1859,21 +1927,22 @@
         "--0000--X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 197 bytes. Limit set to: 196",
-      "http_code":403
+    "expected": {
+      "debug_log": "Appending request body: 197 bytes. Limit set to: 196",
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 196",
@@ -1882,27 +1951,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/invalid boundary before limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/invalid boundary before limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "114"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: text/plain\n",
@@ -1911,22 +1981,23 @@
         "--0000!X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 114 bytes. Limit set to: 113",
-      "error_log":"Multipart parsing error: Multipart: Invalid boundary.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Appending request body: 114 bytes. Limit set to: 113",
+      "error_log": "Multipart parsing error: Multipart: Invalid boundary.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 113",
@@ -1934,27 +2005,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/invalid final boundary before limit #1",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/LF/partial/invalid final boundary before limit #1",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Type": "multipart/form-data; boundary=0000"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Content-Length": "115"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"name1\"; filename=\"name1.txt\"\n",
         "Content-Type: text/plain\n",
@@ -1963,22 +2035,23 @@
         "--0000-!X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Appending request body: 115 bytes. Limit set to: 114",
-      "error_log":"Multipart parsing error: Multipart: Invalid final boundary.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Appending request body: 115 bytes. Limit set to: 114",
+      "error_log": "Multipart parsing error: Multipart: Invalid final boundary.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 114",
@@ -1986,45 +2059,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_name without value",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_name without value",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "8",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "bad_name"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 8",
@@ -2033,45 +2107,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name without value without delimeter before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name without value without delimeter before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "9",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "bad_nameX"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 8",
@@ -2080,45 +2155,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name without value with delimiter before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name without value with delimiter before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "10",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "bad_name&X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 9",
@@ -2127,45 +2203,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_name with value",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_name with value",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "10",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "bad_name=1"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 10",
@@ -2174,45 +2251,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name with value without delimeter before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name with value without delimeter before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "11",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "bad_name=1X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 10",
@@ -2221,45 +2299,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name with value with delimiter before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_name with value with delimiter before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "12",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "bad_name=1&X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 11",
@@ -2268,45 +2347,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_value",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/entire/bad_value",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "11",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "a=bad_value"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 11",
@@ -2315,45 +2395,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_value without delimeter before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_value without delimeter before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "12",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "a=bad_valueX"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 11",
@@ -2362,45 +2443,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_value with delimeter before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - url-encoded/partial/bad_value with delimeter before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "13",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "a=bad_value&X"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 12",
@@ -2409,45 +2491,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - json/bad_name after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - json/bad_name after limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/json",
         "Content-Length": "14"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "{\"bad_name\":1}"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 12",
@@ -2457,45 +2540,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - json/bad_name before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - json/bad_name before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/json",
         "Content-Length": "14"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "{\"bad_name\":1}"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 13",
@@ -2505,45 +2589,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - json/bad_value after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - json/bad_value after limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/json",
         "Content-Length": "17"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "{\"a\":\"bad_value\"}"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 15",
@@ -2553,45 +2638,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - json/bad_value before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - json/bad_value before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/json",
         "Content-Length": "17"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "{\"a\":\"bad_value\"}"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 16",
@@ -2601,45 +2687,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - json/ill-formed after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - json/ill-formed after limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/json",
-        "Content-Length": "17"
+        "Content-Length": "18"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "{\"a\":\"bad_value\"}}"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 17",
@@ -2649,45 +2736,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - json/ill-formed before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - json/ill-formed before limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/json",
-        "Content-Length": "17"
+        "Content-Length": "18"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "{\"a\":\"bad_value\"}}"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":400
+    "expected": {
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 18",
@@ -2697,46 +2785,47 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "resource":"libxml2",
-    "title":"SecRequestBodyLimitAction ProcessPartial - xml/bad_value after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - xml/bad_value after limit",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/xml",
         "Content-Length": "16"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "<a>bad_value</a>"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 11",
@@ -2746,46 +2835,47 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "resource":"libxml2",
-    "title":"SecRequestBodyLimitAction ProcessPartial - xml/bad_value before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - xml/bad_value before limit",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/xml",
         "Content-Length": "16"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "<a>bad_value</a>"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 12",
@@ -2795,46 +2885,47 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "resource":"libxml2",
-    "title":"SecRequestBodyLimitAction ProcessPartial - xml/ill-formed after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - xml/ill-formed after limit",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/xml",
         "Content-Length": "20"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "<a>bad_value</a></b>"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":403
+    "expected": {
+      "http_code": 403
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 19",
@@ -2844,46 +2935,47 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "resource":"libxml2",
-    "title":"SecRequestBodyLimitAction ProcessPartial - xml/ill-formed before limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - xml/ill-formed before limit",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Type": "application/xml",
         "Content-Length": "20"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "<a>bad_value</a></b>"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":400
+    "expected": {
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 20",
@@ -2893,46 +2985,47 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "resource":"libxml2",
-    "title":"SecRequestBodyLimitAction ProcessPartial - RequestBodyNoFilesLimit ignored",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - RequestBodyNoFilesLimit ignored",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "12",
         "Content-Type": "application/xml"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "<a></a></b>\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyLimitAction ProcessPartial",
@@ -2943,126 +3036,137 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecResponseBodyLimitAction Reject - Engine Disabled",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecResponseBodyLimitAction Reject - Engine Disabled",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"GET"
-    },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
-      },
-      "body":[
-        "no need.\n"
+      "uri": "/?key=value&key=other_value",
+      "method": "GET",
+      "body": [
+        ""
       ]
     },
-    "expected":{
-      "http_code":200
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
     },
-    "rules":[
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
       "SecRuleEngine Off",
       "SecResponseBodyLimitAction Reject",
       "SecResponseBodyLimit 5"
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecResponseBodyLimitAction Reject - Engine Detection Only",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecResponseBodyLimitAction Reject - Engine Detection Only",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*"
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
       },
-      "uri":"/?key=value&key=other_value",
-      "method":"GET"
-    },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
-      },
-      "body":[
-        "no need.\n"
+      "uri": "/?key=value&key=other_value",
+      "method": "GET",
+      "body": [
+        ""
       ]
     },
-    "expected":{
-      "http_code":200
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
     },
-    "rules":[
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
       "SecRuleEngine DetectionOnly",
       "SecResponseBodyLimitAction Reject",
       "SecResponseBodyLimit 5"
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyNoFilesLimit - urlencoded, limit exceeded",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyNoFilesLimit - urlencoded, limit exceeded",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "41",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "42",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "param1=value1&param2=value2&param3=value3\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Request body excluding files is bigger than the maximum expected.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Request body excluding files is bigger than the maximum expected.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyNoFilesLimit 20",
@@ -3070,45 +3174,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyNoFilesLimit - urlencoded, limit not exceeded",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyNoFilesLimit - urlencoded, limit not exceeded",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "41",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "42",
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "param1=value1&param2=value2&param3=value3\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyNoFilesLimit 60",
@@ -3116,46 +3221,47 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyNoFilesLimit - json, limit exceeded",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyNoFilesLimit - json, limit exceeded",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "41",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "49",
         "Content-Type": "application/json"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "{\"param1\":{\"param2\":\"value2\",\"param3\":\"value3\"}}\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Request body excluding files is bigger than the maximum expected.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Request body excluding files is bigger than the maximum expected.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyNoFilesLimit 20",
@@ -3164,45 +3270,46 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyNoFilesLimit - json, limit not exceeded",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyNoFilesLimit - json, limit not exceeded",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "41",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "49",
         "Content-Type": "application/json"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "{\"param1\":{\"param2\":\"value2\",\"param3\":\"value3\"}}\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyNoFilesLimit 80",
@@ -3211,47 +3318,48 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "resource":"libxml2",
-    "title":"SecRequestBodyNoFilesLimit - xml, limit exceeded",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyNoFilesLimit - xml, limit exceeded",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "77",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "78",
         "Content-Type": "application/xml"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><aaa><bbb>ccc</bbb><ddd>eee</ddd></aaa>\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Request body excluding files is bigger than the maximum expected.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Request body excluding files is bigger than the maximum expected.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyNoFilesLimit 20",
@@ -3260,46 +3368,47 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "resource":"libxml2",
-    "title":"SecRequestBodyNoFilesLimit - xml, limit not exceeded",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyNoFilesLimit - xml, limit not exceeded",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "77",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "78",
         "Content-Type": "application/xml"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><aaa><bbb>ccc</bbb><ddd>eee</ddd></aaa>\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyNoFilesLimit 90",
@@ -3308,27 +3417,27 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyNoFilesLimit - multipart, limit exceeded",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyNoFilesLimit - multipart, limit exceeded",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "77",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "198",
         "Content-Type": "multipart/form-data; boundary=0000"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"a\"\n",
@@ -3341,21 +3450,22 @@
         "--0000--\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "debug_log":"Request body excluding files is bigger than the maximum expected.",
-      "http_code":400
+    "expected": {
+      "debug_log": "Request body excluding files is bigger than the maximum expected.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyNoFilesLimit 80",
@@ -3363,27 +3473,27 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyNoFilesLimit - multipart, limit not exceeded",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyNoFilesLimit - multipart, limit not exceeded",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "77",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "198",
         "Content-Type": "multipart/form-data; boundary=0000"
       },
-      "uri":"/",
-      "method":"POST",
+      "uri": "/",
+      "method": "POST",
       "body": [
         "--0000\n",
         "Content-Disposition: form-data; name=\"a\"\n",
@@ -3396,20 +3506,21 @@
         "--0000--\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRequestBodyNoFilesLimit 120",
@@ -3417,28 +3528,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/no epilogue",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/no epilogue",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "176",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -3446,20 +3557,21 @@
         "-----------------------------69343412719991675451336310646--"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 176",
@@ -3467,28 +3579,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR after limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CR after limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "177",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -3496,20 +3608,21 @@
         "-----------------------------69343412719991675451336310646--\r"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 176",
@@ -3517,28 +3630,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR just in limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CR just in limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "177",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -3546,21 +3659,22 @@
         "-----------------------------69343412719991675451336310646--\r"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":400,
-      "error_log": "Multipart: Invalid epilogue after final boundary."
+    "expected": {
+      "error_log": "Multipart: Invalid epilogue after final boundary.",
+      "http_code": 400
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 177",
@@ -3568,28 +3682,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CRLF across limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CRLF across limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "178",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -3597,20 +3711,21 @@
         "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 177",
@@ -3618,28 +3733,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/CR before limit, non-LF after",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/CR before limit, non-LF after",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
         "Content-Length": "203",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -3647,20 +3762,21 @@
         "-----------------------------69343412719991675451336310646--\rbad epilogue after just CR"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 177",
@@ -3668,28 +3784,28 @@
     ]
   },
   {
-    "enabled":1,
-    "version_min":300000,
-    "title":"SecRequestBodyLimitAction ProcessPartial - multipart/empty epilogue just in limit",
-    "client":{
-      "ip":"200.249.12.31",
-      "port":123
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyLimitAction ProcessPartial - multipart/empty epilogue just in limit",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
     },
-    "server":{
-      "ip":"200.249.12.31",
-      "port":80
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
     },
-    "request":{
-      "headers":{
-        "Host":"localhost",
-        "User-Agent":"curl/7.38.0",
-        "Accept":"*/*",
-        "Content-Length": "143",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "178",
         "Content-Type": "multipart/form-data; boundary=---------------------------69343412719991675451336310646"
       },
-      "uri":"/test.txt",
-      "method":"POST",
-      "body":[
+      "uri": "/test.txt",
+      "method": "POST",
+      "body": [
         "-----------------------------69343412719991675451336310646\r\n",
         "Content-Disposition: form-data; name=\"name1\"\r\n",
         "\r\n",
@@ -3697,20 +3813,21 @@
         "-----------------------------69343412719991675451336310646--\r\n"
       ]
     },
-    "response":{
-      "headers":{
-        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type":"text/html"
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
       },
-      "body":[
-        "no need.\n"
+      "body": [
+        "no need."
       ]
     },
-    "expected":{
-      "http_code":200
+    "expected": {
+      "http_code": 200
     },
-    "rules":[
+    "rules": [
       "SecRuleEngine On",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 178",
@@ -3718,4 +3835,3 @@
     ]
   }
 ]
-

@@ -15,33 +15,35 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=   test   &param2=test2",
+      "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "plain\/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
-        "test\n"
+        "test"
       ]
     },
     "expected": {
-      "audit_log": "",
       "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -72,33 +74,35 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=   test   &param2=test2",
+      "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "plain\/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
-        "test\n"
+        "test"
       ]
     },
     "expected": {
-      "audit_log": "",
       "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -130,33 +134,35 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=   test   &param2=test2",
+      "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "plain\/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
-        "test\n"
+        "test"
       ]
     },
     "expected": {
-      "audit_log": "",
       "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -188,33 +194,35 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=   test   &param2=test2",
+      "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "plain\/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
-        "test\n"
+        "test"
       ]
     },
     "expected": {
       "audit_log": "{\"transaction\":{\"client_ip\":\"200.249.12.31\",\"time_stamp\":\"\\S{3} \\S{3} [ \\d]\\d \\d{2}:\\d{2}:\\d{2} \\d{4}\"",
-      "debug_log": "",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -247,24 +255,34 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=test&param2=test2",
+      "uri": "/test.pl?param1=test&param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "audit_log": "id \"1556",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -296,24 +314,34 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=test&param2=tEst2",
+      "uri": "/test.pl?param1=test&param2=tEst2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -345,24 +373,34 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=test&param2=%20tEst2",
+      "uri": "/test.pl?param1=test&param2=%20tEst2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -394,24 +432,34 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=test&param2=tEst2",
+      "uri": "/test.pl?param1=test&param2=tEst2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -444,24 +492,34 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=test&param2=%20tEst2",
+      "uri": "/test.pl?param1=test&param2=%20tEst2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "audit_log": "\\[msg \"testmsg\"\\] \\[data \"testdata\"\\] \\[severity \"7\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[tag \"testtag1\"\\] \\[tag \"testtag2\"\\]",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -494,33 +552,35 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/test.pl?param1=   test   &param2=test2",
+      "uri": "/test.pl?param1=   test   &param2=test2",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "plain\/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
-        "test\n"
+        "test"
       ]
     },
     "expected": {
       "audit_log": "\\[audit\\.log]:\\ ---.*\\[audit\\.log]:\\ Keep-Alive",
-      "debug_log": "",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -553,33 +613,35 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
         "Keep-Alive": "300",
         "Connection": "keep-alive",
         "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
       },
-      "uri": "\/?%ADd+allow%3d1+%ADd+auto",
+      "uri": "/?%ADd+allow%3d1+%ADd+auto",
       "method": "GET",
       "http_version": 1.1,
-      "body": "\n"
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "plain\/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
-        "test\n"
+        "test"
       ]
     },
     "expected": {
       "audit_log": "\"match\":\"Matched \\\\\"Operator `ValidateUtf8Encoding' with parameter `' against variable `ARGS_NAMES:\\\\\\\\xadd allow=1 \\\\\\\\xadd auto' \\(Value: `\\\\\\\\xadd allow=1 \\\\\\\\xadd auto' \\)\"",
-      "debug_log": "",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
@@ -612,8 +674,8 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
@@ -622,27 +684,26 @@
         "Pragma": "no-cache",
         "Cache-Control": "no-cache",
         "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": "3"
+        "Content-Length": "5"
       },
-      "uri": "\/?attack=true",
+      "uri": "/?attack=true",
       "method": "POST",
       "http_version": 1.1,
       "body": [
-        "\u00ad=\u00ad\n"
+        "­=­"
       ]
     },
     "response": {
       "headers": {
-        "Content-Type": "plain\/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
-        "test\n"
+        "test"
       ]
     },
     "expected": {
-      "audit_log": "\"body\":\"\\\\\\\\xc2\\\\\\\\xad=\\\\\\\\xc2\\\\\\\\xad\\\\\\\\x0a",
-      "debug_log": "",
-      "error_log": "",
+      "audit_log": "\"body\":\"\\\\\\\\xc2\\\\\\\\xad=\\\\\\\\xc2\\\\\\\\xad",
       "http_code": 403
     },
     "rules": [
@@ -675,8 +736,8 @@
     "request": {
       "headers": {
         "Host": "www.modsecurity.org",
-        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
-        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-us,en;q=0.5",
         "Accept-Encoding": "gzip,deflate",
         "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
@@ -685,28 +746,27 @@
         "Pragma": "no-cache",
         "Cache-Control": "no-cache",
         "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": "3",
-        "X-\u00ad-custom": "Some \u00ad value"
+        "Content-Length": "5",
+        "X-­-custom": "Some ­ value"
       },
-      "uri": "\/?attack=true",
+      "uri": "/?attack=true",
       "method": "POST",
       "http_version": 1.1,
       "body": [
-        "\u00ad=\u00ad\n"
+        "­=­"
       ]
     },
     "response": {
       "headers": {
-        "Content-Type": "plain\/text\n\r"
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
       },
       "body": [
-        "test\n"
+        "test"
       ]
     },
     "expected": {
       "audit_log": "\"X-\\\\\\\\xc2\\\\\\\\xad-custom\":\"Some \\\\\\\\xc2\\\\\\\\xad value\"",
-      "debug_log": "",
-      "error_log": "",
       "http_code": 403
     },
     "rules": [
