@@ -31,7 +31,7 @@ jobs:
           - { label: "without geoip",   opt: "--without-geoip" }
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
-          - { label: "with pcre",       opt: "--with-pcre" }
+          - { label: "with pcre2",       opt: "--with-pcre2" }
 
     steps:
       - uses: actions/checkout@v6
@@ -57,7 +57,9 @@ jobs:
             libfuzzy-dev \
             pcre2-utils \
             bison \
-            flex
+            flex \
+            pkg-config
+
 
       - name: Run build preparation script
         run: ./build.sh
