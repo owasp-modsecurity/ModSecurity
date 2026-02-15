@@ -41,8 +41,6 @@ if test "x${PCRE_FOUND}" = "x1" && test -n "${PCRE_VERSION}"; then
     CFLAGS=$_msc_save_CFLAGS
     LDFLAGS=$_msc_save_LDFLAGS
     LIBS=$_msc_save_LIBS
-
-    PCRE_LDADD="${PCRE_LDADD} -lpcre"
 fi
 
 AC_SUBST(PCRE_CONFIG)

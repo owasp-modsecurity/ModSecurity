@@ -11,33 +11,23 @@ MSC_CHECK_LIB([LUA], [lua54 lua5.4 lua-5.4 lua53 lua5.3 lua-5.3 lua52 lua5.2 lua
 
 # Post-processing: detect Lua version and add version-specific defines
 if test "x${LUA_FOUND}" = "x1"; then
-    LUA_VERSION=""
 
-    # First, try to get version from pkg-config modversion
-    if test -n "${PKG_CONFIG}"; then
-        _msc_lua_pkg_name=""
-        for _msc_lua_p in lua54 lua5.4 lua-5.4 lua53 lua5.3 lua-5.3 lua52 lua5.2 lua-5.2 lua51 lua5.1 lua-5.1 luajit lua; do
-            if ${PKG_CONFIG} --exists ${_msc_lua_p} 2>/dev/null; then
-                _msc_lua_pkg_name="${_msc_lua_p}"
-                break
-            fi
-        done
-        if test -n "${_msc_lua_pkg_name}"; then
-            _msc_lua_pkg_version="`${PKG_CONFIG} ${_msc_lua_pkg_name} --modversion`"
-            case $_msc_lua_pkg_version in
-                5.1*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; LUA_VERSION="${_msc_lua_pkg_version}" ;;
-                5.2*) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ; LUA_VERSION="${_msc_lua_pkg_version}" ;;
-                5.3*) LUA_CFLAGS="-DWITH_LUA_5_3 ${LUA_CFLAGS}" ; LUA_VERSION="${_msc_lua_pkg_version}" ;;
-                5.4*) LUA_CFLAGS="-DWITH_LUA_5_4 ${LUA_CFLAGS}" ; LUA_VERSION="${_msc_lua_pkg_version}" ;;
-                2.0*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ; LUA_VERSION="${_msc_lua_pkg_version}" ;;
-                2.1*) LUA_CFLAGS="-DWITH_LUA_5_1 -DWITH_LUA_JIT_2_1 ${LUA_CFLAGS}" ; LUA_VERSION="${_msc_lua_pkg_version}" ;;
-            esac
-            AC_MSG_NOTICE([LUA pkg-config version: ${_msc_lua_pkg_version}])
-        fi
+    # Use version already detected by MSC_CHECK_LIB (from pkg-config) if available
+    if test -n "${LUA_VERSION}" && test "x${LUA_VERSION}" != "xunknown"; then
+        case ${LUA_VERSION} in
+            5.1*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ;;
+            5.2*) LUA_CFLAGS="-DWITH_LUA_5_2 ${LUA_CFLAGS}" ;;
+            5.3*) LUA_CFLAGS="-DWITH_LUA_5_3 ${LUA_CFLAGS}" ;;
+            5.4*) LUA_CFLAGS="-DWITH_LUA_5_4 ${LUA_CFLAGS}" ;;
+            2.0*) LUA_CFLAGS="-DWITH_LUA_5_1 ${LUA_CFLAGS}" ;;
+            2.1*) LUA_CFLAGS="-DWITH_LUA_5_1 -DWITH_LUA_JIT_2_1 ${LUA_CFLAGS}" ;;
+        esac
+        AC_MSG_NOTICE([LUA version: ${LUA_VERSION}])
     fi
 
-    # If no version detected via pkg-config, try compile tests
-    if test -z "${LUA_VERSION}"; then
+    # If no version detected yet, try compile tests
+    if test -z "${LUA_VERSION}" || test "x${LUA_VERSION}" = "xunknown"; then
+        LUA_VERSION=""
         _msc_save_CFLAGS=$CFLAGS
         CFLAGS="${LUA_CFLAGS} ${CFLAGS}"
 
