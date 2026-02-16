@@ -715,14 +715,16 @@ using namespace modsecurity::operators;
 %type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables
 %type <std::unique_ptr<Variable>> var
 
-// Destructor directives to prevent memory leaks on parse errors
-// When YYERROR is called, these ensure proper cleanup of semantic values
+// Destructor directives to prevent memory leaks on parse errors.
+// When YYERROR is called, these ensure proper cleanup of semantic values.
+// Empty bodies are correct: with api.value.type variant, the variant's
+// destructor automatically calls std::unique_ptr's destructor.
 %destructor { } <std::unique_ptr<actions::Action>>
 %destructor { } <std::unique_ptr<RunTimeString>>
-%destructor { } <std::unique_ptr<std::vector<std::unique_ptr<actions::Action>>>>
+%destructor { } <std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > >
 %destructor { } <std::unique_ptr<Operator>>
 %destructor { } <std::unique_ptr<Variable>>
-%destructor { } <std::unique_ptr<std::vector<std::unique_ptr<Variable>>>>
+%destructor { } <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > >
 
 //%printer { yyoutput << $$; } <*>;
 
