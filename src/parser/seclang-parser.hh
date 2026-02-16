@@ -581,7 +581,7 @@ namespace yy {
       YY_ASSERT (!yytypeid_);
       YY_ASSERT (sizeof (T) <= size);
       yytypeid_ = & typeid (T);
-      return *new (yyas_<T> ()) T (t);
+      return *new (yyas_<T> ()) T (std::move((T&)t));
     }
 # endif
 
