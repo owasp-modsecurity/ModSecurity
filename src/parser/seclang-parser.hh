@@ -2138,6 +2138,42 @@ namespace yy {
         (void) yysym;
         switch (yykind)
         {
+      case symbol_kind::S_op: // op
+#line 723 "seclang-parser.yy"
+                    { }
+#line 2145 "seclang-parser.hh"
+        break;
+
+      case symbol_kind::S_op_before_init: // op_before_init
+#line 723 "seclang-parser.yy"
+                    { }
+#line 2151 "seclang-parser.hh"
+        break;
+
+      case symbol_kind::S_var: // var
+#line 724 "seclang-parser.yy"
+                    { }
+#line 2157 "seclang-parser.hh"
+        break;
+
+      case symbol_kind::S_act: // act
+#line 720 "seclang-parser.yy"
+                    { }
+#line 2163 "seclang-parser.hh"
+        break;
+
+      case symbol_kind::S_setvar_action: // setvar_action
+#line 720 "seclang-parser.yy"
+                    { }
+#line 2169 "seclang-parser.hh"
+        break;
+
+      case symbol_kind::S_run_time_string: // run_time_string
+#line 721 "seclang-parser.yy"
+                    { }
+#line 2175 "seclang-parser.hh"
+        break;
+
        default:
           break;
         }
@@ -8821,7 +8857,7 @@ switch (yykind)
 
 
 } // yy
-#line 8825 "seclang-parser.hh"
+#line 8861 "seclang-parser.hh"
 
 
 
