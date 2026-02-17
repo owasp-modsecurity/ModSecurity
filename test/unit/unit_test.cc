@@ -21,6 +21,7 @@
 #include <string>
 #include <iostream>
 #include <iterator>
+#include <memory>
 
 #include "test/common/colors.h"
 #include "src/utils/regex.h"
@@ -105,9 +106,9 @@ std::string UnitTest::print() const {
 }
 
 
-UnitTest *UnitTest::from_yajl_node(const yajl_val &node) {
+std::unique_ptr<UnitTest> UnitTest::from_yajl_node(const yajl_val &node) {
     size_t num_tests = node->u.object.len;
-    UnitTest *u = new UnitTest();
+    auto u = std::make_unique<UnitTest>();
 
     for (int i = 0; i < num_tests; i++) {
         const char *key = node->u.object.keys[ i ];
