@@ -441,7 +441,7 @@ void RuleWithActions::executeTransformations(
 }
 
 
-bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
+bool RuleWithActions::containsTag(const std::string& name, Transaction *t) const {
     for (const auto &tag : m_actionsTag) {
         if (tag != NULL && tag->getName(t) == name) {
             return true;

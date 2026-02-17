@@ -80,7 +80,7 @@ class RuleWithActions : public Rule {
 
     std::vector<actions::Action *> getActionsByName(const std::string& name,
         const Transaction *t);
-    bool containsTag(const std::string& name, Transaction *t);
+    bool containsTag(const std::string& name, Transaction *t) const;
     bool containsMsg(const std::string& name, Transaction *t);
 
     inline bool isChained() const { return m_isChained == true; }
