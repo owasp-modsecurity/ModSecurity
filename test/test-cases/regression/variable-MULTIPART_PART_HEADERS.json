@@ -128,23 +128,23 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "292",
+        "Content-Length": "312",
         "Content-Type": "multipart/form-data; boundary=-----------------------------69343412719991675451336310646",
         "Expect": "100-continue"
       },
       "uri": "/",
       "method": "POST",
       "body": [
-        "-------------------------------69343412719991675451336310646",
-        "Content-Disposition: form-data; name=parm1",
-        "Content-Type: image/jpeg",
-        "",
-        "1",
-        "-------------------------------69343412719991675451336310646",
-        "Content-Disposition: form-data; name=parm2",
-        "",
-        "2",
-        "-------------------------------69343412719991675451336310646--"
+        "-------------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=parm1\r\n",
+        "Content-Type: image/jpeg\r\n",
+        "\r\n",
+        "1\r\n",
+        "-------------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=parm2\r\n",
+        "\r\n",
+        "2\r\n",
+        "-------------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response": {
@@ -183,19 +183,19 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "241",
+        "Content-Length": "251",
         "Content-Type": "multipart/form-data; boundary=-----------------------------69343412719991675451336310646",
         "Expect": "100-continue"
       },
       "uri": "/",
       "method": "POST",
       "body": [
-        "-------------------------------69343412719991675451336310646",
-        "Content-Disposition: form-data; name=\"file\"; filename=\"New Text Document.txt\"",
+        "-------------------------------69343412719991675451336310646\r\n",
+        "Content-Disposition: form-data; name=\"file\"; filename=\"New Text Document.txt\"\r\n",
         "Content-Type: text/plain; charset=utf-8\r\n",
-        "",
-        "1",
-        "-------------------------------69343412719991675451336310646--"
+        "\r\n",
+        "1\r\n",
+        "-------------------------------69343412719991675451336310646--\r\n"
       ]
     },
     "response": {
