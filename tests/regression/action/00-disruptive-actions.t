@@ -456,17 +456,14 @@
 	match_log => {
 		error => {
 			apache => [qr/ModSecurity: Access denied using proxy to \(phase 1\)/, 1],
-			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 1\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
 		},
 	},
 	match_response => {
 		status => {
 			apache => qr/^200$/,
-			nginx => qr/^500$/,
 		},
 		content => {
 			apache => qr/^TEST$/,
-			nginx => qr/^*$/,
 		},
 	},
 
@@ -487,17 +484,14 @@
 	match_log => {
 		error => {
 			apache => [qr/ModSecurity: Access denied using proxy to \(phase 1\)/, 1],
-			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 1\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
 		},
 	},
 	match_response => {
 		status => {
 			apache => qr/^200$/,
-			nginx => qr/^500$/,
 		},
 		content => {
 			apache => qr/^TEST$/,
-			nginx => qr/^*$/,
 		},
 	},
 
@@ -518,17 +512,14 @@
 	match_log => {
 		error => {
 			apache => [qr/ModSecurity: Access denied using proxy to \(phase 2\)/, 1],
-			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 2\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
 		},
 	},
 	match_response => {
 		status => {
 			apache => qr/^200$/,
-			nginx => qr/^500$/,
 		},
 		content => {
 			apache => qr/^TEST$/,
-			nginx => qr/^*$/,
 		},
 	},
 	request => new HTTP::Request(
@@ -550,13 +541,11 @@
 	match_log => {
 		error => {
 			apache => [qr/ModSecurity: Access denied with code 500 \(phase 3\) \(Configuration Error: Proxy action requested but it does not work in output phases\)./, 1],
-			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 3\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
 		}
 	},
 	match_response => {
 		status => {
 			apache => qr/^500$/,
-			nginx => qr/^500$/,
 		},
 	},
 	request => new HTTP::Request(
@@ -578,13 +567,11 @@
 	match_log => {
 		error => {
 			apache => [qr/ModSecurity: Access denied with code 500 \(phase 4\) \(Configuration Error: Proxy action requested but it does not work in output phases\)./, 1],
-			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 4\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
 		}
 	},
 	match_response => {
 		status => {
 			apache => qr/^500$/,
-			nginx => qr/^500$/,
 		},
 	},
 	request => new HTTP::Request(

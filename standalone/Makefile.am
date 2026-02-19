@@ -42,8 +42,7 @@ standalone_la_SOURCES = ../apache2/acmp.c \
     regex.c \
     server.c
 
-    # FIXME: Standalone does not mean that it will be a nginx build.
-standalone_la_CFLAGS = -DVERSION_NGINX \
+standalone_la_CFLAGS = -DVERSION_STANDALONE \
     @APR_CFLAGS@ \
     @APU_CFLAGS@ \
     @APXS_CFLAGS@ \

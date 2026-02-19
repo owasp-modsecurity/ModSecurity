@@ -52,14 +52,10 @@
 #ifdef	VERSION_IIS
 #define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
 #else
-#ifdef	VERSION_NGINX
-#define MODSEC_MODULE_NAME "ModSecurity for nginx (STABLE)"
-#else
 #ifdef	VERSION_STANDALONE
 #define MODSEC_MODULE_NAME "ModSecurity Standalone (STABLE)"
 #else
 #define MODSEC_MODULE_NAME "ModSecurity for Apache"
-#endif
 #endif
 #endif
 #define MODSEC_MODULE_VERSION MODSEC_VERSION

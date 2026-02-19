@@ -35,10 +35,6 @@ test: check
 test-regression:
 	(cd tests && $(MAKE) test-regression)
 
-test-regression-nginx:
-	(cd tests && $(MAKE) test-regression-nginx)
-
-
 cppcheck:
 	@cppcheck \
 	    -j `getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu || echo 1` \
@@ -58,8 +54,7 @@ cppcheck:
 	    --inconclusive \
 	    --template="warning: {file},{line},{severity},{id},{message}" \
 	    --error-exitcode=1 \
-		standalone/ \
-	    nginx/
+		standalone/ 
 
 check-static: cppcheck
 
