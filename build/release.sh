@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
 git clean -xfdi
 git submodule foreach --recursive git clean -xfdi
 
-VERSION=`git describe --tags`
+VERSION=$(git describe --tags)
 DIR_NAME="modsecurity-$VERSION"
 TAR_NAME="modsecurity-$VERSION.tar.gz"
 

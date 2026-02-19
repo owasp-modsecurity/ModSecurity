@@ -25,7 +25,7 @@ AC_MSG_CHECKING([for libcurl config script])
 
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
-    if test ! -d "$x" -a -e "$x"; then
+    if test ! -d "$x" && test -e "$x"; then
         CURL_CONFIG=$x
         curl_path="no"
         break
@@ -100,7 +100,7 @@ AC_SUBST(CURL_LDFLAGS)
 AC_SUBST(CURL_LDADD)
 AC_SUBST(CURL_USES_GNUTLS)
 
-if test "x${with_curl}" == "xno"; then
+if test "x${with_curl}" = "xno"; then
     CURL_DISABLED=yes
 else
     if test "x${with_curl}" != "x"; then

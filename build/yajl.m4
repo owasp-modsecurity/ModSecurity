@@ -24,12 +24,12 @@ AC_ARG_WITH(
     [AS_HELP_STRING([--with-yajl=PATH],[Path to yajl prefix or config script])]
 )
 
-if test "x${with_yajl}" == "xno"; then
+if test "x${with_yajl}" = "xno"; then
     AC_DEFINE(HAVE_YAJL, 0, [Support for YAJL was disabled by the utilization of --without-yajl or --with-yajl=no])
     AC_MSG_NOTICE([Support for YAJL was disabled by the utilization of --without-yajl or --with-yajl=no])
     YAJL_DISABLED=yes
 else
-    if test "x${with_yajl}" == "xyes"; then
+    if test "x${with_yajl}" = "xyes"; then
         YAJL_MANDATORY=yes
         AC_MSG_NOTICE([YAJL support was marked as mandatory by the utilization of --with-yajl=yes])
     fi
@@ -40,8 +40,8 @@ else
 #            fi
 #        done
 
-#    if test "x${with_yajl}" != "xyes" or test "x${with_yajl}" == "xyes"; then
-        if test "x${with_yajl}" == "x" || test "x${with_yajl}" == "xyes"; then
+#    if test "x${with_yajl}" != "xyes" or test "x${with_yajl}" = "xyes"; then
+        if test "x${with_yajl}" = "x" || test "x${with_yajl}" = "xyes"; then
             # Nothing about YAJL was informed, using the pkg-config to figure things out.
             if test -n "${PKG_CONFIG}"; then
                 YAJL_PKG_NAME=""
@@ -182,7 +182,7 @@ AC_DEFUN([CHECK_FOR_YAJL_AT], [
         AC_MSG_NOTICE([YAJL headers found at: ${yajl_inc_path}])
     fi
 
-    if test -n "${yajl_lib_path}" -a -n "${yajl_inc_path}"; then
+    if test -n "${yajl_lib_path}" && test -n "${yajl_inc_path}"; then
         # TODO: Compile a piece of code to check the version.
         YAJL_CFLAGS="-I${yajl_inc_path}"
         YAJL_LDADD="-l${yajl_lib_name}"

@@ -24,14 +24,14 @@ AC_ARG_WITH(
     [AS_HELP_STRING([--with-pcre2=PATH],[Path to pcre2 prefix or config script])]
 )
 
-if test "x${with_pcre2}" == "xno"; then
+if test "x${with_pcre2}" = "xno"; then
     AC_DEFINE(HAVE_PCRE2, 0, [Support for PCRE2 was disabled by the utilization of --without-pcre2 or --with-pcre2=no])
     AC_MSG_NOTICE([Support for PCRE2 was disabled by the utilization of --without-pcre2 or --with-pcre2=no])
     PCRE2_DISABLED=yes
 else
      PCRE2_MANDATORY=yes
      AC_MSG_NOTICE([PCRE2 is enabled by default.])
-#    if test "x${with_pcre2}" == "xyes"; then
+#    if test "x${with_pcre2}" = "xyes"; then
 #        PCRE2_MANDATORY=yes
 #        AC_MSG_NOTICE([PCRE2 support was marked as mandatory by the utilization of --with-pcre2=yes])
 #    fi
@@ -42,8 +42,8 @@ else
 #            fi
 #        done
 
-#    if test "x${with_pcre2}" != "xyes" or test "x${with_pcre2}" == "xyes"; then
-        if test "x${with_pcre2}" == "x" || test "x${with_pcre2}" == "xyes"; then
+#    if test "x${with_pcre2}" != "xyes" or test "x${with_pcre2}" = "xyes"; then
+        if test "x${with_pcre2}" = "x" || test "x${with_pcre2}" = "xyes"; then
             # Nothing about PCRE2 was informed, using the pkg-config to figure things out.
             if test -n "${PKG_CONFIG}"; then
                 PCRE2_PKG_NAME=""
@@ -177,7 +177,7 @@ AC_DEFUN([CHECK_FOR_PCRE2_AT], [
         AC_MSG_NOTICE([PCRE2 headers found at: ${pcre2_inc_path}])
     fi
 
-    if test -n "${pcre2_lib_path}" -a -n "${pcre2_inc_path}"; then
+    if test -n "${pcre2_lib_path}" && test -n "${pcre2_inc_path}"; then
         # TODO: Compile a piece of code to check the version.
         PCRE2_CFLAGS="-I${pcre2_inc_path}"
         PCRE2_LDADD="-l${pcre2_lib_name}"
