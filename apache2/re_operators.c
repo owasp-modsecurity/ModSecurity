@@ -1362,7 +1362,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     char *end = NULL;
     const char *rulefile_path;
     char *processed = NULL;
-    unsigned short int op_len;
+    size_t op_len;
     apr_status_t rc;
     apr_file_t *fd = NULL;
     ACMP *p;
@@ -1703,7 +1703,7 @@ static const char *gsb_reduce_char(apr_pool_t *pool, const char *domain) {
  * \retval 1 On Match
  * \retval 0 On No Match
  */
-static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned int match_length) {
+static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, size_t match_length) {
     assert(gsb != NULL);
     assert(msr != NULL);
     assert(match != NULL);

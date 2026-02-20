@@ -277,9 +277,9 @@ unsigned char is_netmask_v6(char *ip_strv6) {
 char *parse_pm_content(const char *op_parm, size_t op_len, msre_rule *rule, char **error_msg)  {
     char *parm = NULL;
     char *content = NULL;
-    unsigned short int offset = 0;
+    size_t offset = 0;
     char converted = 0;
-    int i, x;
+    size_t i, x;
     unsigned char bin = 0, esc = 0, bin_offset = 0;
     unsigned char c = 0;
     unsigned char bin_parm[3] = { 0 };

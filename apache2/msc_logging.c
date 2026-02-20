@@ -334,7 +334,7 @@ static void sanitize_request_line(modsec_rec *msr) {
                         arg_max = 1;
                         while((*pat != '\0')&&(j--)) {
                             if(arg_max > mparm->pad_2)  {
-                                size_t off = (strlen(mparm->value) - arg_max);
+                                int off = (int)strlen(mparm->value) - arg_max;
                                 int pos = (mparm->pad_1-1);
                                 if(off > pos)    {
                                     *pat = '*';
@@ -829,7 +829,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
                             arg_max = 1;
                             while((*pat != '\0')&&(j--)) {
                                 if(arg_max > mparm->pad_2)  {
-                                    size_t off = strlen(mparm->value) - arg_max;
+                                    int off = (int)strlen(mparm->value) - arg_max;
                                     int pos = mparm->pad_1-1;
                                     if(off > pos)    {
                                         *pat = '*';
@@ -1086,7 +1086,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
                                 arg_max = 1;
                                 while((*pat != '\0')&&(j--)) {
                                     if(arg_max > mparm->pad_2)  {
-                                        size_t off = strlen(mparm->value) - arg_max;
+                                        int off = (int)strlen(mparm->value) - arg_max;
                                         int pos = mparm->pad_1-1;
                                         if(off > pos)    {
                                             *pat = '*';
@@ -1686,7 +1686,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
                             arg_max = 1;
                             while((*pat != '\0')&&(j--)) {
                                 if(arg_max > mparm->pad_2)  {
-                                    size_t off = strlen(mparm->value) - arg_max;
+                                    int off = (int)strlen(mparm->value) - arg_max;
                                     int pos = mparm->pad_1-1;
                                     if(off > pos)    {
                                         *pat = '*';
@@ -1934,7 +1934,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
                                 arg_max = 1;
                                 while((*pat != '\0')&&(j--)) {
                                     if(arg_max > mparm->pad_2)  {
-                                        size_t off = strlen(mparm->value) - arg_max;
+                                        int off = (int)strlen(mparm->value) - arg_max;
                                         int pos = mparm->pad_1-1;
                                         if(off > pos)    {
                                             *pat = '*';
