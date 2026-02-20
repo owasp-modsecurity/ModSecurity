@@ -387,7 +387,7 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     char *data = NULL;
     char delim;
     int ignore_case = 0;
-    unsigned short int op_len = 0;
+    size_t op_len = 0;
 
     *error_msg = NULL;
 
@@ -529,7 +529,8 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char *data_out = NULL;
     unsigned int size = 0;
     unsigned int maxsize=0;
-    int output_body = 0, input_body = 0, sl;
+    int output_body = 0, input_body = 0;
+    size_t sl;
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
     ap_regmatch_t pmatch[AP_MAX_REG_MATCH];
 #else
@@ -1315,7 +1316,7 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
     ACMP *p;
     const char *phrase;
     const char *next;
-    unsigned short int op_len;
+    size_t op_len;
 
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
@@ -1794,15 +1795,16 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     int options = 0;
     gsb_db *gsb = msr->txcfg->gsb;
     const char *match = NULL;
-    unsigned int match_length;
-    unsigned int canon_length;
+    size_t match_length;
+    size_t canon_length;
     int rv, i, ret, count_slash;
     unsigned int j = 0;
     unsigned int size = var->value_len;
     char *base = NULL, *domain = NULL, *savedptr = NULL;
     char *str = NULL, *canon = NULL, *dot = NULL;
     char *data = NULL, *ptr = NULL, *url = NULL;
-    int capture, domain_len;
+    int capture;
+    size_t domain_len;
     int d_pos = -1;
     int s_pos = -1;
 
@@ -2672,7 +2674,7 @@ static int msre_op_strmatch_param_init(msre_rule *rule, char **error_msg) {
     const apr_strmatch_pattern *compiled_pattern;
     char *processed = NULL;
     const char *pattern = rule->op_param;
-    unsigned short int op_len;
+    size_t op_len;
 
     *error_msg = NULL;
 
@@ -4166,7 +4168,8 @@ static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
     struct fuzzy_hash_chunk *chunk, *t;
     FILE *fp;
     char *file;
-    int param_len,threshold;
+    size_t param_len;
+    int threshold;
     char line[1024];
 
     char *data = NULL;

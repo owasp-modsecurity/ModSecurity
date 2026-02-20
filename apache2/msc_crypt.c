@@ -700,7 +700,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 int hash_response_body_links(modsec_rec *msr)   {
     int lsize = 0, fsize = 0, lcount = 0, fcount = 0, i;
     int isize = 0, icount = 0, frsize = 0, frcount = 0;
-    int bytes = 0;
+    size_t bytes = 0;
     xmlXPathContextPtr  xpathCtx = NULL;
     xmlXPathObjectPtr   xpathObj = NULL;
     xmlChar *content_option = NULL;

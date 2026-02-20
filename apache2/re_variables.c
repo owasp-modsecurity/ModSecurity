@@ -2484,7 +2484,7 @@ static int var_full_request_generate(modsec_rec *msr, msre_var *var,
     char *full_request = NULL;
     int full_request_length = 0;
     int headers_length = 0;
-    int request_line_length = 0;
+    size_t request_line_length = 0;
 
     arr = apr_table_elts(msr->request_headers);
     headers_length = msc_headers_to_buffer(arr, NULL, 0);
