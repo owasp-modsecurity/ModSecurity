@@ -236,3 +236,54 @@ jobs:
 
       - name: Run cppcheck
         run: make check-static
+
+  cppcheck-linux:
+    name: Static analysis (cppcheck, Linux, debian:sid)
+    runs-on: ubuntu-latest
+    container: debian:sid
+
+    steps:
+      - name: Install basic tools
+        run: |
+          apt-get update
+          apt-get install -y git
+
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Ensure submodules are fully initialized (recursive)
+        run: git submodule update --init --recursive
+
+      - name: Install dependencies (v2 style)
+        run: |
+          apt-get update
+          apt-get install -y \
+            autoconf \
+            automake \
+            build-essential \
+            libtool \
+            pkg-config \
+            cppcheck \
+            libyajl-dev \
+            libcurl4-openssl-dev \
+            liblmdb-dev \
+            liblua5.2-dev \
+            libmaxminddb-dev \
+            libpcre2-dev \
+            libgeoip-dev \
+            libxml2-dev \
+            libfuzzy-dev \
+            pcre2-utils \
+            bison \
+            flex
+
+      - name: Run build preparation script
+        run: ./build.sh
+
+      - name: Configure project
+        run: ./configure
+
+      - name: Run cppcheck
+        run: make check-static
