@@ -954,7 +954,7 @@ unixd_config_rec unixd_config;
 #else
 unixd_config_rec ap_unixd_config;
 #endif
-const char *ap_server_argv0 = "nginx";
+const char *ap_server_argv0 = "standalone";
 
 
 #ifdef HAVE_GETPWNAM

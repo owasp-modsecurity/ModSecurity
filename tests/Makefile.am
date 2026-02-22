@@ -82,7 +82,5 @@ test: check
 test-regression: run-regression-tests.pl
 	$(PERL) run-regression-tests.pl -S .
 
-test-regression-nginx: run-regression-tests-nginx.pl
-	$(PERL) run-regression-tests-nginx.pl
 
 .PHONY: test test-regression
