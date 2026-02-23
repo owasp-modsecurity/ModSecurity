@@ -13,12 +13,21 @@
  *
  */
 
+/*
+ * ModSecurity, http://www.modsecurity.org/
+ * Copyright (c) 2015 - 2021 Trustwave Holdings, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0
+ */
+
 #include "src/operators/inspect_file.h"
 
 #include <stdio.h>
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <array>
+#include <vector>
 
 #include "src/operators/operator.h"
 #include "src/utils/system.h"
@@ -29,7 +38,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <vector>
 #endif
 
 namespace modsecurity {
@@ -69,8 +77,8 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
      * to avoid shell interpretation while preserving behavior.
      */
 
-    int pipefd[2];
-    if (pipe(pipefd) == -1) {
+    std::array<int, 2> pipefd{};
+    if (pipe(pipefd.data()) == -1) {
         return false;
     }
 
@@ -83,36 +91,39 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
     if (pid == 0) {
         // Child process
-        close(pipefd[0]);                 // Close read end
-        dup2(pipefd[1], STDOUT_FILENO);   // Redirect stdout
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
         close(pipefd[1]);
 
+        // Create mutable copies (avoid const_cast)
+        std::string param_copy = m_param;
+        std::string str_copy = str;
+
         std::vector<char*> argv;
-        argv.push_back(const_cast<char*>(m_param.c_str()));
-        argv.push_back(const_cast<char*>(str.c_str()));
+        argv.push_back(param_copy.data());
+        argv.push_back(str_copy.data());
         argv.push_back(nullptr);
 
         execvp(argv[0], argv.data());
 
-        // execvp failed
-        _exit(1);
+        _exit(1); // exec failed
     }
 
     // Parent process
-    close(pipefd[1]); // Close write end
+    close(pipefd[1]);
 
-    char buff[512];
     std::stringstream s;
+    std::array<char, 512> buff{};
     ssize_t count;
 
-    while ((count = read(pipefd[0], buff, sizeof(buff))) > 0) {
-        s.write(buff, count);
+    while ((count = read(pipefd[0], buff.data(), buff.size())) > 0) {
+        s.write(buff.data(), count);
     }
 
     close(pipefd[0]);
     waitpid(pid, nullptr, 0);
 
-    std::string res = s.str();
+    const std::string res = s.str();
 
     if (res.size() > 1 && res[0] != '1') {
         return true; /* match */
@@ -125,7 +136,7 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
      * Windows fallback: preserve existing behavior
      */
     FILE *in;
-    char buff[512];
+    std::array<char, 512> buff{};
     std::stringstream s;
     std::string res;
     std::string openstr;
@@ -138,8 +149,8 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
         return false;
     }
 
-    while (fgets(buff, sizeof(buff), in) != NULL) {
-        s << buff;
+    while (fgets(buff.data(), buff.size(), in) != NULL) {
+        s << buff.data();
     }
 
     pclose(in);
