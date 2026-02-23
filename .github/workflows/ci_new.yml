@@ -31,7 +31,8 @@ jobs:
           - { label: "without geoip",   opt: "--without-geoip" }
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
-          - { label: "with pcre2",       opt: "--with-pcre2" }
+          - { label: "with pcre2 (default)", opt: "" }
+          - { label: "with pcre",        opt: "--with-pcre" }
 
     steps:
       - uses: actions/checkout@v6
@@ -52,6 +53,7 @@ jobs:
             liblua5.2-dev \
             libmaxminddb-dev \
             libpcre2-dev \
+            libpcre3-dev \
             libgeoip-dev \
             libxml2-dev \
             libfuzzy-dev \
@@ -94,6 +96,7 @@ jobs:
           - { label: "without geoip",   opt: "--without-geoip" }
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
+          - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",       opt: "--with-pcre" }
 
     steps:
