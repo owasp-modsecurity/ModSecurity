@@ -123,13 +123,12 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
     close(pipefd[0]);
     waitpid(pid, nullptr, 0);
 
-    const std::string res = s.str();
+    if (const std::string res = s.str();
+    res.size() > 1 && res[0] != '1') {
+    return true;
+}
 
-    if (res.size() > 1 && res[0] != '1') {
-        return true; /* match */
-    }
-
-    return false;
+return false;
 
 #else
     /*
@@ -155,10 +154,10 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
     pclose(in);
 
-    res.append(s.str());
-    if (res.size() > 1 && res[0] != '1') {
-        return true; /* match */
-    }
+    if (const std::string res = s.str();
+    res.size() > 1 && res[0] != '1') {
+    return true;
+}
 
     return false;
 #endif
