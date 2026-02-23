@@ -1,0 +1,177 @@
+name: Quality Assurance
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04]
+        platform: [x32, x64]
+        compiler: [gcc, clang]
+        configure:
+          - {label: "with pcre2, no study, no jit",      opt: "--enable-pcre-study=no" }
+          - {label: "with pcre2, with study, no jit",    opt: "--enable-pcre-study=yes" }
+          - {label: "with pcre2, no study, with jit",    opt: "--enable-pcre-study=no --enable-pcre-jit" }
+          - {label: "with pcre2, with study, with jit",  opt: "--enable-pcre-study=yes --enable-pcre-jit" }
+          - {label: "with pcre",                         opt: "--with-pcre --enable-pcre-study=no" }
+          - {label: "with pcre, with study, no jit",     opt: "--with-pcre --enable-pcre-study=yes" }
+          - {label: "with pcre, no study, with jit",     opt: "--with-pcre --enable-pcre-study=no --enable-pcre-jit" }
+          - {label: "with pcre, with study, with jit",   opt: "--with-pcre --enable-pcre-study=yes --enable-pcre-jit" }
+          - {label: "with lua",                          opt: "--with-lua" }
+          - {label: "wo lua",                            opt: "--without-lua" }
+    steps:
+      - name: Setup Dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data
+      - uses: actions/checkout@v2
+      - name: autogen.sh
+        run: ./autogen.sh
+      - name: configure ${{ matrix.configure.label }}
+        run: ./configure --enable-assertions ${{ matrix.configure.opt }} 'CFLAGS=-Werror=format-security'
+      - uses: ammaraskar/gcc-problem-matcher@master
+      - name: make
+        run: make -j `nproc`
+      - name: install module
+        run: sudo make install
+      - name: prepare config
+        run: |
+          sudo cp .github/security2.conf /etc/apache2/mods-enabled/
+          sudo cp modsecurity.conf-recommended /etc/apache2/modsecurity.conf
+          sudo cp unicode.mapping /etc/apache2/
+          sudo mkdir -p /var/cache/modsecurity
+          sudo chown -R www-data:www-data /var/cache/modsecurity
+      - name: first check config (to get syntax errors)
+        run: sudo apachectl configtest
+      - name: start apache with module
+        run: sudo systemctl restart apache2.service
+      - name: Search for errors/warnings in error log
+        run: |
+          # '|| :' handles the case grep doesn't match, otherwise the script exits with 1 (error)
+          errors=$(grep -E ':(?error|warn)[]]' /var/log/apache2/error.log) || :
+          if [[ -z "${errors}" ]]; then exit 0; fi
+          echo "::error:: Found errors/warnings in error.log"
+          echo "${errors}"
+          exit 1
+      - name: Check error.log
+        run: |
+          # Send requests & check log format
+          # Valid request
+          curl -s http://127.0.01/ > /dev/null || echo $?
+          # Invalid request
+          curl -s http://127.0.01/%2e%2f > /dev/null || echo $? 
+          # Check log format
+          grep -F ModSecurity < /var/log/apache2/error.log | grep -vP "^\[[^\]]+\] \[security2:[a-z]+\] \[pid [0-9]+:tid [0-9]+\] (?:\[client [0-9.:]+\] )?ModSecurity" || exit 0
+          # grep -v succeeded => found some lines with invalid format
+          exit 1
+      - name: Show httpd error log
+        if: always()
+        run: sudo cat /var/log/apache2/error.log
+      - name: Show mod_security2 audit log
+        if: always()
+        run: sudo cat /var/log/apache2/modsec_audit.log
+
+  test-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04]
+        platform: [x32, x64]
+        compiler: [gcc, clang]
+        configure:
+          - {label: "with pcre2, no study, no jit",      opt: "--enable-pcre-study=no" }
+          - {label: "with pcre2, with study, no jit",    opt: "--enable-pcre-study=yes" }
+          - {label: "with pcre2, no study, with jit",    opt: "--enable-pcre-study=no --enable-pcre-jit" }
+          - {label: "with pcre2, with study, with jit",  opt: "--enable-pcre-study=yes --enable-pcre-jit" }
+          - {label: "with pcre",                         opt: "--with-pcre --enable-pcre-study=no" }
+          - {label: "with pcre, with study, no jit",     opt: "--with-pcre --enable-pcre-study=yes" }
+          - {label: "with pcre, no study, with jit",     opt: "--with-pcre --enable-pcre-study=no --enable-pcre-jit" }
+          - {label: "with pcre, with study, with jit",   opt: "--with-pcre --enable-pcre-study=yes --enable-pcre-jit" }
+          - {label: "with lua",                          opt: "--with-lua" }
+          - {label: "wo lua",                            opt: "--without-lua" }
+    steps:
+      - name: Setup Dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data
+      - uses: actions/checkout@v2
+      - name: autogen.sh
+        run: ./autogen.sh
+      - name: configure ${{ matrix.configure.label }}
+        run: ./configure ${{ matrix.configure.opt }} 'CFLAGS=-Werror=format-security'
+      - uses: ammaraskar/gcc-problem-matcher@master
+      - name: make
+        run: make -j `nproc`
+      - name: install module
+        run: sudo make install
+      - name: run tests
+        run: make test
+
+  test-regression-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04]
+        platform: [x64]
+        compiler: [gcc]
+        configure:
+          - {label: "with pcre2, with study, with jit",  opt: "--enable-pcre-study=yes --enable-pcre-jit" }
+    steps:
+      - name: Setup Dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl ssdeep libfuzzy-dev libfuzzy2
+      - uses: actions/checkout@v2
+      - name: autogen.sh
+        run: ./autogen.sh
+      - name: configure ${{ matrix.configure.label }}
+        run: ./configure ${{ matrix.configure.opt }} 'CFLAGS=-Werror=format-security'
+      - uses: ammaraskar/gcc-problem-matcher@0f9c86f9e693db67dacf53986e1674de5f2e5f28 #v0.3.0
+      - name: make
+        run: make -j `nproc`
+      - name: install module
+        run: sudo make install
+      - name: run regression tests
+        run: make test-regression
+
+  cppcheck:
+    runs-on: [ubuntu-24.04]
+    container:
+      image: debian:sid
+    steps:
+      - name: Setup Dependencies
+        run: |
+              apt-get update -y -qq
+              apt-get install -y --no-install-recommends build-essential \
+              autoconf \
+              automake \
+              libtool \
+              pkg-config \
+              cppcheck \
+              apache2-dev \
+              libpcre2-dev \
+              libapr1-dev \
+              libaprutil1-dev \
+              libxml2-dev \
+              liblua5.3-dev \
+              libyajl-dev \
+              libfuzzy-dev \
+              ssdeep \
+              curl \
+              ca-certificates
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
+      - name: configure
+        run: |
+          ./autogen.sh
+          ./configure --with-apxs=/usr/bin/apxs
+      - name: cppcheck
+        run: |
+          make check-static
+
