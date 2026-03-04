@@ -30,6 +30,7 @@ modsec_rules_check_LDFLAGS = \
 	$(LIBXML2_LDFLAGS)
 
 modsec_rules_check_CPPFLAGS = \
+	-I$(top_srcdir) \
 	-I$(top_builddir)/headers \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \

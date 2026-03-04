@@ -19,9 +19,12 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <memory>
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule_remove_target_entry.h"
 #include "src/utils/string.h"
+#include "src/utils/regex.h"
 
 
 namespace modsecurity {
@@ -48,12 +51,35 @@ bool RuleRemoveTargetById::init(std::string *error) {
 
     m_target = param[1];
 
+    // Detect regex format: COLLECTION:/pattern/ (e.g. ARGS:/mixpanel$/)
+    if (m_target.size() >= 4) {
+        size_t colon = m_target.find(':');
+        if (colon != std::string::npos && colon + 2 < m_target.size() &&
+            m_target[colon + 1] == '/' && m_target[m_target.size() - 1] == '/') {
+            size_t pattern_start = colon + 2;
+            size_t pattern_end = m_target.size() - 1;
+            if (pattern_end > pattern_start) {
+                std::string pattern = m_target.substr(pattern_start,
+                    pattern_end - pattern_start);
+                m_regex = std::make_unique<Utils::Regex>(pattern, true);
+                if (m_regex->hasError()) {
+                    error->assign("Invalid regex in ctl:ruleRemoveTargetById: " +
+                        m_target);
+                    return false;
+                }
+            }
+        }
+    }
+
     return true;
 }
 
 bool RuleRemoveTargetById::evaluate(RuleWithActions *rule, Transaction *transaction) {
-    transaction->m_ruleRemoveTargetById.push_back(
-        std::make_pair(m_id, m_target));
+    RuleRemoveTargetByIdEntry entry;
+    entry.id = m_id;
+    entry.literal = m_target;
+    entry.regex = m_regex;  // shared_ptr: reuse pre-compiled regex
+    transaction->m_ruleRemoveTargetById.push_back(std::move(entry));
     return true;
 }
 
