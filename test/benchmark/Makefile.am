@@ -33,6 +33,7 @@ benchmark_LDFLAGS = \
 	$(LUA_LDFLAGS)
 
 benchmark_CPPFLAGS = \
+	-I$(top_srcdir) \
 	-I$(top_builddir)/headers \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
