@@ -32,16 +32,12 @@ jobs:
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
-          - { label: "with pcre",        opt: "--with-pcre" }
 
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: true
-
-      - name: Ensure submodules are fully initialized (recursive)
-        run: git submodule update --init --recursive
+          submodules: recursive
 
       - name: Install dependencies
         run: |
@@ -53,8 +49,6 @@ jobs:
             liblua5.2-dev \
             libmaxminddb-dev \
             libpcre2-dev \
-            libpcre3-dev \
-            libgeoip-dev \
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
@@ -97,17 +91,13 @@ jobs:
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
-          - { label: "with pcre",       opt: "--with-pcre" }
 
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: true
-
-      - name: Ensure submodules are fully initialized (recursive)
-        run: git submodule update --init --recursive
-
+          submodules: recursive
+          
       - name: Install dependencies
         # curl and pcre2 are typically already available in the macOS runner image
         run: |
@@ -123,17 +113,6 @@ jobs:
                        pcre \
                        bison \
                        flex
-
-      - name: Build GeoIP library
-        run: |
-          git clone --depth 1 --no-checkout https://github.com/maxmind/geoip-api-c.git
-          cd geoip-api-c
-          git fetch --tags
-          # last release v1.6.12
-          git checkout 4b526e7331ca1d692b74a0509ddcc725622ed31a
-          autoreconf --install
-          ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew
-          make install
 
       - name: Run build preparation script
         run: ./build.sh
@@ -171,10 +150,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: true
-
-      - name: Ensure submodules are fully initialized (recursive)
-        run: git submodule update --init --recursive
+          submodules: recursive
 
       - name: Install Conan package manager
         run: |
@@ -223,10 +199,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: true
-
-      - name: Ensure submodules are fully initialized (recursive)
-        run: git submodule update --init --recursive
+          submodules: recursive
 
       - name: Install cppcheck
         run: |
@@ -243,7 +216,7 @@ jobs:
   cppcheck-linux:
     name: Static analysis (cppcheck, Linux, debian:sid)
     runs-on: ubuntu-latest
-    container: debian:sid
+    container: debian:trixie
 
     steps:
       - name: Install basic tools
@@ -251,16 +224,14 @@ jobs:
           apt-get update
           apt-get install -y git
 
+      - name: Mark repo as safe for git
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
+        
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: true
+          submodules: recursive
 
-      - name: Mark repo as safe for git
-        run: git config --global --add safe.directory $GITHUB_WORKSPACE
-
-      - name: Ensure submodules are fully initialized (recursive)
-        run: git submodule update --init --recursive
 
       - name: Install dependencies (v2 style)
         run: |
@@ -278,7 +249,6 @@ jobs:
             liblua5.2-dev \
             libmaxminddb-dev \
             libpcre2-dev \
-            libgeoip-dev \
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
