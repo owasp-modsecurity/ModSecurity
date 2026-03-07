@@ -32,6 +32,7 @@ jobs:
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
+          - { label: "with pcre",        opt: "--with-pcre" }
 
     steps:
       - uses: actions/checkout@v6
@@ -52,6 +53,7 @@ jobs:
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
+            libpcre3-dev \
             bison \
             flex \
             pkg-config
@@ -91,6 +93,7 @@ jobs:
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
+          - { label: "with pcre",       opt: "--with-pcre" }
 
     steps:
       - uses: actions/checkout@v6
@@ -203,7 +206,7 @@ jobs:
 
       - name: Install cppcheck
         run: |
-          brew install autoconf automake libtool cppcheck
+          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua lmdb ssdeep
 
       - name: Configure project
         run: |
@@ -216,7 +219,7 @@ jobs:
   cppcheck-linux:
     name: Static analysis (cppcheck, Linux, debian:sid)
     runs-on: ubuntu-latest
-    container: debian:trixie
+    container: debian:sid
 
     steps:
       - name: Install basic tools
