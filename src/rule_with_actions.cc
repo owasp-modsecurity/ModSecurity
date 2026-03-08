@@ -209,7 +209,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         a->evaluate(this, trans);
     }
 
-    for (auto &b :
+    for (const auto& b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
@@ -262,7 +262,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         a->evaluate(this, trans, ruleMessage);
     }
 
-    for (auto &b :
+    for (const auto& b :
         trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
@@ -373,7 +373,7 @@ void RuleWithActions::executeTransformations(
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
+        for (const auto& a : trans->m_rules->m_defaultActions[getPhase()]) {
             if (a->action_kind \
                 != actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
                 continue;
@@ -400,7 +400,7 @@ void RuleWithActions::executeTransformations(
 
     // FIXME: It can't be something different from transformation. Sort this
     //        on rules compile time.
-    for (auto &b :
+    for (const auto& b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
@@ -412,7 +412,7 @@ void RuleWithActions::executeTransformations(
         }
     }
 
-    for (auto &b :
+    for (const auto& b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
@@ -441,8 +441,8 @@ void RuleWithActions::executeTransformations(
 }
 
 
-bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
-    for (auto &tag : m_actionsTag) {
+bool RuleWithActions::containsTag(const std::string& name, Transaction *t) const {
+    for (const auto &tag : m_actionsTag) {
         if (tag != NULL && tag->getName(t) == name) {
             return true;
         }
@@ -459,17 +459,17 @@ bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
 std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::string& name,
     const Transaction *trans) {
     std::vector<actions::Action *> ret;
-    for (auto &z : m_actionsRuntimePos) {
+    for (const auto &z : m_actionsRuntimePos) {
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
     }
-    for (auto &z : m_transformations) {
+    for (const auto& z : m_transformations) {
         if (*z->m_name.get() == name) {
             ret.push_back(z);
         }
     }
-    for (auto &b :
+    for (const auto& b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
@@ -479,7 +479,7 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
             ret.push_back(z);
         }
     }
-    for (auto &b :
+    for (const auto& b :
         trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;

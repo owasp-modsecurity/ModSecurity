@@ -90,8 +90,8 @@ void XML::evaluate(Transaction *t,
         ms_dbg_a(t, 2, "XML: Can't look for xmlns, internal error.");
     } else {
         std::vector<actions::Action *> acts = rule->getActionsByName("xmlns", t);
-        for (auto &x : acts) {
-            actions::XmlNS *z = static_cast<actions::XmlNS *>(x);
+        for (const auto *x : acts) {
+            const auto *z = static_cast<const actions::XmlNS *>(x);
             if (xmlXPathRegisterNs(xpathCtx, reinterpret_cast<const xmlChar*>(z->m_scope.c_str()),
                     reinterpret_cast<const xmlChar*>(z->m_href.c_str())) != 0) {
                 ms_dbg_a(t, 1, "Failed to register XML namespace href \"" + \

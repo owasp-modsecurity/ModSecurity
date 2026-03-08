@@ -61,7 +61,7 @@ struct OperatorTest {
     using ItemType = Operator;
 
     static ItemType* init(const UnitTest &t) {
-        auto op = Operator::instantiate(t.name, t.param);
+        auto *op = Operator::instantiate(t.name, t.param);
         assert(op != nullptr);
 
         std::string error;
@@ -86,7 +86,7 @@ struct TransformationTest {
     using ItemType = Transformation;
 
     static ItemType* init(const UnitTest &t) {
-        auto tfn = Transformation::instantiate("t:" + t.name);
+        auto *tfn = Transformation::instantiate("t:" + t.name);
         assert(tfn != nullptr);
 
         return tfn;
@@ -249,9 +249,9 @@ int main(int argc, char **argv) {
         test.load_tests("test-cases/secrules-language-tests/transformations");
     }
 
-    for (auto& [filename, tests] : test) {
+    for (const auto& [filename, tests] : test) {
         total += tests.size();
-        for (auto &t : tests) {
+        for (const auto &t : tests) {
             ModSecurityTestResults<UnitTest> r;
 
             if (!test.m_automake_output) {
@@ -264,7 +264,7 @@ int main(int argc, char **argv) {
                 if (r.size() == 0) {
                     std::cout << KGRN << "0 tests failed.";
                 } else {
-                    for (const auto &i : r) {
+                    for (const auto *i : r) {
                         if (i->skipped == true) {
                             skp++;
                         }
@@ -286,7 +286,7 @@ int main(int argc, char **argv) {
     if (!test.m_automake_output) {
         std::cout << "Total >> "  << total << std::endl;
 
-        for (const auto t : results) {
+        for (const auto& t : results) {
             std::cout << t->print() << std::endl;
         }
     }

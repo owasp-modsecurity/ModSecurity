@@ -51,7 +51,7 @@ class RulesExceptions {
     bool addRange(int a, int b);
     bool addNumber(int a);
     bool contains(int a);
-    bool merge(RulesExceptions *from);
+    bool merge(const RulesExceptions *from);
 
     bool loadRemoveRuleByMsg(const std::string &msg, const std::string *error);
     bool loadRemoveRuleByTag(const std::string &msg, const std::string *error);

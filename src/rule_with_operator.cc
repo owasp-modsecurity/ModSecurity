@@ -252,7 +252,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 
     getFinalVars(&vars, &exclusion, trans);
 
-    for (auto &var : vars) {
+    for (const auto &var : vars) {
         std::vector<const VariableValue *> e;
         if (!var) {
             continue;

@@ -155,7 +155,7 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
         const std::shared_lock lock(m_mutex); // read lock (shared access)
 
         if (keySize == 0) {
-            for (auto &i : m_map) {
+            for (const auto &i : m_map) {
                 if (ke.toOmit(i.first)) {
                     continue;
                 }

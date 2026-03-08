@@ -46,14 +46,14 @@ void RunTimeString::appendVar(
 }
 
 
-std::string RunTimeString::evaluate(Transaction *t) {
+std::string RunTimeString::evaluate(Transaction *t) const {
     return evaluate(t, NULL);
 }
 
 
-std::string RunTimeString::evaluate(Transaction *t, Rule *r) {
+std::string RunTimeString::evaluate(Transaction *t, Rule *r) const {
     std::string s;
-    for (auto &z : m_elements) {
+    for (const auto& z : m_elements) {
         if (z->m_string.size() > 0) {
             s.append(z->m_string);
         } else if (z->m_var != NULL && t != NULL) {
