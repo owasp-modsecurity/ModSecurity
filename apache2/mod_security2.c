@@ -91,7 +91,7 @@ TreeRoot DSOLOCAL *conn_write_state_whitelist = 0;
 TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
 
 
-#if defined(WIN32) || defined(VERSION_NGINX)
+#if defined(WIN32)
 int (*modsecDropAction)(request_rec *r) = NULL;
 #endif
 static int server_limit, thread_limit;
@@ -235,7 +235,7 @@ int perform_interception(modsec_rec *msr) {
             break;
 
         case ACTION_PROXY :
-#if !(defined(VERSION_IIS)) && !(defined(VERSION_NGINX)) && !(defined(VERSION_STANDALONE))
+#if !(defined(VERSION_IIS)) && !(defined(VERSION_STANDALONE))
             if (msr->phase < 3) {
                 if (ap_find_linked_module("mod_proxy.c") == NULL) {
                     log_level = 1;
@@ -275,7 +275,7 @@ int perform_interception(modsec_rec *msr) {
             /* ENH This does not seem to work on Windows. Is there a
              *     better way to drop a connection anyway?
              */
-            #if !defined(WIN32) && !defined(VERSION_NGINX)
+            #if !defined(WIN32)
             {
                 extern module core_module;
                 apr_socket_t *csd;
@@ -608,10 +608,10 @@ static apr_status_t change_server_signature(server_rec *s) {
     char *server_version = NULL;
 
     /* This is a very particular way to handle the server banner. It is Apache
-     * only. Stanalone and descendants should address that in its specifics
-     * implementations, e.g. Nginx module.
+     * only. Standalone and descendants should address that in its specifics
+     * implementations, e.g. IIS module.
      */
-#if !(defined(VERSION_IIS)) && !(defined(VERSION_NGINX)) && !(defined(VERSION_STANDALONE))
+#if !(defined(VERSION_IIS)) && !(defined(VERSION_STANDALONE))
     if (new_server_signature == NULL) return 0;
 
     server_version = (char *)apache_get_server_version();

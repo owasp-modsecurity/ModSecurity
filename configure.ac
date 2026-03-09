@@ -189,7 +189,7 @@ fi
 # Standalone Module
 AC_ARG_ENABLE(standalone-module,
               AS_HELP_STRING([--enable-standalone-module],
-                             [Enable building standalone module.]),
+                             [Enable building standalone module (IIS, test server). Note: NGINX support has been removed.]),
 [
   if test "$enableval" != "no"; then
     build_standalone_module=1
@@ -297,7 +297,6 @@ if test "$build_docs" -eq 1; then
        AC_CONFIG_FILES([doc/doxygen-apache])
     fi
     if test "$build_standalone_module" -eq 1; then
-       AC_CONFIG_FILES([doc/doxygen-nginx])
        AC_CONFIG_FILES([doc/doxygen-iis])
        AC_CONFIG_FILES([doc/doxygen-standalone])
     fi
@@ -937,7 +936,6 @@ AC_CONFIG_FILES([apache2/Makefile])
 fi
 if test "$build_standalone_module" -ne 0; then
 AC_CONFIG_FILES([standalone/Makefile])
-AC_CONFIG_FILES([nginx/modsecurity/config])
 fi
 if test "$build_extentions" -ne 0; then
 AC_CONFIG_FILES([ext/Makefile])

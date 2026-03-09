@@ -49,19 +49,14 @@
   MODSEC_VERSION_SUFFIX
 
 /* Apache Module Defines */
-#ifdef	VERSION_IIS
-#define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
+#if defined(VERSION_IIS)
+  #define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
+#elif defined(VERSION_STANDALONE)
+  #define MODSEC_MODULE_NAME "ModSecurity Standalone (STABLE)"
 #else
-#ifdef	VERSION_NGINX
-#define MODSEC_MODULE_NAME "ModSecurity for nginx (STABLE)"
-#else
-#ifdef	VERSION_STANDALONE
-#define MODSEC_MODULE_NAME "ModSecurity Standalone (STABLE)"
-#else
-#define MODSEC_MODULE_NAME "ModSecurity for Apache"
+  #define MODSEC_MODULE_NAME "ModSecurity for Apache"
 #endif
-#endif
-#endif
+
 #define MODSEC_MODULE_VERSION MODSEC_VERSION
 #define MODSEC_MODULE_NAME_FULL MODSEC_MODULE_NAME "/" MODSEC_MODULE_VERSION " (http://www.modsecurity.org/)"
 

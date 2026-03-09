@@ -70,8 +70,6 @@ AP_DECLARE(void) ap_regfree(ap_regex_t *preg)
 
 AP_DECLARE(int) ap_regcomp(ap_regex_t *preg, const char *pattern, int cflags)
 {
-const char *errorptr;
-int erroffset;
 int options = 0;
 int nsub = 0;
 
@@ -94,6 +92,8 @@ preg->re_nsub = nsub;
 #else // otherwise use PCRE
 if ((cflags & AP_REG_ICASE) != 0) options |= PCRE_CASELESS;
 if ((cflags & AP_REG_NEWLINE) != 0) options |= PCRE_MULTILINE;
+const char *errorptr;
+int erroffset;
 
 preg->re_pcre = pcre_compile(pattern, options, &errorptr, &erroffset, NULL);
 preg->re_erroffset = erroffset;
@@ -149,7 +149,7 @@ if (nmatch > 0)
   PCRE2_SPTR pcre2_s;
   int pcre2_ret;
   pcre2_match_data *match_data;
-  PCRE2_SIZE *pcre2_ovector = NULL;
+  const PCRE2_SIZE *pcre2_ovector = NULL;
 
   pcre2_s = (PCRE2_SPTR)string;
   match_data = pcre2_match_data_create_from_pattern(preg->re_pcre, NULL);
@@ -192,14 +192,14 @@ if (rc >= 0)
     pmatch[i].rm_so = ovector[i*2];
     pmatch[i].rm_eo = ovector[i*2+1];
     }
-  if (allocated_ovector) free(ovector);
+  if (allocated_ovector) ovector = NULL;
   for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
   return 0;
   }
 
 else
   {
-  if (allocated_ovector) free(ovector);
+  if (allocated_ovector) ovector = NULL;
   switch(rc)
     {
 #ifndef WITH_PCRE

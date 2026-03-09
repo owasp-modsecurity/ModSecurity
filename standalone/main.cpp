@@ -37,12 +37,12 @@ int event_file_blocks[256];
 char urls[MAX_URLS][4096];
 int url_cnt = 0;
 
-void readeventfile(char *name)
+void readeventfile(const char *name)
 {
 	if(event_file == NULL)
 	{
-		event_file = (char *)malloc(EVENT_FILE_MAX_SIZE);
-		event_file_lines = (char **)malloc(EVENT_FILE_MAX_SIZE);
+		event_file = static_cast<char*>(malloc(EVENT_FILE_MAX_SIZE));
+		event_file_lines = static_cast<char**>(malloc(EVENT_FILE_MAX_SIZE));
 	}
 
 	event_file_len = 0;
@@ -119,13 +119,13 @@ void parseargs(int argc, char *argv[])
 	{
 		if(argv[i][0] == '-')
 		{
-			if(argv[i][1] == 'c' && i < argc - 1)
+			if(i < argc - 1 && argv[i][1] == 'c')
 			{
 				config_file = argv[i + 1];
 				i += 2;
 				continue;
 			}
-			if(argv[i][1] == 'u' && i < argc - 1)
+			if(i < argc - 1 && argv[i][1] == 'u')
 			{
 				url_file = argv[i + 1];
 				i += 2;
@@ -144,7 +144,7 @@ void parseargs(int argc, char *argv[])
 	}
 }
 
-void log(void *obj, int level, char *str)
+void log(const void *obj, int level, const char *str) //NOSONAR
 {
 	printf("%s\n", str);
 }
@@ -265,25 +265,26 @@ void main(int argc, char *argv[])
 	if(url_file != NULL)
 	{
 		FILE *fr = fopen(url_file, "rb");
-		int i = 0;
+		if(fr != nullptr){
+			int i = 0;
+			while(fgets(urls[i],4096,fr) != NULL)
+			{
+				urls[i][4095] = 0;
 
-		while(fgets(urls[i],4096,fr) != NULL)
-		{
-			urls[i][4095] = 0;
+				int l = strlen(urls[i]) - 1;
 
-			int l = strlen(urls[i]) - 1;
+				if(l < 8)
+					continue;
 
-			if(l < 8)
-				continue;
+				while(urls[i][l] == 10 || urls[i][l] == 13)
+					l--;
 
-			while(urls[i][l] == 10 || urls[i][l] == 13)
-				l--;
+				urls[i++][l + 1] = 0;
+			}
 
-			urls[i++][l + 1] = 0;
+			url_cnt = i;
+			fclose(fr);
 		}
-
-		url_cnt = i;
-		fclose(fr);
 	}
 
 	for(int i = 0; i < event_file_cnt; i++)
@@ -320,7 +321,9 @@ void main(int argc, char *argv[])
 
 			char *method = event_file_lines[j];
 			char *url = strchr(method, 32);
-			char *proto = strchr(url + 1, 32);
+			char *proto = nullptr;
+			if(*(url + 1) != '\0')
+				proto = strchr(url + 1, 32);
 
 			if(url == NULL || proto == NULL)
 				continue;
@@ -380,8 +383,7 @@ void main(int argc, char *argv[])
 
 			if(query != NULL)
 			{
-				rawurl = (char *)apr_palloc(r->pool, strlen(url) + 1);
-				strcpy(rawurl, url);
+				rawurl = static_cast<char*>(apr_palloc(r->pool, strlen(url) + 1));				strcpy(rawurl, url);
 				*query++ = 0;
 				r->args = query;
 			}
@@ -392,15 +394,14 @@ void main(int argc, char *argv[])
 			{
 				r->content_languages = apr_array_make(r->pool, 1, sizeof(const char *));
 
-				*(const char **)apr_array_push(r->content_languages) = lng;
+				*static_cast<const char **>(apr_array_push(r->content_languages)) = lng;
 			}
 
 			r->request_time = apr_time_now();
 
 			r->parsed_uri.scheme = "http";
 			r->parsed_uri.path = r->path_info;
-			r->parsed_uri.hostname = (char *)r->hostname;
-			r->parsed_uri.is_initialized = 1;
+			r->parsed_uri.hostname = const_cast<char*>(r->hostname);			r->parsed_uri.is_initialized = 1;
 			r->parsed_uri.port = 80;
 			r->parsed_uri.port_str = "80";
 			r->parsed_uri.query = r->args;
@@ -413,8 +414,7 @@ void main(int argc, char *argv[])
 			r->unparsed_uri = rawurl;
 			r->uri = r->unparsed_uri;
 
-			r->the_request = (char *)apr_palloc(r->pool, strlen(r->method) + 1 + strlen(r->uri) + 1 + strlen(r->protocol) + 1);
-
+			r->the_request = static_cast<char*>(apr_palloc(r->pool, strlen(r->method) + 1 + strlen(r->uri) + 1 + strlen(r->protocol) + 1));
 			strcpy(r->the_request, r->method);
 			strcat(r->the_request, " ");
 			strcat(r->the_request, r->uri);

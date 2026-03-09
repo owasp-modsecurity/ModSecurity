@@ -4,7 +4,6 @@
 	match_log => {
 		error => {
 			apache => [ qr/ModSecurity for Apache.* configured\./, 10 ],
-			nginx => [ qr/ModSecurity for nginx.* configured\./, 10 ],
 		},
 	},
 },
@@ -23,7 +22,6 @@
 	match_log => {
 		error => {
 			apache => [ qr/ModSecurity for Apache.* configured\./, 10 ],
-			nginx => [ qr/ModSecurity for nginx.* configured\./, 10 ],
 		},
 	},
 },
