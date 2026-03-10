@@ -248,7 +248,7 @@ bool AuditLog::init(std::string *error) {
 }
 
 
-bool AuditLog::isRelevant(const int status) const {
+bool AuditLog::isRelevant(int status) const {
     std::string sstatus = std::to_string(status);
 
     if (m_relevant.empty()) {

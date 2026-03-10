@@ -160,7 +160,7 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     std::vector<const VariableValue *> *l,
     variables::KeyExclusions &ke) {  // cppcheck-suppress constParameterReference
-    static_cast<const AnchoredSetVariable&>(*this).resolveRegularExpression(r, l);
+    static_cast<const AnchoredSetVariable&>(*this).resolveRegularExpression(r, l, ke);
 }
 
 
