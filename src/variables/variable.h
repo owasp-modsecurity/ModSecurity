@@ -162,6 +162,10 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
         }
         return false;
     }
+
+    bool toOmit(std::string a) {
+        return static_cast<const KeyExclusions&>(*this).toOmit(a);
+    }
 };
 
 
