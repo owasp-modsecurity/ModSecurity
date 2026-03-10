@@ -172,6 +172,7 @@ class AuditLog {
 
     bool saveIfRelevant(Transaction *transaction);
     bool saveIfRelevant(Transaction *transaction, int parts);
+    bool isRelevant(const int status) const;
     bool isRelevant(int status);
 
     static int addParts(int parts, std::string_view new_parts);
