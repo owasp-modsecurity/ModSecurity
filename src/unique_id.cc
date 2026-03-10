@@ -229,7 +229,7 @@ std::string UniqueId::ethernetMacAddress() {
 
     return std::string(reinterpret_cast<const char *>(mac));
 #if defined(__linux__) || defined(__gnu_linux__) || defined(DARWIN) || defined(WIN32)
-failed:
+failed:  // cppcheck-suppress unusedLabelConfiguration
     return std::string("");
 #endif
 }
