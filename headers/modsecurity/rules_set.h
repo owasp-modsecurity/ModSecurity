@@ -75,6 +75,7 @@ class RulesSet : public RulesSetProperties {
     int merge(RulesSet *rules);
 
     int evaluate(int phase, Transaction *transaction);
+    std::string getParserError() const;
     std::string getParserError();
 
     void debug(int level, const std::string &id, const std::string &uri,
