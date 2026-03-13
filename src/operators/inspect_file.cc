@@ -69,8 +69,8 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
      * Use fork()+execv() to avoid shell interpretation and PATH ambiguity.
      * Execute the resolved m_file path directly instead of m_param.
      */
-    int pipefd[2];
-    if (pipe(pipefd) == -1) {
+    std::array<int, 2> pipefd{};
+    if (pipe(pipefd.data()) == -1) {
         return false;
     }
 
@@ -108,24 +108,17 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
     std::array<char, 512> buff{};
     std::stringstream s;
-    ssize_t count;
 
     // Retry on EINTR so a signal does not silently truncate output
-    while (true) {
+    ssize_t count = 0;
+    do {
         count = read(pipefd[0], buff.data(), buff.size());
         if (count > 0) {
             s.write(buff.data(), count);
-        } else if (count == 0) {
-            // EOF
-            break;
-        } else {
-            if (errno == EINTR) {
-                continue;
-            }
-            // Unrecoverable read error
-            break;
+        } else if (count < 0 && errno == EINTR) {
+            count = 1;  // sentinel: keep looping
         }
-    }
+    } while (count > 0);
 
     close(pipefd[0]);
 
@@ -138,8 +131,7 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
         return false;
     }
 
-    const std::string res = s.str();
-    if (res.size() > 1 && res[0] != '1') {
+    if (const std::string res = s.str(); res.size() > 1 && res[0] != '1') {
         return true;
     }
 
@@ -168,8 +160,7 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
     pclose(in);
 
-    const std::string res = s.str();
-    if (res.size() > 1 && res[0] != '1') {
+    if (const std::string res = s.str(); res.size() > 1 && res[0] != '1') {
         return true;
     }
 
