@@ -13,21 +13,12 @@
  *
  */
 
-/*
- * ModSecurity, http://www.modsecurity.org/
- * Copyright (c) 2015 - 2021 Trustwave Holdings, Inc.
- *
- * Licensed under the Apache License, Version 2.0
- */
-
 #include "src/operators/inspect_file.h"
 
 #include <stdio.h>
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <array>
-#include <vector>
 
 #include "src/operators/operator.h"
 #include "src/utils/system.h"
@@ -38,10 +29,13 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <array>
+#include <vector>
 #endif
 
 namespace modsecurity {
 namespace operators {
+
 
 bool InspectFile::init(const std::string &param2, std::string *error) {
     std::ifstream *iss;
@@ -50,7 +44,6 @@ bool InspectFile::init(const std::string &param2, std::string *error) {
 
     m_file = utils::find_resource(m_param, param2, &err);
     iss = new std::ifstream(m_file, std::ios::in);
-
     if (iss->is_open() == false) {
         error->assign("Failed to open file: " + m_param + ". " + err);
         delete iss;
@@ -65,6 +58,7 @@ bool InspectFile::init(const std::string &param2, std::string *error) {
     return true;
 }
 
+
 bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
     if (m_isScript) {
         return m_lua.run(transaction, str);
@@ -72,13 +66,11 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
 #ifndef WIN32
     /*
-     * SECURITY HARDENING:
-     * Replace shell-based popen() execution with fork()+execvp()
-     * to avoid shell interpretation while preserving behavior.
+     * Use fork()+execv() to avoid shell interpretation and PATH ambiguity.
+     * Execute the resolved m_file path directly instead of m_param.
      */
-
-    std::array<int, 2> pipefd{};
-    if (pipe(pipefd.data()) == -1) {
+    int pipefd[2];
+    if (pipe(pipefd) == -1) {
         return false;
     }
 
@@ -91,55 +83,77 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
     if (pid == 0) {
         // Child process
-        close(pipefd[0]);
-        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[0]);                // Close read end
+        dup2(pipefd[1], STDOUT_FILENO);  // Redirect stdout to pipe
         close(pipefd[1]);
 
-        // Create mutable copies (avoid const_cast)
-        std::string param_copy = m_param;
+        // Create mutable copies for execv() argument array
+        std::string file_copy = m_file;
         std::string str_copy = str;
 
-        std::vector<char*> argv;
-        argv.push_back(param_copy.data());
+        std::vector<char *> argv;
+        argv.push_back(file_copy.data());
         argv.push_back(str_copy.data());
         argv.push_back(nullptr);
 
-        execvp(argv[0], argv.data());
+        // Use execv() with the resolved path — avoids PATH lookup ambiguity
+        execv(file_copy.data(), argv.data());
 
-        _exit(1); // exec failed
+        // execv() failed: exit child immediately
+        _exit(1);
     }
 
     // Parent process
-    close(pipefd[1]);
+    close(pipefd[1]);  // Close write end
 
-    std::stringstream s;
     std::array<char, 512> buff{};
+    std::stringstream s;
     ssize_t count;
 
-    while ((count = read(pipefd[0], buff.data(), buff.size())) > 0) {
-        s.write(buff.data(), count);
+    // Retry on EINTR so a signal does not silently truncate output
+    while (true) {
+        count = read(pipefd[0], buff.data(), buff.size());
+        if (count > 0) {
+            s.write(buff.data(), count);
+        } else if (count == 0) {
+            // EOF
+            break;
+        } else {
+            if (errno == EINTR) {
+                continue;
+            }
+            // Unrecoverable read error
+            break;
+        }
     }
 
     close(pipefd[0]);
-    waitpid(pid, nullptr, 0);
 
-    if (const std::string res = s.str();
-    res.size() > 1 && res[0] != '1') {
-    return true;
-}
+    // Check child exit status; treat non-zero exit as no match
+    int wstatus = 0;
+    if (waitpid(pid, &wstatus, 0) == -1) {
+        return false;
+    }
+    if (!WIFEXITED(wstatus) || WEXITSTATUS(wstatus) != 0) {
+        return false;
+    }
 
-return false;
+    const std::string res = s.str();
+    if (res.size() > 1 && res[0] != '1') {
+        return true;
+    }
+
+    return false;
 
 #else
     /*
-     * Windows fallback: preserve existing behavior
+     * Windows fallback: use popen() to invoke the script.
      */
     FILE *in;
     std::array<char, 512> buff{};
     std::stringstream s;
-    std::string res;
-    std::string openstr;
 
+    std::string openstr;
     openstr.append(m_param);
     openstr.append(" ");
     openstr.append(str);
@@ -148,20 +162,21 @@ return false;
         return false;
     }
 
-    while (fgets(buff.data(), buff.size(), in) != NULL) {
+    while (fgets(buff.data(), static_cast<int>(buff.size()), in) != NULL) {
         s << buff.data();
     }
 
     pclose(in);
 
-    if (const std::string res = s.str();
-    res.size() > 1 && res[0] != '1') {
-    return true;
-}
+    const std::string res = s.str();
+    if (res.size() > 1 && res[0] != '1') {
+        return true;
+    }
 
     return false;
 #endif
 }
+
 
 }  // namespace operators
 }  // namespace modsecurity
