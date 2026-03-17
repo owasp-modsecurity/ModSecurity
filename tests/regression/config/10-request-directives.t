@@ -2700,7 +2700,7 @@
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
 			"Content-Type" => "application/json",
-			"Content-Length" => "8192",
+			"Content-Length" => "8219",
 		],
 		'{"a":1,"b":"' . 'b' x 8192 . '","bad_name":1,',
 	),
