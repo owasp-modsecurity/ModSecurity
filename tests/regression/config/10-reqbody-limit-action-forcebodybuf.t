@@ -136,7 +136,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (forcebodybuf, >Limit, <=NoFilesLimit) should be 200",
+	comment => "SecRequestBodyLimitAction ProcessPartial (forcebodybuf, >Limit, <=NoFilesLimit)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -148,10 +148,11 @@
 		SecRule REQUEST_URI "/test.txt" "id:500219,phase:1,t:none,pass,ctl:forceRequestBodyVariable=On"
 	),
 	match_log => {
-		error => [ qr/exit signal Segmentation fault \(11\), possible coredump in/, 1 ],
+ 		error => [ qr/ModSecurity: Request body \(Content-Length\) is larger than the configured limit \(16384\)\./, 1 ],
+		debug => [ qr/enable_partial_processing for none reqbody_processor/, 1 ],
 	},
 	match_response => {
-		status => qr/^500$/,
+		status => qr/^200$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -164,7 +165,7 @@
 },
 {
 	type => "config",
-	comment => "SecRequestBodyLimitAction ProcessPartial (forcebodybuf, >Limit, >NoFilesLimit) should be 200",
+	comment => "SecRequestBodyLimitAction ProcessPartial (forcebodybuf, >Limit, >NoFilesLimit)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -176,10 +177,11 @@
 		SecRule REQUEST_URI "/test.txt" "id:500219,phase:1,t:none,pass,ctl:forceRequestBodyVariable=On"
 	),
 	match_log => {
-		error => [ qr/exit signal Segmentation fault \(11\), possible coredump in/, 1 ],
+		error => [ qr/ModSecurity: Request body \(Content-Length\) is larger than the configured limit \(32768\)\./, 1 ],
+		debug => [ qr/enable_partial_processing for none reqbody_processor/, 1 ],
 	},
 	match_response => {
-		status => qr/^500$/,
+		status => qr/^200$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
