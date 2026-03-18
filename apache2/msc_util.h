@@ -166,7 +166,7 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
 #endif
 
 char DSOLOCAL *get_username(apr_pool_t* mp);
-const char* id_log(msre_rule* rule);
+const char* id_log(msre_rule* rule, apr_pool_t* pool);
 
 int read_line(char *buff, int size, FILE *fp);
 
