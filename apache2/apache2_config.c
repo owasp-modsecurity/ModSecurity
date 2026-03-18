@@ -219,48 +219,57 @@ static void copy_rules_phase(apr_pool_t *mp,
             exceptions = (rule_exception **)exceptions_arr->elts;
             assert(exceptions != NULL);
             for(j = 0; j < exceptions_arr->nelts; j++) {
-
                 /* Process exceptions. */
                 switch(exceptions[j]->type) {
-                    case RULE_EXCEPTION_REMOVE_ID :
-                        if ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) {
-                            int ruleid = atoi(rule->actionset->id);
-                            if (rule_id_in_range(ruleid, exceptions[j]->param)) copy--;
+                case RULE_EXCEPTION_REMOVE_ID :
+                    if ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) {
+                        int ruleid = atoi(rule->actionset->id);
+                        if (rule_id_in_range(ruleid, exceptions[j]->param)) {
+                            copy = 0;
+                            break;
                         }
-                        break;
-                    case RULE_EXCEPTION_REMOVE_MSG :
-                        if ((rule->actionset != NULL)&&(rule->actionset->msg != NULL)) {
-                            char *my_error_msg = NULL;
+                    }
+                    break;
+                case RULE_EXCEPTION_REMOVE_MSG :
+                    if ((rule->actionset != NULL)&&(rule->actionset->msg != NULL)) {
+                        char *my_error_msg = NULL;
 
-                            int rc = msc_regexec(exceptions[j]->param_data,
-                                    rule->actionset->msg, strlen(rule->actionset->msg),
+                        int rc = msc_regexec(exceptions[j]->param_data,
+                            rule->actionset->msg, strlen(rule->actionset->msg),
+                            &my_error_msg);
+                        if (rc >= 0) {
+                            copy = 0;
+                            break;
+                        }
+                    }
+                    break;
+                case RULE_EXCEPTION_REMOVE_TAG :
+                    if ((rule->actionset != NULL)&&(apr_is_empty_table(rule->actionset->actions) == 0)) {
+                        char *my_error_msg = NULL;
+                        const apr_array_header_t *tarr = NULL;
+                        const apr_table_entry_t *telts = NULL;
+                        int c;
+
+                        tarr = apr_table_elts(rule->actionset->actions);
+                        telts = (const apr_table_entry_t*)tarr->elts;
+
+                        for (c = 0; c < tarr->nelts; c++) {
+                            msre_action *action = (msre_action *)telts[c].val;
+                            if(strcmp("tag", action->metadata->name) == 0) {
+
+                                int rc = msc_regexec(exceptions[j]->param_data,
+                                    action->param, strlen(action->param),
                                     &my_error_msg);
-                            if (rc >= 0) copy--;
-                        }
-                        break;
-                    case RULE_EXCEPTION_REMOVE_TAG :
-                        if ((rule->actionset != NULL)&&(apr_is_empty_table(rule->actionset->actions) == 0)) {
-                            char *my_error_msg = NULL;
-                            const apr_array_header_t *tarr = NULL;
-                            const apr_table_entry_t *telts = NULL;
-                            int c;
-
-                            tarr = apr_table_elts(rule->actionset->actions);
-                            telts = (const apr_table_entry_t*)tarr->elts;
-
-                            for (c = 0; c < tarr->nelts; c++) {
-                                msre_action *action = (msre_action *)telts[c].val;
-                                if(strcmp("tag", action->metadata->name) == 0)  {
-
-                                    int rc = msc_regexec(exceptions[j]->param_data,
-                                            action->param, strlen(action->param),
-                                            &my_error_msg);
-                                    if (rc >= 0) copy--;
+                                if (rc >= 0) {
+                                    copy = 0;
+                                    break;
                                 }
                             }
                         }
-                        break;
+                    }
+                    break;
                 }
+                if (!copy) break;
             }
 
             if (copy > 0) {
