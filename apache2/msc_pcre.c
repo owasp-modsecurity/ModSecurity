@@ -70,6 +70,9 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
 
     pcre2_pattern = (PCRE2_SPTR)pattern;
     pcre2_options = (uint32_t)options;
+#ifdef WITH_PCRE2_UTF
+    pcre2_options |= PCRE2_UTF;
+#endif
 
     regex->re = pcre2_compile(pcre2_pattern, PCRE2_ZERO_TERMINATED,
         pcre2_options, &error_number, &error_offset, NULL);
