@@ -94,7 +94,7 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
      * via malloc).
      */
     apr_pool_create(&msr->msc_reqbody_mp, NULL);
-
+    apr_pool_abort_set(apr_pool_abort_get(msr->mp), msr->msc_reqbody_mp);
     /* Initialise request body processors, if any. */
 
     if (msr->msc_reqbody_processor != NULL) {
