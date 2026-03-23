@@ -106,7 +106,12 @@ bool SharedFiles::reopen(const std::string& fileName, std::string *error) {
         return true;
     }
 
-    FILE *fp = fopen(fileName.c_str(), "a");
+    FILE *fp;
+#ifdef WIN32
+    fopen_s(&fp, fileName.c_str(), "a");
+#else
+    fp = fopen(fileName.c_str(), "a");
+#endif
     if (fp == nullptr) {
         error->assign("Failed to reopen file: " + fileName);
         return false;
