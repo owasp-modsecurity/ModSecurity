@@ -43,7 +43,7 @@ bool DebugLog::reopenDebugLogFile(std::string *error) {
     if (!isLogFileSet()) {
         return true;
     }
-    return DebugLogWriter::getInstance().reopen(m_fileName, error);
+    return DebugLogWriter::reopen(m_fileName, error);
 }
 
 

@@ -345,7 +345,11 @@ extern "C" int msc_rules_cleanup(RulesSet *rules) {
 }
 
 
-extern "C" int msc_rules_reopen_logs(RulesSet *rules, const char **error) {
+}  // namespace modsecurity
+
+
+extern "C" int msc_rules_reopen_logs(modsecurity::RulesSet *rules,
+    const char **error) {
     bool succeeded = true;
     std::string errorStr;
 
@@ -378,7 +382,4 @@ extern "C" int msc_rules_reopen_logs(RulesSet *rules, const char **error) {
 
     return succeeded ? 0 : -1;
 }
-
-
-}  // namespace modsecurity
 
