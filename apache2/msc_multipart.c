@@ -273,6 +273,18 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
     /* The buffer is data so increase the data length counter. */
     msr->msc_reqbody_no_files_length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
 
+    /* Enable partial processing if the no_files_length exceeds the limit and the limit action is ProcessPartial. */
+    if ((msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
+        && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
+    {
+        msr->mpd->bufleft -= msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit;
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "MULTIPART: length shortend by %" APR_SIZE_T_FMT " bytes because of no_files_len limit.",
+                    msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit);
+        }
+        modsecurity_request_body_enable_partial_processing(msr);
+    }
+
     if (len > 1) {
         if (msr->mpd->buf[len - 2] == '\r') {
             msr->mpd->flag_crlf_line = 1;
@@ -586,6 +598,18 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
 
         /* The buffer contains data so increase the data length counter. */
         msr->msc_reqbody_no_files_length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0];
+
+        /* Enable partial processing if the no_files_length exceeds the limit and the limit action is ProcessPartial. */
+        if ((msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
+            && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
+        {
+            msr->mpd->bufleft -= msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit;
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "MULTIPART: length shortend by %" APR_SIZE_T_FMT " bytes because of no_files_len limit.",
+                        msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit);
+            }
+            modsecurity_request_body_enable_partial_processing(msr);
+        }
 
         /* add this part to the list of parts */
 

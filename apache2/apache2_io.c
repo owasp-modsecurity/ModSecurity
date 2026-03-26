@@ -301,8 +301,22 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
             if (msr->reqbody_length + buflen > (apr_size_t)msr->txcfg->reqbody_limit && msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL) {
                 buflen = (apr_size_t)msr->txcfg->reqbody_limit - msr->reqbody_length;
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Input filter: Bucket type %s shortened by %" APR_SIZE_T_FMT " bytes because of reqbody_limit and ProcessPartial.",
+                            bucket->type->name, (apr_size_t)msr->txcfg->reqbody_limit - msr->reqbody_length);
+                }
+
                 finished_reading = 1;
                 modsecurity_request_body_enable_partial_processing(msr);
+            } else if (   (msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
+                    && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
+            {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Input filter: Bucket type %s skip storing because of no_files_limit and ProcessPartial.",
+                            bucket->type->name);
+                }
+                buflen = 0;
+                finished_reading = 1;
             }
 
             msr->reqbody_length += buflen;
