@@ -83,6 +83,7 @@
       ]
     },
     "expected": {
+      "debug_log": "libinjection was not able to find any XSS in: safevalue123",
       "http_code": 200
     },
     "rules": [
