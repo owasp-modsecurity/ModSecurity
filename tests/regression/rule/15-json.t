@@ -320,6 +320,7 @@
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
 			"Content-Type" => "application/json",
+			"Content-Length" => "27",
 		],
 		q({"a":12345,"b":"bad_value"}),
 	),

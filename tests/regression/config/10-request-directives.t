@@ -1857,14 +1857,11 @@
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 15
+		SecRequestBodyNoFilesLimit 16
 		SecRequestBodyLimit 16
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
 	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(15\)\./, 1 ],
-	},
 	match_response => {
 		status => qr/^403$/,
 	},
@@ -1872,6 +1869,7 @@
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
 			"Content-Type" => "application/x-www-form-urlencoded",
+			"Content-Length" => "16",
 		],
 		normalize_raw_request_data(
 			q(a=1&b=2&bad_name),
@@ -2256,7 +2254,8 @@
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 11
+		SecRequestBodyNoFilesLimit 13
+		SecRequestBodyLimit 13
 		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny
@@ -2268,10 +2267,9 @@
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
 			"Content-Type" => "application/xml",
+			"Content-Length" => "14",
 		],
-		normalize_raw_request_data(
-			q(<a>bad_value</a>),
-		),
+		'<a>bad_value <',
 	),
 },
 {
@@ -2283,7 +2281,8 @@
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 12
+		SecRequestBodyNoFilesLimit 13
+		SecRequestBodyLimit 13
 		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny
@@ -2295,10 +2294,9 @@
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
 			"Content-Type" => "application/xml",
+			"Content-Length" => "14",
 		],
-		normalize_raw_request_data(
-			q(<a>bad_value</a>),
-		),
+		'<a>bad_value< ',
 	),
 },
 {
@@ -2496,494 +2494,5 @@
 			"Content-Type" => "application/x-www-form-urlencoded",
 		],
 		"a=0123456789ABCDE",
-	),
-},
-# "long-body" means that we have multiple buckets in input filter brigade
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (url-encoded/long-body/NoFilesLimit<Limit<size/deny)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8208
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^403$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "application/x-www-form-urlencoded",
-			"Content-Length" => "8209",
-		],
-		'a=1&b=' . 'b' x 8192 . '&bad_name&c',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (url-encoded/long-body/NoFilesLimit<Limit<size/pass)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8208
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "application/x-www-form-urlencoded",
-			"Content-Length" => "8209",
-		],
-		'a=1&b=' . 'b' x 8193 . '&bad_name&',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (url-encoded/long-body/NoFilesLimit<Limit=size/deny)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8208
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^403$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "application/x-www-form-urlencoded",
-			"Content-Length" => "8208",
-		],
-		'a=1&b=' . 'b' x 8193 . '&bad_name',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (url-encoded/long-bodyNoFilesLimit<Limit=size/pass)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8200
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "application/x-www-form-urlencoded",
-			"Content-Length" => "8200",
-		],
-		'a=1&b=' . 'b' x 8193 . '&',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (json/long-body/NoFilesLimit<Limit<size/deny)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8219
-		SecRule REQUEST_HEADERS:Content-Type "application/json" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^403$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "application/json",
-			"Content-Length" => "8220",
-		],
-		'{"a":1,"b":"' . 'b' x 8192 . '","bad_name":1, ',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (json/long-body/NoFilesLimit<Limit<size/pass)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8219
-		SecRule REQUEST_HEADERS:Content-Type "application/json" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "application/json",
-			"Content-Length" => "8220",
-		],
-		'{"a":1,"b":"' . 'b' x 8192 . '", "bad_name": 1',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (json/long-body/NoFilesLimit<Limit=size/bad)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8219
-		SecRule REQUEST_HEADERS:Content-Type "application/json" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS_NAMES "bad_name" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^400$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "application/json",
-			"Content-Length" => "8219",
-		],
-		'{"a":1,"b":"' . 'b' x 8192 . '","bad_name":1,',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (xml/long-body/NoFilesLimit<Limit<size/deny)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8214
-		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^403$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "text/xml",
-			"Content-Length" => "8215",
-		],
-		'<a><b>' . 'b' x 8192 . '</b><c>bad_value ',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (xml/long-body/NoFilesLimit<Limit<size/pass)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8214
-		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "text/xml",
-			"Content-Length" => "8215",
-		],
-		'<a><b>' . 'b' x 8192 . '</b><c> bad_value',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (xml/long-body/NoFilesLimit<Limit=size/bad)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8214
-		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Request body no files data length is larger than the configured limit \(2048\)\./, 1 ],
-	},
-	match_response => {
-		status => qr/^400$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "text/xml",
-			"Content-Length" => "8214",
-		],
-		'<a><b>' . 'b' x 8192 . '</b><c>bad_value',
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (multipart/long-body/NoFilesLimit<Limit<size/deny)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8472
-		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" \\
-			"id:'200003',phase:2,t:none,log,deny,status:400, \\
-			msg:'Multipart request body failed strict validation: \\
-			PE %{REQBODY_PROCESSOR_ERROR}, \\
-			BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
-			BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
-			DB %{MULTIPART_DATA_BEFORE}, \\
-			DA %{MULTIPART_DATA_AFTER}, \\
-			HF %{MULTIPART_HEADER_FOLDING}, \\
-			LF %{MULTIPART_LF_LINE}, \\
-			SM %{MULTIPART_MISSING_SEMICOLON}, \\
-			IQ %{MULTIPART_INVALID_QUOTING}, \\
-			IP %{MULTIPART_INVALID_PART}, \\
-			IH %{MULTIPART_INVALID_HEADER_FOLDING}, \\
-			FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
-		SecRule MULTIPART_UNMATCHED_BOUNDARY "!\@eq 0" \\
-			"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200005', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS "bad_value" "id:'200006',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Multipart: Allow partial processing of request body/, 1 ],
-		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
-	},
-	match_response => {
-		status => qr/^403$/,
-	},
-	request => normalize_raw_request_data(
-		qq(
-			POST /test.txt HTTP/1.1
-			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
-			User-Agent: $ENV{USER_AGENT}
-			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
-			Transfer-Encoding: chunked
-
-		),
-	)
-	.encode_chunked(
-		normalize_raw_request_data(
-			q(
-				-----------------------------69343412719991675451336310646
-				Content-Disposition: form-data; name="a"
-
-				1) . "a" x 8192 . q(
-				-----------------------------69343412719991675451336310646
-				Content-Disposition: form-data; name="b"
-
-				bad_value
-				-----------------------------69343412719991675451336310646)
-		) . "\r",
-		8192
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (multipart/long-body/NoFilesLimit<Limit<size/pass)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8471
-		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" \\
-			"id:'200003',phase:2,t:none,log,deny,status:400, \\
-			msg:'Multipart request body failed strict validation: \\
-			PE %{REQBODY_PROCESSOR_ERROR}, \\
-			BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
-			BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
-			DB %{MULTIPART_DATA_BEFORE}, \\
-			DA %{MULTIPART_DATA_AFTER}, \\
-			HF %{MULTIPART_HEADER_FOLDING}, \\
-			LF %{MULTIPART_LF_LINE}, \\
-			SM %{MULTIPART_MISSING_SEMICOLON}, \\
-			IQ %{MULTIPART_INVALID_QUOTING}, \\
-			IP %{MULTIPART_INVALID_PART}, \\
-			IH %{MULTIPART_INVALID_HEADER_FOLDING}, \\
-			FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
-		SecRule MULTIPART_UNMATCHED_BOUNDARY "!\@eq 0" \\
-			"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200005', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS "bad_value" "id:'200006',phase:2,t:none,deny
-	),
-	match_log => {
-		debug => [ qr/Multipart: Allow partial processing of request body/, 1 ],
-		-error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => normalize_raw_request_data(
-		qq(
-			POST /test.txt HTTP/1.1
-			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
-			User-Agent: $ENV{USER_AGENT}
-			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
-			Transfer-Encoding: chunked
-
-		),
-	)
-	.encode_chunked(
-		normalize_raw_request_data(
-			q(
-				-----------------------------69343412719991675451336310646
-				Content-Disposition: form-data; name="a"
-
-				1) . "a" x 8192 . q(
-				-----------------------------69343412719991675451336310646
-				Content-Disposition: form-data; name="b"
-
-				bad_value
-				-----------------------------69343412719991675451336310646)
-		),
-		8192
-	),
-},
-{
-	type => "config",
-	comment => "ProcessPartial NoFilesLimit (multipart/long-body/NoFilesLimit<Limit=size/bad)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyNoFilesLimit 2048
-		SecRequestBodyLimit 8472
-		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" \\
-			"id:'200003',phase:2,t:none,log,deny,status:400, \\
-			msg:'Multipart request body failed strict validation: \\
-			PE %{REQBODY_PROCESSOR_ERROR}, \\
-			BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
-			BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
-			DB %{MULTIPART_DATA_BEFORE}, \\
-			DA %{MULTIPART_DATA_AFTER}, \\
-			HF %{MULTIPART_HEADER_FOLDING}, \\
-			LF %{MULTIPART_LF_LINE}, \\
-			SM %{MULTIPART_MISSING_SEMICOLON}, \\
-			IQ %{MULTIPART_INVALID_QUOTING}, \\
-			IP %{MULTIPART_INVALID_PART}, \\
-			IH %{MULTIPART_INVALID_HEADER_FOLDING}, \\
-			FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
-		SecRule MULTIPART_UNMATCHED_BOUNDARY "!\@eq 0" \\
-			"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
-		SecRule REQBODY_ERROR "!\@eq 0" "id:'200005', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule ARGS "bad_value" "id:'200006',phase:2,t:none,deny
-	),
-	match_log => {
-		-debug => [ qr/Multipart: Allow partial processing of request body/, 1 ],
-		error => [ qr/Multipart parsing error: Multipart: Final boundary missing./, 1],
-	},
-	match_response => {
-		status => qr/^400$/,
-	},
-	request => normalize_raw_request_data(
-		qq(
-			POST /test.txt HTTP/1.1
-			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
-			User-Agent: $ENV{USER_AGENT}
-			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
-			Transfer-Encoding: chunked
-
-		),
-	)
-	.encode_chunked(
-		normalize_raw_request_data(
-			q(
-				-----------------------------69343412719991675451336310646
-				Content-Disposition: form-data; name="a"
-
-				1) . "a" x 8192 . q(
-				-----------------------------69343412719991675451336310646
-				Content-Disposition: form-data; name="b"
-
-				bad_value
-				-----------------------------69343412719991675451336310646)
-		),
-		8192
 	),
 },

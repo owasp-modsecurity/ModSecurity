@@ -148,7 +148,7 @@
 		SecRule REQUEST_URI "/test.txt" "id:500219,phase:1,t:none,pass,ctl:forceRequestBodyVariable=On"
 	),
 	match_log => {
- 		error => [ qr/ModSecurity: Request body \(Content-Length\) is larger than the configured limit \(16384\)\./, 1 ],
+		error => [ qr/ModSecurity: Request body \(Content-Length\) is larger than the configured limit \(16384\)\./, 1 ],
 		debug => [ qr/enable_partial_processing for none reqbody_processor/, 1 ],
 	},
 	match_response => {
@@ -157,7 +157,7 @@
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
- 			"Content-Type" => "text/plain",
+			"Content-Type" => "text/plain",
 			"Content-Length" => "16385",
 		],
 		"a" x 16385,
