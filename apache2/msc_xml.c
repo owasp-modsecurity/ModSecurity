@@ -304,10 +304,12 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
 
     /* Only if we have a context, meaning we've done some work. */
     if (msr->xml->parsing_ctx != NULL || msr->xml->parsing_ctx_arg != NULL) {
+        int terminate = !msr->reqbody_partial_processing_enabled;
+
         if (msr->xml->parsing_ctx != NULL &&
             msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
             /* This is how we signal the end of parsing to libxml. */
-            xmlParseChunk(msr->xml->parsing_ctx, NULL, 0, 1);
+            xmlParseChunk(msr->xml->parsing_ctx, NULL, 0, terminate);
 
             /* Preserve the results for our reference. */
             msr->xml->well_formed = msr->xml->parsing_ctx->wellFormed;
@@ -326,7 +328,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
 
         if (msr->xml->parsing_ctx_arg != NULL &&
             msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_OFF) {
-            if (xmlParseChunk(msr->xml->parsing_ctx_arg, NULL, 0, 1) != 0) {
+            if (xmlParseChunk(msr->xml->parsing_ctx_arg, NULL, 0, terminate) != 0) {
                 if (msr->xml->xml_error) {
                     *error_msg = msr->xml->xml_error;
                 }
