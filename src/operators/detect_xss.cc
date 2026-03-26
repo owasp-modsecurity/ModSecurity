@@ -19,6 +19,7 @@
 
 #include "src/operators/operator.h"
 #include "libinjection/src/libinjection.h"
+#include "libinjection/src/libinjection_error.h"
 
 
 namespace modsecurity {
@@ -27,25 +28,46 @@ namespace operators {
 
 bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
-    int is_xss;
-
-    is_xss = libinjection_xss(input.c_str(), input.length());
+    injection_result_t xss_result = libinjection_xss(input.c_str(),
+        input.length());
+    bool is_match = false;
 
     if (t) {
-        if (is_xss) {
-            ms_dbg_a(t, 5, "detected XSS using libinjection.");
-            if (rule && rule->hasCaptureAction()) {
-                t->m_collections.m_tx_collection->storeOrUpdateFirst(
-                    "0", std::string(input));
-                ms_dbg_a(t, 7, "Added DetectXSS match TX.0: " + \
-                    std::string(input));
-            }
-        } else {
-            ms_dbg_a(t, 9, "libinjection was not able to " \
-                "find any XSS in: " + input);
-            }
+        switch (xss_result) {
+            case LIBINJECTION_RESULT_TRUE:
+                is_match = true;
+                ms_dbg_a(t, 5, "detected XSS using libinjection.");
+                if (rule && rule->hasCaptureAction()) {
+                    t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                        "0", std::string(input));
+                    ms_dbg_a(t, 7, "Added DetectXSS match TX.0: " + \
+                        std::string(input));
+                }
+                break;
+            case LIBINJECTION_RESULT_ERROR:
+                is_match = true;
+                ms_dbg_a(t, 4, "libinjection parser error during XSS "
+                    "analysis; treating as match (fail-safe). Input: " + input);
+                if (rule && rule->hasCaptureAction()) {
+                    t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                        "0", std::string(input));
+                    ms_dbg_a(t, 7, "Added DetectXSS error input TX.0: " + \
+                        std::string(input));
+                }
+                break;
+            case LIBINJECTION_RESULT_FALSE:
+                ms_dbg_a(t, 9, "libinjection was not able to " \
+                    "find any XSS in: " + input);
+                break;
+        }
     }
-    return is_xss != 0;
+
+    if (t == nullptr) {
+        is_match = xss_result == LIBINJECTION_RESULT_TRUE
+            || xss_result == LIBINJECTION_RESULT_ERROR;
+    }
+
+    return is_match;
 }
 
 
