@@ -28,10 +28,10 @@ namespace modsecurity::operators {
 bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
 
-    char fingerprint[8] = {0};
+    std::array<char, 8> fingerprint{};
 
     const injection_result_t sqli_result =
-        libinjection_sqli(input.c_str(), input.length(), fingerprint);
+        libinjection_sqli(input.c_str(), input.length(), fingerprint.data());
 
     if (t == nullptr) {
         return isMaliciousLibinjectionResult(sqli_result);
