@@ -430,6 +430,142 @@
 },
 {
 	type => "rule",
+	comment => "xml ProcessPartial, bad format and whole body before limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 57
+		SecRequestBodyNoFilesLimit 57
+		SecXmlExternalEntity Off
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'500007', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule XML:/* "bad_value" "id:'500008',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 400 \(phase 2\). Match of "eq 0" against "REQBODY_ERROR" required\./, 1 ],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+			"Content-Length" => "57",
+		],
+		'<?xml version="1.0" encoding="utf-8"?><a><b>value</b></a ',
+	),
+},
+{
+	type => "rule",
+	comment => "xml ProcessPartial, bad format and length exceeds limit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 57
+		SecRequestBodyNoFilesLimit 57
+		SecXmlExternalEntity Off
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'500007', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule XML:/* "bad_value" "id:'500008',phase:2,t:none,deny"
+	),
+	match_log => {
+		-error => [ qr/Access denied with code 400 \(phase 2\). Match of "eq 0" against "REQBODY_ERROR" required\./, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+			"Content-Length" => "58",
+		],
+		'<?xml version="1.0" encoding="utf-8"?><a><b>value</b></a  ',
+	),
+},
+{
+	type => "rule",
+	comment => "xml ProcessPartial, bad format and whole body before limit, no declaration",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 19
+		SecRequestBodyNoFilesLimit 19
+		SecXmlExternalEntity Off
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'500007', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule XML:/* "bad_value" "id:'500008',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 400 \(phase 2\). Match of "eq 0" against "REQBODY_ERROR" required\./, 1 ],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+			"Content-Length" => "19",
+		],
+		'<a><b>value</b></a ',
+	),
+},
+{
+	type => "rule",
+	comment => "xml ProcessPartial, bad format and length exceeds limit, no declaration",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 19
+		SecRequestBodyNoFilesLimit 19
+		SecXmlExternalEntity Off
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+			"id:'500007', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+		SecRule XML:/* "bad_value" "id:'500008',phase:2,t:none,deny"
+	),
+	match_log => {
+		-error => [ qr/Access denied with code 400 \(phase 2\). Match of "eq 0" against "REQBODY_ERROR" required\./, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+			"Content-Length" => "20",
+		],
+		'<a><b>value</b></a  ',
+	),
+},
+{
+	type => "rule",
 	comment => "xml ProcessPartial, bad value and whole body before limit",
 	conf => qq(
 		SecRuleEngine On
