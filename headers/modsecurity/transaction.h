@@ -59,10 +59,10 @@ typedef struct Rules_t RulesSet;
       if (m_rules && m_rules->m_debugLog && m_rules->m_debugLog->m_debugLevel >= b) { \
           m_rules->debug(b, m_id, m_uri, c); \
       } \
-  } while (0)
+  } while (0);
 #else
 #define ms_dbg(b, c) \
-  do { } while (0)
+  do { } while (0);
 #endif
 
 #ifndef NO_LOGS
@@ -71,10 +71,10 @@ typedef struct Rules_t RulesSet;
       if (t && t->m_rules && t->m_rules->m_debugLog && t->m_rules->m_debugLog->m_debugLevel >= b) { \
           t->debug(b, c); \
       } \
-  } while (0)
+  } while (0);
 #else
 #define ms_dbg_a(t, b, c) \
-    do { } while (0)
+    do { } while (0);
 #endif
 
 
