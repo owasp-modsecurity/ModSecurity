@@ -18,7 +18,7 @@
 
 #include "libinjection/src/libinjection_error.h"
 
-namespace modsecurity:operators {
+namespace modsecurity::operators {
 
 /*
  * libinjection parser errors are handled in fail-safe mode as suspicious
