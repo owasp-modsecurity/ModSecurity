@@ -260,7 +260,7 @@
 	),
 },
 
-# The four tests below checks whether the partial text content is added or not.
+# The 8 tests below checks whether the partial text content is added or not.
 #
 # xmlParseChunk adds a text content whose length is greater than or equal to 300 bytes even when
 # you pass 0 as the terminate argument. If the length is less than 300 bytes it does not a text content
@@ -380,6 +380,122 @@
 			"Content-Length" => "16385",
 		],
 		'<root><a>' . '1' x 16073 . '<b>' . '2' x 290 . 'bad_value ',
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (XML, short, >NoFilesLimit, chunk_len>=300, deny)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyNoFilesLimit 1024
+		SecRequestBodyLimit 2048
+		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Request body no files data length is larger than the configured limit \(1024\)\./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+			"Content-Length" => "1025",
+		],
+		'<root><a>' . '1' x 708 . '</a><b>' . '2' x 291 . 'bad_value ',
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (XML, short, >NoFilesLimit, chunk_len<300, pass)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyNoFilesLimit 1024
+		SecRequestBodyLimit 2048
+		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Request body no files data length is larger than the configured limit \(1024\)\./, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+			"Content-Length" => "1025",
+		],
+		'<root><a>' . '1' x 709 . '</a><b>' . '2' x 290 . 'bad_value ',
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (XML, short, >NoFilesLimit, nested, chunk_len>=300, deny)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyNoFilesLimit 1024
+		SecRequestBodyLimit 2048
+		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Request body no files data length is larger than the configured limit \(1024\)\./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+			"Content-Length" => "1025",
+		],
+		'<root><a>' . '1' x 712 . '<b>' . '2' x 291 . 'bad_value ',
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (XML, short, >NoFilesLimit, nested, chunk_len<300, pass)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyNoFilesLimit 1024
+		SecRequestBodyLimit 2048
+		SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\\+|/)|text/)xml" "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+		SecRule XML:/* "bad_value" "id:'200002',phase:2,t:none,deny"
+	),
+	match_log => {
+		error => [ qr/Request body no files data length is larger than the configured limit \(1024\)\./, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+			"Content-Length" => "1025",
+		],
+		'<root><a>' . '1' x 713 . '<b>' . '2' x 290 . 'bad_value ',
 	),
 },
 
