@@ -18,6 +18,7 @@
 #include <string>
 #include <list>
 #include <array>
+
 #include "src/operators/operator.h"
 #include "src/operators/libinjection_utils.h"
 #include "libinjection/src/libinjection.h"
@@ -39,15 +40,19 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
 
     switch (sqli_result) {
         case LIBINJECTION_RESULT_TRUE:
-            t->m_matched.push_back(fingerprint);
+            t->m_matched.push_back(std::string(fingerprint.data()));
 
             ms_dbg_a(t, 4,
                 std::string("detected SQLi using libinjection with fingerprint '")
-                + fingerprint + "' at: '" + input + "'");
+                + fingerprint.data() + "' at: '" + input + "'");
 
             if (rule != nullptr && rule->hasCaptureAction()) {
-                t->m_collections.m_tx_collection->storeOrUpdateFirst("0", fingerprint);
-                ms_dbg_a(t, 7, std::string("Added DetectSQLi match TX.0: ") + fingerprint);
+                t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                    "0", std::string(fingerprint.data()));
+
+                ms_dbg_a(t, 7,
+                    std::string("Added DetectSQLi match TX.0: ")
+                    + fingerprint.data());
             }
             break;
 
@@ -59,14 +64,19 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
                 + input + "'");
 
             if (rule != nullptr && rule->hasCaptureAction()) {
-                t->m_collections.m_tx_collection->storeOrUpdateFirst("0", input);
-                ms_dbg_a(t, 7, std::string("Added DetectSQLi error input TX.0: ") + input);
+                t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                    "0", input);
+
+                ms_dbg_a(t, 7,
+                    std::string("Added DetectSQLi error input TX.0: ")
+                    + input);
             }
             break;
 
         case LIBINJECTION_RESULT_FALSE:
             ms_dbg_a(t, 9,
-                std::string("libinjection was not able to find any SQLi in: ") + input);
+                std::string("libinjection was not able to find any SQLi in: ")
+                + input);
             break;
     }
 
