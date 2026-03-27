@@ -19,6 +19,7 @@
 #include <list>
 
 #include "src/operators/operator.h"
+#include "src/operators/libinjection_utils.h"
 #include "libinjection/src/libinjection.h"
 #include "libinjection/src/libinjection_error.h"
 
@@ -29,18 +30,16 @@ namespace operators {
 bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
     char fingerprint[8];
-    injection_result_t sqli_result;
-    bool is_match = false;
+    injection_result_t sqli_result = LIBINJECTION_RESULT_FALSE;
 
     sqli_result = libinjection_sqli(input.c_str(), input.length(), fingerprint);
 
-    if (!t) {
-        goto tisempty;
+    if (t == nullptr) {
+        return isMaliciousLibinjectionResult(sqli_result);
     }
 
     switch (sqli_result) {
         case LIBINJECTION_RESULT_TRUE:
-            is_match = true;
             t->m_matched.push_back(fingerprint);
             ms_dbg_a(t, 4, "detected SQLi using libinjection with " \
                 "fingerprint '" + std::string(fingerprint) + "' at: '" +
@@ -53,9 +52,9 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
             }
             break;
         case LIBINJECTION_RESULT_ERROR:
-            is_match = true;
             ms_dbg_a(t, 4, "libinjection parser error during SQLi "
-                "analysis; treating as match (fail-safe). Input: '" + input + "'");
+                "analysis (" + std::string(libinjectionResultToString(sqli_result))
+                + "); treating as match (fail-safe). Input: '" + input + "'");
             if (rule && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst(
                     "0", std::string(input));
@@ -69,12 +68,7 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
             break;
     }
 
-tisempty:
-    if (t == nullptr) {
-        is_match = sqli_result == LIBINJECTION_RESULT_TRUE
-            || sqli_result == LIBINJECTION_RESULT_ERROR;
-    }
-    return is_match;
+    return isMaliciousLibinjectionResult(sqli_result);
 }
 
 
