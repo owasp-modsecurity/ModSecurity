@@ -36,10 +36,10 @@ bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
 
     switch (xss_result) {
         case LIBINJECTION_RESULT_TRUE:
-            ms_dbg_a(t, 5, std::string("detected XSS using libinjection."));
+            ms_dbg_a(t, 5, std::string("detected XSS using libinjection."))
             if (rule != nullptr && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst("0", input);
-                ms_dbg_a(t, 7, std::string("Added DetectXSS match TX.0: ") + input);
+                ms_dbg_a(t, 7, std::string("Added DetectXSS match TX.0: ") + input)
             }
             break;
 
@@ -48,16 +48,16 @@ bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
                 std::string("libinjection parser error during XSS analysis (")
                 + libinjectionResultToString(xss_result)
                 + "); treating as match (fail-safe). Input: "
-                + input);
+                + input)
             if (rule != nullptr && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst("0", input);
-                ms_dbg_a(t, 7, std::string("Added DetectXSS error input TX.0: ") + input);
+                ms_dbg_a(t, 7, std::string("Added DetectXSS error input TX.0: ") + input)
             }
             break;
 
         case LIBINJECTION_RESULT_FALSE:
             ms_dbg_a(t, 9,
-                std::string("libinjection was not able to find any XSS in: ") + input);
+                std::string("libinjection was not able to find any XSS in: ") + input)
             break;
     }
 
