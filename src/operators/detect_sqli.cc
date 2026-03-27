@@ -40,7 +40,7 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
 
     switch (sqli_result) {
         case LIBINJECTION_RESULT_TRUE:
-            t->m_matched.push_back(std::string(fingerprint.data()));
+            t->m_matched.emplace_back(fingerprint.data());
 
             ms_dbg_a(t, 4,
                 std::string("detected SQLi using libinjection with fingerprint '")
