@@ -17,7 +17,7 @@
 
 #include <string>
 #include <list>
-
+#include <array>
 #include "src/operators/operator.h"
 #include "src/operators/libinjection_utils.h"
 #include "libinjection/src/libinjection.h"
