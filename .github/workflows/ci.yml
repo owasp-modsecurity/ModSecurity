@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+env:
+  LUA_VERSION: "5.4"
+
 jobs:
   build-linux:
     name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
@@ -40,7 +43,7 @@ jobs:
           sudo apt-get install -y libyajl-dev:${{ matrix.platform.arch }} \
                                   libcurl4-openssl-dev:${{ matrix.platform.arch }} \
                                   liblmdb-dev:${{ matrix.platform.arch }} \
-                                  liblua5.2-dev:${{ matrix.platform.arch }} \
+                                  liblua${{ env.LUA_VERSION }}-dev:${{ matrix.platform.arch }} \
                                   libmaxminddb-dev:${{ matrix.platform.arch }} \
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
@@ -99,14 +102,14 @@ jobs:
                        libtool \
                        yajl \
                        lmdb \
-                       lua@5.4 \
+                       lua@${{ env.LUA_VERSION }} \
                        libmaxminddb \
                        libxml2 \
                        ssdeep \
                        pcre \
                        bison \
                        flex
-          echo "/usr/local/opt/lua@5.4/bin" >> $GITHUB_PATH
+          echo "/usr/local/opt/lua@${{ env.LUA_VERSION }}/bin" >> $GITHUB_PATH
       - uses: actions/checkout@v4
         with:
           submodules: true

@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+env:
+  LUA_VERSION: "5.4"
+
 jobs:
   build-linux:
     name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
@@ -47,7 +50,7 @@ jobs:
             libyajl-dev \
             libcurl4-openssl-dev \
             liblmdb-dev \
-            liblua5.2-dev \
+            liblua${{ env.LUA_VERSION }}-dev \
             libmaxminddb-dev \
             libpcre2-dev \
             libxml2-dev \
@@ -109,14 +112,14 @@ jobs:
                        libtool \
                        yajl \
                        lmdb \
-                       lua@5.4 \
+                       lua@${{ env.LUA_VERSION }} \
                        libmaxminddb \
                        libxml2 \
                        ssdeep \
                        pcre \
                        bison \
                        flex
-          echo "/usr/local/opt/lua@5.4/bin" >> $GITHUB_PATH
+          echo "/usr/local/opt/lua@${{ env.LUA_VERSION }}/bin" >> $GITHUB_PATH
       - name: Run build preparation script
         run: ./build.sh
 
@@ -206,8 +209,8 @@ jobs:
 
       - name: Install cppcheck
         run: |
-          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua@5.4 lmdb ssdeep
-          echo "/usr/local/opt/lua@5.4/bin" >> $GITHUB_PATH
+          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua@${{ env.LUA_VERSION }} lmdb ssdeep
+          echo "/usr/local/opt/lua@${{ env.LUA_VERSION }}/bin" >> $GITHUB_PATH
 
       - name: Configure project
         run: |
@@ -250,7 +253,7 @@ jobs:
             libyajl-dev \
             libcurl4-openssl-dev \
             liblmdb-dev \
-            liblua5.2-dev \
+            liblua${{ env.LUA_VERSION }}-dev \
             libmaxminddb-dev \
             libpcre2-dev \
             libxml2-dev \
