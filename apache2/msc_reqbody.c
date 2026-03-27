@@ -312,6 +312,24 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
     return 1;
 }
 
+/* Enable partial processing if no_files_len exceeds limit and action is ProcessPartial */
+static void modsecurity_request_body_enable_partial_processing_for_no_files_length(modsec_rec *msr,
+    apr_size_t *length, const char *reqbody_processor)
+{
+    /* Enable partial processing if no_files_len exceeds limit and action is ProcessPartial */
+    if (   (msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
+        && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
+    {
+        *length -= msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit;
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "%s: length shortened by %" APR_SIZE_T_FMT " bytes because of no_files_len limit.",
+                    reqbody_processor,
+                    msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit);
+        }
+        modsecurity_request_body_enable_partial_processing(msr);
+    }
+}
+
 /**
  * Stores one chunk of request body data. Returns -1 on error.
  */
@@ -361,18 +379,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
         else if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             /* Increase per-request data length counter. */
             msr->msc_reqbody_no_files_length += length;
-
-            /* Enable partial processing if no_files_len exceeds limit and action is ProcessPartial */
-            if (   (msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
-                && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
-            {
-                length -= msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit;
-                if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "XML: length shortened by %" APR_SIZE_T_FMT " bytes because of no_files_len limit.",
-                            msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit);
-                }
-                modsecurity_request_body_enable_partial_processing(msr);
-            }
+            modsecurity_request_body_enable_partial_processing_for_no_files_length(msr, &length, "XML");
 
             /* Process data as XML. */
             if (xml_process_chunk(msr, data, length, &my_error_msg) < 0) {
@@ -385,18 +392,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
         else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
             /* Increase per-request data length counter. */
             msr->msc_reqbody_no_files_length += length;
-
-            /* Enable partial processing if no_files_len exceeds limit and action is ProcessPartial */
-            if (   (msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
-                && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
-            {
-                length -= msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit;
-                if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "JSON: length shortened by %" APR_SIZE_T_FMT " bytes because of no_files_len limit.",
-                            msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit);
-                }
-                modsecurity_request_body_enable_partial_processing(msr);
-            }
+            modsecurity_request_body_enable_partial_processing_for_no_files_length(msr, &length, "JSON");
 
             /* Process data as JSON. */
 #ifdef WITH_YAJL
@@ -416,18 +412,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
         else if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             /* Increase per-request data length counter. */
             msr->msc_reqbody_no_files_length += length;
-
-            /* Enable partial processing if no_files_len exceeds limit and action is ProcessPartial */
-            if (   (msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
-                && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
-            {
-                length -= msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit;
-                if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "URLENCODED: length shortened by %" APR_SIZE_T_FMT " bytes because of no_files_len limit.",
-                            msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit);
-                }
-                modsecurity_request_body_enable_partial_processing(msr);
-            }
+            modsecurity_request_body_enable_partial_processing_for_no_files_length(msr, &length, "URLENCODED");
 
             /* Do nothing else, URLENCODED processor does not support streaming. */
         }
@@ -439,18 +424,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
     } else if (msr->txcfg->reqbody_buffering != REQUEST_BODY_FORCEBUF_OFF) {
         /* Increase per-request data length counter if forcing buffering. */
         msr->msc_reqbody_no_files_length += length;
-
-        /* Enable partial processing if no_files_len exceeds limit and action is ProcessPartial */
-        if (   (msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
-            && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
-        {
-            length -= msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit;
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "forceBuf: length shortened by %" APR_SIZE_T_FMT " bytes because of no_files_len limit.",
-                        msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit);
-            }
-            modsecurity_request_body_enable_partial_processing(msr);
-        }
+        modsecurity_request_body_enable_partial_processing_for_no_files_length(msr, &length, "forceBuf");
     }
 
     /* Check that we are not over the request body no files limit. */
