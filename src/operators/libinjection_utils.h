@@ -43,7 +43,6 @@ static inline const char *libinjectionResultToString(injection_result_t result) 
     return "unexpected-result";
 }
 
-}  // namespace operators
-}  // namespace modsecurity
+}  // namespace modsecurity::operators
 
 #endif  // SRC_OPERATORS_LIBINJECTION_UTILS_H_
