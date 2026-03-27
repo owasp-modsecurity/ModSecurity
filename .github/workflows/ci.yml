@@ -99,13 +99,14 @@ jobs:
                        libtool \
                        yajl \
                        lmdb \
-                       lua \
+                       lua@5.4 \
                        libmaxminddb \
                        libxml2 \
                        ssdeep \
                        pcre \
                        bison \
                        flex
+          echo "/usr/local/opt/lua@5.4/bin" >> $GITHUB_PATH
       - uses: actions/checkout@v4
         with:
           submodules: true

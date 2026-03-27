@@ -100,7 +100,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-          
+
       - name: Install dependencies
         # curl and pcre2 are typically already available in the macOS runner image
         run: |
@@ -109,14 +109,14 @@ jobs:
                        libtool \
                        yajl \
                        lmdb \
-                       lua \
+                       lua@5.4 \
                        libmaxminddb \
                        libxml2 \
                        ssdeep \
                        pcre \
                        bison \
                        flex
-
+          echo "/usr/local/opt/lua@5.4/bin" >> $GITHUB_PATH
       - name: Run build preparation script
         run: ./build.sh
 
@@ -206,7 +206,8 @@ jobs:
 
       - name: Install cppcheck
         run: |
-          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua lmdb ssdeep
+          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua@5.4 lmdb ssdeep
+          echo "/usr/local/opt/lua@5.4/bin" >> $GITHUB_PATH
 
       - name: Configure project
         run: |
