@@ -3,8 +3,8 @@ function dump(o)
       local s = '{ '
       for k,v in pairs(o) do
          -- we create a local var because in Lua55
-	 -- variables k and v get an implicit 'const' modifier
-	 -- this works in previous Lua versions too
+         -- variables k and v get an implicit 'const' modifier
+         -- this works in previous Lua versions too
          local key_str = k
          if type(key_str) ~= 'number' then
             key_str = '"'..key_str..'"'
