@@ -37,12 +37,13 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectSQLi match TX.0: f\\(f\\(f",
-      "http_code": 200
+      "http_code": 403,
+      "debug_log": "Added DetectSQLi match TX.0: f\\(f\\(f"
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectSQLi\" \"id:1201,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1201,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2201,phase:2,deny,status:403\""
     ]
   },
   {
@@ -83,12 +84,13 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectSQLi match TX.0: f\\(f\\(f",
-      "http_code": 200
+      "http_code": 403,
+      "debug_log": "Added DetectSQLi match TX.0: f\\(f\\(f"
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectSQLi\" \"id:1202,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1202,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2202,phase:2,deny,status:403\""
     ]
   },
   {
@@ -129,11 +131,12 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectSQLi\" \"id:1203,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1203,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2203,phase:2,deny,status:403\""
     ]
   },
   {
@@ -174,11 +177,12 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectSQLi\" \"id:1204,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1204,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2204,phase:2,deny,status:403\""
     ]
   },
   {
@@ -219,11 +223,12 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectSQLi\" \"id:1205,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1205,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2205,phase:2,deny,status:403\""
     ]
   },
   {
@@ -264,11 +269,12 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectSQLi\" \"id:1206,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1206,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2206,phase:2,deny,status:403\""
     ]
   },
   {
@@ -313,7 +319,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectSQLi\" \"id:1207,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1207,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2207,phase:2,deny,status:403\""
     ]
   },
   {
@@ -358,7 +365,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectSQLi\" \"id:1208,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1208,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2208,phase:2,deny,status:403\""
     ]
   }
 ]
