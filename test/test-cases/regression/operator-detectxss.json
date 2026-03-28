@@ -48,7 +48,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS benign input",
+    "title": "Testing Operator :: @detectXSS :: basic script payload",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -62,13 +62,13 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "19",
+        "Content-Length": "45",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/",
       "method": "POST",
       "body": [
-        "param1=safevalue123"
+        "param1=<script>alert(1)</script&param2=value2"
       ]
     },
     "response": {
@@ -83,12 +83,149 @@
       ]
     },
     "expected": {
-      "debug_log": "libinjection was not able to find any XSS in: safevalue123",
+      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSS\" \"id:1,phase:2,capture,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @detectXSS :: trim preserves captured payload",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "53",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=   <script>alert(1)</script   &param2=value2"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script",
       "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
       "SecRule ARGS \"@detectXSS\" \"id:2,phase:2,capture,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @detectXSS :: image onerror payload",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "42",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=<img src=x onerror=alert(1)>&p=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Added DetectXSS match TX.0: <img src=x onerror=alert(1)>",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSS\" \"id:3,phase:2,capture,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @detectXSS :: benign input should not match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "24",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=hello-world&x=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSS\" \"id:4,phase:2,capture,pass,t:trim\""
     ]
   }
 ]
