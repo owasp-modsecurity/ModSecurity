@@ -167,7 +167,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
                 trans->m_ruleRemoveTargetById.end(),
                 [&, variable, this](const auto &m) -> bool {
                     return m.id == m_ruleId &&
-                           m.matchesVariable(*variable->m_fullName.get());
+                           m.target.matchesFullName(*variable->m_fullName.get());
                 }) != trans->m_ruleRemoveTargetById.end()) {
             continue;
         }
@@ -175,8 +175,8 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, variable, trans, this](
                         const auto &m) -> bool {
-                        return containsTag(m.first, trans)
-                            && m.second == *variable->m_fullName.get();
+                        return containsTag(m.tag, trans)
+                            && m.target.matchesFullName(*variable->m_fullName.get());
                     }) != trans->m_ruleRemoveTargetByTag.end()) {
             continue;
         }
@@ -260,7 +260,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     trans->m_ruleRemoveTargetById.end(),
                     [&, v, this](const auto &m) -> bool {
                         return m.id == m_ruleId &&
-                               m.matches(v->getKey(), v->getKeyWithCollection());
+                               m.target.matchesKeyWithCollection(v->getKey(), v->getKeyWithCollection());
                     }) != trans->m_ruleRemoveTargetById.end()
             ) {
                 delete v;
@@ -271,7 +271,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, v, trans, this](const auto &m) -> bool {
-                        return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
+                        return containsTag(m.tag, trans) &&
+                               m.target.matchesKeyWithCollection(v->getKey(), v->getKeyWithCollection());
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
                 delete v;
