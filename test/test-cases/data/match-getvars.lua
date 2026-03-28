@@ -2,8 +2,14 @@ function dump(o)
    if type(o) == 'table' then
       local s = '{ '
       for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
+         -- we create a local var because in Lua55
+	 -- variables k and v get an implicit 'const' modifier
+	 -- this works in previous Lua versions too
+         local key_str = k
+         if type(key_str) ~= 'number' then
+            key_str = '"'..key_str..'"'
+         end
+         s = s .. '['..key_str..'] = ' .. dump(v) .. ','
       end
       return s .. '} '
    else
