@@ -37,12 +37,12 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script>",
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1101,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1101,phase:2,pass,t:trim,setvar:tx.xss_hit=1\"",
+      "SecRule TX:xss_hit \"@eq 1\" \"id:2101,phase:2,deny,status:403\""
     ]
   },
   {
@@ -67,7 +67,7 @@
         "no need."
       ]
     },
-    "title": "Testing Operator :: @detectXSS :: trim preserves captured payload",
+    "title": "Testing Operator :: @detectXSS :: trim preserves detection",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -83,12 +83,12 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script>",
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1102,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1102,phase:2,pass,t:trim,setvar:tx.xss_hit=1\"",
+      "SecRule TX:xss_hit \"@eq 1\" \"id:2102,phase:2,deny,status:403\""
     ]
   },
   {
@@ -129,12 +129,12 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <img src=x onerror=alert(1)>",
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1103,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1103,phase:2,pass,t:trim,setvar:tx.xss_hit=1\"",
+      "SecRule TX:xss_hit \"@eq 1\" \"id:2103,phase:2,deny,status:403\""
     ]
   },
   {
@@ -175,12 +175,12 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script>",
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1104,phase:2,capture,pass,t:urlDecodeUni,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1104,phase:2,pass,t:urlDecodeUni,t:trim,setvar:tx.xss_hit=1\"",
+      "SecRule TX:xss_hit \"@eq 1\" \"id:2104,phase:2,deny,status:403\""
     ]
   },
   {
@@ -221,11 +221,12 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1105,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1105,phase:2,pass,t:trim,setvar:tx.xss_hit=1\"",
+      "SecRule TX:xss_hit \"@eq 1\" \"id:2105,phase:2,deny,status:403\""
     ]
   },
   {
@@ -270,7 +271,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1106,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1106,phase:2,pass,t:trim,setvar:tx.xss_hit=1\"",
+      "SecRule TX:xss_hit \"@eq 1\" \"id:2106,phase:2,deny,status:403\""
     ]
   },
   {
@@ -315,7 +317,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1107,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1107,phase:2,pass,t:trim,setvar:tx.xss_hit=1\"",
+      "SecRule TX:xss_hit \"@eq 1\" \"id:2107,phase:2,deny,status:403\""
     ]
   }
 ]
