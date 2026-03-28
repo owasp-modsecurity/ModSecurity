@@ -83,5 +83,132 @@
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/mixpanel$/\"",
       "SecRule ARGS \"@contains value\" \"id:1,phase:2,deny,status:403,tag:'test'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Issue 3505: ctl:ruleRemoveTargetByTag with regex - JSON array keys",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "35"
+      },
+      "uri": "/api/jobs",
+      "method": "POST",
+      "body": [
+        "[{\"JobDescription\":\"javascript\"}]"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@beginsWith /api/jobs\" \"id:100100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=XSS;ARGS:/^json\\.\\d+\\.JobDescription$/\"",
+      "SecRule ARGS \"@rx (?i:script)\" \"id:932125,phase:2,deny,status:403,log,tag:'XSS'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Issue 3505: ctl:ruleRemoveTargetByTag with regex - mixpanel suffix",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?mixpanel=value&other=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:/mixpanel$/\"",
+      "SecRule ARGS \"@contains value\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Issue 3505: ctl:ruleRemoveTargetByTag with literal still works",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?password=secret123",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:password\"",
+      "SecRule ARGS \"@contains secret\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
   }
 ]

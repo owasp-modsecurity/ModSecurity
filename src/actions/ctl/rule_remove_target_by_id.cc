@@ -77,8 +77,8 @@ bool RuleRemoveTargetById::init(std::string *error) {
 bool RuleRemoveTargetById::evaluate(RuleWithActions *rule, Transaction *transaction) {
     RuleRemoveTargetByIdEntry entry;
     entry.id = m_id;
-    entry.literal = m_target;
-    entry.regex = m_regex;  // shared_ptr: reuse pre-compiled regex
+    entry.target.literal = m_target;
+    entry.target.regex = m_regex;
     transaction->m_ruleRemoveTargetById.push_back(std::move(entry));
     return true;
 }

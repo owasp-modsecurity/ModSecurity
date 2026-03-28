@@ -24,31 +24,23 @@
 namespace modsecurity {
 
 /**
- * Entry for ctl:ruleRemoveTargetById exclusion.
+ * Shared target-matching logic for ctl:ruleRemoveTarget{ById,ByTag}.
  * Supports literal target (e.g. ARGS:pwd) or regex (e.g. ARGS:/^json\.\d+\.JobDescription$/).
- * Regex is compiled at config load (maintainer's approach).
+ * Regex is compiled at config load time.
  */
-struct RuleRemoveTargetByIdEntry {
-    int id;
+struct RuleRemoveTargetSpec {
     std::string literal;
-    std::shared_ptr<Utils::Regex> regex;  // shared: same compiled regex reused per request
+    std::shared_ptr<Utils::Regex> regex;
 
-    /**
-     * Match VariableValue. For regex: match against key (dict element).
-     * For literal: match against keyWithCollection (e.g. ARGS:mixpanel).
-     */
-    bool matches(const std::string &key, const std::string &keyWithCollection) const {
+    bool matchesKeyWithCollection(const std::string &key,
+                                  const std::string &keyWithCollection) const {
         if (regex) {
             return regex->searchAll(key).size() > 0;
         }
         return literal == keyWithCollection;
     }
 
-    /**
-     * Match Variable (for getFinalVars). Uses case-insensitive literal match.
-     * Regex uses key from variable's fullName (extract part after colon).
-     */
-    bool matchesVariable(const std::string &fullName) const {
+    bool matchesFullName(const std::string &fullName) const {
         if (regex) {
             size_t colon = fullName.find(':');
             std::string keyPart = (colon != std::string::npos && colon + 1 < fullName.size())
@@ -64,6 +56,18 @@ struct RuleRemoveTargetByIdEntry {
                        std::tolower(static_cast<unsigned char>(b));
             });
     }
+};
+
+
+struct RuleRemoveTargetByIdEntry {
+    int id;
+    RuleRemoveTargetSpec target;
+};
+
+
+struct RuleRemoveTargetByTagEntry {
+    std::string tag;
+    RuleRemoveTargetSpec target;
 };
 
 }  // namespace modsecurity

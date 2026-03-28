@@ -523,7 +523,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     /**
      *
      */
-    std::list< std::pair<std::string, std::string> > m_ruleRemoveTargetByTag;
+    std::list<RuleRemoveTargetByTagEntry> m_ruleRemoveTargetByTag;
 
     /**
      *
