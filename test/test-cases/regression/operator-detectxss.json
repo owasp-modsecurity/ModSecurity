@@ -2,7 +2,6 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -10,20 +9,6 @@
     "server": {
       "ip": "200.249.12.31",
       "port": 80
-    },
-    "request": {
-      "headers": {
-        "Host": "localhost",
-        "User-Agent": "curl/7.38.0",
-        "Accept": "*/*",
-        "Content-Length": "45",
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      "uri": "/",
-      "method": "POST",
-      "body": [
-        "param1=<script>alert(1)</script&param2=value2"
-      ]
     },
     "response": {
       "headers": {
@@ -36,19 +21,33 @@
         "no need."
       ]
     },
+    "title": "Testing Operator :: @detectXSS :: script tag payload",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "46",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=<script>alert(1)</script>&param2=value2"
+      ]
+    },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <script>alert",
+      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script>",
       "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1101,phase:2,capture,pass,t:trim\""
     ]
   },
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS :: basic script payload",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -56,20 +55,6 @@
     "server": {
       "ip": "200.249.12.31",
       "port": 80
-    },
-    "request": {
-      "headers": {
-        "Host": "localhost",
-        "User-Agent": "curl/7.38.0",
-        "Accept": "*/*",
-        "Content-Length": "45",
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      "uri": "/",
-      "method": "POST",
-      "body": [
-        "param1=<script>alert(1)</script&param2=value2"
-      ]
     },
     "response": {
       "headers": {
@@ -82,65 +67,33 @@
         "no need."
       ]
     },
-    "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script",
-      "http_code": 200
-    },
-    "rules": [
-      "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1,phase:2,capture,pass,t:trim\""
-    ]
-  },
-  {
-    "enabled": 1,
-    "version_min": 300000,
     "title": "Testing Operator :: @detectXSS :: trim preserves captured payload",
-    "client": {
-      "ip": "200.249.12.31",
-      "port": 123
-    },
-    "server": {
-      "ip": "200.249.12.31",
-      "port": 80
-    },
     "request": {
       "headers": {
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "53",
+        "Content-Length": "52",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/",
       "method": "POST",
       "body": [
-        "param1=   <script>alert(1)</script   &param2=value2"
-      ]
-    },
-    "response": {
-      "headers": {
-        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
-        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
-        "Content-Type": "text/html",
-        "Content-Length": "8"
-      },
-      "body": [
-        "no need."
+        "param1=   <script>alert(1)</script>   &param2=value2"
       ]
     },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script",
+      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script>",
       "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:2,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1102,phase:2,capture,pass,t:trim\""
     ]
   },
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS :: image onerror payload",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -148,20 +101,6 @@
     "server": {
       "ip": "200.249.12.31",
       "port": 80
-    },
-    "request": {
-      "headers": {
-        "Host": "localhost",
-        "User-Agent": "curl/7.38.0",
-        "Accept": "*/*",
-        "Content-Length": "42",
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      "uri": "/",
-      "method": "POST",
-      "body": [
-        "param1=<img src=x onerror=alert(1)>&p=1"
-      ]
     },
     "response": {
       "headers": {
@@ -172,6 +111,21 @@
       },
       "body": [
         "no need."
+      ]
+    },
+    "title": "Testing Operator :: @detectXSS :: img onerror payload",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "49",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=<img src=x onerror=alert(1)>&param2=value2"
       ]
     },
     "expected": {
@@ -180,13 +134,12 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:3,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1103,phase:2,capture,pass,t:trim\""
     ]
   },
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS :: benign input should not match",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -194,20 +147,6 @@
     "server": {
       "ip": "200.249.12.31",
       "port": 80
-    },
-    "request": {
-      "headers": {
-        "Host": "localhost",
-        "User-Agent": "curl/7.38.0",
-        "Accept": "*/*",
-        "Content-Length": "24",
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      "uri": "/",
-      "method": "POST",
-      "body": [
-        "param1=hello-world&x=1"
-      ]
     },
     "response": {
       "headers": {
@@ -220,12 +159,163 @@
         "no need."
       ]
     },
+    "title": "Testing Operator :: @detectXSS :: encoded script payload with urlDecodeUni",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "63",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=%20%20%3Cscript%3Ealert(1)%3C%2Fscript%3E%20%20&param2=v"
+      ]
+    },
+    "expected": {
+      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script>",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSS\" \"id:1104,phase:2,capture,pass,t:urlDecodeUni,t:trim\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "title": "Testing Operator :: @detectXSS :: mixed-case javascript URI",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "40",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=JaVaScRiPt:alert(1)&param2=value2"
+      ]
+    },
     "expected": {
       "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:4,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectXSS\" \"id:1105,phase:2,capture,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "title": "Testing Operator :: @detectXSS :: benign html should not match",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "33",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=<b>hello</b>&param2=value2"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSS\" \"id:1106,phase:2,capture,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "title": "Testing Operator :: @detectXSS :: benign plain text should not match",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "33",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=welcome-to-modsecurity&x=1"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSS\" \"id:1107,phase:2,capture,pass,t:trim\""
     ]
   }
 ]
