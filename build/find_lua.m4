@@ -16,7 +16,7 @@ LUA_CPPFLAGS=""
 LUA_LDADD=""
 LUA_LDFLAGS=""
 LUA_CONFIG=${PKG_CONFIG}
-LUA_PKGNAMES="lua5.1 lua-5.1 lua_5.1 lua-51 lua_51 lua51 lua5 lua lua5.2 lua-5.2 lua_5.2 lua-52 lua_52 lua52 lua5.3 lua-5.3 lua_5.3 lua-53 lua_53 lua53 "
+LUA_PKGNAMES="lua5.5 lua-5.5 lua_5.5 lua-55 lua_55 lua55 lua5.4 lua-5.4 lua_5.4 lua-54 lua_54 lua54 lua5.3 lua-5.3 lua_5.3 lua-53 lua_53 lua53 lua5.2 lua-5.2 lua_5.2 lua-52 lua_52 lua52 lua5.1 lua-5.1 lua_5.1 lua-51 lua_51 lua51 lua5 lua"
 LUA_SONAMES="so la sl dll dylib a"
 
 AC_ARG_WITH(
