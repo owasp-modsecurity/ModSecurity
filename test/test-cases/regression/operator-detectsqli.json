@@ -44,11 +44,11 @@
       "SecRuleEngine On",
       "SecRule ARGS \"@detectSQLi\" \"id:1,phase:2,capture,pass,t:trim\""
     ]
-  },
+  },[
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS :: basic script payload",
+    "title": "Testing Operator :: @detectSQLi :: known fingerprint payload",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -62,13 +62,13 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "45",
+        "Content-Length": "61",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/",
       "method": "POST",
       "body": [
-        "param1=<script>alert(1)</script&param2=value2"
+        "param1=ascii(substring(version() from 1 for 1))&param2=value2"
       ]
     },
     "response": {
@@ -83,18 +83,18 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script",
+      "debug_log": "Added DetectSQLi match TX.0: f\\(f\\(f",
       "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:1,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:1,phase:2,capture,pass,t:trim\""
     ]
   },
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS :: trim preserves captured payload",
+    "title": "Testing Operator :: @detectSQLi :: trim still captures fingerprint",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -108,13 +108,13 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "53",
+        "Content-Length": "67",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/",
       "method": "POST",
       "body": [
-        "param1=   <script>alert(1)</script   &param2=value2"
+        "param1=   ascii(substring(version() from 1 for 1))   &param2=value2"
       ]
     },
     "response": {
@@ -129,18 +129,18 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <script>alert(1)</script",
+      "debug_log": "Added DetectSQLi match TX.0: f\\(f\\(f",
       "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:2,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:2,phase:2,capture,pass,t:trim\""
     ]
   },
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS :: image onerror payload",
+    "title": "Testing Operator :: @detectSQLi :: boolean style payload",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -154,13 +154,13 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "42",
+        "Content-Length": "31",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri": "/",
       "method": "POST",
       "body": [
-        "param1=<img src=x onerror=alert(1)>&p=1"
+        "param1=' or 1=1 -- &param2=x"
       ]
     },
     "response": {
@@ -175,18 +175,17 @@
       ]
     },
     "expected": {
-      "debug_log": "Added DetectXSS match TX.0: <img src=x onerror=alert(1)>",
       "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:3,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:3,phase:2,capture,pass,t:trim\""
     ]
   },
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @detectXSS :: benign input should not match",
+    "title": "Testing Operator :: @detectSQLi :: benign input should not match",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -225,7 +224,7 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@detectXSS\" \"id:4,phase:2,capture,pass,t:trim\""
+      "SecRule ARGS \"@detectSQLi\" \"id:4,phase:2,capture,pass,t:trim\""
     ]
   }
 ]
