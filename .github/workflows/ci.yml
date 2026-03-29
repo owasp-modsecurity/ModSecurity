@@ -4,9 +4,6 @@ on:
   push:
   pull_request:
   
-env:
-  LUA_VERSION: "5.4"
-
 jobs:
   build-linux:
     name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
@@ -37,6 +34,45 @@ jobs:
           - platform: {label: "x32"}
             configure: {label: "wo ssdeep"}
     steps:
+      - name: Detect latest Lua dev package
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sudo dpkg --add-architecture ${{ matrix.platform.arch }}
+          sudo apt-get update -y -qq
+
+          CANDIDATES="$(apt-cache search '^liblua[0-9]+\.[0-9]+-dev$' | awk '{print $1}')"
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          VALID_PACKAGES=""
+          for pkg in $CANDIDATES; do
+            if apt-cache show "${pkg}:${{ matrix.platform.arch }}" >/dev/null 2>&1; then
+              VALID_PACKAGES="${VALID_PACKAGES}${pkg}"$'\n'
+            fi
+          done
+
+          if [ -z "$VALID_PACKAGES" ]; then
+            echo "No Lua package available for architecture ${{ matrix.platform.arch }}"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$VALID_PACKAGES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+
+          echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "Using $BEST_PKG for ${{ matrix.platform.arch }}"
+
       - name: Setup Dependencies (common)
         run: |
           sudo dpkg --add-architecture ${{ matrix.platform.arch }}
@@ -44,7 +80,7 @@ jobs:
           sudo apt-get install -y libyajl-dev:${{ matrix.platform.arch }} \
                                   libcurl4-openssl-dev:${{ matrix.platform.arch }} \
                                   liblmdb-dev:${{ matrix.platform.arch }} \
-                                  liblua${{ env.LUA_VERSION }}-dev:${{ matrix.platform.arch }} \
+                                  ${{ steps.detect_lua.outputs.lua_pkg }}:${{ matrix.platform.arch }} \
                                   libmaxminddb-dev:${{ matrix.platform.arch }} \
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
@@ -104,7 +140,7 @@ jobs:
                        libtool \
                        yajl \
                        lmdb \
-                       lua@${{ env.LUA_VERSION }} \
+                       lua \
                        libmaxminddb \
                        libxml2 \
                        ssdeep \
