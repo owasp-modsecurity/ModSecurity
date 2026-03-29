@@ -50,7 +50,7 @@ jobs:
             libyajl-dev \
             libcurl4-openssl-dev \
             liblmdb-dev \
-            liblua${{ env.LUA_VERSION }}-dev \
+            liblua5.4-dev \
             libmaxminddb-dev \
             libpcre2-dev \
             libxml2-dev \
