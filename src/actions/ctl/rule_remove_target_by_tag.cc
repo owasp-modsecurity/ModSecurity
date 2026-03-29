@@ -53,7 +53,7 @@ bool RuleRemoveTargetByTag::init(std::string *error) {
             if (pattern_end > pattern_start) {
                 std::string pattern = m_target.substr(pattern_start,
                     pattern_end - pattern_start);
-                m_regex = std::make_unique<Utils::Regex>(pattern, true);
+                m_regex = std::make_shared<Utils::Regex>(pattern, true);
                 if (m_regex->hasError()) {
                     error->assign("Invalid regex in ctl:ruleRemoveTargetByTag: " +
                         m_target);

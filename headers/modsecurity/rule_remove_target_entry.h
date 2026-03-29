@@ -19,9 +19,8 @@
 #include <memory>
 #include <string>
 
-#include "src/utils/regex.h"
-
 namespace modsecurity {
+namespace Utils { class Regex; }
 
 /**
  * Shared target-matching logic for ctl:ruleRemoveTarget{ById,ByTag}.
@@ -33,29 +32,8 @@ struct RuleRemoveTargetSpec {
     std::shared_ptr<Utils::Regex> regex;
 
     bool matchesKeyWithCollection(const std::string &key,
-                                  const std::string &keyWithCollection) const {
-        if (regex) {
-            return regex->searchAll(key).size() > 0;
-        }
-        return literal == keyWithCollection;
-    }
-
-    bool matchesFullName(const std::string &fullName) const {
-        if (regex) {
-            size_t colon = fullName.find(':');
-            std::string keyPart = (colon != std::string::npos && colon + 1 < fullName.size())
-                ? fullName.substr(colon + 1) : fullName;
-            return regex->searchAll(keyPart).size() > 0;
-        }
-        if (literal.size() != fullName.size()) {
-            return false;
-        }
-        return std::equal(literal.begin(), literal.end(), fullName.begin(),
-            [](char a, char b) {
-                return std::tolower(static_cast<unsigned char>(a)) ==
-                       std::tolower(static_cast<unsigned char>(b));
-            });
-    }
+                                  const std::string &keyWithCollection) const;
+    bool matchesFullName(const std::string &fullName) const;
 };
 
 
