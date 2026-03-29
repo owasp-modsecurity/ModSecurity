@@ -5,7 +5,7 @@ on:
   pull_request:
   
 env:
-  LUA_VERSION: "5.5"
+  LUA_VERSION: "5.4"
 
 jobs:
   build-linux:
@@ -58,8 +58,8 @@ jobs:
       - name: Setup Dependencies (x64)
         if: ${{ matrix.platform.label == 'x64' }}
         run: |
-          sudo apt-get install -y libgeoip-dev:${{ matrix.platform.arch }} \
-                                  libfuzzy-dev:${{ matrix.platform.arch }}
+          sudo apt-get install -y libfuzzy-dev:${{ matrix.platform.arch }}
+          
       - uses: actions/checkout@v6
         with:
           submodules: recursive
@@ -116,16 +116,6 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-      - name: Build GeoIP
-        run: |
-          git clone --depth 1 --no-checkout https://github.com/maxmind/geoip-api-c.git
-          cd geoip-api-c
-          git fetch --tags
-          # Check out the last release, v1.6.12
-          git checkout 4b526e7331ca1d692b74a0509ddcc725622ed31a
-          autoreconf --install
-          ./configure --disable-dependency-tracking --disable-silent-rules --prefix=/opt/homebrew
-          make install
       - name: build.sh
         run: ./build.sh
       - name: configure
