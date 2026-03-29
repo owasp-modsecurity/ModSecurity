@@ -20,7 +20,10 @@
 #include <string>
 
 namespace modsecurity {
-namespace Utils { class Regex; }
+
+namespace Utils {
+class Regex;
+}
 
 /**
  * Shared target-matching logic for ctl:ruleRemoveTarget{ById,ByTag}.
