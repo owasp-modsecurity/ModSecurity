@@ -48,7 +48,7 @@ jobs:
                                   libmaxminddb-dev:${{ matrix.platform.arch }} \
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
-                                  bison flex
+                                  bison flex python3 python3-venv
       - name: Setup Dependencies (x32)
         if: ${{ matrix.platform.label == 'x32' }}
         run: |
@@ -110,7 +110,8 @@ jobs:
                        ssdeep \
                        pcre \
                        bison \
-                       flex
+                       flex \
+                       python3
       - uses: actions/checkout@v6
         with:
           submodules: recursive
@@ -200,8 +201,9 @@ jobs:
           brew install autoconf \
                        automake \
                        libtool \
-                       cppcheck
-      - uses: actions/checkout@v4
+                       cppcheck \
+                       python3
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
           fetch-depth: 0
