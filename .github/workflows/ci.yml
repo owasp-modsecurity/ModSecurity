@@ -3,12 +3,16 @@ name: Quality Assurance
 on:
   push:
   pull_request:
+  
+env:
+  LUA_VERSION: "5.5"
 
 jobs:
   build-linux:
     name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04]
         platform:
@@ -40,7 +44,7 @@ jobs:
           sudo apt-get install -y libyajl-dev:${{ matrix.platform.arch }} \
                                   libcurl4-openssl-dev:${{ matrix.platform.arch }} \
                                   liblmdb-dev:${{ matrix.platform.arch }} \
-                                  liblua5.2-dev:${{ matrix.platform.arch }} \
+                                  liblua${{ env.LUA_VERSION }}-dev:${{ matrix.platform.arch }} \
                                   libmaxminddb-dev:${{ matrix.platform.arch }} \
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
@@ -56,9 +60,9 @@ jobs:
         run: |
           sudo apt-get install -y libgeoip-dev:${{ matrix.platform.arch }} \
                                   libfuzzy-dev:${{ matrix.platform.arch }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
       - name: build.sh
         run: ./build.sh
@@ -77,6 +81,7 @@ jobs:
     name: macOS (${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-14]
         configure:
@@ -99,16 +104,16 @@ jobs:
                        libtool \
                        yajl \
                        lmdb \
-                       lua \
+                       lua@${{ env.LUA_VERSION }} \
                        libmaxminddb \
                        libxml2 \
                        ssdeep \
                        pcre \
                        bison \
                        flex
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
       - name: Build GeoIP
         run: |
@@ -134,6 +139,7 @@ jobs:
     name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-2022]
         platform:
@@ -147,9 +153,9 @@ jobs:
           - {label: "wo libxml",  opt: "-DWITH_LIBXML2=OFF" }
           - {label: "with lmdb",  opt: "-DWITH_LMDB=ON" }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
       - name: Install Conan
         run: |
@@ -197,7 +203,7 @@ jobs:
                        cppcheck
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
       - name: configure
         run: |
