@@ -1,3 +1,10 @@
+v3.0.18 - TBD
+---------------------
+
+  - feat: Regex pattern for variable key in ctl:ruleRemoveTargetById and
+    ctl:ruleRemoveTargetByTag (#3505)
+    [PR #3526 - @etiennemunnich]
+
 v3.0.17 - 2026-Sep-29
 ---------------------
 
