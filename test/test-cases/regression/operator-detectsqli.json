@@ -368,5 +368,98 @@
       "SecRule ARGS \"@detectSQLi\" \"id:1208,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
       "SecRule TX:sqli_hit \"@eq 1\" \"id:2208,phase:2,deny,status:403\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "title": "Testing Operator :: @detectSQLi :: capture stores fingerprint in TX.0",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "61",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=ascii(substring(version() from 1 for 1))&param2=value2"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectSQLi\" \"id:1209,phase:2,capture,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:0 \"@streq f(f(f\" \"id:2209,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "title": "Testing Operator :: @detectSQLi :: no capture keeps TX.0 unchanged",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "61",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=ascii(substring(version() from 1 for 1))&param2=value2"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectSQLi\" \"id:1210,phase:2,pass,t:trim,setvar:tx.sqli_hit=1\"",
+      "SecRule TX:0 \"@streq f(f(f\" \"id:2210,phase:2,deny,status:409\"",
+      "SecRule TX:sqli_hit \"@eq 1\" \"id:2211,phase:2,deny,status:403\""
+    ]
   }
 ]

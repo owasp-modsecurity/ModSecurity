@@ -19,16 +19,21 @@
 
 #include "src/operators/operator.h"
 #include "src/operators/libinjection_utils.h"
-#include "libinjection/src/libinjection.h"
+#include "src/operators/libinjection_adapter.h"
+#include "src/utils/string.h"
 #include "libinjection/src/libinjection_error.h"
 
 namespace modsecurity::operators {
 
 bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
+#ifndef NO_LOGS
+    const std::string loggable_input =
+        utils::string::limitTo(80, utils::string::toHexIfNeeded(input));
+#endif
 
     const injection_result_t xss_result =
-        libinjection_xss(input.c_str(), input.length());
+        runLibinjectionXSS(input.c_str(), input.length());
 
     if (t == nullptr) {
         return isMaliciousLibinjectionResult(xss_result);
@@ -44,11 +49,13 @@ bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
             break;
 
         case LIBINJECTION_RESULT_ERROR:
+#ifndef NO_LOGS
             ms_dbg_a(t, 4,
                 std::string("libinjection parser error during XSS analysis (")
                 + libinjectionResultToString(xss_result)
                 + "); treating as match (fail-safe). Input: "
-                + input);
+                + loggable_input);
+#endif
             if (rule != nullptr && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst("0", input);
                 ms_dbg_a(t, 7, std::string("Added DetectXSS error input TX.0: ") + input);
@@ -56,8 +63,11 @@ bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
             break;
 
         case LIBINJECTION_RESULT_FALSE:
+#ifndef NO_LOGS
             ms_dbg_a(t, 9,
-                std::string("libinjection was not able to find any XSS in: ") + input);
+                std::string("libinjection was not able to find any XSS in: ")
+                + loggable_input);
+#endif
             break;
     }
 

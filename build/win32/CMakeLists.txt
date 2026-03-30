@@ -164,7 +164,7 @@ project(libModSecurityTests)
 
 function(setTestTargetProperties executable)
   target_compile_definitions(${executable} PRIVATE WITH_PCRE2)
-  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers)
+  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others)
   target_link_libraries(${executable} PRIVATE libModSecurity pcre2::pcre2 dirent::dirent)
   add_package_dependency(${executable} WITH_YAJL yajl::yajl HAVE_YAJL)
 endfunction()
@@ -239,7 +239,7 @@ setTestTargetProperties(rules_optimization)
 project(libModSecurityExamples)
 
 function(setExampleTargetProperties executable)
-  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers)
+  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others)
   target_link_libraries(${executable} PRIVATE libModSecurity)
 endfunction()
 
