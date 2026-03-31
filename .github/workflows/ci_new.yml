@@ -32,7 +32,6 @@ jobs:
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
-          - { label: "with pcre",        opt: "--with-pcre" }
 
     steps:
       - uses: actions/checkout@v6
@@ -78,7 +77,6 @@ jobs:
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
-            libpcre3-dev \
             bison \
             flex \
             pkg-config \
