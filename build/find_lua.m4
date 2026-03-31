@@ -16,7 +16,7 @@ LUA_CPPFLAGS=""
 LUA_LDADD=""
 LUA_LDFLAGS=""
 LUA_CONFIG=${PKG_CONFIG}
-LUA_PKGNAMES="lua5.1 lua-5.1 lua_5.1 lua-51 lua_51 lua51 lua5 lua lua5.2 lua-5.2 lua_5.2 lua-52 lua_52 lua52 lua5.3 lua-5.3 lua_5.3 lua-53 lua_53 lua53 "
+LUA_PKGNAMES="lua5.5 lua-5.5 lua_5.5 lua-55 lua_55 lua55 lua5.4 lua-5.4 lua_5.4 lua-54 lua_54 lua54 lua5.3 lua-5.3 lua_5.3 lua-53 lua_53 lua53 lua5.2 lua-5.2 lua_5.2 lua-52 lua_52 lua52 lua5.1 lua-5.1 lua_5.1 lua-51 lua_51 lua51 lua5 lua"
 LUA_SONAMES="so la sl dll dylib a"
 
 AC_ARG_WITH(
@@ -83,59 +83,30 @@ else
     dnl Hack to just try to find the lib and include
     AC_MSG_CHECKING([for lua install])
     for x in ${test_paths}; do
-        for y in ${LUA_SONAMES}; do
-            if test -e "${x}/liblua5.1.${y}"; then
-                lua_lib_path="${x}"
-                lua_lib_name="lua5.1"
-                break
-            elif test -e "${x}/lib/liblua5.1.${y}"; then
-                lua_lib_path="${x}/lib"
-                lua_lib_name="lua5.1"
-                break
-            elif test -e "${x}/lib64/liblua5.1.${y}"; then
-                lua_lib_path="${x}/lib64"
-                lua_lib_name="lua5.1"
-                break
-            elif test -e "${x}/lib32/liblua5.1.${y}"; then
-                lua_lib_path="${x}/lib32"
-                lua_lib_name="lua5.1"
-                break
-            elif test -e "${x}/liblua51.${y}"; then
-                lua_lib_path="${x}"
-                lua_lib_name="lua51"
-                break
-            elif test -e "${x}/lib/liblua51.${y}"; then
-                lua_lib_path="${x}/lib"
-                lua_lib_name="lua51"
-                break
-            elif test -e "${x}/lib64/liblua51.${y}"; then
-                lua_lib_path="${x}/lib64"
-                lua_lib_name="lua51"
-                break
-            elif test -e "${x}/lib32/liblua51.${y}"; then
-                lua_lib_path="${x}/lib32"
-                lua_lib_name="lua51"
-                break
-            elif test -e "${x}/liblua.${y}"; then
-                lua_lib_path="${x}"
-                lua_lib_name="lua"
-                break
-            elif test -e "${x}/lib/liblua.${y}"; then
-                lua_lib_path="${x}/lib"
-                lua_lib_name="lua"
-                break
-            elif test -e "${x}/lib64/liblua.${y}"; then
-                lua_lib_path="${x}/lib64"
-                lua_lib_name="lua"
-                break
-            elif test -e "${x}/lib32/liblua.${y}"; then
-                lua_lib_path="${x}/lib32"
-                lua_lib_name="lua"
-                break
-            else
-                lua_lib_path=""
-                lua_lib_name=""
-            fi
+        for v in 5.5 5.4 5.3 5.2 5.1 51 ""; do
+            # Generate the necessary names: lua5.5, lua5.4 ... lua51 (legacy) or just simply lua
+            curr_lib="lua${v}"
+            if test -z "${v}"; then curr_lib="lua"; fi
+
+            for y in ${LUA_SONAMES}; do
+                if test -e "${x}/lib${curr_lib}.${y}"; then
+                    lua_lib_path="${x}"
+                    lua_lib_name="${curr_lib}"
+                    break 2 # exit from two inner loops
+                elif test -e "${x}/lib/lib${curr_lib}.${y}"; then
+                    lua_lib_path="${x}/lib"
+                    lua_lib_name="${curr_lib}"
+                    break 2
+                elif test -e "${x}/lib64/lib${curr_lib}.${y}"; then
+                    lua_lib_path="${x}/lib64"
+                    lua_lib_name="${curr_lib}"
+                    break 2
+                elif test -e "${x}/lib32/lib${curr_lib}.${y}"; then
+                    lua_lib_path="${x}/lib32"
+                    lua_lib_name="${curr_lib}"
+                    break 2
+                fi
+            done
         done
         if test -n "$lua_lib_path"; then
             break
