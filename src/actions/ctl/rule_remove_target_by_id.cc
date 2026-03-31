@@ -25,7 +25,6 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule_remove_target_entry.h"
 #include "src/utils/string.h"
-#include "src/utils/regex.h"
 
 
 namespace modsecurity {
@@ -73,6 +72,10 @@ bool RuleRemoveTargetById::init(std::string *error) {
                         m_target);
                     return false;
                 }
+            } else {
+                error->assign("Empty regex in ctl:ruleRemoveTargetById: " +
+                    m_target);
+                return false;
             }
         }
     }

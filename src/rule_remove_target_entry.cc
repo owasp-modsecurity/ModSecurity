@@ -46,6 +46,12 @@ bool RuleRemoveTargetSpec::matchesKeyWithCollection(
     if (regex) {
         size_t litColon = literal.find(':');
         size_t kwcColon = keyWithCollection.find(':');
+        // Collection-scoped target cannot match a scalar variable.
+        if (litColon != std::string::npos && kwcColon == std::string::npos) {
+            return false;
+        }
+        // Regex targets match only the key portion; verify collection prefix
+        // separately so ARGS:/.../ does not exclude REQUEST_HEADERS variables.
         if (litColon != std::string::npos && kwcColon != std::string::npos) {
             if (!collectionPrefixMatches(literal, litColon,
                                          keyWithCollection, kwcColon)) {
@@ -62,6 +68,12 @@ bool RuleRemoveTargetSpec::matchesFullName(const std::string &fullName) const {
     if (regex) {
         size_t litColon = literal.find(':');
         size_t fullColon = fullName.find(':');
+        // Collection-scoped target cannot match a scalar variable.
+        if (litColon != std::string::npos && fullColon == std::string::npos) {
+            return false;
+        }
+        // Regex targets match only the key portion; verify collection prefix
+        // separately so ARGS:/.../ does not exclude REQUEST_HEADERS variables.
         if (litColon != std::string::npos && fullColon != std::string::npos) {
             if (!collectionPrefixMatches(literal, litColon,
                                          fullName, fullColon)) {
