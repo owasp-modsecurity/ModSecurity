@@ -102,11 +102,12 @@ jobs:
 
   build-macos:
     name: macOS (${{ matrix.configure.label }})
-    runs-on: macos-15
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [macos-15, macos-26]
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -220,7 +221,7 @@ jobs:
 
   cppcheck:
     name: Static analysis (cppcheck)
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
       - uses: actions/checkout@v6
