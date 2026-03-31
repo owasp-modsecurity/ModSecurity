@@ -93,7 +93,7 @@ else
                     lua_lib_path="${x}"
                     lua_lib_name="${curr_lib}"
                     break 2 # exit from two inner loops
-                elif test -e "${x}/lib/${curr_lib}.${y}"; then
+                elif test -e "${x}/lib/lib${curr_lib}.${y}"; then
                     lua_lib_path="${x}/lib"
                     lua_lib_name="${curr_lib}"
                     break 2
