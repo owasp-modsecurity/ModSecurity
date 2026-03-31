@@ -101,6 +101,10 @@ else
                     lua_lib_path="${x}/lib64"
                     lua_lib_name="${curr_lib}"
                     break 2
+                elif test -e "${x}/lib32/lib${curr_lib}.${y}"; then
+                    lua_lib_path="${x}/lib32"
+                    lua_lib_name="${curr_lib}"
+                    break 2
                 fi
             done
         done
