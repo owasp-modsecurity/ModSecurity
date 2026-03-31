@@ -24,7 +24,6 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule_remove_target_entry.h"
 #include "src/utils/string.h"
-#include "src/utils/regex.h"
 
 
 namespace modsecurity {
@@ -44,6 +43,7 @@ bool RuleRemoveTargetByTag::init(std::string *error) {
     m_tag = param[0];
     m_target = param[1];
 
+    // Detect regex format: COLLECTION:/pattern/ (e.g. ARGS:/mixpanel$/)
     if (m_target.size() >= 4) {
         size_t colon = m_target.find(':');
         if (colon != std::string::npos && colon + 2 < m_target.size() &&
@@ -59,6 +59,10 @@ bool RuleRemoveTargetByTag::init(std::string *error) {
                         m_target);
                     return false;
                 }
+            } else {
+                error->assign("Empty regex in ctl:ruleRemoveTargetByTag: " +
+                    m_target);
+                return false;
             }
         }
     }
