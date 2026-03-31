@@ -83,8 +83,8 @@ else
     dnl Hack to just try to find the lib and include
     AC_MSG_CHECKING([for lua install])
     for x in ${test_paths}; do
-        for v in 5.5 5.4 5.3 5.2 5.1 ""; do
-            # Generate the necessary names: lua5.5, lua5.4 ... or just simply lua
+        for v in 5.5 5.4 5.3 5.2 5.1 51 ""; do
+            # Generate the necessary names: lua5.5, lua5.4 ... lua51 (legacy) or just simply lua
             curr_lib="lua${v}"
             if test -z "${v}"; then curr_lib="lua"; fi
 
