@@ -84,7 +84,7 @@ AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git de
 AC_SUBST([LIBINJECTION_VERSION])
 
 # Check for Mbed TLS
-if ! test -f "${srcdir}/others/mbedtls/library/base64.c"; then
+if ! test -f "${srcdir}/others/mbedtls/tf-psa-crypto/utilities/base64.c"; then
 AC_MSG_ERROR([\
 
 
@@ -532,4 +532,3 @@ if test "$aflFuzzer" = "true"; then
     echo "  $ export CC=afl-clang-fast "
     echo " "
 fi
-

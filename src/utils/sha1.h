@@ -3,7 +3,7 @@
  * Copyright (c) 2015 - 2021 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * You may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * the License. You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -16,59 +16,78 @@
 #ifndef SRC_UTILS_SHA1_H_
 #define SRC_UTILS_SHA1_H_
 
+#include <array>
+#include <exception>
 #include <string>
-#include <cassert>
+#include <string_view>
 
 #include "src/utils/string.h"
-#include "mbedtls/sha1.h"
+#include "mbedtls/md.h"
 
 namespace modsecurity::Utils {
 
+class DigestCalculationException : public std::exception {
+ public:
+    explicit DigestCalculationException(const char *message) noexcept
+        : m_message(message) { }
 
-using DigestOp = int (*)(const unsigned char *, size_t, unsigned char []);
+    const char *what() const noexcept override {
+        return m_message;
+    }
+
+ private:
+    const char *m_message;
+};
 
 
-template<DigestOp digestOp, int DigestSize>
+template<mbedtls_md_type_t DigestType, int DigestSize>
 class DigestImpl {
  public:
-
     static std::string digest(const std::string& input) {
-        return digestHelper(input, [](const auto digest) { 
-            return std::string(digest);
-        });
+        const auto digestBytes = calculateDigest(input);
+        return std::string(digestBytes.begin(), digestBytes.end());
     }
 
     static void digestReplace(std::string& value) {
-        digestHelper(value, [&value](const auto digest) mutable { 
-            value = digest;
-        });
+        const auto digestBytes = calculateDigest(value);
+        value.assign(digestBytes.begin(), digestBytes.end());
     }
 
-    static std::string hexdigest(const std::string &input) {
-        return digestHelper(input, [](const auto digest) { 
-            return utils::string::string_to_hex(digest);
-        });
+    static std::string hexdigest(const std::string& input) {
+        const auto digestBytes = calculateDigest(input);
+        const std::string digestString(digestBytes.begin(), digestBytes.end());
+        return utils::string::string_to_hex(digestString);
     }
 
-private:
+ private:
+    static std::array<unsigned char, DigestSize> calculateDigest(
+        std::string_view input) {
+        std::array<unsigned char, DigestSize> digestBytes = {};
 
-    template<typename ConvertOp>
-    static auto digestHelper(const std::string &input,
-        ConvertOp convertOp) -> auto {
-        char digest[DigestSize];
+        const mbedtls_md_info_t *mdInfo = mbedtls_md_info_from_type(DigestType);
+        if (mdInfo == nullptr) {
+            throw DigestCalculationException(
+                "mbedtls_md_info_from_type() returned nullptr");
+        }
 
-        const auto ret = (*digestOp)(reinterpret_cast<const unsigned char *>(input.c_str()),
-                 input.size(), reinterpret_cast<unsigned char *>(digest));
-        assert(ret == 0);
+        const auto *inputBytes =
+            static_cast<const unsigned char *>(static_cast<const void *>(input.data()));
 
-        return convertOp(std::string_view(digest, DigestSize));
+        if (const int ret = mbedtls_md(
+                mdInfo,
+                inputBytes,
+                input.size(),
+                digestBytes.data()); ret != 0) {
+            throw DigestCalculationException("mbedtls_md() failed");
+        }
+
+        return digestBytes;
     }
 };
 
 
-class Sha1 : public DigestImpl<&mbedtls_sha1, 20> {
+class Sha1 : public DigestImpl<MBEDTLS_MD_SHA1, 20> {
 };
-
 
 }  // namespace modsecurity::Utils
 
