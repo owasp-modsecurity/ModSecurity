@@ -92,6 +92,12 @@ jobs:
             python3 \
             python3-venv
 
+      - name: Show Lua installation
+        run: |
+          which lua || true
+          lua -v || true
+          dpkg -l | grep lua || true
+          
       - name: Run build preparation script
         run: ./build.sh
 
