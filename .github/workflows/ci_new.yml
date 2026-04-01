@@ -40,14 +40,39 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Detect latest Lua dev package
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sudo apt-get update -y -qq
+
+          CANDIDATES="$(apt-cache search '^liblua[0-9]+\.[0-9]+-dev$' | awk '{print $1}')"
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+
+          echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "Using $BEST_PKG"
+
       - name: Install dependencies
         run: |
-          sudo apt-get update -y -qq
           sudo apt-get install -y \
             libyajl-dev \
             libcurl4-openssl-dev \
             liblmdb-dev \
-            liblua5.2-dev \
+            ${{ steps.detect_lua.outputs.lua_pkg }} \
             libmaxminddb-dev \
             libpcre2-dev \
             libxml2-dev \
@@ -56,8 +81,9 @@ jobs:
             libpcre3-dev \
             bison \
             flex \
-            pkg-config
-
+            pkg-config \
+            python3 \
+            python3-venv
 
       - name: Run build preparation script
         run: ./build.sh
@@ -78,11 +104,12 @@ jobs:
 
   build-macos:
     name: macOS (${{ matrix.configure.label }})
-    runs-on: macos-15
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [macos-15, macos-26]
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -196,7 +223,7 @@ jobs:
 
   cppcheck:
     name: Static analysis (cppcheck)
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
       - uses: actions/checkout@v6
@@ -234,11 +261,47 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+          
+      - name: Detect latest Lua packages
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
 
+          apt-get update
+
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+
+          if [ -z "$BEST_PKG" ]; then
+            echo "Failed to determine Lua dev package"
+            printf '%s\n' "$CANDIDATES"
+            exit 1
+          fi
+
+          BEST_VER="$(printf '%s\n' "$BEST_PKG" | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1/')"
+          LUA_PKG="lua$BEST_VER"
+
+          echo "lua_dev_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "lua_pkg=$LUA_PKG" >> "$GITHUB_OUTPUT"
+
+          echo "Using dev package: $BEST_PKG"
+          echo "Using interpreter: $LUA_PKG"
 
       - name: Install dependencies (v2 style)
         run: |
-          apt-get update
           apt-get install -y \
             autoconf \
             automake \
@@ -249,15 +312,24 @@ jobs:
             libyajl-dev \
             libcurl4-openssl-dev \
             liblmdb-dev \
-            liblua5.2-dev \
+            ${{ steps.detect_lua.outputs.lua_dev_pkg }} \
+            ${{ steps.detect_lua.outputs.lua_pkg }} \
             libmaxminddb-dev \
             libpcre2-dev \
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
             bison \
-            flex
-
+            flex \
+            python3 \
+            python3-venv
+            
+      - name: Show Lua installation
+        run: |
+          which lua || true
+          lua -v || true
+          dpkg -l | grep lua || true
+            
       - name: Run build preparation script
         run: ./build.sh
 
