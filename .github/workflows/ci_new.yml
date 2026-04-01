@@ -32,6 +32,7 @@ jobs:
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "--with-pcre2" }
+          - { label: "with pcre",        opt: "--with-pcre" }
 
     steps:
       - uses: actions/checkout@v6
@@ -77,6 +78,7 @@ jobs:
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
+            libpcre3-dev \
             bison \
             flex \
             pkg-config \
@@ -140,7 +142,7 @@ jobs:
                        ssdeep \
                        pcre \
                        bison \
-                       flex  
+                       flex
 
       - name: Run build preparation script
         run: ./build.sh
@@ -231,7 +233,7 @@ jobs:
 
       - name: Install cppcheck
         run: |
-          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua lmdb ssdeep 
+          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua lmdb ssdeep
 
       - name: Configure project
         run: |
