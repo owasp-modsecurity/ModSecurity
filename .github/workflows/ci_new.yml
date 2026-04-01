@@ -31,7 +31,7 @@ jobs:
           - { label: "without geoip",   opt: "--without-geoip" }
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
-          - { label: "with pcre2 (default)", opt: "--with-pcre2" }
+          - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",        opt: "--with-pcre" }
 
     steps:
