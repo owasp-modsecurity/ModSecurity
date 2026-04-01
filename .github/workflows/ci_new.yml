@@ -40,7 +40,6 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      
       - name: Detect latest Lua dev package
         id: detect_lua
         shell: bash
@@ -97,7 +96,7 @@ jobs:
           which lua || true
           lua -v || true
           dpkg -l | grep lua || true
-          
+
       - name: Run build preparation script
         run: ./build.sh
 
