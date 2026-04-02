@@ -44,12 +44,13 @@ cppcheck:
 	    --library=gnu \
 	    --library=posix \
 	    --std=c++17 \
-		-I ./apache2 \
+	    -I ./apache2 \
 	    -I /usr/include/libxml2 \
-		-I @APXS_INCLUDEDIR@ \
+	    -I @APXS_INCLUDEDIR@ \
 	    -I @APR_INCLUDEDIR@ \
 	    -I @APU_INCLUDEDIR@ \
 	    --suppressions-list=./tests/cppcheck_suppressions.txt \
+	    --suppress=syntaxError:@APR_INCLUDEDIR@/* \
 	    --inline-suppr \
 	    --inconclusive \
 	    --template="warning: {file},{line},{severity},{id},{message}" \

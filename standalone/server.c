@@ -139,16 +139,15 @@ AP_DECLARE(int) ap_index_of_response(int status)
 {
     static const int shortcut[6] = {0, LEVEL_200, LEVEL_300, LEVEL_400,
     LEVEL_500, RESPONSE_CODES};
-    int i, pos;
 
     if (status < 100) {               /* Below 100 is illegal for HTTP status */
         return LEVEL_500;
     }
 
-    for (i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
         status -= 100;
         if (status < 100) {
-            pos = (status + shortcut[i]);
+            int pos = (status + shortcut[i]);
             if (pos < shortcut[i + 1]) {
                 return pos;
             }
