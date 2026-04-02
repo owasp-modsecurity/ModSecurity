@@ -1,0 +1,167 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS matrix A: No scope-out, normal payload (GET) - baseline",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*"},
+      "uri": "/test.pl?param1=safe&param2=value",
+      "method": "GET",
+      "body": []
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSS\" \"id:941100,phase:2,deny,status:403,log,tag:'XSS'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS matrix B: No scope-out, JSON payload with FP key (SearchQuery=SQLi) - blocks",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Type": "application/json", "Content-Length": "52"},
+      "uri": "/api/search",
+      "method": "POST",
+      "body": ["[{\"SearchQuery\":\"1' OR '1'='1\",\"Other\":\"safe\"}]"]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 403},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942100,phase:2,deny,status:403,log,tag:'SQLi'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS matrix B-lit: FP scope-out with LITERAL only (no regex) - same payload as B/D, passes on both",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Type": "application/json", "Content-Length": "52"},
+      "uri": "/api/search",
+      "method": "POST",
+      "body": ["[{\"SearchQuery\":\"1' OR '1'='1\",\"Other\":\"safe\"}]"]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetById=942100;ARGS:json.array_0.SearchQuery\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942100,phase:2,deny,status:403,log,tag:'SQLi'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS matrix D-whole: Whole-body exclusion (ARGS), SearchQuery=SQLi — passes, runs on both",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Type": "application/json", "Content-Length": "52"},
+      "uri": "/api/search",
+      "method": "POST",
+      "body": ["[{\"SearchQuery\":\"1' OR '1'='1\",\"Other\":\"safe\"}]"]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetById=942100;ARGS\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942100,phase:2,deny,status:403,log,tag:'SQLi'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS matrix E-whole: Whole-body exclusion (ARGS), Other=SQLi — 200 false negative, runs on both",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Type": "application/json", "Content-Length": "52"},
+      "uri": "/api/search",
+      "method": "POST",
+      "body": ["[{\"SearchQuery\":\"safe\",\"Other\":\"1' OR '1'='1\"}]"]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetById=942100;ARGS\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942100,phase:2,deny,status:403,log,tag:'SQLi'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS matrix C: WITH scope-out, normal payload (GET) - scope-out does not fire",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*"},
+      "uri": "/test.pl?param1=safe&param2=value",
+      "method": "GET",
+      "body": []
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=942100;ARGS:/^json[.]array_[0-9]+[.]SearchQuery$/\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942100,phase:2,deny,status:403,log,tag:'SQLi'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS matrix D: WITH scope-out, JSON payload with FP key (SearchQuery) - scope-out fires, passes",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Type": "application/json", "Content-Length": "52"},
+      "uri": "/api/search",
+      "method": "POST",
+      "body": ["[{\"SearchQuery\":\"1' OR '1'='1\",\"Other\":\"safe\"}]"]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetById=942100;ARGS:/^json[.]array_[0-9]+[.]SearchQuery$/\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942100,phase:2,deny,status:403,log,tag:'SQLi'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS matrix E: WITH scope-out, JSON payload with malicious Other (not scoped out) - blocks",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Type": "application/json", "Content-Length": "52"},
+      "uri": "/api/search",
+      "method": "POST",
+      "body": ["[{\"SearchQuery\":\"safe\",\"Other\":\"1' OR '1'='1\"}]"]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 403},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetById=942100;ARGS:/^json[.]array_[0-9]+[.]SearchQuery$/\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942100,phase:2,deny,status:403,log,tag:'SQLi'\""
+    ]
+  }
+]

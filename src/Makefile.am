@@ -47,6 +47,7 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/rule_unconditional.h \
 	../headers/modsecurity/rule_with_actions.h \
 	../headers/modsecurity/rule_with_operator.h \
+	../headers/modsecurity/rule_remove_target_entry.h \
 	../headers/modsecurity/rules.h \
 	../headers/modsecurity/rule_message.h \
 	../headers/modsecurity/rules_set.h \
@@ -274,6 +275,7 @@ libmodsecurity_la_SOURCES = \
 	rule_unconditional.cc \
 	rule_with_actions.cc \
 	rule_with_operator.cc \
+	rule_remove_target_entry.cc \
 	rule_message.cc \
 	rule_script.cc \
 	unique_id.cc \

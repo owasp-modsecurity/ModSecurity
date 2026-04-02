@@ -51,6 +51,9 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/variable_origin.h"
 #include "modsecurity/anchored_set_variable_translation_proxy.h"
 #include "modsecurity/audit_log.h"
+#ifdef __cplusplus
+#include "modsecurity/rule_remove_target_entry.h"
+#endif
 
 
 #ifndef NO_LOGS
@@ -520,12 +523,12 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     /**
      *
      */
-    std::list< std::pair<std::string, std::string> > m_ruleRemoveTargetByTag;
+    std::list<RuleRemoveTargetByTagEntry> m_ruleRemoveTargetByTag;
 
     /**
      *
      */
-    std::list< std::pair<int, std::string> > m_ruleRemoveTargetById;
+    std::list<RuleRemoveTargetByIdEntry> m_ruleRemoveTargetById;
 
     /**
      *

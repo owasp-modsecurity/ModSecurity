@@ -13,10 +13,12 @@
  *
  */
 
+#include <memory>
 #include <string>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/utils/regex.h"
 
 
 #ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
@@ -37,6 +39,7 @@ class RuleRemoveTargetByTag : public Action {
 
     std::string m_tag;
     std::string m_target;
+    std::shared_ptr<Utils::Regex> m_regex;
 };
 
 
