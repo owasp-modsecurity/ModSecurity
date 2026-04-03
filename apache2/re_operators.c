@@ -2322,7 +2322,7 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
             case LIBINJECTION_RESULT_ERROR:
                 set_match_to_tx(msr, capture, var->value, 0);
                 *error_msg = apr_psprintf(msr->mp, "libinjection parser error: '%s'",
-                                        var->value);
+                                        log_escape_ex(msr->mp, var->value, var->value_len));
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "ISSQL: libinjection's input '%s' caused a parser error",
                         log_escape_ex(msr->mp, var->value, var->value_len));
@@ -2376,7 +2376,7 @@ static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                 break;
             case LIBINJECTION_RESULT_ERROR:
                 *error_msg = apr_psprintf(msr->mp, "libinjection parser error: '%s'",
-                                        var->value);
+                                        log_escape_ex(msr->mp, var->value, var->value_len));
                     if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "IS_XSS: libinjection's input '%s' caused a parser error",
                         log_escape_ex(msr->mp, var->value, var->value_len));
