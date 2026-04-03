@@ -171,7 +171,8 @@ jobs:
               libfuzzy-dev \
               ssdeep \
               curl \
-              ca-certificates
+              ca-certificates \
+              git
       - uses: actions/checkout@v4
         with:
           submodules: recursive
