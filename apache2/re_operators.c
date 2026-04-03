@@ -2309,17 +2309,34 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
 
     if (libinjection_evaluate(issqli)) {
         switch(issqli) {
-            set_match_to_tx(msr, capture, fingerprint, 0);
             case LIBINJECTION_RESULT_TRUE:
+                set_match_to_tx(msr, capture, fingerprint, 0);
                 *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection with fingerprint '%s'",
                                         fingerprint);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "ISSQL: libinjection fingerprint '%s' matched input '%s'",
+                        fingerprint,
+                        log_escape_ex(msr->mp, var->value, var->value_len));
+                }
                 break;
             case LIBINJECTION_RESULT_ERROR:
+                set_match_to_tx(msr, capture, var->value, 0);
                 *error_msg = apr_psprintf(msr->mp, "libinjection parser error: '%s'",
                                         var->value);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "ISSQL: libinjection's input '%s' caused a parser error",
+                        log_escape_ex(msr->mp, var->value, var->value_len));
+                }
                 break;
             default:
-                *error_msg = apr_psprintf(msr->mp, "unexpected libinjection result: %d", issqli);
+                set_match_to_tx(msr, capture, var->value, 0);
+                *error_msg = apr_psprintf(msr->mp, "unexpected libinjection result: (%d)", issqli);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "ISSQL: libinjection's input '%s' caused an unexpected result: (%d)",
+                        log_escape_ex(msr->mp, var->value, var->value_len),
+                        issqli);
+                }
+                break;
         }
     } else {
         if (msr->txcfg->debuglog_level >= 9) {
@@ -2348,20 +2365,31 @@ static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (libinjection_evaluate(is_xss)) {
+        set_match_to_tx(msr, capture, var->value, 0);
         switch(is_xss) {
-            set_match_to_tx(msr, capture, var->value, 0);
             case LIBINJECTION_RESULT_TRUE:
                 *error_msg = apr_psprintf(msr->mp, "detected XSS using libinjection.");
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "IS_XSS: libinjection detected XSS.");
+                    msr_log(msr, 9, "IS_XSS: libinjection detected XSS in input '%s'",
+                        log_escape_ex(msr->mp, var->value, var->value_len));
                 }
                 break;
             case LIBINJECTION_RESULT_ERROR:
                 *error_msg = apr_psprintf(msr->mp, "libinjection parser error: '%s'",
                                         var->value);
+                    if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "IS_XSS: libinjection's input '%s' caused a parser error",
+                        log_escape_ex(msr->mp, var->value, var->value_len));
+                }
                 break;
             default:
-                *error_msg = apr_psprintf(msr->mp, "unexpected libinjection result: %d", is_xss);
+                *error_msg = apr_psprintf(msr->mp, "unexpected libinjection result: (%d)", is_xss);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "IS_XSS: libinjection's input '%s' caused an unexpected result: (%d)",
+                        log_escape_ex(msr->mp, var->value, var->value_len),
+                        is_xss);
+                }
+                break;
         }
     } else {
         if (msr->txcfg->debuglog_level >= 9) {
