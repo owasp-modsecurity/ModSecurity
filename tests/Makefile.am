@@ -1,9 +1,9 @@
 check_PROGRAMS = msc_test
 msc_test_SOURCES = msc_test.c \
     ../apache2/acmp.c \
-    ../apache2/libinjection/libinjection_html5.c \
-    ../apache2/libinjection/libinjection_sqli.c \
-    ../apache2/libinjection/libinjection_xss.c \
+    ../apache2/others/libinjection/src/libinjection_html5.c \
+    ../apache2/others/libinjection/src/libinjection_sqli.c \
+    ../apache2/others/libinjection/src/libinjection_xss.c \
     ../apache2/modsecurity.c \
     ../apache2/msc_status_engine.c \
     ../apache2/msc_remote_rules.c \
