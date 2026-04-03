@@ -29,7 +29,7 @@ class Base64 {
     static std::string encode(const std::string& data);
 
     static std::string decode(const std::string& data, bool forgiven);
-    static std::string decode(const std::string& data);
+    static bool decode(const std::string& data, std::string &out);
     static std::string decode_forgiven(const std::string& data);
 
     static void decode_forgiven_engine(unsigned char *plain_text,

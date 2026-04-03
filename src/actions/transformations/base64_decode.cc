@@ -23,9 +23,14 @@ namespace modsecurity::actions::transformations {
 
 bool Base64Decode::transform(std::string &value, const Transaction *trans) const {
     if (value.empty()) return false;
-    value = Utils::Base64::decode(value);
+
+    std::string decoded;
+    if (!Utils::Base64::decode(value, decoded)) {
+        return false;
+    }
+
+    value = std::move(decoded);
     return true;
 }
-
 
 }  // namespace modsecurity::actions::transformations

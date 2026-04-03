@@ -55,14 +55,33 @@ std::string Base64::decode(const std::string& data, bool forgiven) {
         return decode_forgiven(data);
     }
 
-    return decode(data);
+    std::string out;
+    decode(data, out);
+    return out;
 }
 
 
-std::string Base64::decode(const std::string& data) {
-    return base64Helper(data.c_str(), strlen(data.c_str()), mbedtls_base64_decode);
-}
+bool Base64::decode(const std::string& data, std::string &out) {
+    size_t out_len = 0;
+    const auto *src = reinterpret_cast<const unsigned char *>(data.c_str());
+    const size_t slen = strlen(data.c_str());
 
+    const int ret = mbedtls_base64_decode(nullptr, 0, &out_len, src, slen);
+
+    if (ret != MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL) {
+        return false;
+    }
+
+    out.resize(out_len);
+    if (mbedtls_base64_decode(
+            reinterpret_cast<unsigned char *>(out.data()),
+            out.size(), &out_len, src, slen) != 0) {
+        return false;
+    }
+
+    out.resize(out_len);
+    return true;
+}
 
 std::string Base64::decode_forgiven(const std::string& data) {
     return base64Helper(data.c_str(), data.size(), decode_forgiven_engine);

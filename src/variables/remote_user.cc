@@ -54,7 +54,11 @@ void RemoteUser::evaluate(Transaction *transaction,
             base64 = std::string(header, 6, header.length());
         }
 
-        base64 = Utils::Base64::decode(base64);
+        if (std::string decoded; Utils::Base64::decode(base64, decoded)) {
+            base64 = std::move(decoded);
+        } else {
+            base64.clear();
+        }
 
         if (const auto pos{base64.find(":")}; pos != std::string::npos) {
             transaction->m_variableRemoteUser.assign(std::string(base64, 0, pos));
