@@ -2309,8 +2309,8 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
 
     if (libinjection_evaluate(issqli)) {
         switch(issqli) {
+            set_match_to_tx(msr, capture, fingerprint, 0);
             case LIBINJECTION_RESULT_TRUE:
-                set_match_to_tx(msr, capture, fingerprint, 0);
                 *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection with fingerprint '%s'",
                                         fingerprint);
                 break;
@@ -2349,8 +2349,8 @@ static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
     if (libinjection_evaluate(is_xss)) {
         switch(is_xss) {
+            set_match_to_tx(msr, capture, var->value, 0);
             case LIBINJECTION_RESULT_TRUE:
-                set_match_to_tx(msr, capture, var->value, 0);
                 *error_msg = apr_psprintf(msr->mp, "detected XSS using libinjection.");
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "IS_XSS: libinjection detected XSS.");
