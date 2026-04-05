@@ -589,9 +589,14 @@ int set_match_to_tx_safe(modsec_rec *msr, int capture, const char *match, unsign
 
         s->name = apr_psprintf(msr->mp,"%d", tx_n);
         s->name_len = strlen(s->name);
-        s->value = apr_pstrmemdup(msr->mp, match, match_len);
-        if (s->value == NULL) return -1;
-        s->value_len = match_len;
+        if (match) {
+            s->value = apr_pstrmemdup(msr->mp, match, match_len);
+            if (s->value == NULL) return -1;
+            s->value_len = match_len;
+        }
+        else {
+            return -1;
+        }
         apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
         if (msr->txcfg->debuglog_level >= 9) {
