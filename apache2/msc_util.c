@@ -537,9 +537,10 @@ int convert_to_int(const char c)
  * \param msr Pointer to modsec resource
  * \param capture If ON match will be saved
  * \param match Pointer to captured string
- *\parm tx_n The tx number to save the data
+ * \param tx_n The tx number to save the data
  *
- * \retval 0 On Sucess|Fail
+ * \retval 0 On success
+ * \retval -1 On allocation failure while saving the captured match
  */
 int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  {
     assert(msr != NULL);
@@ -566,6 +567,47 @@ int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  
     return 0;
 }
 
+
+/** \brief Set a match to tx.N safe mode
+ *
+ * \param msr Pointer to modsec resource
+ * \param capture If ON match will be saved
+ * \param match Pointer to captured string
+ * \param match_len Length of the captured string even if it contains NUL bytes
+ * \param tx_n The tx number to save the data
+ *
+ * \retval 0 On success
+ * \retval -1 On allocation failure while saving the captured match
+ */
+int set_match_to_tx_safe(modsec_rec *msr, int capture, const char *match, unsigned int match_len, int tx_n)  {
+    assert(msr != NULL);
+
+    if (capture) {
+        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+        if (s == NULL) return -1;
+
+        s->name = apr_psprintf(msr->mp,"%d", tx_n);
+        s->name_len = strlen(s->name);
+        if (match) {
+            s->value = apr_pstrmemdup(msr->mp, match, match_len);
+            if (s->value == NULL) return -1;
+            s->value_len = match_len;
+        }
+        else {
+            return -1;
+        }
+        apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Added phrase match to TX.%d: %s",
+                    tx_n, log_escape_nq_ex(msr->mp, s->value, s->value_len));
+        }
+
+    }
+
+    return 0;
+}
 
 /**
  * Parses a string that contains a name-value pair in the form "name=value".

@@ -1,0 +1,3 @@
+[submodule "apache2/others/libinjection"]
+	path = apache2/others/libinjection
+	url = https://github.com/libinjection/libinjection.git
