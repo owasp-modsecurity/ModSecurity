@@ -2321,8 +2321,7 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
                 }
                 break;
             case LIBINJECTION_RESULT_ERROR:
-                input_copy = apr_pmemdup(msr->mp, var->value, var->value_len);
-                set_match_to_tx(msr, capture, input_copy, 0);
+                set_match_to_tx_safe(msr, capture, var->value, var->value_len, 0);
                 *error_msg = apr_psprintf(msr->mp, "libinjection parser error");
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "ISSQL: libinjection's input '%s' caused a parser error",
@@ -2330,8 +2329,7 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
                 }
                 break;
             default:
-                input_copy = apr_pmemdup(msr->mp, var->value, var->value_len);
-                set_match_to_tx(msr, capture, input_copy, 0);
+                set_match_to_tx_safe(msr, capture, var->value, var->value_len, 0);
                 *error_msg = apr_psprintf(msr->mp, "unexpected libinjection result: (%d)", issqli);
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "ISSQL: libinjection's input '%s' caused an unexpected result: (%d)",
@@ -2367,7 +2365,7 @@ static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (libinjection_evaluate(is_xss)) {
-        set_match_to_tx(msr, capture, var->value, 0);
+        set_match_to_tx_safe(msr, capture, var->value, var->value_len, 0);
         switch(is_xss) {
             case LIBINJECTION_RESULT_TRUE:
                 *error_msg = apr_psprintf(msr->mp, "detected XSS using libinjection.");
