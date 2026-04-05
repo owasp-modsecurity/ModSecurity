@@ -39,9 +39,9 @@ set(IIS_APACHE_SOURCES
     ../apache2/msc_status_engine.c
     ../apache2/msc_remote_rules.c
     ../apache2/msc_json.c
-    ../apache2/libinjection/libinjection_html5.c
-    ../apache2/libinjection/libinjection_sqli.c
-    ../apache2/libinjection/libinjection_xss.c
+    ../apache2/others/libinjection/src/libinjection_html5.c
+    ../apache2/others/libinjection/src/libinjection_sqli.c
+    ../apache2/others/libinjection/src/libinjection_xss.c
 )
 
 set(IIS_STANDALONE_SOURCES
@@ -105,7 +105,7 @@ target_include_directories(${IIS_MODULE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}/../apache2
-    ${CMAKE_CURRENT_SOURCE_DIR}/../apache2/libinjection
+    ${CMAKE_CURRENT_SOURCE_DIR}/../apache2/others/libinjection/src
     ${LIBXML2_INCLUDE_DIR}/libxml
     ${CMAKE_CURRENT_SOURCE_DIR}/../standalone
     ${PCRE2_INCLUDE_DIRS}
