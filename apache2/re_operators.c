@@ -2375,7 +2375,7 @@ static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                 break;
             case LIBINJECTION_RESULT_ERROR:
                 *error_msg = apr_psprintf(msr->mp, "libinjection parser error");
-                    if (msr->txcfg->debuglog_level >= 9) {
+                if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "IS_XSS: libinjection's input '%s' caused a parser error",
                         log_escape_ex(msr->mp, var->value, var->value_len));
                 }
