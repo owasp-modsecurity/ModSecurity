@@ -2303,7 +2303,6 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
     char fingerprint[8];
     injection_result_t issqli;
     int capture;
-    char *input_copy;
 
     issqli = libinjection_sqli(var->value, var->value_len, fingerprint);
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
