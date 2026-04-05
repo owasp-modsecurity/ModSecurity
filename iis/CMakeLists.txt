@@ -44,6 +44,10 @@ set(IIS_APACHE_SOURCES
     ../apache2/others/libinjection/src/libinjection_xss.c
 )
 
+include_directories(
+    ../apache2/others/libinjection/src
+)
+
 set(IIS_STANDALONE_SOURCES
     ../standalone/api.c
     ../standalone/buckets.c
@@ -105,7 +109,7 @@ target_include_directories(${IIS_MODULE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}/../apache2
-    ${CMAKE_CURRENT_SOURCE_DIR}/../apache2/libinjection
+    ${CMAKE_CURRENT_SOURCE_DIR}/../apache2/others/libinjection/src
     ${LIBXML2_INCLUDE_DIR}/libxml
     ${CMAKE_CURRENT_SOURCE_DIR}/../standalone
     ${PCRE2_INCLUDE_DIRS}
