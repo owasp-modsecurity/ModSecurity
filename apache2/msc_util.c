@@ -539,7 +539,7 @@ int convert_to_int(const char c)
  * \param match Pointer to captured string
  * \param tx_n The tx number to save the data
  *
- * \retval 0 On sucess
+ * \retval 0 On success
  */
 int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  {
     assert(msr != NULL);
@@ -575,7 +575,7 @@ int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  
  * \param match_len Length of the captured string even if it contains NUL bytes
  * \param tx_n The tx number to save the data
  *
- * \retval 0 On sucess
+ * \retval 0 On success
  */
 int set_match_to_tx_safe(modsec_rec *msr, int capture, const char *match, unsigned int match_len, int tx_n)  {
     assert(msr != NULL);
