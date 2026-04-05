@@ -44,10 +44,6 @@ set(IIS_APACHE_SOURCES
     ../apache2/others/libinjection/src/libinjection_xss.c
 )
 
-include_directories(
-    ../apache2/others/libinjection/src
-)
-
 set(IIS_STANDALONE_SOURCES
     ../standalone/api.c
     ../standalone/buckets.c
