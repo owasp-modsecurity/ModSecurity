@@ -68,9 +68,9 @@ OBJS = mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
        msc_status_engine.obj \
        msc_remote_rules.obj \
        msc_json.obj \
-       libinjection/libinjection_html5.obj \
-       libinjection/libinjection_sqli.obj \
-       libinjection/libinjection_xss.obj
+       others/libinjection/src/libinjection_html5.obj \
+       others/libinjection/src/libinjection_sqli.obj \
+       others/libinjection/src/libinjection_xss.obj
 
 all: $(DLL)
 
