@@ -2304,7 +2304,7 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
     injection_result_t issqli;
     int capture;
 
-    issqli = libinjection_sqli(var->value, var->value_len, fingerprint);
+    issqli = libinjection_sqli(var->value ? var->value : "", var->value_len, fingerprint);
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (libinjection_evaluate(issqli)) {
@@ -2360,11 +2360,11 @@ static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     int capture;
     injection_result_t is_xss;
 
-    is_xss = libinjection_xss(var->value, var->value_len);
+    is_xss = libinjection_xss(var->value ? var->value : "", var->value_len);
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (libinjection_evaluate(is_xss)) {
-        set_match_to_tx_safe(msr, capture, var->value, var->value_len, 0);
+        set_match_to_tx_safe(msr, capture, var->value ? var->value : "", var->value_len, 0);
         switch(is_xss) {
             case LIBINJECTION_RESULT_TRUE:
                 *error_msg = apr_psprintf(msr->mp, "detected XSS using libinjection.");
