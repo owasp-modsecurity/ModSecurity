@@ -537,7 +537,7 @@ int convert_to_int(const char c)
  * \param msr Pointer to modsec resource
  * \param capture If ON match will be saved
  * \param match Pointer to captured string
- *\parm tx_n The tx number to save the data
+ * \param tx_n The tx number to save the data
  *
  * \retval 0 On Sucess|Fail
  */
@@ -573,7 +573,7 @@ int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  
  * \param capture If ON match will be saved
  * \param match Pointer to captured string
  * \param match_len Length of the captured string even if it contains NUL bytes
- *\parm tx_n The tx number to save the data
+ * \param tx_n The tx number to save the data
  *
  * \retval 0 On Sucess|Fail
  */
@@ -587,7 +587,7 @@ int set_match_to_tx_safe(modsec_rec *msr, int capture, const char *match, unsign
 
         s->name = apr_psprintf(msr->mp,"%d", tx_n);
         s->name_len = strlen(s->name);
-        s->value = apr_pstrndup(msr->mp, match, match_len);
+        s->value = apr_pstrmemdup(msr->mp, match, match_len);
         if (s->value == NULL) return -1;
         s->value_len = match_len;
         apr_table_setn(msr->tx_vars, s->name, (void *)s);
