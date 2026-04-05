@@ -2320,7 +2320,7 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
                 }
                 break;
             case LIBINJECTION_RESULT_ERROR:
-                set_match_to_tx_safe(msr, capture, var->value, var->value_len, 0);
+                set_match_to_tx_safe(msr, capture, var->value ? var->value : "", var->value_len, 0);
                 *error_msg = apr_psprintf(msr->mp, "libinjection parser error");
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "ISSQL: libinjection's input '%s' caused a parser error",
@@ -2328,7 +2328,7 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
                 }
                 break;
             default:
-                set_match_to_tx_safe(msr, capture, var->value, var->value_len, 0);
+                set_match_to_tx_safe(msr, capture, var->value ? var->value : "", var->value_len, 0);
                 *error_msg = apr_psprintf(msr->mp, "unexpected libinjection result: (%d)", issqli);
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "ISSQL: libinjection's input '%s' caused an unexpected result: (%d)",
