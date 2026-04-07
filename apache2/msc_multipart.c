@@ -20,6 +20,8 @@
 #include "msc_util.h"
 #include "msc_parsers.h"
 
+#define CONTENT_TYPE_MAX_LENGTH 1024
+
 void validate_quotes(modsec_rec *msr, char *data, char quote)  {
     assert(msr != NULL);
     int i, len;
@@ -841,7 +843,7 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
         return -1;
     }
 
-    if (strlen(msr->request_content_type) > 1024) {
+    if (strlen(msr->request_content_type) > CONTENT_TYPE_MAX_LENGTH) {
         msr->mpd->flag_error = 1;
         *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (length).");
         return -1;
@@ -1063,7 +1065,7 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                  *                   [CRLF epilogue]
                  */
                 unsigned int buf_data_len = (unsigned int)(MULTIPART_BUF_SIZE - msr->mpd->bufleft);
-                size_t boundary_len = strlen(msr->mpd->boundary);
+                size_t boundary_len = strnlen(msr->mpd->boundary, CONTENT_TYPE_MAX_LENGTH);
                 if ( (buf_data_len >= 2 + boundary_len)
                     && (*(msr->mpd->buf) == '-')
                     && (*(msr->mpd->buf + 1) == '-')
