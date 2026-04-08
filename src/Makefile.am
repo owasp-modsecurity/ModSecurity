@@ -66,7 +66,8 @@ libmodsecurity_includesub_collection_HEADERS = \
 libmodsecurity_includesub_actions_HEADERS = \
 	../headers/modsecurity/actions/action.h
 
-include headers.mk
+noinst_HEADERS =
+-include headers.mk
 
 ENGINES = \
 	engine/lua.cc

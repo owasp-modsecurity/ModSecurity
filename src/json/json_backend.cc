@@ -147,7 +147,7 @@ uint32_t msc_json_cxx_capabilities(void) {
 #endif
 }
 
-yajl_gen yajl_gen_alloc(const yajl_alloc_funcs *allocFuncs) {
+yajl_gen yajl_gen_alloc(const void *allocFuncs) {
     (void)allocFuncs;
     return new msc_json_gen_ctx{false, "", nullptr, {}};
 }

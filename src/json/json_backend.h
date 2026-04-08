@@ -19,14 +19,6 @@ enum {
     yajl_gen_beautify = 1
 };
 
-typedef struct {
-    unsigned int version;
-    void *(*malloc)(void *ctx, size_t sz);
-    void *(*realloc)(void *ctx, void *ptr, size_t sz);
-    void (*free)(void *ctx, void *ptr);
-    void *ctx;
-} yajl_alloc_funcs;
-
 typedef enum {
     MSC_JSON_CAP_DOM = 1 << 0,
     MSC_JSON_CAP_EVENTS = 1 << 1,
@@ -43,7 +35,7 @@ const char *msc_json_cxx_backend_origin(void);
 uint32_t msc_json_c_capabilities(void);
 uint32_t msc_json_cxx_capabilities(void);
 
-yajl_gen yajl_gen_alloc(const yajl_alloc_funcs *allocFuncs);
+yajl_gen yajl_gen_alloc(const void *allocFuncs);
 void yajl_gen_free(yajl_gen g);
 yajl_gen_status yajl_gen_config(yajl_gen g, int opt, ...);
 yajl_gen_status yajl_gen_map_open(yajl_gen g);

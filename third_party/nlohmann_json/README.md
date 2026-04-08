@@ -1,12 +1,10 @@
-# Vendored module: nlohmann/json
+# Vendored module placeholder
+# Platzhalter für vendortes Modul
 
-- Upstream: https://github.com/nlohmann/json
-- Recommended tag: `v3.11.3`
-- Preferred mode: system header first (unless `--with-json-prefer=bundled`)
-- Bundled activation: `--with-json-cxx=nlohmannjson --with-json-prefer=bundled`
+## English
+This directory is reserved for optional vendored sources for backend nlohmann_json.
+Use system packages when available; use bundled sources as fallback.
 
-Populate/update with:
-
-```bash
-scripts/import-nlohmannjson.sh v3.11.3
-```
+## Deutsch
+Dieses Verzeichnis ist für optionale vendorte Quellen des Backends nlohmann_json reserviert.
+Nutze nach Möglichkeit Systempakete; Bundled-Quellen dienen als Fallback.

@@ -1,9 +1,10 @@
-# Vendored module placeholder: jansson
+# Vendored module placeholder
+# Platzhalter für vendortes Modul
 
-This directory is reserved for optional vendored JSON backend sources.
+## English
+This directory is reserved for optional vendored sources for backend jansson.
+Use system packages when available; use bundled sources as fallback.
 
-Expected behavior:
-- Prefer system package when available.
-- Fallback to this vendored module when system package is unavailable.
-
-Populate this directory with the selected upstream release and include/build files as needed.
+## Deutsch
+Dieses Verzeichnis ist für optionale vendorte Quellen des Backends jansson reserviert.
+Nutze nach Möglichkeit Systempakete; Bundled-Quellen dienen als Fallback.
