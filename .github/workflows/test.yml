@@ -148,6 +148,13 @@ jobs:
             json_mode: "events"
             json_debug: false
 
+          - label: "json-c + nlohmannjson system dom"
+            json_c: "json-c"
+            json_cxx: "nlohmannjson"
+            json_prefer: "system"
+            json_mode: "dom"
+            json_debug: false
+
           - label: "jansson + jsoncpp system events"
             json_c: "jansson"
             json_cxx: "jsoncpp"
@@ -169,11 +176,53 @@ jobs:
             json_mode: "auto"
             json_debug: false
 
+          - label: "none + nlohmannjson system auto"
+            json_c: "none"
+            json_cxx: "nlohmannjson"
+            json_prefer: "system"
+            json_mode: "auto"
+            json_debug: false
+
           - label: "none + none system auto"
             json_c: "none"
             json_cxx: "none"
             json_prefer: "system"
             json_mode: "auto"
+            json_debug: false
+
+          - label: "yyjson + jsoncons bundled dom"
+            json_c: "yyjson"
+            json_cxx: "jsoncons"
+            json_prefer: "bundled"
+            json_mode: "dom"
+            json_debug: false
+
+          - label: "yyjson + glaze bundled events"
+            json_c: "yyjson"
+            json_cxx: "glaze"
+            json_prefer: "bundled"
+            json_mode: "events"
+            json_debug: false
+
+          - label: "yyjson + auto bundled auto"
+            json_c: "yyjson"
+            json_cxx: "auto"
+            json_prefer: "bundled"
+            json_mode: "auto"
+            json_debug: false
+
+          - label: "auto + jsoncons bundled dom"
+            json_c: "auto"
+            json_cxx: "jsoncons"
+            json_prefer: "bundled"
+            json_mode: "dom"
+            json_debug: false
+
+          - label: "auto + glaze bundled events"
+            json_c: "auto"
+            json_cxx: "glaze"
+            json_prefer: "bundled"
+            json_mode: "events"
             json_debug: false
 
           - label: "jansson + auto auto dom"
@@ -186,6 +235,20 @@ jobs:
           - label: "cjson + auto auto events"
             json_c: "cjson"
             json_cxx: "auto"
+            json_prefer: "auto"
+            json_mode: "events"
+            json_debug: false
+
+          - label: "auto + jsoncpp auto dom"
+            json_c: "auto"
+            json_cxx: "jsoncpp"
+            json_prefer: "auto"
+            json_mode: "dom"
+            json_debug: false
+
+          - label: "auto + simdjson auto events"
+            json_c: "auto"
+            json_cxx: "simdjson"
             json_prefer: "auto"
             json_mode: "events"
             json_debug: false
@@ -355,13 +418,12 @@ jobs:
         run: make check
 
   build-macos-json:
-    name: macOS JSON (${{ matrix.os }}, ${{ matrix.label }})
-    runs-on: ${{ matrix.os }}
+    name: macOS JSON (${{ matrix.label }})
+    runs-on: macos-26
 
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-26]
         include:
           - label: "auto-auto-auto-auto debug off"
             json_c: "auto"
@@ -488,7 +550,6 @@ jobs:
 
       - name: Run tests
         run: make check
-
 
   build-windows:
     name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
