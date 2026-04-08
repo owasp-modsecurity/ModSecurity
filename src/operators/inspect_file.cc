@@ -15,10 +15,12 @@
 
 #include "src/operators/inspect_file.h"
 
-#include <stdio.h>
-#include <string>
+#include <array>
 #include <iostream>
 #include <sstream>
+#include <stdio.h>
+#include <string>
+#include <vector>
 
 #include "src/operators/operator.h"
 #include "src/utils/system.h"
@@ -26,11 +28,10 @@
 #ifdef WIN32
 #include "src/compat/msvc.h"
 #else
-#include <unistd.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <array>
-#include <vector>
+#include <unistd.h>
 #endif
 
 namespace modsecurity {
@@ -66,8 +67,8 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
 #ifndef WIN32
     /*
-     * Use fork()+execv() to avoid shell interpretation and PATH ambiguity.
-     * Execute the resolved m_file path directly instead of m_param.
+     * Use fork()+execv() with the resolved m_file path to avoid shell
+     * interpretation and PATH-lookup ambiguity.
      */
     std::array<int, 2> pipefd{};
     if (pipe(pipefd.data()) == -1) {
@@ -82,52 +83,53 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
     }
 
     if (pid == 0) {
-        // Child process
-        close(pipefd[0]);                // Close read end
-        dup2(pipefd[1], STDOUT_FILENO);  // Redirect stdout to pipe
+        // Child process: wire stdout to the pipe then exec the script.
+        close(pipefd[0]);                // Close unused read end
+        dup2(pipefd[1], STDOUT_FILENO);  // Redirect stdout to pipe write end
         close(pipefd[1]);
 
-        // Create mutable copies for execv() argument array
+        // Mutable copies required by execv()'s char* const argv[] signature.
         std::string file_copy = m_file;
-        std::string str_copy = str;
+        std::string str_copy  = str;
 
         std::vector<char *> argv;
         argv.push_back(file_copy.data());
         argv.push_back(str_copy.data());
         argv.push_back(nullptr);
 
-        // Use execv() with the resolved path — avoids PATH lookup ambiguity
+        // execv() uses an exact path — no PATH lookup, no shell.
         execv(file_copy.data(), argv.data());
 
-        // execv() failed: exit child immediately
+        // Only reached if execv() fails.
         _exit(1);
     }
 
-    // Parent process
-    close(pipefd[1]);  // Close write end
+    // Parent process: read all child output, retrying on EINTR.
+    close(pipefd[1]);  // Close unused write end
 
     std::array<char, 512> buff{};
     std::stringstream s;
-
-    // Retry on EINTR so a signal does not silently truncate output
     ssize_t count = 0;
+
     do {
         count = read(pipefd[0], buff.data(), buff.size());
         if (count > 0) {
             s.write(buff.data(), count);
         } else if (count < 0 && errno == EINTR) {
-            count = 1;  // sentinel: keep looping
+            count = 1;  // Signal interrupted — keep looping.
         }
     } while (count > 0);
 
     close(pipefd[0]);
 
-    // Check child exit status; treat non-zero exit as no match
+    // Reap child and treat abnormal exit or exec failure as no-match.
     int wstatus = 0;
-    if (waitpid(pid, &wstatus, 0) == -1) {
-        return false;
-    }
-    if (!WIFEXITED(wstatus) || WEXITSTATUS(wstatus) != 0) {
+    pid_t waited = 0;
+    do {
+        waited = waitpid(pid, &wstatus, 0);
+    } while (waited == -1 && errno == EINTR);
+
+    if (waited == -1 || !WIFEXITED(wstatus) || WEXITSTATUS(wstatus) != 0) {
         return false;
     }
 
@@ -137,24 +139,23 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
     return false;
 
-#else
+#else  // WIN32
     /*
-     * Windows fallback: use popen() to invoke the script.
+     * Windows: no fork()/execv(); use _popen() via the popen() alias
+     * provided by src/compat/msvc.h. Command injection risk here is
+     * accepted as a pre-existing platform limitation on Windows.
      */
-    FILE *in;
     std::array<char, 512> buff{};
     std::stringstream s;
 
-    std::string openstr;
-    openstr.append(m_param);
-    openstr.append(" ");
-    openstr.append(str);
+    const std::string openstr = m_param + " " + str;
 
-    if (!(in = popen(openstr.c_str(), "r"))) {
+    FILE *in = popen(openstr.c_str(), "r");
+    if (in == nullptr) {
         return false;
     }
 
-    while (fgets(buff.data(), static_cast<int>(buff.size()), in) != NULL) {
+    while (fgets(buff.data(), static_cast<int>(buff.size()), in) != nullptr) {
         s << buff.data();
     }
 
