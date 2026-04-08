@@ -1,4 +1,4 @@
-name: Quality Assurance new tset
+name: Quality Assurance new test
 
 on:
   workflow_dispatch:
@@ -7,8 +7,6 @@ jobs:
   build-linux:
     name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
 
-    # Ubuntu 24.04 does not provide native 32-bit (i386) installation images.
-    # Only amd64 (x86_64) is officially supported. 32-bit has been removed from this matrix.
     runs-on: ubuntu-24.04
 
     strategy:
@@ -31,7 +29,7 @@ jobs:
           - { label: "without ssdeep",  opt: "--without-ssdeep" }
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
-          - { label: "with pcre",        opt: "--with-pcre" }
+          - { label: "with pcre",       opt: "--with-pcre" }
 
     steps:
       - uses: actions/checkout@v6
@@ -127,131 +125,109 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - label: "auto-auto-auto-auto debug off"
+          - label: "auto/auto prefer=auto mode=auto"
             json_c: "auto"
             json_cxx: "auto"
             json_prefer: "auto"
             json_mode: "auto"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "auto-auto-auto-dom debug on"
+          - label: "auto/auto prefer=system mode=dom"
             json_c: "auto"
             json_cxx: "auto"
-            json_prefer: "auto"
+            json_prefer: "system"
             json_mode: "dom"
+            json_debug: false
+            expect_configure_failure: false
+
+          - label: "auto/auto prefer=bundled mode=events"
+            json_c: "auto"
+            json_cxx: "auto"
+            json_prefer: "bundled"
+            json_mode: "events"
             json_debug: true
+            expect_configure_failure: false
 
-          - label: "auto-auto-auto-events debug off"
-            json_c: "auto"
-            json_cxx: "auto"
+          - label: "none/none explicit no json"
+            json_c: "none"
+            json_cxx: "none"
             json_prefer: "auto"
-            json_mode: "events"
+            json_mode: "auto"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "json-c + nlohmannjson system dom"
+          - label: "json-c + nlohmannjson system"
             json_c: "json-c"
             json_cxx: "nlohmannjson"
             json_prefer: "system"
             json_mode: "dom"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "jansson + jsoncpp system events"
+          - label: "jansson + jsoncpp system"
             json_c: "jansson"
             json_cxx: "jsoncpp"
             json_prefer: "system"
             json_mode: "events"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "cjson + simdjson system dom"
+          - label: "cjson + simdjson system"
             json_c: "cjson"
             json_cxx: "simdjson"
             json_prefer: "system"
             json_mode: "dom"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "json-c + none system auto"
+          - label: "json-c + none system"
             json_c: "json-c"
             json_cxx: "none"
             json_prefer: "system"
             json_mode: "auto"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "none + nlohmannjson system auto"
+          - label: "none + nlohmannjson system"
             json_c: "none"
             json_cxx: "nlohmannjson"
             json_prefer: "system"
             json_mode: "auto"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "none + none system auto"
-            json_c: "none"
+          - label: "yyjson + auto bundled"
+            json_c: "yyjson"
+            json_cxx: "auto"
+            json_prefer: "bundled"
+            json_mode: "auto"
+            json_debug: false
+            expect_configure_failure: false
+
+          - label: "yyjson + glaze bundled"
+            json_c: "yyjson"
+            json_cxx: "glaze"
+            json_prefer: "bundled"
+            json_mode: "events"
+            json_debug: false
+            expect_configure_failure: false
+
+          - label: "fail explicit missing bundled C backend"
+            json_c: "yyjson"
             json_cxx: "none"
             json_prefer: "system"
             json_mode: "auto"
             json_debug: false
+            expect_configure_failure: true
 
-          - label: "yyjson + jsoncons bundled dom"
-            json_c: "yyjson"
-            json_cxx: "jsoncons"
-            json_prefer: "bundled"
-            json_mode: "dom"
-            json_debug: false
-
-          - label: "yyjson + glaze bundled events"
-            json_c: "yyjson"
+          - label: "fail explicit bundled CXX backend with system prefer"
+            json_c: "none"
             json_cxx: "glaze"
-            json_prefer: "bundled"
-            json_mode: "events"
-            json_debug: false
-
-          - label: "yyjson + auto bundled auto"
-            json_c: "yyjson"
-            json_cxx: "auto"
-            json_prefer: "bundled"
+            json_prefer: "system"
             json_mode: "auto"
             json_debug: false
-
-          - label: "auto + jsoncons bundled dom"
-            json_c: "auto"
-            json_cxx: "jsoncons"
-            json_prefer: "bundled"
-            json_mode: "dom"
-            json_debug: false
-
-          - label: "auto + glaze bundled events"
-            json_c: "auto"
-            json_cxx: "glaze"
-            json_prefer: "bundled"
-            json_mode: "events"
-            json_debug: false
-
-          - label: "jansson + auto auto dom"
-            json_c: "jansson"
-            json_cxx: "auto"
-            json_prefer: "auto"
-            json_mode: "dom"
-            json_debug: false
-
-          - label: "cjson + auto auto events"
-            json_c: "cjson"
-            json_cxx: "auto"
-            json_prefer: "auto"
-            json_mode: "events"
-            json_debug: false
-
-          - label: "auto + jsoncpp auto dom"
-            json_c: "auto"
-            json_cxx: "jsoncpp"
-            json_prefer: "auto"
-            json_mode: "dom"
-            json_debug: false
-
-          - label: "auto + simdjson auto events"
-            json_c: "auto"
-            json_cxx: "simdjson"
-            json_prefer: "auto"
-            json_mode: "events"
-            json_debug: false
+            expect_configure_failure: true
 
     steps:
       - uses: actions/checkout@v6
@@ -326,9 +302,10 @@ jobs:
         run: ./build.sh
 
       - name: Configure
+        id: configure_json
         shell: bash
         run: |
-          set -euo pipefail
+          set +e
 
           EXTRA_OPTS=()
           EXTRA_OPTS+=("--with-json-c=${{ matrix.json_c }}")
@@ -347,22 +324,53 @@ jobs:
             --enable-assertions=yes \
             "${EXTRA_OPTS[@]}"
 
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Validate configure result
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          status="${{ steps.configure_json.outputs.status }}"
+          expect_fail="${{ matrix.expect_configure_failure }}"
+
+          echo "configure status: $status"
+          echo "expect failure: $expect_fail"
+
+          if [ "$expect_fail" = "true" ]; then
+            if [ "$status" -eq 0 ]; then
+              echo "Configure succeeded, but failure was expected"
+              exit 1
+            fi
+            echo "Configure failed as expected"
+            exit 0
+          fi
+
+          if [ "$status" -ne 0 ]; then
+            echo "Configure failed unexpectedly"
+            exit 1
+          fi
+
       - uses: ammaraskar/gcc-problem-matcher@master
+        if: ${{ matrix.expect_configure_failure == false }}
 
       - name: Compile
+        if: ${{ matrix.expect_configure_failure == false }}
         run: make -j "$(nproc)"
 
       - name: Run tests
+        if: ${{ matrix.expect_configure_failure == false }}
         run: make check
 
   build-macos:
-    name: macOS (${{ matrix.os }}, ${{ matrix.configure.label }})
-    runs-on: ${{ matrix.os }}
+    name: macOS (${{ matrix.configure.label }})
+    runs-on: macos-26
 
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-26]
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -425,68 +433,69 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - label: "auto-auto-auto-auto debug off"
+          - label: "auto/auto prefer=auto mode=auto"
             json_c: "auto"
             json_cxx: "auto"
             json_prefer: "auto"
             json_mode: "auto"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "auto-auto-auto-dom debug on"
+          - label: "auto/auto prefer=system mode=dom"
             json_c: "auto"
             json_cxx: "auto"
-            json_prefer: "auto"
+            json_prefer: "system"
             json_mode: "dom"
-            json_debug: true
+            json_debug: false
+            expect_configure_failure: false
 
-          - label: "auto-auto-auto-events debug off"
+          - label: "auto/auto prefer=bundled mode=events"
             json_c: "auto"
             json_cxx: "auto"
-            json_prefer: "auto"
+            json_prefer: "bundled"
             json_mode: "events"
-            json_debug: false
+            json_debug: true
+            expect_configure_failure: false
 
-          - label: "jansson + jsoncpp system events"
+          - label: "jansson + jsoncpp system"
             json_c: "jansson"
             json_cxx: "jsoncpp"
             json_prefer: "system"
             json_mode: "events"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "cjson + simdjson system dom"
+          - label: "cjson + simdjson system"
             json_c: "cjson"
             json_cxx: "simdjson"
             json_prefer: "system"
             json_mode: "dom"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "json-c + none system auto"
+          - label: "json-c + none system"
             json_c: "json-c"
             json_cxx: "none"
             json_prefer: "system"
             json_mode: "auto"
             json_debug: false
+            expect_configure_failure: false
 
-          - label: "none + none system auto"
+          - label: "none + none explicit no json"
             json_c: "none"
+            json_cxx: "none"
+            json_prefer: "auto"
+            json_mode: "auto"
+            json_debug: false
+            expect_configure_failure: false
+
+          - label: "fail explicit bundled c backend with system prefer"
+            json_c: "yyjson"
             json_cxx: "none"
             json_prefer: "system"
             json_mode: "auto"
             json_debug: false
-
-          - label: "jansson + auto auto dom"
-            json_c: "jansson"
-            json_cxx: "auto"
-            json_prefer: "auto"
-            json_mode: "dom"
-            json_debug: false
-
-          - label: "cjson + auto auto events"
-            json_c: "cjson"
-            json_cxx: "auto"
-            json_prefer: "auto"
-            json_mode: "events"
-            json_debug: false
+            expect_configure_failure: true
 
     steps:
       - uses: actions/checkout@v6
@@ -522,9 +531,10 @@ jobs:
         run: ./build.sh
 
       - name: Configure
+        id: configure_json
         shell: bash
         run: |
-          set -euo pipefail
+          set +e
 
           EXTRA_OPTS=()
           EXTRA_OPTS+=("--with-json-c=${{ matrix.json_c }}")
@@ -543,12 +553,44 @@ jobs:
             --enable-assertions=yes \
             "${EXTRA_OPTS[@]}"
 
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Validate configure result
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          status="${{ steps.configure_json.outputs.status }}"
+          expect_fail="${{ matrix.expect_configure_failure }}"
+
+          echo "configure status: $status"
+          echo "expect failure: $expect_fail"
+
+          if [ "$expect_fail" = "true" ]; then
+            if [ "$status" -eq 0 ]; then
+              echo "Configure succeeded, but failure was expected"
+              exit 1
+            fi
+            echo "Configure failed as expected"
+            exit 0
+          fi
+
+          if [ "$status" -ne 0 ]; then
+            echo "Configure failed unexpectedly"
+            exit 1
+          fi
+
       - uses: ammaraskar/gcc-problem-matcher@master
+        if: ${{ matrix.expect_configure_failure == false }}
 
       - name: Compile
+        if: ${{ matrix.expect_configure_failure == false }}
         run: make -j "$(sysctl -n hw.logicalcpu)"
 
       - name: Run tests
+        if: ${{ matrix.expect_configure_failure == false }}
         run: make check
 
   build-windows:
