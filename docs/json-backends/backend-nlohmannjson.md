@@ -1,10 +1,12 @@
-# Backend: nlohmann/json
+# Moved documentation
+# Verschobene Dokumentation
 
-Status: **funktional (DOM + Walker/Event-Adapter)**.
+## English
+This document moved. Please see:
+- `docs/json-backends/build.md`
+- `docs/json-backends/backends/`
 
-- Configure token: `--with-json-cxx=nlohmannjson`
-- Erkennung: Header-Check `nlohmann/json.hpp`
-- Fallback: `third_party/nlohmann_json/include/nlohmann/json.hpp`
-- Capabilities: `DOM`, `EVENTS`, `TYPED_BINDING`
-
-Hinweis: Der Walker in `src/json/json_walk.cc` kann JSON über `nlohmann::json` parsen und als internes Event-Interface ablaufen.
+## Deutsch
+Dieses Dokument wurde verschoben. Siehe:
+- `docs/json-backends/build.md`
+- `docs/json-backends/backends/`

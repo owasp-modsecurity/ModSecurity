@@ -1,15 +1,24 @@
-# Migration notes
+# Migration Notes
+# Migrationsnotizen
 
-## Fertig in diesem Schritt
-- Interne JSON-Schicht mit Capability-Flags und Writer-Kompatibilität eingeführt.
-- Direkte YAJL-Generator-Includes aus `transaction.cc` und `modsecurity.cc` entfernt und auf interne API umgestellt.
-- Build-/Configure-Auswahl für C- und C++-JSON-Backends ergänzt.
-- Funktionale Walker integriert für:
-  - `json-c` (C)
-  - `nlohmann/json` (C++)
-- Vendor-Struktur und Importskript für `nlohmann/json` ergänzt.
+## English
+Completed:
+- Internal JSON generator abstraction wired into existing JSON output call sites.
+- Functional JSON walker for json-c and nlohmann/json.
+- Configure options for backend selection, prefer mode, and debug mode.
+- Header existence checks for bundled json-c and bundled nlohmann/json.
 
-## Weiter offen
-1. Request-Body-JSON parser (`request_body_processor/json.*`) auf internes Event-Interface migrieren.
-2. Backend-spezifische Writer/DOM-Implementierungen für yyjson/jansson/cJSON/jsoncpp/jsoncons/simdjson/glaze vervollständigen.
-3. Tests für Backend-Matrix ergänzen (auto/system/bundled).
+Open TODOs:
+- Migrate request body YAJL SAX processor to internal event interface.
+- Implement full backend implementations for yyjson, jansson, cJSON, jsoncpp, jsoncons, simdjson, glaze.
+
+## Deutsch
+Abgeschlossen:
+- Interne JSON-Generator-Abstraktion in bestehende JSON-Output-Callsites integriert.
+- Funktionaler JSON-Walker für json-c und nlohmann/json.
+- Configure-Optionen für Backend-Auswahl, Prefer-Modus und Debug-Modus ergänzt.
+- Header-Existenzprüfung für bundled json-c und bundled nlohmann/json eingebaut.
+
+Offene TODOs:
+- YAJL-SAX-Request-Body-Prozessor auf internes Event-Interface migrieren.
+- Vollständige Backend-Implementierungen für yyjson, jansson, cJSON, jsoncpp, jsoncons, simdjson, glaze umsetzen.

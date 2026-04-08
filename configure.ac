@@ -152,11 +152,13 @@ JSON_BACKEND_LDADD=""
 JSON_BACKEND_LDFLAGS=""
 JSON_C_BACKEND_SOURCE=""
 JSON_CXX_BACKEND_SOURCE=""
+JSON_C_BACKEND=""
+JSON_CXX_BACKEND="none"
 
 AC_MSG_NOTICE([Resolving C JSON backend (${with_json_c})])
 case "x$with_json_c" in
   xauto|xyyjson|xjson-c|xjansson|xcjson)
-    if test "x$with_json_prefer" = "xbundled" && (test "x$with_json_c" = "xauto" || test "x$with_json_c" = "xjson-c") && test -d "${srcdir}/third_party/json-c"; then
+    if test "x$with_json_prefer" = "xbundled" && (test "x$with_json_c" = "xauto" || test "x$with_json_c" = "xjson-c") && test -f "${srcdir}/third_party/json-c/include/json-c/json.h"; then
       JSON_C_BACKEND="json-c"
       JSON_C_BACKEND_SOURCE="vendored"
       JSON_BACKEND_CFLAGS="-I\$(top_srcdir)/third_party/json-c/include"
@@ -202,10 +204,12 @@ case "x$with_json_c" in
       fi
     fi
     if test "x$JSON_C_BACKEND" = "x" && test "x$with_json_prefer" != "xsystem"; then
-      if test -d "${srcdir}/third_party/json-c"; then
+      if test -f "${srcdir}/third_party/json-c/include/json-c/json.h"; then
         JSON_C_BACKEND="json-c"
         JSON_C_BACKEND_SOURCE="vendored"
         JSON_BACKEND_CFLAGS="-I\$(top_srcdir)/third_party/json-c/include"
+      elif test "x$with_json_prefer" = "xbundled" && (test "x$with_json_c" = "xjson-c" || test "x$with_json_c" = "xauto"); then
+        AC_MSG_ERROR([Vendored json-c selected but headers missing: third_party/json-c/include/json-c/json.h])
       elif test "x$with_json_c" != "xauto"; then
         AC_MSG_ERROR([Requested C JSON backend '$with_json_c' not available as system package and no vendored module found.])
       fi
@@ -224,8 +228,7 @@ case "x$with_json_c" in
 esac
 
 if test "x$JSON_C_BACKEND" = "x"; then
-  JSON_C_BACKEND="none"
-  JSON_C_BACKEND_SOURCE="disabled"
+  AC_MSG_ERROR([No usable C JSON backend found. Checked (priority): yyjson > json-c > jansson > cjson.])
 fi
 
 case "x$JSON_C_BACKEND" in
@@ -246,7 +249,7 @@ JSON_CXX_BACKEND="none"
 JSON_CXX_BACKEND_SOURCE="disabled"
 case "x$with_json_cxx" in
   xauto|xsimdjson|xnlohmannjson|xjsoncons|xjsoncpp|xglaze)
-    if test "x$with_json_prefer" = "xbundled" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xnlohmannjson") && test -d "${srcdir}/third_party/nlohmann_json/include/nlohmann"; then
+    if test "x$with_json_prefer" = "xbundled" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xnlohmannjson") && test -f "${srcdir}/third_party/nlohmann_json/include/nlohmann/json.hpp"; then
       JSON_CXX_BACKEND="nlohmannjson"
       JSON_CXX_BACKEND_SOURCE="vendored"
       JSON_BACKEND_CFLAGS="$JSON_BACKEND_CFLAGS -I\$(top_srcdir)/third_party/nlohmann_json/include"
@@ -266,10 +269,12 @@ case "x$with_json_cxx" in
     if test "x$JSON_CXX_BACKEND" = "xnone" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xglaze"); then
       AC_CHECK_HEADER([glaze/glaze.hpp], [JSON_CXX_BACKEND="glaze"; JSON_CXX_BACKEND_SOURCE="system"])
     fi
-    if test "x$JSON_CXX_BACKEND" = "xnone" && test "x$with_json_prefer" != "xsystem" && test -d "${srcdir}/third_party/nlohmann_json"; then
+    if test "x$JSON_CXX_BACKEND" = "xnone" && test "x$with_json_prefer" != "xsystem" && test -f "${srcdir}/third_party/nlohmann_json/include/nlohmann/json.hpp"; then
       JSON_CXX_BACKEND="nlohmannjson"
       JSON_CXX_BACKEND_SOURCE="vendored"
       JSON_BACKEND_CFLAGS="$JSON_BACKEND_CFLAGS -I\$(top_srcdir)/third_party/nlohmann_json/include"
+    elif test "x$JSON_CXX_BACKEND" = "xnone" && test "x$with_json_prefer" = "xbundled" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xnlohmannjson"); then
+      AC_MSG_ERROR([Vendored nlohmann/json selected but header missing: third_party/nlohmann_json/include/nlohmann/json.hpp])
     fi
     if test "x$JSON_CXX_BACKEND" = "xnone" && test "x$with_json_cxx" != "xauto"; then
       AC_MSG_ERROR([Requested C++ JSON backend '$with_json_cxx' not available as system package and no vendored module found.])
@@ -672,6 +677,8 @@ MSC_STATUS_LIB([LibCURL                                      ], [CURL])
 MSC_STATUS_LIB([YAJL                                         ], [YAJL])
 echo "   + JSON C backend                                 ....${JSON_C_BACKEND} (${JSON_C_BACKEND_SOURCE})"
 echo "   + JSON C++ backend                               ....${JSON_CXX_BACKEND} (${JSON_CXX_BACKEND_SOURCE})"
+echo "   + JSON backend                                   ....${JSON_C_BACKEND} (${JSON_C_BACKEND_SOURCE})"
+echo "   + JSON C++ backend (effective)                   ....${JSON_CXX_BACKEND} (${JSON_CXX_BACKEND_SOURCE})"
 echo "   + JSON preference                                ....${with_json_prefer}"
 echo "   + JSON mode                                      ....${with_json_mode}"
 if test "x$enable_json_backend_debug" = "xyes"; then

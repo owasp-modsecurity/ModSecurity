@@ -1,25 +1,32 @@
-# JSON backend overview
+# JSON Backend Overview
+# Übersicht JSON-Backends
 
-Diese Migration führt eine interne JSON-Backend-Schicht (`src/json/`) ein, damit YAJL schrittweise aus direkten Call-Sites entfernt werden kann.
+## English
+This repository now uses an internal JSON abstraction layer in `src/json/`.
+It decouples core logic from direct YAJL generator usage and supports gradual migration.
 
-## Implementiert
-- Übergangs-Writer-API inkl. Capability-Flags in `src/json/json_backend.h/.cc`.
-- Event-Walker-Interface in `src/json/json_walk.h`.
-- Funktionaler DOM->Event-Walker für:
+Implemented now:
+- Internal generator abstraction (`json_backend.*`)
+- Event walker API (`json_walk.*`)
+- Functional walker backends:
   - C: `json-c`
   - C++: `nlohmann/json`
 
-## Build-Auswahl
-- `--with-json-c=auto|yyjson|json-c|jansson|cjson|none`
-- `--with-json-cxx=auto|nlohmannjson|jsoncpp|jsoncons|simdjson|glaze|none`
-- `--with-json-prefer=system|bundled|auto`
-- `--with-json-mode=auto|dom|events`
-- `--enable-json-backend-debug`
+Still pending:
+- Request-body YAJL SAX parser migration (`src/request_body_processor/json.*`)
+- Full backend implementations for all remaining providers
 
-## Auto-Priorität
-C: `yyjson > json-c > jansson > cjson`
+## Deutsch
+Dieses Repository nutzt jetzt eine interne JSON-Abstraktionsschicht in `src/json/`.
+Sie entkoppelt Kernlogik von direkter YAJL-Generator-Nutzung und ermöglicht eine schrittweise Migration.
 
-C++: `simdjson > nlohmann/json > jsoncons > jsoncpp > glaze`
+Aktuell implementiert:
+- Interne Generator-Abstraktion (`json_backend.*`)
+- Event-Walker-API (`json_walk.*`)
+- Funktionale Walker-Backends:
+  - C: `json-c`
+  - C++: `nlohmann/json`
 
-## Noch YAJL-gebunden
-- Request-Body-JSON-Prozessor (`src/request_body_processor/json.*`) bleibt vorerst YAJL/SAX-basiert und wird in Folgeschritten auf den Event-Walker migriert.
+Noch offen:
+- Migration des YAJL-SAX-Request-Body-Parsers (`src/request_body_processor/json.*`)
+- Vollständige Backend-Implementierungen für die übrigen Provider

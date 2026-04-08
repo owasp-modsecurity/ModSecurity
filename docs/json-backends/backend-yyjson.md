@@ -1,7 +1,12 @@
-# Backend: yyjson
+# Moved documentation
+# Verschobene Dokumentation
 
-Status: strukturell vorbereitet (Build-/Configure-Integration vorhanden, Backend-Implementierung noch nicht abgeschlossen).
+## English
+This document moved. Please see:
+- `docs/json-backends/build.md`
+- `docs/json-backends/backends/`
 
-- Configure token: siehe autotools-integration.md
-- System-vs-bundled-Auflösung: implementiert über Configure-Auswahl/Fallback-Logik
-- Capabilities: aktuell als Übergang dokumentiert; vollständige Backend-spezifische Implementierung ist TODO.
+## Deutsch
+Dieses Dokument wurde verschoben. Siehe:
+- `docs/json-backends/build.md`
+- `docs/json-backends/backends/`

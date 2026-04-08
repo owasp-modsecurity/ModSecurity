@@ -1,4 +1,12 @@
-# Build integration
+# Moved documentation
+# Verschobene Dokumentation
 
-Dieses Dokument wurde durch `autotools-integration.md` ersetzt.
-Siehe: `docs/json-backends/autotools-integration.md`.
+## English
+This document moved. Please see:
+- `docs/json-backends/build.md`
+- `docs/json-backends/backends/`
+
+## Deutsch
+Dieses Dokument wurde verschoben. Siehe:
+- `docs/json-backends/build.md`
+- `docs/json-backends/backends/`

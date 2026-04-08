@@ -31,7 +31,16 @@ static void appendEscaped(std::string *dst, const unsigned char *str, size_t len
             case '\n': *dst += "\\n"; break;
             case '\r': *dst += "\\r"; break;
             case '\t': *dst += "\\t"; break;
-            default: dst->push_back(static_cast<char>(c)); break;
+            default:
+                if (c < 0x20) {
+                    static const char hex[] = "0123456789abcdef";
+                    dst->append("\\u00");
+                    dst->push_back(hex[(c >> 4) & 0x0f]);
+                    dst->push_back(hex[c & 0x0f]);
+                } else {
+                    dst->push_back(static_cast<char>(c));
+                }
+                break;
         }
     }
     dst->push_back('"');
@@ -165,7 +174,6 @@ yajl_gen_status yajl_gen_map_open(yajl_gen g) {
         return yajl_gen_status_error;
     }
     g->out.push_back('{');
-    endToken(g);
     g->stack.push_back({Frame::Map, true, true});
     return yajl_gen_status_ok;
 }
@@ -185,7 +193,6 @@ yajl_gen_status yajl_gen_array_open(yajl_gen g) {
         return yajl_gen_status_error;
     }
     g->out.push_back('[');
-    endToken(g);
     g->stack.push_back({Frame::Array, true, false});
     return yajl_gen_status_ok;
 }
