@@ -1,4 +1,4 @@
-name: Quality Assurance new
+name: Quality Assurance new tset
 
 on:
   workflow_dispatch:
