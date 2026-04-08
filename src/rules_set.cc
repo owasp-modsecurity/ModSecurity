@@ -101,8 +101,12 @@ int RulesSet::load(const char *plainRules) {
 }
 
 
-std::string RulesSet::getParserError() {
+std::string RulesSet::getParserError() const {
     return this->m_parserError.str();
+}
+
+std::string RulesSet::getParserError() {
+    return static_cast<const RulesSet&>(*this).getParserError();
 }
 
 void RulesSet::cleanMatchedVars(Transaction *trans) {
@@ -119,7 +123,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
        return 0;
     }
 
-    Rules *rules = m_rulesSetPhases[phase];
+    const Rules *rules = m_rulesSetPhases[phase];
 
     ms_dbg_a(t, 9, "This phase consists of " \
         + std::to_string(rules->size()) + " rule(s).");

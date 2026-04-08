@@ -14,18 +14,24 @@
     },
     "request": {
       "headers": {
-        "Host": "foobar.com"
+        "Host": "foobar.com",
+        "Content-Length": "0"
       },
-      "uri": "\/test.php?param1=pattern2",
+      "uri": "/test.php?param1=pattern2",
       "method": "GET",
       "http_version": 1.1,
-      "body": ""
+      "body": [
+        ""
+      ]
     },
     "response": {
       "headers": {
-        "Content-Type": "text\/html; charset=utf-8\n\r",
-        "Content-Length": "10\n\r"
-      }
+        "Content-Type": "text/html; charset=utf-8\n\r",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
     },
     "expected": {
       "debug_log": "Rule returned 1",
