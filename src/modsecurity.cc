@@ -17,9 +17,8 @@
 #include "modsecurity/modsecurity.h"
 #include "src/config.h"
 
-#ifdef WITH_YAJL
-#include <yajl/yajl_tree.h>
-#include <yajl/yajl_gen.h>
+#ifdef WITH_JSON_SUPPORT
+#include "src/json/json_backend.h"
 #endif
 #ifdef WITH_LIBXML2
 #include <libxml/xmlschemas.h>
@@ -214,7 +213,7 @@ void ModSecurity::serverLog(void *data, const RuleMessage &rm) {
 
 int ModSecurity::processContentOffset(const char *content, size_t len,
     const char *matchString, std::string *json, const char **err) {
-#ifdef WITH_YAJL
+#ifdef WITH_JSON_SUPPORT
     Utils::Regex variables("v([0-9]+),([0-9]+)");
     Utils::Regex operators("o([0-9]+),([0-9]+)");
     Utils::Regex transformations("t:(?:(?!t:).)+");
@@ -380,7 +379,7 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
     yajl_gen_free(g);
     return 0;
 #else
-    *err = "Without YAJL support, we cannot generate JSON.";
+    *err = "Without JSON backend support, we cannot generate JSON.";
     return -1;
 #endif
 }

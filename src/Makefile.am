@@ -66,7 +66,8 @@ libmodsecurity_includesub_collection_HEADERS = \
 libmodsecurity_includesub_actions_HEADERS = \
 	../headers/modsecurity/actions/action.h
 
-include headers.mk
+noinst_HEADERS =
+-include headers.mk
 
 ENGINES = \
 	engine/lua.cc
@@ -250,6 +251,20 @@ BODY_PROCESSORS = \
 	request_body_processor/xml.cc \
 	request_body_processor/json.cc
 
+JSON_BACKENDS = \
+	json/json_backend.cc \
+	json/json_walk.cc \
+	json/backends/backend_yajl.cc \
+	json/backends/backend_yyjson.cc \
+	json/backends/backend_jsonc.cc \
+	json/backends/backend_jansson.cc \
+	json/backends/backend_cjson.cc \
+	json/backends/backend_nlohmannjson.cpp \
+	json/backends/backend_jsoncpp.cpp \
+	json/backends/backend_jsoncons.cpp \
+	json/backends/backend_simdjson.cpp \
+	json/backends/backend_glaze.cpp
+
 
 libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.cc \
@@ -278,6 +293,7 @@ libmodsecurity_la_SOURCES = \
 	rule_script.cc \
 	unique_id.cc \
 	rules_exceptions.cc \
+	${JSON_BACKENDS} \
 	${BODY_PROCESSORS} \
 	${ACTIONS} \
 	${ENGINES} \
@@ -303,6 +319,7 @@ libmodsecurity_la_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
+	$(JSON_BACKEND_CFLAGS) \
 	$(YAJL_CFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
@@ -325,6 +342,7 @@ libmodsecurity_la_LDFLAGS = \
 	$(PCRE2_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
+	$(JSON_BACKEND_LDFLAGS) \
 	$(YAJL_LDFLAGS) \
 	-version-info @MSC_VERSION_INFO@
 
@@ -342,5 +360,5 @@ libmodsecurity_la_LIBADD = \
 	$(PCRE2_LDADD) \
 	$(MAXMIND_LDADD) \
 	$(SSDEEP_LDADD) \
+	$(JSON_BACKEND_LDADD) \
 	$(YAJL_LDADD)
-

@@ -15,9 +15,8 @@
 
 #include "modsecurity/transaction.h"
 
-#ifdef WITH_YAJL
-#include <yajl/yajl_tree.h>
-#include <yajl/yajl_gen.h>
+#ifdef WITH_JSON_SUPPORT
+#include "src/json/json_backend.h"
 #endif
 
 #include <stdio.h>
@@ -1564,7 +1563,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
 
 
 std::string Transaction::toJSON(int parts) {
-#ifdef WITH_YAJL
+#ifdef WITH_JSON_SUPPORT
     const unsigned char *buf;
     size_t len;
     yajl_gen g;
