@@ -392,7 +392,20 @@ elif test "x$JSON_CXX_BACKEND_SOURCE" = "xvendored"; then
   JSON_CXX_BACKEND_DEFINE="$JSON_CXX_BACKEND_DEFINE -DMSC_JSON_CXX_BACKEND_VENDORED"
 fi
 
+JSON_SUPPORT_ENABLED="no"
+JSON_SUPPORT_REASON="none"
 if test "x$JSON_C_BACKEND" != "xnone"; then
+  JSON_SUPPORT_ENABLED="yes"
+  JSON_SUPPORT_REASON="c-backend:${JSON_C_BACKEND}"
+elif test "x$JSON_CXX_BACKEND" != "xnone"; then
+  JSON_SUPPORT_ENABLED="yes"
+  JSON_SUPPORT_REASON="cxx-backend:${JSON_CXX_BACKEND}"
+elif test "x$YAJL_FOUND" = "x1"; then
+  JSON_SUPPORT_ENABLED="yes"
+  JSON_SUPPORT_REASON="legacy-yajl"
+fi
+
+if test "x$JSON_SUPPORT_ENABLED" = "xyes"; then
   AC_DEFINE([WITH_JSON_SUPPORT], [1], [Define if a JSON backend is enabled for JSON generation])
   JSON_BACKEND_CFLAGS="$JSON_BACKEND_CFLAGS $JSON_C_BACKEND_DEFINE $JSON_CXX_BACKEND_DEFINE -DWITH_JSON_SUPPORT"
 else
@@ -406,6 +419,8 @@ AC_SUBST([JSON_C_BACKEND])
 AC_SUBST([JSON_C_BACKEND_SOURCE])
 AC_SUBST([JSON_CXX_BACKEND])
 AC_SUBST([JSON_CXX_BACKEND_SOURCE])
+AC_SUBST([JSON_SUPPORT_ENABLED])
+AC_SUBST([JSON_SUPPORT_REASON])
 AC_SUBST([JSON_PREFER_MODE], [$with_json_prefer])
 AC_SUBST([JSON_OPERATING_MODE], [$with_json_mode])
 
@@ -770,6 +785,7 @@ echo "   + JSON C backend                                 ....${JSON_C_BACKEND} 
 echo "   + JSON C++ backend                               ....${JSON_CXX_BACKEND} (${JSON_CXX_BACKEND_SOURCE})"
 echo "   + JSON backend                                   ....${JSON_C_BACKEND} (${JSON_C_BACKEND_SOURCE})"
 echo "   + JSON C++ backend (effective)                   ....${JSON_CXX_BACKEND} (${JSON_CXX_BACKEND_SOURCE})"
+echo "   + JSON support (overall)                         ....${JSON_SUPPORT_ENABLED} (${JSON_SUPPORT_REASON})"
 echo "   + JSON preference                                ....${with_json_prefer}"
 echo "   + JSON mode                                      ....${with_json_mode}"
 if test "x$enable_json_backend_debug" = "xyes"; then
