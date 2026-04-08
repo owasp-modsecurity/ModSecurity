@@ -20,8 +20,15 @@ struct msc_json_gen_ctx {
 };
 
 static void appendEscaped(std::string *dst, const unsigned char *str, size_t len) {
+    static const char hex[] = "0123456789abcdef";
+    auto appendByteEscape = [&](unsigned char c) {
+        dst->append("\\u00");
+        dst->push_back(hex[(c >> 4) & 0x0f]);
+        dst->push_back(hex[c & 0x0f]);
+    };
+
     dst->push_back('"');
-    for (size_t i = 0; i < len; ++i) {
+    for (size_t i = 0; i < len; ) {
         const unsigned char c = str[i];
         switch (c) {
             case '"': *dst += "\\\""; break;
@@ -33,14 +40,65 @@ static void appendEscaped(std::string *dst, const unsigned char *str, size_t len
             case '\t': *dst += "\\t"; break;
             default:
                 if (c < 0x20) {
-                    static const char hex[] = "0123456789abcdef";
-                    dst->append("\\u00");
-                    dst->push_back(hex[(c >> 4) & 0x0f]);
-                    dst->push_back(hex[c & 0x0f]);
-                } else {
+                    appendByteEscape(c);
+                    ++i;
+                } else if (c < 0x80) {
                     dst->push_back(static_cast<char>(c));
+                    ++i;
+                } else {
+                    size_t need = 0;
+                    bool validLead = true;
+                    if ((c & 0xE0) == 0xC0) {
+                        need = 2;
+                        if (c < 0xC2) validLead = false;
+                    } else if ((c & 0xF0) == 0xE0) {
+                        need = 3;
+                    } else if ((c & 0xF8) == 0xF0) {
+                        need = 4;
+                        if (c > 0xF4) validLead = false;
+                    } else {
+                        validLead = false;
+                    }
+
+                    if (!validLead || i + need > len) {
+                        appendByteEscape(c);
+                        ++i;
+                        break;
+                    }
+
+                    bool valid = true;
+                    for (size_t j = 1; j < need; ++j) {
+                        if ((str[i + j] & 0xC0) != 0x80) {
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (valid && need == 3) {
+                        const unsigned char b1 = str[i + 1];
+                        if ((c == 0xE0 && b1 < 0xA0) || (c == 0xED && b1 >= 0xA0)) {
+                            valid = false;
+                        }
+                    }
+                    if (valid && need == 4) {
+                        const unsigned char b1 = str[i + 1];
+                        if ((c == 0xF0 && b1 < 0x90) || (c == 0xF4 && b1 >= 0x90)) {
+                            valid = false;
+                        }
+                    }
+
+                    if (!valid) {
+                        appendByteEscape(c);
+                        ++i;
+                        break;
+                    }
+
+                    dst->append(reinterpret_cast<const char *>(str + i), need);
+                    i += need;
                 }
                 break;
+        }
+        if (c == '"' || c == '\\' || c == '\b' || c == '\f' || c == '\n' || c == '\r' || c == '\t') {
+            ++i;
         }
     }
     dst->push_back('"');

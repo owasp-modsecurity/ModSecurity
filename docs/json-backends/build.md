@@ -14,7 +14,8 @@ Selection rules:
 2. Resolve backend according to requested backend and priority.
 3. Prefer system or bundled by `--with-json-prefer`.
 4. For bundled mode, verify required headers exist.
-5. On explicit request, fail with clear error if unresolved.
+5. Explicit backend requests are strict and fail if unavailable.
+6. `--with-json-c=auto` degrades gracefully to `none` when no backend is usable.
 
 C auto order: `yyjson > json-c > jansson > cjson`.
 
@@ -31,6 +32,7 @@ Auswahllogik:
 2. Backend anhand gewünschter Auswahl und Priorität auflösen.
 3. System oder Bundled gemäß `--with-json-prefer` bevorzugen.
 4. Im Bundled-Modus notwendige Header prüfen.
-5. Bei expliziter Auswahl mit klarer Fehlermeldung abbrechen, falls nicht auflösbar.
+5. Explizite Backend-Auswahl wird strikt validiert und bricht bei Nichterfüllung mit klarer Fehlermeldung ab.
+6. `--with-json-c=auto` degradiert weich auf `none`, falls kein Backend nutzbar ist.
 
 C-Auto-Reihenfolge: `yyjson > json-c > jansson > cjson`.

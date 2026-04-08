@@ -157,65 +157,132 @@ JSON_CXX_BACKEND="none"
 
 AC_MSG_NOTICE([Resolving C JSON backend (${with_json_c})])
 case "x$with_json_c" in
-  xauto|xyyjson|xjson-c|xjansson|xcjson)
-    if test "x$with_json_prefer" = "xbundled" && (test "x$with_json_c" = "xauto" || test "x$with_json_c" = "xjson-c") && test -f "${srcdir}/third_party/json-c/include/json-c/json.h"; then
-      JSON_C_BACKEND="json-c"
-      JSON_C_BACKEND_SOURCE="vendored"
-      JSON_BACKEND_CFLAGS="-I\$(top_srcdir)/third_party/json-c/include"
-    fi
-    if test "x$with_json_c" = "xauto" || test "x$with_json_c" = "xyyjson"; then
-      MSC_CHECK_LIB([YYJSON], [yyjson], [yyjson.h], [yyjson], [])
-      if test "x$YYJSON_FOUND" = "x1"; then
-        JSON_C_BACKEND="yyjson"
-        JSON_BACKEND_CFLAGS="$YYJSON_CFLAGS"
-        JSON_BACKEND_LDFLAGS="$YYJSON_LDFLAGS"
-        JSON_BACKEND_LDADD="$YYJSON_LDADD"
-        JSON_C_BACKEND_SOURCE="system"
-      fi
-    fi
-    if test "x$JSON_C_BACKEND" = "x" && (test "x$with_json_c" = "xauto" || test "x$with_json_c" = "xjson-c"); then
-      MSC_CHECK_LIB([JSONC], [json-c], [json-c/json.h], [json-c], [-DWITH_JSON_C])
-      if test "x$JSONC_FOUND" = "x1"; then
-        JSON_C_BACKEND="json-c"
-        JSON_BACKEND_CFLAGS="$JSONC_CFLAGS"
-        JSON_BACKEND_LDFLAGS="$JSONC_LDFLAGS"
-        JSON_BACKEND_LDADD="$JSONC_LDADD"
-        JSON_C_BACKEND_SOURCE="system"
-      fi
-    fi
-    if test "x$JSON_C_BACKEND" = "x" && (test "x$with_json_c" = "xauto" || test "x$with_json_c" = "xjansson"); then
-      MSC_CHECK_LIB([JANSSON], [jansson], [jansson.h], [jansson], [])
-      if test "x$JANSSON_FOUND" = "x1"; then
-        JSON_C_BACKEND="jansson"
-        JSON_BACKEND_CFLAGS="$JANSSON_CFLAGS"
-        JSON_BACKEND_LDFLAGS="$JANSSON_LDFLAGS"
-        JSON_BACKEND_LDADD="$JANSSON_LDADD"
-        JSON_C_BACKEND_SOURCE="system"
-      fi
-    fi
-    if test "x$JSON_C_BACKEND" = "x" && (test "x$with_json_c" = "xauto" || test "x$with_json_c" = "xcjson"); then
-      MSC_CHECK_LIB([CJSON], [libcjson cjson], [cjson/cJSON.h], [cjson], [])
-      if test "x$CJSON_FOUND" = "x1"; then
-        JSON_C_BACKEND="cjson"
-        JSON_BACKEND_CFLAGS="$CJSON_CFLAGS"
-        JSON_BACKEND_LDFLAGS="$CJSON_LDFLAGS"
-        JSON_BACKEND_LDADD="$CJSON_LDADD"
-        JSON_C_BACKEND_SOURCE="system"
-      fi
-    fi
-    if test "x$JSON_C_BACKEND" = "x" && test "x$with_json_prefer" != "xsystem"; then
+  xauto)
+    _msc_json_c_order="yyjson json-c jansson cjson"
+    if test "x$with_json_prefer" = "xbundled"; then
       if test -f "${srcdir}/third_party/json-c/include/json-c/json.h"; then
         JSON_C_BACKEND="json-c"
         JSON_C_BACKEND_SOURCE="vendored"
         JSON_BACKEND_CFLAGS="-I\$(top_srcdir)/third_party/json-c/include"
-      elif test "x$with_json_prefer" = "xbundled" && (test "x$with_json_c" = "xjson-c" || test "x$with_json_c" = "xauto"); then
-        AC_MSG_ERROR([Vendored json-c selected but headers missing: third_party/json-c/include/json-c/json.h])
-      elif test "x$with_json_c" != "xauto"; then
-        AC_MSG_ERROR([Requested C JSON backend '$with_json_c' not available as system package and no vendored module found.])
       fi
     fi
-    if test "x$JSON_C_BACKEND" = "x" && test "x$with_json_prefer" = "xsystem" && test "x$with_json_c" != "xauto"; then
-      AC_MSG_ERROR([Requested C JSON backend '$with_json_c' was not found as a system package (--with-json-prefer=system).])
+    for _msc_cand in $_msc_json_c_order; do
+      if test "x$JSON_C_BACKEND" != "x"; then
+        break
+      fi
+      case "$_msc_cand" in
+        yyjson)
+          MSC_CHECK_LIB([YYJSON], [yyjson], [yyjson.h], [yyjson], [])
+          if test "x$YYJSON_FOUND" = "x1"; then
+            JSON_C_BACKEND="yyjson"
+            JSON_BACKEND_CFLAGS="$YYJSON_CFLAGS"
+            JSON_BACKEND_LDFLAGS="$YYJSON_LDFLAGS"
+            JSON_BACKEND_LDADD="$YYJSON_LDADD"
+            JSON_C_BACKEND_SOURCE="system"
+          fi
+          ;;
+        json-c)
+          MSC_CHECK_LIB([JSONC], [json-c], [json-c/json.h], [json-c], [-DWITH_JSON_C])
+          if test "x$JSONC_FOUND" = "x1"; then
+            JSON_C_BACKEND="json-c"
+            JSON_BACKEND_CFLAGS="$JSONC_CFLAGS"
+            JSON_BACKEND_LDFLAGS="$JSONC_LDFLAGS"
+            JSON_BACKEND_LDADD="$JSONC_LDADD"
+            JSON_C_BACKEND_SOURCE="system"
+          elif test "x$with_json_prefer" != "xsystem" && test -f "${srcdir}/third_party/json-c/include/json-c/json.h"; then
+            JSON_C_BACKEND="json-c"
+            JSON_C_BACKEND_SOURCE="vendored"
+            JSON_BACKEND_CFLAGS="-I\$(top_srcdir)/third_party/json-c/include"
+          fi
+          ;;
+        jansson)
+          MSC_CHECK_LIB([JANSSON], [jansson], [jansson.h], [jansson], [])
+          if test "x$JANSSON_FOUND" = "x1"; then
+            JSON_C_BACKEND="jansson"
+            JSON_BACKEND_CFLAGS="$JANSSON_CFLAGS"
+            JSON_BACKEND_LDFLAGS="$JANSSON_LDFLAGS"
+            JSON_BACKEND_LDADD="$JANSSON_LDADD"
+            JSON_C_BACKEND_SOURCE="system"
+          fi
+          ;;
+        cjson)
+          MSC_CHECK_LIB([CJSON], [libcjson cjson], [cjson/cJSON.h], [cjson], [])
+          if test "x$CJSON_FOUND" = "x1"; then
+            JSON_C_BACKEND="cjson"
+            JSON_BACKEND_CFLAGS="$CJSON_CFLAGS"
+            JSON_BACKEND_LDFLAGS="$CJSON_LDFLAGS"
+            JSON_BACKEND_LDADD="$CJSON_LDADD"
+            JSON_C_BACKEND_SOURCE="system"
+          fi
+          ;;
+      esac
+    done
+    if test "x$JSON_C_BACKEND" = "x"; then
+      JSON_C_BACKEND="none"
+      JSON_C_BACKEND_SOURCE="disabled"
+    fi
+    ;;
+  xyyjson|xjson-c|xjansson|xcjson)
+    _msc_explicit_c="$with_json_c"
+    if test "x$with_json_prefer" = "xbundled" && test "x$_msc_explicit_c" = "xjson-c"; then
+      if test -f "${srcdir}/third_party/json-c/include/json-c/json.h"; then
+        JSON_C_BACKEND="json-c"
+        JSON_C_BACKEND_SOURCE="vendored"
+        JSON_BACKEND_CFLAGS="-I\$(top_srcdir)/third_party/json-c/include"
+      else
+        AC_MSG_ERROR([Vendored json-c selected but headers missing: third_party/json-c/include/json-c/json.h])
+      fi
+    fi
+    if test "x$JSON_C_BACKEND" = "x"; then
+      case "$_msc_explicit_c" in
+        yyjson)
+          MSC_CHECK_LIB([YYJSON], [yyjson], [yyjson.h], [yyjson], [])
+          if test "x$YYJSON_FOUND" = "x1"; then
+            JSON_C_BACKEND="yyjson"
+            JSON_BACKEND_CFLAGS="$YYJSON_CFLAGS"
+            JSON_BACKEND_LDFLAGS="$YYJSON_LDFLAGS"
+            JSON_BACKEND_LDADD="$YYJSON_LDADD"
+            JSON_C_BACKEND_SOURCE="system"
+          fi
+          ;;
+        json-c)
+          MSC_CHECK_LIB([JSONC], [json-c], [json-c/json.h], [json-c], [-DWITH_JSON_C])
+          if test "x$JSONC_FOUND" = "x1"; then
+            JSON_C_BACKEND="json-c"
+            JSON_BACKEND_CFLAGS="$JSONC_CFLAGS"
+            JSON_BACKEND_LDFLAGS="$JSONC_LDFLAGS"
+            JSON_BACKEND_LDADD="$JSONC_LDADD"
+            JSON_C_BACKEND_SOURCE="system"
+          elif test "x$with_json_prefer" != "xsystem" && test -f "${srcdir}/third_party/json-c/include/json-c/json.h"; then
+            JSON_C_BACKEND="json-c"
+            JSON_C_BACKEND_SOURCE="vendored"
+            JSON_BACKEND_CFLAGS="-I\$(top_srcdir)/third_party/json-c/include"
+          fi
+          ;;
+        jansson)
+          MSC_CHECK_LIB([JANSSON], [jansson], [jansson.h], [jansson], [])
+          if test "x$JANSSON_FOUND" = "x1"; then
+            JSON_C_BACKEND="jansson"
+            JSON_BACKEND_CFLAGS="$JANSSON_CFLAGS"
+            JSON_BACKEND_LDFLAGS="$JANSSON_LDFLAGS"
+            JSON_BACKEND_LDADD="$JANSSON_LDADD"
+            JSON_C_BACKEND_SOURCE="system"
+          fi
+          ;;
+        cjson)
+          MSC_CHECK_LIB([CJSON], [libcjson cjson], [cjson/cJSON.h], [cjson], [])
+          if test "x$CJSON_FOUND" = "x1"; then
+            JSON_C_BACKEND="cjson"
+            JSON_BACKEND_CFLAGS="$CJSON_CFLAGS"
+            JSON_BACKEND_LDFLAGS="$CJSON_LDFLAGS"
+            JSON_BACKEND_LDADD="$CJSON_LDADD"
+            JSON_C_BACKEND_SOURCE="system"
+          fi
+          ;;
+      esac
+    fi
+    if test "x$JSON_C_BACKEND" = "x"; then
+      AC_MSG_ERROR([Requested C JSON backend '$with_json_c' is not available with current --with-json-prefer=${with_json_prefer}.])
     fi
     ;;
   xnone)
@@ -226,10 +293,6 @@ case "x$with_json_c" in
     AC_MSG_ERROR([Invalid value for --with-json-c: $with_json_c])
     ;;
 esac
-
-if test "x$JSON_C_BACKEND" = "x"; then
-  AC_MSG_ERROR([No usable C JSON backend found. Checked (priority): yyjson > json-c > jansson > cjson.])
-fi
 
 case "x$JSON_C_BACKEND" in
   xyyjson) JSON_C_BACKEND_DEFINE="-DMSC_JSON_C_BACKEND_YYJSON" ;;
@@ -248,36 +311,64 @@ AC_MSG_NOTICE([Resolving C++ JSON backend (${with_json_cxx})])
 JSON_CXX_BACKEND="none"
 JSON_CXX_BACKEND_SOURCE="disabled"
 case "x$with_json_cxx" in
-  xauto|xsimdjson|xnlohmannjson|xjsoncons|xjsoncpp|xglaze)
-    if test "x$with_json_prefer" = "xbundled" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xnlohmannjson") && test -f "${srcdir}/third_party/nlohmann_json/include/nlohmann/json.hpp"; then
+  xauto)
+    if test "x$with_json_prefer" = "xbundled" && test -f "${srcdir}/third_party/nlohmann_json/include/nlohmann/json.hpp"; then
       JSON_CXX_BACKEND="nlohmannjson"
       JSON_CXX_BACKEND_SOURCE="vendored"
       JSON_BACKEND_CFLAGS="$JSON_BACKEND_CFLAGS -I\$(top_srcdir)/third_party/nlohmann_json/include"
     fi
-    if test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xsimdjson"; then
+    if test "x$JSON_CXX_BACKEND" = "xnone"; then
       AC_CHECK_HEADER([simdjson.h], [JSON_CXX_BACKEND="simdjson"; JSON_CXX_BACKEND_SOURCE="system"])
     fi
-    if test "x$JSON_CXX_BACKEND" = "xnone" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xnlohmannjson"); then
+    if test "x$JSON_CXX_BACKEND" = "xnone"; then
       AC_CHECK_HEADER([nlohmann/json.hpp], [JSON_CXX_BACKEND="nlohmannjson"; JSON_CXX_BACKEND_SOURCE="system"])
     fi
-    if test "x$JSON_CXX_BACKEND" = "xnone" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xjsoncons"); then
+    if test "x$JSON_CXX_BACKEND" = "xnone"; then
       AC_CHECK_HEADER([jsoncons/json.hpp], [JSON_CXX_BACKEND="jsoncons"; JSON_CXX_BACKEND_SOURCE="system"])
     fi
-    if test "x$JSON_CXX_BACKEND" = "xnone" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xjsoncpp"); then
+    if test "x$JSON_CXX_BACKEND" = "xnone"; then
       AC_CHECK_HEADER([json/json.h], [JSON_CXX_BACKEND="jsoncpp"; JSON_CXX_BACKEND_SOURCE="system"])
     fi
-    if test "x$JSON_CXX_BACKEND" = "xnone" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xglaze"); then
+    if test "x$JSON_CXX_BACKEND" = "xnone"; then
       AC_CHECK_HEADER([glaze/glaze.hpp], [JSON_CXX_BACKEND="glaze"; JSON_CXX_BACKEND_SOURCE="system"])
     fi
     if test "x$JSON_CXX_BACKEND" = "xnone" && test "x$with_json_prefer" != "xsystem" && test -f "${srcdir}/third_party/nlohmann_json/include/nlohmann/json.hpp"; then
       JSON_CXX_BACKEND="nlohmannjson"
       JSON_CXX_BACKEND_SOURCE="vendored"
       JSON_BACKEND_CFLAGS="$JSON_BACKEND_CFLAGS -I\$(top_srcdir)/third_party/nlohmann_json/include"
-    elif test "x$JSON_CXX_BACKEND" = "xnone" && test "x$with_json_prefer" = "xbundled" && (test "x$with_json_cxx" = "xauto" || test "x$with_json_cxx" = "xnlohmannjson"); then
-      AC_MSG_ERROR([Vendored nlohmann/json selected but header missing: third_party/nlohmann_json/include/nlohmann/json.hpp])
     fi
-    if test "x$JSON_CXX_BACKEND" = "xnone" && test "x$with_json_cxx" != "xauto"; then
-      AC_MSG_ERROR([Requested C++ JSON backend '$with_json_cxx' not available as system package and no vendored module found.])
+    ;;
+  xsimdjson|xnlohmannjson|xjsoncons|xjsoncpp|xglaze)
+    _msc_explicit_cxx="$with_json_cxx"
+    if test "x$_msc_explicit_cxx" = "xnlohmannjson"; then
+      if test "x$with_json_prefer" = "xbundled"; then
+        if test -f "${srcdir}/third_party/nlohmann_json/include/nlohmann/json.hpp"; then
+          JSON_CXX_BACKEND="nlohmannjson"
+          JSON_CXX_BACKEND_SOURCE="vendored"
+          JSON_BACKEND_CFLAGS="$JSON_BACKEND_CFLAGS -I\$(top_srcdir)/third_party/nlohmann_json/include"
+        else
+          AC_MSG_ERROR([Vendored nlohmann/json selected but header missing: third_party/nlohmann_json/include/nlohmann/json.hpp])
+        fi
+      fi
+      if test "x$JSON_CXX_BACKEND" = "xnone"; then
+        AC_CHECK_HEADER([nlohmann/json.hpp], [JSON_CXX_BACKEND="nlohmannjson"; JSON_CXX_BACKEND_SOURCE="system"])
+      fi
+      if test "x$JSON_CXX_BACKEND" = "xnone" && test "x$with_json_prefer" != "xsystem" && test -f "${srcdir}/third_party/nlohmann_json/include/nlohmann/json.hpp"; then
+        JSON_CXX_BACKEND="nlohmannjson"
+        JSON_CXX_BACKEND_SOURCE="vendored"
+        JSON_BACKEND_CFLAGS="$JSON_BACKEND_CFLAGS -I\$(top_srcdir)/third_party/nlohmann_json/include"
+      fi
+    elif test "x$_msc_explicit_cxx" = "xsimdjson"; then
+      AC_CHECK_HEADER([simdjson.h], [JSON_CXX_BACKEND="simdjson"; JSON_CXX_BACKEND_SOURCE="system"])
+    elif test "x$_msc_explicit_cxx" = "xjsoncons"; then
+      AC_CHECK_HEADER([jsoncons/json.hpp], [JSON_CXX_BACKEND="jsoncons"; JSON_CXX_BACKEND_SOURCE="system"])
+    elif test "x$_msc_explicit_cxx" = "xjsoncpp"; then
+      AC_CHECK_HEADER([json/json.h], [JSON_CXX_BACKEND="jsoncpp"; JSON_CXX_BACKEND_SOURCE="system"])
+    elif test "x$_msc_explicit_cxx" = "xglaze"; then
+      AC_CHECK_HEADER([glaze/glaze.hpp], [JSON_CXX_BACKEND="glaze"; JSON_CXX_BACKEND_SOURCE="system"])
+    fi
+    if test "x$JSON_CXX_BACKEND" = "xnone"; then
+      AC_MSG_ERROR([Requested C++ JSON backend '$with_json_cxx' is not available with current --with-json-prefer=${with_json_prefer}.])
     fi
     ;;
   xnone)
