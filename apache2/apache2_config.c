@@ -34,7 +34,7 @@
 # define ap_log_perror(a, b, c, d, fmt, ...) fprintf(stderr, fmt "\n", __VA_ARGS__)
 #endif
 
-const char* id_log(msre_rule* rule, apr_pool_t* pool) {
+const char* id_log(const msre_rule* rule, apr_pool_t* pool) {
 	assert(rule != NULL);
 	assert(rule->actionset != NULL);
 	assert(rule->ruleset != NULL);
@@ -42,7 +42,7 @@ const char* id_log(msre_rule* rule, apr_pool_t* pool) {
 	if (!id || id == NOT_SET_P || !*id) id = apr_psprintf(pool, "%s (%d)", rule->filename, rule->line_num);
 	return id;
 }
-const char* id_log_ifnotempty(msre_actionset* actionset) {
+const char* id_log_ifnotempty(const msre_actionset* actionset) {
 	if (actionset == NULL) return "";
 	const char* id = actionset->id;
 	if (!id || id == NOT_SET_P || !*id) id = "";
