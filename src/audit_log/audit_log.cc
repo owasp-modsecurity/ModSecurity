@@ -248,7 +248,7 @@ bool AuditLog::init(std::string *error) {
 }
 
 
-bool AuditLog::isRelevant(int status) {
+bool AuditLog::isRelevant(int status) const {
     std::string sstatus = std::to_string(status);
 
     if (m_relevant.empty()) {
@@ -262,6 +262,10 @@ bool AuditLog::isRelevant(int status) {
 
     return Utils::regex_search(sstatus,
         Utils::Regex(m_relevant)) != 0;
+}
+
+bool AuditLog::isRelevant(int status) {
+    return static_cast<const AuditLog&>(*this).isRelevant(status);
 }
 
 

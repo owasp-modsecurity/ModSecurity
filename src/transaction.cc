@@ -531,7 +531,7 @@ int Transaction::addRequestHeader(const std::string& key,
 
             // find the first '='
             pos = c.find_first_of("=", 0);
-            std::string ckey = "";
+            std::string ckey;
             std::string cval = "";
 
             // if the cookie doesn't contains '=', its just a key
