@@ -10,3 +10,6 @@
 [submodule "others/mbedtls"]
 	path = others/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git
+[submodule "others/simdjson"]
+	path = others/simdjson
+	url = https://github.com/simdjson/simdjson.git
