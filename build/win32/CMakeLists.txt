@@ -7,6 +7,8 @@ option(WITH_LUA     "Include LUA support"     ON)
 option(WITH_LIBXML2 "Include LibXML2 support" ON)
 option(WITH_MAXMIND "Include MaxMind support" ON)
 option(WITH_CURL    "Include CURL support"    ON)
+set(JSON_BACKEND "simdjson" CACHE STRING "Select internal JSON backend (simdjson or jsoncons)")
+set_property(CACHE JSON_BACKEND PROPERTY STRINGS simdjson jsoncons)
 
 option(USE_ASAN     "Build with Address Sanitizer" OFF)
 
@@ -51,6 +53,8 @@ target_compile_definitions(libinjection PRIVATE LIBINJECTION_VERSION="${LIBINJEC
 project(mbedcrypto C)
 
 set(MBEDTLS_DIR ${BASE_DIR}/others/mbedtls)
+set(SIMDJSON_DIR ${BASE_DIR}/others/simdjson/singleheader)
+set(JSONCONS_DIR ${BASE_DIR}/others/jsoncons/include)
 
 add_library(mbedcrypto STATIC ${MBEDTLS_DIR}/library/base64.c ${MBEDTLS_DIR}/library/sha1.c ${MBEDTLS_DIR}/library/md5.c ${MBEDTLS_DIR}/library/platform_util.c ${MBEDTLS_DIR}/library/constant_time.c)
 
@@ -87,7 +91,25 @@ set(PACKAGE_VERSION "${PROJECT_VERSION}")
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 set(PACKAGE_TARNAME "${PACKAGE_NAME}")
 
-set(HAVE_YAJL     1)    # should always be one, mandatory dependency
+if(NOT JSON_BACKEND STREQUAL "simdjson" AND NOT JSON_BACKEND STREQUAL "jsoncons")
+  message(FATAL_ERROR "Unsupported JSON_BACKEND '${JSON_BACKEND}'. Use simdjson or jsoncons.")
+endif()
+
+unset(MSC_JSON_BACKEND_SIMDJSON)
+unset(MSC_JSON_BACKEND_JSONCONS)
+set(JSON_BACKEND_SIMDJSON_SOURCE ${BASE_DIR}/src/request_body_processor/json_backend_simdjson.cc)
+set(JSON_BACKEND_JSONCONS_SOURCE ${BASE_DIR}/src/request_body_processor/json_backend_jsoncons.cc)
+
+if(JSON_BACKEND STREQUAL "simdjson")
+  set(MSC_JSON_BACKEND_SIMDJSON 1)
+  set(JSON_BACKEND_SOURCES ${JSON_BACKEND_SIMDJSON_SOURCE} ${SIMDJSON_DIR}/simdjson.cpp)
+  set(JSON_BACKEND_INCLUDE_DIR ${SIMDJSON_DIR})
+else()
+  set(MSC_JSON_BACKEND_JSONCONS 1)
+  set(JSON_BACKEND_SOURCES ${JSON_BACKEND_JSONCONS_SOURCE})
+  set(JSON_BACKEND_INCLUDE_DIR ${JSONCONS_DIR})
+endif()
+
 set(HAVE_GEOIP    0)    # should always be zero, no conan package available
 set(HAVE_SSDEEP   0)    # should always be zero, no conan package available
 
@@ -119,7 +141,6 @@ macro(include_package package flag)
   endif()
 endmacro()
 
-include_package(yajl HAVE_YAJL)
 include_package(libxml2 HAVE_LIBXML2)
 include_package(lua HAVE_LUA)
 include_package(CURL HAVE_CURL)
@@ -133,11 +154,13 @@ include_package(maxminddb HAVE_MAXMIND)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 file(GLOB_RECURSE libModSecuritySources ${BASE_DIR}/src/*.cc)
+list(REMOVE_ITEM libModSecuritySources ${JSON_BACKEND_SIMDJSON_SOURCE} ${JSON_BACKEND_JSONCONS_SOURCE})
+list(APPEND libModSecuritySources ${JSON_BACKEND_SOURCES})
 
 add_library(libModSecurity SHARED ${libModSecuritySources})
 
 target_compile_definitions(libModSecurity PRIVATE WITH_PCRE2)
-target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include)
+target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include ${JSON_BACKEND_INCLUDE_DIR})
 target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
 
 macro(add_package_dependency project compile_definition link_library flag)
@@ -147,7 +170,6 @@ macro(add_package_dependency project compile_definition link_library flag)
   endif()
 endmacro()
 
-add_package_dependency(libModSecurity WITH_YAJL yajl::yajl HAVE_YAJL)
 add_package_dependency(libModSecurity WITH_LIBXML2 LibXml2::LibXml2 HAVE_LIBXML2)
 add_package_dependency(libModSecurity WITH_LUA lua::lua HAVE_LUA)
 if(HAVE_LUA)
@@ -164,9 +186,8 @@ project(libModSecurityTests)
 
 function(setTestTargetProperties executable)
   target_compile_definitions(${executable} PRIVATE WITH_PCRE2)
-  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers)
+  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${JSONCONS_DIR})
   target_link_libraries(${executable} PRIVATE libModSecurity pcre2::pcre2 dirent::dirent)
-  add_package_dependency(${executable} WITH_YAJL yajl::yajl HAVE_YAJL)
 endfunction()
 
 # unit tests

@@ -1,0 +1,677 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar string",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "7"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "\"hello\""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"hello\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210101',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^hello$\" \"id:'210102',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar decimal number",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "3"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "1.0"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"1.0\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210103',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^1.0$\" \"id:'210104',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar scientific number",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "3"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "1e3"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"1e3\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210105',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^1e3$\" \"id:'210106',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar negative zero",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "2"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "-0"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"-0\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210107',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^-0$\" \"id:'210108',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar big integer",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "30"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "123456789012345678901234567890"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"123456789012345678901234567890\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210109',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^123456789012345678901234567890$\" \"id:'210110',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar boolean",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "5"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "false"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"false\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210121',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^false$\" \"id:'210122',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar null",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "4"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "null"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210123',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^$\" \"id:'210124',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - nested root array path",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "20"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "[{\"deep\":[\"x\",\"y\"]}]"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"y\" \\(Variable: ARGS:json.array_0.deep.array_1\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210111',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json.array_0.deep.array_1 \"^y$\" \"id:'210112',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - empty root array",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "2"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "[]"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"0\" .Variable: REQBODY_ERROR.",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210125',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQBODY_ERROR \"0\" \"id:'210126',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - empty root object",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "2"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{}"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"0\" .Variable: REQBODY_ERROR.",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210113',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQBODY_ERROR \"0\" \"id:'210114',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root array high index",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "21"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "[0,1,2,3,4,5,6,7,8,9]"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"9\" \\(Variable: ARGS:json.array_9\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210127',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json.array_9 \"^9$\" \"id:'210128',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar big exponent",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "6"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "1e1000"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"1e1000\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210129',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^1e1000$\" \"id:'210130',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - duplicate keys remain addressable",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "30"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"dup\":\"first\",\"dup\":\"second\"}"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"second\" \\(Variable: ARGS:json.dup\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210115',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json.dup \"^second$\" \"id:'210116',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - truncated body",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "7"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"foo\":"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Failed to parse request body",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210117',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'210118',phase:2,t:none,log,deny,status:403,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - invalid unicode escape",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "16"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"bad\":\"\\uD800\"}"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Failed to parse request body",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210119',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'210120',phase:2,t:none,log,deny,status:403,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}'\""
+    ]
+  }
+]

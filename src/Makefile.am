@@ -231,6 +231,7 @@ UTILS = \
 	utils/geo_lookup.cc \
 	utils/https_client.cc \
 	utils/ip_tree.cc \
+	utils/json_writer.cc \
 	utils/msc_tree.cc \
 	utils/random.cc \
 	utils/regex.cc \
@@ -248,10 +249,28 @@ COLLECTION = \
 BODY_PROCESSORS = \
 	request_body_processor/multipart.cc \
 	request_body_processor/xml.cc \
-	request_body_processor/json.cc
+	request_body_processor/json.cc \
+	request_body_processor/json_adapter.cc
+
+if JSON_BACKEND_SIMDJSON
+BODY_PROCESSORS += \
+	request_body_processor/json_backend_simdjson.cc
+JSON_BACKEND_SOURCES = \
+	../others/simdjson/singleheader/simdjson.cpp
+JSON_BACKEND_CPPFLAGS = \
+	-I$(top_srcdir)/others/simdjson/singleheader
+endif
+
+if JSON_BACKEND_JSONCONS
+BODY_PROCESSORS += \
+	request_body_processor/json_backend_jsoncons.cc
+JSON_BACKEND_CPPFLAGS = \
+	-I$(top_srcdir)/others/jsoncons/include
+endif
 
 
 libmodsecurity_la_SOURCES = \
+	$(JSON_BACKEND_SOURCES) \
 	parser/seclang-parser.cc \
 	parser/seclang-scanner.cc \
 	parser/driver.cc \
@@ -295,6 +314,7 @@ libmodsecurity_la_CPPFLAGS = \
 	-I$(top_builddir) \
 	-g \
 	-I$(top_srcdir)/others \
+	$(JSON_BACKEND_CPPFLAGS) \
 	-I$(top_srcdir)/others/mbedtls/include \
 	-fPIC \
 	-O3 \
@@ -303,7 +323,6 @@ libmodsecurity_la_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
-	$(YAJL_CFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(PCRE2_CFLAGS) \
@@ -325,7 +344,6 @@ libmodsecurity_la_LDFLAGS = \
 	$(PCRE2_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
-	$(YAJL_LDFLAGS) \
 	-version-info @MSC_VERSION_INFO@
 
 
@@ -341,6 +359,4 @@ libmodsecurity_la_LIBADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(MAXMIND_LDADD) \
-	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
-
+	$(SSDEEP_LDADD)

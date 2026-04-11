@@ -13,12 +13,12 @@
  *
  */
 
-#include <yajl/yajl_tree.h>
-
 #include <iostream>
 #include <vector>
 #include <string>
 #include <memory>
+
+#include "test/common/json.h"
 
 #ifndef TEST_UNIT_UNIT_TEST_H_
 #define TEST_UNIT_UNIT_TEST_H_
@@ -33,7 +33,10 @@ class UnitTestResult {
 
 class UnitTest {
  public:
-    static std::unique_ptr<UnitTest> from_yajl_node(const yajl_val &);
+    static std::unique_ptr<UnitTest> from_json_document(
+        modsecurity_test::json::JsonDocument *document);
+    static std::unique_ptr<UnitTest> from_json_value(
+        modsecurity_test::json::JsonValue value);
 
     std::string print() const;
 

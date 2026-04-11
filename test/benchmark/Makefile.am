@@ -11,7 +11,6 @@ benchmark_LDADD = \
 	$(MAXMIND_LDADD) \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
-	$(YAJL_LDADD) \
 	$(LMDB_LDADD) \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
@@ -27,13 +26,12 @@ benchmark_LDFLAGS = \
 	-lstdc++ \
 	$(GEOIP_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
-	$(YAJL_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(LUA_LDFLAGS)
 
 benchmark_CPPFLAGS = \
-	-I$(top_builddir)/headers \
+	-I$(top_srcdir)/headers \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(PCRE2_CFLAGS) \
@@ -42,4 +40,3 @@ benchmark_CPPFLAGS = \
 
 MAINTAINERCLEANFILES = \
         Makefile.in
-

@@ -29,6 +29,16 @@
 
 
 namespace modsecurity_test {
+namespace {
+
+std::unique_ptr<UnitTest> make_empty_unit_test() {
+    auto test = std::make_unique<UnitTest>();
+    test->ret = 0;
+    test->skipped = false;
+    return test;
+}
+
+}  // namespace
 
 
 void replaceAll(std::string *s, const std::string &search,
@@ -106,36 +116,85 @@ std::string UnitTest::print() const {
 }
 
 
-std::unique_ptr<UnitTest> UnitTest::from_yajl_node(const yajl_val &node) {
-    size_t num_tests = node->u.object.len;
-    auto u = std::make_unique<UnitTest>();
+std::unique_ptr<UnitTest> UnitTest::from_json_document(
+    modsecurity_test::json::JsonDocument *document) {
+    modsecurity_test::json::JsonValue root;
 
-    for (int i = 0; i < num_tests; i++) {
-        const char *key = node->u.object.keys[ i ];
-        yajl_val val = node->u.object.values[ i ];
+    if (modsecurity_test::json::get(document->get_value(), &root) == false) {
+        return make_empty_unit_test();
+    }
 
-        u->skipped = false;
-        if (strcmp(key, "param") == 0) {
-           u->param = YAJL_GET_STRING(val);
-        } else if (strcmp(key, "input") == 0) {
-           u->input = YAJL_GET_STRING(val);
-           json2bin(&u->input);
-        } else if (strcmp(key, "resource") == 0) {
-           u->resource = YAJL_GET_STRING(val);
-        } else if (strcmp(key, "name") == 0) {
-           u->name = YAJL_GET_STRING(val);
-        } else if (strcmp(key, "type") == 0) {
-           u->type = YAJL_GET_STRING(val);
-        } else if (strcmp(key, "ret") == 0) {
-           u->ret = YAJL_GET_INTEGER(val);
-        } else if (strcmp(key, "output") == 0) {
-           u->output = std::string(YAJL_GET_STRING(val));
-           json2bin(&u->output);
-           /*
-            * Converting \\u0000 to \0 due to the following gcc bug:
-            * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53690
-            *
-            */
+    modsecurity_test::json::JsonType type;
+    if (modsecurity_test::json::get(root.type(), &type) == false) {
+        return make_empty_unit_test();
+    }
+
+    if (type == modsecurity_test::json::JsonType::Array) {
+        modsecurity_test::json::JsonArray tests;
+        if (modsecurity_test::json::get(root.get_array(), &tests) == false) {
+            return make_empty_unit_test();
+        }
+
+        for (auto test_result : tests) {
+            modsecurity_test::json::JsonValue test_value;
+            if (modsecurity_test::json::get(std::move(test_result),
+                    &test_value) == false) {
+                continue;
+            }
+
+            return from_json_value(test_value);
+        }
+
+        return make_empty_unit_test();
+    }
+
+    return from_json_value(root);
+}
+
+std::unique_ptr<UnitTest> UnitTest::from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    modsecurity_test::json::JsonObject object;
+    auto u = make_empty_unit_test();
+
+    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
+        return u;
+    }
+
+    for (auto field_result : object) {
+        modsecurity_test::json::JsonField field;
+        std::string_view key;
+        modsecurity_test::json::JsonValue child;
+
+        if (modsecurity_test::json::get(std::move(field_result), &field)
+                == false) {
+            continue;
+        }
+        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
+            continue;
+        }
+        child = field.value();
+
+        if (key == "param") {
+            u->param = modsecurity_test::json::get_string(child);
+        } else if (key == "input") {
+            u->input = modsecurity_test::json::get_string(child);
+            json2bin(&u->input);
+        } else if (key == "resource") {
+            u->resource = modsecurity_test::json::get_string(child);
+        } else if (key == "name") {
+            u->name = modsecurity_test::json::get_string(child);
+        } else if (key == "type") {
+            u->type = modsecurity_test::json::get_string(child);
+        } else if (key == "ret") {
+            u->ret = static_cast<int>(modsecurity_test::json::get_integer(child));
+        } else if (key == "output") {
+            u->output = modsecurity_test::json::get_string(child);
+            json2bin(&u->output);
+            /*
+             * Converting \\u0000 to \0 due to the following gcc bug:
+             * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53690
+             *
+             */
         }
     }
 

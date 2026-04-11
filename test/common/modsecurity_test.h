@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 #ifndef TEST_COMMON_MODSECURITY_TEST_H_
 #define TEST_COMMON_MODSECURITY_TEST_H_

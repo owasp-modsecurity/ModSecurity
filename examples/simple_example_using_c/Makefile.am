@@ -17,15 +17,12 @@ test_LDFLAGS = \
 	-lm \
 	-lstdc++ \
 	$(LUA_LDFLAGS) \
-	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(SSDEEP_LDFLAGS)
 
 test_CFLAGS = \
-	-I$(top_builddir)/headers \
+	-I$(top_srcdir)/headers \
 	-I$(top_builddir) \
 	$(GLOBAL_CFLAGS)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
-
-
