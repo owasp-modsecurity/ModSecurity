@@ -23,7 +23,8 @@ noinst_PROGRAMS =
 EXTRA_DIST = \
 	test-cases/* \
 	custom-test-driver \
-	test-suite.sh
+	test-suite.sh \
+	run-json-backend-matrix.sh
 
 
 # unit_tests

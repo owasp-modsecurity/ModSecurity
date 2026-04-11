@@ -13,11 +13,18 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "src/request_body_processor/json.h"
 
+#include <chrono>
+#include <cstdint>
 #include <string>
 
 #include "src/request_body_processor/json_adapter.h"
+#include "src/request_body_processor/json_instrumentation.h"
 
 
 namespace modsecurity {
@@ -25,6 +32,49 @@ namespace RequestBodyProcessor {
 
 static const double json_depth_limit_default = 10000.0;
 static const char* json_depth_limit_exceeded_msg = ". Parsing depth limit exceeded";
+
+namespace {
+
+JsonSinkStatus startContainer(std::deque<JSONContainer *> *containers,
+    JSONContainer *container, int64_t *current_depth, double max_depth,
+    bool *depth_limit_exceeded) {
+    containers->push_back(container);
+    (*current_depth)++;
+    if (*current_depth > max_depth) {
+        *depth_limit_exceeded = true;
+        return JsonSinkStatus::DepthLimitExceeded;
+    }
+    return JsonSinkStatus::Continue;
+}
+
+JsonSinkStatus endContainer(std::deque<JSONContainer *> *containers,
+    int64_t *current_depth) {
+    if (containers->empty()) {
+        return JsonSinkStatus::InternalError;
+    }
+
+    JSONContainer *container = containers->back();
+    containers->pop_back();
+    delete container;
+
+    if (containers->empty() == false) {
+        JSONContainerArray *array = dynamic_cast<JSONContainerArray *>(
+            containers->back());
+        if (array != nullptr) {
+            array->m_elementCounter++;
+        }
+    }
+
+    (*current_depth)--;
+    if (*current_depth < 0) {
+        *current_depth = 0;
+        return JsonSinkStatus::InternalError;
+    }
+
+    return JsonSinkStatus::Continue;
+}
+
+}  // namespace
 
 JSON::JSON(Transaction *transaction) : m_transaction(transaction),
     m_current_key(""),
@@ -55,7 +105,15 @@ bool JSON::processChunk(const char *buf, unsigned int size,
     const std::string *err) {
     (void) err;
     if (buf != nullptr && size > 0) {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+        const auto start_time = std::chrono::steady_clock::now();
         m_data.append(buf, size);
+        recordJsonProcessChunkAppend(size, static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now() - start_time).count()));
+#else
+        m_data.append(buf, size);
+#endif
     }
 
     return true;
@@ -199,79 +257,24 @@ JsonSinkStatus JSON::on_number(std::string_view value) {
 
 
 JsonSinkStatus JSON::on_start_array() {
-    std::string name = getCurrentKey();
-    m_containers.push_back(
-        reinterpret_cast<JSONContainer *>(new JSONContainerArray(name)));
-    m_current_depth++;
-    if (m_current_depth > m_max_depth) {
-        m_depth_limit_exceeded = true;
-        return JsonSinkStatus::DepthLimitExceeded;
-    }
-    return JsonSinkStatus::Continue;
+    return startContainer(&m_containers, new JSONContainerArray(getCurrentKey()),
+        &m_current_depth, m_max_depth, &m_depth_limit_exceeded);
 }
 
 
 JsonSinkStatus JSON::on_end_array() {
-    if (m_containers.empty()) {
-        return JsonSinkStatus::InternalError;
-    }
-
-    JSONContainer *a = m_containers.back();
-    m_containers.pop_back();
-    delete a;
-    if (m_containers.size() > 0) {
-        JSONContainerArray *ja = dynamic_cast<JSONContainerArray *>(
-            m_containers.back());
-        if (ja) {
-            ja->m_elementCounter++;
-        }
-    }
-    m_current_depth--;
-    if (m_current_depth < 0) {
-        m_current_depth = 0;
-        return JsonSinkStatus::InternalError;
-    }
-
-    return JsonSinkStatus::Continue;
+    return endContainer(&m_containers, &m_current_depth);
 }
 
 
 JsonSinkStatus JSON::on_start_object() {
-    std::string name(getCurrentKey());
-    m_containers.push_back(
-        reinterpret_cast<JSONContainer *>(new JSONContainerMap(name)));
-    m_current_depth++;
-    if (m_current_depth > m_max_depth) {
-        m_depth_limit_exceeded = true;
-        return JsonSinkStatus::DepthLimitExceeded;
-    }
-    return JsonSinkStatus::Continue;
+    return startContainer(&m_containers, new JSONContainerMap(getCurrentKey()),
+        &m_current_depth, m_max_depth, &m_depth_limit_exceeded);
 }
 
 
 JsonSinkStatus JSON::on_end_object() {
-    if (m_containers.empty()) {
-        return JsonSinkStatus::InternalError;
-    }
-
-    JSONContainer *a = m_containers.back();
-    m_containers.pop_back();
-    delete a;
-
-    if (m_containers.size() > 0) {
-        JSONContainerArray *ja = dynamic_cast<JSONContainerArray *>(
-            m_containers.back());
-        if (ja) {
-            ja->m_elementCounter++;
-        }
-    }
-
-    m_current_depth--;
-    if (m_current_depth < 0) {
-        m_current_depth = 0;
-        return JsonSinkStatus::InternalError;
-    }
-    return JsonSinkStatus::Continue;
+    return endContainer(&m_containers, &m_current_depth);
 }
 
 void JSON::clearContainers() {

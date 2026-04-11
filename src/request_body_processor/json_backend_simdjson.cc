@@ -13,11 +13,18 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "src/request_body_processor/json_backend.h"
 
+#include <chrono>
+#include <cstdint>
 #include <string>
 #include <utility>
 
+#include "src/request_body_processor/json_instrumentation.h"
 #include "simdjson.h"
 
 namespace modsecurity {
@@ -361,13 +368,39 @@ JsonParseResult parseDocumentWithSimdjson(const std::string &input,
             JsonSinkStatus::InternalError, "JSON event sink is null.");
     }
 
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+    const auto parser_start = std::chrono::steady_clock::now();
+    simdjson::ondemand::parser parser;
+    recordSimdjsonParserConstruction(static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now() - parser_start).count()));
+    const auto padded_start = std::chrono::steady_clock::now();
+    simdjson::padded_string padded(input);
+    recordSimdjsonPaddedCopy(input.size(), static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now() - padded_start).count()));
+#else
     simdjson::ondemand::parser parser;
     simdjson::padded_string padded(input);
+#endif
     simdjson::ondemand::document document;
 
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+    const auto iterate_start = std::chrono::steady_clock::now();
+    if (auto error = parser.iterate(padded).get(document); error) {
+        recordSimdjsonIterate(static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now() - iterate_start).count()));
+        return fromSimdjsonError(error);
+    }
+    recordSimdjsonIterate(static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now() - iterate_start).count()));
+#else
     if (auto error = parser.iterate(padded).get(document); error) {
         return fromSimdjsonError(error);
     }
+#endif
 
     JsonBackendWalker walker(sink);
     return walker.walk(&document);

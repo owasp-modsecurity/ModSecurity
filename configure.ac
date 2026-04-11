@@ -166,6 +166,18 @@ AC_DEFINE([MSC_JSON_BACKEND_JSONCONS], [1],
 fi
 AC_SUBST([JSON_BACKEND_VERSION])
 
+AC_ARG_ENABLE([json-audit-instrumentation],
+    [AS_HELP_STRING([--enable-json-audit-instrumentation],
+        [Enable optional JSON audit instrumentation for benchmark builds [default=no]])],
+    [enable_json_audit_instrumentation="$enableval"],
+    [enable_json_audit_instrumentation="no"])
+
+AS_CASE([$enable_json_audit_instrumentation],
+    [yes], [AC_DEFINE([MSC_JSON_AUDIT_INSTRUMENTATION], [1],
+                [Define if optional JSON audit instrumentation is enabled])],
+    [no], [],
+    [AC_MSG_ERROR([Unsupported value '$enable_json_audit_instrumentation' for --enable-json-audit-instrumentation. Use yes or no.])])
+
 # SecLang test version
 AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(cd "test/test-cases/secrules-language-tests" && git log -1 --format="%h" --abbrev-commit && cd ../../..))
 

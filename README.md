@@ -253,6 +253,12 @@ It is recommended to use assertions where applicable, and to enable them with
 
 The source tree includes a Benchmark tool that can help measure library performance. The tool is located in the `test/benchmark/` directory. The build process also creates the binary here, so you will have the tool after the compilation is finished.
 
+To compare the JSON regression suite across both supported JSON backends with separate build directories, run:
+
+```shell
+$ ./test/run-json-backend-matrix.sh --jobs 4
+```
+
 To run, just type:
 
 ```shell
@@ -322,6 +328,8 @@ Each transaction is an HTTP/1.1 GET request with some GET parameters. Common hea
 Note that the tool does not call the last phase (logging).
 
 Please remember to reset `basic_rules.conf` if you want to try with a different ruleset.
+
+The benchmark directory also includes `json_benchmark`, which targets JSON request-body processing with fixed scenario classes such as large objects, deep nesting, numeric payloads and UTF-8-heavy strings.
 
 ## Reporting Issues
 

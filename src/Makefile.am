@@ -250,7 +250,8 @@ BODY_PROCESSORS = \
 	request_body_processor/multipart.cc \
 	request_body_processor/xml.cc \
 	request_body_processor/json.cc \
-	request_body_processor/json_adapter.cc
+	request_body_processor/json_adapter.cc \
+	request_body_processor/json_instrumentation.cc
 
 if JSON_BACKEND_SIMDJSON
 BODY_PROCESSORS += \

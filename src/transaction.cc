@@ -13,6 +13,10 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "modsecurity/transaction.h"
 
 #include <stdio.h>
@@ -32,6 +36,7 @@
 #include "modsecurity/intervention.h"
 #include "modsecurity/modsecurity.h"
 #include "src/request_body_processor/json.h"
+#include "src/request_body_processor/json_instrumentation.h"
 #include "src/request_body_processor/multipart.h"
 #include "src/request_body_processor/xml.h"
 #include "modsecurity/audit_log.h"
@@ -53,6 +58,7 @@
 
 
 using modsecurity::actions::Action;
+using modsecurity::RequestBodyProcessor::captureRequestBodySnapshot;
 using modsecurity::RequestBodyProcessor::Multipart;
 using modsecurity::RequestBodyProcessor::XML;
 
@@ -681,13 +687,17 @@ int Transaction::processRequestBody() {
      */
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
+    const std::string requestBodySnapshot = captureRequestBodySnapshot(
+        m_requestBody);
+    const std::size_t requestBodySnapshotSize = requestBodySnapshot.size();
 
     bool requestBodyNoFilesLimitExceeded = false;
     if ((m_requestBodyType == WWWFormUrlEncoded) ||
         (m_requestBodyProcessor == JSONRequestBody) ||
         (m_requestBodyProcessor == XMLRequestBody)) {
         if ((m_rules->m_requestBodyNoFilesLimit.m_set)
-            && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
+            && (requestBodySnapshotSize
+                > m_rules->m_requestBodyNoFilesLimit.m_value)) {
             m_variableReqbodyError.set("1", 0);
             m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
             m_variableInboundDataError.set("1", m_variableOffset);
@@ -705,12 +715,12 @@ int Transaction::processRequestBody() {
                 m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
             }
             if (m_json->init() == true) {
-                m_json->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size(),
+                m_json->processChunk(requestBodySnapshot.c_str(),
+                    requestBodySnapshotSize,
                     &error);
                 m_json->complete(&error);
             }
-            if (error.empty() == false && m_requestBody.str().size() > 0) {
+            if (error.empty() == false && requestBodySnapshotSize > 0) {
                 m_variableReqbodyError.set("1", m_variableOffset);
                 m_variableReqbodyProcessorError.set("1", m_variableOffset);
                 m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
@@ -729,8 +739,8 @@ int Transaction::processRequestBody() {
         if (!requestBodyNoFilesLimitExceeded) {
             std::string error;
             if (m_xml->init() == true) {
-                m_xml->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size(),
+                m_xml->processChunk(requestBodySnapshot.c_str(),
+                    requestBodySnapshotSize,
                     &error);
                 m_xml->complete(&error);
             }
@@ -754,7 +764,7 @@ int Transaction::processRequestBody() {
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
-                m.process(m_requestBody.str(), &error, m_variableOffset);
+                m.process(requestBodySnapshot, &error, m_variableOffset);
             }
             reqbodyNoFilesLength = m.m_reqbody_no_files_length;
             m.multipart_complete(&error);
@@ -781,7 +791,7 @@ int Transaction::processRequestBody() {
         m_variableOffset++;
         // large size might cause issues in the parsing itself; omit if exceeded
         if (!requestBodyNoFilesLimitExceeded) {
-            extractArguments("POST", m_requestBody.str(), m_variableOffset);
+            extractArguments("POST", requestBodySnapshot, m_variableOffset);
 	}
     } else if (m_requestBodyType != UnknownFormat) {
         /**
@@ -835,16 +845,16 @@ int Transaction::processRequestBody() {
     }
 
     fullRequest = fullRequest + "\n\n";
-    fullRequest = fullRequest + m_requestBody.str();
+    fullRequest = fullRequest + requestBodySnapshot;
     m_variableFullRequest.set(fullRequest, m_variableOffset);
     m_variableFullRequestLength.set(std::to_string(fullRequest.size()),
         m_variableOffset);
 
     if (m_requestBody.tellp() > 0) {
-        m_variableRequestBody.set(m_requestBody.str(), m_variableOffset);
+        m_variableRequestBody.set(requestBodySnapshot, m_variableOffset);
         m_variableRequestBodyLength.set(std::to_string(
-            m_requestBody.str().size()),
-            m_variableOffset, m_requestBody.str().size());
+            requestBodySnapshotSize),
+            m_variableOffset, requestBodySnapshotSize);
     }
 
     this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);

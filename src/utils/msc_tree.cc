@@ -980,12 +980,11 @@ int tree_contains_ip(TreeRoot *rtree,
 
 
 
-int add_ip_from_param(
-    const char *param, TreeRoot **rtree, char **error_msg)
+static int add_ip_entries_from_param(const char *param, TreeRoot *rtree)
 {
     char *param_copy = strdup(param);
     char *saved = NULL;
-    char *str;
+    char *str = NULL;
     TreeNode *tnode = NULL;
 
     str = strtok_r(param_copy, ",", &saved);
@@ -993,17 +992,15 @@ int add_ip_from_param(
     {
         if (strchr(str, ':') == NULL)
         {
-            tnode = TreeAddIP(str, (*rtree)->ipv4_tree, IPV4_TREE);
+            tnode = TreeAddIP(str, rtree->ipv4_tree, IPV4_TREE);
         }
         else
         {
-            tnode = TreeAddIP(str, (*rtree)->ipv6_tree, IPV6_TREE);
+            tnode = TreeAddIP(str, rtree->ipv6_tree, IPV6_TREE);
         }
 
         if (tnode == NULL)
         {
-            //*error_msg = apr_psprintf("Could not add entry " \
-            //    "\"%s\" from: %s.", str, param);
             free(param_copy);
             return -1;
         }
@@ -1016,45 +1013,22 @@ int add_ip_from_param(
 }
 
 
+int add_ip_from_param(
+    const char *param, TreeRoot **rtree, char **error_msg)
+{
+    return add_ip_entries_from_param(param, *rtree);
+}
+
+
 int ip_tree_from_param(
     const char *param, TreeRoot **rtree, char **error_msg)
 {
-    char *param_copy = strdup(param);
-    char *saved = NULL;
-    char *str = NULL;
-    TreeNode *tnode = NULL;
-
     if (create_radix_tree(rtree, error_msg))
     {
-        free(param_copy);
         return -1;
     }
 
-    str = strtok_r(param_copy, ",", &saved);
-    while (str != NULL)
-    {
-        if (strchr(str, ':') == NULL)
-        {
-            tnode = TreeAddIP(str, (*rtree)->ipv4_tree, IPV4_TREE);
-        }
-        else
-        {
-            tnode = TreeAddIP(str, (*rtree)->ipv6_tree, IPV6_TREE);
-        }
-
-        if (tnode == NULL)
-        {
-            //*error_msg = apr_psprintf("Could not add entry " \
-            //    "\"%s\" from: %s.", str, param);
-            free(param_copy);
-            return -1;
-        }
-
-        str = strtok_r(NULL, ",", &saved);
-    }
-    free(param_copy);
-
-    return 0;
+    return add_ip_entries_from_param(param, *rtree);
 }
 
 

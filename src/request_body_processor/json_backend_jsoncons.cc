@@ -13,14 +13,21 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "src/request_body_processor/json_backend.h"
 
 #include <cctype>
+#include <chrono>
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <system_error>
 #include <utility>
 
+#include "src/request_body_processor/json_instrumentation.h"
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_options.hpp>
@@ -456,6 +463,7 @@ JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
         return makeResult(JsonParseStatus::InternalError,
             JsonSinkStatus::Continue, sync_detail);
     }
+    recordJsonconsTokenSyncStep();
 
     switch (event.event_type()) {
         case jsoncons::staj_event_type::begin_object:
@@ -578,31 +586,65 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
     cursor_options.lossless_bignum(true);
 
     std::error_code error;
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+    const auto cursor_start = std::chrono::steady_clock::now();
     jsoncons::json_string_cursor cursor(input, cursor_options, error);
+    recordJsonconsCursorInit(static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now() - cursor_start).count()));
+#else
+    jsoncons::json_string_cursor cursor(input, cursor_options, error);
+#endif
     if (error) {
         return fromJsonconsError(error, cursor.context());
     }
 
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+    const auto token_cursor_start = std::chrono::steady_clock::now();
     RawJsonTokenCursor token_cursor(input);
+    recordJsonconsTokenCursorInit(static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now() - token_cursor_start).count()));
+    const auto event_loop_start = std::chrono::steady_clock::now();
+    const auto record_event_loop = [&event_loop_start]() {
+        recordJsonconsEventLoop(static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now() - event_loop_start).count()));
+    };
+#else
+    RawJsonTokenCursor token_cursor(input);
+#endif
 
     while (!cursor.done()) {
         JsonParseResult result = emitEvent(input, sink, &token_cursor,
             cursor.current(), cursor.context());
         if (!result.ok()) {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+            record_event_loop();
+#endif
             return result;
         }
 
         cursor.next(error);
         if (error) {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+            record_event_loop();
+#endif
             return fromJsonconsError(error, cursor.context());
         }
     }
 
     cursor.check_done(error);
     if (error) {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+        record_event_loop();
+#endif
         return fromJsonconsError(error, cursor.context());
     }
 
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+    record_event_loop();
+#endif
     return makeResult(JsonParseStatus::Ok);
 }
 
