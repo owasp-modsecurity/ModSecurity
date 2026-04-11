@@ -89,7 +89,7 @@ const std::string& JsonWriter::str() const {
     return m_output;
 }
 
-std::string JsonWriter::to_string() const {
+const std::string& JsonWriter::to_string() const {
     return m_output;
 }
 

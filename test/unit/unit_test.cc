@@ -117,7 +117,7 @@ std::string UnitTest::print() const {
 
 
 std::unique_ptr<UnitTest> UnitTest::from_json_document(
-    modsecurity_test::json::JsonDocument *document) {
+    const modsecurity_test::json::JsonDocument *document) {
     modsecurity_test::json::JsonValue root;
 
     if (modsecurity_test::json::get(document->get_value(), &root) == false) {

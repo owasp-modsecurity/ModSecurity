@@ -33,7 +33,7 @@ namespace modsecurity_test {
 class RegressionTest {
  public:
     static std::unique_ptr<RegressionTest> from_json_document(
-        modsecurity_test::json::JsonDocument *document);
+        const modsecurity_test::json::JsonDocument *document);
     static std::unique_ptr<RegressionTest> from_json_value(
         modsecurity_test::json::JsonValue value);
 
@@ -94,7 +94,7 @@ private:
 class RegressionTests {
  public:
     static std::unique_ptr<RegressionTests> from_json_document(
-        modsecurity_test::json::JsonDocument *document);
+        const modsecurity_test::json::JsonDocument *document);
     static std::unique_ptr<RegressionTests> from_json_value(
         modsecurity_test::json::JsonValue value);
     void update_content_lengths();

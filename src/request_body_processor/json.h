@@ -53,10 +53,11 @@ class JSONContainerMap : public JSONContainer {
 class JSON : public JsonEventSink {
  public:
     explicit JSON(Transaction *transaction);
-    ~JSON();
+    ~JSON() override;
 
     bool init();
-    bool processChunk(const char *buf, unsigned int size, std::string *err);
+    bool processChunk(const char *buf, unsigned int size,
+        const std::string *err);
     bool complete(std::string *err);
 
     int addArgument(const std::string& value);

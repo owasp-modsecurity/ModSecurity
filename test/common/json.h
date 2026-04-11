@@ -36,12 +36,14 @@ enum class JsonType {
     Unknown
 };
 
+using JsonNode = jsoncons::ojson;
+
 class JsonValue;
 
 class JsonField {
  public:
     JsonField() = default;
-    JsonField(std::string_view key, const jsoncons::json *value)
+    JsonField(std::string_view key, const JsonNode *value)
         : m_key(key),
           m_value(value) { }
 
@@ -57,14 +59,14 @@ class JsonField {
 
  private:
     std::string_view m_key;
-    const jsoncons::json *m_value{nullptr};
+    const JsonNode *m_value{nullptr};
 };
 
 class JsonArray {
  public:
     class iterator {
      public:
-        explicit iterator(jsoncons::json::const_array_iterator iterator)
+        explicit iterator(JsonNode::const_array_iterator iterator)
             : m_iterator(iterator) { }
 
         JsonValue operator*() const;
@@ -79,11 +81,11 @@ class JsonArray {
         }
 
      private:
-        jsoncons::json::const_array_iterator m_iterator;
+        JsonNode::const_array_iterator m_iterator;
     };
 
     JsonArray() = default;
-    explicit JsonArray(const jsoncons::json *value) : m_value(value) { }
+    explicit JsonArray(const JsonNode *value) : m_value(value) { }
 
     bool valid() const {
         return m_value != nullptr && m_value->is_array();
@@ -98,14 +100,14 @@ class JsonArray {
     }
 
  private:
-    const jsoncons::json *m_value{nullptr};
+    const JsonNode *m_value{nullptr};
 };
 
 class JsonObject {
  public:
     class iterator {
      public:
-        explicit iterator(jsoncons::json::const_object_iterator iterator)
+        explicit iterator(JsonNode::const_object_iterator iterator)
             : m_iterator(iterator) { }
 
         JsonField operator*() const {
@@ -124,11 +126,11 @@ class JsonObject {
         }
 
      private:
-        jsoncons::json::const_object_iterator m_iterator;
+        JsonNode::const_object_iterator m_iterator;
     };
 
     JsonObject() = default;
-    explicit JsonObject(const jsoncons::json *value) : m_value(value) { }
+    explicit JsonObject(const JsonNode *value) : m_value(value) { }
 
     bool valid() const {
         return m_value != nullptr && m_value->is_object();
@@ -143,13 +145,13 @@ class JsonObject {
     }
 
  private:
-    const jsoncons::json *m_value{nullptr};
+    const JsonNode *m_value{nullptr};
 };
 
 class JsonValue {
  public:
     JsonValue() = default;
-    explicit JsonValue(const jsoncons::json *value) : m_value(value) { }
+    explicit JsonValue(const JsonNode *value) : m_value(value) { }
 
     bool valid() const {
         return m_value != nullptr;
@@ -185,12 +187,12 @@ class JsonValue {
         return JsonType::Number;
     }
 
-    const jsoncons::json *raw() const {
+    const JsonNode *raw() const {
         return m_value;
     }
 
  private:
-    const jsoncons::json *m_value{nullptr};
+    const JsonNode *m_value{nullptr};
 };
 
 inline JsonValue JsonField::value() const {
@@ -213,7 +215,7 @@ class JsonDocument {
 
     bool parse(const std::string &input, std::string *error = nullptr) {
         try {
-            m_root = jsoncons::json::parse(input);
+            m_root = JsonNode::parse(input);
             return true;
         } catch (const std::exception &exception) {
             if (error != nullptr) {
@@ -224,7 +226,7 @@ class JsonDocument {
     }
 
  private:
-    jsoncons::json m_root;
+    JsonNode m_root;
 };
 
 inline bool get(JsonArray value, JsonArray *target,
@@ -237,7 +239,7 @@ inline bool get(JsonArray value, JsonArray *target,
     return true;
 }
 
-inline bool get(JsonField value, JsonField *target,
+inline bool get(const JsonField &value, JsonField *target,
     std::string *error = nullptr) {
     (void) error;
     if (!value.valid()) {

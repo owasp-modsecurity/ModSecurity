@@ -41,7 +41,7 @@ class JsonWriter {
     void null();
 
     const std::string& str() const;
-    std::string to_string() const;
+    const std::string& to_string() const;
 
  private:
     enum class ContainerType {

@@ -34,7 +34,7 @@ class UnitTestResult {
 class UnitTest {
  public:
     static std::unique_ptr<UnitTest> from_json_document(
-        modsecurity_test::json::JsonDocument *document);
+        const modsecurity_test::json::JsonDocument *document);
     static std::unique_ptr<UnitTest> from_json_value(
         modsecurity_test::json::JsonValue value);
 

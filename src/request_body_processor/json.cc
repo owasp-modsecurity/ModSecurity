@@ -51,7 +51,9 @@ bool JSON::init() {
 }
 
 
-bool JSON::processChunk(const char *buf, unsigned int size, std::string *err) {
+bool JSON::processChunk(const char *buf, unsigned int size,
+    const std::string *err) {
+    (void) err;
     if (buf != nullptr && size > 0) {
         m_data.append(buf, size);
     }
