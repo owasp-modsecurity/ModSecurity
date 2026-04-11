@@ -36,10 +36,14 @@ unit_tests_SOURCES = \
 
 
 noinst_HEADERS = \
-       common/modsecurity_test.cc \
-       common/*.h \
-       unit/*.h \
-       regression/*.h
+       $(srcdir)/common/colors.h \
+       $(srcdir)/common/custom_debug_log.h \
+       $(srcdir)/common/json.h \
+       $(srcdir)/common/modsecurity_test.h \
+       $(srcdir)/common/modsecurity_test_context.h \
+       $(srcdir)/common/modsecurity_test_results.h \
+       $(srcdir)/unit/unit_test.h \
+       $(srcdir)/regression/regression_test.h
 
 
 unit_tests_LDADD = \

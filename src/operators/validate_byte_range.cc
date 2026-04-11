@@ -15,6 +15,8 @@
 
 #include "src/operators/validate_byte_range.h"
 
+#include <cctype>
+#include <cstring>
 #include <string>
 #include <memory>
 
@@ -23,18 +25,73 @@
 namespace modsecurity {
 namespace operators {
 
+namespace {
+
+std::string trimCopy(const std::string &value) {
+    std::string::size_type start = 0;
+    std::string::size_type end = value.size();
+
+    while (start < end
+        && std::isspace(static_cast<unsigned char>(value[start]))) {
+        start++;
+    }
+    while (end > start
+        && std::isspace(static_cast<unsigned char>(value[end - 1]))) {
+        end--;
+    }
+
+    return value.substr(start, end - start);
+}
+
+bool parseStrictInt(const std::string &value, int *result, std::string *error) {
+    const std::string trimmed = trimCopy(value);
+
+    if (trimmed.empty()) {
+        error->assign("Not able to convert '" + value + "' into a number");
+        return false;
+    }
+
+    size_t pos = 0;
+
+    try {
+        *result = std::stoi(trimmed, &pos);
+    } catch (...) {
+        error->assign("Not able to convert '" + trimmed + "' into a number");
+        return false;
+    }
+
+    if (pos != trimmed.size()) {
+        error->assign("Not able to convert '" + trimmed + "' into a number");
+        return false;
+    }
+
+    return true;
+}
+
+inline void allowByte(std::array<unsigned char, 32> *table, int value) {
+    (*table)[value >> 3] = ((*table)[value >> 3]
+        | (1U << static_cast<unsigned char>(value & 0x7)));
+}
+
+}  // namespace
+
+
 bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
     std::string *error) {
-    size_t pos = rangeRepresentation.find_first_of("-");
-    int start;
-    int end;
+    return getRange(rangeRepresentation, &table, error);
+}
+
+
+bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
+    std::array<unsigned char, kTableSize> *targetTable,
+    std::string *error) const {
+    const std::string range = trimCopy(rangeRepresentation);
+    const size_t pos = range.find_first_of("-");
+    int start = 0;
+    int end = 0;
 
     if (pos == std::string::npos) {
-        try {
-            start = std::stoi(rangeRepresentation);
-        } catch(...) {
-            error->assign("Not able to convert '" + rangeRepresentation +
-                "' into a number");
+        if (parseStrictInt(range, &start, error) == false) {
             return false;
         }
         if ((start < 0) || (start > 255)) {
@@ -42,26 +99,16 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
                 std::to_string(start));
             return false;
         }
-        table[start >> 3] = (table[start >> 3] | (1 << (start & 0x7)));
+        allowByte(targetTable, start);
         return true;
     }
 
-    try {
-        start = std::stoi(std::string(rangeRepresentation, 0, pos));
-    } catch (...) {
-        error->assign("Not able to convert '" +
-            std::string(rangeRepresentation, 0, pos) +
-            "' into a number");
+    if (parseStrictInt(std::string(range, 0, pos), &start, error) == false) {
         return false;
     }
 
-    try {
-        end = std::stoi(std::string(rangeRepresentation, pos + 1,
-            rangeRepresentation.length() - (pos + 1)));
-    } catch (...) {
-        error->assign("Not able to convert '" + std::string(rangeRepresentation,
-            pos + 1, rangeRepresentation.length() - (pos + 1)) +
-            "' into a number");
+    if (parseStrictInt(std::string(range, pos + 1,
+            range.length() - (pos + 1)), &end, error) == false) {
         return false;
     }
 
@@ -81,7 +128,7 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
     }
 
     while (start <= end) {
-        table[start >> 3] = (table[start >> 3] | (1 << (start & 0x7)));
+        allowByte(targetTable, start);
         start++;
     }
 
@@ -91,34 +138,29 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
 
 bool ValidateByteRange::init(const std::string &file,
     std::string *error) {
-    size_t pos = m_param.find_first_of(",");
-    bool rc;
+    std::array<unsigned char, kTableSize> parsedTable{};
+    std::string::size_type pos = 0;
 
-    if (pos == std::string::npos) {
-        rc = getRange(m_param, error);
-    } else {
-        rc = getRange(std::string(m_param, 0, pos), error);
-    }
+    table.fill('\0');
 
-    if (rc == false) {
-        return false;
-    }
+    while (true) {
+        const std::string::size_type nextPos = m_param.find(',', pos);
+        const std::string token = nextPos == std::string::npos
+            ? m_param.substr(pos)
+            : m_param.substr(pos, nextPos - pos);
 
-    while (pos != std::string::npos) {
-        size_t next_pos = m_param.find_first_of(",", pos + 1);
-
-        if (next_pos == std::string::npos) {
-            rc = getRange(std::string(m_param, pos + 1, m_param.length() -
-                (pos + 1)), error);
-        } else {
-            rc = getRange(std::string(m_param, pos + 1, next_pos - (pos + 1)), error);
-        }
-        if (rc == false) {
+        if (getRange(token, &parsedTable, error) == false) {
             return false;
         }
-        pos = next_pos;
+
+        if (nextPos == std::string::npos) {
+            break;
+        }
+
+        pos = nextPos + 1;
     }
 
+    table = parsedTable;
     return true;
 }
 
