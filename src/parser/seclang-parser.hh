@@ -32,7 +32,7 @@
 
 
 /**
- ** \file seclang-parser.tab.hh
+ ** \file y.tab.h
  ** Define the yy::parser class.
  */
 
@@ -42,8 +42,8 @@
 // especially those whose name start with YY_ or yy_.  They are
 // private implementation details that can be changed or removed.
 
-#ifndef YY_YY_SECLANG_PARSER_TAB_HH_INCLUDED
-# define YY_YY_SECLANG_PARSER_TAB_HH_INCLUDED
+#ifndef YY_YY_SECLANG_PARSER_HH_INCLUDED
+# define YY_YY_SECLANG_PARSER_HH_INCLUDED
 // "%code requires" blocks.
 #line 10 "seclang-parser.yy"
 
@@ -8892,4 +8892,4 @@ switch (yykind)
 
 
 
-#endif // !YY_YY_SECLANG_PARSER_TAB_HH_INCLUDED
+#endif // !YY_YY_SECLANG_PARSER_HH_INCLUDED
