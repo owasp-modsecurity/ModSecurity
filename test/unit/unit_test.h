@@ -27,7 +27,7 @@ namespace modsecurity_test {
 
 class UnitTestResult {
  public:
-    int ret;
+    int ret = 0;
     std::string output;
 };
 

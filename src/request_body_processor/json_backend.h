@@ -19,8 +19,7 @@
 #include <string>
 #include <string_view>
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 enum class JsonParseStatus {
     Ok,
@@ -71,10 +70,12 @@ class JsonEventSink {
 JsonParseResult parseDocumentWithSimdjson(const std::string &input,
     JsonEventSink *sink, const JsonBackendParseOptions &options);
 
+JsonParseResult parseDocumentWithSimdjson(std::string &input,
+    JsonEventSink *sink, const JsonBackendParseOptions &options);
+
 JsonParseResult parseDocumentWithJsoncons(const std::string &input,
     JsonEventSink *sink, const JsonBackendParseOptions &options);
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace modsecurity::RequestBodyProcessor
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_JSON_BACKEND_H_

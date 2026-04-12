@@ -15,6 +15,7 @@
 
 #include "config.h"
 
+#include <array>
 #include <sys/resource.h>
 
 #include <cerrno>
@@ -149,8 +150,8 @@ Options parseOptions(int argc, const char *argv[]) {
             if (i + 1 >= argc) {
                 throw std::runtime_error("missing value for --output");
             }
-            const std::string output_format(argv[++i]);
-            if (output_format != "json") {
+            if (const std::string output_format(argv[++i]);
+                output_format != "json") {
                 throw std::runtime_error("unsupported output format: "
                     + output_format);
             }
@@ -164,9 +165,9 @@ Options parseOptions(int argc, const char *argv[]) {
         throw std::runtime_error("missing required --scenario");
     }
 
-    const bool is_invalid_scenario = options.scenario == "truncated"
-        || options.scenario == "malformed";
-    if (is_invalid_scenario && !options.include_invalid) {
+    if (const bool is_invalid_scenario = options.scenario == "truncated"
+            || options.scenario == "malformed";
+        is_invalid_scenario && !options.include_invalid) {
         throw std::runtime_error(
             "invalid JSON scenarios require --include-invalid");
     }
@@ -195,13 +196,13 @@ std::string makeLargeObject(std::size_t target_bytes) {
 }
 
 std::string makeUtf8Object(std::size_t target_bytes) {
-    static const char *const utf8_values[] = {
+    static const std::array<const char *, 5> utf8_values{{
         u8"Gr\u00fc\u00dfe",
         u8"\u3053\u3093\u306b\u3061\u306f",
         u8"\u043f\u0440\u0438\u0432\u0435\u0442",
         u8"\u0645\u0631\u062d\u0628\u0627",
         u8"\U0001F30D"
-    };
+    }};
 
     std::string body("{");
     std::size_t index = 0;
@@ -213,7 +214,7 @@ std::string makeUtf8Object(std::size_t target_bytes) {
         body += "\"utf8_";
         body += std::to_string(index);
         body += "\":\"";
-        body += utf8_values[index % (sizeof(utf8_values) / sizeof(utf8_values[0]))];
+        body += utf8_values[index % utf8_values.size()];
         body += "\"";
         index++;
     }
@@ -223,7 +224,7 @@ std::string makeUtf8Object(std::size_t target_bytes) {
 }
 
 std::string makeNumbersArray(std::size_t target_bytes) {
-    static const char *const numeric_tokens[] = {
+    static const std::array<const char *, 8> numeric_tokens{{
         "0",
         "-0",
         "1.0",
@@ -232,7 +233,7 @@ std::string makeNumbersArray(std::size_t target_bytes) {
         "123456789012345678901234567890",
         "6.02214076e23",
         "3.141592653589793238462643383279"
-    };
+    }};
 
     std::string body("[");
     std::size_t index = 0;
@@ -241,8 +242,7 @@ std::string makeNumbersArray(std::size_t target_bytes) {
         if (index > 0) {
             body.push_back(',');
         }
-        body += numeric_tokens[index
-            % (sizeof(numeric_tokens) / sizeof(numeric_tokens[0]))];
+        body += numeric_tokens[index % numeric_tokens.size()];
         index++;
     }
 
@@ -353,10 +353,9 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
 
         const bool parse_success = isResolvedZero(reqbody_error)
             && isResolvedZero(processor_error);
-        const bool parse_error = !isResolvedZero(reqbody_error)
-            || !isResolvedZero(processor_error);
-
-        if (parse_success == parse_error) {
+        if (const bool parse_error = !isResolvedZero(reqbody_error)
+                || !isResolvedZero(processor_error);
+            parse_success == parse_error) {
             throw std::runtime_error(
                 "ambiguous JSON parse outcome observed in benchmark");
         }
@@ -382,8 +381,8 @@ long currentMaxRssKb() {
 void printJson(const Options &options, const std::string &body,
     const Metrics &metrics) {
     std::cout << "{";
-    std::cout << "\"backend\":\"" << benchmarkBackend() << "\",";
-    std::cout << "\"scenario\":\"" << options.scenario << "\",";
+    std::cout << R"("backend":")" << benchmarkBackend() << "\",";
+    std::cout << R"("scenario":")" << options.scenario << "\",";
     std::cout << "\"iterations\":" << options.iterations << ",";
     std::cout << "\"body_bytes\":" << body.size() << ",";
     std::cout << "\"append_request_body_ns\":"
@@ -435,6 +434,8 @@ void printJson(const Options &options, const std::string &body,
         << instrumentation.jsoncons_event_loop_ns;
     std::cout << ",\"jsoncons_token_sync_steps\":"
         << instrumentation.jsoncons_token_sync_steps;
+    std::cout << ",\"jsoncons_token_exact_advance_steps\":"
+        << instrumentation.jsoncons_token_exact_advance_steps;
 #endif
     std::cout << "}" << std::endl;
 }
@@ -470,8 +471,8 @@ int main(int argc, const char *argv[]) {
             "ModSecurity-json-benchmark v0.0.1-alpha");
 
         modsecurity::RulesSet rules;
-        const std::string rules_path = rulesFilePath();
-        if (rules.loadFromUri(rules_path.c_str()) < 0) {
+        if (const std::string rules_path = rulesFilePath();
+            rules.loadFromUri(rules_path.c_str()) < 0) {
             std::cerr << "failed to load benchmark rules from "
                 << rules_path << std::endl;
             std::cerr << rules.m_parserError.str() << std::endl;

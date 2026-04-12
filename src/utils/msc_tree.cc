@@ -983,14 +983,14 @@ int tree_contains_ip(TreeRoot *rtree,
 static int add_ip_entries_from_param(const char *param, TreeRoot *rtree)
 {
     char *param_copy = strdup(param);
-    char *saved = NULL;
-    char *str = NULL;
-    TreeNode *tnode = NULL;
+    char *saved = nullptr;
+    char *str = nullptr;
+    TreeNode *tnode = nullptr;
 
     str = strtok_r(param_copy, ",", &saved);
-    while (str != NULL)
+    while (str != nullptr)
     {
-        if (strchr(str, ':') == NULL)
+        if (strchr(str, ':') == nullptr)
         {
             tnode = TreeAddIP(str, rtree->ipv4_tree, IPV4_TREE);
         }
@@ -999,13 +999,13 @@ static int add_ip_entries_from_param(const char *param, TreeRoot *rtree)
             tnode = TreeAddIP(str, rtree->ipv6_tree, IPV6_TREE);
         }
 
-        if (tnode == NULL)
+        if (tnode == nullptr)
         {
             free(param_copy);
             return -1;
         }
 
-        str = strtok_r(NULL, ",", &saved);
+        str = strtok_r(nullptr, ",", &saved);
     }
     free(param_copy);
 

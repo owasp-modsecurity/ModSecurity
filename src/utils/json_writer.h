@@ -21,8 +21,7 @@
 #include <string_view>
 #include <vector>
 
-namespace modsecurity {
-namespace utils {
+namespace modsecurity::utils {
 
 class JsonWriter {
  public:
@@ -68,7 +67,6 @@ class JsonWriter {
     std::string m_indent;
 };
 
-}  // namespace utils
-}  // namespace modsecurity
+}  // namespace modsecurity::utils
 
 #endif  // SRC_UTILS_JSON_WRITER_H_

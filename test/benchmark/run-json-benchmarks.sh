@@ -13,16 +13,16 @@ jsoncons_build=""
 include_invalid=0
 output_file="${PWD}/json-benchmark-results.jsonl"
 
-while [ "$#" -gt 0 ]; do
+while [[ "$#" -gt 0 ]]; do
     case "$1" in
         --simdjson-build)
             shift
-            [ "$#" -gt 0 ] || { usage; exit 64; }
+            [[ "$#" -gt 0 ]] || { usage; exit 64; }
             simdjson_build="$1"
             ;;
         --jsoncons-build)
             shift
-            [ "$#" -gt 0 ] || { usage; exit 64; }
+            [[ "$#" -gt 0 ]] || { usage; exit 64; }
             jsoncons_build="$1"
             ;;
         --include-invalid)
@@ -40,8 +40,8 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-[ -n "${simdjson_build}" ] || { usage; exit 64; }
-[ -n "${jsoncons_build}" ] || { usage; exit 64; }
+[[ -n "${simdjson_build}" ]] || { usage; exit 64; }
+[[ -n "${jsoncons_build}" ]] || { usage; exit 64; }
 
 readonly base_scenarios=(
     "large-object"
@@ -60,7 +60,7 @@ run_scenarios() {
     local binary="${build_dir}/test/benchmark/json_benchmark"
     local scenario
 
-    if [ ! -x "${binary}" ]; then
+    if [[ ! -x "${binary}" ]]; then
         echo "missing benchmark binary: ${binary}" >&2
         return 1
     fi
@@ -69,7 +69,7 @@ run_scenarios() {
         "${binary}" --scenario "${scenario}" --output json >> "${output_file}"
     done
 
-    if [ "${include_invalid}" -ne 0 ]; then
+    if [[ "${include_invalid}" -ne 0 ]]; then
         for scenario in "${invalid_scenarios[@]}"; do
             "${binary}" --scenario "${scenario}" --include-invalid --output json >> "${output_file}"
         done

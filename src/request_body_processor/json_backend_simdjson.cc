@@ -19,16 +19,17 @@
 
 #include "src/request_body_processor/json_backend.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <utility>
 
 #include "src/request_body_processor/json_instrumentation.h"
 #include "simdjson.h"
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 namespace {
 
 JsonParseResult makeResult(JsonParseStatus parse_status,
@@ -87,6 +88,85 @@ JsonParseResult fromSimdjsonError(simdjson::error_code error) {
     }
 }
 
+std::size_t effectiveTechnicalMaxDepth(
+    const JsonBackendParseOptions &options) {
+    return options.technical_max_depth > 0
+        ? static_cast<std::size_t>(options.technical_max_depth) : 1;
+}
+
+std::string_view trimTrailingJsonWhitespace(std::string_view token) {
+    while (!token.empty()) {
+        if (const char tail = token.back();
+            tail != ' ' && tail != '\t' && tail != '\n' && tail != '\r') {
+            break;
+        }
+        token.remove_suffix(1);
+    }
+    return token;
+}
+
+/*
+ * The ondemand parser is reused per thread because simdjson benefits from
+ * keeping its internal buffers warm across parses. thread_local storage keeps
+ * the parser isolated to the calling thread, so no parser state is shared
+ * across transactions running on different threads. The parse and full
+ * document traversal both complete inside parseDocumentWithSimdjson(), so no
+ * parser-backed state escapes this function. We intentionally do not add an
+ * automatic release/recreate heuristic here: the vendored simdjson API
+ * explicitly supports parser reuse, and retained capacity after unusually
+ * large inputs remains a conscious tradeoff rather than an accidental leak.
+ */
+simdjson::ondemand::parser &getReusableSimdjsonParser() {
+    thread_local std::unique_ptr<simdjson::ondemand::parser> parser;
+    if (parser == nullptr) {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+        const auto parser_start = std::chrono::steady_clock::now();
+        parser.reset(new simdjson::ondemand::parser());
+        recordSimdjsonParserConstruction(static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now() - parser_start).count()));
+#else
+        parser.reset(new simdjson::ondemand::parser());
+#endif
+    }
+    return *parser;
+}
+
+std::size_t clampRequestedMaxDepth(std::size_t input_size,
+    const JsonBackendParseOptions &options) {
+    const std::size_t requested_depth = effectiveTechnicalMaxDepth(options);
+    const std::size_t max_possible_depth = (input_size / 2) + 1;
+    return std::min(requested_depth, std::max<std::size_t>(1,
+        max_possible_depth));
+}
+
+simdjson::error_code prepareParser(simdjson::ondemand::parser *parser,
+    std::size_t input_size, const JsonBackendParseOptions &options) {
+    if (parser == nullptr) {
+        return simdjson::MEMALLOC;
+    }
+
+    const JsonBackendParseOptions default_options;
+    std::size_t required_max_depth = parser->max_depth();
+    if (options.technical_max_depth != default_options.technical_max_depth) {
+        required_max_depth = clampRequestedMaxDepth(input_size, options);
+    }
+
+    if (parser->capacity() >= input_size
+        && parser->max_depth() == required_max_depth) {
+        return simdjson::SUCCESS;
+    }
+
+    // simdjson reuses parser buffers across parses. allocate() can grow the
+    // per-thread parser to satisfy a larger document or different max-depth,
+    // but it does not proactively shrink retained capacity for later, smaller
+    // inputs. In simdjson 4.6.1 the max-depth parameter is only enforced by
+    // simdjson's development checks, so we keep passing it here for that
+    // internal guardrail while our own walker enforces technical_max_depth at
+    // runtime using current_depth().
+    return parser->allocate(input_size, required_max_depth);
+}
+
 template <typename ResultType, typename TargetType>
 JsonParseResult getResult(ResultType &&result, TargetType *target) {
     if (auto error = std::forward<ResultType>(result).get(*target); error) {
@@ -98,7 +178,10 @@ JsonParseResult getResult(ResultType &&result, TargetType *target) {
 
 class JsonBackendWalker {
  public:
-    explicit JsonBackendWalker(JsonEventSink *sink) : m_sink(sink) { }
+    JsonBackendWalker(JsonEventSink *sink,
+        const JsonBackendParseOptions &options)
+        : m_sink(sink),
+          m_technical_max_depth(effectiveTechnicalMaxDepth(options)) { }
 
     JsonParseResult walk(simdjson::ondemand::document *document) {
         bool is_scalar = false;
@@ -136,8 +219,8 @@ class JsonBackendWalker {
                     return result;
                 }
 
-                JsonSinkStatus sink_status = m_sink->on_string(decoded);
-                if (sink_status != JsonSinkStatus::Continue) {
+                if (JsonSinkStatus sink_status = m_sink->on_string(decoded);
+                    sink_status != JsonSinkStatus::Continue) {
                     return stopTraversal(sink_status, "handling a root string");
                 }
                 return makeResult(JsonParseStatus::Ok);
@@ -149,8 +232,9 @@ class JsonBackendWalker {
                     return result;
                 }
 
-                JsonSinkStatus sink_status = m_sink->on_number(raw_number);
-                if (sink_status != JsonSinkStatus::Continue) {
+                if (JsonSinkStatus sink_status = m_sink->on_number(
+                        trimTrailingJsonWhitespace(raw_number));
+                    sink_status != JsonSinkStatus::Continue) {
                     return stopTraversal(sink_status, "handling a root number");
                 }
                 return makeResult(JsonParseStatus::Ok);
@@ -162,8 +246,9 @@ class JsonBackendWalker {
                     return result;
                 }
 
-                JsonSinkStatus sink_status = m_sink->on_boolean(boolean_value);
-                if (sink_status != JsonSinkStatus::Continue) {
+                if (JsonSinkStatus sink_status = m_sink->on_boolean(
+                        boolean_value);
+                    sink_status != JsonSinkStatus::Continue) {
                     return stopTraversal(sink_status, "handling a root boolean");
                 }
                 return makeResult(JsonParseStatus::Ok);
@@ -179,17 +264,19 @@ class JsonBackendWalker {
                         "Root scalar classified as null but failed validation.");
                 }
 
-                JsonSinkStatus sink_status = m_sink->on_null();
-                if (sink_status != JsonSinkStatus::Continue) {
+                if (JsonSinkStatus sink_status = m_sink->on_null();
+                    sink_status != JsonSinkStatus::Continue) {
                     return stopTraversal(sink_status, "handling a root null");
                 }
                 return makeResult(JsonParseStatus::Ok);
             }
+            case simdjson::ondemand::json_type::unknown:
+                return makeResult(JsonParseStatus::ParseError,
+                    "Invalid JSON token encountered in simdjson backend.");
             case simdjson::ondemand::json_type::object:
             case simdjson::ondemand::json_type::array:
-            case simdjson::ondemand::json_type::unknown:
                 return makeResult(JsonParseStatus::InternalError,
-                    "Unexpected root scalar type encountered in simdjson backend.");
+                    "Unexpected root scalar container encountered in simdjson backend.");
         }
 
         return makeResult(JsonParseStatus::InternalError,
@@ -199,15 +286,21 @@ class JsonBackendWalker {
     JsonParseResult walkValue(simdjson::ondemand::value value) {
         simdjson::ondemand::json_type type;
 
-        JsonParseResult result = getResult(value.type(), &type);
-        if (!result.ok()) {
+        if (JsonParseResult result = getResult(value.type(), &type);
+            !result.ok()) {
             return result;
         }
 
         switch (type) {
             case simdjson::ondemand::json_type::object:
+                if (auto result = enforceTechnicalDepth(value); !result.ok()) {
+                    return result;
+                }
                 return walkObject(value);
             case simdjson::ondemand::json_type::array:
+                if (auto result = enforceTechnicalDepth(value); !result.ok()) {
+                    return result;
+                }
                 return walkArray(value);
             case simdjson::ondemand::json_type::string:
                 return walkString(value);
@@ -216,15 +309,15 @@ class JsonBackendWalker {
             case simdjson::ondemand::json_type::boolean:
                 return walkBoolean(value);
             case simdjson::ondemand::json_type::null: {
-                JsonSinkStatus sink_status = m_sink->on_null();
-                if (sink_status != JsonSinkStatus::Continue) {
+                if (JsonSinkStatus sink_status = m_sink->on_null();
+                    sink_status != JsonSinkStatus::Continue) {
                     return stopTraversal(sink_status, "handling a null value");
                 }
                 return makeResult(JsonParseStatus::Ok);
             }
             case simdjson::ondemand::json_type::unknown:
-                return makeResult(JsonParseStatus::InternalError,
-                    "Unknown JSON token type encountered.");
+                return makeResult(JsonParseStatus::ParseError,
+                    "Invalid JSON token encountered in simdjson backend.");
         }
 
         return makeResult(JsonParseStatus::InternalError,
@@ -315,13 +408,13 @@ class JsonBackendWalker {
 
     JsonParseResult walkString(simdjson::ondemand::value value) {
         std::string_view decoded;
-        JsonParseResult result = getResult(value.get_string(), &decoded);
-        if (!result.ok()) {
+        if (JsonParseResult result = getResult(value.get_string(), &decoded);
+            !result.ok()) {
             return result;
         }
 
-        JsonSinkStatus sink_status = m_sink->on_string(decoded);
-        if (sink_status != JsonSinkStatus::Continue) {
+        if (JsonSinkStatus sink_status = m_sink->on_string(decoded);
+            sink_status != JsonSinkStatus::Continue) {
             return stopTraversal(sink_status, "handling a string");
         }
 
@@ -329,10 +422,10 @@ class JsonBackendWalker {
     }
 
     JsonParseResult walkNumber(simdjson::ondemand::value value) {
-        std::string_view raw_number = value.raw_json_token();
-        JsonSinkStatus sink_status = m_sink->on_number(raw_number);
-
-        if (sink_status != JsonSinkStatus::Continue) {
+        std::string_view raw_number = trimTrailingJsonWhitespace(
+            value.raw_json_token());
+        if (JsonSinkStatus sink_status = m_sink->on_number(raw_number);
+            sink_status != JsonSinkStatus::Continue) {
             return stopTraversal(sink_status, "handling a number");
         }
 
@@ -341,53 +434,92 @@ class JsonBackendWalker {
 
     JsonParseResult walkBoolean(simdjson::ondemand::value value) {
         bool boolean_value = false;
-        JsonParseResult result = getResult(value.get_bool(), &boolean_value);
-        if (!result.ok()) {
+        if (JsonParseResult result = getResult(value.get_bool(),
+                &boolean_value); !result.ok()) {
             return result;
         }
 
-        JsonSinkStatus sink_status = m_sink->on_boolean(boolean_value);
-        if (sink_status != JsonSinkStatus::Continue) {
+        if (JsonSinkStatus sink_status = m_sink->on_boolean(boolean_value);
+            sink_status != JsonSinkStatus::Continue) {
             return stopTraversal(sink_status, "handling a boolean");
         }
 
         return makeResult(JsonParseStatus::Ok);
     }
 
+    JsonParseResult enforceTechnicalDepth(simdjson::ondemand::value value) {
+        const int32_t current_depth = value.current_depth();
+        if (current_depth <= 0) {
+            return makeResult(JsonParseStatus::InternalError,
+                "Invalid current depth reported by simdjson backend.");
+        }
+
+        if (static_cast<std::size_t>(current_depth) > m_technical_max_depth) {
+            return makeResult(JsonParseStatus::ParseError,
+                "JSON nesting depth exceeds backend technical max depth.");
+        }
+
+        return makeResult(JsonParseStatus::Ok);
+    }
+
     JsonEventSink *m_sink;
+    std::size_t m_technical_max_depth;
 };
 
-}  // namespace
+struct PreparedSimdjsonInput {
+    simdjson::padded_string_view view{};
+    simdjson::padded_string owned_copy{};
+};
 
-JsonParseResult parseDocumentWithSimdjson(const std::string &input,
-    JsonEventSink *sink, const JsonBackendParseOptions &options) {
-    (void) options;
+PreparedSimdjsonInput prepareMutableSimdjsonInput(std::string *input) {
+    PreparedSimdjsonInput prepared;
 
-    if (sink == nullptr) {
-        return makeResult(JsonParseStatus::InternalError,
-            JsonSinkStatus::InternalError, "JSON event sink is null.");
+    // The production request-body path owns a mutable std::string, so we can
+    // pad that buffer in place and keep the logical JSON length in the
+    // returned padded_string_view. This removes the extra padded_string copy
+    // while still satisfying simdjson's padding requirement explicitly.
+    prepared.view = simdjson::pad(*input);
+    return prepared;
+}
+
+PreparedSimdjsonInput prepareConstSimdjsonInput(const std::string &input) {
+    PreparedSimdjsonInput prepared;
+    prepared.view = simdjson::padded_string_view(input);
+
+    // The const path must not guess about std::string capacity. We only parse
+    // directly when simdjson itself confirms that the existing allocation
+    // and/or trailing whitespace provide sufficient padding.
+    if (prepared.view.has_sufficient_padding()) {
+        return prepared;
     }
 
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    const auto parser_start = std::chrono::steady_clock::now();
-    simdjson::ondemand::parser parser;
-    recordSimdjsonParserConstruction(static_cast<std::uint64_t>(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::steady_clock::now() - parser_start).count()));
     const auto padded_start = std::chrono::steady_clock::now();
-    simdjson::padded_string padded(input);
+    prepared.owned_copy = simdjson::padded_string(input);
     recordSimdjsonPaddedCopy(input.size(), static_cast<std::uint64_t>(
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now() - padded_start).count()));
 #else
-    simdjson::ondemand::parser parser;
-    simdjson::padded_string padded(input);
+    prepared.owned_copy = simdjson::padded_string(input);
 #endif
-    simdjson::ondemand::document document;
+    prepared.view = prepared.owned_copy;
+    return prepared;
+}
 
+JsonParseResult parsePreparedDocumentWithSimdjson(
+    simdjson::padded_string_view input, JsonEventSink *sink,
+    const JsonBackendParseOptions &options) {
+    simdjson::ondemand::parser &parser = getReusableSimdjsonParser();
+    // This only prepares parser capacity and max-depth bookkeeping. Buffer
+    // lifetime and padding must already have been handled by the caller.
+    if (auto error = prepareParser(&parser, input.length(), options); error) {
+        return fromSimdjsonError(error);
+    }
+
+    simdjson::ondemand::document document;
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
     const auto iterate_start = std::chrono::steady_clock::now();
-    if (auto error = parser.iterate(padded).get(document); error) {
+    if (auto error = parser.iterate(input).get(document); error) {
         recordSimdjsonIterate(static_cast<std::uint64_t>(
             std::chrono::duration_cast<std::chrono::nanoseconds>(
                 std::chrono::steady_clock::now() - iterate_start).count()));
@@ -397,14 +529,37 @@ JsonParseResult parseDocumentWithSimdjson(const std::string &input,
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now() - iterate_start).count()));
 #else
-    if (auto error = parser.iterate(padded).get(document); error) {
+    if (auto error = parser.iterate(input).get(document); error) {
         return fromSimdjsonError(error);
     }
 #endif
 
-    JsonBackendWalker walker(sink);
+    JsonBackendWalker walker(sink, options);
     return walker.walk(&document);
 }
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace
+
+JsonParseResult parseDocumentWithSimdjson(std::string &input,
+    JsonEventSink *sink, const JsonBackendParseOptions &options) {
+    if (sink == nullptr) {
+        return makeResult(JsonParseStatus::InternalError,
+            JsonSinkStatus::InternalError, "JSON event sink is null.");
+    }
+
+    PreparedSimdjsonInput prepared = prepareMutableSimdjsonInput(&input);
+    return parsePreparedDocumentWithSimdjson(prepared.view, sink, options);
+}
+
+JsonParseResult parseDocumentWithSimdjson(const std::string &input,
+    JsonEventSink *sink, const JsonBackendParseOptions &options) {
+    if (sink == nullptr) {
+        return makeResult(JsonParseStatus::InternalError,
+            JsonSinkStatus::InternalError, "JSON event sink is null.");
+    }
+
+    PreparedSimdjsonInput prepared = prepareConstSimdjsonInput(input);
+    return parsePreparedDocumentWithSimdjson(prepared.view, sink, options);
+}
+
+}  // namespace modsecurity::RequestBodyProcessor

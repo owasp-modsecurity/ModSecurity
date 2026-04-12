@@ -35,6 +35,10 @@ unit_tests_SOURCES = \
         unit/unit_test.cc \
         common/custom_debug_log.cc
 
+noinst_PROGRAMS += json_backend_depth_tests
+json_backend_depth_tests_SOURCES = \
+        unit/json_backend_depth_tests.cc
+
 
 noinst_HEADERS = \
        $(srcdir)/common/colors.h \
@@ -90,6 +94,15 @@ unit_tests_CPPFLAGS = \
 	$(LUA_CFLAGS) \
 	$(SSDEEP_CFLAGS) \
 	$(LIBXML2_CFLAGS)
+
+json_backend_depth_tests_LDADD = \
+	$(unit_tests_LDADD)
+
+json_backend_depth_tests_LDFLAGS = \
+	$(unit_tests_LDFLAGS)
+
+json_backend_depth_tests_CPPFLAGS = \
+	$(unit_tests_CPPFLAGS)
 
 
 # regression

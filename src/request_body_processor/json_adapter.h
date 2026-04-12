@@ -20,16 +20,17 @@
 
 #include "src/request_body_processor/json_backend.h"
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 class JSONAdapter {
  public:
+    JsonParseResult parse(std::string &input, JsonEventSink *sink,
+        const JsonBackendParseOptions &options = JsonBackendParseOptions()) const;
+
     JsonParseResult parse(const std::string &input, JsonEventSink *sink,
         const JsonBackendParseOptions &options = JsonBackendParseOptions()) const;
 };
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace modsecurity::RequestBodyProcessor
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_JSON_ADAPTER_H_

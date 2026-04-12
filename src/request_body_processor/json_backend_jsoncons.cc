@@ -33,8 +33,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/semantic_tag.hpp>
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 namespace {
 
 JsonParseResult makeResult(JsonParseStatus parse_status,
@@ -85,6 +84,8 @@ JsonParseResult fromJsonconsError(const std::error_code &error,
             return makeResult(JsonParseStatus::TruncatedInput,
                 JsonSinkStatus::Continue, detail);
         case jsoncons::json_errc::max_nesting_depth_exceeded:
+            return makeResult(JsonParseStatus::ParseError,
+                JsonSinkStatus::Continue, detail);
         case jsoncons::json_errc::source_error:
             return makeResult(JsonParseStatus::InternalError,
                 JsonSinkStatus::Continue, detail);
@@ -237,6 +238,53 @@ class RawJsonTokenCursor {
         return false;
     }
 
+    bool consumeNextNumberToken(std::string_view *raw_token,
+        std::string *detail) {
+        std::size_t probe_offset = m_offset;
+        if (!skipToNextNumberToken(&probe_offset, detail)) {
+            return false;
+        }
+        if (!consumeNumberAt(&probe_offset, raw_token, detail)) {
+            return false;
+        }
+        m_offset = probe_offset;
+        return true;
+    }
+
+    bool advanceExactNumber(std::string_view exact_number, std::string *detail) {
+        if (!isValidJsonNumber(exact_number)) {
+            if (detail != nullptr) {
+                *detail = "Unable to advance raw JSON number cursor using a non-numeric token.";
+            }
+            return false;
+        }
+
+        std::size_t probe_offset = m_offset;
+        if (!skipToNextNumberToken(&probe_offset, detail)) {
+            return false;
+        }
+        if (probe_offset + exact_number.size() > m_input.size()
+            || m_input.compare(probe_offset, exact_number.size(), exact_number)
+                != 0) {
+            if (detail != nullptr) {
+                *detail = "Exact raw JSON number token did not match jsoncons numeric lexeme.";
+            }
+            return false;
+        }
+
+        const std::size_t next_offset = probe_offset + exact_number.size();
+        if (next_offset < m_input.size()
+            && !isNumberBoundary(m_input[next_offset])) {
+            if (detail != nullptr) {
+                *detail = "Exact raw JSON number token was followed by additional numeric characters.";
+            }
+            return false;
+        }
+
+        m_offset = next_offset;
+        return true;
+    }
+
  private:
     static bool isWhitespace(char value) {
         return std::isspace(static_cast<unsigned char>(value)) != 0;
@@ -246,11 +294,19 @@ class RawJsonTokenCursor {
         return std::isxdigit(static_cast<unsigned char>(value)) != 0;
     }
 
+    static bool isNumberBoundary(char value) {
+        return isWhitespace(value) || value == ',' || value == ']' || value == '}';
+    }
+
     void skipInsignificant() {
-        while (m_offset < m_input.size()) {
-            char current = m_input[m_offset];
-            if (isWhitespace(current) || current == ',' || current == ':') {
-                m_offset++;
+        skipInsignificantAt(&m_offset);
+    }
+
+    void skipInsignificantAt(std::size_t *offset) const {
+        while (*offset < m_input.size()) {
+            if (char current = m_input[*offset];
+                isWhitespace(current) || current == ',' || current == ':') {
+                (*offset)++;
                 continue;
             }
             break;
@@ -259,7 +315,12 @@ class RawJsonTokenCursor {
 
     bool consumeChar(char expected, std::string_view *raw_token,
         std::string *detail) {
-        if (m_offset >= m_input.size() || m_input[m_offset] != expected) {
+        return consumeCharAt(&m_offset, expected, raw_token, detail);
+    }
+
+    bool consumeCharAt(std::size_t *offset, char expected,
+        std::string_view *raw_token, std::string *detail) const {
+        if (*offset >= m_input.size() || m_input[*offset] != expected) {
             if (detail != nullptr) {
                 *detail = std::string("Expected raw JSON token '") + expected
                     + "' while synchronizing jsoncons events.";
@@ -267,16 +328,21 @@ class RawJsonTokenCursor {
             return false;
         }
 
-        *raw_token = std::string_view(m_input.data() + m_offset, 1);
-        m_offset++;
+        *raw_token = std::string_view(m_input.data() + *offset, 1);
+        (*offset)++;
         return true;
     }
 
     bool consumeLiteral(const char *literal, std::string_view *raw_token,
         std::string *detail) {
+        return consumeLiteralAt(&m_offset, literal, raw_token, detail);
+    }
+
+    bool consumeLiteralAt(std::size_t *offset, const char *literal,
+        std::string_view *raw_token, std::string *detail) const {
         const std::size_t length = std::char_traits<char>::length(literal);
-        if (m_offset + length > m_input.size()
-            || m_input.compare(m_offset, length, literal) != 0) {
+        if (*offset + length > m_input.size()
+            || m_input.compare(*offset, length, literal) != 0) {
             if (detail != nullptr) {
                 *detail = std::string("Expected raw JSON literal '") + literal
                     + "' while synchronizing jsoncons events.";
@@ -284,43 +350,47 @@ class RawJsonTokenCursor {
             return false;
         }
 
-        *raw_token = std::string_view(m_input.data() + m_offset, length);
-        m_offset += length;
+        *raw_token = std::string_view(m_input.data() + *offset, length);
+        *offset += length;
         return true;
     }
 
     bool consumeString(std::string_view *raw_token, std::string *detail) {
-        const std::size_t start = m_offset;
+        return consumeStringAt(&m_offset, raw_token, detail);
+    }
 
-        if (m_offset >= m_input.size() || m_input[m_offset] != '"') {
+    bool consumeStringAt(std::size_t *offset, std::string_view *raw_token,
+        std::string *detail) const {
+        const std::size_t start = *offset;
+
+        if (*offset >= m_input.size() || m_input[*offset] != '"') {
             if (detail != nullptr) {
                 *detail = "Expected raw JSON string token while synchronizing jsoncons events.";
             }
             return false;
         }
 
-        m_offset++;
-        while (m_offset < m_input.size()) {
-            char current = m_input[m_offset++];
+        (*offset)++;
+        while (*offset < m_input.size()) {
+            char current = m_input[(*offset)++];
             if (current == '\\') {
-                if (m_offset >= m_input.size()) {
+                if (*offset >= m_input.size()) {
                     if (detail != nullptr) {
                         *detail = "Truncated escape sequence while synchronizing raw JSON string token.";
                     }
                     return false;
                 }
 
-                char escaped = m_input[m_offset++];
-                if (escaped == 'u') {
+                if (char escaped = m_input[(*offset)++]; escaped == 'u') {
                     for (int i = 0; i < 4; i++) {
-                        if (m_offset >= m_input.size()
-                            || !isHexDigit(m_input[m_offset])) {
+                        if (*offset >= m_input.size()
+                            || !isHexDigit(m_input[*offset])) {
                             if (detail != nullptr) {
                                 *detail = "Invalid Unicode escape while synchronizing raw JSON string token.";
                             }
                             return false;
                         }
-                        m_offset++;
+                        (*offset)++;
                     }
                 }
                 continue;
@@ -328,7 +398,7 @@ class RawJsonTokenCursor {
 
             if (current == '"') {
                 *raw_token = std::string_view(m_input.data() + start,
-                    m_offset - start);
+                    *offset - start);
                 return true;
             }
 
@@ -347,108 +417,158 @@ class RawJsonTokenCursor {
     }
 
     bool consumeNumber(std::string_view *raw_token, std::string *detail) {
-        const std::size_t start = m_offset;
+        return consumeNumberAt(&m_offset, raw_token, detail);
+    }
 
-        if (m_offset < m_input.size() && m_input[m_offset] == '-') {
-            m_offset++;
+    bool consumeNumberAt(std::size_t *offset, std::string_view *raw_token,
+        std::string *detail) const {
+        const std::size_t start = *offset;
+
+        if (*offset < m_input.size() && m_input[*offset] == '-') {
+            (*offset)++;
         }
 
-        if (m_offset >= m_input.size()) {
+        if (*offset >= m_input.size()) {
             if (detail != nullptr) {
                 *detail = "Unexpected end of input while synchronizing raw JSON number token.";
             }
             return false;
         }
 
-        if (m_input[m_offset] == '0') {
-            m_offset++;
+        if (m_input[*offset] == '0') {
+            (*offset)++;
         } else {
-            if (!isDigit(m_input[m_offset]) || m_input[m_offset] == '0') {
+            if (!isDigit(m_input[*offset]) || m_input[*offset] == '0') {
                 if (detail != nullptr) {
                     *detail = "Invalid integer component while synchronizing raw JSON number token.";
                 }
                 return false;
             }
-            while (m_offset < m_input.size() && isDigit(m_input[m_offset])) {
-                m_offset++;
+            while (*offset < m_input.size() && isDigit(m_input[*offset])) {
+                (*offset)++;
             }
         }
 
-        if (m_offset < m_input.size() && m_input[m_offset] == '.') {
-            m_offset++;
-            if (m_offset >= m_input.size() || !isDigit(m_input[m_offset])) {
+        if (*offset < m_input.size() && m_input[*offset] == '.') {
+            (*offset)++;
+            if (*offset >= m_input.size() || !isDigit(m_input[*offset])) {
                 if (detail != nullptr) {
                     *detail = "Invalid fraction component while synchronizing raw JSON number token.";
                 }
                 return false;
             }
-            while (m_offset < m_input.size() && isDigit(m_input[m_offset])) {
-                m_offset++;
+            while (*offset < m_input.size() && isDigit(m_input[*offset])) {
+                (*offset)++;
             }
         }
 
-        if (m_offset < m_input.size()
-            && (m_input[m_offset] == 'e' || m_input[m_offset] == 'E')) {
-            m_offset++;
-            if (m_offset < m_input.size()
-                && (m_input[m_offset] == '+' || m_input[m_offset] == '-')) {
-                m_offset++;
+        if (*offset < m_input.size()
+            && (m_input[*offset] == 'e' || m_input[*offset] == 'E')) {
+            (*offset)++;
+            if (*offset < m_input.size()
+                && (m_input[*offset] == '+' || m_input[*offset] == '-')) {
+                (*offset)++;
             }
-            if (m_offset >= m_input.size() || !isDigit(m_input[m_offset])) {
+            if (*offset >= m_input.size() || !isDigit(m_input[*offset])) {
                 if (detail != nullptr) {
                     *detail = "Invalid exponent component while synchronizing raw JSON number token.";
                 }
                 return false;
             }
-            while (m_offset < m_input.size() && isDigit(m_input[m_offset])) {
-                m_offset++;
+            while (*offset < m_input.size() && isDigit(m_input[*offset])) {
+                (*offset)++;
             }
         }
 
-        *raw_token = std::string_view(m_input.data() + start, m_offset - start);
+        *raw_token = std::string_view(m_input.data() + start, *offset - start);
         return true;
+    }
+
+    bool skipTokenAt(std::size_t *offset, std::string *detail) const {
+        std::string_view ignored;
+        if (*offset >= m_input.size()) {
+            if (detail != nullptr) {
+                *detail = "Unexpected end of input while searching for a raw JSON number token.";
+            }
+            return false;
+        }
+
+        switch (m_input[*offset]) {
+            case '{':
+                return consumeCharAt(offset, '{', &ignored, detail);
+            case '}':
+                return consumeCharAt(offset, '}', &ignored, detail);
+            case '[':
+                return consumeCharAt(offset, '[', &ignored, detail);
+            case ']':
+                return consumeCharAt(offset, ']', &ignored, detail);
+            case '"':
+                return consumeStringAt(offset, &ignored, detail);
+            case 't':
+                return consumeLiteralAt(offset, "true", &ignored, detail);
+            case 'f':
+                return consumeLiteralAt(offset, "false", &ignored, detail);
+            case 'n':
+                return consumeLiteralAt(offset, "null", &ignored, detail);
+            default:
+                if (detail != nullptr) {
+                    *detail = "Unable to locate the next raw JSON number token while synchronizing jsoncons events.";
+                }
+                return false;
+        }
+    }
+
+    bool skipToNextNumberToken(std::size_t *offset, std::string *detail) const {
+        while (true) {
+            skipInsignificantAt(offset);
+            if (*offset >= m_input.size()) {
+                if (detail != nullptr) {
+                    *detail = "Unexpected end of input while searching for a raw JSON number token.";
+                }
+                return false;
+            }
+            if (m_input[*offset] == '-' || isDigit(m_input[*offset])) {
+                return true;
+            }
+            if (!skipTokenAt(offset, detail)) {
+                return false;
+            }
+        }
     }
 
     const std::string &m_input;
     std::size_t m_offset{0};
 };
 
-std::string rawNumberFromContext(const std::string &input,
+std::string_view rawNumberFromContext(const std::string &input,
     jsoncons::staj_event_type event_type, const jsoncons::ser_context &context,
     const jsoncons::staj_event &event, std::string_view scanned_token) {
     const std::size_t begin = context.begin_position();
-    const std::size_t end = context.end_position();
-
-    if (begin < end && end <= input.size()) {
+    if (const std::size_t end = context.end_position();
+        begin < end && end <= input.size()) {
         std::string_view candidate(input.data() + begin, end - begin);
         if (tokenMatchesNumericEvent(event_type, candidate)) {
-            return std::string(candidate);
+            return candidate;
         }
     }
 
     if (tokenMatchesNumericEvent(event_type, scanned_token)) {
-        return std::string(scanned_token);
+        return scanned_token;
     }
 
     if (isNumericStringEvent(event)) {
         std::error_code error;
         jsoncons::string_view decoded = event.get<jsoncons::string_view>(error);
         if (error) {
-            return "";
+            return std::string_view();
         }
         if (isValidJsonNumber(std::string_view(decoded.data(), decoded.size()))) {
-            return std::string(decoded.data(), decoded.size());
+            return std::string_view(decoded.data(), decoded.size());
         }
-        return "";
+        return std::string_view();
     }
 
-    std::error_code error;
-    std::string fallback = event.get<std::string>(error);
-    if (error) {
-        return "";
-    }
-
-    return fallback;
+    return std::string_view();
 }
 
 JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
@@ -458,12 +578,6 @@ JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
     std::error_code error;
     std::string_view raw_token;
     std::string sync_detail;
-
-    if (!token_cursor->consume(event, &raw_token, &sync_detail)) {
-        return makeResult(JsonParseStatus::InternalError,
-            JsonSinkStatus::Continue, sync_detail);
-    }
-    recordJsonconsTokenSyncStep();
 
     switch (event.event_type()) {
         case jsoncons::staj_event_type::begin_object:
@@ -508,7 +622,24 @@ JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
                 return fromJsonconsError(error, context);
             }
             if (isNumericStringEvent(event)) {
-                std::string raw_number = rawNumberFromContext(input,
+                if (const std::string_view decoded_number(decoded.data(),
+                        decoded.size()); isValidJsonNumber(decoded_number)
+                    && token_cursor->advanceExactNumber(decoded_number,
+                        &sync_detail)) {
+                    recordJsonconsTokenExactAdvanceStep();
+                    sink_status = sink->on_number(decoded_number);
+                    if (sink_status != JsonSinkStatus::Continue) {
+                        return stopTraversal(sink_status, "handling a number");
+                    }
+                    return makeResult(JsonParseStatus::Ok);
+                }
+                if (!token_cursor->consumeNextNumberToken(&raw_token,
+                    &sync_detail)) {
+                    return makeResult(JsonParseStatus::InternalError,
+                        JsonSinkStatus::Continue, sync_detail);
+                }
+                recordJsonconsTokenSyncStep();
+                std::string_view raw_number = rawNumberFromContext(input,
                     jsoncons::staj_event_type::double_value, context, event,
                     raw_token);
                 if (raw_number.empty()) {
@@ -551,7 +682,13 @@ JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
         case jsoncons::staj_event_type::uint64_value:
         case jsoncons::staj_event_type::double_value:
         case jsoncons::staj_event_type::half_value: {
-            std::string raw_number = rawNumberFromContext(input,
+            if (!token_cursor->consumeNextNumberToken(&raw_token,
+                &sync_detail)) {
+                return makeResult(JsonParseStatus::InternalError,
+                    JsonSinkStatus::Continue, sync_detail);
+            }
+            recordJsonconsTokenSyncStep();
+            std::string_view raw_number = rawNumberFromContext(input,
                 event.event_type(), context, event, raw_token);
             if (raw_number.empty()) {
                 return makeResult(JsonParseStatus::InternalError,
@@ -616,9 +753,8 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
 #endif
 
     while (!cursor.done()) {
-        JsonParseResult result = emitEvent(input, sink, &token_cursor,
-            cursor.current(), cursor.context());
-        if (!result.ok()) {
+        if (JsonParseResult result = emitEvent(input, sink, &token_cursor,
+                cursor.current(), cursor.context()); !result.ok()) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
             record_event_loop();
 #endif
@@ -648,5 +784,4 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
     return makeResult(JsonParseStatus::Ok);
 }
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace modsecurity::RequestBodyProcessor

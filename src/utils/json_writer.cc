@@ -18,8 +18,7 @@
 #include <cstdio>
 #include <utility>
 
-namespace modsecurity {
-namespace utils {
+namespace modsecurity::utils {
 
 JsonWriter::JsonWriter(bool pretty, std::string indent)
     : m_output(),
@@ -161,10 +160,10 @@ void JsonWriter::write_escaped_string(std::string_view value) {
     for (const unsigned char c : value) {
         switch (c) {
             case '"':
-                m_output.append("\\\"");
+                m_output.append(R"(\")");
                 break;
             case '\\':
-                m_output.append("\\\\");
+                m_output.append(R"(\\)");
                 break;
             case '\b':
                 m_output.append("\\b");
@@ -195,5 +194,4 @@ void JsonWriter::write_escaped_string(std::string_view value) {
     m_output.push_back('"');
 }
 
-}  // namespace utils
-}  // namespace modsecurity
+}  // namespace modsecurity::utils

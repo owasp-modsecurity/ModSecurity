@@ -23,8 +23,7 @@
 #include <string>
 #include <string_view>
 
-namespace modsecurity_test {
-namespace json {
+namespace modsecurity_test::json {
 
 enum class JsonType {
     Object,
@@ -336,7 +335,6 @@ inline int64_t get_integer(JsonValue value) {
     }
 }
 
-}  // namespace json
-}  // namespace modsecurity_test
+}  // namespace modsecurity_test::json
 
 #endif  // TEST_COMMON_JSON_H_

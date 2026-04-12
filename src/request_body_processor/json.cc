@@ -27,8 +27,7 @@
 #include "src/request_body_processor/json_instrumentation.h"
 
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 static const double json_depth_limit_default = 10000.0;
 static const char* json_depth_limit_exceeded_msg = ". Parsing depth limit exceeded";
@@ -126,10 +125,8 @@ bool JSON::complete(std::string *err) {
     }
 
     JSONAdapter adapter;
-    JsonParseResult result = adapter.parse(m_data,
-        static_cast<JsonEventSink *>(this));
-
-    if (!result.ok()) {
+    if (JsonParseResult result = adapter.parse(m_data,
+            static_cast<JsonEventSink *>(this)); !result.ok()) {
         if (result.sink_status == JsonSinkStatus::DepthLimitExceeded) {
             m_depth_limit_exceeded = true;
         }
@@ -285,5 +282,4 @@ void JSON::clearContainers() {
     }
 }
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace modsecurity::RequestBodyProcessor

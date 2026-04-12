@@ -47,6 +47,51 @@
   {
     "enabled": 1,
     "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar zero",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "1"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "0"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"0\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210131',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^0$\" \"id:'210132',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
     "title": "Testing JSON request body parser - root scalar decimal number",
     "client": {
       "ip": "200.249.12.31",
@@ -137,6 +182,51 @@
   {
     "enabled": 1,
     "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar negative fraction with exponent",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "8"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "-1.25e-4"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"-1.25e-4\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210133',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^-1\\.25e-4$\" \"id:'210134',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
     "title": "Testing JSON request body parser - root scalar negative zero",
     "client": {
       "ip": "200.249.12.31",
@@ -177,6 +267,96 @@
       "SecRequestBodyAccess On",
       "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210107',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
       "SecRule ARGS:json \"^-0$\" \"id:'210108',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar uint64 max",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "20"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "18446744073709551615"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"18446744073709551615\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210135',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^18446744073709551615$\" \"id:'210136',phase:3,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON request body parser - root scalar uint64 overflow",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "20"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "18446744073709551616"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"18446744073709551616\" \\(Variable: ARGS:json\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'210137',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json \"^18446744073709551616$\" \"id:'210138',phase:3,log\""
     ]
   },
   {

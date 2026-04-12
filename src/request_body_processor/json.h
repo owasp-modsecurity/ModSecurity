@@ -24,8 +24,7 @@
 #include "src/request_body_processor/json_backend.h"
 
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 
 class JSONContainer {
@@ -114,7 +113,6 @@ class JSON : public JsonEventSink {
 };
 
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace modsecurity::RequestBodyProcessor
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_JSON_H_

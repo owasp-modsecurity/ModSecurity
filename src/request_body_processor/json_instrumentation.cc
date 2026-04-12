@@ -6,8 +6,7 @@
 
 #include <chrono>
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 namespace {
 
 thread_local JsonInstrumentationMetrics g_metrics;
@@ -114,5 +113,10 @@ void recordJsonconsTokenSyncStep() noexcept {
 #endif
 }
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+void recordJsonconsTokenExactAdvanceStep() noexcept {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+    g_metrics.jsoncons_token_exact_advance_steps++;
+#endif
+}
+
+}  // namespace modsecurity::RequestBodyProcessor

@@ -22,21 +22,21 @@ jobs="$(getconf _NPROCESSORS_ONLN 2>/dev/null || printf '1')"
 configure_extra=""
 keep_build_dirs=0
 
-while [ "$#" -gt 0 ]; do
+while [[ "$#" -gt 0 ]]; do
     case "$1" in
         --build-root)
             shift
-            [ "$#" -gt 0 ] || { usage; exit 64; }
+            [[ "$#" -gt 0 ]] || { usage; exit 64; }
             build_root="$1"
             ;;
         --jobs)
             shift
-            [ "$#" -gt 0 ] || { usage; exit 64; }
+            [[ "$#" -gt 0 ]] || { usage; exit 64; }
             jobs="$1"
             ;;
         --configure-extra)
             shift
-            [ "$#" -gt 0 ] || { usage; exit 64; }
+            [[ "$#" -gt 0 ]] || { usage; exit 64; }
             configure_extra="$1"
             ;;
         --keep-build-dirs)
@@ -55,7 +55,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 declare -a configure_extra_args=()
-if [ -n "${configure_extra}" ]; then
+if [[ -n "${configure_extra}" ]]; then
     read -r -a configure_extra_args <<< "${configure_extra}"
 fi
 
@@ -87,7 +87,7 @@ run_backend() {
     local build_status=0
     local test_status=0
 
-    if [ "${keep_build_dirs}" -eq 0 ]; then
+    if [[ "${keep_build_dirs}" -eq 0 ]]; then
         rm -rf "${build_dir}"
     fi
     mkdir -p "${build_dir}"
@@ -100,7 +100,7 @@ run_backend() {
             "${configure_extra_args[@]}"
     ) >> "${raw_log}" 2>&1
     configure_status=$?
-    if [ "${configure_status}" -ne 0 ]; then
+    if [[ "${configure_status}" -ne 0 ]]; then
         return 10
     fi
 
@@ -109,7 +109,7 @@ run_backend() {
         make -j "${jobs}" -C others
     ) >> "${raw_log}" 2>&1
     build_status=$?
-    if [ "${build_status}" -ne 0 ]; then
+    if [[ "${build_status}" -ne 0 ]]; then
         return 11
     fi
 
@@ -118,16 +118,16 @@ run_backend() {
         make -j "${jobs}" -C src libmodsecurity.la
     ) >> "${raw_log}" 2>&1
     build_status=$?
-    if [ "${build_status}" -ne 0 ]; then
+    if [[ "${build_status}" -ne 0 ]]; then
         return 11
     fi
 
     (
         cd "${build_dir}" && \
-        make -j "${jobs}" -C test regression_tests
+        make -j "${jobs}" -C test regression_tests json_backend_depth_tests
     ) >> "${raw_log}" 2>&1
     build_status=$?
-    if [ "${build_status}" -ne 0 ]; then
+    if [[ "${build_status}" -ne 0 ]]; then
         return 11
     fi
 
@@ -136,13 +136,21 @@ run_backend() {
             cd "${build_dir}/test" && \
             ./regression_tests automake "${repo_root}/${test_file}"
         ) >> "${raw_log}" 2>&1
-        if [ "$?" -ne 0 ]; then
+        if [[ "$?" -ne 0 ]]; then
             test_status=1
         fi
     done
 
+    (
+        cd "${build_dir}/test" && \
+        ./json_backend_depth_tests
+    ) >> "${raw_log}" 2>&1
+    if [[ "$?" -ne 0 ]]; then
+        test_status=1
+    fi
+
     extract_summary "${backend}" "${raw_log}" "${summary_file}"
-    if [ ! -s "${summary_file}" ]; then
+    if [[ ! -s "${summary_file}" ]]; then
         test_status=1
     fi
     if awk -F '\t' '$4 != "PASS" {exit 1}' "${summary_file}"; then
@@ -151,7 +159,7 @@ run_backend() {
         test_status=1
     fi
 
-    if [ "${test_status}" -ne 0 ]; then
+    if [[ "${test_status}" -ne 0 ]]; then
         return 12
     fi
     return 0
@@ -189,7 +197,7 @@ else
     exit 13
 fi
 
-if [ "${backend_test_failure}" -ne 0 ]; then
+if [[ "${backend_test_failure}" -ne 0 ]]; then
     exit 12
 fi
 

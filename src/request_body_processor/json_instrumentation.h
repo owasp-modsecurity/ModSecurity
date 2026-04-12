@@ -6,8 +6,7 @@
 #include <sstream>
 #include <string>
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 struct JsonInstrumentationMetrics {
     std::uint64_t request_body_snapshot_count{0};
@@ -30,6 +29,7 @@ struct JsonInstrumentationMetrics {
     std::uint64_t jsoncons_token_cursor_init_ns{0};
     std::uint64_t jsoncons_event_loop_ns{0};
     std::uint64_t jsoncons_token_sync_steps{0};
+    std::uint64_t jsoncons_token_exact_advance_steps{0};
 };
 
 void jsonInstrumentationReset() noexcept;
@@ -47,8 +47,8 @@ void recordJsonconsCursorInit(std::uint64_t elapsed_ns) noexcept;
 void recordJsonconsTokenCursorInit(std::uint64_t elapsed_ns) noexcept;
 void recordJsonconsEventLoop(std::uint64_t elapsed_ns) noexcept;
 void recordJsonconsTokenSyncStep() noexcept;
+void recordJsonconsTokenExactAdvanceStep() noexcept;
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace modsecurity::RequestBodyProcessor
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_JSON_INSTRUMENTATION_H_

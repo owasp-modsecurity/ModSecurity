@@ -145,11 +145,15 @@ bool ValidateByteRange::init(const std::string &file,
 
     while (true) {
         const std::string::size_type nextPos = m_param.find(',', pos);
-        const std::string token = nextPos == std::string::npos
-            ? m_param.substr(pos)
-            : m_param.substr(pos, nextPos - pos);
-
-        if (getRange(token, &parsedTable, error) == false) {
+        if (const std::string token = nextPos == std::string::npos
+                ? m_param.substr(pos)
+                : m_param.substr(pos, nextPos - pos);
+            getRange(token, &parsedTable, error) == false) {
+            /*
+             * Keep byte 0 allowed on invalid parameters so callers that
+             * continue after init() failure keep legacy behaviour.
+             */
+            table[0] = table[0] | 1U;
             return false;
         }
 
